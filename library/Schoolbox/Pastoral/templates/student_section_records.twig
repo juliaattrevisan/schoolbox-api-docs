@@ -36,7 +36,7 @@
                                     <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': studentId, 'recordId': recordId}) }}">
                                         <h3>{{ record.heading }}
                                             {% if config.pastoral_severity == true and record.severity and record.severity.color %}
-                                                <span class="circle" style="background-color:{{ record.severity.color }}" title="{{ record.severity.name }}"></span>
+                                                <span class="circle" style="margin-right: .5rem;background-color:{{ record.severity.color }}" title="{{ record.severity.name }}"></span>
                                             {% endif %}
                                             {% if record.expiresAt is not null %}
                                                 <sbx-icon name="archive" size="1rem" title="Record archived - {{ record.expiresAt | date('M d, Y') }}"></sbx-icon>
