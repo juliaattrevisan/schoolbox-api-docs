@@ -140,9 +140,9 @@ class Controller extends Base
                 }
                 if ($updateRelyingPartyGrant) {
                     // Set expiry and scopes
-                    $relyingPartyGrant->setScopes($requestedScopes);
                     $relyingPartyGrant = $relyingPartyGrant
-                        ->setExpiresAt(Alaress_Date_Format::now()->addMonths(3));
+                        ->setExpiresAt(Alaress_Date_Format::now()->modify(RelyingParty\Grant\Model::DEFAULT_EXPIRY))
+                        ->setScopes($requestedScopes);
                     $this->relyingPartyGrantMapper->save($relyingPartyGrant);
                 }
             }

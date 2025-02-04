@@ -30,6 +30,11 @@ class Model
     use DeletedAtDate;
 
     /**
+     * Default expiry time for a grant is 1 year.
+     */
+    public const DEFAULT_EXPIRY = '+1 year';
+
+    /**
      * The relying party to which the user granted access.
      */
     private RelyingParty $relyingParty;
