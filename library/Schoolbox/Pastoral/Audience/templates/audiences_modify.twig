@@ -22,26 +22,63 @@
     } %}
 
     <div class="admin-content">
-        <button id="apply-default-expiry" data-reveal-id="confirm-apply-default-expiry" class="button icon-calendar">Apply Default Expiry to all records</button>
-        <div data-reveal id="confirm-apply-default-expiry" class="reveal-modal">
+        <button id="apply-default-expiry" data-reveal-id="apply-default-expiry-modal" class="button icon-calendar">Apply Default Expiry to all records</button>
+        <div data-reveal id="apply-default-expiry-modal" class="reveal-modal">
             <h2>Please confirm</h2>
             <p>Are you sure you wish to apply the Default Expiry? This will overwrite and apply to all existing records of this type.</p>
             <a class="close-reveal-modal" aria-label="Close">&#215;</a>
             <ul class="flex-list">
-                <li><button class="button icon-approve submit">Yes</button></li>
-                <li><button class="button icon-close" id="close-apply-default-expiry">Cancel</button></li>
+                <li><button id="confirm-apply-default-expiry" class="button icon-approve submit">Yes</button></li>
+                <li><button id="cancel-apply-default-expiry" class="button icon-close">Cancel</button></li>
             </ul>
         </div>
         <script type="text/javascript">
         {% autoescape 'js' %}
-        $(function () {
             /**
-             * Close the modal
+             * Confirm to apply the default expiry
              */
-            $("#close-apply-default-expiry").on("click", () => {
-                $("#confirm-apply-default-expiry").foundation("reveal", "close");
+            const confirmButton = document.getElementById("confirm-apply-default-expiry");
+            confirmButton.addEventListener("click", () => {
+                // prevent multiple submissions
+                if (confirmButton.getAttribute("data-is-processing") === "true") {
+                    return;
+                }
+                confirmButton.setAttribute("data-is-processing", "true");
+                confirmButton.innerHTML = "Applying...";
+                /**
+                 * send through the apply default expiry request
+                 */
+                 /*
+                try {
+                    fetch("{{ action }}", {
+                        method: "POST",
+                        body: JSON.stringify({
+                            typeId: {{ type.id }},
+                            subtypeId: {{ subtype.id }}
+                        })
+                    }).then((response) => {
+                        if (response.ok) {
+                            $("#apply-default-expiry-modal").foundation("reveal", "close");
+                            // fire toast success
+                        } else {
+                            // fire toast error
+                        }
+                        confirmButton.setAttribute("data-is-processing", "false");
+                        confirmButton.innerHTML = "Yes";
+                    });
+                } catch (e) {
+                    // fire toast error
+                    confirmButton.setAttribute("data-is-processing", "false");
+                    confirmButton.innerHTML = "Yes";
+                }
+                */
             });
-        });
+            /**
+             * Close the confirm default expiry modal
+             */
+            document.getElementById("cancel-apply-default-expiry").addEventListener("click", () => {
+                $("#apply-default-expiry-modal").foundation("reveal", "close");
+            });
         {% endautoescape %}
     </script>
         <div class="small-12 island" id="formPastoral">
