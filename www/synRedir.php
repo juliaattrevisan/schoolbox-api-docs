@@ -101,6 +101,11 @@ if ($_SESSION['communityLogin'] ?? false) {
     $formArray['textBox1'] = $user->getUsername();
     $formArray['textBox2'] = $password;
 
+    // validate required fields (whilst ignoring CSRF fields):
+    if (empty($loginUsername) || empty($loginPassword) || empty($loginButton)) {
+        throw new SchoolboxException("Community Portal Login unavailable. Please try again later");
+    }
+
     $_SESSION['communityLogin'] = true;
 }
 ?>
