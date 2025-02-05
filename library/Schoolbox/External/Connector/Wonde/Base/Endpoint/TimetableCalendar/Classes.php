@@ -13,6 +13,7 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
+use Schoolbox\External\Connector\ClassCode;
 use Schoolbox\External\Connector\Wonde\Base\Endpoint\Factory;
 use Schoolbox\External\Connector\Wonde\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Wonde\Base\Endpoint\Lookup\IdToMisId;
@@ -255,7 +256,7 @@ class Classes implements IStrategy
          *
          * Every other school should presume usage of $class['code']
          */
-        $class['code'] = $class['code'] ?? $class['mis_id'];
+        $class['code'] = (new ClassCode($this->log))->generate($class['code'] ?? $class['mis_id']);
 
         foreach ($class['lessons']['data'] as $lesson) {
             /* Decide if we need to process this lesson
