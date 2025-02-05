@@ -133,50 +133,6 @@ class Classes implements IStrategy
 
 
     /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $log;
-
-
-    /**
-     * The "perform" flag from the cli tool
-     *
-     * @var bool
-     */
-    private bool $perform;
-
-
-    /**
-     * @var IApi
-     */
-    private IApi $api;
-
-
-    /**
-     * @var \Schoolbox\External\Event\Mapper
-     */
-    private \Schoolbox\External\Event\Mapper $eventMapper;
-
-
-    /**
-     * @var \Schoolbox\External\Event\Overrides\Mapper
-     */
-    private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper;
-
-
-    /**
-     * @var ClassEntryMapper
-     */
-    private ClassEntryMapper $classEntryMapper;
-
-
-    /**
-     * @var ClassInvolvementMapper
-     */
-    private ClassInvolvementMapper $classInvolvementMapper;
-
-
-    /**
      * @var string
      */
     private string $lBound;
@@ -218,24 +174,16 @@ class Classes implements IStrategy
      * @param string                                     $toDate
      */
     public function __construct(
-        LoggerInterface $log,
-        bool $perform,
-        IApi $api,
-        \Schoolbox\External\Event\Mapper $eventMapper,
-        \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
-        ClassEntryMapper $classEntryMapper,
-        ClassInvolvementMapper $classInvolvementMapper,
-        string $fromDate,
-        string $toDate
+        private LoggerInterface $log,
+        private bool $perform,
+        private IApi $api,
+        private \Schoolbox\External\Event\Mapper $eventMapper,
+        private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
+        private ClassEntryMapper $classEntryMapper,
+        private ClassInvolvementMapper $classInvolvementMapper,
+        private string $fromDate,
+        private string $toDate
     ) {
-        $this->log = $log;
-        $this->perform = $perform;
-        $this->api = $api;
-        $this->eventMapper = $eventMapper;
-        $this->overridesMapper = $overridesMapper;
-        $this->classEntryMapper = $classEntryMapper;
-        $this->classInvolvementMapper = $classInvolvementMapper;
-
         /* Data is obtained daily; remember lower and upper bound values
          * for api calls. It needs to be in a specific format so might
          * as well remember that
