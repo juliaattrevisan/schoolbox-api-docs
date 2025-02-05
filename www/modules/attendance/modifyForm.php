@@ -15,6 +15,10 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 
 $externalClass = new External_Synergetic_Class();
 
+if (null === $externalClass->getDatabase()) {
+    error(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
+}
+
 /* This is a POST only page
  * the 3 params are required and we should go back if they are not.
  * $_POST['classCode'], $_POST['fileType'], $_POST['timetableGroup']

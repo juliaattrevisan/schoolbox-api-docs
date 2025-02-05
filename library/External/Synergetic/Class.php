@@ -322,7 +322,7 @@ class External_Synergetic_Class implements External_ClassInterface
     /**
      * @return IConnector
      */
-    protected function getDatabase()
+    public function getDatabase()
     {
         return $this->database;
     }
