@@ -334,7 +334,8 @@ class SubmissionBoxMapper extends BaseMapper
         $query = "
 			SELECT
 				{$this->getColumnString('sb')},
-				{$marktype_mapper->getColumnString('mt')}
+				{$marktype_mapper->getColumnString('mt')},
+				{$marktype_mapper->getColumnString('imt')}
 			FROM {$this->getTable()} sb
 			LEFT JOIN {$this->getJoinSql('mark_type', 'sb', 'mt')}
             LEFT JOIN {$this->getJoinSql('instructor_mark_type', 'sb', 'imt')}
