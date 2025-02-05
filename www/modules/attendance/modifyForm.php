@@ -15,6 +15,21 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 
 $externalClass = new External_Synergetic_Class();
 
+/* getDatabase() promoted to `public` because we need to inspect whether
+ * External_Synergetic_Class spawned with a NullConnector instance; that
+ * happens when misconfigured or network timeouts etc.
+ *
+ * At this point External_Synergetic_Class diverges from the interface anyway,
+ * since it implements getClass() etc which aren't formally part of the interface;
+ * only Synergetic supports it, so we kinda have to treat it specially
+ *
+ * You could move this check into the External_Synergetic_Class to shortcut an
+ * error detection but that's a secondary evolution for the time being
+ */
+if (null === $externalClass->getDatabase()) {
+    error(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
+}
+
 /* This is a POST only page
  * the 3 params are required and we should go back if they are not.
  * $_POST['classCode'], $_POST['fileType'], $_POST['timetableGroup']
