@@ -86,6 +86,11 @@ if ($_SESSION['communityLogin'] ?? false) {
     preg_match('/name="(.*?)" type="text"/', $login, $loginUsername);
     preg_match('/name="(.*?)" type="password"/', $login, $loginPassword);
 
+    // validate required fields (whilst ignoring CSRF fields):
+    if (empty($loginUsername) || empty($loginPassword) || empty($loginButton)) {
+        throw new SchoolboxException("Community Portal Login unavailable. Please try again later");
+    }
+
     $password = $_SESSION['password'];
     $formArray['__VIEWSTATE'] = $viewState[1];
     $formArray['__EVENTVALIDATION'] = $eventValidation[1];
@@ -100,11 +105,6 @@ if ($_SESSION['communityLogin'] ?? false) {
     $formArray['loginButton'] = 'Login';
     $formArray['textBox1'] = $user->getUsername();
     $formArray['textBox2'] = $password;
-
-    // validate required fields (whilst ignoring CSRF fields):
-    if (empty($loginUsername) || empty($loginPassword) || empty($loginButton)) {
-        throw new SchoolboxException("Community Portal Login unavailable. Please try again later");
-    }
 
     $_SESSION['communityLogin'] = true;
 }
