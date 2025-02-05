@@ -524,6 +524,11 @@ class Tracer
         ?float $endTimestamp = null,
         ?SpanStatus $status = null,
     ): void {
+        // No hub somehow? Do nothing
+        if (!$this->hub) {
+            return;
+        }
+
         if ($this->transactionContext instanceof TransactionContext) {
             /** @var array<Span> $spanStack */
             $spanStack   = [];
