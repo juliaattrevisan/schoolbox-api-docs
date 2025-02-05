@@ -15,13 +15,26 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 
 $externalClass = new External_Synergetic_Class();
 
+/* This is a POST only page
+ * the 3 params are required and we should go back if they are not.
+ * $_POST['classCode'], $_POST['fileType'], $_POST['timetableGroup']
+ *
+ * we need to throw an error to inform the user of an issue, rather than redirect and them assume it succeeded
+ *
+ * There are other POST params but some of those have their own validation
+ */
+if (!isset($_POST['classCode'], $_POST['fileType'], $_POST['timetableGroup'])) {
+    error(ErrorMapper::ERROR_INFORMATION_MISSING);
+}
+
 $class = $externalClass->getClass($_POST['classCode'], $_SESSION['user'], null, null, $_POST['fileType']);
 
 if (!$class) {
     error(ErrorMapper::ERROR_CLASS_CODE_NOT_FOUND);
 }
 
-if (!strlen($_POST['attendanceDate'])) {
+// harden the check for $_POST['attendanceDate']
+if (!isset($_POST['attendanceDate']) || !strlen($_POST['attendanceDate'])) {
     error(ErrorMapper::ERROR_PERIOD_NUMBER_INVALID);
 }
 
