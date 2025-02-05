@@ -19,12 +19,12 @@ $externalClass = new External_Synergetic_Class();
  * the 3 params are required and we should go back if they are not.
  * $_POST['classCode'], $_POST['fileType'], $_POST['timetableGroup']
  *
+ * we need to throw an error to inform the user of an issue, rather than redirect and them assume it succeeded
+ *
  * There are other POST params but some of those have their own validation
- * if accessed via GET dump the user back on the dashboard
- * they have a brand new session as they may have been redirected through a sso login attempt
  */
 if (!isset($_POST['classCode'], $_POST['fileType'], $_POST['timetableGroup'])) {
-    SitePage::localRedir('/');
+    error(ErrorMapper::ERROR_INFORMATION_MISSING);
 }
 
 $class = $externalClass->getClass($_POST['classCode'], $_SESSION['user'], null, null, $_POST['fileType']);
