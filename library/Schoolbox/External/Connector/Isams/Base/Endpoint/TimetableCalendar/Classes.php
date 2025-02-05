@@ -13,6 +13,7 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
+use Schoolbox\External\Connector\ClassCode;
 use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Event\Model;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
@@ -221,7 +222,7 @@ class Classes implements IStrategy
     ): \Schoolbox\External\Event\Model {
         /* Fill in these vars as usual
          */
-        $classCode = trim((string)$classData['code']);
+        $classCode = (new ClassCode($this->log))->generate(trim((string)$classData['code']));
 
         /* This seems to always be an int, so prefix it wtih a hardcoded "Day"
          */
