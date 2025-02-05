@@ -13,6 +13,7 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
+use Schoolbox\External\Connector\ClassCode;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\Lookup;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
@@ -561,7 +562,8 @@ class Classes implements IStrategy
         /* Truncate it to our schema's length, because somehow schools are making
          * very long class codes somehow
          */
-        $classCode = $this->generateClassCode(trim((string)$activity['importIdentifier']));
+        $compassClassCode = $this->generateClassCode(trim((string)$activity['importIdentifier']));
+        $classCode = (new ClassCode($this->log))->generate($compassClassCode);
 
         /* Fill in these vars as usual
          */
