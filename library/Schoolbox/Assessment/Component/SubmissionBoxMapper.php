@@ -337,7 +337,7 @@ class SubmissionBoxMapper extends BaseMapper
 				{$marktype_mapper->getColumnString('mt')}
 			FROM {$this->getTable()} sb
 			LEFT JOIN {$this->getJoinSql('mark_type', 'sb', 'mt')}
-            LEFT JOIN {$this->getJoinSql('instructor_mark_type', 'sb', 'tmt')}
+            LEFT JOIN {$this->getJoinSql('instructor_mark_type', 'sb', 'imt')}
 			WHERE sb.id=?
 		";
         $statement = $this->database->prepare($query);
@@ -349,7 +349,7 @@ class SubmissionBoxMapper extends BaseMapper
             if (!($submission_box instanceof SubmissionBox)) {
                 $submission_box = $this->hydrate($row, 'sb');
                 $submission_box->setMarkType($marktype_mapper->hydrate($row, 'mt'));
-                $submission_box->setInstructorMarkType($marktype_mapper->hydrate($row, 'tmt'));
+                $submission_box->setInstructorMarkType($marktype_mapper->hydrate($row, 'imt'));
                 try {
                     $submission_box->setAssessmentModel($this->getJoinMapper('assessmentModel')->findById($row['sb.assessment_id'])); // I despise the necessity of this
                 } catch (Schoolbox\Mapper\Exception\Deleted $e) {

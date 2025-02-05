@@ -495,7 +495,7 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('duework', 'd')},
                 {$this->getJoinColumnString('work_type', 'wt')},
                 {$this->getJoinColumnString('duework.mark_type', 'mt')},
-                {$this->getJoinColumnString('duework.instructor_mark_type', 'tmt')},
+                {$this->getJoinColumnString('duework.instructor_mark_type', 'imt')},
                 {$this->getJoinColumnString('duework.rubric_capability_mark_type_id', 'rmt')},
                 {$this->getJoinColumnString('duework.rubric_capability_grade_group_id', 'rcgg')},
                 {$this->getJoinColumnString('duework.worksheetTemplate', 'dueworkWorksheetTemplate')},
@@ -528,7 +528,7 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('lessonPlan', '', 'lessonPlan', true)}
             LEFT JOIN {$this->getJoinSql('work_type', '', 'wt')}
             LEFT JOIN {$this->getJoinSql('duework.mark_type', 'd', 'mt')}
-            LEFT JOIN {$this->getJoinSql('duework.instructor_mark_type', 'd', 'tmt')}
+            LEFT JOIN {$this->getJoinSql('duework.instructor_mark_type', 'd', 'imt')}
             LEFT JOIN {$this->getJoinSql('duework.rubric_capability_mark_type_id', 'd', 'rmt')}
             LEFT JOIN {$this->getJoinSql('duework.rubric_capability_grade_group_id', 'd', 'rcgg', true)}
             LEFT JOIN {$this->getJoinSql('quiz', '', 'q', true)}
@@ -809,7 +809,7 @@ class Mapper extends BaseMapper
                 $model->setDueWork(
                     $this->hydrateJoin($row, 'duework', 'd')
                         ->setMarkType($this->hydrateJoin($row, 'duework.mark_type', 'mt'))
-                        ->setInstructorMarkType($this->hydrateJoin($row, 'duework.instructor_mark_type', 'tmt'))
+                        ->setInstructorMarkType($this->hydrateJoin($row, 'duework.instructor_mark_type', 'imt'))
                         ->setCapabilityMarkType($this->hydrateJoin($row, 'duework.rubric_capability_mark_type_id', 'rmt'))
                         ->setCapabilityGradeGroup($this->hydrateJoin($row, 'duework.rubric_capability_grade_group_id', 'rcgg'))
                         ->setWorksheetTemplate(
