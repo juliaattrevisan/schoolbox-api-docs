@@ -919,7 +919,9 @@ HELP;
                         'dueDate' => self::ASSESSMENT_SEM2_DATE_DUE,
                         'closeDate' => self::ASSESSMENT_SEM2_DATE_CLOSE,
                         'markType' => (string)MarkType::TYPE_LETTER,
+                        'instructor-markType' => (string)MarkType::TYPE_LETTER,
                         'gradingScheme' => $gradingScheme,
+                        'instructor-gradingScheme' => $gradingScheme,
                         'visibility' => SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT,
                         /* Get past rubric foreign key shenanigans
                          */
