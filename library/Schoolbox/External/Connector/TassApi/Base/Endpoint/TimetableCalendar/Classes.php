@@ -13,6 +13,7 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
+use Schoolbox\External\Connector\ClassCode;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\Code;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\DSN;
@@ -624,7 +625,12 @@ class Classes implements IStrategy
                     $detail = '';
                     $day = "Day {$dayNumber}";
                     $room = trim((string)$subject['ROOM_CODE']);
-                    $classCode = (new Code())->encode($yearGroup, (string)$subject['SUB_CODE'], (string)$subject['CLASS']);
+
+                    /* Ensure these concatted class codes are less than the maximum allowed
+                     */
+                    $tassClassCode = (new Code())->encode($yearGroup, (string)$subject['SUB_CODE'], (string)$subject['CLASS']);
+                    $classCode = (new ClassCode($this->log))->generate($tassClassCode);
+
                     $period = trim((string)$periodData['PRD_DESC']);
                     $type = '';
 
