@@ -332,6 +332,7 @@ class Bulk_Folder
         if (!empty($folderSequence)) {
             if (!ctype_digit($folderSequence)) {
                 $warnings[] = "Sequence value '$folderSequence' is not an integer";
+                $folderSequence = '';
             }
             $newFolder->setSequence((int)$folderSequence);
         }
