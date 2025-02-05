@@ -86,8 +86,10 @@ class Tracer
 
     /**
      * The Sentry hub to which this tracer reports.
+     *
+     * Will be null if it hasn't been set up yet, for whatever reason.
      */
-    private HubInterface $hub;
+    private ?HubInterface $hub = null;
 
     /**
      * The current transaction context, if there is one.
