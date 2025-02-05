@@ -178,7 +178,6 @@ class ClassResults
      *
      * @param User $viewee
      * @param array $workTypeWhitelist A set of worktype ids that you want to include on the boxplot.
-     *                                 Leaving it empty means "include everything" (default usage)
      * @return array
      * @throws \JsonException
      */
@@ -250,7 +249,7 @@ class ClassResults
         foreach ($this->assessments as $assessment) {
             /* Not in the worktypes whitelist: skip it
              */
-            if (\count($workTypeWhitelist) && !in_array($assessment->getWorkType()->getId(), $workTypeWhitelist, true)) {
+            if (!in_array($assessment->getWorkType()->getId(), $workTypeWhitelist, true)) {
                 continue;
             }
 
