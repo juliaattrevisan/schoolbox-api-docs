@@ -328,9 +328,12 @@ class Bulk_Folder
         }
 
         // Folder Sequence
-        $folderSequence = $sequenceColumnIndex >= 0 ? (int)trim($row[$sequenceColumnIndex]) : '';
+        $folderSequence = $sequenceColumnIndex >= 0 ? trim($row[$sequenceColumnIndex] ?? ''): '';
         if (!empty($folderSequence)) {
-            $newFolder->setSequence($folderSequence);
+            if (!ctype_digit($folderSequence)) {
+                $warnings[] = "Sequence value '$folderSequence' is not an integer";
+            }
+            $newFolder->setSequence((int)$folderSequence);
         }
 
         // Persist models to DB.
