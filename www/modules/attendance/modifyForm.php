@@ -15,6 +15,14 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 
 $externalClass = new External_Synergetic_Class();
 
+/* This is a POST only page
+ * if accessed via GET dump the user back on the dashboard
+ * they have a brand new session as they may have been redirected through a sso login attempt
+ */
+if ("POST" !== $_SERVER['REQUEST_METHOD']) {
+    SitePage::localRedir('/');
+}
+
 $class = $externalClass->getClass($_POST['classCode'], $_SESSION['user'], null, null, $_POST['fileType']);
 
 if (!$class) {
