@@ -179,6 +179,18 @@ class HmacTest extends TestCase
                 ),
                 false
             ],
+            'SQL Test 7 - null params not encoded at all' => [
+                "SELECT * FROM luYearLevel",
+                null,
+                hash_hmac(
+                    Proxy::PAPERLY_PROXY_HMAC_ALGO,
+                    json_encode([
+                        'sql' => "SELECT * FROM luYearLevel",
+                    ]),
+                    self::MOCK_SECRET
+                ),
+                false
+            ],
         ];
     }
 
