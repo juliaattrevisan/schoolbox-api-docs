@@ -181,8 +181,8 @@ class Classes implements IStrategy
         private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
         private ClassEntryMapper $classEntryMapper,
         private ClassInvolvementMapper $classInvolvementMapper,
-        private string $fromDate,
-        private string $toDate
+        string $fromDate,
+        string $toDate
     ) {
         /* Data is obtained daily; remember lower and upper bound values
          * for api calls. It needs to be in a specific format so might
