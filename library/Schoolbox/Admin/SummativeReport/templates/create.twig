@@ -423,6 +423,7 @@
                                         <th>Grade</th>
                                         <th>Comment</th>
                                         <th>Rubric</th>
+                                        <th>Boxplot</th>
                                     </tr>
                                     {% for worktype in worktypesSummary %}
                                     <tr data-summary-worktype-id="{{ worktype.id }}">
@@ -446,6 +447,11 @@
                                             <input name="summary[workType][{{ worktype.id }}][rubrics]" type="hidden" value="0" />
                                             <input data-summary-worktype-option="{{ worktype.id }}" data-summary-worktype-rubrics="{{ worktype.id }}" id="report-summary-worktype-{{ worktype.id }}-rubrics" name="summary[workType][{{ worktype.id }}][rubrics]" type="checkbox" value="1" {% if worktype.rubrics ?? false %}checked="checked"{% endif %} {% if not worktype.show ?? false %} disabled="disabled" {% endif %}/>
                                             <label for="report-summary-worktype-{{ worktype.id }}-rubrics" class="checkbox-label"></label>
+                                        </td>
+                                        <td>
+                                            <input name="summary[workType][{{ worktype.id }}][boxplot]" type="hidden" value="0" />
+                                            <input data-summary-worktype-option="{{ worktype.id }}" data-summary-worktype-boxplot="{{ worktype.id }}" id="report-summary-worktype-{{ worktype.id }}-boxplot" name="summary[workType][{{ worktype.id }}][boxplot]" type="checkbox" value="1" {% if worktype.boxplot ?? false %}checked="checked"{% endif %} {% if not worktype.show ?? false %} disabled="disabled" {% endif %}/>
+                                            <label for="report-summary-worktype-{{ worktype.id }}-boxplot" class="checkbox-label"></label>
                                         </td>
                                     </tr>
                                     {% endfor %}
@@ -547,6 +553,7 @@
                                     <th>Grade</th>
                                     <th>Comment</th>
                                     <th>Rubric</th>
+                                    <th>Boxplot</th>
                                 </tr>
                                 {% for worktype in worktypesClass %}
                                     <tr data-class-worktype-id="{{ worktype.id }}">
@@ -570,6 +577,11 @@
                                             <input name="class[workType][{{ worktype.id }}][rubrics]" type="hidden" value="0" />
                                             <input data-class-worktype-option="{{ worktype.id }}" data-class-worktype-rubrics="{{ worktype.id }}" id="report-class-worktype-{{ worktype.id }}-rubrics" name="class[workType][{{ worktype.id }}][rubrics]" type="checkbox" value="1" {% if worktype.rubrics ?? false %}checked="checked"{% endif %} {% if not worktype.show ?? false %} disabled="disabled" {% endif %}/>
                                             <label for="report-class-worktype-{{ worktype.id }}-rubrics" class="checkbox-label"></label>
+                                        </td>
+                                        <td>
+                                            <input name="class[workType][{{ worktype.id }}][boxplot]" type="hidden" value="0" />
+                                            <input data-class-worktype-option="{{ worktype.id }}" data-class-worktype-boxplot="{{ worktype.id }}" id="report-class-worktype-{{ worktype.id }}-boxplot" name="class[workType][{{ worktype.id }}][boxplot]" type="checkbox" value="1" {% if worktype.boxplot ?? false %}checked="checked"{% endif %} {% if not worktype.show ?? false %} disabled="disabled" {% endif %}/>
+                                            <label for="report-class-worktype-{{ worktype.id }}-boxplot" class="checkbox-label"></label>
                                         </td>
                                     </tr>
                                 {% endfor %}
