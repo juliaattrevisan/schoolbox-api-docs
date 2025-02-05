@@ -108,7 +108,53 @@ class Profile implements IStrategy
         if ($this->validStrats->isStudentStratEnabled() || $this->validStrats->isFamiliesStratEnabled()) {
             $this->log->info('Processing students and their parents.');
 
-            $this->importStudents();
+//            $currentStudents = sprintf(
+//                'students?page=%s&per_page=%s&include=%s',
+//                1,
+//                self::NUM_PER_PAGE,
+//                implode(',', [
+//                    'contact_details',
+//                    'contacts',
+//                    'contacts.contact_details',
+//                    'education_details',
+//                    'extended_details',
+//                    'house',
+//                    'identifiers',
+//                    'medical_conditions',
+//                    'permissions',
+//                    'sen_needs',
+//                    'year',
+//                    'campus'
+//                ])
+//            );
+//
+//            $this->importStudents($currentStudents);
+
+            /* Optionally process future families
+             */
+            if ($this->api->getOptions()['futurefamilies'] ?? false) {
+                $futureFamilies = sprintf(
+                    'students-pre-admission?page=%s&per_page=%s&include=%s',
+                    1,
+                    self::NUM_PER_PAGE,
+                    implode(',', [
+                        'contact_details',
+                        'contacts',
+                        'contacts.contact_details',
+                        'education_details',
+                        'extended_details',
+                        'house',
+                        'identifiers',
+                        'medical_conditions',
+                        'permissions',
+                        'sen_needs',
+                        'year',
+                        'campus'
+                    ])
+                );
+
+                $this->importStudents($futureFamilies);
+            }
         }
 
         /* Import staff profile data
@@ -124,7 +170,7 @@ class Profile implements IStrategy
     /**
      * Import students' profile data
      */
-    private function importStudents(): void
+    private function importStudents(string $startUrl): void
     {
         /* Get a set of students that we need to process
          *
@@ -133,25 +179,7 @@ class Profile implements IStrategy
          * the forgot to do that for you - implode() to dodge around it.
          * Plus, it's easier to add more includes like this
          */
-        $nextUrl = sprintf(
-            'students?page=%s&per_page=%s&include=%s',
-            1,
-            self::NUM_PER_PAGE,
-            implode(',', [
-                'contact_details',
-                'contacts',
-                'contacts.contact_details',
-                'education_details',
-                'extended_details',
-                'house',
-                'identifiers',
-                'medical_conditions',
-                'permissions',
-                'sen_needs',
-                'year',
-                'campus'
-            ])
-        );
+        $nextUrl = $startUrl;
 
         for ($i = 0; ($nextUrl && $i < self::MAX_CALLS); $i++) {
             $students = $this->api->retrieve('GET', $nextUrl, []);
