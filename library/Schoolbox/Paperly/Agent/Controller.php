@@ -128,7 +128,7 @@ class Controller extends Base
 
         // Checking hash to make sure the sql request matches with hash
         $hash = $data['hash'] ?? null;
-        if (!isset($hash) || !$this->proxy->isValidRequest($hash, $sql, $this->secret)) {
+        if (!isset($hash) || !$this->proxy->isValidRequest($hash, $sql, $params, $this->secret)) {
             $this->sendJsonError('Access denied', Response::HTTP_UNAUTHORIZED);
             return;
         }
