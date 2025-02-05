@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\TimetableCalendar;
 
+use DebugBar\DebugBarException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
@@ -61,65 +62,6 @@ class Classes implements IStrategy
 
 
     /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $log;
-
-
-    /**
-     * The "perform" flag from the cli tool
-     *
-     * @var bool
-     */
-    private bool $perform;
-
-
-    /**
-     * @var array
-     */
-    private array $api;
-
-
-    /**
-     * @var Lookup
-     */
-    private Lookup $lookup;
-
-
-    /**
-     * This is the config setting for date_local
-     * It's used by the Nat Picker in the optional TASS Academic Periods area
-     *
-     * @var string
-     */
-    private string $dateLocalFormat;
-
-
-    /**
-     * @var \Schoolbox\External\Event\Mapper
-     */
-    private \Schoolbox\External\Event\Mapper $eventMapper;
-
-
-    /**
-     * @var ClassEntryMapper
-     */
-    private ClassEntryMapper $classEntryMapper;
-
-
-    /**
-     * @var ClassInvolvementMapper
-     */
-    private ClassInvolvementMapper $classInvolvementMapper;
-
-
-    /**
-     * @var \Schoolbox\External\Event\Overrides\Mapper
-     */
-    private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper;
-
-
-    /**
      * A list of timetable calendar entries, which is a list of days
      *
      * @var array
@@ -154,12 +96,6 @@ class Classes implements IStrategy
 
 
     /**
-     * @var array
-     */
-    private array $watchlist;
-
-
-    /**
      * A caching mechanism to prevent dupe CLEAR overrides actions
      *
      * $overridesEntries[$classCode][$room][$startDate][$finishDate] = true
@@ -171,6 +107,9 @@ class Classes implements IStrategy
 
     /**
      * Constructor
+     *
+     * dateLocalFormat: This is the config setting for date_local
+     * It's used by the Nat Picker in the optional TASS Academic Periods area
      *
      * @param LoggerInterface                            $log
      * @param bool                                       $perform
@@ -184,27 +123,17 @@ class Classes implements IStrategy
      * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
      */
     public function __construct(
-        LoggerInterface $log,
-        bool $perform,
-        array $api,
-        Lookup $lookup,
-        array $watchlist,
-        string $dateLocalFormat,
-        \Schoolbox\External\Event\Mapper $eventMapper,
-        ClassEntryMapper $classEntryMapper,
-        ClassInvolvementMapper $classInvolvementMapper,
-        \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
+        private LoggerInterface $log,
+        private bool $perform,
+        private array $api,
+        private Lookup $lookup,
+        private array $watchlist,
+        private string $dateLocalFormat,
+        private \Schoolbox\External\Event\Mapper $eventMapper,
+        private ClassEntryMapper $classEntryMapper,
+        private ClassInvolvementMapper $classInvolvementMapper,
+        private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
     ) {
-        $this->log = $log;
-        $this->perform = $perform;
-        $this->api = $api;
-        $this->lookup = $lookup;
-        $this->watchlist = $watchlist;
-        $this->dateLocalFormat = $dateLocalFormat;
-        $this->eventMapper = $eventMapper;
-        $this->classEntryMapper = $classEntryMapper;
-        $this->classInvolvementMapper = $classInvolvementMapper;
-        $this->overridesMapper = $overridesMapper;
     }
 
 
@@ -212,10 +141,8 @@ class Classes implements IStrategy
      * Import all timetables for everyone
      *
      * @return void
-     * @throws \InvalidArgumentException
-     * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
+     * @throws DebugBarException
+     * @throws Exception
      */
     public function import(): void
     {
@@ -228,10 +155,8 @@ class Classes implements IStrategy
      * Import all student timetables.
      *
      * @return void
+     * @throws DebugBarException
      * @throws Exception
-     * @throws \InvalidArgumentException
-     * @throws \PDOException
-     * @throws \UnexpectedValueException
      */
     private function importStudentTimetables(): void
     {
@@ -359,10 +284,8 @@ class Classes implements IStrategy
      * Import all student timetables.
      *
      * @return void
-     * @throws \InvalidArgumentException
-     * @throws \PDOException
+     * @throws DebugBarException
      * @throws Exception
-     * @throws \UnexpectedValueException
      */
     private function importStaffTimetables(): void
     {
@@ -504,14 +427,12 @@ class Classes implements IStrategy
      * Create individual SUDS Timetable events out of each element
      * inside this person's $timetable
      *
-     * @param int   $roleType
+     * @param int $roleType
      * @param array $person
      * @param array $timetable
      * @return void
      * @throws Exception
-     * @throws \InvalidArgumentException
-     * @throws \PDOException
-     * @throws \UnexpectedValueException
+     * @throws DebugBarException
      */
     private function process(int $roleType, array $person, array $timetable): void
     {
