@@ -1200,7 +1200,7 @@ class Controller extends ConfigController
      * Generate standard cohort graph similar to the grades page
      *
      * @param Collection $assessments
-     * @param Model $folder
+     * @param \Schoolbox\Resource\Folder\Model $folder
      * @param Markbook $filteredMarkbook
      * @param bool $lmsCohortComparison
      * @param bool $gradientEnable
