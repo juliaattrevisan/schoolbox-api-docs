@@ -16,10 +16,14 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 $externalClass = new External_Synergetic_Class();
 
 /* This is a POST only page
+ * the 3 params are required and we should go back if they are not.
+ * $_POST['classCode'], $_POST['fileType'], $_POST['timetableGroup']
+ *
+ * There are other POST params but some of those have their own validation
  * if accessed via GET dump the user back on the dashboard
  * they have a brand new session as they may have been redirected through a sso login attempt
  */
-if ("POST" !== $_SERVER['REQUEST_METHOD']) {
+if (!isset($_POST['classCode'], $_POST['fileType'], $_POST['timetableGroup'])) {
     SitePage::localRedir('/');
 }
 
@@ -29,7 +33,8 @@ if (!$class) {
     error(ErrorMapper::ERROR_CLASS_CODE_NOT_FOUND);
 }
 
-if (!strlen($_POST['attendanceDate'])) {
+// harden the check for $_POST['attendanceDate']
+if (!isset($_POST['attendanceDate']) || !strlen($_POST['attendanceDate'])) {
     error(ErrorMapper::ERROR_PERIOD_NUMBER_INVALID);
 }
 
