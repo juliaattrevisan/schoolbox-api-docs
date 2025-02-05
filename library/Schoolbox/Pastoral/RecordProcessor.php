@@ -247,16 +247,23 @@ class RecordProcessor
                         $record->setOccurredOn($occurredOn);
                     } catch (\Exception $e) {
                         $locale = new \Alaress_Date_Locale_Config();
-                        throw new SchoolboxException("occurredOn must be in the format of {$locale->localShortFormat()}");
+                        throw new SchoolboxException("Occurred On must be in the format of {$locale->localShortFormat()}");
                     }
                 }
             }
 
-            $expiresAt = $post->get('expiresAt');
-            if (empty($expiresAt)) {
-                $expiresAt = null;
-            } else {
-                $record->setExpiresAt(\Alaress_Date_Format::newLocalShort($expiresAt)->startOfDay());
+            if ($post->offsetExists('expiresAt')) {
+                if ((string)$post->get('expiresAt') === '') {
+                    $record->setExpiresAt(null);
+                } else {
+                    try {
+                        $expiresAt = \Alaress_Date_Format::newLocalShort($post->get('expiresAt'))->startOfDay();
+                        $record->setExpiresAt($expiresAt);
+                    } catch (\Exception $e) {
+                        $locale = new \Alaress_Date_Locale_Config();
+                        throw new SchoolboxException("Expires At must be in the format of {$locale->localShortFormat()}");
+                    }
+                }
             }
 
             if ($post->get('points')) {
