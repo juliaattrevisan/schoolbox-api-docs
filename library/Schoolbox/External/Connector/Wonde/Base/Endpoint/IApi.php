@@ -32,4 +32,12 @@ interface IApi
      * @return ApiUsage
      */
     public function getUsage(): ApiUsage;
+
+
+    /**
+     * Optional settings in the wonde connector.
+     *
+     * @return array
+     */
+    public function getOptions(): array;
 }
