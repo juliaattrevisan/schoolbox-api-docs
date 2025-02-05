@@ -329,11 +329,11 @@ class Bulk_Folder
 
         // Folder Sequence
         $folderSequence = $sequenceColumnIndex >= 0 ? trim($row[$sequenceColumnIndex] ?? '') : '';
+        if (!empty($folderSequence) && !ctype_digit($folderSequence)) {
+            $warnings[] = "Sequence value '$folderSequence' is not an integer";
+            $folderSequence = '';
+        }
         if (!empty($folderSequence)) {
-            if (!ctype_digit($folderSequence)) {
-                $warnings[] = "Sequence value '$folderSequence' is not an integer";
-                $folderSequence = '';
-            }
             $newFolder->setSequence((int)$folderSequence);
         }
 
