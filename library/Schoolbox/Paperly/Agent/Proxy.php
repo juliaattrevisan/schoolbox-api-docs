@@ -120,10 +120,13 @@ class Proxy
      */
     public function isValidRequest(string $hash, string $sql, ?array $params, string $secret): bool
     {
-        return hash_hmac(
-            self::PAPERLY_PROXY_HMAC_ALGO,
-            json_encode(['sql' => $sql, 'params' => $params]),
-            $secret
-        ) === $hash;
+        return hash_equals(
+            hash_hmac(
+                self::PAPERLY_PROXY_HMAC_ALGO,
+                json_encode(['sql' => $sql, 'params' => $params]),
+                $secret
+            ),
+            $hash
+        );
     }
 }
