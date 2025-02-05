@@ -77,7 +77,7 @@ $column-gutter: rem-calc(32);
 
 // Media Query Ranges
 $small-breakpoint: 40em !default; //640px
-$medium-breakpoint: 64em !default; // 1024px
+$medium-breakpoint: 59.375em !default; // 950px
 $large-breakpoint: 90em !default; // 1440px
 $xlarge-breakpoint: 120em !default; // 1920px
 
@@ -86,8 +86,8 @@ $sidenav-breakpoint: 64em !default; //  1024 used to let the chrome change to "l
 
 // Here we define the lower and upper bounds for each media size
 $small-range: (0, $small-breakpoint) !default; /* 0, 640px */
-$medium-range: ($small-breakpoint + 0.0625em, $medium-breakpoint) !default; /*  641px,  1024px */
-$large-range: ($medium-breakpoint + 0.0625em, $large-breakpoint) !default; /*  1025px, 1440px */
+$medium-range: ($small-breakpoint + 0.0625em, $medium-breakpoint) !default; /*  641px,  950px */
+$large-range: ($medium-breakpoint + 0.0625em, $large-breakpoint) !default; /*  951px, 1440px */
 $xlarge-range: ($large-breakpoint + 0.0625em, $xlarge-breakpoint) !default; /* 1441px, 1920px */
 $xxlarge-range: ($xlarge-breakpoint + 0.0625em, 99999999em) !default; /* 1921px, ...    */
 
