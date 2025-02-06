@@ -97,7 +97,7 @@
     "@ckeditor/ckeditor5-inspector": "~4.1.0",
     "@happy-dom/jest-environment": "~17.0.0",
     "@pinia/testing": "~0.1.7",
-    "@playwright/test": "~1.43.1",
+    "@playwright/test": "~1.50.1",
     "@storybook/addon-a11y": "~8.5.3",
     "@storybook/addon-actions": "~8.5.3",
     "@storybook/addon-designs": "~8.1.0",

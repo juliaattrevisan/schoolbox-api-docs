@@ -94,7 +94,7 @@
         "ts-ebml": "~3.0.1",
         "v-tables-3-select-rows": "~0.4.9",
         "videojs-record": "~4.8.0",
-        "vue": "^3.5.13",
+        "vue": "~3.5.13",
         "vuejs-paginate-next": "~1.0.2"
       },
       "devDependencies": {
@@ -102,7 +102,7 @@
         "@ckeditor/ckeditor5-inspector": "~4.1.0",
         "@happy-dom/jest-environment": "~17.0.0",
         "@pinia/testing": "~0.1.7",
-        "@playwright/test": "~1.43.1",
+        "@playwright/test": "^1.50.1",
         "@storybook/addon-a11y": "~8.5.3",
         "@storybook/addon-actions": "~8.5.3",
         "@storybook/addon-designs": "~8.1.0",
@@ -6436,18 +6436,18 @@
       }
     },
     "node_modules/@playwright/test": {
-      "version": "1.43.1",
-      "resolved": "https://registry.npmjs.org/@playwright/test/-/test-1.43.1.tgz",
-      "integrity": "sha512-HgtQzFgNEEo4TE22K/X7sYTYNqEMMTZmFS8kTq6m8hXj+m1D8TgwgIbumHddJa9h4yl4GkKb8/bgAl2+g7eDgA==",
+      "version": "1.50.1",
+      "resolved": "https://registry.npmjs.org/@playwright/test/-/test-1.50.1.tgz",
+      "integrity": "sha512-Jii3aBg+CEDpgnuDxEp/h7BimHcUTDlpEtce89xEumlJ5ef2hqepZ+PWp1DDpYC/VO9fmWVI1IlEaoI5fK9FXQ==",
       "dev": true,
       "dependencies": {
-        "playwright": "1.43.1"
+        "playwright": "1.50.1"
       },
       "bin": {
         "playwright": "cli.js"
       },
       "engines": {
-        "node": ">=16"
+        "node": ">=18"
       }
     },
     "node_modules/@protobufjs/aspromise": {
@@ -22509,33 +22509,33 @@
       "integrity": "sha512-qAXFCIPz8Kd1b7RXuxsMNoZgLq+NR/fzJBFWpyUYARzh/ORG1xMG6suRLOFg/DkJXtS+pvsjawMfwq1htVBpUg=="
     },
     "node_modules/playwright": {
-      "version": "1.43.1",
-      "resolved": "https://registry.npmjs.org/playwright/-/playwright-1.43.1.tgz",
-      "integrity": "sha512-V7SoH0ai2kNt1Md9E3Gwas5B9m8KR2GVvwZnAI6Pg0m3sh7UvgiYhRrhsziCmqMJNouPckiOhk8T+9bSAK0VIA==",
+      "version": "1.50.1",
+      "resolved": "https://registry.npmjs.org/playwright/-/playwright-1.50.1.tgz",
+      "integrity": "sha512-G8rwsOQJ63XG6BbKj2w5rHeavFjy5zynBA9zsJMMtBoe/Uf757oG12NXz6e6OirF7RCrTVAKFXbLmn1RbL7Qaw==",
       "dev": true,
       "dependencies": {
-        "playwright-core": "1.43.1"
+        "playwright-core": "1.50.1"
       },
       "bin": {
         "playwright": "cli.js"
       },
       "engines": {
-        "node": ">=16"
+        "node": ">=18"
       },
       "optionalDependencies": {
         "fsevents": "2.3.2"
       }
     },
     "node_modules/playwright-core": {
-      "version": "1.43.1",
-      "resolved": "https://registry.npmjs.org/playwright-core/-/playwright-core-1.43.1.tgz",
-      "integrity": "sha512-EI36Mto2Vrx6VF7rm708qSnesVQKbxEWvPrfA1IPY6HgczBplDx7ENtx+K2n4kJ41sLLkuGfmb0ZLSSXlDhqPg==",
+      "version": "1.50.1",
+      "resolved": "https://registry.npmjs.org/playwright-core/-/playwright-core-1.50.1.tgz",
+      "integrity": "sha512-ra9fsNWayuYumt+NiM069M6OkcRb1FZSK8bgi66AtpFoWkg2+y0bJSNmkFrWhMbEBbVKC/EruAHH3g0zmtwGmQ==",
       "dev": true,
       "bin": {
         "playwright-core": "cli.js"
       },
       "engines": {
-        "node": ">=16"
+        "node": ">=18"
       }
     },
     "node_modules/pofile": {
@@ -33116,12 +33116,12 @@
       }
     },
     "@playwright/test": {
-      "version": "1.43.1",
-      "resolved": "https://registry.npmjs.org/@playwright/test/-/test-1.43.1.tgz",
-      "integrity": "sha512-HgtQzFgNEEo4TE22K/X7sYTYNqEMMTZmFS8kTq6m8hXj+m1D8TgwgIbumHddJa9h4yl4GkKb8/bgAl2+g7eDgA==",
+      "version": "1.50.1",
+      "resolved": "https://registry.npmjs.org/@playwright/test/-/test-1.50.1.tgz",
+      "integrity": "sha512-Jii3aBg+CEDpgnuDxEp/h7BimHcUTDlpEtce89xEumlJ5ef2hqepZ+PWp1DDpYC/VO9fmWVI1IlEaoI5fK9FXQ==",
       "dev": true,
       "requires": {
-        "playwright": "1.43.1"
+        "playwright": "1.50.1"
       }
     },
     "@protobufjs/aspromise": {
@@ -45011,19 +45011,19 @@
       "integrity": "sha512-qAXFCIPz8Kd1b7RXuxsMNoZgLq+NR/fzJBFWpyUYARzh/ORG1xMG6suRLOFg/DkJXtS+pvsjawMfwq1htVBpUg=="
     },
     "playwright": {
-      "version": "1.43.1",
-      "resolved": "https://registry.npmjs.org/playwright/-/playwright-1.43.1.tgz",
-      "integrity": "sha512-V7SoH0ai2kNt1Md9E3Gwas5B9m8KR2GVvwZnAI6Pg0m3sh7UvgiYhRrhsziCmqMJNouPckiOhk8T+9bSAK0VIA==",
+      "version": "1.50.1",
+      "resolved": "https://registry.npmjs.org/playwright/-/playwright-1.50.1.tgz",
+      "integrity": "sha512-G8rwsOQJ63XG6BbKj2w5rHeavFjy5zynBA9zsJMMtBoe/Uf757oG12NXz6e6OirF7RCrTVAKFXbLmn1RbL7Qaw==",
       "dev": true,
       "requires": {
         "fsevents": "2.3.2",
-        "playwright-core": "1.43.1"
+        "playwright-core": "1.50.1"
       }
     },
     "playwright-core": {
-      "version": "1.43.1",
-      "resolved": "https://registry.npmjs.org/playwright-core/-/playwright-core-1.43.1.tgz",
-      "integrity": "sha512-EI36Mto2Vrx6VF7rm708qSnesVQKbxEWvPrfA1IPY6HgczBplDx7ENtx+K2n4kJ41sLLkuGfmb0ZLSSXlDhqPg==",
+      "version": "1.50.1",
+      "resolved": "https://registry.npmjs.org/playwright-core/-/playwright-core-1.50.1.tgz",
+      "integrity": "sha512-ra9fsNWayuYumt+NiM069M6OkcRb1FZSK8bgi66AtpFoWkg2+y0bJSNmkFrWhMbEBbVKC/EruAHH3g0zmtwGmQ==",
       "dev": true
     },
     "pofile": {
