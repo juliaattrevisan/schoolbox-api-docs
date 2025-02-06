@@ -42,19 +42,7 @@ class Validator
                     }
                     break;
                 case 'assessmentType':
-                    if (
-                        !in_array(
-                            $value,
-                            [
-                                AssessmentType::TYPE_TASK,
-                                AssessmentType::TYPE_QUIZ,
-                                AssessmentType::TYPE_LTI_ASSESSMENT,
-                                AssessmentType::TYPE_DUE_WORK,
-                                AssessmentType::TYPE_PROJECT,
-                                AssessmentType::TYPE_LESSON_PLAN
-                            ]
-                        )
-                    ) {
+                    if (!in_array($value, AssessmentType::ALL_TYPES)) {
                         throw new SchoolboxException("Filter 'assessmentType' has unknown value.");
                     }
                     break;
