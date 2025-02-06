@@ -87,9 +87,9 @@
         "pinia": "^2.3.1",
         "qrcode.vue": "~3.6.0",
         "sanitize-html": "~2.14.0",
-        "sortablejs": "^1.15.6",
+        "sortablejs": "~1.15.6",
         "strtotime": "~1.0.0",
-        "swiper": "~11.1.9",
+        "swiper": "^11.2.2",
         "tinycolor2": "~1.6.0",
         "ts-ebml": "~3.0.1",
         "v-tables-3-select-rows": "~0.4.9",
@@ -25427,9 +25427,9 @@
       "dev": true
     },
     "node_modules/swiper": {
-      "version": "11.1.9",
-      "resolved": "https://registry.npmjs.org/swiper/-/swiper-11.1.9.tgz",
-      "integrity": "sha512-rflu8zvfGa3x1v/aeSufk4zRJffhOQowyvtJlp46sUBnOqAuk1Rdv5Ldj0AWWBV595iZ+ZMk7VB35ZRtRUomtA==",
+      "version": "11.2.2",
+      "resolved": "https://registry.npmjs.org/swiper/-/swiper-11.2.2.tgz",
+      "integrity": "sha512-FmAN6zACpVUbd/1prO9xQ9gKo9cc6RE2UKU/z4oXtS8fNyX4sdOW/HHT/e444WucLJs0jeMId6WjdWM2Lrs8zA==",
       "funding": [
         {
           "type": "patreon",
@@ -47114,9 +47114,9 @@
       }
     },
     "swiper": {
-      "version": "11.1.9",
-      "resolved": "https://registry.npmjs.org/swiper/-/swiper-11.1.9.tgz",
-      "integrity": "sha512-rflu8zvfGa3x1v/aeSufk4zRJffhOQowyvtJlp46sUBnOqAuk1Rdv5Ldj0AWWBV595iZ+ZMk7VB35ZRtRUomtA=="
+      "version": "11.2.2",
+      "resolved": "https://registry.npmjs.org/swiper/-/swiper-11.2.2.tgz",
+      "integrity": "sha512-FmAN6zACpVUbd/1prO9xQ9gKo9cc6RE2UKU/z4oXtS8fNyX4sdOW/HHT/e444WucLJs0jeMId6WjdWM2Lrs8zA=="
     },
     "tabbable": {
       "version": "6.2.0",
