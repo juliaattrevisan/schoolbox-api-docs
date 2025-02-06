@@ -61,14 +61,14 @@
         "@melloware/coloris": "~0.24.0",
         "@microsoft/immersive-reader-sdk": "~1.4.0",
         "@phudak/ckeditor5-emoji": "~1.1.1",
-        "@vueuse/components": "^12.5.0",
-        "@vueuse/core": "^12.5.0",
-        "@vueuse/integrations": "^12.5.0",
+        "@vueuse/components": "~12.5.0",
+        "@vueuse/core": "~12.5.0",
+        "@vueuse/integrations": "~12.5.0",
         "axios": "~1.7.4",
         "clipboard": "~2.0.11",
         "datatables.net": "~1.13.8",
         "datatables.net-fixedcolumns": "~4.3.0",
-        "dayjs": "~1.11.12",
+        "dayjs": "^1.11.13",
         "dropzone": "~6.0.0-beta.2",
         "firebase": "~10.13.1",
         "flatpickr": "~4.6.13",
@@ -13983,9 +13983,9 @@
       }
     },
     "node_modules/dayjs": {
-      "version": "1.11.12",
-      "resolved": "https://registry.npmjs.org/dayjs/-/dayjs-1.11.12.tgz",
-      "integrity": "sha512-Rt2g+nTbLlDWZTwwrIXjy9MeiZmSDI375FvZs72ngxx8PDC6YXOeR3q5LAuPzjZQxhiWdRKac7RKV+YyQYfYIg=="
+      "version": "1.11.13",
+      "resolved": "https://registry.npmjs.org/dayjs/-/dayjs-1.11.13.tgz",
+      "integrity": "sha512-oaMBel6gjolK862uaPQOVTA7q3TZhuSvuMQAAglQDOWYO9A91IrAOUJEyKVlqJlHE0vq5p5UXxzdPfMH/x6xNg=="
     },
     "node_modules/de-indent": {
       "version": "1.0.2",
@@ -38882,9 +38882,9 @@
       }
     },
     "dayjs": {
-      "version": "1.11.12",
-      "resolved": "https://registry.npmjs.org/dayjs/-/dayjs-1.11.12.tgz",
-      "integrity": "sha512-Rt2g+nTbLlDWZTwwrIXjy9MeiZmSDI375FvZs72ngxx8PDC6YXOeR3q5LAuPzjZQxhiWdRKac7RKV+YyQYfYIg=="
+      "version": "1.11.13",
+      "resolved": "https://registry.npmjs.org/dayjs/-/dayjs-1.11.13.tgz",
+      "integrity": "sha512-oaMBel6gjolK862uaPQOVTA7q3TZhuSvuMQAAglQDOWYO9A91IrAOUJEyKVlqJlHE0vq5p5UXxzdPfMH/x6xNg=="
     },
     "de-indent": {
       "version": "1.0.2",
