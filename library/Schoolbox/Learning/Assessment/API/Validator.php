@@ -14,7 +14,7 @@ use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Learning\Assessment\AssessmentType;
 
 /**
- * Password validator
+ * Validator of assessment-related API requests.
  *
  * @package Schoolbox\User\Password
  */

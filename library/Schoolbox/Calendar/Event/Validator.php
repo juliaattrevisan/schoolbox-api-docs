@@ -22,7 +22,7 @@ use Schoolbox\Calendar\EventRecurrenceMapper;
 use UnexpectedValueException;
 
 /**
- * Password validator
+ * Validator of event-related API requests.
  *
  * @package Schoolbox\User\Password
  */
