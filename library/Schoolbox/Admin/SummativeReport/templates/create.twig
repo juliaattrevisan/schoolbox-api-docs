@@ -405,7 +405,7 @@
                                     <li>
                                         <input name="summary[cohort]" type="hidden" value="0" />
                                         <input id="report-summary-show-cohort" name="summary[cohort]" type="checkbox" value="1" {% if options.summary.cohort ?? false %}checked="checked"{% endif %} />
-                                        <label for="report-summary-show-cohort" class="checkbox-label">Show cohort/class distribution</label>
+                                        <label for="report-summary-show-cohort" class="checkbox-label">Show cohort/class distribution graph</label>
                                     </li>
                                     <li>
                                         <input name="summary[classCode]" type="hidden" value="0" />
@@ -427,7 +427,7 @@
                                         <th>Grade</th>
                                         <th>Comment</th>
                                         <th>Rubric</th>
-                                        <th>Boxplot</th>
+                                        <th>Graph</th>
                                     </tr>
                                     {% for worktype in worktypesSummary %}
                                     <tr data-summary-worktype-id="{{ worktype.id }}">
@@ -557,7 +557,7 @@
                                     <th>Grade</th>
                                     <th>Comment</th>
                                     <th>Rubric</th>
-                                    <th>Boxplot</th>
+                                    <th>Graph</th>
                                 </tr>
                                 {% for worktype in worktypesClass %}
                                     <tr data-class-worktype-id="{{ worktype.id }}">
