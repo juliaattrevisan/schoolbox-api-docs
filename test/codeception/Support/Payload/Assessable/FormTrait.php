@@ -61,6 +61,11 @@ trait FormTrait
         $this->setFormParam('markType', 1);
         $this->setFormParam('maxMark', '');
         $this->setFormParam('gradingScheme', 1);
+        if ($assessableType === AssessmentType::TYPE_DUE_WORK) {
+            $this->setFormParam('instructor-maxMark', '');
+            $this->setFormParam('instructor-markType', 1);
+            $this->setFormParam('instructor-gradingScheme', 1);
+        }
         $this->setFormParam('resultset', '');
         $this->setFormParam('formField', 'rb');
         $this->setFormParam('useRubric', 0);
