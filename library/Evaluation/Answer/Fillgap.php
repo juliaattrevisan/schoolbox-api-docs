@@ -299,11 +299,11 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
 
         /* Append commentary
          */
-        $data['comment'] = $response['comment'];
+        $data['comment'] = $response['comment'] ?? '';
 
         /* Append awarded mark
          */
-        $data['mark'] = $response['mark'];
+        $data['mark'] = $response['mark'] ?? '';
 
         return $data;
     }

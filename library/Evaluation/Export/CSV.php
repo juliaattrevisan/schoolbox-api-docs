@@ -325,7 +325,7 @@ abstract class Evaluation_Export_CSV
 
                         /* Append horizontally
                          */
-                        $additionalColumns[] = str_replace("\t", '', $responseData['response']);
+                        $additionalColumns[] = str_replace("\t", '', $responseData['response'] ?? '');
 
                         /* Additional columns.
                          *
