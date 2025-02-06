@@ -32,8 +32,8 @@ class Validator
         foreach ($filter as $key => $value) {
             switch ($key) {
                 case 'assessmentId':
-                    if (!is_numeric($value)) {
-                        throw new SchoolboxException("Filter 'assessmentId' must have a numeric value.");
+                    if (!is_int($value) && !ctype_digit($value)) {
+                        throw new SchoolboxException("Filter 'assessmentId' must have an integer value.");
                     }
                     break;
                 case 'title':
@@ -96,7 +96,7 @@ class Validator
                     if (
                         !is_array($value) ||
                         count($value) !== 1 ||
-                        (array_key_exists('id', $value) && is_numeric($value['id']))
+                        !(array_key_exists('id', $value) && (is_int($value['id']) || ctype_digit($value['id'])))
                     ) {
                         // Note 'object' in the exception below refers to JSON objects.  JSON objects will appear here as arrays.
                         throw new SchoolboxException('Filter \'project\' must be an object like {"id": integer}.');
@@ -144,8 +144,8 @@ class Validator
                 foreach ($subArray as $key => $value) {
                     switch ($key) {
                         case 'id':
-                            if (!is_numeric($value)) {
-                                throw new SchoolboxException("Filter 'folder' item property 'id' must have a numeric value.");
+                            if (!is_int($value) && !ctype_digit($value)) {
+                                throw new SchoolboxException("Filter 'folder' item property 'id' must have an integer value.");
                             }
                             break;
                         case 'code':
@@ -204,8 +204,8 @@ class Validator
         foreach ($array as $key => $value) {
             switch ($key) {
                 case 'id':
-                    if (!is_numeric($value)) {
-                        throw new SchoolboxException("Filter '$arrayName' property 'id' must have a numeric value.");
+                    if (!is_int($value) && !ctype_digit($value)) {
+                        throw new SchoolboxException("Filter '$arrayName' property 'id' must have an integer value.");
                     }
                     break;
                 case 'name':

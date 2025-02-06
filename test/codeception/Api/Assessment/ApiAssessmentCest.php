@@ -99,6 +99,12 @@ class ApiAssessmentCest
         ];
         yield [
             'filter' => [
+                'assessmentId' => '1e3'
+            ],
+            'valid'  => false,
+        ];
+        yield [
+            'filter' => [
                 'title' => 'Character',
             ],
             'valid'  => true,
