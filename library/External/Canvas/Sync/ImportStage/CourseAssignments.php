@@ -293,16 +293,19 @@ class CourseAssignments extends CourseAssessmentAbstract
             $submissionTypes = json_decode($submissionTypes);
         }
         // Translate Canvas attributes to SB attributes if not a 1:1 between systems
-        $maxMark           = $this->assignmentBridge->getMaxMark($pointsPossible);
-        $markType          = $this->assignmentBridge->getMarkType($gradingType, $pointsPossible);
-        $gradeGroup        = $this->assignmentBridge->getGradeGroup($gradingType);
-        $acceptOnline      = $this->assignmentBridge->getAcceptOnline($submissionTypes);
-        $acceptMultiple    = $this->assignmentBridge->getAcceptMultiple($submissionTypes);
-        $markVisibility    = $this->assignmentBridge->getMarkVisibility($muted);
-        $selfReviewability = $this->assignmentBridge->getSelfReviewability();
-        $workType          = $assignmentGroup ? $this->assignmentBridge->getSubmissionBoxWorkType($assignmentGroup) : null;
-        $weight            = $this->assignmentBridge->getSubmissionBoxWeight();
-        $submissionBox     = $this->findSubmissionBoxSpec($canvasId);
+        $maxMark                = $this->assignmentBridge->getMaxMark($pointsPossible);
+        $instructorMaxMark      = $this->assignmentBridge->getInstructorMaxMark($pointsPossible);
+        $markType               = $this->assignmentBridge->getMarkType($gradingType, $pointsPossible);
+        $instructorMarkType     = $this->assignmentBridge->getInstructorMarkType($gradingType, $pointsPossible);
+        $gradeGroup             = $this->assignmentBridge->getGradeGroup($gradingType);
+        $instructorGradeGroup   = $this->assignmentBridge->getInstructorGradeGroup($gradingType);
+        $acceptOnline           = $this->assignmentBridge->getAcceptOnline($submissionTypes);
+        $acceptMultiple         = $this->assignmentBridge->getAcceptMultiple($submissionTypes);
+        $markVisibility         = $this->assignmentBridge->getMarkVisibility($muted);
+        $selfReviewability      = $this->assignmentBridge->getSelfReviewability();
+        $workType               = $assignmentGroup ? $this->assignmentBridge->getSubmissionBoxWorkType($assignmentGroup) : null;
+        $weight                 = $this->assignmentBridge->getSubmissionBoxWeight();
+        $submissionBox          = $this->findSubmissionBoxSpec($canvasId);
 
         // Not found in SB?
         if (!$submissionBox) {
@@ -316,8 +319,11 @@ class CourseAssignments extends CourseAssessmentAbstract
                 $title,
                 $description,
                 $maxMark,
+                $instructorMaxMark,
                 $markType,
+                $instructorMarkType,
                 $gradeGroup,
+                $instructorGradeGroup,
                 $acceptOnline,
                 $acceptMultiple,
                 $weight,
@@ -352,18 +358,24 @@ class CourseAssignments extends CourseAssessmentAbstract
         if (
             // Does any attribute no longer align?
             $submissionBox->getMaxMark() !== $maxMark ||
+            $submissionBox->getInstructorMaxMark() !== $instructorMaxMark ||
             $submissionBox->getAcceptOnline() !== $acceptOnline ||
             $submissionBox->getAcceptMultiple() !== $acceptMultiple ||
             $submissionBox->getMarkVisibility() !== $markVisibility ||
             $submissionBox->getSelfReviewability() !== $selfReviewability ||
             $submissionBox->getMarkType()->getId() !== $markType->getId() ||
-            $submissionBox->getGradeGroup()?->getId() !== $gradeGroup?->getId()
+            $submissionBox->getInstructorMarkType()->getId() !== $instructorMarkType->getId() ||
+            $submissionBox->getGradeGroup()?->getId() !== $gradeGroup?->getId() ||
+            $submissionBox->getInstructorGradeGroup()?->getId() !== $instructorGradeGroup?->getId()
         ) {
             // Update all attributes and update
             $submissionBox
                 ->setMaxMark($maxMark)
+                ->setInstructorMaxMark($instructorMaxMark)
                 ->setMarkType($markType)
+                ->setInstructorMarkType($instructorMarkType)
                 ->setGradeGroup($gradeGroup)
+                ->setInstructorGradeGroup($instructorGradeGroup)
                 ->setAcceptOnline($acceptOnline)
                 ->setAcceptMultiple($acceptMultiple)
                 ->setMarkVisibility($markVisibility)
@@ -431,8 +443,11 @@ class CourseAssignments extends CourseAssessmentAbstract
      * @param string                                    $title
      * @param string|null                               $description
      * @param float|null                                $maxMark
+     * @param float|null                                $instructorMaxMark
      * @param SubmissionBox\MarkType                    $markType
+     * @param SubmissionBox\MarkType                    $instructorMarkType
      * @param SubmissionBox\GradeLevel\Group\Model|null $gradeGroup
+     * @param SubmissionBox\GradeLevel\Group\Model|null $instructorGradeGroup
      * @param bool                                      $acceptOnline
      * @param bool                                      $acceptMultiple
      * @param float                                     $weight
@@ -452,8 +467,11 @@ class CourseAssignments extends CourseAssessmentAbstract
         string $title,
         ?string $description,
         ?float $maxMark,
+        ?float $instructorMaxMark,
         SubmissionBox\MarkType $markType,
+        SubmissionBox\MarkType $instructorMarkType,
         ?SubmissionBox\GradeLevel\Group\Model $gradeGroup,
+        ?SubmissionBox\GradeLevel\Group\Model $instructorGradeGroup,
         bool $acceptOnline,
         bool $acceptMultiple,
         float $weight,
@@ -479,8 +497,11 @@ class CourseAssignments extends CourseAssessmentAbstract
             ->setAssessmentModel($assessment)
             ->setOwner((new User())->setId($boxOwnerId))
             ->setMaxMark($maxMark)
+            ->setInstructorMaxMark($instructorMaxMark)
             ->setMarkType($markType)
+            ->setInstructorMarkType($instructorMarkType)
             ->setGradeGroup($gradeGroup)
+            ->setInstructorGradeGroup($instructorGradeGroup)
             ->setAcceptOnline($acceptOnline)
             ->setAcceptMultiple($acceptMultiple)
             ->setMarkVisibility($markVisibility)

@@ -77,6 +77,16 @@ class Assignment
     }
 
     /**
+     * @param float|null $pointsPossible
+     * @return float|null
+     */
+    public function getInstructorMaxMark(?float $pointsPossible): ?float
+    {
+        // For now, instructor max mark is always the same as the learner max mark
+        return $this->getMaxMark($pointsPossible);
+    }
+
+    /**
      * @param GradeLevelGroupMapper $gradeLevelGroupMapper
      * @param GradeLevelMapper      $gradeLevelMapper
      * @param UserMapper            $userMapper
@@ -234,12 +244,35 @@ class Assignment
     }
 
     /**
+     * Returns a translated mark type for instructors
+     *
+     * @param string|null $gradingType
+     * @param float|null  $pointsPossible
+     * @return SubmissionBox\MarkType
+     */
+    public function getInstructorMarkType(?string $gradingType, ?float $pointsPossible): SubmissionBox\MarkType
+    {
+        // For now, instructor mark type is always the same as the learner mark type
+        return $this->getMarkType($gradingType, $pointsPossible);
+    }
+
+    /**
      * @param string|null $gradingType
      * @return SubmissionBox\GradeLevel\Group\Model|null
      */
     public function getGradeGroup(?string $gradingType): ?SubmissionBox\GradeLevel\Group\Model
     {
         return null;
+    }
+
+    /**
+     * @param string|null $gradingType
+     * @return SubmissionBox\GradeLevel\Group\Model|null
+     */
+    public function getInstructorGradeGroup(?string $gradingType): ?SubmissionBox\GradeLevel\Group\Model
+    {
+        // For now, instructor grade group is always the same as the learner grade group
+        return $this->getGradeGroup($gradingType);
     }
 
     /**

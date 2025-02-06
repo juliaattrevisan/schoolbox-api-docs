@@ -294,26 +294,32 @@ class SectionAssignment extends SectionAssessmentAbstract
         }
         if (
             $assessableImpl->getMaxMark() === $assessableSpec->getMaxMark() &&
+            $assessableImpl->getInstructorMaxMark() === $assessableSpec->getInstructorMaxMark() &&
             $assessableImpl->getAcceptOnline() === $assessableSpec->getAcceptOnline() &&
             $assessableImpl->getAcceptMultiple() === $assessableSpec->getAcceptMultiple() &&
             $assessableImpl->getMarkVisibility() === $assessableSpec->getMarkVisibility() &&
             $assessableImpl->getSelfReviewability() === $assessableSpec->getSelfReviewability() &&
             $assessableImpl->getOwner()->getId() === $owner->getId() &&
             $assessableImpl->getMarkType()->getId() === $assessableSpec->getMarkType()->getId() &&
-            $assessableImpl->getGradeGroup()?->getId() === $assessableSpec->getGradeGroup()?->getId()
+            $assessableImpl->getInstructorMarkType()->getId() === $assessableSpec->getInstructorMarkType()->getId() &&
+            $assessableImpl->getGradeGroup()?->getId() === $assessableSpec->getGradeGroup()?->getId() &&
+            $assessableImpl->getInstructorGradeGroup()?->getId() === $assessableSpec->getInstructorGradeGroup()?->getId()
         ) {
             return false;
         }
         $this->log->debug("Updating SubmissionBoxImpl for Canvas Assignment (canvasId: $assessmentCanvasId)");
         $assessableImpl
             ->setMaxMark($assessableSpec->getMaxMark())
+            ->setInstructorMaxMark($assessableSpec->getInstructorMaxMark())
             ->setAcceptOnline($assessableSpec->getAcceptOnline())
             ->setAcceptMultiple($assessableSpec->getAcceptMultiple())
             ->setMarkVisibility($assessableSpec->getMarkVisibility())
             ->setSelfReviewability($assessableSpec->getSelfReviewability())
             ->setOwner($owner)
             ->setMarkType($assessableSpec->getMarkType())
-            ->setGradeGroup($assessableSpec->getGradeGroup());
+            ->setInstructorMarkType($assessableSpec->getInstructorMarkType())
+            ->setGradeGroup($assessableSpec->getGradeGroup())
+            ->setInstructorGradeGroup($assessableSpec->getInstructorGradeGroup());
         $this->submissionBoxMapper->save($assessableImpl);
         return true;
     }
