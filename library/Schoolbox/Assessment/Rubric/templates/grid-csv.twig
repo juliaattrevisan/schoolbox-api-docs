@@ -56,7 +56,9 @@
             }
 
             postdata.markTypeId   = body.find(':input[name="markType"]').val();
+            postdata.instructorMarkTypeId   = body.find(':input[name="instructor-markType"]').val();
             postdata.gradeGroupId = body.find(':input[name="gradingScheme"]').val();
+            postdata.instructorGradeGroupId = body.find(':input[name="instructor-gradingScheme"]').val();
 
             // show/hide appropriate things
             wrap.find('[data-hideable]').addClass('hide');
