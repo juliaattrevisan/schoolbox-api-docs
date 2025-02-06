@@ -83,8 +83,8 @@
         "lightgallery": "^2.8.2",
         "locutus": "~2.0.32",
         "lodash": "~4.17.21",
-        "mediaelement": "^7.0.7",
-        "pinia": "~2.2.2",
+        "mediaelement": "~7.0.7",
+        "pinia": "^2.3.1",
         "qrcode.vue": "~3.4.1",
         "sanitize-html": "~2.13.0",
         "sortablejs": "~1.15.3",
@@ -22365,9 +22365,9 @@
       }
     },
     "node_modules/pinia": {
-      "version": "2.2.8",
-      "resolved": "https://registry.npmjs.org/pinia/-/pinia-2.2.8.tgz",
-      "integrity": "sha512-NRTYy2g+kju5tBRe0oNlriZIbMNvma8ZJrpHsp3qudyiMEA8jMmPPKQ2QMHg0Oc4BkUyQYWagACabrwriCK9HQ==",
+      "version": "2.3.1",
+      "resolved": "https://registry.npmjs.org/pinia/-/pinia-2.3.1.tgz",
+      "integrity": "sha512-khUlZSwt9xXCaTbbxFYBKDc/bWAGWJjOgvxETwkTN7KRm66EeT1ZdZj6i2ceh9sP2Pzqsbc704r2yngBrxBVug==",
       "dependencies": {
         "@vue/devtools-api": "^6.6.3",
         "vue-demi": "^0.14.10"
@@ -22376,14 +22376,10 @@
         "url": "https://github.com/sponsors/posva"
       },
       "peerDependencies": {
-        "@vue/composition-api": "^1.4.0",
         "typescript": ">=4.4.4",
-        "vue": "^2.6.14 || ^3.5.11"
+        "vue": "^2.7.0 || ^3.5.11"
       },
       "peerDependenciesMeta": {
-        "@vue/composition-api": {
-          "optional": true
-        },
         "typescript": {
           "optional": true
         }
@@ -44925,9 +44921,9 @@
       "dev": true
     },
     "pinia": {
-      "version": "2.2.8",
-      "resolved": "https://registry.npmjs.org/pinia/-/pinia-2.2.8.tgz",
-      "integrity": "sha512-NRTYy2g+kju5tBRe0oNlriZIbMNvma8ZJrpHsp3qudyiMEA8jMmPPKQ2QMHg0Oc4BkUyQYWagACabrwriCK9HQ==",
+      "version": "2.3.1",
+      "resolved": "https://registry.npmjs.org/pinia/-/pinia-2.3.1.tgz",
+      "integrity": "sha512-khUlZSwt9xXCaTbbxFYBKDc/bWAGWJjOgvxETwkTN7KRm66EeT1ZdZj6i2ceh9sP2Pzqsbc704r2yngBrxBVug==",
       "requires": {
         "@vue/devtools-api": "^6.6.3",
         "vue-demi": "^0.14.10"
