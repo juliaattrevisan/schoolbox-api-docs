@@ -13,6 +13,7 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\Base\ShadowTable;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint as TassApiEndpoint;
 use Schoolbox\External\Connector\Compass\Base\Endpoint as CompassEndpoint;
+use Schoolbox\External\Connector\Civica\Base\Endpoint as CivicaEndpoint;
 use Schoolbox\GenericCollection;
 use Schoolbox\RoleMapper;
 use SensitiveParameter;
@@ -32,34 +33,7 @@ class CalendarFactory implements IFactory
      */
     public const TASS_API = 'tassapi';
     public const COMPASS = 'compass';
-
-
-    /**
-     * API Endpoint url
-     *
-     * @var string
-     */
-    private string $host;
-
-
-    /**
-     * API Endpoint access token
-     *
-     * @var string
-     */
-    private string $key;
-
-
-    /**
-     * @var bool
-     */
-    private bool $perform;
-
-
-    /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $logger;
+    public const CIVICA = 'civica';
 
 
     /**
@@ -71,15 +45,11 @@ class CalendarFactory implements IFactory
      * @param LoggerInterface $logger
      */
     public function __construct(
-        string $host,
-        #[SensitiveParameter] string $key,
-        bool $perform,
-        LoggerInterface $logger
+        private string $host,
+        #[SensitiveParameter] private string $key,
+        private bool $perform,
+        private LoggerInterface $logger
     ) {
-        $this->host = $host;
-        $this->key = $key;
-        $this->perform = $perform;
-        $this->logger = $logger;
     }
 
 
@@ -116,6 +86,17 @@ class CalendarFactory implements IFactory
 
             case self::COMPASS:
                 $composites = (new CompassEndpoint\Calendar\Factory(
+                    $this->logger,
+                    $this->perform,
+                    $this->host,
+                    $this->key,
+                    \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
+                    \Schoolbox\External\Event\User\Mapper::getInstance()->disableCache()
+                ))->produce();
+                break;
+
+            case self::CIVICA:
+                $composites = (new CivicaEndpoint\Calendar\Factory(
                     $this->logger,
                     $this->perform,
                     $this->host,
