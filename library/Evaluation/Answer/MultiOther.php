@@ -89,7 +89,7 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer
         if (is_numeric($question_id)) {
             $answerGroup = parent::getForQuestion($question_id);
 
-            if ($answerGroup) {
+            if (isset($answerGroup['answer']) && is_string($answerGroup['answer'])) {
                 $allAnswers = unserialize($answerGroup['answer']);
 
                 if (is_array($allAnswers) && count($allAnswers)) {
@@ -212,12 +212,12 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer
 
         $answerGroup = $this->getByQuestionID($question_id);
 
-        if ($answerGroup) {
+        if (isset($answerGroup['answer']) && is_string($answerGroup['answer']) ) {
             $allAnswers = unserialize($answerGroup['answer']);
 
             /* Just unserialize this once, dude
              */
-            if ($existing['response']) {
+            if (isset($existing['response']) && is_string($existing['response'])) {
                 $existingAnswer = unserialize($existing['response']);
             } else {
                 $existingAnswer = false;
@@ -331,7 +331,7 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer
         $answerGroup = $this->getByQuestionID($question_id);
         $page->setVar('answerOption_block', '');
 
-        if ($answerGroup) {
+        if (isset($answerGroup['answer']) && is_string($answerGroup['answer'])) {
             $allAnswers = unserialize($answerGroup['answer']);
 
             if (is_array($allAnswers)) {
@@ -406,7 +406,7 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer
             ];
         }
 
-        $data = unserialize($response['response']);
+        $data = unserialize($response['response'] ?? '');
 
         if (is_array($data)) {
             /* Answer text to appear in export
@@ -457,18 +457,19 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer
     {
         $answer = $this->getByQuestionID($question_id);
 
-        $allOptions = unserialize($answer['answer']);
+        if(isset($answer['answer']) && is_string($answer['answer'])) {
+            $allOptions = unserialize($answer['answer']);
 
-        $other = new StdClass();
-        $other->description = 'Other';
-        $other->value = $this->otherLetterIndex($allOptions);
-        ;
+            $other              = new StdClass();
+            $other->description = 'Other';
+            $other->value       = $this->otherLetterIndex($allOptions);;
 
-        $allOptions[] = $other;
+            $allOptions[] = $other;
 
-        foreach ($allOptions as $currentOption) {
-            if ($currentOption->value == $value) {
-                return $currentOption->description;
+            foreach ($allOptions as $currentOption) {
+                if ($currentOption->value == $value) {
+                    return $currentOption->description;
+                }
             }
         }
 
@@ -509,13 +510,13 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer
     {
         $existing       = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
         $existingAnswer = null;
-        if ($existing) {
+        if (isset($existing['response']) && is_string($existing['response'])) {
             $existingAnswer = unserialize($existing['response']);
         }
 
         $answerGroup = $this->getByQuestionID($question_id);
 
-        if ($answerGroup) {
+        if (isset($answerGroup['answer']) && is_string($answerGroup['answer'])) {
             /** @var stdClass[] $allAnswers */
             $allAnswers = unserialize($answerGroup['answer']);
 

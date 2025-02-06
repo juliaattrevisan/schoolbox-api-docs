@@ -105,7 +105,7 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
                 )
             );
 
-            if ($answerGroup) {
+            if (isset($answerGroup['answer']) && is_string($answerGroup['answer'])) {
                 $allAnswers = unserialize($answerGroup['answer']);
 
                 if (is_array($allAnswers) && count($allAnswers)) {
@@ -192,7 +192,7 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
 
         $answerGroup = $this->getByQuestionID($question_id);
 
-        if ($answerGroup) {
+        if (isset($answerGroup['answer']) && is_string($answerGroup['answer'])) {
             $answerCount = 0;
             $allAnswers  = unserialize($answerGroup['answer']);
 
@@ -202,7 +202,7 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
                 $answerCount++;
             }
 
-            if ($existing['response']) {
+            if (isset($existing['response']) && is_string($existing['response'])) {
                 $right = unserialize($existing['response']);
             } else {
                 $originalRight = $right;
@@ -279,7 +279,7 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
 
         $answerGroup = $this->getByQuestionID($question_id);
 
-        if ($answerGroup) {
+        if (isset($answerGroup['answer']) && is_string($answerGroup['answer'])) {
             $allAnswers = unserialize($answerGroup['answer']);
             if (is_array($allAnswers)) {
                 foreach ($allAnswers as $currentAnswer) {
@@ -341,7 +341,7 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
             ];
         }
 
-        $data = unserialize($response['response']);
+        $data = unserialize($response['response'] ?? '');
 
         if (is_array($data)) {
             if ($this->getLegendHTML() !== false) {
@@ -373,14 +373,15 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
     {
         $answer = $this->getByQuestionID($question_id);
 
-        $allOptions = unserialize($answer['answer']);
+        if(isset($answer['answer']) && is_string($answer['answer'])) {
+            $allOptions = unserialize($answer['answer']);
 
-        foreach ($allOptions as $currentOption) {
-            if ($currentOption->value == $value) {
-                return $currentOption->description;
+            foreach ($allOptions as $currentOption) {
+                if ($currentOption->value == $value) {
+                    return $currentOption->description;
+                }
             }
         }
-
         return '';
     }
 
@@ -399,7 +400,7 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
         /* If a question was added after the attempt was made by the student,
          * then $response['response'] might not even exist; return empty array
          */
-        if ($response) {
+        if (isset($response['response']) && is_string($response['response'])) {
             return unserialize($response['response']);
         }
 
@@ -420,7 +421,7 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
         $right = array();
         $existing = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
 
-        if ($existing['response']) {
+        if (isset($existing['response']) && is_string($existing['response'])) {
             $right = unserialize($existing['response']);
         }
 
@@ -443,7 +444,7 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
                 )
             );
 
-            $allAnswers = unserialize($answerGroup['answer']);
+            $allAnswers = unserialize($answerGroup['answer'] ?? '');
 
             for ($i = 0; $i < count($allAnswers); $i++) {
                 $currentAnswer = $allAnswers[$i];
@@ -483,7 +484,7 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
 
         $existing = $this->getResponseHandler()->isResponseExists($attemptId, $currentQuestion['question_id']);
 
-        if ($existing['response']) {
+        if (isset($existing['response']) && is_string($existing['response'])) {
             $right = unserialize($existing['response']);
         }
 
@@ -495,7 +496,7 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
 
         $answerGroup = $this->getByQuestionID($currentQuestion['question_id']);
 
-        if ($answerGroup) {
+        if (isset($answerGroup['answer']) && is_string($answerGroup['answer'])) {
             $page->setVar(
                 array(
                     'RESPONSE_USER_ID' => $currentQuestion['user_id'],
@@ -552,7 +553,7 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
 
         $answerGroup = $this->getByQuestionID($currentQuestion['question_id']);
 
-        if ($answerGroup) {
+        if (isset($answerGroup['answer']) && is_string($answerGroup['answer'])) {
             $allAnswers = unserialize($answerGroup['answer']);
 
             for ($i = 0; $i < count($allAnswers); $i++) {

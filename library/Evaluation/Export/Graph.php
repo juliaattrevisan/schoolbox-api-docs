@@ -169,7 +169,7 @@ class Evaluation_Export_Graph
                 // Not all questions have pre-defined answers:
                 // for example, the Parent Child question allows a parent to
                 // select one of their own children.
-                if (isset($answerRecord['answer'])) {
+                if (isset($answerRecord['answer']) && is_string($answerRecord['answer'])) {
                     $allAnswers = unserialize($answerRecord['answer']);
 
                     /* If this was a multi-choice or radio variant, answers
