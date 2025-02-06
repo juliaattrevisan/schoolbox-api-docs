@@ -81,7 +81,7 @@
     "mediaelement": "~7.0.7",
     "pinia": "^2.3.1",
     "qrcode.vue": "~3.6.0",
-    "sanitize-html": "~2.13.0",
+    "sanitize-html": "~2.14.0",
     "sortablejs": "~1.15.3",
     "strtotime": "~1.0.0",
     "swiper": "~11.1.9",
