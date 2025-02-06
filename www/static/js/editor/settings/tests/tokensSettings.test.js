@@ -27,36 +27,40 @@ test("wraps multiple of the same token", () => {
 test("wraps various different tokens", () => {
     const testString = `
     <table>
-        <tr>
-            <td>[fullname]</td>
-        </tr>
-        <tr>
-            <td>[year]</td>
-        </tr>
-        <tr>
-            <td>[house]</td>
-        </tr>
-        <tr>
-            <td>[year]</td>
-        </tr>
+        <tbody>
+            <tr>
+                <td>[fullname]</td>
+            </tr>
+            <tr>
+                <td>[year]</td>
+            </tr>
+            <tr>
+                <td>[house]</td>
+            </tr>
+            <tr>
+                <td>[year]</td>
+            </tr>
+        </tbody>
     </table>`;
     const config = { tokenList: ["[fullname]", "[year]", "[house]"] };
     const divElement = document.createElement("div");
     divElement.innerHTML = testString;
     const expected = `
     <table>
-        <tr>
-            <td><span class="mention" data-mention="[fullname]">[fullname]</span></td>
-        </tr>
-        <tr>
-            <td><span class="mention" data-mention="[year]">[year]</span></td>
-        </tr>
-        <tr>
-            <td><span class="mention" data-mention="[house]">[house]</span></td>
-        </tr>
-        <tr>
-            <td><span class="mention" data-mention="[year]">[year]</span></td>
-        </tr>
+        <tbody>
+            <tr>
+                <td><span class="mention" data-mention="[fullname]">[fullname]</span></td>
+            </tr>
+            <tr>
+                <td><span class="mention" data-mention="[year]">[year]</span></td>
+            </tr>
+            <tr>
+                <td><span class="mention" data-mention="[house]">[house]</span></td>
+            </tr>
+            <tr>
+                <td><span class="mention" data-mention="[year]">[year]</span></td>
+            </tr>
+        </tbody>
     </table>`;
     expect(wrapTokens(divElement, config).innerHTML).toBe(expected);
 });
