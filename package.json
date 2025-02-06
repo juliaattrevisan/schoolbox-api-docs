@@ -80,7 +80,7 @@
     "lodash": "~4.17.21",
     "mediaelement": "~7.0.7",
     "pinia": "^2.3.1",
-    "qrcode.vue": "~3.4.1",
+    "qrcode.vue": "~3.6.0",
     "sanitize-html": "~2.13.0",
     "sortablejs": "~1.15.3",
     "strtotime": "~1.0.0",
