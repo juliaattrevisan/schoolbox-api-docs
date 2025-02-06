@@ -55,7 +55,7 @@ class Validator
                             ]
                         )
                     ) {
-                        throw new SchoolboxException("Filter 'assessmentType' has unexpected enum value.");
+                        throw new SchoolboxException("Filter 'assessmentType' has unknown value.");
                     }
                     break;
                 case 'folder':
