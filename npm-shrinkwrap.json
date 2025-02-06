@@ -72,9 +72,9 @@
         "dropzone": "~6.0.0-beta.2",
         "firebase": "^11.2.0",
         "flatpickr": "~4.6.13",
-        "focus-trap": "^7.6.4",
+        "focus-trap": "~7.6.4",
         "gsap": "npm:@gsap/business@~3.12.5",
-        "highcharts": "~11.4.7",
+        "highcharts": "^12.1.2",
         "highcharts-vue": "~2.0.1",
         "intro.js": "~2.9.3",
         "jquery": "~3.7.1",
@@ -16787,9 +16787,9 @@
       "dev": true
     },
     "node_modules/highcharts": {
-      "version": "11.4.7",
-      "resolved": "https://registry.npmjs.org/highcharts/-/highcharts-11.4.7.tgz",
-      "integrity": "sha512-4FQTaV/9DtYal6U8rCgGeFWzzoL5QoKowpzyGlG0sp+UJKjm9G9t4bvyz+odvXt+YcqUvK9GEspdLoBnKSWGVA=="
+      "version": "12.1.2",
+      "resolved": "https://registry.npmjs.org/highcharts/-/highcharts-12.1.2.tgz",
+      "integrity": "sha512-paZ72q1um0zZT1sS+O/3JfXVSOLPmZ0zlo8SgRc0rEplPFPQUPc4VpkgQS8IUTueeOBgIWwVpAWyC9tBYbQ0kg=="
     },
     "node_modules/highcharts-vue": {
       "version": "2.0.1",
@@ -40848,9 +40848,9 @@
       "dev": true
     },
     "highcharts": {
-      "version": "11.4.7",
-      "resolved": "https://registry.npmjs.org/highcharts/-/highcharts-11.4.7.tgz",
-      "integrity": "sha512-4FQTaV/9DtYal6U8rCgGeFWzzoL5QoKowpzyGlG0sp+UJKjm9G9t4bvyz+odvXt+YcqUvK9GEspdLoBnKSWGVA=="
+      "version": "12.1.2",
+      "resolved": "https://registry.npmjs.org/highcharts/-/highcharts-12.1.2.tgz",
+      "integrity": "sha512-paZ72q1um0zZT1sS+O/3JfXVSOLPmZ0zlo8SgRc0rEplPFPQUPc4VpkgQS8IUTueeOBgIWwVpAWyC9tBYbQ0kg=="
     },
     "highcharts-vue": {
       "version": "2.0.1",

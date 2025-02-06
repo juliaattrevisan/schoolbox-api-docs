@@ -69,7 +69,7 @@
     "flatpickr": "~4.6.13",
     "focus-trap": "~7.6.4",
     "gsap": "npm:@gsap/business@~3.12.5",
-    "highcharts": "~11.4.7",
+    "highcharts": "~12.1.2",
     "highcharts-vue": "~2.0.1",
     "intro.js": "~2.9.3",
     "jquery": "~3.7.1",
