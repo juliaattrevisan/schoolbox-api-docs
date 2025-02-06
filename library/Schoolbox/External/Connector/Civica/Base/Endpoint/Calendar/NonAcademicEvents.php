@@ -18,7 +18,7 @@ use Schoolbox\Mapper\Exception;
 
 /**
  * Import all the non-academic events, saving them as sis_event records
- * with the 'timetable' classification
+ * with the 'event' classification
  */
 class NonAcademicEvents implements IStrategy
 {
@@ -47,6 +47,7 @@ class NonAcademicEvents implements IStrategy
 
     /**
      * @return void
+     * @throws Exception
      * @throws \JsonException
      */
     public function import(): void
@@ -62,8 +63,8 @@ class NonAcademicEvents implements IStrategy
 
 
     /**
-     * For each class, process the lessons and apply student/staff involvements
-     * Ignore lessons that occur outside the [$from, $to] window
+     * For each event, process the event data and apply student/staff involvements
+     * Ignore events that occur outside the [$from, $to] window
      *
      * @param array $data
      * @return void
@@ -89,7 +90,7 @@ class NonAcademicEvents implements IStrategy
 
 
     /**
-     * Create a new SUDS Timetable Event with all the class and lesson pieces
+     * Create a new School Data Event with all the event and attendee "involvements"
      *
      * @param array $data
      * @return Model|null
@@ -97,8 +98,6 @@ class NonAcademicEvents implements IStrategy
      */
     private function createEvent(array $data): ?\Schoolbox\External\Event\Model
     {
-        /* Name is the same as the Code, in compass
-         */
         $title = trim((string)$data['eventName']);
 
         /* Fill in these vars as usual
@@ -114,7 +113,7 @@ class NonAcademicEvents implements IStrategy
          */
         $guid = trim((string)$data['eventOccurrenceId']);
 
-        /* Datetimes for when this class occurs
+        /* Datetimes for when this event occurs
          * All day events don't have times.
          */
         if ($allDay) {
@@ -194,12 +193,12 @@ class NonAcademicEvents implements IStrategy
             ->setType($type)
             ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_EVENT)
             ->setGuid($guid)
-            ->setSource(\Schoolbox\External\Connector\Compass\Base\Endpoint\Factory::SOURCE_NAME);
+            ->setSource(\Schoolbox\External\Connector\Civica\Base\Endpoint\Factory::SOURCE_NAME);
 
         /* Save it and remember what we saw in case we need to reuse this later
          */
         $this->log->debug(sprintf(
-            'Creating new timetable event %s (%s) on day %s, period %s, %s-%s',
+            'Creating new event %s (%s) on day %s, period %s, %s-%s',
             $event->getTitle(),
             $event->getCode(),
             $event->getDay(),
@@ -217,7 +216,7 @@ class NonAcademicEvents implements IStrategy
 
 
     /**
-     * Save all the involvements for a given $class
+     * Save all the involvements for a given $event
      *
      * @param array $data
      * @param Model $event
@@ -228,8 +227,6 @@ class NonAcademicEvents implements IStrategy
         array $data,
         \Schoolbox\External\Event\Model $event
     ): void {
-        /* Name is the same as the Code, in compass
-         */
         $title = $event->getTitle();
 
         /* Alternatively, this might also have additional participating teachers
@@ -248,7 +245,7 @@ class NonAcademicEvents implements IStrategy
             }
         }
 
-        /* Save sis_class_user involvements
+        /* Save sis_event_user involvements
          * This is the student(s) and they're associated with all instances
          */
         if (!\count($data['students'])) {
@@ -267,8 +264,8 @@ class NonAcademicEvents implements IStrategy
 
 
     /**
-     * Save staff involvement as an override, which allows each class
-     * to have different teachers depending on their associated sis_event
+     * Creates a relationship between a user and an event instance,
+     * akin to "Personal" events just like in  the main calendar
      *
      * @param Model $event
      * @param array $teacher
@@ -299,7 +296,7 @@ class NonAcademicEvents implements IStrategy
             ->setExternalId($teacher['externalId']);
 
         $this->log->debug(sprintf(
-            'Creating new override for %s in timetable event %s - %s, %s, %s-%s',
+            'Creating new event involvement for %s in %s - %s, %s, %s-%s',
             $teacher['externalId'],
             $event->getTitle(),
             $event->getDay(),
@@ -345,7 +342,7 @@ class NonAcademicEvents implements IStrategy
             ->setExternalId($student['externalId']);
 
         $this->log->debug(sprintf(
-            'Creating new override for %s in timetable event %s - %s-%s',
+            'Creating new event involvement for %s in %s - %s-%s',
             $student['externalId'],
             $event->getTitle(),
             $event->getStartAt()->getDatabase(),
