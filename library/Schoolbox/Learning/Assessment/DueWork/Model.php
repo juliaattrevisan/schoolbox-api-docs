@@ -879,7 +879,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
     /**
      * @return MarkType
      */
-    public function getInstructorMarkType(): MarkType
+    public function getInstructorMarkType()
     {
         return $this->instructorMarkType;
     }
@@ -888,7 +888,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
      * @param MarkType $instructorMarkType
      * @return $this
      */
-    public function setInstructorMarkType(MarkType $instructorMarkType): self
+    public function setInstructorMarkType($instructorMarkType): self
     {
         $this->instructorMarkType = $instructorMarkType;
         return $this;
@@ -897,7 +897,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
     /**
      * @return GradeGroup|null
      */
-    public function getInstructorGradeGroup(): ?GradeGroup
+    public function getInstructorGradeGroup()
     {
         return $this->instructorGradeGroup;
     }
@@ -915,7 +915,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
     /**
      * @return IMarkScheme
      */
-    public function getInstructorMarkScheme(): IMarkScheme
+    public function getInstructorMarkScheme()
     {
         return $this->instructorMarkScheme;
     }
