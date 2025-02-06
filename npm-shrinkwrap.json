@@ -120,10 +120,10 @@
         "@storybook/vue3-webpack5": "~8.5.3",
         "@testing-library/jest-dom": "~6.6.3",
         "@types/jest": "~29.5.14",
-        "@types/jquery": "^3.5.32",
+        "@types/jquery": "~3.5.32",
         "@types/jqueryui": "~1.12.23",
-        "@types/lodash": "^4.17.15",
-        "@types/node": "^22.13.1",
+        "@types/lodash": "~4.17.15",
+        "@types/node": "~22.13.1",
         "@types/sanitize-html": "~2.13.0",
         "@types/sortablejs": "~1.15.8",
         "@types/tinycolor2": "~1.4.6",
@@ -132,7 +132,7 @@
         "@typescript-eslint/parser": "~6.21.0",
         "@vue/test-utils": "~2.4.6",
         "@vue/vue3-jest": "~29.2.6",
-        "chromatic": "~11.7.1",
+        "chromatic": "^11.25.2",
         "css-loader": "~7.1.2",
         "eslint": "~8.56.0",
         "eslint-config-airbnb-base": "~15.0.0",
@@ -13227,9 +13227,9 @@
       }
     },
     "node_modules/chromatic": {
-      "version": "11.7.1",
-      "resolved": "https://registry.npmjs.org/chromatic/-/chromatic-11.7.1.tgz",
-      "integrity": "sha512-LvgPimdQdnQB07ZDxLEC2KtxgYeqTw0X71GA7fi3zhgtKLxZcE+BSZ/5I9rrQp1V8ydmfElfw0ZwnUH4fVgUAQ==",
+      "version": "11.25.2",
+      "resolved": "https://registry.npmjs.org/chromatic/-/chromatic-11.25.2.tgz",
+      "integrity": "sha512-/9eQWn6BU1iFsop86t8Au21IksTRxwXAl7if8YHD05L2AbuMjClLWZo5cZojqrJHGKDhTqfrC2X2xE4uSm0iKw==",
       "dev": true,
       "bin": {
         "chroma": "dist/bin.js",
@@ -38421,9 +38421,9 @@
       "dev": true
     },
     "chromatic": {
-      "version": "11.7.1",
-      "resolved": "https://registry.npmjs.org/chromatic/-/chromatic-11.7.1.tgz",
-      "integrity": "sha512-LvgPimdQdnQB07ZDxLEC2KtxgYeqTw0X71GA7fi3zhgtKLxZcE+BSZ/5I9rrQp1V8ydmfElfw0ZwnUH4fVgUAQ==",
+      "version": "11.25.2",
+      "resolved": "https://registry.npmjs.org/chromatic/-/chromatic-11.25.2.tgz",
+      "integrity": "sha512-/9eQWn6BU1iFsop86t8Au21IksTRxwXAl7if8YHD05L2AbuMjClLWZo5cZojqrJHGKDhTqfrC2X2xE4uSm0iKw==",
       "dev": true,
       "requires": {}
     },
