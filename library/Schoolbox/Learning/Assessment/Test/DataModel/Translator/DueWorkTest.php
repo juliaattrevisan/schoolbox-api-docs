@@ -532,6 +532,7 @@ class DueWorkTest extends TestCase
                 (new DueWorkModel())
                     ->setAssessmentModel($assessmentModel)
                     ->setMarkType(self::buildMarkType())
+                    ->setInstructorMarkType(self::buildMarkType())
                     ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL),
                 None::class,
                 null,
@@ -541,6 +542,7 @@ class DueWorkTest extends TestCase
                 (new DueWorkModel())
                     ->setAssessmentModel($assessmentModel)
                     ->setMarkType(self::buildMarkType(DueWorkModel\MarkType::TYPE_PERCENT))
+                    ->setInstructorMarkType(self::buildMarkType(DueWorkModel\MarkType::TYPE_PERCENT))
                     ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL),
                 Percentage::class,
                 null,
@@ -550,7 +552,11 @@ class DueWorkTest extends TestCase
                 (new DueWorkModel())
                     ->setAssessmentModel($assessmentModel)
                     ->setMarkType(self::buildMarkType(DueWorkModel\MarkType::TYPE_LETTER))
+                    ->setInstructorMarkType(self::buildMarkType(DueWorkModel\MarkType::TYPE_LETTER))
                     ->setGradeGroup((new DueWorkModel\GradeLevel\Group\Model())->setId(1)->setGradeLevels(
+                        new GenericCollection(DueWorkModel\GradeLevel\Model::class, [new DueWorkModel\GradeLevel\Model()])
+                    ))
+                    ->setInstructorGradeGroup((new DueWorkModel\GradeLevel\Group\Model())->setId(2)->setGradeLevels(
                         new GenericCollection(DueWorkModel\GradeLevel\Model::class, [new DueWorkModel\GradeLevel\Model()])
                     ))
                     ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL),
@@ -562,11 +568,25 @@ class DueWorkTest extends TestCase
                 (new DueWorkModel())
                     ->setAssessmentModel($assessmentModel)
                     ->setMarkType(self::buildMarkType(DueWorkModel\MarkType::TYPE_TOTAL))
+                    ->setInstructorMarkType(self::buildMarkType(DueWorkModel\MarkType::TYPE_TOTAL))
                     ->setMaxMark(15)
+                    ->setInstructorMaxMark(15)
                     ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL),
                 TotalMarkFractional::class,
                 15,
                 null
+            ],
+            [
+                // different instructor mark type
+                (new DueWorkModel())
+                    ->setAssessmentModel($assessmentModel)
+                    ->setMarkType(self::buildMarkType(DueWorkModel\MarkType::TYPE_PERCENT))
+                    ->setInstructorMarkType(self::buildMarkType(DueWorkModel\MarkType::TYPE_TOTAL))
+                    ->setInstructorMaxMark(15)
+                    ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL),
+                Percentage::class,
+                null,
+                null,
             ],
         ];
     }
