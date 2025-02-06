@@ -82,7 +82,7 @@
     "pinia": "^2.3.1",
     "qrcode.vue": "~3.6.0",
     "sanitize-html": "~2.14.0",
-    "sortablejs": "~1.15.3",
+    "sortablejs": "~1.15.6",
     "strtotime": "~1.0.0",
     "swiper": "~11.1.9",
     "tinycolor2": "~1.6.0",
