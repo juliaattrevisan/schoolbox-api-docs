@@ -31,7 +31,9 @@ export default class AssessmentForm {
 
     static readonly SELECTOR_DUE_DATE = "assessment-form-input-date-due";
 
-    static readonly SELECTOR_MARK_TYPE = "assessment-form-select-markType";
+    static readonly DATATEST_MARK_TYPE = "assessment-form-select-markType";
+
+    static readonly DATATEST_INSTRUCTOR_MARK_TYPE = "assessment-form-select-markType";
 
     static readonly SELECTOR_BUTTON_CREATE = "assessment-form-button-submit-Create";
 
@@ -147,7 +149,16 @@ export default class AssessmentForm {
      * @param markType - The mark type to set
      */
     async setMarkType(markType: number): Promise<void> {
-        const markTypeSelectEl = this.page.getByTestId(AssessmentForm.SELECTOR_MARK_TYPE);
+        const markTypeSelectEl = this.page.getByTestId(AssessmentForm.DATATEST_MARK_TYPE);
+        await markTypeSelectEl.selectOption({ value: markType.toString() });
+    }
+
+    /**
+     * Sets instructor mark type
+     * @param markType - The mark type to set
+     */
+    async setInstructorMarkType(markType: number): Promise<void> {
+        const markTypeSelectEl = this.page.getByTestId(AssessmentForm.DATATEST_INSTRUCTOR_MARK_TYPE);
         await markTypeSelectEl.selectOption({ value: markType.toString() });
     }
 
