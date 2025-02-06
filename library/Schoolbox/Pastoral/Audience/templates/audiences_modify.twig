@@ -7,6 +7,9 @@
 {% endif %}
 {% set getActionsRoute = routeLookup('pastoral.getActions') %}
 
+{% set expiryType = subtype is null ? 'pastoralAudience.postTypeDefaultExpiry' : 'pastoralAudience.postSubTypeDefaultExpiry' %}
+{% set expirySetAction = routeLookupIfAuthorized(expiryType) %}
+
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
 
@@ -59,14 +62,16 @@
                 /**
                  * send through the apply default expiry request
                  */
-                 /*
                 try {
-                    fetch("{{ action }}", {
+                    fetch("{{ expirySetAction }}", {
                         method: "POST",
                         body: JSON.stringify({
                             typeId: {{ type.id }},
-                            subtypeId: {{ subtype.id }}
-                        })
+                            subtypeId: {{ subtype.id ?? '""' }}
+                        }),
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
                     }).then((response) => {
                         if (response.ok) {
                             $("#apply-default-expiry-modal").foundation("reveal", "close");
@@ -84,7 +89,6 @@
                     confirmButton.innerHTML = "Yes";
                     $("#apply-default-expiry-modal").foundation("reveal", "close");
                 }
-                */
             });
             /**
              * Close the confirm default expiry modal

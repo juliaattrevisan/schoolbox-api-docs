@@ -61,8 +61,10 @@ class Module extends AlaressModule\Module
                 '/subtype/{subtypeId}/modify' => ['getAudiencesSubTypeModify' => $loggedInAndPastoralWritePerm],
             ],
             'POST' => [
-                '/type/{typeId}/modify'       => ['postAudienceTypeModify'    => $pastoralWriteAndTypeHasSubTypes],
+                '/type/{typeId}/modify'       => ['postAudienceTypeModify' => $pastoralWriteAndTypeHasSubTypes],
                 '/subtype/{subtypeId}/modify' => ['postAudienceSubTypeModify' => $loggedInAndPastoralWritePerm],
+                '/type/expiry/apply'          => ['postTypeDefaultExpiry' => $loggedInAndPastoralWritePerm],
+                '/subtype/expiry/apply'       => ['postSubTypeDefaultExpiry' => $loggedInAndPastoralWritePerm],
             ],
         ]);
     }
@@ -85,6 +87,10 @@ class Module extends AlaressModule\Module
             $this->injector->get('l10n'),
             new ColorFactory(),
             $this->getMapperFactory()->get(Pastoral\Access\Mapper::class),
+            new Pastoral\ExpiryHelper(
+                $this->getMapperFactory()->get(Pastoral\Mapper::class),
+                $this->getMapperFactory()->get(\Schoolbox\Assessment\Term\Mapper::class),
+            ),
         );
     }
 

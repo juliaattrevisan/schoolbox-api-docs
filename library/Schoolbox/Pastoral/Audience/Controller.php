@@ -13,6 +13,9 @@ use Alaress\Color\ColorFactory;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Request\Values;
+use Schoolbox\Pastoral\Type\Model as PastoralType;
+use Symfony\Component\HttpFoundation\Response;
+use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\L10n\RosettaStone;
@@ -57,7 +60,8 @@ class Controller extends Base
         private IconMapper $iconMapper,
         private RosettaStone $rosettaStone,
         private ColorFactory $colorFactory,
-        private Pastoral\Access\Mapper $pastoralAccessMapper
+        private Pastoral\Access\Mapper $pastoralAccessMapper,
+        private Pastoral\ExpiryHelper $expiryHelper,
     ) {
     }
 
@@ -436,5 +440,56 @@ class Controller extends Base
         $pb = $this->pastoralAudienceMapper->getPredicateBuilder();
         $subtype ? $pb->equals('subtype_id', $subtype->getId()) : $pb->equals('type_id', $type->getId());
         return $this->pastoralAudienceMapper->findByPredicates($pb)->filter($this->pastoralAudienceMapper->getPermissionCallback());
+    }
+
+    /**
+     * @return void
+     */
+    public function postTypeDefaultExpiry(): void
+    {
+        $post = $this->getRequestPost();
+
+        try {
+            $type = $this->pastoralTypeMapper->findById($post->getInt('typeId'));
+        } catch (MapperException | MapperException\Deleted $e) {
+            $this->sendJsonError($e->getMessage(), Response::HTTP_NOT_FOUND);
+            return;
+        }
+        $defaultExpiry = $type->getDefaultExpiry();
+
+        try {
+            $this->expiryHelper->updateDefaultExpireAt(
+                $post->getInt('typeId'),
+                $post->getInt('subtypeId'),
+                $defaultExpiry,
+            );
+        } catch (MapperException | \Exception $e) {
+            $this->sendJsonError($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+            return;
+        }
+    }
+
+    public function postSubTypeDefaultExpiry(): void
+    {
+        $post = $this->getRequestPost();
+
+        try {
+            $subType = $this->pastoralSubTypeMapper->findById($post->getInt('subtypeId'));
+        } catch (MapperException | MapperException\Deleted $e) {
+            $this->sendJsonError($e->getMessage(), Response::HTTP_NOT_FOUND);
+            return;
+        }
+        $defaultExpiry = $subType->getDefaultExpiry();
+
+        try {
+            $this->expiryHelper->updateDefaultExpireAt(
+                $post->getInt('typeId'),
+                $post->getInt('subtypeId'),
+                $defaultExpiry,
+            );
+        } catch (MapperException | \Exception $e) {
+            $this->sendJsonError($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+            return;
+        }
     }
 }
