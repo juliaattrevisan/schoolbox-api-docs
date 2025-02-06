@@ -77,21 +77,16 @@ $column-gutter: rem-calc(32);
 
 // Media Query Ranges
 $small-breakpoint: 40em !default; //640px
-$medium-breakpoint: 59.375em !default; // 950px
+$medium-breakpoint: 64em !default; // 1024px
 $large-breakpoint: 90em !default; // 1440px
 $xlarge-breakpoint: 120em !default; // 1920px
 
-//Sets the sidenav-breakpoint (64em = 1024px) at which the sidenav switches to its large layout.
-$sidenav-breakpoint: 64em !default; //  1024 used to let the chrome change to "large" before content
-
 // Here we define the lower and upper bounds for each media size
 $small-range: (0, $small-breakpoint) !default; /* 0, 640px */
-$medium-range: ($small-breakpoint + 0.0625em, $medium-breakpoint) !default; /*  641px,  950px */
-$large-range: ($medium-breakpoint + 0.0625em, $large-breakpoint) !default; /*  951px, 1440px */
+$medium-range: ($small-breakpoint + 0.0625em, $medium-breakpoint) !default; /*  641px,  1024px */
+$large-range: ($medium-breakpoint + 0.0625em, $large-breakpoint) !default; /*  1025px, 1440px */
 $xlarge-range: ($large-breakpoint + 0.0625em, $xlarge-breakpoint) !default; /* 1441px, 1920px */
 $xxlarge-range: ($xlarge-breakpoint + 0.0625em, 99999999em) !default; /* 1921px, ...    */
-
-$sidenav-range: ($medium-breakpoint + 0.0625em, $sidenav-breakpoint) !default; /*  951px, 1024px */
 
 $screen: "only print, screen";
 
@@ -116,10 +111,6 @@ $xlarge-down: "#{$screen} and (max-width:#{upper-bound($xlarge-range)})" !defaul
 $xxlarge-up: "#{$screen} and (min-width:#{lower-bound($xxlarge-range)})";
 $xxlarge-only: "#{$screen} and (min-width:#{lower-bound($xxlarge-range)}) and (max-width:#{upper-bound($xxlarge-range)})";
 $xxlarge-down: "#{$screen} and (max-width:#{upper-bound($xxlarge-range)})" !default;
-
-$sidenav-up: "#{$screen} and (min-width:#{lower-bound($sidenav-range)})";
-$sidenav-only: "#{$screen} and (min-width:#{lower-bound($sidenav-range)}) and (max-width:#{upper-bound($sidenav-range)})";
-$sidenav-down: "#{$screen} and (max-width:#{upper-bound($sidenav-range)})" !default;
 
 // Legacy
 $small: $small-up;
