@@ -41,7 +41,7 @@
     "@ckeditor/ckeditor5-word-count": "~40.2.0",
     "@firebase/app": "~0.10.18",
     "@firebase/messaging": "~0.12.16",
-    "@floating-ui/dom": "~1.6.10",
+    "@floating-ui/dom": "~1.6.13",
     "@fullcalendar/adaptive": "~6.1.15",
     "@fullcalendar/core": "~6.1.15",
     "@fullcalendar/daygrid": "~6.1.15",
