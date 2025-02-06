@@ -89,12 +89,12 @@
         "sanitize-html": "~2.14.0",
         "sortablejs": "~1.15.6",
         "strtotime": "~1.0.0",
-        "swiper": "^11.2.2",
+        "swiper": "~11.2.2",
         "tinycolor2": "~1.6.0",
         "ts-ebml": "~3.0.1",
         "v-tables-3-select-rows": "~0.4.9",
         "videojs-record": "~4.8.0",
-        "vue": "~3.5.12",
+        "vue": "^3.5.13",
         "vuejs-paginate-next": "~1.0.2"
       },
       "devDependencies": {
