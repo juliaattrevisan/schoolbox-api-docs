@@ -191,10 +191,9 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         // normalise the birth date: change YYYY-mm-dd to timestamp
         $student['STUDENTBIRTHDATE'] = strtotime($student['STUDENTBIRTHDATE']);
 
-        /* Assign alert messages to the right places and filter out empty values
-         * There can only be one AlertMessage in this connector per user
+        /* There are no alert messages in edumate, just initialise the stacks
          */
-        $student['AlertMessage'] = AllMeaningfulValues::find([$student['AlertMessage']]);
+        $student['AlertMessage'] = [];
         $student['AlertLegal'] = [];
 
         return $this->normaliseFields($student, $caseSensitiveFields);
