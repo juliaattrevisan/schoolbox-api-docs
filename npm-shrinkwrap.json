@@ -141,7 +141,7 @@
         "eslint-import-resolver-typescript": "~3.6.1",
         "eslint-plugin-import": "~2.29.1",
         "eslint-plugin-jsdoc": "~48.0.4",
-        "eslint-plugin-storybook": "^0.8.0",
+        "eslint-plugin-storybook": "~0.8.0",
         "eslint-plugin-vue": "~9.21.1",
         "expose-loader": "~5.0.0",
         "extract-loader": "~5.1.0",
@@ -150,7 +150,7 @@
         "jest-serializer-vue": "~3.1.0",
         "msw": "~2.3.5",
         "msw-storybook-addon": "~2.0.4",
-        "mysql2": "~3.11.0",
+        "mysql2": "^3.12.0",
         "postcss": "~8.4.34",
         "postcss-import": "~12.0.1",
         "postcss-loader": "~4.3.0",
@@ -20405,6 +20405,21 @@
         "node": ">=10"
       }
     },
+    "node_modules/lru.min": {
+      "version": "1.1.1",
+      "resolved": "https://registry.npmjs.org/lru.min/-/lru.min-1.1.1.tgz",
+      "integrity": "sha512-FbAj6lXil6t8z4z3j0E5mfRlPzxkySotzUHwRXjlpRh10vc6AI6WN62ehZj82VG7M20rqogJ0GLwar2Xa05a8Q==",
+      "dev": true,
+      "engines": {
+        "bun": ">=1.0.0",
+        "deno": ">=1.30.0",
+        "node": ">=8.0.0"
+      },
+      "funding": {
+        "type": "github",
+        "url": "https://github.com/sponsors/wellwelwel"
+      }
+    },
     "node_modules/lz-string": {
       "version": "1.5.0",
       "resolved": "https://registry.npmjs.org/lz-string/-/lz-string-1.5.0.tgz",
@@ -21810,9 +21825,9 @@
       }
     },
     "node_modules/mysql2": {
-      "version": "3.11.0",
-      "resolved": "https://registry.npmjs.org/mysql2/-/mysql2-3.11.0.tgz",
-      "integrity": "sha512-J9phbsXGvTOcRVPR95YedzVSxJecpW5A5+cQ57rhHIFXteTP10HCs+VBjS7DHIKfEaI1zQ5tlVrquCd64A6YvA==",
+      "version": "3.12.0",
+      "resolved": "https://registry.npmjs.org/mysql2/-/mysql2-3.12.0.tgz",
+      "integrity": "sha512-C8fWhVysZoH63tJbX8d10IAoYCyXy4fdRFz2Ihrt9jtPILYynFEKUUzpp1U7qxzDc3tMbotvaBH+sl6bFnGZiw==",
       "dev": true,
       "dependencies": {
         "aws-ssl-profiles": "^1.1.1",
@@ -21820,7 +21835,7 @@
         "generate-function": "^2.3.1",
         "iconv-lite": "^0.6.3",
         "long": "^5.2.1",
-        "lru-cache": "^8.0.0",
+        "lru.min": "^1.0.0",
         "named-placeholders": "^1.1.3",
         "seq-queue": "^0.0.5",
         "sqlstring": "^2.3.2"
@@ -21839,15 +21854,6 @@
       },
       "engines": {
         "node": ">=0.10.0"
-      }
-    },
-    "node_modules/mysql2/node_modules/lru-cache": {
-      "version": "8.0.5",
-      "resolved": "https://registry.npmjs.org/lru-cache/-/lru-cache-8.0.5.tgz",
-      "integrity": "sha512-MhWWlVnuab1RG5/zMRRcVGXZLCXrZTgfwMikgzCegsPnG62yDQo5JnqKkrK4jO5iKqDAZGItAqN5CtKBCBWRUA==",
-      "dev": true,
-      "engines": {
-        "node": ">=16.14"
       }
     },
     "node_modules/named-placeholders": {
@@ -43788,6 +43794,12 @@
         "yallist": "^4.0.0"
       }
     },
+    "lru.min": {
+      "version": "1.1.1",
+      "resolved": "https://registry.npmjs.org/lru.min/-/lru.min-1.1.1.tgz",
+      "integrity": "sha512-FbAj6lXil6t8z4z3j0E5mfRlPzxkySotzUHwRXjlpRh10vc6AI6WN62ehZj82VG7M20rqogJ0GLwar2Xa05a8Q==",
+      "dev": true
+    },
     "lz-string": {
       "version": "1.5.0",
       "resolved": "https://registry.npmjs.org/lz-string/-/lz-string-1.5.0.tgz",
@@ -44761,9 +44773,9 @@
       }
     },
     "mysql2": {
-      "version": "3.11.0",
-      "resolved": "https://registry.npmjs.org/mysql2/-/mysql2-3.11.0.tgz",
-      "integrity": "sha512-J9phbsXGvTOcRVPR95YedzVSxJecpW5A5+cQ57rhHIFXteTP10HCs+VBjS7DHIKfEaI1zQ5tlVrquCd64A6YvA==",
+      "version": "3.12.0",
+      "resolved": "https://registry.npmjs.org/mysql2/-/mysql2-3.12.0.tgz",
+      "integrity": "sha512-C8fWhVysZoH63tJbX8d10IAoYCyXy4fdRFz2Ihrt9jtPILYynFEKUUzpp1U7qxzDc3tMbotvaBH+sl6bFnGZiw==",
       "dev": true,
       "requires": {
         "aws-ssl-profiles": "^1.1.1",
@@ -44771,7 +44783,7 @@
         "generate-function": "^2.3.1",
         "iconv-lite": "^0.6.3",
         "long": "^5.2.1",
-        "lru-cache": "^8.0.0",
+        "lru.min": "^1.0.0",
         "named-placeholders": "^1.1.3",
         "seq-queue": "^0.0.5",
         "sqlstring": "^2.3.2"
@@ -44785,12 +44797,6 @@
           "requires": {
             "safer-buffer": ">= 2.1.2 < 3.0.0"
           }
-        },
-        "lru-cache": {
-          "version": "8.0.5",
-          "resolved": "https://registry.npmjs.org/lru-cache/-/lru-cache-8.0.5.tgz",
-          "integrity": "sha512-MhWWlVnuab1RG5/zMRRcVGXZLCXrZTgfwMikgzCegsPnG62yDQo5JnqKkrK4jO5iKqDAZGItAqN5CtKBCBWRUA==",
-          "dev": true
         }
       }
     },
