@@ -453,9 +453,9 @@
                                             <label for="report-summary-worktype-{{ worktype.id }}-rubrics" class="checkbox-label"></label>
                                         </td>
                                         <td>
-                                            <input name="summary[workType][{{ worktype.id }}][boxplot]" type="hidden" value="0" />
-                                            <input data-summary-worktype-option="{{ worktype.id }}" data-summary-worktype-boxplot="{{ worktype.id }}" id="report-summary-worktype-{{ worktype.id }}-boxplot" name="summary[workType][{{ worktype.id }}][boxplot]" type="checkbox" value="1" {% if worktype.boxplot ?? false %}checked="checked"{% endif %} {% if not worktype.show ?? false %} disabled="disabled" {% endif %}/>
-                                            <label for="report-summary-worktype-{{ worktype.id }}-boxplot" class="checkbox-label"></label>
+                                            <input name="summary[workType][{{ worktype.id }}][graph]" type="hidden" value="0" />
+                                            <input data-summary-worktype-option="{{ worktype.id }}" data-summary-worktype-graph="{{ worktype.id }}" id="report-summary-worktype-{{ worktype.id }}-graph" name="summary[workType][{{ worktype.id }}][graph]" type="checkbox" value="1" {% if worktype.graph ?? false %}checked="checked"{% endif %} {% if not worktype.show ?? false %} disabled="disabled" {% endif %}/>
+                                            <label for="report-summary-worktype-{{ worktype.id }}-graph" class="checkbox-label"></label>
                                         </td>
                                     </tr>
                                     {% endfor %}
@@ -583,9 +583,9 @@
                                             <label for="report-class-worktype-{{ worktype.id }}-rubrics" class="checkbox-label"></label>
                                         </td>
                                         <td>
-                                            <input name="class[workType][{{ worktype.id }}][boxplot]" type="hidden" value="0" />
-                                            <input data-class-worktype-option="{{ worktype.id }}" data-class-worktype-boxplot="{{ worktype.id }}" id="report-class-worktype-{{ worktype.id }}-boxplot" name="class[workType][{{ worktype.id }}][boxplot]" type="checkbox" value="1" {% if worktype.boxplot ?? false %}checked="checked"{% endif %} {% if not worktype.show ?? false %} disabled="disabled" {% endif %}/>
-                                            <label for="report-class-worktype-{{ worktype.id }}-boxplot" class="checkbox-label"></label>
+                                            <input name="class[workType][{{ worktype.id }}][graph]" type="hidden" value="0" />
+                                            <input data-class-worktype-option="{{ worktype.id }}" data-class-worktype-graph="{{ worktype.id }}" id="report-class-worktype-{{ worktype.id }}-graph" name="class[workType][{{ worktype.id }}][graph]" type="checkbox" value="1" {% if worktype.graph ?? false %}checked="checked"{% endif %} {% if not worktype.show ?? false %} disabled="disabled" {% endif %}/>
+                                            <label for="report-class-worktype-{{ worktype.id }}-graph" class="checkbox-label"></label>
                                         </td>
                                     </tr>
                                 {% endfor %}

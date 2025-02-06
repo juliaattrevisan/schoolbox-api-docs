@@ -308,7 +308,7 @@ class Controller extends ConfigController
                 'grades' => $payload['summary']['workType'][$summaryWorkType->getId()]['grades'] ?? false,
                 'comments' => $payload['summary']['workType'][$summaryWorkType->getId()]['comments'] ?? false,
                 'rubrics' => $payload['summary']['workType'][$summaryWorkType->getId()]['rubrics'] ?? false,
-                'boxplot' => $payload['summary']['workType'][$summaryWorkType->getId()]['boxplot'] ?? false,
+                'graph' => $payload['summary']['workType'][$summaryWorkType->getId()]['graph'] ?? false,
                  // if we have seen this worktype in the payload, then set to show, and use it
                 'show' => isset($payload['summary']['workType'][$summaryWorkType->getId()]),
             ];
@@ -318,7 +318,7 @@ class Controller extends ConfigController
                 'grades' => $payload['class']['workType'][$summaryWorkType->getId()]['grades'] ?? false,
                 'comments' => $payload['class']['workType'][$summaryWorkType->getId()]['comments'] ?? false,
                 'rubrics' => $payload['class']['workType'][$summaryWorkType->getId()]['rubrics'] ?? false,
-                'boxplot' => $payload['class']['workType'][$summaryWorkType->getId()]['boxplot'] ?? false,
+                'graph' => $payload['class']['workType'][$summaryWorkType->getId()]['graph'] ?? false,
                 // if we have seen this worktype in the payload, then set to show, and use it
                 'show' => isset($payload['class']['workType'][$summaryWorkType->getId()]),
             ];
@@ -935,7 +935,7 @@ class Controller extends ConfigController
             $workTypeWhitelist = [];
 
             foreach ($optionsPayload['summary']['workType'] as $worktypeId => $worktype) {
-                if ($worktype['boxplot']) {
+                if ($worktype['graph']) {
                     $workTypeWhitelist[] = $worktypeId;
                 }
             }
@@ -971,7 +971,7 @@ class Controller extends ConfigController
                 $workTypeWhitelist = [];
 
                 foreach ($optionsPayload['class']['workType'] as $worktypeId => $worktype) {
-                    if ($worktype['boxplot']) {
+                    if ($worktype['graph']) {
                         $workTypeWhitelist[] = $worktypeId;
                     }
                 }
