@@ -83,7 +83,7 @@
         "lightgallery": "^2.8.2",
         "locutus": "~2.0.32",
         "lodash": "~4.17.21",
-        "mediaelement": "~7.0.5",
+        "mediaelement": "^7.0.7",
         "pinia": "~2.2.2",
         "qrcode.vue": "~3.4.1",
         "sanitize-html": "~2.13.0",
@@ -20573,9 +20573,9 @@
       }
     },
     "node_modules/mediaelement": {
-      "version": "7.0.5",
-      "resolved": "https://registry.npmjs.org/mediaelement/-/mediaelement-7.0.5.tgz",
-      "integrity": "sha512-KFtaLZa7FzK3yuES/G+pL/W1OxGjaklSxdbmLgVs/Ls2JY45XPTZ4U8iOGwVr+nrytrRT0fJw73epPF6xCVvyQ==",
+      "version": "7.0.7",
+      "resolved": "https://registry.npmjs.org/mediaelement/-/mediaelement-7.0.7.tgz",
+      "integrity": "sha512-NstTSj21B5ow+ZmINIFkpzXrgpwLf5SMHD0bIihIfPIQZ8U4z4YsAlreJMqfukU9TmdusIGki1M7V9ILlZkYEA==",
       "dependencies": {
         "global": "^4.3.1",
         "svg4everybody": "^2.1.9"
@@ -43676,9 +43676,9 @@
       "integrity": "sha512-dq+qelQ9akHpcOl/gUVRTxVIOkAJ1wR3QAvb4RsVjS8oVoFjDGTc679wJYmUmknUF5HwMLOgb5O+a3KxfWapPQ=="
     },
     "mediaelement": {
-      "version": "7.0.5",
-      "resolved": "https://registry.npmjs.org/mediaelement/-/mediaelement-7.0.5.tgz",
-      "integrity": "sha512-KFtaLZa7FzK3yuES/G+pL/W1OxGjaklSxdbmLgVs/Ls2JY45XPTZ4U8iOGwVr+nrytrRT0fJw73epPF6xCVvyQ==",
+      "version": "7.0.7",
+      "resolved": "https://registry.npmjs.org/mediaelement/-/mediaelement-7.0.7.tgz",
+      "integrity": "sha512-NstTSj21B5ow+ZmINIFkpzXrgpwLf5SMHD0bIihIfPIQZ8U4z4YsAlreJMqfukU9TmdusIGki1M7V9ILlZkYEA==",
       "requires": {
         "global": "^4.3.1",
         "svg4everybody": "^2.1.9"

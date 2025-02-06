@@ -78,7 +78,7 @@
     "lightgallery": "^2.8.2",
     "locutus": "~2.0.32",
     "lodash": "~4.17.21",
-    "mediaelement": "~7.0.5",
+    "mediaelement": "~7.0.7",
     "pinia": "~2.2.2",
     "qrcode.vue": "~3.4.1",
     "sanitize-html": "~2.13.0",
