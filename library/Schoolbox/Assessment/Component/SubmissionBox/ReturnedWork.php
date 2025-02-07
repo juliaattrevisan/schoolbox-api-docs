@@ -73,6 +73,11 @@ class ReturnedWork implements ISoftDeletable
     protected $humanReadableMark;
 
     /**
+     * @var null|string
+     */
+    protected $humanReadableInstructorMark;
+
+    /**
      * @var null|float
      */
     protected $normalized_mark;
@@ -281,6 +286,24 @@ class ReturnedWork implements ISoftDeletable
     public function setHumanReadableMark($mark)
     {
         $this->humanReadableMark = $mark;
+        return $this;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getHumanReadableInstructorMark()
+    {
+        return $this->humanReadableInstructorMark;
+    }
+
+    /**
+     * @param  null|string $mark
+     * @return $this
+     */
+    public function setHumanReadableInstructorMark($mark)
+    {
+        $this->humanReadableInstructorMark = $mark;
         return $this;
     }
 
