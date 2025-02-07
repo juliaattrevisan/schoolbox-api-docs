@@ -586,6 +586,16 @@ class Model implements ISoftDeletable, IModel
     }
 
     /**
+     * Return if the record is archived
+     *
+     * @return bool
+     */
+    public function isArchived(): bool
+    {
+        return $this->getExpiresAt() !== null && $this->getExpiresAt()->isPast();
+    }
+
+    /**
      * Returns occurred on if set, created at otherwise
      * @return Alaress_Date_Format|null
      */
