@@ -70,6 +70,19 @@
                         <input type="text" class='suds-crypto' name="dsn[isams][modules][restapi][clientsecret]" value="{{ modules.restapi.clientsecret ?? ''}}" />
                     </div>
                 </div>
+
+                <hr />
+
+                <div class="row">
+                    <div class="small-12 columns">
+                        <label>Parent</label>
+                        <span class="meta">
+                            Enter contact types <b>separated by commas (not case-sensitive)</b> to specify which will be identified as parents of students.
+                            If left blank, all contact types will be identified as parents by default.
+                        </span>
+                        <input type="text" class='' name="dsn[isams][options][parentRelations]" value="{{ options.parentRelations ?? ''}}" />
+                    </div>
+                </div>
             </div>
         </fieldset>
     </section>
