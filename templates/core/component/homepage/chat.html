@@ -32,18 +32,15 @@
 
             document.querySelector('a[data-action="active"]').addEventListener('click', function(event) {
                 event.preventDefault();
+                const formData = new FormData();
+                formData.append("cid", "{ID}");
+                formData.append("type", "config");
+                formData.append("component", "{CHAT_COMPONENT_ID}");
+                formData.append("state", "Active");
+                formData.append("teacher_timestamp", "");
                 fetch('/homepage/configForm.php', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: new URLSearchParams({
-                        cid: '{ID}',
-                        type: 'config',
-                        component: '{CHAT_COMPONENT_ID}',
-                        state: 'Active',
-                        teacher_timestamp: ''
-                    })
+                    body: formData,
                 }).then(response => {
                     if (response.redirected) {
                         const redirectUrl = response.url;
