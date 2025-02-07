@@ -323,6 +323,7 @@ $app = new class extends CliTool\App {
             'mobile_firebase_browser'   => 'SELECT count(*) FROM `mobile_app_registry` JOIN mobile_app on (mobile_app_registry.app_id = mobile_app.id AND mobile_app.deleted_at IS NULL AND provider = "Firebase") WHERE device_id = "Browser" AND mobile_app_registry.deleted_at is null',
             'mobile_firebase_ios'       => 'SELECT count(*) FROM `mobile_app_registry` JOIN mobile_app on (mobile_app_registry.app_id = mobile_app.id AND mobile_app.deleted_at IS NULL AND provider = "Firebase") WHERE device_id = "iOS" AND mobile_app_registry.deleted_at is null',
             'mobile_tass_orbit'         => 'SELECT count(*) FROM `mobile_app_registry` JOIN mobile_app on (mobile_app_registry.app_id = mobile_app.id AND mobile_app.deleted_at IS NULL AND provider = "TassOrbit") WHERE mobile_app_registry.deleted_at is null',
+            'mobile_firebase_inklass'   => 'SELECT count(*) FROM `mobile_app_registry` JOIN mobile_app on (mobile_app_registry.app_id = mobile_app.id AND mobile_app.deleted_at IS NULL AND provider = "Firebase") WHERE device_id like "%Inklass%" AND mobile_app_registry.deleted_at is null',
 
             //Calendar
             'event_school'      => 'SELECT COUNT(*) FROM event WHERE type = ' . Schoolbox\Calendar\Event::ACCESS_CAMPUS . ' AND deleted_at IS NULL',
