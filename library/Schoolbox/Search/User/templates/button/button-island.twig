@@ -114,7 +114,7 @@
                     {% elseif button.type in ['documentmanagement'] %}
                         {% set route = routeLookupIfAuthorized('profileDocumentManagement.getIndex', {studentId: user.id}) %}
                     {% elseif button.type in ['geosnapshot'] %}
-                        {% set route = routeLookupIfAuthorized('geosnapshotApi.getStudentPhotos', {id: user.id}) %}
+                        {% set route = routeLookupIfAuthorized('geosnapshotApi.getPhotos', {id: user.id}) %}
                     {% endif %}
 
                     {% if route %}
