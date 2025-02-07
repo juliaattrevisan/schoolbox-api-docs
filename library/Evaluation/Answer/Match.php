@@ -437,7 +437,7 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
                 )
             );
 
-            $allAnswers = unserialize($answerGroup['answer'] ?? '');
+            $allAnswers = unserialize($answerGroup['answer']);
 
             for ($i = 0; $i < count($allAnswers); $i++) {
                 $currentAnswer = $allAnswers[$i];
