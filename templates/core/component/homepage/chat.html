@@ -29,6 +29,30 @@
                     msgbox.setActive();
                 }
             });
+
+            document.querySelector('a[data-action="active"]').addEventListener('click', function(event) {
+                event.preventDefault();
+                fetch('/homepage/configForm.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams({
+                        cid: '{ID}',
+                        type: 'config',
+                        component: '{CHAT_COMPONENT_ID}',
+                        state: 'Active',
+                        teacher_timestamp: ''
+                    })
+                }).then(response => {
+                    if (response.redirected) {
+                        const redirectUrl = response.url;
+                        if (redirectUrl) {
+                            window.location.href = redirectUrl;
+                        }
+                    }
+                }).catch(error => console.error('Error:', error));
+            });
         });
     </script>
     <!-- BEGIN chat_staff_js -->
@@ -62,8 +86,7 @@
 
                 <!-- BEGIN empty_write -->
                 <p>
-                    <a href="/homepage/configForm.php?cid={ID}&type=config&component={CHAT_COMPONENT_ID}&state=Active&teacher_timestamp=">Activate the chat</a> to allow users to have conversations on this page, or <a href="/homepage/chatArchive/{ID}/">view the chat archive</a>.
-                </p>
+                    <a href="#" data-action="active">Activate the chat</a> to allow users to have conversations on this page, or <a href="/homepage/chatArchive/{ID}/">view the chat archive</a>.                </p>
                 <!-- END empty_write -->
 
             </div>
