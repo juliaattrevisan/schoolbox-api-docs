@@ -201,21 +201,34 @@ class Factory
         if ($this->mark !== null && $this->mark !== '') {
             // mark defined and non-empty
             try {
-                $scheme = $this->participant->getAssessable()->getMarkScheme();
+                /** @var \Schoolbox\Learning\Assessment\DueWork\Model $assessable */
+                $assessable = $this->participant->getAssessable();
 
-                // verify normalisation, then sanitise the output
-                $norm = $scheme->getNormalisedMark($this->mark);
-                $humanReadableMark = $scheme->getHumanReadableMark($norm);
+                /** Get mark schemes
+                 * - Instructor mark scheme is used to normalise what was inputted by the user
+                 * - Learner mark scheme is used when displaying the mark back to learners/parents
+                 */
+                $instructorScheme = $assessable->getInstructorMarkScheme();
+                $learnerScheme = $assessable->getMarkScheme();
+
+                // verify normalisation
+                $norm = $instructorScheme->getNormalisedMark($this->mark);
+
+                //then sanitise the output for both instructor and learner marks
+                $humanReadableMark = $learnerScheme->getHumanReadableMark($norm);
+                $humanReadableInstructorMark = $instructorScheme->getHumanReadableMark($norm);
 
                 $feedback
                     ->setNormalisedMark($norm)
-                    ->setHumanReadableMark($humanReadableMark);
+                    ->setHumanReadableMark($humanReadableMark)
+                    ->setHumanReadableInstructorMark($humanReadableInstructorMark);
             } catch (\InvalidArgumentException $e) {
                 $code = StateMapper::getInstance()->findOneByColumn('display_as', $this->mark);
 
                 $feedback
                     ->setNormalisedMark($code->getNormaliseAs())
-                    ->setHumanReadableMark($this->mark);
+                    ->setHumanReadableMark($this->mark)
+                    ->setHumanReadableInstructorMark($this->mark);
             }
         } else {
             // TODO what on EARTH is going on here? what is this "special case"?
@@ -226,7 +239,8 @@ class Factory
 
             $feedback
                 ->setNormalisedMark(null)
-                ->setHumanReadableMark('');
+                ->setHumanReadableMark('')
+                ->setHumanReadableInstructorMark('');
         }
 
         // Attach any attached files (if this kind of attachment accepts them)
