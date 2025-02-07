@@ -56,7 +56,10 @@ class External_Synergetic_Tsc_User extends External_Synergetic_User
                         vStudentsAll.StudentSpecialNeedsFlag,
                         vStudentsAll.EnglishSecondFlag,
                         vStudentsAll.StudentStudiesCode,
-                        AlertMessage,
+                        CASE WHEN AlertCategoryCode != ''
+                            THEN CONCAT(AlertCategoryCode,': ',AlertMessage)
+                            ELSE AlertMessage
+                        END AS AlertMessage,
                         vStudentsAll.LegalCourtOrderType AS CourtOrderType,
                         vStudentsAll.LegalParentsSeparatedFlag AS ParentsSeparatedFlag,
                         luBoarder.Description AS StudentBoarder,

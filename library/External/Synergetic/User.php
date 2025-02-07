@@ -314,7 +314,10 @@ class External_Synergetic_User implements External_UserInterface
                         vStudentsAll.EnglishSecondFlag,
                         vStudentsAll.StudentGovernmentStudentNumber,
                         vStudentsAll.StudentStudiesCode,
-                        AlertMessage,
+                        CASE WHEN AlertCategoryCode != ''
+                            THEN CONCAT(AlertCategoryCode,': ',AlertMessage)
+                            ELSE AlertMessage
+                         END AS AlertMessage,
                         vStudentsAll.LegalCourtOrderType AS CourtOrderType,
                         vStudentsAll.LegalParentsSeparatedFlag AS ParentsSeparatedFlag,
                         luBoarder.Description AS StudentBoarder,
