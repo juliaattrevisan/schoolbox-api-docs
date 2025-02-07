@@ -89,7 +89,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
         if (is_numeric($question_id)) {
             $answerGroup = parent::getForQuestion($question_id);
 
-            if ($answerGroup) {
+            if (isset($answerGroup['answer']) && is_string($answerGroup['answer'])) {
                 $allAnswers = unserialize($answerGroup['answer']);
 
                 if (is_array($allAnswers) && count($allAnswers)) {
@@ -153,7 +153,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
      */
     protected function getAnswersFromAnswerGroup($answerGroup)
     {
-        return unserialize($answerGroup['answer']);
+        return unserialize($answerGroup['answer'] ?? '');
     }
 
     /**
@@ -245,7 +245,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
                     'ANSWER_AUTO_COMPLETE' => ($questionConfig->randomiseOptionOrder ?? false) ? 'off' : 'on',
                 ));
 
-                if ($existing['response']) {
+                if (isset($existing['response']) && is_string($existing['response'])) {
                     if ($this->isAnswerSelected($currentAnswer->value, unserialize($existing['response']))) {
                         $page->setVar(array(
                             'ANSWER_CHECKED' => 'checked=\'checked\'',
@@ -313,7 +313,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
         $answerGroup = $this->getByQuestionID($question_id);
         $page->setVar('answerOption_block', '');
 
-        if ($answerGroup) {
+        if (isset($answerGroup['answer']) && is_string($answerGroup['answer'])) {
             $allAnswers = unserialize($answerGroup['answer']);
 
             if (is_array($allAnswers)) {
@@ -391,7 +391,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
 
         $postprocessed = [];
 
-        $data = (array)unserialize($response['response']);
+        $data = (array)unserialize($response['response'] ?? '');
 
 
         /* Answer text to appear in export
@@ -412,11 +412,11 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
 
         /* Append commentary
          */
-        $data['comment'] = $response['comment'];
+        $data['comment'] = $response['comment'] ?? '';
 
         /* Append awarded mark
          */
-        $data['mark'] = $response['mark'];
+        $data['mark'] = $response['mark'] ?? '';
 
         return $data;
     }
@@ -432,11 +432,13 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
     {
         $answer = $this->getByQuestionID($question_id);
 
-        $allOptions = unserialize($answer['answer']);
+        if (isset($answer['answer']) && is_string($answer['answer'])) {
+            $allOptions = unserialize($answer['answer']);
 
-        foreach ($allOptions as $currentOption) {
-            if ($currentOption->value == $value) {
-                return $currentOption->description;
+            foreach ($allOptions as $currentOption) {
+                if ($currentOption->value == $value) {
+                    return $currentOption->description;
+                }
             }
         }
 
@@ -457,7 +459,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
         /* If a question was added after the attempt was made by the student,
          * then $response['response'] might not even exist; return empty array
          */
-        if ($response) {
+        if (isset($response['response']) && is_string($response['response'])) {
             return unserialize($response['response']);
         }
 
@@ -478,13 +480,13 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
         $existing = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
         $existingAnswer = false;
 
-        if ($existing) {
+        if (isset($existing['response']) && is_string($existing['response'])) {
             $existingAnswer = $this->getAnswersFromResponse($existing['response']);
         }
 
         $answerGroup = $this->getByQuestionID($question_id);
 
-        if ($answerGroup) {
+        if (isset($answerGroup['answer']) && is_string($answerGroup['answer'])) {
             $allAnswers = unserialize($answerGroup['answer']);
 
             $page->setVar(array(
@@ -546,13 +548,13 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
         $existing = $this->getResponseHandler()->isResponseExists($attemptId, $currentQuestion['question_id']);
         $existingAnswer = false;
 
-        if ($existing) {
+        if (isset($existing['response']) && is_string($existing['response'])) {
             $existingAnswer = $this->getAnswersFromResponse($existing['response']);
         }
 
         $answerGroup = $this->getByQuestionID($currentQuestion['question_id']);
 
-        if ($answerGroup) {
+        if (isset($answerGroup['answer']) && is_string($answerGroup['answer'])) {
             $allAnswers = unserialize($answerGroup['answer']);
 
             $page->setVar(array(
@@ -642,7 +644,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
     {
         $answerGroup = $this->getByQuestionID($currentQuestion['question_id']);
 
-        if ($answerGroup) {
+        if (isset($answerGroup['answer']) && is_string($answerGroup['answer'])) {
             $allAnswers = unserialize($answerGroup['answer']);
 
             $page->setVar(array(

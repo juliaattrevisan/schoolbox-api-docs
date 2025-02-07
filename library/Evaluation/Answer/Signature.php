@@ -234,15 +234,15 @@ abstract class Evaluation_Answer_Signature extends Evaluation_Answer
 
         /* Remove tab characters
          */
-        $data['response'] = str_replace("\t", '', $response['response']);
+        $data['response'] = str_replace("\t", '', $response['response'] ?? '');
 
         /* Append commentary
          */
-        $data['comment'] = $response['comment'];
+        $data['comment'] = $response['comment'] ?? '';
 
         /* Append awarded mark
          */
-        $data['mark'] = $response['mark'];
+        $data['mark'] = $response['mark'] ?? '';
 
         return $data;
     }
