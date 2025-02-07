@@ -27,7 +27,6 @@ async function createClassPage(
 
     tester.isGoingTo("Create a homepage");
     await createFolder.goto();
-    await page.waitForLoadState("domcontentloaded");
     const homepageTemplateOption = "Blank";
     tester.isGoingTo("type a folder name, select a template option and set access permissions");
     await createFolder.typeName(folderName);
@@ -52,6 +51,11 @@ test.describe("Quiz Create Tests", () => {
     // Run tests serially, as tests rely on prior tests to have been run
     test.describe.configure({ mode: "serial" });
 
+    const folderName = "Test Class Homepage Quiz";
+    const quizName = "Quiz Automation Test";
+    let folderId: string | null = null;
+    let quizId: number | null = null;
+
     test.beforeEach(async ({ tester }) => {
         await tester.logout();
         await tester.loginAsAdmin();
@@ -63,17 +67,12 @@ test.describe("Quiz Create Tests", () => {
         const assessmentForm = new AssessmentForm(tester, page);
         const quiz = new QuizSettingPage(tester, page);
 
-        const quizName = "Quiz Automation Test";
-        const folderName = "Test Class Homepage Quiz";
-
         tester.isGoingTo("create a homepage, navigate to the class page and add a quiz component");
         await createClassPage(tester, page, db, folderName);
         await resources.goto();
-        const folderId = (await db.grabFromDatabase("folder", "id", { deleted_at: null, name: folderName })) as string;
+        folderId = (await db.grabFromDatabase("folder", "id", { deleted_at: null, name: folderName })) as string;
         await resources.clickFolderName(folderName);
-        await page.waitForLoadState("domcontentloaded");
         await resources.clickMenuItem("home");
-        await page.waitForLoadState("domcontentloaded");
         await homepage.addComponent(Homepage.ELEMENT_ADD_COMPONENT_SECTION_LEARNING, "Quizzes");
 
         tester.isGoingTo("Create a quiz");
@@ -86,29 +85,25 @@ test.describe("Quiz Create Tests", () => {
 
         tester.isGoingTo("navigate to the homepage and ensure the quiz is presented");
         await homepage.goto(parseInt(folderId, 10));
-        const quizId = (await db.grabFromDatabase("assessment", "id", {
+        quizId = (await db.grabFromDatabase("assessment", "id", {
             deleted_at: null,
             "title like": quizName,
         })) as number;
-        await expect(page.getByTestId(`${Homepage.SELECTOR_ASSESSMENT_COMPONENT_TITLE}${quizId}`)).toContainText(
+        await expect(page.getByTestId(`${Homepage.DATATEST_ASSESSMENT_COMPONENT_TITLE}${quizId}`)).toContainText(
             quizName,
         );
     });
 
-    test("Modify a quiz settings", async ({ tester, page, db }) => {
+    test("Modify a quiz settings", async ({ tester, page }) => {
         const homepage = new Homepage(page);
         const assessmentForm = new AssessmentForm(tester, page);
         const quiz = new QuizSettingPage(tester, page);
 
-        const quizName = "Quiz Automation Test";
-        const folderName = "Test Class Homepage Quiz";
-        const folderId = (await db.grabFromDatabase("folder", "id", { deleted_at: null, name: folderName })) as string;
-        const quizId = (await db.grabFromDatabase("assessment", "id", {
-            deleted_at: null,
-            "title like": quizName,
-        })) as number;
+        if (folderId === null || quizId === null) {
+            throw new Error("Folder ID or Quiz ID not found");
+        }
 
-        tester.isGoingTo("navigate to the class page. click the quiz dropdown and click Modify");
+        tester.isGoingTo("navigate to the class page, click the quiz dropdown and click Modify");
         await homepage.goto(parseInt(folderId, 10));
         await homepage.clickAssessmentComponentTOTMenu(quizId);
         await homepage.clickModifyViaAssessmentComponent("Modify Settings");
@@ -125,17 +120,13 @@ test.describe("Quiz Create Tests", () => {
         await expect(page.locator(`li.icon-quiz`)).toHaveText("Homework");
     });
 
-    test("Delete a quiz", async ({ tester, page, db }) => {
+    test("Delete a quiz", async ({ tester, page }) => {
         const homepage = new Homepage(page);
         const common = new Common(page);
 
-        const quizName = "Quiz Automation Test Updated";
-        const folderName = "Test Class Homepage Quiz";
-        const folderId = (await db.grabFromDatabase("folder", "id", { deleted_at: null, name: folderName })) as string;
-        const quizId = (await db.grabFromDatabase("assessment", "id", {
-            deleted_at: null,
-            "title like": quizName,
-        })) as number;
+        if (folderId === null || quizId === null) {
+            throw new Error("Folder ID or Quiz ID not found");
+        }
 
         tester.isGoingTo("navigate to the class page. click the quiz dropdown and click Delete");
         await homepage.goto(parseInt(folderId, 10));
