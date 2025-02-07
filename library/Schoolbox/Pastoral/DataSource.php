@@ -209,7 +209,7 @@ class DataSource
 
         $typeWheres     = [];
         $typeParams     = [];
-        $startDateWhere = $startDate ? ' AND COALESCE(`p`.`occurred_on`, `p`.`created_at`) >= :startDate ' : '';
+        $archiveWhere = " AND (expires_at > NOW() OR expires_at IS NULL) ";
 
         if (!empty($typeIds)) {
             $typeBindings = Builder::getBindings($typeIds, 'typeId');
@@ -231,7 +231,7 @@ class DataSource
                 FROM pastoral p
         WHERE ({$where['where']})
         AND ({$typeWhere})
-        {$startDateWhere}
+        {$archiveWhere}
         GROUP BY p.type_id, p.subtype_id
         ";
 
@@ -239,9 +239,6 @@ class DataSource
             $typeParams,
             $where['params']
         );
-        if ($startDate) {
-            $params = array_merge($params, ['startDate' => $startDate->getDatabaseDate()]);
-        }
 
         $stmt = $this->mapper->getDatabase()->query($sql, $params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
