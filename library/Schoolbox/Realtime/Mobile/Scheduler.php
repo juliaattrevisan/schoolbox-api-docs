@@ -361,8 +361,6 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
         $blackoutEndTime   = $this->config->get(ConfigMapper::NAME_NOTIFICATION_BLACKOUT_END_TIME);
 
         if ($blackoutEnabled) {
-            $this->log->notice(sprintf('Blackout period enabled (start: %s, end: %s)', $blackoutStartTime, $blackoutEndTime));
-
             // Validate blackout start and end, clearing if invalid
             if (!$this->validateTimeValue($blackoutStartTime)) {
                 $this->log->warning(
@@ -388,6 +386,15 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
             if (!isset($blackoutStartTime, $blackoutEndTime)) {
                 $blackoutStartTime = null;
                 $blackoutEndTime   = null;
+            } else {
+                $this->log->notice(
+                    sprintf(
+                        'Blackout period enabled (start: %s, end: %s%s)',
+                        $blackoutStartTime,
+                        $blackoutEndTime,
+                        $blackoutEndTime < $blackoutStartTime ? ' next day' : '',
+                    ),
+                );
             }
         } else {
             $this->log->notice('Blackout period not enabled');
