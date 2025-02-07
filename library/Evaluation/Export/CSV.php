@@ -12,7 +12,6 @@
  */
 abstract class Evaluation_Export_CSV
 {
-
     /**
      * Include html in export output
      *

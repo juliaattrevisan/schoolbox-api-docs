@@ -373,7 +373,7 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
     {
         $answer = $this->getByQuestionID($question_id);
 
-        if(isset($answer['answer']) && is_string($answer['answer'])) {
+        if (isset($answer['answer']) && is_string($answer['answer'])) {
             $allOptions = unserialize($answer['answer']);
 
             foreach ($allOptions as $currentOption) {

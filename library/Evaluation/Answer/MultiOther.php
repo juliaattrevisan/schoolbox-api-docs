@@ -212,7 +212,7 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer
 
         $answerGroup = $this->getByQuestionID($question_id);
 
-        if (isset($answerGroup['answer']) && is_string($answerGroup['answer']) ) {
+        if (isset($answerGroup['answer']) && is_string($answerGroup['answer'])) {
             $allAnswers = unserialize($answerGroup['answer']);
 
             /* Just unserialize this once, dude
@@ -457,12 +457,12 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer
     {
         $answer = $this->getByQuestionID($question_id);
 
-        if(isset($answer['answer']) && is_string($answer['answer'])) {
+        if (isset($answer['answer']) && is_string($answer['answer'])) {
             $allOptions = unserialize($answer['answer']);
 
             $other              = new StdClass();
             $other->description = 'Other';
-            $other->value       = $this->otherLetterIndex($allOptions);;
+            $other->value       = $this->otherLetterIndex($allOptions);
 
             $allOptions[] = $other;
 
