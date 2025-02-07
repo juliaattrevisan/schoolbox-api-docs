@@ -187,10 +187,6 @@ use Schoolbox\User\Token\Mapper as TokenMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Version\Version;
 use Scrub;
-use Sentry\State\HubInterface;
-use Sentry\Tracing\Transaction;
-use Sentry\Tracing\TransactionContext;
-use Sentry\Tracing\TransactionSource;
 use SitePage;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\RedisStore;
@@ -2147,11 +2143,8 @@ abstract class Kernel
             'search.indexBuilder',
             $di->lazy(
                 function () use ($di) {
-                    /** @var SchoolboxDatabaseFactory $dbFactory */
-                    $dbFactory = $di->get('databaseFactory');
-
-                    // Should this return write database always?
-                    $dbi = $dbFactory->getInternalDatabase();
+                    /** @var IConnector $dbi */
+                    $dbi = $di->get('databaseInternal');
 
                     // What sort of logger should this use?
                     // The CLI variant should use the kernel's logger:
