@@ -58,7 +58,10 @@ class External_Synergetic_Smcs_User extends External_Synergetic_User
                         '' AS StudentMobilePhone,
                         uvStudents.StudentSpecialNeedsFlag,
                         uvStudents.StudentStudiesCode,
-                        AlertMessage,
+                        CASE WHEN AlertCategoryCode != ''
+                            THEN CONCAT(AlertCategoryCode,': ',AlertMessage)
+                            ELSE AlertMessage
+                        END AS AlertMessage,
                         '' AS CourtOrderType,
                         luBoarder.Description AS StudentBoarder,
                         uvStudents.StudentsComment as Comment,
