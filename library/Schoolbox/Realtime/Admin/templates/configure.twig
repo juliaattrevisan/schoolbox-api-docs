@@ -322,8 +322,14 @@
                                                list="blackoutTimeSteps"
                                                style="width: auto; display: inline-block"
                                         />
+
+                                        {##
+                                         # Hide next day label if:
+                                         # * either blackout start or end time are unset, or:
+                                         # * both are set, and start < end
+                                         #}
                                         <span id="blackoutDescriptionNextDay"
-                                              {% if not (blackoutStartTime and blackoutEndTime and blackoutStartTime <= blackoutEndTime) %}class="hide"{% endif %}
+                                              {% if (not blackoutStartTime) or (not blackoutEndTime) or (blackoutStartTime < blackoutEndTime) %}class="hide"{% endif %}
                                         >the next day</span>.
 
                                         <datalist id="blackoutTimeSteps">
