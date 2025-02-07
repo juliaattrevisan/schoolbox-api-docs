@@ -90,7 +90,7 @@
                     </fieldset>
                     <div data-reveal id="apply-default-expiry-modal" class="reveal-modal">
                         <h2>Please confirm</h2>
-                        <p>Are you sure you wish to apply the Default Expiry? This will overwrite and apply to all existing records of this type.</p>
+                        <p>Are you sure you wish to apply the Default Expiry to <em>{{ currentDefaultExpiry ?? "Never" }}</em>? This will overwrite and apply to all existing records of this type.</p>
                         <a class="close-reveal-modal" aria-label="Close">&#215;</a>
                         <ul class="flex-list">
                             <li><button id="confirm-apply-default-expiry" class="button icon-approve submit">Yes</button></li>
