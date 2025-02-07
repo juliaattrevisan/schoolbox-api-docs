@@ -17,7 +17,7 @@
 
 {% set formField = 'rubric' %}
 {% set rubricId = 'rb-' ~ rubricGrid.assessment.id %}
-{% set markType = rubricGrid.assessment.markScheme.generateContext %}
+{% set markType = rubricGrid.assessment.instructorMarkScheme.generateContext %}
 {% set showDescriptorValue = showDescriptorValue ? true : false %}
 {% set showGroupTotal = showGroupTotal ? true : false %}
 {% set showRubricTotal = showRubricTotal ? true : false %}
@@ -120,6 +120,7 @@
                 </span>
 
                 {# Self-Assessment: only show the mark if it's self graded, as if it's self-reflect only they never marked themselves #}
+                {# todo which one should this show #}
                 {% if selfAssessmentFeedback is not null and selfAssessmentFeedback.isSelfGrading %}
                     ({{ selfAssessmentFeedback.humanReadableMark }} given in {{ locale.selfAssessment.proper }})
                 {% endif %}
