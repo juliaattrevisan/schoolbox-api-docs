@@ -20,6 +20,30 @@ class Factory
     private $factory;
 
     /**
+     * Singleton instance of the internal database connection within this
+     * factory instance.
+     */
+    private ?IConnector $internalDatabase = null;
+
+    /**
+     * Singleton instance of the read replica internal database connection
+     * within this factory instance.
+     */
+    private ?IConnector $internalReadDatabase = null;
+
+    /**
+     * Singleton instance of the master (writable) internal database connection
+     * within this factory instance.
+     */
+    private ?IConnector $internalWriteDatabase = null;
+
+    /**
+     * Singleton instance of the external (SIS or SUDS) database connection
+     * within this factory instance.
+     */
+    private ?IConnector $externalDatabase = null;
+
+    /**
      * TODO: Once we've got DI accessible everywhere this is currently used this should no longer required
      *
      * @deprecated
@@ -138,7 +162,12 @@ class Factory
     public function getInternalDatabase(): IConnector
     {
         // TODO: use the DB Proxy to correctly route to the correct DB connection...
-        return new ReadReplicatedProxy($this->getInternalWriteDatabase(), $this->getInternalReadDatabase(), 10);
+        $this->internalDatabase ??= new ReadReplicatedProxy(
+            $this->getInternalWriteDatabase(),
+            $this->getInternalReadDatabase(),
+            10,
+        );
+        return $this->internalDatabase;
     }
 
     /**
@@ -149,8 +178,11 @@ class Factory
      */
     public function getInternalWriteDatabase(): IConnector
     {
-        // TODO: use the DB Proxy to correctly route to the correct DB connection...
-        $connectorInternal = $this->factory->createMysql();
+        if ($this->internalWriteDatabase) {
+            return $this->internalWriteDatabase;
+        }
+
+        $this->internalWriteDatabase = $this->factory->createMysql();
 
         $host = SQL_host;
         $db   = SQL_db;
@@ -161,13 +193,13 @@ class Factory
         if (!isset($host, $db, $user, $pass)) {
             throw new DatabaseException("Schoolbox database not configured.");
         }
-        if (!$connectorInternal->connect($host, $db, $user, $pass)) {
+        if (!$this->internalWriteDatabase->connect($host, $db, $user, $pass)) {
             throw new DatabaseException("Unable to connect to Schoolbox database.");
         }
 
-        $connectorInternal->setTimezone($this->fetchTimezone($connectorInternal));
+        $this->internalWriteDatabase->setTimezone($this->fetchTimezone($this->internalWriteDatabase));
 
-        return $connectorInternal;
+        return $this->internalWriteDatabase;
     }
 
     /**
@@ -178,7 +210,11 @@ class Factory
      */
     public function getInternalReadDatabase(): IConnector
     {
-        $connectorInternalRead = $this->factory->createMysql();
+        if ($this->internalReadDatabase) {
+            return $this->internalReadDatabase;
+        }
+
+        $this->internalReadDatabase = $this->factory->createMysql();
 
         $hostRead = SQL_host_read;
         $dbRead   = SQL_db_read;
@@ -189,13 +225,13 @@ class Factory
         if (!isset($hostRead, $dbRead, $userRead, $passRead)) {
             throw new DatabaseException("Schoolbox read-only database not configured.");
         }
-        if (!$connectorInternalRead->connect($hostRead, $dbRead, $userRead, $passRead)) {
+        if (!$this->internalReadDatabase->connect($hostRead, $dbRead, $userRead, $passRead)) {
             throw new DatabaseException("Unable to connect to Schoolbox read-only database.");
         }
 
-        $connectorInternalRead->setTimezone($this->fetchTimezone($connectorInternalRead));
+        $this->internalReadDatabase->setTimezone($this->fetchTimezone($this->internalReadDatabase));
 
-        return $connectorInternalRead;
+        return $this->internalReadDatabase;
     }
 
 
@@ -210,17 +246,24 @@ class Factory
      */
     public function getExternalDatabase(IConfigLoader $config, bool $ignoreDisabled = false): ?IConnector
     {
+        if ($this->externalDatabase) {
+            return $this->externalDatabase;
+        }
+
         if (!$ignoreDisabled && !$config->get('external_enable')) {
-            return new NullConnector();
+            $this->externalDatabase = new NullConnector();
+            return $this->externalDatabase;
         }
 
         switch ($config->get('external_type')) {
             case null:
-                return new NullConnector();
+                $this->externalDatabase = new NullConnector();
+                return $this->externalDatabase;
 
             // Schoolbox connector: just return internal DB
             case 'schoolbox':
-                return $this->getInternalDatabase();
+                $this->externalDatabase = $this->getInternalDatabase();
+                return $this->externalDatabase;
 
             // Microsoft SQL Server
             case 'tass':
@@ -230,30 +273,28 @@ class Factory
             case 'isams':
             case 'doublefirst':
             case 'schooledge':
-                $connectorExternal = $this->factory->createSqlsrv();
+                $this->externalDatabase = $this->factory->createSqlsrv();
                 break;
 
             // IBM DB2
             case 'edumate':
-                $connectorExternal = $this->factory->createDb2();
+                $this->externalDatabase = $this->factory->createDb2();
                 [$host, $schema] = explode('/', $config->get('external_db_host'), 2);
-                $connectorExternal->connect(
+                $this->externalDatabase->connect(
                     $host,
                     $config->get('external_db_db'),
                     $config->get('external_db_user'),
                     $config->get('external_db_passwd'),
                     ['schema' => $schema]
                 );
-                return $connectorExternal;
-                break;
-        }
+                return $this->externalDatabase;
 
-        if (!isset($connectorExternal)) {
-            throw new DatabaseException("Unknown external database type.");
+            default:
+                throw new DatabaseException("Unknown external database type.");
         }
 
         try {
-            $connectorExternal->connect(
+            $this->externalDatabase->connect(
                 $config->get('external_db_host'),
                 $config->get('external_db_db'),
                 $config->get('external_db_user'),
@@ -261,9 +302,9 @@ class Factory
                 ['Encrypt' => $config->get('external_db_encryption')]
             );
 
-            $connectorExternal->setTimezone($this->fetchTimezone($this->getInternalReadDatabase()));
+            $this->externalDatabase->setTimezone($this->fetchTimezone($this->getInternalReadDatabase()));
 
-            return $connectorExternal;
+            return $this->externalDatabase;
         } catch (Exception $e) {
             /* If the connectivity doesn't work for some throwable reason, you'll find it silently discarded
              * here, which is annoying. This makes a NullConnector which, for some usages of the external db,
@@ -275,7 +316,8 @@ class Factory
              */
             // var_dump($e->getMessage());
         }
-        return new NullConnector();
+        $this->externalDatabase = new NullConnector();
+        return $this->externalDatabase;
     }
 
 
