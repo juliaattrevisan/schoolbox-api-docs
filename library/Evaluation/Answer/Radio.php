@@ -227,7 +227,7 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer
                     )
                 );
 
-                if (isset($existing['answer']) && is_string($existing['answer'])) {
+                if (isset($existing['response']) && is_string($existing['response'])) {
                     $existingAnswer = unserialize($existing['response']);
 
                     if (is_array($existingAnswer) && in_array($currentAnswer->value, $existingAnswer)) {
