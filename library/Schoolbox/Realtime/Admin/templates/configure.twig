@@ -335,6 +335,26 @@
                                             {% endfor %}
                                         </datalist>
                                     </p>
+
+                                    <ul>
+                                        <li>
+                                            Both a valid start and end time must be set, otherwise notifications will
+                                            not be delayed.
+                                        </li>
+                                        <li>
+                                            This affects only the sending of instant notifications sent to a device,
+                                            either via a web app or a <a href="{{ routeLookup('adminNotifications.getApps') }}">delivery provider</a>:
+                                            it does not affect digest, side panel or email notifications.
+                                        </li>
+                                        <li>
+                                            Priority news notifications are still sent as soon as they are able to be.
+                                        </li>
+                                        <li>
+                                            If this setting is changed, any notifications which were already delayed due
+                                            to this setting will still be sent at the previous blackout end time, rather
+                                            than the new time.
+                                        </li>
+                                    </ul>
                                 </section>
                             </form>
                         </div>
