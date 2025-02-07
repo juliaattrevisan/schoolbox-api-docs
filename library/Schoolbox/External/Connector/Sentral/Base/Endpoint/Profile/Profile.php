@@ -257,7 +257,7 @@ class Profile implements IStrategy
                 $title = (string)$student['relationships']['person']['data']['attributes']['title'];
                 $tutor = '';
                 $tutorGroup = (string)$student['relationships']['primaryEnrolment']['data']['attributes']['tutorGroup'];
-                $username = '';
+                $username = (string)$student['attributes']['username'];
                 $yearLevel = (string)$student['relationships']['primaryEnrolment']['data']['attributes']['schoolYear'];
 
                 /* Dates
