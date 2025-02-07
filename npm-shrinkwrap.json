@@ -68,23 +68,23 @@
         "clipboard": "~2.0.11",
         "datatables.net": "~1.13.8",
         "datatables.net-fixedcolumns": "~4.3.0",
-        "dayjs": "^1.11.13",
+        "dayjs": "~1.11.13",
         "dropzone": "~6.0.0-beta.2",
-        "firebase": "^11.2.0",
+        "firebase": "~11.2.0",
         "flatpickr": "~4.6.13",
         "focus-trap": "~7.6.4",
-        "gsap": "npm:@gsap/business@~3.12.5",
+        "gsap": "npm:@gsap/business@^3.12.7",
         "highcharts": "~12.1.2",
         "highcharts-vue": "~2.0.1",
         "intro.js": "~2.9.3",
         "jquery": "~3.7.1",
         "jquery-ui": "~1.14.1",
         "jquery-validation": "~1.21.0",
-        "lightgallery": "^2.8.2",
+        "lightgallery": "~2.8.2",
         "locutus": "~2.0.32",
         "lodash": "~4.17.21",
         "mediaelement": "~7.0.7",
-        "pinia": "^2.3.1",
+        "pinia": "~2.3.1",
         "qrcode.vue": "~3.6.0",
         "sanitize-html": "~2.14.0",
         "sortablejs": "~1.15.6",
@@ -160,7 +160,7 @@
         "storybook": "~8.5.3",
         "style-loader": "~4.0.0",
         "ts-jest": "~29.2.5",
-        "ts-loader": "^9.5.2",
+        "ts-loader": "~9.5.2",
         "typescript": "~5.7.3",
         "vue-loader": "~17.4.2",
         "vue-style-loader": "~4.1.3",
@@ -16574,10 +16574,9 @@
     },
     "node_modules/gsap": {
       "name": "@gsap/business",
-      "version": "3.12.5",
-      "resolved": "https://npm.greensock.com/@gsap%2fbusiness/-/business-3.12.5.tgz",
-      "integrity": "sha512-MaoS/j4c+ZHCzkA0C1hWah3E0PTBOaevgJCD4ccad7FePaFcVyC1RSXi67GZQNntMTb03crXB+8CKXL490L6GQ==",
-      "license": "This package should only be used by individuals/companies with an active Business Green Club GSAP membership. See https://gsap.com/pricing/. Licensing: https://gsap.com/licensing/"
+      "version": "3.12.7",
+      "resolved": "https://npm.greensock.com/@gsap%2fbusiness/-/business-3.12.7.tgz",
+      "integrity": "sha512-R70kt4G2xfGOVwyaEkBxz7kbwQRasC6NFjUN2kT7hKUtj3O8EytwBcAh0KW1hhLEJWs8E9IcKLXx2jV9gTJtwA=="
     },
     "node_modules/happy-dom": {
       "version": "17.0.0",
@@ -40673,9 +40672,9 @@
       "dev": true
     },
     "gsap": {
-      "version": "npm:@gsap/business@3.12.5",
-      "resolved": "https://npm.greensock.com/@gsap%2fbusiness/-/business-3.12.5.tgz",
-      "integrity": "sha512-MaoS/j4c+ZHCzkA0C1hWah3E0PTBOaevgJCD4ccad7FePaFcVyC1RSXi67GZQNntMTb03crXB+8CKXL490L6GQ=="
+      "version": "npm:@gsap/business@3.12.7",
+      "resolved": "https://npm.greensock.com/@gsap%2fbusiness/-/business-3.12.7.tgz",
+      "integrity": "sha512-R70kt4G2xfGOVwyaEkBxz7kbwQRasC6NFjUN2kT7hKUtj3O8EytwBcAh0KW1hhLEJWs8E9IcKLXx2jV9gTJtwA=="
     },
     "happy-dom": {
       "version": "17.0.0",
