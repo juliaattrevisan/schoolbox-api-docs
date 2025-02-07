@@ -64,7 +64,7 @@
 }
 
 // Smallest screen size (both panels are always unpinned)
-@media #{$mediumwide-down} {
+@media #{$medium-down} {
     body {
         // Search bar always has right=1 and left-padding=2 while notifications are enabled
         &:not(.disableNotifications) .c-header-search {

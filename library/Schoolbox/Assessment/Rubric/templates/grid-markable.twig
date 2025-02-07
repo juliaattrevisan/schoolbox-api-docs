@@ -88,12 +88,12 @@
 
                             <td>
                                 {# This container displays rubric levels for the mobile view. #}
-                                <div class="rubric-levels-mobile l-pad-m"><p><b>{{ level.name | markdown }}</b><p></div>
+                                <div class="hide-for-large-up l-pad-m"><p><b>{{ level.name | markdown }}</b><p></div>
                                 {% include '@rubric/descriptor-markable.twig' %}
                             </td>
 
                         {% else %}
-                            <td class="rb-blank rubric-levels-mobile-hidden">&nbsp;</td>
+                            <td class="rb-blank hide-for-medium-down">&nbsp;</td>
                         {% endif %}
 
                     {% endfor %}
