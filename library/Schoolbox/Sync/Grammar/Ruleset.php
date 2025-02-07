@@ -150,7 +150,7 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
                     try {
                         $value = $this->tokenizer->parseToken($input, $token, false);
                     } catch (NoMatchingMapException) {
-                        $this->log->notice(
+                        $this->log->debug(
                             sprintf(
                                 'Rule "%s" effect "%s" is a mapping which matches no value for user "%s" (%s): leaving property as is',
                                 $rule->getLabel(),
