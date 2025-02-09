@@ -354,6 +354,12 @@ class ConfigMapper extends Mapper
     public const NAME_SENTRY_TRACE_CUSTOM_SAMPLE_RATES = 'sentry_trace_custom_sample_rates';
 
 
+    // Notification settings
+    public const NAME_NOTIFICATION_BLACKOUT_ENABLED    = 'notification_blackout_enabled';
+    public const NAME_NOTIFICATION_BLACKOUT_START_TIME = 'notification_blackout_start_time';
+    public const NAME_NOTIFICATION_BLACKOUT_END_TIME   = 'notification_blackout_end_time';
+
+
     /**
      * Config settings which may affect the behaviour of the router daemon.
      *
@@ -380,6 +386,18 @@ class ConfigMapper extends Mapper
         'restrict_student_submissions',
         'restrict_parent_grades',
         self::NAME_MOBILE_DAEMON_ENABLED,
+    ];
+
+    /**
+     * Config settings which may affect the behaviour of the mobile daemon.
+     *
+     * If any of these settings change: send a refresh configuration message
+     * to the mobile daemon.
+     */
+    public const SETTINGS_AFFECTING_MOBILED = [
+        self::NAME_NOTIFICATION_BLACKOUT_ENABLED,
+        self::NAME_NOTIFICATION_BLACKOUT_START_TIME,
+        self::NAME_NOTIFICATION_BLACKOUT_END_TIME,
     ];
 
     /**

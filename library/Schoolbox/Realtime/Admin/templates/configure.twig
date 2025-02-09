@@ -151,6 +151,63 @@
         });
 
         $('[data-collapser]').collapsable();
+
+        // Show/hide blackout input container
+        $('#blackoutEnabledInput').on('change', function () {
+            let $blackoutInputContainer = $('#blackoutInputContainer');
+            $blackoutInputContainer
+                .stop()
+                .removeClass('hide')
+                .slideUp(1);
+
+            if (this.checked) {
+                $blackoutInputContainer.slideDown();
+            } else {
+                $blackoutInputContainer.addClass('hide')
+            }
+        });
+
+        // Show/hide next day if blackout start time is before end time:
+        // it's assumed that this means the blackout starts the evening before,
+        // and ends at the end time the next morning.
+        let $blackoutStartTimeInput     = $('#blackoutStartTimeInput'),
+            $blackoutEndTimeInput       = $('#blackoutEndTimeInput'),
+            $blackoutDescriptionNextDay = $('#blackoutDescriptionNextDay'),
+            blackoutTimeChange          = function () {
+                let blackoutStartTime      = $blackoutStartTimeInput.val(),
+                    blackoutEndTime        = $blackoutEndTimeInput.val(),
+                    showNextDayDescription =
+                        blackoutStartTime && blackoutEndTime && blackoutStartTime > blackoutEndTime;
+                $blackoutDescriptionNextDay.toggleClass('hide', !showNextDayDescription);
+            };
+        $blackoutStartTimeInput.on('change', blackoutTimeChange);
+        $blackoutEndTimeInput.on('change', blackoutTimeChange);
+
+        // Save blackout form
+        let $toast       = $('#toast'),
+            blackoutForm = document.getElementById('blackoutForm'),
+            formSubmit   = async function () {
+                $toast.toastActivate();
+                let response = await fetch(
+                    blackoutForm.action,
+                    {
+                        method:  blackoutForm.method,
+                        body:    new FormData(blackoutForm),
+                    }
+                );
+                if (response.ok) {
+                    $toast.toastTimeout({
+                        text: "Settings saved",
+                        css:  "success",
+                    });
+                } else {
+                    $toast.toastTimeout({
+                        text: "Could not save settings",
+                        css:  "alert",
+                    });
+                }
+            };
+        $(blackoutForm).on('change', ':input', _.debounce(formSubmit, 1000));
     });
 
     function customiserCallback(data) {
@@ -225,6 +282,90 @@
                         </ul>
                     </section>
 
+                    <div class="row">
+                        <div class="small-12 columns">
+                            <h2 class="subheader">Notification Blackout</h2>
+
+                            <form id="blackoutForm"
+                                  method="post"
+                                  action="{{ routeLookupIfAuthorized('adminNotificationsConfig.postConfig') }}"
+                            >
+                                <div class="switch">
+                                    <input name="notification_blackout_enabled" value="0" type="hidden">
+                                    <input id="blackoutEnabledInput"
+                                           name="notification_blackout_enabled"
+                                           {% if blackoutEnabled %}checked="checked"{% endif %}
+                                           value="1"
+                                           type="checkbox"
+                                    />
+                                    <label for="blackoutEnabledInput">
+                                        <span>On</span>
+                                        <span>Off</span>
+                                    </label>
+                                </div>
+
+                                <section class="content {% if not blackoutEnabled %}hide{% endif %}" id="blackoutInputContainer">
+                                    <p>
+                                        Notifications triggered after
+                                        <input id="blackoutStartTimeInput"
+                                               type="time"
+                                               name="notification_blackout_start_time"
+                                               value="{{ blackoutStartTime }}"
+                                               list="blackoutTimeSteps"
+                                               style="width: auto; display: inline-block"
+                                        />
+                                        each day will be delayed until
+                                        <input id="blackoutEndTimeInput"
+                                               type="time"
+                                               name="notification_blackout_end_time"
+                                               value="{{ blackoutEndTime }}"
+                                               list="blackoutTimeSteps"
+                                               style="width: auto; display: inline-block"
+                                        />
+
+                                        {##
+                                         # Hide next day label if:
+                                         # * either blackout start or end time are unset, or:
+                                         # * both are set, and start < end
+                                         #}
+                                        <span id="blackoutDescriptionNextDay"
+                                              {% if (not blackoutStartTime) or (not blackoutEndTime) or (blackoutStartTime < blackoutEndTime) %}class="hide"{% endif %}
+                                        >the next day</span>.
+
+                                        <datalist id="blackoutTimeSteps">
+                                            {% for hour in 0..23 %}
+                                                {% for minute in [0, 15, 30, 45] %}
+                                                    {% set value = '%02d:%02d' | format(hour, minute) %}
+                                                    <option value="{{ value }}">{{ value }}</option>
+                                                {% endfor %}
+                                            {% endfor %}
+                                        </datalist>
+                                    </p>
+
+                                    <ul>
+                                        <li>
+                                            Both a valid start and end time must be set, otherwise notifications will
+                                            not be delayed.
+                                        </li>
+                                        <li>
+                                            This affects only the sending of instant notifications sent to a device,
+                                            either via a web app or a <a href="{{ routeLookup('adminNotifications.getApps') }}">delivery provider</a>:
+                                            it does not affect digest, side panel or email notifications.
+                                        </li>
+                                        <li>
+                                            Priority news notifications are still sent as soon as they are able to be.
+                                        </li>
+                                        <li>
+                                            If this setting is changed, any notifications which were already delayed due
+                                            to this setting will still be sent at the previous blackout end time, rather
+                                            than the new time.
+                                        </li>
+                                    </ul>
+                                </section>
+                            </form>
+                        </div>
+                    </div>
+
                     <div class="actions-small-1 row">
                         <div class="list-item">
                             <div class="small-12 columns">
@@ -274,3 +415,5 @@
 
     <a class="close-reveal-modal">&#215;</a>
 </div>
+
+<div id="toast" class="toast"></div>
