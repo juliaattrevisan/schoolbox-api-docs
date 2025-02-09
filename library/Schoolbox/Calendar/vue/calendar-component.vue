@@ -58,6 +58,7 @@ export default {
             },
             eventsLoaded: false,
             hasEvents: null,
+            hasError: false,
             hasHeadingDisplayUpdated: false, //to ensure it doesn't fire multiple times
         };
     },
@@ -187,9 +188,12 @@ export default {
                             this.hasEvents = true;
                         }
                         callback(events);
+                    })
+                    .catch((error) => {
+                        this.hasError = true;
                     });
             } catch (error) {
-                // Fail callback: consider a message saying something failed
+                this.hasError = true;
             }
         },
 
@@ -252,11 +256,18 @@ export default {
             </template>
         </full-calendar>
 
+        <!-- Error state -->
+        <div v-if="hasError" class="alert-box alert f-no-margins">
+            Sorry, there was an error during calendar retrieval. Please
+            <a href="" title="refresh the page"> refresh the page </a>
+            to try again and contact your support if the problem persists.
+        </div>
+
         <!-- Loading state -->
-        <div ref="loadingState" class="loader" v-if="!eventsLoaded"></div>
+        <div ref="loadingState" class="loader" v-else-if="!eventsLoaded"></div>
 
         <!-- Empty state: show only if events have loaded, but none are shown -->
-        <div ref="emptyState" class="empty-state" v-if="eventsLoaded && !hasEvents">
+        <div ref="emptyState" class="empty-state" v-else-if="eventsLoaded && !hasEvents">
             <!-- Different variants of empty state for dashboard (no folder ID) and homepage -->
             <template v-if="config.folderId">
                 <i class="icon-calendar"></i>
