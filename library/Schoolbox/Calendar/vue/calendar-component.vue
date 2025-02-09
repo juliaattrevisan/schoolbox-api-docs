@@ -8,7 +8,7 @@ import ExportUrlModal from "./export-url-modal";
 import interactionPlugin from "@fullcalendar/interaction";
 import listPlugin from "@fullcalendar/list";
 import adaptivePlugin from "@fullcalendar/adaptive";
-import axios from "axios";
+import { getSearchString } from "@js/util/queryUtils";
 import fullCalendarHelper from "@schoolboxVue/components/fullcalendar/mixinFullCalendarHelper";
 import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
 import CustomisedCalendarEvent from "@schoolboxVue/components/fullcalendar/customised-calendar-event";
@@ -156,41 +156,41 @@ export default {
          * @param callback  A function to call with the list of events.
          */
         events(fetchInfo, callback) {
-            axios
-                .get(ENDPOINTS.URL_EVENT_SOURCE, {
+            try {
+                const params = {
+                    start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
+                    end: Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
+                    userId: this.config.userId,
+                    folderId: this.config.folderId,
+                    componentInstanceId: this.componentInstanceId,
+                };
+                fetch(`${ENDPOINTS.URL_EVENT_SOURCE}?${getSearchString(params)}`, {
                     headers: {
                         "X-Requested-With": "XMLHttpRequest",
                     },
-                    params: {
-                        start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
-                        end: Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
-                        userId: this.config.userId,
-                        folderId: this.config.folderId,
-                        componentInstanceId: this.componentInstanceId,
-                    },
                 })
-                .then((response) => {
-                    // Add ability to limit events:
-                    // need to filter, then sort, then slice
-                    this.eventsLoaded = true;
-                    let events = response.data
-                        .filter((v) => "start" in v)
-                        .sort((a, b) => String(a.start).localeCompare(String(b.start)));
-                    if (this.config.limit) {
-                        events = events.slice(0, this.config.limit);
-                    }
-
-                    // Empty? Don't show the calendar at all
-                    if (events.length === 0) {
-                        // self.$refs.emptyState.style.removeProperty('display');
-                        // self.$refs.fullCalendar.getApi().destroy();
-                        this.hasEvents = false;
-                    } else {
-                        this.hasEvents = true;
-                    }
-                    callback(events);
-                });
-            // Fail callback: consider a message saying something failed
+                    .then((response) => response.json())
+                    .then((response) => {
+                        // Add ability to limit events:
+                        // need to filter, then sort, then slice
+                        this.eventsLoaded = true;
+                        let events = response
+                            .filter((v) => "start" in v)
+                            .sort((a, b) => String(a.start).localeCompare(String(b.start)));
+                        if (this.config.limit) {
+                            events = events.slice(0, this.config.limit);
+                        }
+                        // Empty? Don't show the calendar at all
+                        if (events.length === 0) {
+                            this.hasEvents = false;
+                        } else {
+                            this.hasEvents = true;
+                        }
+                        callback(events);
+                    });
+            } catch (error) {
+                // Fail callback: consider a message saying something failed
+            }
         },
 
         /**
