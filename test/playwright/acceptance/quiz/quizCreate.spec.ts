@@ -48,7 +48,7 @@ async function createClassPage(
 }
 
 test.describe("Quiz Create Tests", () => {
-    // Run tests serially, as tests rely on prior tests to have been run
+    // Run tests serially, as tests rely on prior tests to have been run.
     test.describe.configure({ mode: "serial" });
 
     const folderName = "Test Class Homepage Quiz";
