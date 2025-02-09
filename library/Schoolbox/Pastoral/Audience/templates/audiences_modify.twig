@@ -92,74 +92,12 @@
                             <div class="row checklist">
                                 <div class="small-12 columns">
                                     <ul class="option-list">
-                                        <li><input id="checkbox1" type="checkbox"><label for="checkbox1" class="f-no-margins">Apply</label></li>
+                                        <li><input id="applyDefaultExpiry" name="applyDefaultExpiry" type="checkbox"><label for="applyDefaultExpiry" class="f-no-margins">Apply</label></li>
                                     </ul>
                                 </div>
                             </div>
                         </div>
                     </fieldset>
-                    <div data-reveal id="apply-default-expiry-modal" class="reveal-modal">
-                        <h2>Please confirm</h2>
-                        <p>Are you sure you wish to apply the Default Expiry to <em>{{ currentDefaultExpiry ?? "Never" }}</em>? This will overwrite and apply to all existing records of this type.</p>
-                        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-                        <ul class="flex-list">
-                            <li><button id="confirm-apply-default-expiry" class="button icon-approve submit">Yes</button></li>
-                            <li><button id="cancel-apply-default-expiry" class="button icon-close">Cancel</button></li>
-                        </ul>
-                    </div>
-                    <script type="text/javascript">
-                    {% autoescape 'js' %}
-                        /**
-                        * Confirm to apply the default expiry
-                        */
-                        const confirmButton = document.getElementById("confirm-apply-default-expiry");
-                        confirmButton.addEventListener("click", () => {
-                            // prevent multiple submissions
-                            if (confirmButton.getAttribute("data-is-processing") === "true") {
-                                return;
-                            }
-                            confirmButton.setAttribute("data-is-processing", "true");
-                            confirmButton.innerHTML = "Applying...";
-                            window.sbProps.toastActivate("Applying...");
-                            /**
-                            * send through the apply default expiry request
-                            */
-                            try {
-                                fetch("{{ expirySetAction }}", {
-                                    method: "POST",
-                                    body: JSON.stringify({
-                                        typeId: {{ type.id }},
-                                        subtypeId: {{ subtype.id ?? '""' }}
-                                    }),
-                                    headers: {
-                                        "Content-Type": "application/json",
-                                    },
-                                }).then((response) => {
-                                    if (response.ok) {
-                                        $("#apply-default-expiry-modal").foundation("reveal", "close");
-                                        window.sbProps.toastTimeout({ text: "Applied successfully" });
-                                    } else {
-                                        window.sbProps.toastTimeout({ text: "There was an unknown error", isSuccess: false });
-                                    }
-                                    confirmButton.setAttribute("data-is-processing", "false");
-                                    confirmButton.innerHTML = "Yes";
-                                    $("#apply-default-expiry-modal").foundation("reveal", "close");
-                                });
-                            } catch (e) {
-                                window.sbProps.toastTimeout({ text: "There was an unknown error", isSuccess: false });
-                                confirmButton.setAttribute("data-is-processing", "false");
-                                confirmButton.innerHTML = "Yes";
-                                $("#apply-default-expiry-modal").foundation("reveal", "close");
-                            }
-                        });
-                        /**
-                        * Close the confirm default expiry modal
-                        */
-                        document.getElementById("cancel-apply-default-expiry").addEventListener("click", () => {
-                            $("#apply-default-expiry-modal").foundation("reveal", "close");
-                        });
-                    {% endautoescape %}
-                    </script>
                     <fieldset class="content">
                         <div class="small-12 columns">
                             <label for="sentiment">Sentiment</label>
