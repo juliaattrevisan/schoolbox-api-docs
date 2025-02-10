@@ -2,7 +2,7 @@
 // Ignore this file for ESLint checks for now (SA-18376)
 /* eslint-disable */
 /* eslint-enable vue/no-v-html */
-import axios from "axios";
+import { getSearchString } from "@js/util/queryUtils";
 import MediaArticle from "@schoolboxVue/components/media-article";
 import Storage from "@schoolboxVue/components/storage";
 import Toast from "@schoolboxVue/components/toast";
@@ -128,11 +128,17 @@ export default {
             const getUrl = this.commentThread?._links?.getComments?.href;
             if (getUrl && cursor) {
                 this.$refs.toast.activate("Loading...");
-                axios
-                    .get(getUrl, { params: { cursor: cursor } })
+                const params = { cursor: cursor };
+                fetch(`${getUrl}?${getSearchString(params)}`, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                    },
+                })
+                    .then((response) => response.json())
                     .then((response) => {
-                        this.commentThread.children.data = this.commentThread.children.data.concat(response.data.data);
-                        this.commentThread.children.metadata.cursor.next = response.data.metadata.cursor.next;
+                        this.commentThread.children.data = this.commentThread.children.data.concat(response.data);
+                        this.commentThread.children.metadata.cursor.next = response.metadata.cursor.next;
                         this.$refs.toast.timeout("Loaded comments", true, 2000);
                     })
                     .catch(() => this.$refs.toast.timeout("Loading comments failed", false, 5000));
