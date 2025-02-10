@@ -3,7 +3,7 @@
 /* eslint-disable */
 /* eslint-enable vue/no-v-html */
 import axios from "axios";
-import { getSearchString } from "@js/util/queryUtils";
+import { getFormData, getSearchString } from "@js/util/queryUtils";
 import MediaArticle from "@schoolboxVue/components/media-article";
 import toastMixin from "@schoolboxVue/components/toast-mixin";
 import RevealModal from "@schoolboxVue/components/reveal-modal";
@@ -174,10 +174,17 @@ export default {
                 // 2: associate it with this context
                 // 3: set this object's thread ID
                 changeThreadStatusAction = new Promise((resolve, reject) => {
-                    axios
-                        .post(this.createThreadEndpoint, { open: this.isThreadEnabled }, { headers: this.postHeaders })
+                    fetch(this.createThreadEndpoint, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Accept: "application/json",
+                        },
+                        body: JSON.stringify({ open: this.isThreadEnabled }),
+                    })
+                        .then((response) => response.json())
                         .then((response) => {
-                            this.threadId = response.data.id;
+                            this.threadId = response.id;
                             resolve();
                         })
                         .catch(function (error) {
