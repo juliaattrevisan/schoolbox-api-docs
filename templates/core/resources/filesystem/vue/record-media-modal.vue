@@ -254,6 +254,25 @@ export default {
             }
         },
 
+        async uploadMedia() {
+            return new Promise((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                const formData = this.getFormData();
+                xhr.upload.addEventListener("progress", (progressEvent) => this.onUploadProgress(progressEvent));
+                xhr.open("POST", "/storage/asyncUpload.php");
+                xhr.addEventListener("load", () => {
+                    try {
+                        const response = JSON.parse(xhr.responseText); // Parse JSON response
+                        resolve(response);
+                    } catch (error) {
+                        reject(new Error("Invalid JSON response"));
+                    }
+                });
+                xhr.addEventListener("error", () => reject(new Error("Upload failed.")));
+                xhr.send(formData);
+            });
+        },
+
         /**
          * the video is ready, so upload it up to SchoolBox
          */
@@ -261,12 +280,10 @@ export default {
             try {
                 this.isUploading = true;
                 this.uploadProgressRatio = "0%";
-                const response = await axios.post("/storage/asyncUpload.php", this.getFormData(), {
-                    onUploadProgress: (progressEvent) => this.onUploadProgress(progressEvent),
-                });
+                const response = await this.uploadMedia();
                 this.uploadProgressRatio = "100%";
                 this.isUploading = false;
-                return response.data;
+                return response;
             } catch (error) {
                 this.checkErrorMessage(error.response.data);
                 this.isUploading = false;
@@ -298,7 +315,7 @@ export default {
         },
 
         /**
-         * try and grab known error messages to better inform of the error that's occured
+         * try and grab known error messages to better inform of the error that's occurred
          *
          * @params {Object}
          */
