@@ -230,7 +230,9 @@ foreach ($userList as $user) {
                             $catCache = [];
                             if (count($period) > 0) {
                                 foreach ($period as $class) {
-                                    $cacheKey = ($class['campus'] ?? '') . $class['code'];
+                                    /* It appears that code could potentially be null according to the schema
+                                     */
+                                    $cacheKey = ($class['campus'] ?? '') . $class['code'] ?? '';
 
                                     /* Handle colour array */
                                     if ($cacheKey && !array_key_exists($cacheKey, $subjectColourMap)) {
