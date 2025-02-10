@@ -13,8 +13,9 @@ import CreateBookingModal from "@schoolboxVue/components/fullcalendar/resourceBo
 import ExportModal from "@schoolboxVue/components/fullcalendar/resourceBooking/export-booking-modal";
 import FilterModal from "@schoolboxVue/components/fullcalendar/resourceBooking/filter-modal";
 import FlatPickr from "@schoolboxVue/components/fullcalendar/flat-pickr";
-import axios from "axios";
 import fullCalendarHelper from "@schoolboxVue/components/fullcalendar/mixinFullCalendarHelper";
+import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
+import { getSearchString } from "@js/util/queryUtils";
 
 // Various URLs that FullCalendar may make use of.
 const URL_STATE_CHANGE = "/calendar/changeState";
@@ -182,25 +183,30 @@ export default {
          * @param callback  A function to call with the list of events.
          */
         events(fetchInfo, callback) {
-            axios
-                .get(this.config.resourceBookingEndpoint, {
-                    headers: {
-                        "X-Requested-With": "XMLHttpRequest",
-                    },
-                    params: {
-                        start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
-                        end: Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
-                        status: this.config.selectedFilters,
-                    },
-                })
+            activate("Retrieving events...");
+            const params = {
+                start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
+                end: Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
+                status: this.config.selectedFilters,
+            };
+            fetch(`${this.config.resourceBookingEndpoint}?${getSearchString(params)}`, {
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                },
+            })
+                .then((response) => response.json())
                 .then((response) => {
                     callback(
-                        response.data.filter((v) => {
+                        response.filter((v) => {
                             return "start" in v;
                         }),
                     );
+                    timeout({ text: "Events retrieved" });
+                })
+                .catch((error) => {
+                    console.error(error);
+                    timeout({ text: "Events could not be retrieved", isSuccess: false });
                 });
-            // Fail callback: consider a message saying something failed
         },
 
         /**
