@@ -18,7 +18,7 @@
 {% import '@learning/macro/urgency.twig' as urgency %}
 {% import '@learning/macro/markDecorator.twig' as decorator %}
 
-    <div class="actions-small-1 small-12 columns">
+    <div class="actions-small-1">
         {% if not courseSpec.courseImplementations|length %}
         {% set importUrl = routeLookup('courseImport.getImport', {courseSpecId: courseSpec.id, folderId: 0, componentId: 0}) %}
         <div class="empty-state">
