@@ -1,5 +1,3 @@
-import axios from "axios";
-
 /**
  * Goal-oriented mixins, so they're for detecting Goal badges
  * and dealing with their idiosyncrasies
@@ -28,11 +26,12 @@ export default {
          * @return {Promise} An AJAX request created by `axios`
          */
         convertToAchievement(award) {
-            return axios.request({
-                url: award._links.goalAward,
-                data: { users: [award.recipient], conversion: true },
-                method: "post",
-                responseType: "json",
+            return fetch(award._links.goalAward, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ users: [award.recipient], conversion: true }),
             });
         },
     },
