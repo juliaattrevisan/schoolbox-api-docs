@@ -82,9 +82,9 @@ export default {
         };
     },
     mounted() {
-        axios
-            .get(this.textboxUsageEndpoint)
-            .then((response) => (this.textboxes = response.data))
+        fetch(this.textboxUsageEndpoint)
+            .then((response) => response.json())
+            .then((response) => (this.textboxes = response))
             .finally(() => (this.showSkeletonLoader = false));
 
         // Add event so that a new textbox may be added from outside of this
