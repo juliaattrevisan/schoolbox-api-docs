@@ -3,7 +3,7 @@
 /* eslint-disable */
 /* eslint-enable vue/no-v-html */
 import axios from "axios";
-import { getFormData, getSearchString } from "@js/util/queryUtils";
+import { getSearchString } from "@js/util/queryUtils";
 import MediaArticle from "@schoolboxVue/components/media-article";
 import toastMixin from "@schoolboxVue/components/toast-mixin";
 import RevealModal from "@schoolboxVue/components/reveal-modal";
@@ -218,12 +218,17 @@ export default {
             this.isProcessing = true;
             this.toastActivate("Posting comment...");
 
-            axios
-                .post("/discussion/comms/" + this.articleId + "/threads/" + this.threadId + "/comments", {
-                    content: newComment,
-                })
+            fetch(`/discussion/comms/${this.articleId}/threads/${this.threadId}/comments`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                },
+                body: JSON.stringify({ content: newComment }),
+            })
+                .then((response) => response.json())
                 .then((response) => {
-                    this.comments.unshift(response.data);
+                    this.comments.unshift(response);
                     this.totalCommentsCount++;
 
                     this.toastSuccess("Comment has been added");
