@@ -350,6 +350,7 @@ class ConfigMapper extends Mapper
 
 
     // Debugging settings
+    public const NAME_SENTRY_ERROR_SAMPLE_RATE = 'sentry_error_sample_rate';
     public const NAME_SENTRY_TRACE_DEFAULT_SAMPLE_RATE = 'sentry_trace_default_sample_rate';
     public const NAME_SENTRY_TRACE_CUSTOM_SAMPLE_RATES = 'sentry_trace_custom_sample_rates';
 

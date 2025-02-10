@@ -68,6 +68,7 @@ class Factory
             'error_types'       => self::ERROR_REPORTING,
             'send_default_pii'  => true,
             'attach_stacktrace' => true,
+            'sample_rate'       => min(1, max(0, floatval($configLoader->get(ConfigMapper::NAME_SENTRY_ERROR_SAMPLE_RATE) ?? 1))),
             'traces_sampler'    => function (Sentry\Tracing\SamplingContext $context) use ($configLoader): float {
                 // Maintenance mode: trace nothing, not even crons.
                 if ($configLoader->get(ConfigMapper::NAME_MAINTENANCE_MODE)) {
