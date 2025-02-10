@@ -111,7 +111,7 @@ HELP;
     {
         $this->getLogger()->info("Running in vagrant mode");
         $root = SITE_root;
-        exec("git -C $root describe --exact-match --tags 2>&1 /dev/null", $output, $result_code);
+        exec("git -C $root describe --exact-match --tags > /dev/null 2>&1", $output, $result_code);
         if ($result_code !== 0) {
             throw new RuntimeException("This is not a git installation or a tag is not checked out");
         }
