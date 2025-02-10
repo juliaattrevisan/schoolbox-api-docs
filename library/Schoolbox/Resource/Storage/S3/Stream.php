@@ -44,6 +44,8 @@ class Stream
         $secret  = $config->get('otfs_s3_cred_secret');
         $bucket  = $config->get('otfs_s3_bucket');
         $host    = $config->get('otfs_s3_host');
+        $s3AltAccessKey       = trim($config->get('otfs_s3_alt_access_key') ?? "");
+        $s3AltSecretAccessKey = trim($config->get('otfs_s3_alt_secret_access_key') ?? "");
 
         // Connect to Amazon S3
 

@@ -56,7 +56,11 @@ class PreSignedUrlService
         ];
         $host = trim($config->get('otfs_s3_host') ?? '');
         if (!empty($host)) {
+            $s3AltAccessKey       = trim($config->get('otfs_s3_alt_access_key') ?? "");
+            $s3AltSecretAccessKey = trim($config->get('otfs_s3_alt_secret_access_key') ?? "");
             $cfg['endpoint'] = $host;
+            $cfg['credentials']['key'] = $s3AltAccessKey;
+            $cfg['credentials']['secret'] = $s3AltSecretAccessKey;
         }
         $this->s3Client = new S3Client($cfg);
         $this->bucket   = trim($config->get('otfs_s3_bucket') ?? '');

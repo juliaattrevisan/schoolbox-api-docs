@@ -281,11 +281,13 @@ class DeleteTransforms extends CliTool\App
      */
     private function buildS3Client(string $bucketName): ?S3Client
     {
-        $s3Region    = trim($this->getConfig()->get('otfs_s3_region') ?? "");
-        $s3Version   = trim($this->getConfig()->get('otfs_s3_version') ?? "");
-        $s3AccessKey = trim($this->getConfig()->get('otfs_s3_cred_key') ?? "");
-        $s3SecretKey = trim($this->getConfig()->get('otfs_s3_cred_secret') ?? "");
-        $s3Host      = trim($this->getConfig()->get('otfs_s3_cred_host') ?? "");
+        $s3Region             = trim($this->getConfig()->get('otfs_s3_region') ?? "");
+        $s3Version            = trim($this->getConfig()->get('otfs_s3_version') ?? "");
+        $s3AccessKey          = trim($this->getConfig()->get('otfs_s3_cred_key') ?? "");
+        $s3SecretKey          = trim($this->getConfig()->get('otfs_s3_cred_secret') ?? "");
+        $s3Host               = trim($this->getConfig()->get('otfs_s3_cred_host') ?? "");
+        $s3AltAccessKey       = trim($this->getConfig()->get('otfs_s3_alt_access_key') ?? "");
+        $s3AltSecretAccessKey = trim($this->getConfig()->get('otfs_s3_alt_secret_access_key') ?? "");
 
         $badConfig = empty($s3AccessKey) || empty($s3SecretKey) || empty($s3Region) || empty($s3Version) || empty($bucketName);
         if ($badConfig) {
@@ -303,6 +305,8 @@ class DeleteTransforms extends CliTool\App
         ];
         if (!empty($s3Host)) {
             $cfg['endpoint'] = $s3Host;
+            $cfg['credentials']['key'] = $s3AltAccessKey;
+            $cfg['credentials']['secret'] = $s3AltSecretAccessKey;
         }
         return new S3Client($cfg);
     }

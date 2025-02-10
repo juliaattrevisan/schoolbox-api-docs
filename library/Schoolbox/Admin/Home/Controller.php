@@ -293,12 +293,14 @@ class Controller extends Base
     {
         $enabledData = [];
 
-        $s3AccessKey = trim($this->getConfigLoader()->get('otfs_s3_cred_key') ?? "");
-        $s3SecretKey = trim($this->getConfigLoader()->get('otfs_s3_cred_secret') ?? "");
-        $s3Region    = trim($this->getConfigLoader()->get('otfs_s3_region') ?? "");
-        $s3Version   = trim($this->getConfigLoader()->get('otfs_s3_version') ?? "");
-        $s3Bucket    = trim($this->getConfigLoader()->get('otfs_s3_bucket') ?? "");
-        $s3Host      = trim($this->getConfigLoader()->get('otfs_s3_host') ?? "");
+        $s3AccessKey          = trim($this->getConfigLoader()->get('otfs_s3_cred_key') ?? "");
+        $s3SecretKey          = trim($this->getConfigLoader()->get('otfs_s3_cred_secret') ?? "");
+        $s3Region             = trim($this->getConfigLoader()->get('otfs_s3_region') ?? "");
+        $s3Version            = trim($this->getConfigLoader()->get('otfs_s3_version') ?? "");
+        $s3Bucket             = trim($this->getConfigLoader()->get('otfs_s3_bucket') ?? "");
+        $s3Host               = trim($this->getConfigLoader()->get('otfs_s3_host') ?? "");
+        $s3AltAccessKey       = trim($this->getConfigLoader()->get('otfs_s3_alt_access_key') ?? "");
+        $s3AltSecretAccessKey = trim($this->getConfigLoader()->get('otfs_s3_alt_secret_access_key') ?? "");
 
         $s3CredentialsMissing =
             $s3AccessKey === '' ||
@@ -374,6 +376,8 @@ class Controller extends Base
 
         if (!empty($s3Host)) {
             $cfg['endpoint'] = $s3Host;
+            $cfg['credentials']['key'] = $s3AltAccessKey;
+            $cfg['credentials']['secret'] = $s3AltSecretAccessKey;
         }
         $s3Client = new S3Client(
             $cfg

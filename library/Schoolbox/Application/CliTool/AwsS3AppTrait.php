@@ -32,13 +32,14 @@ trait AwsS3AppTrait
      */
     private function buildS3ClientOrExit(LoggerInterface $log, IConfigLoader $config): S3Client
     {
-        $s3AccessKey = trim($config->get('otfs_s3_cred_key') ?? "");
-        $s3SecretKey = trim($config->get('otfs_s3_cred_secret') ?? "");
-        $s3Region    = trim($config->get('otfs_s3_region') ?? "");
-        $s3Version   = trim($config->get('otfs_s3_version') ?? "");
-        $s3Bucket    = trim($config->get('otfs_s3_bucket') ?? "");
-        $s3Host      = trim($config->get('otfs_s3_host') ?? "");
-
+        $s3AccessKey          = trim($config->get('otfs_s3_cred_key') ?? "");
+        $s3SecretKey          = trim($config->get('otfs_s3_cred_secret') ?? "");
+        $s3Region             = trim($config->get('otfs_s3_region') ?? "");
+        $s3Version            = trim($config->get('otfs_s3_version') ?? "");
+        $s3Bucket             = trim($config->get('otfs_s3_bucket') ?? "");
+        $s3Host               = trim($config->get('otfs_s3_host') ?? "");
+        $s3AltAccessKey       = trim($config->get('otfs_s3_alt_access_key') ?? "");
+        $s3AltSecretAccessKey = trim($config->get('otfs_s3_alt_secret_access_key') ?? "");
         $log->debug(sprintf("OTFS Adapter: '%s'", $config->get(ConfigMapper::NAME_OTFS_ADAPTER)));
         $log->debug("S3 Access Key: '$s3AccessKey'");
         $log->debug(sprintf("S3 Secret Key: '%s'", str_pad("", strlen($s3SecretKey), "*")));
@@ -61,6 +62,8 @@ trait AwsS3AppTrait
 
         if (!empty($s3Host)) {
             $cfg['endpoint'] = $s3Host;
+            $cfg['credentials']['key'] = $s3AltAccessKey;
+            $cfg['credentials']['secret'] = $s3AltSecretAccessKey;
         }
 
         return new S3Client($cfg);

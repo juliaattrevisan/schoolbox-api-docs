@@ -130,12 +130,14 @@ class FilesystemFactory
      */
     public function buildAwsS3FileSystem(IConfigLoader $config, string $prefix = ''): Filesystem
     {
-        $otfs_s3_cred_key    = trim($config->get('otfs_s3_cred_key') ?? "");
-        $otfs_s3_cred_secret = trim($config->get('otfs_s3_cred_secret') ?? "");
-        $otfs_s3_region      = trim($config->get('otfs_s3_region') ?? "");
-        $otfs_s3_version     = trim($config->get('otfs_s3_version') ?? "");
-        $otfs_s3_bucket      = trim($config->get('otfs_s3_bucket') ?? "");
-        $otfs_s3_host        = trim($config->get('otfs_s3_host') ?? "");
+        $otfs_s3_cred_key     = trim($config->get('otfs_s3_cred_key') ?? "");
+        $otfs_s3_cred_secret  = trim($config->get('otfs_s3_cred_secret') ?? "");
+        $otfs_s3_region       = trim($config->get('otfs_s3_region') ?? "");
+        $otfs_s3_version      = trim($config->get('otfs_s3_version') ?? "");
+        $otfs_s3_bucket       = trim($config->get('otfs_s3_bucket') ?? "");
+        $otfs_s3_host         = trim($config->get('otfs_s3_host') ?? "");
+        $s3AltAccessKey       = trim($config->get('otfs_s3_alt_access_key') ?? "");
+        $s3AltSecretAccessKey = trim($config->get('otfs_s3_alt_secret_access_key') ?? "");
 
         $cfg = [
             'credentials' => [
@@ -150,6 +152,8 @@ class FilesystemFactory
         ];
         if (!empty($otfs_s3_host)) {
             $cfg['endpoint'] = $otfs_s3_host;
+            $cfg['credentials']['key'] = $s3AltAccessKey;
+            $cfg['credentials']['secret'] = $s3AltSecretAccessKey;
         }
         $client = new S3Client($cfg);
 
