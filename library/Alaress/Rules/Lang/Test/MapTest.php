@@ -138,13 +138,13 @@ class MapTest extends TestCase
             ['1'],
         ];
 
-        yield 'Character class negation' => [
+        yield 'Character class negation !' => [
             ['match[!12]' => '1', 'match[!34]' => '2'],
             ['match1'],
             ['2'],
         ];
 
-        yield 'Character class negation: exact match' => [
+        yield 'Character class negation !: exact match' => [
             ['match[!12]' => '1', 'match[!34]' => '2'],
             ['match[!12]'],
             ['1'],
@@ -174,13 +174,13 @@ class MapTest extends TestCase
             ['1'],
         ];
 
-        yield 'Character class negation' => [
+        yield 'Character class negation ^' => [
             ['match[^12]' => '1', 'match[^34]' => '2'],
             ['match1'],
             ['2'],
         ];
 
-        yield 'Character class negation: exact match' => [
+        yield 'Character class negation ^: exact match' => [
             ['match[^12]' => '1', 'match[^34]' => '2'],
             ['match[^12]'],
             ['1'],
@@ -441,12 +441,12 @@ class MapTest extends TestCase
             ['zero0'],
         ];
 
-        yield 'negative lookahead: no match' => [
+        yield 'negative lookahead: no match !' => [
             ['zero(![0-9])*' => '1'],
             ['zero0'],
         ];
 
-        yield 'negative lookahead: no match' => [
+        yield 'negative lookahead: no match ^' => [
             ['zero(^[0-9])*' => '1'],
             ['zero0'],
         ];
