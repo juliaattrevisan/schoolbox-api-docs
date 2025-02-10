@@ -115,13 +115,15 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
      */
     private function generateTicks($numTicks)
     {
-        $ticks = array();
+        /* 0th element
+         */
+        $ticks = [''];
 
         for ($i = 1; $i <= $numTicks; $i++) {
-            $ticks[] = "$i:'{$this->ordinal($i)}'";
+            $ticks[] = $this->ordinal($i);
         }
 
-        return '{' . implode(', ', $ticks) . '}';
+        return json_encode($ticks);
     }
 
 
