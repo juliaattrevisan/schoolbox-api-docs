@@ -21,7 +21,7 @@ $url = new \Schoolbox\Url\Uri($config->get('external_portal'));
 
 /* If the user has already passed by the login, we can go directly to the page */
 if ($_SESSION['communityLogin'] ?? false) {
-    if ($_GET['page']) {
+    if (isset($_GET['page'])) {
         $url = $url->withPath('/' . $_GET['page'] . '.aspx');
     } else {
         // This seems to be the default post-login landing page
@@ -29,15 +29,15 @@ if ($_SESSION['communityLogin'] ?? false) {
     }
 
     $query = $url->getQueryAsArray();
-    if ($_GET['id']) {
+    if (isset($_GET['id'])) {
         $query['id'] = $_GET['id'];
     }
-    if ($_GET['sn']) {
+    if (isset($_GET['sn'])) {
         $query['sn'] = $_GET['sn'];
     }
 
     /* If no menu requested turn it off */
-    if ($_GET['menu']) {
+    if (isset($_GET['menu'])) {
         $query['menu'] = 0;
     }
     $url = $url->appendQueryParameters($query);
@@ -70,11 +70,11 @@ if ($_SESSION['communityLogin'] ?? false) {
     }
 
     /* Set the URL to redirect the user to after login */
-    if ($_GET['page']) {
-        if ($_GET['menu']) {
+    if (isset($_GET['page'])) {
+        if (isset($_GET['menu'])) {
             $action = $action . '?ReturnUrl=' . urlencode($_GET['page'] . '.aspx?menu=0');
         } else {
-            $action = $action . '?ReturnUrl=' . $_GET['page'] . '.aspx';
+            $action = $action . '?ReturnUrl=' . urlencode($_GET['page']) . '.aspx';
         }
     }
 
