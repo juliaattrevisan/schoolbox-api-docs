@@ -254,6 +254,10 @@ export default {
             }
         },
 
+        /**
+         * upload the media to SchoolBox, we wrap in a promise as XMLHttpRequest does not support async/await
+         * we use XMLHttpRequest as fetch does not support progress events to display upload progress
+         */
         async uploadMedia() {
             return new Promise((resolve, reject) => {
                 const xhr = new XMLHttpRequest();
