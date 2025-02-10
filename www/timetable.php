@@ -230,10 +230,12 @@ foreach ($userList as $user) {
                             $catCache = [];
                             if (count($period) > 0) {
                                 foreach ($period as $class) {
-                                    $cacheKey = ($class['campus'] ?? '') . $class['code'];
+                                    /* It appears that code could potentially be null according to the schema
+                                     */
+                                    $cacheKey = ($class['campus'] ?? '') . $class['code'] ?? '';
 
                                     /* Handle colour array */
-                                    if ($class['code'] && !array_key_exists($cacheKey, $subjectColourMap)) {
+                                    if ($cacheKey && !array_key_exists($cacheKey, $subjectColourMap)) {
                                         // not enough colors: loop around to index 0.
                                         if (!$colourList->offsetExists($colourIndex)) {
                                             $colourIndex = 0;
@@ -279,7 +281,7 @@ foreach ($userList as $user) {
                                         'PERIOD_CODE'   => '(' . Scrub::Text($class['code']) . ')',
                                         'PERIOD_ROOM'   => Scrub::Text($class['room']),
                                         'PERIOD_STAFF'  => Scrub::Text($staffIdNameMap[$class['staffID']]),
-                                        'PERIOD_COLOUR' => Scrub::text($subjectColourMap[$cacheKey]),
+                                        'PERIOD_COLOUR' => Scrub::text($subjectColourMap[$cacheKey] ?? ''),
                                     ]);
 
                                     if (isset($catCache[$cacheKey]) && $groupHandler->getPermission($catCache[$cacheKey]->getId()) >= UserAccess::ACCESS_READ) {
