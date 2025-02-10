@@ -524,7 +524,7 @@ abstract class Kernel
                     $tokenBuilder = $di->get('user.tokenBuilder');
 
                     /** @var TokenMapper $tokenMapper */
-                    $tokenMapper = $mapperFactory->getLazy(TokenMapper::class);
+                    $tokenMapper = $mapperFactory->get(TokenMapper::class);
 
                     // Build API key and version
                     $gotenbergApiKey = $config->get(ConfigMapper::NAME_GOTENBERG_API_KEY);
