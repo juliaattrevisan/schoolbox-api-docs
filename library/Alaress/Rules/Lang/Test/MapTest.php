@@ -139,14 +139,14 @@ class MapTest extends TestCase
         ];
 
         yield 'Character class negation' => [
-            ['match[^12]' => '1', 'match[^34]' => '2'],
+            ['match[!12]' => '1', 'match[!34]' => '2'],
             ['match1'],
             ['2'],
         ];
 
         yield 'Character class negation: exact match' => [
-            ['match[^12]' => '1', 'match[^34]' => '2'],
-            ['match[^12]'],
+            ['match[!12]' => '1', 'match[!34]' => '2'],
+            ['match[!12]'],
             ['1'],
         ];
 
