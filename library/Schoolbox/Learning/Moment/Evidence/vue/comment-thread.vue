@@ -161,29 +161,48 @@ export default {
             this.$refs.toast.activate("Saving...");
 
             if (!this.hasThread) {
-                prePromise = axios.post(this.createThreadEndpoint, { open: true }).then((response) => {
-                    // Set the comment thread to the one just created,
-                    // and forge an empty set of comments
-                    this.commentThread = response.data;
-                    this.commentThread.children = {
-                        data: [],
-                        metadata: {
-                            count: 0,
-                            cursor: {
-                                current: null,
-                                next: null,
+                prePromise = fetch(this.createThreadEndpoint, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                    },
+                    body: JSON.stringify({ open: true }),
+                })
+                    .then((response) => response.json())
+                    .then((response) => {
+                        // Set the comment thread to the one just created,
+                        // and forge an empty set of comments
+                        this.commentThread = response;
+                        this.commentThread.children = {
+                            data: [],
+                            metadata: {
+                                count: 0,
+                                cursor: {
+                                    current: null,
+                                    next: null,
+                                },
                             },
-                        },
-                    };
-                });
+                        };
+                    });
             }
             prePromise
-                .then(() => axios.post(this.commentThread._links.createComment.href, { content: newComment }))
+                .then(() =>
+                    fetch(this.commentThread._links.createComment.href, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Accept: "application/json",
+                        },
+                        body: JSON.stringify({ content: newComment }),
+                    }),
+                )
+                .then((response) => response.json())
                 .then((response) => {
                     // Update the comment count, add the new comment to the
                     // thread, clear the pending comment box
                     this.commentThread.children.metadata.count += 1;
-                    this.commentThread.children.data.unshift(response.data);
+                    this.commentThread.children.data.unshift(response);
                     this.$refs.toast.timeout("Comment posted", true, 2000);
                 })
                 .catch(() => this.$refs.toast.timeout("Comment post failed", false, 5000))
