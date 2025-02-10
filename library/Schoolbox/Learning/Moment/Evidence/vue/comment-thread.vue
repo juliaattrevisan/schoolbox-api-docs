@@ -231,8 +231,13 @@ export default {
             this.$refs.deleteModal.close();
             if (deleteLink) {
                 this.$refs.toast.activate("Deleting...");
-                axios
-                    .delete(deleteLink)
+                fetch(deleteLink, {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                    },
+                })
                     .then(() => {
                         this.commentThread.children.data.splice(index, 1);
                         this.commentThread.children.metadata.count -= 1;
