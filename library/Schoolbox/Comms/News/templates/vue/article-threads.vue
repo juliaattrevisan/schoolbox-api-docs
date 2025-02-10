@@ -155,8 +155,12 @@ export default {
                         changeThreadStatusEndpoint += "close";
                     }
 
-                    axios
-                        .put(changeThreadStatusEndpoint, {}, { headers: this.postHeaders })
+                    fetch(changeThreadStatusEndpoint, {
+                        method: "PUT",
+                        headers: {
+                            ...this.postHeaders,
+                        },
+                    })
                         .then(() => {
                             resolve();
                         })
