@@ -3,6 +3,7 @@
 /* eslint-disable */
 /* eslint-enable vue/no-v-html */
 import axios from "axios";
+import { getSearchString } from "@js/util/queryUtils";
 import MediaArticle from "@schoolboxVue/components/media-article";
 import toastMixin from "@schoolboxVue/components/toast-mixin";
 import RevealModal from "@schoolboxVue/components/reveal-modal";
@@ -83,20 +84,20 @@ export default {
                 this.showCommentsSection = this.isThreadCheckboxVisible;
                 return;
             }
-
-            axios
-                .get("/discussion/comms/" + this.articleId + "/threads/" + this.threadId + "/comments/", {
-                    params: {
-                        cursor: this.cursorNext,
-                    },
-                })
+            const params = {
+                cursor: this.cursorNext,
+            };
+            fetch(`/discussion/comms/${this.articleId}/threads/${this.threadId}/comments/?${getSearchString(params)}`, {
+                headers: {
+                    Accept: "application/json",
+                },
+            })
+                .then((response) => response.json())
                 .then((response) => {
-                    const responseData = response.data;
-
+                    const responseData = response;
                     responseData.data.forEach((data) => {
                         this.comments.push(data);
                     });
-
                     this.totalCommentsCount = responseData.metadata.count;
                     this.cursorNext = responseData.metadata.cursor.next;
 
