@@ -106,7 +106,7 @@
         "gotenberg/gotenberg-php": "^2.7",
         "guzzlehttp/psr7": "^2.4",
         "learnosity/learnosity-sdk-php": "1.0.3",
-        "fileeye/pel": "^0.10",
+        "fileeye/pel": "^0.12.0",
         "ramsey/uuid": "^4.7",
         "steverhoades/oauth2-openid-connect-client": "^2.0",
         "cache/simple-cache-bridge": "^1.2",
