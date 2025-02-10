@@ -70,11 +70,11 @@ if ($_SESSION['communityLogin'] ?? false) {
     }
 
     /* Set the URL to redirect the user to after login */
-    if ($_GET['page']) {
-        if ($_GET['menu']) {
+    if (isset($_GET['page'])) {
+        if (isset($_GET['menu'])) {
             $action = $action . '?ReturnUrl=' . urlencode($_GET['page'] . '.aspx?menu=0');
         } else {
-            $action = $action . '?ReturnUrl=' . $_GET['page'] . '.aspx';
+            $action = $action . '?ReturnUrl=' . urlencode($_GET['page']) . '.aspx';
         }
     }
 
