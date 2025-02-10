@@ -2,7 +2,6 @@
 // Ignore this file for ESLint checks for now (SA-18376)
 /* eslint-disable */
 /* eslint-enable vue/no-v-html */
-import axios from "axios";
 import Toast from "@schoolboxVue/components/toast";
 import RevealModal from "@schoolboxVue/components/reveal-modal";
 import { EditorEvent } from "@js/editor/event/editorEvent";
@@ -411,7 +410,9 @@ export default {
             try {
                 /* Asynchronously access the endpoint to delete the thing
                  */
-                await axios.delete(this.textboxes[this.textboxIndexToDelete].textbox._links.delete);
+                await fetch(this.textboxes[this.textboxIndexToDelete].textbox._links.delete, {
+                    method: "DELETE",
+                });
 
                 /* Mark this textbox as deleted
                  */
