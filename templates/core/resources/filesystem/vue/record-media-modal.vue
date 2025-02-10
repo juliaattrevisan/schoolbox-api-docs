@@ -263,12 +263,24 @@ export default {
                 xhr.addEventListener("load", () => {
                     try {
                         const response = JSON.parse(xhr.responseText); // Parse JSON response
-                        resolve(response);
+                        if (typeof response === "object" && "success" in response && response.success) {
+                            resolve(response);
+                        } else {
+                            reject(response);
+                        }
                     } catch (error) {
-                        reject(new Error("Invalid JSON response"));
+                        reject({
+                            message:
+                                "Sorry, there was an error during upload. Please refresh the page and try again. If the problem persists, contact your support.",
+                        });
                     }
                 });
-                xhr.addEventListener("error", () => reject(new Error("Upload failed.")));
+                xhr.addEventListener("error", () =>
+                    reject({
+                        message:
+                            "Sorry, there was an error during upload. Please refresh the page and try again. If the problem persists, contact your support.",
+                    }),
+                );
                 xhr.send(formData);
             });
         },
@@ -285,7 +297,7 @@ export default {
                 this.isUploading = false;
                 return response;
             } catch (error) {
-                this.checkErrorMessage(error.response.data);
+                this.checkErrorMessage(error);
                 this.isUploading = false;
                 this.hasUploadError = true;
             }
@@ -324,9 +336,12 @@ export default {
                 this.uploadErrorMessage = `Sorry, the recording of ${humanFileSize(
                     this.recordedData.size,
                 )} is over the allowed file size limit. Please try a shorter recording or request your administrator(s) to increase the allowed file size limit.`;
-            }
-            if (errorResponseData.hash?.includes("The specified filename exceeds the max length")) {
+            } else if (errorResponseData.hash?.includes("The specified filename exceeds the max length")) {
                 this.uploadErrorMessage = `Sorry, the specified filename is longer than the allowed length.\nPlease shorten the filename length.`;
+            } else if (errorResponseData.message) {
+                this.uploadErrorMessage = errorResponseData.message;
+            } else {
+                this.uploadErrorMessage = "Sorry, there was an unknown error while uploading.";
             }
         },
 
@@ -347,7 +362,7 @@ export default {
             this.hasUploaded = true;
             this.canUpload = false;
             setTimeout(() => {
-                //put a slight delay so user sees the upload successfull modal
+                //put a slight delay so user sees the upload successful modal
                 window.top.postMessage(JSON.stringify({ data: [data] }), location.origin);
                 this.hasUploaded = false;
             }, 1000);
