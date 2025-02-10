@@ -66,7 +66,7 @@ class Matcher
     private function buildRegexp(string $pattern): string
     {
         $pattern = preg_replace_callback(
-            '/\\\\*\\[^/',
+            '/\\\\*\\[\^/',
             function ($matches) {
                 // Is there an even number of escape chars (inc. 0)?
                 // Replace if so: otherwise do not
