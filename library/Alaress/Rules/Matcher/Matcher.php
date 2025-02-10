@@ -65,6 +65,19 @@ class Matcher
      */
     private function buildRegexp(string $pattern): string
     {
+        $pattern = preg_replace_callback(
+            '/\\\\*\\[^/',
+            function ($matches) {
+                // Is there an even number of escape chars (inc. 0)?
+                // Replace if so: otherwise do not
+                [$match] = $matches;
+                if (strlen($match) % 2 === 0) {
+                    return str_replace('[^', '[!', $match);
+                }
+                return $match;
+            },
+            $pattern,
+        );
         return (new Pattern($pattern))->toRegex() . 'i';
     }
 }

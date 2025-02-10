@@ -174,6 +174,42 @@ class MapTest extends TestCase
             ['1'],
         ];
 
+        yield 'Character class negation' => [
+            ['match[^12]' => '1', 'match[^34]' => '2'],
+            ['match1'],
+            ['2'],
+        ];
+
+        yield 'Character class negation: exact match' => [
+            ['match[^12]' => '1', 'match[^34]' => '2'],
+            ['match[^12]'],
+            ['1'],
+        ];
+
+        yield 'Character class negation, ^ format' => [
+            ['match[^12]' => '1', 'match[^34]' => '2'],
+            ['match1'],
+            ['2'],
+        ];
+
+        yield 'Character class negation: exact match, ^ format' => [
+            ['match[^12]' => '1', 'match[^34]' => '2'],
+            ['match[^12]'],
+            ['1'],
+        ];
+
+        yield '[^ escaped' => [
+            ['match\\[^1]' => '1'],
+            ['match\\[^1]'],
+            ['1'],
+        ];
+
+        yield '[^ double-escaped' => [
+            ['match\\\\[^1]' => '1'],
+            ['match\\2'],
+            ['1'],
+        ];
+
         yield 'backslashes escape' => [
             ['test\\*' => '1'],
             ['test*'],
@@ -258,6 +294,12 @@ class MapTest extends TestCase
             ['1'],
         ];
 
+        yield 'negative lookahead: match' => [
+            ['zero(^[a-z])*' => '1'],
+            ['zero0'],
+            ['1'],
+        ];
+
         // Invalid patterns:
         // I'd like to raise a warning, but I cannot without having different
         // behavior when running UPS on the command line and dry run: the CLI
@@ -305,6 +347,16 @@ class MapTest extends TestCase
 
         yield '[! double-escaped, no match' => [
             ['match\\\\[!1]' => '1'],
+            ['match\\1'],
+        ];
+
+        yield '[^ escaped, no match' => [
+            ['match\\[^1]' => '1'],
+            ['match\\2'],
+        ];
+
+        yield '[^ double-escaped, no match' => [
+            ['match\\\\[^1]' => '1'],
             ['match\\1'],
         ];
 
@@ -391,6 +443,11 @@ class MapTest extends TestCase
 
         yield 'negative lookahead: no match' => [
             ['zero(![0-9])*' => '1'],
+            ['zero0'],
+        ];
+
+        yield 'negative lookahead: no match' => [
+            ['zero(^[0-9])*' => '1'],
             ['zero0'],
         ];
 
