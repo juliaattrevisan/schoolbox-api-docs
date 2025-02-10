@@ -16,7 +16,7 @@ export default {
         window: () => window,
 
         exportUrl() {
-            let values = Object.assign({}, this.form);
+            const values = {};
 
             // Add token to object
             values.token = this.token;
