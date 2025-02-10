@@ -23,7 +23,7 @@ export default {
          * Converts a goal to an achievement.
          *
          * @param {Object} award the award to convert to an achievement
-         * @return {Promise} An AJAX request created by `axios`
+         * @return {Promise} An AJAX request created by `fetch`
          */
         convertToAchievement(award) {
             return fetch(award._links.goalAward, {
