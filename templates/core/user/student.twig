@@ -170,10 +170,10 @@
                                                             {% endfor %}
                                                         {% elseif selectedField.field in ['StudentMedicalAlert'] %}
                                                             {# A string with a special prefix that displays in a flag #}
-                                                            Medical Note: {{ selectedField.value }}
+                                                            Medical Note: {{ selectedField.value|nl2br }}
                                                         {% elseif selectedField.field in ['Comment'] %}
                                                             {# A string that displays on its own in a flag#}
-                                                            {{ selectedField.value }}
+                                                            {{ selectedField.value|nl2br }}
                                                         {% elseif selectedField.field in ['ParentsSeparatedFlag'] %}
                                                             {% block parentsSeparated %}
                                                                 {# A special flag that has a hardcoded text string #}
