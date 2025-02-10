@@ -95,21 +95,16 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
      */
     private function ordinal($num)
     {
+        $num = (int) $num;
+        $suffixes = ['th', 'st', 'nd', 'rd'];
 
-        // Special case "teenth"
-        if (($num / 10) % 10 != 1) {
-            // Handle 1st, 2nd, 3rd
-            switch ($num % 10) {
-                case 1:
-                    return $num . 'st';
-                case 2:
-                    return $num . 'nd';
-                case 3:
-                    return $num . 'rd';
-            }
+        // Special case: numbers ending in 11, 12, or 13 are always "th"
+        if ($num % 100 >= 11 && $num % 100 <= 13) {
+            return $num . 'th';
         }
-        // Everything else is "nth"
-        return $num . 'th';
+
+        // Get the correct suffix for 1, 2, 3; default to "th"
+        return $num . ($suffixes[$num % 10] ?? 'th');
     }
 
 
