@@ -9,7 +9,6 @@
  */
 class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
 {
-
     /**
      * Template file containing the graph
      *
