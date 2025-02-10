@@ -2,7 +2,6 @@
 // Ignore this file for ESLint checks for now (SA-18376)
 /* eslint-disable */
 /* eslint-enable vue/no-v-html */
-import axios from "axios";
 import { getSearchString } from "@js/util/queryUtils";
 import MediaArticle from "@schoolboxVue/components/media-article";
 import toastMixin from "@schoolboxVue/components/toast-mixin";
@@ -265,12 +264,12 @@ export default {
             const commentIdToDelete = this.comments[this.commentIndexToDelete].id;
 
             // Need the commentIdToDelete, so needs to be constructed manually?
-            axios
-                .delete(
-                    "/discussion/comms/" + this.articleId + "/comments/" + commentIdToDelete,
-                    {},
-                    { headers: this.postHeaders },
-                )
+            fetch(`/discussion/comms/${this.articleId}/comments/${commentIdToDelete}`, {
+                method: "DELETE",
+                headers: {
+                    ...this.postHeaders,
+                },
+            })
                 .then(() => {
                     this.comments.splice(this.commentIndexToDelete, 1);
                     this.totalCommentsCount--;
