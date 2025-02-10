@@ -278,12 +278,18 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
         if (is_array($allResults)) {
             foreach ($allResults as $currentResult) {
                 $response = unserialize($currentResult['response']);
+
                 if (!is_array($response)) {
                     continue;
                 }
 
                 for ($i = 0; $i < count($response); $i++) {
-                    $scoreboard[$i][$response[$i]]++;
+                    /* Disregard any responses that might have been given to an option
+                     * that no longer exists in the question.
+                     */
+                    if (isset($scoreboard[$i][$response[$i]])) {
+                        $scoreboard[$i][$response[$i]]++;
+                    }
                 }
             }
         }
