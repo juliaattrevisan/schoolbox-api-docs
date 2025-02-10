@@ -288,13 +288,13 @@ class MapTest extends TestCase
             ['zero0'],
             ['1'],
         ];
-        yield 'negative lookahead: match' => [
+        yield 'negative lookahead: match !' => [
             ['zero(![a-z])*' => '1'],
             ['zero0'],
             ['1'],
         ];
 
-        yield 'negative lookahead: match' => [
+        yield 'negative lookahead: match ^' => [
             ['zero(^[a-z])*' => '1'],
             ['zero0'],
             ['1'],
