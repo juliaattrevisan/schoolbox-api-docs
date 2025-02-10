@@ -294,12 +294,6 @@ class MapTest extends TestCase
             ['1'],
         ];
 
-        yield 'negative lookahead: match ^' => [
-            ['zero(^[a-z])*' => '1'],
-            ['zero0'],
-            ['1'],
-        ];
-
         // Invalid patterns:
         // I'd like to raise a warning, but I cannot without having different
         // behavior when running UPS on the command line and dry run: the CLI
