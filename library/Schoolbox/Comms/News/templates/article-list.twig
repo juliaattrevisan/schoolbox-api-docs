@@ -105,11 +105,6 @@
 
     var topicAll = {{ topicAll | json_encode | raw }};
 
-    // Axios does not set the XHR header by default, so we have to do it manually.
-    var getHeaders = {
-        'X-Requested-With' : 'XMLHttpRequest'
-    };
-
 </script>
 
 <div id="news-component">
