@@ -37,7 +37,7 @@
         "sabre/vobject" : "^4.4.0",
         "ezyang/htmlpurifier": "^4.14.0",
         "twig/twig": "^3.4.1",
-        "maximebf/debugbar": "^1.17.3",
+        "maximebf/debugbar": "^v2.1.0",
         "predis/predis": "^1.0",
         "monolog/monolog": "^3.7",
         "league/flysystem": "^3.5.2",
