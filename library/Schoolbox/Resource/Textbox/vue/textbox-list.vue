@@ -181,10 +181,24 @@ export default {
                     // If it doesn't it's new, so create it: otherwise update.
                     let updateEndpoint = textbox?._links?.update;
                     if (updateEndpoint) {
-                        requests.push(axios.put(updateEndpoint, textbox).then(() => this.markAsClean(index)));
+                        requests.push(
+                            fetch(updateEndpoint, {
+                                method: "PUT",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify(textbox),
+                            }).then(() => this.markAsClean(index)),
+                        );
                     } else {
                         requests.push(
-                            axios.post(this.createTextboxEndpoint, textbox).then(() => this.markAsClean(index)),
+                            fetch(this.createTextboxEndpoint, {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify(textbox),
+                            }).then(() => this.markAsClean(index)),
                         );
                     }
                 }
