@@ -78,7 +78,7 @@
         "ssnepenthe/color-utils": "^0.4.2",
         "dragonmantank/cron-expression": "^3.0",
         "ext-simplexml": "*",
-        "enshrined/svg-sanitize": "~0.20.0",
+        "enshrined/svg-sanitize": "^0.21.0",
         "maennchen/zipstream-php": "^3.1.0",
         "ext-mbstring": "*",
         "ext-intl": "*",
