@@ -13,7 +13,6 @@ import RecordCamera from "@schoolboxVue/components/record/record-camera";
 import RecordScreen from "@schoolboxVue/components/record/record-screen";
 import OverMediaModal from "@schoolboxVue/components/videojs-record/over-media-modal";
 import recordMediaTypes from "@js/record-media/recordMediaTypes";
-import axios from "axios";
 import { humanFileSize } from "@js/util/fileUtils";
 import { hasDeviceCapture } from "@js/util/featureDetectionUtils";
 import { isOfFileType, convertFilenameExtension } from "@js/util/fileUtils";
