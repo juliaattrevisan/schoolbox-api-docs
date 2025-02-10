@@ -112,7 +112,6 @@ class Session extends BaseSession
         /**
          * session_id is provided by phpfunc
          *
-         * @phpstan-ignore-next-line
          * @noinspection PhpUndefinedMethodInspection
          */
         $sessionId = $this->phpfunc->session_id();

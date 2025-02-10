@@ -873,7 +873,6 @@ class Profile implements IStrategy
     /**
      * Find legal alerts
      *
-     * @phpstan-ignore-next-line: this will eventually return a string
      * @return string|null
      */
     private function findLegal(): ?string
