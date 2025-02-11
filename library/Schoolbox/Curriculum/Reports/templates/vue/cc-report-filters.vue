@@ -41,7 +41,7 @@ const isModalOpen = window.Vue.ref(false); // to open/close the exporting to csv
                 <p class="meta">Only show curriculum that has a total usage count of 0.</p>
                 <div class="switch">
                     <input id="onlyShowGapsSwitch" v-model="filtersStore.onlyShowGaps" type="checkbox" />
-                    <label for="onlyShowGapsSwitch">
+                    <label for="onlyShowGapsSwitch" data-test="cc-report-filters-gaps-switch">
                         <span class="icon-approve"></span>
                         <span class="icon-cancel"></span>
                     </label>

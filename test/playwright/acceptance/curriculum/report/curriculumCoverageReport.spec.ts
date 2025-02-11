@@ -95,5 +95,9 @@ test.describe("Curriculum Coverage Report Tests", () => {
         );
         await page.locator("table tbody tr:nth-child(10) td:nth-child(10)").click(); // Select table cell
         await expect(page.getByTestId("cc-usage-pop-out")).toContainText("Present a scene of Romeo and Juliet");
+
+        tester.isGoingTo("Select Only show unused curriculum and confirm open/close toggles have been hidden");
+        await page.getByTestId("cc-report-filters-gaps-switch").click(); // Select Only show unused curriculum
+        await expect(page.locator("[data-test^='cc-report-table-node-expand-button-']")).toHaveCount(0); // Confirm no expand buttons
     });
 });
