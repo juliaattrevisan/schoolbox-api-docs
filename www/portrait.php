@@ -43,7 +43,7 @@ $config = $kernel->getDependencyInjector()->get('config');
 
 /* If current user is not available return permission denied */
 if (!(($_SESSION['user'] ?? null) instanceof Schoolbox\User)) {
-    SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 403);
+    SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'] ?? '', 403);
 }
 
 /* Accept both id and userId params
@@ -61,7 +61,7 @@ try {
     // $user will be null
 }
 if (!$user) {
-    SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size']);
+    SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'] ?? '');
     exit;
 }
 
