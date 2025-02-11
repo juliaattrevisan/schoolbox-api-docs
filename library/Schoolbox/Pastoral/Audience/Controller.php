@@ -13,6 +13,9 @@ use Alaress\Color\ColorFactory;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Request\Values;
+use Schoolbox\Pastoral\Type\Model as PastoralType;
+use Symfony\Component\HttpFoundation\Response;
+use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\L10n\RosettaStone;
@@ -57,7 +60,8 @@ class Controller extends Base
         private IconMapper $iconMapper,
         private RosettaStone $rosettaStone,
         private ColorFactory $colorFactory,
-        private Pastoral\Access\Mapper $pastoralAccessMapper
+        private Pastoral\Access\Mapper $pastoralAccessMapper,
+        private Pastoral\ExpiryHelper $expiryHelper,
     ) {
     }
 
@@ -363,6 +367,21 @@ class Controller extends Base
         if (in_array($post['defaultExpiry'], Pastoral\Type\TypeAbstract::PASTORAL_EXPIRY)) {
             $currentType->setDefaultExpiry($post['defaultExpiry']);
         }
+
+        /* Apply default expiry when option is checked
+         */
+        if ($post->offsetExists('applyDefaultExpiry')) {
+            try {
+                $this->expiryHelper->updateDefaultExpireAt(
+                    $type->getId(),
+                    $isSubType ? $currentType->getId() : null,
+                    $post['defaultExpiry']
+                );
+            } catch (MapperException | \Exception $e) {
+                $this->sendError($e->getMessage(), [], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+        }
+
         $currentType->setColor(!empty($post['color']) ? $this->colorFactory->build($post['color']) : null);
         $currentType->setVisibilityLocked($isVisibilityLocked);
         if ($isSubType) {

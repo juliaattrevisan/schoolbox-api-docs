@@ -85,6 +85,10 @@ class Module extends AlaressModule\Module
             $this->injector->get('l10n'),
             new ColorFactory(),
             $this->getMapperFactory()->get(Pastoral\Access\Mapper::class),
+            new Pastoral\ExpiryHelper(
+                $this->getMapperFactory()->get(Pastoral\Mapper::class),
+                $this->getMapperFactory()->get(\Schoolbox\Assessment\Term\Mapper::class),
+            ),
         );
     }
 
