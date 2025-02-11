@@ -65,7 +65,7 @@ window.Vue.watch(
 </script>
 
 <template>
-    <div ref="popOutElement" class="usage" style="display: none">
+    <div ref="popOutElement" class="usage" style="display: none" data-test="cc-usage-pop-out">
         <div v-if="popOutStore.hasLoadError" class="alert-box alert f-no-margins">
             There was an error during usage retrieval. Please
             <a href="" title="refresh the page">refresh the page</a>

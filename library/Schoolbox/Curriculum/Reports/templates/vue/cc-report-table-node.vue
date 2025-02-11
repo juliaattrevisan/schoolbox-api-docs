@@ -104,6 +104,7 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
                 class="l-flex l-flex--center f-no-bkg"
                 :aria-label="props.node.isExpanded ? 'Collapse' : 'Expand'"
                 :title="props.node.isExpanded ? 'Collapse' : 'Expand'"
+                :data-test="`cc-report-table-node-expand-button-${props.node.id}`"
                 @click="nodesStore.toggleNodeExpand(props.node)"
             >
                 <sbx-icon v-if="props.node.isExpanded" name="up-arrow" />

@@ -83,5 +83,17 @@ test.describe("Curriculum Coverage Report Tests", () => {
         tester.isGoingTo("Uncheck Unit filter and confirm Year 9 Curriculum goes from 12 to 10");
         await page.getByTestId("cc-report-filters-label-unit").click(); // Select Unit filter
         await expect(page.locator("table tbody tr:nth-child(4) td:nth-child(2)")).toHaveText("10");
+
+        tester.isGoingTo("Expand out to English > Year 9 > Language > Text structure and organisation > ACELA1553");
+        await page.getByTestId("cc-report-table-node-expand-button-136").click(); // Select Year 9
+        await page.getByTestId("cc-report-table-node-expand-button-138").click(); // Select Language
+        await page.getByTestId("cc-report-table-node-expand-button-148").click(); // Select Text structure and organisation
+        await page.getByTestId("cc-report-table-node-expand-button-149").click(); // Select ACELA1553
+
+        tester.isGoingTo(
+            "Select ACELA1553 / Romeo & Juliet and confirm “Present a scene of Romeo and Juliet” is visible in the pop out",
+        );
+        await page.locator("table tbody tr:nth-child(10) td:nth-child(10)").click(); // Select table cell
+        await expect(page.getByTestId("cc-usage-pop-out")).toContainText("Present a scene of Romeo and Juliet");
     });
 });
