@@ -33,7 +33,7 @@ export default class AssessmentForm {
 
     static readonly DATATEST_MARK_TYPE = "assessment-form-select-markType";
 
-    static readonly DATATEST_INSTRUCTOR_MARK_TYPE = "assessment-form-select-markType";
+    static readonly DATATEST_INSTRUCTOR_MARK_TYPE = "assessment-form-select-instructor-markType";
 
     static readonly SELECTOR_BUTTON_CREATE = "assessment-form-button-submit-Create";
 
