@@ -259,10 +259,9 @@ Usage:
                                                         </ul>
                                                     </li>
                                                 </ul>
-                                                {# todo hmm i wonder what the student should enter #}
-                                                {% if selfAssessmentFeedback.humanReadableMark|length %}
+                                                {% if selfAssessmentFeedback.humanReadableInstructorMark|length %}
                                                     <div class="grade {{ urgency.marks(selfAssessmentFeedback.normalisedMark) }}-bg">
-                                                        <span>{{ selfAssessmentFeedback.humanReadableMark }}</span>
+                                                        <span>{{ selfAssessmentFeedback.humanReadableInstructorMark }}</span>
                                                     </div>
                                                 {% endif %}
                                             </div>
