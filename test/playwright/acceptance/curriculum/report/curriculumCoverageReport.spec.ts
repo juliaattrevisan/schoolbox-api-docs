@@ -19,7 +19,7 @@ test.describe("Curriculum Coverage Report Tests", () => {
         await coverageReport.goto();
 
         tester.isGoingTo("Confirm the empty state is visible");
-        await expect(page.getByTestId("cc-empty-state")).toBeVisible();
+        await expect(page.getByTestId("cc-report-empty-state")).toBeVisible();
 
         tester.isGoingTo("Within Select Courses: Choose Year 9 English, Year 9 French and 20th Century History");
         await page.getByTestId("search-select-button-courses").click(); // Open the select courses modal
@@ -53,7 +53,7 @@ test.describe("Curriculum Coverage Report Tests", () => {
         await coverageReport.submit(); // Generate the report
 
         tester.isGoingTo("Confirm loading spinner is visible");
-        await expect(page.getByTestId("cc-loading")).toBeVisible();
+        await expect(page.getByTestId("cc-report-loading")).toBeVisible();
 
         tester.isGoingTo("Confirm English > Year 9 has total usage of 12");
         await expect(page.locator("table tbody tr:nth-child(4) td:nth-child(2)")).toHaveText("12");
@@ -62,7 +62,7 @@ test.describe("Curriculum Coverage Report Tests", () => {
         await page.reload();
 
         tester.isGoingTo("Confirm loading spinner is visible");
-        await expect(page.getByTestId("cc-loading")).toBeVisible();
+        await expect(page.getByTestId("cc-report-loading")).toBeVisible();
 
         tester.isGoingTo("Confirm English > Year 9 has total usage of 12");
         await expect(page.locator("table tbody tr:nth-child(4) td:nth-child(2)")).toHaveText("12");
@@ -70,5 +70,15 @@ test.describe("Curriculum Coverage Report Tests", () => {
         tester.isGoingTo("Select load more curriculum and confirm Years 9 and 10 French is now visible");
         await page.getByTestId("cc-report-load-more-button").click(); // Select load more curriculum
         await expect(page.locator("table tbody tr:nth-child(7) td:nth-child(1)")).toHaveText("Years 9 and 10 French");
+
+        tester.isGoingTo("Export the report and confirm the download is successful");
+        await page.getByTestId("cc-report-filters-export-button").click(); // Select Export as CSV
+        // Start waiting for the download event
+        const [download] = await Promise.all([
+            page.waitForEvent("download"), // Wait for the file to be downloaded
+            page.getByTestId("cc-report-filters-export-button-confirm").click(), // Click the download button
+        ]);
+        const fileName = download.suggestedFilename();
+        expect(fileName).toBe("curriculum-coverage-report.csv");
     });
 });

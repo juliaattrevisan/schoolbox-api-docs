@@ -48,6 +48,7 @@ const isModalOpen = window.Vue.ref(false); // to open/close the exporting to csv
                 class="l-flex-row l-gap-s f-no-bkg f-no-margins"
                 aria-label="Export to CSV"
                 title="Export to CSV"
+                data-test="cc-report-filters-export-button"
                 @click="isModalOpen = true"
             >
                 <sbx-icon name="export" />
@@ -66,6 +67,7 @@ const isModalOpen = window.Vue.ref(false); // to open/close the exporting to csv
                         type="button"
                         class="button submit"
                         :href="exportStore.getEndpoint()"
+                        data-test="cc-report-filters-export-button-confirm"
                         @click="isModalOpen = false"
                         >Export</a
                     >
