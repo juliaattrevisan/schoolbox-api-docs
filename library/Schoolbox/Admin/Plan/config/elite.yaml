@@ -33,7 +33,6 @@ config:
   pastoral_page_size: {hide: true} # This should stay hidden
   pastoral_page_visible: {hide: true} # This should stay hidden
   pastoral_create_tag_enable: {hide: false}
-  pastoral_flag_count_period: {hide: false}
   pastoral_action_enable: {hide: false}
   pastoral_bulk_import_enabled: {hide: false}
 
