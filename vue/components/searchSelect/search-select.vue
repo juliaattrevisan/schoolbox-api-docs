@@ -189,7 +189,7 @@ function onButtonSelected(): void {
 </script>
 
 <template>
-    <div ref="searchSelectEl" v-on-click-outside="onClickOutside">
+    <div ref="searchSelectEl" v-on-click-outside="onClickOutside" :data-test="`search-select-${props.labelId}`">
         <label :for="props.labelId" :class="`${props.isRequired ? 'required' : ''}`">{{ props.label }}</label>
         <slot name="meta"></slot>
         <label v-if="props.hasError" class="error" :for="props.labelId">{{ errorMessage }}</label>

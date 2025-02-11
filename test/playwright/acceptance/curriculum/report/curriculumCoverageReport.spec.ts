@@ -32,5 +32,11 @@ test.describe("Curriculum Coverage Report Tests", () => {
         await expect(page.getByTestId("ss-selected")).toContainText("Year 9 English");
         await expect(page.getByTestId("ss-selected")).toContainText("Year 9 French");
         await expect(page.getByTestId("ss-selected")).toContainText("20th Century History");
+
+        tester.isGoingTo("Try and generate a report, confirming that Curriculum is also required");
+        await page.getByTestId("cc-input-button").click(); // Select Generate Report
+        await expect(page.getByTestId("search-select-curriculum")).toContainText(
+            "Please select at least one curriculum outcome",
+        );
     });
 });
