@@ -54,5 +54,17 @@ test.describe("Curriculum Coverage Report Tests", () => {
 
         tester.isGoingTo("Confirm loading spinner is visible");
         await expect(page.getByTestId("cc-loading")).toBeVisible();
+
+        tester.isGoingTo("Confirm English > Year 9 has total usage of 12");
+        await expect(page.locator("table tbody tr:nth-child(4) td:nth-child(2)")).toHaveText("12");
+
+        tester.isGoingTo("Reload the page and ensure the report still persists");
+        await page.reload();
+
+        tester.isGoingTo("Confirm loading spinner is visible");
+        await expect(page.getByTestId("cc-loading")).toBeVisible();
+
+        tester.isGoingTo("Confirm English > Year 9 has total usage of 12");
+        await expect(page.locator("table tbody tr:nth-child(4) td:nth-child(2)")).toHaveText("12");
     });
 });
