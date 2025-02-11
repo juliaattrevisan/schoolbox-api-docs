@@ -16,7 +16,7 @@ const reportStore = useReportStore();
         <i class="icon-report"></i>
         To generate a report, first select at least one Course and Curriculum.
     </div>
-    <div v-else-if="reportStore.isLoading" class="c-island l-pad-m">
+    <div v-else-if="reportStore.isLoading" class="c-island l-pad-m" data-test="cc-loading">
         <div class="loader"></div>
     </div>
     <div v-else-if="reportStore.hasLoadError" class="c-island l-pad-m">

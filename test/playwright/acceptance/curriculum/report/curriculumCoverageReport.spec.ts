@@ -51,5 +51,8 @@ test.describe("Curriculum Coverage Report Tests", () => {
 
         tester.isGoingTo("Try and generate a report again");
         await coverageReport.submit(); // Generate the report
+
+        tester.isGoingTo("Confirm loading spinner is visible");
+        await expect(page.getByTestId("cc-loading")).toBeVisible();
     });
 });
