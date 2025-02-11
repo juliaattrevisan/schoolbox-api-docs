@@ -127,7 +127,6 @@ class Helper
      * @param Collection               $students          collection of students we want to count the pastoral events
      * @param Collection|null          $typesWhitelist    optional whitelist of pastoral types that should be counted
      * @param Collection|null          $subTypesWhitelist optional whitelist of pastoral subtypes that should be counted
-     * @param Alaress_Date_Format|null $startDate         date to count records from. 12 months ago, if not provided
      * @return Collection
      * @throws RouteNotFound
      */
