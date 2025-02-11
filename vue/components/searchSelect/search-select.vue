@@ -216,6 +216,7 @@ function onButtonSelected(): void {
                 v-if="props.hasButton"
                 type="button"
                 :class="`button ${props.buttonIcon}`"
+                :data-test="`search-select-button-${props.labelId}`"
                 @click.prevent="onButtonSelected"
             >
                 {{ props.buttonTitle }}

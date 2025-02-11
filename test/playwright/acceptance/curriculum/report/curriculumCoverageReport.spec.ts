@@ -20,5 +20,17 @@ test.describe("Curriculum Coverage Report Tests", () => {
 
         tester.isGoingTo("confirm the empty state is visible");
         await expect(page.getByTestId("cc-empty-state")).toBeVisible();
+
+        tester.isGoingTo("Within Select Courses: Choose Year 9 English, Year 9 French and 20th Century History");
+        await page.getByTestId("search-select-button-courses").click(); // Open the select courses modal
+        await page.getByTestId("ss-results-item-label-6").click(); // Select Year 9 English
+        await page.getByTestId("ss-results-item-label-2").click(); // Select Year 9 French
+        await page.getByTestId("ss-results-item-label-14").click(); // Select 20th Century History
+        await page.getByTestId("ssm-footer-save-button").click(); // Select Select, closing the modal
+
+        tester.isGoingTo("Check that those courses are selected");
+        await expect(page.getByTestId("ss-selected")).toContainText("Year 9 English");
+        await expect(page.getByTestId("ss-selected")).toContainText("Year 9 French");
+        await expect(page.getByTestId("ss-selected")).toContainText("20th Century History");
     });
 });
