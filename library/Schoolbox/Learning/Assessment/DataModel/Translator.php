@@ -320,16 +320,6 @@ class Translator
             }
         }
 
-        // As above:
-        // Ideally this would exist in the Due Work translator, but that would require making this method public.
-        // That is too dangerous, best to perform an instanceof here.
-        if ($domainObject instanceof \Schoolbox\Learning\Assessment\DueWork\Model) {
-            /** @var \Schoolbox\Learning\Assessment\DueWork\Model $dataModel */
-            $dataModel->setInstructorMarkType($domainObject->getInstructorMarkType());
-            $dataModel->setInstructorMaxMark($domainObject->getInstructorMaxMark());
-            $dataModel->setInstructorGradeGroup($domainObject->getInstructorGradeGroup());
-        }
-
         // This would ideally be in the Project translator. But that would require making this method public.
         // The danger of that is worth the instanceof check here.
         if ($domainObject instanceof Project && $domainObject->getAssessables() !== null) {
