@@ -159,6 +159,7 @@ class QuizSubmission extends SubmissionAbstract
                             $canvasSubmission,
                             $attempts,
                             $markScheme,
+                            null,
                             $feedbackTime
                         );
                         if (!$feedback) {
@@ -199,6 +200,7 @@ class QuizSubmission extends SubmissionAbstract
      * @param array                $canvasSubmission
      * @param GenericCollection    $existingFeedbacks
      * @param IMarkScheme          $markScheme
+     * @param ?IMarkScheme         $instructorMarkScheme
      * @param string               $feedbackTime
      * @return Quiz\Attempt\Model|null
      * @throws Mapper\Exception
@@ -210,6 +212,7 @@ class QuizSubmission extends SubmissionAbstract
         array $canvasSubmission,
         GenericCollection $existingFeedbacks,
         IMarkScheme $markScheme,
+        ?IMarkScheme $instructorMarkScheme, // This is unused for quiz, but here to match the interface
         string $feedbackTime
     ): ?Quiz\Attempt\Model {
         /** @var Quiz\Model $quiz */

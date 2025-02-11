@@ -218,6 +218,7 @@ abstract class SubmissionAbstract
      * @param array                $canvasSubmission
      * @param GenericCollection    $existingFeedbacks
      * @param IMarkScheme          $markScheme
+     * @param IMarkScheme|null     $instructorMarkScheme (only relevant for due work)
      * @param string               $feedbackTime
      * @return mixed
      */
@@ -228,6 +229,7 @@ abstract class SubmissionAbstract
         array $canvasSubmission,
         GenericCollection $existingFeedbacks,
         IMarkScheme $markScheme,
+        ?IMarkScheme $instructorMarkScheme,
         string $feedbackTime
     ): mixed;
 

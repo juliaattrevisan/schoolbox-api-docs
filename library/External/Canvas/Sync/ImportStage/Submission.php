@@ -107,6 +107,7 @@ class Submission extends SubmissionAbstract
             $syncedFeedbackIds = [];
 
             $markScheme = $markSchemaFactory->spawnMarkSchemeFor($assessmentImpl);
+            $instructorMarkScheme = $markSchemaFactory->spawnInstructorMarkSchemeFor($assessmentImpl);
 
             foreach ($assessmentImpl->getPlans() as $plan) {
                 foreach ($plan->getParticipants() as $participant) {
@@ -144,6 +145,7 @@ class Submission extends SubmissionAbstract
                             $canvasSubmission,
                             $existingFeedbacks,
                             $markScheme,
+                            $instructorMarkScheme,
                             $feedbackTime
                         );
                         if (!$feedback) {
@@ -185,6 +187,7 @@ class Submission extends SubmissionAbstract
      * @param array                           $canvasSubmission
      * @param GenericCollection               $existingFeedbacks
      * @param IMarkScheme                     $markScheme
+     * @param IMarkScheme|null                $instructorMarkScheme
      * @param string                          $feedbackTime
      * @return SubmissionBox\ReturnedWork|null
      * @throws Mapper\Exception
@@ -196,6 +199,7 @@ class Submission extends SubmissionAbstract
         array $canvasSubmission,
         GenericCollection $existingFeedbacks,
         IMarkScheme $markScheme,
+        ?IMarkScheme $instructorMarkScheme,
         string $feedbackTime
     ): ?SubmissionBox\ReturnedWork {
         /** @var SubmissionBox $submissionBox */
@@ -203,6 +207,7 @@ class Submission extends SubmissionAbstract
         $this->log->debug(sprintf('Processing marks for submission_box: box_id:%s student:%d', $submissionBox->getId(), $reviewee->getId()));
         $normMark     = $canvasSubmission['norm_mark'];
         $readableMark = $canvasSubmission['mark'];
+        $readableInstructorMark = $canvasSubmission['mark']; // Intentionally the same as readableMark as canvas doesn't have separate instructor marks
 
         if (
             $submissionBox->getMarkType()->getSlug() === SubmissionBox\MarkType::SLUG_LETTER
@@ -226,6 +231,11 @@ class Submission extends SubmissionAbstract
             $readableMark = $markScheme->getHumanReadableMark($normMark);
         }
 
+        // In case the asessment has been changed to have a different mark scheme for instructors, use that
+        if ($submissionBox->getInstructorMarkType()->getSlug() !== SubmissionBox\MarkType::SLUG_NONE) {
+            $readableInstructorMark = $instructorMarkScheme->getHumanReadableMark($normMark);
+        }
+
         /** @var SubmissionBox\ReturnedWork $existingFeedback */
         foreach ($existingFeedbacks as $existingFeedback) {
             // Check whether the rest are the same
@@ -236,6 +246,7 @@ class Submission extends SubmissionAbstract
                 && $existingFeedback->getMarker()->getId() === $reviewer->getId()
                 && (string)$existingFeedback->getComment() === (string)$canvasSubmission['comment']
                 && (string)$existingFeedback->getHumanReadableMark() === (string)$readableMark
+                && (string)$existingFeedback->getHumanReadableInstructorMark() === (string)$readableInstructorMark
                 && (abs((float)$existingFeedback->getNormalizedMark() - (float)$normMark) < 0.0001)
             ) {
                 $this->log->debug(sprintf('Feedback already exists : submission_return_id:%s', $existingFeedback->getId()));
@@ -257,6 +268,7 @@ class Submission extends SubmissionAbstract
                  ->setReviewRoute(SubmissionBox\ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
                  ->setComment($plainComment->getText())
                  ->setHumanReadableMark($readableMark)
+                 ->setHumanReadableInstructorMark($readableInstructorMark)
                  ->setNormalizedMark($normMark)
                  ->setCreatedAt($feedbackTime)
                  ->setPublishedAt($feedbackTime)
