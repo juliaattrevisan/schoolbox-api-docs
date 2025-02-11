@@ -60,9 +60,9 @@ class Processor
      */
     private const QUERY_FEEDBACK = "
         INSERT INTO submission_return
-        (box_id, marker, owner, review_route, comment, mark, norm_mark, resubmission_required, created_at, published_at, published_by, updated_at)
+        (box_id, marker, owner, review_route, comment, mark, instructor_mark, norm_mark, resubmission_required, created_at, published_at, published_by, updated_at)
         VALUES
-        (:boxId, :marker, :owner, :reviewRoute, :comment, :mark, :normMark, :resubmissionRequired, :createdAt, :publishedAt, :publishedBy, :updatedAt)
+        (:boxId, :marker, :owner, :reviewRoute, :comment, :mark, :instructorMark, :normMark, :resubmissionRequired, :createdAt, :publishedAt, :publishedBy, :updatedAt)
     ";
 
 
@@ -276,6 +276,7 @@ class Processor
                     'reviewRoute' => 'instructor',
                     'comment' => $comment,
                     'mark' => $humanReadableMark,
+                    'instructorMark' => $humanReadableMark,
                     'normMark' => $normalisedMark,
                     'resubmissionRequired' => 0,
                     'createdAt' => \Alaress_Date_Format::now()->getDatabase(),

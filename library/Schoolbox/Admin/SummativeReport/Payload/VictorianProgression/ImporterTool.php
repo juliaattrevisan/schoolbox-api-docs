@@ -210,9 +210,9 @@ class ImporterTool extends CliTool\App
      */
     private const QUERY_FEEDBACK = "
         INSERT INTO submission_return
-        (box_id, marker, owner, review_route, mark, resubmission_required, created_at, published_at, published_by, updated_at)
+        (box_id, marker, owner, review_route, mark, instructor_mark, resubmission_required, created_at, published_at, published_by, updated_at)
         VALUES
-        (:boxId, :marker, :owner, :reviewRoute, :mark, :resubmissionRequired, :createdAt, :publishedAt, :publishedBy, :updatedAt)
+        (:boxId, :marker, :owner, :reviewRoute, :mark, :instructorMark, :resubmissionRequired, :createdAt, :publishedAt, :publishedBy, :updatedAt)
     ";
 
 
@@ -978,6 +978,7 @@ HELP;
                     'owner' => $student->getId(),
                     'reviewRoute' => 'instructor',
                     'mark' => $row[11],
+                    'instructorMark' => $row[11],
                     'resubmissionRequired' => 0,
                     'createdAt' => \Alaress_Date_Format::now()->getDatabase(),
                     'publishedAt' => $feedbackPublishedAt,
