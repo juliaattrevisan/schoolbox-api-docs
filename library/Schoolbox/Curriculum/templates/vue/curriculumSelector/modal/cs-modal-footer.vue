@@ -45,7 +45,13 @@ const isSaveDisabled = window.Vue.computed(() => selectedNodesStore.hasNoNodes &
     <ul class="flex-list buttons">
         <li><button type="button" class="button" :disabled="false" @click.prevent="onCancelled">Cancel</button></li>
         <li>
-            <button type="button" class="button submit" :disabled="isSaveDisabled" @click.prevent="onSelected">
+            <button
+                type="button"
+                class="button submit"
+                :disabled="isSaveDisabled"
+                data-test="cs-modal-footer-save-button"
+                @click.prevent="onSelected"
+            >
                 {{ saveText }}
             </button>
         </li>

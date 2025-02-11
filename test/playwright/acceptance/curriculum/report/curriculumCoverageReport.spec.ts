@@ -38,5 +38,18 @@ test.describe("Curriculum Coverage Report Tests", () => {
         await expect(page.getByTestId("search-select-curriculum")).toContainText(
             "Please select at least one curriculum outcome",
         );
+
+        tester.isGoingTo(
+            "Within Select Curriculum: Choose Year 12 French, Years 9 and 10 French, Year 9 History and English ",
+        );
+        await page.getByTestId("search-select-button-curriculum").click(); // Open the select courses modal
+        await page.getByTestId("cs-modal-node-checkbox-label-302").click(); // Select Year 12 French
+        await page.getByTestId("cs-modal-node-checkbox-label-304").click(); // Select Years 9 and 10 French
+        await page.getByTestId("cs-modal-node-checkbox-label-1").click(); // Select Year 9 History
+        await page.getByTestId("cs-modal-node-checkbox-label-135").click(); // Select English
+        await page.getByTestId("cs-modal-footer-save-button").click(); // Select Select, closing the modal
+
+        tester.isGoingTo("Try and generate a report again");
+        await page.getByTestId("cc-input-button").click(); // Select Generate Report
     });
 });
