@@ -100,7 +100,9 @@ class ModelToArray
                     ];
                 }
             ),
-
+            // Expiry
+            'expiresAt'     => $model->getExpiresAt(),
+            'isArchived'    => $model->isArchived(),
             // Actions
             'recordActions' => $model->getRecordActions()->map(
                 function (RecordAction $action) {
