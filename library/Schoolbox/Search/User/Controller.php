@@ -163,7 +163,6 @@ class Controller extends BaseController
         }
 
         $pastoralCountHelper = null;
-        $pastoralCountPeriod = null;
 
         if ($showPastoral) {
             $pastoralCountHelper = (new PastoralCountHelper(
@@ -173,8 +172,6 @@ class Controller extends BaseController
                 $this->pastoralDataSource,
                 $this->termMapper
             ));
-
-            $pastoralCountPeriod = (int)$this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_FLAG_COUNT_PERIOD);
         }
 
         /* Full Payload Construction
@@ -192,14 +189,11 @@ class Controller extends BaseController
                 /* Inject pastoral counts so it executes in proper place deeper in the Factory
                  * ...but only if Pastoral Counts were a renderable field, as per admin
                  */
-                'pastoralCounts' => static function () use ($pastoralCountHelper, $pastoralCountPeriod, $viewee, $viewer) {
+                'pastoralCounts' => static function () use ($pastoralCountHelper, $viewee, $viewer) {
                     if ($pastoralCountHelper) {
                         return $pastoralCountHelper->countStudentEventsByTypes(
                             $viewer,
                             $viewee,
-                            null,
-                            null,
-                            $pastoralCountHelper->getStartDate($pastoralCountPeriod)
                         );
                     }
 

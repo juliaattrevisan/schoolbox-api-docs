@@ -192,9 +192,6 @@ class Controller extends Base
         $output              = $pastoralCountHelper->countStudentsEventsByTypes(
             $this->getUser(),
             $students,
-            null,
-            null,
-            $pastoralCountHelper->getStartDate((int)$this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_FLAG_COUNT_PERIOD))
         );
 
         $this->response = $this->responseAsJson($output);

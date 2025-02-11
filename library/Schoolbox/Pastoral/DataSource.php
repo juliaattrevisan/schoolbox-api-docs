@@ -198,10 +198,9 @@ class DataSource
      * @param User $student
      * @param array $typeIds
      * @param array $subtypeIds
-     * @param Alaress_Date_Format|null $startDate
      * @return array
      */
-    public function countRecordsByType(User $viewer, User $student, array $typeIds, array $subtypeIds, ?Alaress_Date_Format $startDate): array
+    public function countRecordsByType(User $viewer, User $student, array $typeIds, array $subtypeIds): array
     {
         if (empty($typeIds) && empty($subtypeIds)) {
             return [];

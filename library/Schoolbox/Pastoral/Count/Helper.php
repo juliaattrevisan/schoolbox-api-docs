@@ -131,7 +131,7 @@ class Helper
      * @return Collection
      * @throws RouteNotFound
      */
-    public function countStudentsEventsByTypes(User $viewer, Collection $students, ?Collection $typesWhitelist = null, ?Collection $subTypesWhitelist = null, ?Alaress_Date_Format $startDate = null): Collection
+    public function countStudentsEventsByTypes(User $viewer, Collection $students, ?Collection $typesWhitelist = null, ?Collection $subTypesWhitelist = null): Collection
     {
         /**
          * make sure we are always falling back to a consistent default list of types
@@ -148,7 +148,7 @@ class Helper
         foreach ($students as $student) {
             $output->setOffset(
                 $student->getId(),
-                $this->countStudentEventsByTypes($viewer, $student, $pastoralTypes, $pastoralSubtypes, $startDate)
+                $this->countStudentEventsByTypes($viewer, $student, $pastoralTypes, $pastoralSubtypes)
             );
         }
 
@@ -162,11 +162,10 @@ class Helper
      * @param User                     $student
      * @param Collection|null          $typesWhitelist
      * @param Collection|null          $subTypesWhitelist
-     * @param Alaress_Date_Format|null $startDate
      * @return Collection
      * @throws RouteNotFound
      */
-    public function countStudentEventsByTypes(User $viewer, User $student, ?Collection $typesWhitelist = null, ?Collection $subTypesWhitelist = null, ?Alaress_Date_Format $startDate = null): Collection
+    public function countStudentEventsByTypes(User $viewer, User $student, ?Collection $typesWhitelist = null, ?Collection $subTypesWhitelist = null): Collection
     {
         /**
          * if we're partitioned by month, then we will want to make sure that we are fetching all types & subtypes,
@@ -184,7 +183,6 @@ class Helper
                 $student,
                 $pastoralTypes->getPropertyValues('id'),
                 $pastoralSubtypes->getPropertyValues('id'),
-                $startDate
             )
         );
 
