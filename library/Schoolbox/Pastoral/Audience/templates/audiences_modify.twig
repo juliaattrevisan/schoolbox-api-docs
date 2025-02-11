@@ -7,9 +7,6 @@
 {% endif %}
 {% set getActionsRoute = routeLookup('pastoral.getActions') %}
 
-{% set expiryType = subtype is null ? 'pastoralAudience.postTypeDefaultExpiry' : 'pastoralAudience.postSubTypeDefaultExpiry' %}
-{% set expirySetAction = routeLookupIfAuthorized(expiryType) %}
-
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
 

@@ -61,10 +61,8 @@ class Module extends AlaressModule\Module
                 '/subtype/{subtypeId}/modify' => ['getAudiencesSubTypeModify' => $loggedInAndPastoralWritePerm],
             ],
             'POST' => [
-                '/type/{typeId}/modify'       => ['postAudienceTypeModify' => $pastoralWriteAndTypeHasSubTypes],
+                '/type/{typeId}/modify'       => ['postAudienceTypeModify'    => $pastoralWriteAndTypeHasSubTypes],
                 '/subtype/{subtypeId}/modify' => ['postAudienceSubTypeModify' => $loggedInAndPastoralWritePerm],
-                '/type/expiry/apply'          => ['postTypeDefaultExpiry' => $loggedInAndPastoralWritePerm],
-                '/subtype/expiry/apply'       => ['postSubTypeDefaultExpiry' => $loggedInAndPastoralWritePerm],
             ],
         ]);
     }

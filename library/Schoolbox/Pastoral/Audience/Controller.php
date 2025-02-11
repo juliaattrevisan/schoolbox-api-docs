@@ -367,6 +367,21 @@ class Controller extends Base
         if (in_array($post['defaultExpiry'], Pastoral\Type\TypeAbstract::PASTORAL_EXPIRY)) {
             $currentType->setDefaultExpiry($post['defaultExpiry']);
         }
+
+        /* Apply default expiry when option is checked
+         */
+        if ($post->offsetExists('applyDefaultExpiry')) {
+            try {
+                $this->expiryHelper->updateDefaultExpireAt(
+                    $type->getId(),
+                    $isSubType ? $currentType->getId() : null,
+                    $post['defaultExpiry']
+                );
+            } catch (MapperException | \Exception $e) {
+                $this->sendError($e->getMessage(), [], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+        }
+
         $currentType->setColor(!empty($post['color']) ? $this->colorFactory->build($post['color']) : null);
         $currentType->setVisibilityLocked($isVisibilityLocked);
         if ($isSubType) {
@@ -440,56 +455,5 @@ class Controller extends Base
         $pb = $this->pastoralAudienceMapper->getPredicateBuilder();
         $subtype ? $pb->equals('subtype_id', $subtype->getId()) : $pb->equals('type_id', $type->getId());
         return $this->pastoralAudienceMapper->findByPredicates($pb)->filter($this->pastoralAudienceMapper->getPermissionCallback());
-    }
-
-    /**
-     * @return void
-     */
-    public function postTypeDefaultExpiry(): void
-    {
-        $post = $this->getRequestPost();
-
-        try {
-            $type = $this->pastoralTypeMapper->findById($post->getInt('typeId'));
-        } catch (MapperException | MapperException\Deleted $e) {
-            $this->sendJsonError($e->getMessage(), Response::HTTP_NOT_FOUND);
-            return;
-        }
-        $defaultExpiry = $type->getDefaultExpiry();
-
-        try {
-            $this->expiryHelper->updateDefaultExpireAt(
-                $post->getInt('typeId'),
-                $post->getInt('subtypeId'),
-                $defaultExpiry,
-            );
-        } catch (MapperException | \Exception $e) {
-            $this->sendJsonError($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
-            return;
-        }
-    }
-
-    public function postSubTypeDefaultExpiry(): void
-    {
-        $post = $this->getRequestPost();
-
-        try {
-            $subType = $this->pastoralSubTypeMapper->findById($post->getInt('subtypeId'));
-        } catch (MapperException | MapperException\Deleted $e) {
-            $this->sendJsonError($e->getMessage(), Response::HTTP_NOT_FOUND);
-            return;
-        }
-        $defaultExpiry = $subType->getDefaultExpiry();
-
-        try {
-            $this->expiryHelper->updateDefaultExpireAt(
-                $post->getInt('typeId'),
-                $post->getInt('subtypeId'),
-                $defaultExpiry,
-            );
-        } catch (MapperException | \Exception $e) {
-            $this->sendJsonError($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
-            return;
-        }
     }
 }
