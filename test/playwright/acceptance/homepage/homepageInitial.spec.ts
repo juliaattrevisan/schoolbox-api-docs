@@ -183,7 +183,7 @@ test.describe("Homepage Initial Tests", () => {
         const resources = new Resources(page);
         const student = "Ms Jana Reed";
         tester.isGoingTo("Navigate to the Test Homepage via resources browser");
-        await tester.impersonateViaModifyUserPage(student);
+        await tester.impersonateViaUserProfilePage(student);
         await createFolder.gotoResources();
         await expect(page.locator(`a.jstree-anchor:has-text("${folderName}")`)).toBeVisible();
         await resources.clickFolderName(folderName);

@@ -1,0 +1,64 @@
+{##
+ # Displays the heading for a user's profile page,
+ # Showing the users's name and further button controls depending on the user's permissions
+ #
+ # @param \Schoobox\User user   The user being viewed
+ # @param bool isSuperuser      Whether the current user is a super user
+ # @param bool canImpersonate   Whether the current user can impersonate the user being viewed
+ # @param string nameFormat       The format to display the user's name in
+ #}
+
+{% macro myProfileHeading(user, nameFormat) %}
+    {% block profileHeading %}
+        <h1 data-test="user-profile-name">{{ user.formatName(nameFormat) }}</h1>
+    {% endblock %}
+{% endmacro %}
+
+{% if isSuperuser %}
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            {{ _self.myProfileHeading(user, nameFormat) }}
+        </div>
+    </div>
+    <nav>
+        <sbx-pop-out content-id="header-options"></sbx-pop-out>
+    </nav>
+    <ul class="f-dropdown" id="header-options" data-dropdown-content>
+        <li><a href="{{ routeLookup('adminUser.getModify', {'userId': user.id}) }}" class="icon-modify" title="Modify User" data-test="user-profile-modify">Modify User</a></li>
+        <li>
+            {% if user.enabled %}
+                <a
+                    href="{{ routeLookup('user.impersonate', {userId: user.id}) }}"
+                    class="icon-staff-students"
+                    title="Login as user"
+                    data-test="admin-user-modify-impersonate"
+                >Impersonate</a>
+            {% else %}
+                <a class="icon-staff-students menu_disabled" title="Account disabled">Impersonate</a>
+            {% endif %}
+        </li>
+    </ul>
+</div>
+{% elseif canImpersonate %}
+<div class="row">
+    <div class="button-action small-12 columns">
+        {{ _self.myProfileHeading(user, nameFormat) }}
+        {% if user.enabled %}
+            <a
+                href="{{ routeLookup('user.impersonate', {userId: user.id}) }}"
+                class="button icon-staff-students"
+                title="Login as user"
+            >Impersonate</a>
+        {% else %}
+            <a class="button icon-staff-students menu_disabled" title="Account disabled">Impersonate</a>
+        {% endif %}
+    </div>
+</div>
+{% else %}
+<div class="row">
+    <div class="column small-12">
+        {{ _self.myProfileHeading(user, nameFormat) }}
+    </div>
+</div>
+{% endif %}

@@ -189,14 +189,14 @@ test.describe("Create and Verify News Article Test", () => {
         await form.seeExpiryDate(expiry);
 
         tester.isGoingTo("Verify that user Tim Reed(student from secondary) cannot see it");
-        await tester.impersonateViaModifyUserPage(student);
+        await tester.impersonateViaUserProfilePage(student);
         await index.goto("all");
         await index.dontSeeHeadline(headline);
         await index.goto("general");
         await index.dontSeeHeadline(headline);
 
         tester.isGoingTo("Verify that user Alison Chan(teacher) can see it");
-        await tester.impersonateViaModifyUserPage(teacher);
+        await tester.impersonateViaUserProfilePage(teacher);
         await index.goto("all");
         await index.seeHeadline(headline);
         await index.goto("general");
@@ -210,7 +210,7 @@ test.describe("Create and Verify News Article Test", () => {
         await item.unpublishArticle();
 
         tester.isGoingTo("Verify that user Alison Chan can no longer see it");
-        await tester.impersonateViaModifyUserPage(teacher);
+        await tester.impersonateViaUserProfilePage(teacher);
         await index.goto("all");
         await index.dontSeeHeadline(headline);
         await index.goto("general");

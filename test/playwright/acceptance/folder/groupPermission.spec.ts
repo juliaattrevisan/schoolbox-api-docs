@@ -59,17 +59,17 @@ test.describe("Group Permission Tests", () => {
         await expect(page.locator("#container")).toContainText("Group Free");
 
         tester.isGoingTo("get logged in as a middle student to check the group is NOT presented to them");
-        await tester.impersonateViaModifyUserPage(studentMiddle);
+        await tester.impersonateViaUserProfilePage(studentMiddle);
         await page.goto("https://vagrant.dev.schoolbox.cloud/groups#groups-i-can-join");
         await expect(page.locator("#container")).not.toContainText("Group Free");
 
         tester.isGoingTo("get logged in as a senior student to check the group is presented to them");
-        await tester.impersonateViaModifyUserPage(studentSenior);
+        await tester.impersonateViaUserProfilePage(studentSenior);
         await page.goto("https://vagrant.dev.schoolbox.cloud/groups#groups-i-can-join");
         await expect(page.locator("#container")).toContainText("Group Free");
 
         tester.isGoingTo("get logged in as Eloise White and check she is able to leave the group");
-        await tester.impersonateViaModifyUserPage(groupMember);
+        await tester.impersonateViaUserProfilePage(groupMember);
         await page.goto(`https://vagrant.dev.schoolbox.cloud/homepage/${folderId}`);
         await page.click("[data-test=sbx-pop-out-tab-control-button]");
         await expect(page.locator("#container")).toContainText("Group Free");
@@ -130,17 +130,17 @@ test.describe("Group Permission Tests", () => {
         await expect(page.locator("#container")).toContainText("Group Moderated");
 
         tester.isGoingTo("get  logged in as a middle student to check the group is NOT presented to them");
-        await tester.impersonateViaModifyUserPage(studentMiddle);
+        await tester.impersonateViaUserProfilePage(studentMiddle);
         await page.goto("https://vagrant.dev.schoolbox.cloud/groups#groups-i-can-join");
         await expect(page.locator("#container")).not.toContainText("Group Moderated");
 
         tester.isGoingTo("get logged in as a senior student to check the group is presented to them");
-        await tester.impersonateViaModifyUserPage(studentSenior);
+        await tester.impersonateViaUserProfilePage(studentSenior);
         await page.goto("https://vagrant.dev.schoolbox.cloud/groups#groups-i-can-join");
         await expect(page.locator("#container")).toContainText("Group Moderated");
 
         tester.isGoingTo("get logged in as Eloise White and check she is able to leave the group");
-        await tester.impersonateViaModifyUserPage(groupMember);
+        await tester.impersonateViaUserProfilePage(groupMember);
         await page.goto(`https://vagrant.dev.schoolbox.cloud/homepage/${folderId}`);
         await page.click("[data-test=sbx-pop-out-tab-control-button]");
         await expect(page.locator("#container")).toContainText("Leave Group");
@@ -202,17 +202,17 @@ test.describe("Group Permission Tests", () => {
         await expect(page.locator("#container")).not.toContainText("Group Restricted");
 
         tester.isGoingTo("get  logged in as a middle student to check the group is NOT presented to them");
-        await tester.impersonateViaModifyUserPage(studentMiddle);
+        await tester.impersonateViaUserProfilePage(studentMiddle);
         await page.goto("https://vagrant.dev.schoolbox.cloud/groups#groups-i-can-join");
         await expect(page.locator("#container")).not.toContainText("Group Restricted");
 
         tester.isGoingTo("get logged in as a senior student to check the group is NOT presented to them");
-        await tester.impersonateViaModifyUserPage(studentSenior);
+        await tester.impersonateViaUserProfilePage(studentSenior);
         await page.goto("https://vagrant.dev.schoolbox.cloud/groups#groups-i-can-join");
         await expect(page.locator("#container")).not.toContainText("Group Restricted");
 
         tester.isGoingTo("get logged in as Jana Reed and check she is able to leave the group");
-        await tester.impersonateViaModifyUserPage(groupMember);
+        await tester.impersonateViaUserProfilePage(groupMember);
         await page.goto(`https://vagrant.dev.schoolbox.cloud/homepage/${folderId}`);
         await page.click("[data-test=sbx-pop-out-tab-control-button]");
         await expect(page.locator("#container")).not.toContainText("Leave Group");

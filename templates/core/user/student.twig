@@ -8,6 +8,7 @@
 {# Permissions #}
 {% set isSuperuser = session.user.superUser %}
 {% set isStaffWhoCanView = isSuperuser or (USER.role.staff and USER.role.viewStudentProfile) %}
+{% set canImpersonate = routeLookupIfAuthorized('user.impersonate', { user: user, userId: user.id }) %}
 {# Leaving isStaff for extended custom templates #}
 {% set isStaff = isSuperuser or USER.role.staff %}
 {% set isSelf = session.user.id == user.id %}
@@ -49,20 +50,12 @@
     });
 </script>
 
-<div class="actions-small-{{ isSuperuser ? 1 : 0 }} row">
-    <div class="list-item">
-        <div class="small-12 column">
-            {% block profileHeading %}
-                <h1 data-test="user-profile-name">{{ user.formatName(nameFormat) }}</h1>
-            {% endblock %}
-        </div>
-    </div>
-    <nav>
-        {% if routeLookupIfAuthorized('adminUser.getModify') %}
-            <a href="{{ routeLookup('adminUser.getModify', {'userId': user.id}) }}" class="icon-modify" title="Modify User" data-test="user-profile-modify"></a>
-        {% endif %}
-    </nav>
-</div>
+{% include '@searchUser/heading/heading.twig' with {
+    user: user,
+    isSuperuser: isSuperuser,
+    canImpersonate: canImpersonate,
+    nameFormat: nameFormat,
+} only %}
 
 <div class="row">
     <div class="small-12 island">

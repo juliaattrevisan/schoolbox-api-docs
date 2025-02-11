@@ -247,7 +247,7 @@ test.describe("Lesson Plan Activity", () => {
         await expect(page.locator('ul[class="information-list"]')).toContainText("Romeo and Juliet");
         await expect(page.locator('ul[class="information-list"]')).toContainText(lessonPlanName);
         tester.isGoingTo("as a student view the lesson plan");
-        await tester.impersonateViaModifyUserPage(student);
+        await tester.impersonateViaUserProfilePage(student);
         await page.goto(`/homepage/${folderId}`);
         await page.waitForTimeout(3000);
         await page.click("a[title='Lesson Plan']");
@@ -260,7 +260,7 @@ test.describe("Lesson Plan Activity", () => {
             "Automation Field 2 not visible to students",
         );
         tester.isGoingTo("as a teacher view the lesson plan");
-        await tester.impersonateViaModifyUserPage(teacher);
+        await tester.impersonateViaUserProfilePage(teacher);
         await page.goto(`/homepage/${folderId}`);
         await page.waitForTimeout(3000);
         await page.click("a[title='Lesson Plan']");

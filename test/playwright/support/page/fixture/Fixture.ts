@@ -244,7 +244,7 @@ export default class Fixture {
         await this.tester.common.assertNotifNotExists(text);
 
         this.tester.isGoingTo("login as Jana Reed and expect the notification to exist");
-        await this.tester.impersonateViaModifyUserPage("Ms Jana Reed");
+        await this.tester.impersonateViaUserProfilePage("Ms Jana Reed");
         await this.tester.common.assertNotifExists(text);
 
         this.tester.isGoingTo("login back as the current user (admin)");
@@ -264,7 +264,7 @@ export default class Fixture {
         await this.tester.common.assertNotifNotExists(text);
 
         this.tester.isGoingTo("login as Jana Reed and expect the notification to not exist");
-        await this.tester.impersonateViaModifyUserPage("Ms Jana Reed");
+        await this.tester.impersonateViaUserProfilePage("Ms Jana Reed");
         await this.tester.common.assertNotifNotExists(text);
 
         this.tester.isGoingTo("login back as the current user (admin)");
