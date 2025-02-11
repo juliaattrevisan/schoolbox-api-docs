@@ -14,6 +14,7 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
+use Schoolbox\External\Connector\ClassCode;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Factory;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Users;
@@ -218,7 +219,7 @@ class Classes implements IStrategy
     ): Model {
         /* Fill in these vars as usual
          */
-        $classCode = trim((string)$class['class_id']);
+        $classCode = (new ClassCode($this->log))->generate(trim((string)$class['class_id']));
         $day = trim((string)$classInstance['day']['name']);
         $detail = null;
 
