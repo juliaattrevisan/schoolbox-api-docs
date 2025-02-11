@@ -73,12 +73,15 @@ test.describe("Curriculum Coverage Report Tests", () => {
 
         tester.isGoingTo("Export the report and confirm the download is successful");
         await page.getByTestId("cc-report-filters-export-button").click(); // Select Export as CSV
-        // Start waiting for the download event
         const [download] = await Promise.all([
             page.waitForEvent("download"), // Wait for the file to be downloaded
             page.getByTestId("cc-report-filters-export-button-confirm").click(), // Click the download button
         ]);
         const fileName = download.suggestedFilename();
-        expect(fileName).toBe("curriculum-coverage-report.csv");
+        expect(fileName).toBe("curriculum-coverage-report.csv"); // Confirm the file name
+
+        tester.isGoingTo("Uncheck Unit filter and confirm Year 9 Curriculum goes from 12 to 10");
+        await page.getByTestId("cc-report-filters-label-unit").click(); // Select Unit filter
+        await expect(page.locator("table tbody tr:nth-child(4) td:nth-child(2)")).toHaveText("10");
     });
 });

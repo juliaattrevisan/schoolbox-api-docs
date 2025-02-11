@@ -27,7 +27,12 @@ const isModalOpen = window.Vue.ref(false); // to open/close the exporting to csv
                             :value="reportOption.value"
                             type="checkbox"
                         />
-                        <label :for="reportOption.value" class="f-no-margins">{{ reportOption.label }}</label>
+                        <label
+                            :for="reportOption.value"
+                            class="f-no-margins"
+                            :data-test="`cc-report-filters-label-${reportOption.value}`"
+                            >{{ reportOption.label }}</label
+                        >
                     </li>
                 </ul>
             </div>
