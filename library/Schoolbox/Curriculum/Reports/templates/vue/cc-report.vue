@@ -12,7 +12,7 @@ const reportStore = useReportStore();
 </script>
 
 <template>
-    <div v-if="reportStore.hasNotReported" class="empty-state-flex-centered">
+    <div v-if="reportStore.hasNotReported" class="empty-state-flex-centered" data-test="cc-empty-state">
         <i class="icon-report"></i>
         To generate a report, first select at least one Course and Curriculum.
     </div>

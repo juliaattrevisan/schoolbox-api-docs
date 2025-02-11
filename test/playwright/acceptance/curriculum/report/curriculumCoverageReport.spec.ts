@@ -14,6 +14,11 @@ test.describe("Curriculum Coverage Report Tests", () => {
 
     test("Generate a report", async ({ tester, page, db }) => {
         const coverageReport = new CurriculumCoverageReport(page);
+
+        tester.isGoingTo("visit the curriculum coverage report page");
         await coverageReport.goto();
+
+        tester.isGoingTo("confirm the empty state is visible");
+        await expect(page.getByTestId("cc-empty-state")).toBeVisible();
     });
 });
