@@ -34,7 +34,7 @@ test.describe("Curriculum Coverage Report Tests", () => {
         await expect(page.getByTestId("ss-selected")).toContainText("20th Century History");
 
         tester.isGoingTo("Try and generate a report, confirming that Curriculum is also required");
-        await page.getByTestId("cc-input-button").click(); // Select Generate Report
+        await coverageReport.submit(); // Generate the report
         await expect(page.getByTestId("search-select-curriculum")).toContainText(
             "Please select at least one curriculum outcome",
         );
@@ -50,6 +50,6 @@ test.describe("Curriculum Coverage Report Tests", () => {
         await page.getByTestId("cs-modal-footer-save-button").click(); // Select Select, closing the modal
 
         tester.isGoingTo("Try and generate a report again");
-        await page.getByTestId("cc-input-button").click(); // Select Generate Report
+        await coverageReport.submit(); // Generate the report
     });
 });

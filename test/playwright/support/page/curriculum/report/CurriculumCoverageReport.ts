@@ -9,7 +9,7 @@ export default class CurriculumCoverageReport {
 
     static readonly URL = "/curriculum/reports/coverage";
 
-    // static readonly DATATEST_FOLDER_FORM_INPUT_NAME = "folder-form-input-name";
+    static readonly DATATEST_GENERATE_REPORT_BUTTON = "cc-input-button";
 
     constructor(page: Page) {
         this.page = page;
@@ -20,5 +20,12 @@ export default class CurriculumCoverageReport {
      */
     async goto(): Promise<void> {
         await this.page.goto(CurriculumCoverageReport.URL);
+    }
+
+    /**
+     * Clicks the generate report button
+     */
+    async submit(): Promise<void> {
+        await this.page.getByTestId(CurriculumCoverageReport.DATATEST_GENERATE_REPORT_BUTTON).click();
     }
 }
