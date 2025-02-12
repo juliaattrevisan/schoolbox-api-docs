@@ -28,8 +28,9 @@ class CSV extends AbstractCSV
      * @param CourseMarkbook $courseMarkbook
      * @param string         $filename
      * @param bool           $showDrafts
+     * @param bool           $showCommunicatedMarks Should communicated (student) marks be shown in the export instead of instructor marks?
      */
-    public function export(CourseMarkbook $courseMarkbook, string $filename, bool $showDrafts): void
+    public function export(CourseMarkbook $courseMarkbook, string $filename, bool $showDrafts, bool $showCommunicatedMarks): void
     {
         $this->initExport($filename);
         $assessmentSpecs = $courseMarkbook->getCollapsedAssessments();
@@ -162,6 +163,7 @@ class CSV extends AbstractCSV
                             $studentMarks[$class->getId()][$assessmentSpec->getId()][$student->getId()],
                             $student,
                             $showDrafts,
+                            $showCommunicatedMarks,
                         );
                     } elseif (isset($studentTaskProgresses[$class->getId()][$assessmentSpec->getId()][$student->getId()])) {
                         // Task
@@ -222,6 +224,7 @@ class CSV extends AbstractCSV
      * @param array       $currentMark
      * @param User        $student
      * @param bool        $showDrafts
+     * @param bool        $showCommunicatedMarks
      * @return array
      */
     private function appendStudentMarks(
@@ -231,6 +234,7 @@ class CSV extends AbstractCSV
         array $currentMark,
         User $student,
         bool $showDrafts,
+        bool $showCommunicatedMarks,
     ): array {
         $mark    = $currentMark['published'] ?? null;
         $isDraft = false;
@@ -245,7 +249,7 @@ class CSV extends AbstractCSV
             return $this->appendData($row, $assessment, '');
         }
         $suffix            = $isDraft ? self::DRAFT_SUFFIX : '';
-        $humanReadableMark = $mark['hr'];
+        $humanReadableMark = $showCommunicatedMarks ? $mark['hr'] : $mark['hrInstructor'];
         if ($this->hasTotalMarkColumn($assessment)) {
             $row[] = $this->parseNumerator($humanReadableMark) . $suffix;
             $row[] = $this->parseDenominator($humanReadableMark) . $suffix;
