@@ -72,6 +72,7 @@ class Classes implements IStrategy
         private bool $perform,
         private IApi $api,
         private array $watchlist,
+        private string $externalStaffPortal,
         private \Schoolbox\External\Event\Mapper $eventMapper,
         private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
         private ClassEntryMapper $classEntryMapper,
@@ -329,7 +330,7 @@ class Classes implements IStrategy
             ->setStartAt($startAt)
             ->setFinishAt($finishAt)
             ->setType($type)
-            ->setMetadata((new Metadata\Builder())->build($class, $classInstance))
+            ->setMetadata((new Metadata\Builder($this->externalStaffPortal))->build($class, $classInstance))
             ->setClassification(Model::CLASSIFICATION_TIMETABLE)
             ->setGuid($guid)
             ->setSource(Factory::SOURCE_NAME);

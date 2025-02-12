@@ -82,6 +82,7 @@ class Factory
         private string $host,
         #[SensitiveParameter] private string $key,
         private array $watchlist,
+        private string $externalStaffPortal,
         /* Profile pieces */
         private UserProfile\Mapper $baseProfileMapper,
         private UserProfile\Student\Mapper $studentProfileMapper,
@@ -175,6 +176,7 @@ class Factory
                     $this->perform,
                     $api,
                     $this->watchlist,
+                    $this->externalStaffPortal,
                     $this->eventMapper,
                     $this->overridesMapper,
                     $this->classEntryMapper,
