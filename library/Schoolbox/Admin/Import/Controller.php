@@ -31,6 +31,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\Connector\DSNFactory;
 use Schoolbox\External\Connector\Liss\Base\Endpoint\PayloadList;
+use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Event\Export\Classes;
 use Schoolbox\External\Event\Export\Timetable;
 use Schoolbox\External\Importer\Endpoint;
@@ -187,6 +188,17 @@ class Controller extends ConfigController
                 /* A flash message to tell users to w8
                  */
                 'hasPerformUpdate' => $hasPerformUpdate,
+                /* These are strats allowed by the cli
+                 *
+                 * They've been aliased for convenience, though these were originally diagnostic
+                 * so they might sound a bit funny to be on the ui if you're used to them.
+                 */
+                'strats' => [
+                    'full' => implode(',', ValidStrats::STRATS_FULL),
+                    'profiles' => implode(',', ValidStrats::STRATS_PROFILE),
+                    'timetable' => implode(',', ValidStrats::STRATS_TIMETABLE),
+                    'calendar' => implode(',', ValidStrats::STRATS_CALENDAR),
+                ],
                 /* Decide if the current suds selection uses the cyclic grid
                  */
                 'cyclicGrid' => !(new ValidUsesScheduleTimetable())->isSatisfiedBy($externalType, $dataSource, $timetableView)
@@ -344,13 +356,34 @@ class Controller extends ConfigController
          */
         if (0 === $queuedRequests->count()) {
             $importQueue = $this->importQueueMapper->createModel()
-                ->setUser($this->getUser());
+                ->setUser($this->getUser())
+                ->setStrats($this->requestQuery->get('strats'));
 
             $this->importQueueMapper->save($importQueue);
         }
 
         // Redirect back to ruleset page, with either an alert message on the page or in notifications
         $this->response = $this->redirectFound($this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex'));
+    }
+
+
+    /**
+     * This lets you cancel a user-initiated sync if you're quick enough. For time-critical moments
+     * such as daily org, this might save you minutes of processing.
+     *
+     * Maybe controversially: for this reason there's no confirmation when cancelling a user-initiated
+     * request to sync data. You can always enact one if you cancel it: you don't lose any data etc.
+     *
+     * @return void
+     * @throws Exception
+     */
+    public function postCancelUpdate(): void
+    {
+        $instances = $this->importQueueMapper->findAll();
+
+        foreach ($instances as $instance) {
+            $this->importQueueMapper->delete($instance);
+        }
     }
 
 

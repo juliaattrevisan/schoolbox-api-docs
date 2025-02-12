@@ -54,6 +54,7 @@ class Module extends BaseModule
         $this->register('GET', '/schoolDataImport/status/indicator', 'getStatusIndicator', $perms);
         $this->register('GET', '/schoolDataImport/status/report', 'getStatusReport', $perms);
         $this->register('GET', '/schoolDataImport/performUpdate', 'getPerformUpdate', $perms);
+        $this->register('POST', '/schoolDataImport/cancelUpdate', 'postCancelUpdate', $perms);
         $this->register('GET', '/schoolDataImport/export', 'getExport', $perms);
         $this->register('GET', '/schoolDataImport/timetable/export', 'getTimetableExport', $perms);
         $this->register('GET', '/schoolDataImport/classes/export', 'getClassesExport', $perms);

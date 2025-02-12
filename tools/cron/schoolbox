@@ -74,6 +74,9 @@ MAILTO="ist+cron@schoolbox.com.au"
 # SIS Data Importer (User-initiated) - every minute, compile it into the same log as the automated scheduler
 * * * * *	www-data	php /usr/share/schoolbox/tools/synchronise/userInitiated.php >> /var/log/schoolbox/sis-scheduler.log 2>&1
 
+# SIS Data Importer (Scheduled Timetable Daily Org) - every minute, compile it into the same log as the automated scheduler
+* * * * *	www-data	php /usr/share/schoolbox/tools/synchronise/dailyorg.php >> /var/log/schoolbox/sis-scheduler.log 2>&1
+
 # Calendar: pre-parse any vCal files every 2 hours
 35 */2 * * *    www-data    /usr/share/schoolbox/tools/calendar/preparseVcalSubscription.php -v >> /var/log/schoolbox/preparseVcalSubscription.log 2>&1
 

@@ -25,6 +25,12 @@ class Model
 
 
     /**
+     * @var string|null
+     */
+    private ?string $strats = null;
+
+
+    /**
      * @return User
      */
     public function getUser(): User
@@ -41,6 +47,26 @@ class Model
     public function setUser(User $user): self
     {
         $this->user = $user;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getStrats(): ?string
+    {
+        return $this->strats;
+    }
+
+
+    /**
+     * @param string|null $strats
+     * @return $this
+     */
+    public function setStrats(?string $strats): self
+    {
+        $this->strats = $strats;
         return $this;
     }
 }
