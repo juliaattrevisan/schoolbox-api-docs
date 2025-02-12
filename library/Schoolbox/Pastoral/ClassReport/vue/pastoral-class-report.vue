@@ -122,6 +122,16 @@ export default {
         },
 
         /**
+         * Format MMM DD, YYYY date for output
+         *
+         * @param {String} date
+         * @returns {String}
+         */
+        formatDateArcived(date) {
+            return dayjs(date).format('MMM DD, YYYY');
+        },
+
+        /**
          * Format relative time
          *
          * @param {String} date
@@ -265,6 +275,13 @@ export default {
                                                         :style="'background-color:' + record.severity?.color"
                                                         :title="record.severity?.name"
                                                     ></span>
+                                                    <!-- TODO: ADDING GREY HIGHLIGHT/SHADE  -->
+                                                    <sbx-icon
+                                                        v-if="record.isArchived"
+                                                        name="archive"
+                                                        size="0.75rem"
+                                                        :title="'Record archived - ' + formatDateArcived(record.expiresAt)"
+                                                    ></sbx-icon>
                                                 </span>
                                             </a>
                                             <div class="record-date">
