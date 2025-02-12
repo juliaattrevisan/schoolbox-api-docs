@@ -12,16 +12,21 @@ use InvalidArgumentException;
 use Schoolbox\Config\Loader;
 use Schoolbox\IConfigLoader;
 
+/**
+ * Factory class for building connections to Schoolbox's databases:
+ * * internal database, for Schoolbox's data: returns both master (writable) and
+ *   read replica connections
+ * * external database, for connecting to the configured SIS:
+ *   for SUDS instances, this will be the same as the internal database
+ */
 class Factory
 {
     /**
-     * @var DatabaseFactory $factory
-     */
-    private $factory;
-
-    /**
      * Singleton instance of the internal database connection within this
      * factory instance.
+     *
+     * This may be a proxy which can forward `SELECT` requests to a read replica
+     * connection, and other requests to a master connection.
      */
     private ?IConnector $internalDatabase = null;
 
@@ -44,12 +49,11 @@ class Factory
     private ?IConnector $externalDatabase = null;
 
     /**
-     * An instance of this object
+     * A static instance of this object.
      *
-     * @deprecated
-     * @var self
+     * @deprecated use the DI instance of this object instead
      */
-    private static $instance;
+    private static ?Factory $instance = null;
 
     /**
      * Retrieve a static instance of this factory.
@@ -60,11 +64,7 @@ class Factory
      */
     private static function getInstance(): Factory
     {
-        if (!isset(self::$instance)) {
-            self::$instance = new self(new DatabaseFactory());
-        }
-
-        return self::$instance;
+        return self::$instance ??= new self(new DatabaseFactory());
     }
 
 
@@ -112,9 +112,8 @@ class Factory
      *
      * @param DatabaseFactory $factory
      */
-    public function __construct($factory)
+    public function __construct(private DatabaseFactory $factory)
     {
-        $this->factory = $factory;
     }
 
 
