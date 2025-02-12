@@ -269,4 +269,38 @@
             }
         });
     };
+
+    /**
+     * Show the communicated (learner) mark in markbook cells and hide the instructor mark
+     */
+    function showCommunicatedMarks() {
+        $("[data-learner-mark]").show();
+        $("[data-instructor-mark]").hide();
+    }
+
+    /**
+     * Hide the communicated (learner) mark in markbook cells and show the instructor mark
+     */
+    function hideCommunicatedMarks() {
+        $("[data-learner-mark]").hide();
+        $("[data-instructor-mark]").show();
+    }
+
+    /**
+     * Set up toggle on/off of communicated marks.
+     *
+     * On changing the show/hide communicated marks checkbox:
+     * * show/hide communicated marks in the markbook
+     *
+     * @param selector
+     */
+    $.marksheetToggleCommunicatedMarks = function (selector) {
+        $(document).on("change", selector, function () {
+            if ($(this).prop("checked")) {
+                showCommunicatedMarks();
+            } else {
+                hideCommunicatedMarks();
+            }
+        });
+    };
 })(jQuery);
