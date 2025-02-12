@@ -119,16 +119,25 @@ class IdFinder extends AbstractIdFinder
         // Archived Record selection
         $archivedSelection = $completeFilters[Archived\Definition::class] ?? null;
         if (isset($archivedSelection) && count($archivedSelection) > 0) {
-            /* Only show the active (un-archived) records by default
-             */
-            if ($archivedSelection->offsetExists(Archived\Definition::KEY_EXCLUDE_ARCHIVED_RECORDS)) {
-                $pb->any(
-                    $this->getMapper()
-                         ->getPredicateBuilder()
-                         ->any($this->getMapper()->getPredicateBuilder()->isNull('p.expires_at'))
-                         ->any($this->getMapper()->getPredicateBuilder()->greaterThan('p.expires_at', \Alaress_Date_Format::now()->getDatabaseDate()))
+            $archivedBuilderPb = $this->getMapper()->getPredicateBuilder();
+            if ($archivedSelection->offsetExists(Archived\Definition::KEY_INCLUDE_ACTIVE_RECORDS)) {
+                $archivedBuilderPb->any(
+                    $this->getMapper()->getPredicateBuilder()
+                         ->isNull('p.expires_at')
+                         ->greaterThan('p.expires_at', \Alaress_Date_Format::now()->getDatabaseDate())
                 );
             }
+
+            if ($archivedSelection->offsetExists(Archived\Definition::KEY_INCLUDE_ARCHIVED_RECORDS)) {
+                $archivedBuilderPb->any(
+                    $this->getMapper()->getPredicateBuilder()
+                         ->lessThanOrEqualTo('p.expires_at', \Alaress_Date_Format::now()->getDatabaseDate())
+                );
+            }
+            /* Note this will include all expires_at in WHERE condition, but it should be cleaner than
+             * having to add an extra condition to check if both options exists
+             */
+            $pb->any($archivedBuilderPb);
         }
         $query = "SELECT DISTINCT p.id FROM pastoral p";
         if (count($joins)) {

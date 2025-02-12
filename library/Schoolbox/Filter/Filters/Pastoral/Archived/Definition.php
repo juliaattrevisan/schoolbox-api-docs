@@ -18,16 +18,16 @@ use Schoolbox\IConfigLoader;
  */
 class Definition extends AbstractDefinition
 {
-    protected const NAME = 'Archived Records';
+    protected const NAME = 'Status';
 
     public const KEY_INCLUDE_ARCHIVED_RECORDS = 'includeArchivedRecords';
-    public const KEY_EXCLUDE_ARCHIVED_RECORDS = 'excludeArchivedRecords';
+    public const KEY_INCLUDE_ACTIVE_RECORDS = 'includeActiveRecords';
 
     protected function getCustomKeys(): array
     {
         return [
+            self::KEY_INCLUDE_ACTIVE_RECORDS,
             self::KEY_INCLUDE_ARCHIVED_RECORDS,
-            self::KEY_EXCLUDE_ARCHIVED_RECORDS,
         ];
     }
 
@@ -41,8 +41,8 @@ class Definition extends AbstractDefinition
     public function getLabel(string $key): string
     {
         return match ($key) {
-            self::KEY_INCLUDE_ARCHIVED_RECORDS => 'Include Archived Records',
-            self::KEY_EXCLUDE_ARCHIVED_RECORDS => 'Exclude Archived Records',
+            self::KEY_INCLUDE_ACTIVE_RECORDS => 'Active',
+            self::KEY_INCLUDE_ARCHIVED_RECORDS => 'Archived',
             default => ''
         };
     }
@@ -53,5 +53,16 @@ class Definition extends AbstractDefinition
     protected static function getTemplatesDir(): string
     {
         return '@filterDefinitions/Pastoral/Archived/templates';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getInitialSelectedState(string $key, string $page, string $roleType): bool
+    {
+        if (Model::PAGE_CLASS_PASTORAL === $page && $key === self::KEY_INCLUDE_ACTIVE_RECORDS) {
+            return true;
+        }
+        return false;
     }
 }
