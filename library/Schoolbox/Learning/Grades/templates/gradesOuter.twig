@@ -39,16 +39,30 @@
 
 {{ bread.crumbs(['Learning', '/learning/classes'], [locale.grades.properPlural, routeLookup('learningGrades.getGrades', {userId: student.id, termCode: term.code})], [subject.name]) }}
 
-<div class="row">
+{% set canViewInstructorMarks = USER.role.isStaff %}
+<div class="row{% if canViewInstructorMarks %} actions-small-2{% endif %}">
     <div class="small-12 columns">
         <h1>{{ locale.grades.properPlural }} for {{ subject.name }} - {{ student.fullName }}</h1>
 
-        {% if subject.teachers|length %}
+        {% if subject.teachers|length or canViewInstructorMarks %}
         <ul class="meta">
-            <li class="icon-teacher">Teacher(s): {% for teacher in subject.teachers %}<a href="/search/user/{{ teacher.id }}" title="View Profile">{{ teacher.fullName }}</a>{% if not loop.last %}, {% endif %}{% endfor %}</li>
+            {% if subject.teachers|length %}
+                <li class="icon-teacher">Teacher(s): {% for teacher in subject.teachers %}<a href="/search/user/{{ teacher.id }}" title="View Profile">{{ teacher.fullName }}</a>{% if not loop.last %}, {% endif %}{% endfor %}</li>
+            {% endif %}
+            {% if canViewInstructorMarks %}
+                <li data-has-student-view-meta class="icon-teacher">Teacher view</li>
+            {% endif %}
         </ul>
         {% endif %}
     </div>
+    {% if canViewInstructorMarks %}
+        <nav>
+            <sbx-pop-out content-id="header-options" data-test="sbx-pop-out-header-options"></sbx-pop-out>
+        </nav>
+        <ul id="header-options" class="f-dropdown" data-dropdown-content>
+            {% include '@learningGrades/fragments/studentViewNavSwitcher.twig' %}
+        </ul>
+    {% endif %}
 </div>
 
 <div class="row">
