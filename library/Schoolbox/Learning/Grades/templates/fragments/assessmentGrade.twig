@@ -55,16 +55,30 @@
     </div>
 
     {% if participant and assessment.isFeedbackVisibleToUser(USER) %}
-        {% set grade = participant.humanReadableMark(true) %}
         {% if assessment is task %}
             {% include '@learningAssessment/fragments/progressTick.twig' with {
                 assessment: assessment,
                 student:    student
             } only %}
-        {% elseif grade %}
-            <div class="grade {{ urgency.marks(participant.normalisedMark(true)) }}-bg">
-                <span>{{ grade }}</span>
-            </div>
+        {% else %}
+            {# learners and instructors can view the display mark, only instructors can see the instructor mark #}
+            {% set grade = participant.humanReadableMark(true) %}
+            {% set instructorGrade = USER.role.isStaff ? participant.humanReadableInstructorMark(true) : null %}
+
+            {% if grade %}
+                <div data-learner-mark class="grade {{ urgency.marks(participant.normalisedMark(true)) }}-bg"
+                    {# If there's an instructor grade available, then hide this by default #}
+                    {% if instructorGrade %}style="display: none"{% endif %}
+                >
+                    <span>{{ grade }}</span>
+                </div>
+            {% endif %}
+
+            {% if instructorGrade %}
+                <div data-instructor-mark class="grade {{ urgency.marks(participant.normalisedMark(true)) }}-bg">
+                    <span>{{ instructorGrade }}</span>
+                </div>
+            {% endif %}
         {% endif %}
     {% endif %}
 </div>
