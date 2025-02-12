@@ -66,6 +66,12 @@ class Api implements IApi
 
 
     /**
+     * @var array
+     */
+    private array $options = [];
+
+
+    /**
      * Constructor.
      *
      * @param string $host
@@ -98,6 +104,10 @@ class Api implements IApi
     private function initClient(string $host, #[SensitiveParameter] string $dsn, int $timeout): Client
     {
         $credentials = (new Codec\DSN())->decode($dsn);
+
+        /* Remember the optional pieces we offer
+         */
+        $this->options = $credentials['options'] ?? [];
 
         /* Enforce slash in the endpoint prefix
          *
@@ -227,6 +237,15 @@ class Api implements IApi
          * was being requested, so I guess you ended up here
          */
         throw new \DomainException('Could not access server, or bad json payload returned.', 0, $e ?? null);
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getOptions(): array
+    {
+        return $this->options;
     }
 
 
