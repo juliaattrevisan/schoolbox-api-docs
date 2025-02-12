@@ -169,13 +169,13 @@ class Helper
      * Builds an array of data used by twig to render the assessment box-and-whiskers graph
      *
      * @param Markbook $markbook
-     * @param User     $viewee        // studnet / learner
-     * @param User     $viewer        // user viewing the graph
-     * @param Boolean  $gradeGradient config.grade_gradient_enable
-     *
+     * @param User $viewee // studnet / learner
+     * @param User $viewer // user viewing the graph
+     * @param Boolean $gradeGradient config.grade_gradient_enable
+     * @param array $workTypeWhitelist A set of worktype ids that you want to include on the boxplot.
      * @return array{info: string, assessments: string, data: string, scatter: string}
      */
-    public function buildGraph(Markbook $markbook, User $viewee, User $viewer, bool $gradeGradient): array
+    public function buildGraph(Markbook $markbook, User $viewee, User $viewer, bool $gradeGradient, array $workTypeWhitelist = []): array
     {
         // Get the data for the graph
         $graphInfo        = [];
@@ -183,10 +183,15 @@ class Helper
         $graphData        = [];
         $graphScatter     = [];
 
-
         $statistics = $markbook->getAssessmentStatistics();
 
         foreach ($markbook->getAssessments() as $assessment) {
+            /* Not in the worktypes whitelist: skip it
+             */
+            if (!in_array($assessment->getWorkType()->getId(), $workTypeWhitelist, true)) {
+                continue;
+            }
+
             if ($assessment->isFeedbackVisibleToUser($viewer) && $assessment->getMarkScheme()->isQuantitative()) {
                 $graphAssessments[] = $assessment->getTitle();
 

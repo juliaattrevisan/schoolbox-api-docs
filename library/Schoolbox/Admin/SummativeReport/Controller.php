@@ -308,6 +308,7 @@ class Controller extends ConfigController
                 'grades' => $payload['summary']['workType'][$summaryWorkType->getId()]['grades'] ?? false,
                 'comments' => $payload['summary']['workType'][$summaryWorkType->getId()]['comments'] ?? false,
                 'rubrics' => $payload['summary']['workType'][$summaryWorkType->getId()]['rubrics'] ?? false,
+                'graph' => $payload['summary']['workType'][$summaryWorkType->getId()]['graph'] ?? false,
                  // if we have seen this worktype in the payload, then set to show, and use it
                 'show' => isset($payload['summary']['workType'][$summaryWorkType->getId()]),
             ];
@@ -317,6 +318,7 @@ class Controller extends ConfigController
                 'grades' => $payload['class']['workType'][$summaryWorkType->getId()]['grades'] ?? false,
                 'comments' => $payload['class']['workType'][$summaryWorkType->getId()]['comments'] ?? false,
                 'rubrics' => $payload['class']['workType'][$summaryWorkType->getId()]['rubrics'] ?? false,
+                'graph' => $payload['class']['workType'][$summaryWorkType->getId()]['graph'] ?? false,
                 // if we have seen this worktype in the payload, then set to show, and use it
                 'show' => isset($payload['class']['workType'][$summaryWorkType->getId()]),
             ];
@@ -928,6 +930,16 @@ class Controller extends ConfigController
 
         // If the student does not have Comparitave graphs enabled for them, do not show the graph
         if ($student->getDisplayGradeGraph() || $viewer->getRole()->isStaff()) {
+            /* Compile a whitelist of worktypes that we want to include on the boxplots
+             */
+            $workTypeWhitelist = [];
+
+            foreach ($optionsPayload['summary']['workType'] as $worktypeId => $worktype) {
+                if ($worktype['graph']) {
+                    $workTypeWhitelist[] = $worktypeId;
+                }
+            }
+
             if ($optionsPayload['summary']['cohort']) {
                 foreach ($folders as $folder) {
                     // if the folder is empty, then don't attempt to generate a graph for it
@@ -947,12 +959,23 @@ class Controller extends ConfigController
                         $student,
                         $viewer,
                         $term,
-                        $gradeHelper
+                        $gradeHelper,
+                        $workTypeWhitelist
                     );
                 }
             }
 
             if ($optionsPayload['class']['cohort']) {
+                /* Compile a whitelist of worktypes that we want to include on the boxplots
+                 */
+                $workTypeWhitelist = [];
+
+                foreach ($optionsPayload['class']['workType'] as $worktypeId => $worktype) {
+                    if ($worktype['graph']) {
+                        $workTypeWhitelist[] = $worktypeId;
+                    }
+                }
+
                 foreach ($folders as $folder) {
                     // if the folder is empty, then don't attempt to generate a graph for it
                     if (!isset($classAssessments[$folder->getId()])) {
@@ -971,7 +994,8 @@ class Controller extends ConfigController
                         $student,
                         $viewer,
                         $term,
-                        $gradeHelper
+                        $gradeHelper,
+                        $workTypeWhitelist
                     );
                 }
             }
@@ -1173,10 +1197,10 @@ class Controller extends ConfigController
     }
 
     /**
-     *  Generate standard cohort graph similar to the grades page
+     * Generate standard cohort graph similar to the grades page
      *
      * @param Collection $assessments
-     * @param Folder\Model $folder
+     * @param \Schoolbox\Resource\Folder\Model $folder
      * @param Markbook $filteredMarkbook
      * @param bool $lmsCohortComparison
      * @param bool $gradientEnable
@@ -1184,15 +1208,9 @@ class Controller extends ConfigController
      * @param User $viewer
      * @param Term\Model $term
      * @param Helper $gradeHelper
-     *
+     * @param array $workTypeWhitelist
      * @return array{graph: array, type: string}
-     * @throws \DomainException
-     * @throws \InvalidArgumentException
      * @throws \JsonException
-     * @throws \LogicException
-     * @throws \PDOException
-     * @throws DefinitionException
-     * @throws \UnexpectedValueException
      */
     private function generateCohortGraph(
         Collection $assessments,
@@ -1203,7 +1221,8 @@ class Controller extends ConfigController
         User $student,
         User $viewer,
         Term\Model $term,
-        Helper $gradeHelper
+        Helper $gradeHelper,
+        array $workTypeWhitelist
     ): array {
         if ((new ValidUseCohortMarks())->isSatisfiedBy($lmsCohortComparison, $folder)) {
             $graphType = 'cohort';
@@ -1213,11 +1232,12 @@ class Controller extends ConfigController
                 $assessments,
                 $viewer,
                 $term,
-            ))->collate($student);
+            ))->collate($student, $workTypeWhitelist);
         } else {
             $graphType = 'class';
-            $graph = $gradeHelper->buildGraph($filteredMarkbook, $student, $viewer, $gradientEnable);
+            $graph = $gradeHelper->buildGraph($filteredMarkbook, $student, $viewer, $gradientEnable, $workTypeWhitelist);
         }
+
         return [
             'graph' => $graph,
             'type'  => $graphType,

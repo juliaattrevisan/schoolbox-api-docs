@@ -177,18 +177,12 @@ class ClassResults
      * using $viewee's results as scatter plot values
      *
      * @param User $viewee
+     * @param array $workTypeWhitelist A set of worktype ids that you want to include on the boxplot.
      * @return array
-     * @throws \DomainException
-     * @throws \InvalidArgumentException
-     * @throws \LogicException
-     * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \UnexpectedValueException
-     * @throws \PDOException
      * @throws \JsonException
      */
-    public function collate(User $viewee): array
+    public function collate(User $viewee, array $workTypeWhitelist = []): array
     {
-
         /* Get all the assessments we need to analyse
          */
         $assessmentMarks = $this->getCohortAssessmentSet();
@@ -253,6 +247,12 @@ class ClassResults
         $specsWithPublishedMarks = array_values($this->tuples);
 
         foreach ($this->assessments as $assessment) {
+            /* Not in the worktypes whitelist: skip it
+             */
+            if (!in_array($assessment->getWorkType()->getId(), $workTypeWhitelist, true)) {
+                continue;
+            }
+
             /* Skip assessments which weren't spawned from a course
              * $assessment could be a homepage-specific assessment because this data set
              * also informs the markbook. We have to skip them as we go.
