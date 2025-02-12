@@ -4,6 +4,7 @@
  # Params:
  # * assessment:  IAssessable - The assessment object
  # * student:     User        - The user record for the student
+ # * canViewInstructorMarks: bool - Whether the user can view instructor marks
  #}
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 {% import '@learning/macro/urgency.twig' as urgency %}
@@ -63,7 +64,7 @@
         {% else %}
             {# learners and instructors can view the display mark, only instructors can see the instructor mark #}
             {% set grade = participant.humanReadableMark(true) %}
-            {% set instructorGrade = USER.role.isStaff ? participant.humanReadableInstructorMark(true) : null %}
+            {% set instructorGrade = canViewInstructorMarks ?? false ? participant.humanReadableInstructorMark(true) : null %}
 
             {% if grade %}
                 <div data-learner-mark class="grade {{ urgency.marks(participant.normalisedMark(true)) }}-bg"

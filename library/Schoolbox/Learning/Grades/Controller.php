@@ -511,6 +511,12 @@ class Controller extends Base
             'teacherAssessed' => 'incomplete',
         ];
 
+        /**
+         * Only staff can view instructor marks in the grade report
+         * This avoids a student gaining write+ access to a page (becoming an "instructor") then seeing the marks
+         */
+        $canViewInstructorMarks = $this->getUser()->getRole()->isStaff();
+
         $this->response = $this->responseAsJson([
             'status'  => 200,
             'content' => $this->responseFromTemplateUnthemed('@learningGrades/gradesInner.twig', [
@@ -520,6 +526,7 @@ class Controller extends Base
                 'tabs'                  => $tabs,
                 'selectedTab'           => $selectedTab,
                 'canSeeShowcaseButton'  => $canSeeShowcaseButton,
+                'canViewInstructorMarks' => $canViewInstructorMarks,
                 'graph'                 => $graph,
                 'longitudinalRubric'    => $longitudinalRubric,
                 'showRubricPoints'      => $showRubricPoints,
