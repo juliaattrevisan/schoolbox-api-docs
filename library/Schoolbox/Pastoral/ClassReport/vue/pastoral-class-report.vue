@@ -128,7 +128,7 @@ export default {
          * @returns {String}
          */
         formatDateArcived(date) {
-            return dayjs(date).format('MMM DD, YYYY');
+            return dayjs(date).format("MMM DD, YYYY");
         },
 
         /**
@@ -280,7 +280,9 @@ export default {
                                                         v-if="record.isArchived"
                                                         name="archive"
                                                         size="0.75rem"
-                                                        :title="'Record archived - ' + formatDateArcived(record.expiresAt)"
+                                                        :title="
+                                                            'Record archived - ' + formatDateArcived(record.expiresAt)
+                                                        "
                                                     ></sbx-icon>
                                                 </span>
                                             </a>
