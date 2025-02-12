@@ -26,8 +26,8 @@ class Definition extends AbstractDefinition
     protected function getCustomKeys(): array
     {
         return [
-            self::KEY_EXCLUDE_ARCHIVED_RECORDS,
             self::KEY_INCLUDE_ARCHIVED_RECORDS,
+            self::KEY_EXCLUDE_ARCHIVED_RECORDS,
         ];
     }
 
@@ -41,8 +41,8 @@ class Definition extends AbstractDefinition
     public function getLabel(string $key): string
     {
         return match ($key) {
-            self::KEY_EXCLUDE_ARCHIVED_RECORDS => 'Exclude Archived Records',
             self::KEY_INCLUDE_ARCHIVED_RECORDS => 'Include Archived Records',
+            self::KEY_EXCLUDE_ARCHIVED_RECORDS => 'Exclude Archived Records',
             default => ''
         };
     }

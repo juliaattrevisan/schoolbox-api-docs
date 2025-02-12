@@ -116,6 +116,20 @@ class IdFinder extends AbstractIdFinder
             $pb = $pb->in('p.student_id', $studentSelection);
         }
 
+        // Archived Record selection
+        $archivedSelection = $completeFilters[Archived\Definition::class] ?? null;
+        if (isset($archivedSelection) && count($archivedSelection) > 0) {
+            /* Only show the active (un-archived) records by default
+             */
+            if ($archivedSelection->offsetExists(Archived\Definition::KEY_EXCLUDE_ARCHIVED_RECORDS)) {
+                $pb->any(
+                    $this->getMapper()
+                         ->getPredicateBuilder()
+                         ->any($this->getMapper()->getPredicateBuilder()->isNull('p.expires_at'))
+                         ->any($this->getMapper()->getPredicateBuilder()->greaterThan('p.expires_at', \Alaress_Date_Format::now()->getDatabaseDate()))
+                );
+            }
+        }
         $query = "SELECT DISTINCT p.id FROM pastoral p";
         if (count($joins)) {
             $query .= ' ' . implode(' ', $joins);
