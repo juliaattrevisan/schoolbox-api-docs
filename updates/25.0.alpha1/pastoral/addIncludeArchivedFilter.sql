@@ -1,6 +1,6 @@
-INSERT INTO (entity, class)
+INSERT INTO filter (entity, class)
 VALUES
     (
         'Schoolbox\\Pastoral\\Mapper',
-        'Schoolbox\\Filter\\Filters\\Pastoral\\Archive\\Definition'
-    ),
+        'Schoolbox\\Filter\\Filters\\Pastoral\\Archived\\Definition'
+    );
