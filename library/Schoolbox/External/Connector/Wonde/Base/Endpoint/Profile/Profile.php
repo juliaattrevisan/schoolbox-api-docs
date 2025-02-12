@@ -108,27 +108,27 @@ class Profile implements IStrategy
         if ($this->validStrats->isStudentStratEnabled() || $this->validStrats->isFamiliesStratEnabled()) {
             $this->log->info('Processing students and their parents.');
 
-//            $currentStudents = sprintf(
-//                'students?page=%s&per_page=%s&include=%s',
-//                1,
-//                self::NUM_PER_PAGE,
-//                implode(',', [
-//                    'contact_details',
-//                    'contacts',
-//                    'contacts.contact_details',
-//                    'education_details',
-//                    'extended_details',
-//                    'house',
-//                    'identifiers',
-//                    'medical_conditions',
-//                    'permissions',
-//                    'sen_needs',
-//                    'year',
-//                    'campus'
-//                ])
-//            );
-//
-//            $this->importStudents($currentStudents);
+            $currentStudents = sprintf(
+                'students?page=%s&per_page=%s&include=%s',
+                1,
+                self::NUM_PER_PAGE,
+                implode(',', [
+                    'contact_details',
+                    'contacts',
+                    'contacts.contact_details',
+                    'education_details',
+                    'extended_details',
+                    'house',
+                    'identifiers',
+                    'medical_conditions',
+                    'permissions',
+                    'sen_needs',
+                    'year',
+                    'campus'
+                ])
+            );
+
+            $this->importStudents($currentStudents);
 
             /* Optionally process future families
              */
