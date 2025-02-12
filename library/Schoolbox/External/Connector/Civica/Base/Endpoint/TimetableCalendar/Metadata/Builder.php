@@ -13,8 +13,11 @@ class Builder
 {
     /**
      * Apparently everyone is going to be using this
+     *
+     * Staging host: https://cetas-test.civica.education/TeacherToolkit/attendance
+     * Prod host: https://cetas.civica.education/TeacherToolkit/attendance
      */
-    private const HOST = 'https://cetas-test.civica.education/TeacherToolkit/attendance';
+    private const HOST = 'https://cetas.civica.education/TeacherToolkit/attendance';
 
 
     /**
