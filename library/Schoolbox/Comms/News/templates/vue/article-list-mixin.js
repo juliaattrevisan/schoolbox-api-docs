@@ -2,8 +2,6 @@
  * Shared between each of the Layout components
  */
 
-import axios from "axios";
-
 export default {
     computed: {
         /**
@@ -54,8 +52,13 @@ export default {
 
             var $toast = $("#toaster");
             $toast.toastActivate({ text: toastActivateMessage });
-            axios
-                .post(requestURL, [], { headers: postHeaders })
+            fetch(requestURL, {
+                method: "POST",
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                    "content-type": "application/x-www-form-urlencoded",
+                },
+            })
                 .then(function () {
                     $toast.toastTimeout({ text: toastSuccessMessage, duration: 2000 });
                     updateArticleIds(article.id);

@@ -60,7 +60,11 @@ export default {
     },
     mounted: function () {
         if (this.data.getSavedArticlesRoute) {
-            fetch(this.data.getSavedArticlesRoute, { headers: getHeaders })
+            fetch(this.data.getSavedArticlesRoute, {
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                },
+            })
                 .then((response) => response.json())
                 .then((data) => {
                     this.savedArticleIds = data;

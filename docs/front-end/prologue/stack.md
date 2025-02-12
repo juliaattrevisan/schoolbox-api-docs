@@ -17,7 +17,6 @@ Most of the front-end code in Schoolbox is written with the technologies above.
 | [Sass](https://sass-lang.com/)                                  |        CSS syntactic sugar        |
 | [Foundation 5](https://foundation.zurb.com/sites/docs/v/5.5.3/) |            UI Library             |
 | [Vue](https://vuejs.org/)                                       |    Component based development    |
-| [Axios](https://github.com/axios/axios)                         |           XHR requests            |
 | [Webpack](https://webpack.js.org/)                              |             Bundling              |
 | [NPM](https://www.npmjs.com/)                                   | Package management & task running |
 

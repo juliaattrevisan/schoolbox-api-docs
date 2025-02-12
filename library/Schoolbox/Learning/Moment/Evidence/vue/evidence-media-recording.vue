@@ -12,7 +12,6 @@ import RecordCamera from "@schoolboxVue/components/record/record-camera";
 import RecordAudioOnly from "@schoolboxVue/components/record/record-audio-only";
 import OverMediaModal from "@schoolboxVue/components/videojs-record/over-media-modal";
 import recordMediaTypes from "@js/record-media/recordMediaTypes";
-import axios from "axios";
 import { humanFileSize } from "@js/util/fileUtils";
 import { hasDeviceCapture } from "@js/util/featureDetectionUtils";
 import { isOfFileType, convertFilenameExtension } from "@js/util/fileUtils";
@@ -55,7 +54,7 @@ export default {
             defaultRatio: 0, //a ratio to return to when a video is selected
             currentRatio: 0, //default to 16:9 ratio, but could change when the device is actually available or moving between the recorded media and new media
             targetHeight: "0px", //to set the height based on the aspect ratio of the video
-            isFirstRecording: true, //prevent multipled recordings coming through
+            isFirstRecording: true, //prevent multiple recordings coming through
             deviceWidth: 0, //to restore to device dimensions if expanding/contracting on over-media-modal changes
             deviceHeight: 0, //to restore to device dimensions if expanding/contracting on over-media-modal changes
         };
@@ -166,7 +165,7 @@ export default {
             if (!this.hasUploadError) {
                 this.addHiddenInputs(responseData);
                 this.displayUploadSuccessful();
-                document.dispatchEvent(new CustomEvent("evidence-media-recording__onUploadComplete")); //dispach to form.twig to continue form submit
+                document.dispatchEvent(new CustomEvent("evidence-media-recording__onUploadComplete")); //dispatch to form.twig to continue form submit
             }
         },
 
@@ -182,6 +181,41 @@ export default {
         },
 
         /**
+         * upload the media to SchoolBox, we wrap in a promise as XMLHttpRequest does not support async/await
+         * we use XMLHttpRequest as fetch does not support progress events to display upload progress
+         */
+        async uploadMedia() {
+            return new Promise((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                const formData = this.getFormData();
+                xhr.upload.addEventListener("progress", (progressEvent) => this.onUploadProgress(progressEvent));
+                xhr.open("POST", "/storage/asyncUpload.php");
+                xhr.addEventListener("load", () => {
+                    try {
+                        const response = JSON.parse(xhr.responseText); // Parse JSON response
+                        if (typeof response === "object" && "success" in response && response.success) {
+                            resolve(response);
+                        } else {
+                            reject(response);
+                        }
+                    } catch (error) {
+                        reject({
+                            message:
+                                "Sorry, there was an error during upload. Please refresh the page and try again. If the problem persists, contact your support.",
+                        });
+                    }
+                });
+                xhr.addEventListener("error", () =>
+                    reject({
+                        message:
+                            "Sorry, there was an error during upload. Please refresh the page and try again. If the problem persists, contact your support.",
+                    }),
+                );
+                xhr.send(formData);
+            });
+        },
+
+        /**
          * the media is ready, so upload it up to SchoolBox and return response
          *
          */
@@ -189,14 +223,12 @@ export default {
             try {
                 this.isUploading = true; //show the upload modal
                 this.uploadProgressRatio = "0%";
-                const response = await axios.post("/storage/asyncUpload.php", this.getFormData(), {
-                    onUploadProgress: (progressEvent) => this.onUploadProgress(progressEvent),
-                });
+                const response = await this.uploadMedia();
                 this.uploadProgressRatio = "100%";
                 this.isUploading = false; //hide the upload modal
-                return response.data;
+                return response;
             } catch (error) {
-                this.checkErrorMessage(error.response.data);
+                this.checkErrorMessage(error);
                 this.isUploading = false; //hide the upload modal
                 this.hasUploadError = true; //to show the error modal
             }
@@ -226,7 +258,7 @@ export default {
         },
 
         /**
-         * try and grab known error messages to better inform of the error that's occured
+         * try and grab known error messages to better inform of the error that's occurred
          *
          * @params {Object}
          */
@@ -235,6 +267,12 @@ export default {
                 this.uploadErrorMessage = `Sorry, the recording of ${humanFileSize(
                     this.recordedData.size,
                 )} is over the allowed file size limit. Please try a shorter recording or request your administrator(s) to increase the allowed file size limit.`;
+            } else if (errorResponseData.hash?.includes("The specified filename exceeds the max length")) {
+                this.uploadErrorMessage = `Sorry, the specified filename is longer than the allowed length.\nPlease shorten the filename length.`;
+            } else if (errorResponseData.message) {
+                this.uploadErrorMessage = errorResponseData.message;
+            } else {
+                this.uploadErrorMessage = "Sorry, there was an unknown error while uploading.";
             }
         },
 

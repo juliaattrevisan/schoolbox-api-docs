@@ -1,6 +1,6 @@
 # 7. Asynchronous Payload
 
-Sometimes you don't want to load data synchronously and you're after something similar to jQuery's `$.ajax` method. The Vue equivalent is `axios` and it functions in a very similar way.
+Sometimes you don't want to load data synchronously and you're after something similar to jQuery's `$.ajax` method. The Vue equivalent is `fetch` and it functions in a very similar way.
 
 ## 7.1 Set up asynchronous payload endpoint in Aura
 
@@ -50,13 +50,7 @@ And finally in `container.twig` we don't need to pass a payload data structure a
 <user-list></user-list>
 ```
 
-## 7.2 Set up axios
-
-We need to import the `axios` library at the top of `user-list.vue`,
-
-```js
-import axios from 'axios';
-```
+## 7.2 Set up fetch
 
 Then in `mounted()` (the Vue equivalent of window.onload), we need to set up a few things.
 
@@ -89,9 +83,10 @@ mounted () {
         responseType: 'json'
     }
 
-    axios.request(request)
+    fetch(request)
+        .then((response) => response.json())
         .then((response) => {
-            this.allUsers = response.data; //Load into vue component
+            this.allUsers = response; //Load into vue component
         })
 
         .catch((error) => {
@@ -135,6 +130,6 @@ If you compile and reload the screen, you'll briefly see a `Loading` message whi
 
 > Don't forget to dress up the Loading screen with skeletons or other ui fancyness.
 
-> You can also handle errors inside the `axios.request` call, just like you would with the jQuery equivalents.
+> You can also handle errors inside the `fetch` call, just like you would with the jQuery equivalents.
 
 [Pagination](08-pagination.md)
