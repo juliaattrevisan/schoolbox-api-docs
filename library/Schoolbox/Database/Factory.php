@@ -44,29 +44,6 @@ class Factory
     private ?IConnector $externalDatabase = null;
 
     /**
-     * TODO: Once we've got DI accessible everywhere this is currently used this should no longer required
-     *
-     * @deprecated
-     * @return IConnector
-     */
-    protected static $connectorExternal;
-
-    /**
-     * TODO: Once we've got DI accessible everywhere this is currently used this should no longer required
-     *
-     * @deprecated
-     * @return IConnector
-     */
-    protected static $connectorInternal;
-
-    /**
-     * Read Only DB
-     *
-     * @return IConnector
-     */
-    protected static $connectorInternalRead;
-
-    /**
      * An instance of this object
      *
      * @deprecated
@@ -95,18 +72,13 @@ class Factory
      * Retrieves static instance of external database connection (used in External connectors)
      * TODO: Once we've got DI accessible everywhere this is currently used this should no longer required
      *
-     * @deprecated
+     * @deprecated use non-static `getExternalDatabase` instead
      * @return null|IConnector
      * @throws DatabaseException
      */
     public static function getInstanceExternal(): ?IConnector
     {
-        // TODO SA-8354: use DI'd database instead
-        if (!isset(self::$connectorExternal)) {
-            self::$connectorExternal = self::getInstance()->getExternalDatabase(new Loader());
-        }
-
-        return (self::$connectorExternal instanceof NullConnector ? null : self::$connectorExternal);
+        return self::getInstance()->getExternalDatabase(new Loader());
     }
 
 
@@ -114,32 +86,25 @@ class Factory
      * Retrieves static instance of internal database connection.
      * TODO: Once we've got DI accessible everywhere this is currently used this should no longer required
      *
-     * @deprecated
+     * @deprecated use non-static `getInternalDatabase` instead
      * @return IConnector
      * @throws DatabaseException
      */
     public static function getInstanceInternal(): IConnector
     {
-        if (!isset(self::$connectorInternal)) {
-            self::$connectorInternal = self::getInstance()->getInternalDatabase();
-        }
-
-        return self::$connectorInternal;
+        return self::getInstance()->getInternalDatabase();
     }
 
     /**
      * Retrieves static instance of internal Read only database connection.
      *
+     * @deprecated use non-static `getInternalReadDatabase` instead
      * @return IConnector
      * @throws DatabaseException
      */
     public static function getInstanceInternalRead(): IConnector
     {
-        if (!isset(self::$connectorInternalRead)) {
-            self::$connectorInternalRead = self::getInstance()->getInternalReadDatabase();
-        }
-
-        return self::$connectorInternalRead;
+        return self::getInstance()->getInternalReadDatabase();
     }
 
     /**
