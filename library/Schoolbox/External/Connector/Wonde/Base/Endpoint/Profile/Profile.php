@@ -133,6 +133,8 @@ class Profile implements IStrategy
             /* Optionally process future families
              */
             if ($this->api->getOptions()['futurefamilies'] ?? false) {
+                $this->log->info('Processing pre-admission students and their parents.');
+
                 $futureFamilies = sprintf(
                     'students-pre-admission?page=%s&per_page=%s&include=%s',
                     1,
