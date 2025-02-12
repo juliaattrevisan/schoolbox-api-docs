@@ -324,6 +324,7 @@
         assessment: assessment,
         allMarkTypes: capabilityMarkTypes,
         allGradeSchemes: capabilityGradingSchemes,
+        selectedMaxMark: assessment.maxMark ?? null,
         selectedMarkType: assessment.capabilityMarkType.id ?? null,
         selectedGradeGroup: assessment.capabilityGradeGroup.id ?? null,
         defaultGradeGroup: defaultGradeGroup,
@@ -399,4 +400,3 @@
         </div>
     </div>
 {% endif %}
-

@@ -608,6 +608,7 @@ class ProjectTest extends TestCase
                                 (new DueWorkModel())
                                     ->setId(3)
                                     ->setMarkType(self::buildMarkType())
+                                    ->setInstructorMarkType(self::buildMarkType())
                                     ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL)
                             )
                     )

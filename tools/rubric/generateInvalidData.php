@@ -35,7 +35,6 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Generate invalid data');
  * This is to simulate invalid rubric data
  */
 $app = new class extends CliTool\App {
-
     /** @var FolderMapper */
     private $folderMapper;
 
@@ -137,6 +136,7 @@ $app = new class extends CliTool\App {
                                                    ->setCategory($unitSpecC->getFolder())
                                                    ->setName('test')
                                                    ->setMarkType($this->markTypeMapper->findAll()->first())
+                                                   ->setInstructorMarkType($this->markTypeMapper->findAll()->first())
                                                    ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_FULL)
                                                    ->setUseRubric(1);
         $this->submissionBoxMapper->save($submissionBox);

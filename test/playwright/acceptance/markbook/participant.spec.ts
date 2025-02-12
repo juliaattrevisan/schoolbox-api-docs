@@ -63,6 +63,7 @@ test.describe("Participant Tests", () => {
         await dueworkForm.setPublishDate(Common.getTodayAtMidnight());
         await dueworkForm.setOpenDate(Common.getTodayAtMidnight());
         await dueworkForm.setMarkType(AssessmentForm.MARK_TYPE_PERCENTAGE);
+        await dueworkForm.setInstructorMarkType(AssessmentForm.MARK_TYPE_PERCENTAGE);
         await dueworkForm.create();
 
         tester.isGoingTo("As Jack Coles, create submission");

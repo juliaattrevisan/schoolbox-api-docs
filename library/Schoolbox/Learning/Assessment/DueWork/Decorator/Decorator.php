@@ -53,12 +53,15 @@ class Decorator implements DecoratorInterface
      *
      * @param int          $acceptOnline
      * @param int          $markType
+     * @param int          $instructorMarkType
      * @param int|null     $gradingScheme
+     * @param int|null     $instructorGradingScheme
      * @param bool         $useRubric
      * @param int          $capabilityMarkType
      * @param int|null     $capabilityGradeGroup
      * @param bool         $useMarkRange
      * @param float|null   $maxMark
+     * @param float|null   $instructorMaxMark
      * @param array|null   $rubricData
      * @param array        $attachedFiles
      * @param string|null  $selfReviewable
@@ -74,12 +77,15 @@ class Decorator implements DecoratorInterface
     public function __construct(
         int $acceptOnline,
         int $markType,
+        int $instructorMarkType,
         ?int $gradingScheme,
+        ?int $instructorGradingScheme,
         bool $useRubric,
         int $capabilityMarkType,
         ?int $capabilityGradeGroup,
         bool $useMarkRange,
         ?float $maxMark,
+        ?float $instructorMaxMark,
         ?array $rubricData,
         array $attachedFiles,
         ?string $selfReviewable,
@@ -94,12 +100,15 @@ class Decorator implements DecoratorInterface
     ) {
         $this->setAcceptOnline($acceptOnline);
         $this->setMarkType($markType);
+        $this->setInstructorMarkType($instructorMarkType);
         $this->setGradingScheme($gradingScheme);
+        $this->setInstructorGradingScheme($instructorGradingScheme);
         $this->setUseRubric($useRubric);
         $this->setCapabilityMarkType($capabilityMarkType);
         $this->setCapabilityGradeGroup($capabilityGradeGroup);
         $this->setUseMarkRange($useMarkRange);
         $this->setMaxMark($maxMark);
+        $this->setInstructorMaxMark($instructorMaxMark);
         $this->setRubricData($rubricData);
         $this->setAttachedFiles($attachedFiles);
         $this->setSelfReviewable($selfReviewable);
@@ -137,14 +146,18 @@ class Decorator implements DecoratorInterface
          * I end up drowning in the Swamp if I try
          */
         $markType = MarkTypeMapper::getInstance()->createModel()->setId($this->getMarkType());
+        $instructorMarkType = MarkTypeMapper::getInstance()->createModel()->setId($this->getInstructorMarkType());
         $gradingGroup = Mapper::getInstance()->createModel()->setId($this->getGradingScheme());
+        $instructorGradingGroup = Mapper::getInstance()->createModel()->setId($this->getInstructorGradingScheme());
 
         $capabilityMarkType = MarkTypeMapper::getInstance()->createModel()->setId($this->getCapabilityMarkType());
         /** @var SubmissionBox\GradeLevel\Group\Model $capabilityGradeGroup */
         $capabilityGradeGroup = Mapper::getInstance()->createModel()->setId($this->getCapabilityGradeGroup());
 
         $assessment->setMarkType($markType);
+        $assessment->setInstructorMarkType($instructorMarkType);
         $assessment->setGradeGroup($gradingGroup);
+        $assessment->setInstructorGradeGroup($instructorGradingGroup);
         $assessment->setUseRubric($this->getUseRubric());
         $assessment->setCapabilityMarkType($capabilityMarkType);
         $assessment->setCapabilityGradeGroup($capabilityGradeGroup);
@@ -178,6 +191,7 @@ class Decorator implements DecoratorInterface
             $rubricMapper->importGrid($assessment, $importer);
             $markMax = $assessment->getRubricGrid()->calculateMaxValueFromCapabilities();
             $assessment->setMaxMark($markMax);
+            $assessment->setInstructorMaxMark($markMax);
         } elseif ($this->getUseRubric()) {
             $rubricMapper = RubricDataSource::getInstance();
             $gridFactory  = new GridFactory();
@@ -213,15 +227,18 @@ class Decorator implements DecoratorInterface
             // the max mark from its capabilities
             $markMax = $newGrid->calculateMaxValueFromCapabilities();
             $assessment->setMaxMark($markMax);
+            $assessment->setInstructorMaxMark($markMax);
         } else {
             // The max mark is always whatever got sent in the form
             $assessment->setMaxMark($this->getMaxMark());
+            $assessment->setInstructorMaxMark($this->getInstructorMaxMark());
         }
 
         // Only spawn the mark scheme after the max mark is finalized
         // (as it might have changed from what was submitted to the form)
         $markSchemeFactory = new MarkSchemeFactory();
         $assessment->setMarkScheme($markSchemeFactory->spawnMarkSchemeFor($assessment));
+        $assessment->setInstructorMarkScheme($markSchemeFactory->spawnInstructorMarkSchemeFor($assessment));
 
         /* If there were attachments, accumulate them
          * Otherwise set attachedFiles to an empty collection

@@ -43,12 +43,15 @@ class CourseManagedDecorator implements DecoratorInterface
      * Decorator constructor.
      *
      * @param int          $markType
+     * @param int          $instructorMarkType
      * @param int|null     $gradingScheme
+     * @param int|null     $instructorGradingScheme
      * @param bool         $useRubric
      * @param int          $capabilityMarkType
      * @param int|null     $capabilityGradeGroup
      * @param bool         $useMarkRange
      * @param float|null   $maxMark
+     * @param float|null   $instructorMaxMark
      * @param array|null   $rubricData
      * @param array        $attachedFiles
      * @param bool         $enableWorksheet
@@ -61,12 +64,15 @@ class CourseManagedDecorator implements DecoratorInterface
      */
     public function __construct(
         int $markType,
+        int $instructorMarkType,
         ?int $gradingScheme,
+        ?int $instructorGradingScheme,
         bool $useRubric,
         int $capabilityMarkType,
         ?int $capabilityGradeGroup,
         bool $useMarkRange,
         ?float $maxMark,
+        ?float $instructorMaxMark,
         ?array $rubricData,
         array $attachedFiles,
         bool $enableWorksheet,
@@ -78,12 +84,15 @@ class CourseManagedDecorator implements DecoratorInterface
         ?DueWork $original
     ) {
         $this->setMarkType($markType);
+        $this->setInstructorMarkType($instructorMarkType);
         $this->setGradingScheme($gradingScheme);
+        $this->setInstructorGradingScheme($instructorGradingScheme);
         $this->setUseRubric($useRubric);
         $this->setCapabilityMarkType($capabilityMarkType);
         $this->setCapabilityGradeGroup($capabilityGradeGroup);
         $this->setUseMarkRange($useMarkRange);
         $this->setMaxMark($maxMark);
+        $this->setInstructorMaxMark($instructorMaxMark);
         $this->setRubricData($rubricData);
         $this->setAttachedFiles($attachedFiles);
         $this->setEnableWorksheet($enableWorksheet);

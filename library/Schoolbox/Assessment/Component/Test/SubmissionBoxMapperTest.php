@@ -44,6 +44,7 @@ class SubmissionBoxMapperTest extends TestCase
             'enable_files'            => true,
             'enable_policy'           => true,
             'max_mark'                => 100,
+            'instructor_max_mark'        => 50,
             'self_reviewability'      => SubmissionBox::SELF_REVIEWABILITY_NONE,
         );
 
@@ -60,6 +61,7 @@ class SubmissionBoxMapperTest extends TestCase
         $this->assertEquals(true, $box->getEnableFiles());
         $this->assertEquals(true, $box->getEnablePolicy());
         $this->assertEquals(100, $box->getMaxMark());
+        $this->assertEquals(50, $box->getInstructorMaxMark());
     }
 
     public function testFindById()

@@ -279,7 +279,10 @@ TEST;
             $standardTestLevelCount,
             (new DueWorkModel())
                 ->setMarkType((new MarkType())->setSlug(MarkType::SLUG_NONE))
-                ->setGradeGroup((new GradeGroup())->setId(1)),
+                ->setInstructorMarkType((new MarkType())->setSlug(MarkType::SLUG_NONE))
+                ->setGradeGroup((new GradeGroup())->setId(1))
+                ->setInstructorGradeGroup((new GradeGroup())->setId(1))
+            ,
             $standardTestLevels,
             $standardTestCapabilities,
             false,
@@ -292,7 +295,10 @@ TEST;
             $standardTestLevelCount,
             (new DueWorkModel())
                 ->setMarkType((new MarkType())->setSlug(MarkType::SLUG_PERCENT))
-                ->setGradeGroup((new GradeGroup())->setId(1)),
+                ->setInstructorMarkType((new MarkType())->setSlug(MarkType::SLUG_PERCENT))
+                ->setGradeGroup((new GradeGroup())->setId(1))
+                ->setInstructorGradeGroup((new GradeGroup())->setId(1))
+            ,
             $standardTestLevels,
             $standardTestCapabilities,
             false,
@@ -305,7 +311,10 @@ TEST;
             $standardTestLevelCount,
             (new DueWorkModel())
                 ->setMarkType((new MarkType())->setSlug(MarkType::SLUG_TOTAL))
-                ->setGradeGroup((new GradeGroup())->setId(1)),
+                ->setInstructorMarkType((new MarkType())->setSlug(MarkType::SLUG_TOTAL))
+                ->setGradeGroup((new GradeGroup())->setId(1))
+                ->setInstructorGradeGroup((new GradeGroup())->setId(1))
+            ,
             $standardTestLevels,
             $standardTestCapabilities,
             false,
@@ -318,7 +327,9 @@ TEST;
             $standardTestLevelCount,
             (new DueWorkModel())
                 ->setMarkType((new MarkType())->setSlug(MarkType::SLUG_LETTER))
+                ->setInstructorMarkType((new MarkType())->setSlug(MarkType::SLUG_LETTER))
                 ->setGradeGroup((new GradeGroup())->setId(1))
+                ->setInstructorGradeGroup((new GradeGroup())->setId(1))
             ,
             $standardTestLevels,
             $standardTestCapabilities,
@@ -353,7 +364,10 @@ TEST;
             $standardTestLevelCount,
             (new DueWorkModel())
                 ->setMarkType((new MarkType())->setSlug(MarkType::SLUG_NONE))
-                ->setGradeGroup((new GradeGroup())->setId(1)),
+                ->setInstructorMarkType((new MarkType())->setSlug(MarkType::SLUG_NONE))
+                ->setGradeGroup((new GradeGroup())->setId(1))
+                ->setInstructorGradeGroup((new GradeGroup())->setId(1))
+            ,
             $standardTestLevels,
             $standardTestCapabilities,
             false,
@@ -366,7 +380,10 @@ TEST;
             $standardTestLevelCount,
             (new DueWorkModel())
                 ->setMarkType((new MarkType())->setSlug(MarkType::SLUG_PERCENT))
-                ->setGradeGroup((new GradeGroup())->setId(1)),
+                ->setInstructorMarkType((new MarkType())->setSlug(MarkType::SLUG_PERCENT))
+                ->setGradeGroup((new GradeGroup())->setId(1))
+                ->setInstructorGradeGroup((new GradeGroup())->setId(1))
+            ,
             $standardTestLevels,
             $standardTestCapabilities,
             false,
@@ -379,7 +396,10 @@ TEST;
             $standardTestLevelCount,
             (new DueWorkModel())
                 ->setMarkType((new MarkType())->setSlug(MarkType::SLUG_TOTAL))
-                ->setGradeGroup((new GradeGroup())->setId(1)),
+                ->setInstructorMarkType((new MarkType())->setSlug(MarkType::SLUG_TOTAL))
+                ->setGradeGroup((new GradeGroup())->setId(1))
+                ->setInstructorGradeGroup((new GradeGroup())->setId(1))
+            ,
             $standardTestLevels,
             $standardTestCapabilities,
             false,
@@ -392,7 +412,10 @@ TEST;
             $standardTestLevelCount,
             (new DueWorkModel())
                 ->setMarkType((new MarkType())->setSlug(MarkType::SLUG_LETTER))
-                ->setGradeGroup((new GradeGroup())->setId(1)),
+                ->setInstructorMarkType((new MarkType())->setSlug(MarkType::SLUG_LETTER))
+                ->setGradeGroup((new GradeGroup())->setId(1))
+                ->setInstructorGradeGroup((new GradeGroup())->setId(1))
+            ,
             $standardTestLevels,
             $standardTestCapabilities,
             false,

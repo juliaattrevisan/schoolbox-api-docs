@@ -61,6 +61,11 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     protected $gradeGroup;
 
     /**
+     * @var GradeLevel\Group\Model
+     */
+    protected $instructorGradeGroup;
+
+    /**
      * @var SubmissionBox\SingleFile\Model[]|GenericCollection
      */
     protected $attachments;
@@ -126,14 +131,32 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     protected $created;
 
     /**
+     * The max mark as per $this->mark_type
+     *
      * @var float
      */
     protected $max_mark;
 
     /**
-     * @return int
+     * The max mark as per $this->instructorMarkType
+     *
+     * @var float
+     */
+    protected $instructorMaxMark;
+
+    /**
+     * The mark type that to display when the instructor mark type is not (i.e. to learners)
+     *
+     * @var MarkType
      */
     protected $mark_type;
+
+    /**
+     * The input (instructor) mark type
+     *
+     * @var MarkType
+     */
+    protected $instructorMarkType;
 
     /** @var bool */
     protected $useRubric;
@@ -396,6 +419,24 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     }
 
     /**
+     * @param  MarkType $instructorMarkType
+     * @return $this
+     */
+    public function setInstructorMarkType($instructorMarkType)
+    {
+        $this->instructorMarkType = $instructorMarkType;
+        return $this;
+    }
+
+    /**
+     * @return MarkType
+     */
+    public function getInstructorMarkType()
+    {
+        return $this->instructorMarkType;
+    }
+
+    /**
      * @param  float $max_mark
      * @return $this
      */
@@ -411,6 +452,24 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     public function getMaxMark()
     {
         return $this->max_mark;
+    }
+
+    /**
+     * @param  float $instructorMaxMark
+     * @return $this
+     */
+    public function setInstructorMaxMark($instructorMaxMark)
+    {
+        $this->instructorMaxMark = $instructorMaxMark;
+        return $this;
+    }
+
+    /**
+     * @return float
+     */
+    public function getInstructorMaxMark()
+    {
+        return $this->instructorMaxMark;
     }
 
     /**
@@ -556,6 +615,24 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     public function setGradeGroup($gradeGroup)
     {
         $this->gradeGroup = $gradeGroup;
+        return $this;
+    }
+
+    /**
+     * @return GradeLevel\Group\Model|null
+     */
+    public function getInstructorGradeGroup()
+    {
+        return $this->instructorGradeGroup;
+    }
+
+    /**
+     * @param GradeLevel\Group\Model $instructorGradeGroup
+     * @return $this
+     */
+    public function setInstructorGradeGroup($instructorGradeGroup)
+    {
+        $this->instructorGradeGroup = $instructorGradeGroup;
         return $this;
     }
 

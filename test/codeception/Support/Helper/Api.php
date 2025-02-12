@@ -484,6 +484,7 @@ class Api extends \Codeception\Module
             ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_NONE)
             ->setCreator($staff)
             ->setMarkScheme(new Percentage())
+            ->setInstructorMarkScheme(new Percentage())
             ->setOpenAt($now)
             ->setPublishAt($now)
             ->setDueAt($close)
