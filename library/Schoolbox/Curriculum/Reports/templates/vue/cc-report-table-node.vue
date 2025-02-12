@@ -116,6 +116,7 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
                 :style="{
                     paddingLeft: filtersStore.onlyShowGaps || showExpandButton ? '0' : '2.5rem',
                 }"
+                :data-test="`cc-report-table-node-title-button-${props.node.id}`"
                 @click="emit('titleClick', props.node)"
             >
                 <template v-if="props.depth === 0">

@@ -99,5 +99,52 @@ test.describe("Curriculum Coverage Report Tests", () => {
         tester.isGoingTo("Select Only show unused curriculum and confirm open/close toggles have been hidden");
         await page.getByTestId("cc-report-filters-gaps-switch").click(); // Select Only show unused curriculum
         await expect(page.locator("[data-test^='cc-report-table-node-expand-button-']")).toHaveCount(0); // Confirm no expand buttons
+
+        tester.isGoingTo(
+            "Scroll down to the bottom of the table, allowing time for all rows to become visible and confirm ACLFRC109 is the last row in the table",
+        );
+        await page.getByTestId("cc-report-table").hover(); // First hover over the scrollable table
+        // await page.getByText("Footer text").scrollIntoViewIfNeeded();
+        // const element = page.getByTestId("cc-report-table-node-title-button-307"); // Replace with the actual selector of the element
+        // await element.scrollIntoViewIfNeeded(); // Scroll to ensure element is in view
+        // await page.mouse.wheel(0, 5000); // Scroll to the bottom of the table
+        // await page.waitForTimeout(1000);
+        // await page.mouse.wheel(0, 10000); // Scroll to the bottom of the table
+        // await page.waitForTimeout(1000);
+        // await page.mouse.wheel(0, 15000); // Scroll to the bottom of the table
+        // await page.waitForTimeout(1000);
+        // await page.mouse.wheel(0, 20000); // Scroll to the bottom of the table
+        // await page.waitForTimeout(1000);
+        // await expect(page.getByTestId("cc-report-table-node-title-button-307")).toHaveText("ACLFRC109");
+        // await page.getByTestId("cc-report-table").evaluate((element) => (element.scrollTop += 100));
+        let scrollHeight = 0;
+        scrollHeight = await page.getByTestId("cc-report-table").evaluate((element) => element.scrollHeight);
+        tester.isGoingTo(`ScrollHeight: ${scrollHeight}`);
+        await page.mouse.wheel(0, scrollHeight + 100); // Scroll to the bottom of the table
+        scrollHeight = await page.getByTestId("cc-report-table").evaluate((element) => element.scrollHeight);
+        tester.isGoingTo(`ScrollHeight: ${scrollHeight}`);
+        await page.mouse.wheel(0, scrollHeight + 100); // Scroll to the bottom of the table
+        scrollHeight = await page.getByTestId("cc-report-table").evaluate((element) => element.scrollHeight);
+        tester.isGoingTo(`ScrollHeight: ${scrollHeight}`);
+        await page.mouse.wheel(0, scrollHeight + 100); // Scroll to the bottom of the table
+        scrollHeight = await page.getByTestId("cc-report-table").evaluate((element) => element.scrollHeight);
+        tester.isGoingTo(`ScrollHeight: ${scrollHeight}`);
+        await page.mouse.wheel(0, scrollHeight + 100); // Scroll to the bottom of the table
+        scrollHeight = await page.getByTestId("cc-report-table").evaluate((element) => element.scrollHeight);
+        tester.isGoingTo(`ScrollHeight: ${scrollHeight}`);
+        // await page.mouse.wheel(0, scrollHeight); // Scroll to the bottom of the table
+        // scrollHeight = await page.getByTestId("cc-report-table").evaluate((element) => element.scrollHeight);
+        // await page.mouse.wheel(0, scrollHeight); // Scroll to the bottom of the table
+        // scrollHeight = await page.getByTestId("cc-report-table").evaluate((element) => element.scrollHeight);
+        // await page.mouse.wheel(0, scrollHeight); // Scroll to the bottom of the table
+        // scrollHeight = await page.getByTestId("cc-report-table").evaluate((element) => element.scrollHeight);
+        // await page.mouse.wheel(0, scrollHeight); // Scroll to the bottom of the table
+        // scrollHeight = await page.getByTestId("cc-report-table").evaluate((element) => element.scrollHeight);
+        // await page.mouse.wheel(0, scrollHeight); // Scroll to the bottom of the table
+        // scrollHeight = await page.getByTestId("cc-report-table").evaluate((element) => element.scrollHeight);
+        // await page.mouse.wheel(0, scrollHeight); // Scroll to the bottom of the table
+        // scrollHeight = await page.getByTestId("cc-report-table").evaluate((element) => element.scrollHeight);
+        // await page.mouse.wheel(0, scrollHeight); // Scroll to the bottom of the table
+        // await expect(page.getByTestId("cc-report-table-node-title-button-307")).toHaveText("ACLFRC109");
     });
 });
