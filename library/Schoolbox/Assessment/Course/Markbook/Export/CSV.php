@@ -36,7 +36,7 @@ class CSV extends AbstractCSV
         $assessmentSpecs = $courseMarkbook->getCollapsedAssessments();
 
         // Column headings
-        $this->writeHeader($assessmentSpecs);
+        $this->writeHeader($assessmentSpecs, $showCommunicatedMarks);
 
         // Course Average
         $courseAverages    = $courseMarkbook->getAssessmentSpecAverages();
@@ -59,7 +59,7 @@ class CSV extends AbstractCSV
                     }
                 }
             }
-            $courseAverageData = $this->appendData($courseAverageData, $assessmentSpec, $mark);
+            $courseAverageData = $this->appendData($courseAverageData, $assessmentSpec, $mark, $showCommunicatedMarks);
         }
         $this->exportRow(['Course Average', '', '', ''], $courseAverageData);
 
@@ -100,7 +100,7 @@ class CSV extends AbstractCSV
                         }
                     }
                 }
-                $classAveragesData = $this->appendData($classAveragesData, $assessmentSpec, $mark);
+                $classAveragesData = $this->appendData($classAveragesData, $assessmentSpec, $mark, $showCommunicatedMarks);
             }
             $rowHeaders = [$class->getFolder()->getTitle(), '', '', ''];
             $rank       = [];
@@ -144,13 +144,13 @@ class CSV extends AbstractCSV
                 foreach ($assessmentSpecs as $assessmentSpec) {
                     $assessmentImpl = $classAssessments->offsetGet($assessmentSpec->getId());
                     if (!$assessmentImpl) {
-                        $assessmentData = $this->appendData($assessmentData, $assessmentSpec, '');
+                        $assessmentData = $this->appendData($assessmentData, $assessmentSpec, '', $showCommunicatedMarks);
                         continue;
                     }
                     /** @var IAssessable $assessmentImpl */
                     $participant = $assessmentImpl->getParticipantIfExtant($student);
                     if (!$participant || $participant->isExcluded()) {
-                        $assessmentData = $this->appendData($assessmentData, $assessmentSpec, '');
+                        $assessmentData = $this->appendData($assessmentData, $assessmentSpec, '', $showCommunicatedMarks);
                         continue;
                     }
 
@@ -178,9 +178,9 @@ class CSV extends AbstractCSV
                             default:
                                 $mark = '';
                         }
-                        $assessmentData = $this->appendData($assessmentData, $assessmentSpec, $mark);
+                        $assessmentData = $this->appendData($assessmentData, $assessmentSpec, $mark, $showCommunicatedMarks);
                     } else {
-                        $assessmentData = $this->appendData($assessmentData, $assessmentSpec, '');
+                        $assessmentData = $this->appendData($assessmentData, $assessmentSpec, '', $showCommunicatedMarks);
                     }
                 }
                 $this->exportRow($studentData, $assessmentData);
@@ -197,15 +197,16 @@ class CSV extends AbstractCSV
      * @param array       $row
      * @param IAssessable $assessment
      * @param string      $mark
+     * @param bool        $showCommunicatedMarks
      * @return array
      */
-    private function appendData(array $row, IAssessable $assessment, string $mark): array
+    private function appendData(array $row, IAssessable $assessment, string $mark, bool $showCommunicatedMarks): array
     {
         $row[] = $mark;
-        if ($this->hasTotalMarkColumn($assessment)) {
+        if ($this->hasTotalMarkColumn($assessment, $showCommunicatedMarks)) {
             $row[] = '';
         }
-        if ($this->hasNormalizedMarkColumn($assessment)) {
+        if ($this->hasNormalizedMarkColumn($assessment, $showCommunicatedMarks)) {
             $row[] = '';
         }
         if ($this->hasCommentColumn($assessment)) {
@@ -246,17 +247,17 @@ class CSV extends AbstractCSV
         }
         if (!isset($mark)) {
             //Make sure to fill in space if mark is not published
-            return $this->appendData($row, $assessment, '');
+            return $this->appendData($row, $assessment, '', $showCommunicatedMarks);
         }
         $suffix            = $isDraft ? self::DRAFT_SUFFIX : '';
         $humanReadableMark = $showCommunicatedMarks ? $mark['hr'] : $mark['hrInstructor'];
-        if ($this->hasTotalMarkColumn($assessment)) {
+        if ($this->hasTotalMarkColumn($assessment, $showCommunicatedMarks)) {
             $row[] = $this->parseNumerator($humanReadableMark) . $suffix;
             $row[] = $this->parseDenominator($humanReadableMark) . $suffix;
         } else {
             $row[] = $humanReadableMark . $suffix;
         }
-        if ($this->hasNormalizedMarkColumn($assessment)) {
+        if ($this->hasNormalizedMarkColumn($assessment, $showCommunicatedMarks)) {
             $row[] = $mark['norm'] . $suffix;
         }
         if ($this->hasCommentColumn($assessment)) {

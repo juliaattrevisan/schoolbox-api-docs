@@ -96,8 +96,9 @@ class AbstractCSV
      * Write CSV column headers
      *
      * @param GenericCollection|IAssessable[] $sortedAssessments
+     * @param bool                            $showCommunicatedMarks
      */
-    protected function writeHeader(GenericCollection $sortedAssessments): void
+    protected function writeHeader(GenericCollection $sortedAssessments, bool $showCommunicatedMarks): void
     {
         // Column headings
         $headings         = [
@@ -112,7 +113,7 @@ class AbstractCSV
         }
         $assessmentTitles = [];
         foreach ($sortedAssessments as $assessment) {
-            $assessmentTitles = $this->addHeaders($assessmentTitles, $assessment);
+            $assessmentTitles = $this->addHeaders($assessmentTitles, $assessment, $showCommunicatedMarks);
         }
         $this->exportRow($headings, $assessmentTitles);
     }
@@ -123,19 +124,20 @@ class AbstractCSV
      *
      * @param string[]    $row
      * @param IAssessable $assessment
+     * @param bool        $showCommunicatedMarks
      * @return string[]
      */
-    protected function addHeaders(array $row, IAssessable $assessment): array
+    protected function addHeaders(array $row, IAssessable $assessment, bool $showCommunicatedMarks): array
     {
         $title = "{$assessment->getTitle()} \r\n({$assessment->getTypeName()})";
 
-        if ($this->hasTotalMarkColumn($assessment)) {
+        if ($this->hasTotalMarkColumn($assessment, $showCommunicatedMarks)) {
             $row[] = "$title";
             $row[] = "$title (Total)";
         } else {
             $row[] = "$title";
         }
-        if ($this->hasNormalizedMarkColumn($assessment)) {
+        if ($this->hasNormalizedMarkColumn($assessment, $showCommunicatedMarks)) {
             $row[] = "$title (Normalized)";
         }
         if ($this->hasCommentColumn($assessment)) {
@@ -197,11 +199,18 @@ class AbstractCSV
      * Does this assessment have a normalized mark column?
      *
      * @param IAssessable $assessment
+     * @param bool        $showCommunicatedMarks Whether we are showing the communicated marks for this assessment
+     *                                           It is important to do this check so we are aligned to the mark scheme that is being shown
      * @return bool
      */
-    protected function hasNormalizedMarkColumn(IAssessable $assessment): bool
+    protected function hasNormalizedMarkColumn(IAssessable $assessment, bool $showCommunicatedMarks): bool
     {
-        return !($assessment->getMarkScheme() instanceof None || $assessment->getMarkScheme() instanceof Completion);
+        // If this isn't a due work, then it doesn't have an instructor mark so fall back to normal mark scheme
+        $markScheme = $showCommunicatedMarks || !$assessment instanceof DueWork\Model
+            ? $assessment->getMarkScheme()
+            : $assessment->getInstructorMarkScheme();
+
+        return !($markScheme instanceof None || $markScheme instanceof Completion);
     }
 
 
@@ -209,11 +218,18 @@ class AbstractCSV
      * Does this assessment have a total mark column?
      *
      * @param IAssessable $assessment
+     * @param bool        $showCommunicatedMarks Whether we are showing the communicated marks for this assessment
+     *                                           It is important to do this check so we are aligned to the mark scheme that is being shown
      * @return bool
      */
-    protected function hasTotalMarkColumn(IAssessable $assessment): bool
+    protected function hasTotalMarkColumn(IAssessable $assessment, bool $showCommunicatedMarks): bool
     {
-        return $assessment->getMarkScheme() instanceof TotalMarkAbstract;
+        // If this isn't a due work, then it doesn't have an instructor mark so fall back to normal mark scheme
+        $markScheme = $showCommunicatedMarks || !$assessment instanceof DueWork\Model
+            ? $assessment->getMarkScheme()
+            : $assessment->getInstructorMarkScheme();
+
+        return $markScheme instanceof TotalMarkAbstract;
     }
 
 
