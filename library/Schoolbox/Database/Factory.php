@@ -160,7 +160,7 @@ class Factory
             throw new DatabaseException("Unable to connect to Schoolbox database.");
         }
 
-        $internalWriteDatabase->setTimezone($this->fetchTimezone($this->internalWriteDatabase));
+        $internalWriteDatabase->setTimezone($this->fetchTimezone($internalWriteDatabase));
 
         $this->internalWriteDatabase = $internalWriteDatabase;
         return $this->internalWriteDatabase;
@@ -193,7 +193,7 @@ class Factory
             throw new DatabaseException("Unable to connect to Schoolbox read-only database.");
         }
 
-        $internalReadDatabase->setTimezone($this->fetchTimezone($this->internalReadDatabase));
+        $internalReadDatabase->setTimezone($this->fetchTimezone($internalReadDatabase));
 
         $this->internalReadDatabase = $internalReadDatabase;
         return $this->internalReadDatabase;
