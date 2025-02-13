@@ -127,7 +127,7 @@ export default {
          * @param {String} date
          * @returns {String}
          */
-        formatDateArcived(date) {
+        formatDateArchived(date) {
             return dayjs(date).format("MMM DD, YYYY");
         },
 
@@ -247,7 +247,7 @@ export default {
                                     <div
                                         v-for="record in studentData.records.data"
                                         :key="'record-' + String(record.id)"
-                                        class="pastoral-container"
+                                        :class="`pastoral-container ${record.isArchived ? 'faded' : ''}`"
                                     >
                                         <div class="tiny card small-12">
                                             <a
@@ -280,9 +280,7 @@ export default {
                                                         v-if="record.isArchived"
                                                         name="archive"
                                                         size="0.75rem"
-                                                        :title="
-                                                            'Record archived - ' + formatDateArcived(record.expiresAt)
-                                                        "
+                                                        :title="`Record archived - ${formatDateArchived(record.expiresAt)}`"
                                                     ></sbx-icon>
                                                 </span>
                                             </a>
@@ -424,7 +422,6 @@ input[type="radio"]:not(.plain) + label.input-toggle {
 
                 .pastoral-container {
                     height: 2.5rem;
-                    width: 100%;
                     margin-left: 0.25rem;
 
                     .tiny {
