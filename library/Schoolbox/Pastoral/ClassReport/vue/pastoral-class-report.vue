@@ -275,7 +275,6 @@ export default {
                                                         :style="'background-color:' + record.severity?.color"
                                                         :title="record.severity?.name"
                                                     ></span>
-                                                    <!-- TODO: ADDING GREY HIGHLIGHT/SHADE  -->
                                                     <sbx-icon
                                                         v-if="record.isArchived"
                                                         name="archive"
