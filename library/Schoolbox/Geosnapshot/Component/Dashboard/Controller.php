@@ -55,7 +55,11 @@ class Controller extends Component_Dashboard_ControllerAbstract
             try {
                 $api = new Api($this->getConfigLoader()->get('geosnapshot_api_key'));
 
-                $response = $api->retrieveEventPhotos($this->getConfig('eventName'), $this->getUser());
+                $response = $api->retrieveEventPhotos(
+                    $this->getConfig('eventName'),
+                    $this->getConfig('albumName'),
+                    $this->getUser()
+                );
             } catch (\RuntimeException | \DomainException $e) {
                 /* DomainException is thrown when json can't be decoded
                  */
