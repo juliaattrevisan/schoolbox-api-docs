@@ -416,9 +416,7 @@ class AccessTest extends TestCase
         $access     = $this->newAccess();
         $reflection = new ReflectionClass($access);
         $instance   = $reflection->getProperty('externalUser');
-        $instance->setAccessible(true);
         $instance->setValue($access, null);
-        $instance->setAccessible(false);
 
         $access->involvedInSubject((new User())->setExternalId('abc'), 'xyz');
     }
