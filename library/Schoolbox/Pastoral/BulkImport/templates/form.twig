@@ -126,7 +126,10 @@
         <input type="submit" data-submit value="Preview">
     </form>
 </div>
-
+{#
+   We are also passing in the Entry tip and Default expiry in even
+   though we are not using at the moment as we have dependancy in the twig file
+#}
 {% include "@pastoral/modify_scripts.twig" with {
     record: record,
     canCreate: true,
@@ -136,6 +139,10 @@
     typesIndexPrivate: typesIndexPrivate,
     subtypesIndex: subtypesIndex,
     subtypesIndexPrivate: subtypesIndexPrivate,
+    subtypesIndexEntryTip: subtypesIndexEntryTip,
+    typesIndexEntryTip: typesIndexEntryTip,
+    subtypesIndexDefaultExpiry: subtypesIndexDefaultExpiry,
+    typesIndexDefaultExpiry: typesIndexDefaultExpiry,
 } only %}
 
 {% if showAdminNavMenu %}
