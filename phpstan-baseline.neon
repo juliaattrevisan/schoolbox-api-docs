@@ -3691,6 +3691,12 @@ parameters:
 			path: library/Schoolbox/InstanceRegistry/ApiClient.php
 
 		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 1
+			path: library/Schoolbox/InstanceRegistry/Credentials/Config.php
+
+		-
 			message: '#^Method Schoolbox\\Learning\\Analytics\\CohortAnalysis\:\:getParticipatingStudents\(\) should return iterable\<Schoolbox\\User\>&Schoolbox\\GenericCollection but returns iterable\<Schoolbox\\User\>&Schoolbox\\Collection\.$#'
 			identifier: return.type
 			count: 1
@@ -3805,6 +3811,12 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator.php
 
 		-
+			message: '#^PHPDoc tag @var with type Schoolbox\\Learning\\Assessment\\DueWork\\Model is not subtype of native type Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\.$#'
+			identifier: varTag.nativeType
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator.php
+
+		-
 			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:addAttachment\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -3878,6 +3890,18 @@ parameters:
 
 		-
 			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getGradeGroup\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getInstructorGradeGroup\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getInstructorMaxMark\(\)\.$#'
 			identifier: method.notFound
 			count: 2
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
@@ -4021,6 +4045,24 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
 
 		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:setInstructorGradeGroup\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:setInstructorMarkType\(\)\.$#'
+			identifier: method.notFound
+			count: 4
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:setInstructorMaxMark\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+
+		-
 			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:setKamiWorksheetTemplate\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -4136,6 +4178,12 @@ parameters:
 
 		-
 			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getExternalId\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getInstructorMarkScheme\(\)\.$#'
 			identifier: method.notFound
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
@@ -4262,6 +4310,18 @@ parameters:
 
 		-
 			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:setExternalId\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:setInstructorGradeGroup\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:setInstructorMaxMark\(\)\.$#'
 			identifier: method.notFound
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
@@ -6481,10 +6541,1516 @@ parameters:
 			path: library/Wiki.php
 
 		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:getExistingAssessment\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/Assessment/ApiAssessmentCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:getUsers\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/Assessment/ApiAssessmentCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:grabDataFromResponseByJsonPath\(\)\.$#'
+			identifier: method.notFound
+			count: 4
+			path: test/codeception/Api/Assessment/ApiAssessmentCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:seeResponseCodeIs\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: test/codeception/Api/Assessment/ApiAssessmentCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:sendGet\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/Assessment/ApiAssessmentCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:createEvent\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: test/codeception/Api/Calendar/CalendarEventAttendanceCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:createTestUser\(\)\.$#'
+			identifier: method.notFound
+			count: 5
+			path: test/codeception/Api/Calendar/CalendarEventAttendanceCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:dontSeeResponseContains\(\)\.$#'
+			identifier: method.notFound
+			count: 4
+			path: test/codeception/Api/Calendar/CalendarEventAttendanceCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:getUsers\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/Calendar/CalendarEventAttendanceCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:seeResponseCodeIs\(\)\.$#'
+			identifier: method.notFound
+			count: 18
+			path: test/codeception/Api/Calendar/CalendarEventAttendanceCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:seeResponseContains\(\)\.$#'
+			identifier: method.notFound
+			count: 4
+			path: test/codeception/Api/Calendar/CalendarEventAttendanceCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:seeResponseContainsJson\(\)\.$#'
+			identifier: method.notFound
+			count: 27
+			path: test/codeception/Api/Calendar/CalendarEventAttendanceCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:sendGetAsJson\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: test/codeception/Api/Calendar/CalendarEventAttendanceCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:sendPost\(\)\.$#'
+			identifier: method.notFound
+			count: 5
+			path: test/codeception/Api/Calendar/CalendarEventAttendanceCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:sendPostAsJson\(\)\.$#'
+			identifier: method.notFound
+			count: 10
+			path: test/codeception/Api/Calendar/CalendarEventAttendanceCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:assertSame\(\)\.$#'
+			identifier: method.notFound
+			count: 8
+			path: test/codeception/Api/Calendar/CalendarEventCreateModifyCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:assertTrue\(\)\.$#'
+			identifier: method.notFound
+			count: 13
+			path: test/codeception/Api/Calendar/CalendarEventCreateModifyCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:getCampuses\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: test/codeception/Api/Calendar/CalendarEventCreateModifyCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:getFolder\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: test/codeception/Api/Calendar/CalendarEventCreateModifyCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:getRole\(\)\.$#'
+			identifier: method.notFound
+			count: 4
+			path: test/codeception/Api/Calendar/CalendarEventCreateModifyCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:getUserByUsername\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: test/codeception/Api/Calendar/CalendarEventCreateModifyCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:grabResponse\(\)\.$#'
+			identifier: method.notFound
+			count: 14
+			path: test/codeception/Api/Calendar/CalendarEventCreateModifyCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:sendPost\(\)\.$#'
+			identifier: method.notFound
+			count: 14
+			path: test/codeception/Api/Calendar/CalendarEventCreateModifyCest.php
+
+		-
 			message: '#^Strict comparison using \=\=\= between array and null will always evaluate to false\.$#'
 			identifier: identical.alwaysFalse
 			count: 1
 			path: test/codeception/Api/Calendar/CalendarEventCreateModifyCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:getUsers\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/Mobile/ApiRegisterProviderCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:grabHttpHeader\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/Mobile/ApiRegisterProviderCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:grabResponse\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/Mobile/ApiRegisterProviderCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:seeResponseCodeIs\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: test/codeception/Api/Mobile/ApiRegisterProviderCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:sendPost\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: test/codeception/Api/Mobile/ApiRegisterProviderCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:createTestUser\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/News/NewsCreateCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:generateText\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: test/codeception/Api/News/NewsCreateCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:getFolder\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/News/NewsCreateCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:getUsers\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/News/NewsCreateCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:grabDataFromResponseByJsonPath\(\)\.$#'
+			identifier: method.notFound
+			count: 5
+			path: test/codeception/Api/News/NewsCreateCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:seeResponseCodeIs\(\)\.$#'
+			identifier: method.notFound
+			count: 4
+			path: test/codeception/Api/News/NewsCreateCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:sendGet\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: test/codeception/Api/News/NewsCreateCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:sendPost\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: test/codeception/Api/News/NewsCreateCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:sendPostAsJson\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/News/NewsCreateCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:changeDBConfig\(\)\.$#'
+			identifier: method.notFound
+			count: 5
+			path: test/codeception/Api/Pastoral/PastoralCreateCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:createTestUser\(\)\.$#'
+			identifier: method.notFound
+			count: 4
+			path: test/codeception/Api/Pastoral/PastoralCreateCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:getPastoralSeverities\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: test/codeception/Api/Pastoral/PastoralCreateCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:getPastoralTags\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: test/codeception/Api/Pastoral/PastoralCreateCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:getPastoralTypes\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/Pastoral/PastoralCreateCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:getUsers\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/Pastoral/PastoralCreateCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:grabDataFromResponseByJsonPath\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: test/codeception/Api/Pastoral/PastoralCreateCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:preparePastoralActions\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/Pastoral/PastoralCreateCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:restoreDBConfig\(\)\.$#'
+			identifier: method.notFound
+			count: 4
+			path: test/codeception/Api/Pastoral/PastoralCreateCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:seeResponseCodeIs\(\)\.$#'
+			identifier: method.notFound
+			count: 11
+			path: test/codeception/Api/Pastoral/PastoralCreateCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:seeResponseIsValidOnJsonSchemaString\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: test/codeception/Api/Pastoral/PastoralCreateCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:sendGet\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: test/codeception/Api/Pastoral/PastoralCreateCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:sendPost\(\)\.$#'
+			identifier: method.notFound
+			count: 7
+			path: test/codeception/Api/Pastoral/PastoralCreateCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:createBlog\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: test/codeception/Api/Search/SearchBlogCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:getFolder\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/Search/SearchBlogCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:getUsers\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/Search/SearchBlogCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:grabDataFromResponseByJsonPath\(\)\.$#'
+			identifier: method.notFound
+			count: 4
+			path: test/codeception/Api/Search/SearchBlogCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:seeResponseCodeIs\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: test/codeception/Api/Search/SearchBlogCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:sendGet\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/Search/SearchBlogCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:assertSame\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/Search/SearchEventCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:createEvent\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: test/codeception/Api/Search/SearchEventCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:getFolder\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/Search/SearchEventCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:getUsers\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/Search/SearchEventCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:grabDataFromResponseByJsonPath\(\)\.$#'
+			identifier: method.notFound
+			count: 4
+			path: test/codeception/Api/Search/SearchEventCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:seeResponseCodeIs\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: test/codeception/Api/Search/SearchEventCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:sendGet\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/Search/SearchEventCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:sendPost\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/Search/SearchEventCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:assertTrue\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/Search/SearchFileCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:getExistingFile\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/Search/SearchFileCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:getUsers\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/Search/SearchFileCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:grabDataFromResponseByJsonPath\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: test/codeception/Api/Search/SearchFileCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:seeResponseCodeIs\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: test/codeception/Api/Search/SearchFileCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:sendGet\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/Search/SearchFileCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:assertTrue\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/Search/SearchNewsCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:getExistingNewsArticle\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/Search/SearchNewsCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:getUsers\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/Search/SearchNewsCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:grabDataFromResponseByJsonPath\(\)\.$#'
+			identifier: method.notFound
+			count: 4
+			path: test/codeception/Api/Search/SearchNewsCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:seeResponseCodeIs\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: test/codeception/Api/Search/SearchNewsCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:sendGet\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/Search/SearchNewsCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:assertTrue\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/Search/SearchPageCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:getFolder\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/Search/SearchPageCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:getUsers\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/Search/SearchPageCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:grabDataFromResponseByJsonPath\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: test/codeception/Api/Search/SearchPageCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:seeResponseCodeIs\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: test/codeception/Api/Search/SearchPageCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:sendGet\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/Search/SearchPageCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:assertTrue\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/Search/SearchUserCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:createTestUser\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: test/codeception/Api/Search/SearchUserCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:generateText\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: test/codeception/Api/Search/SearchUserCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:getExistingNewsArticle\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/Search/SearchUserCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:getUsers\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/Search/SearchUserCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:grabDataFromResponseByJsonPath\(\)\.$#'
+			identifier: method.notFound
+			count: 4
+			path: test/codeception/Api/Search/SearchUserCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:seeResponseCodeIs\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: test/codeception/Api/Search/SearchUserCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:sendGet\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/Search/SearchUserCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:generateText\(\)\.$#'
+			identifier: method.notFound
+			count: 8
+			path: test/codeception/Api/User/ApiUserCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:getCampuses\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: test/codeception/Api/User/ApiUserCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:getRole\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: test/codeception/Api/User/ApiUserCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:getUsers\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: test/codeception/Api/User/ApiUserCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:grabDataFromResponseByJsonPath\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: test/codeception/Api/User/ApiUserCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:seeResponseCodeIs\(\)\.$#'
+			identifier: method.notFound
+			count: 5
+			path: test/codeception/Api/User/ApiUserCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:sendGet\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/User/ApiUserCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:sendPatchAsJson\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/User/ApiUserCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:sendPost\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/User/ApiUserCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:createGroup\(\)\.$#'
+			identifier: method.notFound
+			count: 5
+			path: test/codeception/Api/User/UserGroupMembershipCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:getUsers\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/User/UserGroupMembershipCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:seeResponseCodeIs\(\)\.$#'
+			identifier: method.notFound
+			count: 11
+			path: test/codeception/Api/User/UserGroupMembershipCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:seeResponseContainsJson\(\)\.$#'
+			identifier: method.notFound
+			count: 4
+			path: test/codeception/Api/User/UserGroupMembershipCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:sendDelete\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/User/UserGroupMembershipCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:sendGet\(\)\.$#'
+			identifier: method.notFound
+			count: 5
+			path: test/codeception/Api/User/UserGroupMembershipCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:sendPatchAsJson\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/User/UserGroupMembershipCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:sendPostAsJson\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/User/UserGroupMembershipCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:sendPutAsJson\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/User/UserGroupMembershipCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:getUsers\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Api/User/UserViewCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:seeResponseCodeIs\(\)\.$#'
+			identifier: method.notFound
+			count: 11
+			path: test/codeception/Api/User/UserViewCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:sendGet\(\)\.$#'
+			identifier: method.notFound
+			count: 6
+			path: test/codeception/Api/User/UserViewCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:assertSame\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Smoketests/AssessmentOnGroupCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:assertTrue\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Smoketests/AssessmentOnGroupCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabAssessmentRubricGrid\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Smoketests/AssessmentOnGroupCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabFirstAssessmentByTitle\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: test/codeception/Smoketests/AssessmentOnGroupCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabFirstAssessmentIdByTitle\(\)\.$#'
+			identifier: method.notFound
+			count: 8
+			path: test/codeception/Smoketests/AssessmentOnGroupCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabFirstFolderByTitle\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Smoketests/AssessmentOnGroupCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabFirstSubmissionIdByOwnerAndAssessmentID\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: test/codeception/Smoketests/AssessmentOnGroupCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabResponse\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: test/codeception/Smoketests/AssessmentOnGroupCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabUser\(\)\.$#'
+			identifier: method.notFound
+			count: 24
+			path: test/codeception/Smoketests/AssessmentOnGroupCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:seeHttpHeader\(\)\.$#'
+			identifier: method.notFound
+			count: 8
+			path: test/codeception/Smoketests/AssessmentOnGroupCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:seeResponseCodeIs\(\)\.$#'
+			identifier: method.notFound
+			count: 17
+			path: test/codeception/Smoketests/AssessmentOnGroupCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:sendRequest\(\)\.$#'
+			identifier: method.notFound
+			count: 43
+			path: test/codeception/Smoketests/AssessmentOnGroupCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:stopFollowingRedirects\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Smoketests/AssessmentOnGroupCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabFirstBadgeByTitle\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: test/codeception/Smoketests/BadgeCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabResponse\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: test/codeception/Smoketests/BadgeCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:seeResponseCodeIs\(\)\.$#'
+			identifier: method.notFound
+			count: 12
+			path: test/codeception/Smoketests/BadgeCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:sendRequest\(\)\.$#'
+			identifier: method.notFound
+			count: 12
+			path: test/codeception/Smoketests/BadgeCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:stopFollowingRedirects\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Smoketests/BadgeCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabCalendarEventAttendanceList\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Smoketests/CalendarCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabCalendarEventByTitle\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: test/codeception/Smoketests/CalendarCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabCampusByName\(\)\.$#'
+			identifier: method.notFound
+			count: 6
+			path: test/codeception/Smoketests/CalendarCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabFirstHomepageIdByTitle\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Smoketests/CalendarCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabRoleByTitle\(\)\.$#'
+			identifier: method.notFound
+			count: 6
+			path: test/codeception/Smoketests/CalendarCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabUser\(\)\.$#'
+			identifier: method.notFound
+			count: 7
+			path: test/codeception/Smoketests/CalendarCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:seeHttpHeader\(\)\.$#'
+			identifier: method.notFound
+			count: 4
+			path: test/codeception/Smoketests/CalendarCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:seeResponseCodeIs\(\)\.$#'
+			identifier: method.notFound
+			count: 8
+			path: test/codeception/Smoketests/CalendarCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:sendGET\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Smoketests/CalendarCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:sendRequest\(\)\.$#'
+			identifier: method.notFound
+			count: 11
+			path: test/codeception/Smoketests/CalendarCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:stopFollowingRedirects\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Smoketests/CalendarCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:assertEquals\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: test/codeception/Smoketests/CourseCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabFirstAssessmentByTitle\(\)\.$#'
+			identifier: method.notFound
+			count: 4
+			path: test/codeception/Smoketests/CourseCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabFirstCourseSpecByTitle\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: test/codeception/Smoketests/CourseCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabFirstFolderByTitle\(\)\.$#'
+			identifier: method.notFound
+			count: 12
+			path: test/codeception/Smoketests/CourseCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabFirstUnitSpecByTitle\(\)\.$#'
+			identifier: method.notFound
+			count: 5
+			path: test/codeception/Smoketests/CourseCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabFromDatabase\(\)\.$#'
+			identifier: method.notFound
+			count: 6
+			path: test/codeception/Smoketests/CourseCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabNumRecords\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: test/codeception/Smoketests/CourseCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabUser\(\)\.$#'
+			identifier: method.notFound
+			count: 6
+			path: test/codeception/Smoketests/CourseCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:seeHttpHeader\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: test/codeception/Smoketests/CourseCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:seeResponseCodeIs\(\)\.$#'
+			identifier: method.notFound
+			count: 22
+			path: test/codeception/Smoketests/CourseCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:sendRequest\(\)\.$#'
+			identifier: method.notFound
+			count: 40
+			path: test/codeception/Smoketests/CourseCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:stopFollowingRedirects\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Smoketests/CourseCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:cantSeeResponseContains\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: test/codeception/Smoketests/FetchPagesFromCsvCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:getSessionCookie\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Smoketests/FetchPagesFromCsvCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabFromDatabase\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Smoketests/FetchPagesFromCsvCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:haveInDatabase\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Smoketests/FetchPagesFromCsvCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:seeResponseCodeIs\(\)\.$#'
+			identifier: method.notFound
+			count: 8
+			path: test/codeception/Smoketests/FetchPagesFromCsvCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:sendRequest\(\)\.$#'
+			identifier: method.notFound
+			count: 5
+			path: test/codeception/Smoketests/FetchPagesFromCsvCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:setSessionCookie\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Smoketests/FetchPagesFromCsvCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:seeHttpHeader\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: test/codeception/Smoketests/FixturesCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:seeResponseCodeIs\(\)\.$#'
+			identifier: method.notFound
+			count: 35
+			path: test/codeception/Smoketests/FixturesCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:sendRequest\(\)\.$#'
+			identifier: method.notFound
+			count: 141
+			path: test/codeception/Smoketests/FixturesCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:stopFollowingRedirects\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Smoketests/FixturesCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabFromDatabase\(\)\.$#'
+			identifier: method.notFound
+			count: 7
+			path: test/codeception/Smoketests/ForumCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:seeResponseCodeIs\(\)\.$#'
+			identifier: method.notFound
+			count: 6
+			path: test/codeception/Smoketests/ForumCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:sendGet\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Smoketests/ForumCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:sendRequest\(\)\.$#'
+			identifier: method.notFound
+			count: 5
+			path: test/codeception/Smoketests/ForumCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:stopFollowingRedirects\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Smoketests/ForumCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:canSeeHttpHeader\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: test/codeception/Smoketests/HomePageCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabComponentDefinitionByClass\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Smoketests/HomePageCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabFirstFolderByTitle\(\)\.$#'
+			identifier: method.notFound
+			count: 5
+			path: test/codeception/Smoketests/HomePageCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabResponse\(\)\.$#'
+			identifier: method.notFound
+			count: 4
+			path: test/codeception/Smoketests/HomePageCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabTextBoxByHeading\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Smoketests/HomePageCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabUser\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: test/codeception/Smoketests/HomePageCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:seeHttpHeader\(\)\.$#'
+			identifier: method.notFound
+			count: 4
+			path: test/codeception/Smoketests/HomePageCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:seeResponseCodeIs\(\)\.$#'
+			identifier: method.notFound
+			count: 22
+			path: test/codeception/Smoketests/HomePageCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:sendGET\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: test/codeception/Smoketests/HomePageCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:sendRequest\(\)\.$#'
+			identifier: method.notFound
+			count: 22
+			path: test/codeception/Smoketests/HomePageCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:stopFollowingRedirects\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Smoketests/HomePageCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:seeResponseCodeIs\(\)\.$#'
+			identifier: method.notFound
+			count: 7
+			path: test/codeception/Smoketests/InstallPackagesCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:sendRequest\(\)\.$#'
+			identifier: method.notFound
+			count: 7
+			path: test/codeception/Smoketests/InstallPackagesCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:stopFollowingRedirects\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Smoketests/InstallPackagesCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabLearningMomentByBody\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: test/codeception/Smoketests/LearningMomentsCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabResponse\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: test/codeception/Smoketests/LearningMomentsCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabUser\(\)\.$#'
+			identifier: method.notFound
+			count: 5
+			path: test/codeception/Smoketests/LearningMomentsCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:seeResponseCodeIs\(\)\.$#'
+			identifier: method.notFound
+			count: 11
+			path: test/codeception/Smoketests/LearningMomentsCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:sendRequest\(\)\.$#'
+			identifier: method.notFound
+			count: 11
+			path: test/codeception/Smoketests/LearningMomentsCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:stopFollowingRedirects\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Smoketests/LearningMomentsCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabFirstAssessmentByTitle\(\)\.$#'
+			identifier: method.notFound
+			count: 4
+			path: test/codeception/Smoketests/LessonPlanCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabFirstCourseSpecByTitle\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Smoketests/LessonPlanCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabFirstFolderByTitle\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: test/codeception/Smoketests/LessonPlanCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabFirstUnitSpecByTitle\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Smoketests/LessonPlanCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabFromDatabase\(\)\.$#'
+			identifier: method.notFound
+			count: 12
+			path: test/codeception/Smoketests/LessonPlanCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabLessonPlanTemplateByTitle\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: test/codeception/Smoketests/LessonPlanCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabLessonPlanTemplateFieldByTitle\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: test/codeception/Smoketests/LessonPlanCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabNumRecords\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: test/codeception/Smoketests/LessonPlanCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabUser\(\)\.$#'
+			identifier: method.notFound
+			count: 7
+			path: test/codeception/Smoketests/LessonPlanCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:seeResponseCodeIs\(\)\.$#'
+			identifier: method.notFound
+			count: 15
+			path: test/codeception/Smoketests/LessonPlanCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:sendGet\(\)\.$#'
+			identifier: method.notFound
+			count: 4
+			path: test/codeception/Smoketests/LessonPlanCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:sendRequest\(\)\.$#'
+			identifier: method.notFound
+			count: 15
+			path: test/codeception/Smoketests/LessonPlanCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:stopFollowingRedirects\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Smoketests/LessonPlanCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabLessonPlanTemplateByTitle\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: test/codeception/Smoketests/LessonPlanTemplateCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabLessonPlanTemplateFieldByTitle\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: test/codeception/Smoketests/LessonPlanTemplateCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:seeResponseCodeIs\(\)\.$#'
+			identifier: method.notFound
+			count: 6
+			path: test/codeception/Smoketests/LessonPlanTemplateCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:sendRequest\(\)\.$#'
+			identifier: method.notFound
+			count: 6
+			path: test/codeception/Smoketests/LessonPlanTemplateCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:stopFollowingRedirects\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Smoketests/LessonPlanTemplateCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabHttpHeader\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Smoketests/LoginCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:seeHttpHeader\(\)\.$#'
+			identifier: method.notFound
+			count: 4
+			path: test/codeception/Smoketests/LoginCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:seeResponseCodeIs\(\)\.$#'
+			identifier: method.notFound
+			count: 9
+			path: test/codeception/Smoketests/LoginCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:sendGET\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Smoketests/LoginCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:sendRequest\(\)\.$#'
+			identifier: method.notFound
+			count: 8
+			path: test/codeception/Smoketests/LoginCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:startFollowingRedirects\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: test/codeception/Smoketests/LoginCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:stopFollowingRedirects\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Smoketests/LoginCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabFromDatabase\(\)\.$#'
+			identifier: method.notFound
+			count: 6
+			path: test/codeception/Smoketests/NewsCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabNewsArticleByTitle\(\)\.$#'
+			identifier: method.notFound
+			count: 15
+			path: test/codeception/Smoketests/NewsCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:seeHttpHeader\(\)\.$#'
+			identifier: method.notFound
+			count: 10
+			path: test/codeception/Smoketests/NewsCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:seeResponseCodeIs\(\)\.$#'
+			identifier: method.notFound
+			count: 40
+			path: test/codeception/Smoketests/NewsCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:sendGET\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Smoketests/NewsCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:sendGet\(\)\.$#'
+			identifier: method.notFound
+			count: 24
+			path: test/codeception/Smoketests/NewsCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:sendRequest\(\)\.$#'
+			identifier: method.notFound
+			count: 32
+			path: test/codeception/Smoketests/NewsCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:stopFollowingRedirects\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Smoketests/NewsCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:assertEquals\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: test/codeception/Smoketests/PastoralCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabFromDatabase\(\)\.$#'
+			identifier: method.notFound
+			count: 10
+			path: test/codeception/Smoketests/PastoralCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabHttpHeader\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: test/codeception/Smoketests/PastoralCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabNumRecords\(\)\.$#'
+			identifier: method.notFound
+			count: 6
+			path: test/codeception/Smoketests/PastoralCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabPastoralRecordByTitle\(\)\.$#'
+			identifier: method.notFound
+			count: 11
+			path: test/codeception/Smoketests/PastoralCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabRoleByTitle\(\)\.$#'
+			identifier: method.notFound
+			count: 4
+			path: test/codeception/Smoketests/PastoralCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabUser\(\)\.$#'
+			identifier: method.notFound
+			count: 23
+			path: test/codeception/Smoketests/PastoralCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:haveInDatabase\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Smoketests/PastoralCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:seeHttpHeader\(\)\.$#'
+			identifier: method.notFound
+			count: 10
+			path: test/codeception/Smoketests/PastoralCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:seeResponseCodeIs\(\)\.$#'
+			identifier: method.notFound
+			count: 74
+			path: test/codeception/Smoketests/PastoralCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:sendGET\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: test/codeception/Smoketests/PastoralCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:sendGet\(\)\.$#'
+			identifier: method.notFound
+			count: 29
+			path: test/codeception/Smoketests/PastoralCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:sendRequest\(\)\.$#'
+			identifier: method.notFound
+			count: 46
+			path: test/codeception/Smoketests/PastoralCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:stopFollowingRedirects\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Smoketests/PastoralCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:updateInDatabase\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: test/codeception/Smoketests/PastoralCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:assertEquals\(\)\.$#'
+			identifier: method.notFound
+			count: 13
+			path: test/codeception/Smoketests/ResourceBookingCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:grabFromDatabase\(\)\.$#'
+			identifier: method.notFound
+			count: 13
+			path: test/codeception/Smoketests/ResourceBookingCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:seeHttpHeader\(\)\.$#'
+			identifier: method.notFound
+			count: 9
+			path: test/codeception/Smoketests/ResourceBookingCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:seeResponseCodeIs\(\)\.$#'
+			identifier: method.notFound
+			count: 16
+			path: test/codeception/Smoketests/ResourceBookingCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:sendRequest\(\)\.$#'
+			identifier: method.notFound
+			count: 35
+			path: test/codeception/Smoketests/ResourceBookingCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:stopFollowingRedirects\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Smoketests/ResourceBookingCest.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:amBearerAuthenticated\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: test/codeception/Support/ApiTester.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:assertArrayHasKey\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Support/ApiTester.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:assertEmpty\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Support/ApiTester.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:assertTrue\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: test/codeception/Support/ApiTester.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:getAdminToken\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Support/ApiTester.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:grabDataFromResponseByJsonPath\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: test/codeception/Support/ApiTester.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:haveHttpHeader\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: test/codeception/Support/ApiTester.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:seeResponseMatchesJsonType\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: test/codeception/Support/ApiTester.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\ApiTester\:\:sendPost\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Support/ApiTester.php
 
 		-
 			message: '#^PHPDoc tag @return has invalid value \(\\Schoolbox\\Admin\\LessonPlan\\Template\\Field\\Model;\)\: Unexpected token ";", expected TOKEN_HORIZONTAL_WS at offset 167 on line 5$#'
@@ -6503,6 +8069,36 @@ parameters:
 			identifier: phpDoc.parseError
 			count: 1
 			path: test/codeception/Support/Helper/SchoolboxCli.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:seeHttpHeader\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Support/IntegrationTester.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:seeResponseCodeIs\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Support/IntegrationTester.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:sendGet\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: test/codeception/Support/IntegrationTester.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:sendRequest\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Support/IntegrationTester.php
+
+		-
+			message: '#^Call to an undefined method Tests\\Support\\IntegrationTester\:\:stopFollowingRedirects\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: test/codeception/Support/IntegrationTester.php
 
 		-
 			message: '#^Trait Tests\\Support\\Payload\\GetTrait is used zero times and is not analysed\.$#'
