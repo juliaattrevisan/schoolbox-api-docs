@@ -14,7 +14,7 @@ use Schoolbox\Filter\Page\Model;
 use Schoolbox\IConfigLoader;
 
 /**
- * Definition for the action filter on pastoral records.
+ * Definition for the archive status filter on pastoral records.
  */
 class Definition extends AbstractDefinition
 {

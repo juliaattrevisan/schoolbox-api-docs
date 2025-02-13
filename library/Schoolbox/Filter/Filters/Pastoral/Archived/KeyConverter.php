@@ -13,7 +13,7 @@ use Schoolbox\Filter\AbstractKeyConverter;
 use Schoolbox\User;
 
 /**
- * Key converter for the creator filter on pastoral records.
+ * Key converter for the archive status filter on pastoral records.
  */
 class KeyConverter extends AbstractKeyConverter
 {

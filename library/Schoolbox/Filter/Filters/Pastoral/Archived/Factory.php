@@ -13,12 +13,9 @@ use Schoolbox\Filter\AbstractFactory;
 use Schoolbox\Filter\IDefinition;
 use Schoolbox\Filter\IKeyConverter;
 use Schoolbox\Filter\Model;
-use Schoolbox\Filter\Page;
-use Schoolbox\Filter\Selection;
-use Schoolbox\Pastoral;
 
 /**
- * Factory for pastoral severity filter.
+ * Factory for pastoral archive status filter.
  */
 class Factory extends AbstractFactory
 {
