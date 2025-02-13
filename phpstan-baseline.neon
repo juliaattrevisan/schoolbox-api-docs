@@ -2953,12 +2953,6 @@ parameters:
 			path: library/Schoolbox/Database/Factory.php
 
 		-
-			message: '#^Unreachable statement \- code above always terminates\.$#'
-			identifier: deadCode.unreachable
-			count: 1
-			path: library/Schoolbox/Database/Factory.php
-
-		-
 			message: '#^Property Schoolbox\\Discussion\\Comment\\Controller\:\:\$threadMapper is never read, only written\.$#'
 			identifier: property.onlyWritten
 			count: 1
