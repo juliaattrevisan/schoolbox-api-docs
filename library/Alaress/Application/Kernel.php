@@ -581,9 +581,7 @@ abstract class Kernel
         $di->set(
             'databaseFactory',
             function () {
-                return new SchoolboxDatabaseFactory(
-                    new AlaressDatabaseFactory()
-                );
+                return SchoolboxDatabaseFactory::getInstance();
             }
         );
 

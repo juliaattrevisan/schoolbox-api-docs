@@ -181,9 +181,7 @@ class Kernel extends WebKernelAbstract
         $di->set(
             'databaseFactory',
             function () use ($di) {
-                return new SchoolboxDatabaseFactory(
-                    new AlaressDatabaseFactory()
-                );
+                return SchoolboxDatabaseFactory::getInstance();
             }
         );
 

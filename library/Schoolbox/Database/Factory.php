@@ -61,7 +61,7 @@ class Factory
      * @deprecated
      * @return self
      */
-    private static function getInstance(): Factory
+    public static function getInstance(): Factory
     {
         return self::$instance ??= new self(new DatabaseFactory());
     }
