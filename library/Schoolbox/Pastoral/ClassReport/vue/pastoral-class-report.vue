@@ -267,8 +267,8 @@ export default {
                                                 title="View record"
                                                 :class="`record-heading ${record._links.read ? '' : 'disabled'}`"
                                             >
-                                                <span
-                                                    >{{ record.heading }}
+                                                <h3>
+                                                    {{ record.heading }}
                                                     <span
                                                         v-if="record.severity?.color"
                                                         class="circle"
@@ -282,7 +282,7 @@ export default {
                                                         size="0.75rem"
                                                         :title="`Record archived - ${formatDateArchived(record.expiresAt)}`"
                                                     ></sbx-icon>
-                                                </span>
+                                                </h3>
                                             </a>
                                             <div class="record-date">
                                                 <span
@@ -443,7 +443,8 @@ input[type="radio"]:not(.plain) + label.input-toggle {
 
                         .record-heading {
                             grid-area: record-heading;
-                            span {
+                            h3 {
+                                font-size: 0.8125rem;
                                 line-height: 1.5rem;
                             }
                         }
