@@ -6689,9 +6689,3 @@ parameters:
 			identifier: return.unusedType
 			count: 1
 			path: tools/synchronise/userInitiated.php
-
-		-
-			message: '#^Call to private method retrieve\(\) of class Schoolbox\\External\\Connector\\Civica\\Base\\Endpoint\\Api\.$#'
-			identifier: method.private
-			count: 1
-			path: tools/test.php
