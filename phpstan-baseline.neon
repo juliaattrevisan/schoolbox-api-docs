@@ -2947,12 +2947,6 @@ parameters:
 			path: library/Schoolbox/Config/Loader.php
 
 		-
-			message: '#^Static property Schoolbox\\Database\\Factory\:\:\$instance \(Schoolbox\\Database\\Factory\) in isset\(\) is not nullable\.$#'
-			identifier: isset.property
-			count: 1
-			path: library/Schoolbox/Database/Factory.php
-
-		-
 			message: '#^Property Schoolbox\\Discussion\\Comment\\Controller\:\:\$threadMapper is never read, only written\.$#'
 			identifier: property.onlyWritten
 			count: 1
