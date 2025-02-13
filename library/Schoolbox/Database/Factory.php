@@ -240,7 +240,33 @@ class Factory
             case 'doublefirst':
             case 'schooledge':
                 $externalDatabase = $this->factory->createSqlsrv();
-                break;
+
+                try {
+                    $externalDatabase->connect(
+                        $config->get('external_db_host'),
+                        $config->get('external_db_db'),
+                        $config->get('external_db_user'),
+                        $config->get('external_db_passwd'),
+                        ['Encrypt' => $config->get('external_db_encryption')]
+                    );
+
+                    $externalDatabase->setTimezone($this->fetchTimezone($this->getInternalReadDatabase()));
+
+                    $this->externalDatabase = $externalDatabase;
+                    return $this->externalDatabase;
+                } catch (Exception $e) {
+                    /* If the connectivity doesn't work for some throwable reason, you'll find it silently discarded
+                     * here, which is annoying. This makes a NullConnector which, for some usages of the external db,
+                     * causes it to successfully fail silently. It's not logged anywhere.
+                     *
+                        string(241) "Error connecting to database.
+                        DSN String: sqlsrv:Server=172.31.15.10;Database=Synergetic_AUVIC_ALARESS_PRD;LoginTimeout=2;MultipleActiveResultSets=0;
+                        PDO Error: SQLSTATE[HYT00]: [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired"
+                     */
+                    // var_dump($e->getMessage());
+                }
+                $this->externalDatabase = new NullConnector();
+                return $this->externalDatabase;
 
             // IBM DB2
             case 'edumate':
@@ -259,33 +285,6 @@ class Factory
             default:
                 throw new DatabaseException("Unknown external database type.");
         }
-
-        try {
-            $externalDatabase->connect(
-                $config->get('external_db_host'),
-                $config->get('external_db_db'),
-                $config->get('external_db_user'),
-                $config->get('external_db_passwd'),
-                ['Encrypt' => $config->get('external_db_encryption')]
-            );
-
-            $externalDatabase->setTimezone($this->fetchTimezone($this->getInternalReadDatabase()));
-
-            $this->externalDatabase = $externalDatabase;
-            return $this->externalDatabase;
-        } catch (Exception $e) {
-            /* If the connectivity doesn't work for some throwable reason, you'll find it silently discarded
-             * here, which is annoying. This makes a NullConnector which, for some usages of the external db,
-             * causes it to successfully fail silently. It's not logged anywhere.
-             *
-                string(241) "Error connecting to database.
-                DSN String: sqlsrv:Server=172.31.15.10;Database=Synergetic_AUVIC_ALARESS_PRD;LoginTimeout=2;MultipleActiveResultSets=0;
-                PDO Error: SQLSTATE[HYT00]: [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired"
-             */
-            // var_dump($e->getMessage());
-        }
-        $this->externalDatabase = new NullConnector();
-        return $this->externalDatabase;
     }
 
 
