@@ -117,6 +117,7 @@ class Api
      * Manufacture a payload with the necessary parts and send it out there
      *
      * @param string $eventName
+     * @param string $albumName
      * @param User $viewer
      * @return array
      * @throws GuzzleException
@@ -125,9 +126,12 @@ class Api
      * @throws \JsonException
      * @throws \RuntimeException
      */
-    public function retrieveEventPhotos(string $eventName, User $viewer): array
+    public function retrieveEventPhotos(string $eventName, string $albumName, User $viewer): array
     {
-        return $this->retrieve(self::GEOSNAPSHOT_ENDPOINT, (new EventPhoto())->build($eventName, $viewer));
+        return $this->retrieve(
+            self::GEOSNAPSHOT_ENDPOINT,
+            (new EventPhoto())->build($eventName, $albumName, $viewer)
+        );
     }
 
 
