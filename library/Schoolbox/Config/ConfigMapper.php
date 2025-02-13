@@ -224,7 +224,6 @@ class ConfigMapper extends Mapper
     public const NAME_INTELLISCHOOL_LEARNER_DASHBOARD_BASE_URL        = 'intellischool_learner_dashboard_base_url';
     public const NAME_INTELLISCHOOL_COHORT_DASHBOARD_BASE_URL         = 'intellischool_cohort_dashboard_base_url';
 
-    public const NAME_PASTORAL_FLAG_COUNT_PERIOD = 'pastoral_flag_count_period';
     public const NAME_PASTORAL_SEVERITY_ENABLED = 'pastoral_severity';
     public const NAME_PASTORAL_ACTION_ENABLED = 'pastoral_action_enable';
     public const NAME_EXTERNAL_PASTORAL = 'external_pastoral';
