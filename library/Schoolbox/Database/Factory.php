@@ -5,7 +5,6 @@ namespace Schoolbox\Database;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Connector\NullConnector;
 use Alaress\Database\Connector\ReadReplicatedProxy;
-use Alaress\Database\Exception;
 use Alaress\Database\Exception as DatabaseException;
 use Alaress\Database\Factory as DatabaseFactory;
 use InvalidArgumentException;
@@ -254,7 +253,7 @@ class Factory
 
                     $this->externalDatabase = $externalDatabase;
                     return $this->externalDatabase;
-                } catch (Exception $e) {
+                } catch (DatabaseException $e) {
                     /* If the connectivity doesn't work for some throwable reason, you'll find it silently discarded
                      * here, which is annoying. This makes a NullConnector which, for some usages of the external db,
                      * causes it to successfully fail silently. It's not logged anywhere.
