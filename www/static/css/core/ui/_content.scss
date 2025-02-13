@@ -117,20 +117,18 @@
 }
 
 // To highlight the list item is in a disabled / archived state
-.information-list {
-    li.faded {
-        background-color: $vapor;
+.faded {
+    background-color: $vapor;
 
-        .card.small-12 {
-            opacity: 0.75;
+    .card.small-12 {
+        opacity: 0.75;
 
-            h3 {
-                font-style: italic;
-            }
+        h3 {
+            font-style: italic;
+        }
 
-            .meta {
-                color: $aluminum;
-            }
+        .meta {
+            color: $aluminum;
         }
     }
 }

@@ -122,6 +122,16 @@ export default {
         },
 
         /**
+         * Format MMM DD, YYYY date for output
+         *
+         * @param {String} date
+         * @returns {String}
+         */
+        formatDateArchived(date) {
+            return dayjs(date).format("MMM DD, YYYY");
+        },
+
+        /**
          * Format relative time
          *
          * @param {String} date
@@ -237,7 +247,7 @@ export default {
                                     <div
                                         v-for="record in studentData.records.data"
                                         :key="'record-' + String(record.id)"
-                                        class="pastoral-container"
+                                        :class="`pastoral-container ${record.isArchived ? 'faded' : ''}`"
                                     >
                                         <div class="tiny card small-12">
                                             <a
@@ -257,15 +267,21 @@ export default {
                                                 title="View record"
                                                 :class="`record-heading ${record._links.read ? '' : 'disabled'}`"
                                             >
-                                                <span
-                                                    >{{ record.heading }}
+                                                <h3>
+                                                    {{ record.heading }}
                                                     <span
                                                         v-if="record.severity?.color"
                                                         class="circle"
                                                         :style="'background-color:' + record.severity?.color"
                                                         :title="record.severity?.name"
                                                     ></span>
-                                                </span>
+                                                    <sbx-icon
+                                                        v-if="record.isArchived"
+                                                        name="archive"
+                                                        size="0.75rem"
+                                                        :title="`Record archived - ${formatDateArchived(record.expiresAt)}`"
+                                                    ></sbx-icon>
+                                                </h3>
                                             </a>
                                             <div class="record-date">
                                                 <span
@@ -405,7 +421,6 @@ input[type="radio"]:not(.plain) + label.input-toggle {
 
                 .pastoral-container {
                     height: 2.5rem;
-                    width: 100%;
                     margin-left: 0.25rem;
 
                     .tiny {
@@ -427,7 +442,8 @@ input[type="radio"]:not(.plain) + label.input-toggle {
 
                         .record-heading {
                             grid-area: record-heading;
-                            span {
+                            h3 {
+                                font-size: 0.8125rem;
                                 line-height: 1.5rem;
                             }
                         }
