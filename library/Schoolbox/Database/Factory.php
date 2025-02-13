@@ -146,7 +146,7 @@ class Factory
             return $this->internalWriteDatabase;
         }
 
-        $this->internalWriteDatabase = $this->factory->createMysql();
+        $internalWriteDatabase = $this->factory->createMysql();
 
         $host = SQL_host;
         $db   = SQL_db;
@@ -157,12 +157,13 @@ class Factory
         if (!isset($host, $db, $user, $pass)) {
             throw new DatabaseException("Schoolbox database not configured.");
         }
-        if (!$this->internalWriteDatabase->connect($host, $db, $user, $pass)) {
+        if (!$internalWriteDatabase->connect($host, $db, $user, $pass)) {
             throw new DatabaseException("Unable to connect to Schoolbox database.");
         }
 
-        $this->internalWriteDatabase->setTimezone($this->fetchTimezone($this->internalWriteDatabase));
+        $internalWriteDatabase->setTimezone($this->fetchTimezone($this->internalWriteDatabase));
 
+        $this->internalWriteDatabase = $internalWriteDatabase;
         return $this->internalWriteDatabase;
     }
 
@@ -178,7 +179,7 @@ class Factory
             return $this->internalReadDatabase;
         }
 
-        $this->internalReadDatabase = $this->factory->createMysql();
+        $internalReadDatabase = $this->factory->createMysql();
 
         $hostRead = SQL_host_read;
         $dbRead   = SQL_db_read;
@@ -189,12 +190,13 @@ class Factory
         if (!isset($hostRead, $dbRead, $userRead, $passRead)) {
             throw new DatabaseException("Schoolbox read-only database not configured.");
         }
-        if (!$this->internalReadDatabase->connect($hostRead, $dbRead, $userRead, $passRead)) {
+        if (!$internalReadDatabase->connect($hostRead, $dbRead, $userRead, $passRead)) {
             throw new DatabaseException("Unable to connect to Schoolbox read-only database.");
         }
 
-        $this->internalReadDatabase->setTimezone($this->fetchTimezone($this->internalReadDatabase));
+        $internalReadDatabase->setTimezone($this->fetchTimezone($this->internalReadDatabase));
 
+        $this->internalReadDatabase = $internalReadDatabase;
         return $this->internalReadDatabase;
     }
 
@@ -237,20 +239,21 @@ class Factory
             case 'isams':
             case 'doublefirst':
             case 'schooledge':
-                $this->externalDatabase = $this->factory->createSqlsrv();
+                $externalDatabase = $this->factory->createSqlsrv();
                 break;
 
             // IBM DB2
             case 'edumate':
-                $this->externalDatabase = $this->factory->createDb2();
+                $externalDatabase = $this->factory->createDb2();
                 [$host, $schema] = explode('/', $config->get('external_db_host'), 2);
-                $this->externalDatabase->connect(
+                $externalDatabase->connect(
                     $host,
                     $config->get('external_db_db'),
                     $config->get('external_db_user'),
                     $config->get('external_db_passwd'),
                     ['schema' => $schema]
                 );
+                $this->externalDatabase = $externalDatabase;
                 return $this->externalDatabase;
 
             default:
@@ -258,7 +261,7 @@ class Factory
         }
 
         try {
-            $this->externalDatabase->connect(
+            $externalDatabase->connect(
                 $config->get('external_db_host'),
                 $config->get('external_db_db'),
                 $config->get('external_db_user'),
@@ -266,8 +269,9 @@ class Factory
                 ['Encrypt' => $config->get('external_db_encryption')]
             );
 
-            $this->externalDatabase->setTimezone($this->fetchTimezone($this->getInternalReadDatabase()));
+            $externalDatabase->setTimezone($this->fetchTimezone($this->getInternalReadDatabase()));
 
+            $this->externalDatabase = $externalDatabase;
             return $this->externalDatabase;
         } catch (Exception $e) {
             /* If the connectivity doesn't work for some throwable reason, you'll find it silently discarded
