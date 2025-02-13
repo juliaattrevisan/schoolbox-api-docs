@@ -82,6 +82,15 @@ class DisableExpensiveComponents extends App
     /** @inheritDoc */
     public function run(): void
     {
+        /**
+        * Deprecation notice
+        */
+        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->getLogger()->notice('/***************     Deprecated NOTICE - this will be deleted in future    ****************/');
+        $this->getLogger()->notice('/*    If you are running this, please add a comment of this scripts name into SA-19334    */');
+        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->getLogger()->notice('/******************************************************************************************/');
+
         // Did user request help?
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             $this->printHelp();
@@ -101,6 +110,15 @@ class DisableExpensiveComponents extends App
                 $this->restoreDashboardComponentConfig();
                 break;
         }
+
+        /**
+        * Deprecation notice
+        */
+        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->getLogger()->notice('/***************     Deprecated NOTICE - this will be deleted in future    ****************/');
+        $this->getLogger()->notice('/*    If you are running this, please add a comment of this scripts name into SA-19334    */');
+        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->getLogger()->notice('/******************************************************************************************/');
     }
 
     /**
