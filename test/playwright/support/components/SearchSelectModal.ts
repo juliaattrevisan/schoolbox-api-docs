@@ -20,11 +20,11 @@ export default class SearchSelectModal {
      * To select result items by id
      * @param ids - The ids of the result items
      */
-    async selectResults(ids: string[]): Promise<void> {
+    async selectResults(ids: number[]): Promise<void> {
         // eslint-disable-next-line no-restricted-syntax -- need to loop through each sequentially, rather than in parallel with Promise.all
         for (const id of ids) {
             // eslint-disable-next-line no-await-in-loop
-            await this.page.getByTestId(`${SearchSelectModal.DATATEST_RESULTS_ITEM_LABEL}${id}`).click();
+            await this.page.getByTestId(`${SearchSelectModal.DATATEST_RESULTS_ITEM_LABEL}${id.toString()}`).click();
         }
     }
 

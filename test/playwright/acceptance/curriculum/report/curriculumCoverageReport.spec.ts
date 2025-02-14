@@ -8,6 +8,7 @@ import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import CurriculumCoverageReport from "@schoolboxTest/playwright/support/page/curriculum/report/CurriculumCoverageReport";
 import SearchSelect from "@schoolboxTest/playwright/support/components/SearchSelect";
 import SearchSelectModal from "@schoolboxTest/playwright/support/components/SearchSelectModal";
+import CurriculumSelector from "@schoolboxTest/playwright/support/page/curriculum/selector/CurriculumSelector";
 
 test.describe("Curriculum Coverage Report Tests", () => {
     test.beforeEach(async ({ tester }) => {
@@ -18,6 +19,7 @@ test.describe("Curriculum Coverage Report Tests", () => {
         const coverageReport = new CurriculumCoverageReport(page);
         const searchSelect = new SearchSelect(page);
         const searchSelectModal = new SearchSelectModal(page);
+        const curriculumSelector = new CurriculumSelector(page);
 
         tester.isGoingTo("Visit the curriculum coverage report page");
         await coverageReport.goto();
@@ -27,7 +29,7 @@ test.describe("Curriculum Coverage Report Tests", () => {
 
         tester.isGoingTo("Within Select Courses: Choose Year 9 English, Year 9 French and 20th Century History");
         await searchSelect.selectButton("courses");
-        await searchSelectModal.selectResults(["6", "2", "14"]);
+        await searchSelectModal.selectResults([6, 2, 14]);
         await searchSelectModal.save();
 
         tester.isGoingTo("Check that those courses are selected");
@@ -44,12 +46,9 @@ test.describe("Curriculum Coverage Report Tests", () => {
         tester.isGoingTo(
             "Within Select Curriculum: Choose Year 12 French, Years 9 and 10 French, Year 9 History and English ",
         );
-        await page.getByTestId("search-select-button-curriculum").click(); // Open the select courses modal
-        await page.getByTestId("cs-modal-node-checkbox-label-302").click(); // Select Year 12 French
-        await page.getByTestId("cs-modal-node-checkbox-label-304").click(); // Select Years 9 and 10 French
-        await page.getByTestId("cs-modal-node-checkbox-label-1").click(); // Select Year 9 History
-        await page.getByTestId("cs-modal-node-checkbox-label-135").click(); // Select English
-        await page.getByTestId("cs-modal-footer-save-button").click(); // Select Select, closing the modal
+        await searchSelect.selectButton("curriculum"); // Open the select courses modal
+        await curriculumSelector.browseTree([302, 304, 1, 135]);
+        await curriculumSelector.saveModal(); // Select Select, closing the modal
 
         tester.isGoingTo("Try and generate a report again");
         await coverageReport.submit(); // Generate the report
