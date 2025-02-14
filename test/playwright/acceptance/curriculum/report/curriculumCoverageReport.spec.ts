@@ -6,6 +6,8 @@
 
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import CurriculumCoverageReport from "@schoolboxTest/playwright/support/page/curriculum/report/CurriculumCoverageReport";
+import SearchSelect from "@schoolboxTest/playwright/support/components/SearchSelect";
+import SearchSelectModal from "@schoolboxTest/playwright/support/components/SearchSelectModal";
 
 test.describe("Curriculum Coverage Report Tests", () => {
     test.beforeEach(async ({ tester }) => {
@@ -14,6 +16,8 @@ test.describe("Curriculum Coverage Report Tests", () => {
 
     test("Generate a report", async ({ tester, page, db }) => {
         const coverageReport = new CurriculumCoverageReport(page);
+        const searchSelect = new SearchSelect(page);
+        const searchSelectModal = new SearchSelectModal(page);
 
         tester.isGoingTo("Visit the curriculum coverage report page");
         await coverageReport.goto();
@@ -22,16 +26,14 @@ test.describe("Curriculum Coverage Report Tests", () => {
         await expect(page.getByTestId("cc-report-empty-state")).toBeVisible();
 
         tester.isGoingTo("Within Select Courses: Choose Year 9 English, Year 9 French and 20th Century History");
-        await page.getByTestId("search-select-button-courses").click(); // Open the select courses modal
-        await page.getByTestId("ss-results-item-label-6").click(); // Select Year 9 English
-        await page.getByTestId("ss-results-item-label-2").click(); // Select Year 9 French
-        await page.getByTestId("ss-results-item-label-14").click(); // Select 20th Century History
-        await page.getByTestId("ssm-footer-save-button").click(); // Select Select, closing the modal
+        await searchSelect.selectButton("courses");
+        await searchSelectModal.selectResults(["6", "2", "14"]);
+        await searchSelectModal.save();
 
         tester.isGoingTo("Check that those courses are selected");
-        await expect(page.getByTestId("ss-selected")).toContainText("Year 9 English");
-        await expect(page.getByTestId("ss-selected")).toContainText("Year 9 French");
-        await expect(page.getByTestId("ss-selected")).toContainText("20th Century History");
+        await searchSelect.expectItemSelected("Year 9 English");
+        await searchSelect.expectItemSelected("Year 9 French");
+        await searchSelect.expectItemSelected("20th Century History");
 
         tester.isGoingTo("Try and generate a report, confirming that Curriculum is also required");
         await coverageReport.submit(); // Generate the report
