@@ -354,36 +354,8 @@
          */
         const subtypesIndex = {{ subtypesIndex|json_encode|raw }};
         const subtypesIndexPrivate = {{ subtypesIndexPrivate|json_encode|raw }};
-        const subtypesIndexEntryTip = {{ subtypesIndexEntryTip|json_encode|raw }};
-        const subtypesIndexDefaultExpiry = {{ subtypesIndexDefaultExpiry|json_encode|raw }};
         const typesIndex = {{ typesIndex|json_encode|raw }};
         const typesIndexPrivate = {{ typesIndexPrivate|json_encode|raw }};
-        const typesIndexEntryTip = {{ typesIndexEntryTip|json_encode|raw }};
-        const typesIndexDefaultExpiry = {{ typesIndexDefaultExpiry|json_encode|raw }};
-
-        const isExistingRecord = {{ record.id != '' ? "true" : "false"  }};
-        const expiresAt = '{{ record.expiresAt ? record.expiresAt.localShort : null }}';
-
-        /**
-         * When the expires at date has manually changed, this takes precedence and
-         * any further changes when type/sub-type is changed will not update the expires at date.
-         * Rather conveniently, the jQuery .onChange will not trigger when the expiresAt.value is changed within
-         * the updateExpiresAt method, so we don't need to worry about this being triggered when it shouldn't be.
-         */
-        let hasManualExpiresAtInput = false;
-        $("#expiresAt").on("change", function () {
-            hasManualExpiresAtInput = true;
-        });
-
-        /**
-         * Check if the expires at date can be updated when the type/sub-type is changed
-         * We prevent updating the expires at date if the record is existing, the expires at date is set,
-         * or if there is a manual input for the expires at date
-         * @returns boolean
-         */
-        function canUpdateExpiresAt() {
-            return !isExistingRecord && expiresAt === "" && !hasManualExpiresAtInput;
-        }
 
         /* Some convenient selectors
          */
@@ -396,18 +368,6 @@
         subtypeDropdown.on('change', function(event) {
             init(typeDropdown.val(), subtypeDropdown.val());
         });
-
-        {% if record.id != '' %}
-        /* Get the current entry tip when modifying the record
-         */
-        if (subtypeDropdown.val() === null) {
-            updateEntryTip($.trim(typesIndexEntryTip[typeDropdown.val()]));
-            updateExpiresAt($.trim(typesIndexEntryTip[typeDropdown.val()]));
-        } else {
-            updateEntryTip($.trim(subtypesIndexEntryTip[subtypeDropdown.val()]));
-            updateExpiresAt($.trim(subtypesIndexEntryTip[subtypeDropdown.val()]));
-        }
-        {% endif %}
 
         /**
          * If this Type has a Subtype template, change to that
@@ -423,8 +383,7 @@
                  * Template's current value is empty string
                  * same above with the Confidential Templates
                  */
-                replaceTemplate($.trim(subtypesIndex[subtypeVal]), $.trim(subtypesIndexPrivate[subtypeVal]),
-                                $.trim(subtypesIndexEntryTip[subtypeVal]), $.trim(subtypesIndexDefaultExpiry[subtypeVal]));
+                replaceTemplate($.trim(subtypesIndex[subtypeVal]), $.trim(subtypesIndexPrivate[subtypeVal]));
             } else {
 
                 /* If subtypeId == null, look at the parent typeId. load its template
@@ -432,8 +391,7 @@
                  * Type template or if the General Template's current value is empty string
                  * same above with the Confidential Templates
                  */
-                replaceTemplate($.trim(typesIndex[typeVal]), $.trim(typesIndexPrivate[typeVal]),
-                                $.trim(typesIndexEntryTip[typeVal]), $.trim(typesIndexDefaultExpiry[typeVal]));
+                replaceTemplate($.trim(typesIndex[typeVal]), $.trim(typesIndexPrivate[typeVal]));
             }
         }
 
@@ -483,87 +441,8 @@
                 }
             }
 
-            updateEntryTip(entryTip);
-            updateExpiresAt(defaultExpiry);
-
         }
 
-        /**
-         * Update the entry tip based on current type / subtype selection
-         * @param entryTip
-         */
-        function updateEntryTip (entryTip) {
-            const entryTipContainer = document.getElementById("entry-tip-container");
-             if (entryTipContainer === null) {
-                 return;
-             }
-             if (entryTip === "") { // only show the tip is one is set
-                 entryTipContainer.style.display = "none";
-             } else {
-                entryTipContainer.style.display = "block";
-             }
-             const entryTipInput = document.getElementById("entry-tip-input");
-             if (entryTipInput) {
-                 entryTipInput.innerHTML = entryTip; // display the tip
-             }
-        }
-
-        /**
-         * Get the expires on date based on the default expiry
-         * @param defaultExpiry
-         */
-        function getDefaultExpiry (defaultExpiry) {
-            const currentDate = dayjs();
-            switch (defaultExpiry) {
-                case "1 week":
-                    return currentDate.add(1, "week").format("DD/MM/YYYY");
-                case "2 weeks":
-                    return currentDate.add(2, "week").format("DD/MM/YYYY");
-                case "1 month":
-                    return currentDate.add(1, "month").format("DD/MM/YYYY");
-                case "6 months":
-                    return currentDate.add(6, "month").format("DD/MM/YYYY");
-                case "12 months":
-                    return currentDate.add(12, "month").format("DD/MM/YYYY");
-                case "24 months":
-                    return currentDate.add(24, "month").format("DD/MM/YYYY");
-                case "calendar year":
-                    return currentDate.add(1, "year").startOf("year").format("DD/MM/YYYY");
-                case "academic period":
-                    const academicPeriod = "{{ expiresAcademicPeriod.displayFinish ?? '' }}";
-                    return dayjs(academicPeriod).format("DD/MM/YYYY");
-                case "academic year":
-                    // get the start of the school year and set the expiry to the next year on that date
-                    const startOfSchoolYear = "{{ config.start_of_school_year }}";
-                    const startOfSchoolYearDate = dayjs(startOfSchoolYear, "DD/MM");
-                    return currentDate.add(1, "year").set("month", startOfSchoolYearDate.month()).set("date", startOfSchoolYearDate.date()).format("DD/MM/YYYY");
-                default:
-                    return "";
-            }
-        }
-
-        /**
-         * Update the expires at date based on the current type / subtype selection
-         * @param defaultExpiry
-         */
-        function updateExpiresAt (defaultExpiry) {
-            // if this is an existing record, or the expires at date is set, or has a manual expires at input: return
-            if (!canUpdateExpiresAt()) {
-                return;
-            }
-            // ensure expiresAt actually exists before setting the value
-            const expiresAtElement = document.getElementById("expiresAt");
-            if (expiresAtElement === null) {
-                return;
-            }
-            // if the new type/sub-type Default Expiry is set to 'Never', clear the previously set value and return
-            if (defaultExpiry === null || defaultExpiry === "") {
-                expiresAtElement.value = "";
-                return;
-            }
-            // otherwise set the expires at date based on the Default Expiry that was set
-            expiresAtElement.value = getDefaultExpiry(defaultExpiry);
-        }
 
     });
 </script>
