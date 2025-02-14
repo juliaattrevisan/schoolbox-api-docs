@@ -1972,6 +1972,7 @@ class Handler
             'HomeAddressDPID',
             'HomeAddressLatitude',
             'HomeAddressLongitude',
+            'Phone'
         ];
         foreach ($addressKeys as $key) {
             if (isset($data[$key])) {
