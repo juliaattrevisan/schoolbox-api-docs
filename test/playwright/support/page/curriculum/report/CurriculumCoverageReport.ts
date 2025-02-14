@@ -2,7 +2,7 @@
  * Utility class for the Curriculum Coverage Report page
  */
 
-import type { Page } from "@playwright/test";
+import type { Page, Locator } from "@playwright/test";
 import { expect } from "@playwright/test";
 
 export default class CurriculumCoverageReport {
@@ -15,6 +15,14 @@ export default class CurriculumCoverageReport {
     static readonly DATATEST_REPORT_LOADING = "cc-report-loading";
 
     static readonly DATATEST_TABLE_NODE_EXPAND_BUTTON = "cc-report-table-node-expand-button-";
+
+    static readonly DATATEST_FILTER_COURSE = "cc-report-filters-label-course";
+
+    static readonly DATATEST_FILTER_UNIT = "cc-report-filters-label-unit";
+
+    static readonly DATATEST_FILTER_ACTIVITY = "cc-report-filters-label-activity";
+
+    static readonly SELECTOR_YEAR_9_TOTAL = "table tbody tr:nth-child(4) td:nth-child(2)"; // the Year 9 Curriculum total usage table cell at its default state
 
     constructor(page: Page) {
         this.page = page;
@@ -53,5 +61,34 @@ export default class CurriculumCoverageReport {
                 .getByTestId(`${CurriculumCoverageReport.DATATEST_TABLE_NODE_EXPAND_BUTTON}${id.toString()}`)
                 .click();
         }
+    }
+
+    /**
+     * Clicks the course filter
+     */
+    async clickCourseFilter(): Promise<void> {
+        await this.page.getByTestId(CurriculumCoverageReport.DATATEST_FILTER_COURSE).click();
+    }
+
+    /**
+     * Clicks the unit filter
+     */
+    async clickUnitFilter(): Promise<void> {
+        await this.page.getByTestId(CurriculumCoverageReport.DATATEST_FILTER_UNIT).click();
+    }
+
+    /**
+     * Clicks the activity filter
+     */
+    async clickActivityFilter(): Promise<void> {
+        await this.page.getByTestId(CurriculumCoverageReport.DATATEST_FILTER_ACTIVITY).click();
+    }
+
+    /**
+     * Returns the locator for the Year 9 Curriculum total usage table cell
+     * @returns - The locator for the Year 9 Curriculum total usage table cell
+     */
+    year9TotalUsageTableCell(): Locator {
+        return this.page.locator(CurriculumCoverageReport.SELECTOR_YEAR_9_TOTAL);
     }
 }
