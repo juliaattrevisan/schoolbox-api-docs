@@ -106,7 +106,7 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
         >
             <button
                 v-if="showExpandButton"
-                class="l-flex l-flex--center f-no-bkg"
+                class="l-flex l-flex--center l-flex__item--0-shrink f-no-bkg"
                 :aria-label="props.node.isExpanded ? 'Collapse' : 'Expand'"
                 :title="props.node.isExpanded ? 'Collapse' : 'Expand'"
                 @click="nodesStore.toggleNodeExpand(props.node)"
