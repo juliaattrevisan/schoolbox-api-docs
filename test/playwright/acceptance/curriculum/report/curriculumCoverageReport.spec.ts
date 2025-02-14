@@ -54,7 +54,7 @@ test.describe("Curriculum Coverage Report Tests", () => {
         await coverageReport.submit(); // Generate the report
 
         tester.isGoingTo("Confirm loading spinner is visible");
-        await expect(page.getByTestId("cc-report-loading")).toBeVisible();
+        await coverageReport.expectLoading();
 
         tester.isGoingTo("Confirm English > Year 9 has total usage of 12");
         await expect(page.locator("table tbody tr:nth-child(4) td:nth-child(2)")).toHaveText("12");
@@ -63,7 +63,7 @@ test.describe("Curriculum Coverage Report Tests", () => {
         await page.reload();
 
         tester.isGoingTo("Confirm loading spinner is visible");
-        await expect(page.getByTestId("cc-report-loading")).toBeVisible();
+        await coverageReport.expectLoading();
 
         tester.isGoingTo("Confirm English > Year 9 has total usage of 12");
         await expect(page.locator("table tbody tr:nth-child(4) td:nth-child(2)")).toHaveText("12");

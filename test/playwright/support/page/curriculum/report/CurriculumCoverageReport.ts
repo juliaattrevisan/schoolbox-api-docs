@@ -3,6 +3,7 @@
  */
 
 import type { Page } from "@playwright/test";
+import { expect } from "@playwright/test";
 
 export default class CurriculumCoverageReport {
     private page: Page;
@@ -10,6 +11,8 @@ export default class CurriculumCoverageReport {
     static readonly URL = "/curriculum/reports/coverage";
 
     static readonly DATATEST_GENERATE_REPORT_BUTTON = "cc-input-button";
+
+    static readonly DATATEST_REPORT_LOADING = "cc-report-loading";
 
     constructor(page: Page) {
         this.page = page;
@@ -27,5 +30,12 @@ export default class CurriculumCoverageReport {
      */
     async submit(): Promise<void> {
         await this.page.getByTestId(CurriculumCoverageReport.DATATEST_GENERATE_REPORT_BUTTON).click();
+    }
+
+    /**
+     * Expect the loading spinner to be visible
+     */
+    async expectLoading(): Promise<void> {
+        await expect(this.page.getByTestId(CurriculumCoverageReport.DATATEST_REPORT_LOADING)).toBeVisible();
     }
 }
