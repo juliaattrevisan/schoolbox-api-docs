@@ -371,6 +371,20 @@ export default class Common {
     }
 
     /**
+     * Asserts that a file download is triggered by a button
+     * @param downloadButtonId - the id of the button to trigger the download
+     * @param expectedFileName - the expected downloaded file name
+     */
+    async assertFileDownload(downloadButtonId: string, expectedFileName: string): Promise<void> {
+        const [download] = await Promise.all([
+            this.page.waitForEvent("download"), // Wait for the file to be downloaded
+            this.page.getByTestId(downloadButtonId).click(), // Click the download button
+        ]);
+        const fileName = download.suggestedFilename();
+        expect(fileName).toBe(expectedFileName); // Confirm the file name
+    }
+
+    /**
      * Get today's date at 11:59 PM
      * @returns - the date object
      */
