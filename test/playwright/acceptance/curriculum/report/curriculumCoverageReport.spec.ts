@@ -71,8 +71,9 @@ test.describe("Curriculum Coverage Report Tests", () => {
         await expect(page.locator("table tbody tr:nth-child(4) td:nth-child(2)")).toHaveText("12");
 
         tester.isGoingTo("Select load more curriculum and confirm Years 9 and 10 French is now visible");
+        await expect(page.locator("table tbody")).not.toContainText("Years 9 and 10 French");
         await page.getByTestId("cc-report-load-more-button").click(); // Select load more curriculum
-        await expect(page.locator("table tbody tr:nth-child(7) td:nth-child(1)")).toHaveText("Years 9 and 10 French");
+        await expect(page.locator("table tbody")).toContainText("Years 9 and 10 French");
 
         tester.isGoingTo("Export the report and confirm the download is successful");
         await page.getByTestId("cc-report-filters-export-button").click(); // Select Export as CSV
