@@ -525,6 +525,8 @@
                     return currentDate.add(6, "month").format("DD/MM/YYYY");
                 case "12 months":
                     return currentDate.add(12, "month").format("DD/MM/YYYY");
+                case "2 years":
+                    return currentDate.add(2, "year").format("DD/MM/YYYY");
                 case "calendar year":
                     return currentDate.add(1, "year").startOf("year").format("DD/MM/YYYY");
                 case "academic period":
