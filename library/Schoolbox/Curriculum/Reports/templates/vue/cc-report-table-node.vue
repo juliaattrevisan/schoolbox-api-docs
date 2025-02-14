@@ -122,7 +122,7 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
                 }"
                 @click="emit('titleClick', props.node)"
             >
-                <template v-if="props.depth === 0">
+                <template v-if="props.depth === 0 && !filtersStore.onlyShowGaps">
                     <b>{{ title }}</b>
                 </template>
                 <template v-else>{{ title }}</template>
