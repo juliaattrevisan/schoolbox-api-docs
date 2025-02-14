@@ -14,6 +14,8 @@ export default class CurriculumCoverageReport {
 
     static readonly DATATEST_REPORT_LOADING = "cc-report-loading";
 
+    static readonly DATATEST_TABLE_NODE_EXPAND_BUTTON = "cc-report-table-node-expand-button-";
+
     constructor(page: Page) {
         this.page = page;
     }
@@ -37,5 +39,19 @@ export default class CurriculumCoverageReport {
      */
     async expectLoading(): Promise<void> {
         await expect(this.page.getByTestId(CurriculumCoverageReport.DATATEST_REPORT_LOADING)).toBeVisible();
+    }
+
+    /**
+     * To navigate to nodes in the curriculum tree
+     * @param ids - The ids of the nodes to navigate to
+     */
+    async navigateTree(ids: number[]): Promise<void> {
+        // eslint-disable-next-line no-restricted-syntax -- need to loop through each sequentially, rather than in parallel with Promise.all
+        for (const id of ids) {
+            // eslint-disable-next-line no-await-in-loop
+            await this.page
+                .getByTestId(`${CurriculumCoverageReport.DATATEST_TABLE_NODE_EXPAND_BUTTON}${id.toString()}`)
+                .click();
+        }
     }
 }
