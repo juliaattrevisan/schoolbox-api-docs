@@ -49,7 +49,7 @@ abstract class TypeAbstract implements ISoftDeletable, Sequential, \JsonSerializ
         '1 month'         => '1 month',
         '6 months'        => '6 months',
         '12 months'       => '12 months',
-        '2 years'         => '2 years',
+        '24 months'       => '24 months',
         'calendar year'   => 'calendar year',
         'academic period' => 'academic period',
         'academic year'   => 'academic year',
