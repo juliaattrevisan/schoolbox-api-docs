@@ -380,6 +380,12 @@ export default class Common {
         return today;
     }
 
+    /**
+     * Format a date into a string
+     * @param date - the date to format
+     * @param includeTime - whether to include the time in the formatted date
+     * @returns - the formatted date
+     */
     static formatDate(date: Date, includeTime: boolean): string {
         const options: Intl.DateTimeFormatOptions = {
             timeZone: "Australia/Melbourne",
@@ -411,6 +417,12 @@ export default class Common {
         return formattedDate;
     }
 
+    /**
+     * Format a date into a string db format
+     * @param date - the date to format
+     * @param includeTime - whether to include the time in the formatted date
+     * @returns - the formatted date in db format
+     */
     static formatDateDB(date: Date, includeTime: boolean): string {
         const options: Intl.DateTimeFormatOptions = {
             timeZone: "Australia/Melbourne",
