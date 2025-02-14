@@ -36,12 +36,12 @@ const { title } = useNodeTitle(props.node);
 
 // #region expand/collapse
 
-// to remove any padding node is at base depth and has no children
+// to remove any padding when node is at base depth and has no children
 const isSingleNode = window.Vue.computed(
     () => props.depth === 0 && props.node.children && props.node.children.length === 0,
 );
 
-// don't show the expand button when the node has no children, and onlyShowGaps is not active
+// show the expand button when the node has children, and onlyShowGaps is not active
 const showExpandButton = window.Vue.computed(
     () => props.node.children && props.node.children.length > 0 && !filtersStore.onlyShowGaps,
 );
@@ -114,7 +114,7 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
                 <sbx-icon v-if="props.node.isExpanded" name="up-arrow" />
                 <sbx-icon v-else name="down-arrow" />
             </button>
-            <!-- add paddingLeft to the last child node to align better with the expand button -->
+            <!-- add paddingLeft to the last child node to align better with the parent above, which is showing the expand button -->
             <button
                 class="l-pad--0 t-align-left f-no-bkg f-always-show"
                 :style="{
