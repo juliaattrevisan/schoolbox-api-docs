@@ -36,6 +36,11 @@ const { title } = useNodeTitle(props.node);
 
 // #region expand/collapse
 
+// to remove any padding node is at base depth and has no children
+const isSingleNode = window.Vue.computed(
+    () => props.depth === 0 && props.node.children && props.node.children.length === 0,
+);
+
 // don't show the expand button when the node has no children, and onlyShowGaps is not active
 const showExpandButton = window.Vue.computed(
     () => props.node.children && props.node.children.length > 0 && !filtersStore.onlyShowGaps,
@@ -113,7 +118,7 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
             <button
                 class="l-pad--0 t-align-left f-no-bkg f-always-show"
                 :style="{
-                    paddingLeft: filtersStore.onlyShowGaps || showExpandButton ? '0' : '2.5rem',
+                    paddingLeft: isSingleNode || filtersStore.onlyShowGaps || showExpandButton ? '0' : '2.5rem',
                 }"
                 @click="emit('titleClick', props.node)"
             >
