@@ -231,12 +231,9 @@ class Factory
                     ->setHumanReadableInstructorMark($this->mark);
             }
         } else {
-            // TODO what on EARTH is going on here? what is this "special case"?
-
-            //If mark is set to empty string this is a special case
-            //TODO potentially the mark post var may not have been set, we may lose the mark in this case so we should
-            //test the existence of the post var as well
-
+            /* "None" mark type was used here, so we won't get a teacher-assigned mark in this usage
+             * Set norm and hr marks to be acceptable defaults.
+             */
             $feedback
                 ->setNormalisedMark(null)
                 ->setHumanReadableMark('')
