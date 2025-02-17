@@ -6637,12 +6637,6 @@ parameters:
 			path: tools/pastoral/generateTestData.php
 
 		-
-			message: '#^Method Schoolbox\\Application\\CliTool\\App@anonymous/tools/portrait/migrate\.php\:21\:\:getRequiredProcessUser\(\) never returns null so it can be removed from the return type\.$#'
-			identifier: return.unusedType
-			count: 1
-			path: tools/portrait/migrate.php
-
-		-
 			message: '#^Comparison operation "\>\=" between int\<3, max\> and 3 is always true\.$#'
 			identifier: greaterOrEqual.alwaysTrue
 			count: 1
