@@ -168,10 +168,10 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
              * If a parent is viewing, they should only see their child's lesson plans
              * if the restrict_parent_lesson_plan_access config setting is enabled
              */
-            $isParent = $this->getViewer()->getRole()->isParent();
+            $isParentOfUser = $this->getViewer()->isParentOf($this->getUser());
             $isLessonPlan = $assessment->getDefaultTypeName() === 'Lesson Plan';
             $isRestrictLessonPlanAccess = $this->getConfig()->get("restrict_parent_lesson_plan_access");
-            if ($isParent && $isLessonPlan && $isRestrictLessonPlanAccess) {
+            if ($isParentOfUser && $isLessonPlan && $isRestrictLessonPlanAccess) {
                 continue;
             }
 
