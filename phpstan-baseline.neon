@@ -6571,18 +6571,6 @@ parameters:
 			path: tools/assessment/csv.php
 
 		-
-			message: '#^Method Schoolbox\\Application\\CliTool\\App@anonymous/tools/ckImage/ckImage2Storage\.php\:31\:\:getRequiredProcessUser\(\) never returns null so it can be removed from the return type\.$#'
-			identifier: return.unusedType
-			count: 1
-			path: tools/ckImage/ckImage2Storage.php
-
-		-
-			message: '#^Method Schoolbox\\Application\\CliTool\\App@anonymous/tools/custom/help/migrate\.php\:20\:\:getRequiredProcessUser\(\) never returns null so it can be removed from the return type\.$#'
-			identifier: return.unusedType
-			count: 1
-			path: tools/custom/help/migrate.php
-
-		-
 			message: '#^Constant Schoolbox\\Application\\CliTool\\App@anonymous/tools/custom/wes/changeType\.php\:11\:\:ACCESS_LEVEL_PRIVATE is unused\.$#'
 			identifier: classConstant.unused
 			count: 1
@@ -6605,12 +6593,6 @@ parameters:
 			identifier: phpDoc.parseError
 			count: 1
 			path: tools/custom/wgs/pastoral-import.php
-
-		-
-			message: '#^Method Schoolbox\\Application\\CliTool\\App@anonymous/tools/image/sanitize\.php\:21\:\:getRequiredProcessUser\(\) never returns null so it can be removed from the return type\.$#'
-			identifier: return.unusedType
-			count: 1
-			path: tools/image/sanitize.php
 
 		-
 			message: '#^Variable \$addParamsShort might not be defined\.$#'
@@ -6665,9 +6647,3 @@ parameters:
 			identifier: greaterOrEqual.alwaysTrue
 			count: 1
 			path: tools/rubric/repairSpecAssessments.php
-
-		-
-			message: '#^Method Schoolbox\\Application\\CliTool\\App@anonymous/tools/synchronise/sisImporter\.php\:37\:\:getRequiredProcessUser\(\) never returns null so it can be removed from the return type\.$#'
-			identifier: return.unusedType
-			count: 1
-			path: tools/synchronise/sisImporter.php
