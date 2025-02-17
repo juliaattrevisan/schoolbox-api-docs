@@ -343,7 +343,7 @@ class Importer
                 try {
                     $dob = new \Alaress_Date_Format($row['Date of Birth'], self::VALID_DATE_FORMATS);
                 } catch (InvalidArgumentException $e) {
-                    $this->log("Invalid 'Date of Birth' format in row {$i}. Please use YYYY-MM-DD or DD/MM/YYYY format.", self::LOG_ERROR);
+                    $this->log("Invalid 'Date of Birth' format in row {$i}. Please use YYYY-MM-DD or DD/MM/YYYY format", self::LOG_ERROR);
                 }
             }
 
