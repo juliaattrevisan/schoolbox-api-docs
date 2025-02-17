@@ -96,6 +96,16 @@ class RepairDuplicateUnits extends App
     public function run(): void
     {
         $log = $this->getLogger();
+
+        /**
+         * Deprecation notice
+         */
+        $log->notice('/******************************************************************************************/');
+        $log->notice('/***************     Deprecated NOTICE - this will be deleted in future    ****************/');
+        $log->notice('/*    If you are running this, please add a comment of this scripts name into SA-19334    */');
+        $log->notice('/******************************************************************************************/');
+        $log->notice('/******************************************************************************************/');
+
         if ($this->perform() && !$this->isInteractive()) {
             $log->error('This tool requires an interactive session if performing changes.');
             exit(CliKernelAbstract::EXIT_STATUS_KERNEL_ERROR);
@@ -192,6 +202,15 @@ class RepairDuplicateUnits extends App
                 $log->info('---');
             }
         }
+
+        /**
+         * Deprecation notice
+         */
+        $log->notice('/******************************************************************************************/');
+        $log->notice('/***************     Deprecated NOTICE - this will be deleted in future    ****************/');
+        $log->notice('/*    If you are running this, please add a comment of this scripts name into SA-19334    */');
+        $log->notice('/******************************************************************************************/');
+        $log->notice('/******************************************************************************************/');
 
         exit(CliKernelAbstract::EXIT_STATUS_OK);
     }
