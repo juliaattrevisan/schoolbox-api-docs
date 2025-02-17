@@ -133,7 +133,6 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
                 sprintf(
                     'Message received payload is not a %s (received: %s): not retrying delivery',
                     Instance::class,
-                    /** @phpstan-ignore-next-line - just in case this is not an object at all **/
                     is_object($payload) ? get_class($payload) : gettype($payload),
                 ),
             );

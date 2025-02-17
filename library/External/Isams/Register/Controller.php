@@ -59,7 +59,6 @@ class Controller extends BaseController
      * @throws InvalidArgumentException
      * @throws SchoolboxException
      * @throws \JsonException
-     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      * @since                    23.1
      * @api                      GET /modules/isams/register/{register}/student/{studentId}
      */
@@ -108,7 +107,6 @@ class Controller extends BaseController
      * @throws InvalidArgumentException
      * @throws SchoolboxException
      * @throws \JsonException
-     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      * @api                      GET /modules/isams/register/{register}/parent
      * @since                    23.1
      */

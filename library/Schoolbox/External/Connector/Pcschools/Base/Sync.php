@@ -36,7 +36,7 @@ class Sync extends Base implements ISync
      * Constructor
      *
      * @param IConfigLoader    $config
-     * @param array|IConnector $databaseExternal External database connector(s)
+     * @param IConnector $databaseExternal External database connector(s)
      */
     public function __construct(IConfigLoader $config, $databaseExternal)
     {

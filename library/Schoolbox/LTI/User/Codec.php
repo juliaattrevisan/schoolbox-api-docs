@@ -61,7 +61,6 @@ class Codec implements ICodec
         }
 
         // The typehint implies this will never happen, but logically it can
-        /** @phpstan-ignore-next-line */
         throw new TypeError(sprintf('$rawValue must be an instance of %s', User::class));
     }
 

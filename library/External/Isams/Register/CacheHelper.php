@@ -321,7 +321,6 @@ class CacheHelper
      * @throws InvalidArgumentException if key set or OIDC discovery couldn't be
      *                                  written to or read from cache
      * @throws \JsonException
-     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      * @see                      self::getMetadataFields
      *
      */

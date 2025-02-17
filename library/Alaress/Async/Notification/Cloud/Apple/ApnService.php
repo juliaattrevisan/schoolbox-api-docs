@@ -39,7 +39,7 @@ class ApnService extends AbstractService
      *
      * (Created automatically on calling `$this->propagate`.)
      */
-    private ?ProtocolInterface $protocol;
+    private ?ProtocolInterface $protocol = null;
 
     /**
      * The app's title, usually from `config.title`.
