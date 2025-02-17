@@ -69,6 +69,7 @@ class Hydrator
         $hasBadgeAwards = false;
 
         $dueWorkFeedbackIds = [];
+        $quizFeedbackIds = [];
 
         // Build predicate builders
         foreach ($results as $result) {
