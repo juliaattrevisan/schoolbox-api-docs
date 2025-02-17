@@ -269,4 +269,38 @@
             }
         });
     };
+
+    /**
+     * Show the display (learner) mark in markbook cells and hide the instructor mark
+     */
+    function showDisplayMarks() {
+        $("[data-learner-mark]").show();
+        $("[data-instructor-mark]").hide();
+    }
+
+    /**
+     * Hide the display (learner) mark in markbook cells and show the instructor mark
+     */
+    function hideDisplayMarks() {
+        $("[data-learner-mark]").hide();
+        $("[data-instructor-mark]").show();
+    }
+
+    /**
+     * Set up toggle on/off of display marks.
+     *
+     * On changing the show/hide display marks checkbox:
+     * * show/hide display marks in the markbook
+     *
+     * @param selector
+     */
+    $.marksheetToggleDisplayMarks = function (selector) {
+        $(document).on("change", selector, function () {
+            if ($(this).prop("checked")) {
+                showDisplayMarks();
+            } else {
+                hideDisplayMarks();
+            }
+        });
+    };
 })(jQuery);

@@ -35,10 +35,12 @@
 {##
  # Gets label for due work/task/quiz/project mark
  #}
-{% macro label(participant, isPublished) %}
+{% macro label(participant, isPublished, useInstructorMark) %}
 {% apply spaceless %}
     {% if participant.hasSubmittedResponse and (not participant.hasPublishedFeedback and isPublished) %}
         Pending
+    {% elseif useInstructorMark %}
+        {{ participant.humanReadableInstructorMark(isPublished) | default('–') }}
     {% else %}
         {{ participant.humanReadableMark(isPublished) | default('–') }}
     {% endif %}

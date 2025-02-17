@@ -26,6 +26,13 @@
         </div>
     </div>
     <div class="checklist">
+        <input type="checkbox" id="show-display-marks">
+        <label for="show-display-marks">
+            Show Display Marks
+            <span class="hint has-tip tip-top" data-tooltip title="Shows marks in the same format that students see">?</span>
+        </label>
+    </div>
+    <div class="checklist">
         <input type="checkbox" id="show-drafts">
         <label for="show-drafts">
             Show Drafts
@@ -263,13 +270,26 @@
                                 {% set normalisedMark = participant.normalisedMark(true) %}
                                 {% set participationRoute = routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) %}
                                 {% set draftMark = markbook.hasDraft[assessment.id][student.id] is defined %}
-                                 <span class="{{ urgency.marks(normalisedMark) }}"
-                                    href="{{ participationRoute }}" {% if draftMark %} data-actual-mark {% endif %}
-                                    title="{{ participant.authoritativeFeedback(true) ? participant.authoritativeFeedback(true).comment : '' }}">{{ decorator.label(participant, true) }}</span>
+                                <span
+                                    class="{{ urgency.marks(normalisedMark) }}"
+                                    href="{{ participationRoute }}"
+                                    {% if draftMark %} data-actual-mark {% endif %}
+                                    title="{{ participant.authoritativeFeedback(true) ? participant.authoritativeFeedback(true).comment : '' }}"
+                                >
+                                    <span data-instructor-mark>{{ decorator.label(participant, true, true) }}</span>
+                                    <span data-learner-mark style="display: none">{{ decorator.label(participant, true, false) }}</span>
+                                </span>
                                 {% if draftMark %}
-                                    <span href="{{ participationRoute }}" data-draft-mark style="display: none"
-                                       class="meta"
-                                       title="{{ participant.authoritativeFeedback(false) ? participant.authoritativeFeedback(false).comment : '' }}">{{ decorator.label(participant, false) }}</span>
+                                    <span
+                                        href="{{ participationRoute }}"
+                                        data-draft-mark
+                                        style="display: none"
+                                        class="meta"
+                                        title="{{ participant.authoritativeFeedback(false) ? participant.authoritativeFeedback(false).comment : '' }}"
+                                    >
+                                        <span data-instructor-mark>{{ decorator.label(participant, false, true) }}</span>
+                                        <span data-learner-mark style="display: none">{{ decorator.label(participant, false, false) }}</span>
+                                    </span>
                                 {% endif %}
                                 {% if participant.hasSubmittedResponse or participant.resubmissionRequired or participant.hasPublishedFeedback or draftMark %}
                                     <span class="legend-indicator indicator-{{ decorator.indicator(participant, draftMark) }}" title="{{ decorator.notchTitle(participant, draftMark) }}"></span>

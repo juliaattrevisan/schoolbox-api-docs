@@ -26,6 +26,7 @@ Usage:
         $(function() {
             $('#{{ reportContentId }}').on('filterContentLoaded', function () {
                 $.marksheetToggleDrafts('#show-drafts');
+                $.marksheetToggleDisplayMarks('#show-display-marks');
 
                 // Note that we cannot use window.resize here because we must respond to the pinning of the left nav
                 // menu or right notifications window.  Also we cannot listen for resize events on the container,
