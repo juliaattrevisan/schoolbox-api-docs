@@ -102,7 +102,7 @@
         "enqueue/enqueue": "^0.10.15",
         "enqueue/redis": "^0.10.9",
         "imangazaliev/didom": "^2.0",
-        "phlak/splat": "^5.0",
+        "phlak/splat": "^6.0.0",
         "gotenberg/gotenberg-php": "^2.7",
         "guzzlehttp/psr7": "^2.4",
         "learnosity/learnosity-sdk-php": "1.0.3",
