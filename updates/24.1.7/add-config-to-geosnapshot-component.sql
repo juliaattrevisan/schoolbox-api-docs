@@ -3,11 +3,11 @@ component_definition_id = (SELECT id FROM component_definition WHERE class = 'Sc
 `key`                   = 'albumName',
 default_value           = NULL,
 label                   = 'Album Name',
-description             = '';
+description             = NULL;
 
 INSERT INTO component_config_definition SET
 component_definition_id = (SELECT id FROM component_definition WHERE class = 'Schoolbox\\Geosnapshot\\Component\\Dashboard\\Controller'),
 `key`                   = 'albumName',
 default_value           = NULL,
 label                   = 'Album Name',
-description             = '';
+description             = NULL;
