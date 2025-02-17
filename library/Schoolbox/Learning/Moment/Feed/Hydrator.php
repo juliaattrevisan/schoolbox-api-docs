@@ -69,6 +69,7 @@ class Hydrator
         $hasBadgeAwards = false;
 
         $dueWorkFeedbackIds = [];
+        $quizFeedbackIds = [];
 
         // Build predicate builders
         foreach ($results as $result) {
@@ -163,10 +164,10 @@ class Hydrator
                     break;
 
                 case Cursor::DISCRIMINATOR_DUE_WORK_FEEDBACK:
-                    /** @var DueWorkFeedback $dueWorkFeedback */
+                    /** @var DueWorkFeedback|null $dueWorkFeedback */
                     $dueWorkFeedback = $dueWorkFeedbackResults->offsetGet((int)$result['id']);
                     /** @var IAssessable|null $assessment */
-                    $assessment = $assessments->offsetGet($dueWorkFeedback->getAssessable()->getId());
+                    $assessment = $assessments->offsetGet($dueWorkFeedback?->getAssessable()->getId());
                     if (
                         !$assessment
                         || !$this->visibility->isVisibleToUserOrChildOfUser($assessment, $this->viewer, true, null, true)
@@ -183,10 +184,10 @@ class Hydrator
                     break;
 
                 case Cursor::DISCRIMINATOR_QUIZ_FEEDBACK:
-                    /** @var QuizFeedback $quizFeedback */
+                    /** @var QuizFeedback|null $quizFeedback */
                     $quizFeedback = $quizFeedbackResults->offsetGet((int)$result['id']);
                     /** @var IAssessable|null $assessment */
-                    $assessment = $assessments->offsetGet($quizFeedback->getAssessable()->getId());
+                    $assessment = $assessments->offsetGet($quizFeedback?->getAssessable()->getId());
                     if (
                         !$assessment
                         || !$this->visibility->isVisibleToUserOrChildOfUser($assessment, $this->viewer, true, null, true)
