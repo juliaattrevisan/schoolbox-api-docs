@@ -30,9 +30,10 @@ class CSV extends AbstractCSV
      * @param Markbook $markbook   The markbook to export.
      * @param string   $filename   The filename for the CSV export.
      * @param bool     $showDrafts Should draft marks be shown in the export?
+     * @param bool     $showDisplayMarks Should display (student) marks be shown in the export instead of instructor marks?
      * @return void
      */
-    public function export(Markbook $markbook, string $filename, bool $showDrafts): void
+    public function export(Markbook $markbook, string $filename, bool $showDrafts, bool $showDisplayMarks): void
     {
         $this->initExport($filename);
 
@@ -40,9 +41,9 @@ class CSV extends AbstractCSV
         $participants      = $this->getSortedParticipants($markbook);
         $sortedAssessments = $this->getSortedAssessments($markbook);
 
-        $this->writeHeader($sortedAssessments);
-        $this->writeWeightedMean($sortedAssessments, $markbook, $showDrafts);
-        $this->writeStudents($sortedAssessments, $markbook, $students, $participants, $showDrafts);
+        $this->writeHeader($sortedAssessments, $showDisplayMarks);
+        $this->writeWeightedMean($sortedAssessments, $markbook, $showDrafts, $showDisplayMarks);
+        $this->writeStudents($sortedAssessments, $markbook, $students, $participants, $showDrafts, $showDisplayMarks);
 
         $this->closeExport();
     }
@@ -103,9 +104,10 @@ class CSV extends AbstractCSV
      * @param GenericCollection|IAssessable[] $sortedAssessments
      * @param Markbook                        $markbook
      * @param bool                            $showDrafts
+     * @param bool                            $showDisplayMarks
      * @return void
      */
-    private function writeWeightedMean(GenericCollection $sortedAssessments, Markbook $markbook, bool $showDrafts): void
+    private function writeWeightedMean(GenericCollection $sortedAssessments, Markbook $markbook, bool $showDrafts, bool $showDisplayMarks): void
     {
         // Average row
         $averageRowHeaders = [
@@ -119,7 +121,7 @@ class CSV extends AbstractCSV
         }
         $averageRow        = [];
         foreach ($sortedAssessments as $assessment) {
-            $averageRow = $this->addAverage($averageRow, $markbook, $assessment, $showDrafts);
+            $averageRow = $this->addAverage($averageRow, $markbook, $assessment, $showDrafts, $showDisplayMarks);
         }
         $this->exportRow($averageRowHeaders, $averageRow);
     }
@@ -133,6 +135,7 @@ class CSV extends AbstractCSV
      * @param GenericCollection               $students
      * @param GenericCollection               $participants
      * @param bool                            $showDrafts
+     * @param bool                            $showDisplayMarks
      */
     private function writeStudents(
         GenericCollection $sortedAssessments,
@@ -140,6 +143,7 @@ class CSV extends AbstractCSV
         GenericCollection $students,
         GenericCollection $participants,
         bool $showDrafts,
+        bool $showDisplayMarks
     ): void {
         $rank = [];
         if ($this->viewRank) {
@@ -164,7 +168,7 @@ class CSV extends AbstractCSV
 
             $studentRow = [];
             foreach ($sortedAssessments as $assessment) {
-                $studentRow = $this->addParticipant($studentRow, $participants, $assessment, $userId, $showDrafts);
+                $studentRow = $this->addParticipant($studentRow, $participants, $assessment, $userId, $showDrafts, $showDisplayMarks);
             }
             $this->exportRow($studentRowHeaders, $studentRow);
         }
@@ -179,21 +183,22 @@ class CSV extends AbstractCSV
      * @param IAssessable $assessment
      * @param bool        $showDrafts If true: display a draft if it's there,
      *                                otherwise show only the non-draft mean
+     * @param bool        $showDisplayMarks
      * @return string[]
      * @return array
      */
-    private function addAverage(array $row, Markbook $markbook, IAssessable $assessment, bool $showDrafts): array
+    private function addAverage(array $row, Markbook $markbook, IAssessable $assessment, bool $showDrafts, bool $showDisplayMarks): array
     {
         $stats = $markbook->getAssessmentStatistics()[$assessment->getId()];
 
         // The 'mean' obtained here is the mean of the normalised marks (see Markbook->collateAssessmentStatistics()).
         $row[] = $this->extractDraftOrPublishedValue($stats, $showDrafts, 'mean', 'draftMean');
 
-        if ($this->hasTotalMarkColumn($assessment)) {
+        if ($this->hasTotalMarkColumn($assessment, $showDisplayMarks)) {
             // Not needed because the average of the normalised marks is more useful and already provided (see above).
             $row[] = '';
         }
-        if ($this->hasNormalizedMarkColumn($assessment)) {
+        if ($this->hasNormalizedMarkColumn($assessment, $showDisplayMarks)) {
             // Not needed because the provided value is already normalised (see above).
             $row[] = '';
         }
@@ -212,6 +217,7 @@ class CSV extends AbstractCSV
      * @param IAssessable                                           $assessment
      * @param int                                                   $userId
      * @param bool                                                  $showDrafts
+     * @param bool                                                  $showDisplayMarks
      * @return string[]
      */
     private function addParticipant(
@@ -220,6 +226,7 @@ class CSV extends AbstractCSV
         IAssessable $assessment,
         int $userId,
         bool $showDrafts,
+        bool $showDisplayMarks
     ): array {
         if (
             $participants[$assessment->getId()] instanceof Collection
@@ -236,7 +243,9 @@ class CSV extends AbstractCSV
             if ($assessment instanceof Project) {
                 // For projects, there is no feedback, so get data from other places.
                 $suffix = $assessment->isReviewComplete($participant) ? '' : ($showDrafts ? self::DRAFT_SUFFIX : '');
-                $humanReadableMark = $participant->getHumanReadableMark(!$showDrafts);
+                $humanReadableMark = $showDisplayMarks
+                    ? $participant->getHumanReadableMark(!$showDrafts)
+                    : $participant->getHumanReadableInstructorMark(!$showDrafts);
                 $normalisedMark = $participant->getNormalisedMark(!$showDrafts);
                 $comment = '';
                 $dataFound = true;
@@ -252,7 +261,7 @@ class CSV extends AbstractCSV
                     /* First find out if the teacher has provided feedback
                      */
                     $suffix = $feedback->isDraft() ? self::DRAFT_SUFFIX : '';
-                    $humanReadableMark = $feedback->getHumanReadableMark();
+                    $humanReadableMark = $feedback->getHumanReadableMark(); // Tasks only have one mark type, so always use humanReadableMark
                     $normalisedMark = $feedback->getNormalisedMark();
                     $comment = $feedback->getComment();
                     $dataFound = true;
@@ -282,7 +291,10 @@ class CSV extends AbstractCSV
 
                 if ($feedback) {
                     $suffix = $feedback->isDraft() ? self::DRAFT_SUFFIX : '';
-                    $humanReadableMark = $feedback->getHumanReadableMark();
+                    // Only due works have instructor mark schemes, all the others use humanReadableMark
+                    $humanReadableMark = ($showDisplayMarks || !($feedback instanceof \Schoolbox\Learning\Assessment\DueWork\Feedback\Model))
+                        ? $feedback->getHumanReadableMark()
+                        : $feedback->getHumanReadableInstructorMark();
                     $normalisedMark = $feedback->getNormalisedMark();
                     $comment = $feedback->getComment();
                     $dataFound = true;
@@ -290,13 +302,13 @@ class CSV extends AbstractCSV
             }
 
             if ($dataFound) {
-                if ($this->hasTotalMarkColumn($assessment)) {
+                if ($this->hasTotalMarkColumn($assessment, $showDisplayMarks)) {
                     $row[] = $humanReadableMark == '' ? '' : $this->parseNumerator($humanReadableMark) . $suffix;
                     $row[] = $humanReadableMark == '' ? '' : $this->parseDenominator($humanReadableMark) . $suffix;
                 } else {
                     $row[] = $humanReadableMark == '' ? '' : $humanReadableMark . $suffix;
                 }
-                if ($this->hasNormalizedMarkColumn($assessment)) {
+                if ($this->hasNormalizedMarkColumn($assessment, $showDisplayMarks)) {
                     $row[] = $normalisedMark === null ? '' : round($normalisedMark, 2) . $suffix;
                 }
                 if ($this->hasCommentColumn($assessment)) {
@@ -308,10 +320,10 @@ class CSV extends AbstractCSV
 
         // Fallback if nothing to display
         $row[] = '';
-        if ($this->hasTotalMarkColumn($assessment)) {
+        if ($this->hasTotalMarkColumn($assessment, $showDisplayMarks)) {
             $row[] = '';
         }
-        if ($this->hasNormalizedMarkColumn($assessment)) {
+        if ($this->hasNormalizedMarkColumn($assessment, $showDisplayMarks)) {
             $row[] = '';
         }
         if ($this->hasCommentColumn($assessment)) {

@@ -233,17 +233,29 @@
 
     /**
      * Change the download href in any download markbook links.
+     * @param {boolean|null} shouldShowDrafts - whether to show drafts in the download, null to keep the current state
+     * @param {boolean|null} shouldShowDisplayMarks - whether to show display marks in the download, null to keep the current state
      */
-    const changeDownloadHref = function (showDrafts) {
+    const changeDownloadHref = function (shouldShowDrafts, shouldShowDisplayMarks) {
         let downloadLinks = document.querySelectorAll("a[data-download-spreadsheet]");
         downloadLinks.forEach(function (downloadLink) {
             if (downloadLink && "href" in downloadLink) {
                 let downloadUrl = new URL(downloadLink.href);
-                if (showDrafts) {
+
+                // Update the showDrafts query parameter if necessary, keeping the current state if null
+                if (shouldShowDrafts === true) {
                     downloadUrl.searchParams.set("showDrafts", "1");
-                } else {
+                } else if (shouldShowDrafts === false) {
                     downloadUrl.searchParams.delete("showDrafts");
                 }
+
+                // Update the showDisplayMarks query parameter if necessary, keeping the current state if null
+                if (shouldShowDisplayMarks === true) {
+                    downloadUrl.searchParams.set("showDisplayMarks", "1");
+                } else if (shouldShowDisplayMarks === false) {
+                    downloadUrl.searchParams.delete("showDisplayMarks");
+                }
+
                 downloadLink.href = downloadUrl;
             }
         });
@@ -262,10 +274,10 @@
         $(document).on("change", selector, function () {
             if ($(this).prop("checked")) {
                 showDrafts();
-                changeDownloadHref(true);
+                changeDownloadHref(true, null);
             } else {
                 hideDrafts();
-                changeDownloadHref(false);
+                changeDownloadHref(false, null);
             }
         });
     };
@@ -298,8 +310,10 @@
         $(document).on("change", selector, function () {
             if ($(this).prop("checked")) {
                 showDisplayMarks();
+                changeDownloadHref(null, true);
             } else {
                 hideDisplayMarks();
+                changeDownloadHref(null, false);
             }
         });
     };

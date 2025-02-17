@@ -523,6 +523,7 @@ class CourseMarkbook
                     $publishedNormMark = $participant->getNormalisedMark(true);
                     if (null !== $authNormMark) {
                         $authHrMark           = $participant->getHumanReadableMark(false);
+                        $authHrInstructorMark = $participant->getHumanReadableInstructorMark(false);
                         $assessmentAnyMarks[] = $authNormMark;
 
                         if ($isTopLevelAssessable) {
@@ -543,6 +544,7 @@ class CourseMarkbook
                         if ($pendingDraft) {
                             $this->studentMarks[$courseImplId][$aId][$userId]['draft']['norm'] = $authNormMark;
                             $this->studentMarks[$courseImplId][$aId][$userId]['draft']['hr']   = $authHrMark;
+                            $this->studentMarks[$courseImplId][$aId][$userId]['draft']['hrInstructor']   = $authHrInstructorMark;
 
                             $assessmentImplMarkContainsDrafts[$aImplId] = true;
                         }
@@ -555,6 +557,7 @@ class CourseMarkbook
                     }
                     if (null !== $publishedNormMark) {
                         $publishedHrMark            = $participant->getHumanReadableMark(true);
+                        $publishedHrInstructorMark  = $participant->getHumanReadableInstructorMark(true);
                         $assessmentPublishedMarks[] = $publishedNormMark;
 
                         if ($isTopLevelAssessable) {
@@ -567,6 +570,7 @@ class CourseMarkbook
                         // Always store published if it exists
                         $this->studentMarks[$courseImplId][$aId][$userId]['published']['norm'] = $publishedNormMark;
                         $this->studentMarks[$courseImplId][$aId][$userId]['published']['hr']   = $publishedHrMark;
+                        $this->studentMarks[$courseImplId][$aId][$userId]['published']['hrInstructor']   = $publishedHrInstructorMark;
                         if ($aSpec) {
                             $specMarks[$aSpec->getId()]['published'][] = $publishedNormMark;
                         }
@@ -594,16 +598,30 @@ class CourseMarkbook
                         $assessmentPublishedMarks[] = $publishedNormMark;
                     }
 
+                    $publishedHrMark = $authPublishedFeedback->getHumanReadableMark();
+                    // instructor mark is only available for due works
+                    $publishedHrInstructorMark = $authPublishedFeedback instanceof DueWork\Feedback\Model
+                        ? $authPublishedFeedback->getHumanReadableInstructorMark() : $publishedHrMark;
+
                     // Record the student's published mark so we can display in a table cell
                     $this->studentMarks[$courseImplId][$aId][$userId]['published']['norm'] = $publishedNormMark;
-                    $this->studentMarks[$courseImplId][$aId][$userId]['published']['hr']   = $authPublishedFeedback->getHumanReadableMark();
+                    $this->studentMarks[$courseImplId][$aId][$userId]['published']['hr']   = $publishedHrMark;
+                    $this->studentMarks[$courseImplId][$aId][$userId]['published']['hrInstructor'] = $publishedHrInstructorMark;
                 }
+
+
 
                 // Only store a draft mark if a draft mark is pending for a student (even if it is null)
                 $pendingDraft = $authAnyFeedback && $authAnyFeedback->isDraft();
                 if ($pendingDraft) {
+                    $authHrMark = $authAnyFeedback->getHumanReadableMark();
+                    // instructor mark is only available for due works
+                    $authHrInstructorMark = $authAnyFeedback instanceof DueWork\Feedback\Model
+                        ? $authAnyFeedback->getHumanReadableInstructorMark() : $authHrMark;
+
                     $this->studentMarks[$courseImplId][$aId][$userId]['draft']['norm'] = $authNormMark;
-                    $this->studentMarks[$courseImplId][$aId][$userId]['draft']['hr']   = $authAnyFeedback->getHumanReadableMark();
+                    $this->studentMarks[$courseImplId][$aId][$userId]['draft']['hr']   = $authHrMark;
+                    $this->studentMarks[$courseImplId][$aId][$userId]['draft']['hrInstructor'] = $authHrInstructorMark;
                 }
 
 

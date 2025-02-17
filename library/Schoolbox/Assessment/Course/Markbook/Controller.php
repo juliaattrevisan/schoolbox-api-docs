@@ -204,10 +204,12 @@ class Controller extends WebController\Base
 
         $csvExporter = new CSV((bool)$this->getConfigLoader()->get('view_rank'));
         $showDrafts  = (bool)($queryArgs['showDrafts'] ?? false);
+        $showDisplayMarks = (bool)($queryArgs['showDisplayMarks'] ?? false);
         $csvExporter->export(
             $courseMarkbook,
             ($showDrafts ? 'Draft - ' : '') . $courseSpec->getTitle() . ' - Markbook.csv',
             $showDrafts,
+            $showDisplayMarks,
         );
         exit;
     }
