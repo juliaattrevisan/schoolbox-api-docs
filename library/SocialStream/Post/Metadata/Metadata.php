@@ -174,7 +174,7 @@ abstract class Metadata
     /**
      * Get title
      *
-     * @return string
+     * @return string|null
      */
     public function getTitle()
     {
