@@ -259,9 +259,9 @@ Usage:
                                                         </ul>
                                                     </li>
                                                 </ul>
-                                                {% if selfAssessmentFeedback.humanReadableMark|length %}
+                                                {% if selfAssessmentFeedback.humanReadableInstructorMark|length %}
                                                     <div class="grade {{ urgency.marks(selfAssessmentFeedback.normalisedMark) }}-bg">
-                                                        <span>{{ selfAssessmentFeedback.humanReadableMark }}</span>
+                                                        <span>{{ selfAssessmentFeedback.humanReadableInstructorMark }}</span>
                                                     </div>
                                                 {% endif %}
                                             </div>
@@ -274,13 +274,13 @@ Usage:
                         {# The little grades input combobox #}
                         <fieldset class="content">
                             {% block gradeValue %}
-                                {% if '' != assessment.markScheme.template %}
+                                {% if '' != assessment.instructorMarkScheme.template %}
                                     <div class="small-12 medium-3 column">
                                         <label>{{ locale.grades.proper }}
-                                            {% include '@learningMarkScheme/'~assessment.markScheme.template~'.twig' with {
+                                            {% include '@learningMarkScheme/'~assessment.instructorMarkScheme.template~'.twig' with {
                                                 participant: participant,
                                                 feedback: feedback,
-                                                markScheme: assessment.markScheme,
+                                                markScheme: assessment.instructorMarkScheme,
                                                 tabIndex: 1,
                                                 errors: errors,
                                                 readonly: readonly,
@@ -300,7 +300,7 @@ Usage:
 
                             {# Feedback comment textarea #}
                             {% block comment %}
-                                <div class="small-12{% if '' != assessment.markScheme.template %} medium-9{% endif %} column">
+                                <div class="small-12{% if '' != assessment.instructorMarkScheme.template %} medium-9{% endif %} column">
                                     {% include '@learningAssessment/dueWork/comment.twig' with {
                                         participant: participant,
                                         feedback: feedback,

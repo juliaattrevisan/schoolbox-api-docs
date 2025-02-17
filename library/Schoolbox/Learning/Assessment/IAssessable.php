@@ -332,6 +332,18 @@ interface IAssessable extends ISoftDeletable
 
 
     /**
+     * Gets the normalised instructor mark, transformed into human-readable form by this assessment's instructor MarkScheme
+     * Currently only used for due work, but will fall back to getHumanReadableMark
+     *
+     * @param Participant $participant
+     * @param bool        $publishedOnly
+     * @return string|null
+     * @throws DomainException If participant assessment is not this assessment
+     */
+    public function getHumanReadableInstructorMark(Participant $participant, $publishedOnly);
+
+
+    /**
      * Return the IResponse responsible for the participant's assessment mark
      *
      * In the case of a floating feedback without any response, then this returns null.

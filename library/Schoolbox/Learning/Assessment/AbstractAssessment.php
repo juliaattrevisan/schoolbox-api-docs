@@ -639,6 +639,19 @@ abstract class AbstractAssessment implements IAssessable
 
 
     /**
+     * @inheritdoc
+     */
+    public function getHumanReadableInstructorMark(Participant $participant, $publishedOnly)
+    {
+        // For all non-due work assessments, this falls back to getHumanReadableMark (the due work model overrides this)
+        // This avoids having to do a ton of instanceof checks everywhere and as I expect we will introduce
+        // this functionality for more assessment types in the future, this makes it easier to do so.
+
+        return $this->getHumanReadableMark($participant, $publishedOnly);
+    }
+
+
+    /**
      * Is feedback on this assessment visible to $viewingUser?
      *
      * @param User $viewingUser

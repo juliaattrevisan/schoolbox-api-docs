@@ -654,11 +654,16 @@ class DataSource
      */
     public function retrieveMarkedGrid(IFeedback $feedback): MarkedGrid
     {
-        $grid       = $this->retrieveGrid($feedback->getAssessable(), false);
+        $assessable = $feedback->getAssessable();
+
+        $grid       = $this->retrieveGrid($assessable, false);
         $rowSet     = $grid->getRowSet();
 
+        // Get the mark scheme for the grid, instructor mark scheme only exists for due work
         $markSchemeFactory = new MarkSchemeFactory();
-        $gridMarkScheme    = $feedback->getAssessable()->getMarkScheme();
+        $gridMarkScheme    = $assessable instanceof DueWorkModel
+            ? $assessable->getInstructorMarkScheme()
+            : $assessable->getMarkScheme();
 
         $markedGrid = new MarkedGrid($feedback, $grid, $gridMarkScheme);
 

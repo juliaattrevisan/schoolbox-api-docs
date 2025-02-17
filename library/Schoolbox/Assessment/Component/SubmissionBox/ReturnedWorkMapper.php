@@ -67,6 +67,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
         $this->joins('student_submission_id', StudentSubmissionMapper::class, 'id', null, null, 'submission', 'submission');
         $this->uses('comment', self::TYPE_STRING);
         $this->uses('mark', self::TYPE_STRING, null, 'humanReadableMark');
+        $this->uses('instructor_mark', self::TYPE_STRING, null, 'humanReadableInstructorMark');
         $this->uses('norm_mark', self::TYPE_DECIMAL, null, 'normalizedMark');
         $this->uses('resubmission_required', self::TYPE_BOOLEAN);
         $this->uses('published_by', self::TYPE_INTEGER);

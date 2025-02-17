@@ -31,6 +31,13 @@ class Model extends AbstractFeedback implements ISelfAssessableFeedback
     protected $allFiles;
 
     /**
+     * Mark given to this Assessable as shown to the instructor
+     *
+     * @var string|null
+     */
+    protected $humanReadableInstructorMark;
+
+    /**
      * Is this feedback marked as requiring resubmission?
      *
      * @var bool
@@ -160,6 +167,26 @@ class Model extends AbstractFeedback implements ISelfAssessableFeedback
 
 
     /**
+     * @return string|null
+     */
+    public function getHumanReadableInstructorMark()
+    {
+        return $this->humanReadableInstructorMark;
+    }
+
+
+    /**
+     * @param string|null $humanReadableInstructorMark
+     * @return $this
+     */
+    public function setHumanReadableInstructorMark($humanReadableInstructorMark)
+    {
+        $this->humanReadableInstructorMark = $humanReadableInstructorMark;
+        return $this;
+    }
+
+
+    /**
      * @return bool
      */
     public function getResubmissionRequired(): bool
@@ -256,6 +283,7 @@ class Model extends AbstractFeedback implements ISelfAssessableFeedback
         return ($this->getAllFiles()->count() === 0)
             && ($this->getNormalisedMark() === null)
             && ($this->getHumanReadableMark() === null || trim($this->getHumanReadableMark()) === '')
+            && ($this->getHumanReadableInstructorMark() === null || trim($this->getHumanReadableInstructorMark()) === '')
             && ($this->getComment() === null || trim($this->getComment()) === '')
             && !$this->hasResponseWithKamiDocs()
             && !$this->resubmissionRequired;

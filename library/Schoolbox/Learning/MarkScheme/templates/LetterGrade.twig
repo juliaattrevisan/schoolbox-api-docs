@@ -48,10 +48,13 @@
         });
     </script>
 
+    {# If this is a due work, we use the instructor mark #}
+    {% set useInstructorMark = participant.assessable is dueWork %}
+
     {% if feedback %}
-        {% set humanReadableMark = feedback.humanReadableMark(false) %}
+        {% set humanReadableMark = useInstructorMark ? feedback.humanReadableInstructorMark(false) : feedback.humanReadableMark(false) %}
     {% else %}
-        {% set humanReadableMark = participant.humanReadableMark(false) %}
+        {% set humanReadableMark = useInstructorMark ? participant.humanReadableInstructorMark(false) : participant.humanReadableMark(false) %}
     {% endif %}
 
     {% set found = false %}
@@ -131,5 +134,3 @@
 
     </select>
 {% endif %}
-
-

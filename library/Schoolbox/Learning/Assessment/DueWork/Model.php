@@ -595,6 +595,19 @@ class Model extends AbstractAssessment implements ISelfAssessable
 
 
     /**
+     * DueWork does not use the MarkScheme. It merely returns the cached value.
+     *
+     * @inheritdoc
+     */
+    public function getHumanReadableInstructorMark(Participant $participant, $publishedOnly)
+    {
+        /** @var Feedback\Model|null $feedback */
+        $feedback = $this->getAuthoritativeFeedback($participant, $publishedOnly);
+        return $feedback ? $feedback->getHumanReadableInstructorMark() : null;
+    }
+
+
+    /**
      * @inheritdoc
      */
     public function canLearnerCreateResponse(User $learner)

@@ -39,7 +39,7 @@ abstract class AbstractFeedback implements IFeedback
     private $response;
 
     /**
-     * Mark given to this Assessable
+     * Mark given to this Assessable as shown to the learner
      *
      * @var string
      */

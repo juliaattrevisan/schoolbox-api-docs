@@ -157,13 +157,13 @@
                 <input type="hidden" name="responseId" value="{{ response.id ?? '' }}"/>
 
                 <div class="row">
-                    {% if '' != assessment.markScheme.template %}
+                    {% if '' != assessment.instructorMarkScheme.template %}
                         <div class="small-12 medium-3 column">
                             <label>{{ locale.grades.proper }}
-                                {% include '@learningMarkScheme/'~assessment.markScheme.template~'.twig' with {
+                                {% include '@learningMarkScheme/'~assessment.instructorMarkScheme.template~'.twig' with {
                                     participant: participant,
                                     feedback:    participant.findMostRecentInstructorGivenFeedback,
-                                    markScheme:  assessment.markScheme,
+                                    markScheme:  assessment.instructorMarkScheme,
                                     tabIndex:    (loop.index0 * inputsPerFeedback) + inputNo,
                                     errors:      errors,
                                     readonly:    readonly
@@ -180,7 +180,7 @@
                         </div>
 
                     {% endif %}
-                    <div class="small-12{% if '' != assessment.markScheme.template %} medium-9{% endif %} column">
+                    <div class="small-12{% if '' != assessment.instructorMarkScheme.template %} medium-9{% endif %} column">
                         {% include '@learningAssessment/dueWork/comment.twig' with {
                             feedback:       participant.findMostRecentInstructorGivenFeedback,
                             participant:    participant,
@@ -191,7 +191,7 @@
                             blindMode:      false
                         } only %}
                         {% set inputNo = inputNo + 1 %}
-                        {% if '' == assessment.markScheme.template %}
+                        {% if '' == assessment.instructorMarkScheme.template %}
                             {% include '@learningAssessment/dueWork/resubmissionRequired.twig' with {
                                 feedback:    participant.findMostRecentInstructorGivenFeedback,
                                 participant: participant,
