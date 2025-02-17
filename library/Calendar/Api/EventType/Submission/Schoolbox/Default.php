@@ -15,6 +15,8 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\User;
+use Schoolbox\Config\Loader as ConfigLoader;
+use Schoolbox\IConfigLoader;
 
 class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_EventType_Abstract
 {
@@ -27,6 +29,10 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
     /** @var Visibility */
     private $visibility;
 
+    /**
+     * @var IConfigLoader
+     */
+    private $config;
 
     /**
      * @var \Schoolbox\Calendar\EventTypeMapper
@@ -57,6 +63,29 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
         $this->assessmentDataSource = $assessmentDataSource;
         $this->visibility           = $visibility;
         $this->eventTypeMapper      = $eventTypeMapper;
+    }
+
+    /**
+     * @return IConfigLoader
+     */
+    public function getConfig(): IConfigLoader
+    {
+        if (!$this->config instanceof IConfigLoader) {
+            $this->setConfig(ConfigLoader::getInstance());
+        }
+
+        return $this->config;
+    }
+
+    /**
+     * @param \Schoolbox\IConfigLoader $loader
+     *
+     * @return $this
+     */
+    public function setConfig(IConfigLoader $loader): self
+    {
+        $this->config = $loader;
+        return $this;
     }
 
     /**
@@ -141,7 +170,8 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
              */
             $isParent = $this->getViewer()->getRole()->isParent();
             $isLessonPlan = $assessment->getDefaultTypeName() === 'Lesson Plan';
-            if ($isParent && $isLessonPlan) {
+            $isRestrictLessonPlanAccess = $this->getConfig()->get("restrict_parent_lesson_plan_access");
+            if ($isParent && $isLessonPlan && $isRestrictLessonPlanAccess) {
                 continue;
             }
 
