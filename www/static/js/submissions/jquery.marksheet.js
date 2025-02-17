@@ -271,35 +271,35 @@
     };
 
     /**
-     * Show the communicated (learner) mark in markbook cells and hide the instructor mark
+     * Show the display (learner) mark in markbook cells and hide the instructor mark
      */
-    function showCommunicatedMarks() {
+    function showDisplayMarks() {
         $("[data-learner-mark]").show();
         $("[data-instructor-mark]").hide();
     }
 
     /**
-     * Hide the communicated (learner) mark in markbook cells and show the instructor mark
+     * Hide the display (learner) mark in markbook cells and show the instructor mark
      */
-    function hideCommunicatedMarks() {
+    function hideDisplayMarks() {
         $("[data-learner-mark]").hide();
         $("[data-instructor-mark]").show();
     }
 
     /**
-     * Set up toggle on/off of communicated marks.
+     * Set up toggle on/off of display marks.
      *
-     * On changing the show/hide communicated marks checkbox:
-     * * show/hide communicated marks in the markbook
+     * On changing the show/hide display marks checkbox:
+     * * show/hide display marks in the markbook
      *
      * @param selector
      */
-    $.marksheetToggleCommunicatedMarks = function (selector) {
+    $.marksheetToggleDisplayMarks = function (selector) {
         $(document).on("change", selector, function () {
             if ($(this).prop("checked")) {
-                showCommunicatedMarks();
+                showDisplayMarks();
             } else {
-                hideCommunicatedMarks();
+                hideDisplayMarks();
             }
         });
     };
