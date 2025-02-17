@@ -54,7 +54,7 @@ class Importer
     /**
      * Date formats that can be used in the csv
      */
-    public const VALID_DATE_FORMATS = [
+    private const VALID_DATE_FORMATS = [
         \Alaress_Date_Format::DATABASE_DATE_FORMAT,
         'd/m/Y',
     ];
