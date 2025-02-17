@@ -206,7 +206,7 @@ class AbstractCSV
     protected function hasNormalizedMarkColumn(IAssessable $assessment, bool $showDisplayMarks): bool
     {
         // If this isn't a due work, then it doesn't have an instructor mark so fall back to normal mark scheme
-        $markScheme = $showDisplayMarks || !$assessment instanceof DueWork\Model
+        $markScheme = ($showDisplayMarks || !$assessment instanceof DueWork\Model)
             ? $assessment->getMarkScheme()
             : $assessment->getInstructorMarkScheme();
 
@@ -225,7 +225,7 @@ class AbstractCSV
     protected function hasTotalMarkColumn(IAssessable $assessment, bool $showDisplayMarks): bool
     {
         // If this isn't a due work, then it doesn't have an instructor mark so fall back to normal mark scheme
-        $markScheme = $showDisplayMarks || !$assessment instanceof DueWork\Model
+        $markScheme = ($showDisplayMarks || !$assessment instanceof DueWork\Model)
             ? $assessment->getMarkScheme()
             : $assessment->getInstructorMarkScheme();
 

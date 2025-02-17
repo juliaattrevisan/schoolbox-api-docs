@@ -292,7 +292,7 @@ class CSV extends AbstractCSV
                 if ($feedback) {
                     $suffix = $feedback->isDraft() ? self::DRAFT_SUFFIX : '';
                     // Only due works have instructor mark schemes, all the others use humanReadableMark
-                    $humanReadableMark = $showDisplayMarks || !($feedback instanceof \Schoolbox\Learning\Assessment\DueWork\Feedback\Model)
+                    $humanReadableMark = ($showDisplayMarks || !($feedback instanceof \Schoolbox\Learning\Assessment\DueWork\Feedback\Model))
                         ? $feedback->getHumanReadableMark()
                         : $feedback->getHumanReadableInstructorMark();
                     $normalisedMark = $feedback->getNormalisedMark();
