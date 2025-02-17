@@ -135,6 +135,15 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
                 continue;
             }
 
+            /**
+             * If a parent is viewing, they should only see their child's lesson plans
+             * if the restrict_parent_lesson_plan_access config setting is enabled
+             */
+            $isLessonPlan = $assessment->getDefaultTypeName() === 'Lesson Plan';
+            if ($isLessonPlan) {
+                continue;
+            }
+
             // This may be invoked by both staff and students.
             // Students will see their plan's dates, teachers will see the real assessment dates.
             $participant = $assessment->getParticipantIfExtant($this->getUser());
