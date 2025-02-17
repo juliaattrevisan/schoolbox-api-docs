@@ -41,7 +41,7 @@ $app = new class extends CliTool\App
     }
 
     /** @inheritDoc */
-    public function getRequiredProcessUser(): ?string
+    public function getRequiredProcessUser(): string
     {
         return 'www-data';
     }
@@ -62,7 +62,7 @@ an automated Daily Org scenario at 8am when teachers decide they can't
 come in to work, requiring schools to scramble for substitute teachers.
 
 Due to the time sensitive nature of that, this only imports timetable data.
-It doesn't import profile data or any calendar data. 
+It doesn't import profile data or any calendar data.
 
 This always performs updates; there is no dry-run mode for the cron task.
 

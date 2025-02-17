@@ -3691,12 +3691,6 @@ parameters:
 			path: library/Schoolbox/InstanceRegistry/ApiClient.php
 
 		-
-			message: '#^Unreachable statement \- code above always terminates\.$#'
-			identifier: deadCode.unreachable
-			count: 1
-			path: library/Schoolbox/InstanceRegistry/Credentials/Config.php
-
-		-
 			message: '#^Method Schoolbox\\Learning\\Analytics\\CohortAnalysis\:\:getParticipatingStudents\(\) should return iterable\<Schoolbox\\User\>&Schoolbox\\GenericCollection but returns iterable\<Schoolbox\\User\>&Schoolbox\\Collection\.$#'
 			identifier: return.type
 			count: 1
@@ -6673,19 +6667,7 @@ parameters:
 			path: tools/rubric/repairSpecAssessments.php
 
 		-
-			message: '#^Method Schoolbox\\Application\\CliTool\\App@anonymous/tools/synchronise/scheduler\.php\:39\:\:getRequiredProcessUser\(\) never returns null so it can be removed from the return type\.$#'
-			identifier: return.unusedType
-			count: 1
-			path: tools/synchronise/scheduler.php
-
-		-
 			message: '#^Method Schoolbox\\Application\\CliTool\\App@anonymous/tools/synchronise/sisImporter\.php\:37\:\:getRequiredProcessUser\(\) never returns null so it can be removed from the return type\.$#'
 			identifier: return.unusedType
 			count: 1
 			path: tools/synchronise/sisImporter.php
-
-		-
-			message: '#^Method Schoolbox\\Application\\CliTool\\App@anonymous/tools/synchronise/userInitiated\.php\:39\:\:getRequiredProcessUser\(\) never returns null so it can be removed from the return type\.$#'
-			identifier: return.unusedType
-			count: 1
-			path: tools/synchronise/userInitiated.php
