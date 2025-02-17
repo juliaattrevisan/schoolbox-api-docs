@@ -50,6 +50,14 @@ class Importer
      */
     public const CAMPUS_DB_LIMIT = 255;
 
+    /**
+     * Date formats that can be used in the csv
+     */
+    public const VALID_DATE_FORMATS = [
+        \Alaress_Date_Format::DATABASE_DATE_FORMAT,
+        'd/m/Y',
+    ];
+
 
     /**
      * Upload type
@@ -331,7 +339,7 @@ class Importer
              *  but I think the answer is going to be in alaress date format
              */
             if ($row['Date of Birth']) {
-                $dob = new \Alaress_Date_Format($row['Date of Birth'], \Alaress_Date_Format::DATABASE_DATE_FORMAT);
+                $dob = new \Alaress_Date_Format($row['Date of Birth'], self::VALID_DATE_FORMATS);
             }
 
             $campus = $row['Campus'];
