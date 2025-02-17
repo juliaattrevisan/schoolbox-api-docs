@@ -15,7 +15,6 @@ namespace SocialStream\Post\Metadata;
  */
 abstract class Metadata
 {
-
     /**
      * XML output from curl
      *
