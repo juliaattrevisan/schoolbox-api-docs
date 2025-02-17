@@ -183,10 +183,10 @@ class Hydrator
                     break;
 
                 case Cursor::DISCRIMINATOR_QUIZ_FEEDBACK:
-                    /** @var QuizFeedback $quizFeedback */
+                    /** @var QuizFeedback|null $quizFeedback */
                     $quizFeedback = $quizFeedbackResults->offsetGet((int)$result['id']);
                     /** @var IAssessable|null $assessment */
-                    $assessment = $assessments->offsetGet($quizFeedback->getAssessable()->getId());
+                    $assessment = $assessments->offsetGet($quizFeedback?->getAssessable()->getId());
                     if (
                         !$assessment
                         || !$this->visibility->isVisibleToUserOrChildOfUser($assessment, $this->viewer, true, null, true)
