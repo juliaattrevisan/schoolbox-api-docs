@@ -334,7 +334,7 @@ class Controller extends Base
     {
         $response = $e->getResponse();
         if (!$response) {
-            return json_decode($e->getMessage());
+            return $e->getMessage();
         }
 
         // The SHAPs API is JSON. If we got HTML, we're probably hitting somewhere random.
@@ -347,7 +347,7 @@ class Controller extends Base
         try {
             return json_decode($response->getBody()->getContents());
         } catch (RuntimeException $e) {
-            return json_decode($e->getMessage());
+            return $e->getMessage();
         }
     }
 }
