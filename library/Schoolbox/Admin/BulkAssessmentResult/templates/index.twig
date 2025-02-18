@@ -1,3 +1,25 @@
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
+
+<script>
+    $(function() {
+        let bulkAssessmentResultForm = $('#bulkAssessmentResult');
+
+        bulkAssessmentResultForm.find('input[data-selectizeuser]')
+            .userSelectizeSelector({
+                ajax: {
+                    data: {groupID: 0},
+                }
+            })
+            .on('selectize.item_add', function() {
+                bulkAssessmentResultForm.find(':submit').prop('disabled', false).focus();
+            })
+            .on('selectize.item_remove', function() {
+                bulkAssessmentResultForm.find(':submit').prop('disabled', true);
+            });
+    });
+</script>
+
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
 
@@ -29,7 +51,7 @@
         <div class="small-12 island">
             {% set formRoute = routeLookupIfAuthorized('adminBulkAssessmentResult.postPreview') %}
 
-            <form action="{{ formRoute }}" method="post">
+            <form action="{{ formRoute }}" method="post" id="bulkAssessmentResult">
                 <section>
                     <fieldset class="content">
                         <div class="small-12 columns">
@@ -42,7 +64,10 @@
                             </select>
                         </div>
 
-                        Feedback Owner
+                        <div class="small-12 columns">
+                            <label for="userId" class="required">Feedback Author</label>
+                            <input id="userId" data-selectizeuser type="text" name="userId" placeholder="Search Users">
+                        </div>
                     </fieldset>
                 </section>
                 <input type="submit" />
