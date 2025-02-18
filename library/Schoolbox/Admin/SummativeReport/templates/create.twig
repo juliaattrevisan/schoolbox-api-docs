@@ -479,15 +479,8 @@
                                 </li>
                             </ul>
 
-                            {# Decide what this should be called; by default, "Summary of Victorian Curriculum Standards" #}
-                            {% set vicProgressionTitle = curriculumProgression.title %}
-
-                            {% if options.summary.vicProgression.title %}
-                                {% set vicProgressionTitle = options.summary.vicProgression.title %}
-                            {% endif %}
-
                             <label for="report-summary-vic-progression-title">Title</label>
-                            <input id="report-summary-vic-progression-title" name="summary[vicProgression][title]" type="text" maxlength="255" value="{{ vicProgressionTitle }}" />
+                            <input id="report-summary-vic-progression-title" name="summary[vicProgression][title]" type="text" maxlength="255" value="{{ options.summary.vicProgression.title ?? curriculumProgression.title }}" />
 
                             <label for="report-summary-vic-progression-worktype">Work Type</label>
                             <select id="report-summary-vic-progression-worktype" name="summary[vicProgression][workType]">
@@ -600,10 +593,8 @@
                             </table>
                         </div>
                     </fieldset>
-                    {# Victorian Curriculum Progressions is Penola-specific atm #}
-                    {% if 'pcc' == config.site_school_code|lower  %}
                     <fieldset class="content">
-                        <legend>Victorian Curriculum Progressions</legend>
+                        <legend>Curriculum Progressions</legend>
                         <div class="small-12 columns">
                             <p class="meta">
                                 Enabling this will provide a visualisation of <strong>progression points</strong> that students have achieved
@@ -618,6 +609,9 @@
                                 </li>
                             </ul>
 
+                            <label for="report-class-vic-progression-title">Title</label>
+                            <input id="report-class-vic-progression-title" name="class[vicProgression][title]" type="text" maxlength="255" value="{{ options.class.vicProgression.title ?? curriculumProgression.title }}" />
+
                             <label for="report-class-vic-progression-worktype">Work Type</label>
                             <select id="report-class-vic-progression-worktype" name="class[vicProgression][workType]">
                                 {% for worktype in worktypesClass %}
@@ -626,7 +620,6 @@
                             </select>
                         </div>
                     </fieldset>
-                    {% endif %}
 
                         {# NONE of this exists yet....
                         <div class="small-12 columns">

@@ -1027,7 +1027,6 @@ class Controller extends ConfigController
             'annotate' => (bool)$this->requestQuery->get('annotate', false),
             'summary' => null,
             'class' => null,
-            'title' => self::DEFAULT_TITLE
         ];
 
         /* At least one of the Victorian Curriculum Progressions was enabled
@@ -1051,8 +1050,10 @@ class Controller extends ConfigController
 
                 /* Remember its customised title
                  */
-                if ($optionsPayload['summary']['vicProgression']['title']) {
-                    $vicProgression['title'] = $optionsPayload['summary']['vicProgression']['title'];
+                $vicProgression['summary']['title'] = self::DEFAULT_TITLE;
+
+                if ('' !== trim((string)($optionsPayload['summary']['vicProgression']['title'] ?? ''))) {
+                    $vicProgression['summary']['title'] = $optionsPayload['summary']['vicProgression']['title'];
                 }
             }
 
@@ -1066,6 +1067,14 @@ class Controller extends ConfigController
                     (int)$optionsPayload['class']['vicProgression']['workType'],
                     $vicProgression['annotate']
                 );
+
+                /* Remember its customised title
+                 */
+                $vicProgression['class']['title'] = self::DEFAULT_TITLE;
+
+                if ('' !== trim((string)($optionsPayload['class']['vicProgression']['title'] ?? ''))) {
+                    $vicProgression['class']['title'] = $optionsPayload['class']['vicProgression']['title'];
+                }
 
                 /* Render a chart for each class in $folders, I suppose
                  */

@@ -586,7 +586,7 @@
             identifier: 'curriculumProgression-summary',
             payload: vicProgression.summary,
             annotate: vicProgression.annotate,
-            title: vicProgression.title
+            title: vicProgression.summary.title
         } only %}
     </div>
     {% endif %}
@@ -662,7 +662,7 @@
                     identifier: 'curriculumProgression-class-' ~ folder.id,
                     payload: vicProgression.class[folder.id],
                     annotate: vicProgression.annotate,
-                    title: vicProgression.title
+                    title: vicProgression.class.title
                 } only %}
             {% endif %}
         {% endfor %}
