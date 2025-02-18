@@ -6,6 +6,8 @@
  * @link        https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Schoolbox\Admin\Restore;
 
 use Alaress\Web\Controller\Base;
@@ -50,9 +52,10 @@ class Controller extends Base
     }
 
     /**
-     * Load $templateName
+     * Main Restore page
      *
-     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
+     * find all the deleted things
+     *
      */
     public function getIndex()
     {
@@ -119,9 +122,9 @@ class Controller extends Base
     }
 
     /**
-     * Load $templateName
+     * Restore Folder
      *
-     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
+     * @api POST /adminv2/restore/folder
      */
     public function restoreFolder()
     {
@@ -141,9 +144,9 @@ class Controller extends Base
     }
 
     /**
-     * Load $templateName
+     * Restore Assessment
      *
-     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
+     * @api POST /adminv2/restore/assessment
      */
     public function restoreAssessment()
     {
@@ -163,9 +166,10 @@ class Controller extends Base
     }
 
     /**
-     * Load $templateName
+     * Restore User
      *
-     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
+     * @since 25.0
+     * @api POST /adminv2/restore/user
      */
     public function restoreUser()
     {
@@ -185,9 +189,10 @@ class Controller extends Base
     }
 
     /**
-     * Load $templateName
+     * Restore File
      *
-     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
+     * @since 25.0
+     * @api POST /adminv2/restore/file
      */
     public function restoreFile()
     {
