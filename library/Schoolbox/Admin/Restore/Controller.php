@@ -162,19 +162,7 @@ class Controller extends Base
      */
     public function restoreFolder()
     {
-        $recursiveUndeleter = new RecursiveUndeleter(new NullLogger(), self::RESTORE_WINDOW);
-        $modelByIdByMapperClass = $recursiveUndeleter->findDeletedModels($this->folderMapper, [$this->requestPost['id']]);
-        $db = $this->folderMapper->getDatabase();
-        $db->beginTransaction();
-        try {
-            $recursiveUndeleter->restoreSoftDeletedModels($modelByIdByMapperClass);
-        } catch (\Throwable $e) {
-            $db->rollBack();
-            throw $this->generateException(ErrorMapper::ERROR_PROCESSING, $e, "Unable to restore objects, rolling back.");
-        }
-
-        $db->commit();
-        $this->response = $this->responseAsJson(['success' => true]);
+        $this->restore($this->folderMapper);
     }
 
     /**
@@ -184,19 +172,7 @@ class Controller extends Base
      */
     public function restoreAssessment()
     {
-        $recursiveUndeleter = new RecursiveUndeleter(new NullLogger(), self::RESTORE_WINDOW);
-        $modelByIdByMapperClass = $recursiveUndeleter->findDeletedModels($this->assessmentMapper, [$this->requestPost['id']]);
-        $db = $this->assessmentMapper->getDatabase();
-        $db->beginTransaction();
-        try {
-            $recursiveUndeleter->restoreSoftDeletedModels($modelByIdByMapperClass);
-        } catch (\Throwable $e) {
-            $db->rollBack();
-            throw $this->generateException(ErrorMapper::ERROR_PROCESSING, $e, "Unable to restore objects, rolling back.");
-        }
-
-        $db->commit();
-        $this->response = $this->responseAsJson(['success' => true]);
+        $this->restore($this->assessmentMapper);
     }
 
     /**
@@ -207,19 +183,7 @@ class Controller extends Base
      */
     public function restoreUser()
     {
-        $recursiveUndeleter = new RecursiveUndeleter(new NullLogger(), self::RESTORE_WINDOW);
-        $modelByIdByMapperClass = $recursiveUndeleter->findDeletedModels($this->userMapper, [$this->requestPost['id']]);
-        $db = $this->userMapper->getDatabase();
-        $db->beginTransaction();
-        try {
-            $recursiveUndeleter->restoreSoftDeletedModels($modelByIdByMapperClass);
-        } catch (\Throwable $e) {
-            $db->rollBack();
-            throw $this->generateException(ErrorMapper::ERROR_PROCESSING, $e, "Unable to restore objects, rolling back.");
-        }
-
-        $db->commit();
-        $this->response = $this->responseAsJson(['success' => true]);
+        $this->restore($this->userMapper);
     }
 
     /**
@@ -230,19 +194,7 @@ class Controller extends Base
      */
     public function restoreFile()
     {
-        $recursiveUndeleter = new RecursiveUndeleter(new NullLogger(), self::RESTORE_WINDOW);
-        $modelByIdByMapperClass = $recursiveUndeleter->findDeletedModels($this->fileMapper, [$this->requestPost['id']]);
-        $db = $this->fileMapper->getDatabase();
-        $db->beginTransaction();
-        try {
-            $recursiveUndeleter->restoreSoftDeletedModels($modelByIdByMapperClass);
-        } catch (\Throwable $e) {
-            $db->rollBack();
-            throw $this->generateException(ErrorMapper::ERROR_PROCESSING, $e, "Unable to restore objects, rolling back.");
-        }
-
-        $db->commit();
-        $this->response = $this->responseAsJson(['success' => true]);
+        $this->restore($this->fileMapper);
     }
 
     /**
@@ -291,12 +243,13 @@ class Controller extends Base
 
 
     //------------------------------------------------------------------------------------------------------------------
+    //------------------------------------------   Helper Functions   --------------------------------------------------
     /**
      * Fetches and filters objects that live on a folder
      *
-     * @param IMapper $mapper
-     * @param \Alaress_Date_Format $start
-     * @param \Alaress_Date_Format $end
+     * @param IMapper $mapper // what mapper we are restoring the initial object from
+     * @param \Alaress_Date_Format $start // when to start searching for deleted objects
+     * @param \Alaress_Date_Format $end // when to stop searching for deleted objects
      * @return mixed
      */
     private function getDeletdFolderContent(IMapper $mapper, \Alaress_Date_Format $start, \Alaress_Date_Format $end)
@@ -311,6 +264,14 @@ class Controller extends Base
         return $deletedNodes;
     }
 
+    /**
+     * Recursively restore the object and all its children
+     * also handles the $this->response
+     *
+     * @param IMapper $mapper // what mapper we are restoring the initial object from
+     * @return void
+     * @throws \Schoolbox\Mapper\Exception
+     */
     private function restore(IMapper $mapper)
     {
         $recursiveUndeleter = new RecursiveUndeleter(new NullLogger(), self::RESTORE_WINDOW);
@@ -326,5 +287,5 @@ class Controller extends Base
 
         $db->commit();
         $this->response = $this->responseAsJson(['success' => true]);
-        }
+    }
 }
