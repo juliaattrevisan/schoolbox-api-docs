@@ -45,8 +45,10 @@ class Module extends BaseModule
         $this->register('POST', '/folder', 'restoreFolder', $perms, null);
         $this->register('POST', '/assessment', 'restoreAssessment', $perms, null);
         $this->register('POST', '/user', 'restoreUser', $perms, null);
-        $this->register('POST', '/course', 'restoreCourse', $perms, null);
-        $this->register('POST', '/unit', 'restoreUnit', $perms, null);
+        $this->register('POST', '/courseSpec', 'restoreCourseSpec', $perms, null);
+        $this->register('POST', '/courseImpl', 'restoreCourseImpl', $perms, null);
+        $this->register('POST', '/unitSpec', 'restoreUnitSpec', $perms, null);
+        $this->register('POST', '/unitImpl', 'restoreUnitImpl', $perms, null);
         $this->register('POST', '/file', 'restoreFile', $perms, null);
     }
 

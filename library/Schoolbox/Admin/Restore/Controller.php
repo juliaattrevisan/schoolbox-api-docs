@@ -246,6 +246,7 @@ class Controller extends Base
     }
 
 
+    //------------------------------------------------------------------------------------------------------------------
     /**
      * Fetches and filters objects that live on a folder
      *
