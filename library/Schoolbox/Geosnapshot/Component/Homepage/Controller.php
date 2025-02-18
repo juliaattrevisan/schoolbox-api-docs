@@ -5,6 +5,8 @@
  * @link        http://www.alaress.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Schoolbox\Geosnapshot\Component\Homepage;
 
 use Component_Homepage_ControllerAbstract;
@@ -76,7 +78,8 @@ class Controller extends Component_Homepage_ControllerAbstract
 
             /* Get the height set in the component's configuration settings, setting to a min of 500 if not set
              */
-            $this->height = is_numeric($this->getConfig('height')) ? $this->getConfig('height') : 500;
+            $heightInPixels = $this->getConfig('height');
+            $this->height = (is_int($heightInPixels) || ctype_digit($heightInPixels)) ? (int)$heightInPixels : 500;
 
             return true;
         }
