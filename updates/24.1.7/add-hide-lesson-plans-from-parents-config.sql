@@ -25,7 +25,7 @@ VALUES (
         'restrict_parent_lesson_plan_access',
         'Hide Lesson Plans from Parents',
         1,
-        'Toggling this to ''ON'' will hide Lesson Plans from Parents.',
+        'If toggled to ''ON'', parents will be prevented from being able to view Lesson Plans on a students calendar.',
         (
             SELECT id
             FROM lu_config_field
