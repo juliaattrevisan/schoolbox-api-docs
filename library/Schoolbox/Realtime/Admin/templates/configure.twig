@@ -247,6 +247,9 @@
             });
         });
     }
+
+
+
 </script>
 
 {% import 'sub/breadcrumbs.twig' as bread %}
@@ -397,7 +400,7 @@
                                     <li>
                                         {% set currentType = filters.options[filters.selected] %}
                                         {% set plural = (currentType == "parent" or currentType == "student") ? "s" : "" %}
-                                        <a class="icon-export" data-reveal-id="#" href="#apply-default-settings">Apply default settings to all {{ currentType == "all" ? "users" : currentType ~ plural }}...</a>
+                                        <a class="icon-export" data-reveal-id="apply-default-settings-modal" href="#apply-default-settings">Apply default settings to all {{ currentType == "all" ? "users" : currentType ~ plural }}...</a>
                                     </li>
                                 </ul>
                             </div>
@@ -409,6 +412,68 @@
                             {% endif %}
                         {% endfor %}
                     </div>
+                    <div data-reveal id="apply-default-settings-modal" class="reveal-modal">
+                        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+                        <h2>Please confirm</h2>
+                        <p>Are you sure you wish to apply default settings to all? This will overwrite and apply the settings to all users.</p>
+                        <ul class="flex-list buttons">
+                            <li>
+                                <a id="confirm-apply-default-settings" class="button submit">Yes</a>
+                            </li>
+                            <li>
+                                <a id="cancel-apply-default-settings" class="button">Cancel</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <script type="text/javascript">
+                        {% autoescape 'js' %}
+                        /**
+                        * Confirm the application of default settings
+                        */
+                        const confirmButton = document.getElementById("confirm-apply-default-settings");
+                        confirmButton.addEventListener("click", () => {
+                            // prevent multiple submissions
+                            if (confirmButton.getAttribute("data-is-processing") === "true") {
+                                return;
+                            }
+                            confirmButton.setAttribute("data-is-processing", "true");
+                            confirmButton.innerHTML = "Applying...";
+                            /**
+                             * send through the apply default settings request
+                             */
+                            /*
+                            try {
+                                fetch("", {
+                                    method: "POST",
+                                    body: JSON.stringify({
+                                        roletype: ""
+                                        namespace: ""
+                                    })
+                                }).then((response) => {
+                                    if (response.ok) {
+                                        $("#apply-default-settings-modal").foundation("reveal", "close");
+                                        // fire toast success
+                                    } else {
+                                        // fire toast error
+                                    }
+                                    confirmButton.setAttribute("data-is-processing", "false");
+                                    confirmButton.innerHTML = "Yes";
+                                });
+                            } catch (e) {
+                                // fire toast error
+                                confirmButton.setAttribute("data-is-processing", "false");
+                                confirmButton.innerHTML = "Yes";
+                            }
+                            */
+                        });
+                        /**
+                        * Close the modal
+                        */
+                        document.getElementById("cancel-apply-default-settings").addEventListener("click", () => {
+                            $("#apply-default-settings-modal").foundation("reveal", "close");
+                        });
+                        {% endautoescape %}
+                    </script>
                     {% else %}
                     <div class="empty-state">
                         <p>No roles exist with this role type</p>
