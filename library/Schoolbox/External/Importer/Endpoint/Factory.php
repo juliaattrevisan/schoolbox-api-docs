@@ -341,6 +341,7 @@ class Factory implements IFactory
                 $this->host,
                 $this->key,
                 $this->watchlist,
+                trim((string)Loader::getInstance()->get('external_staff_portal')),
                 /* Profile pieces
                  */
                 UserProfile\Mapper::getInstance()->disableCache(),
