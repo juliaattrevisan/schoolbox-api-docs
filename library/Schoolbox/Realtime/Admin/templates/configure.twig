@@ -435,11 +435,15 @@
                         */
                         const namespaceTarget = document.getElementById("apply-default-settings-namespace");
                         const roletypeTarget = document.getElementById("apply-default-settings-roletype");
+                        let currentNamespace = "";
+                        let currentRoletype = "";
                         const applyDefaultButtons = document.querySelectorAll("[data-namespace]");
                         applyDefaultButtons.forEach((applyDefaultButton) => {
                             applyDefaultButton.addEventListener("click", () => {
-                                namespaceTarget.innerText = applyDefaultButton.getAttribute("data-namespace");
-                                roletypeTarget.innerText = applyDefaultButton.getAttribute("data-roletype");
+                                currentNamespace = applyDefaultButton.getAttribute("data-namespace");
+                                currentRoletype = applyDefaultButton.getAttribute("data-roletype");
+                                namespaceTarget.innerText = currentNamespace;
+                                roletypeTarget.innerText = currentRoletype;
                             });
                         });
                         /**
@@ -461,8 +465,8 @@
                                 fetch("", {
                                     method: "POST",
                                     body: JSON.stringify({
-                                        roletype: ""
-                                        namespace: ""
+                                        roletype: currentNamespace
+                                        namespace: currentRoletype
                                     })
                                 }).then((response) => {
                                     if (response.ok) {
