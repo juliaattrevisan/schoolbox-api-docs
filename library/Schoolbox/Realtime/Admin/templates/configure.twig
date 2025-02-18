@@ -384,12 +384,23 @@
                             </li>
                         {% endfor %}
                     </ul>
-
                     {% if config|length  %}
                     <div id="configurator">
                         {% for namespace in msgConfig %}
                             {% if ns[namespace.id] is defined %}
-                            <h3 class="subheader">{{ locale.translateSentence(ns[namespace.id].label) }}</h3>
+                            <div class="actions-small-1">
+                                <h3 class="subheader f-no-margins">{{ locale.translateSentence(ns[namespace.id].label) }}</h3>
+                                <nav>
+                                    <sbx-pop-out content-id="feature-pop-out-{{ namespace.id }}"></sbx-pop-out>
+                                </nav>
+                                <ul id="feature-pop-out-{{ namespace.id }}" class="f-dropdown" data-dropdown-content>
+                                    <li>
+                                        {% set currentType = filters.options[filters.selected] %}
+                                        {% set plural = (currentType == "parent" or currentType == "student") ? "s" : "" %}
+                                        <a class="icon-export" data-reveal-id="#" href="#apply-default-settings">Apply default settings to all {{ currentType == "all" ? "users" : currentType ~ plural }}...</a>
+                                    </li>
+                                </ul>
+                            </div>
                             <section data-namespace="{{ ns[namespace.id].slug }}">
                                 {% for source in namespace.sources %}
                                     {% include '@notifications/source.twig' with { source: source } %}
