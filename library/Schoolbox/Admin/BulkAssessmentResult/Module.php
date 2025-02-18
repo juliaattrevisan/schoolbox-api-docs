@@ -37,7 +37,7 @@ class Module extends BaseModule
             new Rule\IsSuperuser()
         );
 
-        $this->register('GET', '', 'getImport', $perms);
+        $this->register('GET', '', 'getIndex', $perms);
         $this->register('POST', '/preview', 'postPreview', $perms);
         $this->register('POST', '/perform', 'postPerform', $perms);
     }

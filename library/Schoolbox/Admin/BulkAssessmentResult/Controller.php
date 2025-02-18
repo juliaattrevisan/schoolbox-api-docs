@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\BulkAssessmentResult;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Admin\Navigation\Subnav;
 
 class Controller extends Base
 {
@@ -26,11 +27,13 @@ class Controller extends Base
      * Provide input form for configuration and async upload for the csv file
      * Also link to a csv template that users can download and follow
      */
-    public function getImport(): void
+    public function getIndex(): void
     {
         $this->response = $this->responseFromTemplate(
             '@adminBulkAssessmentResult/index.twig',
             [
+                'pageCurrent'    => $this->routeGenerator->generate('adminBulkAssessmentResult.getIndex'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminBulkAssessmentResult.getIndex')),
             ],
             'Bulk Assessment Result'
         );
