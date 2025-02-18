@@ -433,6 +433,12 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer
                 $postprocessed[] = $data['other'];
                 $data['response'] = strip_tags(implode(', ', $postprocessed));
             }
+        } else {
+            /* If this is a partial attempt and the student hasn't answered yet, $data will be set to false
+             * Make sure it's an array so we can continue on.
+             * Provide an empty 'response' key so it doesn't cause other warnings down the line.
+             */
+            $data = ['response' => ''];
         }
 
         /* Append commentary
