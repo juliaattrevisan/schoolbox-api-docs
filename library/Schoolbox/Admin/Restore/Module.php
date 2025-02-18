@@ -14,6 +14,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\UserMapper;
 use Twig\Error\LoaderError;
@@ -41,6 +42,9 @@ class Module extends BaseModule
         $this->register('POST', '/folder', 'restoreFolder', $perms, null);
         $this->register('POST', '/assessment', 'restoreAssessment', $perms, null);
         $this->register('POST', '/user', 'restoreUser', $perms, null);
+        $this->register('POST', '/course', 'restoreCourse', $perms, null);
+        $this->register('POST', '/unit', 'restoreUnit', $perms, null);
+        $this->register('POST', '/file', 'restoreFile', $perms, null);
     }
 
     /**
@@ -61,6 +65,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(FolderMapper::class),
             $this->getMapperFactory()->get(AssessmentMapper::class),
             $this->getMapperFactory()->get(UserMapper::class),
+            $this->getMapperFactory()->get(FileMapper::class),
         );
     }
 }

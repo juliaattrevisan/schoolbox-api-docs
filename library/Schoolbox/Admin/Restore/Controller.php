@@ -16,6 +16,8 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\RecursiveUndeleter;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\File\Mapper as FileMapper;
+use Schoolbox\Resource\File\Model as File;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\UserMapper;
 
@@ -37,11 +39,13 @@ class Controller extends Base
      * @param FolderMapper                $folderMapper
      * @param Assessment\DataModel\Mapper $assessmentMapper
      * @param UserMapper $userMapper
+     * @param FileMapper $fileMapper
      */
     public function __construct(
         private FolderMapper $folderMapper,
         private Assessment\DataModel\Mapper $assessmentMapper,
         private UserMapper $userMapper,
+        private FileMapper $fileMapper
     ) {
     }
 
@@ -87,6 +91,20 @@ class Controller extends Base
 
         $deletedUsers = $this->userMapper->findByPredicates($userspb->betweenDates('deleted_at', $start, $end), ['deleted' => true,'order' => ['deleted_at' => 'DESC']]);
 
+        // Courses
+
+        // Units
+
+        // Files
+        $filepb = $this->fileMapper->getPredicateBuilder();
+
+        $deletedFiles = $this->fileMapper->findByPredicates($filepb->betweenDates('deleted_at', $start, $end), ['deleted' => true,'order' => ['deleted_at' => 'DESC']]);
+
+        // Filter folders where the parent is deleted, these cannot be restored
+        $deletedFiles = $deletedFiles->filter(function (File $node) {
+            return !$node->getFolder()->isDeleted();
+        });
+
         $this->response = $this->responseFromTemplate('@restore/index.twig', [
             'pageCurrent'        => $this->routeGenerator->generate('restore.getIndex'),
             'allBreadcrumbs'     => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('restore.getIndex')),
@@ -96,6 +114,7 @@ class Controller extends Base
                 $this->getConfigLoader()->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE),
             ),
             'deletedUsers'       => $deletedUsers,
+            'deletedFiles'       => $deletedFiles,
         ]);
     }
 
@@ -153,6 +172,28 @@ class Controller extends Base
         $recursiveUndeleter = new RecursiveUndeleter(new NullLogger(), self::RESTORE_WINDOW);
         $modelByIdByMapperClass = $recursiveUndeleter->findDeletedModels($this->userMapper, [$this->requestPost['id']]);
         $db = $this->userMapper->getDatabase();
+        $db->beginTransaction();
+        try {
+            $recursiveUndeleter->restoreSoftDeletedModels($modelByIdByMapperClass);
+        } catch (\Throwable $e) {
+            $db->rollBack();
+            throw $this->generateException(ErrorMapper::ERROR_PROCESSING, $e, "Unable to restore objects, rolling back.");
+        }
+
+        $db->commit();
+        $this->response = $this->responseAsJson(['success' => true]);
+    }
+
+    /**
+     * Load $templateName
+     *
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
+     */
+    public function restoreFile()
+    {
+        $recursiveUndeleter = new RecursiveUndeleter(new NullLogger(), self::RESTORE_WINDOW);
+        $modelByIdByMapperClass = $recursiveUndeleter->findDeletedModels($this->fileMapper, [$this->requestPost['id']]);
+        $db = $this->fileMapper->getDatabase();
         $db->beginTransaction();
         try {
             $recursiveUndeleter->restoreSoftDeletedModels($modelByIdByMapperClass);

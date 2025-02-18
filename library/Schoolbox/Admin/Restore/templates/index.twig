@@ -107,6 +107,41 @@
                 }
             });
         });
+
+        $('[data-restore-file]').click(function(event) {
+            event.preventDefault();
+            $(this).confirmDialog({
+                text: 'Are you sure you want to recover this file?',
+                confirmEvent: function() {
+                    var config = {text: 'Restoring file...'};
+                    $toast.toastActivate(config);
+
+                    $.ajax({
+                        type: 'POST',
+                        url: "{{ routeLookup('restore.restoreFile') }}",
+                        dataType: 'json',
+                        data: {
+                            id: $(event.target).attr('data-restore-file')
+                        }
+                    })
+                        .done(function() {
+                            $toast.toastTimeout({
+                                text: 'File recovered!',
+                                css: 'success'
+                            });
+                            $(event.target).closest('tr').remove();
+                        })
+                        .fail(function(response) {
+                            var temp = $.parseJSON(response.responseText);
+
+                            $toast.toastTimeout({
+                                text: temp.message,
+                                css: 'alert'
+                            });
+                        });
+                }
+            });
+        });
     });
 </script>
 {% endautoescape %}
@@ -132,6 +167,7 @@
                 <dd class="active"><a href="#panel1-1">Folder</a></dd>
                 <dd><a href="#panel1-2">Learning Activity</a></dd>
                 <dd><a href="#panel1-3">Users</a></dd>
+                <dd><a href="#panel1-4">Files</a></dd>
             </dl>
             <section class="content tabs-content">
                 <div class="content active" id="panel1-1">
@@ -213,6 +249,28 @@
                                 <td>{% for campus in user.getCampusCollection %}{{ campus.name }}<br>{% endfor %}</td>
                                 <td>{{ user.deletedAt.long }}</td>
                                 <td><a data-restore-user="{{ user.id }}" href="#" class="icon-upload" title="Restore"></a></td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="content" id="panel1-4">
+                    <table>
+                        <thead>
+                        <tr>
+                            <td>File</td>
+                            <td>Location</td>
+                            <td>Deleted On</td>
+                            <td>Restore</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for file in deletedFiles %}
+                            <tr>
+                                <td>{{ file.getBaseName }}</td>
+                                <td><a href="/resources/{{ file.getFolder.getId }}">{{ file.getFolder.getTitle }}</a></td>
+                                <td>{{ file.deletedAt.long }}</td>
+                                <td><a data-restore-file="{{ file.id }}" href="#" class="icon-upload" title="Restore"></a></td>
                             </tr>
                         {% endfor %}
                         </tbody>
