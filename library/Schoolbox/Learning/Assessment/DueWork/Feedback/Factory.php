@@ -212,7 +212,9 @@ class Factory
                 $learnerScheme = $assessable->getMarkScheme();
 
                 // verify normalisation
-                $norm = $instructorScheme->getNormalisedMark($this->mark);
+                // for self-assessment, we use the learner mark scheme instead
+                $normScheme = $feedback->isSelfAssessment() ? $learnerScheme : $instructorScheme;
+                $norm = $normScheme->getNormalisedMark($this->mark);
 
                 //then sanitise the output for both instructor and learner marks
                 $humanReadableMark = $learnerScheme->getHumanReadableMark($norm);
