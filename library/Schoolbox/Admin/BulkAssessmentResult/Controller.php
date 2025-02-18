@@ -53,6 +53,8 @@ class Controller extends Base
         $this->response = $this->responseFromTemplate(
             '@adminBulkAssessmentResult/preview.twig',
             [
+                'pageCurrent' => $this->routeGenerator->generate('adminBulkAssessmentResult.getIndex'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminBulkAssessmentResult.getIndex')),
                 'settings' => $settings,
             ],
             'Bulk Assessment Result Preview',
@@ -70,6 +72,8 @@ class Controller extends Base
         $this->response = $this->responseFromTemplate(
             '@adminBulkAssessmentResult/perform.twig',
             [
+                'pageCurrent' => $this->routeGenerator->generate('adminBulkAssessmentResult.getIndex'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminBulkAssessmentResult.getIndex')),
                 'settings' => $settings,
             ],
             'Bulk Assessment Result',

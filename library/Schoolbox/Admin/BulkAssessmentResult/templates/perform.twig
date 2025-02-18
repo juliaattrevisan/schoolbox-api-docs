@@ -1,1 +1,33 @@
-processed feedbacks
+{##
+ # Perform
+ #
+ # @param array $settings  A (worktype, user) struct representing identification method and feedback owner
+#}
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+<div class="admin-container row">
+
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent) }}
+
+    <div class="admin-content">
+        <div class="small-12 island">
+            <section>
+                <div class="content">
+                    <ul>
+                        <li><strong>Work type:</strong> {{ settings.worktype.name }}</li>
+                        <li><strong>Feedback Owner:</strong>
+                            {% if settings.feedbackOwner.deleted %}
+                                {{ settings.feedbackOwner.fullname }}
+                            {% else %}
+                                <a href="/search/user/{{ settings.feedbackOwner.id }}" target="_blank" title="{{ settings.feedbackOwner.fullname }}">{{ settings.feedbackOwner.fullname }}</a>
+                            {% endif %}
+                        </li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
