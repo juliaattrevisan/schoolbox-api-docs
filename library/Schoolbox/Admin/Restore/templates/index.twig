@@ -3,270 +3,27 @@
     $(function() {
         var $toast = $('[data-toast]');
 
-        $('[data-restore-folder]').click(function(event) {
+        $('[data-restore]').click(function(event) {
             event.preventDefault();
+            let object = $(event.target).attr('data-restore-type'),
+                href = $(event.target).attr('data-restore-href');
             $(this).confirmDialog({
-                text: 'Are you sure you want to recover this folder?',
+                text: 'Are you sure you want to recover this ' + object + '?',
                 confirmEvent: function() {
-                    var config = {text: 'Restoring folder...'};
+                    var config = {text: 'Restoring ' + object + '...'};
                     $toast.toastActivate(config);
 
                     $.ajax({
                         type: 'POST',
-                        url: "{{ routeLookup('restore.restoreFolder') }}",
+                        url: href,
                         dataType: 'json',
                         data: {
-                            id: $(event.target).attr('data-restore-folder')
-                        }
-                    })
-                    .done(function() {
-                        $toast.toastTimeout({
-                            text: 'Folder recovered!',
-                            css: 'success'
-                        });
-                        $(event.target).closest('tr').remove();
-                    })
-                    .fail(function(response) {
-                        var temp = $.parseJSON(response.responseText);
-
-                        $toast.toastTimeout({
-                            text: temp.message,
-                            css: 'alert'
-                        });
-                    });
-                }
-            });
-        });
-
-        $('[data-restore-assessment]').click(function(event) {
-            event.preventDefault();
-            $(this).confirmDialog({
-                text: 'Are you sure you want to recover this activity?',
-                confirmEvent: function() {
-                    var config = {text: 'Restoring activity...'};
-                    $toast.toastActivate(config);
-
-                    $.ajax({
-                        type: 'POST',
-                        url: "{{ routeLookup('restore.restoreAssessment') }}",
-                        dataType: 'json',
-                        data: {
-                            id: $(event.target).attr('data-restore-assessment')
-                        }
-                    })
-                    .done(function() {
-                        $toast.toastTimeout({
-                            text: 'Activity recovered!',
-                            css: 'success'
-                        });
-                        $(event.target).closest('tr').remove();
-                    })
-                    .fail(function(response) {
-                        var temp = $.parseJSON(response.responseText);
-
-                        $toast.toastTimeout({
-                            text: temp.message,
-                            css: 'alert'
-                        });
-                    });
-                }
-            });
-        });
-
-        $('[data-restore-user]').click(function(event) {
-            event.preventDefault();
-            $(this).confirmDialog({
-                text: 'Are you sure you want to recover this user?',
-                confirmEvent: function() {
-                    var config = {text: 'Restoring user...'};
-                    $toast.toastActivate(config);
-
-                    $.ajax({
-                        type: 'POST',
-                        url: "{{ routeLookup('restore.restoreUser') }}",
-                        dataType: 'json',
-                        data: {
-                            id: $(event.target).attr('data-restore-user')
+                            id: $(event.target).attr('data-restore-id')
                         }
                     })
                         .done(function() {
                             $toast.toastTimeout({
-                                text: 'User recovered!',
-                                css: 'success'
-                            });
-                            $(event.target).closest('tr').remove();
-                        })
-                        .fail(function(response) {
-                            var temp = $.parseJSON(response.responseText);
-
-                            $toast.toastTimeout({
-                                text: temp.message,
-                                css: 'alert'
-                            });
-                        });
-                }
-            });
-        });
-
-        $('[data-restore-file]').click(function(event) {
-            event.preventDefault();
-            $(this).confirmDialog({
-                text: 'Are you sure you want to recover this file?',
-                confirmEvent: function() {
-                    var config = {text: 'Restoring file...'};
-                    $toast.toastActivate(config);
-
-                    $.ajax({
-                        type: 'POST',
-                        url: "{{ routeLookup('restore.restoreFile') }}",
-                        dataType: 'json',
-                        data: {
-                            id: $(event.target).attr('data-restore-file')
-                        }
-                    })
-                        .done(function() {
-                            $toast.toastTimeout({
-                                text: 'File recovered!',
-                                css: 'success'
-                            });
-                            $(event.target).closest('tr').remove();
-                        })
-                        .fail(function(response) {
-                            var temp = $.parseJSON(response.responseText);
-
-                            $toast.toastTimeout({
-                                text: temp.message,
-                                css: 'alert'
-                            });
-                        });
-                }
-            });
-        });
-
-        $('[data-restore-course-spec]').click(function(event) {
-            event.preventDefault();
-            $(this).confirmDialog({
-                text: 'Are you sure you want to recover this Course?',
-                confirmEvent: function() {
-                    var config = {text: 'Restoring course...'};
-                    $toast.toastActivate(config);
-
-                    $.ajax({
-                        type: 'POST',
-                        url: "{{ routeLookup('restore.restoreCourseSpec') }}",
-                        dataType: 'json',
-                        data: {
-                            id: $(event.target).attr('data-restore-course-spec')
-                        }
-                    })
-                        .done(function() {
-                            $toast.toastTimeout({
-                                text: 'Course recovered!',
-                                css: 'success'
-                            });
-                            $(event.target).closest('tr').remove();
-                        })
-                        .fail(function(response) {
-                            var temp = $.parseJSON(response.responseText);
-
-                            $toast.toastTimeout({
-                                text: temp.message,
-                                css: 'alert'
-                            });
-                        });
-                }
-            });
-        });
-
-        $('[data-restore-course-impl]').click(function(event) {
-            event.preventDefault();
-            $(this).confirmDialog({
-                text: 'Are you sure you want to recover this Course?',
-                confirmEvent: function() {
-                    var config = {text: 'Restoring course...'};
-                    $toast.toastActivate(config);
-
-                    $.ajax({
-                        type: 'POST',
-                        url: "{{ routeLookup('restore.restoreCourseImpl') }}",
-                        dataType: 'json',
-                        data: {
-                            id: $(event.target).attr('data-restore-course-impl')
-                        }
-                    })
-                        .done(function() {
-                            $toast.toastTimeout({
-                                text: 'Course recovered!',
-                                css: 'success'
-                            });
-                            $(event.target).closest('tr').remove();
-                        })
-                        .fail(function(response) {
-                            var temp = $.parseJSON(response.responseText);
-
-                            $toast.toastTimeout({
-                                text: temp.message,
-                                css: 'alert'
-                            });
-                        });
-                }
-            });
-        });
-
-        $('[data-restore-unit-spec]').click(function(event) {
-            event.preventDefault();
-            $(this).confirmDialog({
-                text: 'Are you sure you want to recover this Unit?',
-                confirmEvent: function() {
-                    var config = {text: 'Restoring unit...'};
-                    $toast.toastActivate(config);
-
-                    $.ajax({
-                        type: 'POST',
-                        url: "{{ routeLookup('restore.restoreUnitSpec') }}",
-                        dataType: 'json',
-                        data: {
-                            id: $(event.target).attr('data-restore-unit-spec')
-                        }
-                    })
-                        .done(function() {
-                            $toast.toastTimeout({
-                                text: 'Unit recovered!',
-                                css: 'success'
-                            });
-                            $(event.target).closest('tr').remove();
-                        })
-                        .fail(function(response) {
-                            var temp = $.parseJSON(response.responseText);
-
-                            $toast.toastTimeout({
-                                text: temp.message,
-                                css: 'alert'
-                            });
-                        });
-                }
-            });
-        });
-
-        $('[data-restore-unit-impl]').click(function(event) {
-            event.preventDefault();
-            $(this).confirmDialog({
-                text: 'Are you sure you want to recover this Unit?',
-                confirmEvent: function() {
-                    var config = {text: 'Restoring unit...'};
-                    $toast.toastActivate(config);
-
-                    $.ajax({
-                        type: 'POST',
-                        url: "{{ routeLookup('restore.restoreUnitImpl') }}",
-                        dataType: 'json',
-                        data: {
-                            id: $(event.target).attr('data-restore-unit-impl')
-                        }
-                    })
-                        .done(function() {
-                            $toast.toastTimeout({
-                                text: 'Unit recovered!',
+                                text: object + ' recovered!',
                                 css: 'success'
                             });
                             $(event.target).closest('tr').remove();
@@ -328,7 +85,7 @@
                         <tr>
                             <td>{{ folder.nameWithCodes }}</td>
                             <td>{{ folder.deletedAt.long }}</td>
-                            <td><a data-restore-folder="{{ folder.id }}" href="#" class="icon-upload" title="Restore"></a></td>
+                            <td><a data-restore data-restore-id="{{ folder.id }}" data-restore-href="{{ routeLookup('restore.restoreFolder') }}" data-restore-type="Folder" href="#" class="icon-upload" title="Restore"></a></td>
                         </tr>
                         {% endfor %}
                         </tbody>
@@ -368,7 +125,7 @@
                             </td>
                             <td>{{ assessment.assessmentContext.folder.nameWithCodes }}</td>
                             <td>{{ assessment.deletedAt.long }}</td>
-                            <td><span><a data-restore-assessment="{{ assessment.id }}" href="#" class="icon-upload" title="Restore"></a></span></td>
+                            <td><span><a data-restore data-restore-id="{{ assessment.id }}" data-restore-href="{{ routeLookup('restore.restoreAssessment') }}" data-restore-type="Assessment" href="#" class="icon-upload" title="Restore"></a></span></td>
                         </tr>
                         {% endfor %}
                         </tbody>
@@ -392,7 +149,7 @@
                                 <td>{{ user.getRole.getName }}/{{ user.getRole.getType }}</td>
                                 <td>{% for campus in user.getCampusCollection %}{{ campus.name }}<br>{% endfor %}</td>
                                 <td>{{ user.deletedAt.long }}</td>
-                                <td><a data-restore-user="{{ user.id }}" href="#" class="icon-upload" title="Restore"></a></td>
+                                <td><a data-restore data-restore-id="{{ user.id }}" data-restore-href="{{ routeLookup('restore.restoreUser') }}" data-restore-type="User" href="#" class="icon-upload" title="Restore"></a></td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -414,7 +171,7 @@
                                 <td>{{ file.getBaseName }}</td>
                                 <td><a href="/resources/{{ file.getFolder.getId }}">{{ file.getFolder.getTitle }}</a></td>
                                 <td>{{ file.deletedAt.long }}</td>
-                                <td><a data-restore-file="{{ file.id }}" href="#" class="icon-upload" title="Restore"></a></td>
+                                <td><a data-restore data-restore-id="{{ file.id }}" data-restore-href="{{ routeLookup('restore.restoreFile') }}" data-restore-type="File" href="#" class="icon-upload" title="Restore"></a></td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -437,7 +194,7 @@
                                 <td>{{ course.getTitle }}</td>
                                 <td><a href="/resources/{{ course.getFolder.getId }}">{{ course.getFolder.getTitle }}</a></td>
                                 <td>{{ course.deletedAt.long }}</td>
-                                <td><a data-restore-course-spec="{{ course.id }}" href="#" class="icon-upload" title="Restore"></a></td>
+                                <td><a data-restore data-restore-id="{{ course.id }}" data-restore-href="{{ routeLookup('restore.restoreCourseSpec') }}" data-restore-type="Course" href="#" class="icon-upload" title="Restore"></a></td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -460,7 +217,7 @@
                                 <td>{{ unit.getTitle }}</td>
                                 <td><a href="{{ routeLookupIfAuthorized('course.modifyCourse', {courseSpec: unit.getCourse, id: unit.getCourse.getId})  }}">{{ unit.getCourse.getTitle }}</a></td>
                                 <td>{{ unit.deletedAt.long }}</td>
-                                <td><a data-restore-unit-spec="{{ unit.id }}" href="#" class="icon-upload" title="Restore"></a></td>
+                                <td><a data-restore data-restore-id="{{ unit.id }}" data-restore-href="{{ routeLookup('restore.restoreUnitSpec') }}" data-restore-type="Unit" href="#" class="icon-upload" title="Restore"></a></td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -483,7 +240,7 @@
                                 <td>{{ course.getSpecification.getTitle }}</td>
                                 <td><a href="/resources/{{ course.getFolder.getId }}">{{ course.getFolder.getTitle }}</a></td>
                                 <td>{{ course.deletedAt.long }}</td>
-                                <td><a data-restore-course-impl="{{ course.id }}" href="#" class="icon-upload" title="Restore"></a></td>
+                                <td><a data-restore data-restore-id="{{ course.id }}" data-restore-href="{{ routeLookup('restore.restoreCourseImpl') }}" data-restore-type="Course" href="#" class="icon-upload" title="Restore"></a></td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -506,7 +263,7 @@
                                 <td>{{ unit.getTitle }}</td>
                                 <td><a href="/resources/{{ unit.getFolder.getId }}">{{ unit.getFolder.getTitle }}</a></td>
                                 <td>{{ unit.deletedAt.long }}</td>
-                                <td><a data-restore-unit-spec="{{ unit.id }}" href="#" class="icon-upload" title="Restore"></a></td>
+                                <td><a data-restore data-restore-id="{{ unit.id }}" data-restore-href="{{ routeLookup('restore.restoreUnitImpl') }}" data-restore-type="Unit" href="#" class="icon-upload" title="Restore"></a></td>
                             </tr>
                         {% endfor %}
                         </tbody>
