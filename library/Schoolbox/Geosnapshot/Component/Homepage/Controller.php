@@ -63,8 +63,8 @@ class Controller extends Component_Homepage_ControllerAbstract
                 $eventName = $this->getConfig('eventName');
                 $albumName = $this->getConfig('albumName');
                 $response = $api->retrieveEventPhotos(
-                    $eventName === false ? '' : $eventName,
-                    $albumName === false ? '' : $albumName,
+                    is_string($eventName) ? $eventName : '',
+                    is_string($albumName) ? $albumName : '',
                     $this->getUser()
                 );
             } catch (\RuntimeException | \DomainException $e) {
