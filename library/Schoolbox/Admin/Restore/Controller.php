@@ -245,6 +245,50 @@ class Controller extends Base
         $this->response = $this->responseAsJson(['success' => true]);
     }
 
+    /**
+     * Restore CourseSpec
+     *
+     * @since 25.0
+     * @api POST /adminv2/restore/courseSpec
+     */
+    public function restoreCourseSpec()
+    {
+        $this->restore($this->courseSpecMapper);
+    }
+
+    /**
+     * Restore CourseImpl
+     *
+     * @since 25.0
+     * @api POST /adminv2/restore/courseImpl
+     */
+    public function restoreCourseImpl()
+    {
+        $this->restore($this->courseImplMapper);
+    }
+
+    /**
+     * Restore UnitSpec
+     *
+     * @since 25.0
+     * @api POST /adminv2/restore/unitSpec
+     */
+    public function restoreUnitSpec()
+    {
+        $this->restore($this->unitSpecMapper);
+    }
+
+    /**
+     * Restore UnitImpl
+     *
+     * @since 25.0
+     * @api POST /adminv2/restore/unitImpl
+     */
+    public function restoreUnitImpl()
+    {
+        $this->restore($this->unitImplMapper);
+    }
+
 
     //------------------------------------------------------------------------------------------------------------------
     /**
@@ -266,4 +310,21 @@ class Controller extends Base
         });
         return $deletedNodes;
     }
+
+    private function restore(IMapper $mapper)
+    {
+        $recursiveUndeleter = new RecursiveUndeleter(new NullLogger(), self::RESTORE_WINDOW);
+        $modelByIdByMapperClass = $recursiveUndeleter->findDeletedModels($mapper, [$this->requestPost['id']]);
+        $db = $mapper->getDatabase();
+        $db->beginTransaction();
+        try {
+            $recursiveUndeleter->restoreSoftDeletedModels($modelByIdByMapperClass);
+        } catch (\Throwable $e) {
+            $db->rollBack();
+            throw $this->generateException(ErrorMapper::ERROR_PROCESSING, $e, "Unable to restore objects, rolling back.");
+        }
+
+        $db->commit();
+        $this->response = $this->responseAsJson(['success' => true]);
+        }
 }
