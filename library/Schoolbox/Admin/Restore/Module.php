@@ -13,6 +13,10 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplMapper;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\UserMapper;
@@ -65,6 +69,10 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(AssessmentMapper::class),
             $this->getMapperFactory()->get(UserMapper::class),
             $this->getMapperFactory()->get(FileMapper::class),
+            $this->getMapperFactory()->get(CourseSpecMapper::class),
+            $this->getMapperFactory()->get(UnitSpecMapper::class),
+            $this->getMapperFactory()->get(CourseImplMapper::class),
+            $this->getMapperFactory()->get(UnitImplMapper::class),
         );
     }
 }

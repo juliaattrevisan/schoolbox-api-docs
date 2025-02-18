@@ -20,6 +20,10 @@ use Schoolbox\Mapper\RecursiveUndeleter;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\File\Mapper as FileMapper;
+use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
+use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\UserMapper;
 
@@ -42,12 +46,20 @@ class Controller extends Base
      * @param Assessment\DataModel\Mapper $assessmentMapper
      * @param UserMapper $userMapper
      * @param FileMapper $fileMapper
+     * @param CourseSpec\Mapper $courseSpecMapper
+     * @param UnitSpec\Mapper $unitSpecMapper
+     * @param CourseImpl\Mapper $courseImplMapper
+     * @param UnitImpl\Mapper $unitImplMapper
      */
     public function __construct(
         private FolderMapper $folderMapper,
         private Assessment\DataModel\Mapper $assessmentMapper,
         private UserMapper $userMapper,
-        private FileMapper $fileMapper
+        private FileMapper $fileMapper,
+        private CourseSpec\Mapper $courseSpecMapper,
+        private UnitSpec\Mapper $unitSpecMapper,
+        private CourseImpl\Mapper $courseImplMapper,
+        private UnitImpl\Mapper $unitImplMapper,
     ) {
     }
 
@@ -95,6 +107,9 @@ class Controller extends Base
         $deletedUsers = $this->userMapper->findByPredicates($userspb->betweenDates('deleted_at', $start, $end), ['deleted' => true,'order' => ['deleted_at' => 'DESC']]);
 
         // Courses
+        // spec
+        $deletedCourseSpec = $this->getDeletdFolderContent($this->courseSpecMapper, $start, $end);
+        $deletedUnitImpl = $this->getDeletdFolderContent($this->unitImplMapper, $start, $end);
 
         // Units
 
