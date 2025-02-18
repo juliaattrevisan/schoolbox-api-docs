@@ -684,4 +684,18 @@ class Controller extends BaseController
             'id' => $service->getId(),
         ]);
     }
+
+    /**
+     *
+     *
+     * @api POST /adminv2/notifications/settings/apply-default
+     *
+     * @throws \Alaress\Web\Controller\Exception
+     */
+    public function postApplyDefaultSettings()
+    {
+        $this->response = $this->responseAsJson([
+            'test' => 'whoop',
+        ]);
+    }
 }

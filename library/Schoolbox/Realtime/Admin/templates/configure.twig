@@ -387,6 +387,9 @@
                             </li>
                         {% endfor %}
                     </ul>
+                    {% set currentType = filters.options[filters.selected] %}
+                    {% set plural = (currentType == "parent" or currentType == "student") ? "s" : "" %}
+                    {% set userTarget = (currentType == "all") ? "users" : currentType ~ plural %}
                     {% if config|length  %}
                     <div id="configurator">
                         {% for namespace in msgConfig %}
@@ -398,9 +401,6 @@
                                 </nav>
                                 <ul id="feature-pop-out-{{ namespace.id }}" class="f-dropdown" data-dropdown-content>
                                     <li>
-                                        {% set currentType = filters.options[filters.selected] %}
-                                        {% set plural = (currentType == "parent" or currentType == "student") ? "s" : "" %}
-                                        {% set userTarget = (currentType == "all") ? "users" : currentType ~ plural %}
                                         <a class="icon-export" href="#apply-default-settings" data-reveal-id="apply-default-settings-modal" data-roletype="{{ userTarget }}" data-namespace="{{ locale.translateSentence(ns[namespace.id].label) | capitalize }}">
                                             Apply default settings to all {{ userTarget }}...
                                         </a>
@@ -460,13 +460,13 @@
                             /**
                              * send through the apply default settings request
                              */
-                            /*
+
                             try {
-                                fetch("", {
+                                fetch("{{routeLookup('adminNotifications.postApplyDefaultSettings') }}", {
                                     method: "POST",
                                     body: JSON.stringify({
-                                        roletype: currentNamespace
-                                        namespace: currentRoletype
+                                        roletype: "{{ currentType }}",
+                                        namespace: currentNamespace
                                     })
                                 }).then((response) => {
                                     if (response.ok) {
@@ -483,7 +483,6 @@
                                 confirmButton.setAttribute("data-is-processing", "false");
                                 confirmButton.innerHTML = "Yes";
                             }
-                            */
                         });
                         /**
                         * Close the modal
