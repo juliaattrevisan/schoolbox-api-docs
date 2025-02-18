@@ -475,7 +475,8 @@
                                     body: JSON.stringify({
                                         roletype: "{{ roletype }}",
                                         namespace: currentNamespace
-                                    })
+                                    }),
+                                    headers: { "Content-Type": "application/json" },
                                 }).then((response) => {
                                     if (response.ok) {
                                         $("#apply-default-settings-modal").foundation("reveal", "close");
