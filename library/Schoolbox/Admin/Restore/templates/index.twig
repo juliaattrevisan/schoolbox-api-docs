@@ -142,6 +142,146 @@
                 }
             });
         });
+
+        $('[data-restore-course-spec]').click(function(event) {
+            event.preventDefault();
+            $(this).confirmDialog({
+                text: 'Are you sure you want to recover this Course?',
+                confirmEvent: function() {
+                    var config = {text: 'Restoring course...'};
+                    $toast.toastActivate(config);
+
+                    $.ajax({
+                        type: 'POST',
+                        url: "{{ routeLookup('restore.restoreCourseSpec') }}",
+                        dataType: 'json',
+                        data: {
+                            id: $(event.target).attr('data-restore-course-spec')
+                        }
+                    })
+                        .done(function() {
+                            $toast.toastTimeout({
+                                text: 'Course recovered!',
+                                css: 'success'
+                            });
+                            $(event.target).closest('tr').remove();
+                        })
+                        .fail(function(response) {
+                            var temp = $.parseJSON(response.responseText);
+
+                            $toast.toastTimeout({
+                                text: temp.message,
+                                css: 'alert'
+                            });
+                        });
+                }
+            });
+        });
+
+        $('[data-restore-course-impl]').click(function(event) {
+            event.preventDefault();
+            $(this).confirmDialog({
+                text: 'Are you sure you want to recover this Course?',
+                confirmEvent: function() {
+                    var config = {text: 'Restoring course...'};
+                    $toast.toastActivate(config);
+
+                    $.ajax({
+                        type: 'POST',
+                        url: "{{ routeLookup('restore.restoreCourseImpl') }}",
+                        dataType: 'json',
+                        data: {
+                            id: $(event.target).attr('data-restore-course-impl')
+                        }
+                    })
+                        .done(function() {
+                            $toast.toastTimeout({
+                                text: 'Course recovered!',
+                                css: 'success'
+                            });
+                            $(event.target).closest('tr').remove();
+                        })
+                        .fail(function(response) {
+                            var temp = $.parseJSON(response.responseText);
+
+                            $toast.toastTimeout({
+                                text: temp.message,
+                                css: 'alert'
+                            });
+                        });
+                }
+            });
+        });
+
+        $('[data-restore-unit-spec]').click(function(event) {
+            event.preventDefault();
+            $(this).confirmDialog({
+                text: 'Are you sure you want to recover this Unit?',
+                confirmEvent: function() {
+                    var config = {text: 'Restoring unit...'};
+                    $toast.toastActivate(config);
+
+                    $.ajax({
+                        type: 'POST',
+                        url: "{{ routeLookup('restore.restoreUnitSpec') }}",
+                        dataType: 'json',
+                        data: {
+                            id: $(event.target).attr('data-restore-unit-spec')
+                        }
+                    })
+                        .done(function() {
+                            $toast.toastTimeout({
+                                text: 'Unit recovered!',
+                                css: 'success'
+                            });
+                            $(event.target).closest('tr').remove();
+                        })
+                        .fail(function(response) {
+                            var temp = $.parseJSON(response.responseText);
+
+                            $toast.toastTimeout({
+                                text: temp.message,
+                                css: 'alert'
+                            });
+                        });
+                }
+            });
+        });
+
+        $('[data-restore-unit-impl]').click(function(event) {
+            event.preventDefault();
+            $(this).confirmDialog({
+                text: 'Are you sure you want to recover this Unit?',
+                confirmEvent: function() {
+                    var config = {text: 'Restoring unit...'};
+                    $toast.toastActivate(config);
+
+                    $.ajax({
+                        type: 'POST',
+                        url: "{{ routeLookup('restore.restoreUnitImpl') }}",
+                        dataType: 'json',
+                        data: {
+                            id: $(event.target).attr('data-restore-unit-impl')
+                        }
+                    })
+                        .done(function() {
+                            $toast.toastTimeout({
+                                text: 'Unit recovered!',
+                                css: 'success'
+                            });
+                            $(event.target).closest('tr').remove();
+                        })
+                        .fail(function(response) {
+                            var temp = $.parseJSON(response.responseText);
+
+                            $toast.toastTimeout({
+                                text: temp.message,
+                                css: 'alert'
+                            });
+                        });
+                }
+            });
+        });
     });
 </script>
 {% endautoescape %}
