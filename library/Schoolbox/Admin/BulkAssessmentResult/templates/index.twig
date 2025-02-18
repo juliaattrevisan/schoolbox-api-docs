@@ -27,10 +27,22 @@
             </section>
         </div>
         <div class="small-12 island">
-            <form action="" method="post">
-                <section class="content">
+            {% set formRoute = routeLookupIfAuthorized('adminBulkAssessmentResult.postPreview') %}
+
+            <form action="{{ formRoute }}" method="post">
+                <section>
                     <fieldset class="content">
-                        thing
+                        <div class="small-12 columns">
+                            <label for="worktype" class="required">Work Type</label>
+
+                            <select id="worktype" name="worktype">
+                                {% for worktype in worktypes %}
+                                    <option value="{{ worktype.id }}">{{ worktype.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        Feedback Owner
                     </fieldset>
                 </section>
                 <input type="submit" />

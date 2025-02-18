@@ -18,8 +18,7 @@ class Controller extends Base
     /**
      * Constructor.
      */
-    public function __construct(
-    ) {
+    public function __construct(private \Schoolbox\Learning\Assessment\WorkType\Mapper $worktypeMapper) {
     }
 
 
@@ -32,8 +31,9 @@ class Controller extends Base
         $this->response = $this->responseFromTemplate(
             '@adminBulkAssessmentResult/index.twig',
             [
-                'pageCurrent'    => $this->routeGenerator->generate('adminBulkAssessmentResult.getIndex'),
+                'pageCurrent' => $this->routeGenerator->generate('adminBulkAssessmentResult.getIndex'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminBulkAssessmentResult.getIndex')),
+                'worktypes' => $this->worktypeMapper->findAll()->sortNaturally('sequence')
             ],
             'Bulk Assessment Result'
         );
