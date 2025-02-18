@@ -350,7 +350,29 @@
 
                     </table>
                 </div>
-                
+                <div class="content" id="panel1-8">
+                    <table>
+                        <thead>
+                        <tr>
+                            <td>Unit</td>
+                            <td>Location</td>
+                            <td>Deleted On</td>
+                            <td>Restore</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for unit in deletedUnitImpl %}
+                            <tr>
+                                <td>{{ unit.getTitle }}</td>
+                                <td><a href="/resources/{{ unit.getFolder.getId }}">{{ unit.getFolder.getTitle }}</a></td>
+                                <td>{{ unit.deletedAt.long }}</td>
+                                <td><a data-restore-unit-spec="{{ unit.id }}" href="#" class="icon-upload" title="Restore"></a></td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+
+                    </table>
+                </div>
             </section>
         </div>
     </div>
