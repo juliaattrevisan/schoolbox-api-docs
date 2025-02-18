@@ -28,6 +28,7 @@ use Aura\Router\RouterContainer;
 use Psr\Http\Message\ServerRequestInterface;
 use ReflectionMethod;
 use RuntimeException;
+use Schoolbox\API\Token\JwtParser\Exception\Base;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Application\Login\Controller as LoginController;
 use Schoolbox\Application\WebKernelAbstract;
@@ -141,7 +142,7 @@ class Kernel extends WebKernelAbstract
             } else {
                 $this->outputSitepageContent($path, $authHeaderUser, $bypassIpTracking);
             }
-        } catch (Unauthenticated $e) {
+        } catch (Unauthenticated | Base $e) {
             // Unauthenticated response - redirect to a login page.
             // Preserve GET params that aren't "page" or "samlAuth", so the user
             // can get redirected back to what they requested when they log in.
