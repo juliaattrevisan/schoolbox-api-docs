@@ -31,12 +31,10 @@ class Module extends BaseModule
      */
     protected function registerRoutes()
     {
+        // super only, they can restore more than just resources
         $perms = new Rule\All(
             new Rule\IsLoggedIn(),
-            new Rule\Any(
-                new Rule\IsSuperuser(),
-                new Rule\HasServicePermission(UserAccess::SERVICE_CMS, UserAccess::ACCESS_FULL)
-            )
+            new Rule\IsSuperuser()
         );
 
         $this->register('GET', '', 'getIndex', $perms, null);
