@@ -6,7 +6,7 @@
  # @param SummativeReport\Model $report  A of SummativeReportModel instance
  # @param array $options                 A structure containing report options
  # @param Zone $logoZone                 An attachzone for uploading images
- # @param string $defaultTitle           The default title for the Vic Curric Progression bit
+ # @param string $curriculumProgression  An array containing the default title for the Vic Curric Progression bit
  #}
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
@@ -480,7 +480,7 @@
                             </ul>
 
                             {# Decide what this should be called; by default, "Summary of Victorian Curriculum Standards" #}
-                            {% set vicProgressionTitle = defaultTitle %}
+                            {% set vicProgressionTitle = curriculumProgression.title %}
 
                             {% if options.summary.vicProgression.title %}
                                 {% set vicProgressionTitle = options.summary.vicProgression.title %}

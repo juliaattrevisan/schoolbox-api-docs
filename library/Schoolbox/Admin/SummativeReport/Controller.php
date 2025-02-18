@@ -247,7 +247,9 @@ class Controller extends ConfigController
                 'logoZone' => $logoZone->getTwigContext(),
                 'worktypesSummary' => $worktypes,
                 'worktypesClass' => $worktypes,
-                'defaultTitle' => self::DEFAULT_TITLE
+                'curriculumProgression' => [
+                    'title' => self::DEFAULT_TITLE
+                ]
             ]
         );
     }
@@ -345,7 +347,9 @@ class Controller extends ConfigController
                 'logoZone' => $logoZone->getTwigContext(),
                 'worktypesSummary' => $worktypesSummary,
                 'worktypesClass' => $worktypesClass,
-                'defaultTitle' => self::DEFAULT_TITLE
+                'curriculumProgression' => [
+                    'title' => self::DEFAULT_TITLE
+                ]
             ]
         );
     }
