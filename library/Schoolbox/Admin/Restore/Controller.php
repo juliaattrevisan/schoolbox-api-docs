@@ -15,11 +15,11 @@ use Psr\Log\NullLogger;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\IMapper;
 use Schoolbox\Mapper\RecursiveUndeleter;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\File\Mapper as FileMapper;
-use Schoolbox\Resource\File\Model as File;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\UserMapper;
 
@@ -99,14 +99,7 @@ class Controller extends Base
         // Units
 
         // Files
-        $filepb = $this->fileMapper->getPredicateBuilder();
-
-        $deletedFiles = $this->fileMapper->findByPredicates($filepb->betweenDates('deleted_at', $start, $end), ['deleted' => true,'order' => ['deleted_at' => 'DESC']]);
-
-        // Filter folders where the parent is deleted, these cannot be restored
-        $deletedFiles = $deletedFiles->filter(function (File $node) {
-            return !$node->getFolder()->isDeleted();
-        });
+        $deletedFiles = $this->getDeletdFolderContent($this->fileMapper, $start, $end);
 
         $this->response = $this->responseFromTemplate('@restore/index.twig', [
             'pageCurrent'        => $this->routeGenerator->generate('restore.getIndex'),
@@ -209,5 +202,26 @@ class Controller extends Base
 
         $db->commit();
         $this->response = $this->responseAsJson(['success' => true]);
+    }
+
+
+    /**
+     * Fetches and filters objects that live on a folder
+     *
+     * @param IMapper $mapper
+     * @param \Alaress_Date_Format $start
+     * @param \Alaress_Date_Format $end
+     * @return mixed
+     */
+    private function getDeletdFolderContent(IMapper $mapper, \Alaress_Date_Format $start, \Alaress_Date_Format $end)
+    {
+        $pb = $mapper->getPredicateBuilder();
+        $deletedNodes = $mapper->findByPredicates($pb->betweenDates('deleted_at', $start, $end), ['deleted' => true,'order' => ['deleted_at' => 'DESC']]);
+
+        // Filter folders where the parent is deleted, these cannot be restored
+        $deletedNodes = $deletedNodes->filter(function ($node) {
+            return !$node->getFolder()->isDeleted();
+        });
+        return $deletedNodes;
     }
 }
