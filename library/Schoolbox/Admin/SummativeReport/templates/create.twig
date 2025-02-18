@@ -6,6 +6,7 @@
  # @param SummativeReport\Model $report  A of SummativeReportModel instance
  # @param array $options                 A structure containing report options
  # @param Zone $logoZone                 An attachzone for uploading images
+ # @param string $defaultTitle           The default title for the Vic Curric Progression bit
  #}
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
@@ -477,6 +478,16 @@
                                     <label for="report-summary-enable-vic-progression" class="checkbox-label">Enable</label>
                                 </li>
                             </ul>
+
+                            {# Decide what this should be called; by default, "Summary of Victorian Curriculum Standards" #}
+                            {% set vicProgressionTitle = defaultTitle %}
+
+                            {% if options.summary.vicProgression.title %}
+                                {% set vicProgressionTitle = options.summary.vicProgression.title %}
+                            {% endif %}
+
+                            <label for="report-summary-vic-progression-title">Title</label>
+                            <input id="report-summary-vic-progression-title" name="summary[vicProgression][title]" type="text" maxlength="255" value="{{ vicProgressionTitle }}" />
 
                             <label for="report-summary-vic-progression-worktype">Work Type</label>
                             <select id="report-summary-vic-progression-worktype" name="summary[vicProgression][workType]">

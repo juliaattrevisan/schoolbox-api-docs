@@ -584,7 +584,8 @@
         {# Victorian Curriculum Progression: Summary #}
         {% include '@adminSummativeReport/VictorianProgression.twig' with {
             payload: vicProgression.summary,
-            annotate: vicProgression.annotate
+            annotate: vicProgression.annotate,
+            title: vicProgression.title
         } only %}
     </div>
     {% endif %}
@@ -658,7 +659,8 @@
             {% if vicProgression.class[folder.id] ?? false %}
                 {% include '@adminSummativeReport/VictorianProgression.twig' with {
                     payload: vicProgression.class[folder.id],
-                    annotate: vicProgression.annotate
+                    annotate: vicProgression.annotate,
+                    title: vicProgression.title
                 } only %}
             {% endif %}
         {% endfor %}

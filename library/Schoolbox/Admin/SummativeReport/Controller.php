@@ -88,6 +88,12 @@ class Controller extends ConfigController
 
 
     /**
+     * Default title of the report; used if the title field was 0-length
+     */
+    private const DEFAULT_TITLE = 'Summary of Victorian Curriculum Standards';
+
+
+    /**
      * These are used in the View As dropdown, the existence of
      * which in and of itself is questionable atm
      */
@@ -240,7 +246,8 @@ class Controller extends ConfigController
                 'viewAs' => self::AVAILABLE_ROLETYPES,
                 'logoZone' => $logoZone->getTwigContext(),
                 'worktypesSummary' => $worktypes,
-                'worktypesClass' => $worktypes
+                'worktypesClass' => $worktypes,
+                'defaultTitle' => self::DEFAULT_TITLE
             ]
         );
     }
@@ -337,7 +344,8 @@ class Controller extends ConfigController
                 'viewAs' => self::AVAILABLE_ROLETYPES,
                 'logoZone' => $logoZone->getTwigContext(),
                 'worktypesSummary' => $worktypesSummary,
-                'worktypesClass' => $worktypesClass
+                'worktypesClass' => $worktypesClass,
+                'defaultTitle' => self::DEFAULT_TITLE
             ]
         );
     }
@@ -1014,7 +1022,8 @@ class Controller extends ConfigController
              */
             'annotate' => (bool)$this->requestQuery->get('annotate', false),
             'summary' => null,
-            'class' => null
+            'class' => null,
+            'title' => self::DEFAULT_TITLE
         ];
 
         /* At least one of the Victorian Curriculum Progressions was enabled
@@ -1035,6 +1044,12 @@ class Controller extends ConfigController
                     (int)$optionsPayload['summary']['vicProgression']['workType'],
                     $vicProgression['annotate']
                 ))->generate($student, $academicPeriod, null);
+
+                /* Remember its customised title
+                 */
+                if ($optionsPayload['summary']['vicProgression']['title']) {
+                    $vicProgression['title'] = $optionsPayload['summary']['vicProgression']['title'];
+                }
             }
 
             /* The Class Version
