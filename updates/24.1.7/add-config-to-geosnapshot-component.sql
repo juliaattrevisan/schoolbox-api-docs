@@ -11,3 +11,15 @@ component_definition_id = (SELECT id FROM component_definition WHERE class = 'Sc
 default_value           = '',
 label                   = 'Album Name',
 description             = NULL;
+
+UPDATE component_config_definition
+SET default_value = ''
+WHERE component_definition_id IN (
+    SELECT id
+    FROM component_definition
+    WHERE class IN (
+        'Schoolbox\\Geosnapshot\\Component\\Homepage\\Controller',
+        'Schoolbox\\Geosnapshot\\Component\\Dashboard\\Controller'
+    )
+)
+AND `key`='eventName';
