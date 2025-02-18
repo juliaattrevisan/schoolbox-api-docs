@@ -60,11 +60,9 @@ class Controller extends Component_Homepage_ControllerAbstract
              */
             try {
                 $api = new Api($this->getConfigLoader()->get('geosnapshot_api_key'));
-                $eventName = $this->getConfig('eventName');
-                $albumName = $this->getConfig('albumName');
                 $response = $api->retrieveEventPhotos(
-                    is_string($eventName) ? $eventName : '',
-                    is_string($albumName) ? $albumName : '',
+                    trim((string)$this->getConfig('eventName')),
+                    trim((string)$this->getConfig('albumName')),
                     $this->getUser()
                 );
             } catch (\RuntimeException | \DomainException $e) {
