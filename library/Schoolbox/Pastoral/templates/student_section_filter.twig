@@ -1,9 +1,9 @@
 {# Pastoral Type Filter Box #}
-
-{% if types | length and user.role.isStaff %}
+{% set hasAccess = user.role.isStaff or user.role.isParent or user.role.isStudent %}
+{% if types | length and hasAccess %}
 
     <div class="small-12 island">
-        <h2 class="subheader">Filter Records By Type</h2>
+        <h2 class="subheader">Filter Records</h2>
     </div>
     <div class="small-12 island">
         <section>
