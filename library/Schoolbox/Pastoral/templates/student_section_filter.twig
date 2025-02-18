@@ -7,6 +7,7 @@
     </div>
     <div class="small-12 island">
         <section>
+            {% if user.role.isStaff %}
             <fieldset class="content">
                 <div class="small-12 medium-6 columns">
                     <label class="inline-block" for="typeId">Type</label>
@@ -29,6 +30,7 @@
                     </select>
                 </div>
             </fieldset>
+            {% endif %}
             <fieldset class="content">
                 <div class="small-12 columns">
                     <label class="inline-block" for="showArchivedRecords">Show archived records</label>
