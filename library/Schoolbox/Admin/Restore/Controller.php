@@ -15,7 +15,7 @@ use Psr\Log\NullLogger;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\IMapper;
+use Schoolbox\Mapper;
 use Schoolbox\Mapper\RecursiveUndeleter;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -247,12 +247,12 @@ class Controller extends Base
     /**
      * Fetches and filters objects that live on a folder
      *
-     * @param IMapper $mapper // what mapper we are restoring the initial object from
+     * @param Mapper $mapper // what mapper we are restoring the initial object from
      * @param \Alaress_Date_Format $start // when to start searching for deleted objects
      * @param \Alaress_Date_Format $end // when to stop searching for deleted objects
      * @return mixed
      */
-    private function getDeletdFolderContent(IMapper $mapper, \Alaress_Date_Format $start, \Alaress_Date_Format $end)
+    private function getDeletdFolderContent(Mapper $mapper, \Alaress_Date_Format $start, \Alaress_Date_Format $end)
     {
         $pb = $mapper->getPredicateBuilder();
         $deletedNodes = $mapper->findByPredicates($pb->betweenDates('deleted_at', $start, $end), ['deleted' => true,'order' => ['deleted_at' => 'DESC']]);
@@ -268,11 +268,11 @@ class Controller extends Base
      * Recursively restore the object and all its children
      * also handles the $this->response
      *
-     * @param IMapper $mapper // what mapper we are restoring the initial object from
+     * @param Mapper $mapper // what mapper we are restoring the initial object from
      * @return void
      * @throws \Schoolbox\Mapper\Exception
      */
-    private function restore(IMapper $mapper)
+    private function restore(Mapper $mapper)
     {
         $recursiveUndeleter = new RecursiveUndeleter(new NullLogger(), self::RESTORE_WINDOW);
         $modelByIdByMapperClass = $recursiveUndeleter->findDeletedModels($mapper, [$this->requestPost['id']]);
