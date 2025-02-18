@@ -694,6 +694,15 @@ class Controller extends BaseController
      */
     public function postApplyDefaultSettings()
     {
+
+        $roletype = $this->requestPost->get("roletype");
+        $namespace = $this->requestPost->get("namespace");
+
+        // if ($roletype == "" || $namespace == "") {
+        //     $this->sendError("Role type and namespace must be provided");
+        //     return;
+        // }
+
         $this->response = $this->responseAsJson([
             'test' => 'whoop',
         ]);
