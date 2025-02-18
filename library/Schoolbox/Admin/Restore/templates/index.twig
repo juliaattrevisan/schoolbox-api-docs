@@ -72,6 +72,41 @@
                 }
             });
         });
+
+        $('[data-restore-user]').click(function(event) {
+            event.preventDefault();
+            $(this).confirmDialog({
+                text: 'Are you sure you want to recover this user?',
+                confirmEvent: function() {
+                    var config = {text: 'Restoring user...'};
+                    $toast.toastActivate(config);
+
+                    $.ajax({
+                        type: 'POST',
+                        url: "{{ routeLookup('restore.restoreUser') }}",
+                        dataType: 'json',
+                        data: {
+                            id: $(event.target).attr('data-restore-user')
+                        }
+                    })
+                        .done(function() {
+                            $toast.toastTimeout({
+                                text: 'User recovered!',
+                                css: 'success'
+                            });
+                            $(event.target).closest('tr').remove();
+                        })
+                        .fail(function(response) {
+                            var temp = $.parseJSON(response.responseText);
+
+                            $toast.toastTimeout({
+                                text: temp.message,
+                                css: 'alert'
+                            });
+                        });
+                }
+            });
+        });
     });
 </script>
 {% endautoescape %}
@@ -96,6 +131,7 @@
             <dl class="tabs" data-tab>
                 <dd class="active"><a href="#panel1-1">Folder</a></dd>
                 <dd><a href="#panel1-2">Learning Activity</a></dd>
+                <dd><a href="#panel1-3">Users</a></dd>
             </dl>
             <section class="content tabs-content">
                 <div class="content active" id="panel1-1">
@@ -154,6 +190,30 @@
                             <td>{{ assessment.deletedAt.long }}</td>
                             <td><span><a data-restore-assessment="{{ assessment.id }}" href="#" class="icon-upload" title="Restore"></a></span></td>
                         </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="content" id="panel1-3">
+                    <table>
+                        <thead>
+                        <tr>
+                            <td>User</td>
+                            <td>Role/type</td>
+                            <td>Campus</td>
+                            <td>Deleted On</td>
+                            <td>Restore</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for user in deletedUsers %}
+                            <tr>
+                                <td>{{ user.getFullName }}{% if user.getExternalId %} ({{ user.getExternalId }}){% endif %}</td>
+                                <td>{{ user.getRole.getName }}/{{ user.getRole.getType }}</td>
+                                <td>{% for campus in user.getCampusCollection %}{{ campus.name }}<br>{% endfor %}</td>
+                                <td>{{ user.deletedAt.long }}</td>
+                                <td><a data-restore-user="{{ user.id }}" href="#" class="icon-upload" title="Restore"></a></td>
+                            </tr>
                         {% endfor %}
                         </tbody>
                     </table>
