@@ -490,7 +490,7 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer
         /* If a question was added after the attempt was made by the student,
          * then $response['response'] might not even exist; return empty array
          */
-        if ($response) {
+        if (isset($response['response']) && is_string($response['response'])) {
             return unserialize($response['response']);
         }
 
