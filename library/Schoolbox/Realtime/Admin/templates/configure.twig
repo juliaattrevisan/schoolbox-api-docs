@@ -387,9 +387,11 @@
                             </li>
                         {% endfor %}
                     </ul>
-                    {% set currentType = filters.options[filters.selected] %}
-                    {% set plural = (currentType == "parent" or currentType == "student") ? "s" : "" %}
-                    {% set userTarget = (currentType == "all") ? "users" : currentType ~ plural %}
+
+                    {% set roletype = filters.options[filters.selected] %}
+                    {% set plural = (roletype == "parent" or roletype == "student") ? "s" : "" %}
+                    {% set roletypeFormatted = (roletype == "all") ? "users" : roletype ~ plural %}
+
                     {% if config|length  %}
                     <div id="configurator">
                         {% for namespace in msgConfig %}
@@ -401,8 +403,16 @@
                                 </nav>
                                 <ul id="feature-pop-out-{{ namespace.id }}" class="f-dropdown" data-dropdown-content>
                                     <li>
-                                        <a class="icon-export" href="#apply-default-settings" data-reveal-id="apply-default-settings-modal" data-roletype="{{ userTarget }}" data-namespace="{{ locale.translateSentence(ns[namespace.id].label) | capitalize }}">
-                                            Apply default settings to all {{ userTarget }}...
+                                        <a
+                                            class="icon-export"
+                                            href="#apply-default-settings"
+                                            data-apply-default-button
+                                            data-reveal-id="apply-default-settings-modal"
+                                            data-roletype-formatted="{{ roletypeFormatted }}"
+                                            data-namespace="{{ locale.translateSentence(ns[namespace.id].label) }}"
+                                            data-namespace-formatted="{{ locale.translateSentence(ns[namespace.id].label) | capitalize }}"
+                                        >
+                                            Apply default settings to all {{ roletypeFormatted }}...
                                         </a>
                                     </li>
                                 </ul>
@@ -418,7 +428,7 @@
                     <div data-reveal id="apply-default-settings-modal" class="reveal-modal">
                         <a class="close-reveal-modal" aria-label="Close">&#215;</a>
                         <h2>Please confirm</h2>
-                        <p>Are you sure you wish to apply default <span id="apply-default-settings-namespace"></span> settings to all <span id="apply-default-settings-roletype"></span>?</p>
+                        <p>Are you sure you wish to apply default <span id="namespace-span"></span> settings to all <span id="roletype-span"></span>?</p>
                         <ul class="flex-list buttons">
                             <li>
                                 <a id="confirm-apply-default-settings" class="button submit">Yes</a>
@@ -433,17 +443,15 @@
                         /**
                         * Update the confirmation modal text with the relevant context
                         */
-                        const namespaceTarget = document.getElementById("apply-default-settings-namespace");
-                        const roletypeTarget = document.getElementById("apply-default-settings-roletype");
+                        const namespaceSpan = document.getElementById("namespace-span");
+                        const roletypeSpan = document.getElementById("roletype-span");
                         let currentNamespace = "";
-                        let currentRoletype = "";
-                        const applyDefaultButtons = document.querySelectorAll("[data-namespace]");
+                        const applyDefaultButtons = document.querySelectorAll("[data-apply-default-button]");
                         applyDefaultButtons.forEach((applyDefaultButton) => {
                             applyDefaultButton.addEventListener("click", () => {
                                 currentNamespace = applyDefaultButton.getAttribute("data-namespace");
-                                currentRoletype = applyDefaultButton.getAttribute("data-roletype");
-                                namespaceTarget.innerText = currentNamespace;
-                                roletypeTarget.innerText = currentRoletype;
+                                namespaceSpan.innerText = applyDefaultButton.getAttribute("data-namespace-formatted");
+                                roletypeSpan.innerText = applyDefaultButton.getAttribute("data-roletype-formatted");
                             });
                         });
                         /**
@@ -465,7 +473,7 @@
                                 fetch("{{routeLookup('adminNotifications.postApplyDefaultSettings') }}", {
                                     method: "POST",
                                     body: JSON.stringify({
-                                        roletype: "{{ currentType }}",
+                                        roletype: "{{ roletype }}",
                                         namespace: currentNamespace
                                     })
                                 }).then((response) => {
