@@ -121,6 +121,9 @@
 
                 {# Self-Assessment: only show the mark if it's self graded, as if it's self-reflect only they never marked themselves #}
                 {% if selfAssessmentFeedback is not null and selfAssessmentFeedback.isSelfGrading %}
+                    {# Although the student entered the mark using the display mark type, we show it here using the input mark type so that
+                     # it matches what the instructor is currently entering so it can be easily compared.
+                     #}
                     ({{ selfAssessmentFeedback.humanReadableInstructorMark }} given in {{ locale.selfAssessment.proper }})
                 {% endif %}
             </th>
