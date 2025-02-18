@@ -109,9 +109,29 @@ class Controller extends Base
         // Courses
         // spec
         $deletedCourseSpec = $this->getDeletdFolderContent($this->courseSpecMapper, $start, $end);
-        $deletedUnitImpl = $this->getDeletdFolderContent($this->unitImplMapper, $start, $end);
+        // impl
+        $deletedCourseImpl = $this->getDeletdFolderContent($this->courseImplMapper, $start, $end);
 
         // Units
+        // spec
+        $unitSpecpb = $this->unitSpecMapper->getPredicateBuilder();
+
+        $deletedUnitSpec = $this->unitSpecMapper->findByPredicates($unitSpecpb->betweenDates('deleted_at', $start, $end), ['deleted' => true,'order' => ['deleted_at' => 'DESC']]);
+
+        // Filter Units where the parent (folder and course) are deleted, these cannot be restored
+        $deletedUnitSpec = $deletedUnitSpec->filter(function (UnitSpec\Model $node) {
+            return !$node->getCourse()->isDeleted() && !$node->getFolder()->isDeleted();
+        });
+
+        // impl
+        $unitImplpb = $this->unitImplMapper->getPredicateBuilder();
+
+        $deletedUnitImpl = $this->unitImplMapper->findByPredicates($unitImplpb->betweenDates('deleted_at', $start, $end), ['deleted' => true,'order' => ['deleted_at' => 'DESC']]);
+
+        // Filter Units where the parent (folder and course) are deleted, these cannot be restored
+        $deletedUnitImpl = $deletedUnitImpl->filter(function (UnitImpl\Model $node) {
+            return !$node->getCourse()->isDeleted() && !$node->getFolder()->isDeleted();
+        });
 
         // Files
         $deletedFiles = $this->getDeletdFolderContent($this->fileMapper, $start, $end);
@@ -126,6 +146,12 @@ class Controller extends Base
             ),
             'deletedUsers'       => $deletedUsers,
             'deletedFiles'       => $deletedFiles,
+
+            // course/unit
+            'deletedCourseSpec'  => $deletedCourseSpec,
+            'deletedCourseImpl'  => $deletedCourseImpl,
+            'deletedUnitSpec'    => $deletedUnitSpec,
+            'deletedUnitImpl'    => $deletedUnitImpl,
         ]);
     }
 
@@ -233,7 +259,7 @@ class Controller extends Base
         $pb = $mapper->getPredicateBuilder();
         $deletedNodes = $mapper->findByPredicates($pb->betweenDates('deleted_at', $start, $end), ['deleted' => true,'order' => ['deleted_at' => 'DESC']]);
 
-        // Filter folders where the parent is deleted, these cannot be restored
+        // Filter nodes where the folder is deleted, these cannot be restored
         $deletedNodes = $deletedNodes->filter(function ($node) {
             return !$node->getFolder()->isDeleted();
         });

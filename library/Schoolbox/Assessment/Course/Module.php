@@ -93,7 +93,7 @@ class Module extends BaseModule
         };
 
         $preloadCourseSpec = function (array $params) {
-            if (isset($params['courseSpec']) && $params['unitSpec'] instanceof CourseSpecificationModel) {
+            if (isset($params['courseSpec']) && $params['courseSpec'] instanceof CourseSpecificationModel) {
                 return ['courseSpec' => $params['courseSpec']];
             }
             try {

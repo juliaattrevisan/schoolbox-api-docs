@@ -168,6 +168,10 @@
                 <dd><a href="#panel1-2">Learning Activity</a></dd>
                 <dd><a href="#panel1-3">Users</a></dd>
                 <dd><a href="#panel1-4">Files</a></dd>
+                <dd><a href="#panel1-5">Courses</a></dd>
+                <dd><a href="#panel1-6">Units</a></dd>
+                <dd><a href="#panel1-7">Imported Courses</a></dd>
+                <dd><a href="#panel1-8">Imported Units</a></dd>
             </dl>
             <section class="content tabs-content">
                 <div class="content active" id="panel1-1">
@@ -276,6 +280,77 @@
                         </tbody>
                     </table>
                 </div>
+                {# Course / unit #}
+                <div class="content" id="panel1-5">
+                    <table>
+                        <thead>
+                        <tr>
+                            <td>Course</td>
+                            <td>Location</td>
+                            <td>Deleted On</td>
+                            <td>Restore</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for course in deletedCourseSpec %}
+                            <tr>
+                                <td>{{ course.getTitle }}</td>
+                                <td><a href="/resources/{{ course.getFolder.getId }}">{{ course.getFolder.getTitle }}</a></td>
+                                <td>{{ course.deletedAt.long }}</td>
+                                <td><a data-restore-course-spec="{{ course.id }}" href="#" class="icon-upload" title="Restore"></a></td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+
+                    </table>
+                </div>
+                <div class="content" id="panel1-6">
+                    <table>
+                        <thead>
+                        <tr>
+                            <td>Unit</td>
+                            <td>Course</td>
+                            <td>Deleted On</td>
+                            <td>Restore</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for unit in deletedUnitSpec %}
+                            <tr>
+                                <td>{{ unit.getTitle }}</td>
+                                <td><a href="{{ routeLookupIfAuthorized('course.modifyCourse', {courseSpec: unit.getCourse, id: unit.getCourse.getId})  }}">{{ unit.getCourse.getTitle }}</a></td>
+                                <td>{{ unit.deletedAt.long }}</td>
+                                <td><a data-restore-unit-spec="{{ unit.id }}" href="#" class="icon-upload" title="Restore"></a></td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+
+                    </table>
+                </div>
+                <div class="content" id="panel1-7">
+                    <table>
+                        <thead>
+                        <tr>
+                            <td>Course</td>
+                            <td>Location</td>
+                            <td>Deleted On</td>
+                            <td>Restore</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for course in deletedCourseImpl %}
+                            <tr>
+                                <td>{{ course.getSpecification.getTitle }}</td>
+                                <td><a href="/resources/{{ course.getFolder.getId }}">{{ course.getFolder.getTitle }}</a></td>
+                                <td>{{ course.deletedAt.long }}</td>
+                                <td><a data-restore-course-impl="{{ course.id }}" href="#" class="icon-upload" title="Restore"></a></td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+
+                    </table>
+                </div>
+                
             </section>
         </div>
     </div>
