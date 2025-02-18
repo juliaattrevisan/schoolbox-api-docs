@@ -12,6 +12,7 @@ default_value           = '',
 label                   = 'Album Name',
 description             = NULL;
 
+-- The default value for eventName was previously NULL.  Setting to '' to match albumName and for simpler error handling.
 UPDATE component_config_definition
 SET default_value = ''
 WHERE component_definition_id IN (
