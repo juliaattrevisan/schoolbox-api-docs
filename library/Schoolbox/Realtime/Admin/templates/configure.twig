@@ -400,7 +400,10 @@
                                     <li>
                                         {% set currentType = filters.options[filters.selected] %}
                                         {% set plural = (currentType == "parent" or currentType == "student") ? "s" : "" %}
-                                        <a class="icon-export" data-reveal-id="apply-default-settings-modal" href="#apply-default-settings">Apply default settings to all {{ currentType == "all" ? "users" : currentType ~ plural }}...</a>
+                                        {% set userTarget = (currentType == "all") ? "users" : currentType ~ plural %}
+                                        <a class="icon-export" href="#apply-default-settings" data-reveal-id="apply-default-settings-modal" data-roletype="{{ userTarget }}" data-namespace="{{ locale.translateSentence(ns[namespace.id].label) | capitalize }}">
+                                            Apply default settings to all {{ userTarget }}...
+                                        </a>
                                     </li>
                                 </ul>
                             </div>
@@ -415,7 +418,7 @@
                     <div data-reveal id="apply-default-settings-modal" class="reveal-modal">
                         <a class="close-reveal-modal" aria-label="Close">&#215;</a>
                         <h2>Please confirm</h2>
-                        <p>Are you sure you wish to apply default settings to all? This will overwrite and apply the settings to all users.</p>
+                        <p>Are you sure you wish to apply default <span id="apply-default-settings-namespace"></span> settings to all <span id="apply-default-settings-roletype"></span>?</p>
                         <ul class="flex-list buttons">
                             <li>
                                 <a id="confirm-apply-default-settings" class="button submit">Yes</a>
@@ -427,6 +430,18 @@
                     </div>
                     <script type="text/javascript">
                         {% autoescape 'js' %}
+                        /**
+                        * Update the confirmation modal text with the relevant context
+                        */
+                        const namespaceTarget = document.getElementById("apply-default-settings-namespace");
+                        const roletypeTarget = document.getElementById("apply-default-settings-roletype");
+                        const applyDefaultButtons = document.querySelectorAll("[data-namespace]");
+                        applyDefaultButtons.forEach((applyDefaultButton) => {
+                            applyDefaultButton.addEventListener("click", () => {
+                                namespaceTarget.innerText = applyDefaultButton.getAttribute("data-namespace");
+                                roletypeTarget.innerText = applyDefaultButton.getAttribute("data-roletype");
+                            });
+                        });
                         /**
                         * Confirm the application of default settings
                         */
