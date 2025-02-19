@@ -582,12 +582,14 @@
         {% endfor %}
 
         {# Victorian Curriculum Progression: Summary #}
-        {% include '@adminSummativeReport/VictorianProgression.twig' with {
-            identifier: 'curriculumProgression-summary',
-            payload: vicProgression.summary,
-            annotate: vicProgression.annotate,
-            title: vicProgression.summary.title
-        } only %}
+        {% if reportOptions.summary.active %}
+            {% include '@adminSummativeReport/VictorianProgression.twig' with {
+                identifier: 'curriculumProgression-summary',
+                payload: vicProgression.summary,
+                annotate: vicProgression.annotate,
+                title: vicProgression.summary.title ?? null
+            } only %}
+        {% endif %}
     </div>
     {% endif %}
 
@@ -657,12 +659,12 @@
             {% endif %}
 
             {# Victorian Curriculum Progression: Class #}
-            {% if vicProgression.class[folder.id] ?? false %}
+            {% if reportOptions.class.active and (vicProgression.class[folder.id] ?? false) %}
                 {% include '@adminSummativeReport/VictorianProgression.twig' with {
                     identifier: 'curriculumProgression-class-' ~ folder.id,
                     payload: vicProgression.class[folder.id],
                     annotate: vicProgression.annotate,
-                    title: vicProgression.class.title
+                    title: vicProgression.class.title ?? null
                 } only %}
             {% endif %}
         {% endfor %}

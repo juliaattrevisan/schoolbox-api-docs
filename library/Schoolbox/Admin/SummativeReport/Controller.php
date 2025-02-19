@@ -90,7 +90,7 @@ class Controller extends ConfigController
     /**
      * Default title of the report; used if the title field was 0-length
      */
-    private const DEFAULT_TITLE = 'Summary of Victorian Curriculum Standards';
+    private const DEFAULT_TITLE = 'Summary of Curriculum Standards';
 
 
     /**
@@ -1123,6 +1123,7 @@ class Controller extends ConfigController
             'summaryAssessmentFeedbacks' => $summaryAssessmentFeedbacks,
             'classAssessmentFeedbacks'   => $classAssessmentFeedbacks,
             'report'                     => $report,
+            'reportOptions'              => json_decode($report->getOptions()),
             'allGraphs'                  => $allGraphs,
             'showSummary'                => (bool)$optionsPayload['summary']['active'],
             'summaryHeading'             => trim((string)$optionsPayload['summary']['heading']),
