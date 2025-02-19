@@ -143,7 +143,8 @@ class Processor
         $reader->setExpectedColumns([
             'Class Code',
             'Student External ID',
-            'Normalised Mark	Comment'
+            'Normalised Mark',
+            'Comment'
         ]);
 
         /* Compute publish date just once
