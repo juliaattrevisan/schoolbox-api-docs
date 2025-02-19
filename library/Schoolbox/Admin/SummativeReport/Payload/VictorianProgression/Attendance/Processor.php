@@ -250,7 +250,7 @@ class Processor
 
             /* Actual marks and comments
              */
-            $comment = trim((string)$row['Commment']);
+            $comment = trim((string)$row['Comment']);
 
             /* TODO Compute human-readable mark from assessment's mark scheme instead
              */
