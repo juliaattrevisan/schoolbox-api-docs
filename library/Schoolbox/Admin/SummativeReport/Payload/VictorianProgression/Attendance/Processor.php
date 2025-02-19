@@ -263,6 +263,8 @@ class Processor
              */
             $comment = trim((string)$row['Commment']);
 
+            /* TODO Compute human-readable mark from assessment's mark scheme instead
+             */
             $csvMark = trim((string)$row['Normalised Mark']);
             $humanReadableMark = $csvMark . '%';
             $normalisedMark = (float)$csvMark;
