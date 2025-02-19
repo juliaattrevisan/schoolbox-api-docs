@@ -41,7 +41,7 @@ class FileGenerator implements GeneratorInterface
         $filename = $this->filename;
         $userId = $user->getId();
 
-        $data = `grep ".ux.$userId\s" $filename`;
+        $data = shell_exec("grep \".ux.$userId\s\" $filename");
 
         $bindings = [];
 

@@ -5815,18 +5815,6 @@ parameters:
 			path: library/Schoolbox/Realtime/Subscription/Redis/Subscription.php
 
 		-
-			message: '#^Expression "`mysql schoolbox \< /usr/share/schoolbox/sql/notifications\-all\-instant\.sql 2\>&1`" on a separate line does not do anything\.$#'
-			identifier: expr.resultUnused
-			count: 1
-			path: library/Schoolbox/Realtime/Test/AbstractNotificationTestCase.php
-
-		-
-			message: '#^Expression "`rabbitmqadmin get queue\=\{\$q\} count\=10000 requeue\=false`" on a separate line does not do anything\.$#'
-			identifier: expr.resultUnused
-			count: 1
-			path: library/Schoolbox/Realtime/Test/AbstractNotificationTestCase.php
-
-		-
 			message: '#^Method Schoolbox\\Realtime\\Test\\AbstractNotificationTestCase\:\:__construct\(\) overrides @final method Alaress\\Async\\Test\\AbstractTestCase\:\:__construct\(\)\.$#'
 			identifier: method.parentMethodFinalByPhpDoc
 			count: 1
