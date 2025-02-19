@@ -88,16 +88,23 @@ class Controller extends Base
      */
     public function postPreview(): void
     {
-        $settings = $this->verifySettings($this->requestPost->getArrayCopy());
+        $post = $this->requestPost->getArrayCopy();
 
-        /** @var FilesystemProxy $filesystemProxy */
-        $filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
+        $settings = $this->verifySettings($post);
+
+        /* Augment with a storage file
+         */
+        if (!\is_array($post['attachment'])) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+        }
+
+        $settings['sourceFile'] = (new CollectorFactory())->build($post['attachment'])->getFirst();
 
         /* This can be ported to the ui version with null and true in place of logger, perform and lock.
          */
         $outcome = (new Processor(
             $this->assessmentMapperProxy,
-            $filesystemProxy,
+            $this->filesystemProxy,
             $this->userMapper,
             $this->folderMapper,
             null,
@@ -123,13 +130,36 @@ class Controller extends Base
     /**
      * Process in perform mode
      *
-     * @throws Exception
-     * @throws RouteNotFound
+     * @throws Deleted
      * @throws Error
+     * @throws Exception
+     * @throws FilesystemException
+     * @throws RouteNotFound
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function postPerform(): void
     {
-        $settings = $this->verifySettings($this->requestPost->getArrayCopy());
+        $post = $this->requestPost->getArrayCopy();
+
+        $settings = $this->verifySettings($post);
+
+        /* Augment with a storage file
+         */
+        $settings['sourceFile'] = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($post['attachment']);
+
+        /* This can be ported to the ui version with null and true in place of logger, perform and lock.
+         */
+        $outcome = (new Processor(
+            $this->assessmentMapperProxy,
+            $this->filesystemProxy,
+            $this->userMapper,
+            $this->folderMapper,
+            null,
+            $settings['worktype']->getId(),
+            $settings['publishAt'],
+            null,
+            true,
+        ))->parseFeedbacks($settings['sourceFile'], $settings['feedbackOwner']);
 
         $this->response = $this->responseFromTemplate(
             '@adminBulkAssessmentResult/perform.twig',
@@ -137,6 +167,7 @@ class Controller extends Base
                 'pageCurrent' => $this->routeGenerator->generate('adminBulkAssessmentResult.getIndex'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminBulkAssessmentResult.getIndex')),
                 'settings' => $settings,
+                'outcome' => $outcome
             ],
             'Bulk Assessment Result',
         );
@@ -144,7 +175,7 @@ class Controller extends Base
 
 
     /**
-     * Asserts that the selected worktype, feedback owner and csv file actually exists:
+     * Asserts that the selected worktype and feedback owner actually exists:
      * without those, we can't really continue
      *
      * Also assumes a publish datetime here, though you probably want this to be configurable
@@ -152,8 +183,6 @@ class Controller extends Base
      *
      * @param array $postVar
      * @return array
-     * @throws Exception
-     * @throws \Exception
      */
     private function verifySettings(array $postVar): array
     {
@@ -177,19 +206,9 @@ class Controller extends Base
             throw new \DomainException('Unknown feedback owner selected, or was omitted.');
         }
 
-        /* Grab the storage file
-         */
-        $factory = new CollectorFactory();
-        $csvFile = $factory->build($postVar['attachment'])->getFirst();
-
-        if (!\is_array($postVar['attachment'])) {
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
-        }
-
         return [
             'worktype' => $worktype,
             'feedbackOwner' => $feedbackOwner,
-            'sourceFile' => $csvFile,
             'publishAt' => \Alaress_Date_Format::now()
         ];
     }

@@ -342,7 +342,7 @@ class Processor
      */
     private function log(string $message, string $type): void
     {
-        $this->outcome[microtime()] = [
+        $this->outcome[] = [
             'message' => $message,
             'type' => $type
         ];
