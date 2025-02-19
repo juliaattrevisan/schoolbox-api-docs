@@ -3,6 +3,7 @@
  * To avoid this, the view status page now loads up to 30 instances at a time and paginates the rest of the students.
  */
 
+import { slideDown, slideUp } from "@js/util/animateUtils";
 import { EditorEvent } from "@js/editor/event/editorEvent";
 import type { SbxEditor } from "@js/editor/types/editorTypes";
 import { ACTIVITY_STATUS_PAGE_INIT } from "./activityStatusPageEvent";
@@ -73,25 +74,19 @@ async function applyParticipantVisibility(
     isActive: boolean,
     animate: boolean,
 ): Promise<void> {
-    return new Promise((resolve) => {
-        if (!animate) {
-            participantRow.el.style.display = isActive ? "" : "none";
-            resolve();
-            return;
-        }
+    if (!animate) {
+        participantRow.el.style.display = isActive ? "" : "none";
+        return;
+    }
 
-        // For slideDown (show), will not wait since we want to spawn the editor asap
-        if (isActive) {
-            // TODO: Use the gsap thing instead
-            $(participantRow.el).slideDown();
-            resolve();
-            return;
-        }
+    // For slideDown (show), will not wait since we want to spawn the editor asap
+    if (isActive) {
+        void slideDown(participantRow.el);
+        return;
+    }
 
-        // For slideUp (hide), will wait for the animation to finish first to avoid seeing the textarea
-        // TODO: Use the gsap thing instead
-        $(participantRow.el).slideUp(undefined, resolve);
-    });
+    // For slideUp (hide), will wait for the animation to finish first to avoid seeing the textarea
+    await slideUp(participantRow.el);
 }
 
 /**
@@ -137,34 +132,33 @@ async function onSelectedTabChange(activeTab: number, animate: boolean): Promise
     }
 
     const filterEmptyState = document.querySelector(pageConfig.selectors.filterEmptyState);
-    if (filterEmptyState === null) {
+    if (!(filterEmptyState instanceof HTMLElement)) {
         throw new Error("Unable to find filter empty state element");
     }
 
     if (participantTabGroups.length === 0) {
         // everything was filtered out, so show the empty state
-        $(filterEmptyState).slideDown();
+        filterEmptyState.dataset.display = "block";
+        void slideDown(filterEmptyState);
     } else {
-        $(filterEmptyState).slideUp();
+        void slideUp(filterEmptyState);
     }
 
     const activeGroup = participantTabGroups[activeTab]; // could be null if no groups
     await Promise.all(
         participantRows.map(async (participantRow) => {
             const isActive = activeGroup && activeGroup.includes(participantRow);
-            const editor = participantRow.editor;
+            const activeEditor = participantRow.editor;
 
             await applyParticipantVisibility(participantRow, isActive, animate);
 
-            if (isActive && editor === null) {
+            if (isActive && activeEditor === null) {
                 // create a new editor
-                console.log("creating editor for", participantRow);
                 await createEditorForParticipant(participantRow);
-            } else if (!isActive && editor !== null) {
+            } else if (!isActive && activeEditor !== null) {
                 // destroy the existing editor
-                console.log("destroying editor for", participantRow);
                 participantRow.editor = null; // do this first to avoid double-destroying
-                await editor.destroy();
+                await activeEditor.destroy();
             }
         }),
     );
