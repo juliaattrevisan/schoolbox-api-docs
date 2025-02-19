@@ -55,6 +55,7 @@ use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedbackModel
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkModel;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
+use Schoolbox\Learning\Assessment\ISelfAssessableFeedback;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
@@ -661,10 +662,12 @@ class DataSource
 
         // Get the mark scheme for the grid, instructor mark scheme only exists for due work
         $markSchemeFactory = new MarkSchemeFactory();
-        $gridMarkScheme    = $assessable instanceof DueWorkModel
-            ? $assessable->getInstructorMarkScheme()
-            : $assessable->getMarkScheme();
-
+        $gridMarkScheme = $assessable->getMarkScheme();
+        // If this is a due work and not a self-assessment, use the instructor mark scheme
+        $isSelfAssessment = $feedback instanceof ISelfAssessableFeedback && $feedback->isSelfAssessment();
+        if (!$isSelfAssessment && $assessable instanceof DueWorkModel) {
+            $gridMarkScheme = $assessable->getInstructorMarkScheme();
+        }
         $markedGrid = new MarkedGrid($feedback, $grid, $gridMarkScheme);
 
         // What goes in the grid?
