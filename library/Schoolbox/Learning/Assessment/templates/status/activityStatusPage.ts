@@ -3,8 +3,8 @@
  * To avoid this, the view status page now loads up to 30 instances at a time and paginates the rest of the students.
  */
 
-document.addEventListener("DOMContentLoaded", function () {
-    const PAGE_ITEM_LIMIT = 25;
+document.addEventListener("ACTIVITY_STATUS_PAGE_INIT", (event) => {
+    const PAGE_ITEM_LIMIT = event.detail.pageItemLimit;
 
     const participantRows = Array.from(document.querySelectorAll("#assessment-status [data-participant]")).map((el) => {
         return {

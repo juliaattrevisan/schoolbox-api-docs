@@ -153,6 +153,13 @@
 {# Rich text editors / pagination #}
 <script type="text/javascript" src='{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}'></script>
 <script type="text/javascript" src='{{ CDN_PREFIX }}/js/bundle/activityStatusPage.js?v={{ config.site_version }}'></script>
+<script type="text/javascript">
+    document.dispatchEvent(new CustomEvent('ACTIVITY_STATUS_PAGE_INIT', {
+        detail: {
+            pageItemLimit: 25,
+        }
+    }));
+</script>
 
 {% block filtersScript %}
 <script type="text/javascript">

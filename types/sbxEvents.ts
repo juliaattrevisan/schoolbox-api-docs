@@ -10,6 +10,7 @@ import type { ColourPickerDocumentEventHandlerMap } from "@js/colour-picker/colo
 import type { PopOutMenuMarkbookDocumentEventHandlerMap } from "@schoolboxVue/components/menu/popOutMenuMarkbookEvent";
 import type { ImageLightboxDocumentEventHandlerMap } from "@js/image-lightbox/imageLightboxEvent";
 import type { SwiperDocumentEventHandlerMap } from "@js/slideshow/slideshowEvent";
+import type { ActivityStatusPageDocumentEventHandlerMap } from "@schoolboxLibrary/Learning/Assessment/templates/status/activityStatusPageEvent";
 
 /**
  * FOR EVENTS DISPATCHED TO THE DOCUMENT
@@ -21,7 +22,8 @@ export interface SbxGlobalDocumentEventHandlerMap
         ColourPickerDocumentEventHandlerMap,
         ImageLightboxDocumentEventHandlerMap,
         SwiperDocumentEventHandlerMap,
-        PopOutMenuMarkbookDocumentEventHandlerMap {}
+        PopOutMenuMarkbookDocumentEventHandlerMap,
+        ActivityStatusPageDocumentEventHandlerMap {}
 
 /**
  * FOR EVENTS DISPATCHED TO ANY ELEMENT
