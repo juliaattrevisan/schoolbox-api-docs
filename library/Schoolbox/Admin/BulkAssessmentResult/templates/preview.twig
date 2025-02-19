@@ -55,10 +55,10 @@
 
         <div class="small-12 columns">
             <form action="{{ formRoute }}" method="post">
-                <input type="text" name="worktypeId" value="{{ settings.worktype.id }}" />
-                <input type="text" name="attachment" value="{{ settings.sourceFile.hash }}" />
-                <input type="text" name="userId" value="{{ settings.feedbackOwner.id }}" />
-                <input type="submit" />
+                <input type="hidden" name="worktypeId" value="{{ settings.worktype.id }}" />
+                <input type="hidden" name="attachment" value="{{ settings.sourceFile.hash }}" />
+                <input type="hidden" name="userId" value="{{ settings.feedbackOwner.id }}" />
+                <input type="submit" value="Perform Import" />
             </form>
         </div>
     </div>
