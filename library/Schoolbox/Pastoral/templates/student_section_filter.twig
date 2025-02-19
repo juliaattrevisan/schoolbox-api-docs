@@ -1,12 +1,13 @@
 {# Pastoral Type Filter Box #}
-
-{% if types | length and user.role.isStaff %}
+{% set hasAccess = user.role.isStaff or user.role.isParent or user.role.isStudent %}
+{% if types | length and hasAccess %}
 
     <div class="small-12 island">
-        <h2 class="subheader">Filter Records By Type</h2>
+        <h2 class="subheader">Filter Records</h2>
     </div>
     <div class="small-12 island">
         <section>
+            {% if user.role.isStaff %}
             <fieldset class="content">
                 <div class="small-12 medium-6 columns">
                     <label class="inline-block" for="typeId">Type</label>
@@ -29,6 +30,7 @@
                     </select>
                 </div>
             </fieldset>
+            {% endif %}
             <fieldset class="content">
                 <div class="small-12 columns">
                     <label class="inline-block" for="showArchivedRecords">Show archived records</label>
@@ -46,6 +48,7 @@
     </div>
 
     <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/chained/jquery.chained.min.js?v={{ config.site_version }}"></script>
+    {% if user.role.isStaff %}
     <script>
         $(function () {
             $('#subtypeId').chained('#typeId');
@@ -60,5 +63,14 @@
             })
         });
     </script>
+    {% else %}
+    <script>
+        $(function () {
+            $('[data-archived-filter]').on('change', function() {
+                window.location.href = "?showArchived=" + ($(this).is(':checked') ? 1 : 0);
+            })
+        });
+    </script>
+    {% endif %}
 
 {% endif %}
