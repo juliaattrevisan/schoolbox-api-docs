@@ -88,6 +88,11 @@
                             <label for="userId" class="required">Feedback Owner</label>
                             <input id="userId" data-selectizeuser type="text" name="userId" placeholder="Search Users">
                         </div>
+
+                        <div class="small-12 columns">
+                            <label>Source File</label>
+                            {% include 'sub/attachzone.twig' with { attachzone: sourceFileZone } %}
+                        </div>
                     </fieldset>
                 </section>
                 <input type="submit" />

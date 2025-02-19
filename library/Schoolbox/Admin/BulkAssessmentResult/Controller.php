@@ -13,6 +13,7 @@ namespace Schoolbox\Admin\BulkAssessmentResult;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\SummativeReport\Payload\VictorianProgression\Attendance\Processor;
+use Schoolbox\Resource\Attachment\Zone;
 
 class Controller extends Base
 {
@@ -33,6 +34,16 @@ class Controller extends Base
      */
     public function getIndex(): void
     {
+        $zone = (new Zone('sourceFile'))
+            ->setThumbnailSize(64)
+            ->setModalTitle('Select CSV')
+            ->setAttachmentsLabel('')
+            ->setAttachPrompt('Upload CSV')
+            ->setMimeFilter('.csv,text/csv')
+            ->setReadOnly(false)
+            ->setMulti(false)
+            ->useImportExpiryDate();
+
         $this->response = $this->responseFromTemplate(
             '@adminBulkAssessmentResult/index.twig',
             [
@@ -41,7 +52,8 @@ class Controller extends Base
                 'worktypes' => $this->worktypeMapper->findAll()->sortNaturally('sequence'),
                 /* Not sure if there's a shortcut to this: never seen one?
                  */
-                'roletypeStaff' => \Schoolbox\Role::STAFF
+                'roletypeStaff' => \Schoolbox\Role::STAFF,
+                'sourceFileZone' => $zone->getTwigContext(),
             ],
             'Bulk Assessment Result'
         );
