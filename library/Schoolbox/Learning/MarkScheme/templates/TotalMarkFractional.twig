@@ -13,6 +13,7 @@
  # @param int $tabIndex
  # @param string[] $errors  Admin-configured submission states
  # @param bool $readonly  Should this form input be rendered as readonly?
+ # @param bool $useInstructorMark  Should the instructor mark be used? (only relevant for due works)
  #
  # Optional precdence: used for quiz only
  # @param float $limit  Maximum marks available per attempt, indexed by user id
@@ -30,6 +31,7 @@
     feedback:    feedback,
     tabIndex:    tabIndex,
     placeholder: readonly ? '(no mark given)' : 'Mark out of ' ~ limit,
+    useInstructorMark: useInstructorMark,
     limit:       limit,
     maxLength:   48,
     inputTitle:  'Maximum Mark: ' ~ limit,

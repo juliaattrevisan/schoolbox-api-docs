@@ -6,6 +6,7 @@
         tabIndex:    int
         errors:      string[]       Admin-configured submission states
         readonly:     bool          Should this form input be rendered as readonly?
+        useInstructorMark: bool     Should the instructor mark be used? (only relevant for due works)
     ]
 #}
 
@@ -15,6 +16,7 @@
     feedback:    feedback,
     tabIndex:    tabIndex,
     placeholder: readonly ? '(no mark given)' : 'Percentage mark',
+    useInstructorMark: useInstructorMark,
     limit:       100,
     maxLength:   48,
     inputTitle:  'Percentage',
@@ -47,4 +49,3 @@
         });
     </script>
 {% endif %}
-

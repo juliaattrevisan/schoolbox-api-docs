@@ -7,6 +7,7 @@
         markScheme:   LetterGrade
         errors:       string[]       Admin-configured submission states
         readonly:     bool           Should this form input be rendered as readonly?
+        useInstructorMark: bool      Should the instructor mark be used? (only relevant for due works)
     ]
 #}
 
@@ -16,6 +17,7 @@
         feedback:    feedback,
         tabIndex:    tabIndex,
         placeholder: readonly ? '(no grade given)' : '(no grade)',
+        useInstructorMark: useInstructorMark,
         limit:       100,
         maxLength:   48,
         inputTitle:  '',
@@ -47,9 +49,6 @@
             $('[data-feedback-form="' + '{{ participant.user.id }}' + '"]').valid();
         });
     </script>
-
-    {# If this is a due work, we use the instructor mark #}
-    {% set useInstructorMark = participant.assessable is dueWork %}
 
     {% if feedback %}
         {% set humanReadableMark = useInstructorMark ? feedback.humanReadableInstructorMark(false) : feedback.humanReadableMark(false) %}
