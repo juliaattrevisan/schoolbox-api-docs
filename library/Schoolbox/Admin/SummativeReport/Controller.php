@@ -947,7 +947,7 @@ class Controller extends ConfigController
             $workTypeWhitelist = [];
 
             foreach ($optionsPayload['summary']['workType'] as $worktypeId => $worktype) {
-                if ($worktype['graph']) {
+                if ($worktype['graph'] ?? false) {
                     $workTypeWhitelist[] = $worktypeId;
                 }
             }
@@ -983,7 +983,7 @@ class Controller extends ConfigController
                 $workTypeWhitelist = [];
 
                 foreach ($optionsPayload['class']['workType'] as $worktypeId => $worktype) {
-                    if ($worktype['graph']) {
+                    if ($worktype['graph'] ?? false) {
                         $workTypeWhitelist[] = $worktypeId;
                     }
                 }
