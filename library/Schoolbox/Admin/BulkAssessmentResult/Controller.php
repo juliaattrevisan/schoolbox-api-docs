@@ -13,6 +13,7 @@ namespace Schoolbox\Admin\BulkAssessmentResult;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\SummativeReport\Payload\VictorianProgression\Attendance\Processor;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Exception;
@@ -147,6 +148,10 @@ class Controller extends Base
          */
         $factory = new CollectorFactory();
         $csvFile = $factory->build($postVar['attachment'])->getFirst();
+
+        if (!\is_array($post->get('attachment'))) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+        }
 
         return [
             'worktype' => $worktype,

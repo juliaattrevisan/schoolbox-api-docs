@@ -30,13 +30,27 @@
                 'userId': {
                     'required': true
                 },
+                "sourceFile-file": {
+                    required: {
+                        depends: function () {
+                            console.log('fox');
+                            return document.getElementById("sourceFile-zone").querySelector("[data-dz-previews]").children.length === 0;
+                        },
+                    },
+                },
             },
             messages: {
                 'userId': {
                     'required': 'You must specify a feedback owner before you can proceed'
-                }
+                },
+                "sourceFile-file-file": "Please attach a csv file",
             },
-        })
+        });
+
+        // Remove the error message when a worksheet file is uploaded
+        $('#sourceFileZone').on('success.attachzone', () => {
+            $('#sourceFile-file-error').remove();
+        });
     });
 </script>
 
@@ -92,6 +106,7 @@
                         <div class="small-12 columns">
                             <label>Source File</label>
                             {% include 'sub/attachzone.twig' with { attachzone: sourceFileZone } %}
+                            <input type="hidden" name="sourceFile-file" id="sourceFile-file" />
                         </div>
                     </fieldset>
                 </section>
