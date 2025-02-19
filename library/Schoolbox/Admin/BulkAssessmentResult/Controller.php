@@ -68,6 +68,7 @@ class Controller extends Base
 
     /**
      * Process in planning mode
+     *
      * @throws Error
      * @throws Exception
      * @throws RouteNotFound
@@ -86,7 +87,7 @@ class Controller extends Base
 //            \Alaress_Date_Format::now()->getUsingFormat('d/m/Y H:ia'),
 //            null,
 //            null,
-//            true,
+//            false,
 //        ))->parseFeedbacks($storageFile, $settings['feedbackOwner'], null);
 
         $this->response = $this->responseFromTemplate(
@@ -103,6 +104,7 @@ class Controller extends Base
 
     /**
      * Process in perform mode
+     *
      * @throws Exception
      * @throws RouteNotFound
      * @throws Error
