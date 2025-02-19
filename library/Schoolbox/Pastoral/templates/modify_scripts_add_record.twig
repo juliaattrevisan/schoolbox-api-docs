@@ -46,7 +46,6 @@
         subtypeDropdown.on('change', function(event) {
             init(typeDropdown.val(), subtypeDropdown.val());
         });
-        init(typeDropdown.val(), subtypeDropdown.val());
 
         {% if record.id != '' %}
         /* Get the current entry tip when modifying the record
