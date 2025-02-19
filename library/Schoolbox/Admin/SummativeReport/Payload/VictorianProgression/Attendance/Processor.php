@@ -10,7 +10,9 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\SummativeReport\Payload\VictorianProgression\Attendance;
 
 use Alaress\Lock\LockRefreshException;
+use League\Flysystem\FilesystemException;
 use Psr\Log\LoggerInterface;
+use Schoolbox\Admin\Import\Profile\Reader;
 use Schoolbox\Resource\Folder\Mapper;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Model;
@@ -128,6 +130,7 @@ class Processor
      * @param LockInterface|null $lock
      * @return void
      * @throws LockRefreshException
+     * @throws FilesystemException
      */
     public function parseFeedbacks(
         \Schoolbox\Resource\Storage\Model $file,
@@ -136,18 +139,29 @@ class Processor
     ): void {
         /* Load a particular file
          */
-        $this->filesystemProxy->readStream($file);
+        $reader = new Reader($this->filesystemProxy->readStream($file), true);
+        $reader->setExpectedColumns([
+            'Class Code',
+            'Student External ID',
+            'Normalised Mark	Comment'
+        ]);
 
-        /* Skip header row
+        /* Compute publish date just once
          */
-        $row = fgetcsv($fp);
+        $publishAt = $this->publishAt->getDatabase();
 
         /* Maintain a row counter
          */
-        for ($i = 2; $row = fgetcsv($fp); ++$i) {
+        $i = 0;
+
+        foreach ($reader as $row) {
             if ($lock) {
                 $this->refreshLock($lock);
             }
+
+            /* Remember the row number
+             */
+            $i++;
 
             /* Process feedbacks
              *     - $creator (Alaress Admin) owns all assessments and feedbacks
@@ -159,7 +173,7 @@ class Processor
             /* "Attendance Semester 1" should be an assessment in this folder
              * If not, skip it
              */
-            $folderCode = trim((string)$row[3]);
+            $folderCode = trim((string)$row['Class Code']);
 
             /* If we specified a folder code, decide if this matches
              * If not, skip it
@@ -200,7 +214,7 @@ class Processor
 
             /* First see if this student exists
              */
-            $externalId = trim((string)$row[4]);
+            $externalId = trim((string)$row['Student External ID']);
 
             try {
                 $student = $this->userMapper->findByExternalId($externalId);
@@ -247,9 +261,9 @@ class Processor
 
             /* Actual marks and comments
              */
-            $comment = trim((string)$row[6]);
+            $comment = trim((string)$row['Commment']);
 
-            $csvMark = trim((string)$row[5]);
+            $csvMark = trim((string)$row['Normalised Mark']);
             $humanReadableMark = $csvMark . '%';
             $normalisedMark = (float)$csvMark;
 
@@ -292,8 +306,6 @@ class Processor
                 $folderCode
             ));
         }
-
-        fclose($fp);
     }
 
 
