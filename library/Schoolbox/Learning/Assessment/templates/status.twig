@@ -96,9 +96,16 @@
 
 {% block flashMessage %}{% endblock flashMessage %}
 
+{% if assessment.allParticipants | length %}
+{% block participantSearchBar %}
+    <div class="row">
+        <div class="small-12 columns">
+            <input type="search" placeholder="Search for a student" data-participant-filter>
+        </div>
+    </div>
+{% endblock participantSearchBar %}
 <div class="row">
     <div class="small-12 island">
-        {% if assessment.allParticipants | length %}
         <section id="assessment-status">
             <ul class="information-list {{ listClass }}">
             {% for participant in assessment.allParticipants | filter(participant => not participant.isExcluded ) %}
@@ -122,14 +129,26 @@
                 Add another filter or <a id="filter-show-all">show everything</a>.
             </p>
         </div>
-        {% else %}
-            <div class="empty-state">
-                <i class="{{ icon.renderClass(assessment) }}"></i>
-                <p>This {{ locale.activity }} has no students participating.</p>
-            </div>
-        {% endif %}
     </div>
 </div>
+{% block participantPaginator %}
+    <div class="row" data-participant-paginator style="display: none">
+        <div class="small-12 column">
+            <ul class="pagination">
+            </ul>
+        </div>
+    </div>
+{% endblock participantPaginator %}
+{% else %}
+<div class="row">
+    <div class="small-12 column">
+        <div class="empty-state">
+            <i class="{{ icon.renderClass(assessment) }}"></i>
+            <p>This {{ locale.activity }} has no students participating.</p>
+        </div>
+    </div>
+</div>
+{% endif %}
 
 <script type="text/javascript">
     $(function () {

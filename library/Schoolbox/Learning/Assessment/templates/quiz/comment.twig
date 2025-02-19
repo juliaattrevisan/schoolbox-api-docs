@@ -15,7 +15,9 @@
 <label>Comment
     <textarea
         tabindex="{{ tabIndex }}"
-        id="comment-{{ participant.user.id }}" name="comment"
+        id="comment-{{ participant.user.id }}"
+        data-feedback-comment="{{ participant.user.id }}"
+        name="comment"
         placeholder="{{ placeholder }}"
         rows="3"
     >{{ feedback is not null ? feedback.comment : ''}}</textarea>

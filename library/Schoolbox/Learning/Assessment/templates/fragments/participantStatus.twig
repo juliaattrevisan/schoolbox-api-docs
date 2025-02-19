@@ -17,13 +17,13 @@
     </a>
     {% if not participant.user.deleted %}
         <h3>
-            <a href="/search/user/{{ participant.user.id }}" title="View Profile">{{ participant.user.fullName }}</a>
+            <a href="/search/user/{{ participant.user.id }}" title="View Profile" data-participant-name>{{ participant.user.fullName }}</a>
             {% if not participant.plan.isDynamic %}
                 <span class="individualisation has-tip tip-top" data-tooltip title="{{ participant.plan.name|purify}} ({{ participant.plan.duedate.short}})">i</span>
             {% endif %}
         </h3>
     {% else %}
-        <h3>{{ participant.user.fullName }}</h3>
+        <h3 data-participant-name>{{ participant.user.fullName }}</h3>
     {% endif %}
     <p>
         <span class="meta">

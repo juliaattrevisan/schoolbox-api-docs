@@ -14,12 +14,11 @@ document.addEventListener("DOMContentLoaded", function() {
     const participantRows = Array.from(document.querySelectorAll('#assessment-status [data-participant]')).map((el) => {
         return {
             el,
-            textarea: el.querySelector('textarea[name="comment"]'),
-            name: el.querySelector('h3 a[title="View Profile"]').innerText,
+            textarea: el.querySelector('[data-feedback-comment]'),
+            name: el.querySelector('[data-participant-name]').innerText,
             editor: null,
         }
     });
-    const textareas = document.querySelectorAll('textarea[name="comment"]');
 
     function createEditorForParticipant(participantRow) {
         document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
@@ -41,26 +40,12 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // add the search bar
-    if (textareas.length > PAGE_ITEM_LIMIT) {
-        document.querySelector('#assessment-status').closest(".row").insertAdjacentHTML('beforeBegin', `<div class="row">
-            <div class="small-12 column">
-                <input type="text" placeholder="Search for a user" data-user-filter>
-            </div>
-        </div>`);
-
+    if (participantRows.length > PAGE_ITEM_LIMIT) {
         // add pagination
-        document.querySelector('#assessment-status').closest("div.row").insertAdjacentHTML('afterEnd',
-        `<div class="row" data-user-paginator style="display: none;">
-            <div class="small-12 column">
-                <ul class="pagination">
-                </ul>
-            </div>
-        </div>`);
-
         let activeTab = 0;
         let participantTabGroups = [];
-        const userFilterInput = document.querySelector('input[data-user-filter]');
-        const paginator = document.querySelector('[data-user-paginator]');
+        const participantFilterInput = document.querySelector('input[data-participant-filter]');
+        const paginator = document.querySelector('[data-participant-paginator]');
 
         function onSelectedTabChange(tabId) {
             activeTab = tabId;
@@ -68,19 +53,19 @@ document.addEventListener("DOMContentLoaded", function() {
 
             if (participantTabGroups.length) {
                 const tabs = participantTabGroups.map((group, i) => {
-                    return `<li class="${i === activeTab ? 'active' : ''}" data-user-tab=${ i }><a href="">${i + 1}</a></li>`;
+                    return `<li class="${i === activeTab ? 'active' : ''}" data-participant-tab=${ i }><a href="">${i + 1}</a></li>`;
                 });
 
                 paginator.querySelector('ul').innerHTML =
-                    `<li class="arrow ${activeTab == 0 ? 'unavailable' : ''}" data-user-tab="${activeTab - 1}"><a href="">‹</a></li>
+                    `<li class="arrow ${activeTab == 0 ? 'unavailable' : ''}" data-participant-tab="${activeTab - 1}"><a href="">‹</a></li>
                         ${tabs.join('')}
-                    <li class="arrow ${activeTab == participantTabGroups.length - 1 ? 'unavailable' : ''}" data-user-tab="${activeTab + 1}"><a href="">›</a></li>`;
+                    <li class="arrow ${activeTab == participantTabGroups.length - 1 ? 'unavailable' : ''}" data-participant-tab="${activeTab + 1}"><a href="">›</a></li>`;
 
-                paginator.querySelectorAll('[data-user-tab]').forEach((el, i) => {
+                paginator.querySelectorAll('[data-participant-tab]').forEach((el, i) => {
                     el.addEventListener('click', (e) => {
                         e.preventDefault();
                         if (el.classList.contains('unavailable')) { return; }
-                        onSelectedTabChange(parseInt(el.getAttribute('data-user-tab')));
+                        onSelectedTabChange(parseInt(el.getAttribute('data-participant-tab')));
                     });
                 });
             }
@@ -107,8 +92,8 @@ document.addEventListener("DOMContentLoaded", function() {
             });
         }
 
-        function onUserFilterChange() {
-            const filter = userFilterInput.value.toLowerCase();
+        function onParticipantFilterChange() {
+            const filter = participantFilterInput.value.toLowerCase();
             const filteredParticipantRows = Array.from(participantRows).filter((participantRow) => {
                 return participantRow.name.toLowerCase().includes(filter);
             });
@@ -129,7 +114,7 @@ document.addEventListener("DOMContentLoaded", function() {
             onSelectedTabChange(0); // reset to first page
         }
 
-        userFilterInput.addEventListener('input', onUserFilterChange);
+        participantFilterInput.addEventListener('input', onParticipantFilterChange);
         onUserFilterChange(); // initial filter
     } else {
         participantRows.forEach((participantRow) => {
