@@ -13,7 +13,9 @@ namespace Schoolbox\Admin\BulkAssessmentResult;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\SummativeReport\Payload\VictorianProgression\Attendance\Processor;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
+use Schoolbox\Resource\Exception;
 
 class Controller extends Base
 {
@@ -117,16 +119,22 @@ class Controller extends Base
      *
      * @param array $postVar
      * @return array
+     * @throws Exception
      */
     private function verifySettings(array $postVar): array
     {
+        /* Worktype chosen must exist
+         */
         $worktypeId = $postVar['worktypeId'] ?? null;
+
         try {
             $worktype = $this->worktypeMapper->findById($worktypeId);
         } catch (\Schoolbox\Mapper\Exception $e) {
             throw new \DomainException('Unknown work type selected, or was omitted.');
         }
 
+        /* Feedback Owner needs to exist
+         */
         $feedbackOwnerId = $postVar['userId'] ?? null;
 
         try {
@@ -135,9 +143,15 @@ class Controller extends Base
             throw new \DomainException('Unknown feedback owner selected, or was omitted.');
         }
 
+        /* Grab the storage file
+         */
+        $factory = new CollectorFactory();
+        $csvFile = $factory->build($postVar['attachment'])->getFirst();
+
         return [
             'worktype' => $worktype,
             'feedbackOwner' => $feedbackOwner,
+            'sourceFile' => $csvFile,
         ];
     }
 }

@@ -1,7 +1,7 @@
 {##
  # Preview
  #
- # @param array $settings  A (worktype, user) struct representing identification method and feedback owner
+ # @param array $settings  A (worktype, user, sourceFile) struct representing identification method, feedback owner and uploaded csv
  #}
 
 {% import 'sub/breadcrumbs.twig' as bread %}
@@ -25,6 +25,7 @@
                                 <a href="/search/user/{{ settings.feedbackOwner.id }}" target="_blank" title="{{ settings.feedbackOwner.fullname }}">{{ settings.feedbackOwner.fullname }}</a>
                             {% endif %}
                         </li>
+                        <li><strong>Source File:</strong> {{ settings.sourceFile.hash }}</li>
                     </ul>
                 </div>
             </section>
