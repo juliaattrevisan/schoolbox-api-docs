@@ -222,5 +222,5 @@ test("selected results are not visible when show-selected is false", async () =>
             showSelected: false,
         },
     });
-    expect(wrapper.find(`[data-test="ss-selected-container"]`).exists()).toBe(false);
+    expect(wrapper.find(`[data-test="ss-selected"]`).exists()).toBe(false);
 });
