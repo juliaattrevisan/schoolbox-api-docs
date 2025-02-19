@@ -9,18 +9,13 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\SummativeReport\Payload\VictorianProgression\Attendance;
 
-use Alaress\Lock\LockRefreshException;
 use League\Flysystem\FilesystemException;
-use Psr\Log\LoggerInterface;
 use Schoolbox\Admin\Import\Profile\Reader;
 use Schoolbox\Resource\Folder\Mapper;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Model;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Symfony\Component\Lock\Exception\LockAcquiringException;
-use Symfony\Component\Lock\Exception\LockConflictedException;
-use Symfony\Component\Lock\LockInterface;
 
 class Processor
 {
@@ -82,6 +77,14 @@ class Processor
 
 
     /**
+     * A list of log messages that we can report to users
+     *
+     * @var array
+     */
+    private array $outcome = [];
+
+
+    /**
      * Constructor
      *
      * @param FilesystemProxy $filesystemProxy
@@ -91,7 +94,6 @@ class Processor
      * @param int|null $workTypeId
      * @param \Alaress_Date_Format $publishAt
      * @param string|null $folderCode
-     * @param LoggerInterface|null $logger
      * @param bool $perform
      */
     public function __construct(
@@ -102,7 +104,6 @@ class Processor
         private ?int $workTypeId,
         private \Alaress_Date_Format $publishAt,
         private ?string $folderCode,
-        private ?LoggerInterface $logger,
         private bool $perform
     ) {
         /* We're going to reuse this a lot
@@ -127,16 +128,13 @@ class Processor
      *
      * @param Model $file
      * @param User $creator
-     * @param LockInterface|null $lock
-     * @return void
-     * @throws LockRefreshException
+     * @return array
      * @throws FilesystemException
      */
     public function parseFeedbacks(
         \Schoolbox\Resource\Storage\Model $file,
         \Schoolbox\User $creator,
-        ?LockInterface $lock
-    ): void {
+    ): array {
         /* Load a particular file
          */
         $reader = new Reader($this->filesystemProxy->readStream($file), true);
@@ -156,10 +154,6 @@ class Processor
         $i = 0;
 
         foreach ($reader as $row) {
-            if ($lock) {
-                $this->refreshLock($lock);
-            }
-
             /* Remember the row number
              */
             $i++;
@@ -180,7 +174,7 @@ class Processor
              * If not, skip it
              */
             if (null !== $this->folderCode && $folderCode !== $this->folderCode) {
-                $this->logger?->debug(sprintf(
+                $this->log(sprintf(
                     'Row %s: folder code %s does not match requested %s. Skipping',
                     $i,
                     $folderCode,
@@ -192,16 +186,10 @@ class Processor
 
             /* Assume this exists, I guess, for now
              */
-            $this->logger?->debug(sprintf(
-                'Row %s: looking for folder code %s',
-                $i,
-                $folderCode
-            ));
-
             try {
                 $folder = $this->folderMapper->findByCode($folderCode);
             } catch (\Schoolbox\Mapper\Exception $e) {
-                $this->logger?->warning(sprintf(
+                $this->log(sprintf(
                     'Row %s: did not find folder code %s. Skipping',
                     $i,
                     $folderCode
@@ -220,7 +208,7 @@ class Processor
             try {
                 $student = $this->userMapper->findByExternalId($externalId);
             } catch (\Schoolbox\Mapper\Exception $e) {
-                $this->logger?->warning(sprintf(
+                $this->log(sprintf(
                     'Row %s: student %s not found; skipping',
                     $i,
                     $externalId
@@ -250,7 +238,7 @@ class Processor
             /* For some reason this homepage doesn't have the assessment set up
              */
             if (null === $boxId) {
-                $this->logger?->warning(sprintf(
+                $this->log(sprintf(
                     'Row %s: unknown submission_box for assessment in folder %s (%s)',
                     $i,
                     $folder->getTitle(),
@@ -272,15 +260,6 @@ class Processor
 
             /* Slam in a new submission_return
              */
-            $this->logger?->debug(sprintf(
-                'Row %s: preparing attendance score %s (%s) for student %s in folder %s',
-                $i,
-                $humanReadableMark,
-                $normalisedMark,
-                $externalId,
-                $folderCode
-            ));
-
             if ($this->perform) {
                 $datetime = \Alaress_Date_Format::now()->getDatabase();
 
@@ -301,7 +280,7 @@ class Processor
                 ]);
             }
 
-            $this->logger?->info(sprintf(
+            $this->log(sprintf(
                 'Row %s: added attendance score %s (%s) for student %s in folder %s (%s)',
                 $i,
                 $humanReadableMark,
@@ -311,27 +290,19 @@ class Processor
                 $folderCode
             ));
         }
+
+        return $this->outcome;
     }
 
 
     /**
-     * An alias to refresh a lock but captures the exception thrown
-     * when a lock expires
+     * Log outcomes to multiple places
      *
-     * @param LockInterface $lock
+     * @param string $message
      * @return void
-     * @throws LockRefreshException
      */
-    protected function refreshLock(LockInterface $lock): void
+    private function log(string $message): void
     {
-        try {
-            $lock->refresh();
-        } catch (LockConflictedException | LockAcquiringException $e) {
-            $message = 'Could not refresh lock; perhaps expired';
-
-            $this->logger?->warning($message);
-
-            throw new LockRefreshException($message);
-        }
+        $this->outcome[microtime()] = $message;
     }
 }

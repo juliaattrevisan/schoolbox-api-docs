@@ -97,7 +97,6 @@ class Controller extends Base
             $settings['worktype']->getId(),
             $settings['publishAt'],
             null,
-            null,
             false,
         ))->parseFeedbacks($settings['sourceFile'], $settings['feedbackOwner'], null);
 
