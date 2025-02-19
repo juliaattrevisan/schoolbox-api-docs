@@ -480,7 +480,7 @@
                             </ul>
 
                             <label for="report-summary-vic-progression-title">Title</label>
-                            <input id="report-summary-vic-progression-title" name="summary[vicProgression][title]" type="text" maxlength="255" value="{{ options.summary.vicProgression.title ?? curriculumProgression.title }}" />
+                            <input id="report-summary-vic-progression-title" name="summary[vicProgression][title]" type="text" maxlength="255" value="{{ options.summary.vicProgression.title ?? curriculumProgression.title }}" required />
 
                             <label for="report-summary-vic-progression-worktype">Work Type</label>
                             <select id="report-summary-vic-progression-worktype" name="summary[vicProgression][workType]">
@@ -610,7 +610,7 @@
                             </ul>
 
                             <label for="report-class-vic-progression-title">Title</label>
-                            <input id="report-class-vic-progression-title" name="class[vicProgression][title]" type="text" maxlength="255" value="{{ options.class.vicProgression.title ?? curriculumProgression.title }}" />
+                            <input id="report-class-vic-progression-title" name="class[vicProgression][title]" type="text" maxlength="255" value="{{ options.class.vicProgression.title ?? curriculumProgression.title }}" required />
 
                             <label for="report-class-vic-progression-worktype">Work Type</label>
                             <select id="report-class-vic-progression-worktype" name="class[vicProgression][workType]">
