@@ -700,7 +700,7 @@ Admin,"Resources Settings",Student,https://vagrant.dev.schoolbox.cloud/adminv2/s
 Admin,"Resources Settings",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/setting/cms/Resources,401
 Admin,"Resources Restore",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/restore,200
 Admin,"Resources Restore","Badges Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/restore,401
-Admin,"Resources Restore","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/restore,200
+Admin,"Resources Restore","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/restore,401
 Admin,"Resources Restore","Calendar Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/restore,401
 Admin,"Resources Restore","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/restore,401
 Admin,"Resources Restore","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/restore,401
