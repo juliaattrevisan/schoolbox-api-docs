@@ -170,6 +170,12 @@
                     $(checkbox).removeAttr('onclick');
                 });
 
+                /* Enable selects
+                 */
+                fieldsets.find('select').each(function(index, select) {
+                    $(select).prop('disabled', false);
+                });
+
                 /* Micromanage selectize
                  */
                 fieldsets.find('.selectize-control').each(function (index, selectizeControl) {
@@ -191,6 +197,12 @@
             } else {
                 fieldsets.find('input:checkbox, input:text').each(function(index, checkbox) {
                     $(checkbox).prop('readonly', true);
+                });
+
+                /* Disable selects
+                 */
+                fieldsets.find('select').each(function(index, select) {
+                    $(select).prop('disabled', true);
                 });
 
                 /* Micromanage selectize
@@ -483,6 +495,7 @@
                             <input id="report-summary-vic-progression-title" name="summary[vicProgression][title]" type="text" maxlength="255" value="{{ options.summary.vicProgression.title ?? curriculumProgression.title }}" required />
 
                             <label for="report-summary-vic-progression-worktype">Work Type</label>
+                            <input type="hidden" name="summary[vicProgression][workType]" value="{{ options.summary.vicProgression.workType }}" />
                             <select id="report-summary-vic-progression-worktype" name="summary[vicProgression][workType]">
                                 {% for worktype in worktypesSummary %}
                                     <option value="{{ worktype.id }}" {% if worktype.id == options.summary.vicProgression.workType ?? null %}selected="selected"{% endif %}>{{ worktype.name }}</option>
@@ -613,6 +626,7 @@
                             <input id="report-class-vic-progression-title" name="class[vicProgression][title]" type="text" maxlength="255" value="{{ options.class.vicProgression.title ?? curriculumProgression.title }}" required />
 
                             <label for="report-class-vic-progression-worktype">Work Type</label>
+                            <input type="hidden" name="class[vicProgression][workType]" value="{{ options.class.vicProgression.workType }}" />
                             <select id="report-class-vic-progression-worktype" name="class[vicProgression][workType]">
                                 {% for worktype in worktypesClass %}
                                     <option value="{{ worktype.id }}" {% if worktype.id == options.class.vicProgression.workType %}selected="selected"{% endif %}>{{ worktype.name }}</option>
