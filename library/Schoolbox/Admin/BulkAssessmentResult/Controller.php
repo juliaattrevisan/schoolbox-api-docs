@@ -19,6 +19,7 @@ use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\SummativeReport\Payload\VictorianProgression\Attendance\Processor;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Exception;
@@ -79,9 +80,11 @@ class Controller extends Base
      * @throws ContainerExceptionInterface
      * @throws Error
      * @throws Exception
+     * @throws FilesystemException
      * @throws NotFoundExceptionInterface
      * @throws RouteNotFound
-     * @throws FilesystemException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws Deleted
      */
     public function postPreview(): void
     {
@@ -102,7 +105,7 @@ class Controller extends Base
             $settings['publishAt'],
             null,
             false,
-        ))->parseFeedbacks($settings['sourceFile'], $settings['feedbackOwner'], null);
+        ))->parseFeedbacks($settings['sourceFile'], $settings['feedbackOwner']);
 
         $this->response = $this->responseFromTemplate(
             '@adminBulkAssessmentResult/preview.twig',
