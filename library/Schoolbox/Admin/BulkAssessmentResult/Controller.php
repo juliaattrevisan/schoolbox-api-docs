@@ -11,12 +11,14 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\BulkAssessmentResult;
 
 use Alaress\Web\Controller\Base;
+use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\SummativeReport\Payload\VictorianProgression\Attendance\Processor;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Exception;
+use Twig\Error\Error;
 
 class Controller extends Base
 {
@@ -66,6 +68,9 @@ class Controller extends Base
 
     /**
      * Process in planning mode
+     * @throws Error
+     * @throws Exception
+     * @throws RouteNotFound
      */
     public function postPreview(): void
     {
@@ -98,6 +103,9 @@ class Controller extends Base
 
     /**
      * Process in perform mode
+     * @throws Exception
+     * @throws RouteNotFound
+     * @throws Error
      */
     public function postPerform(): void
     {
