@@ -52,15 +52,6 @@ class Importer
     public const CAMPUS_DB_LIMIT = 255;
 
     /**
-     * Date formats that can be used in the csv
-     */
-    private const VALID_DATE_FORMATS = [
-        \Alaress_Date_Format::DATABASE_DATE_FORMAT,
-        'd/m/Y',
-    ];
-
-
-    /**
      * Upload type
      * One of [student, staff, parent, relationship]
      *
@@ -341,9 +332,9 @@ class Importer
              */
             if ($row['Date of Birth']) {
                 try {
-                    $dob = new \Alaress_Date_Format($row['Date of Birth'], self::VALID_DATE_FORMATS);
+                    $dob = new \Alaress_Date_Format($row['Date of Birth'], \Alaress_Date_Format::DATABASE_DATE_FORMAT);
                 } catch (InvalidArgumentException $e) {
-                    $this->log("Invalid 'Date of Birth' format in row {$i}. Please use YYYY-MM-DD or DD/MM/YYYY format", self::LOG_ERROR);
+                    $this->log("Invalid 'Date of Birth' format in row {$i}. Please use YYYY-MM-DD format", self::LOG_ERROR);
                 }
             }
 
