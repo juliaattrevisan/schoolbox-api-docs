@@ -17,6 +17,7 @@ parameters:
 
 rules:
     - Alaress\PhpStan\Rule\PhpUnitTestName
+    - Alaress\PhpStan\Rule\ShellExec
 services:
     -
         class: Alaress\PhpStan\Rule\PhpUnitTestName
