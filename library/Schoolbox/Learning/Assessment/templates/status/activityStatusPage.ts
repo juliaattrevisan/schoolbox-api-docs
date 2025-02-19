@@ -3,190 +3,262 @@
  * To avoid this, the view status page now loads up to 30 instances at a time and paginates the rest of the students.
  */
 
-document.addEventListener("ACTIVITY_STATUS_PAGE_INIT", (event) => {
-    const PAGE_ITEM_LIMIT = event.detail.pageItemLimit;
+import { EditorEvent } from "@js/editor/event/editorEvent";
+import type { SbxEditor } from "@js/editor/types/editorTypes";
+import { ACTIVITY_STATUS_PAGE_INIT } from "./activityStatusPageEvent";
+import type { AcitivityStatusPageConfig } from "./activityStatusPageEvent";
 
-    const participantRows = Array.from(document.querySelectorAll("#assessment-status [data-participant]")).map((el) => {
-        return {
-            el,
-            textarea: el.querySelector("[data-feedback-comment]"),
-            name: el.querySelector("[data-participant-name]").innerText,
-            editor: null,
-        };
+type ParticipantRow = {
+    el: HTMLElement;
+    textarea: HTMLTextAreaElement | null; // null if this participant doesn't have comments?
+    name: string;
+    editor: SbxEditor | null;
+};
+
+const participantRows: ParticipantRow[] = [];
+let participantTabGroups: ParticipantRow[][] = [];
+
+// The page config as specified when initialising the page using the event
+let pageConfig: AcitivityStatusPageConfig;
+
+/**
+ * Trigger the creation of a CKEditor instance for a given participant row
+ * This will also handle the input events to keep the textarea in sync so that jquery.dynamic-feedback.js can track it
+ * @param participantRow - The participant row to create the editor for
+ * @returns A promise that resolves when the editor has been created
+ */
+async function createEditorForParticipant(participantRow: ParticipantRow): Promise<void> {
+    // If no source element, nothing to do
+    const sourceElement = participantRow.textarea;
+    if (sourceElement === null) {
+        return;
+    }
+
+    // TODO: I wonder if spawning them all via targetElements is more efficient?
+    document.dispatchEvent(
+        new CustomEvent(EditorEvent.EDITOR__CREATE, {
+            detail: {
+                targetElements: [sourceElement],
+                hasTokens: true,
+                showWordCount: true,
+            },
+        }),
+    );
+
+    // TODO: Use the TS module for spawning editors instead
+    const editor = await new Promise<SbxEditor>((resolve) => {
+        sourceElement.addEventListener(EditorEvent.EDITOR__CREATED, (event) => {
+            resolve(event.detail.editor);
+        });
     });
 
-    function createEditorForParticipant(participantRow) {
-        document.dispatchEvent(
-            new CustomEvent("EDITOR__CREATE", {
-                detail: {
-                    targetElements: [participantRow.textarea],
-                    hasTokens: true,
-                    showWordCount: true,
-                },
-            }),
-        );
-        participantRow.textarea.addEventListener("EDITOR__CREATED", (editor) => {
-            participantRow.editor = editor.detail.editor;
+    participantRow.editor = editor;
 
-            // on every input, update the textarea and send an input event on it too for jquery.dynamic-feedback.js
-            participantRow.editor.model.document.on("change", (e) => {
-                participantRow.textarea.value = participantRow.editor.getData();
-                participantRow.textarea.dispatchEvent(new Event("change", { bubbles: true }));
+    // on every input, update the textarea and send an input event on it too for jquery.dynamic-feedback.js
+    editor.model.document.on("change", () => {
+        sourceElement.value = editor.getData();
+        sourceElement.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+}
+
+/**
+ * Apply the visibility change for a participant row
+ * @param participantRow - The participant row to apply the visibility change to
+ * @param isActive - Whether the participant should be visible
+ * @param animate - Whether to animate the change
+ * @returns A promise that resolves when the visibility change has been applied
+ */
+async function applyParticipantVisibility(
+    participantRow: ParticipantRow,
+    isActive: boolean,
+    animate: boolean,
+): Promise<void> {
+    return new Promise((resolve) => {
+        if (!animate) {
+            participantRow.el.style.display = isActive ? "" : "none";
+            resolve();
+            return;
+        }
+
+        // For slideDown (show), will not wait since we want to spawn the editor asap
+        if (isActive) {
+            // TODO: Use the gsap thing instead
+            $(participantRow.el).slideDown();
+            resolve();
+            return;
+        }
+
+        // For slideUp (hide), will wait for the animation to finish first to avoid seeing the textarea
+        // TODO: Use the gsap thing instead
+        $(participantRow.el).slideUp(undefined, resolve);
+    });
+}
+
+/**
+ * When the selected tab is changed, show the correct participants
+ * @param activeTab - The index of the tab to show
+ * @param animate - Whether to animate the change (slideUp/slideDown), use this for filters
+ */
+async function onSelectedTabChange(activeTab: number, animate: boolean): Promise<void> {
+    if (pageConfig === undefined) throw new Error("Activity status page config missing");
+
+    // Should we paginate?
+    if (pageConfig.selectors.paginator) {
+        const paginator = document.querySelector(pageConfig.selectors.paginator);
+        if (!(paginator instanceof HTMLElement)) {
+            throw new Error("Unable to find paginator element");
+        }
+        const paginatorUl = paginator.querySelector("ul[class=pagination]");
+        if (!(paginatorUl instanceof HTMLElement)) {
+            throw new Error("Unable to find paginator list element");
+        }
+        paginator.style.display = participantTabGroups.length > 1 ? "" : "none";
+
+        if (participantTabGroups.length > 1) {
+            const tabs = participantTabGroups.map((group, i) => {
+                return `<li class="${i === activeTab ? "active" : ""}" data-participant-tab=${i}><a href="">${i + 1}</a></li>`;
             });
-        });
+
+            paginatorUl.innerHTML = `
+                <li class="arrow ${activeTab === 0 ? "unavailable" : ""}" data-participant-tab="${activeTab - 1}"><a href="">‹</a></li>
+                    ${tabs.join("")}
+                <li class="arrow ${activeTab === participantTabGroups.length - 1 ? "unavailable" : ""}" data-participant-tab="${activeTab + 1}"><a href="">›</a></li>`;
+
+            paginator.querySelectorAll("[data-participant-tab]").forEach((el, i) => {
+                el.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    if (el.classList.contains("unavailable")) {
+                        return;
+                    }
+                    void onSelectedTabChange(parseInt(el.getAttribute("data-participant-tab"), 10), false);
+                });
+            });
+        }
     }
 
-    // add the search bar
-    if (participantRows.length > PAGE_ITEM_LIMIT) {
-        // add pagination
-        let participantTabGroups = [];
-        const participantSearchInput = document.querySelector("input[data-participant-search]");
-        const participantFilters = document.querySelectorAll("[data-participant-filters] input[data-status]");
-        const filterEmptyState = document.querySelector("#empty-filter");
-        const filterReset = document.querySelector("#filter-show-all");
-        const paginator = document.querySelector("[data-participant-paginator]");
+    const filterEmptyState = document.querySelector(pageConfig.selectors.filterEmptyState);
+    if (filterEmptyState === null) {
+        throw new Error("Unable to find filter empty state element");
+    }
 
-        /**
-         * Apply the visibility change for a participant row
-         * Will animate if necessary,
-         * - For slideUp (hide), will wait for the animation to finish first to avoid seeing the textarea
-         * @param {boolean} isActive - Whether the participant should be visible
-         * @param {boolean} animate - Whether to animate the change
-         */
-        async function applyParticipantVisibility(participantRow, isActive, animate) {
-            return new Promise((resolve) => {
-                if (!animate) {
-                    participantRow.el.style.display = isActive ? "" : "none";
-                    resolve();
-                    return;
-                }
-
-                // For slideDown (show), will not wait since we want to spawn the editor asap
-                if (isActive) {
-                    $(participantRow.el).slideDown();
-                    resolve();
-                    return;
-                }
-
-                // For slideUp (hide), will wait for the animation to finish first to avoid seeing the textarea
-                $(participantRow.el).slideUp(undefined, resolve);
-            });
-        }
-
-        /**
-         * When the selected tab is changed, show the correct participants
-         * @param {number} activeTab - The index of the tab to show
-         * @param {boolean} animate - Whether to animate the change (slideUp/slideDown), use this for filters
-         */
-        function onSelectedTabChange(activeTab, animate) {
-            paginator.style.display = participantTabGroups.length > 1 ? "" : "none";
-
-            if (participantTabGroups.length > 1) {
-                const tabs = participantTabGroups.map((group, i) => {
-                    return `<li class="${i === activeTab ? "active" : ""}" data-participant-tab=${i}><a href="">${i + 1}</a></li>`;
-                });
-
-                paginator.querySelector("ul").innerHTML =
-                    `<li class="arrow ${activeTab == 0 ? "unavailable" : ""}" data-participant-tab="${activeTab - 1}"><a href="">‹</a></li>
-                           ${tabs.join("")}
-                       <li class="arrow ${activeTab == participantTabGroups.length - 1 ? "unavailable" : ""}" data-participant-tab="${activeTab + 1}"><a href="">›</a></li>`;
-
-                paginator.querySelectorAll("[data-participant-tab]").forEach((el, i) => {
-                    el.addEventListener("click", (e) => {
-                        e.preventDefault();
-                        if (el.classList.contains("unavailable")) {
-                            return;
-                        }
-                        onSelectedTabChange(parseInt(el.getAttribute("data-participant-tab")), false);
-                    });
-                });
-            }
-
-            if (participantTabGroups.length === 0) {
-                // everything was filtered out, so show the empty state
-                $(filterEmptyState).slideDown();
-            } else {
-                $(filterEmptyState).slideUp();
-            }
-
-            const activeGroup = participantTabGroups[activeTab]; // could be null if no groups
-            participantRows.forEach(async (participantRow) => {
-                const isActive = activeGroup && activeGroup.includes(participantRow);
-                const isAlreadyActive = participantRow.el.style.display !== "none";
-
-                await applyParticipantVisibility(participantRow, isActive, animate);
-
-                if (isActive && participantRow.editor === null) {
-                    // create a new editor
-                    console.log("creating editor for", participantRow);
-                    createEditorForParticipant(participantRow);
-                } else if (!isActive && participantRow.editor !== null) {
-                    // destroy the existing editor
-                    console.log("destroying editor for", participantRow);
-                    participantRow.editor.destroy();
-                    participantRow.editor = null;
-                }
-            });
-        }
-
-        function onParticipantFilterChange() {
-            const searchTerm = participantSearchInput.value.toLowerCase();
-            const activeFilters = Array.from(participantFilters)
-                .filter((el) => el.checked)
-                .map((el) => el.dataset.status);
-
-            const filteredParticipantRows = Array.from(participantRows).filter((participantRow) => {
-                // If there is a search, and it doesn't match the name, don't show
-                if (searchTerm.length && !participantRow.name.toLowerCase().includes(searchTerm)) {
-                    return false;
-                }
-
-                // If the status of the participant doesn't match the active filters, don't show
-                console.log(participantRow.el.dataset.status, activeFilters.includes(participantRow.el.dataset.status));
-                if (!activeFilters.includes(participantRow.el.dataset.status)) {
-                    return false;
-                }
-
-                return true;
-            });
-
-            participantTabGroups = [];
-            let currentGroup = [];
-            filteredParticipantRows.forEach((participantRow) => {
-                currentGroup.push(participantRow);
-                if (currentGroup.length >= PAGE_ITEM_LIMIT) {
-                    participantTabGroups.push(currentGroup);
-                    currentGroup = [];
-                }
-            });
-            if (currentGroup.length) {
-                participantTabGroups.push(currentGroup);
-            }
-
-            onSelectedTabChange(0, true); // reset to first page
-        }
-
-        // Add event listeners for when search/filters change
-        participantSearchInput.addEventListener("input", onParticipantFilterChange);
-        participantFilters.forEach((el) => {
-            el.addEventListener("change", onParticipantFilterChange);
-        });
-
-        // Allow the user to reset the search/filters when the empty state is shown
-        filterReset.addEventListener("click", (e) => {
-            e.preventDefault();
-            participantSearchInput.value = "";
-            participantFilters.forEach((el) => {
-                el.checked = true;
-            });
-            onParticipantFilterChange();
-        });
-
-        // trigger initial filter and pagination
-        onParticipantFilterChange();
+    if (participantTabGroups.length === 0) {
+        // everything was filtered out, so show the empty state
+        $(filterEmptyState).slideDown();
     } else {
-        participantRows.forEach((participantRow) => {
-            createEditorForParticipant(participantRow);
-        });
+        $(filterEmptyState).slideUp();
     }
+
+    const activeGroup = participantTabGroups[activeTab]; // could be null if no groups
+    await Promise.all(
+        participantRows.map(async (participantRow) => {
+            const isActive = activeGroup && activeGroup.includes(participantRow);
+            const editor = participantRow.editor;
+
+            await applyParticipantVisibility(participantRow, isActive, animate);
+
+            if (isActive && editor === null) {
+                // create a new editor
+                console.log("creating editor for", participantRow);
+                await createEditorForParticipant(participantRow);
+            } else if (!isActive && editor !== null) {
+                // destroy the existing editor
+                console.log("destroying editor for", participantRow);
+                participantRow.editor = null; // do this first to avoid double-destroying
+                await editor.destroy();
+            }
+        }),
+    );
+}
+
+/**
+ * When the search or filters change, show the correct participants
+ */
+async function onParticipantFilterChange(): Promise<void> {
+    if (pageConfig === undefined) throw new Error("Activity status page config missing");
+
+    const participantSearchInput = document.querySelector(pageConfig.selectors.participantSearchInput);
+    if (!(participantSearchInput instanceof HTMLInputElement)) {
+        throw new Error("Unable to find participant search input element");
+    }
+    const participantFilters = document.querySelectorAll<HTMLInputElement>(pageConfig.selectors.participantFilters);
+
+    const searchTerm = participantSearchInput.value.toLowerCase();
+    const activeFilters = Array.from(participantFilters)
+        .filter((el) => el.checked)
+        .map((el) => el.dataset.status);
+
+    const filteredParticipantRows = Array.from(participantRows).filter((participantRow) => {
+        // If there is a search, and it doesn't match the name, don't show
+        if (searchTerm.length && !participantRow.name.toLowerCase().includes(searchTerm)) {
+            return false;
+        }
+
+        // If the status of the participant doesn't match the active filters, don't show
+        if (!activeFilters.includes(participantRow.el.dataset.status)) {
+            return false;
+        }
+
+        return true;
+    });
+
+    // should we paginate?
+    participantTabGroups = [];
+    if (pageConfig.selectors.paginator) {
+        let currentGroup: ParticipantRow[] = [];
+
+        filteredParticipantRows.forEach((participantRow) => {
+            currentGroup.push(participantRow);
+            if (currentGroup.length >= pageConfig.pageItemLimit) {
+                participantTabGroups.push(currentGroup);
+                currentGroup = [];
+            }
+        });
+
+        if (currentGroup.length) {
+            participantTabGroups.push(currentGroup);
+        }
+    } else if (filteredParticipantRows.length) {
+        participantTabGroups.push(filteredParticipantRows);
+    }
+
+    await onSelectedTabChange(0, true); // reset to first page
+}
+
+document.addEventListener(ACTIVITY_STATUS_PAGE_INIT, (event) => {
+    pageConfig = event.detail;
+
+    participantRows.push(
+        ...Array.from(document.querySelectorAll(pageConfig.selectors.participantRows)).map((el) => {
+            return {
+                el: el as HTMLElement,
+                textarea: el.querySelector<HTMLTextAreaElement>("[data-feedback-comment]"),
+                name: (el.querySelector("[data-participant-name]") as HTMLElement).innerText,
+                editor: null,
+            };
+        }),
+    );
+
+    const participantSearchInput = document.querySelector(pageConfig.selectors.participantSearchInput);
+    const participantFilters = document.querySelectorAll(pageConfig.selectors.participantFilters);
+    const filterReset = document.querySelector(pageConfig.selectors.filterReset);
+
+    // Add event listeners for when search/filters change
+    // TODO: Debounce to avoid spamming creation/destruction of editors
+    participantSearchInput.addEventListener("input", () => void onParticipantFilterChange());
+    participantFilters.forEach((el) => {
+        el.addEventListener("change", () => void onParticipantFilterChange());
+    });
+
+    // Allow the user to reset the search/filters when the empty state is shown
+    filterReset.addEventListener("click", (e) => {
+        e.preventDefault();
+        participantSearchInput.value = "";
+        participantFilters.forEach((el) => {
+            el.checked = true;
+        });
+        void onParticipantFilterChange();
+    });
+
+    // trigger initial filter and pagination (if needed)
+    void onParticipantFilterChange();
 });

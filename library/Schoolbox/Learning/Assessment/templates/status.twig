@@ -157,6 +157,14 @@
     document.dispatchEvent(new CustomEvent('ACTIVITY_STATUS_PAGE_INIT', {
         detail: {
             pageItemLimit: 25,
+            selectors: {
+                paginator: '[data-participant-paginator]',
+                filterEmptyState: '#empty-filter',
+                filterReset: '#filter-show-all',
+                participantSearchInput: 'input[data-participant-search]',
+                participantFilters: '[data-participant-filters] input[data-status]',
+                participantRows: '#assessment-status [data-participant]',
+            }
         }
     }));
 </script>
