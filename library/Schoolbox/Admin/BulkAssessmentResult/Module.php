@@ -63,6 +63,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\WorkType\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\UserMapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Resource\Folder\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Resource\Storage\Mapper::class),
         );
     }
 

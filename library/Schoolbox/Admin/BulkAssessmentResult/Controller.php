@@ -38,6 +38,7 @@ class Controller extends Base
         private \Schoolbox\Learning\Assessment\WorkType\Mapper $worktypeMapper,
         private \Schoolbox\UserMapper $userMapper,
         private \Schoolbox\Resource\Folder\Mapper $folderMapper,
+        private \Schoolbox\Resource\Storage\Mapper $storageMapper,
     ) {
     }
 
@@ -145,7 +146,7 @@ class Controller extends Base
 
         /* Augment with a storage file
          */
-        $settings['sourceFile'] = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($post['attachment']);
+        $settings['sourceFile'] = $this->storageMapper->findByHash($post['attachment']);
 
         /* This can be ported to the ui version with null and true in place of logger, perform and lock.
          */
