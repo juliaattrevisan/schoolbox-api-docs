@@ -5,6 +5,8 @@
  * @link        http://www.alaress.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Schoolbox\Geosnapshot\Component\Dashboard;
 
 use Component_Dashboard_ControllerAbstract;
@@ -55,7 +57,11 @@ class Controller extends Component_Dashboard_ControllerAbstract
             try {
                 $api = new Api($this->getConfigLoader()->get('geosnapshot_api_key'));
 
-                $response = $api->retrieveEventPhotos($this->getConfig('eventName'), $this->getUser());
+                $response = $api->retrieveEventPhotos(
+                    trim((string)$this->getConfig('eventName')),
+                    trim((string)$this->getConfig('albumName')),
+                    $this->getUser()
+                );
             } catch (\RuntimeException | \DomainException $e) {
                 /* DomainException is thrown when json can't be decoded
                  */
@@ -68,7 +74,8 @@ class Controller extends Component_Dashboard_ControllerAbstract
 
             /* Get the height set in the component's configuration settings, setting to a min of 500 if not set
              */
-            $this->height = is_numeric($this->getConfig('height')) ? $this->getConfig('height') : 500;
+            $heightInPixels = $this->getConfig('height');
+            $this->height = (is_int($heightInPixels) || ctype_digit($heightInPixels)) ? (int)$heightInPixels : 500;
 
             return true;
         }
