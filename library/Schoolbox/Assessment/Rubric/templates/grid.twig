@@ -14,7 +14,7 @@
                                 that also controls this, false for self-reflections
  #}
 
-{% set markType = rubricGrid.assessment.instructorMarkScheme.generateContext %}
+{% set markType = rubricGrid.assessment.markScheme.generateContext %}
 {% set showSummaryTotal = showRubricTotal and rubricMarkedGrid and markType.mode != "none" %}
 {% set showSummaryCapability = showGroupTotal and rubricMarkedGrid and rubricGrid.assessment.isMarkPerCapability %}
 <div class="scrollable">
