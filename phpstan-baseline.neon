@@ -6629,3 +6629,9 @@ parameters:
 			identifier: greaterOrEqual.alwaysTrue
 			count: 1
 			path: tools/rubric/repairSpecAssessments.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getInstructorMarkScheme\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Admin/SummativeReport/Payload/VictorianProgression/Attendance/Processor.php
