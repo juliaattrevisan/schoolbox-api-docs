@@ -10,7 +10,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\BulkAssessmentResult;
 
-use Alaress\Lock\LockRefreshException;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use League\Flysystem\FilesystemException;
@@ -18,6 +17,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\SummativeReport\Payload\VictorianProgression\Attendance\Processor;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
@@ -31,6 +31,8 @@ class Controller extends Base
      * Constructor.
      */
     public function __construct(
+        private MapperProxy $assessmentMapperProxy,
+        private FilesystemProxy $filesystemProxy,
         private \Schoolbox\Error\Mapper $errorMapper,
         private \Schoolbox\Learning\Assessment\WorkType\Mapper $worktypeMapper,
         private \Schoolbox\UserMapper $userMapper,
@@ -91,6 +93,7 @@ class Controller extends Base
         /* This can be ported to the ui version with null and true in place of logger, perform and lock.
          */
         $outcome = (new Processor(
+            $this->assessmentMapperProxy,
             $filesystemProxy,
             $this->userMapper,
             $this->folderMapper,

@@ -14,6 +14,8 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 
 class Module extends BaseModule
 {
@@ -48,7 +50,15 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
+        /** @var MapperProxy $assessmentDataSource */
+        $assessmentDataSource = $this->injector->get('assessmentDataSource');
+
+        /** @var FilesystemProxy $filesystemProxy */
+        $filesystemProxy = $this->injector->get('filesystem.storageProxy');
+
         return new Controller(
+            $assessmentDataSource,
+            $filesystemProxy,
             $this->getMapperFactory()->get(\Schoolbox\Error\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\WorkType\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\UserMapper::class),

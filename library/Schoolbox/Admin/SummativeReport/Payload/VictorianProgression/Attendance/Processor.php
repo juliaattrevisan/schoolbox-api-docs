@@ -11,6 +11,7 @@ namespace Schoolbox\Admin\SummativeReport\Payload\VictorianProgression\Attendanc
 
 use League\Flysystem\FilesystemException;
 use Schoolbox\Admin\Import\Profile\Reader;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Resource\Folder\Mapper;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Model;
@@ -28,7 +29,7 @@ class Processor
             a.id AS assessment_id, 
             sb.id AS box_id
         FROM mv_assessment_relation mvar
-        INNER JOIN assessment a ON a.id = var.assessment_id
+        INNER JOIN assessment a ON a.id = mvar.assessment_id
         INNER JOIN submission_box sb ON sb.assessment_id = a.id
         INNER JOIN folder f ON mvar.folder_id = f.id
         WHERE mvar.folder_id = :folderId
@@ -47,7 +48,7 @@ class Processor
             a.id AS assessment_id, 
             sb.id AS box_id
         FROM mv_assessment_relation mvar
-        INNER JOIN assessment a ON a.id = var.assessment_id
+        INNER JOIN assessment a ON a.id = mvar.assessment_id
         INNER JOIN submission_box sb ON sb.assessment_id = a.id
         INNER JOIN folder f ON mvar.folder_id = f.id
         WHERE mvar.folder_id = :folderId
@@ -91,6 +92,7 @@ class Processor
     /**
      * Constructor
      *
+     * @param MapperProxy $assessmentMapperProxy
      * @param FilesystemProxy $filesystemProxy
      * @param UserMapper $userMapper
      * @param Mapper $folderMapper
@@ -101,6 +103,7 @@ class Processor
      * @param bool $perform
      */
     public function __construct(
+        private MapperProxy $assessmentMapperProxy,
         private FilesystemProxy $filesystemProxy,
         private \Schoolbox\UserMapper $userMapper,
         private \Schoolbox\Resource\Folder\Mapper $folderMapper,
@@ -235,67 +238,75 @@ class Processor
                 ]);
             }
 
-            /* Presume only one tuple exists
+            /* Add a feedback for every assessment that might match the title/worktype combo
+             * This is kind of maybe too loose?
              */
-            $data = $this->assessmentQuery->fetch(\PDO::FETCH_ASSOC);
+            while ($data = $this->assessmentQuery->fetch(\PDO::FETCH_ASSOC)) {
+                $boxId = $data['box_id'] ?? null;
+                $assessmentId = $data['assessment_id'] ?? null;
 
-            $boxId = $data['box_id'] ?? null;
-            $assessmentId = $data['assessment_id'] ?? null;
+                /* For some reason this homepage doesn't have the assessment set up
+                 */
+                if (null === $boxId) {
+                    $this->log(sprintf(
+                        'Row %s: unknown submission_box for assessment in folder %s (%s)',
+                        $i,
+                        $folder->getTitle(),
+                        $folderCode
+                    ));
 
-            /* For some reason this homepage doesn't have the assessment set up
-             */
-            if (null === $boxId) {
+                    continue;
+                }
+
+                /* Try to spawn an IAssessable instance
+                 *
+                 * Note that this is horribly non-performant since it requires the assessmentMapperProxy
+                 * to do enormous amounts of heavy lifting: you could shortcut this by maybe spawning stubs
+                 * containing only the Mark Scheme chosen by the assessment...
+                 */
+
+                /* TODO Compute human-readable mark from assessment's mark scheme instead
+                 */
+                $csvMark = trim((string)$row['Normalised Mark']);
+                $humanReadableMark = $csvMark . '%';
+                $normalisedMark = (float)$csvMark;
+
+                /* Actual marks and comments
+                 */
+                $comment = trim((string)$row['Comment']);
+
+                /* Slam in a new submission_return
+                 */
+                if ($this->perform) {
+                    $datetime = \Alaress_Date_Format::now()->getDatabase();
+
+                    $this->feedbackQuery->execute([
+                        'boxId' => $boxId,
+                        'marker' => $creator->getId(),
+                        'owner' => $student->getId(),
+                        'reviewRoute' => 'instructor',
+                        'comment' => $comment,
+                        'mark' => $humanReadableMark,
+                        'instructorMark' => $humanReadableMark,
+                        'normMark' => $normalisedMark,
+                        'resubmissionRequired' => 0,
+                        'createdAt' => $datetime,
+                        'publishedAt' => $publishAt,
+                        'publishedBy' => $creator->getId(),
+                        'updatedAt' => $datetime
+                    ]);
+                }
+
                 $this->log(sprintf(
-                    'Row %s: unknown submission_box for assessment in folder %s (%s)',
+                    'Row %s: added attendance score %s (%s) for student %s in folder %s (%s)',
                     $i,
-                    $folder->getTitle(),
+                    $humanReadableMark,
+                    $normalisedMark,
+                    $externalId,
+                    $folder->getId(),
                     $folderCode
                 ));
-
-                continue;
             }
-
-            /* Actual marks and comments
-             */
-            $comment = trim((string)$row['Comment']);
-
-            /* TODO Compute human-readable mark from assessment's mark scheme instead
-             */
-            $csvMark = trim((string)$row['Normalised Mark']);
-            $humanReadableMark = $csvMark . '%';
-            $normalisedMark = (float)$csvMark;
-
-            /* Slam in a new submission_return
-             */
-            if ($this->perform) {
-                $datetime = \Alaress_Date_Format::now()->getDatabase();
-
-                $this->feedbackQuery->execute([
-                    'boxId' => $boxId,
-                    'marker' => $creator->getId(),
-                    'owner' => $student->getId(),
-                    'reviewRoute' => 'instructor',
-                    'comment' => $comment,
-                    'mark' => $humanReadableMark,
-                    'instructorMark' => $humanReadableMark,
-                    'normMark' => $normalisedMark,
-                    'resubmissionRequired' => 0,
-                    'createdAt' => $datetime,
-                    'publishedAt' => $publishAt,
-                    'publishedBy' => $creator->getId(),
-                    'updatedAt' => $datetime
-                ]);
-            }
-
-            $this->log(sprintf(
-                'Row %s: added attendance score %s (%s) for student %s in folder %s (%s)',
-                $i,
-                $humanReadableMark,
-                $normalisedMark,
-                $externalId,
-                $folder->getId(),
-                $folderCode
-            ));
         }
 
         return $this->outcome;
