@@ -12,6 +12,8 @@ namespace Schoolbox\Admin\SummativeReport\Payload\VictorianProgression\Attendanc
 use League\Flysystem\FilesystemException;
 use Schoolbox\Admin\Import\Profile\Reader;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Resource\Folder\Mapper;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Model;
@@ -137,6 +139,8 @@ class Processor
      * @param User $creator
      * @return array
      * @throws FilesystemException
+     * @throws Exception
+     * @throws Deleted
      */
     public function parseFeedbacks(
         \Schoolbox\Resource\Storage\Model $file,
@@ -264,12 +268,19 @@ class Processor
                  * to do enormous amounts of heavy lifting: you could shortcut this by maybe spawning stubs
                  * containing only the Mark Scheme chosen by the assessment...
                  */
+                $assessment = $this->assessmentMapperProxy->findById($assessmentId);
 
-                /* TODO Compute human-readable mark from assessment's mark scheme instead
+                /* Compute human-readable mark from assessment's mark scheme instead
                  */
-                $csvMark = trim((string)$row['Normalised Mark']);
-                $humanReadableMark = $csvMark . '%';
-                $normalisedMark = (float)$csvMark;
+                $normalisedMark = (float)trim((string)$row['Normalised Mark']);
+
+                /* This is what the student would see
+                 */
+                $humanReadableMark = $assessment->getMarkScheme()->getHumanReadableMark($normalisedMark);
+
+                /* This is what the instructor would see, due to SA-18452
+                 */
+                $instructorHumanReadableMark = $assessment->getInstructorMarkScheme()->getHumanReadableMark($normalisedMark);
 
                 /* Actual marks and comments
                  */
@@ -287,7 +298,7 @@ class Processor
                         'reviewRoute' => 'instructor',
                         'comment' => $comment,
                         'mark' => $humanReadableMark,
-                        'instructorMark' => $humanReadableMark,
+                        'instructorMark' => $instructorHumanReadableMark,
                         'normMark' => $normalisedMark,
                         'resubmissionRequired' => 0,
                         'createdAt' => $datetime,
