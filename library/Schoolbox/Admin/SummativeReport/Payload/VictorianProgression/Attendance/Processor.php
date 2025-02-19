@@ -249,6 +249,13 @@ class Processor
                 ]);
             }
 
+            /* Used for a feedback's created_at and updated_at timestamps
+            *
+             * Make them universally the same, to better keep track of things after an import
+             * has occurred
+             */
+            $datetime = \Alaress_Date_Format::now()->getDatabase();
+
             /* Add a feedback for every assessment that might match the title/worktype combo
              * This is kind of maybe too loose?
              */
@@ -296,8 +303,6 @@ class Processor
                 /* Slam in a new submission_return
                  */
                 if ($this->perform) {
-                    $datetime = \Alaress_Date_Format::now()->getDatabase();
-
                     $this->feedbackQuery->execute([
                         'boxId' => $boxId,
                         'marker' => $creator->getId(),
