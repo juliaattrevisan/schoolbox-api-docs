@@ -26,7 +26,6 @@
                             {% endif %}
                         </li>
                         <li><strong>Source File:</strong> {{ settings.sourceFile.hash }}</li>
-                        <li><strong>Publish Date:</strong> {{ settings.publishAt.database }}</strong></li>
                     </ul>
                 </div>
             </section>
@@ -49,6 +48,18 @@
                     </div>
                 </section>
             {% endif %}
+        </div>
+
+        {# Recycle the form params for immediate effect #}
+        {% set formRoute = routeLookupIfAuthorized('adminBulkAssessmentResult.postPerform') %}
+
+        <div class="small-12 columns">
+            <form action="{{ formRoute }}" method="post">
+                <input type="text" name="worktypeId" value="{{ settings.worktype.id }}" />
+                <input type="text" name="attachment[]" value="{{ settings.sourceFile.hash }}" />
+                <input type="text" name="feedbackOwner" value="{{ settings.feedbackOwner.id }}" />
+                <input type="submit" />
+            </form>
         </div>
     </div>
 </div>

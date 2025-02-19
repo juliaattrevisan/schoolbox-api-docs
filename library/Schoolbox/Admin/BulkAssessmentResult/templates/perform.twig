@@ -1,7 +1,7 @@
 {##
- # Perform
+ # Preview
  #
- # @param array $settings  A (worktype, user) struct representing identification method and feedback owner
+ # @param array $settings  A (worktype, user, sourceFile) struct representing identification method, feedback owner and uploaded csv
 #}
 
 {% import 'sub/breadcrumbs.twig' as bread %}
@@ -25,9 +25,30 @@
                                 <a href="/search/user/{{ settings.feedbackOwner.id }}" target="_blank" title="{{ settings.feedbackOwner.fullname }}">{{ settings.feedbackOwner.fullname }}</a>
                             {% endif %}
                         </li>
+                        <li><strong>Source File:</strong> {{ settings.sourceFile.hash }}</li>
+                        <li><strong>Publish Date:</strong> {{ settings.publishAt.database }}</strong></li>
                     </ul>
                 </div>
             </section>
+
+            {% if outcome|length %}
+                <h2 class="subheader">Preview</h2>
+                <section class="content">
+                    <div>
+                        <ul class="information-list">
+                            {% for row in outcome %}
+                                <li>
+                                    {% if row.type == 'warning' %}
+                                        <span style="color:red">{{ row.message }}</span>
+                                    {% else %}
+                                        {{ row.message }}
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </section>
+            {% endif %}
         </div>
     </div>
 </div>
