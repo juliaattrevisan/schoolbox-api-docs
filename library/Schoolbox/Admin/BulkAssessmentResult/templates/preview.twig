@@ -30,6 +30,19 @@
                     </ul>
                 </div>
             </section>
+
+            {% if outcome|length %}
+                <h2 class="subheader">Preview</h2>
+                <section class="content">
+                    <div>
+                        <ul class="information-list">
+                            {% for row in outcome %}
+                                <li>{{ row }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </section>
+            {% endif %}
         </div>
     </div>
 </div>

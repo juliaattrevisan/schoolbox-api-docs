@@ -13,6 +13,7 @@ namespace Schoolbox\Admin\BulkAssessmentResult;
 use Alaress\Lock\LockRefreshException;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
+use League\Flysystem\FilesystemException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Admin\Navigation\Subnav;
@@ -73,12 +74,12 @@ class Controller extends Base
     /**
      * Process in planning mode
      *
+     * @throws ContainerExceptionInterface
      * @throws Error
      * @throws Exception
-     * @throws LockRefreshException
-     * @throws RouteNotFound
-     * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
+     * @throws RouteNotFound
+     * @throws FilesystemException
      */
     public function postPreview(): void
     {
@@ -89,7 +90,7 @@ class Controller extends Base
 
         /* This can be ported to the ui version with null and true in place of logger, perform and lock.
          */
-        (new Processor(
+        $outcome = (new Processor(
             $filesystemProxy,
             $this->userMapper,
             $this->folderMapper,
@@ -106,6 +107,7 @@ class Controller extends Base
                 'pageCurrent' => $this->routeGenerator->generate('adminBulkAssessmentResult.getIndex'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminBulkAssessmentResult.getIndex')),
                 'settings' => $settings,
+                'outcome' => $outcome
             ],
             'Bulk Assessment Result Preview',
         );
