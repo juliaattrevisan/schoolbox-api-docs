@@ -24,6 +24,7 @@ class Controller extends Base
      * Constructor.
      */
     public function __construct(
+        private \Schoolbox\Error\Mapper $errorMapper,
         private \Schoolbox\Learning\Assessment\WorkType\Mapper $worktypeMapper,
         private \Schoolbox\UserMapper $userMapper,
         private \Schoolbox\Resource\Folder\Mapper $folderMapper,
@@ -121,6 +122,7 @@ class Controller extends Base
      * @param array $postVar
      * @return array
      * @throws Exception
+     * @throws \Exception
      */
     private function verifySettings(array $postVar): array
     {
@@ -149,7 +151,7 @@ class Controller extends Base
         $factory = new CollectorFactory();
         $csvFile = $factory->build($postVar['attachment'])->getFirst();
 
-        if (!\is_array($post->get('attachment'))) {
+        if (!\is_array($postVar['attachment'])) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
