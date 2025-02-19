@@ -9,10 +9,11 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\SummativeReport\Payload\VictorianProgression\Attendance;
 
-use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Lock\LockRefreshException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Resource\Folder\Mapper;
+use Schoolbox\Resource\Storage\FilesystemProxy;
+use Schoolbox\Resource\Storage\Model;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
@@ -81,22 +82,23 @@ class Processor
     /**
      * Constructor
      *
+     * @param FilesystemProxy $filesystemProxy
      * @param UserMapper $userMapper
      * @param Mapper $folderMapper
      * @param string|null $assessmentTitle
      * @param int|null $workTypeId
-     * @param string $publishAt
+     * @param \Alaress_Date_Format $publishAt
      * @param string|null $folderCode
      * @param LoggerInterface|null $logger
      * @param bool $perform
-     * @throws \RuntimeException
      */
     public function __construct(
+        private FilesystemProxy $filesystemProxy,
         private \Schoolbox\UserMapper $userMapper,
         private \Schoolbox\Resource\Folder\Mapper $folderMapper,
         private ?string $assessmentTitle,
         private ?int $workTypeId,
-        private string $publishAt,
+        private \Alaress_Date_Format $publishAt,
         private ?string $folderCode,
         private ?LoggerInterface $logger,
         private bool $perform
@@ -121,26 +123,20 @@ class Processor
     /**
      * Process feedbacks
      *
-     * @param string $filename
+     * @param Model $file
      * @param User $creator
      * @param LockInterface|null $lock
      * @return void
-     * @throws InvalidColumnException
      * @throws LockRefreshException
-     * @throws \PDOException
      */
     public function parseFeedbacks(
-        string $filename,
+        \Schoolbox\Resource\Storage\Model $file,
         \Schoolbox\User $creator,
         ?LockInterface $lock
     ): void {
-        /* Universal publish date
-         */
-        $publishAt = (new \Alaress_Date_Format($this->publishAt, 'd/m/Y H:ia'))->getDatabase();
-
         /* Load a particular file
          */
-        $fp = fopen($filename, 'r');
+        $this->filesystemProxy->readStream($file);
 
         /* Skip header row
          */

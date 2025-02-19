@@ -10,14 +10,18 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\BulkAssessmentResult;
 
+use Alaress\Lock\LockRefreshException;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\SummativeReport\Payload\VictorianProgression\Attendance\Processor;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Exception;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Twig\Error\Error;
 
 class Controller extends Base
@@ -71,24 +75,31 @@ class Controller extends Base
      *
      * @throws Error
      * @throws Exception
+     * @throws LockRefreshException
      * @throws RouteNotFound
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function postPreview(): void
     {
         $settings = $this->verifySettings($this->requestPost->getArrayCopy());
 
-//        /* This can be ported to the ui version with null and true in place of logger, perform and lock.
-//         */
-//        (new Processor(
-//            $this->userMapper,
-//            $this->folderMapper,
-//            null,
-//            $settings['worktype']->getId(),
-//            \Alaress_Date_Format::now()->getUsingFormat('d/m/Y H:ia'),
-//            null,
-//            null,
-//            false,
-//        ))->parseFeedbacks($storageFile, $settings['feedbackOwner'], null);
+        /** @var FilesystemProxy $filesystemProxy */
+        $filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
+
+        /* This can be ported to the ui version with null and true in place of logger, perform and lock.
+         */
+        (new Processor(
+            $filesystemProxy,
+            $this->userMapper,
+            $this->folderMapper,
+            null,
+            $settings['worktype']->getId(),
+            $settings['publishAt'],
+            null,
+            null,
+            false,
+        ))->parseFeedbacks($settings['sourceFile'], $settings['feedbackOwner'], null);
 
         $this->response = $this->responseFromTemplate(
             '@adminBulkAssessmentResult/preview.twig',
@@ -126,8 +137,11 @@ class Controller extends Base
 
 
     /**
-     * Asserts that the selected worktype and feedback owner actually exists:
+     * Asserts that the selected worktype, feedback owner and csv file actually exists:
      * without those, we can't really continue
+     *
+     * Also assumes a publish datetime here, though you probably want this to be configurable
+     * at some point in the future
      *
      * @param array $postVar
      * @return array
@@ -169,6 +183,7 @@ class Controller extends Base
             'worktype' => $worktype,
             'feedbackOwner' => $feedbackOwner,
             'sourceFile' => $csvFile,
+            'publishAt' => \Alaress_Date_Format::now()
         ];
     }
 }
