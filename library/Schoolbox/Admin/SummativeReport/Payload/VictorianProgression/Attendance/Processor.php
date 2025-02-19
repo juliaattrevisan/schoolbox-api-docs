@@ -23,6 +23,13 @@ use Schoolbox\UserMapper;
 class Processor
 {
     /**
+     * Used to make logging a bit more bearable
+     */
+    private const WARNING = 'warning';
+    private const INFO = 'info';
+
+
+    /**
      * Used to find a relationship between a folder and a particular
      * assessment by its title.
      */
@@ -190,7 +197,7 @@ class Processor
                     $i,
                     $folderCode,
                     $this->folderCode
-                ));
+                ), self::WARNING);
 
                 continue;
             }
@@ -204,7 +211,7 @@ class Processor
                     'Row %s: did not find folder code %s. Skipping',
                     $i,
                     $folderCode
-                ));
+                ), self::WARNING);
 
                 continue;
             }
@@ -223,7 +230,7 @@ class Processor
                     'Row %s: student %s not found; skipping',
                     $i,
                     $externalId
-                ));
+                ), self::WARNING);
 
                 continue;
             }
@@ -257,7 +264,7 @@ class Processor
                         $i,
                         $folder->getTitle(),
                         $folderCode
-                    ));
+                    ), self::WARNING);
 
                     continue;
                 }
@@ -318,7 +325,7 @@ class Processor
                     $externalId,
                     $folder->getId(),
                     $folderCode
-                ));
+                ), self::INFO);
             }
         }
 
@@ -330,10 +337,14 @@ class Processor
      * Log outcomes to multiple places
      *
      * @param string $message
+     * @param string $type
      * @return void
      */
-    private function log(string $message): void
+    private function log(string $message, string $type): void
     {
-        $this->outcome[microtime()] = $message;
+        $this->outcome[microtime()] = [
+            'message' => $message,
+            'type' => $type
+        ];
     }
 }
