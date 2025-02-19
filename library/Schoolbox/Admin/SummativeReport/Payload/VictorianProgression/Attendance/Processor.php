@@ -24,12 +24,14 @@ class Processor
      * assessment by its title.
      */
     private const QUERY_ASSESSMENT_TITLE = "
-        SELECT sb.id AS box_id
-        FROM v_assessment_relation var
+        SELECT 
+            a.id AS assessment_id, 
+            sb.id AS box_id
+        FROM mv_assessment_relation mvar
         INNER JOIN assessment a ON a.id = var.assessment_id
         INNER JOIN submission_box sb ON sb.assessment_id = a.id
-        INNER JOIN folder f ON var.folder_id = f.id
-        WHERE var.folder_id = :folderId
+        INNER JOIN folder f ON mvar.folder_id = f.id
+        WHERE mvar.folder_id = :folderId
         AND a.title = :title
         AND a.deleted_at IS NULL
         AND f.deleted_at IS NULL
@@ -41,12 +43,14 @@ class Processor
      * assessment by its worktype.
      */
     private const QUERY_ASSESSMENT_WORKTYPE = "
-        SELECT sb.id AS box_id
-        FROM v_assessment_relation var
+        SELECT 
+            a.id AS assessment_id, 
+            sb.id AS box_id
+        FROM mv_assessment_relation mvar
         INNER JOIN assessment a ON a.id = var.assessment_id
         INNER JOIN submission_box sb ON sb.assessment_id = a.id
-        INNER JOIN folder f ON var.folder_id = f.id
-        WHERE var.folder_id = :folderId
+        INNER JOIN folder f ON mvar.folder_id = f.id
+        WHERE mvar.folder_id = :folderId
         AND a.work_type_id = :workTypeId
         AND a.deleted_at IS NULL
         AND f.deleted_at IS NULL
@@ -233,7 +237,10 @@ class Processor
 
             /* Presume only one tuple exists
              */
-            $boxId = $this->assessmentQuery->fetch(\PDO::FETCH_ASSOC)['box_id'] ?? null;
+            $data = $this->assessmentQuery->fetch(\PDO::FETCH_ASSOC);
+
+            $boxId = $data['box_id'] ?? null;
+            $assessmentId = $data['assessment_id'] ?? null;
 
             /* For some reason this homepage doesn't have the assessment set up
              */
