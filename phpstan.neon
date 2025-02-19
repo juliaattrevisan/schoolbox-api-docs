@@ -17,7 +17,7 @@ parameters:
 
 rules:
     - Alaress\PhpStan\Rule\PhpUnitTestName
-    - Alaress\PhpStan\Rule\ShellExec
+    - Alaress\PhpStan\Rule\BacktickForbidden
 services:
     -
         class: Alaress\PhpStan\Rule\PhpUnitTestName

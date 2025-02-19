@@ -20,8 +20,10 @@ use PHPStan\Rules\RuleErrorBuilder;
  * These are going to be very hard to find with a casual search: better to just
  * mandate the use of `shell_exec`.
  */
-class ShellExec implements Rule
+class BacktickForbidden implements Rule
 {
+    private const IDENTIFIER = 'backtick.forbidden';
+
     /**
      * @inheritdoc
      */
@@ -36,8 +38,8 @@ class ShellExec implements Rule
     public function processNode(Node $node, Scope $scope): array
     {
         return [
-            RuleErrorBuilder::message('Backticks are not permitted: use shell_exec instead')
-                ->identifier('shellExec')
+            RuleErrorBuilder::message('The backtick operator is not permitted: use shell_exec instead')
+                ->identifier(self::IDENTIFIER)
                 ->build(),
         ];
     }
