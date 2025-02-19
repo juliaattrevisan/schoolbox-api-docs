@@ -321,13 +321,15 @@ class Processor
                 }
 
                 $this->log(sprintf(
-                    'Row %s: added grade %s with instructor grade %s (normalised mark %s) for %s (%s) in folder %s (%s)',
+                    'Row %s: added grade %s (instructor grade %s, normalised mark %s) for %s (%s) in assessment "%s" (%s) found in folder %s (%s)',
                     $i,
                     $humanReadableMark,
                     $instructorHumanReadableMark,
                     $normalisedMark,
                     $student->getFullName(),
                     $externalId,
+                    $assessment->getTitle(),
+                    $assessment->getId(),
                     $folder->getId(),
                     $folderCode
                 ), self::INFO);

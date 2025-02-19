@@ -25,7 +25,7 @@
                                 <a href="/search/user/{{ settings.feedbackOwner.id }}" target="_blank" title="{{ settings.feedbackOwner.fullname }}">{{ settings.feedbackOwner.fullname }}</a>
                             {% endif %}
                         </li>
-                        <li><strong>Source File:</strong> {{ settings.sourceFile.hash }}</li>
+                        <li><strong>Source File:</strong> <a href="/storage/fetch.php?hash={{ settings.sourceFile.hash }}">{{ settings.sourceFile.filename }}</a></li>
                     </ul>
                 </div>
             </section>
