@@ -309,10 +309,12 @@ class Processor
                 }
 
                 $this->log(sprintf(
-                    'Row %s: added attendance score %s (%s) for student %s in folder %s (%s)',
+                    'Row %s: added grade %s with instructor grade %s (normalised mark %s) for %s (%s) in folder %s (%s)',
                     $i,
                     $humanReadableMark,
+                    $instructorHumanReadableMark,
                     $normalisedMark,
+                    $student->getFullName(),
                     $externalId,
                     $folder->getId(),
                     $folderCode
