@@ -15,12 +15,13 @@ use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 
 /**
- * PHPStan rule for enforcing that backticks are not used for `shell_exec`.
+ * PHPStan rule for enforcing that backticks are not used for executing shell
+ * commands.
  *
  * These are going to be very hard to find with a casual search: better to just
  * mandate the use of `shell_exec`.
  */
-class BacktickForbidden implements Rule
+class ForbidBacktickOperator implements Rule
 {
     private const IDENTIFIER = 'backtick.forbidden';
 
@@ -38,7 +39,7 @@ class BacktickForbidden implements Rule
     public function processNode(Node $node, Scope $scope): array
     {
         return [
-            RuleErrorBuilder::message('The backtick operator is not permitted: use shell_exec instead')
+            RuleErrorBuilder::message('The backtick operator is forbidden: use shell_exec instead')
                 ->identifier(self::IDENTIFIER)
                 ->build(),
         ];
