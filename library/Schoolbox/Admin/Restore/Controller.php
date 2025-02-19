@@ -32,7 +32,7 @@ class Controller extends Base
     /**
      * Period of time that you can restore items, older than this will not be displayed
      */
-    private const TIME_FRAME = '-1 weeks';
+    private const TIME_FRAME = '-2 weeks';
 
     /**
      * Recursively undelete all children if they are deleted within this timeframe of the parent in seconds
