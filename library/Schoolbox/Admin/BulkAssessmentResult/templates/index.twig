@@ -15,7 +15,7 @@
         bulkAssessmentResultForm.find('input[data-selectizeuser]')
             .userSelectizeSelector({
                 ajax: {
-                    data: {groupID: 0},
+                    data: {roleTypeID: '{{ roletypeStaff }}'},
                 }
             })
             .on('selectize.item_add', function() {

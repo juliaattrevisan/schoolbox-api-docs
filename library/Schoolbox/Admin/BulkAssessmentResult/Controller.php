@@ -36,7 +36,10 @@ class Controller extends Base
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminBulkAssessmentResult.getIndex'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminBulkAssessmentResult.getIndex')),
-                'worktypes' => $this->worktypeMapper->findAll()->sortNaturally('sequence')
+                'worktypes' => $this->worktypeMapper->findAll()->sortNaturally('sequence'),
+                /* Not sure if there's a shortcut to this: never seen one?
+                 */
+                'roletypeStaff' => \Schoolbox\Role::STAFF
             ],
             'Bulk Assessment Result'
         );
