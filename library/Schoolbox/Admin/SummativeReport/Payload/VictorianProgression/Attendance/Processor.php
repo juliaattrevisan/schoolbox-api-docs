@@ -279,6 +279,8 @@ class Processor
             ));
 
             if ($this->perform) {
+                $datetime = \Alaress_Date_Format::now()->getDatabase();
+
                 $this->feedbackQuery->execute([
                     'boxId' => $boxId,
                     'marker' => $creator->getId(),
@@ -289,10 +291,10 @@ class Processor
                     'instructorMark' => $humanReadableMark,
                     'normMark' => $normalisedMark,
                     'resubmissionRequired' => 0,
-                    'createdAt' => \Alaress_Date_Format::now()->getDatabase(),
+                    'createdAt' => $datetime,
                     'publishedAt' => $publishAt,
                     'publishedBy' => $creator->getId(),
-                    'updatedAt' => \Alaress_Date_Format::now()->getDatabase()
+                    'updatedAt' => $datetime
                 ]);
             }
 
