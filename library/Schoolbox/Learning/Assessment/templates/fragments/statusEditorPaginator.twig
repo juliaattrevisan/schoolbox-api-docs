@@ -1,0 +1,140 @@
+{#
+ # We found that the view status page was not able to efficiently load a large number of ckeditor instances.
+ # To avoid this, the view status page now loads up to 30 instances at a time and paginates the rest of the students.
+ #}
+
+{# Rich text editors / pagination #}
+<script type="text/javascript" src='{{ CDN_PREFIX }}/js/bundle/editor.js'></script>
+
+<script>
+{# TODO: This is all a test, the code needs a lot of improvement #}
+document.addEventListener("DOMContentLoaded", function() {
+    const PAGE_ITEM_LIMIT = 3;
+
+    const participantRows = Array.from(document.querySelectorAll('#assessment-status [data-participant]')).map((el) => {
+        return {
+            el,
+            textarea: el.querySelector('textarea[name="comment"]'),
+            name: el.querySelector('h3 a[title="View Profile"]').innerText,
+            editor: null,
+        }
+    });
+    const textareas = document.querySelectorAll('textarea[name="comment"]');
+
+    function createEditorForParticipant(participantRow) {
+        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+            detail: {
+                targetElements: [participantRow.textarea],
+                hasTokens: true,
+                showWordCount: true,
+            }
+        }));
+        participantRow.textarea.addEventListener("EDITOR__CREATED", (editor) => {
+            participantRow.editor = editor.detail.editor;
+
+            // on every input, update the textarea and send an input event on it too for jquery.dynamic-feedback.js
+            participantRow.editor.model.document.on("change", (e) => {
+                participantRow.textarea.value = participantRow.editor.getData();
+                participantRow.textarea.dispatchEvent(new Event('change', { bubbles: true }));
+            });
+        });
+    }
+
+    // add the search bar
+    if (textareas.length > PAGE_ITEM_LIMIT) {
+        document.querySelector('#assessment-status').closest(".row").insertAdjacentHTML('beforeBegin', `<div class="row">
+            <div class="small-12 column">
+                <input type="text" placeholder="Search for a user" data-user-filter>
+            </div>
+        </div>`);
+
+        // add pagination
+        document.querySelector('#assessment-status').closest("div.row").insertAdjacentHTML('afterEnd',
+        `<div class="row" data-user-paginator style="display: none;">
+            <div class="small-12 column">
+                <ul class="pagination">
+                </ul>
+            </div>
+        </div>`);
+
+        let activeTab = 0;
+        let participantTabGroups = [];
+        const userFilterInput = document.querySelector('input[data-user-filter]');
+        const paginator = document.querySelector('[data-user-paginator]');
+
+        function onSelectedTabChange(tabId) {
+            activeTab = tabId;
+            paginator.style.display = participantTabGroups.length > 1 ? '' : 'none';
+
+            if (participantTabGroups.length) {
+                const tabs = participantTabGroups.map((group, i) => {
+                    return `<li class="${i === activeTab ? 'active' : ''}" data-user-tab=${ i }><a href="">${i + 1}</a></li>`;
+                });
+
+                paginator.querySelector('ul').innerHTML =
+                    `<li class="arrow ${activeTab == 0 ? 'unavailable' : ''}" data-user-tab="${activeTab - 1}"><a href="">‹</a></li>
+                        ${tabs.join('')}
+                    <li class="arrow ${activeTab == participantTabGroups.length - 1 ? 'unavailable' : ''}" data-user-tab="${activeTab + 1}"><a href="">›</a></li>`;
+
+                paginator.querySelectorAll('[data-user-tab]').forEach((el, i) => {
+                    el.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        if (el.classList.contains('unavailable')) { return; }
+                        onSelectedTabChange(parseInt(el.getAttribute('data-user-tab')));
+                    });
+                });
+            }
+
+            const activeGroup = participantTabGroups[activeTab];
+            participantRows.forEach((participantRow) => {
+                const isActive = activeGroup.includes(participantRow);
+                const isAlreadyActive = participantRow.el.style.display !== 'none';
+
+                if (isAlreadyActive !== isActive) {
+                    participantRow.el.style.display = isActive ? '' : 'none';
+                }
+
+                if (isActive && participantRow.editor === null) {
+                    // create a new editor
+                    console.log("creating editor for", participantRow);
+                    createEditorForParticipant(participantRow);
+                } else if (!isActive && participantRow.editor !== null) {
+                    // destroy the existing editor
+                    console.log("destroying editor for", participantRow);
+                    participantRow.editor.destroy();
+                    participantRow.editor = null;
+                }
+            });
+        }
+
+        function onUserFilterChange() {
+            const filter = userFilterInput.value.toLowerCase();
+            const filteredParticipantRows = Array.from(participantRows).filter((participantRow) => {
+                return participantRow.name.toLowerCase().includes(filter);
+            });
+
+            participantTabGroups = [];
+            let currentGroup = [];
+            filteredParticipantRows.forEach((participantRow) => {
+                currentGroup.push(participantRow);
+                if (currentGroup.length >= PAGE_ITEM_LIMIT) {
+                    participantTabGroups.push(currentGroup);
+                    currentGroup = [];
+                }
+            });
+            if (currentGroup.length) {
+                participantTabGroups.push(currentGroup);
+            }
+
+            onSelectedTabChange(0); // reset to first page
+        }
+
+        userFilterInput.addEventListener('input', onUserFilterChange);
+        onUserFilterChange(); // initial filter
+    } else {
+        participantRows.forEach((participantRow) => {
+            createEditorForParticipant(participantRow);
+        });
+    }
+});
+</script>
