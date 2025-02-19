@@ -14,7 +14,6 @@ use Schoolbox\User;
 
 class FileGenerator implements GeneratorInterface
 {
-
     /** @var string */
     private $filename;
 
