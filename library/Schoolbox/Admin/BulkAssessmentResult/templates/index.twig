@@ -24,6 +24,19 @@
             .on('selectize.item_remove', function() {
                 bulkAssessmentResultForm.find(':submit').prop('disabled', true);
             });
+
+        bulkAssessmentResultForm.alaressValidate({
+            rules: {
+                'userId': {
+                    'required': true
+                },
+            },
+            messages: {
+                'userId': {
+                    'required': 'You must specify a feedback owner before you can proceed'
+                }
+            },
+        })
     });
 </script>
 
