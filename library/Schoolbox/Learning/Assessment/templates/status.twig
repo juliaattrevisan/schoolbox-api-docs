@@ -59,7 +59,7 @@
         </ul>
     </div>
     <div class="small-12 large-8 columns text-right">
-        <ul class="filters" id="filters">
+        <ul class="filters" data-participant-filters id="filters">
             <li>
                 <input type="checkbox" id="filter-incom" checked="checked" data-status="{{ statusIncomplete }}" />
                 <label for="filter-incom">
@@ -100,7 +100,7 @@
 {% block participantSearchBar %}
     <div class="row">
         <div class="small-12 columns">
-            <input type="search" placeholder="Search for a student" data-participant-filter>
+            <input type="search" placeholder="Search for a student" data-participant-search>
         </div>
     </div>
 {% endblock participantSearchBar %}
@@ -150,6 +150,7 @@
 </div>
 {% endif %}
 
+{% block filtersScript %}
 <script type="text/javascript">
     $(function () {
         var assessmentList = $('#assessment-status');
@@ -184,5 +185,7 @@
         });
     });
 </script>
+{% endblock %}
+
 {% block scripts %}
 {% endblock %}
