@@ -38,7 +38,7 @@ class Processor
 
     /**
      * Used to find a relationship between a folder and a particular
-     * assessment by its title.
+     * assessment by its worktype.
      */
     private const QUERY_ASSESSMENT_WORKTYPE = "
         SELECT sb.id AS box_id
