@@ -1,40 +1,37 @@
-{#
- # We found that the view status page was not able to efficiently load a large number of ckeditor instances.
- # To avoid this, the view status page now loads up to 30 instances at a time and paginates the rest of the students.
- #}
+/**
+ * We found that the view status page was not able to efficiently load a large number of ckeditor instances.
+ * To avoid this, the view status page now loads up to 30 instances at a time and paginates the rest of the students.
+ */
 
-{# Rich text editors / pagination #}
-<script type="text/javascript" src='{{ CDN_PREFIX }}/js/bundle/editor.js'></script>
-
-<script>
-{# TODO: This is all a test, the code needs a lot of improvement #}
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
     const PAGE_ITEM_LIMIT = 25;
 
-    const participantRows = Array.from(document.querySelectorAll('#assessment-status [data-participant]')).map((el) => {
+    const participantRows = Array.from(document.querySelectorAll("#assessment-status [data-participant]")).map((el) => {
         return {
             el,
-            textarea: el.querySelector('[data-feedback-comment]'),
-            name: el.querySelector('[data-participant-name]').innerText,
+            textarea: el.querySelector("[data-feedback-comment]"),
+            name: el.querySelector("[data-participant-name]").innerText,
             editor: null,
-        }
+        };
     });
 
     function createEditorForParticipant(participantRow) {
-        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
-            detail: {
-                targetElements: [participantRow.textarea],
-                hasTokens: true,
-                showWordCount: true,
-            }
-        }));
+        document.dispatchEvent(
+            new CustomEvent("EDITOR__CREATE", {
+                detail: {
+                    targetElements: [participantRow.textarea],
+                    hasTokens: true,
+                    showWordCount: true,
+                },
+            }),
+        );
         participantRow.textarea.addEventListener("EDITOR__CREATED", (editor) => {
             participantRow.editor = editor.detail.editor;
 
             // on every input, update the textarea and send an input event on it too for jquery.dynamic-feedback.js
             participantRow.editor.model.document.on("change", (e) => {
                 participantRow.textarea.value = participantRow.editor.getData();
-                participantRow.textarea.dispatchEvent(new Event('change', { bubbles: true }));
+                participantRow.textarea.dispatchEvent(new Event("change", { bubbles: true }));
             });
         });
     }
@@ -43,11 +40,11 @@ document.addEventListener("DOMContentLoaded", function() {
     if (participantRows.length > PAGE_ITEM_LIMIT) {
         // add pagination
         let participantTabGroups = [];
-        const participantSearchInput = document.querySelector('input[data-participant-search]');
-        const participantFilters = document.querySelectorAll('[data-participant-filters] input[data-status]');
-        const filterEmptyState = document.querySelector('#empty-filter');
-        const filterReset = document.querySelector('#filter-show-all');
-        const paginator = document.querySelector('[data-participant-paginator]');
+        const participantSearchInput = document.querySelector("input[data-participant-search]");
+        const participantFilters = document.querySelectorAll("[data-participant-filters] input[data-status]");
+        const filterEmptyState = document.querySelector("#empty-filter");
+        const filterReset = document.querySelector("#filter-show-all");
+        const paginator = document.querySelector("[data-participant-paginator]");
 
         /**
          * Apply the visibility change for a participant row
@@ -59,7 +56,7 @@ document.addEventListener("DOMContentLoaded", function() {
         async function applyParticipantVisibility(participantRow, isActive, animate) {
             return new Promise((resolve) => {
                 if (!animate) {
-                    participantRow.el.style.display = isActive ? '' : 'none';
+                    participantRow.el.style.display = isActive ? "" : "none";
                     resolve();
                     return;
                 }
@@ -82,23 +79,25 @@ document.addEventListener("DOMContentLoaded", function() {
          * @param {boolean} animate - Whether to animate the change (slideUp/slideDown), use this for filters
          */
         function onSelectedTabChange(activeTab, animate) {
-            paginator.style.display = participantTabGroups.length > 1 ? '' : 'none';
+            paginator.style.display = participantTabGroups.length > 1 ? "" : "none";
 
             if (participantTabGroups.length > 1) {
                 const tabs = participantTabGroups.map((group, i) => {
-                    return `<li class="${i === activeTab ? 'active' : ''}" data-participant-tab=${ i }><a href="">${i + 1}</a></li>`;
+                    return `<li class="${i === activeTab ? "active" : ""}" data-participant-tab=${i}><a href="">${i + 1}</a></li>`;
                 });
 
-                paginator.querySelector('ul').innerHTML =
-                    `<li class="arrow ${activeTab == 0 ? 'unavailable' : ''}" data-participant-tab="${activeTab - 1}"><a href="">‹</a></li>
-                        ${tabs.join('')}
-                    <li class="arrow ${activeTab == participantTabGroups.length - 1 ? 'unavailable' : ''}" data-participant-tab="${activeTab + 1}"><a href="">›</a></li>`;
+                paginator.querySelector("ul").innerHTML =
+                    `<li class="arrow ${activeTab == 0 ? "unavailable" : ""}" data-participant-tab="${activeTab - 1}"><a href="">‹</a></li>
+                           ${tabs.join("")}
+                       <li class="arrow ${activeTab == participantTabGroups.length - 1 ? "unavailable" : ""}" data-participant-tab="${activeTab + 1}"><a href="">›</a></li>`;
 
-                paginator.querySelectorAll('[data-participant-tab]').forEach((el, i) => {
-                    el.addEventListener('click', (e) => {
+                paginator.querySelectorAll("[data-participant-tab]").forEach((el, i) => {
+                    el.addEventListener("click", (e) => {
                         e.preventDefault();
-                        if (el.classList.contains('unavailable')) { return; }
-                        onSelectedTabChange(parseInt(el.getAttribute('data-participant-tab')), false);
+                        if (el.classList.contains("unavailable")) {
+                            return;
+                        }
+                        onSelectedTabChange(parseInt(el.getAttribute("data-participant-tab")), false);
                     });
                 });
             }
@@ -113,7 +112,7 @@ document.addEventListener("DOMContentLoaded", function() {
             const activeGroup = participantTabGroups[activeTab]; // could be null if no groups
             participantRows.forEach(async (participantRow) => {
                 const isActive = activeGroup && activeGroup.includes(participantRow);
-                const isAlreadyActive = participantRow.el.style.display !== 'none';
+                const isAlreadyActive = participantRow.el.style.display !== "none";
 
                 await applyParticipantVisibility(participantRow, isActive, animate);
 
@@ -168,15 +167,15 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         // Add event listeners for when search/filters change
-        participantSearchInput.addEventListener('input', onParticipantFilterChange);
+        participantSearchInput.addEventListener("input", onParticipantFilterChange);
         participantFilters.forEach((el) => {
-            el.addEventListener('change', onParticipantFilterChange);
+            el.addEventListener("change", onParticipantFilterChange);
         });
 
         // Allow the user to reset the search/filters when the empty state is shown
-        filterReset.addEventListener('click', (e) => {
+        filterReset.addEventListener("click", (e) => {
             e.preventDefault();
-            participantSearchInput.value = '';
+            participantSearchInput.value = "";
             participantFilters.forEach((el) => {
                 el.checked = true;
             });
@@ -191,4 +190,3 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 });
-</script>

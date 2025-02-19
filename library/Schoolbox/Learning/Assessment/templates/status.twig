@@ -150,6 +150,10 @@
 </div>
 {% endif %}
 
+{# Rich text editors / pagination #}
+<script type="text/javascript" src='{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}'></script>
+<script type="text/javascript" src='{{ CDN_PREFIX }}/js/bundle/activityStatusPage.js?v={{ config.site_version }}'></script>
+
 {% block filtersScript %}
 <script type="text/javascript">
     $(function () {

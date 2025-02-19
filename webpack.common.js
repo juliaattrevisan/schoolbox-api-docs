@@ -157,6 +157,7 @@ module.exports = {
         similarityReport:
             "./library/Schoolbox/Learning/Assessment/templates/dueWork/vue/similarityReport/similarityReport.ts",
         linkedActivities: "./library/Schoolbox/Learning/Assessment/templates/lessonPlan/vue/linkedActivities.ts",
+        activityStatusPage: "./library/Schoolbox/Learning/Assessment/templates/status/activityStatusPage.ts",
 
         // Assessment
         unitPlanner: "./library/Schoolbox/Assessment/Course/Plan/templates/vue/unitPlanner.ts",
