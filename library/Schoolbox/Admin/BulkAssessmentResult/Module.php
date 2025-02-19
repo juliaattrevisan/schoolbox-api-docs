@@ -50,7 +50,8 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\WorkType\Mapper::class),
-            $this->getMapperFactory()->get(\Schoolbox\UserMapper::class)
+            $this->getMapperFactory()->get(\Schoolbox\UserMapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Resource\Folder\Mapper::class),
         );
     }
 

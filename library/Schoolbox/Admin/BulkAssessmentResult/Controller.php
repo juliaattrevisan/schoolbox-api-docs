@@ -12,6 +12,7 @@ namespace Schoolbox\Admin\BulkAssessmentResult;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\Navigation\Subnav;
+use Schoolbox\Admin\SummativeReport\Payload\VictorianProgression\Attendance\Processor;
 
 class Controller extends Base
 {
@@ -20,7 +21,8 @@ class Controller extends Base
      */
     public function __construct(
         private \Schoolbox\Learning\Assessment\WorkType\Mapper $worktypeMapper,
-        private \Schoolbox\UserMapper $userMapper
+        private \Schoolbox\UserMapper $userMapper,
+        private \Schoolbox\Resource\Folder\Mapper $folderMapper,
     ) {
     }
 
@@ -52,6 +54,19 @@ class Controller extends Base
     public function postPreview(): void
     {
         $settings = $this->verifySettings($this->requestPost->getArrayCopy());
+
+//        /* This can be ported to the ui version with null and true in place of logger, perform and lock.
+//         */
+//        (new Processor(
+//            $this->userMapper,
+//            $this->folderMapper,
+//            null,
+//            $settings['worktype']->getId(),
+//            \Alaress_Date_Format::now()->getUsingFormat('d/m/Y H:ia'),
+//            null,
+//            null,
+//            true,
+//        ))->parseFeedbacks($storageFile, $settings['feedbackOwner'], null);
 
         $this->response = $this->responseFromTemplate(
             '@adminBulkAssessmentResult/preview.twig',
