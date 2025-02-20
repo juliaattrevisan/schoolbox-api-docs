@@ -1,0 +1,119 @@
+services:
+  # Web server
+  caddy:
+    container_name: caddy
+    image: caddy:2.9
+    volumes:
+      - code:/usr/share/schoolbox
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - public
+      - private
+
+  # PHP-FPM server:
+  # point requests from Caddy to here
+  php:
+    container_name: php
+    image: php:8.2-fpm
+    volumes:
+      - code:/usr/share/schoolbox
+    ports:
+      - 9000:9000
+    networks:
+      - private
+
+  # Image intended for:
+  # * command-line tools
+  # * updates
+  # * cron tasks
+  schoolbox-cli:
+    image: ubuntu:jammy
+    volumes:
+      - code:/usr/share/schoolbox
+    networks:
+      - public
+      - private
+
+  # Database services
+  mariadb:
+    container_name: mariadb
+    image: mariadb:11.4
+    volumes:
+      - db-data:/var/lib/mysql
+    expose:
+      - 3306
+    networks:
+      - private
+
+  redis-storage:
+    container_name: redis-storage
+    image: redis:7.4
+    ports:
+      - 6379:6379
+    networks:
+      - private
+
+  redis-cache:
+    container_name: redis-cache
+    image: redis:7.4
+    ports:
+      - 6380:6379
+    networks:
+      - private
+
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3.13
+
+  # Not-yet-essential services
+#  schoolbox-digestd:
+#    image: ubuntu:jammy
+#
+#  schoolbox-scheduled:
+#    image: ubuntu:jammy
+#
+#  schoolbox-mobiled:
+#    image: ubuntu:jammy
+#
+#  schoolbox-socketd:
+#    image : ubuntu:jammy
+#
+#  schoolbox-taskd:
+#    image: alaress/taskd:latest
+#
+#  gotenberg:
+#    image: gotenberg/gotenberg:7
+#
+#  etherpad:
+#    image: schoolbox/epl:latest
+
+volumes:
+  # Volume for Schoolbox's code base
+  code:
+    driver_opts:
+      type: none
+      o: bind
+      device: ./
+
+  # Volume for database
+  db-data:
+    driver_opts:
+      type: none
+      o: bind
+      device: ./data/vagrantx/db-data
+
+  # Volume for storage
+  storage:
+    driver_opts:
+      type: none
+      o: bind
+      device: ./data/vagrantx/storage
+
+networks:
+  public:
+    name: public
+
+  private:
+    name: private
