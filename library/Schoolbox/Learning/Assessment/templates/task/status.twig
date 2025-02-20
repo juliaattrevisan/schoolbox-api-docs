@@ -22,8 +22,6 @@
 
 {% set listClass = 'expandable-card' %}
 
-{% block participantSearchBar %}{% endblock %}
-
 {% block participant %}
     {% set latestFeedback    = participant.findMostRecentInstructorGivenFeedback %}
     {% set latestResponse    = participant.findMostRecentSubmittedResponse %}

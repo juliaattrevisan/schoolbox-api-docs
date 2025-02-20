@@ -44,8 +44,6 @@
     </li>
 {% endblock %}
 
-{% block participantSearchBar %}{% endblock %}
-
 {% block participant %}
     {% set latestFeedback    = participant.findMostRecentInstructorGivenFeedback %}
     {% set latestResponse    = participant.findMostRecentSubmittedResponse %}
