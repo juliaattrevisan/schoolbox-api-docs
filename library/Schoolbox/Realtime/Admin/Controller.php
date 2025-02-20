@@ -23,6 +23,7 @@ use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\Message\Source;
 use Schoolbox\Realtime\Message\SourceMapper;
+use Schoolbox\Realtime\Message\RerouteMapper;
 use Schoolbox\Realtime\Notification\Parameter\SimpleParam;
 use Schoolbox\Resource;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
@@ -707,6 +708,38 @@ class Controller extends BaseController
                 $this->sendError("Roletype and namespace must be provided");
                 return;
             }
+
+            /** TODO - split the below into a shared resource and share with tools/notif/delete-personalised-settings.php  */
+
+            if ($roletype) {
+                $roleMapper = RoleMapper::getInstance();
+                $roleIds = $roleMapper->findIdsByColumn('group_type', $roletype);
+            }
+
+            if (empty($roleIds)) {
+                $this->sendError("No roles found for roletype: $roletype");
+                return;
+            }
+
+            $msgRerouteMapper = RerouteMapper::getInstance();
+            $msgRerouteMapper->getDatabase()->beginTransaction();
+
+            $roleIdList = implode(',', $roleIds);
+            $params = [];
+            $delete = "DELETE msg_reroute ";
+            $sql = " FROM msg_reroute
+                    JOIN msg_source ON msg_source.id = msg_reroute.msg_source_id
+                    JOIN msg_namespace ON msg_namespace.id = msg_source.namespace
+                    JOIN user ON user.id = msg_reroute.user_id AND user.deleted_at IS NULL
+                    JOIN `groups` ON user.group_id = `groups`.id
+                    WHERE `groups`.id IN ({$roleIdList})
+                    AND `groups`.deleted_at IS NULL";
+
+            $deleteStatement = $this->getNsMapper()->getDatabase()->prepare($delete . $sql);
+            $deleteStatement->execute($params);
+            $msgRerouteMapper->getDatabase()->commit();
+
+            /** END TODO */
 
             $this->response = $this->responseAsJson(['success' => true]);
 
