@@ -432,6 +432,7 @@
                         <a class="close-reveal-modal" aria-label="Close">&#215;</a>
                         <h2>Please confirm</h2>
                         <p>Are you sure you wish to apply default <span id="namespace-span"></span> settings to all <span id="roletype-span"></span>?</p>
+                        <div id="default-settings-error-message" class="alert-box alert" hidden></div>
                         <ul class="flex-list buttons">
                             <li>
                                 <a id="confirm-apply-default-settings" class="button submit">Yes</a>
@@ -471,30 +472,33 @@
                             /**
                              * send through the apply default settings request
                              */
-
-                            try {
-                                fetch("{{routeLookup('adminNotifications.postApplyDefaultSettings') }}", {
-                                    method: "POST",
-                                    body: JSON.stringify({
-                                        roletype: "{{ roletype }}",
-                                        namespace: currentNamespace
-                                    }),
-                                    headers: { "Content-Type": "application/json" },
-                                }).then((response) => {
-                                    if (response.ok) {
-                                        $("#apply-default-settings-modal").foundation("reveal", "close");
-                                        // fire toast success
-                                    } else {
-                                        // fire toast error
-                                    }
-                                    confirmButton.setAttribute("data-is-processing", "false");
-                                    confirmButton.innerHTML = "Yes";
-                                });
-                            } catch (e) {
-                                // fire toast error
+                            window.sbProps.toastActivate("Applying...");
+                            fetch("{{routeLookup('adminNotifications.postApplyDefaultSettings') }}", {
+                                method: "POST",
+                                body: JSON.stringify({
+                                    roletype: "{{ roletype }}",
+                                    namespace: currentNamespace
+                                }),
+                                headers: { "Content-Type": "application/json" },
+                            }).then((response) => {
+                                if (response.ok) {
+                                    $("#apply-default-settings-modal").foundation("reveal", "close");
+                                    window.sbProps.toastTimeout({ text: "Settings applied successfully" });
+                                } else {
+                                    return response.json().then((data) => {
+                                        throw new Error(data.message);
+                                    });
+                                }
+                            }).catch((error) => {
+                                const errorMessage = error.message || "Sorry, there was an unknown error. Please try again and contact your support if the problem persists.";
+                                const errorElement = document.getElementById("default-settings-error-message");
+                                errorElement.innerHTML = errorMessage;
+                                errorElement.hidden = false;
+                                window.sbProps.toastTimeout({ text: "Settings not applied", isSuccess: false });
                                 confirmButton.setAttribute("data-is-processing", "false");
                                 confirmButton.innerHTML = "Yes";
-                            }
+                            });
+
                         });
                         /**
                         * Close the modal
