@@ -29,6 +29,8 @@ let pageConfig: {
         } | null; // null if no pagination
         filterEmptyState: HTMLElement;
         filterReset: HTMLElement;
+        participantLoader: HTMLElement;
+        participantContainer: HTMLElement;
         participantSearchInput: HTMLInputElement | null;
         participantFilters: HTMLInputElement[];
         participantRows: HTMLElement[];
@@ -153,7 +155,14 @@ function createPageTab(label: string | number, targetTab: number, activeTab: num
     if (!isUnavailable) {
         tabLi.addEventListener("click", (e) => {
             e.preventDefault();
-            void changeTab(targetTab, false);
+            // Scroll to the top of the page and show the loader
+            pageConfig.elements.participantLoader.classList.remove("hide");
+            pageConfig.elements.participantContainer.classList.add("hide");
+            document.querySelector("#header")?.scrollIntoView();
+            // A slight delay to allow the scroll to start before the tab change hangs the page
+            setTimeout(async () => {
+                await changeTab(targetTab, false);
+            }, 100);
         });
     }
 
@@ -216,6 +225,10 @@ async function onSelectedTabChange(activeTab: number, animate: boolean): Promise
 
     // Create all the editors at once
     await createEditorForParticipants(editorsToCreate);
+
+    // Remove the loader and show the participants
+    pageConfig.elements.participantLoader.classList.add("hide");
+    pageConfig.elements.participantContainer.classList.remove("hide");
 }
 
 let changeTabLock: Promise<void> | null = null;
@@ -313,6 +326,14 @@ document.addEventListener(ACTIVITY_STATUS_PAGE_INIT, (event) => {
     if (!(filterReset instanceof HTMLElement)) {
         throw new Error("Unable to find filter reset element");
     }
+    const participantLoader = document.querySelector(event.detail.selectors.participantLoader);
+    if (!(participantLoader instanceof HTMLElement)) {
+        throw new Error("Unable to find participant loader element");
+    }
+    const participantContainer = document.querySelector(event.detail.selectors.participantContainer);
+    if (!(participantContainer instanceof HTMLElement)) {
+        throw new Error("Unable to find participant container element");
+    }
     // We don't require a participant search input for every page
     const participantSearchInput = event.detail.selectors.participantSearchInput
         ? document.querySelector(event.detail.selectors.participantSearchInput)
@@ -326,6 +347,8 @@ document.addEventListener(ACTIVITY_STATUS_PAGE_INIT, (event) => {
             paginator: null, // to be set below if enabled
             filterEmptyState,
             filterReset,
+            participantLoader,
+            participantContainer,
             participantSearchInput,
             participantFilters: Array.from(
                 document.querySelectorAll<HTMLInputElement>(event.detail.selectors.participantFilters),

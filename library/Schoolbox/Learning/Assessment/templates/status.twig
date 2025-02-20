@@ -113,7 +113,10 @@
                 Add another filter or <a id="filter-show-all">show everything</a>.
             </p>
         </div>
-        <section id="assessment-status">
+        <section class="content" id="participant-loader">
+            <div class="loader"></div>
+        </section>
+        <section id="assessment-status" class="hide">
             <ul class="information-list {{ listClass }}">
             {% for participant in assessment.allParticipants | filter(participant => not participant.isExcluded ) %}
 
@@ -163,6 +166,8 @@
                 filterReset: '#filter-show-all',
                 participantSearchInput: 'input[data-participant-search]',
                 participantFilters: '[data-participant-filters] input[data-status]',
+                participantLoader: '#participant-loader',
+                participantContainer: '#assessment-status',
                 participantRows: '#assessment-status [data-participant]',
                 participantRowName: '[data-participant-name]',
                 participantRowCommentTextarea: '[data-feedback-comment]',

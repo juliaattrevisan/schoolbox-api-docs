@@ -20,6 +20,10 @@ export type ActivityStatusPageInitEventDetail = {
         participantSearchInput: string | null;
         // The filter checkboxes (i.e. incomplete/self-assessed/teacher-assessed)
         participantFilters: string;
+        // The loader element to use when switching tabs
+        participantLoader: string;
+        // The element that wraps the participant rows
+        participantContainer: string;
         // The <li> elements that represent each participant row
         participantRows: string;
         // The selector for the participant name inside a participant row
