@@ -44,7 +44,7 @@ export function getToolbar(config: SbxEditorConfig): ToolbarConfig {
             "numberedList",
             "bulletedList",
         ];
-    } else if (config.toolbar === EditorToolbar.COMMENT) {
+    } else if (config.toolbar === EditorToolbar.COMMENT || config.toolbar === EditorToolbar.COMMENT_AI) {
         items = [
             "bold",
             "italic",
@@ -52,6 +52,8 @@ export function getToolbar(config: SbxEditorConfig): ToolbarConfig {
             "strikethrough",
             "blockQuote",
             "removeFormat",
+            // If using the COMMENT_AI toolbar, add the AI commands and assistant in the right spot
+            ...(config.toolbar === EditorToolbar.COMMENT_AI ? getToolbarAI() : []),
             "|",
             "link",
             "|",

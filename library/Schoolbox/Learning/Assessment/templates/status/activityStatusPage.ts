@@ -6,6 +6,8 @@
 import debounce from "lodash/debounce";
 import { slideDown, slideUp } from "@js/util/animateUtils";
 import { EditorEvent } from "@js/editor/event/editorEvent";
+import type { EditorCreateEventInfo } from "@js/editor/event/editorEvent";
+import { EditorToolbar } from "@js/editor/types/editorTypes";
 import type { SbxEditor } from "@js/editor/types/editorTypes";
 import { ACTIVITY_STATUS_PAGE_INIT } from "./activityStatusPageEvent";
 
@@ -77,11 +79,12 @@ async function createEditorForParticipants(participantRows: ParticipantRow[]): P
     }
 
     document.dispatchEvent(
-        new CustomEvent(EditorEvent.EDITOR__CREATE, {
+        new CustomEvent<EditorCreateEventInfo>(EditorEvent.EDITOR__CREATE, {
             detail: {
                 targetElements: validParticipantRows.map((participantRow) => participantRow.textarea),
                 hasTokens: true,
                 showWordCount: true,
+                toolbar: EditorToolbar.COMMENT_AI,
             },
         }),
     );

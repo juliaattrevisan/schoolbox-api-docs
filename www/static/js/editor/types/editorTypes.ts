@@ -15,6 +15,7 @@ export enum EditorType {
 export enum EditorToolbar {
     DEFAULT = "default",
     COMMENT = "comment",
+    COMMENT_AI = "comment_ai",
     SIMPLE = "simple",
 }
 
@@ -24,7 +25,7 @@ export enum EditorToolbar {
 export interface SbxEditorConfig {
     targetElements: (string | SbxEditorElement)[]; // the elements to target for the editor
     type: EditorType.CLASSIC | EditorType.INLINE; // the type of editor to use
-    toolbar: EditorToolbar.DEFAULT | EditorToolbar.COMMENT | EditorToolbar.SIMPLE; // the toolbar to use for the editor
+    toolbar: EditorToolbar; // the toolbar to use for the editor
     hasTokens?: boolean; // whether or not to enable the tokens plugin
     tokenList?: string[]; // the list of tokens to use for the ckeditor
     baseHref?: string; // the base url to be prepended to relative links or assets included in the ckeditor
