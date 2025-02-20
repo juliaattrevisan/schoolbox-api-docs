@@ -3,6 +3,7 @@
  * To avoid this, the view status page now loads up to 30 instances at a time and paginates the rest of the students.
  */
 
+import debounce from "lodash/debounce";
 import { slideDown, slideUp } from "@js/util/animateUtils";
 import { EditorEvent } from "@js/editor/event/editorEvent";
 import type { SbxEditor } from "@js/editor/types/editorTypes";
@@ -94,7 +95,7 @@ async function applyParticipantVisibility(
     // For slideDown (show), will not wait since we want to spawn the editor asap
     if (isActive) {
         // no need to slide down if it's already visible
-        if (participantRow.el.style.display !== "none") {
+        if (participantRow.el.style.display === "none") {
             participantRow.el.dataset.display = "block"; // need this otherwise slideDown keeps it as none?
             void slideDown(participantRow.el);
         }
@@ -208,7 +209,7 @@ async function onParticipantFilterChange(): Promise<void> {
         .filter((el) => el.checked)
         .map((el) => el.dataset.status);
 
-    const filteredParticipantRows = Array.from(participantRows).filter((participantRow) => {
+    const filteredParticipantRows = participantRows.filter((participantRow) => {
         // If there is a search, and it doesn't match the name, don't show
         if (searchTerm.length && !participantRow.name.toLowerCase().includes(searchTerm)) {
             return false;
@@ -308,10 +309,12 @@ document.addEventListener(ACTIVITY_STATUS_PAGE_INIT, (event) => {
     });
 
     // Add event listeners for when search/filters change
-    // TODO: Debounce to avoid spamming creation/destruction of editors
-    pageConfig.elements.participantSearchInput.addEventListener("input", () => void onParticipantFilterChange());
+    // Create a debounced version of onParticipantFilterChange to avoid spamming editor creation/destruction.
+    const debouncedFilterChange = debounce(onParticipantFilterChange, 300);
+
+    pageConfig.elements.participantSearchInput.addEventListener("input", debouncedFilterChange);
     pageConfig.elements.participantFilters.forEach((el) => {
-        el.addEventListener("change", () => void onParticipantFilterChange());
+        el.addEventListener("change", debouncedFilterChange);
     });
 
     // Allow the user to reset the search/filters when the empty state is shown
