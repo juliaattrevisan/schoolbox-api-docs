@@ -36,7 +36,12 @@ const { title } = useNodeTitle(props.node);
 
 // #region expand/collapse
 
-// don't show the expand button when the node has no children, and onlyShowGaps is not active
+// to remove any padding when node is at base depth and has no children
+const isSingleNode = window.Vue.computed(
+    () => props.depth === 0 && props.node.children && props.node.children.length === 0,
+);
+
+// show the expand button when the node has children, and onlyShowGaps is not active
 const showExpandButton = window.Vue.computed(
     () => props.node.children && props.node.children.length > 0 && !filtersStore.onlyShowGaps,
 );
@@ -101,7 +106,7 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
         >
             <button
                 v-if="showExpandButton"
-                class="l-flex l-flex--center f-no-bkg"
+                class="l-flex l-flex--center l-flex__item--0-shrink f-no-bkg"
                 :aria-label="props.node.isExpanded ? 'Collapse' : 'Expand'"
                 :title="props.node.isExpanded ? 'Collapse' : 'Expand'"
                 :data-test="`cc-report-table-node-expand-button-${props.node.id}`"
@@ -110,16 +115,16 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
                 <sbx-icon v-if="props.node.isExpanded" name="up-arrow" />
                 <sbx-icon v-else name="down-arrow" />
             </button>
-            <!-- add paddingLeft to the last child node to align better with the expand button -->
+            <!-- add paddingLeft to the last child node to align better with the parent above, which is showing the expand button -->
             <button
                 class="l-pad--0 t-align-left f-no-bkg f-always-show"
                 :style="{
-                    paddingLeft: filtersStore.onlyShowGaps || showExpandButton ? '0' : '2.5rem',
+                    paddingLeft: isSingleNode || filtersStore.onlyShowGaps || showExpandButton ? '0' : '2.5rem',
                 }"
                 :data-test="`cc-report-table-node-title-button-${props.node.id}`"
                 @click="emit('titleClick', props.node)"
             >
-                <template v-if="props.depth === 0">
+                <template v-if="props.depth === 0 && !filtersStore.onlyShowGaps">
                     <b>{{ title }}</b>
                 </template>
                 <template v-else>{{ title }}</template>
