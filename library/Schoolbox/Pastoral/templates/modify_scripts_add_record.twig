@@ -13,6 +13,7 @@
 
         const isExistingRecord = {{ record.id != '' ? "true" : "false"  }};
         const expiresAt = '{{ record.expiresAt ? record.expiresAt.localShort : null }}';
+        const calculatedExpiresAt = {{ calculatedExpiresAt|json_encode|raw }}
 
         /**
          * When the expires at date has manually changed, this takes precedence and
@@ -93,40 +94,6 @@
         }
 
         /**
-         * Get the expires on date based on the default expiry
-         * @param defaultExpiry
-         */
-        function getDefaultExpiry (defaultExpiry) {
-            const currentDate = dayjs();
-            switch (defaultExpiry) {
-                case "1 week":
-                    return currentDate.add(1, "week").format("DD/MM/YYYY");
-                case "2 weeks":
-                    return currentDate.add(2, "week").format("DD/MM/YYYY");
-                case "1 month":
-                    return currentDate.add(1, "month").format("DD/MM/YYYY");
-                case "6 months":
-                    return currentDate.add(6, "month").format("DD/MM/YYYY");
-                case "12 months":
-                    return currentDate.add(12, "month").format("DD/MM/YYYY");
-                case "24 months":
-                    return currentDate.add(24, "month").format("DD/MM/YYYY");
-                case "calendar year":
-                    return currentDate.add(1, "year").startOf("year").format("DD/MM/YYYY");
-                case "academic period":
-                    const academicPeriod = "{{ expiresAcademicPeriod.displayFinish ?? '' }}";
-                    return dayjs(academicPeriod).format("DD/MM/YYYY");
-                case "academic year":
-                    // get the start of the school year and set the expiry to the next year on that date
-                    const startOfSchoolYear = "{{ config.start_of_school_year }}";
-                    const startOfSchoolYearDate = dayjs(startOfSchoolYear, "DD/MM");
-                    return currentDate.add(1, "year").set("month", startOfSchoolYearDate.month()).set("date", startOfSchoolYearDate.date()).format("DD/MM/YYYY");
-                default:
-                    return "";
-            }
-        }
-
-        /**
          * Update the expires at date based on the current type / subtype selection
          * @param defaultExpiry
          */
@@ -146,7 +113,7 @@
                 return;
             }
             // otherwise set the expires at date based on the Default Expiry that was set
-            expiresAtElement.value = getDefaultExpiry(defaultExpiry);
+            expiresAtElement.value = calculatedExpiresAt[defaultExpiry] ?? '';
         }
 
     });

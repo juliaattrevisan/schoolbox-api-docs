@@ -235,20 +235,4 @@ class TemplateDataHelper
         }
         return $audienceDefaults;
     }
-
-    /**
-     * Find the current academic period of the student that the record is assigning to
-     *
-     * @param Model      $record
-     * @param TermMapper $termMapper
-     * @return TermModel
-     * @throws Exception
-     */
-    public function loadAcademicPeriod(Model $record, TermMapper $termMapper): TermModel
-    {
-        return $termMapper->findForDateAndYearLevel(
-            $record->getCreatedAt() ?? \Alaress_Date_Format::now(),
-            $record->getStudent()->getYear()
-        );
-    }
 }
