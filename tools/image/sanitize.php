@@ -34,6 +34,15 @@ $app = new class extends CliTool\App {
      */
     public function run(): void
     {
+        /**
+         * Deprecation notice
+         */
+        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->getLogger()->notice('/***************     Deprecated NOTICE - this will be deleted in future    ****************/');
+        $this->getLogger()->notice('/*    If you are running this, please add a comment of this scripts name into SA-19334    */');
+        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->getLogger()->notice('/******************************************************************************************/');
+
         if ($this->perform()) {
             $this->getLogger()->info('Running in perform mode (-p): changes will be written to filesystem');
         } else {
@@ -67,6 +76,15 @@ $app = new class extends CliTool\App {
                 $this->getLogger()->debug(($this->perform() ? 'Skipped: ' : 'Will be skipped: ') . $svgFile->getHash());
             }
         }
+
+                /**
+         * Deprecation notice
+         */
+        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->getLogger()->notice('/***************     Deprecated NOTICE - this will be deleted in future    ****************/');
+        $this->getLogger()->notice('/*    If you are running this, please add a comment of this scripts name into SA-19334    */');
+        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->getLogger()->notice('/******************************************************************************************/');
     }
 };
 
