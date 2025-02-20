@@ -161,20 +161,23 @@ function createPageTab(label: string | number, targetTab: number, activeTab: num
     tabA.textContent = String(label);
     tabLi.appendChild(tabA);
 
-    if (!isUnavailable) {
-        tabLi.addEventListener("click", (e) => {
-            e.preventDefault();
+    tabLi.addEventListener("click", (e) => {
+        e.preventDefault(); // always prevent default even if unavailable
+        if (!isUnavailable && targetTab !== activeTab) {
             // Scroll to the top of the page and show the loader
             pageConfig.elements.participantLoader.classList.remove("hide");
             pageConfig.elements.participantContainer.classList.add("hide");
+            if (pageConfig.elements.paginator) {
+                pageConfig.elements.paginator.wrapper.style.display = "none";
+            }
             document.querySelector("#header")?.scrollIntoView();
             // A slight delay to allow the scroll to start before the tab change hangs the page
             setTimeout(() => {
                 // eslint-disable-next-line @typescript-eslint/no-use-before-define -- intentional recursion for now
                 void changeTab(targetTab, false);
             }, 100);
-        });
-    }
+        }
+    });
 
     return tabLi;
 }
