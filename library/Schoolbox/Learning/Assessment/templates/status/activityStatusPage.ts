@@ -59,7 +59,6 @@ async function createEditorForParticipant(participantRow: ParticipantRow): Promi
         }),
     );
 
-    // TODO: Use the TS module for spawning editors instead
     const editor = await new Promise<SbxEditor>((resolve) => {
         sourceElement.addEventListener(EditorEvent.EDITOR__CREATED, (event) => {
             resolve(event.detail.editor);
