@@ -18,6 +18,15 @@ require_once __DIR__ . '/../conf/core/require.php';
 
 $kernel = new \Schoolbox\Application\Daemon\Kernel(__FILE__);
 
+/**
+ * Deprecation notice
+ */
+echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;
+echo "\033[1;33m/***************     Deprecated NOTICE - this will be deleted in future    ****************/\033[0m" . PHP_EOL;
+echo "\033[1;33m/*    If you are running this, please add a comment of this scripts name into SA-19334    */\033[0m" . PHP_EOL;
+echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;
+echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;
+
 $opts = getopt('t::');
 
 if (empty($opts['t'])) {
@@ -146,7 +155,14 @@ echo "
 }
 ";
 
-
+/**
+ * Deprecation notice
+ */
+echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;
+echo "\033[1;33m/***************     Deprecated NOTICE - this will be deleted in future    ****************/\033[0m" . PHP_EOL;
+echo "\033[1;33m/*    If you are running this, please add a comment of this scripts name into SA-19334    */\033[0m" . PHP_EOL;
+echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;
+echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;
 
 
 /**
