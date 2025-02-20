@@ -2,9 +2,9 @@ FROM caddy:alpine
 
 COPY Caddyfile /etc/caddy/Caddyfile
 
-RUN chown -R caddy:caddy /usr/share/schoolbox
-
-USER caddy
+#RUN chown -R caddy:caddy /usr/share/schoolbox
+#
+#USER caddy
 
 EXPOSE 80 443
 
