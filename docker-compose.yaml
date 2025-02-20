@@ -7,8 +7,8 @@ services:
     volumes:
       - code:/usr/share/schoolbox
     ports:
-      - 80:80
-      - 443:443
+      - '80:80'
+      - '443:443'
     networks:
       - public
       - private
@@ -22,8 +22,8 @@ services:
     volumes:
       - code:/usr/share/schoolbox
     ports:
-      - 9000:9000
-      - 9002:9002
+      - '9000:9000'
+      - '9002:9002'
     networks:
       - private
 
@@ -54,7 +54,7 @@ services:
     container_name: redis-storage
     image: redis:7.4
     ports:
-      - 6379:6379
+      - '6379:6379'
     networks:
       - private
 
@@ -62,7 +62,7 @@ services:
     container_name: redis-cache
     image: redis:7.4
     ports:
-      - 6380:6379
+      - '6380:6379'
     networks:
       - private
 
