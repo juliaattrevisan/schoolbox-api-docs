@@ -718,8 +718,12 @@ class Controller extends BaseController
                 JOIN `groups` ON user.group_id = `groups`.id
                 WHERE `groups`.id IN ({$roleIdList})
                 AND `groups`.deleted_at IS NULL";
+        $sql .= " AND msg_namespace.slug = :slug";
+        $namespaceMapper = NSMapper::getInstance();
+        $targetNameSpace = $namespaceMapper->findOneBySlug($namespace);
+        $params = ['slug' => $targetNameSpace];
 
-        $deleteStatement = $this->getNsMapper()->getDatabase()->prepare($delete . $sql);
+        $deleteStatement = $namespaceMapper->getDatabase()->prepare($delete . $sql);
         $deleteStatement->execute($params);
         $msgRerouteMapper->getDatabase()->commit();
 
