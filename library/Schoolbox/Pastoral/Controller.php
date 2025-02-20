@@ -122,7 +122,7 @@ class Controller extends Base
         private FilesystemProxy $filesystemProxy,
         private \Schoolbox\External\User $externalUser,
         private RecordProcessor $recordProcessor,
-        private PastoralMapper  $pastoralMapper,
+        private PastoralMapper $pastoralMapper,
     ) {
     }
 
