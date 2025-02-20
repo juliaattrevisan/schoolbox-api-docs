@@ -274,11 +274,11 @@ document.addEventListener(ACTIVITY_STATUS_PAGE_INIT, (event) => {
     };
 
     // pagination is only used on some view status pages (wherever editors need to be spawned)
-    if (event.detail.selectors.paginator) {
-        const paginatorWrapper = document.querySelector(event.detail.selectors.paginator);
-        if (!(paginatorWrapper instanceof HTMLElement)) {
-            throw new Error("Unable to find paginator wrapper element");
-        }
+    // if a selector was provided but no element found, disable pagination (avoids needing extra twig blocks)
+    const paginatorWrapper = event.detail.selectors.paginator
+        ? document.querySelector(event.detail.selectors.paginator)
+        : null;
+    if (paginatorWrapper instanceof HTMLElement) {
         const paginatorUl = paginatorWrapper.querySelector("ul[class=pagination]");
         if (!(paginatorUl instanceof HTMLUListElement)) {
             throw new Error("Unable to find paginator list element");
