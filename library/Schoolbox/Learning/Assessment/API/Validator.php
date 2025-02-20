@@ -133,6 +133,9 @@ class Validator
                     "  If key 'id' is present there should be no other items."
                 );
             }
+            if (!is_int($value['id']) && !ctype_digit($value['id'])) {
+                throw new SchoolboxException("Filter 'folder' property 'id' must have an integer value.");
+            }
         } else {
             // Expect $value to contain an array like the following.
             // Note each sub-array may contain 'id', 'code' or both.
