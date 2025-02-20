@@ -177,42 +177,5 @@
     }));
 </script>
 
-{% block filtersScript %}
-<script type="text/javascript">
-    $(function () {
-        var assessmentList = $('#assessment-status');
-        var filters        = $('#filters');
-        var emptyFilter    = $('#empty-filter');
-        var filterShowAll  = $('#filter-show-all');
-
-        filters.on('change', 'input', function () {
-            var $in = $(this);
-            var s   = $in.data('status');
-            var $li = assessmentList.find('[data-status="'+s+'"]');
-
-            if ($in.is(':checked')) {
-                $li.slideDown();
-                if ($li.length) {
-                    emptyFilter.slideUp();
-                }
-            } else {
-                $li.slideUp(function () {
-                    if (assessmentList.find('li[data-status]:visible').length === 0) {
-                        emptyFilter.slideDown();
-                    } else {
-                        emptyFilter.slideUp();
-                    }
-                })
-            }
-        });
-
-        filterShowAll.on('click', function (e) {
-            e.preventDefault();
-            filters.find('[type=checkbox]').prop('checked', true).trigger('change');
-        });
-    });
-</script>
-{% endblock %}
-
 {% block scripts %}
 {% endblock %}
