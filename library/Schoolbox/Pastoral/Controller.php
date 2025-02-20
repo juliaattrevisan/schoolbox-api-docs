@@ -14,6 +14,7 @@ namespace Schoolbox\Pastoral;
 
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Request\Values;
+use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
 use Exception;
 use External_Pastoral;
@@ -48,6 +49,8 @@ use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
 use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Action\Mapper as PastoralActionMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
+use Schoolbox\Pastoral\Mapper as PastoralMapper;
+use Schoolbox\Pastoral\Type\TypeAbstract;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Storage\FilesystemProxy;
@@ -92,6 +95,7 @@ class Controller extends Base
      * @param FilesystemProxy                 $filesystemProxy
      * @param \Schoolbox\External\User        $externalUser
      * @param RecordProcessor                 $recordProcessor
+     * @param PastoralMapper                  $pastoralMapper
      */
     public function __construct(
         private IConfigLoader $config,
@@ -118,6 +122,7 @@ class Controller extends Base
         private FilesystemProxy $filesystemProxy,
         private \Schoolbox\External\User $externalUser,
         private RecordProcessor $recordProcessor,
+        private PastoralMapper  $pastoralMapper,
     ) {
     }
 
@@ -515,13 +520,23 @@ class Controller extends Base
             ];
         }
 
+        //Helper for loading default expiry date
+        $expiryHelper = new ExpiryHelper(
+            $this->pastoralMapper,
+            $this->termMapper
+        );
+
         // Render this thing out
 
         $this->response = $this->responseFromTemplate(
             '@pastoral/modify.twig',
             $templateData + [
                 'record'                => $record,
-                'expiresAcademicPeriod' => $templateDataHelper->loadAcademicPeriod($record, $this->termMapper),
+                'calculatedExpiresAt' => array_map(fn($expiry) => $expiryHelper->calculateExpireDate(
+                    $record->getCreatedAt() ?? Alaress_Date_Format::now(),
+                    $expiry,
+                    $record->getStudent()?->getYear()
+                )?->getUsingFormat('d/m/Y'), TypeAbstract::PASTORAL_EXPIRY),
                 'canCreate'             => $this->getConfigLoader()->get('pastoral_create_tag_enable'),
                 'moderator'             => $moderator,
                 'attachzonePublic'      => $this->getAttachZone(self::ATTACHZONE_PUBLIC, $record),
