@@ -36,7 +36,7 @@
     {% set pTooltip     = participant.responseRequired ? labelIncomplete : (participant.feedbackRequired ? labelPending : labelReviewed) %}
     {% set pStatusText  = pTooltip %}
 
-    <li data-status="{{ pStatusClass }}" data-participant-name="{{ participant.user.fullName }}">
+    <li data-status="{{ pStatusClass }}" data-participant="{{ participant.user.id }}" data-participant-name="{{ participant.user.fullName }}">
         <div>
             <div class="expander{% if participant.allResponses | length %} icon-down-arrow{% endif %}"
                  data-collapser="user-completions-{{ participant.user.id }}"

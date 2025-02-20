@@ -16,8 +16,8 @@ export type ActivityStatusPageInitEventDetail = {
         filterEmptyState: string;
         // The button to reset the search/filters
         filterReset: string;
-        // The search input element
-        participantSearchInput: string;
+        // The search input element, if not provided then no search functionality exists
+        participantSearchInput: string | null;
         // The filter checkboxes (i.e. incomplete/self-assessed/teacher-assessed)
         participantFilters: string;
         // The <li> elements that represent each participant row

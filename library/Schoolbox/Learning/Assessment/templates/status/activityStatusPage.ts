@@ -29,7 +29,7 @@ let pageConfig: {
         } | null; // null if no pagination
         filterEmptyState: HTMLElement;
         filterReset: HTMLElement;
-        participantSearchInput: HTMLInputElement;
+        participantSearchInput: HTMLInputElement | null;
         participantFilters: HTMLInputElement[];
         participantRows: HTMLElement[];
     };
@@ -204,7 +204,9 @@ async function onSelectedTabChange(activeTab: number, animate: boolean): Promise
 async function onParticipantFilterChange(): Promise<void> {
     if (pageConfig === undefined) throw new Error("Activity status page config missing");
 
-    const searchTerm = pageConfig.elements.participantSearchInput.value.toLowerCase();
+    const searchTerm = pageConfig.elements.participantSearchInput
+        ? pageConfig.elements.participantSearchInput.value.toLowerCase()
+        : "";
     const activeFilters = pageConfig.elements.participantFilters
         .filter((el) => el.checked)
         .map((el) => el.dataset.status);
@@ -256,8 +258,11 @@ document.addEventListener(ACTIVITY_STATUS_PAGE_INIT, (event) => {
     if (!(filterReset instanceof HTMLElement)) {
         throw new Error("Unable to find filter reset element");
     }
-    const participantSearchInput = document.querySelector(event.detail.selectors.participantSearchInput);
-    if (!(participantSearchInput instanceof HTMLInputElement)) {
+    // We don't require a participant search input for every page
+    const participantSearchInput = event.detail.selectors.participantSearchInput
+        ? document.querySelector(event.detail.selectors.participantSearchInput)
+        : null;
+    if (participantSearchInput !== null && !(participantSearchInput instanceof HTMLInputElement)) {
         throw new Error("Unable to find participant search input element");
     }
     pageConfig = {
@@ -312,7 +317,9 @@ document.addEventListener(ACTIVITY_STATUS_PAGE_INIT, (event) => {
     // Create a debounced version of onParticipantFilterChange to avoid spamming editor creation/destruction.
     const debouncedFilterChange = debounce(onParticipantFilterChange, 300);
 
-    pageConfig.elements.participantSearchInput.addEventListener("input", debouncedFilterChange);
+    if (pageConfig.elements.participantSearchInput !== null) {
+        pageConfig.elements.participantSearchInput.addEventListener("input", debouncedFilterChange);
+    }
     pageConfig.elements.participantFilters.forEach((el) => {
         el.addEventListener("change", debouncedFilterChange);
     });
@@ -320,7 +327,9 @@ document.addEventListener(ACTIVITY_STATUS_PAGE_INIT, (event) => {
     // Allow the user to reset the search/filters when the empty state is shown
     pageConfig.elements.filterReset.addEventListener("click", (e) => {
         e.preventDefault();
-        pageConfig.elements.participantSearchInput.value = "";
+        if (pageConfig.elements.participantSearchInput !== null) {
+            pageConfig.elements.participantSearchInput.value = "";
+        }
         pageConfig.elements.participantFilters.forEach((el) => {
             el.checked = true;
         });
