@@ -138,7 +138,7 @@ function createPageTab(label: string | number, targetTab: number, activeTab: num
     if (!isUnavailable) {
         tabLi.addEventListener("click", (e) => {
             e.preventDefault();
-            void onSelectedTabChange(targetTab, false);
+            void changeTab(targetTab, false);
         });
     }
 
@@ -198,6 +198,41 @@ async function onSelectedTabChange(activeTab: number, animate: boolean): Promise
     );
 }
 
+let changeTabLock: Promise<void> | null = null;
+let changeTabNext: (() => Promise<void>) | null = null;
+
+/**
+ * To change the selected tab
+ * This ensures that only one call of onSelectedTabChange is running at a time to avoid concurrent editor creation/destruction
+ * @param activeTab - The index of the tab to show
+ * @param animate - Whether to animate the change (slideUp/slideDown), use this for filters
+ */
+async function changeTab(activeTab: number, animate: boolean): Promise<void> {
+    // If there is a call in progress, set this as the next call to make after it
+    if (changeTabLock !== null) {
+        changeTabNext = async () => {
+            await changeTab(activeTab, animate);
+        };
+        return;
+    }
+
+    // Before we start a call, clear any queued calls (which is probably what called this)
+    changeTabNext = null;
+
+    // Now change the tab
+    changeTabLock = onSelectedTabChange(activeTab, animate);
+    try {
+        await changeTabLock;
+    } finally {
+        changeTabLock = null;
+        // If there is a queued call, start it now
+        if (typeof changeTabNext === "function") {
+            // @ts-expect-error: TS doesn't seem to understand that changeTabNext may have changed during the await
+            await changeTabNext();
+        }
+    }
+}
+
 /**
  * When the search or filters change, show the correct participants
  */
@@ -245,7 +280,7 @@ async function onParticipantFilterChange(): Promise<void> {
         participantTabGroups.push(filteredParticipantRows);
     }
 
-    await onSelectedTabChange(0, true); // reset to first page
+    await changeTab(0, true); // reset to first page
 }
 
 document.addEventListener(ACTIVITY_STATUS_PAGE_INIT, (event) => {
