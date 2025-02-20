@@ -36,28 +36,14 @@ let pageConfig: {
 };
 
 /**
- * Trigger the creation of a CKEditor instance for a given participant row
+ * Wait for the editor to be created for a participant row
  * This will also handle the input events to keep the textarea in sync so that jquery.dynamic-feedback.js can track it
- * @param participantRow - The participant row to create the editor for
- * @returns A promise that resolves when the editor has been created
  */
-async function createEditorForParticipant(participantRow: ParticipantRow): Promise<void> {
-    // If no source element, nothing to do
+async function waitForParticipantEditor(participantRow: ParticipantRow): Promise<void> {
     const sourceElement = participantRow.textarea;
     if (sourceElement === null) {
-        return;
+        throw new Error("Participant row does not have a textarea");
     }
-
-    // TODO: I wonder if spawning them all via targetElements is more efficient?
-    document.dispatchEvent(
-        new CustomEvent(EditorEvent.EDITOR__CREATE, {
-            detail: {
-                targetElements: [sourceElement],
-                hasTokens: true,
-                showWordCount: true,
-            },
-        }),
-    );
 
     const editor = await new Promise<SbxEditor>((resolve) => {
         sourceElement.addEventListener(EditorEvent.EDITOR__CREATED, (event) => {
@@ -69,9 +55,39 @@ async function createEditorForParticipant(participantRow: ParticipantRow): Promi
 
     // on every input, update the textarea and send an input event on it too for jquery.dynamic-feedback.js
     editor.model.document.on("change", () => {
-        sourceElement.value = editor.getData();
-        sourceElement.dispatchEvent(new Event("change", { bubbles: true }));
+        if (!(editor.sourceElement instanceof HTMLTextAreaElement)) return;
+        editor.sourceElement.value = editor.getData();
+        editor.sourceElement.dispatchEvent(new Event("change", { bubbles: true }));
     });
+}
+
+/**
+ * Trigger the creation of a CKEditor instance for participant row(s)
+ * @param participantRows - The participant rows to create the editor for
+ * @returns A promise that resolves when the editors have all been created
+ */
+async function createEditorForParticipants(participantRows: ParticipantRow[]): Promise<void> {
+    // If no source elements, nothing to do
+    const validParticipantRows = participantRows.filter((participantRow) => participantRow.textarea !== null);
+    if (validParticipantRows.length === 0) {
+        return;
+    }
+
+    document.dispatchEvent(
+        new CustomEvent(EditorEvent.EDITOR__CREATE, {
+            detail: {
+                targetElements: validParticipantRows.map((participantRow) => participantRow.textarea),
+                hasTokens: true,
+                showWordCount: true,
+            },
+        }),
+    );
+
+    await Promise.all(
+        validParticipantRows.map((participantRow) => {
+            return waitForParticipantEditor(participantRow);
+        }),
+    );
 }
 
 /**
@@ -178,6 +194,7 @@ async function onSelectedTabChange(activeTab: number, animate: boolean): Promise
     }
 
     const activeGroup = participantTabGroups[activeTab]; // could be null if no groups
+    const editorsToCreate: ParticipantRow[] = [];
     await Promise.all(
         participantRows.map(async (participantRow) => {
             const isActive = activeGroup && activeGroup.includes(participantRow);
@@ -187,7 +204,8 @@ async function onSelectedTabChange(activeTab: number, animate: boolean): Promise
 
             if (isActive && activeEditor === null) {
                 // create a new editor
-                await createEditorForParticipant(participantRow);
+                // await createEditorForParticipant(participantRow);
+                editorsToCreate.push(participantRow);
             } else if (!isActive && activeEditor !== null) {
                 // destroy the existing editor
                 participantRow.editor = null; // do this first to avoid double-destroying
@@ -195,6 +213,9 @@ async function onSelectedTabChange(activeTab: number, animate: boolean): Promise
             }
         }),
     );
+
+    // Create all the editors at once
+    await createEditorForParticipants(editorsToCreate);
 }
 
 let changeTabLock: Promise<void> | null = null;
