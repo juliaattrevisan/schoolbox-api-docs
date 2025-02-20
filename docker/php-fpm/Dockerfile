@@ -1,6 +1,8 @@
 FROM php:8.2-fpm-alpine
 
-RUN pecl install redis xdebug
+RUN apk --no-cache add ${PHPIZE_DEPS} && \
+    apk add --update linux-headers && \
+    pecl install redis xdebug
 
 # https://hub.docker.com/_/php for directions on installing extensions
 RUN docker-php-ext-install readline && \
