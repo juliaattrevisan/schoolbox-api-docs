@@ -43,6 +43,7 @@ let pageConfig: {
 /**
  * Wait for the editor to be created for a participant row
  * This will also handle the input events to keep the textarea in sync so that jquery.dynamic-feedback.js can track it
+ * @param participantRow - The participant row to wait for the editor on
  */
 async function waitForParticipantEditor(participantRow: ParticipantRow): Promise<void> {
     const sourceElement = participantRow.textarea;
@@ -68,12 +69,15 @@ async function waitForParticipantEditor(participantRow: ParticipantRow): Promise
 
 /**
  * Trigger the creation of a CKEditor instance for participant row(s)
- * @param participantRows - The participant rows to create the editor for
+ * @param participants - The participant rows to create the editor for
  * @returns A promise that resolves when the editors have all been created
  */
-async function createEditorForParticipants(participantRows: ParticipantRow[]): Promise<void> {
+async function createEditorForParticipants(participants: ParticipantRow[]): Promise<void> {
     // If no source elements, nothing to do
-    const validParticipantRows = participantRows.filter((participantRow) => participantRow.textarea !== null);
+    const validParticipantRows = participants.filter((participantRow) => participantRow.textarea !== null) as (Omit<
+        ParticipantRow,
+        "textarea"
+    > & { textarea: HTMLTextAreaElement })[];
     if (validParticipantRows.length === 0) {
         return;
     }
@@ -135,6 +139,7 @@ async function applyParticipantVisibility(
  * @param label - The label to display on the tab, string for arrows, number for page number
  * @param targetTab - The index of the tab to switch to when clicked
  * @param activeTab - The index of the currently active tab
+ * @returns The created tab element
  */
 function createPageTab(label: string | number, targetTab: number, activeTab: number): HTMLLIElement {
     const tabLi = document.createElement("li");
@@ -164,8 +169,9 @@ function createPageTab(label: string | number, targetTab: number, activeTab: num
             pageConfig.elements.participantContainer.classList.add("hide");
             document.querySelector("#header")?.scrollIntoView();
             // A slight delay to allow the scroll to start before the tab change hangs the page
-            setTimeout(async () => {
-                await changeTab(targetTab, false);
+            setTimeout(() => {
+                // eslint-disable-next-line @typescript-eslint/no-use-before-define -- intentional recursion for now
+                void changeTab(targetTab, false);
             }, 100);
         });
     }
@@ -247,7 +253,7 @@ let changeTabNext: (() => Promise<void>) | null = null;
 async function changeTab(activeTab: number, animate: boolean): Promise<void> {
     // If there is a call in progress, set this as the next call to make after it
     if (changeTabLock !== null) {
-        changeTabNext = async () => {
+        changeTabNext = async (): Promise<void> => {
             await changeTab(activeTab, animate);
         };
         return;
@@ -404,10 +410,10 @@ document.addEventListener(ACTIVITY_STATUS_PAGE_INIT, (event) => {
     const debouncedFilterChange = debounce(onParticipantFilterChange, 300);
 
     if (pageConfig.elements.participantSearchInput !== null) {
-        pageConfig.elements.participantSearchInput.addEventListener("input", debouncedFilterChange);
+        pageConfig.elements.participantSearchInput.addEventListener("input", () => void debouncedFilterChange());
     }
     pageConfig.elements.participantFilters.forEach((el) => {
-        el.addEventListener("change", debouncedFilterChange);
+        el.addEventListener("change", () => void debouncedFilterChange());
     });
 
     // Allow the user to reset the search/filters when the empty state is shown
