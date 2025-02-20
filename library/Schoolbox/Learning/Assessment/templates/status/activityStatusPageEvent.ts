@@ -7,6 +7,10 @@ export const ACTIVITY_STATUS_PAGE_INIT = "ACTIVITY_STATUS_PAGE_INIT";
 export type ActivityStatusPageInitEventDetail = {
     // The number of items to show per page
     pageItemLimit: number;
+    // How many *more* items beyond pageItemLimit before it starts actually paginating
+    // This means we can set a higher limit for one page (cover all normal class sizes) but still
+    // have a smoother experience swapping between pages with a smaller list
+    pageItemLimitOffset: number;
     // Selectors for relevant elements on the page
     selectors: {
         // The element that wraps where the paginator exists, if not provided then no pagination will occur

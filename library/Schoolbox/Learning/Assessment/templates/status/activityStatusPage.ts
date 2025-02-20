@@ -22,6 +22,7 @@ let participantTabGroups: ParticipantRow[][] = [];
 // The page config as specified when initialising the page using the event
 let pageConfig: {
     pageItemLimit: number;
+    pageItemLimitOffset: number;
     elements: {
         paginator: {
             wrapper: HTMLElement;
@@ -295,7 +296,10 @@ async function onParticipantFilterChange(): Promise<void> {
 
     // should we paginate?
     participantTabGroups = [];
-    if (pageConfig.elements.paginator !== null) {
+    if (
+        pageConfig.elements.paginator !== null &&
+        filteredParticipantRows.length > pageConfig.pageItemLimit + pageConfig.pageItemLimitOffset
+    ) {
         let currentGroup: ParticipantRow[] = [];
 
         filteredParticipantRows.forEach((participantRow) => {
@@ -343,6 +347,7 @@ document.addEventListener(ACTIVITY_STATUS_PAGE_INIT, (event) => {
     }
     pageConfig = {
         pageItemLimit: event.detail.pageItemLimit,
+        pageItemLimitOffset: event.detail.pageItemLimitOffset,
         elements: {
             paginator: null, // to be set below if enabled
             filterEmptyState,
