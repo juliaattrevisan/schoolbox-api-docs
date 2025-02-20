@@ -4,6 +4,8 @@ RUN apk --no-cache add ${PHPIZE_DEPS} && \
     apk add --update linux-headers && \
     pecl install redis xdebug
 
+RUN apk add libzip-dev zip unzip
+
 # https://hub.docker.com/_/php for directions on installing extensions
 RUN docker-php-ext-install zip && \
     docker-php-ext-install pcntl && \
