@@ -371,6 +371,20 @@ export default class Common {
     }
 
     /**
+     * Asserts that a file download is triggered by a button
+     * @param downloadButtonId - the id of the button to trigger the download
+     * @param expectedFileName - the expected downloaded file name
+     */
+    async assertFileDownload(downloadButtonId: string, expectedFileName: string): Promise<void> {
+        const [download] = await Promise.all([
+            this.page.waitForEvent("download"), // Wait for the file to be downloaded
+            this.page.getByTestId(downloadButtonId).click(), // Click the download button
+        ]);
+        const fileName = download.suggestedFilename();
+        expect(fileName).toBe(expectedFileName); // Confirm the file name
+    }
+
+    /**
      * Get today's date at 11:59 PM
      * @returns - the date object
      */
@@ -380,6 +394,12 @@ export default class Common {
         return today;
     }
 
+    /**
+     * Format a date into a string
+     * @param date - the date to format
+     * @param includeTime - whether to include the time in the formatted date
+     * @returns - the formatted date
+     */
     static formatDate(date: Date, includeTime: boolean): string {
         const options: Intl.DateTimeFormatOptions = {
             timeZone: "Australia/Melbourne",
@@ -411,6 +431,12 @@ export default class Common {
         return formattedDate;
     }
 
+    /**
+     * Format a date into a string db format
+     * @param date - the date to format
+     * @param includeTime - whether to include the time in the formatted date
+     * @returns - the formatted date in db format
+     */
     static formatDateDB(date: Date, includeTime: boolean): string {
         const options: Intl.DateTimeFormatOptions = {
             timeZone: "Australia/Melbourne",

@@ -27,7 +27,12 @@ const isModalOpen = window.Vue.ref(false); // to open/close the exporting to csv
                             :value="reportOption.value"
                             type="checkbox"
                         />
-                        <label :for="reportOption.value" class="f-no-margins">{{ reportOption.label }}</label>
+                        <label
+                            :for="reportOption.value"
+                            class="f-no-margins"
+                            :data-test="`cc-report-filters-label-${reportOption.value}`"
+                            >{{ reportOption.label }}</label
+                        >
                     </li>
                 </ul>
             </div>
@@ -36,7 +41,7 @@ const isModalOpen = window.Vue.ref(false); // to open/close the exporting to csv
                 <p class="meta">Only show curriculum that has a total usage count of 0.</p>
                 <div class="switch">
                     <input id="onlyShowGapsSwitch" v-model="filtersStore.onlyShowGaps" type="checkbox" />
-                    <label for="onlyShowGapsSwitch">
+                    <label for="onlyShowGapsSwitch" data-test="cc-report-filters-gaps-switch">
                         <span class="icon-approve"></span>
                         <span class="icon-cancel"></span>
                     </label>
@@ -48,6 +53,7 @@ const isModalOpen = window.Vue.ref(false); // to open/close the exporting to csv
                 class="l-flex-row l-gap-s f-no-bkg f-no-margins"
                 aria-label="Export to CSV"
                 title="Export to CSV"
+                data-test="cc-report-filters-export-button"
                 @click="isModalOpen = true"
             >
                 <sbx-icon name="export" />
@@ -66,6 +72,7 @@ const isModalOpen = window.Vue.ref(false); // to open/close the exporting to csv
                         type="button"
                         class="button submit"
                         :href="exportStore.getEndpoint()"
+                        data-test="cc-report-filters-export-button-confirm"
                         @click="isModalOpen = false"
                         >Export</a
                     >

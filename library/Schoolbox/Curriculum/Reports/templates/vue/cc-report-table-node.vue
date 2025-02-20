@@ -104,6 +104,7 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
                 class="l-flex l-flex--center f-no-bkg"
                 :aria-label="props.node.isExpanded ? 'Collapse' : 'Expand'"
                 :title="props.node.isExpanded ? 'Collapse' : 'Expand'"
+                :data-test="`cc-report-table-node-expand-button-${props.node.id}`"
                 @click="nodesStore.toggleNodeExpand(props.node)"
             >
                 <sbx-icon v-if="props.node.isExpanded" name="up-arrow" />
@@ -115,6 +116,7 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
                 :style="{
                     paddingLeft: filtersStore.onlyShowGaps || showExpandButton ? '0' : '2.5rem',
                 }"
+                :data-test="`cc-report-table-node-title-button-${props.node.id}`"
                 @click="emit('titleClick', props.node)"
             >
                 <template v-if="props.depth === 0">

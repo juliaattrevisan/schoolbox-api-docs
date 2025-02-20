@@ -79,7 +79,7 @@ window.Vue.watch(bottom, (isAtBottom) => {
 </script>
 
 <template>
-    <div ref="scrollableEl" class="scrollable" :style="{ maxHeight: maxScrollableHeight }">
+    <div ref="scrollableEl" class="scrollable" :style="{ maxHeight: maxScrollableHeight }" data-test="cc-report-table">
         <table class="coverage-report">
             <thead>
                 <tr>

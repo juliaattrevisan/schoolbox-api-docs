@@ -84,7 +84,7 @@ window.Vue.onMounted(() => {
                 />
             </div>
         </div>
-        <button class="submit">{{ buttonText }}</button>
+        <button class="submit" data-test="cc-input-button">{{ buttonText }}</button>
     </form>
 </template>
 

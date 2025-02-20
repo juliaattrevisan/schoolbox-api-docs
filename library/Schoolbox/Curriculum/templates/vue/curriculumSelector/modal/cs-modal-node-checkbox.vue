@@ -84,7 +84,10 @@ function onChange($isChecked: boolean): void {
             :checked="isChecked"
             @change="onChange(($event.target as HTMLInputElement).checked)"
         />
-        <label :for="`checkbox-${props.node.id}__${extraId}`"></label>
+        <label
+            :for="`checkbox-${props.node.id}__${extraId}`"
+            :data-test="`cs-modal-node-checkbox-label-${props.node.id}`"
+        ></label>
     </div>
 </template>
 
