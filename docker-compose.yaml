@@ -17,7 +17,8 @@ services:
   # point requests from Caddy to here
   php-fpm:
     container_name: php-fpm
-    image: php:8.2-fpm
+    build:
+      context: ./docker/php-fpm
     volumes:
       - code:/usr/share/schoolbox
     ports:
