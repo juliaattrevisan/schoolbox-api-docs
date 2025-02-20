@@ -15,13 +15,14 @@ services:
 
   # PHP-FPM server:
   # point requests from Caddy to here
-  php:
-    container_name: php
+  php-fpm:
+    container_name: php-fpm
     image: php:8.2-fpm
     volumes:
       - code:/usr/share/schoolbox
     ports:
       - 9000:9000
+      - 9002:9002
     networks:
       - private
 

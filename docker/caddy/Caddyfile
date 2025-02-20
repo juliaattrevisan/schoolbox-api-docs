@@ -62,15 +62,15 @@ vagrant.dev.schoolbox.cloud:443 {
     }
 
     handle_path /websocket {
-        reverse_proxy localhost:9081
+        reverse_proxy php-fpm:9081
     }
     handle_path /pad* {
-        reverse_proxy localhost:9001
+        reverse_proxy php-fpm:9001
     }
     @images path_regexp (portrait|videothumb|cms/(image|myimage)|images/(fail|icon|logo)|(socialstream|storage)/image)\.php$
     handle @images {
         log_skip *
-        php_fastcgi localhost:9002 {
+        php_fastcgi php-fpm:9002 {
             try_files index.php
         }
     }
@@ -80,7 +80,7 @@ vagrant.dev.schoolbox.cloud:443 {
         file_server
     }
     handle_path /awstats* {
-        php_fastcgi localhost:9000 {
+        php_fastcgi php-fpm:9000 {
             try_files private/auth.php
             env X-Original-URI {http.request.orig_uri}
 
@@ -113,7 +113,7 @@ vagrant.dev.schoolbox.cloud:443 {
     log_skip /service-worker.js
     log_skip /manifest
     encode  zstd  gzip
-    php_fastcgi localhost:9000 {
+    php_fastcgi php-fpm:9000 {
             try_files index.php
     }
     file_server
@@ -122,13 +122,13 @@ vagrant.dev.schoolbox.cloud:443 {
 vagrant.dev.schoolbox.cloud:1081 {
     tls /etc/nginx/certs/schoolbox-vagrantx-fullchain.crt /etc/nginx/certs/schoolbox-vagrantx-private.key
     root * /usr/share/schoolbox/www
-    php_fastcgi localhost:9000 {
+    php_fastcgi php-fpm:9000 {
         try_files private/auth.php
 
         @good status 200
         handle_response @good {
             rewrite {http.request.orig_uri}
-            reverse_proxy localhost:1080
+            reverse_proxy php-fpm:1080
         }
         handle_response {
             respond {rp.status_text} {rp.status_code}
@@ -142,7 +142,7 @@ vagrant-dav.dev.schoolbox.cloud {
 tls /etc/nginx/certs/schoolbox-vagrantx-fullchain.crt /etc/nginx/certs/schoolbox-vagrantx-private.key
     root * /usr/share/schoolbox/dav
     import headers
-    php_fastcgi localhost:9000
+    php_fastcgi php-fpm:9000
     handle_errors 404 {
         rewrite * /index.php?page=common/404
     }
