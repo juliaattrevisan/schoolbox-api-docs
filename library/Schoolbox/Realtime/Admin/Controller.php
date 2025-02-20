@@ -694,7 +694,8 @@ class Controller extends BaseController
      *
      * @throws \Alaress\Web\Controller\Exception
      */
-    private function applyDefaultSettings ($roletype, $namespace) {
+    private function applyDefaultSettings($roletype, $namespace)
+    {
         if ($roletype) {
             $roleMapper = RoleMapper::getInstance();
             $roleIds = $roleMapper->findIdsByColumn('group_type', $roletype);
@@ -726,7 +727,6 @@ class Controller extends BaseController
         $deleteStatement = $namespaceMapper->getDatabase()->prepare($delete . $sql);
         $deleteStatement->execute($params);
         $msgRerouteMapper->getDatabase()->commit();
-
     }
 
     /**
@@ -761,7 +761,6 @@ class Controller extends BaseController
             }
 
             $this->response = $this->responseAsJson(['success' => true]);
-
         } catch (\Exception $e) {
             $this->response = $this->responseAsJson(
                 ['success' => false, 'message' => $e->getMessage()]
