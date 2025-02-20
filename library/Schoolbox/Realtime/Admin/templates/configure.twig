@@ -410,7 +410,7 @@
                                             class="icon-export"
                                             href="#apply-default-settings"
                                             data-apply-default-button
-                                            data-reveal-id="apply-default-settings-modal"
+                                            data-reveal-id="default-settings-modal"
                                             data-roletype-formatted="{{ roletypeFormatted }}"
                                             data-namespace="{{ locale.translateSentence(ns[namespace.id].slug) }}"
                                             data-namespace-formatted="{{ locale.translateSentence(ns[namespace.id].label) | capitalize }}"
@@ -428,27 +428,28 @@
                             {% endif %}
                         {% endfor %}
                     </div>
-                    <div data-reveal id="apply-default-settings-modal" class="reveal-modal">
+                    <div data-reveal id="default-settings-modal" class="reveal-modal">
                         <a class="close-reveal-modal" aria-label="Close">&#215;</a>
                         <h2>Please confirm</h2>
-                        <p>Are you sure you wish to apply default <span id="namespace-span"></span> settings to all <span id="roletype-span"></span>?</p>
+                        <p>Are you sure you wish to apply default <span id="default-settings-namespace"></span> settings to all <span id="default-settings-roletype"></span>?</p>
                         <div id="default-settings-error-message" class="alert-box alert" hidden></div>
                         <ul class="flex-list buttons">
                             <li>
-                                <a id="confirm-apply-default-settings" class="button submit">Yes</a>
+                                <a id="confirm-default-settings" class="button submit">Yes</a>
                             </li>
                             <li>
-                                <a id="cancel-apply-default-settings" class="button">Cancel</a>
+                                <a id="cancel-default-settings" class="button">Cancel</a>
                             </li>
                         </ul>
                     </div>
                     <script type="text/javascript">
                         {% autoescape 'js' %}
                         /**
-                        * Update the confirmation modal text with the relevant context
+                        * Update the confirmation modal text with the relevant context,
+                        * filling in the empty spans to provide the appropriate details
                         */
-                        const namespaceSpan = document.getElementById("namespace-span");
-                        const roletypeSpan = document.getElementById("roletype-span");
+                        const namespaceSpan = document.getElementById("default-settings-namespace");
+                        const roletypeSpan = document.getElementById("default-settings-roletype");
                         let currentNamespace = "";
                         const applyDefaultButtons = document.querySelectorAll("[data-apply-default-button]");
                         applyDefaultButtons.forEach((applyDefaultButton) => {
@@ -461,7 +462,7 @@
                         /**
                         * Confirm the application of default settings
                         */
-                        const confirmButton = document.getElementById("confirm-apply-default-settings");
+                        const confirmButton = document.getElementById("confirm-default-settings");
                         confirmButton.addEventListener("click", () => {
                             // prevent multiple submissions
                             if (confirmButton.getAttribute("data-is-processing") === "true") {
@@ -482,29 +483,32 @@
                                 headers: { "Content-Type": "application/json" },
                             }).then((response) => {
                                 if (response.ok) {
-                                    $("#apply-default-settings-modal").foundation("reveal", "close");
-                                    window.sbProps.toastTimeout({ text: "Settings applied successfully" });
+                                    $("#default-settings-modal").foundation("reveal", "close");
+                                    window.sbProps.toastTimeout({ text: "Settings applied successfully." });
                                 } else {
                                     return response.json().then((data) => {
                                         throw new Error(data.message);
                                     });
                                 }
                             }).catch((error) => {
+                                /**
+                                 * Display an error message to the user, attempting to retrieve the error message from the response
+                                 */
                                 const errorMessage = error.message || "Sorry, there was an unknown error. Please try again and contact your support if the problem persists.";
                                 const errorElement = document.getElementById("default-settings-error-message");
                                 errorElement.innerHTML = errorMessage;
                                 errorElement.hidden = false;
-                                window.sbProps.toastTimeout({ text: "Settings not applied", isSuccess: false });
+                                window.sbProps.toastTimeout({ text: "Settings not applied.", isSuccess: false });
                                 confirmButton.setAttribute("data-is-processing", "false");
                                 confirmButton.innerHTML = "Yes";
                             });
 
                         });
                         /**
-                        * Close the modal
+                        * Close the default settings modal
                         */
-                        document.getElementById("cancel-apply-default-settings").addEventListener("click", () => {
-                            $("#apply-default-settings-modal").foundation("reveal", "close");
+                        document.getElementById("cancel-default-settings").addEventListener("click", () => {
+                            $("#default-settings-modal").foundation("reveal", "close");
                         });
                         {% endautoescape %}
                     </script>
