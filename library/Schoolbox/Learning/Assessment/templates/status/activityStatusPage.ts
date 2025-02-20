@@ -93,12 +93,19 @@ async function applyParticipantVisibility(
 
     // For slideDown (show), will not wait since we want to spawn the editor asap
     if (isActive) {
-        void slideDown(participantRow.el);
+        // no need to slide down if it's already visible
+        if (participantRow.el.style.display !== "none") {
+            participantRow.el.dataset.display = "block"; // need this otherwise slideDown keeps it as none?
+            void slideDown(participantRow.el);
+        }
         return;
     }
 
     // For slideUp (hide), will wait for the animation to finish first to avoid seeing the textarea
-    await slideUp(participantRow.el);
+    // no need to slide up if it's already hidden
+    if (participantRow.el.style.display !== "none") {
+        await slideUp(participantRow.el);
+    }
 }
 
 /**
