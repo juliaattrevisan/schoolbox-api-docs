@@ -113,6 +113,18 @@ class Validator
      */
     private function validateFilterFolderValue(array $value): void
     {
+        $keys = array_keys($value);
+
+        foreach ($keys as $key) {
+            if (is_string($key)) {
+                if ($key !== 'id') {
+                    throw new SchoolboxException(
+                        "Filter 'folder' should be an object like {\"id\": 83} or an array of objects."
+                    );
+                }
+            }
+        }
+
         if (array_key_exists('id', $value)) {
             // Expect $value to contain an array like ['id' => $integer].
             if (count($value) > 1) {
