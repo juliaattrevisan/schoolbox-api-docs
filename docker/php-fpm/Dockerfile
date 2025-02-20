@@ -4,16 +4,16 @@ RUN apk --no-cache add ${PHPIZE_DEPS} && \
     apk add --update linux-headers && \
     pecl install redis xdebug
 
-RUN apk add libzip-dev zip unzip
+RUN apk add libzip-dev zip unzip libxml2-dev oniguruma-dev
 
 # https://hub.docker.com/_/php for directions on installing extensions
 RUN docker-php-ext-install zip && \
     docker-php-ext-install pcntl && \
     docker-php-ext-install pdo && \
     docker-php-ext-install posix && \
-    docker-php-ext-install openssl && \
-    docker-php-ext-install imagick && \
-    docker-php-ext-install json && \
+#    docker-php-ext-install openssl && \
+#    docker-php-ext-install imagick && \
+#    docker-php-ext-install json && \
     docker-php-ext-install simplexml && \
     docker-php-ext-install mbstring && \
     docker-php-ext-install intl && \
