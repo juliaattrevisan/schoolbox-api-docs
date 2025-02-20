@@ -4,7 +4,7 @@
 
 export const ACTIVITY_STATUS_PAGE_INIT = "ACTIVITY_STATUS_PAGE_INIT";
 
-export type AcitivityStatusPageConfig = {
+export type ActivityStatusPageInitEventDetail = {
     // The number of items to show per page
     pageItemLimit: number;
     // Selectors for relevant elements on the page
@@ -22,9 +22,13 @@ export type AcitivityStatusPageConfig = {
         participantFilters: string;
         // The <li> elements that represent each participant row
         participantRows: string;
+        // The selector for the participant name inside a participant row
+        participantRowName: string;
+        // The selector for the feedback comment textarea inside a participant row
+        participantRowCommentTextarea: string;
     };
 };
 
 export interface ActivityStatusPageDocumentEventHandlerMap {
-    [ACTIVITY_STATUS_PAGE_INIT]: CustomEvent<AcitivityStatusPageConfig>;
+    [ACTIVITY_STATUS_PAGE_INIT]: CustomEvent<ActivityStatusPageInitEventDetail>;
 }

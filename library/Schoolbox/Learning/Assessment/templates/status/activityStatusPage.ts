@@ -7,7 +7,6 @@ import { slideDown, slideUp } from "@js/util/animateUtils";
 import { EditorEvent } from "@js/editor/event/editorEvent";
 import type { SbxEditor } from "@js/editor/types/editorTypes";
 import { ACTIVITY_STATUS_PAGE_INIT } from "./activityStatusPageEvent";
-import type { AcitivityStatusPageConfig } from "./activityStatusPageEvent";
 
 type ParticipantRow = {
     el: HTMLElement;
@@ -16,11 +15,24 @@ type ParticipantRow = {
     editor: SbxEditor | null;
 };
 
-const participantRows: ParticipantRow[] = [];
+let participantRows: ParticipantRow[] = [];
 let participantTabGroups: ParticipantRow[][] = [];
 
 // The page config as specified when initialising the page using the event
-let pageConfig: AcitivityStatusPageConfig;
+let pageConfig: {
+    pageItemLimit: number;
+    elements: {
+        paginator: {
+            wrapper: HTMLElement;
+            ul: HTMLUListElement;
+        } | null; // null if no pagination
+        filterEmptyState: HTMLElement;
+        filterReset: HTMLElement;
+        participantSearchInput: HTMLInputElement;
+        participantFilters: HTMLInputElement[];
+        participantRows: HTMLElement[];
+    };
+};
 
 /**
  * Trigger the creation of a CKEditor instance for a given participant row
@@ -98,28 +110,20 @@ async function onSelectedTabChange(activeTab: number, animate: boolean): Promise
     if (pageConfig === undefined) throw new Error("Activity status page config missing");
 
     // Should we paginate?
-    if (pageConfig.selectors.paginator) {
-        const paginator = document.querySelector(pageConfig.selectors.paginator);
-        if (!(paginator instanceof HTMLElement)) {
-            throw new Error("Unable to find paginator element");
-        }
-        const paginatorUl = paginator.querySelector("ul[class=pagination]");
-        if (!(paginatorUl instanceof HTMLElement)) {
-            throw new Error("Unable to find paginator list element");
-        }
-        paginator.style.display = participantTabGroups.length > 1 ? "" : "none";
+    if (pageConfig.elements.paginator !== null) {
+        pageConfig.elements.paginator.wrapper.style.display = participantTabGroups.length > 1 ? "" : "none";
 
         if (participantTabGroups.length > 1) {
             const tabs = participantTabGroups.map((group, i) => {
                 return `<li class="${i === activeTab ? "active" : ""}" data-participant-tab=${i}><a href="">${i + 1}</a></li>`;
             });
 
-            paginatorUl.innerHTML = `
+            pageConfig.elements.paginator.ul.innerHTML = `
                 <li class="arrow ${activeTab === 0 ? "unavailable" : ""}" data-participant-tab="${activeTab - 1}"><a href="">‹</a></li>
                     ${tabs.join("")}
                 <li class="arrow ${activeTab === participantTabGroups.length - 1 ? "unavailable" : ""}" data-participant-tab="${activeTab + 1}"><a href="">›</a></li>`;
 
-            paginator.querySelectorAll("[data-participant-tab]").forEach((el, i) => {
+            pageConfig.elements.paginator.wrapper.querySelectorAll("[data-participant-tab]").forEach((el, i) => {
                 el.addEventListener("click", (e) => {
                     e.preventDefault();
                     if (el.classList.contains("unavailable")) {
@@ -131,17 +135,12 @@ async function onSelectedTabChange(activeTab: number, animate: boolean): Promise
         }
     }
 
-    const filterEmptyState = document.querySelector(pageConfig.selectors.filterEmptyState);
-    if (!(filterEmptyState instanceof HTMLElement)) {
-        throw new Error("Unable to find filter empty state element");
-    }
-
     if (participantTabGroups.length === 0) {
         // everything was filtered out, so show the empty state
-        filterEmptyState.dataset.display = "block";
-        void slideDown(filterEmptyState);
+        pageConfig.elements.filterEmptyState.dataset.display = "block"; // need this otherwise slideDown keeps it as none?
+        void slideDown(pageConfig.elements.filterEmptyState);
     } else {
-        void slideUp(filterEmptyState);
+        void slideUp(pageConfig.elements.filterEmptyState);
     }
 
     const activeGroup = participantTabGroups[activeTab]; // could be null if no groups
@@ -170,14 +169,8 @@ async function onSelectedTabChange(activeTab: number, animate: boolean): Promise
 async function onParticipantFilterChange(): Promise<void> {
     if (pageConfig === undefined) throw new Error("Activity status page config missing");
 
-    const participantSearchInput = document.querySelector(pageConfig.selectors.participantSearchInput);
-    if (!(participantSearchInput instanceof HTMLInputElement)) {
-        throw new Error("Unable to find participant search input element");
-    }
-    const participantFilters = document.querySelectorAll<HTMLInputElement>(pageConfig.selectors.participantFilters);
-
-    const searchTerm = participantSearchInput.value.toLowerCase();
-    const activeFilters = Array.from(participantFilters)
+    const searchTerm = pageConfig.elements.participantSearchInput.value.toLowerCase();
+    const activeFilters = pageConfig.elements.participantFilters
         .filter((el) => el.checked)
         .map((el) => el.dataset.status);
 
@@ -197,7 +190,7 @@ async function onParticipantFilterChange(): Promise<void> {
 
     // should we paginate?
     participantTabGroups = [];
-    if (pageConfig.selectors.paginator) {
+    if (pageConfig.elements.paginator !== null) {
         let currentGroup: ParticipantRow[] = [];
 
         filteredParticipantRows.forEach((participantRow) => {
@@ -219,35 +212,79 @@ async function onParticipantFilterChange(): Promise<void> {
 }
 
 document.addEventListener(ACTIVITY_STATUS_PAGE_INIT, (event) => {
-    pageConfig = event.detail;
+    // parse the event detail and validate the elements exist
+    const filterEmptyState = document.querySelector(event.detail.selectors.filterEmptyState);
+    if (!(filterEmptyState instanceof HTMLElement)) {
+        throw new Error("Unable to find filter empty state element");
+    }
+    const filterReset = document.querySelector(event.detail.selectors.filterReset);
+    if (!(filterReset instanceof HTMLElement)) {
+        throw new Error("Unable to find filter reset element");
+    }
+    const participantSearchInput = document.querySelector(event.detail.selectors.participantSearchInput);
+    if (!(participantSearchInput instanceof HTMLInputElement)) {
+        throw new Error("Unable to find participant search input element");
+    }
+    pageConfig = {
+        pageItemLimit: event.detail.pageItemLimit,
+        elements: {
+            paginator: null, // to be set below if enabled
+            filterEmptyState,
+            filterReset,
+            participantSearchInput,
+            participantFilters: Array.from(
+                document.querySelectorAll<HTMLInputElement>(event.detail.selectors.participantFilters),
+            ),
+            participantRows: Array.from(document.querySelectorAll<HTMLElement>(event.detail.selectors.participantRows)),
+        },
+    };
 
-    participantRows.push(
-        ...Array.from(document.querySelectorAll(pageConfig.selectors.participantRows)).map((el) => {
-            return {
-                el: el as HTMLElement,
-                textarea: el.querySelector<HTMLTextAreaElement>("[data-feedback-comment]"),
-                name: (el.querySelector("[data-participant-name]") as HTMLElement).innerText,
-                editor: null,
-            };
-        }),
-    );
+    // pagination is only used on some view status pages (wherever editors need to be spawned)
+    if (event.detail.selectors.paginator) {
+        const paginatorWrapper = document.querySelector(event.detail.selectors.paginator);
+        if (!(paginatorWrapper instanceof HTMLElement)) {
+            throw new Error("Unable to find paginator wrapper element");
+        }
+        const paginatorUl = paginatorWrapper.querySelector("ul[class=pagination]");
+        if (!(paginatorUl instanceof HTMLUListElement)) {
+            throw new Error("Unable to find paginator list element");
+        }
+        pageConfig.elements.paginator = {
+            wrapper: paginatorWrapper,
+            ul: paginatorUl,
+        };
+    }
 
-    const participantSearchInput = document.querySelector(pageConfig.selectors.participantSearchInput);
-    const participantFilters = document.querySelectorAll(pageConfig.selectors.participantFilters);
-    const filterReset = document.querySelector(pageConfig.selectors.filterReset);
+    participantRows = pageConfig.elements.participantRows.map((el) => {
+        const participantName = el.querySelector(event.detail.selectors.participantRowName);
+        if (!(participantName instanceof HTMLElement)) {
+            throw new Error("Unable to find participant name element");
+        }
+        // We don't require a comment textarea for every participant row (e.g. tasks don't have comments)
+        const participantCommentTextarea = el.querySelector(event.detail.selectors.participantRowCommentTextarea);
+        if (participantCommentTextarea !== null && !(participantCommentTextarea instanceof HTMLTextAreaElement)) {
+            throw new Error("Unable to find participant comment textarea element");
+        }
+        return {
+            el,
+            textarea: participantCommentTextarea,
+            name: participantName.innerText,
+            editor: null,
+        };
+    });
 
     // Add event listeners for when search/filters change
     // TODO: Debounce to avoid spamming creation/destruction of editors
-    participantSearchInput.addEventListener("input", () => void onParticipantFilterChange());
-    participantFilters.forEach((el) => {
+    pageConfig.elements.participantSearchInput.addEventListener("input", () => void onParticipantFilterChange());
+    pageConfig.elements.participantFilters.forEach((el) => {
         el.addEventListener("change", () => void onParticipantFilterChange());
     });
 
     // Allow the user to reset the search/filters when the empty state is shown
-    filterReset.addEventListener("click", (e) => {
+    pageConfig.elements.filterReset.addEventListener("click", (e) => {
         e.preventDefault();
-        participantSearchInput.value = "";
-        participantFilters.forEach((el) => {
+        pageConfig.elements.participantSearchInput.value = "";
+        pageConfig.elements.participantFilters.forEach((el) => {
             el.checked = true;
         });
         void onParticipantFilterChange();
