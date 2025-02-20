@@ -102,6 +102,42 @@ async function applyParticipantVisibility(
 }
 
 /**
+ * Create a page tab element
+ * @param label - The label to display on the tab, string for arrows, number for page number
+ * @param targetTab - The index of the tab to switch to when clicked
+ * @param activeTab - The index of the currently active tab
+ */
+function createPageTab(label: string | number, targetTab: number, activeTab: number): HTMLLIElement {
+    const tabLi = document.createElement("li");
+    // When the label is a string, it's an arrow
+    if (typeof label === "string") {
+        tabLi.classList.add("arrow");
+    }
+    // When it's the active tab
+    if (targetTab === activeTab) {
+        tabLi.classList.add("active");
+    }
+    // If the target is out of bounds, make it unavailable
+    const isUnavailable = targetTab < 0 || targetTab >= participantTabGroups.length;
+    if (isUnavailable) {
+        tabLi.classList.add("unavailable");
+    }
+    const tabA = document.createElement("a");
+    tabA.href = "";
+    tabA.textContent = String(label);
+    tabLi.appendChild(tabA);
+
+    if (!isUnavailable) {
+        tabLi.addEventListener("click", (e) => {
+            e.preventDefault();
+            void onSelectedTabChange(targetTab, false);
+        });
+    }
+
+    return tabLi;
+}
+
+/**
  * When the selected tab is changed, show the correct participants
  * @param activeTab - The index of the tab to show
  * @param animate - Whether to animate the change (slideUp/slideDown), use this for filters
@@ -111,27 +147,18 @@ async function onSelectedTabChange(activeTab: number, animate: boolean): Promise
 
     // Should we paginate?
     if (pageConfig.elements.paginator !== null) {
-        pageConfig.elements.paginator.wrapper.style.display = participantTabGroups.length > 1 ? "" : "none";
+        const { wrapper, ul } = pageConfig.elements.paginator;
+        // Show paginator only if more than one tab exists
+        wrapper.style.display = participantTabGroups.length > 1 ? "" : "none";
 
+        // Create the tabs
         if (participantTabGroups.length > 1) {
-            const tabs = participantTabGroups.map((group, i) => {
-                return `<li class="${i === activeTab ? "active" : ""}" data-participant-tab=${i}><a href="">${i + 1}</a></li>`;
+            ul.innerHTML = "";
+            ul.appendChild(createPageTab("‹", activeTab - 1, activeTab));
+            participantTabGroups.forEach((_, i) => {
+                ul.appendChild(createPageTab(i + 1, i, activeTab));
             });
-
-            pageConfig.elements.paginator.ul.innerHTML = `
-                <li class="arrow ${activeTab === 0 ? "unavailable" : ""}" data-participant-tab="${activeTab - 1}"><a href="">‹</a></li>
-                    ${tabs.join("")}
-                <li class="arrow ${activeTab === participantTabGroups.length - 1 ? "unavailable" : ""}" data-participant-tab="${activeTab + 1}"><a href="">›</a></li>`;
-
-            pageConfig.elements.paginator.wrapper.querySelectorAll("[data-participant-tab]").forEach((el, i) => {
-                el.addEventListener("click", (e) => {
-                    e.preventDefault();
-                    if (el.classList.contains("unavailable")) {
-                        return;
-                    }
-                    void onSelectedTabChange(parseInt(el.getAttribute("data-participant-tab"), 10), false);
-                });
-            });
+            ul.appendChild(createPageTab("›", activeTab + 1, activeTab));
         }
     }
 
