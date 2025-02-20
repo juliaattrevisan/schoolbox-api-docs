@@ -42,7 +42,7 @@ class AssessmentType implements IType
     public const TYPE_LTI_ASSESSMENT = 'lti';
     public const TYPE_LESSON_PLAN = 'lessonPlan';
 
-    private const ALL_TYPES = [
+    public const ALL_TYPES = [
         self::TYPE_PROJECT,
         self::TYPE_DUE_WORK,
         self::TYPE_TASK,
