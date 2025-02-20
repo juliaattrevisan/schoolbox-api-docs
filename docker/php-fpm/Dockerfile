@@ -5,8 +5,7 @@ RUN apk --no-cache add ${PHPIZE_DEPS} && \
     pecl install redis xdebug
 
 # https://hub.docker.com/_/php for directions on installing extensions
-RUN docker-php-ext-install readline && \
-    docker-php-ext-install zip && \
+RUN docker-php-ext-install zip && \
     docker-php-ext-install pcntl && \
     docker-php-ext-install pdo && \
     docker-php-ext-install posix && \
