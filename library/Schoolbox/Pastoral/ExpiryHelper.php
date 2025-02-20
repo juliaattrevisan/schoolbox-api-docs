@@ -12,8 +12,10 @@ namespace Schoolbox\Pastoral;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Assessment\Term\Model as TermModel;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\YearLevel\Model as YearLevel;
 use Schoolbox\Pastoral\Type\Model as PastoralType;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
+use Alaress_Date_Format;
 
 class ExpiryHelper
 {
@@ -55,10 +57,10 @@ class ExpiryHelper
      *
      * @param Model       $record
      * @param string|null $defaultExpiry
-     * @return \Alaress_Date_Format|null
+     * @return Alaress_Date_Format|null
      * @throws Exception
      */
-    private function getActualExpireDate(Model $record, ?string $defaultExpiry): ?\Alaress_Date_Format
+    private function getActualExpireDate(Model $record, ?string $defaultExpiry): ?Alaress_Date_Format
     {
         /* No expiry
          */
@@ -66,32 +68,49 @@ class ExpiryHelper
             return null;
         }
 
-        $createdAt = $record->getCreatedAt();
-        if (PastoralType::PASTORAL_EXPIRY['academic period'] === $defaultExpiry) {
-            $expiryDate = $this->loadAcademicPeriod($record)->getDisplayFinish();
-        } else if (PastoralType::PASTORAL_EXPIRY['academic year'] === $defaultExpiry) {
-            $expiryDate = (new \Alaress_Date_Format($createdAt))->getStartOfSchoolYear()->addYears(1);
-        } else if (PastoralType::PASTORAL_EXPIRY['calendar year'] === $defaultExpiry) {
-            $expiryDate = (new \Alaress_Date_Format($createdAt))->addYears(1)->startOfYear();
-        } else {
-            $expiryDate = (new \Alaress_Date_Format($createdAt))->modify("+{$defaultExpiry}");
-        }
-
-        return $expiryDate;
+        return $this->calculateExpireDate(
+            $record->getCreatedAt(),
+            $defaultExpiry,
+            $record->getStudent()->getYear()
+        );
     }
 
     /**
      * Find the current academic period of the student that the record is assigning to
      *
-     * @param Model      $record
+     * @param Alaress_Date_Format|null $createdAt
+     * @param YearLevel                 $yearLevel
      * @return TermModel
      * @throws Exception
      */
-    public function loadAcademicPeriod(Model $record): TermModel
+    private function loadAcademicPeriod(?Alaress_Date_Format $createdAt, YearLevel $yearLevel): TermModel
     {
         return $this->termMapper->findForDateAndYearLevel(
-            $record->getCreatedAt() ?? \Alaress_Date_Format::now(),
-            $record->getStudent()->getYear()
+            $createdAt ?? Alaress_Date_Format::now(),
+            $yearLevel
         );
+    }
+
+    /**
+     * Calculating the expiry date
+     *
+     * @param Alaress_Date_Format $fromDate
+     * @param string               $defaultExpiry
+     * @param YearLevel            $yearLevel
+     * @return Alaress_Date_Format
+     * @throws Exception
+     */
+    public function calculateExpireDate(Alaress_Date_Format $fromDate, string $defaultExpiry, YearLevel $yearLevel): Alaress_Date_Format
+    {
+        if (PastoralType::PASTORAL_EXPIRY['academic period'] === $defaultExpiry) {
+            $expiryDate = $this->loadAcademicPeriod($fromDate, $yearLevel)->getDisplayFinish();
+        } else if (PastoralType::PASTORAL_EXPIRY['academic year'] === $defaultExpiry) {
+            $expiryDate = (new Alaress_Date_Format($fromDate))->getStartOfSchoolYear()->addYears(1);
+        } else if (PastoralType::PASTORAL_EXPIRY['calendar year'] === $defaultExpiry) {
+            $expiryDate = (new Alaress_Date_Format($fromDate))->addYears(1)->startOfYear();
+        } else {
+            $expiryDate = (new Alaress_Date_Format($fromDate))->modify("+{$defaultExpiry}");
+        }
+        return $expiryDate;
     }
 }
