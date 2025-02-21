@@ -12,6 +12,7 @@ namespace Schoolbox\Pastoral;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Assessment\Term\Model as TermModel;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Pastoral\Type\TypeAbstract;
 use Schoolbox\YearLevel\Model as YearLevel;
 use Schoolbox\Pastoral\Type\Model as PastoralType;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
@@ -81,13 +82,22 @@ class ExpiryHelper
      * @param YearLevel|null      $yearLevel
      * @return Alaress_Date_Format|null
      * @throws Exception
+     * @throws \InvalidArgumentException
      */
     public function calculateExpireDate(Alaress_Date_Format $fromDate, ?string $defaultExpiry, ?YearLevel $yearLevel): ?Alaress_Date_Format
     {
-        /* No expiry
+        /* No expiry could be either null or empty string
          */
-        if (null === $defaultExpiry) {
+        if ('' === (string)$defaultExpiry) {
             return null;
+        }
+
+        /* Additional check to make sure that the value passed was part of the valid expiry period
+         */
+        if (!in_array($defaultExpiry, TypeAbstract::PASTORAL_EXPIRY)) {
+            throw new \InvalidArgumentException(
+                sprintf('Default expiry is not valid. %s was given.', $defaultExpiry)
+            );
         }
 
         if (PastoralType::PASTORAL_EXPIRY['academic period'] === $defaultExpiry) {
