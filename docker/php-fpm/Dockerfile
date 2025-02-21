@@ -11,7 +11,6 @@ RUN docker-php-ext-install zip && \
     docker-php-ext-install pcntl && \
     docker-php-ext-install pdo && \
     docker-php-ext-install pdo_mysql && \
-#    docker-php-ext-install openssl && \
 #    docker-php-ext-install imagick && \
     docker-php-ext-install mbstring && \
     docker-php-ext-install intl && \
