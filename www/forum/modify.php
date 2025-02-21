@@ -29,6 +29,31 @@ $this->setVar(array(
     'quote_block' => '',
 ));
 
+/**
+ * Validate user has access to the page/forum, and return the access level
+ *
+ * @param FolderMapper $folderMapper
+ * @param int $folderId
+ * @param Access $access
+ * @param Group $groupHandler
+ * @return int
+ * @throws \Schoolbox\Mapper\Exception
+ * @throws \Schoolbox\Mapper\Exception\Deleted
+ */
+function getAccess(FolderMapper $folderMapper, int $folderId, Access $access, Group $groupHandler): int
+{
+    /* Check permissions
+    */
+    $accessLevel = $access->getFolderAccess($_SESSION['user'], $folderId);
+    if ($accessLevel < UserAccess::ACCESS_READ) {
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+    }
+    if ($groupHandler->hasChildAccessOnly($folderId, $_SESSION['user']->getId())) {
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+    }
+    return $accessLevel;
+}
+
 if (is_numeric($this->arg[0])) {
     /* Category exists
      */
@@ -40,13 +65,7 @@ if (is_numeric($this->arg[0])) {
 
     /* Check permissions
     */
-    $accessLevel = $access->getFolderAccess($_SESSION['user'], $folder->getId());
-    if ($accessLevel < UserAccess::ACCESS_READ) {
-        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
-    }
-    if ($groupHandler->hasChildAccessOnly($folder->getId(), $_SESSION['user']->getId())) {
-        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
-    }
+    $accessLevel = getAccess($folderMapper, $folder->getId(), $access, $groupHandler);
 
     /* Forum exists
      */
@@ -77,16 +96,7 @@ if (is_numeric($this->arg[0])) {
         }
 
         // forum may be alt sourced:
-        $forumSource = $folderMapper->findById($thread->getCategory()->getId());
-        /* Check permissions
-        */
-        $accessLevel = $access->getFolderAccess($_SESSION['user'], $forumSource->getId());
-        if ($accessLevel < UserAccess::ACCESS_READ) {
-            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
-        }
-        if ($groupHandler->hasChildAccessOnly($forumSource->getId(), $_SESSION['user']->getId())) {
-            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
-        }
+        $accessLevel = getAccess($folderMapper, $thread->getCategory()->getId(), $access, $groupHandler);
 
         /* Check user owns post
          */
@@ -143,16 +153,7 @@ if (is_numeric($this->arg[0])) {
         }
 
         // forum may be alt sourced:
-        $forumSource = $folderMapper->findById($thread->getCategory()->getId());
-        /* Check permissions
-        */
-        $accessLevel = $access->getFolderAccess($_SESSION['user'], $forumSource->getId());
-        if ($accessLevel < UserAccess::ACCESS_READ) {
-            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
-        }
-        if ($groupHandler->hasChildAccessOnly($forumSource->getId(), $_SESSION['user']->getId())) {
-            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
-        }
+        $accessLevel = getAccess($folderMapper, $thread->getCategory()->getId(), $access, $groupHandler);
 
         /* Check locked
          */
