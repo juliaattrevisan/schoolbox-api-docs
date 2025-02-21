@@ -17,6 +17,7 @@ if (!isset($this)) {
 $threadMapper = ThreadMapper::getInstance();
 $postMapper = PostMapper::getInstance();
 $folderMapper = FolderMapper::getInstance();
+$access      = Access::getInstance();
 $groupHandler = new Group();
 
 $this->setFile(TEMPLATE_content, 'forum/modify.html');
@@ -39,7 +40,6 @@ if (is_numeric($this->arg[0])) {
 
     /* Check permissions
     */
-    $access      = Access::getInstance();
     $accessLevel = $access->getFolderAccess($_SESSION['user'], $folder->getId());
     if ($accessLevel < UserAccess::ACCESS_READ) {
         throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
@@ -80,7 +80,6 @@ if (is_numeric($this->arg[0])) {
         $forumSource = $folderMapper->findById($thread->getCategory()->getId());
         /* Check permissions
         */
-        $access      = Access::getInstance();
         $accessLevel = $access->getFolderAccess($_SESSION['user'], $forumSource->getId());
         if ($accessLevel < UserAccess::ACCESS_READ) {
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
@@ -147,7 +146,6 @@ if (is_numeric($this->arg[0])) {
         $forumSource = $folderMapper->findById($thread->getCategory()->getId());
         /* Check permissions
         */
-        $access      = Access::getInstance();
         $accessLevel = $access->getFolderAccess($_SESSION['user'], $forumSource->getId());
         if ($accessLevel < UserAccess::ACCESS_READ) {
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
