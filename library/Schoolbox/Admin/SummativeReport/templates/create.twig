@@ -291,6 +291,26 @@
                 document.querySelector('#report-class-vic-progression-worktype').setAttribute('disabled', 'true');
             }
         });
+
+        /* Detect initial conditions
+         */
+        if (document.querySelector('#report-summary-enable-vic-progression').checked) {
+            document.querySelector('#report-summary-vic-progression-title').removeAttribute('readonly');
+            document.querySelector('#report-summary-vic-progression-worktype').removeAttribute('disabled');
+        } else {
+            document.querySelector('#report-summary-vic-progression-title').setAttribute('readonly', 'true');
+            document.querySelector('#report-summary-vic-progression-worktype').setAttribute('disabled', 'true');
+        }
+
+        /* Detect initial conditions
+         */
+        if (document.querySelector('#report-class-enable-vic-progression').checked) {
+            document.querySelector('#report-class-vic-progression-title').removeAttribute('readonly');
+            document.querySelector('#report-class-vic-progression-worktype').removeAttribute('disabled');
+        } else {
+            document.querySelector('#report-class-vic-progression-title').setAttribute('readonly', 'true');
+            document.querySelector('#report-class-vic-progression-worktype').setAttribute('disabled', 'true');
+        }
     });
 </script>
 
