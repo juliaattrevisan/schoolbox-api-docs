@@ -64,7 +64,7 @@ if (is_numeric($this->arg[0])) {
 
     /* Check permissions
     */
-    $accessLevel = getAccess($folderMapper, $folder->getId(), $access, $groupHandler);
+    $accessLevel = getAccess($folder->getId(), $access, $groupHandler);
 
     /* Forum exists
      */
@@ -95,7 +95,7 @@ if (is_numeric($this->arg[0])) {
         }
 
         // forum may be alt sourced:
-        $accessLevel = getAccess($folderMapper, $thread->getCategory()->getId(), $access, $groupHandler);
+        $accessLevel = getAccess($thread->getCategory()->getId(), $access, $groupHandler);
 
         /* Check user owns post
          */
@@ -152,7 +152,7 @@ if (is_numeric($this->arg[0])) {
         }
 
         // forum may be alt sourced:
-        $accessLevel = getAccess($folderMapper, $thread->getCategory()->getId(), $access, $groupHandler);
+        $accessLevel = getAccess($thread->getCategory()->getId(), $access, $groupHandler);
 
         /* Check locked
          */
