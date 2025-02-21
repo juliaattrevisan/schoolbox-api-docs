@@ -1167,10 +1167,6 @@ class Handler
 
             foreach ($stmt as $sturow) {
                 $studentID = $sturow['StudentID'];
-                if ($sturow["LegalParentsSeparatedFlag"] == 1 || $sturow["LegalCourtOrderType"] !== '') {
-                    $authArr[$studentID] = ["Type" => "BLOCK"];
-                    continue;
-                }
 
                 $birthDate          = $sturow['StudentBirthDate'];
                 $formattedBirthDate = ($birthDate !== null)
