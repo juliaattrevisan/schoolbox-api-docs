@@ -6,9 +6,10 @@ services:
       context: ./docker/caddy
     volumes:
       - code:/usr/share/schoolbox
-    ports:
-      - '80:80'
-      - '443:443'
+      - ./docker/caddy:/etc/caddy
+    expose:
+      - 80
+      - 443
     networks:
       - public
       - private
@@ -21,17 +22,23 @@ services:
       context: ./docker/php-fpm
     volumes:
       - code:/usr/share/schoolbox
-    ports:
-      - '9000:9000'
-      - '9002:9002'
+    expose:
+      - 9000
+      - 9002
     networks:
       - private
 
-  # Image intended for:
+  # Image intended for running command-line processes:
   # * command-line tools
   # * updates
   # * cron tasks
+  #
+  # Basically, anything which we haven't yet figured out how to migrate into its
+  # own container will go here for now.
   schoolbox-cli:
+    container_name: schoolbox-cli
+    # Using ubuntu rather than alpine, as that's what anyone who would be using
+    # a command-line tool would be familiar with.
     image: ubuntu:jammy
     volumes:
       - code:/usr/share/schoolbox
@@ -39,7 +46,9 @@ services:
       - public
       - private
 
-  # Database services
+  # Database services:
+  # these are containers only in a development environment, they won't be on
+  # staging or production envs.
   mariadb:
     container_name: mariadb
     image: mariadb:11.4
@@ -72,7 +81,8 @@ services:
     networks:
       - private
 
-  # Not-yet-essential services
+  # Not-yet-essential services:
+  # These will be implemented as separate containers (if they aren't already).
 #  schoolbox-digestd:
 #    image: ubuntu:jammy
 #
@@ -117,8 +127,14 @@ volumes:
       device: ./data/vagrantx/storage
 
 networks:
+  # Public network:
+  # it's expected that only the ports exposed on containers  attached to this
+  # network will be exposed to the host.
   public:
     name: public
 
+  # Private network:
+  # Non-public services (e.g. anything except the web server) will be on this
+  # network only, which will not be exposed to the host.
   private:
     name: private
