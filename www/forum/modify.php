@@ -36,6 +36,17 @@ if (is_numeric($this->arg[0])) {
         throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
     }
 
+    /* Check permissions
+    */
+    $access      = Access::getInstance();
+    $accessLevel = $access->getFolderAccess($_SESSION['user'], $folder->getId());
+    if ($accessLevel < UserAccess::ACCESS_READ) {
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+    }
+    if ($groupHandler->hasChildAccessOnly($folder->getId(), $_SESSION['user']->getId())) {
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+    }
+
     /* Forum exists
      */
     if (!$threadMapper->isComponent($folder->getId())) {
@@ -63,7 +74,7 @@ if (is_numeric($this->arg[0])) {
         } catch (Exception $e) {
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
-        
+
         // forum may be alt sourced:
         $forumSource = FolderMapper::getInstance()->findById($thread->getCategory()->getId());
         /* Check permissions
