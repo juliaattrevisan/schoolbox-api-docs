@@ -116,6 +116,17 @@
                             </div>
                         </div>
                     </fieldset>
+                    <fieldset class="content">
+                        <div class="small-12 columns">
+                            <label for="points">Points</label>
+                            {% set currentPoints  = (subtype ? subtype.points : type.points) %}
+                            <div class="row">
+                                <div class="small-12 columns">
+                                    <input id="points" name="points" type="text" value="{{ currentPoints }}">
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
                     {% if config.pastoral_action_enable %}
                     <fieldset class="content">
                         <div class="small-12 columns">
