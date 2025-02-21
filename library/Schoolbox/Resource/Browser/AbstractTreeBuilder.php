@@ -260,6 +260,14 @@ abstract class AbstractTreeBuilder
             }
         }
 
+        if ($folder instanceof Folder\Model) {
+            $sequence = $folder->getSequence();
+            $createdAt = $folder->getCreatedAt();
+        } else {
+            $sequence = 0;
+            $createdAt = null;
+        }
+
         // Output something.
         return $this->generateFolderArray(
             $folder,
@@ -267,8 +275,8 @@ abstract class AbstractTreeBuilder
             $name,
             $colour,
             $coverImage,
-            $folder->getSequence(),
-            $folder->getCreatedAt(),
+            $sequence,
+            $createdAt,
             $this->buildLiAttributes($folder, $permission, $this->getDataType($folder, $type)),
             [
                 'href' => $href
