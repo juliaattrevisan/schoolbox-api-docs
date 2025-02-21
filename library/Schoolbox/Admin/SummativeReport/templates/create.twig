@@ -269,6 +269,28 @@
                 document.querySelector('#search-subject-overview').classList.add('hidden');
             }
         });
+
+        /* Micromanage these states, but be careful about assuming initial conditions
+         */
+        document.querySelector('#report-summary-enable-vic-progression').addEventListener('change', function(event) {
+            if (event.target.checked) {
+                document.querySelector('#report-summary-vic-progression-title').removeAttribute('readonly');
+                document.querySelector('#report-summary-vic-progression-worktype').removeAttribute('disabled');
+            } else {
+                document.querySelector('#report-summary-vic-progression-title').setAttribute('readonly', 'true');
+                document.querySelector('#report-summary-vic-progression-worktype').setAttribute('disabled', 'true');
+            }
+        });
+
+        document.querySelector('#report-class-enable-vic-progression').addEventListener('change', function(event) {
+            if (event.target.checked) {
+                document.querySelector('#report-class-vic-progression-title').removeAttribute('readonly');
+                document.querySelector('#report-class-vic-progression-worktype').removeAttribute('disabled');
+            } else {
+                document.querySelector('#report-class-vic-progression-title').setAttribute('readonly', 'true');
+                document.querySelector('#report-class-vic-progression-worktype').setAttribute('disabled', 'true');
+            }
+        });
     });
 </script>
 
