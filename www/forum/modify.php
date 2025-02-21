@@ -32,7 +32,6 @@ $this->setVar(array(
 /**
  * Validate user has access to the page/forum, and return the access level
  *
- * @param FolderMapper $folderMapper
  * @param int $folderId
  * @param Access $access
  * @param Group $groupHandler
@@ -40,7 +39,7 @@ $this->setVar(array(
  * @throws \Schoolbox\Mapper\Exception
  * @throws \Schoolbox\Mapper\Exception\Deleted
  */
-function getAccess(FolderMapper $folderMapper, int $folderId, Access $access, Group $groupHandler): int
+function getAccess(int $folderId, Access $access, Group $groupHandler): int
 {
     /* Check permissions
     */
