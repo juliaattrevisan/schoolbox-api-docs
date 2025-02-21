@@ -16,6 +16,7 @@ if (!isset($this)) {
 
 $threadMapper = ThreadMapper::getInstance();
 $postMapper = PostMapper::getInstance();
+$folderMapper = FolderMapper::getInstance();
 $groupHandler = new Group();
 
 $this->setFile(TEMPLATE_content, 'forum/modify.html');
@@ -31,7 +32,7 @@ if (is_numeric($this->arg[0])) {
     /* Category exists
      */
     try {
-        $folder = FolderMapper::getInstance()->findById($this->arg[0]);
+        $folder = $folderMapper->findById($this->arg[0]);
     } catch (Exception $e) {
         throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
     }
@@ -76,7 +77,7 @@ if (is_numeric($this->arg[0])) {
         }
 
         // forum may be alt sourced:
-        $forumSource = FolderMapper::getInstance()->findById($thread->getCategory()->getId());
+        $forumSource = $folderMapper->findById($thread->getCategory()->getId());
         /* Check permissions
         */
         $access      = Access::getInstance();
@@ -143,7 +144,7 @@ if (is_numeric($this->arg[0])) {
         }
 
         // forum may be alt sourced:
-        $forumSource = FolderMapper::getInstance()->findById($thread->getCategory()->getId());
+        $forumSource = $folderMapper->findById($thread->getCategory()->getId());
         /* Check permissions
         */
         $access      = Access::getInstance();
