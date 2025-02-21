@@ -173,6 +173,15 @@ abstract class AbstractTreeBuilder
         // Did I ask for the root node? get it
         if ($folderId === IFolder::ROOT_PARENT_ID) {
             $folder = $this->folderLocator->findById(IFolder::ROOT_ID);
+
+            if ($folder instanceof Folder\Model) {
+                $sequence = $folder->getSequence();
+                $createdAt = $folder->getCreatedAt();
+            } else {
+                $sequence = 0;
+                $createdAt = null;
+            }
+
             $output[] = $this->generateNodeArray(
                 $folder->getId(),
                 $folder->getParent()->getId(),
@@ -180,8 +189,8 @@ abstract class AbstractTreeBuilder
                 $this->getRootNodeLabel(),
                 null,
                 null,
-                $folder->getSequence(),
-                $folder->getCreatedAt(),
+                $sequence,
+                $createdAt,
                 [
                     'data-permission' => $this->getFolderPermission($folder->getId()),
                     'data-type' => 'folder'
