@@ -15,6 +15,13 @@ export default class SubmitForm {
 
     static readonly DATATEST_ASSESSMENT_SUMMARY_FILES_LIST_FILE = "assessment-summary-files-list-file";
 
+    static readonly DATATEST_ASSESSMENT_SUMMARY_CREATE_BUTTON = "assessment-summary-create-button";
+
+    static readonly DATATEST_ASSESSMENT_SUBMISSION_CREATE_SUBMITTEDINPERSON =
+        "assessment-submission-create-submittedInPerson";
+
+    static readonly DATATEST_ASSESSMENT_SUBMISSION_INPUT_BODY = "assessment-submission-input-body";
+
     private filePath?: string;
 
     private contents?: string;

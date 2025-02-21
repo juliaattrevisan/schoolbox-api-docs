@@ -16,6 +16,8 @@ export default class AssessmentPage {
 
     static readonly SELECTOR_LINK_STATUS = "#header-options a.icon-progress";
 
+    static readonly DATATEST_ASSESSMENT_SUMMARY_CREATE_BUTTON = "assessment-summary-create-button";
+
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
@@ -62,5 +64,12 @@ export default class AssessmentPage {
     async openStatusPage(): Promise<void> {
         await this.page.getByTestId(AssessmentPage.DATATEST_LINK_JELLY_TOT).click();
         await this.page.locator(AssessmentPage.SELECTOR_LINK_STATUS).click();
+    }
+
+    /**
+     * clcik Create submission button
+     */
+    async clickCreateSubmission(): Promise<void> {
+        await this.page.getByTestId(AssessmentPage.DATATEST_ASSESSMENT_SUMMARY_CREATE_BUTTON).click();
     }
 }

@@ -2,6 +2,7 @@ import { expect } from "@playwright/test";
 import type { Page } from "@playwright/test";
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import Common from "@schoolboxTest/playwright/support/page/Common";
+import type DatabaseHelper from "@schoolboxTest/playwright/support/DatabaseHelper";
 
 export default class AssessmentForm {
     private tester: AcceptanceTester;
@@ -65,6 +66,8 @@ export default class AssessmentForm {
 
     static readonly DATATEST_MODIFY_PLANS = "sbx-pop-out-plan-options-button";
 
+    static readonly SELECTOR_WORKSHEET_ATTACHMENT_ZONE = "#WorksheetZone";
+
     // Work type constants
     static readonly WORKTYPE_ASSESSMENT_TASK = 1;
 
@@ -105,6 +108,8 @@ export default class AssessmentForm {
     static readonly TEXT_EDITOR = "text-editor";
 
     static readonly TYPE_FILES = "files";
+
+    static readonly INTERACTIVE_WORKSHEET = "interactive_worksheet";
 
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
@@ -194,6 +199,7 @@ export default class AssessmentForm {
      */
     async checkSubmissionAllowed(
         submissionType:
+            | typeof AssessmentForm.INTERACTIVE_WORKSHEET
             | typeof AssessmentForm.ALLOW_OFFLINE
             | typeof AssessmentForm.TEXT_EDITOR
             | typeof AssessmentForm.TYPE_FILES,
@@ -292,5 +298,15 @@ export default class AssessmentForm {
      */
     async clickModifyLearningPlan(): Promise<void> {
         await this.page.getByTestId(AssessmentForm.DATATEST_MODIFY_PLANS).click();
+    }
+
+    /**
+     * Sets attachment in the interactive worksheet zone
+     * @param db - The DatabaseHelper instance
+     * @param filePath - The file to attach
+     */
+    async worksheetAttachment(db: DatabaseHelper, filePath: string): Promise<void> {
+        const attachZone = this.page.locator(AssessmentForm.SELECTOR_WORKSHEET_ATTACHMENT_ZONE);
+        await this.tester.dragAndDropFile(db, attachZone, filePath);
     }
 }
