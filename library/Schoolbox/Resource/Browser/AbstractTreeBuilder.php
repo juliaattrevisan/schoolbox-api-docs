@@ -433,10 +433,10 @@ abstract class AbstractTreeBuilder
      * @return array
      */
     protected function generateNodeArray(
-        int $nodeId,
-        int $parentId,
-        string $type,
-        string $name,
+        $nodeId,
+        $parentId,
+        $type,
+        $name,
         Color $colour = null,
         IStorage $coverImage = null,
         ?int $sequence = null,
