@@ -1,5 +1,5 @@
 (function ($) {
-    "use strict";
+    ("use strict");
 
     $.alaressValidate = {};
 
@@ -244,6 +244,19 @@
             return $(element).find(":selected[value]").length > 0;
         },
         "Please select a value",
+    );
+
+    /**
+     * isNumber extension - checks that what you've entered is a number,
+     * allowing for negative numbers and a single decimal point
+     */
+    $.validator.addMethod(
+        "isNumber",
+        function (value, element) {
+            const regex = /^-?(?:\d+|\.\d|\d\.\d)$/;
+            return regex.test(value);
+        },
+        "Please enter a valid number.",
     );
 
     /**

@@ -188,6 +188,13 @@
             return $('#duplicateIds').val() !== '';
         }, $.validator.format("You must select at least one student before you can proceed"));
 
+        // add a method to ensure the points is within the range (which granted, is a rather wide range...)
+        // however this was previously determined via min/max attributes on the number input field via https://github.com/alaress/schoolbox/pull/26755
+        // as we are now using a text input field, we need to re-implement this validation
+        $.validator.addMethod("isWithinPointsRange", function () {
+            return $('#points').val() >= -1000000 && $('#points').val() <= 1000000;
+        }, $.validator.format("Please enter a number between -1,000,000 and 1,000,000"));
+
         form.alaressValidate({
             ignore: ':disabled',
             rules: {
@@ -202,6 +209,10 @@
                         },
                     },
                 },
+                points: {
+                    isNumber: true,
+                    isWithinPointsRange: true
+                }
             },
 
             messages: {
