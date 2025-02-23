@@ -2,12 +2,16 @@
 
 namespace Tests\Smoketests;
 
+use JsonException;
 use Tests\Support\IntegrationTester;
 use Tests\Support\Payload;
 
 class ForumCest
 {
-   /**
+    private int $timestamp = 0;
+    private int $categoryId = 83;
+
+    /**
      * Push a login payload to Schoolbox each test to ensure session is active and logged in.
      *
      * @param IntegrationTester $i
@@ -23,17 +27,17 @@ class ForumCest
      * check the responses
      *
      * @param IntegrationTester $i
+     * @throws JsonException
      */
     public function postThread(IntegrationTester $i): void
     {
         #GIVEN
         // Creating a forum thread
-        $timestamp           = time();
-        $title                = 'Forum: Automation API Smoke Test' . $timestamp;
-        $body = 'Forum: Automation API Smoke Test Body Details' . $timestamp;
-        $categoryId = 83;
+        $this->timestamp = time();
+        $title = 'Forum: Automation API Smoke Test ' . $this->timestamp;
+        $body = 'Forum: Automation API Smoke Test Body Details ' . $this->timestamp;
         $submitValue = 'Post';
-        $forumPayload = new Payload\Forum\CreateForumThread($categoryId, $title, $submitValue);
+        $forumPayload = new Payload\Forum\CreateForumThread($this->categoryId, $title, $submitValue);
         #WHEN
         $i->amGoingTo('Send request to add a forum thread');
         $forumPayload->setFormParam('body', $body);
@@ -47,19 +51,18 @@ class ForumCest
      *
      * @depends postThread
      * @param IntegrationTester $i
+     * @throws JsonException
      */
     public function modifyThread(IntegrationTester $i): void
     {
         #GIVEN
         // Modifying a forum thread
-        $timestamp           = time();
-        $title                = 'Forum: Automation API Smoke Test UPDATED' . $timestamp;
-        $body = 'Forum: Automation API Smoke Test Body Details UPDATED' . $timestamp;
-        $categoryId = 83;
-        $threadId = $i->grabFromDatabase('forumThread', 'threadID', ['title like' => 'Forum: Automation API Smoke Test%']);
-        $postId = $i->grabFromDatabase('forumThread', 'last_post_id', ['title like' => 'Forum: Automation API Smoke Test%']);
+        $title = 'Forum: Automation API Smoke Test UPDATED ' . $this->timestamp;
+        $body = 'Forum: Automation API Smoke Test Body Details UPDATED ' . $this->timestamp;
+        $threadId = $i->grabFromDatabase('forumThread', 'threadID', ['title' => "Forum: Automation API Smoke Test $this->timestamp"]);
+        $postId = $i->grabFromDatabase('forumThread', 'last_post_id', ['title' => "Forum: Automation API Smoke Test $this->timestamp"]);
         $submitValue = 'Modify';
-        $forumPayload = new Payload\Forum\CreateForumThread($categoryId, $title, $submitValue);
+        $forumPayload = new Payload\Forum\CreateForumThread($this->categoryId, $title, $submitValue);
         #WHEN
         $i->amGoingTo('Send request to modify a forum thread');
         $forumPayload->setFormParam('body', $body);
@@ -75,19 +78,18 @@ class ForumCest
      *
      * @depends postThread
      * @param IntegrationTester $i
+     * @throws JsonException
      */
     public function replyThread(IntegrationTester $i): void
     {
         #GIVEN
         // Modifying a forum thread
-        $timestamp           = time();
-        $title                = 'Forum: Automation API Smoke Test UPDATED' . $timestamp;
-        $body = 'Forum Reply: Automation API Smoke Test Replying a Thread' . $timestamp;
-        $categoryId = 83;
-        $threadId = $i->grabFromDatabase('forumThread', 'threadID', ['title like' => 'Forum: Automation API Smoke Test%']);
+        $title = 'Forum: Automation API Smoke Test UPDATED ' . $this->timestamp;
+        $body = 'Forum Reply: Automation API Smoke Test Replying a Thread ' . $this->timestamp;
+        $threadId = $i->grabFromDatabase('forumThread', 'threadID', ['title' => "Forum: Automation API Smoke Test UPDATED $this->timestamp"]);
         $quoteId = $i->grabFromDatabase('forumPost', 'parentID', ['threadID' => $threadId]);
         $submitValue = 'Post';
-        $forumPayload = new Payload\Forum\CreateForumThread($categoryId, $title, $submitValue);
+        $forumPayload = new Payload\Forum\CreateForumThread($this->categoryId, $title, $submitValue);
         #WHEN
         $i->amGoingTo('Send request to modify a forum thread');
         $forumPayload->setFormParam('body', $body);
@@ -103,14 +105,14 @@ class ForumCest
      *
      * @depends modifyThread
      * @param IntegrationTester $i
+     * @throws JsonException
      */
     public function deletePostThread(IntegrationTester $i): void
     {
         #GIVEN
         // Deleting a post
-        $categoryId = 83;
-        $threadId = $i->grabFromDatabase('forumThread', 'threadID', ['title like' => 'Forum: Automation API Smoke Test UPDATED%']);
-        $postID = $i->grabFromDatabase('forumPost', 'postID', ['threadID' => $threadId, 'body like' => 'Forum Reply: Automation API Smoke Test Replying a Thread%']);
+        $threadId = $i->grabFromDatabase('forumThread', 'threadID', ['title' => "Forum: Automation API Smoke Test UPDATED $this->timestamp"]);
+        $postID = $i->grabFromDatabase('forumPost', 'postID', ['threadID' => $threadId, 'body' => "Forum Reply: Automation API Smoke Test Replying a Thread $this->timestamp"]);
         $forumPayload = new Payload\Forum\DeleteForumThread($threadId, $postID, 'deletePost');
         #WHEN
         $i->amGoingTo('Send request to delete a forum post');
@@ -120,12 +122,12 @@ class ForumCest
 
         #GIVEN
         // There is no comments anymore in the thread the forum/folder_id page is still accessible SA-13919
-        $i->sendGet("/forum/" . $categoryId);
+        $i->sendGet("/forum/" . $this->categoryId);
         $i->seeResponseCodeIs(200);
 
         #GIVEN
         // Deleting a thread
-        $threadId = $i->grabFromDatabase('forumThread', 'threadID', ['title like' => 'Forum: Automation API Smoke Test UPDATED%']);
+        $threadId = $i->grabFromDatabase('forumThread', 'threadID', ['title' => "Forum: Automation API Smoke Test UPDATED $this->timestamp"]);
         $forumPayload = new Payload\Forum\DeleteForumThread($threadId, $threadId, 'deleteThread');
         #WHEN
         $i->amGoingTo('Send request to delete a forum thread');
