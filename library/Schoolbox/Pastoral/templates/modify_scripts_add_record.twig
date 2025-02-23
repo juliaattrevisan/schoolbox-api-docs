@@ -8,8 +8,10 @@
 
         const subtypesIndexEntryTip = {{ subtypesIndexEntryTip|json_encode|raw }};
         const subtypesIndexDefaultExpiry = {{ subtypesIndexDefaultExpiry|json_encode|raw }};
+        const subtypesIndexPoints = {{ subtypesIndexPoints|json_encode|raw }};
         const typesIndexEntryTip = {{ typesIndexEntryTip|json_encode|raw }};
         const typesIndexDefaultExpiry = {{ typesIndexDefaultExpiry|json_encode|raw }};
+        const typesIndexPoints = {{ typesIndexPoints|json_encode|raw }};
 
         const isExistingRecord = {{ record.id != '' ? "true" : "false"  }};
         const expiresAt = '{{ record.expiresAt ? record.expiresAt.localShort : null }}';
@@ -54,9 +56,11 @@
         if (subtypeDropdown.val() === null) {
             updateEntryTip($.trim(typesIndexEntryTip[typeDropdown.val()]));
             updateExpiresAt($.trim(typesIndexEntryTip[typeDropdown.val()]));
+            updatePoints($.trim(typesIndexPoints[typeDropdown.val()]));
         } else {
             updateEntryTip($.trim(subtypesIndexEntryTip[subtypeDropdown.val()]));
             updateExpiresAt($.trim(subtypesIndexEntryTip[subtypeDropdown.val()]));
+            updatePoints($.trim(subtypesIndexPoints[subtypeDropdown.val()]));
         }
         {% endif %}
 
@@ -67,9 +71,11 @@
             if (null !== subtypeVal) {
                 updateEntryTip($.trim(subtypesIndexEntryTip[subtypeVal]));
                 updateExpiresAt($.trim(subtypesIndexDefaultExpiry[subtypeVal]));
+                updatePoints($.trim(subtypesIndexPoints[subtypeVal]));
             } else {
                 updateEntryTip($.trim(typesIndexEntryTip[typeVal]));
                 updateExpiresAt($.trim(typesIndexDefaultExpiry[typeVal]));
+                updatePoints($.trim(typesIndexPoints[typeVal]));
             }
         }
 
@@ -98,7 +104,6 @@
          * @param defaultExpiry
          */
         function updateExpiresAt (defaultExpiry) {
-            // if this is an existing record, or the expires at date is set, or has a manual expires at input: return
             if (!canUpdateExpiresAt()) {
                 return;
             }
@@ -114,6 +119,28 @@
             }
             // otherwise set the expires at date based on the Default Expiry that was set
             expiresAtElement.value = calculatedExpiresAt[defaultExpiry] ?? '';
+        }
+
+        /**
+         * Update the points based on the current type / subtype selection
+         * @param points
+         */
+        function updatePoints (points) {
+            /*if (!canUpdatePoints()) {
+                return;
+            }*/
+            // ensure points actually exists before setting the value
+            const pointsElement = document.getElementById("points");
+            if (pointsElement === null) {
+                return;
+            }
+            // if the new type/sub-type points is empty, clear the previously set value and return
+            if (points === null || points === "") {
+                pointsElement.value = "";
+                return;
+            }
+            // otherwise set the points based on the default points that was set
+            pointsElement.value = points;
         }
 
     });
