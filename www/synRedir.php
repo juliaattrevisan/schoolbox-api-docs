@@ -64,14 +64,7 @@ if ($_SESSION['communityLogin'] ?? false) {
          * so lets just replace that here to http. and hope the remote server will redirect to https
          * not just error out, or serve the data on http.
          */
-        $login = $httpClient->get($url, [
-            'headers' => $headers,
-            /* Don't need to wait the default five minutes;
-             * just wait five seconds instead.
-             */
-            'timeout' => 5,
-            'connect_timeout' => 5,
-        ])->getBody()->getContents();
+        $login = $httpClient->get($url, ['headers' => $headers])->getBody()->getContents();
     } catch (RequestException | GuzzleException\ConnectException | GuzzleException\GuzzleException $e) {
         throw new SchoolboxException("Community Portal Login unavailable. Please try again later", 0, $e);
     }
