@@ -88,7 +88,14 @@ if ($_SESSION['communityLogin'] ?? false) {
 
     // validate required fields (whilst ignoring CSRF fields):
     if (empty($loginUsername) || empty($loginPassword) || empty($loginButton)) {
-        throw new SchoolboxException("Community Portal Login unavailable. Please try again later");
+        /* If we can't infer a username/password/login button, then we're looking some weird screen
+         * that we can't interpret, such as the microsoft login form that asks for your email address.
+         * We can't autosubmit that.
+         *
+         * If we can do it on users' behalf, we will: except where we can't.
+         * In such cases, just present the screen that was given to us, and rely on users to fulfil it.
+:         */
+        $page->localRedir($url);
     }
 
     $password = $_SESSION['password'];
