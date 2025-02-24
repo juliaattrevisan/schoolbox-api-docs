@@ -362,7 +362,7 @@ class Subnav
                         'description' => 'Configure the blocks of time that assessments will be visible within, often called terms or semesters.',
                     ],
                     '/adminv2/bulk-assessment-result' => [
-                        'name'        => 'Bulk Assessment Result',
+                        'name'        => 'Bulk Feedback Import',
                         'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
                         'description' => '',
                     ],
