@@ -20,7 +20,9 @@
 <div class="actions-small-1 row">
     <div class="list-item">
         <div class="small-12 column">
-            <h1>Create {{ locale.lessonPlan }}</h1>
+            {% set input = locale.lessonPlan %}
+            {% set capitalized = input|split(' ')|map(word => word|capitalize)|join(' ') %}
+            <h1>Create {{ capitalized }}</h1>
         </div>
     </div>
 </div>
