@@ -108,7 +108,7 @@ class Controller extends Base
             $settings['publishAt'],
             null,
             false,
-        ))->parseFeedbacks($settings['sourceFile'], $settings['feedbackOwner']);
+        ))->parseFeedbacks($settings['sourceFile'], $settings['feedbackAuthor']);
 
         $this->response = $this->responseFromTemplate(
             '@adminBulkAssessmentResult/preview.twig',
@@ -153,7 +153,7 @@ class Controller extends Base
             $settings['publishAt'],
             null,
             true,
-        ))->parseFeedbacks($settings['sourceFile'], $settings['feedbackOwner']);
+        ))->parseFeedbacks($settings['sourceFile'], $settings['feedbackAuthor']);
 
         $this->response = $this->responseFromTemplate(
             '@adminBulkAssessmentResult/perform.twig',
@@ -169,7 +169,7 @@ class Controller extends Base
 
 
     /**
-     * Asserts that the feedback owner actually exists:
+     * Asserts that the feedback author actually exists:
      * without those, we can't really continue
      *
      * Also assumes a publish datetime here, though you probably want this to be configurable
@@ -180,18 +180,18 @@ class Controller extends Base
      */
     private function verifySettings(array $postVar): array
     {
-        /* Feedback Owner needs to exist
+        /* Feedback Author needs to exist
          */
-        $feedbackOwnerId = $postVar['userId'] ?? null;
+        $feedbackAuthorId = $postVar['userId'] ?? null;
 
         try {
-            $feedbackOwner = $this->userMapper->findById($feedbackOwnerId);
+            $feedbackAuthor = $this->userMapper->findById($feedbackAuthorId);
         } catch (\Schoolbox\Mapper\Exception $e) {
-            throw new \DomainException('Unknown feedback owner selected, or was omitted.');
+            throw new \DomainException('Unknown feedback author selected, or was omitted.');
         }
 
         return [
-            'feedbackOwner' => $feedbackOwner,
+            'feedbackAuthor' => $feedbackAuthor,
             'publishAt' => \Alaress_Date_Format::now()
         ];
     }

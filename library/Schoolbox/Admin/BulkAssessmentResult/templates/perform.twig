@@ -1,7 +1,7 @@
 {##
  # Preview
  #
- # @param array $settings  A (publish date, user, sourceFile) struct representing identification method, feedback owner and uploaded csv
+ # @param array $settings  A (publish date, user, sourceFile) struct representing identification method, feedback author and uploaded csv
  # @param array $outcoem   A list of log messages
  #}
 
@@ -18,11 +18,11 @@
             <section>
                 <div class="content">
                     <ul>
-                        <li><strong>Feedback Owner:</strong>
-                            {% if settings.feedbackOwner.deleted %}
-                                {{ settings.feedbackOwner.fullname }}
+                        <li><strong>Feedback Author:</strong>
+                            {% if settings.feedbackAuthor.deleted %}
+                                {{ settings.feedbackAuthor.fullname }}
                             {% else %}
-                                <a href="/search/user/{{ settings.feedbackOwner.id }}" target="_blank" title="{{ settings.feedbackOwner.fullname }}">{{ settings.feedbackOwner.fullname }}</a>
+                                <a href="/search/user/{{ settings.feedbackAuthor.id }}" target="_blank" title="{{ settings.feedbackAuthor.fullname }}">{{ settings.feedbackAuthor.fullname }}</a>
                             {% endif %}
                         </li>
                         <li><strong>Source File:</strong> <a href="/storage/fetch.php?hash={{ settings.sourceFile.hash }}">{{ settings.sourceFile.filename }}</a></li>
