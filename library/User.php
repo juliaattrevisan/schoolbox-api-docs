@@ -281,6 +281,7 @@ class User extends DeprecatedModel
 
         $params = [];
         if ($keyword != "") {
+            $query .= '(';
             if (is_numeric($keyword)) {
                 $query .= "( synergy_id = :externalId ) ";
                 $params['externalId'] = $keyword;
@@ -317,6 +318,7 @@ class User extends DeprecatedModel
                     $params['groupId'] = $group;
                 }
             }
+            $query .= ") ";
         } else {
             if ($group) {
                 $query .= "group_id = :groupId ";
