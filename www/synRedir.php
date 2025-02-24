@@ -71,6 +71,8 @@ if ($_SESSION['communityLogin'] ?? false) {
             code: 0,
             previous: $e,
             httpStatusCode: null,
+            /* FIXME This was supposed to put extra logging to the error screen, but for some reason...won't
+             */
             information: $e->getMessage()
         );
     }
