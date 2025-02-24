@@ -66,7 +66,13 @@ if ($_SESSION['communityLogin'] ?? false) {
          */
         $login = $httpClient->get($url, ['headers' => $headers])->getBody()->getContents();
     } catch (RequestException | GuzzleException\ConnectException | GuzzleException\GuzzleException $e) {
-        throw new SchoolboxException("Community Portal Login unavailable. Please try again later", 0, $e);
+        throw new SchoolboxException(
+            message: "Community Portal Login unavailable. Please try again later",
+            code: 0,
+            previous: $e,
+            httpStatusCode: null,
+            information: $e->getMessage()
+        );
     }
 
     /* Set the URL to redirect the user to after login */
