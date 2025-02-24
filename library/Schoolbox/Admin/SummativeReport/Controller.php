@@ -88,6 +88,12 @@ class Controller extends ConfigController
 
 
     /**
+     * Default title of the report; used if the title field was 0-length
+     */
+    private const DEFAULT_TITLE = 'Summary of Curriculum Standards';
+
+
+    /**
      * These are used in the View As dropdown, the existence of
      * which in and of itself is questionable atm
      */
@@ -240,7 +246,10 @@ class Controller extends ConfigController
                 'viewAs' => self::AVAILABLE_ROLETYPES,
                 'logoZone' => $logoZone->getTwigContext(),
                 'worktypesSummary' => $worktypes,
-                'worktypesClass' => $worktypes
+                'worktypesClass' => $worktypes,
+                'curriculumProgression' => [
+                    'title' => self::DEFAULT_TITLE
+                ]
             ]
         );
     }
@@ -337,7 +346,10 @@ class Controller extends ConfigController
                 'viewAs' => self::AVAILABLE_ROLETYPES,
                 'logoZone' => $logoZone->getTwigContext(),
                 'worktypesSummary' => $worktypesSummary,
-                'worktypesClass' => $worktypesClass
+                'worktypesClass' => $worktypesClass,
+                'curriculumProgression' => [
+                    'title' => self::DEFAULT_TITLE
+                ]
             ]
         );
     }
@@ -935,7 +947,7 @@ class Controller extends ConfigController
             $workTypeWhitelist = [];
 
             foreach ($optionsPayload['summary']['workType'] as $worktypeId => $worktype) {
-                if ($worktype['graph']) {
+                if ($worktype['graph'] ?? false) {
                     $workTypeWhitelist[] = $worktypeId;
                 }
             }
@@ -971,7 +983,7 @@ class Controller extends ConfigController
                 $workTypeWhitelist = [];
 
                 foreach ($optionsPayload['class']['workType'] as $worktypeId => $worktype) {
-                    if ($worktype['graph']) {
+                    if ($worktype['graph'] ?? false) {
                         $workTypeWhitelist[] = $worktypeId;
                     }
                 }
@@ -1014,7 +1026,7 @@ class Controller extends ConfigController
              */
             'annotate' => (bool)$this->requestQuery->get('annotate', false),
             'summary' => null,
-            'class' => null
+            'class' => null,
         ];
 
         /* At least one of the Victorian Curriculum Progressions was enabled
@@ -1035,6 +1047,14 @@ class Controller extends ConfigController
                     (int)$optionsPayload['summary']['vicProgression']['workType'],
                     $vicProgression['annotate']
                 ))->generate($student, $academicPeriod, null);
+
+                /* Remember its customised title
+                 */
+                $vicProgression['summary']['title'] = self::DEFAULT_TITLE;
+
+                if ('' !== trim((string)($optionsPayload['summary']['vicProgression']['title'] ?? ''))) {
+                    $vicProgression['summary']['title'] = $optionsPayload['summary']['vicProgression']['title'];
+                }
             }
 
             /* The Class Version
@@ -1047,6 +1067,14 @@ class Controller extends ConfigController
                     (int)$optionsPayload['class']['vicProgression']['workType'],
                     $vicProgression['annotate']
                 );
+
+                /* Remember its customised title
+                 */
+                $vicProgression['class']['title'] = self::DEFAULT_TITLE;
+
+                if ('' !== trim((string)($optionsPayload['class']['vicProgression']['title'] ?? ''))) {
+                    $vicProgression['class']['title'] = $optionsPayload['class']['vicProgression']['title'];
+                }
 
                 /* Render a chart for each class in $folders, I suppose
                  */
@@ -1095,6 +1123,7 @@ class Controller extends ConfigController
             'summaryAssessmentFeedbacks' => $summaryAssessmentFeedbacks,
             'classAssessmentFeedbacks'   => $classAssessmentFeedbacks,
             'report'                     => $report,
+            'reportOptions'              => json_decode($report->getOptions()),
             'allGraphs'                  => $allGraphs,
             'showSummary'                => (bool)$optionsPayload['summary']['active'],
             'summaryHeading'             => trim((string)$optionsPayload['summary']['heading']),

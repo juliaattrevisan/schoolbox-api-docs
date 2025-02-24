@@ -6,6 +6,7 @@
  # @param SummativeReport\Model $report  A of SummativeReportModel instance
  # @param array $options                 A structure containing report options
  # @param Zone $logoZone                 An attachzone for uploading images
+ # @param string $curriculumProgression  An array containing the default title for the Vic Curric Progression bit
  #}
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
@@ -169,6 +170,12 @@
                     $(checkbox).removeAttr('onclick');
                 });
 
+                /* Enable selects
+                 */
+                fieldsets.find('select').each(function(index, select) {
+                    $(select).prop('disabled', false);
+                });
+
                 /* Micromanage selectize
                  */
                 fieldsets.find('.selectize-control').each(function (index, selectizeControl) {
@@ -187,9 +194,18 @@
                     document.querySelector('#search-subject-overview').classList.add('hidden');
                 }
 
+                /* For Curriculum Progression, figure out what state we're in whenever a section is enabled
+                 */
+                initialiseCurriculumProgression();
             } else {
                 fieldsets.find('input:checkbox, input:text').each(function(index, checkbox) {
                     $(checkbox).prop('readonly', true);
+                });
+
+                /* Disable selects
+                 */
+                fieldsets.find('select').each(function(index, select) {
+                    $(select).prop('disabled', true);
                 });
 
                 /* Micromanage selectize
@@ -256,6 +272,63 @@
                 document.querySelector('#search-subject-overview').classList.add('hidden');
             }
         });
+
+        /* Detect initial conditions
+         */
+        initialiseCurriculumProgression();
+        applyCurriculumProgressionListeners();
+
+
+        /**
+         * Sets the default states of input elements for Curriculum Progression in both Summary
+         * and Class sections
+         */
+        function initialiseCurriculumProgression() {
+            if (document.querySelector('#report-summary-enable-vic-progression').checked) {
+                document.querySelector('#report-summary-vic-progression-title').removeAttribute('readonly');
+                document.querySelector('#report-summary-vic-progression-worktype').removeAttribute('disabled');
+            } else {
+                document.querySelector('#report-summary-vic-progression-title').setAttribute('readonly', 'true');
+                document.querySelector('#report-summary-vic-progression-worktype').setAttribute('disabled', 'true');
+            }
+
+            /* Detect initial conditions
+             */
+            if (document.querySelector('#report-class-enable-vic-progression').checked) {
+                document.querySelector('#report-class-vic-progression-title').removeAttribute('readonly');
+                document.querySelector('#report-class-vic-progression-worktype').removeAttribute('disabled');
+            } else {
+                document.querySelector('#report-class-vic-progression-title').setAttribute('readonly', 'true');
+                document.querySelector('#report-class-vic-progression-worktype').setAttribute('disabled', 'true');
+            }
+        }
+
+
+        /**
+         * Add event listeners to the "Enable" switches for each of the Curriculum Progressions areas,
+         * which toggle the state of these elements
+         */
+        function applyCurriculumProgressionListeners() {
+            document.querySelector('#report-summary-enable-vic-progression').addEventListener('change', function(event) {
+                if (event.target.checked) {
+                    document.querySelector('#report-summary-vic-progression-title').removeAttribute('readonly');
+                    document.querySelector('#report-summary-vic-progression-worktype').removeAttribute('disabled');
+                } else {
+                    document.querySelector('#report-summary-vic-progression-title').setAttribute('readonly', 'true');
+                    document.querySelector('#report-summary-vic-progression-worktype').setAttribute('disabled', 'true');
+                }
+            });
+
+            document.querySelector('#report-class-enable-vic-progression').addEventListener('change', function(event) {
+                if (event.target.checked) {
+                    document.querySelector('#report-class-vic-progression-title').removeAttribute('readonly');
+                    document.querySelector('#report-class-vic-progression-worktype').removeAttribute('disabled');
+                } else {
+                    document.querySelector('#report-class-vic-progression-title').setAttribute('readonly', 'true');
+                    document.querySelector('#report-class-vic-progression-worktype').setAttribute('disabled', 'true');
+                }
+            });
+        }
     });
 </script>
 
@@ -415,80 +488,81 @@
                                 </ul>
                             </fieldset>
                         </div>
-                        </fieldset>
-                        <fieldset class="content">
-                            <div class="small-12 columns">
-                                <legend>Work Types</legend>
-                                <p class="meta">Select the work types and the type of feedback you would like included on the report.</p>
-                                <table>
-                                    <tr>
-                                        <th>&nbsp;</th>
-                                        <th>Show</th>
-                                        <th>Grade</th>
-                                        <th>Comment</th>
-                                        <th>Rubric</th>
-                                        <th>Graph</th>
-                                    </tr>
-                                    {% for worktype in worktypesSummary %}
-                                    <tr data-summary-worktype-id="{{ worktype.id }}">
-                                        <td>{{ worktype.name }}</td>
-                                        <td>
-                                            <input name="summary[workType][{{ worktype.id }}][show]" type="hidden" value="0" />
-                                            <input data-summary-worktype-show="{{ worktype.id }}" id="report-summary-worktype-{{ worktype.id }}-show" name="summary[workType][{{ worktype.id }}][show]" type="checkbox" value="1" {% if worktype.show ?? false %}checked="checked"{% endif %}/>
-                                            <label for="report-summary-worktype-{{ worktype.id }}-show" class="checkbox-label"></label>
-                                        </td>
-                                        <td>
-                                            <input name="summary[workType][{{ worktype.id }}][grades]" type="hidden" value="0" />
-                                            <input data-summary-worktype-option="{{ worktype.id }}" data-summary-worktype-grades="{{ worktype.id }}" id="report-summary-worktype-{{ worktype.id }}-grades" name="summary[workType][{{ worktype.id }}][grades]" type="checkbox" value="1" {% if worktype.grades ?? false %}checked="checked"{% endif %} {% if not worktype.show ?? false %} disabled="disabled" {% endif %}/>
-                                            <label for="report-summary-worktype-{{ worktype.id }}-grades" class="checkbox-label"></label>
-                                        </td>
-                                        <td>
-                                            <input name="summary[workType][{{ worktype.id }}][comments]" type="hidden" value="0" />
-                                            <input data-summary-worktype-option="{{ worktype.id }}" data-summary-worktype-comments="{{ worktype.id }}" id="report-summary-worktype-{{ worktype.id }}-comments" name="summary[workType][{{ worktype.id }}][comments]" type="checkbox" value="1" {% if worktype.comments ?? false %}checked="checked"{% endif %} {% if not worktype.show ?? false %} disabled="disabled" {% endif %}/>
-                                            <label for="report-summary-worktype-{{ worktype.id }}-comments" class="checkbox-label"></label>
-                                        </td>
-                                        <td>
-                                            <input name="summary[workType][{{ worktype.id }}][rubrics]" type="hidden" value="0" />
-                                            <input data-summary-worktype-option="{{ worktype.id }}" data-summary-worktype-rubrics="{{ worktype.id }}" id="report-summary-worktype-{{ worktype.id }}-rubrics" name="summary[workType][{{ worktype.id }}][rubrics]" type="checkbox" value="1" {% if worktype.rubrics ?? false %}checked="checked"{% endif %} {% if not worktype.show ?? false %} disabled="disabled" {% endif %}/>
-                                            <label for="report-summary-worktype-{{ worktype.id }}-rubrics" class="checkbox-label"></label>
-                                        </td>
-                                        <td>
-                                            <input name="summary[workType][{{ worktype.id }}][graph]" type="hidden" value="0" />
-                                            <input data-summary-worktype-option="{{ worktype.id }}" data-summary-worktype-graph="{{ worktype.id }}" id="report-summary-worktype-{{ worktype.id }}-graph" name="summary[workType][{{ worktype.id }}][graph]" type="checkbox" value="1" {% if worktype.graph ?? false %}checked="checked"{% endif %} {% if not worktype.show ?? false %} disabled="disabled" {% endif %}/>
-                                            <label for="report-summary-worktype-{{ worktype.id }}-graph" class="checkbox-label"></label>
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </table>
-                            </div>
-                        </fieldset>
-                        {# Victorian Curriculum Progressions is Penola-specific atm #}
-                        {% if 'pcc' == config.site_school_code|lower  %}
-                        <fieldset class="content">
-                            <legend>Victorian Curriculum Progressions</legend>
-                            <div class="small-12 columns">
-                                <p class="meta">
-                                    Enabling this will provide a visualisation of <strong>progression points</strong> that students have achieved
-                                    whilst undertaking any assessments that use the prescribed <strong>work type</strong>.
-                                </p>
+                    </fieldset>
+                    <fieldset class="content">
+                        <div class="small-12 columns">
+                            <legend>Work Types</legend>
+                            <p class="meta">Select the work types and the type of feedback you would like included on the report.</p>
+                            <table>
+                                <tr>
+                                    <th>&nbsp;</th>
+                                    <th>Show</th>
+                                    <th>Grade</th>
+                                    <th>Comment</th>
+                                    <th>Rubric</th>
+                                    <th>Graph</th>
+                                </tr>
+                                {% for worktype in worktypesSummary %}
+                                <tr data-summary-worktype-id="{{ worktype.id }}">
+                                    <td>{{ worktype.name }}</td>
+                                    <td>
+                                        <input name="summary[workType][{{ worktype.id }}][show]" type="hidden" value="0" />
+                                        <input data-summary-worktype-show="{{ worktype.id }}" id="report-summary-worktype-{{ worktype.id }}-show" name="summary[workType][{{ worktype.id }}][show]" type="checkbox" value="1" {% if worktype.show ?? false %}checked="checked"{% endif %}/>
+                                        <label for="report-summary-worktype-{{ worktype.id }}-show" class="checkbox-label"></label>
+                                    </td>
+                                    <td>
+                                        <input name="summary[workType][{{ worktype.id }}][grades]" type="hidden" value="0" />
+                                        <input data-summary-worktype-option="{{ worktype.id }}" data-summary-worktype-grades="{{ worktype.id }}" id="report-summary-worktype-{{ worktype.id }}-grades" name="summary[workType][{{ worktype.id }}][grades]" type="checkbox" value="1" {% if worktype.grades ?? false %}checked="checked"{% endif %} {% if not worktype.show ?? false %} disabled="disabled" {% endif %}/>
+                                        <label for="report-summary-worktype-{{ worktype.id }}-grades" class="checkbox-label"></label>
+                                    </td>
+                                    <td>
+                                        <input name="summary[workType][{{ worktype.id }}][comments]" type="hidden" value="0" />
+                                        <input data-summary-worktype-option="{{ worktype.id }}" data-summary-worktype-comments="{{ worktype.id }}" id="report-summary-worktype-{{ worktype.id }}-comments" name="summary[workType][{{ worktype.id }}][comments]" type="checkbox" value="1" {% if worktype.comments ?? false %}checked="checked"{% endif %} {% if not worktype.show ?? false %} disabled="disabled" {% endif %}/>
+                                        <label for="report-summary-worktype-{{ worktype.id }}-comments" class="checkbox-label"></label>
+                                    </td>
+                                    <td>
+                                        <input name="summary[workType][{{ worktype.id }}][rubrics]" type="hidden" value="0" />
+                                        <input data-summary-worktype-option="{{ worktype.id }}" data-summary-worktype-rubrics="{{ worktype.id }}" id="report-summary-worktype-{{ worktype.id }}-rubrics" name="summary[workType][{{ worktype.id }}][rubrics]" type="checkbox" value="1" {% if worktype.rubrics ?? false %}checked="checked"{% endif %} {% if not worktype.show ?? false %} disabled="disabled" {% endif %}/>
+                                        <label for="report-summary-worktype-{{ worktype.id }}-rubrics" class="checkbox-label"></label>
+                                    </td>
+                                    <td>
+                                        <input name="summary[workType][{{ worktype.id }}][graph]" type="hidden" value="0" />
+                                        <input data-summary-worktype-option="{{ worktype.id }}" data-summary-worktype-graph="{{ worktype.id }}" id="report-summary-worktype-{{ worktype.id }}-graph" name="summary[workType][{{ worktype.id }}][graph]" type="checkbox" value="1" {% if worktype.graph ?? false %}checked="checked"{% endif %} {% if not worktype.show ?? false %} disabled="disabled" {% endif %}/>
+                                        <label for="report-summary-worktype-{{ worktype.id }}-graph" class="checkbox-label"></label>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </table>
+                        </div>
+                    </fieldset>
+                    <fieldset class="content">
+                        <legend>Curriculum Progressions</legend>
+                        <div class="small-12 columns">
+                            <p class="meta">
+                                Enabling this will provide a visualisation of <strong>progression points</strong> that students have achieved
+                                whilst undertaking any assessments that use the prescribed <strong>work type</strong>.
+                            </p>
 
-                                <ul class="option-list">
-                                    <li>
-                                        <input name="summary[vicProgression][enable]" type="hidden" value="0" />
-                                        <input id="report-summary-enable-vic-progression" name="summary[vicProgression][enable]" type="checkbox" value="1" {% if options.summary.vicProgression.enable ?? false %}checked="checked"{% endif %} />
-                                        <label for="report-summary-enable-vic-progression" class="checkbox-label">Enable</label>
-                                    </li>
-                                </ul>
+                            <ul class="option-list">
+                                <li>
+                                    <input name="summary[vicProgression][enable]" type="hidden" value="0" />
+                                    <input id="report-summary-enable-vic-progression" name="summary[vicProgression][enable]" type="checkbox" value="1" {% if options.summary.vicProgression.enable ?? false %}checked="checked"{% endif %} />
+                                    <label for="report-summary-enable-vic-progression" class="checkbox-label">Enable</label>
+                                </li>
+                            </ul>
 
-                                <label for="report-summary-vic-progression-worktype">Work Type</label>
-                                <select id="report-summary-vic-progression-worktype" name="summary[vicProgression][workType]">
-                                    {% for worktype in worktypesSummary %}
-                                        <option value="{{ worktype.id }}" {% if worktype.id == options.summary.vicProgression.workType ?? null %}selected="selected"{% endif %}>{{ worktype.name }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </fieldset>
-                        {% endif %}
+                            <label for="report-summary-vic-progression-title">Title</label>
+                            <input id="report-summary-vic-progression-title" name="summary[vicProgression][title]" type="text" maxlength="255" value="{{ options.summary.vicProgression.title ?? curriculumProgression.title }}" required />
+
+                            <label for="report-summary-vic-progression-worktype">Work Type</label>
+                            <input type="hidden" name="summary[vicProgression][workType]" value="{{ options.summary.vicProgression.workType }}" />
+                            <select id="report-summary-vic-progression-worktype" name="summary[vicProgression][workType]">
+                                {% for worktype in worktypesSummary %}
+                                    <option value="{{ worktype.id }}" {% if worktype.id == options.summary.vicProgression.workType ?? null %}selected="selected"{% endif %}>{{ worktype.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </fieldset>
                 </section>
 
                 <div class="row actions-small-1">
@@ -547,8 +621,8 @@
                         </div>
                     </fieldset>
                     <fieldset class="content">
+                        <legend>Work Types</legend>
                         <div class="small-12 columns">
-                            <legend>Work Types</legend>
                             <p class="meta">Select the work types and the type of feedback you would like included on the report.</p>
                             <table>
                                 <tr>
@@ -592,10 +666,8 @@
                             </table>
                         </div>
                     </fieldset>
-                    {# Victorian Curriculum Progressions is Penola-specific atm #}
-                    {% if 'pcc' == config.site_school_code|lower  %}
                     <fieldset class="content">
-                        <legend>Victorian Curriculum Progressions</legend>
+                        <legend>Curriculum Progressions</legend>
                         <div class="small-12 columns">
                             <p class="meta">
                                 Enabling this will provide a visualisation of <strong>progression points</strong> that students have achieved
@@ -610,7 +682,11 @@
                                 </li>
                             </ul>
 
+                            <label for="report-class-vic-progression-title">Title</label>
+                            <input id="report-class-vic-progression-title" name="class[vicProgression][title]" type="text" maxlength="255" value="{{ options.class.vicProgression.title ?? curriculumProgression.title }}" required />
+
                             <label for="report-class-vic-progression-worktype">Work Type</label>
+                            <input type="hidden" name="class[vicProgression][workType]" value="{{ options.class.vicProgression.workType }}" />
                             <select id="report-class-vic-progression-worktype" name="class[vicProgression][workType]">
                                 {% for worktype in worktypesClass %}
                                     <option value="{{ worktype.id }}" {% if worktype.id == options.class.vicProgression.workType %}selected="selected"{% endif %}>{{ worktype.name }}</option>
@@ -618,7 +694,6 @@
                             </select>
                         </div>
                     </fieldset>
-                    {% endif %}
 
                         {# NONE of this exists yet....
                         <div class="small-12 columns">
