@@ -8,10 +8,8 @@
 
         const subtypesIndexEntryTip = {{ subtypesIndexEntryTip|json_encode|raw }};
         const subtypesIndexDefaultExpiry = {{ subtypesIndexDefaultExpiry|json_encode|raw }};
-        const subtypesIndexPoints = {{ subtypesIndexPoints|json_encode|raw }};
         const typesIndexEntryTip = {{ typesIndexEntryTip|json_encode|raw }};
         const typesIndexDefaultExpiry = {{ typesIndexDefaultExpiry|json_encode|raw }};
-        const typesIndexPoints = {{ typesIndexPoints|json_encode|raw }};
 
         /**
          * Update the entry tip based on current type / subtype selection
@@ -80,51 +78,6 @@
             expiresAtElement.value = calculatedExpiresAt[defaultExpiry] ?? '';
         }
 
-        const currentPoints = '{{ record.points ? record.points : null }}';
-
-        /**
-         * When the points has manually changed, this takes precedence and
-         * any further changes when type/sub-type is changed will not update the points.
-         * Rather conveniently, the jQuery .onChange will not trigger when the points.value is changed within
-         * the updatePoints method, so we don't need to worry about this being triggered when it shouldn't be.
-         */
-        let hasManualPointsInput = false;
-        $("#points").on("change", function () {
-            hasManualPointsInput = true;
-        });
-
-        /**
-         * Check if the expires at date can be updated when the type/sub-type is changed
-         * We prevent updating the expires at date if the record is existing, the expires at date is set,
-         * or if there is a manual input for the expires at date
-         * @returns boolean
-         */
-        function canUpdatePoints() {
-            return !isExistingRecord && currentPoints === "" && !hasManualPointsInput;
-        }
-
-        /**
-         * Update the points based on the current type / subtype selection
-         * @param points
-         */
-        function updatePoints (points) {
-            if (!canUpdatePoints()) {
-                return;
-            }
-            // ensure points actually exists before setting the value
-            const pointsElement = document.getElementById("points");
-            if (pointsElement === null) {
-                return;
-            }
-            // if the new type/sub-type points is empty, clear the previously set value and return
-            if (points === null || points === "") {
-                pointsElement.value = "";
-                return;
-            }
-            // otherwise set the points based on the default points that was set
-            pointsElement.value = points;
-        }
-
         /* Some convenient selectors
          */
         const typeDropdown = $('#typeId');
@@ -143,11 +96,9 @@
         if (subtypeDropdown.val() === null) {
             updateEntryTip($.trim(typesIndexEntryTip[typeDropdown.val()]));
             updateExpiresAt($.trim(typesIndexEntryTip[typeDropdown.val()]));
-            updatePoints($.trim(typesIndexPoints[typeDropdown.val()]));
         } else {
             updateEntryTip($.trim(subtypesIndexEntryTip[subtypeDropdown.val()]));
             updateExpiresAt($.trim(subtypesIndexEntryTip[subtypeDropdown.val()]));
-            updatePoints($.trim(subtypesIndexPoints[subtypeDropdown.val()]));
         }
         {% endif %}
 
@@ -158,11 +109,9 @@
             if (null !== subtypeVal) {
                 updateEntryTip($.trim(subtypesIndexEntryTip[subtypeVal]));
                 updateExpiresAt($.trim(subtypesIndexDefaultExpiry[subtypeVal]));
-                updatePoints($.trim(subtypesIndexPoints[subtypeVal]));
             } else {
                 updateEntryTip($.trim(typesIndexEntryTip[typeVal]));
                 updateExpiresAt($.trim(typesIndexDefaultExpiry[typeVal]));
-                updatePoints($.trim(typesIndexPoints[typeVal]));
             }
         }
 
