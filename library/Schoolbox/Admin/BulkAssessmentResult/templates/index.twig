@@ -66,14 +66,26 @@
         <div class="small-12 island">
             <section>
                 <div class="content">
-                    <p>
-                        This lets you create feedbacks en masse for all Due Work activities that match the selected work type.
-                    </p>
-                    <p>
-                        Each feedback must be associated with a user who represents its owner, regardless of whomever
-                        actually performs the import. You'll get an opportunity to preview the outcome before committing
-                        to actually creating the feedbacks; once created, they cannot be removed.
-                    </p>
+                    <p>To bulk import feedback (marks and/or comments) to due work items follow these instructions:</p>
+
+                    <ol>
+                        <li>Download and edit the template file using the link below.</li>
+                        <li>Add compulsory data to the CSV for:
+                            <ul>
+                                <li><strong>Assessment ID(s).</strong> This can either be the Assessment ID for a Due Work item on a Class page or the Assessment ID for the Due Work item within the Course Builder on the Unit page.</li>
+                                <li><strong>Class Code(s).</strong> Feedback will only be imported to classes where the data on the CSV matches that on a homepage within Schoolbox. If a homepage utilises multiple class codes, a match will occur on any of the class codes on the homepage.</li>
+                                <li><strong>Student External ID.</strong> This value will come from the Student Information System, but can be found on the user profile in Schoolbox.</li>
+                            </ul>
+                        </li>
+                        <li>Add optional data to the CSV for either 1 or 2 elements of feedback:
+                            <ul>
+                                <li><strong>Normalised Mark.</strong> This must use a value between 0 and 100. If the mark type is set to <em>Total Mark</em> or <em>Letter Grade</em>, Schoolbox will convert the grade on uploading the file. Leave this blank if using the mark type <em>None</em>.</li>
+                                <li><strong>Comment.</strong> This will appear as written feedback and can be left blank if not wanting to add a comment.</li>
+                            </ul>
+                        </li>
+                        <li>Select a Feedback Author below. Every feedback entry must be linked to a user for a successful import.</li>
+                        <li>Upload the file. You will be presented with a preview screen for confirming the Feedback Author, publish date of the feedback and the result of each row of data imported.</li>
+                    </ol>
                 </div>
                 <div class="component-action">
                     <section>
