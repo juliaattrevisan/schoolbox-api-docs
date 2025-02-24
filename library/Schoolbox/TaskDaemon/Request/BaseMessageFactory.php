@@ -180,12 +180,6 @@ abstract class BaseMessageFactory
     public function build(): Message
     {
         $effector = $this->effector;
-        /* if no effector, use the system user */
-        if (!$effector) {
-            $effector = new User();
-            $effector->setId(1);
-            $effector->setUsername(User::USERNAME_SCHOOLBOX_ADMIN);
-        }
         $tokenUser = $this->tokenMapper->generateForUser($effector, $effector, $this->tokenExpiry);
         $token  = $this->effector
             ? $this->tokenBuilder->generate(
