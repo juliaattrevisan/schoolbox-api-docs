@@ -1,4 +1,4 @@
--- Add the new 'Work Phone' field to student and staff profiles
+-- Add the new 'Work Phone' field to staff profiles
 
 INSERT INTO
     `profile_field` 
