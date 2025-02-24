@@ -2,7 +2,6 @@
 
 namespace Tests\Smoketests;
 
-use JsonException;
 use Tests\Support\IntegrationTester;
 use Tests\Support\Payload;
 
@@ -27,7 +26,7 @@ class ForumCest
      * check the responses
      *
      * @param IntegrationTester $i
-     * @throws JsonException
+     * @throws \JsonException
      */
     public function postThread(IntegrationTester $i): void
     {
@@ -51,7 +50,7 @@ class ForumCest
      *
      * @depends postThread
      * @param IntegrationTester $i
-     * @throws JsonException
+     * @throws \JsonException
      */
     public function modifyThread(IntegrationTester $i): void
     {
@@ -78,7 +77,7 @@ class ForumCest
      *
      * @depends postThread
      * @param IntegrationTester $i
-     * @throws JsonException
+     * @throws \JsonException
      */
     public function replyThread(IntegrationTester $i): void
     {
@@ -105,7 +104,7 @@ class ForumCest
      *
      * @depends modifyThread
      * @param IntegrationTester $i
-     * @throws JsonException
+     * @throws \JsonException
      */
     public function deletePostThread(IntegrationTester $i): void
     {
