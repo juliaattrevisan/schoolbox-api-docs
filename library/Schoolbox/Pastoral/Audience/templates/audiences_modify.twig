@@ -363,8 +363,9 @@
                     ignore: ':disabled',
                     rules: {
                         points: {
-                            isNumber: true,
-                            //isWithinPointsRange: true
+                            number: true,
+                            max: 1000000,
+                            min: -1000000
                         }
                     },
                 });
