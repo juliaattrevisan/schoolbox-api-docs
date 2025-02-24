@@ -1,8 +1,9 @@
 {##
  # Preview
  #
- # @param array $settings  A (worktype, user, sourceFile) struct representing identification method, feedback owner and uploaded csv
-#}
+ # @param array $settings  A (publish date, user, sourceFile) struct representing identification method, feedback owner and uploaded csv
+ # @param array $outcoem   A list of log messages
+ #}
 
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
