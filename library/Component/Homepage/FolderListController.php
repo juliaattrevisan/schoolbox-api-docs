@@ -208,14 +208,9 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
         };
 
         if ($comparisonResult === 0) {
-            // If folders compare equally on 1st sort field, sort on Name asc.
-            $comparisonResult = \strnatcasecmp($a['text'], $b['text']);
-
-            // If folders compare equally on Name, sort on 'id' asc.  This comparison is included so the
-            // display order will be consistent on repeated page loads if multiple rows share the same Name.
-            if ($comparisonResult === 0) {
-                $comparisonResult = $a['id'] <=> $b['id'];
-            }
+            // If folders compare equally on 1st sort field, sort on folder.id ascending.
+            // This is done to match the default sort order used on the Modify Course page.
+            $comparisonResult = $a['id'] <=> $b['id'];
         }
 
         // Expected values of $config['sortdir'] are 'asc' and 'desc'.  See Component/Config/Sortdir.php.
