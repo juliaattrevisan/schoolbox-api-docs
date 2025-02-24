@@ -55,14 +55,14 @@ class Jwt
      * Generates a JWT for this user.
      *
      * @param User                     $user
-     * @param string                   $jwtId
+     * @param null|string              $jwtId
      * @param Alaress_Date_Format|null $expiry           If provided, the JWT expires after this
      *                                   many seconds.
      * @param array                    $additionalClaims Any extra claims to make beyond the
      *                                   standard 'iss', 'sub', 'exp'. 'jti'
      * @return string
      */
-    public function generate(User $user, string $jwtId, ?Alaress_Date_Format $expiry = null, array $additionalClaims = []): string
+    public function generate(User $user, ?string $jwtId, ?Alaress_Date_Format $expiry = null, array $additionalClaims = []): string
     {
         $schoolboxFqdn = (new Factory($this->config))->buildFullyQualified()->getHost();
 

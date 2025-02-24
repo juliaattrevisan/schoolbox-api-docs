@@ -86,13 +86,8 @@ class SelfIssued extends Base
                     throw new Exception\Rejected('The JWT ID provided has expired');
                 }
             } catch (MapperException $e) {
-                /** @phpstan-ignore-next-line INSTANCE_ID will be different, so it WON'T always equate to null. */
-                if (INSTANCE_ID === Jwt::HELP_ID) {
-                    // help instance, ignore
-                } else {
-                    // could not find a token with user id and jwt id
-                    throw new Exception\Rejected('The JWT ID provided does not match a token for the given user', 0, $e);
-                }
+                // could not find a token with user id and jwt id
+                throw new Exception\Rejected('The JWT ID provided does not match a token for the given user', 0, $e);
             }
         } else {
             throw new Exception\InvalidIdentity(

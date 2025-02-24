@@ -94,8 +94,8 @@ class RequestFactory
 
         $logoutToken = $this->jwtBuilder->generate(
             $user,
-            Alaress_Date_Format::now()->addSeconds($this->expiry),
             $jwtId,
+            Alaress_Date_Format::now()->addSeconds($this->expiry),
             $claims,
         );
 
