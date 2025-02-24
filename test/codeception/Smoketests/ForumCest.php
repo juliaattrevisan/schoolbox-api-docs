@@ -8,7 +8,7 @@ use Tests\Support\Payload;
 class ForumCest
 {
     private int $timestamp = 0;
-    private int $categoryId = 83;
+    private const CATEGORY_ID = 83;
 
     /**
      * Push a login payload to Schoolbox each test to ensure session is active and logged in.
@@ -36,7 +36,7 @@ class ForumCest
         $title = 'Forum: Automation API Smoke Test ' . $this->timestamp;
         $body = 'Forum: Automation API Smoke Test Body Details ' . $this->timestamp;
         $submitValue = 'Post';
-        $forumPayload = new Payload\Forum\CreateForumThread($this->categoryId, $title, $submitValue);
+        $forumPayload = new Payload\Forum\CreateForumThread(self::CATEGORY_ID, $title, $submitValue);
         #WHEN
         $i->amGoingTo('Send request to add a forum thread');
         $forumPayload->setFormParam('body', $body);
@@ -61,7 +61,7 @@ class ForumCest
         $threadId = $i->grabFromDatabase('forumThread', 'threadID', ['title' => "Forum: Automation API Smoke Test $this->timestamp"]);
         $postId = $i->grabFromDatabase('forumThread', 'last_post_id', ['title' => "Forum: Automation API Smoke Test $this->timestamp"]);
         $submitValue = 'Modify';
-        $forumPayload = new Payload\Forum\CreateForumThread($this->categoryId, $title, $submitValue);
+        $forumPayload = new Payload\Forum\CreateForumThread(self::CATEGORY_ID, $title, $submitValue);
         #WHEN
         $i->amGoingTo('Send request to modify a forum thread');
         $forumPayload->setFormParam('body', $body);
@@ -88,7 +88,7 @@ class ForumCest
         $threadId = $i->grabFromDatabase('forumThread', 'threadID', ['title' => "Forum: Automation API Smoke Test UPDATED $this->timestamp"]);
         $quoteId = $i->grabFromDatabase('forumPost', 'parentID', ['threadID' => $threadId]);
         $submitValue = 'Post';
-        $forumPayload = new Payload\Forum\CreateForumThread($this->categoryId, $title, $submitValue);
+        $forumPayload = new Payload\Forum\CreateForumThread(self::CATEGORY_ID, $title, $submitValue);
         #WHEN
         $i->amGoingTo('Send request to modify a forum thread');
         $forumPayload->setFormParam('body', $body);
@@ -121,7 +121,7 @@ class ForumCest
 
         #GIVEN
         // There is no comments anymore in the thread the forum/folder_id page is still accessible SA-13919
-        $i->sendGet("/forum/" . $this->categoryId);
+        $i->sendGet("/forum/" . self::CATEGORY_ID);
         $i->seeResponseCodeIs(200);
 
         #GIVEN
