@@ -154,6 +154,7 @@ test.describe("Quiz Create Tests", () => {
         await expect(page.locator("table.attempts-table")).toContainText("80 %");
         await profilePage.goto("25");
         await expect(page.locator("li.feed-item").first()).toContainText("80 %");
+        await expect(page.locator("li.feed-item").first()).toContainText("Great work!");
     });
 
     test("Delete a quiz", async ({ tester, page }) => {
