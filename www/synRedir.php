@@ -72,6 +72,8 @@ if ($_SESSION['communityLogin'] ?? false) {
             previous: $e,
             httpStatusCode: null,
             /* FIXME This was supposed to put extra logging to the error screen, but for some reason...won't
+             *  nvm...it's because the iframe accesses synRedir.php instead of just synRedir, which is a phplib
+             *  thing where it loads outside of the SitePage context.
              */
             information: $e->getMessage()
         );
