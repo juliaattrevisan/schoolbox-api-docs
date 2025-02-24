@@ -203,6 +203,18 @@ class Javascript extends Base
                     'student'      => $this->user,
                 ]
             ) . '?' . Redirect::RETURN_URL . '=' . Redirect::encode($returnUrl);
+            /**
+             * Prevent the parent of the student from setting the work details link
+             * if the restrict_student_submissions config setting is enabled
+             */
+            $user_mapper = new \Schoolbox\UserMapper();
+            $user = $user_mapper->findByIdWithFallback($_GET['userId']);
+            $viewer = $_SESSION['user'];
+            $isParentOfUser = $viewer->isParentOf($user);
+            $hideWorkDetailsFromParents = $this->getConfig()->get('restrict_student_submissions');
+            if ($isParentOfUser && $hideWorkDetailsFromParents) {
+                $moreDetailsLink = null;
+            }
         }
 
         return [
