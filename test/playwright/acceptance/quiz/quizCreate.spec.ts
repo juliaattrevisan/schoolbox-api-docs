@@ -8,6 +8,10 @@ import Homepage from "@schoolboxTest/playwright/support/page/homepage/Homepage";
 import AssessmentForm from "@schoolboxTest/playwright/support/page/dueWork/AssessmentForm";
 import QuizSettingPage from "@schoolboxTest/playwright/support/page/quiz/QuizSettingPage";
 import Common from "@schoolboxTest/playwright/support/page/Common";
+import StatusPage from "@schoolboxTest/playwright/support/page/dueWork/StatusPage";
+import AssessmentPage from "@schoolboxTest/playwright/support/page/dueWork/AssessmentPage";
+import ProfilePage from "@schoolboxTest/playwright/support/page/profilePage/ProfilePage";
+import ManageGroup from "@schoolboxTest/playwright/support/page/group/ManageGroup";
 
 /**
  * covenience function to create a homepage
@@ -24,6 +28,7 @@ async function createClassPage(
 ): Promise<void> {
     const createFolder = new CreateFolder(page);
     const resources = new Resources(page);
+    const manageGroup = new ManageGroup(page);
 
     tester.isGoingTo("Create a homepage");
     await createFolder.goto();
@@ -45,6 +50,17 @@ async function createClassPage(
     const folderId = (await db.grabFromDatabase("folder", "id", { deleted_at: null, name: folderName })) as string;
     expect(folderId).not.toBe(null);
     await resources.clickFolderName(folderName);
+    await resources.clickMenuItem("home");
+
+    tester.isGoingTo("Add Jana Reed into the group via manage group page");
+    await page.locator("[data-test=sbx-pop-out-tab-control-button]").click();
+    await page.getByTestId("homepage-actions-folder-manageGroup").click();
+    await tester.common.waitForPageLoad();
+    await manageGroup.search("Jana Reed");
+    await manageGroup.selectUser(25);
+    await manageGroup.clickFromRadioButton("role");
+    await manageGroup.clickAddMembers();
+    await page.waitForTimeout(1000); // wait to be able to update the db
 }
 
 test.describe("Quiz Create Tests", () => {
@@ -81,6 +97,7 @@ test.describe("Quiz Create Tests", () => {
         await homepage.clickComponentEmptyStateLink(layout, position);
         await quiz.setTitle(quizName);
         await assessmentForm.setWorkType(AssessmentForm.WORKTYPE_ASSESSMENT_TASK);
+        await assessmentForm.setMarkType(AssessmentForm.MARK_TYPE_PERCENTAGE);
         await quiz.create(quizName);
 
         tester.isGoingTo("navigate to the homepage and ensure the quiz is presented");
@@ -118,6 +135,25 @@ test.describe("Quiz Create Tests", () => {
 
         await expect(page.locator(`ul.breadcrumb`)).toContainText("Quiz Automation Test Updated");
         await expect(page.locator(`li.icon-quiz`)).toHaveText("Homework");
+    });
+
+    test("Grading a quiz via Quiz Quick Marking page (Status Page)", async ({ tester, page }) => {
+        const assessmentStatusPage = new StatusPage(tester, page);
+        const assessmentPage = new AssessmentPage(tester, page);
+        const profilePage = new ProfilePage(tester, page);
+
+        if (folderId === null || quizId === null) {
+            throw new Error("Folder ID or Quiz ID not found");
+        }
+
+        tester.isGoingTo("navigate to the quiz status page, grade a submission and publish the grade");
+        await assessmentStatusPage.goto(quizId);
+        await assessmentStatusPage.gradeSubmission(25, 80, "Great work!");
+        tester.isGoingTo("check the grade is published via attempt history and studennt profile page");
+        await assessmentPage.goto(quizId, 25);
+        await expect(page.locator("table.attempts-table")).toContainText("80 %");
+        await profilePage.goto("25");
+        await expect(page.locator("li.feed-item").first()).toContainText("80 %");
     });
 
     test("Delete a quiz", async ({ tester, page }) => {
