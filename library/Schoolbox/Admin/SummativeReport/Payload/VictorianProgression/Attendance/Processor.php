@@ -31,9 +31,9 @@ class Processor
 
     /**
      * Used to find a relationship between a folder and a particular
-     * assessment by its title.
+     * assessment by its id.
      */
-    private const QUERY_ASSESSMENT_TITLE = "
+    private const QUERY_ASSESSMENT_ID = "
         SELECT 
             a.id AS assessment_id, 
             sb.id AS box_id
@@ -42,7 +42,7 @@ class Processor
         INNER JOIN submission_box sb ON sb.assessment_id = a.id
         INNER JOIN folder f ON mvar.folder_id = f.id
         WHERE mvar.folder_id = :folderId
-        AND a.title = :title
+        AND a.id = :assessmentId
         AND a.deleted_at IS NULL
         AND f.deleted_at IS NULL
     ";
@@ -105,7 +105,6 @@ class Processor
      * @param FilesystemProxy $filesystemProxy
      * @param UserMapper $userMapper
      * @param Mapper $folderMapper
-     * @param string|null $assessmentTitle
      * @param int|null $workTypeId
      * @param \Alaress_Date_Format $publishAt
      * @param string|null $folderCode
@@ -116,7 +115,6 @@ class Processor
         private FilesystemProxy $filesystemProxy,
         private \Schoolbox\UserMapper $userMapper,
         private \Schoolbox\Resource\Folder\Mapper $folderMapper,
-        private ?string $assessmentTitle,
         private ?int $workTypeId,
         private \Alaress_Date_Format $publishAt,
         private ?string $folderCode,
@@ -124,15 +122,10 @@ class Processor
     ) {
         /* We're going to reuse this a lot
          */
-        if (null !== $this->assessmentTitle) {
-            $this->assessmentQuery = $this->userMapper->getDatabase()->prepare(self::QUERY_ASSESSMENT_TITLE);
-        } elseif (null !== $this->workTypeId) {
+        if (null !== $this->workTypeId) {
             $this->assessmentQuery = $this->userMapper->getDatabase()->prepare(self::QUERY_ASSESSMENT_WORKTYPE);
         } else {
-            /* This should never happen via the future ui (validation prevents it(
-             * and cli encounters are a misuse.
-             */
-            throw new \RuntimeException('Specify one of assessment title or work type to identify assessments.');
+            $this->assessmentQuery = $this->userMapper->getDatabase()->prepare(self::QUERY_ASSESSMENT_ID);
         }
 
         $this->feedbackQuery = $this->userMapper->getDatabase()->prepare(self::QUERY_FEEDBACK);
@@ -157,6 +150,7 @@ class Processor
          */
         $reader = new Reader($this->filesystemProxy->readStream($file), true);
         $reader->setExpectedColumns([
+            'Assessment Id',
             'Class Code',
             'Student External ID',
             'Normalised Mark',
@@ -237,14 +231,14 @@ class Processor
 
             /* Then find the assessment's corresponding submission box id
              */
-            if ($this->assessmentTitle) {
-                $this->assessmentQuery->execute([
-                    'title' => $this->assessmentTitle,
-                    'folderId' => $folder->getId()
-                ]);
-            } elseif ($this->workTypeId) {
+            if ($this->workTypeId) {
                 $this->assessmentQuery->execute([
                     'workTypeId' => $this->workTypeId,
+                    'folderId' => $folder->getId()
+                ]);
+            } else {
+                $this->assessmentQuery->execute([
+                    'assessmentId' => trim((string)$row['Assessment Id']),
                     'folderId' => $folder->getId()
                 ]);
             }

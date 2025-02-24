@@ -17,7 +17,6 @@
             <section>
                 <div class="content">
                     <ul>
-                        <li><strong>Work type:</strong> {{ settings.worktype.name }}</li>
                         <li><strong>Feedback Owner:</strong>
                             {% if settings.feedbackOwner.deleted %}
                                 {{ settings.feedbackOwner.fullname }}
@@ -55,7 +54,6 @@
 
         <div class="small-12 columns">
             <form action="{{ formRoute }}" method="post">
-                <input type="hidden" name="worktypeId" value="{{ settings.worktype.id }}" />
                 <input type="hidden" name="attachment" value="{{ settings.sourceFile.hash }}" />
                 <input type="hidden" name="userId" value="{{ settings.feedbackOwner.id }}" />
                 <input type="submit" value="Perform Import" />
