@@ -356,6 +356,21 @@
 
                 <input type="submit" value="Save">
             </form>
+            <script>
+            $(function () {
+
+                $("form#pastoralForm").alaressValidate({
+                    ignore: ':disabled',
+                    rules: {
+                        points: {
+                            isNumber: true,
+                            //isWithinPointsRange: true
+                        }
+                    },
+                });
+
+            });
+            </script>
         </div>
     </div>
 </div>
