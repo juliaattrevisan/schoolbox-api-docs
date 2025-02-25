@@ -15,18 +15,12 @@ use Aura\Router\Generator;
 use Calendar\Event\Type\RendererBase;
 use Calendar\Event\Type\Submission;
 use Schoolbox\User;
-use Schoolbox\Config\Loader as ConfigLoader;
-use Schoolbox\IConfigLoader;
 
 abstract class Base extends RendererBase
 {
     /** @var Submission\Event */
     protected $event;
 
-    /**
-     * @var IConfigLoader
-     */
-    private $config;
 
     /**
      * Constructor
@@ -43,28 +37,6 @@ abstract class Base extends RendererBase
         $this->event = $event;
     }
 
-    /**
-     * @return IConfigLoader
-     */
-    public function getConfig(): IConfigLoader
-    {
-        if (!$this->config instanceof IConfigLoader) {
-            $this->setConfig(ConfigLoader::getInstance());
-        }
-
-        return $this->config;
-    }
-
-    /**
-     * @param \Schoolbox\IConfigLoader $loader
-     *
-     * @return $this
-     */
-    public function setConfig(IConfigLoader $loader): self
-    {
-        $this->config = $loader;
-        return $this;
-    }
 
     /**
      * Helper function to determine if person viewing assessment event can edit it, this should probably be on the
