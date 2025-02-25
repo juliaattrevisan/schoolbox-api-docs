@@ -93,11 +93,6 @@ class Tracer
     private ?HubInterface $hub = null;
 
     /**
-     * The current transaction context, if there is one.
-     */
-    private ?TransactionContext $transactionContext = null;
-
-    /**
      * A set of stack changes, updated with `startSpan`, `finishSpan` and
      * `addBreadcrumb`.
      *
@@ -448,7 +443,7 @@ class Tracer
         array $metadata = [],
         ?float $timestamp = null,
     ): void {
-        $this->hub->addBreadcrumb(
+        $this->stackChanges[] = new Operation\Breadcrumb(
             new Breadcrumb($level, $type, $category, $message, $metadata, $timestamp),
         );
     }
@@ -534,7 +529,7 @@ class Tracer
 
         // Apply each change to the actual transaction stack.
         foreach ($this->stackChanges as $stackChange) {
-            $spanStack = $stackChange->operate($this->hub, $spanStack);
+            $spanStack = $stackChange->operate($hub, $spanStack);
         }
         $this->stackChanges = [];
 
