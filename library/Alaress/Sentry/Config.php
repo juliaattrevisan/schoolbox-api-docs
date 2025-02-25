@@ -17,9 +17,9 @@ use Schoolbox\Mapper\Exception\NotFound;
 use Sentry;
 
 /**
- * Factory for building the Sentry reporter.
+ * Configuration helper functions for the Sentry hub.
  */
-class Factory
+class Config
 {
     /**
      * Only these types of error are reported to Sentry.
@@ -89,12 +89,12 @@ class Factory
     }
 
     /**
-     * Configure the Sentry hub with the instance's details.
+     * Configure the Sentry hub with details from the instance.
      *
      * @param Instance $instance
      * @return void
      */
-    public static function config(Instance $instance): void
+    public static function useInstance(Instance $instance): void
     {
         Sentry\configureScope(static function (Sentry\State\Scope $scope) use ($instance): void {
             $scope->setTags([

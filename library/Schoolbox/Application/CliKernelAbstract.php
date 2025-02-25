@@ -103,7 +103,7 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
         }
 
         // Configure Sentry with the current instance, now it's known.
-        \Alaress\Sentry\Factory::config($this->di->get('instance'));
+        \Alaress\Sentry\Config::useInstance($this->di->get('instance'));
 
         $this->initRoutes();
         $this->initModules();

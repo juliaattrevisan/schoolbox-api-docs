@@ -8,7 +8,7 @@
  */
 
 // Instance config
-use Alaress\Sentry\Factory;
+use Alaress\Sentry\Config;
 
 require_once __DIR__ . '/../../www/conf/conf.php';
 
@@ -30,8 +30,8 @@ if (!defined('INSTANCE_ID') || trim((string)INSTANCE_ID) === '') {
 // Configure autoloading with Composer
 require __DIR__ . '/../../vendor/autoload.php';
 
-// Set up Sentry before almost anything else
-Factory::init(SENTRY_DSN, SENTRY_ERROR_SAMPLE_RATE, SENTRY_TRACE_SAMPLE_RATE, SENTRY_PROFILE_SAMPLE_RATE);
+// Init Sentry before almost anything else
+Config::init(SENTRY_DSN, SENTRY_ERROR_SAMPLE_RATE, SENTRY_TRACE_SAMPLE_RATE, SENTRY_PROFILE_SAMPLE_RATE);
 
 // Global functions and constants
 require_once __DIR__ . '/../../www/include/stdfuncs.php';

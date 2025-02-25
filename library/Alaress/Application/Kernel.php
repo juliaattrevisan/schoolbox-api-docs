@@ -305,7 +305,7 @@ abstract class Kernel
         }
 
         // Configure Sentry with the current instance, now it's known.
-        \Alaress\Sentry\Factory::config($this->di->get('instance'));
+        \Alaress\Sentry\Config::useInstance($this->di->get('instance'));
 
         self::dieGracefullyIfInMaintenanceMode($config);
         session_save_path(PipeManager::getSessionSavePath($config->get(ConfigMapper::NAME_REDIS_URL), INSTANCE_ID));
