@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Alaress\Sentry\Tracing;
 
 use Sentry\Breadcrumb;
+use Sentry\SentrySdk;
 use Sentry\State\HubInterface;
 use Sentry\Tracing\Span;
 use Sentry\Tracing\SpanContext;
@@ -219,7 +220,15 @@ class Tracer
         }
         $transactionContext->setStartTimestamp($startTimestamp ?? microtime(true));
         $transactionContext->setData($data);
-        $this->hub->startTransaction($transactionContext);
+
+        // Clear the current transaction state, before setting a new one.
+        $this->stackChanges       = [];
+        $this->spanStack          = [];
+        $this->transactionContext = $transactionContext;
+
+        // Also start the transaction, so that profiling can begin.
+        $transaction = SentrySdk::getCurrentHub()->startTransaction($transactionContext);
+        SentrySdk::getCurrentHub()->setSpan($transaction);
         return $transactionContext;
     }
 
@@ -232,14 +241,14 @@ class Tracer
      */
     public function setTransactionContextForAuraRoute(string $route): void
     {
-        $transactionContext = $this->transactionContext;
-        if ($transactionContext) {
-            $transactionContext->setName('aura:' . $route);
-            $transactionContext->setOp('http.server');
-            $transactionContext->setOrigin('auto.http.aura');
-            $transactionContext->setSource(TransactionSource::route());
-            $transactionContext->setData(
-                $transactionContext->getData() + [
+        $transaction = SentrySdk::getCurrentHub()->getTransaction();
+        if ($transaction) {
+            $transaction->setName('aura:' . $route);
+            $transaction->setOp('http.server');
+            $transaction->setOrigin('auto.http.aura');
+            $transaction->getMetadata()->setSource(TransactionSource::route());
+            $transaction->setData(
+                $transaction->getData() + [
                     'url'                 => $this->serverVars['REQUEST_URI'] ?? null,
                     'http.request.method' => $this->serverVars['REQUEST_METHOD'] ?? null,
                 ],
@@ -258,14 +267,14 @@ class Tracer
      */
     public function setTransactionContextForSitePage(string $filename): void
     {
-        $transactionContext = $this->transactionContext;
-        if ($transactionContext) {
-            $transactionContext->setName('sitePage:' . self::normaliseFilename($filename));
-            $transactionContext->setOp('http.server');
-            $transactionContext->setOrigin('auto.http.sitePage');
-            $transactionContext->setSource(TransactionSource::url());
-            $transactionContext->setData(
-                $transactionContext->getData() + [
+        $transaction = SentrySdk::getCurrentHub()->getTransaction();
+        if ($transaction) {
+            $transaction->setName('sitePage:' . self::normaliseFilename($filename));
+            $transaction->setOp('http.server');
+            $transaction->setOrigin('auto.http.sitePage');
+            $transaction->getMetadata()->setSource(TransactionSource::url());
+            $transaction->setData(
+                $transaction->getData() + [
                     'url'                 => $this->serverVars['REQUEST_URI'] ?? null,
                     'http.request.method' => $this->serverVars['REQUEST_METHOD'] ?? null,
                 ],
@@ -284,14 +293,14 @@ class Tracer
      */
     public function setTransactionContextForBasicRequest(string $filename): void
     {
-        $transactionContext = $this->transactionContext;
-        if ($transactionContext) {
-            $transactionContext->setName('basicRequest:' . self::normaliseFilename($filename));
-            $transactionContext->setOp('http.server');
-            $transactionContext->setOrigin('auto.http.basicRequest');
-            $transactionContext->setSource(TransactionSource::url());
-            $transactionContext->setData(
-                $transactionContext->getData() + [
+        $transaction = SentrySdk::getCurrentHub()->getTransaction();
+        if ($transaction) {
+            $transaction->setName('basicRequest:' . self::normaliseFilename($filename));
+            $transaction->setOp('http.server');
+            $transaction->setOrigin('auto.http.basicRequest');
+            $transaction->getMetadata()->setSource(TransactionSource::url());
+            $transaction->setData(
+                $transaction->getData() + [
                     'url'                 => $this->serverVars['REQUEST_URI'] ?? null,
                     'http.request.method' => $this->serverVars['REQUEST_METHOD'] ?? null,
                 ],
@@ -308,17 +317,17 @@ class Tracer
      */
     public function setTransactionContextForCommandLineTool(string $filename): void
     {
-        $transactionContext = $this->transactionContext;
-        if ($transactionContext) {
-            $transactionContext->setName('cli:' . self::normaliseFilename($filename));
-            $transactionContext->setOp('console.command');
-            $transactionContext->setOrigin('auto.console');
-            $transactionContext->setSource(TransactionSource::task());
+        $transaction = SentrySdk::getCurrentHub()->getTransaction();
+        if ($transaction) {
+            $transaction->setName('cli:' . self::normaliseFilename($filename));
+            $transaction->setOp('console.command');
+            $transaction->setOrigin('auto.console');
+            $transaction->getMetadata()->setSource(TransactionSource::task());
 
             // Process data, from
             // https://github.com/open-telemetry/semantic-conventions/blob/main/docs/resource/process.md
-            $transactionContext->setData(
-                $transactionContext->getData() + [
+            $transaction->setData(
+                $transaction->getData() + [
                     'process.command_args' => $this->serverVars['argv'] ?? null,
                     'process.owner'        => get_current_user(),
                     'process.pid'          => getmypid(),
@@ -339,17 +348,17 @@ class Tracer
      */
     public function setTransactionContextForDaemon(string $destination, string $subscriptionId, string $messageId): void
     {
-        $transactionContext = $this->transactionContext;
-        if ($transactionContext) {
-            $transactionContext->setName('consume ' . $destination);
-            $transactionContext->setOp('message.receive');
-            $transactionContext->setOrigin('auto.message');
-            $transactionContext->setSource(TransactionSource::task());
+        $transaction = SentrySdk::getCurrentHub()->getTransaction();
+        if ($transaction) {
+            $transaction->setName('consume ' . $destination);
+            $transaction->setOp('message.receive');
+            $transaction->setOrigin('auto.message');
+            $transaction->getMetadata()->setSource(TransactionSource::task());
 
             // Messaging data, from
             // https://github.com/open-telemetry/semantic-conventions/blob/main/docs/messaging/messaging-spans.md
-            $transactionContext->setData(
-                $transactionContext->getData() + [
+            $transaction->setData(
+                $transaction->getData() + [
                     'messaging.destination.name'     => $subscriptionId,
                     'messaging.destination.template' => $destination,
                     'messaging.operation.name'       => 'consume',
@@ -512,57 +521,33 @@ class Tracer
         ?float $endTimestamp = null,
         ?SpanStatus $status = null,
     ): void {
-        // No hub somehow? Do nothing
-        if (!$this->hub) {
+        $hub = SentrySdk::getCurrentHub();
+
+        /** @var array<Span> $spanStack */
+        $spanStack   = [];
+        $transaction = $hub->getTransaction();
+
+        // No transaction or not sampled? Return
+        if (!($transaction && $transaction->getSampled())) {
             return;
         }
 
-        if ($this->transactionContext instanceof TransactionContext) {
-            /** @var array<Span> $spanStack */
-            $spanStack   = [];
-            $transaction = $this->hub->getTransaction();
-            if (!$transaction) {
-                // Create a new transaction, returning early if not sampled
-                $transaction = $this->hub->startTransaction($this->transactionContext);
-                if (!$transaction->getSampled()) {
-                    return;
-                }
+        // Apply each change to the actual transaction stack.
+        foreach ($this->stackChanges as $stackChange) {
+            $spanStack = $stackChange->operate($this->hub, $spanStack);
+        }
+        $this->stackChanges = [];
 
-                // Autostart a span:
-                // close it only upon finishing the transaction
-                $spanContext = new SpanContext();
-                $spanContext->setDescription($transaction->getName());
-                $spanContext->setOp($transaction->getOp());
-                $spanContext->setOrigin($transaction->getOrigin());
-                $spanContext->setStartTimestamp($transaction->getStartTimestamp());
-                $span = $transaction->startChild($spanContext);
-                $this->hub->setSpan($span);
-                $this->spanStack[] = $span;
+        if ($finish) {
+            // End any leftover spans (including the autostarted span, if there)
+            $endTimestamp ??= microtime(true);
+            while (!empty($this->spanStack)) {
+                $leftoverSpan = array_pop($this->spanStack);
+                $leftoverSpan->finish($endTimestamp);
             }
 
-            // Also return now if not sampled,
-            // in case the transaction was already started?
-            if (!$transaction->getSampled()) {
-                return;
-            }
-
-            // Apply each change to the actual transaction stack.
-            foreach ($this->stackChanges as $stackChange) {
-                $spanStack = $stackChange->operate($this->hub, $spanStack);
-            }
-            $this->stackChanges = [];
-
-            if ($finish) {
-                // End any leftover spans (including the autostarted span, if there)
-                $endTimestamp ??= microtime(true);
-                while (!empty($this->spanStack)) {
-                    $leftoverSpan = array_pop($this->spanStack);
-                    $leftoverSpan->finish($endTimestamp);
-                }
-
-                $transaction->setStatus($status);
-                $transaction->finish($endTimestamp);
-            }
+            $transaction->setStatus($status);
+            $transaction->finish($endTimestamp);
         }
     }
 
