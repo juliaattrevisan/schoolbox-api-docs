@@ -78,10 +78,7 @@ class Validator
                 case 'dueDate':
                     if (!is_array($value)) {
                         // Note 'object' in the exception below refers to JSON objects.  JSON objects will appear here as arrays.
-                        throw new SchoolboxException(
-                            'Filter \'dueDate\' must be an object like {"from": date-time, "to": date-time}.' .
-                            '  Note either property may be omitted, but not both.'
-                        );
+                        throw new SchoolboxException("Filter 'dueDate' has unexpected structure.");
                     }
                     $this->validateFilterDueDateValue($value);
                     break;
@@ -99,7 +96,7 @@ class Validator
                         !(array_key_exists('id', $value) && (is_int($value['id']) || ctype_digit($value['id'])))
                     ) {
                         // Note 'object' in the exception below refers to JSON objects.  JSON objects will appear here as arrays.
-                        throw new SchoolboxException('Filter \'project\' must be an object like {"id": integer}.');
+                        throw new SchoolboxException("Filter 'project' has unexpected structure.");
                     }
                     break;
                 default:
@@ -118,15 +115,14 @@ class Validator
         foreach ($keys as $key) {
             if (is_string($key)) {
                 if ($key !== 'id') {
-                    throw new SchoolboxException(
-                        "Filter 'folder' should be an object like {\"id\": 83} or an array of objects."
-                    );
+                    throw new SchoolboxException("Filter 'folder' has unexpected structure.");
                 }
             }
         }
 
         if (array_key_exists('id', $value)) {
             // Expect $value to contain an array like ['id' => $integer].
+            // Note this option has been deprecated in the API docs since version 24.1.8.
             if (count($value) > 1) {
                 throw new SchoolboxException(
                     "Filter 'folder' contains a key 'id', plus other items." .
@@ -143,7 +139,9 @@ class Validator
             //    ['id' => $integer],
             //    ['code' => $integer],
             //    ['id' => $integer],
-            //    ['id' => $integer, 'code' => $string],
+            //    ['id' => $integer, 'code' => $string], // Note this option exists only because prior to 24.1.8, the
+            //                                           // API docs were misleading, and may have caused some users to
+            //                                           // rely on this working.  The API docs were fixed in 24.1.8.
             //    ...
             // ]
             foreach ($value as $subArray) { // Ignore the keys in this array.
@@ -183,10 +181,7 @@ class Validator
     {
         if (count($dueDateStruct) === 0) {
             // Note 'object' in the exception below refers to JSON objects.  JSON objects will appear here as arrays.
-            throw new SchoolboxException(
-                'Filter \'dueDate\' must be an object like {"from": date-time, "to": date-time}.' .
-                '  Note either attribute may be omitted, but not both.'
-            );
+            throw new SchoolboxException("Filter 'dueDate' has unexpected structure.");
         }
 
         foreach ($dueDateStruct as $key => $value) {
