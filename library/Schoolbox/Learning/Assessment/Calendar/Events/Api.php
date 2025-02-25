@@ -22,6 +22,7 @@ use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use UnexpectedValueException;
+use Schoolbox\Config\Loader as ConfigLoader;
 
 /**
  * Implementation of the calendar API for the assessment calendar.
@@ -102,6 +103,17 @@ class Api implements Calendar_Api_EventType_Interface
         $stack = new GenericCollection(EventInterface::class);
         foreach ($assessments as $assessment) {
             if ($this->visibility && !$this->visibility->isVisibleToUser($assessment, $this->user, true)) {
+                continue;
+            }
+
+            /**
+             * If a parent is viewing, they should only see their child's lesson plans
+             * if the restrict_parent_lesson_plan_access config setting is enabled
+             */
+            $isParentOfUser = $_SESSION['user']->isParentOf($this->user);
+            $isLessonPlan = $assessment->getDefaultTypeName() === 'Lesson Plan';
+            $isRestrictLessonPlanAccess = ConfigLoader::getInstance()->get("restrict_parent_lesson_plan_access");
+            if ($isParentOfUser && $isLessonPlan && $isRestrictLessonPlanAccess) {
                 continue;
             }
 
