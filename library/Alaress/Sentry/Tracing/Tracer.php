@@ -197,9 +197,8 @@ class Tracer
         $transactionContext->setData($data);
 
         // Clear the current transaction state, before setting a new one.
-        $this->stackChanges       = [];
-        $this->spanStack          = [];
-        $this->transactionContext = $transactionContext;
+        $this->stackChanges = [];
+        $this->spanStack    = [];
 
         // Also start the transaction, so that profiling can begin.
         $transaction = SentrySdk::getCurrentHub()->startTransaction($transactionContext);
