@@ -21,9 +21,8 @@ try {
 $trace = Tracer::getDefaultTrace();
 $trace->setServerVars($_SERVER);
 
-// Start transaction differently now:
-// add a name
-// convert setTransactionContextForAuraRoute, etc. to spans
+// Start transaction ASAP for profiling:
+// later, setTransactionContextForAuraRoute, etc. will update the transaction.
 $trace->startTransaction(
     name: 'url:' . $path,
     operation: 'http.server',
