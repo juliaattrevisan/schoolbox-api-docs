@@ -66,7 +66,17 @@ if ($_SESSION['communityLogin'] ?? false) {
          */
         $login = $httpClient->get($url, ['headers' => $headers])->getBody()->getContents();
     } catch (RequestException | GuzzleException\ConnectException | GuzzleException\GuzzleException $e) {
-        throw new SchoolboxException("Community Portal Login unavailable. Please try again later", 0, $e);
+        throw new SchoolboxException(
+            message: "Community Portal Login unavailable. Please try again later",
+            code: 0,
+            previous: $e,
+            httpStatusCode: null,
+            /* FIXME This was supposed to put extra logging to the error screen, but for some reason...won't
+             *  nvm...it's because the iframe accesses synRedir.php instead of just synRedir, which is a phplib
+             *  thing where it loads outside of the SitePage context.
+             */
+            information: $e->getMessage()
+        );
     }
 
     /* Set the URL to redirect the user to after login */
@@ -88,7 +98,14 @@ if ($_SESSION['communityLogin'] ?? false) {
 
     // validate required fields (whilst ignoring CSRF fields):
     if (empty($loginUsername) || empty($loginPassword) || empty($loginButton)) {
-        throw new SchoolboxException("Community Portal Login unavailable. Please try again later");
+        /* If we can't infer a username/password/login button, then we're looking some weird screen
+         * that we can't interpret, such as the microsoft login form that asks for your email address.
+         * We can't autosubmit that.
+         *
+         * If we can do it on users' behalf, we will: except where we can't.
+         * In such cases, just present the screen that was given to us, and rely on users to fulfil it.
+         */
+        $page->localRedir($url);
     }
 
     $password = $_SESSION['password'];
