@@ -25,6 +25,8 @@ class Controller extends Base
      * If you need to run a specific audit use the following;
      *      /adminv2/health-check-export/audit?report=uxui
      *      /adminv2/health-check-export/audit?report=uxui,lms,community
+     *
+     * Current options for this are: assessment, uxui, user, lms, community, sva, implementation, unitplanner
      */
 
     /**
@@ -98,7 +100,7 @@ class Controller extends Base
                     break;
                 case 'uxui':
                     /**
-                     * list of reports for uxui
+                     * list of reports for UX/UI Engagement
                      */
                     $this->taskDHelper->addSource('uxui', 'topMenuReport');
                     $this->taskDHelper->addSource('uxui', 'sideMenuReport');
@@ -107,7 +109,7 @@ class Controller extends Base
                     break;
                 case 'user':
                     /**
-                     * list of reports for user management audit
+                     * list of reports for User Management Engagement
                      */
                     $this->taskDHelper->addSource('user', 'listOfRoles');
                     $this->taskDHelper->addSource('user', 'listOfCampuses');
@@ -119,7 +121,7 @@ class Controller extends Base
                     break;
                 case 'lms':
                     /**
-                     * list of reports for LMS Fundamentals Audit
+                     * list of reports for LMS Fundamentals Engagement
                      */
                     $this->taskDHelper->addSource('lms', 'gradeGroups');
                     $this->taskDHelper->addSource('lms', 'academicPeriods');
@@ -131,7 +133,7 @@ class Controller extends Base
                     break;
                 case 'community':
                     /**
-                     * list of reports for Community Engagement Audit
+                     * list of reports for Community Engagement
                      */
                     $this->taskDHelper->addSource('community', 'newsTopics');
                     $this->taskDHelper->addSource('community', 'newsServicePermissions');
@@ -164,7 +166,7 @@ class Controller extends Base
                     break;
                 case 'implementation':
                     /**
-                     * list of reports for implementation reports
+                     * list of reports for Implementation Engagement
                      */
                     $this->taskDHelper->addSource('', 'implementationServicePermissions');
                     $this->taskDHelper->addSource('', 'implementationRoleList');
@@ -177,6 +179,13 @@ class Controller extends Base
                     // TODO: $this->taskDHelper->addSource('', 'implementationTopMenuReport');
                     $this->taskDHelper->addSource('', 'implementationSideMenuReport');
                     $this->taskDHelper->addSource('', 'implementationAcademicPeriods');
+                    break;
+                case 'unitplanner':
+                    /**
+                     * list of reports for Unit Planner Engagement
+                     */
+                    $this->taskDHelper->addSource('', 'unitplannerFrameworks');
+                    $this->taskDHelper->addSource('', 'unitplannerTextboxes');
                     break;
                 default:
                     throw new SchoolboxException("Report '{$report}' Does not exist.");
@@ -1686,5 +1695,25 @@ class Controller extends Base
         $statement->execute();
         $help = new Helper();
         $help->queryToCSV($statement, 'implementationAcademicPeriods.csv');
+    }
+    public function unitplannerFrameworks()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        QUERY HERE
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'unitplannerFrameworks.csv');
+    }
+    public function unitplannerTextboxes()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        QUERY HERE
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'unitplannerTextboxes.csv');
     }
 }
