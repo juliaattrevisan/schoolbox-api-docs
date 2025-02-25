@@ -36,7 +36,7 @@ test.describe("Course import tests", () => {
      * - ensure the course is presented in the homepage
      */
     test("Import course into class", async ({ tester, page, db }) => {
-        const createFolder = new CreateFolder(page);
+        const createFolder = new CreateFolder(tester, page);
         const courseList = new CourseList(page);
         const importCourseIntoClass = new ImportCourseIntoClass(page);
 
@@ -44,26 +44,21 @@ test.describe("Course import tests", () => {
         const homepageTemplateOption = "Course";
         const schoolCode = "test1";
 
-        tester.isGoingTo(`create a folder named "${folderName}"`);
-        await createFolder.goto();
-        await createFolder.typeName(folderName);
-        await createFolder.setHomepageTemplate(homepageTemplateOption);
-
-        tester.isGoingTo("set write access permission for Administration and Teacher");
-        await createFolder.setAccessPermission(1, "write");
-        await createFolder.setAccessPermission(2, "write");
-        tester.isGoingTo("set read access permission for senior student");
-        await createFolder.setAccessPermission(3, "read");
-        tester.isGoingTo("set read access permission for parent");
-        await createFolder.setAccessPermission(4, "read");
-        tester.isGoingTo("set read access permission for junior student");
-        await createFolder.setAccessPermission(5, "read");
-        tester.isGoingTo("set read access permission for middle student");
-        await createFolder.setAccessPermission(6, "read");
-
-        tester.isGoingTo("type a school code and click Create button");
-        await createFolder.typeClassCode(schoolCode);
-        await createFolder.submit();
+        // sets write access permission for Administration and Teacher, read access permission for senior student, parent, junior student and middle student
+        await createFolder.createFolder(
+            folderName,
+            homepageTemplateOption,
+            db,
+            [
+                [1, "write"],
+                [2, "write"],
+                [3, "read"],
+                [4, "read"],
+                [5, "read"],
+                [6, "read"],
+            ],
+            schoolCode,
+        );
 
         tester.isGoingTo("navigate to the course list page");
         await courseList.goto();
