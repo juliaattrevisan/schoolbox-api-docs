@@ -91,6 +91,14 @@ class Processor
 
 
     /**
+     * A set of (folder code, folder id, folder title) tuples to save some mem
+     *
+     * @var array
+     */
+    private array $folderLookup = [];
+
+
+    /**
      * A list of log messages that we can report to users
      *
      * @var array
@@ -173,14 +181,6 @@ class Processor
             $i++;
 
             /* Process feedbacks
-             *     - $creator (Alaress Admin) owns all assessments and feedbacks
-             *     - Assume all feedbacks are for a Due Work
-             *     - Assessment title is presumed "Attendance Semester 1"
-             *     - Due Date arbitrarily chosen to be in Semester 1, 2024
-             */
-
-            /* "Attendance Semester 1" should be an assessment in this folder
-             * If not, skip it
              */
             $folderCode = trim((string)$row['Class Code']);
 
@@ -200,17 +200,28 @@ class Processor
 
             /* Assume this exists, I guess, for now
              */
-            try {
-                $folder = $this->folderMapper->findByCode($folderCode);
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                $this->log(sprintf(
-                    'Row %s: did not find folder code %s. Skipping',
-                    $i,
-                    $folderCode
-                ), self::WARNING);
+            if (!isset($this->folderLookup[$folderCode])) {
+                try {
+                    $folder = $this->folderMapper->findByCode($folderCode);
 
-                continue;
+                    $this->folderLookup[$folderCode] = [
+                        'id' => $folder->getId(),
+                        'title' => $folder->getTitle()
+                    ];
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    $this->log(sprintf(
+                        'Row %s: did not find folder code %s. Skipping',
+                        $i,
+                        $folderCode
+                    ), self::WARNING);
+
+                    continue;
+                }
             }
+
+            /* Yank it from a local cache
+             */
+            $folder = $this->folderLookup[$folderCode];
 
             /* Avengers Assemble
              */
@@ -236,12 +247,12 @@ class Processor
             if ($this->workTypeId) {
                 $this->assessmentQuery->execute([
                     'workTypeId' => $this->workTypeId,
-                    'folderId' => $folder->getId()
+                    'folderId' => $folder['id']
                 ]);
             } else {
                 $this->assessmentQuery->execute([
                     'assessmentId' => trim((string)$row['Assessment Id']),
-                    'folderId' => $folder->getId()
+                    'folderId' => $folder['id']
                 ]);
             }
 
@@ -258,7 +269,7 @@ class Processor
                     $this->log(sprintf(
                         'Row %s: unknown submission_box for assessment in folder %s (%s)',
                         $i,
-                        $folder->getTitle(),
+                        $folder['title'],
                         $folderCode
                     ), self::WARNING);
 
@@ -319,7 +330,7 @@ class Processor
                     $externalId,
                     $assessment->getTitle(),
                     $assessment->getId(),
-                    $folder->getId(),
+                    $folder['id'],
                     $folderCode
                 ), self::INFO);
             }
