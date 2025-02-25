@@ -99,3 +99,9 @@ define('TEMPLATE_body', $config['TEMPLATE_body']);
 define('TEMPLATE_content', $config['TEMPLATE_content']);
 define('SENTRY_TOKEN', $config['SENTRY_TOKEN']);
 define('SENTRY_PROJECT', $config['SENTRY_PROJECT']);
+
+// New Sentry consts
+define('SENTRY_DSN', $config['SENTRY_DSN'] ?? '');
+define('SENTRY_ERROR_SAMPLE_RATE', floatval($config['SENTRY_ERROR_SAMPLE_RATE'] ?? '1'));
+define('SENTRY_TRACE_SAMPLE_RATE', floatval($config['SENTRY_TRACE_SAMPLE_RATE'] ?? '0.0005'));
+define('SENTRY_PROFILE_SAMPLE_RATE', floatval($config['SENTRY_PROFILE_SAMPLE_RATE'] ?? '0.1'));
