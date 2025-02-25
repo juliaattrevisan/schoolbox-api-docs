@@ -697,7 +697,7 @@ class Controller extends BaseController
     private function applyDefaultSettings($roletype, $namespace)
     {
         if ($roletype) {
-            $roleMapper = RoleMapper::getInstance();
+            $roleMapper = $this->getRoleMapper();
             $roleIds = $roleMapper->findIdsByColumn('group_type', $roletype);
         }
 
@@ -720,7 +720,7 @@ class Controller extends BaseController
                 WHERE `groups`.id IN ({$roleIdList})
                 AND `groups`.deleted_at IS NULL";
         $sql .= " AND msg_namespace.slug = :slug";
-        $namespaceMapper = NSMapper::getInstance();
+        $namespaceMapper = $this->getNsMapper();
         $targetNameSpace = $namespaceMapper->findOneBySlug($namespace);
         $params = ['slug' => $targetNameSpace];
 
