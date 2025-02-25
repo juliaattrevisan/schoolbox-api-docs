@@ -32,6 +32,11 @@ class Helper
     private $namespaceMapper;
 
     /**
+     * @var Array
+     */
+    private $namespaces;
+
+    /**
      * Helper constructor.
      *
      * @param RoleMapper $roleMapper
@@ -43,6 +48,7 @@ class Helper
         $this->roleMapper = $roleMapper;
         $this->msgRerouteMapper = $msgRerouteMapper;
         $this->namespaceMapper = $namespaceMapper;
+        $this->namespaces = $this->namespaceMapper->findAll()->sortBy('slug', 'asc')->getPropertyValues('slug');
     }
 
     /**
@@ -55,12 +61,20 @@ class Helper
      */
     public function applyDefaultSettings(string $roletype, string $namespace): void
     {
+        // check for a valid role type
         if ($roletype) {
             $roleIds = $this->roleMapper->findIdsByColumn('group_type', $roletype);
         }
 
+        // if no role type found, throw an exception
         if (empty($roleIds)) {
             throw new Exception("No roles found for roletype: $roletype");
+            return;
+        }
+
+        // check for a valid namespace
+        if ($namespace !== "all" && !in_array($namespace, $this->namespaces)) {
+            throw new Exception("Please provide a valid namespace. No namespace found for: $namespace");
             return;
         }
 
