@@ -1836,14 +1836,7 @@ abstract class Kernel
         // add sentry to the DI
         $di->set(
             'sentry',
-            $di->lazy(
-                static function () use ($di) {
-                    /** @var Instance $sb */
-                    $sb = $di->get('instance');
-                    \Alaress\Sentry\Factory::config($sb);
-                    return SentrySdk::getCurrentHub();
-                }
-            )
+            $di->lazy(SentrySdk::getCurrentHub(...)),
         );
 
 
