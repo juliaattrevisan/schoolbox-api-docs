@@ -50,7 +50,7 @@ class Processor
 
     /**
      * Used to find a relationship between a folder and a particular
-     * assessment by its worktype.
+     * assessment by its (worktype, assessment title) combo
      */
     private const QUERY_ASSESSMENT_WORKTYPE = "
         SELECT 
@@ -62,6 +62,7 @@ class Processor
         INNER JOIN folder f ON mvar.folder_id = f.id
         WHERE mvar.folder_id = :folderId
         AND a.work_type_id = :workTypeId
+        AND a.title = :assessmentTitle
         AND a.deleted_at IS NULL
         AND f.deleted_at IS NULL
     ";
@@ -113,6 +114,7 @@ class Processor
      * @param FilesystemProxy $filesystemProxy
      * @param UserMapper $userMapper
      * @param Mapper $folderMapper
+     * @param string $assessmentTitle
      * @param int|null $workTypeId
      * @param \Alaress_Date_Format $publishAt
      * @param string|null $folderCode
@@ -123,6 +125,7 @@ class Processor
         private FilesystemProxy $filesystemProxy,
         private \Schoolbox\UserMapper $userMapper,
         private \Schoolbox\Resource\Folder\Mapper $folderMapper,
+        private string $assessmentTitle,
         private ?int $workTypeId,
         private \Alaress_Date_Format $publishAt,
         private ?string $folderCode,
@@ -246,6 +249,7 @@ class Processor
              */
             if ($this->workTypeId) {
                 $this->assessmentQuery->execute([
+                    'assessmentTitle' => $this->assessmentTitle,
                     'workTypeId' => $this->workTypeId,
                     'folderId' => $folder['id']
                 ]);

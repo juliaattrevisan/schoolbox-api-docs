@@ -106,6 +106,7 @@ class Controller extends Base
             $this->filesystemProxy,
             $this->userMapper,
             $this->folderMapper,
+            $settings['assessmentTitle'],
             $settings['worktype']->getId(),
             $settings['publishAt'],
             null,
@@ -151,6 +152,7 @@ class Controller extends Base
             $this->filesystemProxy,
             $this->userMapper,
             $this->folderMapper,
+            $settings['assessmentTitle'],
             $settings['worktype']->getId(),
             $settings['publishAt'],
             null,
@@ -182,7 +184,14 @@ class Controller extends Base
      */
     private function verifySettings(array $postVar): array
     {
-        /* Worktype chosen must exist
+        /* Assessment Title should maybe exist
+         */
+        $assessmentTitle = trim((string)$postVar['assessmentTitle']);
+        if ('' === $assessmentTitle) {
+            throw new \DomainException('Assessment Title was omitted.');
+        }
+
+        /* Worktype chosen should maybe exist
          */
         $worktypeId = $postVar['worktypeId'] ?? null;
 
@@ -205,6 +214,7 @@ class Controller extends Base
         }
 
         return [
+            'assessmentTitle' => $assessmentTitle,
             'worktype' => $worktype,
             'feedbackAuthor' => $feedbackAuthor,
             'publishAt' => \Alaress_Date_Format::now()

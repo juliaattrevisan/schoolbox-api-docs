@@ -30,6 +30,9 @@
                 'userId': {
                     'required': true
                 },
+                'assessmentTitle': {
+                    'required': true
+                },
                 "sourceFile-file": {
                     required: {
                         depends: function () {
@@ -100,6 +103,11 @@
             <form action="{{ formRoute }}" method="post" id="bulkAssessmentResult">
                 <section>
                     <fieldset class="content">
+                        <div class="small-12 columns">
+                            <label for="assessmentTitle" class="required">Assessment Title</label>
+                            <input id="assessmentTitle" type="text" name="assessmentTitle" value='' />
+                        </div>
+
                         <div class="small-12 columns">
                             <label for="worktype" class="required">Work Type</label>
 
