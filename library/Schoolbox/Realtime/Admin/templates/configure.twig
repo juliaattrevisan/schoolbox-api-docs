@@ -499,6 +499,7 @@
                                 errorElement.innerHTML = errorMessage;
                                 errorElement.hidden = false;
                                 window.sbProps.toastTimeout({ text: "Settings not applied.", isSuccess: false });
+                            }).finally(() => {
                                 confirmButton.setAttribute("data-is-processing", "false");
                                 confirmButton.innerHTML = "Yes";
                             });
