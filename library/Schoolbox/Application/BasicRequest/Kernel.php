@@ -58,6 +58,9 @@ use Schoolbox\TaskDaemon\Request\MessageFactory;
 use Schoolbox\User\Token\Mapper as TokenMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Version\Version;
+use Sentry\SentrySdk;
+use Sentry\Tracing\SpanStatus;
+use Sentry\Tracing\TransactionSource;
 use SitePage;
 use Twig\Environment;
 use Alaress\Twig\Method as TwigMethod;
@@ -291,18 +294,11 @@ class Kernel extends WebKernelAbstract
         $di->set(
             'sentry',
             $di->lazy(
-                static function () use ($di, $config) {
-                    $sentryToken   = defined('SENTRY_TOKEN') ? SENTRY_TOKEN : null;
-                    $sentryProject = defined('SENTRY_PROJECT') ? SENTRY_PROJECT : null;
+                static function () use ($di) {
                     /** @var Instance $sb */
                     $sb = $di->get('instance');
-                    return (new \Alaress\Sentry\Factory())->build(
-                        $sb,
-                        Instance::APPLICATION_NAME,
-                        $sentryToken,
-                        $sentryProject,
-                        $config,
-                    );
+                    \Alaress\Sentry\Factory::config($sb);
+                    return SentrySdk::getCurrentHub();
                 }
             )
         );

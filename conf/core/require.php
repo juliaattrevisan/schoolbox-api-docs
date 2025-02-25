@@ -8,6 +8,8 @@
  */
 
 // Instance config
+use Alaress\Sentry\Factory;
+
 require_once __DIR__ . '/../../www/conf/conf.php';
 
 // Fast fail if INSTANCE_ID not set or empty
@@ -27,6 +29,9 @@ if (!defined('INSTANCE_ID') || trim((string)INSTANCE_ID) === '') {
 
 // Configure autoloading with Composer
 require __DIR__ . '/../../vendor/autoload.php';
+
+// Set up Sentry before almost anything else
+Factory::init(SENTRY_DSN, SENTRY_ERROR_SAMPLE_RATE, SENTRY_TRACE_SAMPLE_RATE, SENTRY_PROFILE_SAMPLE_RATE);
 
 // Global functions and constants
 require_once __DIR__ . '/../../www/include/stdfuncs.php';

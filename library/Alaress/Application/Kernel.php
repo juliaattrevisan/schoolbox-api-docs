@@ -187,6 +187,11 @@ use Schoolbox\User\Token\Mapper as TokenMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Version\Version;
 use Scrub;
+use Sentry\SentrySdk;
+use Sentry\State\HubInterface;
+use Sentry\Tracing\Transaction;
+use Sentry\Tracing\TransactionContext;
+use Sentry\Tracing\TransactionSource;
 use SitePage;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\RedisStore;
@@ -1837,18 +1842,11 @@ abstract class Kernel
         $di->set(
             'sentry',
             $di->lazy(
-                static function () use ($di, $config) {
-                    $sentryToken   = defined('SENTRY_TOKEN') ? SENTRY_TOKEN : null;
-                    $sentryProject = defined('SENTRY_PROJECT') ? SENTRY_PROJECT : null;
+                static function () use ($di) {
                     /** @var Instance $sb */
                     $sb = $di->get('instance');
-                    return (new \Alaress\Sentry\Factory())->build(
-                        $sb,
-                        Instance::APPLICATION_NAME,
-                        $sentryToken,
-                        $sentryProject,
-                        $config,
-                    );
+                    \Alaress\Sentry\Factory::config($sb);
+                    return SentrySdk::getCurrentHub();
                 }
             )
         );
