@@ -102,9 +102,8 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
             self::dieGracefullyIfInMaintenanceMode($this->di->get('config'));
         }
 
-        // initialise Sentry without doing anything with it just yet:
-        // required so that stack traces always go through to Sentry.
-        Tracer::getDefaultTrace()->setHub($this->di->get('sentry'));
+        // Configure Sentry with the current instance, now it's known.
+        \Alaress\Sentry\Factory::config($this->di->get('instance'));
 
         $this->initRoutes();
         $this->initModules();

@@ -188,10 +188,6 @@ use Schoolbox\UserMapper;
 use Schoolbox\Version\Version;
 use Scrub;
 use Sentry\SentrySdk;
-use Sentry\State\HubInterface;
-use Sentry\Tracing\Transaction;
-use Sentry\Tracing\TransactionContext;
-use Sentry\Tracing\TransactionSource;
 use SitePage;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\RedisStore;
@@ -308,9 +304,8 @@ abstract class Kernel
             throw new LogicException("The 'config' dependency should have been installed.");
         }
 
-        // initialise Sentry without doing anything with it just yet:
-        // required so that stack traces always go through to Sentry.
-        Tracer::getDefaultTrace()->setHub($this->di->get('sentry'));
+        // Configure Sentry with the current instance, now it's known.
+        \Alaress\Sentry\Factory::config($this->di->get('instance'));
 
         self::dieGracefullyIfInMaintenanceMode($config);
         session_save_path(PipeManager::getSessionSavePath($config->get(ConfigMapper::NAME_REDIS_URL), INSTANCE_ID));

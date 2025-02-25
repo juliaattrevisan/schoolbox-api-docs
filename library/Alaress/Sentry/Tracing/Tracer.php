@@ -11,7 +11,6 @@ namespace Alaress\Sentry\Tracing;
 
 use Sentry\Breadcrumb;
 use Sentry\SentrySdk;
-use Sentry\State\HubInterface;
 use Sentry\Tracing\Span;
 use Sentry\Tracing\SpanContext;
 use Sentry\Tracing\SpanStatus;
@@ -86,13 +85,6 @@ class Tracer
     private static ?Tracer $defaultTrace = null;
 
     /**
-     * The Sentry hub to which this tracer reports.
-     *
-     * Will be null if it hasn't been set up yet, for whatever reason.
-     */
-    private ?HubInterface $hub = null;
-
-    /**
      * A set of stack changes, updated with `startSpan`, `finishSpan` and
      * `addBreadcrumb`.
      *
@@ -129,18 +121,6 @@ class Tracer
     {
         self::$defaultTrace ??= new Tracer();
         return self::$defaultTrace;
-    }
-
-    /**
-     * Set the default hub to use.
-     *
-     * @param HubInterface $hub
-     * @return $this
-     */
-    public function setHub(HubInterface $hub): self
-    {
-        $this->hub = $hub;
-        return $this;
     }
 
     /**
