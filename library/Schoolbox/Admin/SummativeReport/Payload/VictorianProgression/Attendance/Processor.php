@@ -92,6 +92,14 @@ class Processor
 
 
     /**
+     * A set of (user id, fullname) tuples to save some mem
+     *
+     * @var array
+     */
+    private array $learnerLookup = [];
+
+
+    /**
      * A set of (folder code, folder id, folder title) tuples to save some mem
      *
      * @var array
@@ -233,17 +241,28 @@ class Processor
              */
             $externalId = trim((string)$row['Student External ID']);
 
-            try {
-                $student = $this->userMapper->findByExternalId($externalId);
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                $this->log(sprintf(
-                    'Row %s: student %s not found; skipping',
-                    $i,
-                    $externalId
-                ), self::WARNING);
+            if (!isset($this->learnerLookup[$externalId])) {
+                try {
+                    $learner = $this->userMapper->findByExternalId($externalId);
 
-                continue;
+                    $this->learnerLookup[$externalId] = [
+                        'id' => $learner->getId(),
+                        'fullname' => $learner->getFullname(),
+                    ];
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    $this->log(sprintf(
+                        'Row %s: student %s not found; skipping',
+                        $i,
+                        $externalId
+                    ), self::WARNING);
+
+                    continue;
+                }
             }
+
+            /* Yank it from a local cache
+             */
+            $learner = $this->learnerLookup[$externalId];
 
             /* Then find the assessment's corresponding submission box id
              */
@@ -310,7 +329,7 @@ class Processor
                     $this->feedbackQuery->execute([
                         'boxId' => $boxId,
                         'marker' => $creator->getId(),
-                        'owner' => $student->getId(),
+                        'owner' => $learner['id'],
                         'reviewRoute' => 'instructor',
                         'comment' => $comment,
                         'mark' => $humanReadableMark,
@@ -330,7 +349,7 @@ class Processor
                     $humanReadableMark,
                     $instructorHumanReadableMark,
                     $normalisedMark,
-                    $student->getFullName(),
+                    $learner['fullname'],
                     $externalId,
                     $assessment->getTitle(),
                     $assessment->getId(),
