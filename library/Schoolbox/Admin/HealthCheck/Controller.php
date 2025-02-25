@@ -186,6 +186,7 @@ class Controller extends Base
                      */
                     $this->taskDHelper->addSource('', 'unitplannerFrameworks');
                     $this->taskDHelper->addSource('', 'unitplannerTextboxes');
+                    $this->taskDHelper->addSource('', 'unitplannerComponents');
                     break;
                 default:
                     throw new SchoolboxException("Report '{$report}' Does not exist.");
@@ -1696,16 +1697,42 @@ class Controller extends Base
         $help = new Helper();
         $help->queryToCSV($statement, 'implementationAcademicPeriods.csv');
     }
+    /**
+     * UNIT PLANNER
+     * unitplannerFrameworks.csv
+     */
     public function unitplannerFrameworks()
     {
         $database = FolderMapper::getInstance()->getDatabase();
         $statement = $database->prepare("
-        QUERY HERE
+        SELECT @domain := value FROM config WHERE name = 'site_domain';
+        SELECT @hostname := value FROM config WHERE name = 'site_hostname';
+
+        SELECT
+            cs.id AS 'Course ID',
+            fcs.name AS 'Course Name',
+            cs.template_id AS 'Framework ID',
+            ct.name AS 'Framework',
+            '' AS 'New Framework ID',
+            '' AS 'New Framework Name',
+            CONCAT('https://',@hostname,@domain,'/course/modify/',cs.id) AS 'Course Link'
+        FROM
+            course_specification cs
+        JOIN
+            folder fcs ON cs.folder_id = fcs.id AND fcs.deleted_at IS NULL
+        LEFT JOIN
+            courseTemplates ct ON cs.template_id = ct.id
+        WHERE
+            cs.deleted_at IS NULL;
         ");
         $statement->execute();
         $help = new Helper();
         $help->queryToCSV($statement, 'unitplannerFrameworks.csv');
     }
+    /**
+     * UNIT PLANNER
+     * unitplannerTextboxes.csv
+     */
     public function unitplannerTextboxes()
     {
         $database = FolderMapper::getInstance()->getDatabase();
@@ -1715,5 +1742,19 @@ class Controller extends Base
         $statement->execute();
         $help = new Helper();
         $help->queryToCSV($statement, 'unitplannerTextboxes.csv');
+    }
+    /**
+     * UNIT PLANNER
+     * unitplannerComponents.csv
+     */
+    public function unitplannerComponents()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        QUERY HERE
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'unitplannerComponents.csv');
     }
 }
