@@ -158,7 +158,7 @@ class Processor
          */
         $reader = new Reader($this->filesystemProxy->readStream($file), true);
         $reader->setExpectedColumns([
-            'Assessment Id',
+            'Assessment ID',
             'Class Code',
             'Student External ID',
             'Normalised Mark',
@@ -251,7 +251,7 @@ class Processor
                 ]);
             } else {
                 $this->assessmentQuery->execute([
-                    'assessmentId' => trim((string)$row['Assessment Id']),
+                    'assessmentId' => trim((string)$row['Assessment ID']),
                     'folderId' => $folder['id']
                 ]);
             }
