@@ -17,32 +17,34 @@ import Homepage from "@schoolboxTest/playwright/support/page/homepage/Homepage";
  * @param db - The database helper
  */
 async function createNewsFolder(tester: AcceptanceTester, page: Page, db: DatabaseHelper): Promise<void> {
-    const createFolder = new CreateFolder(page);
+    const createFolder = new CreateFolder(tester, page);
     const manageGroup = new ManageGroup(page);
 
     const folderName = "News Folder Test";
     const homepageTemplateOption = "Course";
+    const schoolCode = "";
 
-    tester.isGoingTo("Create a folder page to create articles for that audience");
-    await createFolder.goto();
-    await createFolder.typeName(folderName);
-    await createFolder.setHomepageTemplate(homepageTemplateOption);
-    await createFolder.setAccessPermission(1, "write");
-    await createFolder.setAccessPermission(2, "write");
-    tester.isGoingTo("give senior student write permission");
-    await createFolder.setAccessPermission(3, "write");
-    await createFolder.setAccessPermission(4, "write");
-    tester.isGoingTo("give junior student write permission");
-    await createFolder.setAccessPermission(5, "read");
-    tester.isGoingTo("give middle student none permission");
-    await createFolder.setAccessPermission(6, "none");
-    await createFolder.clickCreateGroupToggle();
-    await createFolder.submit();
+    // sets write access permission for Administration, Teacher, Senior Student, Parent, read access permission for junior student and  none for middle student
+    await createFolder.createFolder(
+        folderName,
+        homepageTemplateOption,
+        db,
+        [
+            [1, "write"],
+            [2, "write"],
+            [3, "write"],
+            [4, "write"],
+            [5, "read"],
+            [6, "none"],
+        ],
+        schoolCode,
+        true,
+    );
+
     const folderId = (await db.grabFromDatabase("folder", "id", {
         deleted_at: null,
         "name LIKE": folderName,
     })) as number;
-    expect(folderId).not.toBe(null);
 
     await manageGroup.setAccessPermission("type-3");
     await manageGroup.clickUpdateButton();

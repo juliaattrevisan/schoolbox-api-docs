@@ -29,26 +29,31 @@ async function createClassPage(
     db: DatabaseHelper,
     folderName: string,
 ): Promise<void> {
-    const createFolder = new CreateFolder(page);
+    const createFolder = new CreateFolder(tester, page);
     const resources = new Resources(page);
     const assessmentForm = new AssessmentForm(tester, page);
     const manageGroup = new ManageGroup(page);
     const homepage = new Homepage(page);
     const filename = path.join(__dirname, "../../support/file/baboon.png");
 
-    tester.isGoingTo("Create a homepage");
-    await createFolder.goto();
     const homepageTemplateOption = "Blank";
-    tester.isGoingTo("type a folder name, select a template option and set access permissions");
-    await createFolder.typeName(folderName);
-    await createFolder.setHomepageTemplate(homepageTemplateOption);
-    await createFolder.setAccessPermission(1, "write");
-    await createFolder.setAccessPermission(2, "write");
-    await createFolder.setAccessPermission(3, "read");
-    await createFolder.setAccessPermission(4, "read");
-    await createFolder.setAccessPermission(5, "read");
-    await createFolder.setAccessPermission(6, "read");
-    await createFolder.submit();
+    const schoolCode = "";
+
+    // sets write access permission for Administration and Teacher, read access permission for senior student, parent, junior student and middle student
+    await createFolder.createFolder(
+        folderName,
+        homepageTemplateOption,
+        db,
+        [
+            [1, "write"],
+            [2, "write"],
+            [3, "read"],
+            [4, "read"],
+            [5, "read"],
+            [6, "read"],
+        ],
+        schoolCode,
+    );
 
     tester.isGoingTo("Navigate to the homepage");
     await resources.goto();

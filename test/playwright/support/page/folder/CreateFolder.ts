@@ -96,11 +96,12 @@ export default class CreateFolder {
 
     /**
      * Creates a folder
-     * @param folderName - The folder name to create
+     * @param folderName - The folder name
      * @param homepageTemplateOption - The homepage template option to set
      * @param db - The database helper
      * @param permissionMap - The permission map to set:group id and permission level eg: [1, "write"], [2, "read"]
-     * @param schoolCode - The school code to set
+     * @param schoolCode - The get the school code set send the string
+     * @param clickCreateGroupToggle - To click the creeate group toggle send true - by default it is false
      */
     async createFolder(
         folderName: string,
@@ -108,6 +109,7 @@ export default class CreateFolder {
         db: DatabaseHelper,
         permissionMap: [number, string][],
         schoolCode: string,
+        clickCreateGroupToggle: boolean = false,
     ): Promise<void> {
         this.tester.isGoingTo("Create a folder");
         await this.goto();
@@ -122,9 +124,15 @@ export default class CreateFolder {
             return this.setAccessPermission(key, value);
         }, Promise.resolve());
 
-        this.tester.isGoingTo("type a school code and click Create button");
+        this.tester.isGoingTo("type a school code");
         await this.typeClassCode(schoolCode);
 
+        this.tester.isGoingTo("click the create group toggle or not");
+        if (clickCreateGroupToggle) {
+            await this.clickCreateGroupToggle();
+        }
+
+        this.tester.isGoingTo("click create folder button");
         await this.submit();
 
         this.tester.isGoingTo("Checking the  folder is created");

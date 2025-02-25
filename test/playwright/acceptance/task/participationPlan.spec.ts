@@ -29,7 +29,7 @@ test.describe("Participation Plan Tests", () => {
         const addComponent = new Homepage(page);
         const dueworkForm = new AssessmentForm(tester, page);
         const statusPage = new StatusPage(tester, page);
-        const folder = new Folder(page);
+        const folder = new Folder(tester, page);
         const manageGroup = new ManageGroup(page);
         const resources = new Resources(page);
 
@@ -40,24 +40,23 @@ test.describe("Participation Plan Tests", () => {
 
         const folderName = "Participation and Learning Plan Homepage";
         const homepageTemplateOption = "Blank";
+        const schoolCode = "";
 
-        tester.isGoingTo("create a folder by typing a name and selecting a homepage template");
-        await folder.goto();
-        await folder.typeName(folderName);
-        await folder.setHomepageTemplate(homepageTemplateOption);
-        tester.isGoingTo("set write access permission for Administration and Teacher");
-        await folder.setAccessPermission("1", "write");
-        await folder.setAccessPermission("2", "write");
-        tester.isGoingTo("set read access permission for senior student");
-        await folder.setAccessPermission("3", "read");
-        tester.isGoingTo("set read access permission for parent");
-        await folder.setAccessPermission("4", "read");
-        tester.isGoingTo("set read access permission for junior student");
-        await folder.setAccessPermission("5", "read");
-        tester.isGoingTo("set read access permission for middle student");
-        await folder.setAccessPermission("6", "read");
-        tester.isGoingTo("type a school code and click Create button");
-        await folder.submit();
+        // sets write access permission for Administration and Teacher, read access permission for senior student, parent, junior student and middle student
+        await folder.createFolder(
+            folderName,
+            homepageTemplateOption,
+            db,
+            [
+                [1, "write"],
+                [2, "write"],
+                [3, "read"],
+                [4, "read"],
+                [5, "read"],
+                [6, "read"],
+            ],
+            schoolCode,
+        );
 
         tester.isGoingTo("Navigate to the new folder store its location for later tests");
         await folder.gotoResources();
