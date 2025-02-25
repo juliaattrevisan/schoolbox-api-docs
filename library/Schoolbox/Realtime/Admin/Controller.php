@@ -688,49 +688,6 @@ class Controller extends BaseController
 
     /**
      * Apply default notification settings for a given role type and namespace.
-     * TODO - split the below into a shared resource and share with tools/notif/delete-personalised-settings.php
-     *
-     * @since 25.0
-     *
-     * @throws \Alaress\Web\Controller\Exception
-     */
-    private function applyDefaultSettings($roletype, $namespace)
-    {
-        if ($roletype) {
-            $roleMapper = $this->getRoleMapper();
-            $roleIds = $roleMapper->findIdsByColumn('group_type', $roletype);
-        }
-
-        if (empty($roleIds)) {
-            $this->sendError("No roles found for roletype: $roletype");
-            return;
-        }
-
-        $msgRerouteMapper = RerouteMapper::getInstance();
-        $msgRerouteMapper->getDatabase()->beginTransaction();
-
-        $roleIdList = implode(',', $roleIds);
-        $params = [];
-        $delete = "DELETE msg_reroute ";
-        $sql = " FROM msg_reroute
-                JOIN msg_source ON msg_source.id = msg_reroute.msg_source_id
-                JOIN msg_namespace ON msg_namespace.id = msg_source.namespace
-                JOIN user ON user.id = msg_reroute.user_id AND user.deleted_at IS NULL
-                JOIN `groups` ON user.group_id = `groups`.id
-                WHERE `groups`.id IN ({$roleIdList})
-                AND `groups`.deleted_at IS NULL";
-        $sql .= " AND msg_namespace.slug = :slug";
-        $namespaceMapper = $this->getNsMapper();
-        $targetNameSpace = $namespaceMapper->findOneBySlug($namespace);
-        $params = ['slug' => $targetNameSpace];
-
-        $deleteStatement = $namespaceMapper->getDatabase()->prepare($delete . $sql);
-        $deleteStatement->execute($params);
-        $msgRerouteMapper->getDatabase()->commit();
-    }
-
-    /**
-     * Apply default notification settings for a given role type and namespace.
      *
      * @api POST /adminv2/notifications/settings/apply-default
      * @since 25.0
@@ -752,12 +709,13 @@ class Controller extends BaseController
                 return;
             }
 
+            $helper = new Helper($this->getRoleMapper(), RerouteMapper::getInstance(), $this->getNsMapper());
             if ($roletype == "all") {
-                $this->applyDefaultSettings("student", $namespace);
-                $this->applyDefaultSettings("staff", $namespace);
-                $this->applyDefaultSettings("parent", $namespace);
+                $helper->applyDefaultSettings("student", $namespace);
+                $helper->applyDefaultSettings("parent", $namespace);
+                $helper->applyDefaultSettings("staff", $namespace);
             } else {
-                $this->applyDefaultSettings($roletype, $namespace);
+                $helper->applyDefaultSettings($roletype, $namespace);
             }
 
             $this->response = $this->responseAsJson(['success' => true]);
