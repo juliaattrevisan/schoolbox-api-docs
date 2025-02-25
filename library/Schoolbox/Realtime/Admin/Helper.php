@@ -80,6 +80,10 @@ class Helper
 
         $this->msgRerouteMapper->getDatabase()->beginTransaction();
 
+        if ($namespace !== "all") {
+            $targetNameSpace = $this->namespaceMapper->findOneBySlug($namespace);
+        }
+
         $roleIdList = implode(',', $roleIds);
         $params = [];
         $delete = "DELETE msg_reroute ";
@@ -90,10 +94,10 @@ class Helper
                 JOIN `groups` ON user.group_id = `groups`.id
                 WHERE `groups`.id IN ({$roleIdList})
                 AND `groups`.deleted_at IS NULL";
-        $sql .= " AND msg_namespace.slug = :slug";
-        $targetNameSpace = $this->namespaceMapper->findOneBySlug($namespace);
-        $params = ['slug' => $targetNameSpace];
-
+        if (isset($targetNameSpace)) {
+            $sql .= " AND msg_namespace.slug = :slug";
+            $params = ['slug' => $targetNameSpace];
+        }
         $deleteStatement = $this->namespaceMapper->getDatabase()->prepare($delete . $sql);
         $deleteStatement->execute($params);
         $this->msgRerouteMapper->getDatabase()->commit();
