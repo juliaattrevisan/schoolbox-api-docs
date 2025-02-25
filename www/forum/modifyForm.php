@@ -17,12 +17,37 @@ $groupHandler = new Group();
 $access = Access::getInstance();
 $threadMapper = ThreadMapper::getInstance();
 $postMapper = PostMapper::getInstance();
+$folderMapper = FolderMapper::getInstance();
+
+/**
+ * Validate user has access to the page/forum, and return the access level
+ *
+ * @param int $folderId
+ * @param Access $access
+ * @param Group $groupHandler
+ * @param int $accessRequired
+ * @return int
+ * @throws \Schoolbox\Mapper\Exception
+ */
+function getAccess(int $folderId, Access $access, Group $groupHandler, int $accessRequired = UserAccess::ACCESS_READ): int
+{
+    /* Check permissions
+    */
+    $accessLevel = $access->getFolderAccess($_SESSION['user'], $folderId);
+    if ($accessLevel < $accessRequired) {
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+    }
+    if ($groupHandler->hasChildAccessOnly($folderId, $_SESSION['user']->getId())) {
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+    }
+    return $accessLevel;
+}
 
 if (is_numeric($_POST['categoryID'] ?? false)) {
     /* Category exists
      */
     try {
-        $folder = FolderMapper::getInstance()->findById($_POST['categoryID']);
+        $folder = $folderMapper->findById($_POST['categoryID']);
     } catch (Exception $e) {
         throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
     }
@@ -32,15 +57,9 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
         SitePage::localRedir('/homepage/' . $folder->getId());
     }
 
-    /* check permissions
-     */
-    $accessLevel = $access->getFolderAccess($_SESSION['user'], $folder->getId());
-    if ($accessLevel < UserAccess::ACCESS_READ) {
-        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
-    }
-    if ($groupHandler->hasChildAccessOnly($_POST['categoryID'], $_SESSION['user']->getId())) {
-        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
-    }
+    /* Check permissions
+    */
+    $accessLevel = getAccess($folder->getId(), $access, $groupHandler);
 
     /* modify post
      */
@@ -107,7 +126,7 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
         if (!is_numeric($_POST['threadID'])) {
             /** @var \Schoolbox\Forum\Thread $thread */
             $thread = $threadMapper->createModel();
-            $thread->setCategory(FolderMapper::getInstance()->createModel()->setId($_POST['categoryID']));
+            $thread->setCategory($folderMapper->createModel()->setId($_POST['categoryID']));
             $thread->setUser($_SESSION['user']);
             $thread->setTitle($_POST['title']);
 
@@ -181,15 +200,9 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
         SitePage::localRedir('/homepage/' . $thread->getCategory()->getId());
     }
 
-    /* check permissions
-     */
-    $accessLevel = $access->getFolderAccess($_SESSION['user'], $thread->getCategory()->getId());
-    if ($accessLevel < UserAccess::ACCESS_WRITE) {
-        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
-    }
-    if ($groupHandler->hasChildAccessOnly($thread->getCategory()->getId(), $_SESSION['user']->getId())) {
-        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
-    }
+    /* Check permissions
+    */
+    $accessLevel = getAccess($thread->getCategory()->getId(), $access, $groupHandler, UserAccess::ACCESS_WRITE);
 
     $thread->setLocked(!$thread->isLocked());
 
@@ -233,15 +246,9 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
             /** @var \Schoolbox\Forum\Thread $thread */
             $thread = $threadMapper->findById($threadID);
 
-            /* check permissions
-             */
-            $accessLevel = $access->getFolderAccess($_SESSION['user'], $thread->getCategory()->getId());
-            if ($accessLevel < UserAccess::ACCESS_WRITE) {
-                throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
-            }
-            if ($groupHandler->hasChildAccessOnly($thread->getCategory()->getId(), $_SESSION['user']->getId())) {
-                throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
-            }
+            /* Check permissions
+            */
+            $accessLevel = getAccess($thread->getCategory()->getId(), $access, $groupHandler, UserAccess::ACCESS_WRITE);
 
             $categoryID = $thread->getCategory()->getId();
 
