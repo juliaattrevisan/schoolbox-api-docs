@@ -17,7 +17,6 @@ use Schoolbox\Instance;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
 use Sentry;
-use Sentry\State\HubInterface;
 
 /**
  * Factory for building the Sentry reporter.
