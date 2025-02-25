@@ -29,6 +29,12 @@ use Twig\Error\Error;
 class Controller extends Base
 {
     /**
+     * Number of minutes this source csv should exist
+     */
+    private const CSV_DURATION = 15;
+
+
+    /**
      * Constructor.
      */
     public function __construct(
@@ -57,7 +63,9 @@ class Controller extends Base
             ->setMimeFilter('.csv,text/csv')
             ->setReadOnly(false)
             ->setMulti(false)
-            ->useImportExpiryDate();
+            /* Expire 30 minutes from now, to minimise the existence in publicly-available storage
+             */
+            ->setExpiryDate(\Alaress_Date_Format::now()->addMinutes(self::CSV_DURATION));
 
         $this->response = $this->responseFromTemplate(
             '@adminBulkAssessmentResult/index.twig',
@@ -187,6 +195,7 @@ class Controller extends Base
         /* Assessment Title should maybe exist
          */
         $assessmentTitle = trim((string)$postVar['assessmentTitle']);
+
         if ('' === $assessmentTitle) {
             throw new \DomainException('Assessment Title was omitted.');
         }
