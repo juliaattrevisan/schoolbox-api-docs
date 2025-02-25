@@ -34,7 +34,7 @@ test.describe("Profile Editor", () => {
         tester.isGoingTo("Navigate to the student profile page");
         await profilePage.goto("25");
         tester.isGoingTo("Ensure the student name is presented");
-        await expect(page.locator("h1")).toContainText("Student");
+        await profileEditor.checkFieldNameIsPresented("Ms Jana Reed");
     });
 
     /**
@@ -49,14 +49,17 @@ test.describe("Profile Editor", () => {
         tester.isGoingTo("Navigate to the staff profile editor page");
         await profileEditor.goto("staff");
         tester.isGoingTo("Set up the field name with {firstname} {lastname} Test");
+        await profileEditor.clearFieldName();
         await profileEditor.typeFieldName("{firstname} {lastname} Test");
-        await page.waitForTimeout(3000);
+
         tester.isGoingTo("Click the update button");
         await profileEditor.clickUpdateButton();
+        await page.waitForTimeout(1000);
         tester.isGoingTo("Navigate to the staff profile page");
         await profilePage.goto("22");
+        await page.waitForTimeout(3000);
         tester.isGoingTo("Ensure the staff first and last names and Test are presented");
-        await expect(page.locator("h1")).toContainText("Jack Coles Test");
+        await profileEditor.checkFieldNameIsPresented("Jack Coles Test");
     });
 
     /**
@@ -71,13 +74,14 @@ test.describe("Profile Editor", () => {
         tester.isGoingTo("Navigate to the parent profile editor page");
         await profileEditor.goto("parent");
         tester.isGoingTo("Set up the field name with {preferredname} {lastname}");
+        await profileEditor.clearFieldName();
         await profileEditor.typeFieldName("{preferredname} {lastname}");
         tester.isGoingTo("Click the update button");
         await profileEditor.clickUpdateButton();
         tester.isGoingTo("Navigate to the parent profile page");
         await profilePage.goto("27");
         tester.isGoingTo("Ensure the parent preferred name and last name are presented");
-        await expect(page.locator("h1")).toContainText("");
+        await profileEditor.checkFieldNameIsPresented("Jenni Reed");
     });
 
     test.afterAll(async ({ baseTester, db }) => {

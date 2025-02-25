@@ -31,7 +31,6 @@ export default class ProfileEditor {
      * @param fieldName - The field name
      */
     async typeFieldName(fieldName: string): Promise<void> {
-        await this.page.locator(ProfileEditor.SELECTOR_NAME_DISPLAY_FIELD).click();
         await this.page.locator(ProfileEditor.SELECTOR_NAME_DISPLAY_FIELD).fill(fieldName);
     }
 
@@ -55,6 +54,6 @@ export default class ProfileEditor {
      * @param fieldName Check the field name is presented
      */
     async checkFieldNameIsPresented(fieldName: string): Promise<void> {
-        await expect(this.page.locator(ProfileEditor.SELECTOR_NAME_DISPLAY_FIELD)).toHaveValue(fieldName);
+        await expect(this.page.locator('[data-test="user-profile-name"]')).toHaveText(fieldName);
     }
 }
