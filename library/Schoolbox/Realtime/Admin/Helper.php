@@ -81,7 +81,7 @@ class Helper
         $this->msgRerouteMapper->getDatabase()->beginTransaction();
 
         if ($namespace !== "all") {
-            $targetNameSpace = $this->namespaceMapper->findOneBySlug($namespace);
+            $targetNamespace = $this->namespaceMapper->findOneBySlug($namespace);
         }
 
         $roleIdList = implode(',', $roleIds);
@@ -94,9 +94,9 @@ class Helper
                 JOIN `groups` ON user.group_id = `groups`.id
                 WHERE `groups`.id IN ({$roleIdList})
                 AND `groups`.deleted_at IS NULL";
-        if (isset($targetNameSpace)) {
+        if (isset($targetNamespace)) {
             $sql .= " AND msg_namespace.slug = :slug";
-            $params = ['slug' => $targetNameSpace];
+            $params = ['slug' => $targetNamespace];
         }
         $deleteStatement = $this->namespaceMapper->getDatabase()->prepare($delete . $sql);
         $deleteStatement->execute($params);
@@ -139,7 +139,7 @@ class Helper
         // $msgRerouteMapper->getDatabase()->beginTransaction();
 
         // if ($nameSpace !== 'all') {
-        //     $targetNameSpace = $msgNamespaceMapper->findOneBySlug($nameSpace);
+        //     $targetNamespace = $msgNamespaceMapper->findOneBySlug($nameSpace);
         // }
 
         // $roleIdList = implode(',', $roleIds);
@@ -153,9 +153,9 @@ class Helper
         //         JOIN `groups` ON user.group_id = `groups`.id
         //         WHERE `groups`.id IN ({$roleIdList})
         //           AND `groups`.deleted_at IS NULL";
-        // if (isset($targetNameSpace)) {
+        // if (isset($targetNamespace)) {
         //     $sql .= " AND msg_namespace.slug = :slug";
-        //     $params = ['slug' => $targetNameSpace];
+        //     $params = ['slug' => $targetNamespace];
         // }
         // $statement = $msgNamespaceMapper->getDatabase()->query($select . $sql, $params);
         // foreach ($statement->fetchAll() as $item) {
