@@ -52,23 +52,35 @@ class Helper
     }
 
     /**
-     * Apply default notification settings for a given role type and namespace.
+     * Apply default notification settings for a given role id or role type and namespace.
      * TODO - update this helper so tools/notif/delete-personalised-settings.php can also access
      *
-     * @param string $roletype
+     * @param int|null $roleId
+     * @param string|null $roletype
      * @param string $namespace
      * @return void
      */
-    public function applyDefaultSettings(string $roletype, string $namespace): void
+    public function applyDefaultSettings(?int $roleId, ?string $roletype, string $namespace): void
     {
-        // check for a valid role type
+        // check for a valid role if set
+        if ($roleId) {
+            try {
+                $role  = $this->roleMapper->findById($roleId);
+                $roleIds = [$role->getId()];
+            } catch (\Exception $e) {
+                throw new Exception("Sorry, we are unable to find a valid role for role id: $roleId");
+                return;
+            }
+        }
+
+        // check for a valid role type if set
         if ($roletype) {
             $roleIds = $this->roleMapper->findIdsByColumn('group_type', $roletype);
         }
 
-        // if no role type found, throw an exception
+        // if no role type found either, throw an exception
         if (empty($roleIds)) {
-            throw new Exception("No roles found for roletype: $roletype");
+            throw new Exception("Please provide either valid role id or roletype");
             return;
         }
 
@@ -78,12 +90,13 @@ class Helper
             return;
         }
 
-        $this->msgRerouteMapper->getDatabase()->beginTransaction();
-
+        // retrieve the target namespace to add to the $params array later
         if ($namespace !== "all") {
             $targetNamespace = $this->namespaceMapper->findOneBySlug($namespace);
         }
 
+        // begin SQL transaction
+        $this->msgRerouteMapper->getDatabase()->beginTransaction();
         $roleIdList = implode(',', $roleIds);
         $params = [];
         $delete = "DELETE msg_reroute ";

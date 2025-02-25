@@ -711,11 +711,11 @@ class Controller extends BaseController
 
             $helper = new Helper($this->getRoleMapper(), RerouteMapper::getInstance(), $this->getNsMapper());
             if ($roletype == "all") {
-                $helper->applyDefaultSettings("student", $namespace);
-                $helper->applyDefaultSettings("parent", $namespace);
-                $helper->applyDefaultSettings("staff", $namespace);
+                $helper->applyDefaultSettings(null, "student", $namespace);
+                $helper->applyDefaultSettings(null, "parent", $namespace);
+                $helper->applyDefaultSettings(null, "staff", $namespace);
             } else {
-                $helper->applyDefaultSettings($roletype, $namespace);
+                $helper->applyDefaultSettings(null, $roletype, $namespace);
             }
 
             $this->response = $this->responseAsJson(['success' => true]);
