@@ -101,6 +101,16 @@
                 <section>
                     <fieldset class="content">
                         <div class="small-12 columns">
+                            <label for="worktype" class="required">Work Type</label>
+
+                            <select id="worktype" name="worktypeId">
+                                {% for worktype in worktypes %}
+                                    <option value="{{ worktype.id }}">{{ worktype.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="small-12 columns">
                             <label for="userId" class="required">Feedback Author</label>
                             <input id="userId" data-selectizeuser type="text" name="userId" placeholder="Search Users">
                         </div>

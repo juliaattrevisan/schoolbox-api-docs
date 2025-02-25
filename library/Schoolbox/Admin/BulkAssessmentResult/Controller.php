@@ -35,6 +35,7 @@ class Controller extends Base
         private MapperProxy $assessmentMapperProxy,
         private FilesystemProxy $filesystemProxy,
         private \Schoolbox\Error\Mapper $errorMapper,
+        private \Schoolbox\Learning\Assessment\WorkType\Mapper $worktypeMapper,
         private \Schoolbox\UserMapper $userMapper,
         private \Schoolbox\Resource\Folder\Mapper $folderMapper,
         private \Schoolbox\Resource\Storage\Mapper $storageMapper,
@@ -66,6 +67,7 @@ class Controller extends Base
                 /* Not sure if there's a shortcut to this: never seen one?
                  */
                 'roletypeStaff' => \Schoolbox\Role::STAFF,
+                'worktypes' => $this->worktypeMapper->findAll()->sortNaturally('sequence'),
                 'sourceFileZone' => $zone->getTwigContext(),
             ],
             'Bulk Assessment Result'
@@ -104,7 +106,7 @@ class Controller extends Base
             $this->filesystemProxy,
             $this->userMapper,
             $this->folderMapper,
-            null,
+            $settings['worktype']->getId(),
             $settings['publishAt'],
             null,
             false,
@@ -149,7 +151,7 @@ class Controller extends Base
             $this->filesystemProxy,
             $this->userMapper,
             $this->folderMapper,
-            null,
+            $settings['worktype']->getId(),
             $settings['publishAt'],
             null,
             true,
@@ -161,7 +163,7 @@ class Controller extends Base
                 'pageCurrent' => $this->routeGenerator->generate('adminBulkAssessmentResult.getIndex'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminBulkAssessmentResult.getIndex')),
                 'settings' => $settings,
-                'outcome' => $outcome
+                'outcome' => $outcome,
             ],
             'Bulk Assessment Result',
         );
@@ -180,6 +182,18 @@ class Controller extends Base
      */
     private function verifySettings(array $postVar): array
     {
+        /* Worktype chosen must exist
+         */
+        $worktypeId = $postVar['worktypeId'] ?? null;
+
+        try {
+            $worktype = $this->worktypeMapper->findById($worktypeId);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            // noop?
+            // throw new \DomainException('Unknown work type selected, or was omitted.');
+            $worktype = null;
+        }
+
         /* Feedback Author needs to exist
          */
         $feedbackAuthorId = $postVar['userId'] ?? null;
@@ -191,6 +205,7 @@ class Controller extends Base
         }
 
         return [
+            'worktype' => $worktype,
             'feedbackAuthor' => $feedbackAuthor,
             'publishAt' => \Alaress_Date_Format::now()
         ];
