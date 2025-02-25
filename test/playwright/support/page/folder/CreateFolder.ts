@@ -64,7 +64,7 @@ export default class CreateFolder {
      * @param groupId - The group ID to set
      * @param permissionLevel - The permission level to set
      */
-    async setAccessPermission(groupId: string | number, permissionLevel: string): Promise<void> {
+    async setAccessPermission(groupId: string | number, permissionLevel: "none" | "read" | "write"): Promise<void> {
         await this.page
             .getByTestId(`${CreateFolder.DATATEST_FOLDER_FORM_RADIO_ACCESS_GROUP}-${permissionLevel}-${groupId}`)
             .check();
@@ -107,7 +107,7 @@ export default class CreateFolder {
         folderName: string,
         homepageTemplateOption: string,
         db: DatabaseHelper,
-        permissionMap: [number, string][],
+        permissionMap: [number, "none" | "read" | "write"][],
         schoolCode: string,
         clickCreateGroupToggle: boolean = false,
     ): Promise<void> {
