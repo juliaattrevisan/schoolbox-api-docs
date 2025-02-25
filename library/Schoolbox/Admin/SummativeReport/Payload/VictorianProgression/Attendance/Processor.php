@@ -158,8 +158,10 @@ class Processor
         ]);
 
         /* Compute publish date just once
+         * and also make it the same as created_at and updated_at to better keep track
+         * of things after an import has occurred
          */
-        $publishAt = $this->publishAt->getDatabase();
+        $datetime = $this->publishAt->getDatabase();
 
         /* Maintain a row counter
          */
@@ -243,13 +245,6 @@ class Processor
                 ]);
             }
 
-            /* Used for a feedback's created_at and updated_at timestamps
-            *
-             * Make them universally the same, to better keep track of things after an import
-             * has occurred
-             */
-            $datetime = \Alaress_Date_Format::now()->getDatabase();
-
             /* Add a feedback for every assessment that might match the title/worktype combo
              * This is kind of maybe too loose?
              */
@@ -308,7 +303,7 @@ class Processor
                         'normMark' => $normalisedMark,
                         'resubmissionRequired' => 0,
                         'createdAt' => $datetime,
-                        'publishedAt' => $publishAt,
+                        'publishedAt' => $datetime,
                         'publishedBy' => $creator->getId(),
                         'updatedAt' => $datetime
                     ]);
