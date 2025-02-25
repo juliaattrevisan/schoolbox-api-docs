@@ -219,20 +219,8 @@ class Tracer
         }
         $transactionContext->setStartTimestamp($startTimestamp ?? microtime(true));
         $transactionContext->setData($data);
-
-        // Clear the current transaction state, before setting a new one.
-        $this->stackChanges       = [];
-        $this->spanStack          = [];
-        $this->transactionContext = $transactionContext;
+        $this->hub->startTransaction($transactionContext);
         return $transactionContext;
-    }
-
-    /**
-     * @return TransactionContext|null
-     */
-    public function getTransactionContext(): ?TransactionContext
-    {
-        return $this->transactionContext;
     }
 
     /**
@@ -451,7 +439,7 @@ class Tracer
         array $metadata = [],
         ?float $timestamp = null,
     ): void {
-        $this->stackChanges[] = new Operation\Breadcrumb(
+        $this->hub->addBreadcrumb(
             new Breadcrumb($level, $type, $category, $message, $metadata, $timestamp),
         );
     }
