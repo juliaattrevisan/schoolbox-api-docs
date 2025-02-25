@@ -58,10 +58,14 @@ class Helper
      * @param int|null $roleId
      * @param string|null $roletype
      * @param string $namespace
-     * @return void
+     * @param boolean|null $hasLog
+     * @return string[]|void
      */
-    public function applyDefaultSettings(?int $roleId, ?string $roletype, string $namespace): void
+    public function applyDefaultSettings(?int $roleId, ?string $roletype, string $namespace): array|null
     {
+        // to return log messages
+        $log = [];
+
         // check for a valid role if set
         if ($roleId) {
             try {
@@ -69,7 +73,7 @@ class Helper
                 $roleIds = [$role->getId()];
             } catch (\Exception $e) {
                 throw new Exception("Sorry, we are unable to find a valid role for role id: $roleId");
-                return;
+                return null;
             }
         }
 
@@ -81,13 +85,13 @@ class Helper
         // if no role type found either, throw an exception
         if (empty($roleIds)) {
             throw new Exception("Please provide either valid role id or roletype");
-            return;
+            return null;
         }
 
         // check for a valid namespace
         if ($namespace !== "all" && !in_array($namespace, $this->namespaces)) {
             throw new Exception("Please provide a valid namespace. No namespace found for: $namespace");
-            return;
+            return null;
         }
 
         // retrieve the target namespace to add to the $params array later
@@ -99,6 +103,7 @@ class Helper
         $this->msgRerouteMapper->getDatabase()->beginTransaction();
         $roleIdList = implode(',', $roleIds);
         $params = [];
+        $select = "SELECT user_id, msg_source.key, msg_namespace.slug, delivery ";
         $delete = "DELETE msg_reroute ";
         $sql = " FROM msg_reroute
                 JOIN msg_source ON msg_source.id = msg_reroute.msg_source_id
@@ -111,9 +116,20 @@ class Helper
             $sql .= " AND msg_namespace.slug = :slug";
             $params = ['slug' => $targetNamespace];
         }
+
+        // fetch the records to be deleted and log them
+        // the below currently results in an error: Cannot use object of type Schoolbox\Realtime\Message\NS as array
+        // $statement = $this->namespaceMapper->getDatabase()->query($select . $sql, $params);
+        // foreach ($statement->fetchAll() as $item) {
+        //     $log[] = sprintf('%s, %s, %s, %s', $item['user_id'], $item['slug'], $item['key'], $item['delivery']);
+        // }
+
+        // execute the delete statement
         $deleteStatement = $this->namespaceMapper->getDatabase()->prepare($delete . $sql);
         $deleteStatement->execute($params);
         $this->msgRerouteMapper->getDatabase()->commit();
+
+        return $log;
 
         /**
          * tools/notif/delete-personalised-settings.php for reference below
