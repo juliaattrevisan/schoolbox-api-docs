@@ -28,6 +28,16 @@ class Factory
      */
     private const ERROR_REPORTING = E_ALL & ~E_NOTICE & ~E_USER_NOTICE & ~E_STRICT;
 
+    /**
+     * Initialise the Sentry hub as much as it can be before the instance's
+     * configuration is known.
+     *
+     * @param string|null $sentryDsn
+     * @param float|null  $errorSampleRate
+     * @param float|null  $traceSampleRate
+     * @param float|null  $profileSampleRate
+     * @return Sentry\State\HubInterface
+     */
     public static function init(
         ?string $sentryDsn,
         ?float $errorSampleRate,
@@ -80,6 +90,12 @@ class Factory
         return $hub;
     }
 
+    /**
+     * Configure the Sentry hub with the instance's details.
+     *
+     * @param Instance $instance
+     * @return void
+     */
     public static function config(Instance $instance): void
     {
         Sentry\configureScope(static function (Sentry\State\Scope $scope) use ($instance): void {
