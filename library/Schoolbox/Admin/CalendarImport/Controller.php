@@ -38,18 +38,6 @@ use Bulk_Calendar;
  */
 class Controller extends Base
 {
-    private FolderMapper $folderMapper;
-
-    private UserMapper $userMapper;
-
-    private CourseImplementation\Mapper $courseImplementationMapper;
-
-    private UnitSpecification\Mapper $unitSpecificationMapper;
-
-    private ImportFactory $importFactory;
-
-    private MapperProxy $assessmentMapperProxy;
-
     /**
      * Controller constructor.
      */
@@ -57,12 +45,6 @@ class Controller extends Base
         private ErrorMapper $errorMapper,
         private CollectorFactory $collectorFactory,
         private FilesystemProxy $filesystemProxy,
-//        FolderMapper $folderMapper,
-//        UserMapper $userMapper,
-//        CourseImplementation\Mapper $courseImplementationMapper,
-//        UnitSpecification\Mapper $unitSpecificationMapper,
-//        ImportFactory $importFactory,
-//        MapperProxy $assessmentMapperProxy,
     ) {
     }
 
@@ -104,7 +86,7 @@ class Controller extends Base
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
-        $collector = (new CollectorFactory())->build($attachment ?? []);
+        $collector = $this->collectorFactory->build($attachment);
 
         try {
             $file = $collector->getFirst();
@@ -129,7 +111,7 @@ class Controller extends Base
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
-        $collector = (new CollectorFactory())->build($attachment ?? []);
+        $collector = $this->collectorFactory->build($attachment);
 
         try {
             $file = $collector->getFirst();
@@ -219,15 +201,6 @@ class Controller extends Base
      */
     private function getAttachZone(): array
     {
-//        $zone = (new Zone('attachment'))
-//            ->setThumbnailSize(64)
-//            ->setModalTitle('Select CSV')
-//            ->setAttachmentsLabel('')
-//            ->setAttachPrompt('Upload CSV')
-//            ->setMimeFilter('.csv,text/csv')
-//            ->setReadOnly(false)
-//            ->setMulti(false);
-
         $zone = (new Zone('bulkadd'))
             ->setFileVar('bulkadd[]')
             ->setThumbnailSize(64)

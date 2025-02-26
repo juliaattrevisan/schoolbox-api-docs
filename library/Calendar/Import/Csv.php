@@ -285,7 +285,6 @@ class Csv extends Base
             $eventAuthor = $this->getAuthor();
 
             if ($hasOwnerColumn && strlen(trim($owner))) {
-                var_dump($owner);
                 if (!is_numeric(trim($owner))) {
                     $output[] = [
                         'name'   => $name,
@@ -341,6 +340,7 @@ class Csv extends Base
                 }
                 $event->setPublishDateTime($publishDate);
             }
+            $folderList = $this->categoryList;
 
             if ($hasCampusColumn) {
                 $cloneCampuses = $allCampuses;
@@ -373,7 +373,6 @@ class Csv extends Base
             } else {
                 // Allow override of folder relations only if no folder list has
                 // been set in the object
-                $folderList = $this->categoryList;
                 if (empty($folderList)) {
                     $folderList = [];
                     foreach (explode(',', $folderIds) as $folderId) {
