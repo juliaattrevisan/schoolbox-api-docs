@@ -52,14 +52,14 @@ class Module extends BaseModule
 
         $this->register(
             self::METHOD_GET,
-            '/Import',
+            '/import/school-events',
             'getCalendarImportForm',
             $permission,
         );
 
         $this->register(
             self::METHOD_POST,
-            '/Import',
+            '/import/school-events',
             'postCalendarImport',
             $permission,
         );
