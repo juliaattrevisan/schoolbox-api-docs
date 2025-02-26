@@ -21,6 +21,8 @@ services:
       context: ./docker/php-fpm
     volumes:
       - code:/usr/share/schoolbox
+      - ./docker/php-fpm/config/schoolbox:/etc/schoolbox
+      - ./docker/php-fpm/config/php/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
   # Image intended for running command-line processes:
   # * command-line tools
@@ -119,16 +121,3 @@ volumes:
       type: none
       o: bind
       device: ./data/vagrantx/storage
-
-#networks:
-#  # Public network:
-#  # it's expected that only the ports exposed on containers  attached to this
-#  # network will be exposed to the host.
-#  public:
-#    name: public
-#
-#  # Private network:
-#  # Non-public services (e.g. anything except the web server) will be on this
-#  # network only, which will not be exposed to the host.
-#  private:
-#    name: private
