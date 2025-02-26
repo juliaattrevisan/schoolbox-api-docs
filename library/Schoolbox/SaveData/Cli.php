@@ -363,24 +363,39 @@ HELP;
     private function downloadBucket(string $dir): void
     {
         $accessKey = $this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_CRED_KEY);
-        $secretKey =  $this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_CRED_SECRET);
-        $bucket =  $this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_BUCKET);
-        $region  =  $this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_REGION);
-        $client = new S3Client([
+        $secretKey = $this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_CRED_SECRET);
+        $region = $this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_REGION);
+        $s3AltHost = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_ALT_HOST) ?? "");
+        $s3AltBucket = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_ALT_BUCKET) ?? "");
+        $s3AltAccessKey = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_ALT_ACCESS_KEY) ?? "");
+        $s3AltSecretAccessKey = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_ALT_SECRET_ACCESS_KEY) ?? "");
+        $s3Bucket = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_BUCKET) ?? "");
+
+        $cfg = [
             'region' => $region,
             'credentials' => [
                 'key' => $accessKey,
                 'secret' => $secretKey
             ],
-        ]);
-        $bucketSize = $this->getBucketStorage($client, $bucket, 'storage/');
+        ];
+
+        if (!empty($s3AltHost)) {
+            $cfg['endpoint'] = $s3AltHost;
+            $cfg['credentials']['key'] = $s3AltAccessKey;
+            $cfg['credentials']['secret'] = $s3AltSecretAccessKey;
+        }
+
+        $client = new S3Client($cfg);
+        $finalBucket = !empty($s3AltHost) && !empty($s3AltBucket) ? $s3AltBucket : $s3Bucket;
+
+        $bucketSize = $this->getBucketStorage($client, $finalBucket, 'storage/');
         $bucketSizeFormat = $this->formatBytes($bucketSize);
         $this->getLogger()->info("downloading bucket ($bucketSizeFormat)");
         $freeSpace = disk_free_space($dir);
         if ($freeSpace - $bucketSize <= 0) {
             throw new RuntimeException("not enough free space in disk: $freeSpace available, $bucketSize in s3 bucket");
         }
-        $manager = new Transfer($client, "s3://$bucket/storage", "$dir/storage");
+        $manager = new Transfer($client, "s3://$finalBucket/storage", "$dir/storage");
         $manager->transfer();
         $this->getLogger()->info("files downloaded");
     }
