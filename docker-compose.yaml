@@ -34,12 +34,13 @@ services:
   # own container will go here for now.
   schoolbox-cli:
     container_name: schoolbox-cli
-    # Using ubuntu rather than alpine, as that's what anyone who would be using
-    # a command-line tool would be familiar with.
-    # Alternately: use either a PHP image or Schoolbox's pre-built images.
-    image: ubuntu:jammy
+    restart: always
+    build:
+      context: ./docker/schoolbox-cli
+    tty: true
     volumes:
       - code:/usr/share/schoolbox
+      - ./docker/schoolbox/config:/etc/schoolbox
 #    networks:
 #      - public
 #      - private
@@ -52,6 +53,8 @@ services:
     image: mariadb:11.4
     volumes:
       - db-data:/var/lib/mysql
+    environment:
+      MARIADB_ROOT_PASSWORD: vagrant
 #    expose:
 #      - 3306
 #    networks:
