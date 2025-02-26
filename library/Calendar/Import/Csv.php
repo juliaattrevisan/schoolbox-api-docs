@@ -70,7 +70,7 @@ class Csv extends Base
         /* Column checks
          */
         $hasCampusColumn = in_array('Campus', $headerRow);
-        $hasRolesColumn = in_array('Roles', $headerRow);
+        $hasRolesColumn = in_array('Role', $headerRow);
         $hasOwnerColumn = in_array('Calendar Owner', $headerRow);
 
         $eventTypeMapper = new EventTypeMapper();
@@ -120,7 +120,10 @@ class Csv extends Base
                     $output[] = array(
                         'name'   => $name,
                         'status' => 'Not Added',
-                        'error'  => 'Invalid role provided',
+                        'error'  => sprintf(
+                            'Invalid role (%s) provided',
+                            $roleName,
+                        ),
                     );
 
                     continue 2;
@@ -289,7 +292,10 @@ class Csv extends Base
                     $output[] = [
                         'name'   => $name,
                         'status' => 'Not Added',
-                        'error'  => 'Invalid owner ID provided',
+                        'error'  => sprint(
+                            'Invalid owner ID (%s) provided',
+                            $owner
+                        )
                     ];
                     continue;
                 }
@@ -302,7 +308,10 @@ class Csv extends Base
                     $output[] = [
                         'name'   => $name,
                         'status' => 'Not Added',
-                        'error'  => 'Owner not found or deleted',
+                        'error'  => sprint(
+                            'Owner (%s) not found or deleted',
+                            $owner
+                        )
                     ];
                     continue;
                 }
@@ -364,7 +373,10 @@ class Csv extends Base
                         $output[] = array(
                             'name'   => $name,
                             'status' => 'Not Added',
-                            'error'  => 'Event campus contains invalid campus',
+                            'error'  => sprintf(
+                                'Event campus contains invalid campus (%s)',
+                                $campus
+                            )
                         );
                         continue 2;
                     }
