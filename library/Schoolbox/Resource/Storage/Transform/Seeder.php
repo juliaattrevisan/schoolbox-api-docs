@@ -275,7 +275,7 @@ class Seeder extends App
         $s3Version            = trim($config->get('otfs_s3_version') ?? "");
         $s3AltHost            = trim($config->get('otfs_s3_alt_host') ?? "");
         $s3AltAccessKey       = trim($config->get('otfs_s3_alt_access_key') ?? "");
-        $s3AltSecretAccessKey = trim($config->get('otfs_s3_alt_secret_access_key') ?? "");
+        $s3AltSecretAccessKey = trim($config->get('otfs_s3_alt_secret_key') ?? "");
         $s3AltRegion          = trim($config->get('otfs_s3_alt_region') ?? "");
 
         $cfg = [

@@ -296,7 +296,7 @@ class DeleteTransforms extends CliTool\App
         $s3Version            = trim($this->getConfig()->get('otfs_s3_version') ?? "");
         $s3AltHost            = trim($this->getConfig()->get('otfs_s3_alt_host') ?? "");
         $s3AltAccessKey       = trim($this->getConfig()->get('otfs_s3_alt_access_key') ?? "");
-        $s3AltSecretAccessKey = trim($this->getConfig()->get('otfs_s3_alt_secret_access_key') ?? "");
+        $s3AltSecretAccessKey = trim($this->getConfig()->get('otfs_s3_alt_secret_key') ?? "");
         $s3AltRegion          = trim($this->getConfig()->get('otfs_s3_alt_region') ?? "");
 
         $cfg = [

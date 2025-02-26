@@ -98,7 +98,7 @@ $app    = new class extends CliTool\App {
     {
         $altHost = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_ALT_HOST) ?? "");
         $s3AltAccessKey = trim($this->getConfig()->get('otfs_s3_alt_access_key') ?? "");
-        $s3AltSecretAccessKey = trim($this->getConfig()->get('otfs_s3_alt_secret_access_key') ?? "");
+        $s3AltSecretAccessKey = trim($this->getConfig()->get('otfs_s3_alt_secret_key') ?? "");
         $altBucket = trim($this->getConfig()->get('otfs_s3_alt_bucket') ?? "");
         $s3AltRegion = trim($this->getConfig()->get('otfs_s3_alt_region') ?? "");
         $cfg = [

@@ -45,7 +45,7 @@ class Stream
         $bucket  = $config->get(ConfigMapper::NAME_OTFS_S3_BUCKET);
         $altHost = $config->get(ConfigMapper::NAME_OTFS_S3_ALT_HOST);
         $s3AltAccessKey = trim($config->get(ConfigMapper::NAME_OTFS_S3_ALT_ACCESS_KEY) ?? "");
-        $s3AltSecretAccessKey = trim($config->get(ConfigMapper::NAME_OTFS_S3_ALT_SECRET_ACCESS_KEY) ?? "");
+        $s3AltSecretAccessKey = trim($config->get(ConfigMapper::NAME_OTFS_S3_ALT_SECRET_KEY) ?? "");
         $altBucket = trim($config->get(ConfigMapper::NAME_OTFS_S3_ALT_BUCKET) ?? "");
         $altRegion = trim($config->get(ConfigMapper::NAME_OTFS_S3_ALT_REGION) ?? "");
 

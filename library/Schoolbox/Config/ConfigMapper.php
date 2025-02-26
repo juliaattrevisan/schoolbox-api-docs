@@ -141,7 +141,7 @@ class ConfigMapper extends Mapper
     public const NAME_OTFS_S3_VERSION                = 'otfs_s3_version';
     public const NAME_OTFS_S3_ALT_HOST               = 'otfs_s3_alt_host';
     public const NAME_OTFS_S3_ALT_ACCESS_KEY         = 'otfs_s3_alt_access_key';
-    public const NAME_OTFS_S3_ALT_SECRET_ACCESS_KEY  = 'otfs_s3_alt_secret_access_key';
+    public const NAME_OTFS_S3_ALT_SECRET_KEY         = 'otfs_s3_alt_secret_key';
     public const NAME_OTFS_S3_ALT_BUCKET             = 'otfs_s3_alt_bucket';
     public const NAME_OTFS_S3_ALT_REGION             = 'otfs_s3_alt_region';
 

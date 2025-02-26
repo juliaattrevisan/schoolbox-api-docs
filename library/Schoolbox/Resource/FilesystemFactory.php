@@ -137,7 +137,7 @@ class FilesystemFactory
         $otfs_s3_bucket       = trim($config->get('otfs_s3_bucket') ?? "");
         $otfs_s3_alt_host     = trim($config->get('otfs_s3_alt_host') ?? "");
         $s3AltAccessKey       = trim($config->get('otfs_s3_alt_access_key') ?? "");
-        $s3AltSecretAccessKey = trim($config->get('otfs_s3_alt_secret_access_key') ?? "");
+        $s3AltSecretAccessKey = trim($config->get('otfs_s3_alt_secret_key') ?? "");
         $otfs_s3_alt_bucket   = trim($config->get('otfs_s3_alt_bucket') ?? "");
         $s3AltRegion         = trim($config->get('otfs_s3_alt_region') ?? "");
 

@@ -45,7 +45,7 @@ trait AwsS3AppTrait
         $s3Bucket             = trim($config->get('otfs_s3_bucket') ?? "");
         $s3AltHost            = trim($config->get('otfs_s3_alt_host') ?? "");
         $s3AltAccessKey       = trim($config->get('otfs_s3_alt_access_key') ?? "");
-        $s3AltSecretAccessKey = trim($config->get('otfs_s3_alt_secret_access_key') ?? "");
+        $s3AltSecretAccessKey = trim($config->get('otfs_s3_alt_secret_key') ?? "");
         $s3AltBucket          = trim($config->get('otfs_s3_alt_bucket') ?? "");
         $s3AltRegion          = trim($config->get('otfs_s3_alt_region') ?? "");
 

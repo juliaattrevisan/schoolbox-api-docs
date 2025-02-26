@@ -368,7 +368,7 @@ HELP;
         $s3AltHost = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_ALT_HOST) ?? "");
         $s3AltBucket = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_ALT_BUCKET) ?? "");
         $s3AltAccessKey = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_ALT_ACCESS_KEY) ?? "");
-        $s3AltSecretAccessKey = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_ALT_SECRET_ACCESS_KEY) ?? "");
+        $s3AltSecretAccessKey = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_ALT_SECRET_KEY) ?? "");
         $s3AltRegion = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_ALT_REGION) ?? "");
         $s3Bucket = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_BUCKET) ?? "");
 
