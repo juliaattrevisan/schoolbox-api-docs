@@ -51,3 +51,8 @@ within a self-contained development environment.
   UPDATE config SET value='tcp://redis-cache:6379' WHERE name='redis_ephemeral_url';
   UPDATE config SET value='tcp://redis-storage:6379' WHERE name='taskd_redis_url';
   ```
+- finagle file permissions for PHP-FPM:
+  ```shell
+  docker exec -it php-fpm \
+    chown -R www-data:www-data /var/lib/schoolbox/{cache,storage,twig,purifier}
+  ```

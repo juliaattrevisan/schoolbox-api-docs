@@ -21,10 +21,15 @@ services:
       context: ./docker/php-fpm
     volumes:
       - code:/usr/share/schoolbox
+      - cache:/var/lib/schoolbox
       - ./docker/schoolbox/config:/etc/schoolbox
       # Instead include configs in image?
       - ./docker/php-fpm/config/99-xdebug.ini:/usr/local/etc/php/conf.d/99-xdebug.ini
       - ./docker/php-fpm/config/99-session.ini:/usr/local/etc/php/conf.d/99-session.ini
+    # After building: make cache mount writable by www-data
+    # (need newer docker compose)
+#    post_start:
+#      - command: chown -R www-data:www-data /var/lib/schoolbox/{cache,storage,twig,purifier}
 
   # Image intended for running command-line processes:
   # * command-line tools
@@ -127,3 +132,11 @@ volumes:
       type: none
       o: bind
       device: ./data/vagrantx/storage
+
+  # Volume for cache:
+  # needs to be writable by www-data in php-fpm container
+  cache:
+    driver_opts:
+      type: none
+      o: bind
+      device: ./data/vagrantx
