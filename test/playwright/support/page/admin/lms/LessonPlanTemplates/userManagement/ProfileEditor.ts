@@ -55,5 +55,6 @@ export default class ProfileEditor {
      */
     async checkFieldNameIsPresented(fieldName: string): Promise<void> {
         await expect(this.page.locator('[data-test="user-profile-name"]')).toHaveText(fieldName);
+        // await expect(this.page.getByTestId("user-profile-name")).toHaveText(fieldName);
     }
 }
