@@ -22,8 +22,9 @@ services:
     volumes:
       - code:/usr/share/schoolbox
       - ./docker/schoolbox/config:/etc/schoolbox
-      # Instead include XDebug config in image?
-      - ./docker/php-fpm/config/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+      # Instead include configs in image?
+      - ./docker/php-fpm/config/99-xdebug.ini:/usr/local/etc/php/conf.d/99-xdebug.ini
+      - ./docker/php-fpm/config/99-session.ini:/usr/local/etc/php/conf.d/99-session.ini
 
   # Image intended for running command-line processes:
   # * command-line tools
