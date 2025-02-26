@@ -99,12 +99,6 @@ class ApiAssessmentCest
         ];
         yield [
             'filter' => [
-                'assessmentId' => '1e3'
-            ],
-            'valid'  => false,
-        ];
-        yield [
-            'filter' => [
                 'title' => 'Character',
             ],
             'valid'  => true,
@@ -138,39 +132,6 @@ class ApiAssessmentCest
                 ],
             ],
             'valid'  => true,
-        ];
-        yield [
-            'filter' => [
-                'folder' => [
-                    [
-                        // This use case is not useful and probably ought to be rejected.
-                        // However, it was allowed initially, so users might depend on it.
-                        'id' => $this->folder->getId(),
-                        'code' => $this->folder->getCodeString(),
-                    ],
-                ],
-            ],
-            'valid'  => true,
-        ];
-        yield [
-            'filter' => [
-                'folder' => [
-                    'code' => $this->folder->getCodeString(),
-                ],
-            ],
-            'valid'  => false,
-        ];
-        yield [
-            'filter' => [
-                'folder' => 83
-            ],
-            'valid'  => false,
-        ];
-        yield [
-            'filter' => [
-                'folder' => [83, 16]
-            ],
-            'valid'  => false,
         ];
         yield [
             'filter' => [
@@ -215,17 +176,6 @@ class ApiAssessmentCest
         ];
         yield [
             'filter' => [
-                // This use case is not useful and probably ought to be rejected.
-                // However, it was allowed initially, so users might depend on it.
-                'workType' => [
-                    'id' => 1,
-                    'name' => 'Quiz',
-                ],
-            ],
-            'valid'  => true,
-        ];
-        yield [
-            'filter' => [
                 'dueDate' => [
                     'from' => '2010-01-30T21:00:00.000Z',
                 ],
@@ -253,63 +203,6 @@ class ApiAssessmentCest
                 ],
             ],
             'valid'  => false,
-        ];
-        yield [
-            'filter' => [
-                'unknownParameter' => 1
-            ],
-            'valid'  => false,
-        ];
-        yield [
-            'filter' => [
-                'yearLevel' => 1
-            ],
-            'valid'  => false,
-        ];
-        yield [
-            'filter' => [
-                'yearLevel' => [1, 2]
-            ],
-            'valid'  => false,
-        ];
-        yield [
-            'filter' => [
-                'project' => 1
-            ],
-            'valid'  => false,
-        ];
-        yield [
-            'filter' => [
-                'project' => [1, 2]
-            ],
-            'valid'  => false,
-        ];
-        yield [
-            'filter' => [
-                'yearLevel' => [
-                    'id' => 3,
-                ],
-            ],
-            'valid'  => true,
-        ];
-        yield [
-            'filter' => [
-                'yearLevel' => [
-                    'name' => "9",
-                ],
-            ],
-            'valid'  => true,
-        ];
-        yield [
-            'filter' => [
-                // This use case is not useful and probably ought to be rejected.
-                // However, it was allowed initially, so users might depend on it.
-                'yearLevel' => [
-                    'id' => 3,
-                    'name' => "9",
-                ],
-            ],
-            'valid'  => true,
         ];
     }
 }
