@@ -223,10 +223,10 @@ class Subnav
                         'visible'     => true,
                         'description' => 'A tool to bulk or individually remove events from personal or group calendars.',
                     ],
-                    '/adminv2/calendar/Import' => [
-                        'name'        => 'Import',
+                    '/adminv2/calendar/import/school-events' => [
+                        'name'        => 'Import School Events',
                         'visible'     => true,
-                        'description' => 'Import events into the school calendar via ICS or CSV.',
+                        'description' => 'Import school events into the school calendar via CSV.',
                     ],
                     '/adminv2/lists/calendar/event-type' => [
                         'name'        => 'Lists - Event Types',
