@@ -100,20 +100,21 @@ $app    = new class extends CliTool\App {
         $s3AltAccessKey = trim($this->getConfig()->get('otfs_s3_alt_access_key') ?? "");
         $s3AltSecretAccessKey = trim($this->getConfig()->get('otfs_s3_alt_secret_access_key') ?? "");
         $altBucket = trim($this->getConfig()->get('otfs_s3_alt_bucket') ?? "");
-
+        $s3AltRegion = trim($this->getConfig()->get('otfs_s3_alt_region') ?? "");
         $cfg = [
             'credentials' => [
                 'key'    => trim($this->getConfig()->get('otfs_s3_cred_key') ?? ""),
                 'secret' => trim($this->getConfig()->get('otfs_s3_cred_secret') ?? ""),
             ],
-            'region'      => trim($this->getConfig()->get('otfs_s3_region') ?? ""),
-            'version'     => trim($this->getConfig()->get('otfs_s3_version') ?? ""),
+            'region'  => trim($this->getConfig()->get('otfs_s3_region') ?? ""),
+            'version' => trim($this->getConfig()->get('otfs_s3_version') ?? ""),
         ];
 
         if (!empty($altHost)) {
             $cfg['endpoint'] = $altHost;
             $cfg['credentials']['key'] = $s3AltAccessKey;
             $cfg['credentials']['secret'] = $s3AltSecretAccessKey;
+            $cfg['region'] = $s3AltRegion;
         }
         return new S3Client($cfg);
     }

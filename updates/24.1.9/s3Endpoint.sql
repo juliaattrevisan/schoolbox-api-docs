@@ -66,4 +66,18 @@ INSERT INTO config (
     'false',
     'settings',
     null
+),
+(
+    'otfs_s3_alt_region',
+    null,
+    'S3 Alternative Region',
+    'Alternative S3 region for non-AWS S3-compatible services',
+    (SELECT id FROM lu_config_field WHERE field = 'input'),
+    null,
+    (SELECT id FROM lu_config_type WHERE type = '3rd Party Services'),
+    'false',
+    'true',
+    'false',
+    'settings',
+    null
 );

@@ -201,6 +201,7 @@ class FileNester extends CliTool\App
         $s3AltAccessKey       = trim($this->getConfig()->get('otfs_s3_alt_access_key') ?? "");
         $s3AltSecretAccessKey = trim($this->getConfig()->get('otfs_s3_alt_secret_access_key') ?? "");
         $s3AltBucket         = trim($this->getConfig()->get('otfs_s3_alt_bucket') ?? "");
+        $s3AltRegion         = trim($this->getConfig()->get('otfs_s3_alt_region') ?? "");
         $this->bucketName = trim($this->getConfig()->get('otfs_s3_bucket') ?? "");
 
         $otfsAdapter = $this->getConfig()->get(ConfigMapper::NAME_OTFS_ADAPTER);
@@ -245,9 +246,8 @@ class FileNester extends CliTool\App
             $cfg['endpoint'] = $s3AltHost;
             $cfg['credentials']['key'] = $s3AltAccessKey;
             $cfg['credentials']['secret'] = $s3AltSecretAccessKey;
-            if (!empty($s3AltBucket)) {
-                $this->bucketName = $s3AltBucket;
-            }
+            $cfg['region'] = $s3AltRegion;
+            $this->bucketName = !empty($s3AltBucket) ? $s3AltBucket : $this->bucketName;
         }
 
         $this->s3Client = new S3Client($cfg);

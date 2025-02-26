@@ -139,6 +139,7 @@ class FilesystemFactory
         $s3AltAccessKey       = trim($config->get('otfs_s3_alt_access_key') ?? "");
         $s3AltSecretAccessKey = trim($config->get('otfs_s3_alt_secret_access_key') ?? "");
         $otfs_s3_alt_bucket   = trim($config->get('otfs_s3_alt_bucket') ?? "");
+        $s3AltRegion         = trim($config->get('otfs_s3_alt_region') ?? "");
 
         $cfg = [
             'credentials' => [
@@ -155,6 +156,7 @@ class FilesystemFactory
             $cfg['endpoint'] = $otfs_s3_alt_host;
             $cfg['credentials']['key'] = $s3AltAccessKey;
             $cfg['credentials']['secret'] = $s3AltSecretAccessKey;
+            $cfg['region'] = $s3AltRegion;
         }
         $client = new S3Client($cfg);
 

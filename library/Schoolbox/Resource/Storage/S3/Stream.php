@@ -11,6 +11,7 @@ use Aws\S3\S3Client;
 use GuzzleHttp;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\FilesystemFactory;
+use Schoolbox\Config\ConfigMapper;
 
 /**
  * Flysystem is unable to chunk a file from storage which makes streaming of
@@ -37,15 +38,16 @@ class Stream
     public static function open($path, IConfigLoader $config)
     {
         // Retrieve AWS S3 configuration from database
-        $region  = $config->get('otfs_s3_region');
-        $version = $config->get('otfs_s3_version');
-        $key     = $config->get('otfs_s3_cred_key');
-        $secret  = $config->get('otfs_s3_cred_secret');
-        $bucket  = $config->get('otfs_s3_bucket');
-        $altHost = $config->get('otfs_s3_alt_host');
-        $s3AltAccessKey       = trim($config->get('otfs_s3_alt_access_key') ?? "");
-        $s3AltSecretAccessKey = trim($config->get('otfs_s3_alt_secret_access_key') ?? "");
-        $altBucket = trim($config->get('otfs_s3_alt_bucket') ?? "");
+        $region  = $config->get(ConfigMapper::NAME_OTFS_S3_REGION);
+        $version = $config->get(ConfigMapper::NAME_OTFS_S3_VERSION);
+        $key     = $config->get(ConfigMapper::NAME_OTFS_S3_CRED_KEY);
+        $secret  = $config->get(ConfigMapper::NAME_OTFS_S3_CRED_SECRET);
+        $bucket  = $config->get(ConfigMapper::NAME_OTFS_S3_BUCKET);
+        $altHost = $config->get(ConfigMapper::NAME_OTFS_S3_ALT_HOST);
+        $s3AltAccessKey = trim($config->get(ConfigMapper::NAME_OTFS_S3_ALT_ACCESS_KEY) ?? "");
+        $s3AltSecretAccessKey = trim($config->get(ConfigMapper::NAME_OTFS_S3_ALT_SECRET_ACCESS_KEY) ?? "");
+        $altBucket = trim($config->get(ConfigMapper::NAME_OTFS_S3_ALT_BUCKET) ?? "");
+        $altRegion = trim($config->get(ConfigMapper::NAME_OTFS_S3_ALT_REGION) ?? "");
 
         // Connect to Amazon S3
         $cfg = [
@@ -64,6 +66,7 @@ class Stream
             $cfg['endpoint'] = $altHost;
             $cfg['credentials']['key'] = $s3AltAccessKey;
             $cfg['credentials']['secret'] = $s3AltSecretAccessKey;
+            $cfg['region'] = $altRegion;
         }
         $client = new S3Client($cfg);
 

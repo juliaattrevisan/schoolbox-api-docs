@@ -302,6 +302,7 @@ class Controller extends Base
         $s3AltAccessKey       = trim($this->getConfigLoader()->get('otfs_s3_alt_access_key') ?? "");
         $s3AltSecretAccessKey = trim($this->getConfigLoader()->get('otfs_s3_alt_secret_access_key') ?? "");
         $s3AltBucket          = trim($this->getConfigLoader()->get('otfs_s3_alt_bucket') ?? "");
+        $s3AltRegion          = trim($this->getConfigLoader()->get('otfs_s3_alt_region') ?? "");
 
         $s3CredentialsMissing =
             $s3AccessKey === '' ||
@@ -379,6 +380,7 @@ class Controller extends Base
             $cfg['endpoint'] = $s3AltHost;
             $cfg['credentials']['key'] = $s3AltAccessKey;
             $cfg['credentials']['secret'] = $s3AltSecretAccessKey;
+            $cfg['region'] = $s3AltRegion;
         }
         $s3Client = new S3Client($cfg);
 
