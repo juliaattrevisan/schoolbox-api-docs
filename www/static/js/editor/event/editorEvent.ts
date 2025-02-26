@@ -25,7 +25,12 @@ export enum EditorEvent {
 // Types for information objects sent with events. /////////////////////////////////////////////////////////////////////
 
 /**
- * When an EDITOR__CREATE event is dispatched, this is included
+ * When an EDITOR__CREATE event is dispatched, include this info:
+ */
+export type EditorCreateEventInfo = PartialSbxEditorConfig;
+
+/**
+ * When an EDITOR__CREATED event is dispatched, this is included
  */
 export type EditorCreatedEventInfo = {
     editor: SbxEditor;
@@ -54,7 +59,7 @@ export type EditorDeletedEventInfo = {
 
 // The map of event names to event objects that are dispatched on the document
 export interface EditorDocumentEventHandlerMap {
-    [EditorEvent.EDITOR__CREATE]: CustomEvent<PartialSbxEditorConfig>;
+    [EditorEvent.EDITOR__CREATE]: CustomEvent<EditorCreateEventInfo>;
     [EditorEvent.EDITOR__DELETE]: CustomEvent<EditorDeleteEventInfo>;
     [EditorEvent.EDITOR__DELETED]: CustomEvent<EditorDeletedEventInfo>;
 }

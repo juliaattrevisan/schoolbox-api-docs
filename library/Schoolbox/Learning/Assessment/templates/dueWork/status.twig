@@ -16,7 +16,7 @@
  # @param array $draftResponses  A lookup of (user id, response id) for those who have drafts
  #}
 
-{% extends '@learningAssessment/status.twig' %}
+{% extends '@learningAssessment/status/status.twig' %}
 
 {% set labelIncomplete = 'Submission required' %}
 {% set labelFailed     = 'Resubmission required' %}
@@ -291,7 +291,6 @@
 
     </li>
 {% endblock %}
-
 
 {##
  # Massive javascript hulk

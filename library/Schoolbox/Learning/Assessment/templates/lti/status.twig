@@ -16,7 +16,7 @@
 #}
 {% import '@learning/macro/urgency.twig' as urgency %}
 
-{% extends '@learningAssessment/status.twig' %}
+{% extends '@learningAssessment/status/status.twig' %}
 
 {% set labelIncomplete = 'Incomplete' %}
 {% set labelPending    = 'Self-Assessed' %}
@@ -57,7 +57,7 @@
     {% set pStatusText    = pTooltip %}
     {% set pActionSummary = routeLookupIfAuthorized('learningAssessment.getSummary', routeArgs) %}
 
-    <li data-status="{{ pStatusClass }}" data-participant-name="{{ participant.user.fullName }}">
+    <li data-status="{{ pStatusClass }}"  data-participant="{{ participant.user.id }}" data-participant-name="{{ participant.user.fullName }}">
         <div class="small-12 columns">
             <div class="row actions-small-1">
                 <div class="flex-grade list-item">
