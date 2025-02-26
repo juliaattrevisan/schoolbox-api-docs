@@ -2,31 +2,25 @@ services:
   # Web server
   caddy:
     container_name: caddy
+    restart: always
     build:
       context: ./docker/caddy
     volumes:
       - code:/usr/share/schoolbox
       - ./docker/caddy:/etc/caddy
-    expose:
-      - 80
-      - 443
-    networks:
-      - public
-      - private
+    ports:
+      - '80:80'
+      - '443:443'
 
   # PHP-FPM server:
   # point requests from Caddy to here
   php-fpm:
     container_name: php-fpm
+    restart: always
     build:
       context: ./docker/php-fpm
     volumes:
       - code:/usr/share/schoolbox
-    expose:
-      - 9000
-      - 9002
-    networks:
-      - private
 
   # Image intended for running command-line processes:
   # * command-line tools
@@ -42,9 +36,9 @@ services:
     image: ubuntu:jammy
     volumes:
       - code:/usr/share/schoolbox
-    networks:
-      - public
-      - private
+#    networks:
+#      - public
+#      - private
 
   # Database services:
   # these are containers only in a development environment, they won't be on
@@ -54,32 +48,32 @@ services:
     image: mariadb:11.4
     volumes:
       - db-data:/var/lib/mysql
-    expose:
-      - 3306
-    networks:
-      - private
+#    expose:
+#      - 3306
+#    networks:
+#      - private
 
   redis-storage:
     container_name: redis-storage
     image: redis:7.4
-    ports:
-      - '6379:6379'
-    networks:
-      - private
+#    ports:
+#      - '6379:6379'
+#    networks:
+#      - private
 
   redis-cache:
     container_name: redis-cache
     image: redis:7.4
-    ports:
-      - '6380:6379'
-    networks:
-      - private
+#    ports:
+#      - '6380:6379'
+#    networks:
+#      - private
 
   rabbitmq:
     container_name: rabbitmq
     image: rabbitmq:3.13
-    networks:
-      - private
+#    networks:
+#      - private
 
   # Not-yet-essential services:
   # These will be implemented as separate containers (if they aren't already).
@@ -126,15 +120,15 @@ volumes:
       o: bind
       device: ./data/vagrantx/storage
 
-networks:
-  # Public network:
-  # it's expected that only the ports exposed on containers  attached to this
-  # network will be exposed to the host.
-  public:
-    name: public
-
-  # Private network:
-  # Non-public services (e.g. anything except the web server) will be on this
-  # network only, which will not be exposed to the host.
-  private:
-    name: private
+#networks:
+#  # Public network:
+#  # it's expected that only the ports exposed on containers  attached to this
+#  # network will be exposed to the host.
+#  public:
+#    name: public
+#
+#  # Private network:
+#  # Non-public services (e.g. anything except the web server) will be on this
+#  # network only, which will not be exposed to the host.
+#  private:
+#    name: private
