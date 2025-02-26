@@ -25,9 +25,8 @@ class Controller extends Base
      * Constructor
      *
      * @param Helper $assessmentHelper Helper class for looking up assessments
-     * @param Validator $validator For validating API requests
      */
-    public function __construct(private Helper $assessmentHelper, private Validator $validator)
+    public function __construct(private Helper $assessmentHelper)
     {
     }
 
@@ -96,7 +95,7 @@ class Controller extends Base
         }
 
         if (null === $filter) {
-            $problem = (new ApiProblem('Filter was blank or could not be decoded'))
+            $problem = (new ApiProblem('Filter must not be blank'))
                 ->setStatus(401)
                 ->asArray();
             $this->response = $this->responseAsJson($problem)->withStatus(401);
@@ -104,7 +103,7 @@ class Controller extends Base
         }
 
         try {
-            $this->validator->validateFilter($filter);
+            $this->assessmentHelper->validateFilter($filter);
             $output = $this->assessmentHelper->searchForAssessments($filter, $limit, $cursor);
             $count = $this->assessmentHelper->searchForAssessmentsCount($filter);
         } catch (SchoolboxException $e) {
