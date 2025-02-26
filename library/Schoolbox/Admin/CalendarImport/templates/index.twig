@@ -1,0 +1,153 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(breadcrumbs) }}
+
+<div class="admin-container row">
+
+    {{ renderAdminNavigation(routeLookup('adminCalendarImport.getCalendarImportForm')) }}
+
+    <div class="admin-content">
+        <div class="small-12 columns">
+            <div class="row">
+                <div class="island small-12">
+                    <section>
+                        <div class="content">
+                            <h3>CSV</h3>
+                            <ol>
+                                <li>Download the template file using the link below</li>
+                                <li>Edit the file in Microsoft Excel or equivalent editor</li>
+                                <li>Save the file</li>
+                                <li>Upload by clicking 'choose file' under "Upload new calendar entries"</li>
+                            </ol>
+                        </div>
+                        <div class="component-action">
+                            <section>
+                                <a href="{{ CDN_PREFIX }}/adminv2/csv/calendarBulkAdd.csv" class="button">Download Template</a>
+                            </section>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <h2 class="subheader">Select file</h2>
+
+            <div class="row">
+                <div class="small-12 island">
+                    <form method="post" enctype="multipart/form-data" name="form" id="importForm"
+                    action="{{ routeLookupIfAuthorized('adminCalendarImport.getCalendarImportForm') }}">
+                        <section>
+                            <fieldset class="content">
+                                <div class="small-12 columns">
+                                    {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+                                </div>
+                                <div class="small-12 columns">
+                                    <label>
+                                        Calendar Owner
+                                        <span class="hint has-tip tip-right" data-tooltip title="Type in the name of the owner of the calendar. This field is optional: if empty, the current user will be used.">?</span>
+                                    </label>
+                                    <label>
+                                        <input name="name" id="name" type="text" placeholder="Search Users" />
+                                    </label>
+                                    <input name="userid" type="hidden" id="userid" size="6" maxlength="6" />
+                                </div>
+                            </fieldset>
+                        </section>
+
+                        <input type="submit" value="Import" />
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/select-all/jquery.select-all.js?v={{ config.site_version }}"></script>
+<script type="text/javascript">
+    $(function() {
+        if ($('table').length) {
+            $('table').selectAll({
+                selector: '#check-all',
+                checkboxes: '[data-cleanup-event-id]'
+            });
+        }
+
+        /* Special modifiers
+         * Automatically activate these two checkboxes whenever
+         * selectAll is triggered
+         */
+        $('input[data-selectall="true"]').change(function(event) {
+            var selectors = $('[data-modifier-control]');
+
+            if ($(this).is(':checked')) {
+                selectors.prop('checked', true);
+            }
+            else {
+                selectors.prop('checked', false);
+            }
+        });
+
+        /* Customise selection modifiers
+         */
+        $('[data-modifier-control]').change(function(event) {
+            var selectors = $('input[data-modifier="' + $(this).val() + '"]');
+
+            if ($(this).is(':checked')) {
+                selectors.prop('checked', true);
+            }
+            else {
+                selectors.prop('checked', false);
+            }
+        });
+
+        $('#name')
+                .userSelectizeSelector({
+                    ajax: {
+                        data:     {groupID: 0},
+                    }
+                })
+                .on('selectize.item_add', function(event, value) {
+                    $('#userid').val(value)
+                })
+                .on('selectize.item_remove', function() {
+                    $('#userid').val('')
+                });
+    });
+</script>
+<script type='text/javascript' src='{{ CDN_PREFIX }}/js/admin/calendar.js'></script>
+<script type='text/javascript'>
+    $(function() {
+        calendar.init({
+            addConfig:    '[data-addsource]',
+            removeConfig: '[data-removesource]'
+        });
+    });
+</script>
+<script>
+    $(function () {
+        var urlFields = $('[data-calendar-url]');
+
+        $('#saveChangesForm').click(function (event) {
+            event.preventDefault();
+            var allGood = true;
+            let url;
+            //check all url fields are valid,
+            urlFields.each(function () {
+                //if they are not valid,
+                try {
+                    url = new URL(this.value);
+                    allGood = true;
+                } catch (_) {
+                    //let the user know
+                    allGood = false;
+                    var calId = $(this).data('calendarId');
+                    $('#error_'+calId)[0].style.display = 'block';
+                }
+            });
+            //if there are no issues submit the form
+            if (allGood) {
+                $("#subscribeForm").submit();
+            }
+        });
+    });
+</script>

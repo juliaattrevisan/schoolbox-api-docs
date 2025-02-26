@@ -1,0 +1,34 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(breadcrumbs) }}
+
+<div class="admin-container row">
+
+    {{ renderAdminNavigation(pageCurrent) }}
+
+    <div class="admin-content">
+        <div class="small-12 columns">
+            <h2 class="subheader">Bulk Add Calendar Events</h2>
+
+            <table>
+                <thead>
+                <tr>
+                    <th>Event Name<span class="hint has-tip tip-top" data-tooltip title="The name of the category, indicated from reading the rows in the CSV file.">?</span></th>
+                    <th>Action<span class="hint has-tip tip-top" data-tooltip title="The function Schoolbox has attempted to complete.">?</span></th>
+                    <th>Response<span class="hint has-tip tip-top" data-tooltip title="Schoolbox's feedback after attempting to complete the requested function.">?</span></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for event in allEvents %}
+                <tr>
+                    <td>{{ event.name }}</td>
+                    <td>{{ event.status }}</td>
+                    <td>{{ event.error }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+            <a href="/adminv2/calendar" class="button icon-previous">Back to calendar</a>
+        </div>
+    </div>
+</div>

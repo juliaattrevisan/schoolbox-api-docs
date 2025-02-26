@@ -18,6 +18,8 @@ use Schoolbox\Calendar\Relation\CategoryMapper;
 use Schoolbox\Calendar\Relation\Role;
 use Schoolbox\Calendar\Relation\RoleMapper;
 use Schoolbox\CampusMapper;
+use Schoolbox\RoleMapper as UserRoleMapper;
+use Schoolbox\UserMapper;
 use Alaress_Date_Format;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -39,6 +41,8 @@ class Csv extends Base
         $roleRelationMapper = new RoleMapper();
         $folderMapper = Folder\Mapper::getInstance();
         $folderCache  = [];
+        $roleMapper = UserRoleMapper::getInstance();
+        $userMapper = UserMapper::getInstance();
 
         // silence notifications
         $mockPropagator = new MockPropagator();
@@ -63,6 +67,12 @@ class Csv extends Base
         $handle = (new \Alaress\Csv\ValidCSV($handle))->skipBom();
         $headerRow = fgetcsv($handle, 0, ",");
 
+        /* Column checks
+         */
+        $hasCampusColumn = in_array('Campus', $headerRow);
+        $hasRolesColumn = in_array('Roles', $headerRow);
+        $hasOwnerColumn = in_array('Calendar Owner', $headerRow);
+
         $eventTypeMapper = new EventTypeMapper();
 
         while (($thisRow = fgetcsv($handle, 0, ",")) !== false) {
@@ -82,7 +92,40 @@ class Csv extends Base
                 $publish_date,
                 $attendance,
                 $folderIds,
-            ] = array_pad($thisRow, 12, '');
+                $roles,
+                $owner,
+            ] = array_pad($thisRow, 14, '');
+
+            /* Role is mandatory
+             */
+            $roleCollection = $this->getGroupList();
+            if ($hasRolesColumn && empty($roleCollection)) {
+                if (!strlen(trim($roles))) {
+                    $output[] = array(
+                        'name'   => $name,
+                        'status' => 'Not Added',
+                        'error'  => 'Roles not provided',
+                    );
+
+                    continue;
+                }
+            }
+
+            $allRoles = explode(",", $roles);
+            foreach ($allRoles as $roleName) {
+                try {
+                    $role = $roleMapper->findOneByColumn('name', $roleName);
+                    $roleCollection[] = $role->getId();
+                } catch (MapperException $e) {
+                    $output[] = array(
+                        'name'   => $name,
+                        'status' => 'Not Added',
+                        'error'  => 'Invalid role provided',
+                    );
+
+                    continue 2;
+                }
+            }
 
             /* Event name is mandatory
              */
@@ -238,12 +281,40 @@ class Csv extends Base
                 continue;
             }
 
+            $eventOwner = $this->getUser();
+            $eventAuthor = $this->getAuthor();
+
+            if ($hasOwnerColumn && strlen(trim($owner))) {
+                var_dump($owner);
+                if (!is_numeric(trim($owner))) {
+                    $output[] = [
+                        'name'   => $name,
+                        'status' => 'Not Added',
+                        'error'  => 'Invalid owner ID provided',
+                    ];
+                    continue;
+                }
+
+                try {
+                    $user = $userMapper->findById($owner);
+                    $eventOwner = $user;
+                    $eventAuthor = $user;
+                } catch (MapperException $e) {
+                    $output[] = [
+                        'name'   => $name,
+                        'status' => 'Not Added',
+                        'error'  => 'Owner not found or deleted',
+                    ];
+                    continue;
+                }
+            }
+
             /* Save
              */
 
             $event = new Event();
-            $event->setOwner($this->getUser());
-            $event->setAuthor($this->getAuthor());
+            $event->setOwner($eventOwner);
+            $event->setAuthor($eventAuthor);
             $event->setAccess($this->getAccess());
             $event->setStartDateTime($startDatetime);
             $event->setEndDateTime($finishDatetime);
@@ -253,7 +324,6 @@ class Csv extends Base
             $event->setAllDay($all_day);
             $event->setType($eventType);
             $event->setAttendance($attendance);
-            $event->setCampusCollection($allCampuses);
             $event->setSource($this->getSource());
 
             /* If a publish date is specified, use it; otherwise leave as empty
@@ -272,49 +342,79 @@ class Csv extends Base
                 $event->setPublishDateTime($publishDate);
             }
 
-            // Allow override of folder relations only if no folder list has
-            // been set in the object
-            $folderList = $this->categoryList;
-            if (empty($folderList)) {
-                $folderList = [];
-                foreach (explode(',', $folderIds) as $folderId) {
-                    // Empty folder ID: just ignore
-                    if ($folderId === '') {
-                        continue;
-                    }
+            if ($hasCampusColumn) {
+                $cloneCampuses = $allCampuses;
+                $campuses = $folderIds;
+                if (!strlen(trim($campuses))) {
+                    $output[] = array(
+                        'name'   => $name,
+                        'status' => 'Not Added',
+                        'error'  => 'Event campus not provided',
+                    );
 
-                    // Is this really a folder ID?
-                    $folderIdNum = filter_var($folderId, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
-                    if (!$folderIdNum) {
-                        $output[] = [
-                            'name'   => $name,
-                            'status' => 'Not Added',
-                            'error'  => sprintf('Folder ID "%s" is not a number', $folderId),
-                        ];
-                        // If not skip this entire CSV row
-                        continue 2;
-                    }
-
-                    // Check the folder ID actually exists
-                    try {
-                        $folderCache[$folderIdNum] ??= $folderMapper->findById($folderIdNum);
-                    } catch (MapperException) {
-                        $output[] = [
-                            'name'   => $name,
-                            'status' => 'Not Added',
-                            'error'  => sprintf('Folder ID %d not found', $folderIdNum),
-                        ];
-                        // If not skip this entire CSV row
-                        continue 2;
-                    }
-                    $folderList[] = $folderIdNum;
+                    continue;
                 }
-            }
+                $allCampusesName = explode(',', $campuses);
+                foreach ($allCampusesName as $campus) {
+                    try {
+                        $importingCampus = $campusMapper->findOneByColumn('name', $campus);
+                        $cloneCampuses[] = $importingCampus->getId();
+                    } catch (MapperException $e) {
+                    //Campus name not found or is invalid
+                        $output[] = array(
+                            'name'   => $name,
+                            'status' => 'Not Added',
+                            'error'  => 'Event campus contains invalid campus',
+                        );
+                        continue 2;
+                    }
+                }
+                $event->setCampusCollection($cloneCampuses);
+            } else {
+                // Allow override of folder relations only if no folder list has
+                // been set in the object
+                $folderList = $this->categoryList;
+                if (empty($folderList)) {
+                    $folderList = [];
+                    foreach (explode(',', $folderIds) as $folderId) {
+                        // Empty folder ID: just ignore
+                        if ($folderId === '') {
+                            continue;
+                        }
 
-            if (!empty($folderList)) {
-                $event->setAccess(Event::ACCESS_GROUP);
-            }
+                        // Is this really a folder ID?
+                        $folderIdNum = filter_var($folderId, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+                        if (!$folderIdNum) {
+                            $output[] = [
+                                'name'   => $name,
+                                'status' => 'Not Added',
+                                'error'  => sprintf('Folder ID "%s" is not a number', $folderId),
+                            ];
+                            // If not skip this entire CSV row
+                            continue 2;
+                        }
 
+                        // Check the folder ID actually exists
+                        try {
+                            $folderCache[$folderIdNum] ??= $folderMapper->findById($folderIdNum);
+                        } catch (MapperException) {
+                            $output[] = [
+                                'name'   => $name,
+                                'status' => 'Not Added',
+                                'error'  => sprintf('Folder ID %d not found', $folderIdNum),
+                            ];
+                            // If not skip this entire CSV row
+                            continue 2;
+                        }
+                        $folderList[] = $folderIdNum;
+                    }
+                }
+
+                if (!empty($folderList)) {
+                    $event->setAccess(Event::ACCESS_GROUP);
+                }
+                $event->setCampusCollection($allCampuses);
+            }
             /* Save it
              */
             $result = $eventMapper->save($event);
@@ -334,7 +434,7 @@ class Csv extends Base
                 /* Assign Role relations
                  */
                 if ($event->isCampusLevel()) {
-                    foreach ($this->getGroupList() as $currentRole) {
+                    foreach ($roleCollection as $currentRole) {
                         $role = new Role();
                         $role->setEventId($event->getId());
                         $role->setRoleId($currentRole);
