@@ -298,9 +298,10 @@ class Controller extends Base
         $s3Region             = trim($this->getConfigLoader()->get('otfs_s3_region') ?? "");
         $s3Version            = trim($this->getConfigLoader()->get('otfs_s3_version') ?? "");
         $s3Bucket             = trim($this->getConfigLoader()->get('otfs_s3_bucket') ?? "");
-        $s3Host               = trim($this->getConfigLoader()->get('otfs_s3_host') ?? "");
+        $s3AltHost            = trim($this->getConfigLoader()->get('otfs_s3_alt_host') ?? "");
         $s3AltAccessKey       = trim($this->getConfigLoader()->get('otfs_s3_alt_access_key') ?? "");
         $s3AltSecretAccessKey = trim($this->getConfigLoader()->get('otfs_s3_alt_secret_access_key') ?? "");
+        $s3AltBucket          = trim($this->getConfigLoader()->get('otfs_s3_alt_bucket') ?? "");
 
         $s3CredentialsMissing =
             $s3AccessKey === '' ||
@@ -374,16 +375,16 @@ class Controller extends Base
             'version'     => $s3Version,
         ];
 
-        if (!empty($s3Host)) {
-            $cfg['endpoint'] = $s3Host;
+        if (!empty($s3AltHost)) {
+            $cfg['endpoint'] = $s3AltHost;
             $cfg['credentials']['key'] = $s3AltAccessKey;
             $cfg['credentials']['secret'] = $s3AltSecretAccessKey;
         }
-        $s3Client = new S3Client(
-            $cfg
-        );
+        $s3Client = new S3Client($cfg);
+
+        $finalBucket = !empty($s3AltHost) && !empty($s3AltBucket) ? $s3AltBucket : $s3Bucket;
         $objects = $s3Client->getIterator('ListObjects', [
-            'Bucket' => $s3Bucket,
+            'Bucket' => $finalBucket,
             'Prefix' => DisasterRecovery::PREFIX_BACKUPS,
         ]);
 

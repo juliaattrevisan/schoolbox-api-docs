@@ -37,18 +37,17 @@ class Stream
     public static function open($path, IConfigLoader $config)
     {
         // Retrieve AWS S3 configuration from database
-
         $region  = $config->get('otfs_s3_region');
         $version = $config->get('otfs_s3_version');
         $key     = $config->get('otfs_s3_cred_key');
         $secret  = $config->get('otfs_s3_cred_secret');
         $bucket  = $config->get('otfs_s3_bucket');
-        $host    = $config->get('otfs_s3_host');
+        $altHost = $config->get('otfs_s3_alt_host');
         $s3AltAccessKey       = trim($config->get('otfs_s3_alt_access_key') ?? "");
         $s3AltSecretAccessKey = trim($config->get('otfs_s3_alt_secret_access_key') ?? "");
+        $altBucket = trim($config->get('otfs_s3_alt_bucket') ?? "");
 
         // Connect to Amazon S3
-
         $cfg = [
             'version'     => $version,
             'region'      => $region,
@@ -61,8 +60,10 @@ class Stream
             ],
         ];
 
-        if (!empty($host)) {
-            $cfg['endpoint'] = $host;
+        if (!empty($altHost)) {
+            $cfg['endpoint'] = $altHost;
+            $cfg['credentials']['key'] = $s3AltAccessKey;
+            $cfg['credentials']['secret'] = $s3AltSecretAccessKey;
         }
         $client = new S3Client($cfg);
 
@@ -74,6 +75,7 @@ class Stream
 
         // Return seekable stream
         $prefix = FilesystemFactory::PREFIX_STORAGE;
-        return fopen("s3://{$bucket}/{$prefix}{$path}", "r", false, $context);
+        $finalBucket = !empty($altHost) && !empty($altBucket) ? $altBucket : $bucket;
+        return fopen("s3://{$finalBucket}/{$prefix}{$path}", "r", false, $context);
     }
 }

@@ -33,7 +33,12 @@ $app    = new class extends CliTool\App {
         $this->s3Region     = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_REGION) ?? "");
         $this->s3Version    = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_VERSION) ?? "");
         $this->s3Bucket     = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_BUCKET) ?? "");
-        $this->s3Host       = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_HOST) ?? "");
+        $altHost            = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_ALT_HOST) ?? "");
+        $altBucket          = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_ALT_BUCKET) ?? "");
+
+        if (!empty($altHost) && !empty($altBucket)) {
+            $this->s3Bucket = $altBucket;
+        }
     }
 
     private function buildS3Client(): void
@@ -46,8 +51,14 @@ $app    = new class extends CliTool\App {
             'region'      => $this->s3Region,
             'version'     => $this->s3Version,
         ];
-        if (!empty($this->s3Host)) {
-            $cfg['endpoint'] = $this->s3Host;
+        $altHost = trim($this->getConfig()->get('otfs_s3_alt_host') ?? "");
+        $s3AltAccessKey = trim($this->getConfig()->get('otfs_s3_alt_access_key') ?? "");
+        $s3AltSecretAccessKey = trim($this->getConfig()->get('otfs_s3_alt_secret_access_key') ?? "");
+
+        if (!empty($altHost)) {
+            $cfg['endpoint'] = $altHost;
+            $cfg['credentials']['key'] = $s3AltAccessKey;
+            $cfg['credentials']['secret'] = $s3AltSecretAccessKey;
         }
         $this->client = new S3Client($cfg);
     }

@@ -37,20 +37,26 @@ trait AwsS3AppTrait
         $s3Region             = trim($config->get('otfs_s3_region') ?? "");
         $s3Version            = trim($config->get('otfs_s3_version') ?? "");
         $s3Bucket             = trim($config->get('otfs_s3_bucket') ?? "");
-        $s3Host               = trim($config->get('otfs_s3_host') ?? "");
+        $s3AltHost            = trim($config->get('otfs_s3_alt_host') ?? "");
         $s3AltAccessKey       = trim($config->get('otfs_s3_alt_access_key') ?? "");
         $s3AltSecretAccessKey = trim($config->get('otfs_s3_alt_secret_access_key') ?? "");
+        $s3AltBucket          = trim($config->get('otfs_s3_alt_bucket') ?? "");
+
         $log->debug(sprintf("OTFS Adapter: '%s'", $config->get(ConfigMapper::NAME_OTFS_ADAPTER)));
         $log->debug("S3 Access Key: '$s3AccessKey'");
         $log->debug(sprintf("S3 Secret Key: '%s'", str_pad("", strlen($s3SecretKey), "*")));
         $log->debug("S3 Region: '$s3Region'");
         $log->debug("S3 Version: '$s3Version'");
-        $log->debug("S3 Bucket: '$s3Bucket'");
+        $log->debug("S3 Alt Host: '$s3AltHost'");
 
-        if (empty($s3AccessKey) || empty($s3SecretKey) || empty($s3Region) || empty($s3Version) || empty($s3Bucket)) {
+        $finalBucket = !empty($s3AltHost) && !empty($s3AltBucket) ? $s3AltBucket : $s3Bucket;
+        $log->debug("S3 Bucket: '$finalBucket'");
+
+        if (empty($s3AccessKey) || empty($s3SecretKey) || empty($s3Region) || empty($s3Version) || empty($finalBucket)) {
             $log->error("Error: S3 config appears invalid");
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
         }
+
         $cfg = [
             'credentials' => [
                 'key'    => $s3AccessKey,
@@ -60,8 +66,8 @@ trait AwsS3AppTrait
             'version'     => $s3Version,
         ];
 
-        if (!empty($s3Host)) {
-            $cfg['endpoint'] = $s3Host;
+        if (!empty($s3AltHost)) {
+            $cfg['endpoint'] = $s3AltHost;
             $cfg['credentials']['key'] = $s3AltAccessKey;
             $cfg['credentials']['secret'] = $s3AltSecretAccessKey;
         }

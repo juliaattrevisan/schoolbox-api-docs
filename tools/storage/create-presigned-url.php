@@ -6,6 +6,7 @@ declare(strict_types=1);
 use Aws\S3\S3Client;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Resource\FilesystemFactory;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -73,7 +74,12 @@ $app    = new class extends CliTool\App {
     private function generatePresignedUrl(string $objectKey, string $expiry): void
     {
         $s3Client = $this->buildS3Client();
-        $bucket   = $this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_BUCKET);
+
+        $s3AltHost   = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_ALT_HOST) ?? "");
+        $s3AltBucket = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_ALT_BUCKET) ?? "");
+        $bucket      = !empty($s3AltHost) && !empty($s3AltBucket)
+            ? $s3AltBucket
+            : $this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_BUCKET);
 
         $command = $s3Client->getCommand('GetObject', [
             'Bucket' => $bucket,
@@ -91,14 +97,26 @@ $app    = new class extends CliTool\App {
      */
     private function buildS3Client(): S3Client
     {
-        return new S3Client([
+        $altHost = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_ALT_HOST) ?? "");
+        $s3AltAccessKey = trim($this->getConfig()->get('otfs_s3_alt_access_key') ?? "");
+        $s3AltSecretAccessKey = trim($this->getConfig()->get('otfs_s3_alt_secret_access_key') ?? "");
+        $altBucket = trim($this->getConfig()->get('otfs_s3_alt_bucket') ?? "");
+
+        $cfg = [
             'credentials' => [
                 'key'    => trim($this->getConfig()->get('otfs_s3_cred_key') ?? ""),
                 'secret' => trim($this->getConfig()->get('otfs_s3_cred_secret') ?? ""),
             ],
             'region'      => trim($this->getConfig()->get('otfs_s3_region') ?? ""),
             'version'     => trim($this->getConfig()->get('otfs_s3_version') ?? ""),
-        ]);
+        ];
+
+        if (!empty($altHost)) {
+            $cfg['endpoint'] = $altHost;
+            $cfg['credentials']['key'] = $s3AltAccessKey;
+            $cfg['credentials']['secret'] = $s3AltSecretAccessKey;
+        }
+        return new S3Client($cfg);
     }
 
     /**

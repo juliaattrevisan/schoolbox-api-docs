@@ -135,9 +135,10 @@ class FilesystemFactory
         $otfs_s3_region       = trim($config->get('otfs_s3_region') ?? "");
         $otfs_s3_version      = trim($config->get('otfs_s3_version') ?? "");
         $otfs_s3_bucket       = trim($config->get('otfs_s3_bucket') ?? "");
-        $otfs_s3_host         = trim($config->get('otfs_s3_host') ?? "");
+        $otfs_s3_alt_host     = trim($config->get('otfs_s3_alt_host') ?? "");
         $s3AltAccessKey       = trim($config->get('otfs_s3_alt_access_key') ?? "");
         $s3AltSecretAccessKey = trim($config->get('otfs_s3_alt_secret_access_key') ?? "");
+        $otfs_s3_alt_bucket   = trim($config->get('otfs_s3_alt_bucket') ?? "");
 
         $cfg = [
             'credentials' => [
@@ -150,8 +151,8 @@ class FilesystemFactory
                 GuzzleHttp\RequestOptions::CONNECT_TIMEOUT => self::getConnectTimeout(),
             ],
         ];
-        if (!empty($otfs_s3_host)) {
-            $cfg['endpoint'] = $otfs_s3_host;
+        if (!empty($otfs_s3_alt_host)) {
+            $cfg['endpoint'] = $otfs_s3_alt_host;
             $cfg['credentials']['key'] = $s3AltAccessKey;
             $cfg['credentials']['secret'] = $s3AltSecretAccessKey;
         }
@@ -162,10 +163,11 @@ class FilesystemFactory
         $client->registerStreamWrapper();
 
         $visibility = self::buildDefaultVisibility(self::FILE_SYSTEM_ADAPTER_AWS_S3);
+        $bucket = !empty($otfs_s3_alt_host) && !empty($otfs_s3_alt_bucket) ? $otfs_s3_alt_bucket : $otfs_s3_bucket;
         return new Filesystem(
             new Adapter(
-                new AwsS3Adapter($client, $otfs_s3_bucket, $prefix),
-                $otfs_s3_bucket,
+                new AwsS3Adapter($client, $bucket, $prefix),
+                $bucket,
             ),
             [
                 Config::OPTION_VISIBILITY           => $visibility,

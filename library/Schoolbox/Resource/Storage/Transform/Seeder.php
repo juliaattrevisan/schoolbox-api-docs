@@ -69,32 +69,40 @@ class Seeder extends App
         $this->buildDependencies()->prepareData()->seed();
     }
 
-
     /**
      * @return Seeder
      */
     private function buildDependencies(): Seeder
     {
         $config = $this->getConfig();
-        $s3Host = $config->get('otfs_s3_host');
+        $s3AccessKey          = trim($config->get('otfs_s3_cred_key') ?? "");
+        $s3SecretKey          = trim($config->get('otfs_s3_cred_secret') ?? "");
+        $s3Region             = trim($config->get('otfs_s3_region') ?? "");
+        $s3Version            = trim($config->get('otfs_s3_version') ?? "");
+        $s3Bucket             = trim($config->get('otfs_s3_bucket') ?? "");
+        $s3AltHost            = trim($config->get('otfs_s3_alt_host') ?? "");
+        $s3AltAccessKey       = trim($config->get('otfs_s3_alt_access_key') ?? "");
+        $s3AltSecretAccessKey = trim($config->get('otfs_s3_alt_secret_access_key') ?? "");
+        $s3AltBucket          = trim($config->get('otfs_s3_alt_bucket') ?? "");
 
         $cfg = [
             'credentials' => [
-                'key'    => trim($config->get('otfs_s3_cred_key') ?? ''),
-                'secret' => trim($config->get('otfs_s3_cred_secret') ?? ''),
+                'key'    => $s3AccessKey,
+                'secret' => $s3SecretKey,
             ],
-            'region'      => trim($config->get('otfs_s3_region') ?? ''),
-            'version'     => trim($config->get('otfs_s3_version') ?? ''),
+            'region'      => $s3Region,
+            'version'     => $s3Version,
         ];
-        if (!empty($s3Host)) {
-            $cfg['endpoint'] = $s3Host;
-        }
-        $this->s3Client = new S3Client(
-            $cfg
-        );
 
-        $this->bucket         = trim($config->get('otfs_s3_bucket') ?? '');
-        $this->storageDir     = trim($config->get('storage_dir'));
+        if (!empty($s3AltHost)) {
+            $cfg['endpoint'] = $s3AltHost;
+            $cfg['credentials']['key'] = $s3AltAccessKey;
+            $cfg['credentials']['secret'] = $s3AltSecretAccessKey;
+        }
+        $this->s3Client = new S3Client($cfg);
+
+        $this->bucket = !empty($s3AltHost) && !empty($s3AltBucket) ? $s3AltBucket : $s3Bucket;
+        $this->storageDir = trim($config->get('storage_dir'));
         $this->storageAdapter = trim($config->get(ConfigMapper::NAME_OTFS_ADAPTER));
 
         $this->createStorageTransformSchema();
