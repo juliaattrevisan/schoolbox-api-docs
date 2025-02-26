@@ -2,7 +2,7 @@
     {{ assessment.selfGradable ? locale.selfAssessment.proper : locale.selfReflection.proper }}
 </h2>
 
-{% set markScheme = assessment.instructorMarkScheme %}
+{% set markScheme = assessment.markScheme %}
 
 {% set gradable = selfAssess and '' != markScheme.template %}
 
@@ -52,6 +52,7 @@
                     participant: participant,
                     feedback: feedback,
                     markScheme: markScheme,
+                    useInstructorMark: false,
                     tabIndex: 1,
                     errors: errors,
                     readonly: readonly
