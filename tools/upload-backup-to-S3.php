@@ -15,7 +15,6 @@ $app    = new class extends CliTool\App {
     private string $s3Region;
     private string $s3Version;
     private string $s3Bucket;
-    private string $s3Host;
     private S3Client $client;
     private const WEEKLY_UPLOAD_DAY              = "Saturday";
     private const MONTHLY_UPLOAD_DAY             = "01";

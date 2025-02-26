@@ -16,7 +16,6 @@ require_once __DIR__ . '/../../conf/core/require.php';
  * Eg, if we need to provide a user-friendly URL for a client, eg during decommission to their storage+db dump files
  */
 $app    = new class extends CliTool\App {
-
     private const OPT_SHORT_HELP      = 'h';
     private const OPT_LONG_HELP       = 'help';
     private const OPT_LONG_OBJECT_KEY = 'key:';
