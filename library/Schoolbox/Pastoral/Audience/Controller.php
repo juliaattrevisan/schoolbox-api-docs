@@ -364,6 +364,7 @@ class Controller extends Base
         if (in_array($post['sentiment'], Pastoral\Type\TypeAbstract::SENTIMENT_VALUES)) {
             $currentType->setSentiment($post['sentiment']);
         }
+        $currentType->setDefaultPoints(floatval($post['defaultPoints']));
         if (in_array($post['defaultExpiry'], Pastoral\Type\TypeAbstract::PASTORAL_EXPIRY)) {
             $currentType->setDefaultExpiry($post['defaultExpiry']);
         }

@@ -11,6 +11,26 @@
         const typesIndexEntryTip = {{ typesIndexEntryTip|json_encode|raw }};
         const typesIndexDefaultExpiry = {{ typesIndexDefaultExpiry|json_encode|raw }};
 
+        /**
+         * Update the entry tip based on current type / subtype selection
+         * @param entryTip
+         */
+        function updateEntryTip (entryTip) {
+            const entryTipContainer = document.getElementById("entry-tip-container");
+             if (entryTipContainer === null) {
+                 return;
+             }
+             if (entryTip === "") { // only show the tip is one is set
+                 entryTipContainer.style.display = "none";
+             } else {
+                entryTipContainer.style.display = "block";
+             }
+             const entryTipInput = document.getElementById("entry-tip-input");
+             if (entryTipInput) {
+                 entryTipInput.innerHTML = entryTip; // display the tip
+             }
+        }
+
         const isExistingRecord = {{ record.id != '' ? "true" : "false"  }};
         const expiresAt = '{{ record.expiresAt ? record.expiresAt.localShort : null }}';
         const calculatedExpiresAt = {{ calculatedExpiresAt|json_encode|raw }}
@@ -34,6 +54,28 @@
          */
         function canUpdateExpiresAt() {
             return !isExistingRecord && expiresAt === "" && !hasManualExpiresAtInput;
+        }
+
+        /**
+         * Update the expires at date based on the current type / subtype selection
+         * @param defaultExpiry
+         */
+        function updateExpiresAt (defaultExpiry) {
+            if (!canUpdateExpiresAt()) {
+                return;
+            }
+            // ensure expiresAt actually exists before setting the value
+            const expiresAtElement = document.getElementById("expiresAt");
+            if (expiresAtElement === null) {
+                return;
+            }
+            // if the new type/sub-type Default Expiry is set to 'Never', clear the previously set value and return
+            if (defaultExpiry === null || defaultExpiry === "") {
+                expiresAtElement.value = "";
+                return;
+            }
+            // otherwise set the expires at date based on the Default Expiry that was set
+            expiresAtElement.value = calculatedExpiresAt[defaultExpiry] ?? '';
         }
 
         /* Some convenient selectors
@@ -71,49 +113,6 @@
                 updateEntryTip($.trim(typesIndexEntryTip[typeVal]));
                 updateExpiresAt($.trim(typesIndexDefaultExpiry[typeVal]));
             }
-        }
-
-        /**
-         * Update the entry tip based on current type / subtype selection
-         * @param entryTip
-         */
-        function updateEntryTip (entryTip) {
-            const entryTipContainer = document.getElementById("entry-tip-container");
-             if (entryTipContainer === null) {
-                 return;
-             }
-             if (entryTip === "") { // only show the tip is one is set
-                 entryTipContainer.style.display = "none";
-             } else {
-                entryTipContainer.style.display = "block";
-             }
-             const entryTipInput = document.getElementById("entry-tip-input");
-             if (entryTipInput) {
-                 entryTipInput.innerHTML = entryTip; // display the tip
-             }
-        }
-
-        /**
-         * Update the expires at date based on the current type / subtype selection
-         * @param defaultExpiry
-         */
-        function updateExpiresAt (defaultExpiry) {
-            // if this is an existing record, or the expires at date is set, or has a manual expires at input: return
-            if (!canUpdateExpiresAt()) {
-                return;
-            }
-            // ensure expiresAt actually exists before setting the value
-            const expiresAtElement = document.getElementById("expiresAt");
-            if (expiresAtElement === null) {
-                return;
-            }
-            // if the new type/sub-type Default Expiry is set to 'Never', clear the previously set value and return
-            if (defaultExpiry === null || defaultExpiry === "") {
-                expiresAtElement.value = "";
-                return;
-            }
-            // otherwise set the expires at date based on the Default Expiry that was set
-            expiresAtElement.value = calculatedExpiresAt[defaultExpiry] ?? '';
         }
 
     });

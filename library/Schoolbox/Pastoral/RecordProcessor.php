@@ -266,7 +266,9 @@ class RecordProcessor
                 }
             }
 
-            if ($post->get('points')) {
+            if ($post->getFloat('points') === null) {
+                $record->setPoints(null);
+            } else {
                 $points = $post->getFloat('points');
                 if (!is_numeric($post->get('points')) || $points < -1000000 || $points > 1000000) {
                     throw new SchoolboxException('Points must be a float between -1000000 and 1000000');

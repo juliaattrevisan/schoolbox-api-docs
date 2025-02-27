@@ -188,6 +188,7 @@
             return $('#duplicateIds').val() !== '';
         }, $.validator.format("You must select at least one student before you can proceed"));
 
+
         form.alaressValidate({
             ignore: ':disabled',
             rules: {
@@ -202,6 +203,11 @@
                         },
                     },
                 },
+                points: {
+                    number: true,
+                    max: 1000000,
+                    min: -1000000
+                }
             },
 
             messages: {
@@ -354,8 +360,56 @@
          */
         const subtypesIndex = {{ subtypesIndex|json_encode|raw }};
         const subtypesIndexPrivate = {{ subtypesIndexPrivate|json_encode|raw }};
+        const subtypesIndexDefaultPoints = {{ subtypesIndexDefaultPoints|json_encode|raw }};
         const typesIndex = {{ typesIndex|json_encode|raw }};
         const typesIndexPrivate = {{ typesIndexPrivate|json_encode|raw }};
+        const typesIndexDefaultPoints = {{ typesIndexDefaultPoints|json_encode|raw }};
+
+        const isExistingRecord = {{ record.id != '' ? "true" : "false"  }};
+        const currentPoints = '{{ record.points ? record.points : null }}';
+
+        /**
+         * When the points has manually changed, this takes precedence and
+         * any further changes when type/sub-type is changed will not update the points.
+         * Rather conveniently, the jQuery .onChange will not trigger when the points.value is changed within
+         * the updatePoints method, so we don't need to worry about this being triggered when it shouldn't be.
+         */
+        let hasManualPointsInput = false;
+        $("#points").on("change", function () {
+            hasManualPointsInput = true;
+        });
+
+        /**
+         * Check if the expires at date can be updated when the type/sub-type is changed
+         * We prevent updating the expires at date if the record is existing, the expires at date is set,
+         * or if there is a manual input for the expires at date
+         * @returns boolean
+         */
+        function canUpdatePoints() {
+            return !isExistingRecord && currentPoints === "" && !hasManualPointsInput;
+        }
+
+        /**
+         * Update the points based on the current type / subtype selection
+         * @param points
+         */
+        function updatePoints (points) {
+            if (!canUpdatePoints()) {
+                return;
+            }
+            // ensure points actually exists before setting the value
+            const pointsElement = document.getElementById("points");
+            if (pointsElement === null) {
+                return;
+            }
+            // if the new type/sub-type points is empty, clear the previously set value and return
+            if (points === null || points === "") {
+                pointsElement.value = "";
+                return;
+            }
+            // otherwise set the points based on the default points that was set
+            pointsElement.value = points;
+        }
 
         /* Some convenient selectors
          */
@@ -384,6 +438,7 @@
                  * same above with the Confidential Templates
                  */
                 replaceTemplate($.trim(subtypesIndex[subtypeVal]), $.trim(subtypesIndexPrivate[subtypeVal]));
+                updatePoints($.trim(subtypesIndexDefaultPoints[subtypeVal]));
             } else {
 
                 /* If subtypeId == null, look at the parent typeId. load its template
@@ -392,6 +447,7 @@
                  * same above with the Confidential Templates
                  */
                 replaceTemplate($.trim(typesIndex[typeVal]), $.trim(typesIndexPrivate[typeVal]));
+                updatePoints($.trim(typesIndexDefaultPoints[typeVal]));
             }
         }
 
@@ -440,7 +496,6 @@
             }
 
         }
-
 
     });
 </script>

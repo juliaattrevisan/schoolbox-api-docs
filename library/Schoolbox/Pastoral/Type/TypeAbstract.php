@@ -102,6 +102,13 @@ abstract class TypeAbstract implements ISoftDeletable, Sequential, \JsonSerializ
     protected string $sentiment = Model::SENTIMENT_NEUTRAL;
 
     /**
+     * Optional. Default Points for this type.
+     *
+     * @var null|float
+     */
+    protected ?float $defaultPoints = null;
+
+    /**
      * Pastoral expiry period
      * @var ?string
      */
@@ -274,6 +281,24 @@ abstract class TypeAbstract implements ISoftDeletable, Sequential, \JsonSerializ
     public function setSentiment(string $sentiment): self
     {
         $this->sentiment = $sentiment;
+        return $this;
+    }
+
+    /**
+     * @return float|null
+     */
+    public function getDefaultPoints(): ?float
+    {
+        return $this->defaultPoints;
+    }
+
+    /**
+     * @param float|null $defaultPoints
+     * @return static
+     */
+    public function setDefaultPoints(?float $defaultPoints): self
+    {
+        $this->defaultPoints = $defaultPoints;
         return $this;
     }
 

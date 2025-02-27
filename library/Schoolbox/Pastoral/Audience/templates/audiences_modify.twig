@@ -116,6 +116,17 @@
                             </div>
                         </div>
                     </fieldset>
+                    <fieldset class="content">
+                        <div class="small-12 columns">
+                            <label for="defaultPoints">Default Points</label>
+                            {% set currentPoints  = (subtype ? subtype.defaultPoints : type.defaultPoints) %}
+                            <div class="row">
+                                <div class="small-12 columns">
+                                    <input id="defaultPoints" name="defaultPoints" type="text" value="{{ currentPoints }}">
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
                     {% if config.pastoral_action_enable %}
                     <fieldset class="content">
                         <div class="small-12 columns">
@@ -345,6 +356,22 @@
 
                 <input type="submit" value="Save">
             </form>
+            <script>
+            $(function () {
+
+                $("form#pastoralForm").alaressValidate({
+                    ignore: ':disabled',
+                    rules: {
+                        defaultPoints: {
+                            number: true,
+                            max: 1000000,
+                            min: -1000000
+                        }
+                    },
+                });
+
+            });
+            </script>
         </div>
     </div>
 </div>
