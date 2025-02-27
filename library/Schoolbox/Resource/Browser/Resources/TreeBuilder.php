@@ -207,7 +207,6 @@ class TreeBuilder extends AbstractTreeBuilder
                 $file->getDescription(),
                 null,
                 null,
-                0,
                 null,
                 [
                     'data-id' => $file->getId(),
@@ -217,7 +216,9 @@ class TreeBuilder extends AbstractTreeBuilder
                 ],
                 [
                     'href' => $file->getHref(),
-                ]
+                ],
+                [],
+                0
             );
         } else {
             return [];
