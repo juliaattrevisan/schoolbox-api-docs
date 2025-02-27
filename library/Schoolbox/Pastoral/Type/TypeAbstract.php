@@ -293,7 +293,7 @@ abstract class TypeAbstract implements ISoftDeletable, Sequential, \JsonSerializ
     }
 
     /**
-     * @param float|null $points
+     * @param float|null $defaultPoints
      * @return static
      */
     public function setDefaultPoints(?float $defaultPoints): self
