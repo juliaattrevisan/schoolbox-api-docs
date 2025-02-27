@@ -30,8 +30,11 @@ class Csv extends Base
 {
     /**
      * Load all events into schoolbox, generate outcome array
+     *
+     * @param bool $perform should it be a dry-run instead
+     * @return void
      */
-    public function load(): void
+    public function load(bool $perform = true): void
     {
         $output = array();
 
@@ -74,6 +77,10 @@ class Csv extends Base
         $hasOwnerColumn = in_array('Calendar Owner', $headerRow);
 
         $eventTypeMapper = new EventTypeMapper();
+
+        /* Starting transaction
+         */
+        $eventMapper->getDatabase()->beginTransaction();
 
         while (($thisRow = fgetcsv($handle, 0, ",")) !== false) {
             // The CSV file will not contain character encoding info, so just assume a compatible encoding has been used.
@@ -469,6 +476,14 @@ class Csv extends Base
 
             /* Free memory */
             unset($publish_date, $start, $finish);
+        }
+
+        /* Should it do a dry run instead
+         */
+        if ($perform) {
+            $eventMapper->getDatabase()->commit();
+        } else {
+            $eventMapper->getDatabase()->rollback();
         }
 
         $this->setOutput($output);

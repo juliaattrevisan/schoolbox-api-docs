@@ -57,13 +57,16 @@ class Vcal extends Base
     /**
      * Load all events into schoolbox, generate outcome array
      *
+     * @param bool $perform should it be a dry-run instead
+     * @return void
+     *
      * @throws VObject\InvalidDataException
      * @throws \InvalidArgumentException
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function load(): void
+    public function load(bool $perform = true): void
     {
         $output = [];
 

@@ -50,7 +50,6 @@ class Controller extends Base
     ) {
     }
 
-
     /**
      * Display bulk upload admin page
      *
@@ -78,29 +77,43 @@ class Controller extends Base
         );
     }
 
-    public function postCalendarImport1(): void
+    public function postRunCalendarImport(): void
     {
         $this->extendExecutionTime(3600);
         $post = $this->requestPost;
 
-        $attachment = $post->get('bulkadd');
-        $ownerId = $post->get('userid');
+        $file = $post->get('csvFilePath');
+        $ownerId = $post->get('ownerid');
 
-        if (!$attachment) {
+        if (!$file) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
-        $collector = $this->collectorFactory->build($attachment);
+        $bulkHandler = new Bulk_Calendar(
+            $file,
+            null,
+            $ownerId,
+            [],
+            [],
+            [],
+        );
+        $allEvents = $bulkHandler->addCalendar(true);
 
-        try {
-            $file = $collector->getFirst();
-        } catch (\Schoolbox\Resource\Exception $e) {
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
-        }
-
-//        $handle = $this->filesystemProxy->readStream($file);
-//        $handle = (new \Alaress\Csv\ValidCSV($handle))->skipBom();
-//        var_dump(fgetcsv($handle));
+        $currentUrl = $this->routeGenerator->generate('adminCalendarImport.getCalendarImportForm');
+        $this->response = $this->responseFromTemplate(
+            '@adminCalendarImport/importResults.twig',
+            [
+                'pageCurrent' => $currentUrl,
+                'breadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))
+                    ->generateBreadcrumbs(
+                        $currentUrl
+                    ),
+                'perform' => 1,
+                'allEvents' => $allEvents,
+                'returnUrl' => $this->requestQuery->get('returnUrl')
+                    ?? $currentUrl,
+            ]
+        );
     }
 
     public function postCalendarImport(): void
@@ -136,70 +149,25 @@ class Controller extends Base
             [],
             [],
         );
-        $allEvents = $bulkHandler->addCalendar();
+        $allEvents = $bulkHandler->addCalendar(false);
 
         $currentUrl = $this->routeGenerator->generate('adminCalendarImport.getCalendarImportForm');
         $this->response = $this->responseFromTemplate(
-            '@adminCalendarImport/preview.twig',
+            '@adminCalendarImport/importResults.twig',
             [
-                'pageCurrent'    => $currentUrl,
+                'pageCurrent' => $currentUrl,
                 'breadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))
                     ->generateBreadcrumbs(
                         $currentUrl
                     ),
-                'allEvents'      => $allEvents,
+                'allEvents' => $allEvents,
+                'userId' => $ownerId,
+                'csvFilePath' => $fileTempName,
                 'returnUrl' => $this->requestQuery->get('returnUrl')
                     ?? $currentUrl,
             ]
         );
     }
-
-    /**
-     * Import courses and render results
-     *
-     * @throws MapperException
-     * @throws RouteNotFound
-     * @throws ResourceException
-     * @since 22.0.0
-     * @api   POST /adminv2/bulkCourseImport
-     */
-    public function postImportResults(): void
-    {
-        $this->extendExecutionTime(3600);
-
-        $post = $this->requestPost;
-
-        if (!\is_array($post->get('attachment'))) {
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
-        }
-
-        $factory = new CollectorFactory();
-        $csvFile = $factory->build($post->get('attachment'))->getFirst();
-
-        $performMode    = (bool)$post->get('perform');
-        $defaultDueTime = $this->getConfigLoader()->get('lms_duetime_default');
-
-        $imported = (new CsvImporter(
-            $this->folderMapper,
-            $this->userMapper,
-            $this->courseImplementationMapper,
-            $this->unitSpecificationMapper,
-            $this->importFactory,
-            $this->assessmentMapperProxy,
-        ))->import($this->filesystemProxy->readStream($csvFile), $defaultDueTime, $performMode);
-
-        // Render this thing out
-        $this->response = $this->responseFromTemplate(
-            '@adminBulkCourseImport/importResults.twig',
-            [
-                'pageCurrent'    => $this->routeGenerator->generate('adminBulkCourseImport.getIndex'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminBulkCourseImport.getIndex')),
-                'results'        => $imported,
-                'perform'        => $performMode,
-            ],
-        );
-    }
-
 
     /**
      * Insert an attach zone into the template

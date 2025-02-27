@@ -1,58 +1,56 @@
-{#
-array allBreadcrumbs
-array results
-bool  perform
-#}
 {% import 'sub/breadcrumbs.twig' as bread %}
-{{ bread.crumbsArray(allBreadcrumbs) }}
+{{ bread.crumbsArray(breadcrumbs) }}
 
 <div class="admin-container row">
 
     {{ renderAdminNavigation(pageCurrent) }}
 
     <div class="admin-content">
-        <div class="row">
-            <div class="small-12 island">
-                <h1>Import Courses</h1>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="large-12 columns">
-                {% if not perform %}
-                    <div data-alert="" class="alert-box warning">
-                        This is a preview only. Repeat with 'Apply Changes' enabled to persist changes.
-                    </div>
-                {% else %}
-                    <div data-alert="" class="alert-box success">
-                        The import was successfully completed.
-                    </div>
-                {% endif %}
-            </div>
-            <div class="large-12 columns">
-                <table>
-                    <thead>
+        <div class="small-12 columns">
+            <h2 class="subheader">Preview bulk calendar event</h2>
+            {% if perform is not defined %}
+                <div data-alert="" class="alert-box warning">
+                    This is a preview only. Click 'Import' to perform import.
+                </div>
+            {% else %}
+                <div data-alert="" class="alert-box success">
+                    The import was successfully completed.
+                </div>
+            {% endif %}
+            <table>
+                <thead>
+                <tr>
+                    <th>Event Name<span class="hint has-tip tip-top" data-tooltip title="The name of the category, indicated from reading the rows in the CSV file.">?</span></th>
+                    <th>Action<span class="hint has-tip tip-top" data-tooltip title="The function Schoolbox has attempted to complete.">?</span></th>
+                    <th>Response<span class="hint has-tip tip-top" data-tooltip title="Schoolbox's feedback after attempting to complete the requested function.">?</span></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for event in allEvents %}
                     <tr>
-                        <th>Unit Spec</th>
-                        <th>Folder</th>
+                        <td>{{ event.name }}</td>
+                        <td>{{ event.status }}</td>
+                        <td>{{ event.error }}</td>
                     </tr>
-                    </thead>
-                    <tbody>
-                    {% for result in results %}
-                        <tr>
-                            <td>
-                                <a href="/homepage/{{ result.specification.folder.id }}">{{ result.specification.title }}</a>
-                            </td>
-                            <td>
-                                <a href="/homepage/{{ result.folder.id }}">{{ result.folder.name }}</a>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-                <a href="{{ routeLookupIfAuthorized('adminBulkCourseImport.getIndex') }}" class="button icon-previous">Return
-                    to Bulk Course Import</a>
-            </div>
+                {% endfor %}
+                </tbody>
+            </table>
+
+            <ul class="flex-list buttons">
+                <li>
+                    <a href="{{ RETURN_URL.previous.decoded }}">Back</a>
+                </li>
+                {% if perform is not defined %}
+                    {% set runRoute = routeLookupIfAuthorized('adminCalendarImport.postRunCalendarImport') %}
+                    <li>
+                        <form class="top" enctype="multipart/form-data" method="post" data-disable-on-submit action="{{ runRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}">
+                            <input type="hidden" name="csvFilePath" value="{{ csvFilePath ?? null }}"/>
+                            <input type="hidden" name="userId" value="{{ userId ?? null }}"/>
+                            <input type="submit" value="Import" />
+                        </form>
+                    </li>
+                {% endif %}
+            </ul>
         </div>
     </div>
 </div>

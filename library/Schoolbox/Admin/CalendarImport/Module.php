@@ -63,6 +63,13 @@ class Module extends BaseModule
             'postCalendarImport',
             $permission,
         );
+
+        $this->register(
+            self::METHOD_POST,
+            '/import/school-events/run',
+            'postRunCalendarImport',
+            $permission,
+        );
     }
 
     /**
