@@ -111,36 +111,28 @@ class Csv extends Base
             /* Role is mandatory
              */
             $roleCollection = $this->getGroupList();
-            if ($hasRolesColumn && empty($roleCollection)) {
-                if (!strlen(trim($roles))) {
-                    $output[] = array(
-                        'name'   => $name,
-                        'status' => 'Not Added',
-                        'error'  => 'Roles not provided',
-                    );
+            if ($hasRolesColumn) {
+                if (strlen(trim($roles))) {
+                    /* Check if roles provided are valid
+                     */
+                    $allRoles = explode(",", $roles);
+                    foreach ($allRoles as $roleName) {
+                        try {
+                            $role             = $roleMapper->findOneByColumn('name', $roleName);
+                            $roleCollection[] = $role->getId();
+                        } catch (MapperException $e) {
+                            $output[] = [
+                                'name'   => $name,
+                                'status' => 'Not Added',
+                                'error'  => sprintf(
+                                    'Invalid role (%s) provided',
+                                    $roleName,
+                                ),
+                            ];
 
-                    continue;
-                }
-            }
-
-            /* Check if roles provided are valid
-             */
-            $allRoles = explode(",", $roles);
-            foreach ($allRoles as $roleName) {
-                try {
-                    $role = $roleMapper->findOneByColumn('name', $roleName);
-                    $roleCollection[] = $role->getId();
-                } catch (MapperException $e) {
-                    $output[] = array(
-                        'name'   => $name,
-                        'status' => 'Not Added',
-                        'error'  => sprintf(
-                            'Invalid role (%s) provided',
-                            $roleName,
-                        ),
-                    );
-
-                    continue 2;
+                            continue 2;
+                        }
+                    }
                 }
             }
 
@@ -459,6 +451,16 @@ class Csv extends Base
                 /* Assign Role relations
                  */
                 if ($event->isCampusLevel()) {
+                    if (empty($roleCollection)) {
+                        $output[] = array(
+                            'name'   => $name,
+                            'status' => 'Not Added',
+                            'error'  => 'Roles not provided',
+                        );
+
+                        continue;
+                    }
+
                     foreach ($roleCollection as $currentRole) {
                         $role = new Role();
                         $role->setEventId($event->getId());
