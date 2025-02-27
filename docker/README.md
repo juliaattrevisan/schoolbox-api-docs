@@ -44,6 +44,7 @@ within a self-contained development environment.
   ```shell
   docker exec -it schoolbox-cli /bin/bash
   mariadb -h mariadb -u root -D schoolbox -p < vagrantcache/schoolbox.sql # password: vagrant
+  mariadb -h mariadb -u root -D schoolbox -p < sql/vagrant.sql # password: vagrant
   ```
 - finagle database settings for Docker:
   ```sql
