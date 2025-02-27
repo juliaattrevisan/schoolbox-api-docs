@@ -228,9 +228,9 @@ class TemplateDataHelper
         foreach ($subtypes as $subtype) {
             $subtypesIndex[$subtype->getId()]        = $subtype->getTemplate();
             $subtypesIndexPrivate[$subtype->getId()] = $subtype->getTemplatePrivate();
-            $typesIndexEntryTip[$subtype->getId()] = $subtype->getEntryTip();
-            $typesIndexDefaultExpiry[$subtype->getId()] = $subtype->getDefaultExpiry();
-            $typesIndexDefaultPoints[$subtype->getId()] = $subtype->getDefaultPoints();
+            $subtypesIndexEntryTip[$subtype->getId()] = $subtype->getEntryTip();
+            $subtypesIndexDefaultExpiry[$subtype->getId()] = $subtype->getDefaultExpiry();
+            $subtypesIndexDefaultPoints[$subtype->getId()] = $subtype->getDefaultPoints();
             if (key_exists($subtype->getId(), $subtypeAudiences) || $subtype->getVisibilityLocked()) {
                 $audienceDefaults[] = [
                     'typeId'    => $subtype->getPastoralType()->getId(),
