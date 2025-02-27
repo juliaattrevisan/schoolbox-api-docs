@@ -17,21 +17,6 @@ use Schoolbox\Application\Exception\Exception;
 class Helper
 {
     /**
-     * @var RoleMapper
-     */
-    private $roleMapper;
-
-    /**
-     * @var RerouteMapper
-     */
-    private $msgRerouteMapper;
-
-    /**
-     * @var NSMapper
-     */
-    private $namespaceMapper;
-
-    /**
      * @var Array
      */
     private $namespaces;
@@ -43,8 +28,11 @@ class Helper
      * @param RerouteMapper $msgRerouteMapper
      * @param NSMapper $namespaceMapper
      */
-    public function __construct(RoleMapper $roleMapper, RerouteMapper $msgRerouteMapper, NSMapper $namespaceMapper)
-    {
+    public function __construct(
+        private RoleMapper $roleMapper,
+        private RerouteMapper $msgRerouteMapper,
+        private NSMapper $namespaceMapper
+    ) {
         $this->roleMapper = $roleMapper;
         $this->msgRerouteMapper = $msgRerouteMapper;
         $this->namespaceMapper = $namespaceMapper;
