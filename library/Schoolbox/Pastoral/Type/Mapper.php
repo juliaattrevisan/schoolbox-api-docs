@@ -42,7 +42,7 @@ class Mapper extends BaseMapper
         $this->uses('external_code', self::TYPE_STRING);
         $this->uses('visibility_locked', self::TYPE_BOOLEAN);
         $this->uses('sentiment', self::TYPE_STRING, self::COLUMN_ENUM, null, Model::SENTIMENT_VALUES);
-        $this->uses('default_points', self::TYPE_INTEGER);
+        $this->uses('default_points', self::TYPE_DECIMAL);
         $this->uses('default_expiry', self::TYPE_STRING);
         $this->uses('sequence', self::TYPE_INTEGER);
         $this->uses('updated_by', self::TYPE_INTEGER);
