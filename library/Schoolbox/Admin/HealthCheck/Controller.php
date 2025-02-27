@@ -1925,12 +1925,228 @@ class Controller extends Base
      */
     public function unitplannerComponents()
     {
+        $units = [];
         $database = FolderMapper::getInstance()->getDatabase();
-        $statement = $database->prepare("
-        QUERY HERE
+
+
+        //build the csv
+        $rowHeadings = [
+            'Course Title',
+            'Course Homepage ID',
+            'Course ID',
+            'Course Framework',
+            'Unit Title',
+            'Unit Homepage ID',
+            'Edit Link',
+            'Component Type',
+            'Component Title',
+            'Curriculum Overview Tree Filter',
+            'File Count',
+            'Link Count',
+        ];
+
+        // base filename with school code and date
+        $filename = sprintf("unit-audit-%s-%s.csv", $this->getConfigLoader()->get('site_school_code'), \Alaress_Date_Format::now()->toIso8601String());
+        $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
+
+        // fetch all units/courses
+        $courseUnitQuery = $database->prepareQuery("select
+            courseFolder.name as 'course.name',
+            courseFolder.id as 'course.id',
+            course_specification.id as 'course_specification.id',
+            unitFolder.name as 'unit.name',
+            unitFolder.id as 'unit.id',
+            courseTemplates.name as 'framework'
+        FROM course_specification
+        join courseTemplates on course_specification.template_id = courseTemplates.id
+        join folder courseFolder on course_specification.folder_id = courseFolder.id
+        join course_unit_specification on course_specification.id = course_unit_specification.course_specification_id
+        join folder unitFolder on course_unit_specification.folder_id = unitFolder.id");
+
+        $courseUnitQuery->execute();
+        while ($row = $courseUnitQuery->fetch(\PDO::FETCH_ASSOC)) {
+            $units[$row['unit.id']] = $row;
+        }
+
+        $unitPlaceHolder = Builder::getArrayPlaceholders(array_keys($units), 'units');
+
+        // fetch all textboxes with components from these units
+        // clone with extension from \Schoolbox\Search\Api\Database\ResultType\Textbox\IndexBuilder::buildUpdates
+        $curricOverviewQuery = $database->prepareQuery("SELECT
+            f.id AS 'folder.id',
+            cci_title.value as 'component.name',
+            ci.id as 'component.id',
+            cn.name as 'tree.filter',
+            cn.code as 'tree.filter_code'
+        FROM component_definition cd
+                JOIN component_instance ci ON ci.component_definition_id = cd.id and ci.module = 'homepage'
+                JOIN folder f ON f.id = ci.identifier
+                JOIN        component_config_definition ccd_title ON
+                            (
+                            ccd_title.component_definition_id = cd.id AND
+                            ccd_title.key = 'componentname'
+                            )
+                LEFT JOIN   component_config_instance cci_title ON (
+                            cci_title.component_config_definition_id = ccd_title.id AND
+                            cci_title.component_instance_id = ci.id
+                            )
+                JOIN        component_config_definition ccd_tree ON
+                            (
+                            ccd_tree.component_definition_id = cd.id AND
+                            ccd_tree.key = 'curriculumTreeFilter'
+                            )
+                LEFT JOIN   component_config_instance cci_tree ON (
+                            cci_tree.component_config_definition_id = ccd_tree.id AND
+                            cci_tree.component_instance_id = ci.id
+                            )
+                LEFT JOIN   curriculum_node cn on cci_tree.value = cn.id AND cn.deleted_at is NULL
+        WHERE cd.`class` = 'Schoolbox\\\Curriculum\\\Component\\\CurriculumOverviewController'
+        AND f.deleted_at IS NULL
+        AND f.id in {$unitPlaceHolder};
         ");
-        $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'unitplannerComponents.csv');
+
+
+        header('Content-type: text/csv; charset=utf-8');
+        header("Content-Disposition: attachment; filename=\"$filename\"");
+
+        $fp = fopen("php://output", 'w');
+        fputcsv($fp, $rowHeadings);
+
+        //---------------------------------------------------------------------------------------------------
+        /**
+         * $rowHeadings = [
+         * 'Course Title',
+         * 'Course Homepage ID',
+         * 'Course ID',
+         * 'Course Framework',
+         * 'Unit Title',
+         * 'Unit Homepage ID',
+         * 'Edit Link',
+         * 'Component Type',
+         * 'Component Title',
+         * 'Curriculum Overview Tree Filter',
+         * 'File Count',
+         * 'Link Count',
+        * ];
+         */
+        $curricOverviewQuery->execute(
+            Builder::getArrayParameters(array_keys($units), 'units')
+                                );
+
+        while ($row = $curricOverviewQuery->fetch(\PDO::FETCH_ASSOC)) {
+            $componentName = $row['componentName'] ?? 'NULL';
+            // if component is empty string, use the system default
+            if (trim($componentName) === '') {
+                $componentName = \Schoolbox\Curriculum\Component\CurriculumOverviewController::DEFAULT_COMPONENT_HEADING;
+            }
+
+            $curricCode=trim((string)$row['tree.filter_code']);
+            $curricFilter=trim((string)$row['tree.filter']);
+
+            if('' !== $curricCode) {
+                $curricFilter .= " [$curricCode]";
+            }
+
+            //build the row and send
+            fputcsv($fp, [
+                $units[$row['folder.id']]['course.name'],
+                $units[$row['folder.id']]['course.id'],
+                $units[$row['folder.id']]['course_specification.id'],
+                $units[$row['folder.id']]['framework'],
+                $units[$row['folder.id']]['unit.name'],
+                $units[$row['folder.id']]['unit.id'],
+                $urlBase->withPath(sprintf("/homepage/%s", $units[$row['folder.id']]['unit.id']))->withFragment(sprintf("component%s", $row['component.id'])),
+                'Curriculum Overview',
+                $componentName,
+                $curricFilter,
+                NULL,
+                NULL,
+            ]);
+        }
+        //---------------------------------------------------------------------------------------------------
+
+        $unitPlaceHolder = Builder::getArrayPlaceholders(array_keys($units), 'units');
+
+        // fetch all textboxes with components from these units
+        // clone with extension from \Schoolbox\Search\Api\Database\ResultType\Textbox\IndexBuilder::buildUpdates
+        $fileQuery = $database->prepareQuery("SELECT
+            f.id AS 'folder.id',
+            cci_title.value as 'component.name',
+            ci.id as 'component.id',
+            cn.name as 'tree.filter',
+            cn.code as 'tree.filter_code'
+        FROM component_definition cd
+                JOIN component_instance ci ON ci.component_definition_id = cd.id and ci.module = 'homepage'
+                JOIN folder f ON f.id = ci.identifier
+                JOIN        component_config_definition ccd_title ON
+                            (
+                            ccd_title.component_definition_id = cd.id AND
+                            ccd_title.key = 'componentname'
+                            )
+                LEFT JOIN   component_config_instance cci_title ON (
+                            cci_title.component_config_definition_id = ccd_title.id AND
+                            cci_title.component_instance_id = ci.id
+                            )
+                JOIN        component_config_definition ccd_tree ON
+                            (
+                            ccd_tree.component_definition_id = cd.id AND
+                            ccd_tree.key = 'curriculumTreeFilter'
+                            )
+                LEFT JOIN   component_config_instance cci_tree ON (
+                            cci_tree.component_config_definition_id = ccd_tree.id AND
+                            cci_tree.component_instance_id = ci.id
+                            )
+                LEFT JOIN   curriculum_node cn on cci_tree.value = cn.id AND cn.deleted_at is NULL
+        WHERE cd.`class` = 'Schoolbox\\\Curriculum\\\Component\\\CurriculumOverviewController'
+        AND f.deleted_at IS NULL
+        AND f.id in {$unitPlaceHolder};
+        ");
+
+        /**
+         * $rowHeadings = [
+         * 'Course Title',
+         * 'Course Homepage ID',
+         * 'Course ID',
+         * 'Course Framework',
+         * 'Unit Title',
+         * 'Unit Homepage ID',
+         * 'Edit Link',
+         * 'Component Type',
+         * 'Component Title',
+         * 'Curriculum Overview Tree Filter',
+         * 'File Count',
+         * 'Link Count',
+        * ];
+         */
+        $fileQuery->execute(
+            Builder::getArrayParameters(array_keys($units), 'units')
+                                );
+
+        while ($row = $fileQuery->fetch(\PDO::FETCH_ASSOC)) {
+            $componentName = $row['componentName'] ?? 'NULL';
+            // if component is empty string, use the system default
+            if (trim($componentName) === '') {
+                $componentName = \Schoolbox\Curriculum\Component\CurriculumOverviewController::DEFAULT_COMPONENT_HEADING;
+            }
+
+            //build the row and send
+            fputcsv($fp, [
+                $units[$row['folder.id']]['course.name'],
+                $units[$row['folder.id']]['course.id'],
+                $units[$row['folder.id']]['course_specification.id'],
+                $units[$row['folder.id']]['framework'],
+                $units[$row['folder.id']]['unit.name'],
+                $units[$row['folder.id']]['unit.id'],
+                $urlBase->withPath(sprintf("/homepage/%s", $units[$row['folder.id']]['unit.id']))->withFragment(sprintf("component%s", $row['component.id'])),
+                'File Component',
+                $componentName,
+                NULL,
+                'File Count',
+                NULL,
+            ]);
+        }
+
+
+        exit(1);
     }
 }
