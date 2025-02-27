@@ -29,7 +29,21 @@
                 {% for event in allEvents %}
                     <tr>
                         <td>{{ event.name }}</td>
-                        <td>{{ event.status }}</td>
+                        <td>
+                            {% if event.error == 'OK' %}
+                                {% if perform is not defined %}
+                                    Will be added
+                                {% else %}
+                                    Added
+                                {% endif %}
+                            {% else %}
+                                {% if perform is not defined %}
+                                    Will not be added
+                                {% else %}
+                                    Not added
+                                {% endif %}
+                            {% endif %}
+                        </td>
                         <td>{{ event.error }}</td>
                     </tr>
                 {% endfor %}
