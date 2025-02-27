@@ -2,14 +2,17 @@
 
 namespace Schoolbox\Admin\HealthCheck;
 
+use Alaress\Database\Predicate\Builder;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Generator;
+use Component_Config_Componentname;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\TaskDaemon\Producer;
 use Schoolbox\TaskDaemon\Request\MessageFactory;
+use Schoolbox\Resource\Textbox;
 use Schoolbox\User\Token\Mapper as TokenMapper;
 
 class Controller extends Base
@@ -186,8 +189,9 @@ class Controller extends Base
                      */
                     $this->taskDHelper->addSource('', 'unitplannerFrameworks');
                     $this->taskDHelper->addSource('', 'unitplannerCourseTextboxes');
-                    $this->taskDHelper->addSource('', 'unitplannerUnitTextboxes');
-                    $this->taskDHelper->addSource('', 'unitplannerComponents');
+                    $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
+                    $this->taskDHelper->addSource('', 'unitplannerUnitTextboxes', $urlBase->withPath($this->routeGenerator->generate('coursePlan.getAudit')));
+//                    $this->taskDHelper->addSource('', 'unitplannerComponents');
                     break;
                 default:
                     throw new SchoolboxException("Report '{$report}' Does not exist.");
@@ -1704,11 +1708,10 @@ class Controller extends Base
      */
     public function unitplannerFrameworks()
     {
+        $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
+
         $database = FolderMapper::getInstance()->getDatabase();
         $statement = $database->prepare("
-        SELECT @domain := value FROM config WHERE name = 'site_domain';
-        SELECT @hostname := value FROM config WHERE name = 'site_hostname';
-
         SELECT
             cs.id AS 'Course ID',
             fcs.name AS 'Course Name',
@@ -1716,7 +1719,7 @@ class Controller extends Base
             ct.name AS 'Framework',
             '' AS 'New Framework ID',
             '' AS 'New Framework Name',
-            CONCAT('https://',@hostname,@domain,'/course/modify/',cs.id) AS 'Course Link'
+            CONCAT(:URL,'/course/modify/',cs.id) AS 'Course Link'
         FROM
             course_specification cs
         JOIN
@@ -1726,24 +1729,196 @@ class Controller extends Base
         WHERE
             cs.deleted_at IS NULL;
         ");
-        $statement->execute();
+        $statement->execute(['URL'=> $urlBase]);
         $help = new Helper();
         $help->queryToCSV($statement, 'unitplannerFrameworks.csv');
     }
     /**
      * UNIT PLANNER
-     * unitplannerTextboxes.csv
+     * unitplannerCourseTextboxes.csv
      */
     public function unitplannerCourseTextboxes()
     {
+
         $database = FolderMapper::getInstance()->getDatabase();
-        $statement = $database->prepare("
-        QUERY HERE
+        $courses = [];
+
+        //build the csv
+        $rowHeadings = [
+            'Course Title',
+            'Course Homepage ID',
+            'Course ID',
+            'Course Framework',
+            'Edit Link',
+            'Textbox Component Name',
+            'Textbox Component ID',
+            'Textbox Title',
+            'Textbox ID',
+            'Textbox Content (empty string, empty state)'
+        ];
+
+        // base filename with school code and date
+        $filename = sprintf("unit-audit-%s-%s.csv", $this->getConfigLoader()->get('site_school_code'), \Alaress_Date_Format::now()->toIso8601String());
+        $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
+
+        // fetch all courses
+        $courseQuery = $database->prepareQuery("select
+            courseFolder.name as 'course.name',
+            courseFolder.id as 'course.id',
+            course_specification.id as 'course_specification.id',
+            courseTemplates.name as 'framework'
+        FROM course_specification
+        join courseTemplates on course_specification.template_id = courseTemplates.id
+        join folder courseFolder on course_specification.folder_id = courseFolder.id
         ");
-        $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'unitplannerCourseTextboxes.csv');
+
+        $courseQuery->execute();
+        while ($row = $courseQuery->fetch(\PDO::FETCH_ASSOC)) {
+            $courses[$row['course.id']] = $row;
+        }
+
+        $coursePlaceHolder = Builder::getArrayPlaceholders(array_keys($courses), 'courses');
+
+        // fetch all textboxes with components from these courses
+        // clone with extension from \Schoolbox\Search\Api\Database\ResultType\Textbox\IndexBuilder::buildUpdates
+        $compTextQuery = $database->prepareQuery("SELECT
+            tb.textBoxID AS id,
+            f.id AS folder_id,
+            cci_componentname.value as 'componentName',
+            ci.id as 'componentId',
+            tb.heading as 'textboxHeading',
+            tb.updated_at AS date,
+            tb.updated_by AS updated_by,
+            tb.body AS textboxBody
+        FROM component_definition cd
+                 JOIN component_instance ci ON ci.component_definition_id = cd.id and ci.module = 'homepage'
+                 JOIN folder f ON f.id = ci.identifier
+                 JOIN component_config_definition ccd_textbox ON (
+            ccd_textbox.component_definition_id = cd.id AND
+            ccd_textbox.key = :homepageComponentKey
+            )
+                 LEFT JOIN component_config_instance cci_textbox ON (
+            cci_textbox.component_config_definition_id = ccd_textbox.id AND
+            cci_textbox.component_instance_id = ci.id
+            )
+                 LEFT JOIN textBox tb ON CAST(tb.textBoxID AS NCHAR)=cci_textbox.value
+                 JOIN component_config_definition ccd_componentname ON (
+            ccd_componentname.component_definition_id = cd.id AND
+            ccd_componentname.key = :componentConfigComponentNameKey
+            )
+                 LEFT JOIN component_config_instance cci_componentname ON (
+            cci_componentname.component_config_definition_id = ccd_componentname.id AND
+            cci_componentname.component_instance_id = ci.id
+            )
+        WHERE cd.`class` = 'Schoolbox\\\Resource\\\Textbox\\\Component\\\Homepage\\\Controller'
+          AND f.deleted_at IS NULL
+          AND tb.deleted_at IS NULL
+        AND f.id in {$coursePlaceHolder};
+        ");
+
+
+        header('Content-type: text/csv; charset=utf-8');
+        header("Content-Disposition: attachment; filename=\"$filename\"");
+
+        $fp = fopen("php://output", 'w');
+        fputcsv($fp, $rowHeadings);
+
+        /**
+         * $rowHeadings = [
+         * 'Course Title',
+         * 'Course Homepage ID',
+         * 'Course Specification ID',
+         * 'Textbox Component Name',
+         * 'Textbox Title',
+         * 'Textbox ID',
+         * 'Textbox Content (empty string, empty state)'
+         * ];
+         */
+        $compTextQuery->execute(array_merge(
+                                    [
+                                        'homepageComponentKey' => Textbox\Mapper::HOMEPAGE_COMPONENT_KEY,
+                                        'componentConfigComponentNameKey' => Component_Config_Componentname::KEY,
+                                    ],
+                                    Builder::getArrayParameters(array_keys($courses), 'courses')
+                                ));
+        while ($row = $compTextQuery->fetch(\PDO::FETCH_ASSOC)) {
+            $componentName = $row['componentName'] ?? 'NULL';
+            // if component is empty string, use the system default
+            if (trim($componentName) === '') {
+                $componentName = Textbox\Component\Homepage\Controller::DEFAULT_COMPONENT_HEADING;
+            }
+            //build the row and send
+            fputcsv($fp, [
+                $courses[$row['folder_id']]['course.name'],
+                $courses[$row['folder_id']]['course.id'],
+                $courses[$row['folder_id']]['course_specification.id'],
+                $courses[$row['folder_id']]['framework'],
+                $urlBase->withPath(sprintf("/homepage/%s", $courses[$row['folder_id']]['course.id']))->withFragment(sprintf("component%s", $row['componentId'])),
+                $componentName,
+                $row['componentId'] ?? 'NULL',
+                $row['textboxHeading'] ?? 'NULL',
+                $row['id'] ?? 'NULL',
+                $row['textboxBody'] ?? 'NULL',
+            ]);
+        }
+
+        // fetch all textboxes with no component from these units
+        // clone with extension from \Schoolbox\Search\Api\Database\ResultType\Textbox\IndexBuilder::buildUpdates
+        $textQuery = $database->prepareQuery("SELECT
+            tb2.textBoxID AS id,
+            tb2.heading as 'textboxHeading',
+            tb2.updated_at AS date,
+            tb2.updated_by AS updated_by,
+            tb2.body AS textboxBody,
+            tb2.categoryID as folderId
+        FROM textBox tb2
+                 LEFT JOIN component_config_instance cci2 ON (
+            cci2.component_config_definition_id = (
+                SELECT id
+                FROM component_config_definition ccd2
+                WHERE ccd2.key = :homepageComponentKey
+            ) AND
+            cci2.value = CAST(tb2.textBoxID AS NCHAR)
+            )
+        WHERE tb2.deleted_at IS NULL
+          AND cci2.id IS NULL
+          AND tb2.categoryID in {$coursePlaceHolder}
+        ");
+
+        /**
+         * $rowHeadings = [
+         * 'Course Title',
+         * 'Course Homepage ID',
+         * 'Textbox Component Name',
+         * 'Textbox Title',
+         * 'Textbox ID',
+         * 'Textbox Content (empty string, empty state)'
+         * ];
+         */
+        $textQuery->execute(array_merge(
+                                [
+                                    'homepageComponentKey' => Textbox\Mapper::HOMEPAGE_COMPONENT_KEY
+                                ],
+                                Builder::getArrayParameters(array_keys($courses), 'courses')
+                            ));
+        while ($row = $textQuery->fetch(\PDO::FETCH_ASSOC)) {
+            //build the row and send
+            fputcsv($fp, [
+                $courses[$row['folderId']]['course.name'],
+                $courses[$row['folderId']]['course.id'],
+                $courses[$row['folderId']]['course_specification.id'],
+                $courses[$row['folderId']]['framework'],
+                $urlBase->withPath(sprintf("/textbox/folder/%s", $courses[$row['folderId']]['course.id'])),
+                'No Component',
+                'No Component',
+                $row['textboxHeading'] ?? 'NULL',
+                $row['id'] ?? 'NULL',
+                $row['textboxBody'] ?? 'NULL',
+            ]);
+        }
+        exit(1);
     }
+
     /**
      * UNIT PLANNER
      * unitplannerComponents.csv
