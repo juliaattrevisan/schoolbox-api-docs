@@ -180,7 +180,7 @@ class TreeBuilder extends AbstractTreeBuilder
      * @throws Resource\Exception
      * @return array
      */
-    protected function buildFileNode($file): array
+    protected function buildFileNode($file)
     {
         $permission = $this->getFilePermission($file);
         if (empty($permission)) {
