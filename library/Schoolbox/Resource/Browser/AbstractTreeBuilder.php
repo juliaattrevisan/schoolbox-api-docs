@@ -175,7 +175,7 @@ abstract class AbstractTreeBuilder
             $folder = $this->folderLocator->findById(IFolder::ROOT_ID);
 
             if ($folder instanceof Folder\Model) {
-                $sequence = $folder->getSequence();
+                $sequence = $folder->getSequence() ?? 0;
                 $createdAt = $folder->getCreatedAt();
             } else {
                 $sequence = 0;
@@ -382,7 +382,7 @@ abstract class AbstractTreeBuilder
             $liAttributes,
             $aAttributes,
             $parentList,
-            $sequence,
+            $sequence ?? 0,
         );
     }
 
@@ -445,7 +445,7 @@ abstract class AbstractTreeBuilder
         array $liAttributes = null,
         array $aAttributes = null,
         array $parentList = [],
-        ?int $sequence = null,
+        int $sequence = 0,
     ): array {
         $array = array(
             'id' => $nodeId,

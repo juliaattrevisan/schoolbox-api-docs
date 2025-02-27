@@ -216,9 +216,7 @@ class TreeBuilder extends AbstractTreeBuilder
                 ],
                 [
                     'href' => $file->getHref(),
-                ],
-                [],
-                0
+                ]
             );
         } else {
             return [];
