@@ -28,6 +28,9 @@ use Schoolbox\Resource\Folder;
 
 class Csv extends Base
 {
+    private const CAMPUS_COLUMN = 'Campus';
+    private const ROLE_COLUMN = 'Role';
+    private const OWNER_COLUMN = 'Calendar Owner';
     /**
      * Load all events into schoolbox, generate outcome array
      *
@@ -72,11 +75,13 @@ class Csv extends Base
 
         /* Column checks
          */
-        $hasCampusColumn = in_array('Campus', $headerRow);
-        $hasRolesColumn = in_array('Role', $headerRow);
-        $hasOwnerColumn = in_array('Calendar Owner', $headerRow);
+        $hasCampusColumn = in_array(self::CAMPUS_COLUMN, $headerRow);
+        $hasRolesColumn = in_array(self::ROLE_COLUMN, $headerRow);
+        $hasOwnerColumn = in_array(self::OWNER_COLUMN, $headerRow);
 
         $eventTypeMapper = new EventTypeMapper();
+
+
 
         /* Starting transaction
          */
