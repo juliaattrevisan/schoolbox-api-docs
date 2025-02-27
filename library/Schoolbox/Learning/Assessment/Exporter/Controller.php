@@ -20,7 +20,6 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\LessonPlan\Activities\Replicator as LessonPlanActivitiesReplicator;
-use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImplementation;
@@ -296,53 +295,26 @@ class Controller extends BaseController
             return;
         }
 
-        $enableReimport    = (bool)$this->getConfigLoader()->get('destructive_activity_export_enabled');
-        $expectedDateTypes = ['publish', 'open', 'due', 'late'];
-        foreach ($assessmentImpls as $assessmentImpl) {
-            /** @var UnitImplementation\Model $unitImpl */
-            $unitImpl = $assessmentImpl->getBaseContext();
-
-            // Was unitImport not selected in form?
-            if (empty($importedImplementations[$unitImpl->getId()])) {
-                continue;
-            }
-
-            // Does the assessment already exist in the unit import?
-            if ($assessmentImpl->getId()) {
-                // Does the system permit destructive re-export?
-                if ($enableReimport) {
-                    $notifier = $this->assessmentDataSource->getNotifier();
-                    $before   = $notifier->dehydrate($assessmentImpl);
-                    $this->assessmentDataSource->delete($assessmentImpl);
-                    $notifier->notify($assessmentImpl, $this->getUser(), $before);
-                } else {
-                    continue;
+        // Transact the entire export procedure, rolling back if any exception is raised.
+        try {
+            $this->unitImplementationMapper->getDatabase()->transact(
+                function () use (
+                    $assessment,
+                    $assessmentImpls,
+                    $importedImplementations,
+                    $importedImplementationDates
+                ): void {
+                    $this->exportAssessmentImplementations(
+                        $assessment,
+                        $assessmentImpls,
+                        $importedImplementations,
+                        $importedImplementationDates
+                    );
                 }
-            }
-
-            $dates        = $importedImplementationDates[$unitImpl->getId()];
-            $datesObjects = [];
-
-            foreach ($expectedDateTypes as $dateType) {
-                if (!array_key_exists($dateType, $dates)) {
-                    continue;
-                }
-                $datesObjects[$dateType] = Alaress_Date_Format::newLocal($dates[$dateType]);
-            }
-
-            $newAssessmentImpl = $this->exportToNewContext(
-                $assessment,
-                $assessmentImpl->getContext(),
-                $assessmentImpl->getId() ? $assessmentImpl->getSequence() : null,
-                $datesObjects['publish'],
-                $datesObjects['open'] ?? $datesObjects['publish'],
-                $datesObjects['due'],
-                $datesObjects['late'] ?? $datesObjects['due']
             );
-
-            // Replicate lesson plan linked activities only after assessment and
-            // project have been overwritten.
-            $this->lessonPlanActivitiesReplicator->replicate($assessment, $newAssessmentImpl);
+        } catch (\Throwable $e) {
+            $this->sendError($e->getMessage());
+            return;
         }
 
         /** @var UnitSpecification\Model $unitSpec */
@@ -619,6 +591,69 @@ class Controller extends BaseController
         return $assessmentImpls;
     }
 
+    /**
+     * @param IAssessable $assessmentToExport
+     * @param GenericCollection $assessmentImpls
+     * @param array $importedImplementations
+     * @param array $importedImplementationDates
+     * @return void
+     * @throws MapperException
+     */
+    private function exportAssessmentImplementations(
+        IAssessable $assessmentToExport,
+        GenericCollection $assessmentImpls,
+        array $importedImplementations,
+        array $importedImplementationDates
+    ): void {
+        $enableReimport    = (bool)$this->getConfigLoader()->get('destructive_activity_export_enabled');
+        $expectedDateTypes = ['publish', 'open', 'due', 'late'];
+        foreach ($assessmentImpls as $assessmentImpl) {
+            /** @var UnitImplementation\Model $unitImpl */
+            $unitImpl = $assessmentImpl->getBaseContext();
+
+            // Was unitImport not selected in form?
+            if (empty($importedImplementations[$unitImpl->getId()])) {
+                continue;
+            }
+
+            // Does the assessment already exist in the unit import?
+            if ($assessmentImpl->getId()) {
+                // Does the system permit destructive re-export?
+                if ($enableReimport) {
+                    $notifier = $this->assessmentDataSource->getNotifier();
+                    $before   = $notifier->dehydrate($assessmentImpl);
+                    $this->assessmentDataSource->delete($assessmentImpl);
+                    $notifier->notify($assessmentImpl, $this->getUser(), $before);
+                } else {
+                    continue;
+                }
+            }
+
+            $dates        = $importedImplementationDates[$unitImpl->getId()];
+            $datesObjects = [];
+
+            foreach ($expectedDateTypes as $dateType) {
+                if (!array_key_exists($dateType, $dates)) {
+                    continue;
+                }
+                $datesObjects[$dateType] = Alaress_Date_Format::newLocal($dates[$dateType]);
+            }
+
+            $newAssessmentImpl = $this->exportToNewContext(
+                $assessmentToExport,
+                $assessmentImpl->getContext(),
+                $assessmentImpl->getId() ? $assessmentImpl->getSequence() : null,
+                $datesObjects['publish'],
+                $datesObjects['open'] ?? $datesObjects['publish'],
+                $datesObjects['due'],
+                $datesObjects['late'] ?? $datesObjects['due']
+            );
+
+            // Replicate lesson plan linked activities only after assessment and
+            // project have been overwritten.
+            $this->lessonPlanActivitiesReplicator->replicate($assessmentToExport, $newAssessmentImpl);
+        }
+    }
 
     /**
      * Download a csv of assessment results for Accellerus
