@@ -360,10 +360,10 @@
          */
         const subtypesIndex = {{ subtypesIndex|json_encode|raw }};
         const subtypesIndexPrivate = {{ subtypesIndexPrivate|json_encode|raw }};
-        const subtypesIndexPoints = {{ subtypesIndexPoints|json_encode|raw }};
+        const subtypesIndexDefaultPoints = {{ subtypesIndexDefaultPoints|json_encode|raw }};
         const typesIndex = {{ typesIndex|json_encode|raw }};
         const typesIndexPrivate = {{ typesIndexPrivate|json_encode|raw }};
-        const typesIndexPoints = {{ typesIndexPoints|json_encode|raw }};
+        const typesIndexDefaultPoints = {{ typesIndexDefaultPoints|json_encode|raw }};
 
         const isExistingRecord = {{ record.id != '' ? "true" : "false"  }};
         const currentPoints = '{{ record.points ? record.points : null }}';
@@ -438,7 +438,7 @@
                  * same above with the Confidential Templates
                  */
                 replaceTemplate($.trim(subtypesIndex[subtypeVal]), $.trim(subtypesIndexPrivate[subtypeVal]));
-                updatePoints($.trim(subtypesIndexPoints[subtypeVal]));
+                updatePoints($.trim(subtypesIndexDefaultPoints[subtypeVal]));
             } else {
 
                 /* If subtypeId == null, look at the parent typeId. load its template
@@ -447,7 +447,7 @@
                  * same above with the Confidential Templates
                  */
                 replaceTemplate($.trim(typesIndex[typeVal]), $.trim(typesIndexPrivate[typeVal]));
-                updatePoints($.trim(typesIndexPoints[typeVal]));
+                updatePoints($.trim(typesIndexDefaultPoints[typeVal]));
             }
         }
 

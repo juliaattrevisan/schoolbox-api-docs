@@ -118,11 +118,11 @@
                     </fieldset>
                     <fieldset class="content">
                         <div class="small-12 columns">
-                            <label for="points">Default Points</label>
-                            {% set currentPoints  = (subtype ? subtype.points : type.points) %}
+                            <label for="defaultPoints">Default Points</label>
+                            {% set currentPoints  = (subtype ? subtype.defaultPoints : type.defaultPoints) %}
                             <div class="row">
                                 <div class="small-12 columns">
-                                    <input id="points" name="points" type="text" value="{{ currentPoints }}">
+                                    <input id="defaultPoints" name="defaultPoints" type="text" value="{{ currentPoints }}">
                                 </div>
                             </div>
                         </div>
@@ -362,7 +362,7 @@
                 $("form#pastoralForm").alaressValidate({
                     ignore: ':disabled',
                     rules: {
-                        points: {
+                        defaultPoints: {
                             number: true,
                             max: 1000000,
                             min: -1000000
