@@ -111,6 +111,8 @@ class Csv extends Base
                 }
             }
 
+            /* Check if roles provided are valid
+             */
             $allRoles = explode(",", $roles);
             foreach ($allRoles as $roleName) {
                 try {
@@ -292,7 +294,7 @@ class Csv extends Base
                     $output[] = [
                         'name'   => $name,
                         'status' => 'Not Added',
-                        'error'  => sprint(
+                        'error'  => sprintf(
                             'Invalid owner ID (%s) provided',
                             $owner
                         )
@@ -308,7 +310,7 @@ class Csv extends Base
                     $output[] = [
                         'name'   => $name,
                         'status' => 'Not Added',
-                        'error'  => sprint(
+                        'error'  => sprintf(
                             'Owner (%s) not found or deleted',
                             $owner
                         )
