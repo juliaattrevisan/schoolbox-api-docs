@@ -185,7 +185,8 @@ class Controller extends Base
                      * list of reports for Unit Planner Engagement
                      */
                     $this->taskDHelper->addSource('', 'unitplannerFrameworks');
-                    $this->taskDHelper->addSource('', 'unitplannerTextboxes');
+                    $this->taskDHelper->addSource('', 'unitplannerCourseTextboxes');
+                    $this->taskDHelper->addSource('', 'unitplannerUnitTextboxes');
                     $this->taskDHelper->addSource('', 'unitplannerComponents');
                     break;
                 default:
@@ -1733,7 +1734,7 @@ class Controller extends Base
      * UNIT PLANNER
      * unitplannerTextboxes.csv
      */
-    public function unitplannerTextboxes()
+    public function unitplannerCourseTextboxes()
     {
         $database = FolderMapper::getInstance()->getDatabase();
         $statement = $database->prepare("
@@ -1741,7 +1742,7 @@ class Controller extends Base
         ");
         $statement->execute();
         $help = new Helper();
-        $help->queryToCSV($statement, 'unitplannerTextboxes.csv');
+        $help->queryToCSV($statement, 'unitplannerCourseTextboxes.csv');
     }
     /**
      * UNIT PLANNER
