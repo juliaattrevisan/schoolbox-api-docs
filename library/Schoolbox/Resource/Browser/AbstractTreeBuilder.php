@@ -189,12 +189,14 @@ abstract class AbstractTreeBuilder
                 $this->getRootNodeLabel(),
                 null,
                 null,
-                $sequence,
                 $createdAt,
                 [
                     'data-permission' => $this->getFolderPermission($folder->getId()),
                     'data-type' => 'folder'
-                ]
+                ],
+                null,
+                [],
+                $sequence,
             );
         } else {
             // Child nodes
@@ -376,11 +378,11 @@ abstract class AbstractTreeBuilder
             $name ?: $folder->getName(),
             $colour,
             $coverImage,
-            $sequence,
             $createdAt,
             $liAttributes,
             $aAttributes,
-            $parentList
+            $parentList,
+            $sequence,
         );
     }
 
@@ -425,11 +427,11 @@ abstract class AbstractTreeBuilder
      * @param string                   $name
      * @param Color|null               $colour
      * @param IStorage|null            $coverImage
-     * @param int|null                 $sequence
      * @param Alaress_Date_Format|null $createdAt
      * @param array|null               $liAttributes
      * @param array|null               $aAttributes
      * @param array                    $parentList
+     * @param int|null                 $sequence
      * @return array
      */
     protected function generateNodeArray(
@@ -439,11 +441,11 @@ abstract class AbstractTreeBuilder
         $name,
         Color $colour = null,
         IStorage $coverImage = null,
-        ?int $sequence = null,
         ?Alaress_Date_Format $createdAt = null,
         array $liAttributes = null,
         array $aAttributes = null,
-        array $parentList = []
+        array $parentList = [],
+        ?int $sequence = null,
     ): array {
         $array = array(
             'id' => $nodeId,
