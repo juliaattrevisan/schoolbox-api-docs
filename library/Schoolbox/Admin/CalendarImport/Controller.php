@@ -16,6 +16,7 @@ use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Assessment\Course\Import\CsvImporter;
 use Schoolbox\Assessment\Course\Import\ImportFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Exception as ResourceException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -25,6 +26,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpecification;
 use Schoolbox\Resource\Storage\FilesystemProxy;
+use Schoolbox\Url\Uri;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
 use Bulk_Calendar;
@@ -60,16 +62,18 @@ class Controller extends Base
      */
     public function getCalendarImportForm(): void
     {
+        $currentUrl  = $this->routeGenerator->generate('adminCalendarImport.getCalendarImportForm');
+
         // Render this thing out
         $this->response = $this->responseFromTemplate(
             '@adminCalendarImport/index.twig',
             [
-                'pageCurrent'    => $this->routeGenerator->generate('adminCalendarImport.getCalendarImportForm'),
+                'pageCurrent'    => $currentUrl,
                 'breadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))
-                    ->generateBreadcrumbs(
-                        $this->routeGenerator->generate('adminCalendarImport.getCalendarImportForm')
-                    ),
+                    ->generateBreadcrumbs($currentUrl),
                 'attachzone'     => $this->getAttachZone(),
+                // Encode return URL separately, so that page number is included
+                'encodedReturnUrl' => Redirect::encode((new Uri($currentUrl))),
             ],
         );
     }
@@ -134,15 +138,18 @@ class Controller extends Base
         );
         $allEvents = $bulkHandler->addCalendar();
 
+        $currentUrl = $this->routeGenerator->generate('adminCalendarImport.getCalendarImportForm');
         $this->response = $this->responseFromTemplate(
             '@adminCalendarImport/preview.twig',
             [
-                'pageCurrent'    => $this->routeGenerator->generate('adminCalendarImport.getCalendarImportForm'),
+                'pageCurrent'    => $currentUrl,
                 'breadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))
                     ->generateBreadcrumbs(
-                        $this->routeGenerator->generate('adminCalendarImport.getCalendarImportForm')
+                        $currentUrl
                     ),
                 'allEvents'      => $allEvents,
+                'returnUrl' => $this->requestQuery->get('returnUrl')
+                    ?? $currentUrl,
             ]
         );
     }
