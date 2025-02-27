@@ -263,7 +263,7 @@ abstract class AbstractTreeBuilder
         }
 
         if ($folder instanceof Folder\Model) {
-            $sequence = $folder->getSequence();
+            $sequence = $folder->getSequence() ?? 0;
             $createdAt = $folder->getCreatedAt();
         } else {
             $sequence = 0;
