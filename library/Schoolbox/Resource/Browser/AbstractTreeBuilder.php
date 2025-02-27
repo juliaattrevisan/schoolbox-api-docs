@@ -431,7 +431,7 @@ abstract class AbstractTreeBuilder
      * @param array|null               $liAttributes
      * @param array|null               $aAttributes
      * @param array                    $parentList
-     * @param int|null                 $sequence
+     * @param int                      $sequence
      * @return array
      */
     protected function generateNodeArray(
