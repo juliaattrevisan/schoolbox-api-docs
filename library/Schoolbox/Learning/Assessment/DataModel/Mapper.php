@@ -931,7 +931,7 @@ class Mapper extends BaseMapper
             $model->setAssessmentContext($context);
 
             // Set assessment model
-            $model->getSubObject()->setAssessmentModel($model);
+            $model->getSubObject()?->setAssessmentModel($model);
 
             $modelList->add($model);
         }
