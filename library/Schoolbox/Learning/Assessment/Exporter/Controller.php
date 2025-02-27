@@ -357,7 +357,6 @@ class Controller extends BaseController
         }
 
         $unitDatesByCourseId = $this->requestPost->get('unitDatesByCourseId');
-
         $courseImpls = $this->courseImplementationMapper->findByColumn('id', $courseImplIds);
 
         // Hydrate existing unit implementations.
@@ -386,57 +385,20 @@ class Controller extends BaseController
             return;
         }
 
-        foreach ($courseImpls as $courseImpl) {
-            $units = $courseImpl->getUnits();
-            $alreadyExistingUnit = null;
-
-            foreach ($units as $unit) {
-                if ($unit->getSpecification()->getId() === $unitSpec->getId()) {
-                    $alreadyExistingUnit = $unit;
+        // Transact this entire request, rolling back if any exception is raised
+        try {
+            $this->unitImplementationMapper->getDatabase()->transact(
+                function () use ($unitSpec, $courseImpls, $unitDatesByCourseId): void {
+                    $this->exportUnit($unitSpec, $courseImpls, $unitDatesByCourseId);
                 }
-            }
-
-            if ($alreadyExistingUnit !== null) {
-                continue; // Overwriting existing units is never allowed by this tool, so skip this course implementation.
-            }
-
-            $unitDates = $unitDatesByCourseId[$courseImpl->getId()];
-            $openDateAlaress = Alaress_Date_Format::newLocalShort($unitDates['open']);
-            $closeDateAlaress = Alaress_Date_Format::newLocalShort($unitDates['close']);
-
-            $unitImplNew = new UnitImplementation\Model();
-            $unitImplNew->setCourse($courseImpl);
-            $unitImplNew->setTitle($unitSpec->getFolder()->getTitle());
-            $unitImplNew->setSpecification($unitSpec);
-            $unitImplNew->setOpenDate($openDateAlaress);
-            $unitImplNew->setDueDate($closeDateAlaress);
-            $this->unitImplementationMapper->save($unitImplNew);
-
-            $implSpecAssessmentPairs = [];
-            foreach ($this->assessmentDataSource->findAllByUnitSpecificationId($unitSpec->getId()) as $unitSpecAssessment) {
-                $newAssessmentImpl = $this->exportToNewContext(
-                    $unitSpecAssessment,
-                    $unitImplNew,
-                    null,
-                    $openDateAlaress,
-                    $openDateAlaress,
-                    $closeDateAlaress,
-                    $closeDateAlaress
-                );
-                $implSpecAssessmentPairs[] = [$newAssessmentImpl, $unitSpecAssessment];
-            }
-
-            // Replicate lesson plan linked activities only after assessment and
-            // project have been overwritten.
-            foreach ($implSpecAssessmentPairs as $pair) {
-                [$newAssessmentImpl, $unitSpecAssessment] = $pair;
-                $this->lessonPlanActivitiesReplicator->replicate($unitSpecAssessment, $newAssessmentImpl);
-            }
+            );
+        } catch (\Throwable $e) {
+            $this->sendError($e->getMessage());
+            return;
         }
 
         $this->redirectToReturnUrlIfSetOrFallbackUrl($fallbackReturnUrl);
     }
-
 
     /**
      * Recursively export an AssessmentSpec to a new context
@@ -652,6 +614,67 @@ class Controller extends BaseController
             // Replicate lesson plan linked activities only after assessment and
             // project have been overwritten.
             $this->lessonPlanActivitiesReplicator->replicate($assessmentToExport, $newAssessmentImpl);
+        }
+    }
+
+    /**
+     * @param UnitSpecification\Model $unitSpec
+     * @param GenericCollection $courseImpls
+     * @param array $unitDatesByCourseId
+     * @throws MapperException
+     */
+    private function exportUnit(
+        UnitSpecification\Model $unitSpec,
+        GenericCollection $courseImpls,
+        array $unitDatesByCourseId
+    ): void {
+        foreach ($courseImpls as $courseImpl) {
+            $units = $courseImpl->getUnits();
+            $alreadyExistingUnit = null;
+
+            foreach ($units as $unit) {
+                if ($unit->getSpecification()->getId() === $unitSpec->getId()) {
+                    $alreadyExistingUnit = $unit;
+                }
+            }
+
+            if ($alreadyExistingUnit !== null) {
+                // Overwriting existing units is never allowed by this tool, so skip this course implementation.
+                continue;
+            }
+
+            $unitDates = $unitDatesByCourseId[$courseImpl->getId()];
+            $openDateAlaress = Alaress_Date_Format::newLocalShort($unitDates['open']);
+            $closeDateAlaress = Alaress_Date_Format::newLocalShort($unitDates['close']);
+
+            $unitImplNew = new UnitImplementation\Model();
+            $unitImplNew->setCourse($courseImpl);
+            $unitImplNew->setTitle($unitSpec->getFolder()->getTitle());
+            $unitImplNew->setSpecification($unitSpec);
+            $unitImplNew->setOpenDate($openDateAlaress);
+            $unitImplNew->setDueDate($closeDateAlaress);
+            $this->unitImplementationMapper->save($unitImplNew);
+
+            $implSpecAssessmentPairs = [];
+            foreach ($this->assessmentDataSource->findAllByUnitSpecificationId($unitSpec->getId()) as $unitSpecAssessment) {
+                $newAssessmentImpl = $this->exportToNewContext(
+                    $unitSpecAssessment,
+                    $unitImplNew,
+                    null,
+                    $openDateAlaress,
+                    $openDateAlaress,
+                    $closeDateAlaress,
+                    $closeDateAlaress
+                );
+                $implSpecAssessmentPairs[] = [$newAssessmentImpl, $unitSpecAssessment];
+            }
+
+            // Replicate lesson plan linked activities only after assessment and
+            // project have been overwritten.
+            foreach ($implSpecAssessmentPairs as $pair) {
+                [$newAssessmentImpl, $unitSpecAssessment] = $pair;
+                $this->lessonPlanActivitiesReplicator->replicate($unitSpecAssessment, $newAssessmentImpl);
+            }
         }
     }
 
