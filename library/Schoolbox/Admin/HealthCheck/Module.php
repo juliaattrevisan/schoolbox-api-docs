@@ -6,6 +6,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Alaress\Authorizer\Rule;
 use InvalidArgumentException;
+use Schoolbox\User\Token\Mapper as TokenMapper;
 
 class Module extends BaseModule
 {
@@ -89,7 +90,8 @@ class Module extends BaseModule
             $this->getConfig(),
             $this->injector->get('router.generator'),
             $this->injector->get('taskd.messageFactory'),
-            $this->injector->get('taskd.messageProducer')
+            $this->injector->get('taskd.messageProducer'),
+            $this->getMapperFactory()->get(TokenMapper::class)
         );
     }
 }

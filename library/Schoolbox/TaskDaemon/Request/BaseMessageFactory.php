@@ -14,6 +14,7 @@ use Schoolbox\API\Token\Jwt;
 use Schoolbox\API\Token\JwtParser\SelfIssued;
 use Schoolbox\Instance;
 use Schoolbox\User;
+use Schoolbox\User\Token\Mapper as TokenMapper;
 
 /**
  * Base class for task daemon message builders.
@@ -55,10 +56,12 @@ abstract class BaseMessageFactory
      *
      * @param Instance    $instance     Information about the Schoolbox instance.
      * @param Jwt         $tokenBuilder Used to generate a JWT for use by taskd when calling the callback URL
+     * @param TokenMapper $tokenMapper  Used to generate a token for the effector
      */
     public function __construct(
         private Instance $instance,
         private Jwt $tokenBuilder,
+        private TokenMapper $tokenMapper
     ) {
     }
 
@@ -176,11 +179,13 @@ abstract class BaseMessageFactory
      */
     public function build(): Message
     {
+        $effector = $this->effector;
+        $tokenUser = $this->tokenMapper->generateForUser($effector, $effector, $this->tokenExpiry);
         $token  = $this->effector
             ? $this->tokenBuilder->generate(
                 $this->effector,
+                $tokenUser->getJwtId(),
                 $this->tokenExpiry,
-                null,
                 [SelfIssued::CUSTOM_CLAIM_TASKD => 1],
             )
             : null;

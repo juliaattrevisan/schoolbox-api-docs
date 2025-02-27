@@ -13,6 +13,7 @@ use Alaress_Date_Format;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\Instance;
 use Schoolbox\User;
+use Schoolbox\User\Token\Mapper as TokenMapper;
 
 /**
  * Factory for building request messages.
@@ -43,9 +44,13 @@ class MessageFactory
      *
      * @param Instance $instance
      * @param Jwt      $tokenBuilder
+     * @param TokenMapper $tokenMapper Used to generate a token for the effector
      */
-    public function __construct(Instance $instance, Jwt $tokenBuilder)
-    {
+    public function __construct(
+        Instance $instance,
+        Jwt $tokenBuilder,
+        private TokenMapper $tokenMapper
+    ) {
         $this->instance     = $instance;
         $this->tokenBuilder = $tokenBuilder;
     }
@@ -73,8 +78,15 @@ class MessageFactory
         ?User $effector,
         ?Alaress_Date_Format $tokenExpiry = null,
     ): Message {
+        /* if no effector, use the system user */
+        if (!$effector) {
+            $effector = new User();
+            $effector->setId(1);
+            $effector->setUsername(User::USERNAME_SCHOOLBOX_ADMIN);
+        }
+        $tokenUser = $this->tokenMapper->generateForUser($effector, $effector, \Alaress_Date_Format::now()->addSeconds(JWT::API_JWT_TIMEOUT));
         // Convert the instance to an intermediary format
-        $token = $effector ? $this->tokenBuilder->generate($effector, $tokenExpiry) : null;
+        $token = $this->tokenBuilder->generate($effector, $tokenUser->getJwtId(), $tokenExpiry);
         return new Message(
             $task,
             $params,

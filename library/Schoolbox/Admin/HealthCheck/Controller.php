@@ -10,6 +10,7 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\TaskDaemon\Producer;
 use Schoolbox\TaskDaemon\Request\MessageFactory;
+use Schoolbox\User\Token\Mapper as TokenMapper;
 
 class Controller extends Base
 {
@@ -29,18 +30,20 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param Jwt            $tokenBuilder
-     * @param IConfigLoader  $config
-     * @param Generator      $routeGenerator
+     * @param Jwt $tokenBuilder
+     * @param IConfigLoader $config
+     * @param Generator $routeGenerator
      * @param MessageFactory $messageFactory
-     * @param Producer       $producer
+     * @param Producer $producer
+     * @param TokenMapper $tokenMapper
      */
     public function __construct(
         Jwt $tokenBuilder,
         IConfigLoader $config,
         Generator $routeGenerator,
         MessageFactory $messageFactory,
-        Producer $producer
+        Producer $producer,
+        TokenMapper $tokenMapper
     ) {
         $this->tokenBuilder = $tokenBuilder;
 
@@ -49,7 +52,8 @@ class Controller extends Base
             $config,
             $routeGenerator,
             $messageFactory,
-            $producer
+            $producer,
+            $tokenMapper
         );
     }
 

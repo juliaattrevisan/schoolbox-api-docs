@@ -85,8 +85,8 @@ class Controller extends Base
         // Generate a JWT
         $jwt = $this->tokenBuilder->generate(
             $this->getUser(),
-            Alaress_Date_Format::now()->addSeconds(self::JWT_EXPIRY),
             null,
+            Alaress_Date_Format::now()->addSeconds(self::JWT_EXPIRY),
             [
                 JwtParser\IParser::CLAIM_EMAIL                   => $this->getUser()->getEmail(),
                 JwtParser\OtherInstanceIssued::CLAIM_INSTANCE_ID => INSTANCE_ID,

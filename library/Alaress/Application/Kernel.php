@@ -443,6 +443,10 @@ abstract class Kernel
             return Redis::getSignalQueueClientInstance();
         });
 
+        // Enable mappers to be injectable, but instantiated only when required
+        $mapperFactory = new MapperFactory($di);
+        $di->set('mapperFactory', $mapperFactory);
+
         $di->set(
             'moduleCache',
             $di->lazyNew(
@@ -483,20 +487,24 @@ abstract class Kernel
                 [
                     'instance'     => $di->lazyGet('instance'),
                     'tokenBuilder' => $di->lazyGet('user.tokenBuilder'),
+                    'tokenMapper' => $mapperFactory->getLazy(TokenMapper::class),
                 ],
             )
         );
         $di->set(
             'taskd.httpRequestMessageFactory',
             $di->lazy(
-                function () use ($di) {
+                function () use ($di, $mapperFactory) {
                     /** @var Instance $instance */
                     $instance = $di->get('instance');
 
                     /** @var Jwt $tokenBuilder */
                     $tokenBuilder = $di->get('user.tokenBuilder');
 
-                    return (new HttpRequestMessageFactory($instance, $tokenBuilder))
+                    /** @var TokenMapper $tokenMapper */
+                    $tokenMapper = $mapperFactory->get(TokenMapper::class);
+
+                    return (new HttpRequestMessageFactory($instance, $tokenBuilder, $tokenMapper))
                         ->setTokenExpiry(Alaress_Date_Format::now()->addDays(1));
                 }
             )
@@ -504,12 +512,15 @@ abstract class Kernel
         $di->set(
             'taskd.downloadPagesMessageFactory',
             $di->lazy(
-                function () use ($config, $di) {
+                function () use ($config, $di, $mapperFactory) {
                     /** @var Instance $instance */
                     $instance = $di->get('instance');
 
                     /** @var Jwt $tokenBuilder */
                     $tokenBuilder = $di->get('user.tokenBuilder');
+
+                    /** @var TokenMapper $tokenMapper */
+                    $tokenMapper = $mapperFactory->get(TokenMapper::class);
 
                     // Build API key and version
                     $gotenbergApiKey = $config->get(ConfigMapper::NAME_GOTENBERG_API_KEY);
@@ -533,6 +544,7 @@ abstract class Kernel
                         $config->get(ConfigMapper::NAME_KAMI_API_KEY),
                         $config->get('turnitin_api_key'),
                         $config->get('turnitin_api_host'),
+                        $tokenMapper,
                     ))->setTokenExpiry(Alaress_Date_Format::now()->addDays(1));
                 }
             )
@@ -668,10 +680,6 @@ abstract class Kernel
             'cdnPrefixGenerator',
             $di->lazyNew(PrefixGenerator::class, ['config' => $di->lazyGet('config')])
         );
-
-        // Enable mappers to be injectable, but instantiated only when required
-        $mapperFactory = new MapperFactory($di);
-        $di->set('mapperFactory', $mapperFactory);
 
         // Preload of route parameters, and its module loader
         $di->set(

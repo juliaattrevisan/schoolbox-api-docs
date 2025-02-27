@@ -106,6 +106,10 @@ class Kernel extends WebKernelAbstract
         Redis::aliasInstance(Redis::INSTANCE_CACHE, Redis::INSTANCE_SIGNAL_QUEUE);
         $di->set('redis.signalQueue.pub', Redis::getSignalQueueClientInstance());
 
+        // Enable mappers to be injectable, but instantiated only when required
+        $mapperFactory = new MapperFactory($di);
+        $di->set('mapperFactory', $mapperFactory);
+
         // User token generator
         $di->set(
             'user.tokenBuilder',
@@ -134,6 +138,7 @@ class Kernel extends WebKernelAbstract
                 [
                     'instance'     => $di->lazyGet('instance'),
                     'tokenBuilder' => $di->lazyGet('user.tokenBuilder'),
+                    'tokenMapper' => $mapperFactory->getLazy(TokenMapper::class),
                 ],
             )
         );
@@ -251,10 +256,6 @@ class Kernel extends WebKernelAbstract
             'cdnPrefixGenerator',
             $di->lazyNew(PrefixGenerator::class, ['config' => $di->lazyGet('config')])
         );
-
-        // Enable mappers to be injectable, but instantiated only when required
-        $mapperFactory = new MapperFactory($di);
-        $di->set('mapperFactory', $mapperFactory);
 
         $di->set(
             'proxyServer',
