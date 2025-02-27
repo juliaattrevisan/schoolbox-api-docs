@@ -16,7 +16,6 @@ use Schoolbox\User;
 
 abstract class Base
 {
-
     /**
      * The person to whom these imported events are relevant
      *

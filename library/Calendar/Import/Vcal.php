@@ -24,7 +24,6 @@ use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
 
 class Vcal extends Base
 {
-
     /**
      * Find an event type from an array of possibilities
      * The array contains the "type" (name) values
