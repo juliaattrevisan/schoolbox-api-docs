@@ -9,6 +9,7 @@
 namespace Schoolbox\Application\BasicRequest;
 
 use Alaress\Codec\Json\Base64;
+use Alaress\Database\Connector\IConnector;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Image\ProcessorFactory;
 use Alaress\Redis\Cache\ItemPool;
@@ -57,8 +58,6 @@ use Schoolbox\TaskDaemon\Request\MessageFactory;
 use Schoolbox\User\Token\Mapper as TokenMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Version\Version;
-use Sentry\Tracing\SpanStatus;
-use Sentry\Tracing\TransactionSource;
 use SitePage;
 use Twig\Environment;
 use Alaress\Twig\Method as TwigMethod;
@@ -182,9 +181,7 @@ class Kernel extends WebKernelAbstract
         $di->set(
             'databaseFactory',
             function () use ($di) {
-                return new SchoolboxDatabaseFactory(
-                    new AlaressDatabaseFactory()
-                );
+                return SchoolboxDatabaseFactory::getInstance();
             }
         );
 
@@ -594,11 +591,8 @@ class Kernel extends WebKernelAbstract
             'search.indexBuilder',
             $di->lazy(
                 function () use ($di) {
-                    /** @var SchoolboxDatabaseFactory $dbFactory */
-                    $dbFactory = $di->get('databaseFactory');
-
-                    // Should this return write database always?
-                    $dbi = $dbFactory->getInternalDatabase();
+                    /** @var IConnector $dbi */
+                    $dbi = $di->get('databaseInternal');
 
                     // What sort of logger should this use?
                     // The CLI variant should use the kernel's logger:
