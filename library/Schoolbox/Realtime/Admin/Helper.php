@@ -59,9 +59,9 @@ class Helper
      * @param string|null $roletype
      * @param string $namespace
      * @param boolean|null $hasLog
-     * @return string[]|void
+     * @return string[]|Exception
      */
-    public function applyDefaultSettings(?int $roleId, ?string $roletype, string $namespace): array|null
+    public function applyDefaultSettings(?int $roleId, ?string $roletype, string $namespace): array|Exception
     {
         // to return log messages
         $log = [];
@@ -73,7 +73,6 @@ class Helper
                 $roleIds = [$role->getId()];
             } catch (\Exception $e) {
                 throw new Exception("Sorry, we are unable to find a valid role for role id: $roleId");
-                return null;
             }
         }
 
@@ -85,13 +84,11 @@ class Helper
         // if no role type found either, throw an exception
         if (empty($roleIds)) {
             throw new Exception("Please provide either valid role id or roletype");
-            return null;
         }
 
         // check for a valid namespace
         if ($namespace !== "all" && !in_array($namespace, $this->namespaces)) {
             throw new Exception("Please provide a valid namespace. No namespace found for: $namespace");
-            return null;
         }
 
         // retrieve the target namespace to add to the $params array later
