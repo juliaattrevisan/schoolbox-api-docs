@@ -130,13 +130,18 @@ class FilesystemFactory
      */
     public function buildAwsS3FileSystem(IConfigLoader $config, string $prefix = ''): Filesystem
     {
-        $otfs_s3_cred_key    = trim($config->get('otfs_s3_cred_key') ?? "");
-        $otfs_s3_cred_secret = trim($config->get('otfs_s3_cred_secret') ?? "");
-        $otfs_s3_region      = trim($config->get('otfs_s3_region') ?? "");
-        $otfs_s3_version     = trim($config->get('otfs_s3_version') ?? "");
-        $otfs_s3_bucket      = trim($config->get('otfs_s3_bucket') ?? "");
+        $otfs_s3_cred_key     = trim($config->get('otfs_s3_cred_key') ?? "");
+        $otfs_s3_cred_secret  = trim($config->get('otfs_s3_cred_secret') ?? "");
+        $otfs_s3_region       = trim($config->get('otfs_s3_region') ?? "");
+        $otfs_s3_version      = trim($config->get('otfs_s3_version') ?? "");
+        $otfs_s3_bucket       = trim($config->get('otfs_s3_bucket') ?? "");
+        $otfs_s3_alt_host     = trim($config->get('otfs_s3_alt_host') ?? "");
+        $s3AltAccessKey       = trim($config->get('otfs_s3_alt_access_key') ?? "");
+        $s3AltSecretAccessKey = trim($config->get('otfs_s3_alt_secret_key') ?? "");
+        $otfs_s3_alt_bucket   = trim($config->get('otfs_s3_alt_bucket') ?? "");
+        $s3AltRegion         = trim($config->get('otfs_s3_alt_region') ?? "");
 
-        $client = new S3Client([
+        $cfg = [
             'credentials' => [
                 'key'    => $otfs_s3_cred_key,
                 'secret' => $otfs_s3_cred_secret,
@@ -146,17 +151,25 @@ class FilesystemFactory
             'http'    => [
                 GuzzleHttp\RequestOptions::CONNECT_TIMEOUT => self::getConnectTimeout(),
             ],
-        ]);
+        ];
+        if (!empty($otfs_s3_alt_host)) {
+            $cfg['endpoint'] = $otfs_s3_alt_host;
+            $cfg['credentials']['key'] = $s3AltAccessKey;
+            $cfg['credentials']['secret'] = $s3AltSecretAccessKey;
+            $cfg['region'] = $s3AltRegion;
+        }
+        $client = new S3Client($cfg);
 
         // Register the S3 stream wrapper, so that the S3 filesystem adapter
         // may use it
         $client->registerStreamWrapper();
 
         $visibility = self::buildDefaultVisibility(self::FILE_SYSTEM_ADAPTER_AWS_S3);
+        $bucket = !empty($otfs_s3_alt_host) && !empty($otfs_s3_alt_bucket) ? $otfs_s3_alt_bucket : $otfs_s3_bucket;
         return new Filesystem(
             new Adapter(
-                new AwsS3Adapter($client, $otfs_s3_bucket, $prefix),
-                $otfs_s3_bucket,
+                new AwsS3Adapter($client, $bucket, $prefix),
+                $bucket,
             ),
             [
                 Config::OPTION_VISIBILITY           => $visibility,

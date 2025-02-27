@@ -32,34 +32,56 @@ trait AwsS3AppTrait
      */
     private function buildS3ClientOrExit(LoggerInterface $log, IConfigLoader $config): S3Client
     {
-        $s3AccessKey = trim($config->get('otfs_s3_cred_key') ?? "");
-        $s3SecretKey = trim($config->get('otfs_s3_cred_secret') ?? "");
-        $s3Region    = trim($config->get('otfs_s3_region') ?? "");
-        $s3Version   = trim($config->get('otfs_s3_version') ?? "");
-        $s3Bucket    = trim($config->get('otfs_s3_bucket') ?? "");
+        $cfg = $this->buildS3Config($config, $log);
+        return new S3Client($cfg);
+    }
+
+    private function buildS3Config(IConfigLoader $config, LoggerInterface $log): array
+    {
+        $s3AccessKey          = trim($config->get('otfs_s3_cred_key') ?? "");
+        $s3SecretKey          = trim($config->get('otfs_s3_cred_secret') ?? "");
+        $s3Region             = trim($config->get('otfs_s3_region') ?? "");
+        $s3Version            = trim($config->get('otfs_s3_version') ?? "");
+        $s3Bucket             = trim($config->get('otfs_s3_bucket') ?? "");
+        $s3AltHost            = trim($config->get('otfs_s3_alt_host') ?? "");
+        $s3AltAccessKey       = trim($config->get('otfs_s3_alt_access_key') ?? "");
+        $s3AltSecretAccessKey = trim($config->get('otfs_s3_alt_secret_key') ?? "");
+        $s3AltBucket          = trim($config->get('otfs_s3_alt_bucket') ?? "");
+        $s3AltRegion          = trim($config->get('otfs_s3_alt_region') ?? "");
 
         $log->debug(sprintf("OTFS Adapter: '%s'", $config->get(ConfigMapper::NAME_OTFS_ADAPTER)));
         $log->debug("S3 Access Key: '$s3AccessKey'");
         $log->debug(sprintf("S3 Secret Key: '%s'", str_pad("", strlen($s3SecretKey), "*")));
         $log->debug("S3 Region: '$s3Region'");
         $log->debug("S3 Version: '$s3Version'");
-        $log->debug("S3 Bucket: '$s3Bucket'");
+        $log->debug("S3 Alt Host: '$s3AltHost'");
 
-        if (empty($s3AccessKey) || empty($s3SecretKey) || empty($s3Region) || empty($s3Version) || empty($s3Bucket)) {
+        $finalBucket = !empty($s3AltHost) && !empty($s3AltBucket) ? $s3AltBucket : $s3Bucket;
+        $log->debug("S3 Bucket: '$finalBucket'");
+
+        if (empty($s3AccessKey) || empty($s3SecretKey) || empty($s3Region) || empty($s3Version) || empty($finalBucket)) {
             $log->error("Error: S3 config appears invalid");
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
         }
 
-        return new S3Client([
+        $cfg = [
             'credentials' => [
                 'key'    => $s3AccessKey,
                 'secret' => $s3SecretKey,
             ],
             'region'      => $s3Region,
             'version'     => $s3Version,
-        ]);
-    }
+        ];
 
+        if (!empty($s3AltHost)) {
+            $cfg['endpoint'] = $s3AltHost;
+            $cfg['credentials']['key'] = $s3AltAccessKey;
+            $cfg['credentials']['secret'] = $s3AltSecretAccessKey;
+            $cfg['region'] = $s3AltRegion;
+        }
+
+        return $cfg;
+    }
 
     /**
      * Fetch the keys of all files found in the bucket in an array where the key is the element index
