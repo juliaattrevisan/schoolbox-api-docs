@@ -207,7 +207,6 @@ class TreeBuilder extends AbstractTreeBuilder
                 $file->getDescription(),
                 null,
                 null,
-                null,
                 [
                     'data-id' => $file->getId(),
                     'data-permission' => $permission,
