@@ -1322,7 +1322,6 @@ class MapperProxy
         }
 
         if ($subObject instanceof Task) {
-throw new \Exception('Bogus exception.');
             $taskMapper = TaskMapper::getInstance();
 
             /* Save the Task before the files, because you need the primary key
