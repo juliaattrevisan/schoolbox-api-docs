@@ -427,11 +427,11 @@ abstract class AbstractTreeBuilder
      * @param string                   $name
      * @param Color|null               $colour
      * @param IStorage|null            $coverImage
-     * @param Alaress_Date_Format|null $createdAt
      * @param array|null               $liAttributes
      * @param array|null               $aAttributes
      * @param array                    $parentList
      * @param int                      $sequence
+     * @param Alaress_Date_Format|null $createdAt
      * @return array
      */
     protected function generateNodeArray(
