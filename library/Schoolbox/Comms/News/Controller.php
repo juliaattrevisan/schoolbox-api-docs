@@ -1283,14 +1283,31 @@ class Controller extends Base
         // Base Case:
         if ($segment->isSimple()) {
             try {
-                return (
+                $access = Access::getInstance();
+                // do I have direct access to this news audience?
+                if (
                     $this->access->getAccessLevel($user, UserAccess::SERVICE_NEWS) >= UserAccess::ACCESS_WRITE ||
                     $segment->getEntityType() !== Audience\Segment\Strategy\Folder::getEntityType() ||
-                    Access::getInstance()->getFolderAccess($user, (int)$segment->getEntityValue()) >= UserAccess::ACCESS_READ
-                );
+                    $access->getFolderAccess($user, (int)$segment->getEntityValue()) >= UserAccess::ACCESS_READ
+                ) {
+                    return true;
+                }
+
+                // does my child have direct access to this news audience?
+                // intentionally ignoring children could have service perms
+                foreach ($user->getChildren() as $child) {
+                    if (
+                        $segment->getEntityType() !== Audience\Segment\Strategy\Folder::getEntityType() ||
+                        $access->getFolderAccess($child, (int)$segment->getEntityValue()) >= UserAccess::ACCESS_READ
+                    ) {
+                        return true;
+                    }
+                }
             } catch (MapperException\Deleted) {
                 return false;
             }
+            // neither me, or my child have access to the news audience. DENY
+            return false;
         }
 
         // Recursive Case:
