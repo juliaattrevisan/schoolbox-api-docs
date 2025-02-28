@@ -1,5 +1,5 @@
 import { test } from "@schoolboxTest/playwright/support/integrations";
-import ProfileEditor from "@schoolboxTest/playwright/support/page/admin/lms/LessonPlanTemplates/userManagement/ProfileEditor";
+import ProfileEditor from "@schoolboxTest/playwright/support/page/admin/userManagement/ProfileEditor";
 import ProfilePage from "@schoolboxTest/playwright/support/page/profilePage/ProfilePage";
 
 /**
