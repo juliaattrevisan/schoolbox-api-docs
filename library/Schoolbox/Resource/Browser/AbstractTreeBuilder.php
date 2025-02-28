@@ -277,13 +277,13 @@ abstract class AbstractTreeBuilder
             $name,
             $colour,
             $coverImage,
-            $sequence,
-            $createdAt,
             $this->buildLiAttributes($folder, $permission, $this->getDataType($folder, $type)),
             [
                 'href' => $href
             ],
-            $parentList
+            $parentList,
+            $sequence,
+            $createdAt,
         );
     }
 
@@ -352,11 +352,11 @@ abstract class AbstractTreeBuilder
      * @param null                     $name
      * @param Color|null               $colour
      * @param IStorage|null            $coverImage
-     * @param int|null                 $sequence
-     * @param Alaress_Date_Format|null $createdAt
      * @param array|null               $liAttributes
      * @param array|null               $aAttributes
      * @param array                    $parentList
+     * @param int                      $sequence
+     * @param Alaress_Date_Format|null $createdAt
      * @return array
      */
     protected function generateFolderArray(
@@ -365,11 +365,11 @@ abstract class AbstractTreeBuilder
         $name = null,
         Color $colour = null,
         IStorage $coverImage = null,
-        ?int $sequence = null,
-        ?Alaress_Date_Format $createdAt = null,
         array $liAttributes = null,
         array $aAttributes = null,
-        array $parentList = []
+        array $parentList = [],
+        int $sequence = 0,
+        ?Alaress_Date_Format $createdAt = null,
     ): array {
         return $this->generateNodeArray(
             $folder->getId(),
@@ -381,7 +381,7 @@ abstract class AbstractTreeBuilder
             $liAttributes,
             $aAttributes,
             $parentList,
-            $sequence ?? 0,
+            $sequence,
             $createdAt,
         );
     }
