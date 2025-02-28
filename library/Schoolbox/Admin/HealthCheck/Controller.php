@@ -2087,7 +2087,7 @@ class Controller extends Base
          */
         $curricOverviewQuery->execute(
             Builder::getArrayParameters(array_keys($units), 'units')
-            );
+        );
 
         while ($row = $curricOverviewQuery->fetch(\PDO::FETCH_ASSOC)) {
             $componentName = $row['componentName'] ?? 'NULL';
@@ -2175,7 +2175,7 @@ class Controller extends Base
          */
         $fileQuery->execute(
             Builder::getArrayParameters(array_keys($units), 'units')
-            );
+        );
 
         while ($row = $fileQuery->fetch(\PDO::FETCH_ASSOC)) {
             $componentName = $row['componentName'] ?? 'NULL';
