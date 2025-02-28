@@ -82,6 +82,7 @@ class Module extends BaseModule
         $this->register('GET', '/audit/unitplannerFrameworks', 'unitplannerFrameworks', $isAlaress);
         $this->register('GET', '/audit/unitplannerTextboxes', 'unitplannerCourseTextboxes', $isAlaress);
         $this->register('GET', '/audit/unitplannerComponents', 'unitplannerComponents', $isAlaress);
+        $this->register('GET', '/audit/unitplannerAssessments', 'unitplannerAssessments', $isAlaress);
     }
 
     /**

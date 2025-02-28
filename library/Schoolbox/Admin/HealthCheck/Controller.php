@@ -191,7 +191,8 @@ class Controller extends Base
                     $this->taskDHelper->addSource('', 'unitplannerCourseTextboxes');
                     $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
                     $this->taskDHelper->addSource('', 'unitplannerUnitTextboxes', $urlBase->withPath($this->routeGenerator->generate('coursePlan.getAudit')));
-//                    $this->taskDHelper->addSource('', 'unitplannerComponents');
+                    $this->taskDHelper->addSource('', 'unitplannerComponents');
+                    $this->taskDHelper->addSource('', 'unitplannerAssessments');
                     break;
                 default:
                     throw new SchoolboxException("Report '{$report}' Does not exist.");
@@ -2146,6 +2147,136 @@ class Controller extends Base
             ]);
         }
 
+        exit(1);
+    }
+
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * UNIT PLANNER
+     * unitplannerAssessments.csv
+     */
+    public function unitplannerAssessments()
+    {
+
+        $database = FolderMapper::getInstance()->getDatabase();
+        $units = [];
+
+        //build the csv
+        $rowHeadings = [
+            'Course Title',
+            'Course Homepage ID',
+            'Course ID',
+            'Course Framework',
+            'Unit Title',
+            'Unit Homepage ID',
+            'Unit ID',
+            'Assessment Type',
+            'Work Type',
+            'Count'
+        ];
+
+        // base filename with school code and date
+        $filename = sprintf("unit-audit-%s-%s.csv", $this->getConfigLoader()->get('site_school_code'), \Alaress_Date_Format::now()->toIso8601String());
+        $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
+
+        // fetch all courses & units & folders of them
+        $courseQuery = $database->prepareQuery("select
+            courseFolder.name as 'course.name',
+            courseFolder.id as 'course.id',
+            course_specification.id as 'course_specification.id',
+            unitFolder.name as 'unit.name',
+            unitFolder.id as 'unit.folder.id',
+            courseTemplates.name as 'framework',
+            course_unit_specification.id as 'unit.id'
+        FROM course_specification
+        join courseTemplates on course_specification.template_id = courseTemplates.id
+        join folder courseFolder on course_specification.folder_id = courseFolder.id
+        join course_unit_specification on course_specification.id = course_unit_specification.course_specification_id
+        join folder unitFolder on course_unit_specification.folder_id = unitFolder.id
+        ");
+
+        $courseQuery->execute();
+        while ($row = $courseQuery->fetch(\PDO::FETCH_ASSOC)) {
+            $units[$row['unit.id']] = $row;
+        }
+
+        $coursePlaceHolder = Builder::getArrayPlaceholders(array_keys($units), 'units');
+
+        // fetch all Assessments on Unit pages within a Course
+        $assessmentQuery = $database->prepareQuery("SELECT
+            COALESCE(
+                    IF(task.id, 'task', NULL),
+                    IF(assess.assessment_id, 'quiz', NULL),
+                    IF(lti_assessment.assessment_id, 'LTI', NULL),
+                    IF(submission_box.id, 'dueWork', NULL),
+                    IF(project.id, 'project', NULL),
+                    IF(lesson_plan.id, 'lessonPlan', NULL)
+            ) AS `assessment.type`,
+            lu_work_type.name AS `work.type.name`,
+            count(assessment.id) as count,
+            mv_assessment_relation.folder_id as `folder_id`
+        FROM mv_assessment_relation
+                 JOIN assessment ON mv_assessment_relation.assessment_id = assessment.id
+                 LEFT JOIN lu_work_type ON assessment.work_type_id = lu_work_type.id
+                 LEFT JOIN task ON assessment.id = task.assessment_id
+                 LEFT JOIN assess ON assessment.id = assess.assessment_id
+                 LEFT JOIN lti_assessment ON assessment.id = lti_assessment.assessment_id
+                 LEFT JOIN project ON assessment.id = project.assessment_id
+                 LEFT JOIN submission_box ON assessment.id = submission_box.assessment_id
+                 LEFT JOIN project projectParent ON projectParent.id = mv_assessment_relation.project_assessment_id
+                 LEFT JOIN lesson_plan ON assessment.id = lesson_plan.assessment_id
+                 JOIN      course_unit_specification ON mv_assessment_relation.course_unit_specification_id = course_unit_specification.id
+        WHERE
+            course_unit_specification.folder_id IN {$coursePlaceHolder}
+        GROUP BY `assessment.type`, lu_work_type.id;
+        ");
+
+
+        header('Content-type: text/csv; charset=utf-8');
+        header("Content-Disposition: attachment; filename=\"$filename\"");
+
+        $fp = fopen("php://output", 'w');
+        fputcsv($fp, $rowHeadings);
+
+        /**
+         * $rowHeadings = [
+         * 'Course Title',
+         * 'Course Homepage ID',
+         * 'Course ID',
+         * 'Course Framework',
+         * 'Unit Title',
+         * 'Unit Homepage ID',
+         * 'Unit ID',
+         * 'Assessment Type',
+         * 'Work Type',
+         * 'Count'
+         * ];
+         */
+        $assessmentQuery->execute(
+            Builder::getArrayParameters(array_keys($units), 'units')
+        );
+        while ($row = $assessmentQuery->fetch(\PDO::FETCH_ASSOC)) {
+
+            //build the row and send
+            fputcsv($fp, [
+                $units[$row['folder_id']]['course.name'],
+                $units[$row['folder_id']]['course.id'],
+                $units[$row['folder_id']]['course_specification.id'],
+                $units[$row['folder_id']]['framework'],
+                $units[$row['folder_id']]['unit.name'],
+                $units[$row['folder_id']]['unit.folder.id'],
+                $units[$row['folder_id']]['unit.id'],
+                $row['assessment.type'] ?? 'NULL',
+                $row['work.type.name'] ?? 'NULL',
+                $row['count'] ?? 'NULL',
+            ]);
+        }
 
         exit(1);
     }
