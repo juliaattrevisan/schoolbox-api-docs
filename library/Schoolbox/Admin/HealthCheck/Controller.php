@@ -1773,7 +1773,7 @@ class Controller extends Base
         WHERE
             cs.deleted_at IS NULL;
         ");
-        $statement->execute(['URL'=> $urlBase]);
+        $statement->execute(['URL' => $urlBase]);
         $help = new Helper();
         $help->queryToCSV($statement, 'unitplannerFrameworks.csv');
     }
@@ -1886,12 +1886,12 @@ class Controller extends Base
          * ];
          */
         $compTextQuery->execute(array_merge(
-                                    [
-                                        'homepageComponentKey' => Textbox\Mapper::HOMEPAGE_COMPONENT_KEY,
-                                        'componentConfigComponentNameKey' => Component_Config_Componentname::KEY,
-                                    ],
-                                    Builder::getArrayParameters(array_keys($courses), 'courses')
-                                ));
+            [
+                'homepageComponentKey' => Textbox\Mapper::HOMEPAGE_COMPONENT_KEY,
+                'componentConfigComponentNameKey' => Component_Config_Componentname::KEY,
+            ],
+            Builder::getArrayParameters(array_keys($courses), 'courses')
+        ));
         while ($row = $compTextQuery->fetch(\PDO::FETCH_ASSOC)) {
             $componentName = $row['componentName'] ?? 'NULL';
             // if component is empty string, use the system default
@@ -1947,11 +1947,11 @@ class Controller extends Base
          * ];
          */
         $textQuery->execute(array_merge(
-                                [
-                                    'homepageComponentKey' => Textbox\Mapper::HOMEPAGE_COMPONENT_KEY
-                                ],
-                                Builder::getArrayParameters(array_keys($courses), 'courses')
-                            ));
+            [
+                'homepageComponentKey' => Textbox\Mapper::HOMEPAGE_COMPONENT_KEY
+            ],
+            Builder::getArrayParameters(array_keys($courses), 'courses')
+        ));
         while ($row = $textQuery->fetch(\PDO::FETCH_ASSOC)) {
             //build the row and send
             fputcsv($fp, [
@@ -2087,7 +2087,7 @@ class Controller extends Base
          */
         $curricOverviewQuery->execute(
             Builder::getArrayParameters(array_keys($units), 'units')
-                                );
+            );
 
         while ($row = $curricOverviewQuery->fetch(\PDO::FETCH_ASSOC)) {
             $componentName = $row['componentName'] ?? 'NULL';
@@ -2096,10 +2096,10 @@ class Controller extends Base
                 $componentName = \Schoolbox\Curriculum\Component\CurriculumOverviewController::DEFAULT_COMPONENT_HEADING;
             }
 
-            $curricCode=trim((string)$row['tree.filter_code']);
-            $curricFilter=trim((string)$row['tree.filter']);
+            $curricCode = trim((string)$row['tree.filter_code']);
+            $curricFilter = trim((string)$row['tree.filter']);
 
-            if('' !== $curricCode) {
+            if ('' !== $curricCode) {
                 $curricFilter .= " [$curricCode]";
             }
 
@@ -2115,8 +2115,8 @@ class Controller extends Base
                 'Curriculum Overview',
                 $componentName,
                 $curricFilter,
-                NULL,
-                NULL,
+                null,
+                null,
             ]);
         }
 
@@ -2175,7 +2175,7 @@ class Controller extends Base
          */
         $fileQuery->execute(
             Builder::getArrayParameters(array_keys($units), 'units')
-                                );
+            );
 
         while ($row = $fileQuery->fetch(\PDO::FETCH_ASSOC)) {
             $componentName = $row['componentName'] ?? 'NULL';
@@ -2195,9 +2195,9 @@ class Controller extends Base
                 $urlBase->withPath(sprintf("/homepage/%s", $units[$row['folder.id']]['unit.id']))->withFragment(sprintf("component%s", $row['component.id'])),
                 'File Component',
                 $componentName,
-                NULL,
+                null,
                 'File Count',
-                NULL,
+                null,
             ]);
         }
 
@@ -2315,7 +2315,6 @@ class Controller extends Base
             Builder::getArrayParameters(array_keys($units), 'units')
         );
         while ($row = $assessmentQuery->fetch(\PDO::FETCH_ASSOC)) {
-
             //build the row and send
             fputcsv($fp, [
                 $units[$row['folder_id']]['course.name'],
