@@ -1,6 +1,5 @@
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import type { Page } from "@playwright/test";
-import { expect } from "@playwright/test";
 
 export default class ProfileEditor {
     private tester: AcceptanceTester;
@@ -47,14 +46,5 @@ export default class ProfileEditor {
      */
     async clickUpdateButton(): Promise<void> {
         await this.page.locator(ProfileEditor.SELECTOR_UPDATE_BUTTON).click();
-    }
-
-    /**
-     * Sets visibility
-     * @param fieldName Check the field name is presented
-     */
-    async checkFieldNameIsPresented(fieldName: string): Promise<void> {
-        await expect(this.page.locator('[data-test="user-profile-name"]')).toHaveText(fieldName);
-        // await expect(this.page.getByTestId("user-profile-name")).toHaveText(fieldName);
     }
 }

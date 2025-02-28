@@ -36,7 +36,7 @@ test.describe("Profile Editor", () => {
         tester.isGoingTo("Navigate to the student profile page");
         await profilePage.goto("25");
         tester.isGoingTo("Ensure the student name is presented");
-        await profileEditor.checkFieldNameIsPresented("Ms Jana Reed");
+        await profilePage.checkFieldNameIsPresented("Ms Jana Reed");
     });
 
     /**
@@ -60,7 +60,7 @@ test.describe("Profile Editor", () => {
         tester.isGoingTo("Navigate to the staff profile page");
         await profilePage.goto("22");
         tester.isGoingTo("Ensure the staff first and last names and Test are presented");
-        await profileEditor.checkFieldNameIsPresented("Jack Coles Test");
+        await profilePage.checkFieldNameIsPresented("Jack Coles Test");
     });
 
     /**
@@ -83,27 +83,27 @@ test.describe("Profile Editor", () => {
         tester.isGoingTo("Navigate to the parent profile page");
         await profilePage.goto("27");
         tester.isGoingTo("Ensure the parent preferred name and last name are presented");
-        await profileEditor.checkFieldNameIsPresented("Jenni Reed");
+        await profilePage.checkFieldNameIsPresented("Jenni Reed");
     });
 
     test.afterAll(async ({ baseTester, db }) => {
+        baseTester.isGoingTo("update the name_format_student to default value");
+        await db.updateInDatabase(
+            "config",
+            { value: "{title} {firstname} {lastname}" },
+            { "name like": "name_format_student" },
+        );
         baseTester.isGoingTo("update the name_format_staff to default value");
         await db.updateInDatabase(
             "config",
-            { value: "{firstname} {lastname} Test" },
-            { name: "{title} {firstname} {lastname}" },
+            { value: "{title} {firstname} {lastname}" },
+            { "name like": "name_format_staff" },
         );
         baseTester.isGoingTo("update the name_format_parent to default value");
         await db.updateInDatabase(
             "config",
-            { value: "{preferredname} {lastname}" },
-            { name: "{title} {firstname} {lastname}" },
-        );
-        baseTester.isGoingTo("update the name_format_student to default value");
-        await db.updateInDatabase(
-            "config",
-            { value: "{firstname} {lastname}" },
-            { name: "{title} {firstname} {lastname}" },
+            { value: "{title} {firstname} {lastname}" },
+            { "name like": "name_format_parent" },
         );
     });
 });
