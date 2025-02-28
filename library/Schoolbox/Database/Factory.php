@@ -77,7 +77,8 @@ class Factory
      */
     public static function getInstanceExternal(): ?IConnector
     {
-        return self::getInstance()->getExternalDatabase(new Loader());
+        $connectorExternal = self::getInstance()->getExternalDatabase(new Loader());
+        return ($connectorExternal instanceof NullConnector ? null : $connectorExternal);
     }
 
 
