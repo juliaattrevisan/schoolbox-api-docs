@@ -14,6 +14,14 @@ within a self-contained development environment.
   ```shell
   mkdir -p data/vagrantx/db-data
   ```
+- `vagrant provision` as per normal: we'll need the database
+- once provisioned, backup the database content:
+  ```shell
+  vagrant ssh
+  sudo /usr/share/schoolbox/tools/backup-database.sh
+  # this will create a file somewhere in /var/lib/schoolbox: note that path
+  cp $backupLocation vagrantcache/schoolbox.sql
+  ```
 - from the base folder, start Docker containers:
   ```shell
   sudo docker-compose up -d
@@ -40,6 +48,7 @@ within a self-contained development environment.
   GRANT ALL ON schoolbox.* to 'schoolboxdocker'@'php-fpm';
   GRANT ALL ON schoolbox.* to 'schoolboxdocker'@'schoolbox-cli';
   ```
+- using the backup from before:
 - extract `schoolbox.sql` out of a dataset (e.g. `vagrantcache/demo.tar.gz`)
   into the `vagrantcache` folder, and then:
   ```shell
