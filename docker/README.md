@@ -26,36 +26,12 @@ within a self-contained development environment.
   ```shell
   sudo docker-compose up -d
   ```
-- from the CLI container, setup database:
+- from the CLI container, setup database and copy from Vagrant:
   ```shell
   sudo docker exec -it schoolbox-cli /bin/bash
   cd /usr/share/schoolbox
-  mariadb -h mariadb -u root
-  ```
-  ```mysql
-  DROP DATABASE IF EXISTS schoolbox;
-  CREATE DATABASE schoolbox CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';
-
-  # for now need to create vagrant user
-  CREATE USER IF NOT EXISTS 'schoolboxvagrant'@'localhost' IDENTIFIED BY 'abc123';
-
-  # create Docker users
-  CREATE USER IF NOT EXISTS 'schoolboxdocker'@'php-fpm' IDENTIFIED BY 'abc123';
-  CREATE USER IF NOT EXISTS 'schoolboxdocker'@'schoolbox-cli' IDENTIFIED BY 'abc123';
-
-  # grant everything to all these users
-  GRANT ALL ON schoolbox.* to 'schoolboxvagrant'@'localhost';
-  GRANT ALL ON schoolbox.* to 'schoolboxdocker'@'php-fpm';
-  GRANT ALL ON schoolbox.* to 'schoolboxdocker'@'schoolbox-cli';
-  ```
-- using the backup from before:
-- extract `schoolbox.sql` out of a dataset (e.g. `vagrantcache/demo.tar.gz`)
-  into the `vagrantcache` folder, and then:
-  ```shell
-  sudo docker exec -it schoolbox-cli /bin/bash
-  cd /usr/share/schoolbox
-  mariadb -h mariadb -u root -D schoolbox -p < vagrantcache/schoolbox.sql
-  mariadb -h mariadb -u root -D schoolbox -p < sql/vagrant.sql
+  mariadb -h mariadb -u root < docker/schoolbox/sql/setup.sql
+  mariadb -h mariadb -u root -D schoolbox < sql/vagrant.sql
   ```
 - finagle database settings for Docker:
   ```sql
