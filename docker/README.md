@@ -22,17 +22,18 @@ within a self-contained development environment.
   ```shell
   docker exec -it schoolbox-cli /bin/bash
   cd /usr/share/schoolbox
-  mariadb -h mariadb -u root -p # password: vagrant
+  mariadb -h mariadb -u root
   ```
   ```mysql
+  DROP DATABASE IF EXISTS schoolbox;
   CREATE DATABASE schoolbox CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';
 
   # for now need to create vagrant user
-  CREATE USER 'schoolboxvagrant'@'localhost' IDENTIFIED BY 'abc123';
+  CREATE USER IF NOT EXISTS 'schoolboxvagrant'@'localhost' IDENTIFIED BY 'abc123';
 
   # create Docker users
-  CREATE USER 'schoolboxdocker'@'php-fpm' IDENTIFIED BY 'abc123';
-  CREATE USER 'schoolboxdocker'@'schoolbox-cli' IDENTIFIED BY 'abc123';
+  CREATE USER IF NOT EXISTS 'schoolboxdocker'@'php-fpm' IDENTIFIED BY 'abc123';
+  CREATE USER IF NOT EXISTS 'schoolboxdocker'@'schoolbox-cli' IDENTIFIED BY 'abc123';
 
   # grant everything to all these users
   GRANT ALL ON schoolbox.* to 'schoolboxvagrant'@'localhost';
@@ -43,8 +44,9 @@ within a self-contained development environment.
   into the `vagrantcache` folder, and then:
   ```shell
   docker exec -it schoolbox-cli /bin/bash
-  mariadb -h mariadb -u root -D schoolbox -p < vagrantcache/schoolbox.sql # password: vagrant
-  mariadb -h mariadb -u root -D schoolbox -p < sql/vagrant.sql # password: vagrant
+  cd /usr/share/schoolbox
+  mariadb -h mariadb -u root -D schoolbox -p < vagrantcache/schoolbox.sql
+  mariadb -h mariadb -u root -D schoolbox -p < sql/vagrant.sql
   ```
 - finagle database settings for Docker:
   ```sql
