@@ -57,3 +57,4 @@ within a self-contained development environment.
   docker exec -it php-fpm \
     chown -R www-data:www-data /var/lib/schoolbox/{cache,storage,twig,purifier}
   ```
+- finally, visit https://docker.dev.schoolbox.cloud:8443

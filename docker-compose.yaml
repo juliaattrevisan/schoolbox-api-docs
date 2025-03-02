@@ -9,8 +9,8 @@ services:
       - code:/usr/share/schoolbox
       - ./docker/caddy:/etc/caddy
     ports:
-      - '80:80'
-      - '443:443'
+      - '8080:80'
+      - '8443:443'
 
   # PHP-FPM server:
   # point requests from Caddy to here
@@ -59,8 +59,8 @@ services:
     image: mariadb:11.4
     volumes:
       - db-data:/var/lib/mysql
-    environment:
-      MARIADB_ROOT_PASSWORD: vagrant
+#    environment:
+#      MARIADB_ROOT_PASSWORD: vagrant
 #    expose:
 #      - 3306
 #    networks:
