@@ -12,7 +12,7 @@ within a self-contained development environment.
   ```
 - create the mounted folders if they don't already exist:
   ```shell
-  mkdir -p data/vagrantx/db-data
+  mkdir -p db-data
   ```
 - `vagrant provision` as per normal: we'll need the database
 - once provisioned, backup the database content:
@@ -31,13 +31,8 @@ within a self-contained development environment.
   sudo docker exec -it schoolbox-cli /bin/bash
   cd /usr/share/schoolbox
   mariadb -h mariadb -u root < docker/schoolbox/sql/setup.sql
-  mariadb -h mariadb -u root -D schoolbox < sql/vagrant.sql
-  ```
-- finagle database settings for Docker:
-  ```sql
-  UPDATE config SET value='tcp://redis-storage:6379' WHERE name='redis_url';
-  UPDATE config SET value='tcp://redis-cache:6379' WHERE name='redis_ephemeral_url';
-  UPDATE config SET value='tcp://redis-storage:6379' WHERE name='taskd_redis_url';
+  mariadb -h mariadb -u root -D schoolbox < vagrantcache/schoolbox.sql
+  mariadb -h mariadb -u root -D schoolbox < docker/schoolbox/sql/post-setup.sql
   ```
 - finagle file permissions for PHP-FPM:
   ```shell

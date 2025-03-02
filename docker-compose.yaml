@@ -59,8 +59,8 @@ services:
     image: mariadb:11.4
     volumes:
       - db-data:/var/lib/mysql
-#    environment:
-#      MARIADB_ROOT_PASSWORD: vagrant
+    environment:
+      MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: 1
 #    expose:
 #      - 3306
 #    networks:
@@ -119,12 +119,13 @@ volumes:
       o: bind
       device: ./
 
-  # Volume for database
+  # Volume for database:
+  # need to figure out somewhere which is outside of normal mount?
   db-data:
     driver_opts:
       type: none
       o: bind
-      device: ./data/vagrantx/db-data
+      device: ./db-data
 
   # Volume for storage
   storage:
