@@ -140,4 +140,4 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: ./data/vagrantx
+      device: ./data

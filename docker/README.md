@@ -15,6 +15,11 @@ within a self-contained development environment.
   mkdir -p db-data
   ```
 - `vagrant provision` as per normal: we'll need the database
+- extract the files from the provisioned dataset to the mount folder:
+  ```shell
+  # with data_filename from vagrant.yaml:
+  tar -C data/vagrantx -xf vagrantcache/$data_filename --strip-components=1 data
+  ```
 - once provisioned, backup the database content:
   ```shell
   vagrant ssh
