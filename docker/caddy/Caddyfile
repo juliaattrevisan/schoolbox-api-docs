@@ -73,7 +73,7 @@ docker.dev.schoolbox.cloud:443 {
     @images path_regexp (portrait|videothumb|cms/(image|myimage)|images/(fail|icon|logo)|(socialstream|storage)/image)\.php$
     handle @images {
         log_skip *
-        php_fastcgi php-fpm:9002 {
+        php_fastcgi php-fpm:9000 {
             try_files index.php
         }
     }
