@@ -28,7 +28,7 @@ within a self-contained development environment.
   ```
 - from the CLI container, setup database:
   ```shell
-  docker exec -it schoolbox-cli /bin/bash
+  sudo docker exec -it schoolbox-cli /bin/bash
   cd /usr/share/schoolbox
   mariadb -h mariadb -u root
   ```
@@ -52,7 +52,7 @@ within a self-contained development environment.
 - extract `schoolbox.sql` out of a dataset (e.g. `vagrantcache/demo.tar.gz`)
   into the `vagrantcache` folder, and then:
   ```shell
-  docker exec -it schoolbox-cli /bin/bash
+  sudo docker exec -it schoolbox-cli /bin/bash
   cd /usr/share/schoolbox
   mariadb -h mariadb -u root -D schoolbox -p < vagrantcache/schoolbox.sql
   mariadb -h mariadb -u root -D schoolbox -p < sql/vagrant.sql
@@ -65,7 +65,7 @@ within a self-contained development environment.
   ```
 - finagle file permissions for PHP-FPM:
   ```shell
-  docker exec -it php-fpm \
+  sudo docker exec -it php-fpm \
     chown -R www-data:www-data /var/lib/schoolbox/{cache,storage,twig,purifier}
   ```
 - finally, visit https://docker.dev.schoolbox.cloud:8443
