@@ -314,7 +314,7 @@ class Validator
         // Check the format of newly supplied dates, taking into account the new or existing value of 'allDay'.
         // Note existing dates can be assumed to have the correct format, since any format can be obtained from existing dates.
         $allDayBool = $requestPost['allDay'] ?? ($event->getAllDay() === Event::ALL_DAY);
-        foreach (['startDate', 'endDate', 'publishDate', 'repeat_until'] as $datetimeKey) {
+        foreach (['startDate', 'endDate', 'publishDate'] as $datetimeKey) {
             if (array_key_exists($datetimeKey, (array)$requestPost)) {
                 if ($datetimeKey === 'publishDate' && in_array($requestPost[$datetimeKey], [null, ''])) {
                     $requestPost[$datetimeKey] = null;
@@ -328,6 +328,18 @@ class Validator
                 } catch (InvalidArgumentException) {
                     throw new SchoolboxException("Value for key '$datetimeKey' should be a date in RFC3339 format.");
                 }
+            }
+        }
+
+        // dupe the things, as we need to match and test against DAY ONLY, NO TIME
+        if (array_key_exists('repeat_until', (array)$requestPost)) {
+            try {
+                new Alaress_Date_Format(
+                    $requestPost['repeat_until'],
+                    $this->getValidFormatsForDateField('repeat_until', $allDayBool)
+                );
+            } catch (InvalidArgumentException) {
+                throw new SchoolboxException("Value for key 'repeat_until' should be a date in YYYY-MM-DD or DD/MM/YYYY format.");
             }
         }
 
