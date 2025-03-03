@@ -16,7 +16,7 @@ test.describe("Group Permission Tests", () => {
     });
 
     test("Group Free", async ({ tester, page, db }) => {
-        const createFolder = new CreateFolder(page);
+        const createFolder = new CreateFolder(tester, page);
         const manageGroup = new ManageGroup(page);
         const folderName = "Group Free";
         const homepageTemplateOption = "Course";
@@ -24,27 +24,29 @@ test.describe("Group Permission Tests", () => {
         const studentMiddle = "Louisa Smith";
         const studentSenior = "Mr Tim Reed";
         const groupMember = "Ms Eloise White";
-        await createFolder.goto();
+        const schoolCode = "";
 
-        tester.isGoingTo("create a group with write permission to teachers");
-        await createFolder.typeName(folderName);
-        await createFolder.setHomepageTemplate(homepageTemplateOption);
-        await createFolder.setAccessPermission(1, "write");
-        await createFolder.setAccessPermission(2, "write");
-        tester.isGoingTo("set write permission to senior student");
-        await createFolder.setAccessPermission(3, "write");
-        await createFolder.setAccessPermission(4, "write");
-        tester.isGoingTo("set write permission to junior student");
-        await createFolder.setAccessPermission(5, "read");
-        tester.isGoingTo("set none permission to middle student");
-        await createFolder.setAccessPermission(6, "none");
-        await createFolder.clickCreateGroupToggle();
-        await createFolder.submit();
+        // sets write access permission for Administration, Teacher, senior student  and parent, read access to junior student and none access to middle student
+        await createFolder.createFolder(
+            folderName,
+            homepageTemplateOption,
+            db,
+            [
+                [1, "write"],
+                [2, "write"],
+                [3, "write"],
+                [4, "write"],
+                [5, "read"],
+                [6, "none"],
+            ],
+            schoolCode,
+            true,
+        );
+
         const folderId = (await db.grabFromDatabase("folder", "id", {
             deleted_at: null,
             "name LIKE": folderName,
         })) as number;
-        expect(folderId).not.toBe(null);
         await manageGroup.setAccessPermission("type-3");
         await manageGroup.clickUpdateButton();
         tester.isGoingTo("add Eloise White into the group");
@@ -87,7 +89,7 @@ test.describe("Group Permission Tests", () => {
      * table with scenarios described in 13387
      */
     test("Group Moderated", async ({ tester, page, db }) => {
-        const createFolder = new CreateFolder(page);
+        const createFolder = new CreateFolder(tester, page);
         const manageGroup = new ManageGroup(page);
         const folderName = "Group Moderated";
         const homepageTemplateOption = "Course";
@@ -95,27 +97,30 @@ test.describe("Group Permission Tests", () => {
         const studentMiddle = "Louisa Smith";
         const studentSenior = "Mr Tim Reed";
         const groupMember = "Ms Eloise White";
-        await createFolder.goto();
+        const schoolCode = "";
 
-        tester.isGoingTo("create a group with write permission to teachers");
-        await createFolder.typeName(folderName);
-        await createFolder.setHomepageTemplate(homepageTemplateOption);
-        await createFolder.setAccessPermission(1, "write");
-        await createFolder.setAccessPermission(2, "write");
-        tester.isGoingTo("set write permission to senior student");
-        await createFolder.setAccessPermission(3, "write");
-        await createFolder.setAccessPermission(4, "write");
-        tester.isGoingTo("set read permission to junior student");
-        await createFolder.setAccessPermission(5, "read");
-        tester.isGoingTo("set none permission to middle student");
-        await createFolder.setAccessPermission(6, "none");
-        await createFolder.clickCreateGroupToggle();
-        await createFolder.submit();
+        // sets write access permission for Administration, Teacher, senior student  and parent, read access to junior student and none access to middle student
+        await createFolder.createFolder(
+            folderName,
+            homepageTemplateOption,
+            db,
+            [
+                [1, "write"],
+                [2, "write"],
+                [3, "write"],
+                [4, "write"],
+                [5, "read"],
+                [6, "none"],
+            ],
+            schoolCode,
+            true,
+        );
+
         const folderId = (await db.grabFromDatabase("folder", "id", {
             deleted_at: null,
             "name LIKE": folderName,
         })) as number;
-        expect(folderId).not.toBe(null);
+
         await manageGroup.setAccessPermission("type-2");
         await manageGroup.clickUpdateButton();
         tester.isGoingTo("add Jana Reed into the group");
@@ -158,7 +163,7 @@ test.describe("Group Permission Tests", () => {
      * table with scenarios described in 13387
      */
     test("Group Restricted", async ({ tester, page, db }) => {
-        const createFolder = new CreateFolder(page);
+        const createFolder = new CreateFolder(tester, page);
         const manageGroup = new ManageGroup(page);
         const folderName = "Group Restricted";
         const homepageTemplateOption = "Course";
@@ -166,27 +171,30 @@ test.describe("Group Permission Tests", () => {
         const studentMiddle = "Louisa Smith";
         const studentSenior = "Mr Tim Reed";
         const groupMember = "Ms Eloise White";
+        const schoolCode = "";
         await createFolder.goto();
 
-        tester.isGoingTo("create a group with write permission to teachers");
-        await createFolder.typeName(folderName);
-        await createFolder.setHomepageTemplate(homepageTemplateOption);
-        await createFolder.setAccessPermission(1, "write");
-        await createFolder.setAccessPermission(2, "write");
-        tester.isGoingTo("set write permission to senior student");
-        await createFolder.setAccessPermission(3, "write");
-        await createFolder.setAccessPermission(4, "write");
-        tester.isGoingTo("set read permission to junior student");
-        await createFolder.setAccessPermission(5, "read");
-        tester.isGoingTo("set none permission to middle student");
-        await createFolder.setAccessPermission(6, "none");
-        await createFolder.clickCreateGroupToggle();
-        await createFolder.submit();
+        // sets write access permission for Administration, Teacher, senior student  and parent, read access to junior student and none access to middle student
+        await createFolder.createFolder(
+            folderName,
+            homepageTemplateOption,
+            db,
+            [
+                [1, "write"],
+                [2, "write"],
+                [3, "write"],
+                [4, "write"],
+                [5, "read"],
+                [6, "none"],
+            ],
+            schoolCode,
+            true,
+        );
+
         const folderId = (await db.grabFromDatabase("folder", "id", {
             deleted_at: null,
             "name LIKE": folderName,
         })) as number;
-        expect(folderId).not.toBe(null);
 
         await manageGroup.setAccessPermission("type-1");
         await manageGroup.clickUpdateButton();
@@ -228,25 +236,27 @@ test.describe("Group Permission Tests", () => {
         const folderName = "Group Root";
         const homepageTemplateOption = "Course";
         const subFolderName = "Group 1";
-        const createFolder = new CreateFolder(page);
+        const schoolCode = "";
+        const createFolder = new CreateFolder(tester, page);
         const manageGroup = new ManageGroup(page);
         const resources = new Resources(page);
-        await createFolder.goto();
 
-        tester.isGoingTo("create a group with write permission to teachers");
-        await createFolder.typeName(folderName);
-        await createFolder.setHomepageTemplate(homepageTemplateOption);
-        await createFolder.setAccessPermission(1, "none");
-        await createFolder.setAccessPermission(2, "none");
-        tester.isGoingTo("set none permission to senior student");
-        await createFolder.setAccessPermission(3, "none");
-        await createFolder.setAccessPermission(4, "none");
-        tester.isGoingTo("set none permission to junior student");
-        await createFolder.setAccessPermission(5, "none");
-        tester.isGoingTo("set none permission to middle student");
-        await createFolder.setAccessPermission(6, "none");
-        await createFolder.clickCreateGroupToggle();
-        await createFolder.submit();
+        // sets none access permission for Administration, Teacher, senior student, parent, junior student and middle student
+        await createFolder.createFolder(
+            folderName,
+            homepageTemplateOption,
+            db,
+            [
+                [1, "none"],
+                [2, "none"],
+                [3, "none"],
+                [4, "none"],
+                [5, "none"],
+                [6, "none"],
+            ],
+            schoolCode,
+            true,
+        );
 
         await manageGroup.setAccessPermission("type-1");
         await manageGroup.clickUpdateButton();

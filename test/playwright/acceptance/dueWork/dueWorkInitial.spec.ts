@@ -56,8 +56,8 @@ test.describe("Initial Due Work functionality tests", () => {
         await tester.loginAsAdmin();
     });
 
-    test("Create 2 Assessments", async ({ tester, page }) => {
-        const createFolder = new CreateFolder(page);
+    test("Create 2 Assessments", async ({ tester, page, db }) => {
+        const createFolder = new CreateFolder(tester, page);
         const assessmentForm = new AssessmentForm(tester, page);
 
         const teacher = "Jack Coles";
@@ -67,18 +67,23 @@ test.describe("Initial Due Work functionality tests", () => {
 
         // Simulate creating a homepage and adding members
         folderName = `Test Class Homepage ${Date.now()}`; // Timestamp to ensure uniqueness
-        tester.isGoingTo(`create a homepage named "${folderName}"`);
-        await createFolder.goto();
-        await createFolder.setHomepageTemplate("Blank");
-        await createFolder.typeName(folderName);
+        const homepageTemplateOption = "Blank";
+        const schoolCode = "";
 
-        await createFolder.setAccessPermission(1, "write");
-        await createFolder.setAccessPermission(2, "write");
-        await createFolder.setAccessPermission(3, "read");
-        await createFolder.setAccessPermission(4, "read");
-        await createFolder.setAccessPermission(5, "read");
-
-        await createFolder.submit();
+        // sets write access permission for Administration and Teacher, read access permission for senior student, parent, junior student
+        await createFolder.createFolder(
+            folderName,
+            homepageTemplateOption,
+            db,
+            [
+                [1, "write"],
+                [2, "write"],
+                [3, "read"],
+                [4, "read"],
+                [5, "read"],
+            ],
+            schoolCode,
+        );
 
         // Navigate to newly created folder
         tester.isGoingTo("navigate to the newly created folder and store its location for later tests");
