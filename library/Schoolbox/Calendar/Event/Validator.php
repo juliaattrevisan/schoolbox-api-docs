@@ -404,6 +404,7 @@ class Validator
                 // Always date only.
                 $acceptedFormats[] = $this->locale->localShortFormat(); // Required by calendar/event/create and modify pages.
                 $acceptedFormats[] = Alaress_Date_Format::DATABASE_DATE_FORMAT;
+                $acceptedFormats[] = Alaress_Date_Format::FORMAT_DATE_ALT;
                 break;
             case 'publishDate':
                 // Always datetime.

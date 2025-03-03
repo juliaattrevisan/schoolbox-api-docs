@@ -723,9 +723,10 @@ class Controller extends Base
         try {
             // Unlike the other dates, until date is currently always a date and
             // not a date+time.
+            // need to match the formats in \Schoolbox\Calendar\Event\Validator::getValidFormatsForDateField, or this will do nothing...
             $untilDate = (new Alaress_Date_Format(
                 $validRequestPost['repeat_until'] ?? $endDate->getDatabaseDate(),
-                [$locale->localShortFormat(), Alaress_Date_Format::DATABASE_DATE_FORMAT],
+                [$locale->localShortFormat(), Alaress_Date_Format::DATABASE_DATE_FORMAT, Alaress_Date_Format::FORMAT_DATE_ALT],
             ))->endOfDay();
         } catch (InvalidArgumentException) {
             $untilDate = (clone $endDate)->endOfDay();
