@@ -66,8 +66,16 @@ class CompositeBuilder implements IBuilder
         ?object $subject,
     ): iterable {
         foreach ($this->builders as $builder) {
-            foreach ($builder->buildDeletes($fromDate, $toDate, $subject) as $item) {
-                yield $item;
+            /** @var BaseBuilder $builder */
+            try {
+                foreach ($builder->buildDeletes($fromDate, $toDate, $subject) as $item) {
+                    yield $item;
+                }
+            } catch (DatabaseException $e) {
+                $builder->getLogger()->error(
+                    'Could not build deletes using ' . get_class($builder) . '.  Exception message: ' . $e->getMessage()
+                );
+                continue;
             }
         }
     }
