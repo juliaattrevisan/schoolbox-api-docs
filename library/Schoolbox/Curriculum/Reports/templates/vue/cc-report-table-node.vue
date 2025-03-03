@@ -43,7 +43,7 @@ const isSingleNode = window.Vue.computed(
 
 // show the expand button when the node has children, and onlyShowGaps is not active
 const showExpandButton = window.Vue.computed(
-    () => props.node.children && props.node.children.length > 0 && !filtersStore.onlyShowGaps,
+    () => props.node.children && props.node.children.length > 0 && !props.node.isExpanded && !filtersStore.onlyShowGaps,
 );
 
 /**
@@ -206,7 +206,7 @@ function onCourseClicked(course: CourseWithCurriculumNodeUsage, buttonEl: HTMLBu
             <!-- add the total course cell if there's multiple courses -->
             <template v-if="useCoursesStore().hasMultipleCourses">
                 <td v-if="props.node.hasNoUsages || course.hasNoTotalUsages">0</td>
-                <td v-else-if="props.node.children && !props.node.isExpanded" class="usage-cell">
+                <td v-else-if="showExpandButton" class="usage-cell">
                     <button class="f-always-show usage-button" @click="onTotalClicked">
                         {{ getFilteredCourseCount(props.node, course, !props.node.isExpanded) }}
                     </button>
