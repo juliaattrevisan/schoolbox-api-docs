@@ -29,27 +29,6 @@ use Schoolbox\Resource\Folder;
 
 class Csv extends Base
 {
-    private const SINGLE_COLUMN = [
-        'Start Date',
-        'Start Time',
-        'Finish Date',
-        'Finish Time',
-        'All Day',
-        'Name',
-        'Detail',
-        'Location',
-        'Type',
-        'Publish Date',
-        'Attendance',
-        'Calendar Owner',
-        'Group Ids',
-    ];
-
-    private const MULTI_COLUMN = [
-        'Campus',
-        'Role',
-    ];
-
     /**
      * Load all events into schoolbox, generate outcome array
      *
@@ -94,13 +73,13 @@ class Csv extends Base
 
         $eventTypeMapper = new EventTypeMapper();
 
-        $test = $this->getActualHeaderColumns($headerRow);
+        $headerColumns = $this->getActualHeaderColumns($headerRow);
 
         /* Column checks
          */
-        $hasCampusColumn = array_key_exists('campus', $test);
-        $hasRolesColumn = array_key_exists('role', $test);
-        $hasOwnerColumn = array_key_exists('calendar owner', $test);
+        $hasCampusColumn = array_key_exists('campus', $headerColumns);
+        $hasRolesColumn = array_key_exists('role', $headerColumns);
+        $hasOwnerColumn = array_key_exists('calendar owner', $headerColumns);
 
         /* Starting transaction
          */
@@ -110,21 +89,21 @@ class Csv extends Base
             // The CSV file will not contain character encoding info, so just assume a compatible encoding has been used.
             // Previously we stripped non-ASCII characters here, but users complained about loss of data.
 
-            $start_date = $thisRow[$test['start date'][0]];
-            $start_time = $thisRow[$test['start time'][0]];
-            $finish_date = $thisRow[$test['finish date'][0]];
-            $finish_time = $thisRow[$test['finish time'][0]];
-            $all_day = $thisRow[$test['all day'][0]];
-            $name = $thisRow[$test['name'][0]];
-            $detail = $thisRow[$test['detail'][0]];
-            $location = $thisRow[$test['location'][0]];
-            $event_type = $thisRow[$test['type'][0]];
-            $publish_date = $thisRow[$test['publish date'][0]];
-            $attendance = $thisRow[$test['attendance'][0]];
-            $folderIds = isset($test['folderIds']) ? $thisRow[$test['folderIds'][0]] : '';
-            $campuses = array_map(fn($value) => $thisRow[$value], $test['campus'] ?? []);
-            $roles = array_map(fn($value) => $thisRow[$value], $test['role'] ?? []);
-            $owner = isset($test['calendar owner']) ? $thisRow[$test['calendar owner'][0]] : '';
+            $start_date = $this->getColumnValues($headerColumns, $thisRow, 'start date');
+            $start_time = $this->getColumnValues($headerColumns, $thisRow, 'start time');
+            $finish_date = $this->getColumnValues($headerColumns, $thisRow, 'finish date');
+            $finish_time = $this->getColumnValues($headerColumns, $thisRow, 'finish time');
+            $all_day = $this->getColumnValues($headerColumns, $thisRow, 'all day');
+            $name = $this->getColumnValues($headerColumns, $thisRow, 'name');
+            $detail = $this->getColumnValues($headerColumns, $thisRow, 'detail');
+            $location = $this->getColumnValues($headerColumns, $thisRow, 'location');
+            $event_type = $this->getColumnValues($headerColumns, $thisRow, 'type');
+            $publish_date = $this->getColumnValues($headerColumns, $thisRow, 'publish date');
+            $attendance = $this->getColumnValues($headerColumns, $thisRow, 'attendance');
+            $folderIds = $this->getColumnValues($headerColumns, $thisRow, 'folderIds');
+            $campuses = $this->getColumnValues($headerColumns, $thisRow, 'campus', true);
+            $roles = $this->getColumnValues($headerColumns, $thisRow, 'role', true);
+            $owner = $this->getColumnValues($headerColumns, $thisRow, 'calendar owner');
 
             $cloneCampuses = $allCampuses;
             if ($hasCampusColumn) {
@@ -523,6 +502,15 @@ class Csv extends Base
             $actualHeaders[strtolower($column)][] = $index;
         }
         return $actualHeaders;
+    }
+
+    private function getColumnValues($headerColumns, $row, $column, $returnArray = false): string|array
+    {
+        if ($returnArray) {
+            return array_map(fn($value) => $row[$value], $headerColumns[$column] ?? []);
+        }
+
+        return isset($headerColumns[$column]) ? $row[$headerColumns[$column][0]] : '';
     }
 
 }
