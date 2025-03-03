@@ -412,8 +412,6 @@ abstract class AbstractTreeBuilder
             $name ?: $file->getTitle(),
             null,
             null,
-            0,
-            null,
             $liAttributes,
             $aAttributes
         );
