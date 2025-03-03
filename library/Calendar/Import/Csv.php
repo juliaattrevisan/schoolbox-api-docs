@@ -10,6 +10,7 @@
 
 namespace Calendar\Import;
 
+use Calendar\Import\CsvReader;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\EventType;
@@ -28,9 +29,27 @@ use Schoolbox\Resource\Folder;
 
 class Csv extends Base
 {
-    private const CAMPUS_COLUMN = 'Campus';
-    private const ROLE_COLUMN = 'Role';
-    private const OWNER_COLUMN = 'Calendar Owner';
+    private const SINGLE_COLUMN = [
+        'Start Date',
+        'Start Time',
+        'Finish Date',
+        'Finish Time',
+        'All Day',
+        'Name',
+        'Detail',
+        'Location',
+        'Type',
+        'Publish Date',
+        'Attendance',
+        'Calendar Owner',
+        'Group Ids',
+    ];
+
+    private const MULTI_COLUMN = [
+        'Campus',
+        'Role',
+    ];
+
     /**
      * Load all events into schoolbox, generate outcome array
      *
@@ -73,15 +92,15 @@ class Csv extends Base
         $handle = (new \Alaress\Csv\ValidCSV($handle))->skipBom();
         $headerRow = fgetcsv($handle, 0, ",");
 
-        /* Column checks
-         */
-        $hasCampusColumn = in_array(self::CAMPUS_COLUMN, $headerRow);
-        $hasRolesColumn = in_array(self::ROLE_COLUMN, $headerRow);
-        $hasOwnerColumn = in_array(self::OWNER_COLUMN, $headerRow);
-
         $eventTypeMapper = new EventTypeMapper();
 
+        $test = $this->getActualHeaderColumns($headerRow);
 
+        /* Column checks
+         */
+        $hasCampusColumn = array_key_exists('campus', $test);
+        $hasRolesColumn = array_key_exists('role', $test);
+        $hasOwnerColumn = array_key_exists('calendar owner', $test);
 
         /* Starting transaction
          */
@@ -91,47 +110,80 @@ class Csv extends Base
             // The CSV file will not contain character encoding info, so just assume a compatible encoding has been used.
             // Previously we stripped non-ASCII characters here, but users complained about loss of data.
 
-            [
-                $start_date,
-                $start_time,
-                $finish_date,
-                $finish_time,
-                $all_day,
-                $name,
-                $detail,
-                $location,
-                $event_type,
-                $publish_date,
-                $attendance,
-                $folderIds,
-                $roles,
-                $owner,
-            ] = array_pad($thisRow, 14, '');
+            $start_date = $thisRow[$test['start date'][0]];
+            $start_time = $thisRow[$test['start time'][0]];
+            $finish_date = $thisRow[$test['finish date'][0]];
+            $finish_time = $thisRow[$test['finish time'][0]];
+            $all_day = $thisRow[$test['all day'][0]];
+            $name = $thisRow[$test['name'][0]];
+            $detail = $thisRow[$test['detail'][0]];
+            $location = $thisRow[$test['location'][0]];
+            $event_type = $thisRow[$test['type'][0]];
+            $publish_date = $thisRow[$test['publish date'][0]];
+            $attendance = $thisRow[$test['attendance'][0]];
+            $folderIds = isset($test['folderIds']) ? $thisRow[$test['folderIds'][0]] : '';
+            $campuses = array_map(fn($value) => $thisRow[$value], $test['campus'] ?? []);
+            $roles = array_map(fn($value) => $thisRow[$value], $test['role'] ?? []);
+            $owner = isset($test['calendar owner']) ? $thisRow[$test['calendar owner'][0]] : '';
+
+            $cloneCampuses = $allCampuses;
+            if ($hasCampusColumn) {
+                $allCampusesName = $campuses;
+
+                foreach ($allCampusesName as $campus) {
+                    if (!strlen(trim($campus))) {
+                        continue;
+                    }
+                    try {
+                        $importingCampus = $campusMapper->findOneByColumn('name', $campus);
+                        $cloneCampuses[] = $importingCampus->getId();
+                    } catch (MapperException $e) {
+                        //Campus name not found or is invalid
+                        $output[] = array(
+                            'name'   => $name,
+                            'status' => 'Not Added',
+                            'error'  => sprintf(
+                                'Event campus contains invalid campus (%s)',
+                                $campus
+                            )
+                        );
+                        continue 2;
+                    }
+                }
+
+                if (empty($cloneCampuses)) {
+                    $output[] = array(
+                        'name'   => $name,
+                        'status' => 'Not Added',
+                        'error'  => 'Event campus not provided',
+                    );
+
+                    continue;
+                }
+            }
 
             /* Role is mandatory
              */
             $roleCollection = $this->getGroupList();
             if ($hasRolesColumn) {
-                if (strlen(trim($roles))) {
-                    /* Check if roles provided are valid
-                     */
-                    $allRoles = explode(",", $roles);
-                    foreach ($allRoles as $roleName) {
-                        try {
-                            $role             = $roleMapper->findOneByColumn('name', $roleName);
-                            $roleCollection[] = $role->getId();
-                        } catch (MapperException $e) {
-                            $output[] = [
-                                'name'   => $name,
-                                'status' => 'Not Added',
-                                'error'  => sprintf(
-                                    'Invalid role (%s) provided',
-                                    $roleName,
-                                ),
-                            ];
+                /* Check if roles provided are valid
+                 */
+                foreach ($roles as $roleName) {
+                    try {
+                        $roleName = trim($roleName);
+                        $role             = $roleMapper->findOneByColumn('name', $roleName);
+                        $roleCollection[] = $role->getId();
+                    } catch (MapperException $e) {
+                        $output[] = [
+                            'name'   => $name,
+                            'status' => 'Not Added',
+                            'error'  => sprintf(
+                                'Invalid role (%s) provided',
+                                $roleName,
+                            ),
+                        ];
 
-                            continue 2;
-                        }
+                        continue 2;
                     }
                 }
             }
@@ -339,6 +391,7 @@ class Csv extends Base
             $event->setType($eventType);
             $event->setAttendance($attendance);
             $event->setSource($this->getSource());
+            $event->setCampusCollection($cloneCampuses);
 
             /* If a publish date is specified, use it; otherwise leave as empty
              */
@@ -357,81 +410,48 @@ class Csv extends Base
             }
             $folderList = $this->categoryList;
 
-            if ($hasCampusColumn) {
-                $cloneCampuses = $allCampuses;
-                $campuses = $folderIds;
-                if (!strlen(trim($campuses))) {
-                    $output[] = array(
-                        'name'   => $name,
-                        'status' => 'Not Added',
-                        'error'  => 'Event campus not provided',
-                    );
+            // Allow override of folder relations only if no folder list has
+            // been set in the object
+            if (empty($folderList)) {
+                $folderList = [];
+                foreach (explode(',', $folderIds ?? '') as $folderId) {
+                    // Empty folder ID: just ignore
+                    if ($folderId === '') {
+                        continue;
+                    }
 
-                    continue;
-                }
-                $allCampusesName = explode(',', $campuses);
-                foreach ($allCampusesName as $campus) {
-                    try {
-                        $importingCampus = $campusMapper->findOneByColumn('name', $campus);
-                        $cloneCampuses[] = $importingCampus->getId();
-                    } catch (MapperException $e) {
-                    //Campus name not found or is invalid
-                        $output[] = array(
+                    // Is this really a folder ID?
+                    $folderIdNum = filter_var($folderId, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+                    if (!$folderIdNum) {
+                        $output[] = [
                             'name'   => $name,
                             'status' => 'Not Added',
-                            'error'  => sprintf(
-                                'Event campus contains invalid campus (%s)',
-                                $campus
-                            )
-                        );
+                            'error'  => sprintf('Folder ID "%s" is not a number', $folderId),
+                        ];
+                        // If not skip this entire CSV row
                         continue 2;
                     }
-                }
-                $event->setCampusCollection($cloneCampuses);
-            } else {
-                // Allow override of folder relations only if no folder list has
-                // been set in the object
-                if (empty($folderList)) {
-                    $folderList = [];
-                    foreach (explode(',', $folderIds) as $folderId) {
-                        // Empty folder ID: just ignore
-                        if ($folderId === '') {
-                            continue;
-                        }
 
-                        // Is this really a folder ID?
-                        $folderIdNum = filter_var($folderId, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
-                        if (!$folderIdNum) {
-                            $output[] = [
-                                'name'   => $name,
-                                'status' => 'Not Added',
-                                'error'  => sprintf('Folder ID "%s" is not a number', $folderId),
-                            ];
-                            // If not skip this entire CSV row
-                            continue 2;
-                        }
-
-                        // Check the folder ID actually exists
-                        try {
-                            $folderCache[$folderIdNum] ??= $folderMapper->findById($folderIdNum);
-                        } catch (MapperException) {
-                            $output[] = [
-                                'name'   => $name,
-                                'status' => 'Not Added',
-                                'error'  => sprintf('Folder ID %d not found', $folderIdNum),
-                            ];
-                            // If not skip this entire CSV row
-                            continue 2;
-                        }
-                        $folderList[] = $folderIdNum;
+                    // Check the folder ID actually exists
+                    try {
+                        $folderCache[$folderIdNum] ??= $folderMapper->findById($folderIdNum);
+                    } catch (MapperException) {
+                        $output[] = [
+                            'name'   => $name,
+                            'status' => 'Not Added',
+                            'error'  => sprintf('Folder ID %d not found', $folderIdNum),
+                        ];
+                        // If not skip this entire CSV row
+                        continue 2;
                     }
+                    $folderList[] = $folderIdNum;
                 }
-
-                if (!empty($folderList)) {
-                    $event->setAccess(Event::ACCESS_GROUP);
-                }
-                $event->setCampusCollection($allCampuses);
             }
+
+            if (!empty($folderList)) {
+                $event->setAccess(Event::ACCESS_GROUP);
+            }
+
             /* Save it
              */
             $result = $eventMapper->save($event);
@@ -495,4 +515,14 @@ class Csv extends Base
 
         $this->setOutput($output);
     }
+
+    private function getActualHeaderColumns(array $headerColumns): array
+    {
+        $actualHeaders = [];
+        foreach ($headerColumns as $index => $column) {
+            $actualHeaders[strtolower($column)][] = $index;
+        }
+        return $actualHeaders;
+    }
+
 }
