@@ -45,8 +45,7 @@ class CompositeBuilder implements IBuilder
         foreach ($this->builders as $builder) {
             /** @var BaseBuilder $builder */
             try {
-                $itemsGenerator = $builder->buildUpdates($fromDate, $toDate, $subject);
-                foreach ($itemsGenerator as $item) {
+                foreach ($builder->buildUpdates($fromDate, $toDate, $subject) as $item) {
                     yield $item;
                 }
             } catch (DatabaseException $e) {
