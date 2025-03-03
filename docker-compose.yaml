@@ -98,15 +98,36 @@ services:
 
   # Not-yet-essential services:
   # These will be implemented as separate containers (if they aren't already).
-#  schoolbox-digestd:
-#    image: ubuntu:jammy
-#
-#  schoolbox-scheduled:
-#    image: ubuntu:jammy
-#
-#  schoolbox-mobiled:
-#    image: ubuntu:jammy
-#
+  schoolbox-digestd:
+    container_name: schoolbox-digestd
+    build:
+      context: ./docker/schoolbox-digestd
+    env_file: docker/default.env
+    volumes:
+      - code:/usr/share/schoolbox
+      - cache:/var/lib/schoolbox
+      - schoolbox-config:/etc/schoolbox
+
+  schoolbox-scheduled:
+    container_name: schoolbox-scheduled
+    build:
+      context: ./docker/schoolbox-scheduled
+    env_file: docker/default.env
+    volumes:
+      - code:/usr/share/schoolbox
+      - cache:/var/lib/schoolbox
+      - schoolbox-config:/etc/schoolbox
+
+  schoolbox-mobiled:
+    container_name: schoolbox-mobiled
+    build:
+      context: ./docker/schoolbox-mobiled
+    env_file: docker/default.env
+    volumes:
+      - code:/usr/share/schoolbox
+      - cache:/var/lib/schoolbox
+      - schoolbox-config:/etc/schoolbox
+
 #  schoolbox-socketd:
 #    image : ubuntu:jammy
 #
