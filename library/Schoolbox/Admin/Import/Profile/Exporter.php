@@ -229,14 +229,10 @@ class Exporter
                     /* If it's a BaseProfile instance, use the external id
                      */
                     $row[$heading] = $value->getExternalId();
-                } elseif (is_string($value)) {
-                    /* If it's a string, ensure its trimmed
-                     */
-                    $row[$heading] = trim($value);
                 } else {
                     /* Otherwise just use whatever's there
                      */
-                    $row[$heading] = $value;
+                    $row[$heading] = trim((string)$value);
                 }
             }
 
