@@ -7,7 +7,7 @@ services:
       context: ./docker/caddy
     volumes:
       - code:/usr/share/schoolbox
-      - ./docker/caddy:/etc/caddy
+      - caddy-config:/etc/caddy
     ports:
       - '8080:80'
       - '8443:443'
@@ -22,7 +22,7 @@ services:
     volumes:
       - code:/usr/share/schoolbox
       - cache:/var/lib/schoolbox
-      - ./docker/schoolbox/config:/etc/schoolbox
+      - schoolbox-config:/etc/schoolbox
       # Instead include configs in image?
       - ./docker/php-fpm/config/99-xdebug.ini:/usr/local/etc/php/conf.d/99-xdebug.ini
       - ./docker/php-fpm/config/99-session.ini:/usr/local/etc/php/conf.d/99-session.ini
@@ -46,10 +46,8 @@ services:
     tty: true
     volumes:
       - code:/usr/share/schoolbox
-      - ./docker/schoolbox/config:/etc/schoolbox
-#    networks:
-#      - public
-#      - private
+      - cache:/var/lib/schoolbox
+      - schoolbox-config:/etc/schoolbox
 
   # Database services:
   # these are containers only in a development environment, they won't be on
@@ -120,14 +118,16 @@ volumes:
       device: ./
 
   # Volume for database:
-  # need to figure out somewhere which is outside of normal mount?
+  # consider mounting something outside code volume?
+  # Does it even need a folder?
   db-data:
     driver_opts:
       type: none
       o: bind
       device: ./db-data
 
-  # Volume for storage
+  # Volume for storage:
+  # consider mounting only this folder, rather than all of cache?
   storage:
     driver_opts:
       type: none
@@ -141,3 +141,16 @@ volumes:
       type: none
       o: bind
       device: ./data
+
+  # Volumes for config
+  schoolbox-config:
+    driver_opts:
+      type: none
+      o: bind
+      device: ./docker/schoolbox/config
+
+  caddy-config:
+    driver_opts:
+      type: none
+      o: bind
+      device: ./docker/caddy/config
