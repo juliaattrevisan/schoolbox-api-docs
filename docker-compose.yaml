@@ -128,6 +128,15 @@ services:
       - cache:/var/lib/schoolbox
       - schoolbox-config:/etc/schoolbox
 
+  schoolbox-socketd:
+    container_name: schoolbox-socketd
+    build:
+      context: ./docker/schoolbox-socketd
+    env_file: docker/default.env
+    volumes:
+      - code:/usr/share/schoolbox
+      - cache:/var/lib/schoolbox
+      - schoolbox-config:/etc/schoolbox
 #  schoolbox-socketd:
 #    image : ubuntu:jammy
 #

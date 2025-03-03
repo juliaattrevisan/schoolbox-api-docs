@@ -65,7 +65,7 @@ docker.dev.schoolbox.cloud:443 {
     }
 
     handle_path /websocket {
-        reverse_proxy php-fpm:9081
+        reverse_proxy schoolbox-socketd:9081
     }
     handle_path /pad* {
         reverse_proxy php-fpm:9001
