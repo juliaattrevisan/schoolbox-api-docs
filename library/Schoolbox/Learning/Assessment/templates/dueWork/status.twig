@@ -182,6 +182,7 @@
 
                     {% endif %}
                     <div class="small-12{% if '' != assessment.instructorMarkScheme.template %} medium-9{% endif %} column">
+                        {# The comment input - intentionally with isRichText: false since we handle that via activityStatusPage.ts #}
                         {% include '@learningAssessment/dueWork/comment.twig' with {
                             feedback:       participant.findMostRecentInstructorGivenFeedback,
                             participant:    participant,
@@ -189,7 +190,8 @@
                             readonly:       readonly,
                             selfAssessment: selfAssess,
                             selfReflection: selfReflect,
-                            blindMode:      false
+                            blindMode:      false,
+                            isRichText: false
                         } only %}
                         {% set inputNo = inputNo + 1 %}
                         {% if '' == assessment.instructorMarkScheme.template %}
