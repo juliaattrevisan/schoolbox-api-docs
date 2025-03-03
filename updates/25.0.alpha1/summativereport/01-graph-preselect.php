@@ -89,6 +89,17 @@ HELP;
         }
 
         try {
+            /* Used to update multiple reports
+             */
+            $updateStatement = $this->getDatabaseInternal()->prepare("
+                UPDATE summative_report
+                SET options = :options
+                WHERE id = :id
+                LIMIT 1
+            ");
+
+            /* Find all the candidate reports
+             */
             $summativeReports = $this->getDatabaseInternal()->prepare("
                 SELECT *
                 FROM summative_report
@@ -100,8 +111,41 @@ HELP;
             while ($report = $summativeReports->fetch(\PDO::FETCH_ASSOC)) {
                 $this->refreshLock($lock);
 
+                /* Awkwardly, the summative report instance required you to have a
+                 * hydrated instance to decode the options payload
+                 */
+                $summativeReport = (new Schoolbox\Admin\SummativeReport\Model())
+                    ->setOptions($report['options']);
 
-                print_r($report);
+                $decodedOptions = $summativeReport->decode();
+
+                /* Traverse each of the worktypes that were enabled and set their Graph
+                 * option, so that users have it preselected upon migration
+                 */
+                foreach ($decodedOptions['summary']['workType'] as $workTypeId => &$option) {
+                    $option['graph'] = 1;
+                }
+
+                foreach ($decodedOptions['class']['workType'] as $workTypeId => &$option) {
+                    $option['graph'] = 1;
+                }
+
+                /* Re-encode it
+                 */
+                $updatedOptions = json_encode($decodedOptions, JSON_THROW_ON_ERROR);
+
+                /* Save it
+                 */
+                $this->getLogger()->info(sprintf(
+                    'Updating report "%s" (%s) to preselect Graph',
+                    $report['title'],
+                    $report['id']
+                ));
+
+                $updateStatement->execute([
+                    'id' => $report['id'],
+                    'options' => $updatedOptions,
+                ]);
             }
         } catch (\Alaress\Lock\LockRefreshException $e) {
             /* Lock TTL expired; just leave politely
