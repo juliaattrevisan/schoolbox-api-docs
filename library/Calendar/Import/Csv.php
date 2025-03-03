@@ -513,19 +513,22 @@ class Csv extends Base
     /**
      * Find the values for each of the columns in the row
      *
-     * @param $headerColumns
-     * @param $row
-     * @param $column
-     * @param $returnArray
+     * @param array $headerColumns
+     * @param array $row
+     * @param string $columnName
+     * @param bool $returnArray
      * @return string|array
      */
-    private function getColumnValues($headerColumns, $row, $column, $returnArray = false): string|array
-    {
+    private function getColumnValues(
+        array $headerColumns,
+        array $row,
+        string $columnName,
+        bool $returnArray = false
+    ): string|array {
         if ($returnArray) {
-            return array_map(fn($value) => $row[$value], $headerColumns[$column] ?? []);
+            return array_map(fn($value) => $row[$value], $headerColumns[$columnName] ?? []);
         }
 
-        return isset($headerColumns[$column]) ? $row[$headerColumns[$column][0]] : '';
+        return isset($headerColumns[$columnName]) ? $row[$headerColumns[$columnName][0]] : '';
     }
-
 }
