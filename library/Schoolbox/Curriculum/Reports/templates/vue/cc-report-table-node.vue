@@ -43,7 +43,7 @@ const isSingleNode = window.Vue.computed(
 
 // show the expand button when the node has children, and onlyShowGaps is not active
 const showExpandButton = window.Vue.computed(
-    () => props.node.children && props.node.children.length > 0 && !filtersStore.onlyShowGaps,
+    () => props.node.children && props.node.children.length > 0 && !props.node.isExpanded && !filtersStore.onlyShowGaps,
 );
 
 /**
@@ -62,7 +62,8 @@ function onTotalClicked(): void {
 const popOutStore = usePopOutStore();
 
 /**
- * When a unit column is clicked, open the pop out
+ * When a unit column is clicked, expand if there's children
+ * and open the pop out if there's any direct usages
  * @param course - the course that was clicked
  * @param unit - the unit that was clicked
  * @param buttonEl - the button that was clicked
@@ -77,18 +78,28 @@ function onUnitClicked(
     if (showExpandButton.value && !props.node.isExpanded) {
         nodesStore.toggleNodeExpand(props.node);
     }
+    // if there are no usages, don't open the pop out
+    if (getFilteredUnitColumnCount(props.node, course, unit, false) === 0) {
+        return;
+    }
     popOutStore.setActiveUnitColumn(course, unit, props.node, buttonEl);
 }
 
 /**
- * When a course column is clicked, open the pop out
+ * When a course column is clicked, expand if there's children
+ * and open the pop out if there's any direct usages
+ * @param course - the course that was clicked
  * @param buttonEl - the button that was clicked
  */
-function onCourseClicked(buttonEl: HTMLButtonElement): void {
+function onCourseClicked(course: CourseWithCurriculumNodeUsage, buttonEl: HTMLButtonElement): void {
     // expand the node if it has children and is not expanded
     // this is so the usage count only shows the count for the node and not its children
     if (showExpandButton.value && !props.node.isExpanded) {
         nodesStore.toggleNodeExpand(props.node);
+    }
+    // if there are no usages, don't open the pop out
+    if (getFilteredCourseColumnCount(props.node, course, false) === 0) {
+        return;
     }
     popOutStore.setActiveCourseColumn(buttonEl);
 }
@@ -161,7 +172,7 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
                                 : '',
                     }"
                     class="f-always-show usage-button"
-                    @click="(event) => onCourseClicked(event.target as HTMLButtonElement)"
+                    @click="(event) => onCourseClicked(course, event.target as HTMLButtonElement)"
                 >
                     {{ getFilteredCourseColumnCount(props.node, course, !props.node.isExpanded) }}
                 </button>
@@ -195,7 +206,7 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
             <!-- add the total course cell if there's multiple courses -->
             <template v-if="useCoursesStore().hasMultipleCourses">
                 <td v-if="props.node.hasNoUsages || course.hasNoTotalUsages">0</td>
-                <td v-else-if="props.node.children && !props.node.isExpanded" class="usage-cell">
+                <td v-else-if="showExpandButton" class="usage-cell">
                     <button class="f-always-show usage-button" @click="onTotalClicked">
                         {{ getFilteredCourseCount(props.node, course, !props.node.isExpanded) }}
                     </button>
