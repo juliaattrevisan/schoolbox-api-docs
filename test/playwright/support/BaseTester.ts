@@ -14,7 +14,6 @@ export default class BaseTester {
      * @returns The stdout from the command.
      * @throws { Error } If the command fails.
      */
-    // eslint-disable-next-line class-methods-use-this
     async runShellCommand(command: string): Promise<string> {
         // Try to run in vagrant if the schoolbox directory does not exist
         if (!existsSync("/usr/share/schoolbox") && !command.startsWith("vagrant ssh -c ")) {

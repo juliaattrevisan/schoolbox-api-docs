@@ -3,7 +3,6 @@ import QuizFeedback from "./quiz-feedback.vue";
 
 window.Vue.createApp({
     components: {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         QuizFeedback,
     },
 })
