@@ -40,21 +40,18 @@ class Factory
     public const SOURCE_NAME = 'suds_veracross';
 
 
-    /* Temporarily disabled
-     * I didn't find any data in the recent years
+    /**
+     * Get timetable classes occurring this far in the past
+     * Measured in months, defaults to -1 month
      */
-//    /**
-//     * Get timetable classes occurring this far in the past
-//     * Measured in months, defaults to -1 month
-//     */
-//    private const FROM = -1;
-//
-//
-//    /**
-//     * Get timetable classes up to this far into the future
-//     * Measured in months, defaults to 6 months
-//     */
-//    private const TO = 6;
+    private const FROM = -1;
+
+
+    /**
+     * Get timetable classes up to this far into the future
+     * Measured in months, defaults to 6 months
+     */
+    private const TO = 6;
 
 
     /**
@@ -114,14 +111,8 @@ class Factory
     {
         /* Schedule/SUDS Timetable: Date Range
          */
-//        $from = \Alaress_Date_Format::now()->addMonths(self::FROM);
-//        $to = \Alaress_Date_Format::now()->addMonths(self::TO);
-
-        /*  TODO For now, this 2016 year has timetabled data. Need a pilot school
-         *   for actual data, not manufactured tests
-         */
-        $from = \Alaress_Date_Format::newDatabaseDate('2016-08-01 00:00:00')->startOfDay();
-        $to =  \Alaress_Date_Format::newDatabaseDate('2017-02-01 00:00:00')->endOfDay();
+        $from = \Alaress_Date_Format::now()->addMonths(self::FROM);
+        $to = \Alaress_Date_Format::now()->addMonths(self::TO);
 
         /* Decide a timezone for all the UTC dates sis gives to us
          */
