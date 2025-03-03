@@ -127,7 +127,7 @@ class External_Synergetic_Sk_User extends External_Synergetic_User
 
                 /* A special appendage
                  */
-                if ('' !== trim((string)$row['StudentNonResidentFlag'])) {
+                if ($row['StudentNonResidentFlag'] ?? false) {
                     $student['StudentBoarder'] .= ' International Student';
                 }
 
