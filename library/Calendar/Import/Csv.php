@@ -89,21 +89,21 @@ class Csv extends Base
             // The CSV file will not contain character encoding info, so just assume a compatible encoding has been used.
             // Previously we stripped non-ASCII characters here, but users complained about loss of data.
 
-            $start_date = $this->getColumnValues($headerColumns, $thisRow, 'start date');
-            $start_time = $this->getColumnValues($headerColumns, $thisRow, 'start time');
-            $finish_date = $this->getColumnValues($headerColumns, $thisRow, 'finish date');
-            $finish_time = $this->getColumnValues($headerColumns, $thisRow, 'finish time');
-            $all_day = $this->getColumnValues($headerColumns, $thisRow, 'all day');
-            $name = $this->getColumnValues($headerColumns, $thisRow, 'name');
-            $detail = $this->getColumnValues($headerColumns, $thisRow, 'detail');
-            $location = $this->getColumnValues($headerColumns, $thisRow, 'location');
-            $event_type = $this->getColumnValues($headerColumns, $thisRow, 'type');
+            $start_date   = $this->getColumnValues($headerColumns, $thisRow, 'start date');
+            $start_time   = $this->getColumnValues($headerColumns, $thisRow, 'start time');
+            $finish_date  = $this->getColumnValues($headerColumns, $thisRow, 'finish date');
+            $finish_time  = $this->getColumnValues($headerColumns, $thisRow, 'finish time');
+            $all_day      = $this->getColumnValues($headerColumns, $thisRow, 'all day');
+            $name         = $this->getColumnValues($headerColumns, $thisRow, 'name');
+            $detail       = $this->getColumnValues($headerColumns, $thisRow, 'detail');
+            $location     = $this->getColumnValues($headerColumns, $thisRow, 'location');
+            $event_type   = $this->getColumnValues($headerColumns, $thisRow, 'type');
             $publish_date = $this->getColumnValues($headerColumns, $thisRow, 'publish date');
-            $attendance = $this->getColumnValues($headerColumns, $thisRow, 'attendance');
-            $folderIds = $this->getColumnValues($headerColumns, $thisRow, 'folderIds');
-            $campuses = $this->getColumnValues($headerColumns, $thisRow, 'campus', true);
-            $roles = $this->getColumnValues($headerColumns, $thisRow, 'role', true);
-            $owner = $this->getColumnValues($headerColumns, $thisRow, 'calendar owner');
+            $attendance   = $this->getColumnValues($headerColumns, $thisRow, 'attendance');
+            $folderIds    = $this->getColumnValues($headerColumns, $thisRow, 'folderIds');
+            $campuses     = $this->getColumnValues($headerColumns, $thisRow, 'campus', true);
+            $roles        = $this->getColumnValues($headerColumns, $thisRow, 'role', true);
+            $owner        = $this->getColumnValues($headerColumns, $thisRow, 'calendar owner');
 
             $cloneCampuses = $allCampuses;
             if ($hasCampusColumn) {
@@ -495,6 +495,12 @@ class Csv extends Base
         $this->setOutput($output);
     }
 
+    /**
+     * Finding the column index for all the headers
+     *
+     * @param array $headerColumns
+     * @return array
+     */
     private function getActualHeaderColumns(array $headerColumns): array
     {
         $actualHeaders = [];
@@ -504,6 +510,15 @@ class Csv extends Base
         return $actualHeaders;
     }
 
+    /**
+     * Find the values for each of the columns in the row
+     *
+     * @param $headerColumns
+     * @param $row
+     * @param $column
+     * @param $returnArray
+     * @return string|array
+     */
     private function getColumnValues($headerColumns, $row, $column, $returnArray = false): string|array
     {
         if ($returnArray) {
