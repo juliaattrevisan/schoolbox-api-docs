@@ -120,16 +120,32 @@ HELP;
                 /* Traverse each of the worktypes that were enabled and set their Graph
                  * option, so that users have it preselected upon migration
                  */
+                $hasChanges = false;
+
                 foreach ($decodedOptions['summary']['workType'] as $workTypeId => &$option) {
                     if (isset($decodedOptions['summary']['cohort']) && $decodedOptions['summary']['cohort']) {
                         $option['graph'] = 1;
+                        $hasChanges = true;
                     }
                 }
 
                 foreach ($decodedOptions['class']['workType'] as $workTypeId => &$option) {
                     if (isset($decodedOptions['class']['cohort']) && $decodedOptions['class']['cohort']) {
                         $option['graph'] = 1;
+                        $hasChanges = true;
                     }
+                }
+
+                /* Only persist if necessary
+                 */
+                if (!$hasChanges) {
+                    $this->getLogger()->info(sprintf(
+                        'Summative report "%s" (id %s) requires no changes; skipping',
+                        $report['title'],
+                        $report['id']
+                    ));
+
+                    continue;
                 }
 
                 /* Re-encode it
@@ -139,7 +155,7 @@ HELP;
                 /* Save it
                  */
                 $this->getLogger()->info(sprintf(
-                    'Updating report "%s" (%s) to preselect Graph',
+                    'Summative report "%s" (id %s) updated to preselect Graph',
                     $report['title'],
                     $report['id']
                 ));
