@@ -196,7 +196,8 @@
 
                 /* For Curriculum Progression, figure out what state we're in whenever a section is enabled
                  */
-                initialiseCurriculumProgression();
+                initialiseCurriculumProgression('summary');
+                initialiseCurriculumProgression('class');
             } else {
                 fieldsets.find('input:checkbox, input:text').each(function(index, checkbox) {
                     $(checkbox).prop('readonly', true);
@@ -286,7 +287,8 @@
 
         /* Detect initial conditions
          */
-        initialiseGraphCheckboxes();
+        initialiseGraphCheckboxes('summary');
+        initialiseGraphCheckboxes('class');
 
         /**
          * Graph checkbox disabled state depends on Show Distribution Graph checkbox
@@ -308,30 +310,23 @@
 
         /* Detect initial conditions
          */
-        initialiseCurriculumProgression();
+        initialiseCurriculumProgression('summary');
+        initialiseCurriculumProgression('class');
         applyCurriculumProgressionListeners();
 
         /**
          * Sets the default states of input elements for Curriculum Progression in both Summary
          * and Class sections
+         *
+         * @param type  "summary" or "class" depending on the section
          */
-        function initialiseCurriculumProgression() {
-            if (document.querySelector('#report-summary-enable-vic-progression').checked) {
-                document.querySelector('#report-summary-vic-progression-title').removeAttribute('readonly');
-                document.querySelector('#report-summary-vic-progression-worktype').removeAttribute('disabled');
+        function initialiseCurriculumProgression(type) {
+            if (document.querySelector('#report-' + type + '-enable-vic-progression').checked) {
+                document.querySelector('#report-' + type + '-vic-progression-title').removeAttribute('readonly');
+                document.querySelector('#report-' + type + '-vic-progression-worktype').removeAttribute('disabled');
             } else {
-                document.querySelector('#report-summary-vic-progression-title').setAttribute('readonly', 'true');
-                document.querySelector('#report-summary-vic-progression-worktype').setAttribute('disabled', 'true');
-            }
-
-            /* Detect initial conditions
-             */
-            if (document.querySelector('#report-class-enable-vic-progression').checked) {
-                document.querySelector('#report-class-vic-progression-title').removeAttribute('readonly');
-                document.querySelector('#report-class-vic-progression-worktype').removeAttribute('disabled');
-            } else {
-                document.querySelector('#report-class-vic-progression-title').setAttribute('readonly', 'true');
-                document.querySelector('#report-class-vic-progression-worktype').setAttribute('disabled', 'true');
+                document.querySelector('#report-' + type + '-vic-progression-title').setAttribute('readonly', 'true');
+                document.querySelector('#report-' + type + '-vic-progression-worktype').setAttribute('disabled', 'true');
             }
         }
 
@@ -342,23 +337,11 @@
          */
         function applyCurriculumProgressionListeners() {
             document.querySelector('#report-summary-enable-vic-progression').addEventListener('change', function(event) {
-                if (event.target.checked) {
-                    document.querySelector('#report-summary-vic-progression-title').removeAttribute('readonly');
-                    document.querySelector('#report-summary-vic-progression-worktype').removeAttribute('disabled');
-                } else {
-                    document.querySelector('#report-summary-vic-progression-title').setAttribute('readonly', 'true');
-                    document.querySelector('#report-summary-vic-progression-worktype').setAttribute('disabled', 'true');
-                }
+                initialiseCurriculumProgression('summary');
             });
 
             document.querySelector('#report-class-enable-vic-progression').addEventListener('change', function(event) {
-                if (event.target.checked) {
-                    document.querySelector('#report-class-vic-progression-title').removeAttribute('readonly');
-                    document.querySelector('#report-class-vic-progression-worktype').removeAttribute('disabled');
-                } else {
-                    document.querySelector('#report-class-vic-progression-title').setAttribute('readonly', 'true');
-                    document.querySelector('#report-class-vic-progression-worktype').setAttribute('disabled', 'true');
-                }
+                initialiseCurriculumProgression('class');
             });
         }
     });
