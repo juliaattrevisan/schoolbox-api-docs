@@ -162,7 +162,6 @@ class IndexBuilder extends BaseBuilder
         }
         $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding text boxes (with components)...');
-echo "Textbox/IndexBuilder->buildUpdates() throwing 'Bogus exception'.\n";
         throw new DatabaseException('Bogus exception');
         $query->execute($params);
         $this->logger->info(sprintf('Building search indices for %d text boxes (with components)', $query->rowCount()));

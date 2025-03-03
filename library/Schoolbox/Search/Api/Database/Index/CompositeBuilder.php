@@ -43,13 +43,16 @@ class CompositeBuilder implements IBuilder
         ?object $subject,
     ): iterable {
         foreach ($this->builders as $builder) {
+            /** @var BaseBuilder $builder */
             try {
                 $itemsGenerator = $builder->buildUpdates($fromDate, $toDate, $subject);
                 foreach ($itemsGenerator as $item) {
                     yield $item;
                 }
             } catch (DatabaseException $e) {
-                echo "Caught exception and continued.  Exception message " . $e->getMessage() . "\n";
+                $builder->getLogger()->error(
+                    "Caught exception and continued.  Exception message " . $e->getMessage()
+                );
                 continue;
             }
         }

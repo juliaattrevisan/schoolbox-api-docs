@@ -68,6 +68,14 @@ abstract class BaseBuilder implements IBuilder
     }
 
     /**
+     *
+     */
+    public function getLogger(): LoggerInterface
+    {
+        return $this->logger;
+    }
+
+    /**
      * Helper function for building an index object.
      *
      * @param string      $identifier
