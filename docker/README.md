@@ -27,13 +27,15 @@ within a self-contained development environment.
   ```shell
   sudo docker-compose up -d
   ```
-- from the CLI container, setup database and copy from Vagrant:
+- from the CLI container, setup database copied from Vagrant and reload
+  notification bindings:
   ```shell
   sudo docker exec -it schoolbox-cli /bin/bash
   cd /usr/share/schoolbox
   mariadb -h mariadb -u root < docker/schoolbox/sql/setup.sql
   mariadb -h mariadb -u root -D schoolbox < vagrantcache/schoolbox.sql
   mariadb -h mariadb -u root -D schoolbox < docker/schoolbox/sql/post-setup.sql
+  tools/notif/route/refresh-binding-cache.php
   ```
 - finagle file permissions for PHP-FPM:
   ```shell
