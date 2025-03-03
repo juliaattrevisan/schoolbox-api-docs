@@ -44,10 +44,10 @@
     /* Window load, set the default value for the date range */
     document.addEventListener('DOMContentLoaded', function() {
         document.querySelector('[data-restore-range]').value = '{{ restoreRange }}';
-    });
-    /* when the search window changes, reload the page */
-    document.querySelector('[data-restore-range]').addEventListener('change', function() {
-        window.location.replace(window.location.href + '?restoreRange=' + this.value);
+        /* when the search window changes, reload the page */
+        document.querySelector('[data-restore-range]').addEventListener('change', function() {
+            window.location.replace(window.location.href + '?restoreRange=' + this.value);
+        });
     });
 </script>
 {% endautoescape %}
