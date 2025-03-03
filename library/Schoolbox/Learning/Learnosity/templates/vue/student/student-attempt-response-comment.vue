@@ -5,6 +5,8 @@
 
 import { watchDebounced } from "@vueuse/core";
 import { timeout } from "@js/util/jsUtils";
+import { EditorToolbar } from "@js/editor/types/editorTypes";
+import { useEditor } from "@schoolboxVue/composables/editor/useEditor";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 
 interface Props {
@@ -14,7 +16,11 @@ interface Props {
 const props = defineProps<Props>();
 
 const editorId = `final-review-comment-${props.student.elementId}`;
-const comment = window.Vue.ref(props.student.attemptResponse.comment ?? "");
+const comment = useEditor(props.student.attemptResponse.comment ?? "", `#${editorId}`, {
+    targetElements: [`#${editorId}`],
+    hasTokens: true,
+    toolbar: EditorToolbar.COMMENT_AI,
+});
 const isSaving = window.Vue.ref(false);
 const hasSaved = window.Vue.ref(false);
 const hasError = window.Vue.ref(false);
