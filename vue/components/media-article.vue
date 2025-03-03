@@ -50,12 +50,12 @@ function getContent(): string {
 async function initMediaElementPlayer(): Promise<void> {
     const $el = window.jQuery(articleEl.value as HTMLElement);
     // @ts-expect-error - schoolboxResource is available here, but untyped.
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- see above
     $.fn.schoolboxResource_ReplaceAll($el);
 
     await window.Vue.nextTick(() => {
         // @ts-expect-error - schoolboxResource is available here, but untyped.
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- see above
         $.fn.schoolboxResource_InitialiseMediaElementPlayer($el);
     });
 }

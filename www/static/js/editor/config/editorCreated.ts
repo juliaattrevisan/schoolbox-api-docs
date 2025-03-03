@@ -43,7 +43,7 @@ function removeValidation(): void {
         // @ts-expect-error - ignore the error as we're using jquery
         if ($(this).data("validator")) {
             // @ts-expect-error - ignore the error as we're using jquery
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- see above
             $(this).data("validator").settings.ignore = ".ck";
         }
     });

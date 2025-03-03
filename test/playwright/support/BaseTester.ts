@@ -70,9 +70,9 @@ export default class BaseTester {
      * Create an "I am going to " comment for debugging
      * @param argumentation - The message to log
      */
-    // eslint-disable-next-line class-methods-use-this
+    // eslint-disable-next-line class-methods-use-this -- This is intentionally used as a non-static method for readability
     isGoingTo(argumentation: string): void {
-        // eslint-disable-next-line no-console
+        // eslint-disable-next-line no-console -- logs in playwright correctly, so console.log is acceptable
         console.log("I am going to", argumentation);
     }
 }

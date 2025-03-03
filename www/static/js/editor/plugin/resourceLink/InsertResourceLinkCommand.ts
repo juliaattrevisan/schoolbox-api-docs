@@ -57,7 +57,7 @@ export default class InsertResourceLinkCommand extends Command {
          * Fire of the jQuery plugin to display the resource modal
          */
         // @ts-expect-error -- This is a custom jQuery plugin, so it won't be found in the types
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- see above
         $.fn.schoolboxResource({
             allowedFilesystems: "link",
             allowedFiles: null,
@@ -82,7 +82,7 @@ export default class InsertResourceLinkCommand extends Command {
      */
     closeModal(): void {
         // @ts-expect-error -- jquery plugin
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- see above
         $("#file-picker").foundation("reveal", "close");
         this.set("isOn", false);
     }
@@ -126,7 +126,7 @@ export default class InsertResourceLinkCommand extends Command {
      */
     onResourceReturned(event: MessageEvent): void {
         // Disable eslint checks for this function, since it is integrating with jquery.modal.js and untyped
-        /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access */
+        /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access -- see above */
         let message;
         try {
             message = JSON.parse(event.data);
@@ -156,6 +156,6 @@ export default class InsertResourceLinkCommand extends Command {
         } else {
             // Connecting to your Google Drive (event is fired when the drive is first accessed)
         }
-        /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access */
+        /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access -- re-enable those rules */
     }
 }

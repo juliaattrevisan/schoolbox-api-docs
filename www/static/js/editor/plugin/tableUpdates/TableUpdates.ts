@@ -142,7 +142,7 @@ export default class TableUpdates extends Plugin {
                 const hasBorderStyles = cells.some(
                     (cell) =>
                         // @ts-expect-error -- accessing a private property is intentional here, for now...
-                        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access -- see above
                         cell._attrs.has("tableCellBorderStyle") && cell._attrs.get("tableCellBorderStyle") !== "none",
                 );
                 if (hasBorderStyles) {
@@ -178,7 +178,7 @@ export default class TableUpdates extends Plugin {
     setCellBorders(): void {
         const cells = this.getCellElements();
         // @ts-expect-error -- accessing a private property is intentional here, for now...
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access -- see above
         const filteredCells = cells.filter((cell) => !cell._attrs.has("tableCellBorderStyle")); // to update only newly inserted cells
         this.editor.model.change((writer) => {
             filteredCells.forEach((cell) => {

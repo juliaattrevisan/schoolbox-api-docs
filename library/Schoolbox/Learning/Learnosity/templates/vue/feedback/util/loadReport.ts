@@ -29,14 +29,14 @@ export function loadReport(initOptions: LearnosityReportInitOptions, hasMarkVisi
             reportCallback = {
                 readyListener: (): void => {
                     // @ts-expect-error -- reportsApp is global but untyped, this should be investigated at some point to determine if we can get this from learnosity
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-use-before-define
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-use-before-define -- see above
                     const attemptReport = (reportsApp as unknown).getReport(reportId);
                     // itemsApi only spawns if you used session-detail-by-item
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access -- see above
                     attemptReport.on("ready:itemsApi", (itemsApp: unknown) => {
                         // Load the items for the student
                         // @ts-expect-error -- itemsApp is global but untyped, this should be investigated at some point to determine if we can get this from learnosity
-                        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+                        // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- see above
                         itemsApp.getItems(($items: object) => {
                             const items: StudentItem[] = [];
                             // grab each item object and push it into the items array
@@ -63,6 +63,6 @@ export function loadReport(initOptions: LearnosityReportInitOptions, hasMarkVisi
     }
     // Initialise reports for each attempt
     // @ts-expect-error -- LearnosityReports is global but untyped, this should be investigated at some point to determine if we can get this from learnosity
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call -- see above
     const reportsApp = (LearnosityReports as unknown).init(initOptions, reportCallback);
 }
