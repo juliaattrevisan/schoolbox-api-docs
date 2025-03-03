@@ -2,9 +2,8 @@
  * Handles the store add a new subsection to an existing node
  */
 
-/* eslint-disable import/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
-
 import { defineStore } from "pinia";
+/* eslint-disable-next-line import/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
 import { useActiveNodeStore } from "@schoolboxCurriculum/vue/manageCurriculum/activeNode/store/mcActiveNodeStore";
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/selectedNodes/store/mcSelectedNodesStore";
 import type { Node } from "@schoolboxCurriculum/types/Node";
