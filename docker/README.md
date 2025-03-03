@@ -42,4 +42,9 @@ within a self-contained development environment.
   sudo docker exec -it php-fpm \
     chown -R www-data:www-data /var/lib/schoolbox/vagrantx/{cache,storage,twig,purifier}
   ```
+- finagle hostname for taskd, and add it to `/etc/hosts`
+  ```shell
+  sudo docker exec -it schoolbox-taskd /bin/sh
+  getent hosts caddy | cut -f1 -d' ' | sed 's/$/ docker.dev.schoolbox.cloud/' >> /etc/hosts
+  ```
 - finally, visit https://docker.dev.schoolbox.cloud:8443

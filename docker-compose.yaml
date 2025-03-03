@@ -144,6 +144,9 @@ services:
       context: ./docker/schoolbox-taskd
     environment:
       REDIS_HOST: redis-storage
+    # Attempt to map caddy to docker.dev.schoolbox.cloud IP
+#    extra_hosts:
+#      - 'docker.dev.schoolbox.cloud=caddy'
 
   schoolbox-gotenberg:
     container_name: schoolbox-gotenberg
