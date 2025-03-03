@@ -35,6 +35,7 @@ export interface SbxEditorConfig {
     addMaxCharCountDefaultEventListeners?: boolean; // Whether to add the default event listeners for dealing with events relating to max char count.
     showWordCount?: boolean; // whether or not to show the word count
     fileBrowserCategoryId?: number; // to traverse directly to a specific folder in the Resources section of the resource modal
+    mirrorChangeEvents?: boolean; // whether or not to mirror the change events back to the source element
 }
 
 /**
