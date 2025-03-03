@@ -403,7 +403,7 @@ class Validator
             case 'repeat_until':
                 // Always date only.
                 $acceptedFormats[] = $this->locale->localShortFormat(); // Required by calendar/event/create and modify pages.
-                $acceptedFormats[] = DateTimeInterface::RFC3339;
+                $acceptedFormats[] = Alaress_Date_Format::DATABASE_DATE_FORMAT;
                 break;
             case 'publishDate':
                 // Always datetime.
