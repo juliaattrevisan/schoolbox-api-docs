@@ -79,9 +79,18 @@ if ($surveyHandler->isOwner($this->arg[0])) {
  */
 $numAttempts = $attemptHandler->userHasAttempted($survey['assess_id'], $_SESSION['id']);
 $attempt = $attemptHandler->getLatestResumableForUser($survey['assess_id'], $_SESSION['id']);
-$attemptStartTime     = ($attempt['start'] ? strtotime($attempt['start']) : $_SERVER['REQUEST_TIME']);
+
+/* Attempt might have been deleted after you started.
+ * I guess this is the same verbiage as quiz...
+ */
+if (!$attempt) {
+    error(118);
+}
+
+$attemptStartTime = ($attempt['start'] ? strtotime($attempt['start']) : $_SERVER['REQUEST_TIME']);
 $attemptTimeRemaining = $attemptStartTime + $survey['duration'] - $_SERVER['REQUEST_TIME'];
 $attemptEndTime = $attemptStartTime + $survey['duration'];
+
 /* Redirect back to the homepage if you've reached the end, or had
  * your attempt_id cleared from the session
  *
