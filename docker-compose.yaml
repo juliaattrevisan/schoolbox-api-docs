@@ -89,7 +89,10 @@ services:
 
   rabbitmq:
     container_name: rabbitmq
-    image: rabbitmq:3.13
+    build:
+      context: ./docker/rabbitmq
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
 #    networks:
 #      - private
 
@@ -131,6 +134,8 @@ volumes:
   redis-storage-data:
 
   redis-cache-data:
+
+  rabbitmq-data:
 
   # Volume for storage:
   # consider mounting only this folder, rather than all of cache?
