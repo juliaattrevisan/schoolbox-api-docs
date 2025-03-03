@@ -69,6 +69,7 @@ $app = new class extends CliTool\App
 Summative Report
 
 Preselects the "Graph" checkbox if you enabled "Show" for a given worktype.
+This always runs in Perform mode.
 
 Usage: 01-graph-preselect.php
 
@@ -114,10 +115,7 @@ HELP;
                 /* Awkwardly, the summative report instance required you to have a
                  * hydrated instance to decode the options payload
                  */
-                $summativeReport = (new Schoolbox\Admin\SummativeReport\Model())
-                    ->setOptions($report['options']);
-
-                $decodedOptions = $summativeReport->decode();
+                $decodedOptions = json_decode($report['options'], true, 512, JSON_THROW_ON_ERROR);
 
                 /* Traverse each of the worktypes that were enabled and set their Graph
                  * option, so that users have it preselected upon migration
@@ -153,7 +151,6 @@ HELP;
             return;
         }
 
-
         /* Announce conclusion
          */
         if (!$this->perform()) {
@@ -161,7 +158,7 @@ HELP;
         }
 
         /* Announce lock release
-          */
+         */
         $this->getLogger()->debug('Releasing lock');
 
         $lock->release();

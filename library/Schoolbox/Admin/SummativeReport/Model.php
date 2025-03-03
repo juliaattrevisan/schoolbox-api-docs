@@ -78,7 +78,7 @@ class Model implements ISoftDeletable
     public function decode(): ?array
     {
         $optionsPayload = json_decode($this->getOptions(), true, 512, JSON_THROW_ON_ERROR);
-print_r($optionsPayload);
+
         /* Bad data or couldn't decode, for some obscure reason
          * Kind of common with third parties, more so than us
          */
