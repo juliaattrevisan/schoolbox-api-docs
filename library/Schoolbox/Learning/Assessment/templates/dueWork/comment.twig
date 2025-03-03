@@ -47,7 +47,7 @@
                 targetElements: ["#comment-{{ participant.user.id }}"],
                 hasTokens: true,
                 showWordCount: true,
-                toolbar: "comment_ai",
+                toolbar: {% if selfAssessment %}"comment"{% else %}"comment_ai"{% endif %},
                 mirrorChangeEvents: true, // To keep jquery.dynamic-feedback.js in sync
             },
         }),
