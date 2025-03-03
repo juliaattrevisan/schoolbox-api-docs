@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\Textbox;
 
 use Alaress_Date_Format;
+use Alaress\Database\Exception as DatabaseException;
 use Component_Config;
 use Component_Config_Componentname;
 use Component_Instance;
@@ -161,6 +162,8 @@ class IndexBuilder extends BaseBuilder
         }
         $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding text boxes (with components)...');
+echo "Textbox/IndexBuilder->buildUpdates() throwing 'Bogus exception'.\n";
+        throw new DatabaseException('Bogus exception');
         $query->execute($params);
         $this->logger->info(sprintf('Building search indices for %d text boxes (with components)', $query->rowCount()));
         foreach ($query as $row) {

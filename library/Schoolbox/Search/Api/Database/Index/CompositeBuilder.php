@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\Index;
 
 use Alaress_Date_Format;
+use Alaress\Database\Exception as DatabaseException;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -42,8 +43,14 @@ class CompositeBuilder implements IBuilder
         ?object $subject,
     ): iterable {
         foreach ($this->builders as $builder) {
-            foreach ($builder->buildUpdates($fromDate, $toDate, $subject) as $item) {
-                yield $item;
+            try {
+                $itemsGenerator = $builder->buildUpdates($fromDate, $toDate, $subject);
+                foreach ($itemsGenerator as $item) {
+                    yield $item;
+                }
+            } catch (DatabaseException $e) {
+                echo "Caught exception and continued.  Exception message " . $e->getMessage() . "\n";
+                continue;
             }
         }
     }
