@@ -1234,6 +1234,7 @@ class Controller extends Base
         $audienceSegments = [];
 
         $codec = new Audience\Segment\Codec();
+        $access = Access::getInstance();
 
         $translator = new Audience\Segment\Translator(
             $this->databaseInternal,
@@ -1249,15 +1250,29 @@ class Controller extends Base
                 continue;
             }
 
+            // store this, so we can reuse and not need to fetch when we clear the id (if the user has no access)
+            $segmentName = $translator->getSegmentName($segment);
+
+            /**
+             * check if this is a folder, and if the user has access to it
+             * if no access, remove the folder id, so we hide the link.
+             */
+            if (
+                'folder' === $segment->getEntityType() &&
+                !$access->getFolderAccess($this->getUser(), (int)$segment->getEntityValue())
+            ) {
+                $segment->setEntityValue(null);
+            }
+
             // Selectize will use 'value' and 'label' to index and display selected items in default rendering.
             // Labels are used in brick rendering
-            $option = new Audience\SegmentSelectizeOption($codec->encode($segment), $translator->getSegmentName($segment));
+            $option = new Audience\SegmentSelectizeOption($codec->encode($segment), $segmentName);
 
             // We must include the friendly name for each value so that bricks can display extra meta about their component segments.
             if ($segment->isSimple()) {
                 $encodedValue = $codec->encodeValue($segment->getEntityValue());
 
-                $option->addLabel($segment->getEntityType(), $encodedValue, $translator->getSegmentName($segment));
+                $option->addLabel($segment->getEntityType(), $encodedValue, $segmentName);
             } else {
                 foreach ($segment->getChildren() as $child) {
                     $encodedValue = $codec->encodeValue($child->getEntityValue());
