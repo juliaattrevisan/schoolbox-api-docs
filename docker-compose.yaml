@@ -67,6 +67,9 @@ services:
   redis-storage:
     container_name: redis-storage
     image: redis:7.4
+    volumes:
+      - redis-storage-config:/usr/local/etc/redis
+      - redis-storage-data:/var/lib/redis
 #    ports:
 #      - '6379:6379'
 #    networks:
@@ -75,6 +78,8 @@ services:
   redis-cache:
     container_name: redis-cache
     image: redis:7.4
+    volumes:
+      - redis-cache-config:/usr/local/etc/redis
 #    ports:
 #      - '6380:6379'
 #    networks:
@@ -121,6 +126,8 @@ volumes:
   # mounted outside of filesystem
   mariadb-data:
 
+  redis-storage-data:
+
   # Volume for storage:
   # consider mounting only this folder, rather than all of cache?
   storage:
@@ -149,3 +156,15 @@ volumes:
       type: none
       o: bind
       device: ./docker/caddy/config
+
+  redis-storage-config:
+    driver_opts:
+      type: none
+      o: bind
+      device: ./docker/redis-storage/config
+
+  redis-cache-config:
+    driver_opts:
+      type: none
+      o: bind
+      device: ./docker/redis-cache/config
