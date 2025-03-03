@@ -127,7 +127,21 @@
                     <section class="content">
                         <input type="hidden" name="studentId" value="{{ student.id }}"/>
                         <input type="hidden" name="categoryId" value="{{ subject.id }}"/>
-                        <textarea name="comment" rows="3"></textarea>
+                        <textarea id="grades-comment-{{ student.id }}" name="comment" rows="3"></textarea>
+                        <script type="text/javascript" src='{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}'></script>
+                        <script>
+                            document.dispatchEvent(
+                                new CustomEvent("EDITOR__CREATE", {
+                                    detail: {
+                                        targetElements: ["#grades-comment-{{ student.id }}"],
+                                        hasTokens: true,
+                                        showWordCount: true,
+                                        toolbar: "comment_ai",
+                                        mirrorChangeEvents: true, // To keep jquery.alaressValidate.js in sync
+                                    },
+                                }),
+                            );
+                        </script>
                         <div class="row">
                             {% if USER.role.isStaff %}
                                 <div class="small-3 medium-3 column">
