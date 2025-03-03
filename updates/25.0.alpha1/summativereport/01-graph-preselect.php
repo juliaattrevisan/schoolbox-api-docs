@@ -121,11 +121,15 @@ HELP;
                  * option, so that users have it preselected upon migration
                  */
                 foreach ($decodedOptions['summary']['workType'] as $workTypeId => &$option) {
-                    $option['graph'] = 1;
+                    if (isset($decodedOptions['summary']['cohort']) && $decodedOptions['summary']['cohort']) {
+                        $option['graph'] = 1;
+                    }
                 }
 
                 foreach ($decodedOptions['class']['workType'] as $workTypeId => &$option) {
-                    $option['graph'] = 1;
+                    if (isset($decodedOptions['class']['cohort']) && $decodedOptions['class']['cohort']) {
+                        $option['graph'] = 1;
+                    }
                 }
 
                 /* Re-encode it
