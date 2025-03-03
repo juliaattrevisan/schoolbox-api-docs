@@ -43,7 +43,7 @@ const isSingleNode = window.Vue.computed(
 
 // show the expand button when the node has children, and onlyShowGaps is not active
 const showExpandButton = window.Vue.computed(
-    () => props.node.children && props.node.children.length > 0 && !props.node.isExpanded && !filtersStore.onlyShowGaps,
+    () => props.node.children && props.node.children.length > 0 && !filtersStore.onlyShowGaps,
 );
 
 // whether the cell can also be used to expand the node
