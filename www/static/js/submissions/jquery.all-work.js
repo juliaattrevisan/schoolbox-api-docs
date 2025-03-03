@@ -82,7 +82,7 @@
          * @param targetId The ID of the <textarea> element to attach the editor to
          */
         function setupRichTextEditor(targetId) {
-=            document.dispatchEvent(
+            document.dispatchEvent(
                 new CustomEvent("EDITOR__CREATE", {
                     detail: {
                         targetElements: [`#${targetId}`],
