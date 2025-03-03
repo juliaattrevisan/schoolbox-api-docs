@@ -273,11 +273,51 @@
             }
         });
 
+        /* Graph checkbox disabled state depends on Show Distribution Graph checkbox
+         */
+        document.querySelector('#report-summary-show-cohort').addEventListener('change', function() {
+            initialiseGraphCheckboxes();
+        });
+
+        document.querySelector('#report-class-show-cohort').addEventListener('change', function() {
+            initialiseGraphCheckboxes();
+        });
+
+
+        /* Detect initial conditions
+         */
+        initialiseGraphCheckboxes();
+
+        /**
+         * Graph checkbox disabled state depends on Show Distribution Graph checkbox
+         */
+        function initialiseGraphCheckboxes() {
+            if (document.querySelector('#report-summary-show-cohort').checked) {
+                document.querySelectorAll('[data-summary-worktype-graph]').forEach(function(element) {
+                    element.removeAttribute('disabled');
+                });
+            } else {
+                document.querySelectorAll('[data-summary-worktype-graph]').forEach(function(element) {
+                    element.setAttribute('disabled', 'true');
+                });
+            }
+
+            if (document.querySelector('#report-class-show-cohort').checked) {
+                document.querySelectorAll('[data-class-worktype-graph]').forEach(function(element) {
+                    element.removeAttribute('disabled');
+                });
+            } else {
+                document.querySelectorAll('[data-class-worktype-graph]').forEach(function(element) {
+                    element.setAttribute('disabled', 'true');
+                });
+            }
+        }
+
+
         /* Detect initial conditions
          */
         initialiseCurriculumProgression();
         applyCurriculumProgressionListeners();
-
 
         /**
          * Sets the default states of input elements for Curriculum Progression in both Summary
