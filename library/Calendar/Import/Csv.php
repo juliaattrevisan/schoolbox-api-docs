@@ -393,7 +393,7 @@ class Csv extends Base
             // been set in the object
             if (empty($folderList)) {
                 $folderList = [];
-                foreach (explode(',', $folderIds ?? '') as $folderId) {
+                foreach (explode(',', $folderIds) as $folderId) {
                     // Empty folder ID: just ignore
                     if ($folderId === '') {
                         continue;
