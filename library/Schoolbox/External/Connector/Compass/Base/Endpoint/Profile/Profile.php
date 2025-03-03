@@ -816,7 +816,7 @@ class Profile implements IStrategy
             if ($this->helper->matchesHost($organisationMilestone['organisationName'])) {
                 if ((int)$organisationMilestone['isActive'] && (int)$organisationMilestone['isCurrent']) {
                     if ('' !== trim((string)$organisationMilestone[$field])) {
-                        return (string)$organisationMilestone[$field];
+                        return trim((string)$organisationMilestone[$field]);
                     }
                 }
             }
