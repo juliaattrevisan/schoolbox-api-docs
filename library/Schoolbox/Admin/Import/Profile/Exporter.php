@@ -25,7 +25,6 @@ use Schoolbox\Mapper;
  */
 class Exporter
 {
-
     /**
      * Export type
      * One of [student, staff, parent, relationship]
