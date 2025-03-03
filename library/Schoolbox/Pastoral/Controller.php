@@ -539,8 +539,8 @@ class Controller extends Base
                 )?->getUsingFormat('d/m/Y'), TypeAbstract::PASTORAL_EXPIRY),
                 'canCreate'             => $this->getConfigLoader()->get('pastoral_create_tag_enable'),
                 // only pastoral moderators with 'moderate' or 'write' access can modify default expiry and point settings
-                'canModifyDefaults'     => $this->getUser()->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL)
-                                            || $this->getUser()->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_WRITE),
+                'canModifyDefaults'     => $this->user->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL)
+                                            || $this->user->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_WRITE),
                 'moderator'             => $moderator,
                 'attachzonePublic'      => $this->getAttachZone(self::ATTACHZONE_PUBLIC, $record),
                 'attachzonePrivate'     => $this->getAttachZone(self::ATTACHZONE_PRIVATE, $record),
