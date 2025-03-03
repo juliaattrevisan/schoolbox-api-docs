@@ -69,16 +69,14 @@ class GroupController extends Component_Dashboard_ControllerAbstract
         foreach ($allFolders as $folder) {
             $muted = $rerouteOverrideMapper->isRouteMuted((string)$folder->getId(), $this->getUser()->getId());
 
-            /* If you muted this folder, but Force Follow was enabled,
-             * include this folder - you're voluntold to know about it
-             */
-            if ($muted && $folder->getGroup()->getForceFollow()) {
+            if ($folder->getGroup()->getForceFollow()) {
+                /* If you muted this folder, but Force Follow was enabled,
+                 * include this folder - you're voluntold to know about it
+                 */
                 $filteredFolders->add($folder);
-            }
-
-            /* Otherwise, if you haven't muted it, include this folder
-             */
-            if (!$muted) {
+            } elseif (!$muted) {
+                /* Otherwise, if you haven't muted it, include this folder
+                 */
                 $filteredFolders->add($folder);
             }
         }
