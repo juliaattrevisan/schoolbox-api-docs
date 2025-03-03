@@ -1,5 +1,6 @@
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import type { Page } from "@playwright/test";
+import { expect } from "@playwright/test";
 
 export default class ProfilePage {
     private tester: AcceptanceTester;
@@ -7,6 +8,8 @@ export default class ProfilePage {
     private page: Page;
 
     static readonly URL = "/search/user/{id}";
+
+    static readonly DATA_TEST_PROFILE_NAME = "user-profile-name";
 
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
@@ -73,5 +76,13 @@ export default class ProfilePage {
 
     async clickBadgeAchievementDropdown(badgeId: number): Promise<void> {
         await this.page.getByTestId(`sbx-pop-out-header-options-1-${badgeId}-achievement`).click();
+    }
+    /**
+     * Sets visibility
+     * @param fieldName Check the field name is presented
+     */
+
+    async checkFieldNameIsPresented(fieldName: string): Promise<void> {
+        await expect(this.page.getByTestId(ProfilePage.DATA_TEST_PROFILE_NAME)).toHaveText(fieldName);
     }
 }
