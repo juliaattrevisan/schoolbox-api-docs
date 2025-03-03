@@ -69,7 +69,7 @@ services:
     image: redis:7.4
     volumes:
       - redis-storage-config:/usr/local/etc/redis
-      - redis-storage-data:/var/lib/redis
+      - redis-storage-data:/data
 #    ports:
 #      - '6379:6379'
 #    networks:
@@ -80,6 +80,7 @@ services:
     image: redis:7.4
     volumes:
       - redis-cache-config:/usr/local/etc/redis
+      - redis-cache-data:/data
 #    ports:
 #      - '6380:6379'
 #    networks:
@@ -127,6 +128,8 @@ volumes:
   mariadb-data:
 
   redis-storage-data:
+
+  redis-cache-data:
 
   # Volume for storage:
   # consider mounting only this folder, rather than all of cache?
