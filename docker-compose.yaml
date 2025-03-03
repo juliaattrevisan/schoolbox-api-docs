@@ -24,6 +24,7 @@ services:
       - cache:/var/lib/schoolbox
       - schoolbox-config:/etc/schoolbox
       # Instead include configs in image?
+      - ./docker/php-fpm/config/99-error-reporting.ini:/usr/local/etc/php/conf.d/99-error-reporting.ini
       - ./docker/php-fpm/config/99-xdebug.ini:/usr/local/etc/php/conf.d/99-xdebug.ini
       - ./docker/php-fpm/config/99-session.ini:/usr/local/etc/php/conf.d/99-session.ini
     # After building: make cache mount writable by www-data
