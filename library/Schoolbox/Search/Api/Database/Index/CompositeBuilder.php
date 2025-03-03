@@ -51,7 +51,7 @@ class CompositeBuilder implements IBuilder
                 }
             } catch (DatabaseException $e) {
                 $builder->getLogger()->error(
-                    "Caught exception and continued.  Exception message: " . $e->getMessage()
+                    'Could not build updates using ' . get_class($builder) . '.  Exception message: ' . $e->getMessage()
                 );
                 continue;
             }
