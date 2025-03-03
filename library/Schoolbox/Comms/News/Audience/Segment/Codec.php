@@ -78,10 +78,10 @@ class Codec
     /**
      * Takes a value string $value and encodes it
      *
-     * @param mixed $value
+     * @param null|string $value
      * @return string
      */
-    public function encodeValue(mixed $value): string
+    public function encodeValue(?string $value): string
     {
         // This scheme supports at least the following values:
         // [':', ',', null, 'null', '1', '', 1, '"', "'", '\\', '/', '<', '&', '!@*(@*#&)!+_!+!@']
