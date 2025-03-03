@@ -10,10 +10,6 @@ within a self-contained development environment.
   ```
   127.0.0.1 docker.dev.schoolbox.cloud
   ```
-- create the mounted folders if they don't already exist:
-  ```shell
-  mkdir -p db-data
-  ```
 - `vagrant provision` as per normal: we'll need the database
 - extract the files from the provisioned dataset to the mount folder:
   ```shell
@@ -42,6 +38,6 @@ within a self-contained development environment.
 - finagle file permissions for PHP-FPM:
   ```shell
   sudo docker exec -it php-fpm \
-    chown -R www-data:www-data /var/lib/schoolbox/{cache,storage,twig,purifier}
+    chown -R www-data:www-data /var/lib/schoolbox/vagrantx/{cache,storage,twig,purifier}
   ```
 - finally, visit https://docker.dev.schoolbox.cloud:8443

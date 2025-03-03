@@ -56,7 +56,7 @@ services:
     container_name: mariadb
     image: mariadb:11.4
     volumes:
-      - db-data:/var/lib/mysql
+      - mariadb-data:/var/lib/mysql
     environment:
       MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: 1
 #    expose:
@@ -117,14 +117,9 @@ volumes:
       o: bind
       device: ./
 
-  # Volume for database:
-  # consider mounting something outside code volume?
-  # Does it even need a folder?
-  db-data:
-    driver_opts:
-      type: none
-      o: bind
-      device: ./db-data
+  # Volume for database data:
+  # mounted outside of filesystem
+  mariadb-data:
 
   # Volume for storage:
   # consider mounting only this folder, rather than all of cache?
