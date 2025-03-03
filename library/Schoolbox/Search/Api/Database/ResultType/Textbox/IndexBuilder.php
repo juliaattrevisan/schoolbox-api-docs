@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\Textbox;
 
 use Alaress_Date_Format;
-use Alaress\Database\Exception as DatabaseException;
 use Component_Config;
 use Component_Config_Componentname;
 use Component_Instance;
