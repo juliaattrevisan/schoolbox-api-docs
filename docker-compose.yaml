@@ -137,15 +137,18 @@ services:
       - code:/usr/share/schoolbox
       - cache:/var/lib/schoolbox
       - schoolbox-config:/etc/schoolbox
-#  schoolbox-socketd:
-#    image : ubuntu:jammy
-#
-#  schoolbox-taskd:
-#    image: alaress/taskd:latest
-#
-#  gotenberg:
-#    image: gotenberg/gotenberg:7
-#
+
+  schoolbox-taskd:
+    container_name: schoolbox-taskd
+    build:
+      context: ./docker/schoolbox-taskd
+    environment:
+      REDIS_HOST: redis-storage
+
+  schoolbox-gotenberg:
+    container_name: schoolbox-gotenberg
+    image: gotenberg/gotenberg:7
+
 #  etherpad:
 #    image: schoolbox/epl:latest
 
