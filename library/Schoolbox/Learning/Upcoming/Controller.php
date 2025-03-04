@@ -371,7 +371,8 @@ class Controller extends Base
                 $this->assessmentDataSource,
                 $visibility,
                 $this->assessmentIdFinder,
-                $filterByClassName
+                $filterByClassName,
+                $this->getConfigLoader()
             ),
             $start,
             $end,

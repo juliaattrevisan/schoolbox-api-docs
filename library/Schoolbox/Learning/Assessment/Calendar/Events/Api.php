@@ -22,8 +22,8 @@ use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
+use Schoolbox\IConfigLoader;
 use UnexpectedValueException;
-use Schoolbox\Config\Loader as ConfigLoader;
 
 /**
  * Implementation of the calendar API for the assessment calendar.
@@ -61,6 +61,11 @@ class Api implements Calendar_Api_EventType_Interface
     private $viewer;
 
     /**
+     * @var IConfigLoader
+     */
+    private $config;
+
+    /**
      * Constructor
      *
      * @param User                 $user
@@ -69,6 +74,7 @@ class Api implements Calendar_Api_EventType_Interface
      * @param null|Visibility      $visibility
      * @param IdFinder             $assessmentIdFinder
      * @param array                $filters
+     * @param IConfigLoader        $config
      */
     public function __construct(
         User $user,
@@ -76,7 +82,8 @@ class Api implements Calendar_Api_EventType_Interface
         AssessmentDataSource $assessmentDataSource,
         ?Visibility $visibility,
         IdFinder $assessmentIdFinder,
-        array $filters
+        array $filters,
+        IConfigLoader $config
     ) {
         $this->assessmentDataSource = $assessmentDataSource;
         $this->visibility           = $visibility;
@@ -84,6 +91,7 @@ class Api implements Calendar_Api_EventType_Interface
         $this->user                 = $user;
         $this->viewer               = $viewer;
         $this->filters              = $filters;
+        $this->config               = $config;
     }
 
 
@@ -121,7 +129,7 @@ class Api implements Calendar_Api_EventType_Interface
              */
             $isParentOfUser = $this->viewer->isParentOf($this->user);
             $isLessonPlan = $assessment instanceof LessonPlan;
-            $isRestrictLessonPlanAccess = ConfigLoader::getInstance()->get("restrict_parent_lesson_plan_access");
+            $isRestrictLessonPlanAccess = $this->config->get("restrict_parent_lesson_plan_access");
             if ($isParentOfUser && $isLessonPlan && $isRestrictLessonPlanAccess) {
                 continue;
             }
