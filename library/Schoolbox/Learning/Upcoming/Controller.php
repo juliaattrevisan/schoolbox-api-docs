@@ -367,6 +367,7 @@ class Controller extends Base
         $calendar = new Renderer(
             new Api(
                 $student,
+                $this->getUser(),
                 $this->assessmentDataSource,
                 $visibility,
                 $this->assessmentIdFinder,

@@ -55,9 +55,15 @@ class Api implements Calendar_Api_EventType_Interface
     private $user;
 
     /**
+     * @var User
+     */
+    private $viewer;
+
+    /**
      * Constructor
      *
      * @param User                 $user
+     * @param User                 $viewer
      * @param AssessmentDataSource $assessmentDataSource
      * @param null|Visibility      $visibility
      * @param IdFinder             $assessmentIdFinder
@@ -65,6 +71,7 @@ class Api implements Calendar_Api_EventType_Interface
      */
     public function __construct(
         User $user,
+        User $viewer,
         AssessmentDataSource $assessmentDataSource,
         ?Visibility $visibility,
         IdFinder $assessmentIdFinder,
@@ -74,6 +81,7 @@ class Api implements Calendar_Api_EventType_Interface
         $this->visibility           = $visibility;
         $this->assessmentIdFinder   = $assessmentIdFinder;
         $this->user                 = $user;
+        $this->viewer               = $viewer;
         $this->filters              = $filters;
     }
 
@@ -110,7 +118,7 @@ class Api implements Calendar_Api_EventType_Interface
              * If a parent is viewing, they should only see their child's lesson plans
              * if the restrict_parent_lesson_plan_access config setting is enabled
              */
-            $isParentOfUser = $_SESSION['user']->isParentOf($this->user);
+            $isParentOfUser = $this->viewer->isParentOf($this->user);
             $isLessonPlan = $assessment->getDefaultTypeName() === 'Lesson Plan';
             $isRestrictLessonPlanAccess = ConfigLoader::getInstance()->get("restrict_parent_lesson_plan_access");
             if ($isParentOfUser && $isLessonPlan && $isRestrictLessonPlanAccess) {
