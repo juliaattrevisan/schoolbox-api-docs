@@ -40,6 +40,15 @@
             });
         });
     });
+
+    /* Window load, set the default value for the date range */
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelector('[data-restore-range]').value = '{{ restoreRange }}';
+        /* when the search window changes, reload the page */
+        document.querySelector('[data-restore-range]').addEventListener('change', function() {
+            window.location.replace(window.location.href.replace(window.location.search,'?restoreRange=' + this.value));
+        });
+    });
 </script>
 {% endautoescape %}
 
@@ -60,6 +69,17 @@
 
     <div class="admin-content">
         <div class="small-12 island">
+            <div>
+                <label for="restoreDateRange">
+                    Deleted Search Window
+                </label>
+                <select id="restoreDateRange" data-restore-range>
+                    <option value="1week">1 Week ago</option>
+                    <option value="2week">2 Weeks ago</option>
+                    <option value="1month">1 Month ago</option>
+                    <option value="3month">3 Months ago</option>
+                </select>
+            </div>
             <dl class="tabs" data-tab>
                 <dd class="active"><a href="#panel1-1">Folder</a></dd>
                 <dd><a href="#panel1-2">Learning Activity</a></dd>

@@ -32,7 +32,13 @@ class Controller extends Base
     /**
      * Period of time that you can restore items, older than this will not be displayed
      */
-    private const TIME_FRAME = '-2 weeks';
+    private const TIME_FRAME = '2weeks';
+    private const VALID_TIME_FRAMES = [
+        '1week',
+        '2week',
+        '1month',
+        '3month'
+    ];
 
     /**
      * Recursively undelete all children if they are deleted within this timeframe of the parent in seconds
@@ -71,8 +77,16 @@ class Controller extends Base
      */
     public function getIndex()
     {
+        /**
+         * validate the time range
+         */
+        $startDate = self::TIME_FRAME;
+        if (in_array($this->requestQuery->get('restoreRange'), self::VALID_TIME_FRAMES, true)) {
+            $startDate = $this->requestQuery->get('restoreRange');
+        }
+
         //Start Range
-        $start = \Alaress_Date_Format::newNaturalDate(self::TIME_FRAME);
+        $start = \Alaress_Date_Format::newNaturalDate(sprintf("-%s", $startDate));
         $end = \Alaress_Date_Format::now();
 
         // Folders
@@ -152,6 +166,7 @@ class Controller extends Base
             'deletedCourseImpl'  => $deletedCourseImpl,
             'deletedUnitSpec'    => $deletedUnitSpec,
             'deletedUnitImpl'    => $deletedUnitImpl,
+            'restoreRange'       => $startDate,
         ]);
     }
 
