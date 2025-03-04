@@ -25,7 +25,6 @@ use Schoolbox\Mapper;
  */
 class Exporter
 {
-
     /**
      * Export type
      * One of [student, staff, parent, relationship]
@@ -232,7 +231,7 @@ class Exporter
                 } else {
                     /* Otherwise just use whatever's there
                      */
-                    $row[$heading] = $value;
+                    $row[$heading] = trim((string)$value);
                 }
             }
 
