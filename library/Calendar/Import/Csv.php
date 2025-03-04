@@ -369,8 +369,8 @@ class Csv extends Base
             $event->setAllDay($all_day);
             $event->setType($eventType);
             $event->setAttendance($attendance);
-            $event->setSource($this->getSource());
             $event->setCampusCollection($cloneCampuses);
+            $event->setSource($this->getSource());
 
             /* If a publish date is specified, use it; otherwise leave as empty
              */
@@ -387,10 +387,10 @@ class Csv extends Base
                 }
                 $event->setPublishDateTime($publishDate);
             }
-            $folderList = $this->categoryList;
 
             // Allow override of folder relations only if no folder list has
             // been set in the object
+            $folderList = $this->categoryList;
             if (empty($folderList)) {
                 $folderList = [];
                 foreach (explode(',', $folderIds) as $folderId) {
