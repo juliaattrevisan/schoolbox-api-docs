@@ -264,7 +264,6 @@ tr:hover {
     }
     &--empty-total {
         background: #ff7d00;
-        color: white;
     }
 }
 
