@@ -19,6 +19,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Visibility;
+use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use UnexpectedValueException;
@@ -119,7 +120,7 @@ class Api implements Calendar_Api_EventType_Interface
              * if the restrict_parent_lesson_plan_access config setting is enabled
              */
             $isParentOfUser = $this->viewer->isParentOf($this->user);
-            $isLessonPlan = $assessment->getDefaultTypeName() === 'Lesson Plan';
+            $isLessonPlan = $assessment instanceof LessonPlan;
             $isRestrictLessonPlanAccess = ConfigLoader::getInstance()->get("restrict_parent_lesson_plan_access");
             if ($isParentOfUser && $isLessonPlan && $isRestrictLessonPlanAccess) {
                 continue;
