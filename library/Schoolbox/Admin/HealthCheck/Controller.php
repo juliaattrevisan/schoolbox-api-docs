@@ -1813,14 +1813,17 @@ class Controller extends Base
         $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
 
         // fetch all courses
-        $courseQuery = $database->prepareQuery("select
-            courseFolder.name as 'course.name',
-            courseFolder.id as 'course.id',
-            course_specification.id as 'course_specification.id',
-            courseTemplates.name as 'framework'
+        $courseQuery = $database->prepareQuery("
+        SELECT
+            courseFolder.name AS 'course.name',
+            courseFolder.id AS 'course.id',
+            course_specification.id AS 'course_specification.id',
+            courseTemplates.name AS 'framework'
         FROM course_specification
-        join courseTemplates on course_specification.template_id = courseTemplates.id
-        join folder courseFolder on course_specification.folder_id = courseFolder.id
+        JOIN courseTemplates ON course_specification.template_id = courseTemplates.id
+        JOIN folder courseFolder ON course_specification.folder_id = courseFolder.id
+        WHERE course_specification.deleted_at IS NULL
+        AND courseFolder.deleted_at IS NULL;
         ");
 
         $courseQuery->execute();
@@ -1835,9 +1838,9 @@ class Controller extends Base
         $compTextQuery = $database->prepareQuery("SELECT
             tb.textBoxID AS id,
             f.id AS folder_id,
-            cci_componentname.value as 'componentName',
-            ci.id as 'componentId',
-            tb.heading as 'textboxHeading',
+            cci_componentname.value AS 'componentName',
+            ci.id AS 'componentId',
+            tb.heading AS 'textboxHeading',
             tb.updated_at AS date,
             tb.updated_by AS updated_by,
             tb.body AS textboxBody
@@ -1922,11 +1925,11 @@ class Controller extends Base
         // clone with extension from \Schoolbox\Search\Api\Database\ResultType\Textbox\IndexBuilder::buildUpdates
         $textQuery = $database->prepareQuery("SELECT
             tb2.textBoxID AS id,
-            tb2.heading as 'textboxHeading',
+            tb2.heading AS 'textboxHeading',
             tb2.updated_at AS date,
             tb2.updated_by AS updated_by,
             tb2.body AS textboxBody,
-            tb2.categoryID as folderId
+            tb2.categoryID AS folderId
         FROM textBox tb2
                  LEFT JOIN component_config_instance cci2 ON (
             cci2.component_config_definition_id = (
@@ -2018,20 +2021,21 @@ class Controller extends Base
         $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
 
         // fetch all units/courses
-        $courseUnitQuery = $database->prepareQuery("select
-            courseFolder.name as 'course.name',
-            courseFolder.id as 'course.id',
-            course_specification.id as 'course_specification.id',
-            unitFolder.name as 'unit.name',
-            unitFolder.id as 'unit.id',
-            courseTemplates.name as 'framework'
+        $courseUnitQuery = $database->prepareQuery("
+        SELECT
+            courseFolder.name AS 'course.name',
+            courseFolder.id AS 'course.id',
+            course_specification.id AS 'course_specification.id',
+            unitFolder.name AS 'unit.name',
+            unitFolder.id AS 'unit.id',
+            courseTemplates.name AS 'framework'
         FROM course_specification
-        JOIN courseTemplates on course_specification.template_id = courseTemplates.id
-        JOIN folder courseFolder on course_specification.folder_id = courseFolder.id
-        JOIN course_unit_specification on course_specification.id = course_unit_specification.course_specification_id
-        JOIN folder unitFolder on course_unit_specification.folder_id = unitFolder.id
-        WHERE course_specification.deleted_at is NULL
-        AND course_unit_specification.deleted_at is NULL
+        JOIN courseTemplates ON course_specification.template_id = courseTemplates.id
+        JOIN folder courseFolder ON course_specification.folder_id = courseFolder.id
+        JOIN course_unit_specification ON course_specification.id = course_unit_specification.course_specification_id
+        JOIN folder unitFolder ON course_unit_specification.folder_id = unitFolder.id
+        WHERE course_specification.deleted_at IS NULL
+        AND course_unit_specification.deleted_at IS NULL
         ");
 
         $courseUnitQuery->execute();
@@ -2045,10 +2049,10 @@ class Controller extends Base
         // clone with extension from \Schoolbox\Search\Api\Database\ResultType\Textbox\IndexBuilder::buildUpdates
         $curricOverviewQuery = $database->prepareQuery("SELECT
             f.id AS 'folder.id',
-            cci_title.value as 'component.name',
-            ci.id as 'component.id',
-            cn.name as 'tree.filter',
-            cn.code as 'tree.filter_code'
+            cci_title.value AS 'component.name',
+            ci.id AS 'component.id',
+            cn.name AS 'tree.filter',
+            cn.code AS 'tree.filter_code'
         FROM component_definition cd
                 JOIN component_instance ci ON ci.component_definition_id = cd.id and ci.module = 'homepage'
                 JOIN folder f ON f.id = ci.identifier
@@ -2070,7 +2074,7 @@ class Controller extends Base
                             cci_tree.component_config_definition_id = ccd_tree.id AND
                             cci_tree.component_instance_id = ci.id
                             )
-                LEFT JOIN   curriculum_node cn on cci_tree.value = cn.id AND cn.deleted_at is NULL
+                LEFT JOIN   curriculum_node cn ON cci_tree.value = cn.id AND cn.deleted_at IS NULL
         WHERE cd.`class` = 'Schoolbox\\\Curriculum\\\Component\\\CurriculumOverviewController'
         AND f.deleted_at IS NULL
         AND f.id in {$unitPlaceHolder};
@@ -2105,7 +2109,7 @@ class Controller extends Base
 
         while ($row = $curricOverviewQuery->fetch(\PDO::FETCH_ASSOC)) {
             $componentName = $row['componentName'] ?? 'NULL';
-            // if component is empty string, use the system default
+            // if component IS empty string, use the system default
             if (trim($componentName) === '') {
                 $componentName = \Schoolbox\Curriculum\Component\CurriculumOverviewController::DEFAULT_COMPONENT_HEADING;
             }
@@ -2140,10 +2144,10 @@ class Controller extends Base
         // clone with extension from \Schoolbox\Search\Api\Database\ResultType\Textbox\IndexBuilder::buildUpdates
         $fileQuery = $database->prepareQuery("SELECT
             f.id AS 'folder.id',
-            cci_title.value as 'component.name',
-            ci.id as 'component.id',
-            cn.name as 'tree.filter',
-            cn.code as 'tree.filter_code'
+            cci_title.value AS 'component.name',
+            ci.id AS 'component.id',
+            cn.name AS 'tree.filter',
+            cn.code AS 'tree.filter_code'
         FROM component_definition cd
                 JOIN component_instance ci ON ci.component_definition_id = cd.id and ci.module = 'homepage'
                 JOIN folder f ON f.id = ci.identifier
@@ -2165,7 +2169,7 @@ class Controller extends Base
                             cci_tree.component_config_definition_id = ccd_tree.id AND
                             cci_tree.component_instance_id = ci.id
                             )
-                LEFT JOIN   curriculum_node cn on cci_tree.value = cn.id AND cn.deleted_at is NULL
+                LEFT JOIN   curriculum_node cn ON cci_tree.value = cn.id AND cn.deleted_at IS NULL
         WHERE cd.`class` = 'Schoolbox\\\Curriculum\\\Component\\\CurriculumOverviewController'
         AND f.deleted_at IS NULL
         AND f.id in {$unitPlaceHolder};
@@ -2193,7 +2197,7 @@ class Controller extends Base
 
         while ($row = $fileQuery->fetch(\PDO::FETCH_ASSOC)) {
             $componentName = $row['componentName'] ?? 'NULL';
-            // if component is empty string, use the system default
+            // if component IS empty string, use the system default
             if (trim($componentName) === '') {
                 $componentName = \Schoolbox\Curriculum\Component\CurriculumOverviewController::DEFAULT_COMPONENT_HEADING;
             }
@@ -2253,19 +2257,22 @@ class Controller extends Base
         $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
 
         // fetch all courses & units & folders of them
-        $courseQuery = $database->prepareQuery("select
-            courseFolder.name as 'course.name',
-            courseFolder.id as 'course.id',
-            course_specification.id as 'course_specification.id',
-            unitFolder.name as 'unit.name',
-            unitFolder.id as 'unit.folder.id',
-            courseTemplates.name as 'framework',
-            course_unit_specification.id as 'unit.id'
+        $courseQuery = $database->prepareQuery("
+        SELECT
+            courseFolder.name AS 'course.name',
+            courseFolder.id AS 'course.id',
+            course_specification.id AS 'course_specification.id',
+            unitFolder.name AS 'unit.name',
+            unitFolder.id AS 'unit.folder.id',
+            courseTemplates.name AS 'framework',
+            course_unit_specification.id AS 'unit.id'
         FROM course_specification
-        join courseTemplates on course_specification.template_id = courseTemplates.id
-        join folder courseFolder on course_specification.folder_id = courseFolder.id
-        join course_unit_specification on course_specification.id = course_unit_specification.course_specification_id
-        join folder unitFolder on course_unit_specification.folder_id = unitFolder.id
+        JOIN courseTemplates ON course_specification.template_id = courseTemplates.id
+        JOIN folder courseFolder ON course_specification.folder_id = courseFolder.id
+        JOIN course_unit_specification ON course_specification.id = course_unit_specification.course_specification_id
+        JOIN folder unitFolder ON course_unit_specification.folder_id = unitFolder.id
+        WHERE course_specification.deleted_at IS NULL
+        AND course_unit_specification.deleted_at IS NULL;
         ");
 
         $courseQuery->execute();
@@ -2275,7 +2282,7 @@ class Controller extends Base
 
         $coursePlaceHolder = Builder::getArrayPlaceholders(array_keys($units), 'units');
 
-        // fetch all Assessments on Unit pages within a Course
+        // fetch all Assessments ON Unit pages within a Course
         $assessmentQuery = $database->prepareQuery("SELECT
             COALESCE(
                     IF(task.id, 'task', NULL),
@@ -2286,8 +2293,8 @@ class Controller extends Base
                     IF(lesson_plan.id, 'lessonPlan', NULL)
             ) AS `assessment.type`,
             lu_work_type.name AS `work.type.name`,
-            count(assessment.id) as count,
-            mv_assessment_relation.folder_id as `folder_id`
+            count(assessment.id) AS count,
+            mv_assessment_relation.folder_id AS `folder_id`
         FROM mv_assessment_relation
                  JOIN assessment ON mv_assessment_relation.assessment_id = assessment.id
                  LEFT JOIN lu_work_type ON assessment.work_type_id = lu_work_type.id
@@ -2385,21 +2392,22 @@ class Controller extends Base
         $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
 
         // fetch all courses & units that aren't deleted
-        $courseQuery = $database->prepareQuery("select
-            courseFolder.name as 'course.name',
-            courseFolder.id as 'course.id',
-            course_specification.id as 'course_specification.id',
-            course_unit_specification.id as 'unit_specification.id',
-            unitFolder.name as 'unit.name',
-            unitFolder.id as 'unit.id',
-            courseTemplates.name as 'framework'
+        $courseQuery = $database->prepareQuery("
+        SELECT
+            courseFolder.name AS 'course.name',
+            courseFolder.id AS 'course.id',
+            course_specification.id AS 'course_specification.id',
+            course_unit_specification.id AS 'unit_specification.id',
+            unitFolder.name AS 'unit.name',
+            unitFolder.id AS 'unit.id',
+            courseTemplates.name AS 'framework'
         FROM course_specification
-        JOIN courseTemplates on course_specification.template_id = courseTemplates.id
-        JOIN folder courseFolder on course_specification.folder_id = courseFolder.id
-        JOIN course_unit_specification on course_specification.id = course_unit_specification.course_specification_id
-        JOIN folder unitFolder on course_unit_specification.folder_id = unitFolder.id
-        WHERE course_specification.deleted_at is NULL
-        AND course_unit_specification.deleted_at is NULL
+        JOIN courseTemplates ON course_specification.template_id = courseTemplates.id
+        JOIN folder courseFolder ON course_specification.folder_id = courseFolder.id
+        JOIN course_unit_specification ON course_specification.id = course_unit_specification.course_specification_id
+        JOIN folder unitFolder ON course_unit_specification.folder_id = unitFolder.id
+        WHERE course_specification.deleted_at IS NULL
+        AND course_unit_specification.deleted_at IS NULL
         ");
 
         $courseQuery->execute();
@@ -2414,9 +2422,9 @@ class Controller extends Base
         $compTextQuery = $database->prepareQuery("SELECT
             tb.textBoxID AS id,
             f.id AS folder_id,
-            cci_componentname.value as 'componentName',
-            ci.id as 'componentId',
-            tb.heading as 'textboxHeading',
+            cci_componentname.value AS 'componentName',
+            ci.id AS 'componentId',
+            tb.heading AS 'textboxHeading',
             tb.updated_at AS date,
             tb.updated_by AS updated_by,
             tb.body AS textboxBody
@@ -2472,11 +2480,11 @@ class Controller extends Base
          * ];
          */
         $compTextQuery->execute(array_merge(
-                                    [
-                                        'homepageComponentKey' => Textbox\Mapper::HOMEPAGE_COMPONENT_KEY,
-                                        'componentConfigComponentNameKey' => Component_Config_Componentname::KEY,
-                                    ],
-                                    Builder::getArrayParameters(array_keys($courses), 'courses')
+            [
+                'homepageComponentKey' => Textbox\Mapper::HOMEPAGE_COMPONENT_KEY,
+                'componentConfigComponentNameKey' => Component_Config_Componentname::KEY,
+            ],
+        Builder::getArrayParameters(array_keys($courses), 'courses')
                                 ));
         while ($row = $compTextQuery->fetch(\PDO::FETCH_ASSOC)) {
             $componentName = $row['componentName'] ?? 'NULL';
@@ -2507,11 +2515,11 @@ class Controller extends Base
         // clone with extension from \Schoolbox\Search\Api\Database\ResultType\Textbox\IndexBuilder::buildUpdates
         $textQuery = $database->prepareQuery("SELECT
             tb2.textBoxID AS id,
-            tb2.heading as 'textboxHeading',
+            tb2.heading AS 'textboxHeading',
             tb2.updated_at AS date,
             tb2.updated_by AS updated_by,
             tb2.body AS textboxBody,
-            tb2.categoryID as folderId
+            tb2.categoryID AS folderId
         FROM textBox tb2
                  LEFT JOIN component_config_instance cci2 ON (
             cci2.component_config_definition_id = (
@@ -2545,11 +2553,11 @@ class Controller extends Base
          * ];
          */
         $textQuery->execute(array_merge(
-                                [
-                                    'homepageComponentKey' => Textbox\Mapper::HOMEPAGE_COMPONENT_KEY
-                                ],
-                                Builder::getArrayParameters(array_keys($courses), 'courses')
-                            ));
+            [
+                'homepageComponentKey' => Textbox\Mapper::HOMEPAGE_COMPONENT_KEY
+            ],
+            Builder::getArrayParameters(array_keys($courses), 'courses')
+        ));
         while ($row = $textQuery->fetch(\PDO::FETCH_ASSOC)) {
             //build the row and send
             fputcsv($fp, [
