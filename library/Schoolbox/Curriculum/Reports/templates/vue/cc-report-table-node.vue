@@ -43,6 +43,11 @@ const isSingleNode = window.Vue.computed(
 
 // show the expand button when the node has children, and onlyShowGaps is not active
 const showExpandButton = window.Vue.computed(
+    () => props.node.children && props.node.children.length > 0 && !filtersStore.onlyShowGaps,
+);
+
+// whether the cell can also be used to expand the node
+const canExpandSelectCells = window.Vue.computed(
     () => props.node.children && props.node.children.length > 0 && !props.node.isExpanded && !filtersStore.onlyShowGaps,
 );
 
@@ -143,7 +148,7 @@ function onCourseClicked(course: CourseWithCurriculumNodeUsage, buttonEl: HTMLBu
         </td>
         <!-- add the total cell -->
         <td v-if="props.node.hasNoUsages" class="u-border-left"><b>0</b></td>
-        <td v-else-if="showExpandButton" class="u-border-left usage-cell">
+        <td v-else-if="canExpandSelectCells" class="u-border-left usage-cell">
             <button class="f-always-show usage-button" @click="onTotalClicked">
                 <b>{{ getFilteredTotalCount(props.node, !props.node.isExpanded) }}</b>
             </button>
@@ -206,7 +211,7 @@ function onCourseClicked(course: CourseWithCurriculumNodeUsage, buttonEl: HTMLBu
             <!-- add the total course cell if there's multiple courses -->
             <template v-if="useCoursesStore().hasMultipleCourses">
                 <td v-if="props.node.hasNoUsages || course.hasNoTotalUsages">0</td>
-                <td v-else-if="showExpandButton" class="usage-cell">
+                <td v-else-if="canExpandSelectCells" class="usage-cell">
                     <button class="f-always-show usage-button" @click="onTotalClicked">
                         {{ getFilteredCourseCount(props.node, course, !props.node.isExpanded) }}
                     </button>
