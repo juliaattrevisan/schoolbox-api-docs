@@ -2484,8 +2484,8 @@ class Controller extends Base
                 'homepageComponentKey' => Textbox\Mapper::HOMEPAGE_COMPONENT_KEY,
                 'componentConfigComponentNameKey' => Component_Config_Componentname::KEY,
             ],
-        Builder::getArrayParameters(array_keys($courses), 'courses')
-                                ));
+            Builder::getArrayParameters(array_keys($courses), 'courses')
+            ));
         while ($row = $compTextQuery->fetch(\PDO::FETCH_ASSOC)) {
             $componentName = $row['componentName'] ?? 'NULL';
             // if component is empty string, use the system default
