@@ -51,6 +51,9 @@ const canExpandSelectCells = window.Vue.computed(
     () => props.node.children && props.node.children.length > 0 && !props.node.isExpanded && !filtersStore.onlyShowGaps,
 );
 
+// to highlight the total cell when there are no usages
+const isEmptyTotal = window.Vue.computed(() => getFilteredTotalCount(props.node, !props.node.isExpanded) === 0);
+
 /**
  * To toggle the expanded state of the node
  */
@@ -147,13 +150,16 @@ function onCourseClicked(course: CourseWithCurriculumNodeUsage, buttonEl: HTMLBu
             </button>
         </td>
         <!-- add the total cell -->
-        <td v-if="props.node.hasNoUsages" class="u-border-left"><b>0</b></td>
-        <td v-else-if="canExpandSelectCells" class="u-border-left usage-cell">
+        <td v-if="props.node.hasNoUsages" class="u-border-left usage-cell usage-cell--empty-total"><b>0</b></td>
+        <td
+            v-else-if="canExpandSelectCells"
+            :class="`u-border-left usage-cell ${isEmptyTotal ? 'usage-cell--empty-total' : ''}`"
+        >
             <button class="f-always-show usage-button" @click="onTotalClicked">
                 <b>{{ getFilteredTotalCount(props.node, !props.node.isExpanded) }}</b>
             </button>
         </td>
-        <td v-else class="u-border-left usage-cell">
+        <td v-else :class="`u-border-left usage-cell ${isEmptyTotal ? 'usage-cell--empty-total' : ''}`">
             <b>{{ getFilteredTotalCount(props.node, !props.node.isExpanded) }}</b>
         </td>
         <!-- loop through each course/unit, retrieving the node usage or returning 0 no usages -->
@@ -251,6 +257,10 @@ tr:hover {
     position: relative;
     &:has(.usage-button) {
         padding: 0; // padding is handled by the button instead
+    }
+    &--empty-total {
+        background: #ff7d00;
+        color: white;
     }
 }
 
