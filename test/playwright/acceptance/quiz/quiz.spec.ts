@@ -12,6 +12,7 @@ import StatusPage from "@schoolboxTest/playwright/support/page/dueWork/StatusPag
 import AssessmentPage from "@schoolboxTest/playwright/support/page/dueWork/AssessmentPage";
 import ProfilePage from "@schoolboxTest/playwright/support/page/profilePage/ProfilePage";
 import ManageGroup from "@schoolboxTest/playwright/support/page/group/ManageGroup";
+import QuizContentsPage from "@schoolboxTest/playwright/support/page/quiz/QuizContents";
 
 /**
  * covenience function to create a homepage
@@ -68,10 +69,18 @@ async function createClassPage(
     await manageGroup.clickFromRadioButton("role");
     await manageGroup.clickAddMembers();
     await page.waitForTimeout(1000); // wait to be able to update the db
+
+    tester.isGoingTo("Add Eden Reed into the group via manage group page");
+    await manageGroup.clickFromRadioButton("name");
+    await manageGroup.search("Eden Reed");
+    await manageGroup.selectUser(6);
+    await manageGroup.clickFromRadioButton("role");
+    await manageGroup.clickAddMembers();
+    await page.waitForTimeout(1000); // wait to be able to update the db
 }
 
 test.describe("Quiz Create Tests", () => {
-    // Run tests serially, as tests rely on prior tests to have been run.
+    // Run tests serially, as tests rely on prior tests to have been run
     test.describe.configure({ mode: "serial" });
 
     const folderName = "Test Class Homepage Quiz";
@@ -89,6 +98,7 @@ test.describe("Quiz Create Tests", () => {
         const homepage = new Homepage(page);
         const assessmentForm = new AssessmentForm(tester, page);
         const quiz = new QuizSettingPage(tester, page);
+        const quizContent = new QuizContentsPage(tester, page);
 
         tester.isGoingTo("create a homepage, navigate to the class page and add a quiz component");
         await createClassPage(tester, page, db, folderName);
@@ -105,7 +115,15 @@ test.describe("Quiz Create Tests", () => {
         await quiz.setTitle(quizName);
         await assessmentForm.setWorkType(AssessmentForm.WORKTYPE_ASSESSMENT_TASK);
         await assessmentForm.setMarkType(AssessmentForm.MARK_TYPE_PERCENTAGE);
+        await assessmentForm.setOpenDate(Common.getTodayAtMidnight());
+        await assessmentForm.setPublishDate(Common.getTodayAtMidnight());
         await quiz.create(quizName);
+
+        tester.isGoingTo("Add a question");
+        await quizContent.clickCreateItemButton();
+        await quizContent.clickAddNewButton();
+        await quizContent.clickQuestionType("Standard Multiple choice question.");
+        await quizContent.clickSaveButton();
 
         tester.isGoingTo("navigate to the homepage and ensure the quiz is presented");
         await homepage.goto(parseInt(folderId, 10));
@@ -156,12 +174,32 @@ test.describe("Quiz Create Tests", () => {
         tester.isGoingTo("navigate to the quiz status page, grade a submission and publish the grade");
         await assessmentStatusPage.goto(quizId);
         await assessmentStatusPage.gradeSubmission(25, 80, "Great work!");
-        tester.isGoingTo("check the grade is published via attempt history and student profile page");
+        tester.isGoingTo("check the grade is published via attempt history and studennt profile page");
         await assessmentPage.goto(quizId, 25);
         await expect(page.locator("table.attempts-table")).toContainText("80 %");
         await profilePage.goto(25);
         await expect(page.locator("li.feed-item").first()).toContainText("80 %");
         await expect(page.locator("li.feed-item").first()).toContainText("Great work!");
+    });
+
+    test("Submit the quiz and vertical review it", async ({ tester, page }) => {
+        const assessmentStatusPage = new StatusPage(tester, page);
+        const assessmentPage = new AssessmentPage(tester, page);
+        const profilePage = new ProfilePage(tester, page);
+
+        if (folderId === null || quizId === null) {
+            throw new Error("Folder ID or Quiz ID not found");
+        }
+
+        tester.isGoingTo("as  Eden Reed submit the Quiz");
+        await tester.impersonate("Eden Reed");
+        await assessmentPage.goto(quizId, 6);
+        await page.locator("a.button.submit").click();
+        await expect(page.getByLabel("Review screen").first()).toBeVisible();
+        await page.locator("a.lrn-mcq-option").first().click();
+        await page.getByLabel("Review screen").click();
+        await page.locator("button.lrn_btn lrn_btn_blue test-submit btn-lg review-screen-focus-element").click();
+        await page.locator("button.test-dialog-save-submit lrn_btn_blue").click();
     });
 
     test("Delete a quiz", async ({ tester, page }) => {
@@ -184,17 +222,17 @@ test.describe("Quiz Create Tests", () => {
         ).toBeVisible();
     });
 
-    test.afterAll(async ({ baseTester, db }) => {
-        baseTester.isGoingTo("update delete_at for the quiz assessment so it does not impact the news tests");
-        await db.updateInDatabase(
-            "assessment",
-            { deleted_at: "2022-01-15 11:22:34" },
-            { "title like": "Quiz Automation Test%", deleted_at: null },
-        );
-        await db.updateInDatabase(
-            "folder",
-            { deleted_at: "2020-01-15 11:22:34" },
-            { "name like": "Test Class Homepage Quiz" },
-        );
-    });
+    // test.afterAll(async ({ baseTester, db }) => {
+    //     baseTester.isGoingTo("update delete_at for the quiz assessment so it does not impact the news tests");
+    //     await db.updateInDatabase(
+    //         "assessment",
+    //         { deleted_at: "2022-01-15 11:22:34" },
+    //         { "title like": "Quiz Automation Test%", deleted_at: null },
+    //     );
+    //     await db.updateInDatabase(
+    //         "folder",
+    //         { deleted_at: "2020-01-15 11:22:34" },
+    //         { "name like": "Test Class Homepage Quiz" },
+    //     );
+    // });
 });
