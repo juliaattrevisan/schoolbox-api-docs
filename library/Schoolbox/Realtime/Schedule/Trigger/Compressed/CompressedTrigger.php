@@ -19,9 +19,9 @@ class CompressedTrigger implements InstantTriggerInterface
     protected ?string $serial;
 
     /**
-     * @param InstantTriggerInterface|null $trigger
+     * @param InstantTriggerInterface $trigger
      */
-    public function __construct(private ?InstantTriggerInterface $trigger = null)
+    public function __construct(private InstantTriggerInterface $trigger)
     {
     }
 
