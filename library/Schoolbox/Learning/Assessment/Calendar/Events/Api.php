@@ -61,9 +61,9 @@ class Api implements Calendar_Api_EventType_Interface
     private $viewer;
 
     /**
-     * @var IConfigLoader
+     * @var bool
      */
-    private $config;
+    private $isRestrictParentLessonPlanAccess;
 
     /**
      * Constructor
@@ -83,7 +83,7 @@ class Api implements Calendar_Api_EventType_Interface
         ?Visibility $visibility,
         IdFinder $assessmentIdFinder,
         array $filters,
-        IConfigLoader $config
+        bool $isRestrictParentLessonPlanAccess
     ) {
         $this->assessmentDataSource = $assessmentDataSource;
         $this->visibility           = $visibility;
@@ -91,7 +91,7 @@ class Api implements Calendar_Api_EventType_Interface
         $this->user                 = $user;
         $this->viewer               = $viewer;
         $this->filters              = $filters;
-        $this->config               = $config;
+        $this->isRestrictParentLessonPlanAccess = $isRestrictParentLessonPlanAccess;
     }
 
 
@@ -129,8 +129,7 @@ class Api implements Calendar_Api_EventType_Interface
              */
             $isParentOfUser = $this->viewer->isParentOf($this->user);
             $isLessonPlan = $assessment instanceof LessonPlan;
-            $isRestrictLessonPlanAccess = $this->config->get("restrict_parent_lesson_plan_access");
-            if ($isParentOfUser && $isLessonPlan && $isRestrictLessonPlanAccess) {
+            if ($isParentOfUser && $isLessonPlan && $this->isRestrictParentLessonPlanAccess) {
                 continue;
             }
 

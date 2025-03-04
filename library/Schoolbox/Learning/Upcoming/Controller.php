@@ -372,7 +372,7 @@ class Controller extends Base
                 $visibility,
                 $this->assessmentIdFinder,
                 $filterByClassName,
-                $this->getConfigLoader()
+                $this->getConfigLoader()->get('restrict_parent_lesson_plan_access')
             ),
             $start,
             $end,
