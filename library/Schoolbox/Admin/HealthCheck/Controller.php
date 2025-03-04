@@ -1804,6 +1804,7 @@ class Controller extends Base
             'Textbox Component Name',
             'Textbox Component ID',
             'Textbox Title',
+            'New Textbox Title',
             'Textbox ID',
             'Textbox Content (empty string, empty state)'
         ];
@@ -1879,8 +1880,12 @@ class Controller extends Base
          * 'Course Title',
          * 'Course Homepage ID',
          * 'Course Specification ID',
+         * 'Course Framework',
+         * 'Edit Link',
          * 'Textbox Component Name',
+         * 'Textbox Component ID',
          * 'Textbox Title',
+         * 'New Textbox Title',
          * 'Textbox ID',
          * 'Textbox Content (empty string, empty state)'
          * ];
@@ -1908,6 +1913,7 @@ class Controller extends Base
                 $componentName,
                 $row['componentId'] ?? 'NULL',
                 $row['textboxHeading'] ?? 'NULL',
+                '',
                 $row['id'] ?? 'NULL',
                 $row['textboxBody'] ?? 'NULL',
             ]);
@@ -1940,8 +1946,13 @@ class Controller extends Base
          * $rowHeadings = [
          * 'Course Title',
          * 'Course Homepage ID',
+         * 'Course ID',
+         * 'Course Framework',
+         * 'Edit Link',
          * 'Textbox Component Name',
+         * 'Textbox Component ID',
          * 'Textbox Title',
+         * 'New Textbox Title',
          * 'Textbox ID',
          * 'Textbox Content (empty string, empty state)'
          * ];
@@ -1963,6 +1974,7 @@ class Controller extends Base
                 'No Component',
                 'No Component',
                 $row['textboxHeading'] ?? 'NULL',
+                '',
                 $row['id'] ?? 'NULL',
                 $row['textboxBody'] ?? 'NULL',
             ]);
