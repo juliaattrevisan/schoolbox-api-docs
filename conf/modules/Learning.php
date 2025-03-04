@@ -55,7 +55,7 @@ class Learning extends ModuleLoader
         // TODO - split 'LearningModule' into ClassModule + PendingModule
         $this->loadModule($di, LearningModule::class, "/{$namespace}");
 
-        // LMS module required plan (Basic,Pro,Learning-Enhanced)
+        // LMS module required plan (Basic,Learning-Essentials,Learning-Enhanced)
         if ($config->get(ConfigMapper::NAME_LMS_ENABLED)) {
             $this->loadModule($di, Grades\Module::class, "/{$namespace}/grades");
             $this->loadModule($di, AssessmentModule::class, "/{$namespace}");
