@@ -93,7 +93,7 @@ class Controller extends Base
      * correspond to stuff that you can see on screen.
      */
     private const LEARNOSITY_QUESTION_GROUP_PLANS = [
-        'elite' => [
+        'learning-enhanced' => [
             'question_type_groups' => [
                 ['reference' => 'mcq'],
                 ['reference' => 'cloze'],
