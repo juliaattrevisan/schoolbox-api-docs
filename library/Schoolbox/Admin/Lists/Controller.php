@@ -40,12 +40,13 @@ use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Comms\News\Topic;
 use Schoolbox\Sequential;
 use Schoolbox\WebDav\Mapper as WebDavMapper;
+use Schoolbox\Pastoral;
+use Schoolbox\Pastoral\DocumentClassification\Mapper as PastoralDocumentClassificationMapper;
+use Schoolbox\Pastoral\DocumentClassification\Model as PastoralDocumentClassificationModel;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
+use Schoolbox\Pastoral\SubType\Mapper as PastoralCategoryMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Pastoral\Type\Model as PastoralTypeModel;
-use Schoolbox\Pastoral\SubType\Mapper as PastoralCategoryMapper;
-use Schoolbox\Pastoral\DocumentClassification\Mapper as PastoralDocumentClassificationMapper;
-use Schoolbox\Pastoral;
 use Schoolbox\YearLevel;
 use Timetable_ColourMapper;
 use Twig\Error\Error;
@@ -529,6 +530,10 @@ class Controller extends Base
                     // Some setters expect objects as parameters.  For those cases we need to create objects.
                     $valueToSet = match ($setter) {
                         'setPastoralType' => (new PastoralTypeModel())->setId($value[$currentIndex]),
+                        'setDocumentClassification',
+                        'setDocumentClassificationConfidential' => (
+                            (new PastoralDocumentClassificationModel())->setId($value[$currentIndex])
+                        ),
                         default => $value[$currentIndex],
                     };
 
