@@ -74,7 +74,7 @@ class Api implements Calendar_Api_EventType_Interface
      * @param null|Visibility      $visibility
      * @param IdFinder             $assessmentIdFinder
      * @param array                $filters
-     * @param IConfigLoader        $config
+     * @param bool                 $config
      */
     public function __construct(
         User $user,
