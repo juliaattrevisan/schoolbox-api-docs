@@ -19,8 +19,10 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Visibility;
+use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
+use Schoolbox\IConfigLoader;
 use UnexpectedValueException;
 
 /**
@@ -54,26 +56,42 @@ class Api implements Calendar_Api_EventType_Interface
     private $user;
 
     /**
+     * @var User
+     */
+    private $viewer;
+
+    /**
+     * @var bool
+     */
+    private $isRestrictParentLessonPlanAccess;
+
+    /**
      * Constructor
      *
      * @param User                 $user
+     * @param User                 $viewer
      * @param AssessmentDataSource $assessmentDataSource
      * @param null|Visibility      $visibility
      * @param IdFinder             $assessmentIdFinder
      * @param array                $filters
+     * @param bool                 $isRestrictParentLessonPlanAccess
      */
     public function __construct(
         User $user,
+        User $viewer,
         AssessmentDataSource $assessmentDataSource,
         ?Visibility $visibility,
         IdFinder $assessmentIdFinder,
-        array $filters
+        array $filters,
+        bool $isRestrictParentLessonPlanAccess
     ) {
         $this->assessmentDataSource = $assessmentDataSource;
         $this->visibility           = $visibility;
         $this->assessmentIdFinder   = $assessmentIdFinder;
         $this->user                 = $user;
+        $this->viewer               = $viewer;
         $this->filters              = $filters;
+        $this->isRestrictParentLessonPlanAccess = $isRestrictParentLessonPlanAccess;
     }
 
 
@@ -102,6 +120,16 @@ class Api implements Calendar_Api_EventType_Interface
         $stack = new GenericCollection(EventInterface::class);
         foreach ($assessments as $assessment) {
             if ($this->visibility && !$this->visibility->isVisibleToUser($assessment, $this->user, true)) {
+                continue;
+            }
+
+            /**
+             * If a parent is viewing, they should only see their child's lesson plans
+             * if the restrict_parent_lesson_plan_access config setting is enabled
+             */
+            $isParentOfUser = $this->viewer->isParentOf($this->user);
+            $isLessonPlan = $assessment instanceof LessonPlan;
+            if ($isParentOfUser && $isLessonPlan && $this->isRestrictParentLessonPlanAccess) {
                 continue;
             }
 

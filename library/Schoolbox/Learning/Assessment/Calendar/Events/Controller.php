@@ -212,10 +212,12 @@ class Controller extends Base
         $assessmentEvents = $this->buildRenderer(
             new Api(
                 $user,
+                $this->getUser(),
                 $this->assessmentDataSource,
                 null,
                 $this->assessmentIdFinder,
-                $filters
+                $filters,
+                $this->getConfigLoader()->get('restrict_parent_lesson_plan_access')
             ),
             $start,
             $end,
