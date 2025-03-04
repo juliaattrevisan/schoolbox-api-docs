@@ -21,7 +21,7 @@ $app = new class extends CliTool\App {
     {
         if (strtolower($this->getConfig()->get('site_plan')) === 'learning-enhanced') {
             passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/230tour-elite.yaml', $returnVar);
-        } elseif (strtolower($this->getConfig()->get('site_plan')) === 'pro') {
+        } elseif (strtolower($this->getConfig()->get('site_plan')) === 'learning-essentials') {
             passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/230tour-pro.yaml', $returnVar);
         } else {
             passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/230tour.yaml', $returnVar);

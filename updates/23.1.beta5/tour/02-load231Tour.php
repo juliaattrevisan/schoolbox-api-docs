@@ -20,7 +20,7 @@ $app = new class extends CliTool\App {
     public function run(): void
     {
         $plan = strtolower($this->getConfig()->get('site_plan'));
-        if ($plan === 'learning-enhanced' || $plan === 'pro') {
+        if ($plan === 'learning-enhanced' || $plan === 'learning-essentials') {
             passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/231tour-lms.yaml', $returnVar);
         }
     }
