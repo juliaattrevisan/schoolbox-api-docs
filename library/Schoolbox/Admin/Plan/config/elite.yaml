@@ -1,6 +1,6 @@
 config:
 
-  site_plan : { value : Elite }
+  site_plan : { value : Learning-Enhanced }
 
   #Modules
   teams_enabled: {edit: true}

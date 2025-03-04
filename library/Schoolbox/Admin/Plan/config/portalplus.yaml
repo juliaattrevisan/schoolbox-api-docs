@@ -1,6 +1,6 @@
 config:
 
-  site_plan : { value : PortalPlus }
+  site_plan : { value : Community-Enhanced }
 
   #Modules
   teams_enabled: {edit: true}

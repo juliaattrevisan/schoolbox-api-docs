@@ -1,6 +1,6 @@
 config:
 
-  site_plan : { value : Pro }
+  site_plan : { value : Learning-Essentials }
 
   #Modules
   teams_enabled: {edit: true}

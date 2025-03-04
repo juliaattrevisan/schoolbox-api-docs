@@ -1,6 +1,6 @@
 config:
 
-  site_plan : { value : Wellbeing }
+  site_plan : { value : Community-Elite }
 
   #Modules
   teams_enabled: {edit: true}

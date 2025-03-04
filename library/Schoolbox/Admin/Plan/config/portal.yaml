@@ -1,6 +1,6 @@
 config:
 
-  site_plan : { value : Portal }
+  site_plan : { value : Community-Essentials }
 
   #Modules
   teams_enabled: {edit: true}

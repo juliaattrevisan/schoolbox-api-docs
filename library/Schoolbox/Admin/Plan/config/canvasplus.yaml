@@ -1,6 +1,6 @@
 config:
 
-  site_plan : { value : CanvasPlus }
+  site_plan : { value : Canvas-Elite }
 
   #Modules
   teams_enabled: {edit: true}
