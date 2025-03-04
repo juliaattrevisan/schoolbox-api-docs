@@ -119,7 +119,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
                 }
                 $uncompressed = gzuncompress($rawRedisData);
                 $instance = unserialize($uncompressed);
-            } catch (Exception $e) {
+            } catch (Exception | TypeError $e) {
                 if ($uncompressed) {
                     // likely be corrupted data
                     $this->deleteFromRedis("Cannot unserialize: {$key}", null, $key);
