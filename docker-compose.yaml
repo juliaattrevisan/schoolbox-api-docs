@@ -152,8 +152,10 @@ services:
     container_name: schoolbox-gotenberg
     image: gotenberg/gotenberg:7
 
-#  etherpad:
-#    image: schoolbox/epl:latest
+  schoolbox-etherpad:
+    container_name: schoolbox-etherpad
+    image: schoolbox/epl:latest
+    env_file: docker/schoolbox-etherpad/default.env
 
 volumes:
   # Volume for Schoolbox's code base

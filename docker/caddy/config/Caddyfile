@@ -68,7 +68,7 @@ docker.dev.schoolbox.cloud:443 {
         reverse_proxy schoolbox-socketd:9081
     }
     handle_path /pad* {
-        reverse_proxy php-fpm:9001
+        reverse_proxy schoolbox-etherpad:9001
     }
     @images path_regexp (portrait|videothumb|cms/(image|myimage)|images/(fail|icon|logo)|(socialstream|storage)/image)\.php$
     handle @images {
