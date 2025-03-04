@@ -215,11 +215,15 @@ function onCourseClicked(course: CourseWithCurriculumNodeUsage, buttonEl: HTMLBu
                 <td v-if="props.node.hasNoUsages || course.hasNoTotalUsages"></td>
                 <td v-else-if="canExpandSelectCells" class="usage-cell">
                     <button class="f-always-show usage-button" @click="onTotalClicked">
-                        {{ getFilteredCourseCount(props.node, course, !props.node.isExpanded) }}
+                        <template v-if="getFilteredCourseCount(props.node, course, !props.node.isExpanded) !== 0">{{
+                            getFilteredCourseCount(props.node, course, !props.node.isExpanded)
+                        }}</template>
                     </button>
                 </td>
                 <td v-else>
-                    {{ getFilteredCourseCount(props.node, course, !props.node.isExpanded) }}
+                    <template v-if="getFilteredCourseCount(props.node, course, !props.node.isExpanded) !== 0">{{
+                        getFilteredCourseCount(props.node, course, !props.node.isExpanded)
+                    }}</template>
                 </td>
             </template>
         </template>
