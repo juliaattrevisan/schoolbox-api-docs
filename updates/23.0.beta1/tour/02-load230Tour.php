@@ -19,9 +19,9 @@ require_once __DIR__ . '/../../../conf/core/require.php';
 $app = new class extends CliTool\App {
     public function run(): void
     {
-        if (strtolower($this->getConfig()->get('site_plan')) === 'learning-enhanced') {
+        if (strtolower($this->getConfig()->get('site_plan')) === 'elite') {
             passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/230tour-elite.yaml', $returnVar);
-        } elseif (strtolower($this->getConfig()->get('site_plan')) === 'learning-essentials') {
+        } elseif (strtolower($this->getConfig()->get('site_plan')) === 'pro') {
             passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/230tour-pro.yaml', $returnVar);
         } else {
             passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/230tour.yaml', $returnVar);
