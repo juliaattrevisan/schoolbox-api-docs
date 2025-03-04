@@ -62,6 +62,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     const PM = 'PM';
     public const FORMAT_DATE_PICKER = 'd/m/Y h:ia';    // Used by JS DatePicker, eg '29/07/2014 11:59pm'
 
+    public const FORMAT_DATE_ALT = 'd/m/Y'; // alt date format to DATABASE_DATE_FORMAT eg '29/07/2014'
     const SUNDAY = 0;
     const MONDAY = 1;
     const TUESDAY = 2;
@@ -967,7 +968,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     public function getStartOfSchoolYear(): Alaress_Date_Format
     {
         $startDateString = $this->locale->startOfSchoolYear();
-        $start           = DateTime::createFromFormat('d/m/Y', $startDateString . '/' . $this->getYear());
+        $start           = DateTime::createFromFormat(self::FORMAT_DATE_ALT, $startDateString . '/' . $this->getYear());
 
         $startDate = clone $this;
         if (!$start instanceof DateTime) {
