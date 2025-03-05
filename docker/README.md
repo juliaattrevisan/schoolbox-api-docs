@@ -17,7 +17,8 @@ within a self-contained development environment.
   ```shell
   # with data_filename from vagrant.yaml:
   # may need to use sudo due to Docker user assuming ownership
-  sudo tar -C data/vagrantx -xf vagrantcache/$data_filename --strip-components=1 data
+  mkdir -p data/docker/storage
+  sudo tar -C data/docker/storage -xf vagrantcache/$data_filename --strip-components=2 data/storage
   ```
 - once provisioned, backup the database content:
   ```shell
