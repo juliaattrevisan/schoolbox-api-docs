@@ -2,10 +2,13 @@ DROP DATABASE IF EXISTS schoolbox;
 CREATE DATABASE schoolbox CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';
 
 # for now need to create vagrant user
+DROP USER IF EXISTS 'schoolboxvagrant'@'localhost';
 CREATE USER IF NOT EXISTS 'schoolboxvagrant'@'localhost' IDENTIFIED BY 'abc123';
 
 # create Docker users
+DROP USER IF EXISTS 'schoolboxdocker'@'php-fpm';
 CREATE USER IF NOT EXISTS 'schoolboxdocker'@'php-fpm' IDENTIFIED BY 'abc123';
+DROP USER IF EXISTS 'schoolboxdocker'@'schoolbox-cli';
 CREATE USER IF NOT EXISTS 'schoolboxdocker'@'schoolbox-cli' IDENTIFIED BY 'abc123';
 
 # grant everything to all these users
