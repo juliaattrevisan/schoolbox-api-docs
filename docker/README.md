@@ -6,6 +6,8 @@ within a self-contained development environment.
 
 ## Manual setup
 
+- first, ensure you're running the most recent Docker Engine, installing if
+  required: https://docs.docker.com/engine/install/
 - add this line to `/etc/hosts` or its Windows equivalent:
   ```
   127.0.0.1 docker.dev.schoolbox.cloud
@@ -26,8 +28,8 @@ within a self-contained development environment.
   ```
 - from the base folder, stop and start Docker containers:
   ```shell
-  sudo docker-compose down
-  sudo docker-compose up -d
+  sudo docker compose down
+  sudo docker compose up -d
   ```
 - from the CLI container, setup database copied from Vagrant and reload
   notification bindings:
@@ -51,8 +53,8 @@ within a self-contained development environment.
   ```
 - finally, visit https://docker.dev.schoolbox.cloud:8443
   - you may be asked to accept an unsigned certificate or similar: accept it
-  - if the right-side notification panel is stuck in "Connecting...": reload
-    the Docker containers:
+  - if the right-side notification panel is stuck in "Connecting...": bring up
+    the Docker containers again:
     ```shell
-    sudo docker-compose up -d
+    sudo docker compose up -d
     ```
