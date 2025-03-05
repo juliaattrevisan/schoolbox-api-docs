@@ -32,7 +32,7 @@ class Controller extends Base
     /**
      * Period of time that you can restore items, older than this will not be displayed
      */
-    private const TIME_FRAME = '2weeks';
+    private const TIME_FRAME = '2week';
     private const VALID_TIME_FRAMES = [
         '1week',
         '2week',
