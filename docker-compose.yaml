@@ -73,10 +73,6 @@ services:
       - mariadb-data:/var/lib/mysql
     environment:
       MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: 1
-#    expose:
-#      - 3306
-#    networks:
-#      - private
 
   redis-storage:
     container_name: redis-storage
@@ -84,10 +80,6 @@ services:
     volumes:
       - redis-storage-config:/usr/local/etc/redis
       - redis-storage-data:/data
-#    ports:
-#      - '6379:6379'
-#    networks:
-#      - private
 
   redis-cache:
     container_name: redis-cache
@@ -95,10 +87,6 @@ services:
     volumes:
       - redis-cache-config:/usr/local/etc/redis
       - redis-cache-data:/data
-#    ports:
-#      - '6380:6379'
-#    networks:
-#      - private
 
   rabbitmq:
     container_name: rabbitmq
@@ -106,8 +94,6 @@ services:
       context: ./docker/rabbitmq
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq
-#    networks:
-#      - private
 
   # Not-yet-essential services:
   # These will be implemented as separate containers (if they aren't already).
