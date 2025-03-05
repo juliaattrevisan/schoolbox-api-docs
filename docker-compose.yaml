@@ -33,9 +33,11 @@ services:
       - ./docker/php-fpm/config/99-xdebug.ini:/usr/local/etc/php/conf.d/99-xdebug.ini
       - ./docker/php-fpm/config/99-session.ini:/usr/local/etc/php/conf.d/99-session.ini
     # After building: make cache mount writable by www-data
-    # (need newer docker compose)
-#    post_start:
-#      - command: chown -R www-data:www-data /var/lib/schoolbox/{cache,storage,twig,purifier}
+    post_start:
+      - command: mkdir -p /var/lib/schoolbox/cache
+      - command: mkdir -p /var/lib/schoolbox/twig
+      - command: mkdir -p /var/lib/schoolbox/purifier
+      - command: chown -R www-data:www-data /var/lib/schoolbox/{cache,storage,twig,purifier}
 
   # Image intended for running command-line processes:
   # * command-line tools
@@ -205,12 +207,13 @@ volumes:
   rabbitmq-data:
 
   # Volume for storage:
-  # consider mounting only this folder, rather than all of cache?
+  # mount only this folder, rather than all of cache,
+  # and then create storage folders on the host
   storage:
     driver_opts:
       type: none
       o: bind
-      device: ./data/vagrantx/storage
+      device: ./data/docker/storage
 
   # Volume for cache:
   # needs to be writable by www-data in php-fpm container
