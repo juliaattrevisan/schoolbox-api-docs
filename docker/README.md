@@ -42,11 +42,6 @@ within a self-contained development environment.
   mariadb -h mariadb -u root -D schoolbox < docker/schoolbox/sql/post-setup.sql
   tools/notif/route/refresh-binding-cache.php
   ```
-- finagle hostname for taskd, and add it to `/etc/hosts`
-  ```shell
-  sudo docker exec -it schoolbox-taskd /bin/sh
-  getent hosts caddy | cut -f1 -d' ' | sed 's/$/ docker.dev.schoolbox.cloud/' >> /etc/hosts
-  ```
 - finally, visit https://docker.dev.schoolbox.cloud:8443
   - you may be asked to accept an unsigned certificate or similar: accept it
   - if the right-side notification panel is stuck in "Connecting...": bring up
