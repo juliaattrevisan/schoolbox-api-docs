@@ -13,6 +13,8 @@ export default class StatusPage {
 
     static readonly SELECTOR_COMMENT = "textarea[name='comment']";
 
+    static readonly SELECTOR_COMMENT_QUIZ_REVIEW = "textarea[id='final-review-comment-schoolbox-student']";
+
     static readonly SELECTOR_BUTTON_PUBLISH = "a[data-draft='publish']";
 
     static readonly DATA_TEST_JELLY_TOT = "sbx-pop-out-header-options-button";

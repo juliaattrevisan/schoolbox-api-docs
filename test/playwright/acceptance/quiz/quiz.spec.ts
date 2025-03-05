@@ -115,8 +115,8 @@ test.describe("Quiz Create Tests", () => {
         await quiz.setTitle(quizName);
         await assessmentForm.setWorkType(AssessmentForm.WORKTYPE_ASSESSMENT_TASK);
         await assessmentForm.setMarkType(AssessmentForm.MARK_TYPE_PERCENTAGE);
-        await assessmentForm.setOpenDate(Common.getTodayAtMidnight());
-        await assessmentForm.setPublishDate(Common.getTodayAtMidnight());
+        await assessmentForm.setOpenDate(Common.getTodayAtMidnightAM());
+        await assessmentForm.setPublishDate(Common.getTodayAtMidnightAM());
         await quiz.create(quizName);
 
         tester.isGoingTo("Add a question");
@@ -194,12 +194,37 @@ test.describe("Quiz Create Tests", () => {
         tester.isGoingTo("as  Eden Reed submit the Quiz");
         await tester.impersonate("Eden Reed");
         await assessmentPage.goto(quizId, 6);
+        tester.isGoingTo("as  Eden Reed Start the Quiz");
         await page.locator("a.button.submit").click();
         await expect(page.getByLabel("Review screen").first()).toBeVisible();
-        await page.locator("a.lrn-mcq-option").first().click();
-        await page.getByLabel("Review screen").click();
-        await page.locator("button.lrn_btn lrn_btn_blue test-submit btn-lg review-screen-focus-element").click();
-        await page.locator("button.test-dialog-save-submit lrn_btn_blue").click();
+        tester.isGoingTo("as  Eden Reed tick the first question option");
+        await page.locator("li.lrn-mcq-option").first().click();
+        tester.isGoingTo("as  Eden Reed click Review and Finsh buttons");
+        await page.getByLabel("Review screen").last().click();
+        await page.locator("button.lrn_btn.lrn_btn_blue.test-submit.btn-lg.review-screen-focus-element").click();
+        tester.isGoingTo("as  Eden Reed confirm the submission in the dialog");
+        await expect(page.locator("button.test-dialog-save-submit.lrn_btn_blue")).toBeVisible();
+        await page.locator("button.test-dialog-save-submit.lrn_btn_blue").click();
+        await expect(page.locator("h2.subheader").first()).toContainText("Result Summary");
+        tester.isGoingTo("review the attempt");
+        await tester.logout();
+        await tester.loginAsAdmin();
+        await assessmentStatusPage.goto(quizId);
+        await page.locator("a:has-text('Review Attempt')").first().click();
+        await page.locator(StatusPage.SELECTOR_MARK).fill("60");
+        await page.locator(StatusPage.SELECTOR_COMMENT_QUIZ_REVIEW).click();
+        await expect(page.locator("div.alert-box.f-no-margins.success")).toBeVisible();
+        await page.keyboard.type("This is a vertical review comment");
+        await expect(page.locator("div.alert-box.f-no-margins.success")).toBeVisible();
+        await page.waitForTimeout(1000);
+        await page.locator("button.button.full-width.icon-approve.submit").click();
+        await page.locator("button.button.icon-approve.submit").getByText("Yes").click();
+        await page.waitForTimeout(1000);
+        await expect(page.getByTestId("assessment-status-meta-title")).toBeVisible();
+        tester.isGoingTo("check the proper review is presented in the profile page");
+        await profilePage.goto("6");
+        await expect(page.locator("li.feed-item").first()).toContainText("60 %");
+        await expect(page.locator("li.feed-item").first()).toContainText("This is a vertical review comment");
     });
 
     test("Delete a quiz", async ({ tester, page }) => {
@@ -222,17 +247,17 @@ test.describe("Quiz Create Tests", () => {
         ).toBeVisible();
     });
 
-    // test.afterAll(async ({ baseTester, db }) => {
-    //     baseTester.isGoingTo("update delete_at for the quiz assessment so it does not impact the news tests");
-    //     await db.updateInDatabase(
-    //         "assessment",
-    //         { deleted_at: "2022-01-15 11:22:34" },
-    //         { "title like": "Quiz Automation Test%", deleted_at: null },
-    //     );
-    //     await db.updateInDatabase(
-    //         "folder",
-    //         { deleted_at: "2020-01-15 11:22:34" },
-    //         { "name like": "Test Class Homepage Quiz" },
-    //     );
-    // });
+    test.afterAll(async ({ baseTester, db }) => {
+        baseTester.isGoingTo("update delete_at for the quiz assessment so it does not impact the news tests");
+        await db.updateInDatabase(
+            "assessment",
+            { deleted_at: "2022-01-15 11:22:34" },
+            { "title like": "Quiz Automation Test%", deleted_at: null },
+        );
+        await db.updateInDatabase(
+            "folder",
+            { deleted_at: "2020-01-15 11:22:34" },
+            { "name like": "Test Class Homepage Quiz" },
+        );
+    });
 });

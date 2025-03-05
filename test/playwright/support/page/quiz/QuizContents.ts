@@ -1,4 +1,5 @@
 import type { Page } from "@playwright/test";
+import { expect } from "@playwright/test";
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 
 export default class QuizContentsPage {
@@ -26,9 +27,10 @@ export default class QuizContentsPage {
      *
      */
     async clickCreateItemButton(): Promise<void> {
+        await expect(this.page.locator(QuizContentsPage.ITEM_BUTTON).getByText("Create item")).toBeVisible();
         await this.page.locator(QuizContentsPage.ITEM_BUTTON).getByText("Create item").click();
         // adding a timeout to avoid waiting for something that is from learnosity side
-        await this.page.waitForTimeout(500);
+        await this.page.waitForTimeout(1000);
     }
 
     /**
@@ -37,9 +39,10 @@ export default class QuizContentsPage {
      *
      */
     async clickAddNewButton(): Promise<void> {
+        await expect(this.page.locator(QuizContentsPage.ADD_NEW_BUTTON)).toBeVisible();
         await this.page.locator(QuizContentsPage.ADD_NEW_BUTTON).click();
         // adding a timeout to avoid waiting for something that is from learnosity side
-        await this.page.waitForTimeout(500);
+        await this.page.waitForTimeout(1000);
     }
 
     /**
@@ -48,9 +51,10 @@ export default class QuizContentsPage {
      * @param questionType - The question type to be added
      */
     async clickQuestionType(questionType: string): Promise<void> {
+        await expect(this.page.getByLabel(questionType)).toBeVisible();
         await this.page.getByLabel(questionType).click();
         // adding a timeout to avoid waiting for something that is from learnosity side
-        await this.page.waitForTimeout(500);
+        await this.page.waitForTimeout(1000);
     }
 
     /**
