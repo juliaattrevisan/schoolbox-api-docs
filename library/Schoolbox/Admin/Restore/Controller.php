@@ -80,19 +80,19 @@ class Controller extends Base
         /**
          * validate the time range
          */
-        $startDate = self::TIME_FRAME;
+        $startRange = self::TIME_FRAME;
         if (in_array($this->requestQuery->get('restoreRange'), self::VALID_TIME_FRAMES, true)) {
-            $startDate = $this->requestQuery->get('restoreRange');
+            $startRange = $this->requestQuery->get('restoreRange');
         }
 
         //Start Range
-        $start = \Alaress_Date_Format::newNaturalDate(sprintf("-%s", $startDate));
+        $startDate = \Alaress_Date_Format::newNaturalDate(sprintf("-%s", $startRange));
         $end = \Alaress_Date_Format::now();
 
         // Folders
         $folderpb = $this->folderMapper->getPredicateBuilder();
 
-        $deletedFolders = $this->folderMapper->findByPredicates($folderpb->betweenDates('deleted_at', $start, $end), ['deleted' => true,'order' => ['deleted_at' => 'DESC']]);
+        $deletedFolders = $this->folderMapper->findByPredicates($folderpb->betweenDates('deleted_at', $startDate, $end), ['deleted' => true,'order' => ['deleted_at' => 'DESC']]);
 
         // Filter folders where the parent is deleted, these cannot be restored
         $deletedFolders = $deletedFolders->filter(function (Folder $node) {
@@ -101,7 +101,7 @@ class Controller extends Base
 
         // Assessments
         $assessmentpb = $this->assessmentMapper->getPredicateBuilder();
-        $deletedAssessments = $this->assessmentMapper->findByPredicates($assessmentpb->betweenDates('deleted_at', $start, $end), ['deleted' => true, 'order' => ['deleted_at' => 'DESC']]);
+        $deletedAssessments = $this->assessmentMapper->findByPredicates($assessmentpb->betweenDates('deleted_at', $startDate, $end), ['deleted' => true, 'order' => ['deleted_at' => 'DESC']]);
 
         // Filter assessments where the context is deleted, these cannot be restored
         $deletedAssessments = $deletedAssessments->filter(function (Assessment\DataModel\Model $node) {
@@ -118,19 +118,19 @@ class Controller extends Base
         // Users
         $userspb = $this->userMapper->getPredicateBuilder();
 
-        $deletedUsers = $this->userMapper->findByPredicates($userspb->betweenDates('deleted_at', $start, $end), ['deleted' => true,'order' => ['deleted_at' => 'DESC']]);
+        $deletedUsers = $this->userMapper->findByPredicates($userspb->betweenDates('deleted_at', $startDate, $end), ['deleted' => true,'order' => ['deleted_at' => 'DESC']]);
 
         // Courses
         // spec
-        $deletedCourseSpec = $this->getDeletdFolderContent($this->courseSpecMapper, $start, $end);
+        $deletedCourseSpec = $this->getDeletdFolderContent($this->courseSpecMapper, $startDate, $end);
         // impl
-        $deletedCourseImpl = $this->getDeletdFolderContent($this->courseImplMapper, $start, $end);
+        $deletedCourseImpl = $this->getDeletdFolderContent($this->courseImplMapper, $startDate, $end);
 
         // Units
         // spec
         $unitSpecpb = $this->unitSpecMapper->getPredicateBuilder();
 
-        $deletedUnitSpec = $this->unitSpecMapper->findByPredicates($unitSpecpb->betweenDates('deleted_at', $start, $end), ['deleted' => true,'order' => ['deleted_at' => 'DESC']]);
+        $deletedUnitSpec = $this->unitSpecMapper->findByPredicates($unitSpecpb->betweenDates('deleted_at', $startDate, $end), ['deleted' => true,'order' => ['deleted_at' => 'DESC']]);
 
         // Filter Units where the parent (folder and course) are deleted, these cannot be restored
         $deletedUnitSpec = $deletedUnitSpec->filter(function (UnitSpec\Model $node) {
@@ -140,7 +140,7 @@ class Controller extends Base
         // impl
         $unitImplpb = $this->unitImplMapper->getPredicateBuilder();
 
-        $deletedUnitImpl = $this->unitImplMapper->findByPredicates($unitImplpb->betweenDates('deleted_at', $start, $end), ['deleted' => true,'order' => ['deleted_at' => 'DESC']]);
+        $deletedUnitImpl = $this->unitImplMapper->findByPredicates($unitImplpb->betweenDates('deleted_at', $startDate, $end), ['deleted' => true,'order' => ['deleted_at' => 'DESC']]);
 
         // Filter Units where the parent (folder and course) are deleted, these cannot be restored
         $deletedUnitImpl = $deletedUnitImpl->filter(function (UnitImpl\Model $node) {
@@ -148,7 +148,7 @@ class Controller extends Base
         });
 
         // Files
-        $deletedFiles = $this->getDeletdFolderContent($this->fileMapper, $start, $end);
+        $deletedFiles = $this->getDeletdFolderContent($this->fileMapper, $startDate, $end);
 
         $this->response = $this->responseFromTemplate('@restore/index.twig', [
             'pageCurrent'        => $this->routeGenerator->generate('restore.getIndex'),
@@ -166,7 +166,8 @@ class Controller extends Base
             'deletedCourseImpl'  => $deletedCourseImpl,
             'deletedUnitSpec'    => $deletedUnitSpec,
             'deletedUnitImpl'    => $deletedUnitImpl,
-            'restoreRange'       => $startDate,
+            'restoreRange'       => $startRange,
+            'startDate'              => $startDate,
         ]);
     }
 
