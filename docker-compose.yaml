@@ -38,8 +38,15 @@ services:
       - ./docker/php-fpm/config/99-xdebug.ini:/usr/local/etc/php/conf.d/99-xdebug.ini
       - ./docker/php-fpm/config/99-session.ini:/usr/local/etc/php/conf.d/99-session.ini
     # After building: create data dirs, and make mount writable by www-data
+    # Cannot currently use create-data-dirs.sh, as /bin/bash isn't available,
+    # and /bin/sh doesn't support {} expansion
     post_start:
-      - command: /usr/share/schoolbox/tools/create-data-dirs.sh /var/lib/schoolbox/docker/
+      - command: mkdir -p /var/lib/schoolbox/docker/cache/portrait
+      - command: mkdir -p /var/lib/schoolbox/docker/cache/stream
+      - command: mkdir -p /var/lib/schoolbox/docker/cache/zip
+      - command: mkdir -p /var/lib/schoolbox/docker/files
+      - command: mkdir -p /var/lib/schoolbox/docker/purifier
+      - command: mkdir -p /var/lib/schoolbox/docker/twig
       - command: chown -R www-data:www-data /var/lib/schoolbox/docker/
 
   # Image intended for running command-line processes:
@@ -61,7 +68,12 @@ services:
       - schoolbox-config:/etc/schoolbox
     # After building: create data dirs
     post_start:
-      - command: /usr/share/schoolbox/tools/create-data-dirs.sh /var/lib/schoolbox/docker/
+      - command : mkdir -p /var/lib/schoolbox/docker/cache/portrait
+      - command : mkdir -p /var/lib/schoolbox/docker/cache/stream
+      - command : mkdir -p /var/lib/schoolbox/docker/cache/zip
+      - command : mkdir -p /var/lib/schoolbox/docker/files
+      - command : mkdir -p /var/lib/schoolbox/docker/purifier
+      - command : mkdir -p /var/lib/schoolbox/docker/twig
 
   # Database services:
   # these are containers only in a development environment, they won't be on
