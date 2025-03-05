@@ -170,11 +170,16 @@ services:
     container_name: schoolbox-taskd
     depends_on:
       - redis-storage
+      - caddy
     build:
       context: ./docker/schoolbox-taskd
     environment:
       REDIS_HOST: redis-storage
-    # Attempt to map caddy to docker.dev.schoolbox.cloud IP
+    # Attempt to map caddy to docker.dev.schoolbox.cloud IP:
+    # for reasons not yet determined, `getent` doesn't work at this point
+    post_start:
+      - command: mkdir -p /etc/hosts.d
+      - command: getent hosts caddy | cut -f1 -d' ' | sed 's/$/ docker.dev.schoolbox.cloud/' >> /etc/hosts.d/caddy
 #    extra_hosts:
 #      - 'docker.dev.schoolbox.cloud=caddy'
 

@@ -42,11 +42,6 @@ within a self-contained development environment.
   mariadb -h mariadb -u root -D schoolbox < docker/schoolbox/sql/post-setup.sql
   tools/notif/route/refresh-binding-cache.php
   ```
-- finagle file permissions for PHP-FPM:
-  ```shell
-  sudo docker exec -it php-fpm \
-    chown -R www-data:www-data /var/lib/schoolbox/vagrantx/{cache,storage,twig,purifier}
-  ```
 - finagle hostname for taskd, and add it to `/etc/hosts`
   ```shell
   sudo docker exec -it schoolbox-taskd /bin/sh
