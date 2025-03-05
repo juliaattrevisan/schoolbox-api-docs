@@ -271,6 +271,7 @@ class ConfigMapper extends Mapper
     public const NAME_PAPERLY_AGENT_EXTERNAL_DB_USER_OVERRIDE = 'paperly_agent_external_db_user_override';
     public const NAME_PAPERLY_AGENT_EXTERNAL_DB_PASSWORD_OVERRIDE = 'paperly_agent_external_db_password_override';
     public const NAME_PAPERLY_AGENT_EXTERNAL_DB_NAME_OVERRIDE = 'paperly_agent_external_db_name_override';
+    public const NAME_PAPERLY_OPEN_IN_NEW_TAB = 'paperly_open_in_new_tab';
 
 
     public const NAME_KAMI_ENABLED = 'kami_enabled';
