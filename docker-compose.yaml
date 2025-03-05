@@ -26,18 +26,16 @@ services:
       context: ./docker/php-fpm
     volumes:
       - code:/usr/share/schoolbox
-      - cache:/var/lib/schoolbox
+      - storage:/var/lib/schoolbox/docker/storage
       - schoolbox-config:/etc/schoolbox
       # Instead include configs in image?
       - ./docker/php-fpm/config/99-error-reporting.ini:/usr/local/etc/php/conf.d/99-error-reporting.ini
       - ./docker/php-fpm/config/99-xdebug.ini:/usr/local/etc/php/conf.d/99-xdebug.ini
       - ./docker/php-fpm/config/99-session.ini:/usr/local/etc/php/conf.d/99-session.ini
-    # After building: make cache mount writable by www-data
+    # After building: create data dirs, and make mount writable by www-data
     post_start:
-      - command: mkdir -p /var/lib/schoolbox/cache
-      - command: mkdir -p /var/lib/schoolbox/twig
-      - command: mkdir -p /var/lib/schoolbox/purifier
-      - command: chown -R www-data:www-data /var/lib/schoolbox/{cache,storage,twig,purifier}
+      - command: /usr/share/schoolbox/tools/create-data-dirs.sh /var/lib/schoolbox/docker/
+      - command: chown -R www-data:www-data /var/lib/schoolbox/docker/
 
   # Image intended for running command-line processes:
   # * command-line tools
@@ -54,8 +52,12 @@ services:
     tty: true
     volumes:
       - code:/usr/share/schoolbox
-      - cache:/var/lib/schoolbox
+      - storage:/var/lib/schoolbox/docker/storage
+#      - cache:/var/lib/schoolbox
       - schoolbox-config:/etc/schoolbox
+    # After building: create data dirs
+    post_start:
+      - command: /usr/share/schoolbox/tools/create-data-dirs.sh /var/lib/schoolbox/docker/
 
   # Database services:
   # these are containers only in a development environment, they won't be on
@@ -117,7 +119,8 @@ services:
     env_file: docker/default.env
     volumes:
       - code:/usr/share/schoolbox
-      - cache:/var/lib/schoolbox
+      - storage:/var/lib/schoolbox/docker/storage
+#      - cache:/var/lib/schoolbox
       - schoolbox-config:/etc/schoolbox
 
   schoolbox-scheduled:
@@ -132,7 +135,8 @@ services:
     env_file: docker/default.env
     volumes:
       - code:/usr/share/schoolbox
-      - cache:/var/lib/schoolbox
+      - storage:/var/lib/schoolbox/docker/storage
+#      - cache:/var/lib/schoolbox
       - schoolbox-config:/etc/schoolbox
 
   schoolbox-mobiled:
@@ -147,7 +151,8 @@ services:
     env_file: docker/default.env
     volumes:
       - code:/usr/share/schoolbox
-      - cache:/var/lib/schoolbox
+      - storage:/var/lib/schoolbox/docker/storage
+#      - cache:/var/lib/schoolbox
       - schoolbox-config:/etc/schoolbox
 
   schoolbox-socketd:
@@ -162,7 +167,8 @@ services:
     env_file: docker/default.env
     volumes:
       - code:/usr/share/schoolbox
-      - cache:/var/lib/schoolbox
+      - storage:/var/lib/schoolbox/docker/storage
+#      - cache:/var/lib/schoolbox
       - schoolbox-config:/etc/schoolbox
 
   schoolbox-taskd:
