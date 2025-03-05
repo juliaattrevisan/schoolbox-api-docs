@@ -6,12 +6,9 @@ DROP USER IF EXISTS 'schoolboxvagrant'@'localhost';
 CREATE USER IF NOT EXISTS 'schoolboxvagrant'@'localhost' IDENTIFIED BY 'abc123';
 
 # create Docker users
-DROP USER IF EXISTS 'schoolboxdocker'@'php-fpm';
-CREATE USER IF NOT EXISTS 'schoolboxdocker'@'php-fpm' IDENTIFIED BY 'abc123';
-DROP USER IF EXISTS 'schoolboxdocker'@'schoolbox-cli';
-CREATE USER IF NOT EXISTS 'schoolboxdocker'@'schoolbox-cli' IDENTIFIED BY 'abc123';
+DROP USER IF EXISTS 'schoolboxdocker'@'%';
+CREATE USER IF NOT EXISTS 'schoolboxdocker'@'%' IDENTIFIED BY 'abc123';
 
 # grant everything to all these users
 GRANT ALL ON schoolbox.* to 'schoolboxvagrant'@'localhost';
-GRANT ALL ON schoolbox.* to 'schoolboxdocker'@'php-fpm';
-GRANT ALL ON schoolbox.* to 'schoolboxdocker'@'schoolbox-cli';
+GRANT ALL ON schoolbox.* to 'schoolboxdocker'@'%';
