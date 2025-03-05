@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # Create Data Directories Script
 # Description:
 #	Performs a soft creation of each data directory
