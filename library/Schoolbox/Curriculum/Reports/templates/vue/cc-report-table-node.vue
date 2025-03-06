@@ -122,9 +122,9 @@ function onCourseClicked(course: CourseWithCurriculumNodeUsage, buttonEl: HTMLBu
 </script>
 
 <template>
-    <tr v-if="props.node.isVisible">
+    <tr v-if="props.node.isVisible" :class="`${!props.node.enabled ? 'disabled' : ''}`">
         <td
-            class="l-flex l-flex--align-center l-gap-s f-no-margins name-cell u-border-right"
+            :class="`l-flex l-flex--align-center l-gap-s f-no-margins name-cell u-border-right ${!props.node.enabled ? 'disabled' : ''}`"
             :style="{
                 paddingInlineStart: filtersStore.onlyShowGaps ? '0.5rem' : `calc(${props.depth * 0.5}rem + 0.5rem)`,
             }"
@@ -256,7 +256,7 @@ function onCourseClicked(course: CourseWithCurriculumNodeUsage, buttonEl: HTMLBu
 
 <style lang="scss" scoped>
 tr:hover {
-    background-color: #f4f3f3; /* to help legibility */
+    background-color: #e9e8e8; /* to help legibility */
 }
 
 .name-cell {
@@ -270,6 +270,10 @@ tr:hover {
     @media (max-width: 1000px) {
         position: static; // prevent the cell from sticking on smaller screens
     }
+}
+
+.disabled {
+    background: #f6f6f6;
 }
 
 .usage-cell {
