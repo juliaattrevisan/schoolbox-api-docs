@@ -65,6 +65,17 @@ class Module extends BaseModule
             ->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
             ->addRoutePermission(
                 $authorizer,
+                '(?:read)',
+                new Rule\All(
+                    new Rule\IsLoggedIn(),
+                    new Rule\Any(
+                        new Auth\CanReadItem(),
+                        new Rule\IsSuperuser(),
+                    )
+                )
+            )
+            ->addRoutePermission(
+                $authorizer,
                 '(?:add|edit|delete)',
                 new Rule\Any(
                     new Rule\IsSuperuser(),
