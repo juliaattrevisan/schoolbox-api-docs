@@ -52,6 +52,10 @@ class Controller extends Base
             return;
         }
 
+        $ai = new Helper($this->client, $this->logMapper, $this->getConfigLoader());
+
+        $ai->async($this->getUser(), payload: $this->request->getBody()->getContents());
+
         /**
          * @var Log\Model $log
          */
