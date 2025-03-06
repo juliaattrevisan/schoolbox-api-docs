@@ -50,8 +50,8 @@ const isModalOpen = window.Vue.ref(false); // to open/close the exporting to csv
             <div>
                 <label>Show disabled outcomes</label>
                 <div class="switch f-no-margins">
-                    <input id="onlyShowGapsSwitch" v-model="filtersStore.showDisabled" type="checkbox" />
-                    <label for="onlyShowGapsSwitch" data-test="cc-report-filters-gaps-switch">
+                    <input id="showDisabledOutcomesSwitch" v-model="filtersStore.showDisabled" type="checkbox" />
+                    <label for="showDisabledOutcomesSwitch" data-test="cc-report-filters-disabled-switch">
                         <span class="icon-approve"></span>
                         <span class="icon-cancel"></span>
                     </label>
