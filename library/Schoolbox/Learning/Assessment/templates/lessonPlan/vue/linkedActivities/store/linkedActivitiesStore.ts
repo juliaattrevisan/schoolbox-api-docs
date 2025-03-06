@@ -1,7 +1,7 @@
 import * as toast from "@schoolboxVue/components/toast/sbxToastEvent";
 import { defineStore } from "pinia";
 import type { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
-import { LessonPlanEvent } from "../../js/event/lessonPlanEvent";
+import { LessonPlanEvent } from "../../../js/event/lessonPlanEvent";
 
 export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () => {
     const sourceId = window.Vue.ref(0); // The id of the source lesson plan

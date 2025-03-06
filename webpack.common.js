@@ -156,7 +156,8 @@ module.exports = {
         checkShareWorkButtons: "./library/Schoolbox/Learning/Moment/Evidence/templates/js/checkShareWorkButtons.js",
         similarityReport:
             "./library/Schoolbox/Learning/Assessment/templates/dueWork/vue/similarityReport/similarityReport.ts",
-        linkedActivities: "./library/Schoolbox/Learning/Assessment/templates/lessonPlan/vue/linkedActivities.ts",
+        linkedActivities:
+            "./library/Schoolbox/Learning/Assessment/templates/lessonPlan/vue/linkedActivities/linkedActivities.ts",
         activityStatusPage: "./library/Schoolbox/Learning/Assessment/templates/status/activityStatusPage.ts",
 
         // Assessment
