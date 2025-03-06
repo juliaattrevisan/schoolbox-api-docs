@@ -2485,7 +2485,7 @@ class Controller extends Base
                 'componentConfigComponentNameKey' => Component_Config_Componentname::KEY,
             ],
             Builder::getArrayParameters(array_keys($courses), 'courses')
-            ));
+        ));
         while ($row = $compTextQuery->fetch(\PDO::FETCH_ASSOC)) {
             $componentName = $row['componentName'] ?? 'NULL';
             // if component is empty string, use the system default
