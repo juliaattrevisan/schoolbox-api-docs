@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useEditor } from "@schoolboxVue/composables/editor/useEditor";
+import type { SbxEditor } from "@js/editor/types/editorTypes";
 import { useLessonPlannerStore } from "./store/lessonPlannerStore";
 import type { LessonPlanField } from "./lessonPlannerTypes";
 
@@ -7,6 +9,7 @@ interface Props {
     studentConst: string; // The const for student visibility
     fieldId: LessonPlanField["id"];
     fieldRef: number | string; // The reference for the field for the form, i.e. the ID if it's an existing field or {newFieldKeyword}{index} if it's a new field
+    fileBrowserCategoryId: number;
 }
 
 const props = defineProps<Props>();
@@ -14,6 +17,30 @@ const lpStore = useLessonPlannerStore();
 
 const field = window.Vue.computed(() => {
     return lpStore.fields.find((f) => f.id === props.fieldId);
+});
+
+const textareaEl = window.Vue.useTemplateRef<HTMLTextAreaElement>("textareaEl");
+
+window.Vue.onMounted(async () => {
+    const currentField = field.value;
+    if (!currentField) throw new Error("Unable to initialise lp-field without a field");
+
+    const editor = await new Promise<SbxEditor>((resolve) => {
+        if (!textareaEl.value) throw new Error("Unable to initialise lp-field without a textarea element");
+        useEditor(
+            currentField.body,
+            textareaEl.value,
+            {
+                maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
+                targetElements: [textareaEl.value],
+                fileBrowserCategoryId: props.fileBrowserCategoryId,
+            },
+            true,
+            (e) => resolve(e.editor),
+        );
+    });
+
+    currentField.editor = editor;
 });
 </script>
 
@@ -40,9 +67,9 @@ const field = window.Vue.computed(() => {
             />
             <textarea
                 :id="`field-body-${props.fieldRef}`"
+                ref="textareaEl"
                 v-model="field.body"
                 :name="`field[${props.fieldRef}][body]`"
-                data-ckeditor
             >
             </textarea>
         </div>

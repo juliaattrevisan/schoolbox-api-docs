@@ -35,6 +35,7 @@
     <lesson-planner
         :new-field-keyword="{{ lessonPlanMeta.newKeyword |json_encode }}"
         :student-const="{{ lessonPlanMeta.consts.student |json_encode }}"
+        :file-browser-category-id="{{ context.baseContext.folder.id ?? 0 }}"
         :fields="{{ lessonPlanMeta.fields |json_encode }}"
     >
         <template v-slot:title>
@@ -143,16 +144,6 @@
          */
         $('input[name="title"]').rules('add', 'requiredNotBlank');
     });
-
-    /* Spawn multiple ckeditors for fields which already existed
-     */
-    document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
-        detail: {
-            maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
-            targetElements: ['[data-ckeditor]'],
-            fileBrowserCategoryId: {{ context.baseContext.folder.id ?? 0 }},
-        }
-    }));
 
     /* but why? See SA-18416
      */

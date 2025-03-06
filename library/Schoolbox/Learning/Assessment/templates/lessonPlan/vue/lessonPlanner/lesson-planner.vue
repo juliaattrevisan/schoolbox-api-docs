@@ -9,6 +9,7 @@ import LpModalReview from "./lp-modal-review.vue";
 interface Props {
     newFieldKeyword: string; // The prefix for new field IDs
     studentConst: string; // The const for student visibility
+    fileBrowserCategoryId: number;
     fields: LessonPlanField[];
 }
 
@@ -36,6 +37,7 @@ window.Vue.onMounted(() => {
             :key="field.id"
             :new-field-keyword="props.newFieldKeyword"
             :student-const="props.studentConst"
+            :file-browser-category-id="props.fileBrowserCategoryId"
             :field-id="field.id"
             :field-ref="field.lessonPlanTemplateField ? field.id : `${props.newFieldKeyword}${i}`"
         />
