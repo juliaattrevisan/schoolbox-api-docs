@@ -371,13 +371,15 @@ abstract class Controller extends ListController implements IAssessmentControlle
                  * so grab all the attributes we need and put them into an array
                  */
                 foreach ($lessonPlanTemplate->getFields() as $field) {
+                    if ($field->isDeleted()) {
+                        continue; // Exclude fields that have been deleted when creating a new lesson plan
+                    }
                     $data['lessonPlanMeta']['fields'][] = [
                         'id' => $field->getId(),
                         'title' => $field->getTitle(),
                         'body' => $field->getBody(),
                         'meta' => null, // TODO: Implement this, can be string|null
                         'visibility' => $field->getVisibility(),
-                        'isDeleted' => $field->isDeleted(),
                     ];
                 }
 
@@ -495,13 +497,13 @@ abstract class Controller extends ListController implements IAssessmentControlle
              * so grab all the attributes we need and put them into an array
              */
             foreach ($lessonPlan->getFields() as $field) {
+                // this notably includes deleted template fields as well since they are still part of the existing lesson plan
                 $data['lessonPlanMeta']['fields'][] = [
                     'id' => $field->getId(),
                     'title' => $field->getTitle(),
                     'body' => $field->getBody(),
                     'meta' => null, // TODO: Implement this, can be string|null
                     'visibility' => $field->getVisibility(),
-                    'isDeleted' => $field->isDeleted(),
                     // this key only exists when modifying an existing lesson plan:
                     'lessonPlanTemplateField' => $field->getLessonPlanTemplateField(),
                 ];

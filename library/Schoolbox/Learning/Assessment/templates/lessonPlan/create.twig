@@ -77,26 +77,24 @@
      #}
     <fieldset>
         {% for field in lessonPlanMeta.fields %}
-            {% if not field.isDeleted %}
-                {% set newFieldIdentifier = lessonPlanMeta.newKeyword ~ loop.index %}
-                <div class="row">
-                    <div class="small-12 columns">
-                        <div class="lp-item-label">
-                            <label>{{ field.title }}</label>
-                            {% if lessonPlanMeta.consts.student != field.visibility %}
-                                <p class="meta"><span class="icon-view-hollow"></span>This field is not visible to students</p>
-                            {% endif %}
-                        </div>
-
-                        {# The Lesson Plan Template field which is related to this Lesson Plan Field
-                         # Because of the swamp you need to know both since the same function fulfils
-                         # create and update phases in mapperProxy->save()
-                         #}
-                        <input type="hidden" name="field[{{ newFieldIdentifier }}][template]" value="{{ field.id }}" />
-                        <textarea id="field-body-{{ newFieldIdentifier }}" name="field[{{ newFieldIdentifier }}][body]" data-ckeditor>{{ field.body }}</textarea>
+            {% set newFieldIdentifier = lessonPlanMeta.newKeyword ~ loop.index %}
+            <div class="row">
+                <div class="small-12 columns">
+                    <div class="lp-item-label">
+                        <label>{{ field.title }}</label>
+                        {% if lessonPlanMeta.consts.student != field.visibility %}
+                            <p class="meta"><span class="icon-view-hollow"></span>This field is not visible to students</p>
+                        {% endif %}
                     </div>
+
+                    {# The Lesson Plan Template field which is related to this Lesson Plan Field
+                        # Because of the swamp you need to know both since the same function fulfils
+                        # create and update phases in mapperProxy->save()
+                        #}
+                    <input type="hidden" name="field[{{ newFieldIdentifier }}][template]" value="{{ field.id }}" />
+                    <textarea id="field-body-{{ newFieldIdentifier }}" name="field[{{ newFieldIdentifier }}][body]" data-ckeditor>{{ field.body }}</textarea>
                 </div>
-            {% endif %}
+            </div>
         {% endfor %}
     </fieldset>
 {% endif %}
