@@ -16,6 +16,7 @@ use Schoolbox\Collection;
 use Schoolbox\File\Mimetype;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Storage;
 use Schoolbox\ResourceBooking\Booking;
 use Schoolbox\ResourceBooking\Category;
@@ -371,22 +372,37 @@ class Mapper extends BaseMapper
         }
 
         $query     = "
-            SELECT {$this->getColumnString('re')}
+            SELECT DISTINCT {$this->getColumnString('re')}
             FROM {$this->getTable()} `re`
+            LEFT JOIN {$this->getJoinSql('moderator', 're', 'm')}
             LEFT JOIN {$this->getJoinSql('role', 're', 'role')}
             WHERE
               (`re`.`name` LIKE :searchLike OR `re`.`description` LIKE :searchLike OR `re`.`room_code` = :search)
               AND {$this->getSoftDeleteFilterSql('re')}
-              AND (`role`.`role_id` = :roleId AND `role`.`allowed` = 1)
+        ";
+
+        $sessionUser = $this->getSessionUser();
+        if (
+            !$sessionUser->isSuperuser() &&
+            !$sessionUser->hasServicePermission(UserAccess::SERVICE_RESOURCE_BOOKING, UserAccess::ACCESS_FULL)
+        ) {
+            $query .= "
+                AND ((`role`.`role_id` = :roleId AND `role`.`allowed` = 1) OR (m.moderator_id = :moderatorId))
+            ";
+        }
+
+        $query .= "
             ORDER BY $order
             LIMIT :limit OFFSET :offset
         ";
+
         $statement = $this->getDatabase()->prepare($query);
         $statement->bindValue('search', $keyword);
         $statement->bindValue('searchLike', '%' . $this->getDatabase()->getQuoter()->escapeForLike($keyword) . '%');
         $statement->bindValue('limit', intval($limit), \PDO::PARAM_INT);
         $statement->bindValue('offset', intval($offset), \PDO::PARAM_INT);
-        $statement->bindValue('roleId', $this->getSessionUser()->getRole()->getId(), \PDO::PARAM_INT);
+        $statement->bindValue('roleId', $sessionUser->getRole()->getId(), \PDO::PARAM_INT);
+        $statement->bindValue('moderatorId', $sessionUser->getId(), \PDO::PARAM_INT);
         $statement->execute();
         return $this->hydrateList($statement, 're');
     }
@@ -402,18 +418,30 @@ class Mapper extends BaseMapper
     public function searchCount($keyword)
     {
         $query     = "
-            SELECT COUNT(*)
+            SELECT COUNT(DISTINCT re.id, re.name, re.description, re.room_code)
             FROM {$this->getTable()} `re`
+            LEFT JOIN {$this->getJoinSql('moderator', 're', 'm')}
             LEFT JOIN {$this->getJoinSql('role', 're', 'role')}
             WHERE
               (`re`.`name` LIKE :searchLike OR `re`.`description` LIKE :searchLike OR `re`.`room_code` = :search)
               AND {$this->getSoftDeleteFilterSql('re')}
-              AND (`role`.`role_id` = :roleId AND `role`.`allowed` = 1)
         ";
+
+        $sessionUser = $this->getSessionUser();
+        if (
+            !$sessionUser->isSuperuser() &&
+            !$sessionUser->hasServicePermission(UserAccess::SERVICE_RESOURCE_BOOKING, UserAccess::ACCESS_FULL)
+        ) {
+            $query .= "
+                AND ((`role`.`role_id` = :roleId AND `role`.`allowed` = 1) OR (m.moderator_id = :moderatorId))
+            ";
+        }
+
         $statement = $this->getDatabase()->prepare($query);
         $statement->bindValue('search', $keyword);
         $statement->bindValue('searchLike', '%' . $this->getDatabase()->getQuoter()->escapeForLike($keyword) . '%');
         $statement->bindValue('roleId', $this->getSessionUser()->getRole()->getId(), \PDO::PARAM_INT);
+        $statement->bindValue('moderatorId', $sessionUser->getId(), \PDO::PARAM_INT);
         $statement->execute();
         return $statement->fetchColumn();
     }

@@ -18,6 +18,7 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Exception as ResourceException;
 use Schoolbox\Role;
 use Schoolbox\User;
@@ -68,6 +69,7 @@ class Controller extends Base
         $page     = max(intval($this->requestQuery->get('page')), 1);
         $category = $this->mapper->getJoinMapper('category')->createModel();
         $category->setName('All');
+
 
         // Use the paginator to limit searches
         $this->paginator->setUrl($this->request->getUri()->__toString());

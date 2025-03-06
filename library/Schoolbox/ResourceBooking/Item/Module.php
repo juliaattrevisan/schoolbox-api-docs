@@ -70,7 +70,9 @@ class Module extends BaseModule
                     new Rule\IsLoggedIn(),
                     new Rule\Any(
                         new Auth\CanReadItem(),
+                        new Auth\CanModerateItem(),
                         new Rule\IsSuperuser(),
+                        new Rule\HasServicePermission(UserAccess::SERVICE_RESOURCE_BOOKING, UserAccess::ACCESS_FULL),
                     )
                 )
             )
