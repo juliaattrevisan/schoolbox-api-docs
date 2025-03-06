@@ -23,15 +23,7 @@ $trace->setServerVars($_SERVER);
 
 // Start transaction ASAP for profiling:
 // later, setTransactionContextForAuraRoute, etc. will update the transaction.
-$trace->startTransaction(
-    operation: 'http.server',
-    origin: 'auto.http',
-    source: TransactionSource::url(),
-    data: [
-        'url'                 => $_SERVER['REQUEST_URI'] ?? null,
-        'http.request.method' => $_SERVER['REQUEST_METHOD'] ?? null,
-    ]
-);
+$trace->startTransaction();
 register_shutdown_function($trace->finishTransaction(...));
 
 if ($path !== "/index.php" && preg_match('/.+\.php$/', $path) && file_exists(WEB_root . $path)) {
