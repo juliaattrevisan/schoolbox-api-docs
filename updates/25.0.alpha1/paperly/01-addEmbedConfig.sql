@@ -7,8 +7,8 @@ INSERT INTO `config`
 VALUES (
     'paperly_open_in_new_tab',
     '0',
-    'Open Paperly in New Tab',
-    'Whether to open paperly in a new tab or use it inline. Use this if users are having issues loading Paperly with the inline option',
+    'Open Paperly in a New Tab instead of Inline',
+    'Enable this to open Paperly in a new tab instead of inline. Useful if users have loading issues with the inline option',
     null,
     (SELECT id FROM lu_config_field WHERE `field` = 'boolean'),
     (SELECT id FROM lu_config_type WHERE `type` = '3rd Party Services'),
