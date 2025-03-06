@@ -32,7 +32,7 @@ class Controller extends Base
     /**
      * Period of time that you can restore items, older than this will not be displayed
      */
-    private const TIME_FRAME = '2weeks';
+    private const TIME_FRAME = '2week';
     private const VALID_TIME_FRAMES = [
         '1week',
         '2week',
@@ -80,13 +80,13 @@ class Controller extends Base
         /**
          * validate the time range
          */
-        $startDate = self::TIME_FRAME;
+        $startRange = self::TIME_FRAME;
         if (in_array($this->requestQuery->get('restoreRange'), self::VALID_TIME_FRAMES, true)) {
-            $startDate = $this->requestQuery->get('restoreRange');
+            $startRange = $this->requestQuery->get('restoreRange');
         }
 
         //Start Range
-        $start = \Alaress_Date_Format::newNaturalDate(sprintf("-%s", $startDate));
+        $start = \Alaress_Date_Format::newNaturalDate(sprintf("-%s", $startRange));
         $end = \Alaress_Date_Format::now();
 
         // Folders
@@ -166,7 +166,7 @@ class Controller extends Base
             'deletedCourseImpl'  => $deletedCourseImpl,
             'deletedUnitSpec'    => $deletedUnitSpec,
             'deletedUnitImpl'    => $deletedUnitImpl,
-            'restoreRange'       => $startDate,
+            'restoreRange'       => $startRange,
         ]);
     }
 

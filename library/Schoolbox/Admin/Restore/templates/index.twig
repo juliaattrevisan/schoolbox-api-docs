@@ -46,7 +46,19 @@
         document.querySelector('[data-restore-range]').value = '{{ restoreRange }}';
         /* when the search window changes, reload the page */
         document.querySelector('[data-restore-range]').addEventListener('change', function() {
-            window.location.replace(window.location.href.replace(window.location.search,'?restoreRange=' + this.value));
+            const searchParams = new URLSearchParams(window.location.search);
+            searchParams.set('restoreRange', this.value);
+            window.location.search = searchParams.toString();
+        });
+
+        /* when the tab changes, update the URL hash */
+        if (window.location.hash) {
+            document.querySelector(`[data-tab] a[href="${window.location.hash}"]`).click();
+        }
+        document.querySelectorAll('[data-tab] a').forEach(function(tab) {
+            tab.addEventListener('click', function() {
+                window.location.hash = this.getAttribute('href').replace('#', '');
+            });
         });
     });
 </script>
@@ -71,13 +83,13 @@
         <div class="small-12 island">
             <div>
                 <label for="restoreDateRange">
-                    Deleted Search Window
+                    Filter Deleted Records:
                 </label>
                 <select id="restoreDateRange" data-restore-range>
-                    <option value="1week">1 Week ago</option>
-                    <option value="2week">2 Weeks ago</option>
-                    <option value="1month">1 Month ago</option>
-                    <option value="3month">3 Months ago</option>
+                    <option value="1week">Last 7 days</option>
+                    <option value="2week">Last 14 days</option>
+                    <option value="1month">Last month</option>
+                    <option value="3month">Last 3 months</option>
                 </select>
             </div>
             <dl class="tabs" data-tab>
