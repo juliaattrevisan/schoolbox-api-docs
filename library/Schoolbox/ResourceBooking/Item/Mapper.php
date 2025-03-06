@@ -404,13 +404,16 @@ class Mapper extends BaseMapper
         $query     = "
             SELECT COUNT(*)
             FROM {$this->getTable()} `re`
+            LEFT JOIN {$this->getJoinSql('role', 're', 'role')}
             WHERE
               (`re`.`name` LIKE :searchLike OR `re`.`description` LIKE :searchLike OR `re`.`room_code` = :search)
               AND {$this->getSoftDeleteFilterSql('re')}
+              AND (`role`.`role_id` = :roleId AND `role`.`allowed` = 1)
         ";
         $statement = $this->getDatabase()->prepare($query);
         $statement->bindValue('search', $keyword);
         $statement->bindValue('searchLike', '%' . $this->getDatabase()->getQuoter()->escapeForLike($keyword) . '%');
+        $statement->bindValue('roleId', $this->getSessionUser()->getRole()->getId(), \PDO::PARAM_INT);
         $statement->execute();
         return $statement->fetchColumn();
     }
