@@ -1,23 +1,23 @@
 config:
 
-  site_plan : { value : PortalPlus }
+  site_plan : { value : Community-Essentials }
 
   #Modules
   teams_enabled: {edit: true}
   curriculum_tagging_enabled: {value: false, edit: false}
   eotc_enabled: {value: false, edit: false}
-  learning_moments_enabled : {edit: true}
+  learning_moments_enabled : {value: false, edit: false}
   badges_enabled : {value: false, edit: false}
-  fixtures_enabled: {edit: true}
-  clipboard_enabled: {edit: true}
+  fixtures_enabled: {value: false, edit: false}
+  clipboard_enabled: {value: false, edit: false}
   pastoral_enabled : {value: false, edit: false}
-  resource_booking_enabled: {edit: true}
-  external_document_report_enabled : { edit : true }
-  webdav_enable: {edit: true}
+  resource_booking_enabled: {value: false, edit: false}
+  external_document_report_enabled : { value : false, edit : false }
+  webdav_enable: {value: false, edit: false}
   kami_enabled: {value: false, edit: false}
   geosnapshot_enabled: {edit: true}
   lms_enabled: {value: false}
-  qr_login_enabled: {value: true, edit: true}
+  qr_login_enabled: {value: false, edit: false}
   summative_report_enabled: {value: false, edit: false}
   curriculum_coverage_report_enabled: {value: false, edit: false}
 
@@ -37,8 +37,8 @@ config:
   pastoral_bulk_import_enabled: {hide: true}
 
   #Learning Moments
-  evidence_parent_create: {hide: false}
-  evidence_parent_comment: {hide: false}
+  evidence_parent_create: {hide: true}
+  evidence_parent_comment: {hide: true}
 
   #LMS
   grade_comments_enable: {value: false, hide: true}
@@ -84,10 +84,10 @@ config:
   global_moderation: { hide: false }
   messaging_enabled: { hide: false }
   ups_groups_enabled: { value: true, hide: true }
-  eportfolio_enabled: { hide: false, edit: true}
-  staff_directory_enabled: {edit: true}
-  report_staff_access : { hide : false }
-  parent_directory_enabled: {edit: true}
+  eportfolio_enabled: { hide: false, value: false, edit: false}
+  staff_directory_enabled: {value: false, edit: false}
+  report_staff_access: {hide: true }
+  parent_directory_enabled: {value: false, edit: false}
 
   # APIs
   weather_api_key: { hide: true }
@@ -95,7 +95,7 @@ config:
   cyberhound_api_url: {value: '', hide: true}
   cyberhound_api_shared_key: {value: '', hide: true }
   cyberhound_whitelist: {value: '', hide: true }
-  clickview_school_id: {hide: false}
+  clickview_school_id: {value: '', hide: true}
   kami_api_key: { hide: true }
   office365_tenant: { hide: false }
   office365_tenant_id : { hide : false }
@@ -117,22 +117,28 @@ topMenu:
     - /learning/grades
     - /learning/badge
     - /course/list
-    - /pastoral
-  show:
     - /eportfolio
     - /fixtures
+    - /pastoral
 components:
   hide:
    - Schoolbox\Learning\Component\Dashboard\UpcomingWorkController
    - Component_Dashboard_RecentSubmissionsController
+   - Component_Homepage_ClickviewController
    - Schoolbox\Learning\Assessment\DueWork\Component\Homepage\Controller
    - Schoolbox\Learning\Assessment\Quiz\Component\Homepage\Controller
+   - Component_Homepage_ChatController
    - Component_Homepage_WolframController
    - Schoolbox\Learning\Assessment\Component\Homepage\Outline\Controller
    - Schoolbox\Learning\Assessment\Component\Homepage\Builder\Controller
    - Component_Homepage_RubricController
+   - Component_Homepage_EtherpadController
    - Schoolbox\Curriculum\Component\CurriculumDetailsController
    - Schoolbox\Curriculum\Component\CurriculumOverviewController
+   - Schoolbox\LTI\Component\Homepage\Controller
+   - Schoolbox\Fixtures\Component\Homepage\Controller
+   - Schoolbox\Fixtures\Component\Dashboard\Controller
    - Schoolbox\Learning\Assessment\Task\Component\Homepage\Controller
+   - Schoolbox\Learning\Moment\StudentToolkit\Component\Dashboard\Controller
    - Schoolbox\Learning\Assessment\Lti\Component\Homepage\Controller
    - Component_Dashboard_CanvasAssignmentsController

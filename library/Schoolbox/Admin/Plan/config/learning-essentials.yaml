@@ -1,24 +1,24 @@
 config:
 
-  site_plan: {value: Basic}
+  site_plan : { value : Learning-Essentials }
 
   #Modules
-  teams_enabled: {value: false, edit: false}
-  curriculum_tagging_enabled: {value: false, edit: false}
+  teams_enabled: {edit: true}
+  curriculum_tagging_enabled: {edit: true}
   eotc_enabled: {value: false, edit: false}
-  learning_moments_enabled : {value: false, edit: false}
-  badges_enabled : {value: false, edit: false}
+  learning_moments_enabled : {edit: true}
+  badges_enabled : {edit: true}
   fixtures_enabled: {value: false, edit: false}
   clipboard_enabled: {value: false, edit: false}
   pastoral_enabled : {value: false, edit: false}
   resource_booking_enabled: {value: false, edit: false}
-  external_document_report_enabled : { value : false, edit : false }
-  webdav_enable: {value: false, edit: false}
-  kami_enabled: {value: false, edit: false}
+  external_document_report_enabled : { edit : true }
+  webdav_enable: {edit: true}
+  kami_enabled: {edit: true}
   geosnapshot_enabled: {edit: true}
   lms_enabled: {value: true}
-  qr_login_enabled: {value: false, edit: false}
-  summative_report_enabled: {value: false, edit: false}
+  qr_login_enabled: {value: true, edit: true}
+  summative_report_enabled: {edit: true}
   curriculum_coverage_report_enabled: {value: false, edit: false}
 
   #Pastoral
@@ -37,15 +37,15 @@ config:
   pastoral_bulk_import_enabled: {hide: true}
 
   #Learning Moments
-  evidence_parent_create: {hide: true}
-  evidence_parent_comment: {hide: true}
+  evidence_parent_create: {hide: false}
+  evidence_parent_comment: {hide: false}
 
   #LMS
-  grade_comments_enable: {value: false, hide: true}
-  custom_assessment_participation: {value: false, hide: true}
-  self_assessment_enabled: {value: false, hide: true}
-  course_markbook_enable: {value: false, hide: true}
-  assessment_calendar_enabled: {value: false, hide: true}
+  grade_comments_enable: {hide: false}
+  custom_assessment_participation: {hide: false}
+  self_assessment_enabled: {hide: false}
+  course_markbook_enable: {hide: false}
+  assessment_calendar_enabled: {hide: false}
   class_markbook_enable: {hide: false}
   rubric_markbook_enable: {hide: false}
   upcoming_assessments_enabled : {hide: false}
@@ -62,8 +62,8 @@ config:
   restrict_student_submissions: {hide: false}
   submission_visibility_max: {hide: false}
   submission_access: {hide: false}
-  similarity_check_student_visible: {hide: true}
-  similarity_check_allow_students_report_access: {hide: true}
+  similarity_check_student_visible: {hide: false}
+  similarity_check_allow_students_report_access: {hide: false}
   restrict_parent_grades: {hide: false}
   default_grade_group: {hide: false}
   show_overall_grade: { hide: false }
@@ -80,29 +80,29 @@ config:
 
   #Comms
   comms_comments_enabled: { hide: false }
-  comms_statistics_enabled : {value: false, hide: true}
+  comms_statistics_enabled : {value: true, hide: true}
   global_moderation: { hide: false }
   messaging_enabled: { hide: false }
-  ups_groups_enabled: { value: false, hide: true }
-  eportfolio_enabled: { hide: false, value: false, edit: false}
-  staff_directory_enabled: {value: false, edit: false}
-  report_staff_access : { hide : true }
-  parent_directory_enabled: {value: false, edit: false}
+  ups_groups_enabled: { value: true, hide: true }
+  eportfolio_enabled: { hide: false, edit: true}
+  staff_directory_enabled: {edit: true}
+  report_staff_access : { hide : false }
+  parent_directory_enabled: {edit: true}
 
   # APIs
-  weather_api_key: {value: '', hide: true }
+  weather_api_key: { hide: true }
   googledrive_enabled: { hide: false }
-  cyberhound_api_url: {value: '', hide: true}
-  cyberhound_api_shared_key: {value: '', hide: true }
-  cyberhound_whitelist: {value: '', hide: true }
-  clickview_school_id: {value: '', hide: true}
+  cyberhound_api_url: { hide: false}
+  cyberhound_api_shared_key: { hide: false }
+  cyberhound_whitelist: { hide: false }
+  clickview_school_id: {hide: false}
   kami_api_key: { hide: true }
   office365_tenant: { hide: false }
-  office365_tenant_id: {hide: true}
-  office365_immersive_reader_name: {hide: true}
+  office365_tenant_id: {hide: false}
+  office365_immersive_reader_name: {hide: false}
   googleapps_api_key: { hide: false }
-  turnitin_api_key: {value: '', hide: true}
-  turnitin_api_host: {value: '', hide: true}
+  turnitin_api_key: {hide: true}
+  turnitin_api_host: {hide: true}
 
   # 3rd party configs
   canvas_data2_secret : { value : '', hide : true }
@@ -110,28 +110,19 @@ config:
   canvas_url : { value : '', hide : true }
   canvas_data_api_key : { value : '', hide : true }
 
-
 topMenu:
   hide:
     - /fixtures
     - /pastoral
-    - /eportfolio
-    - /learning/badge
   show:
     - /learning/pending
     - /learning/due
     - /learning/grades
     - /course/list
+    - /eportfolio
+    - /learning/badge
 components:
   hide:
-   - Schoolbox\Weather\Component\Dashboard\Controller
-   - Component_Homepage_ClickviewController
-   - Component_Homepage_ChatController
-   - Component_Homepage_EtherpadController
-   - Component_Homepage_PinterestController
-   - Schoolbox\Curriculum\Component\CurriculumDetailsController
-   - Schoolbox\Curriculum\Component\CurriculumOverviewController
    - Schoolbox\Fixtures\Component\Homepage\Controller
    - Schoolbox\Fixtures\Component\Dashboard\Controller
-   - Schoolbox\Learning\Moment\StudentToolkit\Component\Dashboard\Controller
    - Component_Dashboard_CanvasAssignmentsController

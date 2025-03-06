@@ -1,6 +1,6 @@
 config:
 
-  site_plan : { value : Elite }
+  site_plan : { value : Canvas-Elite }
 
   #Modules
   teams_enabled: {edit: true}
@@ -14,12 +14,12 @@ config:
   resource_booking_enabled: { edit: true}
   external_document_report_enabled : { edit : true }
   webdav_enable: {edit: true}
-  kami_enabled: {edit: true}
+  kami_enabled: {value: false, edit: false}
   geosnapshot_enabled: {edit: true}
   lms_enabled: {value: true}
   qr_login_enabled: {value: true, edit: true}
-  summative_report_enabled: {edit: true}
-  curriculum_coverage_report_enabled: {value: true, edit: true}
+  summative_report_enabled: {value: false, edit: false}
+  curriculum_coverage_report_enabled: {value: false, edit: false}
 
   #Pastoral
   external_pastoral: {hide: false}
@@ -44,7 +44,7 @@ config:
   grade_comments_enable: {hide: false}
   custom_assessment_participation: {hide: false}
   self_assessment_enabled: {hide: false}
-  course_markbook_enable: {hide: false}
+  course_markbook_enable: {value: false, edit: false}
   assessment_calendar_enabled: {hide: false}
   class_markbook_enable: {hide: false}
   rubric_markbook_enable: {hide: false}
@@ -76,7 +76,7 @@ config:
   lms_cohort_comparison: {hide: false }
   lms_duetime_default: {hide: false }
   lms_seb_enable: {hide: false}
-  lti_assessments_enable: {edit: true}
+  lti_assessments_enable: {value: false, edit: false}
 
   #Comms
   comms_comments_enabled: { hide: false }
@@ -101,19 +101,19 @@ config:
   office365_tenant_id: {hide: false}
   office365_immersive_reader_name: {hide: false}
   googleapps_api_key: { hide: false }
-  turnitin_api_key: {hide: true}
-  turnitin_api_host: {hide: true}
+  turnitin_api_key: {value: '', hide: true}
+  turnitin_api_host: {value: '', hide: true}
 
   # 3rd party configs
-  canvas_data2_secret : { value : '', hide : true }
-  canvas_data2_client_id : { value : '', hide : true }
-  canvas_url : { value : '', hide : true }
-  canvas_data_api_key : { value : '', hide : true }
+  canvas_data_api_key: {hide: false}
+  canvas_data2_secret : { hide : false }
+  canvas_data2_client_id : { hide : false }
+  canvas_url : { hide : false }
 
 topMenu:
   hide:
-  show:
     - /learning/pending
+  show:
     - /learning/due
     - /learning/grades
     - /learning/badge
@@ -123,4 +123,11 @@ topMenu:
     - /pastoral
 components:
   hide:
-   - Component_Dashboard_CanvasAssignmentsController
+    - Component_Dashboard_RecentSubmissionsController
+    - Schoolbox\Learning\Assessment\Quiz\Component\Homepage\Controller
+    - Schoolbox\Learning\Assessment\Component\Homepage\Outline\Controller
+    - Schoolbox\Learning\Assessment\Component\Homepage\Builder\Controller
+    - Component_Homepage_RubricController
+    - Schoolbox\Curriculum\Component\CurriculumDetailsController
+    - Schoolbox\Curriculum\Component\CurriculumOverviewController
+    - Schoolbox\Learning\Assessment\Lti\Component\Homepage\Controller

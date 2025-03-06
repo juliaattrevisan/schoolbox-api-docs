@@ -1,6 +1,6 @@
 config:
 
-  site_plan: { value: Canvas }
+  site_plan: { value: Canvas-Enhanced }
 
   #Modules
   teams_enabled: { edit: true }

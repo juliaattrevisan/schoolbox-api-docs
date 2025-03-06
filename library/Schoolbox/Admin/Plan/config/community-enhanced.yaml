@@ -1,16 +1,16 @@
 config:
 
-  site_plan : { value : Wellbeing }
+  site_plan : { value : Community-Enhanced }
 
   #Modules
   teams_enabled: {edit: true}
   curriculum_tagging_enabled: {value: false, edit: false}
   eotc_enabled: {value: false, edit: false}
   learning_moments_enabled : {edit: true}
-  badges_enabled : {edit: true}
+  badges_enabled : {value: false, edit: false}
   fixtures_enabled: {edit: true}
   clipboard_enabled: {edit: true}
-  pastoral_enabled : {edit: true}
+  pastoral_enabled : {value: false, edit: false}
   resource_booking_enabled: {edit: true}
   external_document_report_enabled : { edit : true }
   webdav_enable: {edit: true}
@@ -22,19 +22,19 @@ config:
   curriculum_coverage_report_enabled: {value: false, edit: false}
 
   #Pastoral
-  external_pastoral: {hide: false}
-  pastoral_external_delete: {hide: false}
-  external_pastoral_upload: {hide: false}
+  external_pastoral: {value: false, hide: true}
+  pastoral_external_delete: {hide: true}
+  external_pastoral_upload: {hide: true}
   pastoral_upload_timeout: {hide: true} # This should stay hidden
-  pastoral_severity: {hide: false}
-  pastoral_individual_access: {hide: false}
-  pastoral_parent_access: {hide: false}
-  pastoral_student_access: {hide: false}
+  pastoral_severity: {hide: true}
+  pastoral_individual_access: {hide: true}
+  pastoral_parent_access: {value: false, hide: true}
+  pastoral_student_access: {value: false, hide: true}
   pastoral_page_size: {hide: true} # This should stay hidden
   pastoral_page_visible: {hide: true} # This should stay hidden
-  pastoral_create_tag_enable: {hide: false}
-  pastoral_action_enable: {hide: false}
-  pastoral_bulk_import_enabled: {hide: false}
+  pastoral_create_tag_enable: {hide: true}
+  pastoral_action_enable: {hide: true}
+  pastoral_bulk_import_enabled: {hide: true}
 
   #Learning Moments
   evidence_parent_create: {hide: false}
@@ -115,12 +115,12 @@ topMenu:
     - /learning/pending
     - /learning/due
     - /learning/grades
+    - /learning/badge
     - /course/list
+    - /pastoral
   show:
     - /eportfolio
     - /fixtures
-    - /pastoral
-    - /learning/badge
 components:
   hide:
    - Schoolbox\Learning\Component\Dashboard\UpcomingWorkController
