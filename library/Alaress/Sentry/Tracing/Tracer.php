@@ -506,6 +506,13 @@ class Tracer
             return;
         }
 
+        // Is the placeholder name still in place?
+        // This means that a `setTransactionContextFor*` method wasn't called,
+        // thus don't sample the transaction.
+        if ($transaction->getName() === self::PLACEHOLDER_TRANSACTION_NAME) {
+            $transaction->setSampled(false);
+        }
+
         // Apply each change to the actual transaction stack.
         foreach ($this->stackChanges as $stackChange) {
             $spanStack = $stackChange->operate($hub, $spanStack);

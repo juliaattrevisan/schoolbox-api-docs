@@ -24,7 +24,6 @@ $trace->setServerVars($_SERVER);
 // Start transaction ASAP for profiling:
 // later, setTransactionContextForAuraRoute, etc. will update the transaction.
 $trace->startTransaction(
-    name: 'url:' . $path,
     operation: 'http.server',
     origin: 'auto.http',
     source: TransactionSource::url(),
