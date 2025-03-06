@@ -129,9 +129,9 @@ function onCourseClicked(course: CourseWithCurriculumNodeUsage, buttonEl: HTMLBu
 </script>
 
 <template>
-    <tr v-if="showNode" :class="`${!props.node.enabled ? 'disabled' : ''}`">
+    <tr v-if="showNode">
         <td
-            :class="`l-flex l-flex--align-center l-gap-s f-no-margins name-cell u-border-right ${!props.node.enabled ? 'disabled' : ''}`"
+            :class="`l-flex l-flex--align-center l-gap-s f-no-margins name-cell u-border-right`"
             :style="{
                 paddingInlineStart: filtersStore.onlyShowGaps ? '0.5rem' : `calc(${props.depth * 0.5}rem + 0.5rem)`,
             }"
@@ -156,6 +156,7 @@ function onCourseClicked(course: CourseWithCurriculumNodeUsage, buttonEl: HTMLBu
                 :data-test="`cc-report-table-node-title-button-${props.node.id}`"
                 @click="emit('titleClick', props.node)"
             >
+                <sbx-icon v-if="!props.node.enabled" name="hidden" title="Disabled outcome" />
                 <template v-if="props.depth === 0 && !filtersStore.onlyShowGaps">
                     <b>{{ title }}</b>
                 </template>
