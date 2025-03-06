@@ -264,7 +264,7 @@ function onCourseClicked(course: CourseWithCurriculumNodeUsage, buttonEl: HTMLBu
 
 <style lang="scss" scoped>
 tr:hover {
-    background-color: #e9e8e8; /* to help legibility */
+    background-color: #f4f3f3; /* to help legibility */
 }
 
 .name-cell {
@@ -273,7 +273,7 @@ tr:hover {
     position: sticky;
     z-index: calc(var(--sbx-depth-ui-sticky) - 1);
     &:hover {
-        background-color: #e9e8e8; /* to help legibility */
+        background-color: #f4f3f3; /* to help legibility */
     }
     @media (max-width: 1000px) {
         position: static; // prevent the cell from sticking on smaller screens
