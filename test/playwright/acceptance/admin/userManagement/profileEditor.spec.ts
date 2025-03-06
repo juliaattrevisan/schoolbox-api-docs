@@ -18,6 +18,19 @@ test.describe("Profile Editor", () => {
         await tester.loginAsAdmin();
     });
 
+    test("Click on the positionTitle field", async ({ tester, page }) => {
+        const profileEditor = new ProfileEditor(tester, page);
+        tester.isGoingTo("Navigate to the student profile editor page");
+        await profileEditor.goto("student");
+        tester.isGoingTo("Click on the cog of positon title field");
+        await profileEditor.clickFieldCog("positionTitle", "student");
+        tester.isGoingTo("Click on the visibility checkbox of positon title field");
+        await profileEditor.clickFieldCheckbox("positionTitle", "student", "visibility", "student");
+        tester.isGoingTo("Click on the availability checkbox of positon title field");
+        await profileEditor.clickFieldCheckbox("positionTitle", "student", "availability", "1");
+        await profileEditor.clickFieldUpdateButton("positionTitle", "student");
+    });
+
     /**
      * on profile-editor:student page clear the field name
      * navigate to the student profile page

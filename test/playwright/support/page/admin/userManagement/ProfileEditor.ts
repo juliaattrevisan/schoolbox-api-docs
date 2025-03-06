@@ -47,4 +47,47 @@ export default class ProfileEditor {
     async clickUpdateButton(): Promise<void> {
         await this.page.locator(ProfileEditor.SELECTOR_UPDATE_BUTTON).click();
     }
+
+    /**
+     * Click the cog of a field
+     * @param fieldName - The field name
+     * @param userType - The user type: student, staff, parent
+     */
+
+    async clickFieldCog(fieldName: string, userType: string): Promise<void> {
+        await this.page.getByTestId(`pe-${userType}-fields-active-item-${fieldName}-settings`).click();
+    }
+    /**
+     * Click the field visibility or availability checkbox
+     * @param fieldName - The field name
+     * @param userType - The user type: student, staff, parent
+     * @param option - The option to click: visibility or availability
+     * @param optionValue - The option value to click: student, 1
+     */
+
+    async clickFieldCheckbox(fieldName: string, userType: string, option: string, optionValue: string): Promise<void> {
+        await this.page
+            .getByTestId(`pe-${userType}-fields-active-item-${fieldName}-setting-${option}-option-${optionValue}`)
+            .click();
+    }
+
+    /**
+     * Click the update button of a field
+     * @param fieldName - The field name
+     * @param userType - The user type: student, staff, parent
+     */
+
+    async clickFieldUpdateButton(fieldName: string, userType: string): Promise<void> {
+        await this.page.getByTestId(`pe-${userType}-fields-active-item-${fieldName}-settings-confirm`).click();
+    }
+
+    /**
+     * Click the available field to add in the active field
+     * @param fieldName - The field name
+     * @param userType - The user type: student, staff, parent
+     */
+
+    async clickAvailableField(fieldName: string, userType: string): Promise<void> {
+        await this.page.getByTestId(`pe-${userType}-fields-available-item-${fieldName}`).click();
+    }
 }
