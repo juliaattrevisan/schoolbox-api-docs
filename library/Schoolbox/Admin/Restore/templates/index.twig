@@ -46,7 +46,19 @@
         document.querySelector('[data-restore-range]').value = '{{ restoreRange }}';
         /* when the search window changes, reload the page */
         document.querySelector('[data-restore-range]').addEventListener('change', function() {
-            window.location.replace(window.location.href.replace(window.location.search,'?restoreRange=' + this.value));
+            const searchParams = new URLSearchParams(window.location.search);
+            searchParams.set('restoreRange', this.value);
+            window.location.search = searchParams.toString();
+        });
+
+        /* when the tab changes, update the URL hash */
+        if (window.location.hash) {
+            document.querySelector(`[data-tab] a[href="${window.location.hash}"]`).click();
+        }
+        document.querySelectorAll('[data-tab] a').forEach(function(tab) {
+            tab.addEventListener('click', function() {
+                window.location.hash = this.getAttribute('href').replace('#', '');
+            });
         });
     });
 </script>
