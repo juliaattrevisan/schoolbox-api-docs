@@ -35,6 +35,13 @@ const nodesStore = useNodesStore();
 const filtersStore = useFiltersStore();
 const { title } = useNodeTitle(props.node);
 
+// whether the node should be shown based on the filters
+const showNode = window.Vue.computed(
+    () =>
+        (props.node.isVisible && filtersStore.showDisabled) ||
+        (props.node.isVisible && !filtersStore.showDisabled && props.node.enabled),
+);
+
 // #region expand/collapse
 
 // to remove any padding when node is at base depth and has no children
@@ -122,7 +129,7 @@ function onCourseClicked(course: CourseWithCurriculumNodeUsage, buttonEl: HTMLBu
 </script>
 
 <template>
-    <tr v-if="props.node.isVisible" :class="`${!props.node.enabled ? 'disabled' : ''}`">
+    <tr v-if="showNode" :class="`${!props.node.enabled ? 'disabled' : ''}`">
         <td
             :class="`l-flex l-flex--align-center l-gap-s f-no-margins name-cell u-border-right ${!props.node.enabled ? 'disabled' : ''}`"
             :style="{
@@ -265,7 +272,7 @@ tr:hover {
     position: sticky;
     z-index: calc(var(--sbx-depth-ui-sticky) - 1);
     &:hover {
-        background-color: #f4f3f3; /* to help legibility */
+        background-color: #e9e8e8; /* to help legibility */
     }
     @media (max-width: 1000px) {
         position: static; // prevent the cell from sticking on smaller screens
