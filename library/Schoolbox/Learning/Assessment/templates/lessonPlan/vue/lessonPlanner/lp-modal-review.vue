@@ -25,10 +25,10 @@ const selectedFields = window.Vue.computed(() => {
         <p v-else>No suggestions available for this section.</p>
     </template>
 
-    <ul class="flex-list buttons">
-        <li><button class="button">Back</button></li>
-        <li><button class="button submit">Add all to Lesson Plan</button></li>
-    </ul>
+    <div class="l-flex-row l-flex--no-wrap">
+        <button class="l-flex__item--1 button" @click="lpStore.modalStep = 'generate'">Back</button>
+        <button class="l-flex__item--1 button submit">Add all to Lesson Plan</button>
+    </div>
 </template>
 
 <style scoped></style>
