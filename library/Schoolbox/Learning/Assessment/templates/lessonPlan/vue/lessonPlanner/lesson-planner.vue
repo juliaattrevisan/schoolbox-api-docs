@@ -20,7 +20,7 @@ window.Vue.onMounted(() => {
 <template>
     <button type="button" class="button expand icon-chat" @click="lpStore.openModal">Generate lesson with AI</button>
 
-    <basic-modal v-model:is-open="lpStore.isModalOpen" :has-background-click="true">
+    <basic-modal v-model:is-open="lpStore.isModalOpen">
         <section>
             <lp-modal-generate v-if="lpStore.modalStep === 'generate'" />
             <div v-else-if="lpStore.modalStep === 'generating'" class="loader"></div>
