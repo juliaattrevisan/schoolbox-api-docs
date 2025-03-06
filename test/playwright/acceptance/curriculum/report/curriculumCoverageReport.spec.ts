@@ -108,8 +108,12 @@ test.describe("Curriculum Coverage Report Tests", () => {
         tester.isGoingTo(
             "Select ACELA1553 / Romeo & Juliet and confirm “Present a scene of Romeo and Juliet” is visible in the pop out",
         );
-        await page.locator("table tbody tr:nth-child(10) td:nth-child(10)").click(); // Select table cell
+        await coverageReport.acela1553RomeoTableCell().click(); // Select table cell
         await expect(page.getByTestId("cc-usage-pop-out")).toContainText("Present a scene of Romeo and Juliet");
+
+        tester.isGoingTo("Uncheck activity filter again and confirm ACELA1553 / Romeo & Juliet 0 value is now hidden");
+        await coverageReport.clickActivityFilter();
+        await expect(coverageReport.acela1553RomeoTableCell()).not.toBeVisible();
 
         tester.isGoingTo("Select Only show unused curriculum and confirm open/close toggles have been hidden");
         await page.getByTestId("cc-report-filters-gaps-switch").click(); // Select Only show unused curriculum

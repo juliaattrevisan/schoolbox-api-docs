@@ -22,6 +22,8 @@ export default class CurriculumCoverageReport {
 
     static readonly DATATEST_FILTER_ACTIVITY = "cc-report-filters-label-activity";
 
+    static readonly DATATEST_ACELA1553_ROMEO = "cc-report-table-node-total-pop-out-button-6-88-149"; // ACELA1553 / Romeo & Juliet table cell
+
     static readonly SELECTOR_YEAR_9_TOTAL = "table tbody tr:nth-child(4) td:nth-child(2)"; // the Year 9 Curriculum total usage table cell at its default state
 
     constructor(page: Page) {
@@ -90,5 +92,13 @@ export default class CurriculumCoverageReport {
      */
     year9TotalUsageTableCell(): Locator {
         return this.page.locator(CurriculumCoverageReport.SELECTOR_YEAR_9_TOTAL);
+    }
+
+    /**
+     * Returns the locator for the ACELA1553 / Romeo & Juliet table cell
+     * @returns - The locator for the ACELA1553 / Romeo & Juliet table cell
+     */
+    acela1553RomeoTableCell(): Locator {
+        return this.page.getByTestId(CurriculumCoverageReport.DATATEST_ACELA1553_ROMEO);
     }
 }

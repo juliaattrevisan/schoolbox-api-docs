@@ -218,6 +218,7 @@ function onCourseClicked(course: CourseWithCurriculumNodeUsage, buttonEl: HTMLBu
                                     : '',
                         }"
                         class="f-always-show usage-button"
+                        :data-test="`cc-report-table-node-total-pop-out-button-${course.id}-${unit.id}-${props.node.id}`"
                         @click="(event) => onUnitClicked(course, unit, event.target as HTMLButtonElement)"
                     >
                         {{ getFilteredUnitColumnCount(props.node, course, unit, !props.node.isExpanded) }}
