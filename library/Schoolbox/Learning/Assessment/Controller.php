@@ -366,8 +366,20 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
                 /* Field list contains the ones from the Lesson Plan Template when creating
                  * When updating, it's actually fields from the Lesson Plan instance itself
+                 *
+                 * To pass into Vue, we need fields to be in a json-encodable format,
+                 * so grab all the attributes we need and put them into an array
                  */
-                $data['lessonPlanMeta']['fields'] = $lessonPlanTemplate->getFields();
+                foreach ($lessonPlanTemplate->getFields() as $field) {
+                    $data['lessonPlanMeta']['fields'][] = [
+                        'id' => $field->getId(),
+                        'title' => $field->getTitle(),
+                        'body' => $field->getBody(),
+                        'meta' => null, // TODO: Implement this, can be string|null
+                        'visibility' => $field->getVisibility(),
+                        'isDeleted' => $field->isDeleted(),
+                    ];
+                }
 
                 if ($this->isXhrRequest()) {
                     $content = $this->responseFromTemplateUnthemed(sprintf(
@@ -470,11 +482,30 @@ abstract class Controller extends ListController implements IAssessmentControlle
                     'student' => \Schoolbox\Role::STUDENT
                 ],
                 'template' => $lessonPlan->getLessonPlanTemplate(),
-                'fields' => $lessonPlan->getFields(),
+                'fields' => [],
                 'type' => AssessmentType::TYPE_LESSON_PLAN,
                 'mageAsync' => false,
                 'includeBreadcrumbs' => false
             ];
+
+            /* Field list contains the ones from the Lesson Plan Template when creating
+             * When updating, it's actually fields from the Lesson Plan instance itself
+             *
+             * To pass into Vue, we need fields to be in a json-encodable format,
+             * so grab all the attributes we need and put them into an array
+             */
+            foreach ($lessonPlan->getFields() as $field) {
+                $data['lessonPlanMeta']['fields'][] = [
+                    'id' => $field->getId(),
+                    'title' => $field->getTitle(),
+                    'body' => $field->getBody(),
+                    'meta' => null, // TODO: Implement this, can be string|null
+                    'visibility' => $field->getVisibility(),
+                    'isDeleted' => $field->isDeleted(),
+                    // this key only exists when modifying an existing lesson plan:
+                    'lessonPlanTemplateField' => $field->getLessonPlanTemplateField(),
+                ];
+            }
         }
 
         $data['courseManaged'] = [

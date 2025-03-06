@@ -41,7 +41,7 @@
     {% endif %}
 
     <div id="lesson-planner-container">
-        <lesson-planner />
+        <lesson-planner :fields="{{ lessonPlanMeta.fields |json_encode }}" />
     </div>
     <script src="{{ CDN_PREFIX }}/js/bundle/lessonPlanner.js?v={{ config.site_version }}"></script>
 </fieldset>
