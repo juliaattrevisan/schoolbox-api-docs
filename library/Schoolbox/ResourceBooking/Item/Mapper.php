@@ -373,9 +373,11 @@ class Mapper extends BaseMapper
         $query     = "
             SELECT {$this->getColumnString('re')}
             FROM {$this->getTable()} `re`
+            LEFT JOIN {$this->getJoinSql('role', 're', 'role')}
             WHERE
               (`re`.`name` LIKE :searchLike OR `re`.`description` LIKE :searchLike OR `re`.`room_code` = :search)
               AND {$this->getSoftDeleteFilterSql('re')}
+              AND (`role`.`role_id` = :roleId AND `role`.`allowed` = 1)
             ORDER BY $order
             LIMIT :limit OFFSET :offset
         ";
@@ -384,6 +386,7 @@ class Mapper extends BaseMapper
         $statement->bindValue('searchLike', '%' . $this->getDatabase()->getQuoter()->escapeForLike($keyword) . '%');
         $statement->bindValue('limit', intval($limit), \PDO::PARAM_INT);
         $statement->bindValue('offset', intval($offset), \PDO::PARAM_INT);
+        $statement->bindValue('roleId', $this->getSessionUser()->getRole()->getId(), \PDO::PARAM_INT);
         $statement->execute();
         return $this->hydrateList($statement, 're');
     }
