@@ -263,7 +263,7 @@ tr:hover {
         padding: 0; // padding is handled by the button instead
     }
     &--empty-total {
-        background: #ff7d00;
+        background: #fed0cf;
     }
 }
 
