@@ -156,7 +156,7 @@ function onCourseClicked(course: CourseWithCurriculumNodeUsage, buttonEl: HTMLBu
                 :data-test="`cc-report-table-node-title-button-${props.node.id}`"
                 @click="emit('titleClick', props.node)"
             >
-                <sbx-icon v-if="!props.node.enabled" name="hidden" title="Disabled outcome" />
+                <sbx-icon v-if="!props.node.enabled" name="hidden" title="This outcome is disabled" />
                 <template v-if="props.depth === 0 && !filtersStore.onlyShowGaps">
                     <b>{{ title }}</b>
                 </template>
