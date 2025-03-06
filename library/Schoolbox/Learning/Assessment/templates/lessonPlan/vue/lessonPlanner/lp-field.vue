@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useEditor } from "@schoolboxVue/composables/editor/useEditor";
-import type { SbxEditor } from "@js/editor/types/editorTypes";
 import { useLessonPlannerStore } from "./store/lessonPlannerStore";
 import type { LessonPlanField } from "./lessonPlannerTypes";
 
@@ -25,7 +24,7 @@ window.Vue.onMounted(async () => {
     const currentField = field.value;
     if (!currentField) throw new Error("Unable to initialise lp-field without a field");
 
-    const editor = await new Promise<SbxEditor>((resolve) => {
+    await new Promise((resolve) => {
         if (!textareaEl.value) throw new Error("Unable to initialise lp-field without a textarea element");
         useEditor(
             currentField.body,
@@ -36,11 +35,11 @@ window.Vue.onMounted(async () => {
                 fileBrowserCategoryId: props.fileBrowserCategoryId,
             },
             true,
-            (e) => resolve(e.editor),
+            resolve,
         );
     });
 
-    currentField.editor = editor;
+    currentField.editorId = `field-body-${props.fieldRef}`;
 });
 </script>
 

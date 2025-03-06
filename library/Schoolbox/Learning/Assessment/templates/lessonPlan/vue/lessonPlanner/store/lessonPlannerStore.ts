@@ -1,5 +1,4 @@
 import { defineStore } from "pinia";
-import type { SbxEditor } from "@js/editor/types/editorTypes";
 import type { LessonPlanField } from "../lessonPlannerTypes";
 
 export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
@@ -7,7 +6,7 @@ export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
     const fields = window.Vue.ref<
         (LessonPlanField & {
             selected: boolean; // Whether the field is selected or not
-            editor: SbxEditor | null; // The editor instance for the field in the main form, null if not yet created
+            editorId: string | null; // The editor ID for the field in the main form, null if not yet created
             suggestedBody?: string; // The suggested body for the field, if it has been generated
         })[]
     >([]);
@@ -23,7 +22,7 @@ export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
         fields.value = $fields.map((field) => ({
             ...field,
             selected: false,
-            editor: null,
+            editorId: null,
         }));
     }
 
@@ -91,5 +90,6 @@ export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
         openModal,
         generate,
         generateError,
+        applySuggestions,
     };
 });
