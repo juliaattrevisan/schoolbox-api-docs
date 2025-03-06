@@ -3,6 +3,7 @@ import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import { useLessonPlannerStore } from "./store/lessonPlannerStore";
 import type { LessonPlanField } from "./lessonPlannerTypes";
 import LpModalGenerate from "./lp-modal-generate.vue";
+import LpModalReview from "./lp-modal-review.vue";
 
 interface Props {
     fields: LessonPlanField[];
@@ -22,6 +23,8 @@ window.Vue.onMounted(() => {
     <basic-modal v-model:is-open="lpStore.isModalOpen" :has-background-click="true">
         <section>
             <lp-modal-generate v-if="lpStore.modalStep === 'generate'" />
+            <div v-else-if="lpStore.modalStep === 'generating'" class="loader"></div>
+            <lp-modal-review v-else-if="lpStore.modalStep === 'review'" />
         </section>
     </basic-modal>
 </template>

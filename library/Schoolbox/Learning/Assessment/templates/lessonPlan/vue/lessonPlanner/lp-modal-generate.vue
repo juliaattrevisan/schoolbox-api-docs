@@ -2,6 +2,13 @@
 import { useLessonPlannerStore } from "./store/lessonPlannerStore";
 
 const lpStore = useLessonPlannerStore();
+
+/**
+ * only allow generation if at least one field is selected
+ */
+const allowGeneration = window.Vue.computed(() => {
+    return lpStore.fields.some((field) => field.selected);
+});
 </script>
 
 <template>
@@ -24,9 +31,16 @@ const lpStore = useLessonPlannerStore();
         Provide any specific instructions, lesson context, or ideas to guide the AI in generating a tailored lesson
         plan.
     </p>
-    <textarea id="lp-generate-additional-context" rows="5"></textarea>
+    <textarea id="lp-generate-additional-context" v-model="lpStore.additionalContext" rows="5"></textarea>
 
-    <button type="button" class="button expand icon-chat">Generate lesson with AI</button>
+    <div v-if="lpStore.generateError" class="alert alert-box">
+        <b>There was a problem generating the lesson plan.</b>
+        {{ lpStore.generateError }}
+    </div>
+
+    <button type="button" class="button expand icon-chat" :disabled="!allowGeneration" @click="lpStore.generate">
+        Generate lesson with AI
+    </button>
 </template>
 
 <style scoped></style>
