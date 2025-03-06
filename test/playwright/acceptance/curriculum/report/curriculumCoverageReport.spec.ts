@@ -52,6 +52,8 @@ test.describe("Curriculum Coverage Report Tests", () => {
         await curriculumSelector.browseTree([302, 304, 1, 135]);
         await curriculumSelector.saveModal(); // Select Select, closing the modal
 
+        // link for reference: https://vagrant.dev.schoolbox.cloud/curriculum/reports/coverage?courseId=6%2C2%2C14&nodeId=302%2C304%2C1%2C135
+
         tester.isGoingTo("Try and generate a report again");
         await coverageReport.submit(); // Generate the report
 
@@ -88,9 +90,11 @@ test.describe("Curriculum Coverage Report Tests", () => {
         await coverageReport.clickActivityFilter();
         await expect(coverageReport.year9TotalUsageTableCell()).toHaveText("3");
 
-        tester.isGoingTo("Uncheck Course filter and confirm Year 9 Curriculum goes from 3 to 0");
+        tester.isGoingTo(
+            "Uncheck Course filter and confirm Year 9 Curriculum goes from 3 to blank (as it's 0 and doesn't have a code)",
+        );
         await coverageReport.clickCourseFilter();
-        await expect(coverageReport.year9TotalUsageTableCell()).toHaveText("0");
+        await expect(coverageReport.year9TotalUsageTableCell()).toHaveText("");
 
         tester.isGoingTo("Check all filters back on and confirm Year 9 Curriculum goes from 0 to 12");
         await coverageReport.clickUnitFilter();
