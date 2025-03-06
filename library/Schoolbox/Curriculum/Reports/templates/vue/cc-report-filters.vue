@@ -39,8 +39,18 @@ const isModalOpen = window.Vue.ref(false); // to open/close the exporting to csv
             <div>
                 <label>Only show unused curriculum</label>
                 <p class="meta">Only show curriculum that has a total usage count of 0.</p>
-                <div class="switch">
+                <div class="switch f-no-margins">
                     <input id="onlyShowGapsSwitch" v-model="filtersStore.onlyShowGaps" type="checkbox" />
+                    <label for="onlyShowGapsSwitch" data-test="cc-report-filters-gaps-switch">
+                        <span class="icon-approve"></span>
+                        <span class="icon-cancel"></span>
+                    </label>
+                </div>
+            </div>
+            <div>
+                <label>Show disabled outcomes</label>
+                <div class="switch f-no-margins">
+                    <input id="onlyShowGapsSwitch" v-model="filtersStore.showDisabled" type="checkbox" />
                     <label for="onlyShowGapsSwitch" data-test="cc-report-filters-gaps-switch">
                         <span class="icon-approve"></span>
                         <span class="icon-cancel"></span>
