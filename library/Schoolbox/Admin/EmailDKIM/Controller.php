@@ -11,9 +11,13 @@ namespace Schoolbox\Admin\EmailDKIM;
 
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
+use GuzzleHttp\Client;
+use Proxy\Server;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\EmailDKIM\Mapper as EmailDKIMMapper;
 use Schoolbox\Auth\KeyPairGenerator;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Symfony\Component\Mime\Crypto\DkimSigner;
 
@@ -127,6 +131,8 @@ class Controller extends Base
                 ->withStatus(404);
             return;
         }
+        // If SES enabled then send dkim details to IR
+        $this->sendDKIMToIR($emailDKIM);
         $this->response = $this->responseAsJson([]);
     }
 
@@ -163,5 +169,28 @@ class Controller extends Base
     {
         $this->emailDKIMMapper->delete($emailDKIM);
         $this->response = $this->responseAsJson([]);
+    }
+
+    private function sendDKIMToIR($emailDKIM)
+    {
+        $config = $this->getConfigLoader();
+        $irApiKey = exec("/usr/local/bin/schoolbox-instance-registry --api-key 2>/dev/null");
+        $configKeys = [ConfigMapper::AMAZON_SES_USERNAME, ConfigMapper::AMAZON_SES_PASSWORD, ConfigMapper::AMAZON_SES_REGION];
+        $configValues = array_map(fn($key) => $config->get($key), $configKeys);
+
+        // Check if all three config values are present for SES
+        if (count(array_filter($configValues)) === count($configKeys)) {
+            $irApiKey = exec("/usr/local/bin/schoolbox-instance-registry --api-key 2>/dev/null");
+            $client = new Client(['curl' => Server::getInstance()->buildCurlOptions()]);
+            $response = $client->get('http://localhost/api/update-dkim', [
+                'headers' => [
+                    'Authorization' => "Bearer {$irApiKey}",
+                    'Content-Type'  => 'application/json',
+                ],
+                'json' => [
+                    'dkim' => $emailDKIM,
+                ],
+            ]);
+        }
     }
 }
