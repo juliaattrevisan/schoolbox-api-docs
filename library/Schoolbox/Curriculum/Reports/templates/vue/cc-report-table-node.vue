@@ -54,6 +54,10 @@ const canExpandSelectCells = window.Vue.computed(
 // to highlight the total cell when there are no usages
 const isEmptyTotal = window.Vue.computed(() => getFilteredTotalCount(props.node, !props.node.isExpanded) === 0);
 
+const showZero = window.Vue.computed(
+    () => (!props.node.isExpanded && props.node.code !== null) || (!props.node.isExpanded && props.node.code === ""),
+);
+
 /**
  * To toggle the expanded state of the node
  */
@@ -150,7 +154,12 @@ function onCourseClicked(course: CourseWithCurriculumNodeUsage, buttonEl: HTMLBu
             </button>
         </td>
         <!-- add the total cell -->
-        <td v-if="props.node.hasNoUsages" class="u-border-left usage-cell usage-cell--empty-total"><b>0</b></td>
+        <td
+            v-if="props.node.hasNoUsages"
+            :class="`u-border-left usage-cell ${showZero ? 'usage-cell--empty-total' : ''}`"
+        >
+            <b v-if="showZero">0</b>
+        </td>
         <td
             v-else-if="canExpandSelectCells"
             :class="`u-border-left usage-cell ${isEmptyTotal ? 'usage-cell--empty-total' : ''}`"
@@ -159,8 +168,10 @@ function onCourseClicked(course: CourseWithCurriculumNodeUsage, buttonEl: HTMLBu
                 <b>{{ getFilteredTotalCount(props.node, !props.node.isExpanded) }}</b>
             </button>
         </td>
-        <td v-else :class="`u-border-left usage-cell ${isEmptyTotal ? 'usage-cell--empty-total' : ''}`">
-            <b>{{ getFilteredTotalCount(props.node, !props.node.isExpanded) }}</b>
+        <td v-else :class="`u-border-left usage-cell ${isEmptyTotal && showZero ? 'usage-cell--empty-total' : ''}`">
+            <b v-if="getFilteredTotalCount(props.node, !props.node.isExpanded) !== 0 && showZero">{{
+                getFilteredTotalCount(props.node, !props.node.isExpanded)
+            }}</b>
         </td>
         <!-- loop through each course/unit, retrieving the node usage or returning 0 no usages -->
         <template v-for="course in props.node.usage.courses" :key="course.id">
