@@ -56,7 +56,7 @@ export default class CurriculumCoverageReport {
     async navigateTree(ids: number[]): Promise<void> {
         // eslint-disable-next-line no-restricted-syntax -- need to loop through each sequentially, rather than in parallel with Promise.all
         for (const id of ids) {
-            // eslint-disable-next-line no-await-in-loop
+            // eslint-disable-next-line no-await-in-loop -- need to click each item sequentially
             await this.page
                 .getByTestId(`${CurriculumCoverageReport.DATATEST_TABLE_NODE_EXPAND_BUTTON}${id.toString()}`)
                 .click();

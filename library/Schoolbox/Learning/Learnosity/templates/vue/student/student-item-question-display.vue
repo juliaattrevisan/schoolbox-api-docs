@@ -176,7 +176,7 @@ window.Vue.onMounted(() => {
          */
         if (response && !response.querySelector("[data-schoolboxmedia-replacement-container]")) {
             // @ts-expect-error - schoolboxResource is available here, but untyped.
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- see above
             $.fn.schoolboxResource_ProxyReplacement($(selector));
         }
 

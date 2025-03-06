@@ -108,7 +108,6 @@ const sortedUnitsByDate = window.Vue.computed(() => {
 
 window.Vue.onMounted(() => {
     useLinkedActivitiesStore().init(props.sourceId, props.linkedActivities, props.gradeGradientEnable);
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     $("[data-collapser]").collapsable();
 });
 </script>

@@ -67,7 +67,7 @@ export default class PanelTweaks extends Plugin {
                 fitInViewport: true,
                 limiter: document.getElementById("content"),
                 // @ts-expect-error - Acessing the private property is intentional here, for now
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- see above
                 positions: item._panelPositions,
             }) as Position;
             item.panelView.position = optimalPosition.name as PanelPosition;

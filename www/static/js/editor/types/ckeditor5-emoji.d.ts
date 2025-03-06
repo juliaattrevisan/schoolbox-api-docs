@@ -6,7 +6,7 @@
  * should not be taken as a definitive type definition for the plugin
  */
 
-/* eslint-disable max-classes-per-file */
+/* eslint-disable-next-line max-classes-per-file -- overriding as this needs to mimic the plugin */
 declare module "@phudak/ckeditor5-emoji/src" {
     import { Plugin } from "@ckeditor/ckeditor5-core";
 

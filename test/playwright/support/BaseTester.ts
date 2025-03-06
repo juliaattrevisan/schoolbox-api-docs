@@ -14,7 +14,6 @@ export default class BaseTester {
      * @returns The stdout from the command.
      * @throws { Error } If the command fails.
      */
-    // eslint-disable-next-line class-methods-use-this
     async runShellCommand(command: string): Promise<string> {
         // Try to run in vagrant if the schoolbox directory does not exist
         if (!existsSync("/usr/share/schoolbox") && !command.startsWith("vagrant ssh -c ")) {
@@ -71,9 +70,9 @@ export default class BaseTester {
      * Create an "I am going to " comment for debugging
      * @param argumentation - The message to log
      */
-    // eslint-disable-next-line class-methods-use-this
+    // eslint-disable-next-line class-methods-use-this -- This is intentionally used as a non-static method for readability
     isGoingTo(argumentation: string): void {
-        // eslint-disable-next-line no-console
+        // eslint-disable-next-line no-console -- logs in playwright correctly, so console.log is acceptable
         console.log("I am going to", argumentation);
     }
 }

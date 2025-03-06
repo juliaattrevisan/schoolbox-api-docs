@@ -23,7 +23,7 @@ export default class CurriculumSelector {
     async browseTree(ids: number[]): Promise<void> {
         // eslint-disable-next-line no-restricted-syntax -- need to loop through each sequentially, rather than in parallel with Promise.all
         for (const id of ids) {
-            // eslint-disable-next-line no-await-in-loop
+            // eslint-disable-next-line no-await-in-loop -- need to click each item sequentially
             await this.page
                 .getByTestId(`${CurriculumSelector.DATATEST_MODAL_NODE_CHECKBOX_LABEL}${id.toString()}`)
                 .click();

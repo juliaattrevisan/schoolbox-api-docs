@@ -25,17 +25,17 @@ export function loadReports(reportPayloads: string[]): void {
          * their divs, because we only want to show one div at a time per report.
          */
         const reportCallback = {
-            // eslint-disable-next-line @typescript-eslint/no-loop-func
+            // eslint-disable-next-line @typescript-eslint/no-loop-func -- see above, every report gets its own callback
             readyListener: (): void => {
                 // @ts-expect-error -- reportsApp is global but untyped, this should be investigated at some point to determine if we can get this from learnosity
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-use-before-define
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-use-before-define -- see above
                 const attemptReport = (reportsApp as unknown).getReport(reportId);
                 // itemsApi only spawns if you used session-detail-by-item
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access -- see above
                 attemptReport.on("ready:itemsApi", (itemsApp: unknown) => {
                     // Load the items for the student
                     // @ts-expect-error -- itemsApp is global but untyped, this should be investigated at some point to determine if we can get this from learnosity
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- see above
                     itemsApp.getItems(($items: object) => {
                         reportsLoaded += 1;
                         const items: StudentItem[] = [];
@@ -57,7 +57,7 @@ export function loadReports(reportPayloads: string[]): void {
 
         // Initialise reports for each attempt
         // @ts-expect-error -- LearnosityReports is global but untyped, this should be investigated at some point to determine if we can get this from learnosity
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call -- see above
         let reportsApp = (LearnosityReports as unknown).init(initOptions, reportCallback);
     }
 }

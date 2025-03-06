@@ -17,7 +17,7 @@ function setSelectedRoleType(role: ProfileEditorRoleType): void {
     peStore.setSelectedRoleType(role);
 
     // @ts-expect-error -- When we switch tabs, we need to tell foundation to fix the tooltips
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- foundation isn't typed, see above
     $(document).foundation("tooltip", "reflow");
 }
 </script>
