@@ -122,12 +122,13 @@
             </div>
 
             {% if canComment %}
+            <script type="text/javascript" src='{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}'></script>
             <div class="small-12 island">
                 <form id="create-comment" data-comment-form action="/ajax/comment.php" method="post">
                     <section class="content">
                         <input type="hidden" name="studentId" value="{{ student.id }}"/>
                         <input type="hidden" name="categoryId" value="{{ subject.id }}"/>
-                        <textarea name="comment" rows="3"></textarea>
+                        <textarea id="create-comment-{{ student.id }}" name="comment" rows="3"></textarea>
                         <div class="row">
                             {% if USER.role.isStaff %}
                                 <div class="small-3 medium-3 column">
