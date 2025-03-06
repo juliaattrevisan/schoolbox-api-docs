@@ -42,7 +42,6 @@ let pageConfig: {
 
 /**
  * Wait for the editor to be created for a participant row
- * This will also handle the input events to keep the textarea in sync so that jquery.dynamic-feedback.js can track it
  * @param participantRow - The participant row to wait for the editor on
  */
 async function waitForParticipantEditor(participantRow: ParticipantRow): Promise<void> {
@@ -58,13 +57,6 @@ async function waitForParticipantEditor(participantRow: ParticipantRow): Promise
     });
 
     participantRow.editor = editor;
-
-    // on every input, update the textarea and send an input event on it too for jquery.dynamic-feedback.js
-    editor.model.document.on("change", () => {
-        if (!(editor.sourceElement instanceof HTMLTextAreaElement)) return;
-        editor.sourceElement.value = editor.getData();
-        editor.sourceElement.dispatchEvent(new Event("change", { bubbles: true }));
-    });
 }
 
 /**
@@ -89,6 +81,7 @@ async function createEditorForParticipants(participants: ParticipantRow[]): Prom
                 hasTokens: true,
                 showWordCount: true,
                 toolbar: EditorToolbar.COMMENT_AI,
+                mirrorChangeEvents: true, // To keep jquery.dynamic-feedback.js in sync
             },
         }),
     );

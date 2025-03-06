@@ -21,6 +21,23 @@ function addToGlobalScope(editor: SbxEditor, sourceElement: SbxEditorElement): v
 }
 
 /**
+ * Mirror editor change events back to the source element if enabled in the config
+ * Sometimes the editor is used in a form which pays attention to the base <textarea> element for autosave/etc
+ * in this case, we need to dispatch the change event from the editor back to the source element
+ * @param editor - the CKEditor instance
+ * @param config - the CKEditor config object
+ */
+function mirrorEditorChanges(editor: SbxEditor, config: SbxEditorConfig): void {
+    if (config.mirrorChangeEvents) {
+        editor.model.document.on("change", () => {
+            if (!(editor.sourceElement instanceof HTMLTextAreaElement)) return;
+            editor.sourceElement.value = editor.getData();
+            editor.sourceElement.dispatchEvent(new Event("change", { bubbles: true }));
+        });
+    }
+}
+
+/**
  * For the simple editor, we need to disable the drag and drop
  * and the ability for the editor to auto embed media
  * @param editor - the CKEditor instance
@@ -107,6 +124,7 @@ function configureIframelyListener(editor: SbxEditor): void {
  */
 export function modifyEditor(sourceElement: SbxEditorElement, editor: SbxEditor, config: SbxEditorConfig): void {
     addToGlobalScope(editor, sourceElement);
+    mirrorEditorChanges(editor, config);
     insertWordCount(sourceElement, editor, config);
     disableAutoMedia(editor, config);
     removeValidation();
