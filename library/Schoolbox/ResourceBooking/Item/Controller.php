@@ -80,6 +80,7 @@ class Controller extends Base
             if ($total > 0) {
                 $list = $this->mapper->search(
                     $search,
+                    null,
                     $this->paginator->getOffset($page),
                     $this->paginator->getPageSize(),
                     'name',
@@ -88,7 +89,6 @@ class Controller extends Base
             }
         } else {
             if ($catId) {
-                $query['resource_category_id'] = $catId;
                 try {
                     $category = $this->mapper->getJoinMapper('category')->findById($catId);
                 } catch (SchoolboxNotFoundException $e) {
@@ -98,16 +98,16 @@ class Controller extends Base
             }
 
             // Get count before running list
-            $total = $this->mapper->countByColumnList($query);
+            $total = $this->mapper->searchCount($search, $catId);
             $this->paginator->setTotal($total);
             if ($total > 0) {
-                $list = $this->mapper->findByColumnList(
-                    $query,
-                    [
-                        'order'  => ['name' => 'asc'],
-                        'limit'  => $this->paginator->getPageSize(),
-                        'offset' => $this->paginator->getOffset($page),
-                    ]
+                $list = $this->mapper->search(
+                    $search,
+                    $catId,
+                    $this->paginator->getOffset($page),
+                    $this->paginator->getPageSize(),
+                    'name',
+                    'asc'
                 );
             }
         }
