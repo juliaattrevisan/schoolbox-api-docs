@@ -39,6 +39,11 @@
     {% if context.baseContext is not unitSpecification %}
         {{ dateForm.dateField('Lesson',     'due',     assessment.dueAt,     '#publishDate', '') }}
     {% endif %}
+
+    <div id="lesson-planner-container">
+        <lesson-planner />
+    </div>
+    <script src="{{ CDN_PREFIX }}/js/bundle/lessonPlanner.js?v={{ config.site_version }}"></script>
 </fieldset>
 
 {% if assessment.id %}
