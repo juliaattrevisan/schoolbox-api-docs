@@ -3,6 +3,7 @@
  * A single node row in the curriculum coverage report.
  */
 
+import { hasCode } from "@schoolboxCurriculum/js/nodeUtils";
 import { useNodeTitle } from "@schoolboxCurriculum/vue/composables/useNodeTitle";
 import type {
     CurriculumCoverageNode,
@@ -51,12 +52,19 @@ const canExpandSelectCells = window.Vue.computed(
     () => props.node.children && props.node.children.length > 0 && !props.node.isExpanded && !filtersStore.onlyShowGaps,
 );
 
-// to highlight the total cell when there are no usages
-const isEmptyTotal = window.Vue.computed(() => getFilteredTotalCount(props.node, !props.node.isExpanded) === 0);
+// to highlight empty total cells on expanded nodes when total count is 0 and node has a code
+const isEmptyTotal = window.Vue.computed(
+    () =>
+        (!showExpandButton.value && getFilteredTotalCount(props.node, false) === 0 && hasCode(props.node)) ||
+        (props.node.isExpanded && getFilteredTotalCount(props.node, false) === 0 && hasCode(props.node)),
+);
 
-// only show a zero in the total cell when the node is not expanded or has no code
+// only shows when the node is not expanded and has no code, or when the total count is 0 and has code
+// this is to prevent 0's showing up on nodes that can't actually have any usages assigned (those without a code)
 const showZero = window.Vue.computed(
-    () => (!props.node.isExpanded && props.node.code !== null) || (!props.node.isExpanded && props.node.code === ""),
+    () =>
+        (!props.node.isExpanded && !hasCode(props.node)) ||
+        (getFilteredTotalCount(props.node, !props.node.isExpanded) === 0 && hasCode(props.node)),
 );
 
 /**
@@ -158,7 +166,7 @@ function onCourseClicked(course: CourseWithCurriculumNodeUsage, buttonEl: HTMLBu
         <!-- if there's no usages inside, we can jump straight to showing 0 if showZero allows -->
         <td
             v-if="props.node.hasNoUsages"
-            :class="`u-border-left usage-cell ${showZero ? 'usage-cell--empty-total' : ''}`"
+            :class="`u-border-left usage-cell ${isEmptyTotal ? 'usage-cell--empty-total' : ''}`"
         >
             <button v-if="canExpandSelectCells" class="f-always-show usage-button" @click="onTotalClicked">
                 <b v-if="showZero">0</b>
@@ -166,15 +174,15 @@ function onCourseClicked(course: CourseWithCurriculumNodeUsage, buttonEl: HTMLBu
             <b v-else-if="showZero">0</b>
         </td>
         <!-- otherwise show the total filtered usage if it's above 0 -->
-        <td v-else :class="`u-border-left usage-cell ${isEmptyTotal ? 'usage-cell--empty-total' : ''}`">
-            <button v-if="canExpandSelectCells" class="f-always-show usage-button" @click="onTotalClicked">
+        <td v-else-if="canExpandSelectCells" class="u-border-left usage-cell">
+            <button class="f-always-show usage-button" @click="onTotalClicked">
                 <b v-if="getFilteredTotalCount(props.node, !props.node.isExpanded) > 0">{{
                     getFilteredTotalCount(props.node, !props.node.isExpanded)
                 }}</b>
             </button>
-            <b v-else-if="getFilteredTotalCount(props.node, false) > 0">{{
-                getFilteredTotalCount(props.node, false)
-            }}</b>
+        </td>
+        <td v-else :class="`u-border-left usage-cell ${isEmptyTotal ? 'usage-cell--empty-total' : ''}`">
+            <b v-if="getFilteredTotalCount(props.node, false) > 0">{{ getFilteredTotalCount(props.node, false) }}</b>
             <b v-else-if="showZero">0</b>
         </td>
         <!-- loop through each course/unit, retrieving the node usage or returning 0 no usages -->
