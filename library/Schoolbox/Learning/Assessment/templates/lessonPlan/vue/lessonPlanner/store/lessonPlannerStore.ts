@@ -46,6 +46,10 @@ export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
      * Open the modal to the initial page
      */
     function openModal(): void {
+        // deselect all fields, but intentionally keep additionalContext so it can be reused on the same page session
+        fields.value.forEach((field) => {
+            field.selected = false;
+        });
         modalStep.value = "generate";
     }
 
