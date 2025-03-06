@@ -97,8 +97,6 @@ define('SQL_dsn_read', 'mysql:host=' . SQL_host_read . ';dbname=' . SQL_db_read)
 
 define('TEMPLATE_body', $config['TEMPLATE_body']);
 define('TEMPLATE_content', $config['TEMPLATE_content']);
-define('SENTRY_TOKEN', $config['SENTRY_TOKEN']);
-define('SENTRY_PROJECT', $config['SENTRY_PROJECT']);
 
 // New Sentry consts
 define('SENTRY_DSN', $config['SENTRY_DSN'] ?? '');
