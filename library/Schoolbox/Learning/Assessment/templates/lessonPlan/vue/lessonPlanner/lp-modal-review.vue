@@ -27,7 +27,7 @@ const selectedFields = window.Vue.computed(() => {
 
     <div class="l-flex-row l-flex--no-wrap">
         <button class="l-flex__item--1 button" @click="lpStore.modalStep = 'generate'">Back</button>
-        <button class="l-flex__item--1 button submit">Add all to Lesson Plan</button>
+        <button class="l-flex__item--1 button submit" @click="lpStore.applySuggestions">Add all to Lesson Plan</button>
     </div>
 </template>
 

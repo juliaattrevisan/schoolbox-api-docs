@@ -81,6 +81,26 @@ export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
         modalStep.value = "review";
     }
 
+    /**
+     * Apply the suggestions from the AI to the actual fields of the lesson plan
+     */
+    function applySuggestions(): void {
+        fields.value.forEach((field) => {
+            if (!field.selected) return; // Field not selected, skip it
+            if (!field.suggestedBody) return; // No suggestion for this field, skip it
+
+            const editor = field.editorId ? window.sbProps.editors[field.editorId] : undefined;
+            if (editor === undefined) {
+                throw new Error("Unable to apply suggestion to lp-field without an editor");
+            }
+
+            editor.setData(field.suggestedBody);
+        });
+
+        // now close the modal
+        isModalOpen.value = false;
+    }
+
     return {
         init,
         fields,
