@@ -12,7 +12,7 @@ use League\Flysystem\Filesystem;
  * @link      https://schoolbox.com.au/
  */
 
-class Scanner
+class Scanner implements IScanner
 {
     /**
      * We use clamdscan to pass file to already running daemon of clamd
@@ -26,12 +26,6 @@ class Scanner
      * Ask clamd to scan its own config file as a test
      */
     private const TEST_CLAMSCAN_COMMAND = 'clamdscan --fdpass /etc/clamav/clamd.conf';
-
-
-    /**
-     * This is the quarantine location, it sits under the system temp directory and will be automatically created
-     */
-    private const VIRUS_QUARANTINE = '/quarantine/';
 
 
     /**
@@ -52,12 +46,11 @@ class Scanner
      * Will scan a file for virus and throw and exception if one is found
      * The file will also be moved to the quarantine directory
      *
-     * @param string $filelocation Path to temporary file on disk to be scanned
+     * @param string $fileLocation Path to temporary file on disk to be scanned
      * @return void
-     * @throws DaemonException
      * @throws FileException
      */
-    public function scan(string $filelocation): void
+    public function scan(string $fileLocation): void
     {
         $output = [];
         $resultCode = null;
@@ -66,9 +59,9 @@ class Scanner
             // Note '2>&1' redirects the output intended for stderr to stdout (so it will end up in the $output variable).
             // Without this redirection, a message like 'sh: 1: clamdscan: not found' can appear in unwanted places.
             // The message does not give any more information than the 127 return code.
-            self::CLAMSCAN_COMMAND . ' 2>&1',
-            sys_get_temp_dir() . self::VIRUS_QUARANTINE,
-            $filelocation
+                 self::CLAMSCAN_COMMAND . ' 2>&1',
+                 sys_get_temp_dir() . self::VIRUS_QUARANTINE,
+                 $fileLocation
         ), $output, $resultCode);
 
         // From clamdscan's man page:
@@ -94,6 +87,9 @@ class Scanner
         }
     }
 
+    /**
+     * @inheritdoc
+     */
     public function checkExists(): string
     {
         $output = [];
