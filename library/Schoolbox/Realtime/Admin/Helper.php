@@ -17,7 +17,7 @@ use Schoolbox\Application\Exception\Exception;
 class Helper
 {
     /**
-     * @var Array
+     * @var array
      */
     private $namespaces;
 
