@@ -118,7 +118,7 @@ export default class CurriculumCoverageReport {
      * Returns the locator for the Year 9 Curriculum total usage table cell
      * @returns - The locator for the Year 9 Curriculum total usage table cell
      */
-    year9TotalUsageTableCell(): Locator {
+    getYear9TotalUsageTableCell(): Locator {
         return this.page.locator(CurriculumCoverageReport.SELECTOR_YEAR_9_TOTAL);
     }
 

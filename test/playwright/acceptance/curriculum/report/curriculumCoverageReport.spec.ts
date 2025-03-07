@@ -63,7 +63,7 @@ test.describe("Curriculum Coverage Report Tests", () => {
         await coverageReport.expectLoading();
 
         tester.isGoingTo("Confirm English > Year 9 has total usage of 12");
-        await expect(coverageReport.year9TotalUsageTableCell()).toHaveText("12");
+        await expect(coverageReport.getYear9TotalUsageTableCell()).toHaveText("12");
 
         tester.isGoingTo("Reload the page and ensure the report still persists");
         await page.reload();
@@ -72,7 +72,7 @@ test.describe("Curriculum Coverage Report Tests", () => {
         await coverageReport.expectLoading();
 
         tester.isGoingTo("Confirm English > Year 9 has total usage of 12");
-        await expect(coverageReport.year9TotalUsageTableCell()).toHaveText("12");
+        await expect(coverageReport.getYear9TotalUsageTableCell()).toHaveText("12");
 
         tester.isGoingTo("Select load more curriculum and confirm Years 9 and 10 French is now visible");
         await expect(page.locator("table tbody")).not.toContainText("Years 9 and 10 French");
@@ -84,25 +84,25 @@ test.describe("Curriculum Coverage Report Tests", () => {
         await common.assertFileDownload("cc-report-filters-export-button-confirm", "curriculum-coverage-report.csv");
 
         tester.isGoingTo("Uncheck Unit filter and confirm Year 9 Curriculum goes from 12 to 10");
-        await expect(coverageReport.year9TotalUsageTableCell()).toHaveText("12");
+        await expect(coverageReport.getYear9TotalUsageTableCell()).toHaveText("12");
         await coverageReport.clickUnitFilter();
-        await expect(coverageReport.year9TotalUsageTableCell()).toHaveText("10");
+        await expect(coverageReport.getYear9TotalUsageTableCell()).toHaveText("10");
 
         tester.isGoingTo("Uncheck Learning Activities filter and confirm Year 9 Curriculum goes from 10 to 3");
         await coverageReport.clickActivityFilter();
-        await expect(coverageReport.year9TotalUsageTableCell()).toHaveText("3");
+        await expect(coverageReport.getYear9TotalUsageTableCell()).toHaveText("3");
 
         tester.isGoingTo(
             "Uncheck Course filter and confirm Year 9 Curriculum goes from 3 to blank (as it's 0 and doesn't have a code)",
         );
         await coverageReport.clickCourseFilter();
-        await expect(coverageReport.year9TotalUsageTableCell()).toHaveText("");
+        await expect(coverageReport.getYear9TotalUsageTableCell()).toHaveText("");
 
         tester.isGoingTo("Check all filters back on and confirm Year 9 Curriculum goes from 0 to 12");
         await coverageReport.clickUnitFilter();
         await coverageReport.clickActivityFilter();
         await coverageReport.clickCourseFilter();
-        await expect(coverageReport.year9TotalUsageTableCell()).toHaveText("12");
+        await expect(coverageReport.getYear9TotalUsageTableCell()).toHaveText("12");
 
         tester.isGoingTo("Expand out to English > Year 9 > Language > Text structure and organisation > ACELA1553");
         await coverageReport.navigateTree([136, 138, 148, 149]);
