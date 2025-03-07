@@ -178,6 +178,8 @@ test.describe("Curriculum Coverage Report Tests", () => {
      * Soft deleting data to not impact the tests
      */
     test.afterAll(async ({ baseTester, db }) => {
+        // Soft-delete data to not interfere with other tests
+        baseTester.isGoingTo("update enabled on the Year 4 History so it does not impact next suite of tests");
         // reset the enabled status of Year 4 History
         await db.updateInDatabase("curriculum_node", { enabled: 1 }, { "name like": "Year 4 History" });
     });
