@@ -112,7 +112,5 @@ class Helper
         $this->msgRerouteMapper->getDatabase()->commit();
 
         return $log;
-
     }
-
 }
