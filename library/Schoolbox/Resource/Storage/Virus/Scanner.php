@@ -31,8 +31,9 @@ class Scanner implements IScanner
      */
     private const TEST_CLAMSCAN_COMMAND = 'clamdscan --fdpass /etc/clamav/clamd.conf';
 
-
     /**
+     * Constructor
+     *
      * @param Filesystem $tempFileSystem
      * @throws \League\Flysystem\FilesystemException
      * @throws \League\Flysystem\UnableToCheckExistence
@@ -47,12 +48,7 @@ class Scanner implements IScanner
 
 
     /**
-     * Will scan a file for virus and throw and exception if one is found
-     * The file will also be moved to the quarantine directory
-     *
-     * @param string $fileLocation Path to temporary file on disk to be scanned
-     * @return void
-     * @throws FileException
+     * @inheritdoc
      */
     public function scan(string $fileLocation): void
     {
@@ -113,14 +109,14 @@ class Scanner implements IScanner
 
         // Virus scanner not available
         if (127 === $resultCode) {
-            return 'unavailable';
+            return self::STATUS_UNAVAILABLE;
         }
 
         /* clamd not currently running or accessible. Might have died due to OOM or not installed properly  */
         if (2 === $resultCode) {
-            return 'offline';
+            return self::STATUS_OFFLINE;
         }
 
-        return 'online';
+        return self::STATUS_ONLINE;
     }
 }

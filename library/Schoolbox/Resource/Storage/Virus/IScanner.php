@@ -17,9 +17,25 @@ use Schoolbox\File\Exception as FileException;
 interface IScanner
 {
     /**
-     * This is the quarantine location, it sits under the system temp directory and will be automatically created
+     * This is the quarantine location: it sits under the system temp directory
+     * and should be automatically created by any implementation.
      */
     public const VIRUS_QUARANTINE = '/quarantine/';
+
+    /**
+     * Status for when the scanner is online.
+     */
+    public const STATUS_ONLINE = 'online';
+
+    /**
+     * Status for when the scanner is offline, but has been configured.
+     */
+    public const STATUS_OFFLINE = 'offline';
+
+    /**
+     * Status for when the scanner is not configured.
+     */
+    public const STATUS_UNAVAILABLE = 'unavailable';
 
     /**
      * Scans a file for viruses, and throw an exception if one is found.
@@ -36,7 +52,7 @@ interface IScanner
     /**
      * Does this virus scanner exist?
      *
-     * @return string
+     * @return self::STATUS_*
      */
     public function checkExists(): string;
 }
