@@ -948,10 +948,12 @@ class Connector implements IConnector
             ->setCallbackUrl((string)$this->baseUrl->withPath($callbackUrl))
             ->build();
 
-        $this->messageProducer->send(
-            $message,
-            delay: 5,
-            maxRequeues: 10,
-        );
+// TODO: Uncomment this.
+// (Temporarily commented out while debugging taskd processes)
+//        $this->messageProducer->send(
+//            $message,
+//            delay: 5,
+//            maxRequeues: 10,
+//        );
     }
 }
