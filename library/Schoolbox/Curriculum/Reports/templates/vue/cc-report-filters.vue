@@ -40,8 +40,8 @@ const isModalOpen = window.Vue.ref(false); // to open/close the exporting to csv
                 <label>Only show unused curriculum</label>
                 <p class="meta">Only show curriculum that has a total usage count of 0.</p>
                 <div class="switch f-no-margins">
-                    <input id="onlyShowGapsSwitch" v-model="filtersStore.onlyShowGaps" type="checkbox" />
-                    <label for="onlyShowGapsSwitch" data-test="cc-report-filters-gaps-switch">
+                    <input id="onlyShowGapsToggle" v-model="filtersStore.onlyShowGaps" type="checkbox" />
+                    <label for="onlyShowGapsToggle" data-test="cc-report-filters-gaps-toggle">
                         <span class="icon-approve"></span>
                         <span class="icon-cancel"></span>
                     </label>
@@ -50,8 +50,8 @@ const isModalOpen = window.Vue.ref(false); // to open/close the exporting to csv
             <div>
                 <label>Show disabled outcomes</label>
                 <div class="switch f-no-margins">
-                    <input id="showDisabledOutcomesSwitch" v-model="filtersStore.showDisabled" type="checkbox" />
-                    <label for="showDisabledOutcomesSwitch" data-test="cc-report-filters-disabled-switch">
+                    <input id="showDisabledOutcomesToggle" v-model="filtersStore.showDisabled" type="checkbox" />
+                    <label for="showDisabledOutcomesToggle" data-test="cc-report-filters-disabled-toggle">
                         <span class="icon-approve"></span>
                         <span class="icon-cancel"></span>
                     </label>
