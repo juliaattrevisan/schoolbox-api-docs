@@ -538,6 +538,8 @@ class Controller extends Base
                     $record->getStudent()?->getYear()
                 )?->getUsingFormat('d/m/Y'), TypeAbstract::PASTORAL_EXPIRY),
                 'canCreate'             => $this->getConfigLoader()->get('pastoral_create_tag_enable'),
+                // only pastoral moderators with 'write' access or above can modify default expiry and point settings
+                'canModifyDefaults'     => $this->user->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_WRITE),
                 'moderator'             => $moderator,
                 'attachzonePublic'      => $this->getAttachZone(self::ATTACHZONE_PUBLIC, $record),
                 'attachzonePrivate'     => $this->getAttachZone(self::ATTACHZONE_PRIVATE, $record),

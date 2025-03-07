@@ -476,6 +476,13 @@ select {
             color: $aluminum;
         }
     }
+    // $aluminum as a color is not great for contrast in a readonly context
+    &[readonly] {
+        color: $input-font-color;
+        &:hover {
+            color: $input-font-color;
+        }
+    }
 }
 
 input[type="checkbox"],

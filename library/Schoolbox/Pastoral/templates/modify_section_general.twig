@@ -55,7 +55,7 @@
                 <span class="hint has-tip tip-top" data-tooltip title="Select when the record will expire.
                 Expired records will move to an archived state.">?</span>
             </label>
-            <input type="text" name="expiresAt" id="expiresAt" data-datepicker maxlength="50" value="{{ record.expiresAt ? record.expiresAt.localShort : null }}" />
+            <input type="text" name="expiresAt" id="expiresAt" maxlength="50" value="{{ record.expiresAt ? record.expiresAt.localShort : null }}" {% if canModifyDefaults %}data-datepicker{% else %}readonly{% endif %} />
         </div>
         <div class="small-12 medium-6 columns">
             {% if severities | length %}
@@ -73,7 +73,9 @@
         <div class="small-12 medium-6 columns">
             {# This label is intentionally unusual, there exists custom JS that PST uses occasionally which targets
              this <input> field, moving up one will break the form. See SA-18992 for more. #}
-            <label> Points <input id="points" type="text" inputmode="numeric" name="points" value="{{ record.points }}"/> </label>
+            <label> Points
+                <input id="points" type="text" inputmode="numeric" name="points" value="{{ record.points }}" {% if canModifyDefaults == false %}readonly {% endif %}/>
+            </label>
         </div>
         <div class="small-12 medium-6 columns">
             <label> Tags
