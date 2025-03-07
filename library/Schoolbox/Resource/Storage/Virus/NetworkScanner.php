@@ -18,21 +18,33 @@ use Schoolbox\File\Exception as FileException;
  */
 class NetworkScanner implements IScanner
 {
+    /**
+     * Prefix for commands.
+     *
+     * This implementation prefixes commands with a `z`, so that a null byte is
+     * used as the delimiter for both commands and their responses.
+     */
     private const COMMAND_PREFIX = 'z';
 
+    /**
+     * Null bytes are used as the delimiter for commands and responses.
+     */
     private const DELIMITER = "\0";
 
     /**
      * Constructor
      *
-     * @param string|null $sharedDirectory The shared directory on this host to copy files to.
-     * @param string|null $clamDaemonHost  The hostname the ClamAV daemon is available on.
-     * @param int|null    $clamDaemonPort  The port the ClamAV daemon is listening on.
+     * @param string $sharedDirectory     The shared directory on this host to copy files to.
+     * @param string $clamDaemonHost      The hostname the ClamAV daemon is available on.
+     * @param int    $clamDaemonPort      The port the ClamAV daemon is listening on.
+     * @param string $clamDaemonDirectory The directory on the ClamAV host from which it will read files to scan.
+     *                                    It's assumed that this and `$sharedDirectory` are a shared mount.
      */
     public function __construct(
-        private ?string $sharedDirectory,
-        private ?string $clamDaemonHost,
-        private ?int $clamDaemonPort,
+        private string $sharedDirectory,
+        private string $clamDaemonHost,
+        private int $clamDaemonPort,
+        private string $clamDaemonDirectory,
     ) {
     }
 
@@ -60,12 +72,17 @@ class NetworkScanner implements IScanner
         }
 
         // And finally scan
-        $response = $this->executeCommand('SCAN ' . $tempFile, 60);
+        $response = $this->executeCommand('SCAN ' . $this->clamDaemonDirectory . '/' . basename($tempFile), 60);
         if (str_ends_with($response, 'OK')) {
             return;
         }
-        throw new FileException(
-            sprintf('Virus scanner received response "%s": presuming virus', $response)
+        if (str_ends_with($response, 'FOUND')) {
+            throw new FileException(
+                sprintf('Virus scanner received response "%s": looks like a virus', $response)
+            );
+        }
+        throw new DaemonException(
+            sprintf('Virus scanner received unknown response "%s"', $response)
         );
     }
 
@@ -97,9 +114,6 @@ class NetworkScanner implements IScanner
     {
         if (!extension_loaded('sockets')) {
             throw new DaemonException('PHP sockets extension is not loaded');
-        }
-        if (!isset($this->clamDaemonHost, $this->clamDaemonPort)) {
-            throw new DaemonException('ClamAV daemon host and port are not configured');
         }
 
         // Can the port be accessed?
