@@ -199,7 +199,8 @@ class Factory
         /* The preprocessed payload that frontend can just use
          */
         return [
-            'data' => $payload
+            'data' => $payload,
+            'coordTeacher' => $referenceFields['coordTeacher'] ?? null,
         ];
     }
 
