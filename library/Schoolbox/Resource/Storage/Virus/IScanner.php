@@ -45,7 +45,9 @@ interface IScanner
      *
      * @param string $fileLocation Path to file on disk to be scanned.
      * @return void
-     * @throws FileException if the file at `$filelocation` contains a virus
+     * @throws FileException   if the file at `$filelocation` contains a virus
+     * @throws DaemonException if the file can't be scanned, or the result is
+     *                         inconclusive
      */
     public function scan(string $fileLocation): void;
 

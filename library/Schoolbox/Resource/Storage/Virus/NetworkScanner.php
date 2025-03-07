@@ -18,8 +18,17 @@ use Schoolbox\File\Exception as FileException;
  */
 class NetworkScanner implements IScanner
 {
+    private const COMMAND_PREFIX = 'z';
+
     private const DELIMITER = "\0";
 
+    /**
+     * Constructor
+     *
+     * @param string|null $sharedDirectory The shared directory on this host to copy files to.
+     * @param string|null $clamDaemonHost  The hostname the ClamAV daemon is available on.
+     * @param int|null    $clamDaemonPort  The port the ClamAV daemon is listening on.
+     */
     public function __construct(
         private ?string $sharedDirectory,
         private ?string $clamDaemonHost,
@@ -34,45 +43,30 @@ class NetworkScanner implements IScanner
     {
         // Copy file to temp, presuming it exists
         if (!file_exists($fileLocation)) {
-            return;
+            throw new DaemonException('File does not exist');
         }
         $tempFile = tempnam($this->sharedDirectory, '');
-        $copied   = copy($fileLocation, $tempFile);
+        if (!$tempFile) {
+            throw new DaemonException('Failed to create temp file');
+        }
+        $copied = copy($fileLocation, $tempFile);
         if (!$copied) {
-            return;
+            throw new DaemonException('Failed to copy file to temp file');
         }
 
         // For now make said file world-readable (for clamav host)
-        chmod($tempFile, 0644);
-
-        // Create socket
-        $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-        socket_connect($socket, $this->clamDaemonHost, $this->clamDaemonPort);
-
-        // Send request to scan file,
-        // presuming that file path is the same on the clamav host
-        socket_write($socket, 'zSCAN ' . $tempFile . self::DELIMITER);
-
-        // Wait for a response: but what?
-        $time     = microtime(true);
-        $timeout  = $time + 10;
-        $response = '';
-        while (microtime(true) < $timeout) {
-            $response .= socket_read($socket, 1024);
-            if (str_ends_with($response, self::DELIMITER)) {
-                $response = trim($response);
-                if (str_ends_with($response, 'OK')) {
-                    socket_close($socket);
-                    return;
-                }
-                // Any other response: assume a virus
-                socket_close($socket);
-                throw new FileException(
-                    sprintf('Virus scanner received response "%s": presuming virus', $response)
-                );
-            }
-            usleep(100000);
+        if (!chmod($tempFile, 0644)) {
+            throw new DaemonException('Failed to change permissions on temp file');
         }
+
+        // And finally scan
+        $response = $this->executeCommand('SCAN ' . $tempFile, 60);
+        if (str_ends_with($response, 'OK')) {
+            return;
+        }
+        throw new FileException(
+            sprintf('Virus scanner received response "%s": presuming virus', $response)
+        );
     }
 
     /**
@@ -80,36 +74,53 @@ class NetworkScanner implements IScanner
      */
     public function checkExists(): string
     {
-        if (!isset($this->sharedDirectory, $this->clamDaemonHost, $this->clamDaemonPort)) {
+        try {
+            $response = $this->executeCommand('PING', 5);
+        } catch (DaemonException) {
             return self::STATUS_UNAVAILABLE;
         }
+        if ($response === 'PONG') {
+            return self::STATUS_ONLINE;
+        }
+        return self::STATUS_OFFLINE;
+    }
+
+    /**
+     * Attempt to send a command to the socket.
+     *
+     * @param string $command The command to send.
+     * @param int    $timeout How many seconds to wait for a response.
+     * @return string The response to the command.
+     * @throws DaemonException if the command failed to run.
+     */
+    private function executeCommand(string $command, int $timeout): string
+    {
         if (!extension_loaded('sockets')) {
-            return self::STATUS_UNAVAILABLE;
+            throw new DaemonException('PHP sockets extension is not loaded');
+        }
+        if (!isset($this->clamDaemonHost, $this->clamDaemonPort)) {
+            throw new DaemonException('ClamAV daemon host and port are not configured');
         }
 
         // Can the port be accessed?
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         socket_connect($socket, $this->clamDaemonHost, $this->clamDaemonPort);
-        socket_write($socket, 'zPING' . self::DELIMITER);
 
-        // Wait for a response from the socket for up to 5s:
-        // said response should be "PONG"
-        $time     = microtime(true);
-        $timeout  = $time + 5;
-        $response = '';
-        while (microtime(true) < $timeout) {
+        // Send the command, and wait for a response
+        socket_write($socket, self::COMMAND_PREFIX . $command . self::DELIMITER);
+        $response    = '';
+        $timeoutTime = microtime(true) + $timeout;
+        while (microtime(true) < $timeoutTime) {
             $response .= socket_read($socket, 1024);
 
-            // If last byte is the delimiter: we have a response
+            // If last byte is the delimiter: we have a fully realised response.
             if (str_ends_with($response, self::DELIMITER)) {
-                if (trim($response) === 'PONG') {
-                    socket_close($socket);
-                    return self::STATUS_ONLINE;
-                }
+                socket_close($socket);
+                return rtrim($response, self::DELIMITER);
             }
             usleep(100000);
         }
         socket_close($socket);
-        return self::STATUS_OFFLINE;
+        return $response;
     }
 }
