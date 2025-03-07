@@ -930,8 +930,14 @@ class Mapper extends BaseMapper
 
             $model->setAssessmentContext($context);
 
-            // Set assessment model
-            $model->getSubObject()->setAssessmentModel($model);
+            // Set assessment model.
+            // The null-safe operator '?->' has been used below to protect against the following case:
+            // If a previous assessment import has failed mid-way through, so that an assessment row has been created,
+            // but the linked row for the sub-object (e.g. task row) has not been created, $model->getSubObject()
+            // will cause an error that prevents the page from loading.  Using the null-safe operator allows the page
+            // to load, which allows the user to re-do the import, which will fix the problem.
+            // Note imports should no longer fail mid-way through due to database transactions being added in SA-19231.
+            $model->getSubObject()?->setAssessmentModel($model);
 
             $modelList->add($model);
         }

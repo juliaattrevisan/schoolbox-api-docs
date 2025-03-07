@@ -138,7 +138,7 @@ class Controller extends Base\Base
              * and you chose to cancel what you were doing
              */
             'importedAlready' => $exists,
-            'importedAlreadyRedirect' => Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL)),
+            'importedAlreadyRedirect' => Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL) ?? ''),
         ];
 
         if (self::IMPORT_STAGE_UNITS === $initialStage) {
