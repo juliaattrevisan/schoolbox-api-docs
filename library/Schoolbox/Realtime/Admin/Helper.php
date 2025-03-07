@@ -33,9 +33,6 @@ class Helper
         private RerouteMapper $msgRerouteMapper,
         private NSMapper $namespaceMapper
     ) {
-        $this->roleMapper = $roleMapper;
-        $this->msgRerouteMapper = $msgRerouteMapper;
-        $this->namespaceMapper = $namespaceMapper;
         $this->namespaces = $this->namespaceMapper->findAll()->sortBy('slug', 'asc')->getPropertyValues('slug');
     }
 
