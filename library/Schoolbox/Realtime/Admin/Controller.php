@@ -23,10 +23,12 @@ use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\Message\Source;
 use Schoolbox\Realtime\Message\SourceMapper;
+use Schoolbox\Realtime\Message\RerouteMapper;
 use Schoolbox\Realtime\Notification\Parameter\SimpleParam;
 use Schoolbox\Resource;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
+use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\MobileApp;
 use Schoolbox\UserMapper;
@@ -683,5 +685,45 @@ class Controller extends BaseController
         $this->response = $this->responseAsJson([
             'id' => $service->getId(),
         ]);
+    }
+
+    /**
+     * Apply default notification settings for a given role type and namespace.
+     *
+     * @api POST /adminv2/notifications/settings/apply-default
+     * @since 25.0
+     *
+     * @throws \Alaress\Web\Controller\Exception
+     */
+    public function postApplyDefaultSettings()
+    {
+        try {
+
+            /** @var string|null $roletype - The role type to apply the default settings to */
+            $roletype = $this->requestPost->get("roletype");
+
+            /** @var string|null $namespace - The namespace to apply the default settings to */
+            $namespace = $this->requestPost->get("namespace");
+
+            if ($roletype == null || $namespace == null) {
+                $this->sendError("Roletype and namespace must be provided");
+                return;
+            }
+
+            $helper = new Helper($this->getRoleMapper(), RerouteMapper::getInstance(), $this->getNsMapper());
+            if ($roletype == "all") {
+                $helper->applyDefaultSettings(null, Role::STUDENT, $namespace);
+                $helper->applyDefaultSettings(null, Role::PARENT, $namespace);
+                $helper->applyDefaultSettings(null, Role::STAFF, $namespace);
+            } else {
+                $helper->applyDefaultSettings(null, $roletype, $namespace);
+            }
+
+            $this->response = $this->responseAsJson(['success' => true]);
+        } catch (\Exception $e) {
+            $this->response = $this->responseAsJson(
+                ['success' => false, 'message' => $e->getMessage()]
+            )->withStatus(500);
+        }
     }
 }
