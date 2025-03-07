@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @copyright Copyright 2023, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage\Virus;
@@ -8,10 +13,9 @@ use Schoolbox\File\Exception as FileException;
 use League\Flysystem\Filesystem;
 
 /**
- * @copyright Copyright 2023, Schoolbox Pty Ltd
- * @link      https://schoolbox.com.au/
+ * Virus scanner implementation, which uses a locally available `clamdscan`
+ * instance for scanning.
  */
-
 class Scanner implements IScanner
 {
     /**
