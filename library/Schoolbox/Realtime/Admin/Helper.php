@@ -43,10 +43,10 @@ class Helper
      * @param int|null $roleId
      * @param string|null $roletype
      * @param string $namespace
-     * @param boolean|null $hasLog
-     * @return string[]|Exception
+     * @return string[]
+     * @throws Exception
      */
-    public function applyDefaultSettings(?int $roleId, ?string $roletype, string $namespace): array|Exception
+    public function applyDefaultSettings(?int $roleId, ?string $roletype, string $namespace): array
     {
         // to return log messages
         $log = [];
