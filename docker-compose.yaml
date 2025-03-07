@@ -49,6 +49,7 @@ services:
       - command: mkdir -p /var/lib/schoolbox/docker/purifier
       - command: mkdir -p /var/lib/schoolbox/docker/twig
       - command: chown -R www-data:www-data /var/lib/schoolbox/docker/
+      - command: chown -R www-data:www-data /var/lib/clamav-temp/
 
   # Image intended for running command-line processes:
   # * command-line tools
