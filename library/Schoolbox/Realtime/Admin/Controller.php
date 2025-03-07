@@ -28,6 +28,7 @@ use Schoolbox\Realtime\Notification\Parameter\SimpleParam;
 use Schoolbox\Resource;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
+use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\MobileApp;
 use Schoolbox\UserMapper;
@@ -711,9 +712,9 @@ class Controller extends BaseController
 
             $helper = new Helper($this->getRoleMapper(), RerouteMapper::getInstance(), $this->getNsMapper());
             if ($roletype == "all") {
-                $helper->applyDefaultSettings(null, "student", $namespace);
-                $helper->applyDefaultSettings(null, "parent", $namespace);
-                $helper->applyDefaultSettings(null, "staff", $namespace);
+                $helper->applyDefaultSettings(null, Role::STUDENT, $namespace);
+                $helper->applyDefaultSettings(null, Role::PARENT, $namespace);
+                $helper->applyDefaultSettings(null, Role::STAFF, $namespace);
             } else {
                 $helper->applyDefaultSettings(null, $roletype, $namespace);
             }
