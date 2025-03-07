@@ -36,6 +36,7 @@ const filtersStore = useFiltersStore();
 const { title } = useNodeTitle(props.node);
 
 // whether the node should be shown based on the filters
+// is shown based on isVisible and whether disabled nodes should be shown
 const showNode = window.Vue.computed(
     () =>
         (props.node.isVisible && filtersStore.showDisabled) ||
@@ -131,7 +132,7 @@ function onCourseClicked(course: CourseWithCurriculumNodeUsage, buttonEl: HTMLBu
 <template>
     <tr v-if="showNode">
         <td
-            :class="`l-flex l-flex--align-center l-gap-s f-no-margins name-cell u-border-right`"
+            class="l-flex l-flex--align-center l-gap-s f-no-margins name-cell u-border-right"
             :style="{
                 paddingInlineStart: filtersStore.onlyShowGaps ? '0.5rem' : `calc(${props.depth * 0.5}rem + 0.5rem)`,
             }"
@@ -278,10 +279,6 @@ tr:hover {
     @media (max-width: 1000px) {
         position: static; // prevent the cell from sticking on smaller screens
     }
-}
-
-.disabled {
-    background: #f6f6f6;
 }
 
 .usage-cell {
