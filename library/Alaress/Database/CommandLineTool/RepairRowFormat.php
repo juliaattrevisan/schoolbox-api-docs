@@ -49,6 +49,15 @@ class RepairRowFormat extends CliTool\App
      */
     public function run(): void
     {
+        /**
+         * Deprecation notice
+         */
+        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->getLogger()->notice('/***************     Deprecated NOTICE - this will be deleted in future    ****************/');
+        $this->getLogger()->notice('/*    If you are running this, please add a comment of this scripts name into SA-19334    */');
+        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->getLogger()->notice('/******************************************************************************************/');
+
         if ($this->getOpt(self::OPT_LONG_HELP) || $this->getOpt(self::OPT_SHORT_HELP)) {
             $file       = $this->getToolFilename();
             $green      = self::COLOUR_GREEN;
@@ -155,6 +164,16 @@ HELP;
                 ? sprintf('%d tables repaired, %d tables unable to be repaired', $successCount, $failureCount)
                 : sprintf('%d tables would have been repaired: run with the `-p` flag to repair', $successCount)
         );
+
+        /**
+         * Deprecation notice
+         */
+        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->getLogger()->notice('/***************     Deprecated NOTICE - this will be deleted in future    ****************/');
+        $this->getLogger()->notice('/*    If you are running this, please add a comment of this scripts name into SA-19334    */');
+        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->getLogger()->notice('/******************************************************************************************/');
+
         exit($failureCount > 0 ? CliTool\Kernel::EXIT_STATUS_APP_ERROR : CliTool\Kernel::EXIT_STATUS_OK);
     }
 
