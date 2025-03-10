@@ -12,6 +12,15 @@ use Monolog\Level;
 use Monolog\Logger;
 use Schoolbox\Config\Loader as ConfigLoader;
 
+/**
+* Deprecation notice
+*/
+echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;
+echo "\033[1;33m/***************     Deprecated NOTICE - this will be deleted in future    ****************/\033[0m" . PHP_EOL;
+echo "\033[1;33m/*    If you are running this, please add a comment of this scripts name into SA-19334    */\033[0m" . PHP_EOL;
+echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;
+echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;
+
 $helptext = <<<EOF
 Usage: $argv[0] [--icon=<icon>] [--href=<href>] [--severity=<level>] <topic> <bodytext>
 Send a message through the notifier
@@ -100,3 +109,12 @@ $n = \Schoolbox\Notif\Notifactory::create($topic, ConfigLoader::getInstance());
 $n->log($values['severity'], "$instance");
 
 echo "Message '$body' sent via '$topic' at severity {$values['severity']}\n";
+
+/**
+ * Deprecation notice
+ */
+echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;
+echo "\033[1;33m/***************     Deprecated NOTICE - this will be deleted in future    ****************/\033[0m" . PHP_EOL;
+echo "\033[1;33m/*    If you are running this, please add a comment of this scripts name into SA-19334    */\033[0m" . PHP_EOL;
+echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;
+echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;
