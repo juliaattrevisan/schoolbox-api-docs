@@ -14,6 +14,15 @@ require_once __DIR__ . '/../conf/core/require.php';
 $app = new class extends CliTool\App {
     public function run(): void
     {
+        /**
+         * Deprecation notice
+         */
+        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->getLogger()->notice('/***************     Deprecated NOTICE - this will be deleted in future    ****************/');
+        $this->getLogger()->notice('/*    If you are running this, please add a comment of this scripts name into SA-19334    */');
+        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->getLogger()->notice('/******************************************************************************************/');
+
         /** @var Storage\Mapper $storageMapper */
         $storageMapper = $this->getDi()->get('mapperFactory')->get(Storage\Mapper::class);
 
@@ -40,6 +49,15 @@ $app = new class extends CliTool\App {
             }
         }
         $this->getLogger()->notice("Completed scanning $countAll: $errorCount files missing, $okCount files found");
+
+        /**
+         * Deprecation notice
+         */
+        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->getLogger()->notice('/***************     Deprecated NOTICE - this will be deleted in future    ****************/');
+        $this->getLogger()->notice('/*    If you are running this, please add a comment of this scripts name into SA-19334    */');
+        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->getLogger()->notice('/******************************************************************************************/');
     }
 };
 
