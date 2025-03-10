@@ -71,6 +71,15 @@ class Folder extends Composite
      */
     public function run(): void
     {
+        /**
+         * Deprecation notice
+         */
+        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->getLogger()->notice('/***************     Deprecated NOTICE - this will be deleted in future    ****************/');
+        $this->getLogger()->notice('/*    If you are running this, please add a comment of this scripts name into SA-19334    */');
+        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->getLogger()->notice('/******************************************************************************************/');
+
         /** @var IConnector $db */
         $db = $this->getDi()->get('databaseInternal');
         $db->beginTransaction();
@@ -87,5 +96,14 @@ class Folder extends Composite
         } else {
             $db->rollBack();
         }
+
+        /**
+         * Deprecation notice
+         */
+        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->getLogger()->notice('/***************     Deprecated NOTICE - this will be deleted in future    ****************/');
+        $this->getLogger()->notice('/*    If you are running this, please add a comment of this scripts name into SA-19334    */');
+        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->getLogger()->notice('/******************************************************************************************/');
     }
 }
