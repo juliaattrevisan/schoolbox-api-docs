@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import locale from "@js/terminology/rosettaStone";
 import { useLessonPlannerStore } from "./store/lessonPlannerStore";
 
 const lpStore = useLessonPlannerStore();
@@ -9,7 +10,7 @@ const selectedFields = window.Vue.computed(() => {
 </script>
 
 <template>
-    <h2>Lesson Plan generated with AI</h2>
+    <h2>{{ locale.lessonPlan.proper() }} generated with AI</h2>
 
     <template v-for="(field, i) in selectedFields" :key="field.id">
         <hr v-if="i > 0" />
@@ -27,7 +28,9 @@ const selectedFields = window.Vue.computed(() => {
 
     <div class="l-flex-row l-flex--no-wrap">
         <button class="l-flex__item--1 button" @click="lpStore.modalStep = 'generate'">Back</button>
-        <button class="l-flex__item--1 button submit" @click="lpStore.applySuggestions">Add all to Lesson Plan</button>
+        <button class="l-flex__item--1 button submit" @click="lpStore.applySuggestions">
+            Add {{ selectedFields.length > 1 ? "all" : "" }} to {{ locale.lessonPlan.proper() }}
+        </button>
     </div>
 </template>
 

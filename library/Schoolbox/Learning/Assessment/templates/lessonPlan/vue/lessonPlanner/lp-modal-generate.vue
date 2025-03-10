@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import locale from "@js/terminology/rosettaStone";
 import { useLessonPlannerStore } from "./store/lessonPlannerStore";
 
 const lpStore = useLessonPlannerStore();
@@ -12,7 +13,9 @@ const allowGeneration = window.Vue.computed(() => {
 </script>
 
 <template>
-    <label for="lp-generate-fields"> Select the sections of your lesson plan which you want AI to help with: </label>
+    <label for="lp-generate-fields">
+        Select the sections of your {{ locale.lessonPlan.singular() }} which you want AI to help with:
+    </label>
     <ul id="lp-generate-fields" class="option-list">
         <li v-for="field in lpStore.fields" :key="field.id">
             <input :id="`lp-generate-field-${field.id}`" v-model="field.selected" type="checkbox" />
@@ -28,13 +31,13 @@ const allowGeneration = window.Vue.computed(() => {
 
     <label for="lp-generate-additional-context">Additional Context</label>
     <p class="meta">
-        Provide any specific instructions, lesson context, or ideas to guide the AI in generating a tailored lesson
-        plan.
+        Provide any specific instructions, lesson context, or ideas to guide the AI in generating a tailored
+        {{ locale.lessonPlan.singular() }}.
     </p>
     <textarea id="lp-generate-additional-context" v-model="lpStore.additionalContext" rows="5"></textarea>
 
     <div v-if="lpStore.generateError" class="alert alert-box">
-        <b>There was a problem generating the lesson plan.</b>
+        <b>There was a problem generating the {{ locale.lessonPlan.singular() }}.</b>
         {{ lpStore.generateError }}
     </div>
 
