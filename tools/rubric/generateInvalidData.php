@@ -72,6 +72,15 @@ $app = new class extends CliTool\App {
     /** @inheritDoc */
     public function run(): void
     {
+        /**
+         * Deprecation notice
+         */
+        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->getLogger()->notice('/***************     Deprecated NOTICE - this will be deleted in future    ****************/');
+        $this->getLogger()->notice('/*    If you are running this, please add a comment of this scripts name into SA-19334    */');
+        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->getLogger()->notice('/******************************************************************************************/');
+
         $configMapper = ConfigMapper::getInstance();
         $configMapper->getDatabase()->query("UPDATE config SET value = 0 WHERE name = 'external_markbook'");
 
@@ -149,6 +158,15 @@ $app = new class extends CliTool\App {
         $this->createIndicator($capCD, "{$suffix} D Course Indicator");
         $capUD = $this->createCapability($unitSpecD->getFolder(), "{$suffix} D Capability\r\n");
         $this->createIndicator($capUD, "{$suffix} D Unit Indicator");
+
+        /**
+         * Deprecation notice
+         */
+        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->getLogger()->notice('/***************     Deprecated NOTICE - this will be deleted in future    ****************/');
+        $this->getLogger()->notice('/*    If you are running this, please add a comment of this scripts name into SA-19334    */');
+        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->getLogger()->notice('/******************************************************************************************/');
     }
 
     /**
