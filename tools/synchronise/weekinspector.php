@@ -28,7 +28,6 @@ require_once __DIR__ . '/../../conf/core/require.php';
  *     Example: php example.php 2> log.txt
  */
 $app = new class extends CliTool\App {
-
     /**
      * --help
      *

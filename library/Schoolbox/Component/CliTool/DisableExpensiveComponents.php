@@ -20,7 +20,6 @@ use Schoolbox\Application\CliTool\App;
  */
 class DisableExpensiveComponents extends App
 {
-
     private const MODE_SHOW    = 'show';
     private const MODE_BACKUP  = 'backup';
     private const MODE_MODIFY  = 'modify';
