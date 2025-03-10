@@ -1,4 +1,12 @@
 # Schoolbox Bell Daemon
+## Deprecation notice:
+```
+******************************************************************************************
+***************     Deprecated NOTICE - this will be deleted in future    ****************
+*    If you are running this, please add a comment of this scripts name into SA-19334    *
+******************************************************************************************
+******************************************************************************************
+```
 
 This feature was commissioned by Melbourne Girls Grammar School (MGGS).
 
