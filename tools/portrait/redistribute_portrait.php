@@ -38,6 +38,15 @@ $app = new class extends CliTool\App
      */
     public function run(): void
     {
+        /**
+         * Deprecation notice
+         */
+        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->getLogger()->notice('/***************     Deprecated NOTICE - this will be deleted in future    ****************/');
+        $this->getLogger()->notice('/*    If you are running this, please add a comment of this scripts name into SA-19334    */');
+        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->getLogger()->notice('/******************************************************************************************/');
+
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
@@ -144,6 +153,15 @@ HELP;
         if (!$this->perform()) {
             $this->getLogger()->info('Planning finished.');
         }
+
+        /**
+         * Deprecation notice
+         */
+        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->getLogger()->notice('/***************     Deprecated NOTICE - this will be deleted in future    ****************/');
+        $this->getLogger()->notice('/*    If you are running this, please add a comment of this scripts name into SA-19334    */');
+        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->getLogger()->notice('/******************************************************************************************/');
     }
 };
 
