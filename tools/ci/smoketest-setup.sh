@@ -113,7 +113,7 @@ composer install -o
 cd tools || exit 1
 ./module/refresh-cache.php
 ./generate-dir-sql-dynamically.sh $instance_data_dir | mariadb schoolbox
-./set-plan.php --plan=elite
+./set-plan.php --plan=learning-enhanced
 ./build-sql-update.sh
 
 # Enter/exit maintenance mode before/after update
