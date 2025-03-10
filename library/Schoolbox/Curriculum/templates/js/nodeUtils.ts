@@ -235,6 +235,16 @@ export function getBreadcrumbs(node: Node, currentBreadcrumbs: Breadcrumb[]): Br
 }
 
 /**
+ * To determine if there's a code assigned to the node,
+ * which means the node can have usages assigned
+ * @param node - the node to check
+ * @returns - whether there's any usage assigned on the node
+ */
+export function hasCode(node: Pick<Node, "code">): boolean {
+    return node.code !== null && node.code !== "";
+}
+
+/**
  * To determine if there's any usage assigned on the node
  * @param node - the node to check
  * @returns - whether there's any usage assigned on the node

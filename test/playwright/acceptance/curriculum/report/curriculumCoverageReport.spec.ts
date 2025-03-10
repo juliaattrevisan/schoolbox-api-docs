@@ -52,6 +52,8 @@ test.describe("Curriculum Coverage Report Tests", () => {
         await curriculumSelector.browseTree([302, 304, 1, 135]);
         await curriculumSelector.saveModal(); // Select Select, closing the modal
 
+        // link for reference: https://vagrant.dev.schoolbox.cloud/curriculum/reports/coverage?courseId=6%2C2%2C14&nodeId=302%2C304%2C1%2C135
+
         tester.isGoingTo("Try and generate a report again");
         await coverageReport.submit(); // Generate the report
 
@@ -88,9 +90,11 @@ test.describe("Curriculum Coverage Report Tests", () => {
         await coverageReport.clickActivityFilter();
         await expect(coverageReport.year9TotalUsageTableCell()).toHaveText("3");
 
-        tester.isGoingTo("Uncheck Course filter and confirm Year 9 Curriculum goes from 3 to 0");
+        tester.isGoingTo(
+            "Uncheck Course filter and confirm Year 9 Curriculum goes from 3 to blank (as it's 0 and doesn't have a code)",
+        );
         await coverageReport.clickCourseFilter();
-        await expect(coverageReport.year9TotalUsageTableCell()).toHaveText("0");
+        await expect(coverageReport.year9TotalUsageTableCell()).toHaveText("");
 
         tester.isGoingTo("Check all filters back on and confirm Year 9 Curriculum goes from 0 to 12");
         await coverageReport.clickUnitFilter();
@@ -104,8 +108,12 @@ test.describe("Curriculum Coverage Report Tests", () => {
         tester.isGoingTo(
             "Select ACELA1553 / Romeo & Juliet and confirm “Present a scene of Romeo and Juliet” is visible in the pop out",
         );
-        await page.locator("table tbody tr:nth-child(10) td:nth-child(10)").click(); // Select table cell
+        await coverageReport.acela1553RomeoTableCell().click(); // Select table cell
         await expect(page.getByTestId("cc-usage-pop-out")).toContainText("Present a scene of Romeo and Juliet");
+
+        tester.isGoingTo("Uncheck activity filter again and confirm ACELA1553 / Romeo & Juliet 0 value is now hidden");
+        await coverageReport.clickActivityFilter();
+        await expect(coverageReport.acela1553RomeoTableCell()).not.toBeVisible();
 
         tester.isGoingTo("Select Only show unused curriculum and confirm open/close toggles have been hidden");
         await page.getByTestId("cc-report-filters-gaps-switch").click(); // Select Only show unused curriculum

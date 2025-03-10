@@ -3,6 +3,7 @@
  * A single node row in the curriculum coverage report.
  */
 
+import { hasCode } from "@schoolboxCurriculum/js/nodeUtils";
 import { useNodeTitle } from "@schoolboxCurriculum/vue/composables/useNodeTitle";
 import type {
     CurriculumCoverageNode,
@@ -49,6 +50,14 @@ const showExpandButton = window.Vue.computed(
 // whether the cell can also be used to expand the node
 const canExpandSelectCells = window.Vue.computed(
     () => props.node.children && props.node.children.length > 0 && !props.node.isExpanded && !filtersStore.onlyShowGaps,
+);
+
+// only shows when the node is not expanded and has no code, or when the total count is 0 and has code
+// this is to prevent 0's showing up on nodes that can't actually have any usages assigned (those without a code)
+const showZero = window.Vue.computed(
+    () =>
+        (!props.node.isExpanded && !hasCode(props.node)) ||
+        (getFilteredTotalCount(props.node, !props.node.isExpanded) === 0 && hasCode(props.node)),
 );
 
 /**
@@ -147,25 +156,34 @@ function onCourseClicked(course: CourseWithCurriculumNodeUsage, buttonEl: HTMLBu
             </button>
         </td>
         <!-- add the total cell -->
-        <td v-if="props.node.hasNoUsages" class="u-border-left"><b>0</b></td>
+        <!-- if there's no usages inside, we can jump straight to showing 0 if showZero allows -->
+        <td v-if="props.node.hasNoUsages" class="u-border-left usage-cell">
+            <button v-if="canExpandSelectCells" class="f-always-show usage-button" @click="onTotalClicked">
+                <b v-if="showZero">0</b>
+            </button>
+            <b v-else-if="showZero">0</b>
+        </td>
+        <!-- or show the total filtered usage if it's above 0 and is selectable (has children within) -->
         <td v-else-if="canExpandSelectCells" class="u-border-left usage-cell">
             <button class="f-always-show usage-button" @click="onTotalClicked">
-                <b>{{ getFilteredTotalCount(props.node, !props.node.isExpanded) }}</b>
+                <b v-if="getFilteredTotalCount(props.node, !props.node.isExpanded) > 0">{{
+                    getFilteredTotalCount(props.node, !props.node.isExpanded)
+                }}</b>
             </button>
         </td>
+        <!-- otherwise show the total filtered usage if it's above 0 or showZero allows -->
         <td v-else class="u-border-left usage-cell">
-            <b>{{ getFilteredTotalCount(props.node, !props.node.isExpanded) }}</b>
+            <b v-if="getFilteredTotalCount(props.node, false) > 0">{{ getFilteredTotalCount(props.node, false) }}</b>
+            <b v-else-if="showZero">0</b>
         </td>
         <!-- loop through each course/unit, retrieving the node usage or returning 0 no usages -->
         <template v-for="course in props.node.usage.courses" :key="course.id">
             <!-- add the course cell -->
-            <td v-if="props.node.hasNoUsages || course.hasNoCourseUsages" class="u-border-left">0</td>
+            <td v-if="props.node.hasNoUsages || course.hasNoCourseUsages" class="u-border-left"></td>
             <td
                 v-else-if="getFilteredCourseColumnCount(props.node, course, !props.node.isExpanded) === 0"
                 class="u-border-left usage-cell"
-            >
-                {{ getFilteredCourseColumnCount(props.node, course, !props.node.isExpanded) }}
-            </td>
+            ></td>
             <td v-else class="u-border-left usage-cell">
                 <button
                     :id="`usage-button-${course.id}-${props.node.id}`"
@@ -184,13 +202,11 @@ function onCourseClicked(course: CourseWithCurriculumNodeUsage, buttonEl: HTMLBu
             </td>
             <!-- loop through the unit cells -->
             <template v-for="unit in course.units" :key="unit.id">
-                <td v-if="props.node.hasNoUsages || unit.hasNoUsages">0</td>
+                <td v-if="props.node.hasNoUsages || unit.hasNoUsages"></td>
                 <td
                     v-else-if="getFilteredUnitColumnCount(props.node, course, unit, !props.node.isExpanded) === 0"
                     class="usage-cell"
-                >
-                    {{ getFilteredUnitColumnCount(props.node, course, unit, !props.node.isExpanded) }}
-                </td>
+                ></td>
                 <td v-else class="usage-cell">
                     <button
                         :id="`usage-button-${course.id}-${unit.id}-${props.node.id}`"
@@ -202,6 +218,7 @@ function onCourseClicked(course: CourseWithCurriculumNodeUsage, buttonEl: HTMLBu
                                     : '',
                         }"
                         class="f-always-show usage-button"
+                        :data-test="`cc-report-table-node-total-pop-out-button-${course.id}-${unit.id}-${props.node.id}`"
                         @click="(event) => onUnitClicked(course, unit, event.target as HTMLButtonElement)"
                     >
                         {{ getFilteredUnitColumnCount(props.node, course, unit, !props.node.isExpanded) }}
@@ -210,14 +227,18 @@ function onCourseClicked(course: CourseWithCurriculumNodeUsage, buttonEl: HTMLBu
             </template>
             <!-- add the total course cell if there's multiple courses -->
             <template v-if="useCoursesStore().hasMultipleCourses">
-                <td v-if="props.node.hasNoUsages || course.hasNoTotalUsages">0</td>
+                <td v-if="props.node.hasNoUsages || course.hasNoTotalUsages"></td>
                 <td v-else-if="canExpandSelectCells" class="usage-cell">
                     <button class="f-always-show usage-button" @click="onTotalClicked">
-                        {{ getFilteredCourseCount(props.node, course, !props.node.isExpanded) }}
+                        <template v-if="getFilteredCourseCount(props.node, course, !props.node.isExpanded) !== 0">{{
+                            getFilteredCourseCount(props.node, course, !props.node.isExpanded)
+                        }}</template>
                     </button>
                 </td>
                 <td v-else>
-                    {{ getFilteredCourseCount(props.node, course, !props.node.isExpanded) }}
+                    <template v-if="getFilteredCourseCount(props.node, course, !props.node.isExpanded) !== 0">{{
+                        getFilteredCourseCount(props.node, course, !props.node.isExpanded)
+                    }}</template>
                 </td>
             </template>
         </template>
@@ -261,10 +282,10 @@ tr:hover {
 .usage-button {
     background: none;
     display: flex; // to align the text to the top left
+    height: 100%;
+    margin: 0;
     padding: 0.625rem;
     position: absolute; // make the button fill the entire td cell
-    margin: 0;
-    height: 100%;
     text-align: left;
     width: 100%;
     &:hover {
