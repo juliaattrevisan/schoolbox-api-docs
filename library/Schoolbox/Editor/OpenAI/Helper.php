@@ -34,7 +34,7 @@ class Helper
     /**
      * chat (no async)
      */
-    public function chat(string $prompt, User $user, string $format)
+    public function chat(string $prompt, User $user, ?array $responseFormat = null)
     {
         /**
          * @var Log\Model $log
@@ -42,7 +42,7 @@ class Helper
         $log = $this->logMapper->createModel();
         $log->setUser($user);
 
-        $query = $this->generatePayload($prompt, $format);
+        $query = $this->generatePayload($prompt, $responseFormat);
 
         try {
             $openAiRequest = new Request('POST', $this->getEndpoint(), array_merge(
@@ -87,7 +87,7 @@ class Helper
         $log->setUser($user);
 
         // either build or use the supplied payload
-        $payload = $payload ?? $this->generatePayload($prompt, 'string');
+        $payload = $payload ?? $this->generatePayload($prompt);
 
         try {
             $openAiRequest = new Request('POST', $this->getEndpoint(), array_merge(
@@ -183,14 +183,14 @@ class Helper
      * Generates the payload for the OpenAI API request.
      *
      * @param string $prompt // user prompt to send to the API
-     * @param string $format
+     * @param ?array $responseFormat
      * @param bool $stream
      * @return string
      * @throws \JsonException
      */
-    private function generatePayload(string $prompt, string $format, bool $stream = false): string
+    private function generatePayload(string $prompt, ?array $responseFormat = null, bool $stream = false): string
     {
-        return json_encode([
+        $payload = [
             "messages" => [
                 [
                     "role" => "system",
@@ -206,7 +206,14 @@ class Helper
             "temperature" => 1,
             "top_p" => 1,
             "stream" => $stream
+        ];
 
-        ], JSON_THROW_ON_ERROR);
+        // only format if requested
+        if ($responseFormat) {
+            $payload['response_format'] = ["type" => "json_object"];
+            $payload['functions'] = [$responseFormat];
+        }
+
+        return json_encode($payload, JSON_THROW_ON_ERROR);
     }
 }
