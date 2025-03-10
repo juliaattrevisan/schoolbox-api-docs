@@ -27,7 +27,8 @@ window.Vue.onMounted(() => {
         <slot name="date"></slot>
 
         <button type="button" class="button expand icon-chat" @click="lpStore.openModal">
-            Generate lesson with AI
+            {{ lpStore.hasLessonContent ? "Regenerate" : "Generate" }}
+            lesson with AI
         </button>
     </fieldset>
 

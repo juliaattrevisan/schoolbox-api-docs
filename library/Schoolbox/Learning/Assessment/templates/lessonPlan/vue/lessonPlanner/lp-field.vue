@@ -26,7 +26,7 @@ window.Vue.onMounted(async () => {
 
     await new Promise((resolve) => {
         if (!textareaEl.value) throw new Error("Unable to initialise lp-field without a textarea element");
-        useEditor(
+        const bodyRef = useEditor(
             currentField.body,
             textareaEl.value,
             {
@@ -37,6 +37,11 @@ window.Vue.onMounted(async () => {
             true,
             resolve,
         );
+
+        // When the body changes, keep the field body in sync
+        window.Vue.watch(bodyRef, (newBody) => {
+            currentField.body = newBody;
+        });
     });
 
     currentField.editorId = `field-body-${props.fieldRef}`;

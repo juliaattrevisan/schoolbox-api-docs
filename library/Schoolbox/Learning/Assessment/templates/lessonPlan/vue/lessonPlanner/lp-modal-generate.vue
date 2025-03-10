@@ -39,7 +39,8 @@ const allowGeneration = window.Vue.computed(() => {
     </div>
 
     <button type="button" class="button expand icon-chat" :disabled="!allowGeneration" @click="lpStore.generate">
-        Generate lesson with AI
+        {{ lpStore.hasLessonContent ? "Regenerate" : "Generate" }}
+        lesson with AI
     </button>
 </template>
 

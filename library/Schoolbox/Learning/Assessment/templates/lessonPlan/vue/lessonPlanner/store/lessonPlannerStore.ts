@@ -1,15 +1,16 @@
 import { defineStore } from "pinia";
+import type { Ref } from "vue";
 import type { LessonPlanField } from "../lessonPlannerTypes";
+
+interface LessonPlanStoreField extends LessonPlanField {
+    selected: boolean; // Whether the field is selected or not
+    editorId: string | null; // The editor ID for the field in the main form, null if not yet created
+    suggestedBody?: string; // The suggested body for the field, if it has been generated
+}
 
 export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
     // An ordered list of each field of the lesson plan
-    const fields = window.Vue.ref<
-        (LessonPlanField & {
-            selected: boolean; // Whether the field is selected or not
-            editorId: string | null; // The editor ID for the field in the main form, null if not yet created
-            suggestedBody?: string; // The suggested body for the field, if it has been generated
-        })[]
-    >([]);
+    const fields = window.Vue.ref<LessonPlanStoreField[]>([]);
 
     // Additional context (if any) to be included in the prompt for the AI generation
     const additionalContext = window.Vue.ref<string>("");
@@ -25,6 +26,14 @@ export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
             editorId: null,
         }));
     }
+
+    /**
+     * Do any of the fields have actual content in them?
+     * I.e. should we show "Generate Lesson Plan" or "Regenerate Lesson Plan"?
+     */
+    const hasLessonContent = window.Vue.computed(() => {
+        return fields.value.some((field) => field.body.trim().length > 0);
+    });
 
     const generateError = window.Vue.ref<string | null>(null);
     const modalStep = window.Vue.ref<null | "generate" | "generating" | "review">(null);
@@ -103,6 +112,7 @@ export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
 
     return {
         init,
+        hasLessonContent,
         fields,
         additionalContext,
         modalStep,
