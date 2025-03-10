@@ -157,6 +157,55 @@ class Helper
         die();
     }
 
+    /**
+     * @see https://platform.openai.com/docs/guides/structured-outputs?example=structured-data#json-mode
+     *
+     * @param string $response
+     * @param bool $stopToken
+     * @return null|string|array
+     */
+    public function validateResponse(string $response, bool $stopToken = false): string|array|null
+    {
+        $response = json_decode($response, true);
+
+        // Check if the conversation was too long for the context window, resulting in incomplete JSON
+        if ($response['choices'][0]['finish_reason']['message'] ?? '' === "length") {
+            // your code should handle this error case
+            throw new \UnexpectedValueException("Conversation was too long for the context window");
+        }
+
+        // Check if the OpenAI safety system refused the request and generated a refusal instead
+        if ($response['choices'][0]['message'][0]['refusal'] ?? false) {
+            // your code should handle this error case
+            // In this case, the .content field will contain the explanation (if any) that the model generated for why it is refusing
+            throw new \UnexpectedValueException($response['choices'][0]['message']['0']['refusal']);
+        }
+
+        // Check if the model's output included restricted content, so the generation of JSON was halted and may be partial
+        if ($response['choices'][0]['finish_reason']['message'] ?? '' === "content_filter") {
+            // your code should handle this error case
+            throw new \UnexpectedValueException("Restricted content detected");
+        }
+
+        if ($response['choices'][0]['finish_reason']['message'] ?? '' === "stop") {
+            // In this case the model has either successfully finished generating the JSON object according to your schema, or the model generated one of the tokens you provided as a "stop token"
+
+            if ($stopToken) {
+                // If you didn't specify any stop tokens, then the generation is complete and the content key will contain the serialized JSON object
+                // This will parse successfully and should now contain  {"winner": "Los Angeles Dodgers"}
+                return json_decode($response['choices'][0]['message']['content'], true);
+            } else {
+                // Check if the response.choices[0].message.content ends with one of your stop tokens and handle appropriately
+            }
+        }
+
+//        if ($response['choices'][0]['finish_reason'] ?? '' === "function_call") {
+//            return json_decode($response['choices'][0]['message']['function_call']['arguments'], true);
+//        }
+
+        return null;
+    }
+
 
     /** ===================================================== */
 
