@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import locale from "@js/terminology/rosettaStone";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import { useLessonPlannerStore } from "./store/lessonPlannerStore";
 import { LessonPlannerModalStep, type LessonPlanField } from "./lessonPlannerTypes";
@@ -28,7 +29,8 @@ window.Vue.onMounted(() => {
 
         <button type="button" class="button expand icon-chat" @click="() => lpStore.openModal()">
             {{ lpStore.hasLessonContent ? "Regenerate" : "Generate" }}
-            lesson with AI
+            {{ locale.lessonPlan.singular() }}
+            with AI
         </button>
     </fieldset>
 
