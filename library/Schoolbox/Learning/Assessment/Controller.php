@@ -857,4 +857,39 @@ abstract class Controller extends ListController implements IAssessmentControlle
     {
         return $this->termMapper;
     }
+
+    /**
+     * Student custom participation page
+     *
+     * @param IAssessable $assessment
+     * @return void
+     * @throws Error
+     * @throws RouteNotFound
+     */
+    public function getAssessmentParticipationForm(IAssessable $assessment): void
+    {
+        $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment);
+
+        $data = $this->getAssessmentAsTwigArray($assessment->getContext(), $assessment);
+
+        $breadcrumbs = $this->getBakery()
+                            ->produceFromAssessment(
+                                $assessment,
+                                $this->getUser())->add([$assessment->getTitle()]
+            );
+
+        $data['breadcrumbs'] = $breadcrumbs;
+        $data['returnUrlName'] = Redirect::RETURN_URL;
+        $data['returnUrl'] = $this->requestQuery->get(Redirect::RETURN_URL);
+
+        $data['pastoralEnabled'] =
+            $this->getConfigLoader()->get('pastoral_enabled') && $this->getUser()->isStaffWithPastoralAccess();
+
+        $data['studentsPastoralCountsUrl'] = $this->getRouteIfAuthorized('pastoral.getStudentsCount');
+
+        $this->response = $this->responseFromTemplate(
+            '@learningAssessment/participation/update.twig',
+            $data
+        );
+    }
 }

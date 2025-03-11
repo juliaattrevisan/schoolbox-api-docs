@@ -201,6 +201,7 @@ class Module extends BaseModule
         $this->register('GET', "$assRoute/overview", 'getOverview', $canViewStatus, $preloadAssessment); // a || c
         $this->register('GET', "$assRoute/overview/export", 'downloadOverview', $canViewStatus, $preloadAssessment); // a || c
         $this->register('GET', "$assRoute/submissions/download", 'downloadSubmissions', $canViewStatus, $preloadAssessment); // a || c
+        $this->register('GET', "$assRoute/participation/modify", 'getAssessmentParticipationForm', $canModify, $preloadAssessment);
 
         $this->register('GET', "$assRoute/$studentParam", 'getSummary', $canViewSummary, $preloadParticipant); // s || p
         $this->register('GET', "$assRoute/$studentParam/seb", 'getSummaryViaSeb', $canViewSummary, $preloadParticipant); // s || p
