@@ -97,14 +97,7 @@ class RepairDuplicateUnits extends App
     {
         $log = $this->getLogger();
 
-        /**
-         * Deprecation notice
-         */
-        $log->notice('/******************************************************************************************/');
-        $log->notice('/***************     Deprecated NOTICE - this will be deleted in future    ****************/');
-        $log->notice('/*    If you are running this, please add a comment of this scripts name into SA-19334    */');
-        $log->notice('/******************************************************************************************/');
-        $log->notice('/******************************************************************************************/');
+        $this->deprecationNotice();
 
         if ($this->perform() && !$this->isInteractive()) {
             $log->error('This tool requires an interactive session if performing changes.');
@@ -203,14 +196,7 @@ class RepairDuplicateUnits extends App
             }
         }
 
-        /**
-         * Deprecation notice
-         */
-        $log->notice('/******************************************************************************************/');
-        $log->notice('/***************     Deprecated NOTICE - this will be deleted in future    ****************/');
-        $log->notice('/*    If you are running this, please add a comment of this scripts name into SA-19334    */');
-        $log->notice('/******************************************************************************************/');
-        $log->notice('/******************************************************************************************/');
+        $this->deprecationNotice();
 
         exit(CliKernelAbstract::EXIT_STATUS_OK);
     }
