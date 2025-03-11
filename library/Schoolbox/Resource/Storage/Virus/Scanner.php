@@ -59,9 +59,9 @@ class Scanner implements IScanner
             // Note '2>&1' redirects the output intended for stderr to stdout (so it will end up in the $output variable).
             // Without this redirection, a message like 'sh: 1: clamdscan: not found' can appear in unwanted places.
             // The message does not give any more information than the 127 return code.
-                 self::CLAMSCAN_COMMAND . ' 2>&1',
-                 sys_get_temp_dir() . self::VIRUS_QUARANTINE,
-                 $fileLocation
+            self::CLAMSCAN_COMMAND . ' 2>&1',
+            sys_get_temp_dir() . self::VIRUS_QUARANTINE,
+            $fileLocation,
         ), $output, $resultCode);
 
         // From clamdscan's man page:
