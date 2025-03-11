@@ -149,20 +149,24 @@ function onCourseClicked(course: CourseWithCurriculumNodeUsage, buttonEl: HTMLBu
                 <sbx-icon v-else name="down-arrow" />
             </button>
             <!-- add paddingLeft to the last child node to align better with the parent above, which is showing the expand button -->
-            <button
-                class="l-pad--0 t-align-left f-no-bkg f-always-show"
+            <div
+                class="l-flex l-flex--align-center l-gap-s"
                 :style="{
                     paddingLeft: isSingleNode || filtersStore.onlyShowGaps || showExpandButton ? '0' : '2.5rem',
                 }"
-                :data-test="`cc-report-table-node-title-button-${props.node.id}`"
-                @click="emit('titleClick', props.node)"
             >
                 <sbx-icon v-if="!props.node.enabled" name="hidden" title="This outcome is disabled" />
-                <template v-if="props.depth === 0 && !filtersStore.onlyShowGaps">
-                    <b>{{ title }}</b>
-                </template>
-                <template v-else>{{ title }}</template>
-            </button>
+                <button
+                    class="l-pad--0 t-align-left f-no-bkg f-always-show"
+                    :data-test="`cc-report-table-node-title-button-${props.node.id}`"
+                    @click="emit('titleClick', props.node)"
+                >
+                    <template v-if="props.depth === 0 && !filtersStore.onlyShowGaps">
+                        <b>{{ title }}</b>
+                    </template>
+                    <template v-else>{{ title }}</template>
+                </button>
+            </div>
         </td>
         <!-- add the total cell -->
         <!-- if there's no usages inside, we can jump straight to showing 0 if showZero allows -->
