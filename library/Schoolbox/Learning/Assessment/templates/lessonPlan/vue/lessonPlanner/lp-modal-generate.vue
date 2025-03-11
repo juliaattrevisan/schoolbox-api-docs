@@ -46,7 +46,7 @@ const allowGeneration = window.Vue.computed(() => {
         {{ lpStore.generateError }}
     </div>
 
-    <button type="button" class="button expand icon-chat" :disabled="!allowGeneration" @click="lpStore.generate">
+    <button type="button" class="button submit expand icon-chat" :disabled="!allowGeneration" @click="lpStore.generate">
         <template v-if="lpStore.generateForField === null">
             {{ lpStore.hasLessonContent ? "Regenerate" : "Generate" }}
             {{ locale.lessonPlan.singular() }}
