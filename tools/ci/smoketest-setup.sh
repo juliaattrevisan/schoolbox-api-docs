@@ -113,8 +113,8 @@ composer install -o
 cd tools || exit 1
 ./module/refresh-cache.php
 ./generate-dir-sql-dynamically.sh $instance_data_dir | mariadb schoolbox
+./build-sql-update.sh # Updates must run before set-plan, because set-plan may for example depend on feature flags added in update scripts.
 ./set-plan.php --plan=learning-enhanced
-./build-sql-update.sh
 
 # Enter/exit maintenance mode before/after update
 ./maintenance/site_down.sh
