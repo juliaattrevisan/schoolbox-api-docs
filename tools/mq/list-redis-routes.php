@@ -45,14 +45,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
      */
     public function run(): void
     {
-        /**
-         * Deprecation notice
-         */
-        $this->getLogger()->notice('/******************************************************************************************/');
-        $this->getLogger()->notice('/***************     Deprecated NOTICE - this will be deleted in future    ****************/');
-        $this->getLogger()->notice('/*    If you are running this, please add a comment of this scripts name into SA-19334    */');
-        $this->getLogger()->notice('/******************************************************************************************/');
-        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->deprecationNotice();
 
         $this->instanceId = $this->getOpt(self::OPT_LONG_INSTANCE_ID);
         if (empty($this->instanceId)) {
@@ -72,14 +65,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
             $this->getLogger()->debug(implode(',', array_keys($userIds)) . "\n");
         }
 
-        /**
-         * Deprecation notice
-         */
-        $this->getLogger()->notice('/******************************************************************************************/');
-        $this->getLogger()->notice('/***************     Deprecated NOTICE - this will be deleted in future    ****************/');
-        $this->getLogger()->notice('/*    If you are running this, please add a comment of this scripts name into SA-19334    */');
-        $this->getLogger()->notice('/******************************************************************************************/');
-        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->deprecationNotice();
     }
 }, [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG, CliTool\Kernel::OPTION_ERRORS => E_ALL]);
 

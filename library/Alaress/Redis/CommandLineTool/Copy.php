@@ -102,14 +102,7 @@ Copies an instance's redis data to the specified server
      */
     public function run(): void
     {
-        /**
-         * Deprecation notice
-         */
-        $this->getLogger()->notice('/******************************************************************************************/');
-        $this->getLogger()->notice('/***************     Deprecated NOTICE - this will be deleted in future    ****************/');
-        $this->getLogger()->notice('/*    If you are running this, please add a comment of this scripts name into SA-19334    */');
-        $this->getLogger()->notice('/******************************************************************************************/');
-        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->deprecationNotice();
 
         if ($this->getOpt(self::OPT_SHORT_HELP) || $this->getOpt(self::OPT_LONG_HELP)) {
             $this->printHelp();
@@ -253,14 +246,7 @@ Copies an instance's redis data to the specified server
             $this->getLogger()->info(sprintf('%d Keys will be %s. Total size: %d', $this->count, $this->isDelete ? 'deleted' : 'migrated', $this->totalLength));
         }
 
-        /**
-         * Deprecation notice
-         */
-        $this->getLogger()->notice('/******************************************************************************************/');
-        $this->getLogger()->notice('/***************     Deprecated NOTICE - this will be deleted in future    ****************/');
-        $this->getLogger()->notice('/*    If you are running this, please add a comment of this scripts name into SA-19334    */');
-        $this->getLogger()->notice('/******************************************************************************************/');
-        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->deprecationNotice();
     }
 
     /**

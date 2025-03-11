@@ -147,14 +147,8 @@ class FileNester extends CliTool\App
      */
     public function run(): void
     {
-        /**
-         * Deprecation notice
-         */
-        $this->getLogger()->notice('/******************************************************************************************/');
-        $this->getLogger()->notice('/***************     Deprecated NOTICE - this will be deleted in future    ****************/');
-        $this->getLogger()->notice('/*    If you are running this, please add a comment of this scripts name into SA-19334    */');
-        $this->getLogger()->notice('/******************************************************************************************/');
-        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->deprecationNotice();
+
 
         $this->startTime = time();
         $this->getLogger()->info(sprintf("S3 File Copy/Move to top-level directory '/%s'", FilesystemFactory::PREFIX_STORAGE));
@@ -163,14 +157,7 @@ class FileNester extends CliTool\App
         $this->processFiles();
         $this->printResults();
 
-        /**
-         * Deprecation notice
-         */
-        $this->getLogger()->notice('/******************************************************************************************/');
-        $this->getLogger()->notice('/***************     Deprecated NOTICE - this will be deleted in future    ****************/');
-        $this->getLogger()->notice('/*    If you are running this, please add a comment of this scripts name into SA-19334    */');
-        $this->getLogger()->notice('/******************************************************************************************/');
-        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->deprecationNotice();
     }
 
 

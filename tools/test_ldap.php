@@ -22,14 +22,7 @@ require_once __DIR__ . '/../conf/core/require.php';
 $kernel = new CliTool\Kernel(new class extends CliTool\App {
     public function run(): void
     {
-        /**
-         * Deprecation notice
-         */
-        $this->getLogger()->notice('/******************************************************************************************/');
-        $this->getLogger()->notice('/***************     Deprecated NOTICE - this will be deleted in future    ****************/');
-        $this->getLogger()->notice('/*    If you are running this, please add a comment of this scripts name into SA-19334    */');
-        $this->getLogger()->notice('/******************************************************************************************/');
-        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->deprecationNotice();
 
         $this->getLogger()->notice("Testing primary...");
         $this->testLdap($this->getConfig()->get('ldap_host'), $this->getConfig()->get('ldap_user'));
@@ -40,14 +33,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App {
         $this->getLogger()->notice("Testing tertiary...");
         $this->testLdap($this->getConfig()->get('ldap_host_ter'), $this->getConfig()->get('ldap_user_ter'));
 
-        /**
-         * Deprecation notice
-         */
-        $this->getLogger()->notice('/******************************************************************************************/');
-        $this->getLogger()->notice('/***************     Deprecated NOTICE - this will be deleted in future    ****************/');
-        $this->getLogger()->notice('/*    If you are running this, please add a comment of this scripts name into SA-19334    */');
-        $this->getLogger()->notice('/******************************************************************************************/');
-        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->deprecationNotice();
     }
 
     /**

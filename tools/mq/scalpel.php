@@ -42,14 +42,7 @@ $app = new class extends CliTool\App{
     /** @inheritDoc */
     public function run(): void
     {
-        /**
-         * Deprecation notice
-         */
-        $this->getLogger()->notice('/******************************************************************************************/');
-        $this->getLogger()->notice('/***************     Deprecated NOTICE - this will be deleted in future    ****************/');
-        $this->getLogger()->notice('/*    If you are running this, please add a comment of this scripts name into SA-19334    */');
-        $this->getLogger()->notice('/******************************************************************************************/');
-        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->deprecationNotice();
 
         if ($this->getOpt('h') || $this->getOpt('help')) {
             $this->printHelp();
@@ -88,14 +81,7 @@ $app = new class extends CliTool\App{
 
         $this->checkRedis($args, $regexMode);
 
-        /**
-         * Deprecation notice
-         */
-        $this->getLogger()->notice('/******************************************************************************************/');
-        $this->getLogger()->notice('/***************     Deprecated NOTICE - this will be deleted in future    ****************/');
-        $this->getLogger()->notice('/*    If you are running this, please add a comment of this scripts name into SA-19334    */');
-        $this->getLogger()->notice('/******************************************************************************************/');
-        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->deprecationNotice();
     }
 
 
