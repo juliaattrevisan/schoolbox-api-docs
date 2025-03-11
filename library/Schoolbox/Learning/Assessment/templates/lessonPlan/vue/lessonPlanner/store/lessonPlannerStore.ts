@@ -65,6 +65,7 @@ export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
      */
     function openModal(fieldId?: LessonPlanStoreField["id"]): void {
         // deselect all fields, but intentionally keep additionalContext so it can be reused on the same page session
+        generateForField.value = null;
         fields.value.forEach((field) => {
             field.selected = false;
 
