@@ -610,5 +610,10 @@ abstract class App
         $this->getLogger()->notice(sprintf("Script name: %s", get_class($this)));
         $this->getLogger()->notice('/******************************************************************************************/');
         $this->getLogger()->notice('/******************************************************************************************/');
+
+        // if interactive confirm you saw this
+        if ($this->isInteractive()) {
+            $this->readLine('Press enter to continue');
+        }
     }
 }
