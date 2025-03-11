@@ -200,7 +200,11 @@ class Factory
          */
         return [
             'data' => $payload,
+            'tutorTeacher' => $referenceFields['tutorTeacher'] ?? null,
+            'formTeacher' => $referenceFields['formTeacher'] ?? null,
+            'hohTeacher' => $referenceFields['hohTeacher'] ?? null,
             'coordTeacher' => $referenceFields['coordTeacher'] ?? null,
+            'studentCoach' => $referenceFields['studentCoach'] ?? null,
         ];
     }
 
