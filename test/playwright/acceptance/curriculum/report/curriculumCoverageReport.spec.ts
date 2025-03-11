@@ -9,6 +9,8 @@ import CurriculumCoverageReport from "@schoolboxTest/playwright/support/page/cur
 import SearchSelect from "@schoolboxTest/playwright/support/components/SearchSelect";
 import SearchSelectModal from "@schoolboxTest/playwright/support/components/SearchSelectModal";
 import CurriculumSelector from "@schoolboxTest/playwright/support/page/curriculum/selector/CurriculumSelector";
+import ManageCurriculum from "@schoolboxTest/playwright/support/page/curriculum/manage/ManageCurriculum";
+import DisableNodes from "@schoolboxTest/playwright/support/page/curriculum/manage/action/DisableNodes";
 import Common from "@schoolboxTest/playwright/support/page/Common";
 
 test.describe("Curriculum Coverage Report Tests", () => {
@@ -61,7 +63,7 @@ test.describe("Curriculum Coverage Report Tests", () => {
         await coverageReport.expectLoading();
 
         tester.isGoingTo("Confirm English > Year 9 has total usage of 12");
-        await expect(coverageReport.year9TotalUsageTableCell()).toHaveText("12");
+        await expect(coverageReport.getYear9TotalUsageTableCell()).toHaveText("12");
 
         tester.isGoingTo("Reload the page and ensure the report still persists");
         await page.reload();
@@ -70,7 +72,7 @@ test.describe("Curriculum Coverage Report Tests", () => {
         await coverageReport.expectLoading();
 
         tester.isGoingTo("Confirm English > Year 9 has total usage of 12");
-        await expect(coverageReport.year9TotalUsageTableCell()).toHaveText("12");
+        await expect(coverageReport.getYear9TotalUsageTableCell()).toHaveText("12");
 
         tester.isGoingTo("Select load more curriculum and confirm Years 9 and 10 French is now visible");
         await expect(page.locator("table tbody")).not.toContainText("Years 9 and 10 French");
@@ -82,25 +84,25 @@ test.describe("Curriculum Coverage Report Tests", () => {
         await common.assertFileDownload("cc-report-filters-export-button-confirm", "curriculum-coverage-report.csv");
 
         tester.isGoingTo("Uncheck Unit filter and confirm Year 9 Curriculum goes from 12 to 10");
-        await expect(coverageReport.year9TotalUsageTableCell()).toHaveText("12");
+        await expect(coverageReport.getYear9TotalUsageTableCell()).toHaveText("12");
         await coverageReport.clickUnitFilter();
-        await expect(coverageReport.year9TotalUsageTableCell()).toHaveText("10");
+        await expect(coverageReport.getYear9TotalUsageTableCell()).toHaveText("10");
 
         tester.isGoingTo("Uncheck Learning Activities filter and confirm Year 9 Curriculum goes from 10 to 3");
         await coverageReport.clickActivityFilter();
-        await expect(coverageReport.year9TotalUsageTableCell()).toHaveText("3");
+        await expect(coverageReport.getYear9TotalUsageTableCell()).toHaveText("3");
 
         tester.isGoingTo(
             "Uncheck Course filter and confirm Year 9 Curriculum goes from 3 to blank (as it's 0 and doesn't have a code)",
         );
         await coverageReport.clickCourseFilter();
-        await expect(coverageReport.year9TotalUsageTableCell()).toHaveText("");
+        await expect(coverageReport.getYear9TotalUsageTableCell()).toHaveText("");
 
         tester.isGoingTo("Check all filters back on and confirm Year 9 Curriculum goes from 0 to 12");
         await coverageReport.clickUnitFilter();
         await coverageReport.clickActivityFilter();
         await coverageReport.clickCourseFilter();
-        await expect(coverageReport.year9TotalUsageTableCell()).toHaveText("12");
+        await expect(coverageReport.getYear9TotalUsageTableCell()).toHaveText("12");
 
         tester.isGoingTo("Expand out to English > Year 9 > Language > Text structure and organisation > ACELA1553");
         await coverageReport.navigateTree([136, 138, 148, 149]);
@@ -116,7 +118,7 @@ test.describe("Curriculum Coverage Report Tests", () => {
         await expect(coverageReport.acela1553RomeoTableCell()).not.toBeVisible();
 
         tester.isGoingTo("Select Only show unused curriculum and confirm open/close toggles have been hidden");
-        await page.getByTestId("cc-report-filters-gaps-switch").click(); // Select Only show unused curriculum
+        await page.getByTestId("cc-report-filters-gaps-toggle").click(); // Select Only show unused curriculum
         await expect(page.locator("[data-test^='cc-report-table-node-expand-button-']")).toHaveCount(0); // Confirm no expand buttons
 
         tester.isGoingTo(
@@ -127,5 +129,58 @@ test.describe("Curriculum Coverage Report Tests", () => {
         await page.getByTestId("cc-report-table").hover(); // First hover over the scrollable table
         await page.mouse.wheel(0, scrollHeight); // then scroll to the bottom of the table
         await expect(page.getByTestId("cc-report-table-node-title-button-124")).toHaveCount(1); // Confirm node now visible after scroll
+    });
+
+    test("Check Show disabled outcomes toggle", async ({ tester, page }) => {
+        const manageCurriculum = new ManageCurriculum(page, tester);
+        const disableNodes = new DisableNodes(page, tester);
+        const coverageReport = new CurriculumCoverageReport(page);
+
+        await manageCurriculum.goto();
+
+        tester.isGoingTo("disable Year 4 History");
+
+        // Check Year 4
+        await manageCurriculum.checkNode("Year 4 History");
+
+        // Click Disable button
+        await disableNodes.clickDisableButton();
+
+        tester.isGoingTo("Ensure the confirmation modal appears");
+        await disableNodes.waitForConfirmModal();
+
+        tester.isGoingTo("Confirm the disable action");
+        await disableNodes.clickConfirmButton();
+
+        tester.isGoingTo("Ensure the toast message is shown");
+        await expect(page.getByTestId("toast")).toContainText("Outcome successfully disabled");
+
+        tester.isGoingTo("Visit the curriculum coverage report page with disabled nodes preloaded");
+        await coverageReport.gotoDisabledTest();
+
+        tester.isGoingTo("Confirm the disabled node is visible");
+        await expect(coverageReport.getTable()).toContainText("Year 4 History");
+
+        tester.isGoingTo("Select the Show disabled outcomes toggle");
+        await coverageReport.clickShowDisabledToggle();
+
+        tester.isGoingTo("Confirm the disabled node is no longer visible");
+        await expect(coverageReport.getTable()).not.toContainText("Year 4 History");
+
+        tester.isGoingTo("Select the Show disabled outcomes toggle again");
+        await coverageReport.clickShowDisabledToggle();
+
+        tester.isGoingTo("Confirm the disabled node is visible");
+        await expect(coverageReport.getTable()).toContainText("Year 4 History");
+    });
+
+    /**
+     * Soft deleting data to not impact the tests
+     */
+    test.afterAll(async ({ baseTester, db }) => {
+        // Soft-delete data to not interfere with other tests
+        baseTester.isGoingTo("update enabled on the Year 4 History so it does not impact next suite of tests");
+        // reset the enabled status of Year 4 History
+        await db.updateInDatabase("curriculum_node", { enabled: 1 }, { "name like": "Year 4 History" });
     });
 });

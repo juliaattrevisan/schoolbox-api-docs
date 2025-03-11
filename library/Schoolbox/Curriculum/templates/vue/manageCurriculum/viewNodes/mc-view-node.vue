@@ -215,7 +215,6 @@ const showUsage = window.Vue.computed(() => props.node.id !== UNSET_ID);
         <div v-if="showNode" ref="viewNodeEl" data-test-node>
             <div
                 class="container"
-                :data-enabled="props.node.enabled"
                 :data-is-inactive="`${isViewingAnother || isUpdatingAnother || isAddingAnother ? true : false}`"
                 :data-is-new="isNew"
                 :data-just-updated="justUpdated"
@@ -334,6 +333,4 @@ const showUsage = window.Vue.computed(() => props.node.id !== UNSET_ID);
         background-color: white;
     }
 }
-
-@import "../style/mcStyle";
 </style>

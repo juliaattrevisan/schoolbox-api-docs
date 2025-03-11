@@ -10,9 +10,13 @@ export default class CurriculumCoverageReport {
 
     static readonly URL = "/curriculum/reports/coverage";
 
+    static readonly URL_DISABLED = "/curriculum/reports/coverage?courseId=4&nodeId=247%2C1"; // url used to check the disabled toggle
+
     static readonly DATATEST_GENERATE_REPORT_BUTTON = "cc-input-button";
 
     static readonly DATATEST_REPORT_LOADING = "cc-report-loading";
+
+    static readonly DATATEST_TABLE = "cc-report-table";
 
     static readonly DATATEST_TABLE_NODE_EXPAND_BUTTON = "cc-report-table-node-expand-button-";
 
@@ -23,6 +27,8 @@ export default class CurriculumCoverageReport {
     static readonly DATATEST_FILTER_ACTIVITY = "cc-report-filters-label-activity";
 
     static readonly DATATEST_ACELA1553_ROMEO = "cc-report-table-node-total-pop-out-button-6-88-149"; // ACELA1553 / Romeo & Juliet table cell
+
+    static readonly DATATEST_DISABLED_TOGGLE = "cc-report-filters-disabled-toggle";
 
     static readonly SELECTOR_YEAR_9_TOTAL = "table tbody tr:nth-child(4) td:nth-child(2)"; // the Year 9 Curriculum total usage table cell at its default state
 
@@ -38,6 +44,13 @@ export default class CurriculumCoverageReport {
     }
 
     /**
+     * Navigates to the curriculum coverage report page with the disabled toggle test
+     */
+    async gotoDisabledTest(): Promise<void> {
+        await this.page.goto(CurriculumCoverageReport.URL_DISABLED);
+    }
+
+    /**
      * Clicks the generate report button
      */
     async submit(): Promise<void> {
@@ -49,6 +62,14 @@ export default class CurriculumCoverageReport {
      */
     async expectLoading(): Promise<void> {
         await expect(this.page.getByTestId(CurriculumCoverageReport.DATATEST_REPORT_LOADING)).toBeVisible();
+    }
+
+    /**
+     * Returns the locator for the report table
+     * @returns - The locator for the report table
+     */
+    getTable(): Locator {
+        return this.page.getByTestId(CurriculumCoverageReport.DATATEST_TABLE);
     }
 
     /**
@@ -87,10 +108,17 @@ export default class CurriculumCoverageReport {
     }
 
     /**
+     * Clicks the show disabled toggle
+     */
+    async clickShowDisabledToggle(): Promise<void> {
+        await this.page.getByTestId(CurriculumCoverageReport.DATATEST_DISABLED_TOGGLE).click();
+    }
+
+    /**
      * Returns the locator for the Year 9 Curriculum total usage table cell
      * @returns - The locator for the Year 9 Curriculum total usage table cell
      */
-    year9TotalUsageTableCell(): Locator {
+    getYear9TotalUsageTableCell(): Locator {
         return this.page.locator(CurriculumCoverageReport.SELECTOR_YEAR_9_TOTAL);
     }
 
