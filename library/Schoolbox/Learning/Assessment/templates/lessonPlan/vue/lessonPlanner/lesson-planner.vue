@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import { useLessonPlannerStore } from "./store/lessonPlannerStore";
-import type { LessonPlanField } from "./lessonPlannerTypes";
+import { LessonPlannerModalStep, type LessonPlanField } from "./lessonPlannerTypes";
 import LpField from "./lp-field.vue";
 import LpModalGenerate from "./lp-modal-generate.vue";
 import LpModalReview from "./lp-modal-review.vue";
@@ -26,16 +26,14 @@ window.Vue.onMounted(() => {
         <slot name="title"></slot>
         <slot name="date"></slot>
 
-        <button type="button" class="button expand icon-chat" @click="lpStore.openModal">
+        <button type="button" class="button expand icon-chat" @click="() => lpStore.openModal()">
             {{ lpStore.hasLessonContent ? "Regenerate" : "Generate" }}
             lesson with AI
         </button>
     </fieldset>
 
-    <fieldset>
+    <fieldset v-for="(field, i) in lpStore.fields" :key="field.id">
         <lp-field
-            v-for="(field, i) in lpStore.fields"
-            :key="field.id"
             :new-field-keyword="props.newFieldKeyword"
             :student-const="props.studentConst"
             :file-browser-category-id="props.fileBrowserCategoryId"
@@ -46,9 +44,9 @@ window.Vue.onMounted(() => {
 
     <basic-modal v-model:is-open="lpStore.isModalOpen">
         <section>
-            <lp-modal-generate v-if="lpStore.modalStep === 'generate'" />
-            <div v-else-if="lpStore.modalStep === 'generating'" class="loader"></div>
-            <lp-modal-review v-else-if="lpStore.modalStep === 'review'" />
+            <lp-modal-generate v-if="lpStore.modalStep === LessonPlannerModalStep.GENERATE" />
+            <div v-else-if="lpStore.modalStep === LessonPlannerModalStep.GENERATING" class="loader"></div>
+            <lp-modal-review v-else-if="lpStore.modalStep === LessonPlannerModalStep.REVIEW" />
         </section>
     </basic-modal>
 </template>

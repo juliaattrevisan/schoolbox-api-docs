@@ -13,21 +13,26 @@ const allowGeneration = window.Vue.computed(() => {
 </script>
 
 <template>
-    <label for="lp-generate-fields">
-        Select the sections of your {{ locale.lessonPlan.singular() }} which you want AI to help with:
-    </label>
-    <ul id="lp-generate-fields" class="option-list">
-        <li v-for="field in lpStore.fields" :key="field.id">
-            <input :id="`lp-generate-field-${field.id}`" v-model="field.selected" type="checkbox" />
-            <label :for="`lp-generate-field-${field.id}`" class="checkbox-label">
-                {{ field.title }}
-                <template v-if="field.meta">
-                    <br />
-                    <span class="meta">{{ field.meta }}</span>
-                </template>
-            </label>
-        </li>
-    </ul>
+    <template v-if="lpStore.generateForField === null">
+        <label for="lp-generate-fields">
+            Select the sections of your {{ locale.lessonPlan.singular() }} which you want AI to help with:
+        </label>
+        <ul id="lp-generate-fields" class="option-list">
+            <li v-for="field in lpStore.fields" :key="field.id">
+                <input :id="`lp-generate-field-${field.id}`" v-model="field.selected" type="checkbox" />
+                <label :for="`lp-generate-field-${field.id}`" class="checkbox-label">
+                    {{ field.title }}
+                    <template v-if="field.meta">
+                        <br />
+                        <span class="meta">{{ field.meta }}</span>
+                    </template>
+                </label>
+            </li>
+        </ul>
+    </template>
+    <template v-else>
+        <h2>{{ lpStore.generateForField.title }}</h2>
+    </template>
 
     <label for="lp-generate-additional-context">Additional Context</label>
     <p class="meta">
@@ -42,8 +47,14 @@ const allowGeneration = window.Vue.computed(() => {
     </div>
 
     <button type="button" class="button expand icon-chat" :disabled="!allowGeneration" @click="lpStore.generate">
-        {{ lpStore.hasLessonContent ? "Regenerate" : "Generate" }}
-        lesson with AI
+        <template v-if="lpStore.generateForField === null">
+            {{ lpStore.hasLessonContent ? "Regenerate" : "Generate" }}
+            {{ locale.lessonPlan.singular() }}
+        </template>
+        <template v-else>
+            {{ lpStore.generateForField.body.trim().length > 0 ? "Regenerate" : "Generate" }}
+        </template>
+        with AI
     </button>
 </template>
 

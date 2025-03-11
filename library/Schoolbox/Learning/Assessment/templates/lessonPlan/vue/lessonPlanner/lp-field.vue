@@ -76,8 +76,16 @@ window.Vue.onMounted(async () => {
                 :name="`field[${props.fieldRef}][body]`"
             >
             </textarea>
+            <a class="icon-chat lp-field-regenerate" @click="() => lpStore.openModal(props.fieldId)">
+                {{ field.body.trim().length > 0 ? "Regenerate" : "Generate" }} with AI
+            </a>
         </div>
     </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.lp-field-regenerate {
+    float: right;
+    color: var(--content-ui-foreground);
+}
+</style>

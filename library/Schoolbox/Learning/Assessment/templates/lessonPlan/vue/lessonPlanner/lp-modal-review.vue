@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import locale from "@js/terminology/rosettaStone";
 import { useLessonPlannerStore } from "./store/lessonPlannerStore";
+import { LessonPlannerModalStep } from "./lessonPlannerTypes";
 
 const lpStore = useLessonPlannerStore();
 
@@ -27,7 +28,9 @@ const selectedFields = window.Vue.computed(() => {
     </template>
 
     <div class="l-flex-row l-flex--no-wrap">
-        <button class="l-flex__item--1 button" @click="lpStore.modalStep = 'generate'">Back</button>
+        <button class="l-flex__item--1 button" @click="lpStore.modalStep = LessonPlannerModalStep.GENERATE">
+            Back
+        </button>
         <button class="l-flex__item--1 button submit" @click="lpStore.applySuggestions">
             Add {{ selectedFields.length > 1 ? "all" : "" }} to {{ locale.lessonPlan.proper() }}
         </button>
