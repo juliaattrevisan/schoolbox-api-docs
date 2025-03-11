@@ -113,11 +113,11 @@ composer install -o
 cd tools || exit 1
 ./module/refresh-cache.php
 ./generate-dir-sql-dynamically.sh $instance_data_dir | mariadb schoolbox
-./build-sql-update.sh # Build combined update script.
-./maintenance/site_down.sh # Enter maintenance mode before running update script.
-./update-sql-nocheck.sh # Run combined update script (note this must be done before set-plan,
+./build-sql-update.sh # Build list of update scripts.
+./maintenance/site_down.sh # Enter maintenance mode before running update scripts.
+./update-sql-nocheck.sh # Run update scripts (note this must be done before set-plan,
                         # because e.g. set-plan might depend on feature flags added by update scripts.
-./maintenance/site_up.sh # Exit maintenance mode after running update script.
+./maintenance/site_up.sh # Exit maintenance mode after running update scripts.
 ./set-plan.php --plan=learning-enhanced
 
 ./schema/charset.php --perform
