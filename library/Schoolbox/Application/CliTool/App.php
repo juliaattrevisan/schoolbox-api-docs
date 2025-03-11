@@ -591,4 +591,24 @@ abstract class App
         }
         return null;
     }
+
+
+    /**
+     * Deprecation as past of 25.0 [SA-18702]
+     *
+     * if you are still using this script, please add a comment of this scripts name into SA-19334
+     * @deprecated
+     */
+    public function deprecationNotice(): void
+    {
+        /**
+         * Deprecation notice
+         */
+        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->getLogger()->notice('/***************     Deprecated NOTICE - this will be deleted in future    ****************/');
+        $this->getLogger()->notice('/*    If you are running this, please add a comment of this scripts name into SA-19334    */');
+        $this->getLogger()->notice(sprintf("Script name: %s", get_class($this)));
+        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->getLogger()->notice('/******************************************************************************************/');
+    }
 }
