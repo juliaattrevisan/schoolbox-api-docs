@@ -52,7 +52,10 @@ window.Vue.onMounted(async () => {
     <div v-if="field" class="row">
         <div class="small-12 columns">
             <div class="lp-item-label">
-                <label>{{ field.title }}</label>
+                <label>
+                    {{ field.title }}
+                    <p v-if="field.meta" class="meta">{{ field.meta }}</p>
+                </label>
 
                 <p v-if="props.studentConst !== field.visibility" class="meta">
                     <span class="icon-view-hollow"></span>This field is not visible to students
