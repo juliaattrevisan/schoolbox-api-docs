@@ -198,14 +198,25 @@ class Factory
 
         /* The preprocessed payload that frontend can just use
          */
-        return [
+        $data = [
             'data' => $payload,
-            'tutorTeacher' => $referenceFields['tutorTeacher'] ?? null,
-            'formTeacher' => $referenceFields['formTeacher'] ?? null,
-            'hohTeacher' => $referenceFields['hohTeacher'] ?? null,
-            'coordTeacher' => $referenceFields['coordTeacher'] ?? null,
-            'studentCoach' => $referenceFields['studentCoach'] ?? null,
         ];
+
+        if ($viewee->getRole()->isStudent()) {
+            $data = array_merge(
+                $data,
+                [
+                    /* Surfacing for email to teachers in student profile
+                     */
+                    'tutorTeacher' => $referenceFields['tutorTeacher'] ?? null,
+                    'formTeacher'  => $referenceFields['formTeacher'] ?? null,
+                    'hohTeacher'   => $referenceFields['hohTeacher'] ?? null,
+                    'coordTeacher' => $referenceFields['coordTeacher'] ?? null,
+                    'studentCoach' => $referenceFields['studentCoach'] ?? null,
+                ]
+            );
+        }
+        return $data;
     }
 
 
