@@ -7,6 +7,7 @@
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import ManageRecordSettings from "@schoolboxTest/playwright/support/page/pastoralCare/ManageRecordSettings";
 import CreatePastoralRecord from "@schoolboxTest/playwright/support/page/pastoralCare/CreatePastoralRecord";
+import dayjs from "dayjs";
 
 test.describe("Test the pastoral care modules expiry feature", () => {
     test.beforeEach(async ({ tester }) => {
@@ -90,5 +91,23 @@ test.describe("Test the pastoral care modules expiry feature", () => {
 
         tester.isGoingTo("Set type to Academic > Award Achievement");
         await createPastoralRecord.selectType("1");
+
+        tester.isGoingTo("Check expires at date is 1 month from today");
+        const dateOneMonth = dayjs().add(1, "month").format("DD/MM/YYYY");
+        createPastoralRecord.expectExpiresAtToBe(dateOneMonth);
+
+        tester.isGoingTo("Set sub type to Academic > Learning Difficulties");
+        await createPastoralRecord.selectSubType("2");
+
+        tester.isGoingTo("Check expires at date is 6 month from today");
+        const dateSixMonths = dayjs().add(6, "month").format("DD/MM/YYYY");
+        createPastoralRecord.expectExpiresAtToBe(dateSixMonths);
+
+        tester.isGoingTo("Set type to Attendance");
+        await createPastoralRecord.selectType("2");
+
+        tester.isGoingTo("Check expires at date is 6 month from today");
+        const date2Weeks = dayjs().add(2, "weeks").format("DD/MM/YYYY");
+        createPastoralRecord.expectExpiresAtToBe(date2Weeks);
     });
 });
