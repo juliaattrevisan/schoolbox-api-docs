@@ -37,13 +37,13 @@ class NetworkScanner implements IScanner
      * The size (in bytes) of each chunk to write to `clamd`, when streaming a
      * file to be scanned.
      */
-    private const CHUNK_SIZE_WRITE = 1024;
+    private const CHUNK_SIZE_WRITE = 8192;
 
     /**
      * The size (in bytes) of each chunk to read from `clamd`, when receiving a
      * response.
      */
-    private const CHUNK_SIZE_READ = 1024;
+    private const CHUNK_SIZE_READ = 8192;
 
     /**
      * Constructor
