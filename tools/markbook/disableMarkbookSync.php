@@ -18,10 +18,10 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Enable Markbook External Sync
 // Get this kernel started
 
 $kernel->run(function ($di, $loop, $log, $opts) use ($kernel) {
-    $kernel->deprecationNotice();
+    $kernel->deprecationNotice('SA-19334');
 
     $configMapper = ConfigMapper::getInstance();
     $configMapper->getDatabase()->query("UPDATE config SET value = 0 WHERE name = 'external_markbook'");
 
-    $kernel->deprecationNotice();
+    $kernel->deprecationNotice('SA-19334');
 });
