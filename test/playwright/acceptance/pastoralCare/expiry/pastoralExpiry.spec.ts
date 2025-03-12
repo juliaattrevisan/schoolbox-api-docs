@@ -6,6 +6,7 @@
 
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import ManageRecordSettings from "@schoolboxTest/playwright/support/page/pastoralCare/ManageRecordSettings";
+import CreatePastoralRecord from "@schoolboxTest/playwright/support/page/pastoralCare/CreatePastoralRecord";
 
 test.describe("Test the pastoral care modules expiry feature", () => {
     test.beforeEach(async ({ tester }) => {
@@ -79,5 +80,12 @@ test.describe("Test the pastoral care modules expiry feature", () => {
 
         tester.isGoingTo("Confirm the changes have been saved");
         await manageRecordSettings.expectDefaultExpiryToBe("2 weeks");
+    });
+
+    test("Check the expires at changes based on the current type/subtype selection", async ({ tester, page }) => {
+        const createPastoralRecord = new CreatePastoralRecord(page);
+
+        tester.isGoingTo("Add a new pastoral record to Jana Reed");
+        await createPastoralRecord.goto(25);
     });
 });

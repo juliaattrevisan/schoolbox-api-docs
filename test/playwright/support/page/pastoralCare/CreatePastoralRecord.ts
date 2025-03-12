@@ -21,6 +21,14 @@ export default class CreatePastoralRecord {
     }
 
     /**
+     * Navigates to the Add Pastoral Record page
+     * @param userId - The id of the user to add the pastoral record to
+     */
+    async goto(userId: number): Promise<void> {
+        await this.page.goto(CreatePastoralRecord.URL.replace("{studentId}", userId.toString()));
+    }
+
+    /**
      * type a title for the pastoral record
      * @param pastoralTitle - The title of the pastoral record
      */
