@@ -14,6 +14,10 @@ export default class PastoralExpiry {
 
     static readonly URL_MANAGE_ATTENDANCE = "/pastoral/management/audience/type/2/modify";
 
+    static readonly DATATEST_FLAG_SELECT = "audiences-modify-pastoral-flag-select";
+
+    static readonly DATATEST_FLAG_COLOR_INPUT = "audiences-modify-pastoral-flag-color-input";
+
     constructor(page: Page) {
         this.page = page;
     }
@@ -37,5 +41,21 @@ export default class PastoralExpiry {
      */
     async gotoManageAttendance(): Promise<void> {
         await this.page.goto(PastoralExpiry.URL_MANAGE_ATTENDANCE);
+    }
+
+    /**
+     * Selects a flag by label
+     * @param label - The label of the flag to select
+     */
+    async selectFlagByLabel(label: string): Promise<void> {
+        await this.page.getByTestId(PastoralExpiry.DATATEST_FLAG_SELECT).selectOption({ label });
+    }
+
+    /**
+     * Sets the flag color
+     * @param color - The color to set the flag to
+     */
+    async setFlagColor(color: string): Promise<void> {
+        await this.page.getByTestId(PastoralExpiry.DATATEST_FLAG_COLOR_INPUT).fill(color);
     }
 }

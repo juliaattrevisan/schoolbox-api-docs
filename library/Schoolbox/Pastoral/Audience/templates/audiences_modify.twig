@@ -39,7 +39,7 @@
                             {% set color = (subtype ? subtype.color : type.color) %}
                             <div class="row">
                                 <div class="small-12 medium-8 columns">
-                                    <select id="pastoralIcon" name="icon">
+                                    <select id="pastoralIcon" name="icon" data-test="audiences-modify-pastoral-flag-select">
                                         <option value="">-- none selected --</option>
                                         {% for icon in icons %}
                                             <option value="{{ icon.name }}"
@@ -51,7 +51,7 @@
                                 </div>
                                 <div class="small-6 medium-2 columns">
                                     <input id="pastoralColor" name="color" type="text"
-                                           value="{{ flagColors.foreground }}"/>
+                                           value="{{ flagColors.foreground }}"  data-test="audiences-modify-pastoral-flag-color-input"/>
                                 </div>
                                 <div class="small-6 medium-2 columns">
                                     <span id="pastoralFlagPreview"

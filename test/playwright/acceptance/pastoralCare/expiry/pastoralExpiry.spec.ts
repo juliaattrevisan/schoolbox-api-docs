@@ -17,5 +17,11 @@ test.describe("Curriculum Coverage Report Tests", () => {
 
         tester.isGoingTo("Visit the Manage Award/Achievement page");
         await pastoralExpiry.gotoManageAwardAchievement();
+
+        tester.isGoingTo("Select Achievement flag");
+        await pastoralExpiry.selectFlagByLabel("Achievement");
+
+        tester.isGoingTo("Set the flag color to green");
+        await pastoralExpiry.setFlagColor("green");
     });
 });
