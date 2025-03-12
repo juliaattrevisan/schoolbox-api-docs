@@ -875,8 +875,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $breadcrumbs = $this->getBakery()
                             ->produceFromAssessment(
                                 $assessment,
-                                $this->getUser())->add([$assessment->getTitle()]
-            );
+                                $this->getUser()
+                            )->add([$assessment->getTitle()]);
 
         $data['breadcrumbs'] = $breadcrumbs;
         $data['returnUrlName'] = Redirect::RETURN_URL;
