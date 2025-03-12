@@ -1,4 +1,4 @@
-import { test } from "@schoolboxTest/playwright/support/integrations";
+import { expect, test } from "@schoolboxTest/playwright/support/integrations";
 import ProfileEditor from "@schoolboxTest/playwright/support/page/admin/userManagement/ProfileEditor";
 import ProfilePage from "@schoolboxTest/playwright/support/page/profilePage/ProfilePage";
 import Common from "@schoolboxTest/playwright/support/page/Common";
@@ -41,12 +41,28 @@ test.describe("Profile Editor", () => {
         await profileEditor.clickFieldCheckbox("staff", "role", "availability", "1");
         await profileEditor.clickFieldCheckbox("staff", "role", "availability", "2");
         await profileEditor.clickFieldUpdateButton("staff", "role");
+        await profileEditor.goto("parent");
+        tester.isGoingTo("Add campus field to parent profile editor page");
+        await profileEditor.clickFieldsTab("External Fields");
+        await profileEditor.clickAvailableField("parent", "campusCollection");
+        tester.isGoingTo("Click on the cog of campus field");
+        await profileEditor.clickFieldCog("parent", "campusCollection");
+        tester.isGoingTo("Click on the visibility checkbox of campus field");
+        await profileEditor.clickFieldCheckbox("parent", "campusCollection", "visibility", "self");
+        await profileEditor.clickFieldCheckbox("parent", "campusCollection", "visibility", "student");
+        await profileEditor.clickFieldCheckbox("parent", "campusCollection", "visibility", "staff");
+        await profileEditor.clickFieldCheckbox("parent", "campusCollection", "visibility", "parent");
+        tester.isGoingTo("Click on the availability checkbox of campus field");
+        await profileEditor.clickFieldCheckbox("parent", "campusCollection", "availability", "1");
+        await profileEditor.clickFieldCheckbox("parent", "campusCollection", "availability", "2");
+        await profileEditor.clickFieldUpdateButton("parent", "campusCollection");
         tester.isGoingTo("Navigate to the Jack Coles profile page");
         await tester.impersonate(teacher);
         await profilePage.goto("22");
         tester.isGoingTo("Ensure the role field is presented on staff profile page");
         await profilePage.checkFieldIsVisible("Role");
-        tester.isGoingTo("As Jack coles, Ensure the role field is presented on Jana Reed profile page");
+        await profilePage.checkFieldIsVisible("Campus");
+        tester.isGoingTo("As Jack coles, Ensure the role & Campus field is presented on Jana Reed profile page");
         await searchPage.goto();
         await searchPage.inputKeyword("Jana Reed");
         await searchPage.clearFilters();
@@ -54,7 +70,8 @@ test.describe("Profile Editor", () => {
         tester.isGoingTo("Navigate to the Jana Reed profile page");
         await profilePage.goto("25");
         await profilePage.checkFieldIsVisible("Role");
-        tester.isGoingTo("As Jack coles, Ensure the role field is presented on Alison Chan profile page");
+        await profilePage.checkFieldIsVisible("Campus");
+        tester.isGoingTo("As Jack coles, Ensure the role & Campus field is presented on Alison Chan profile page");
         await searchPage.goto();
         await searchPage.inputKeyword("Alison Chan");
         await searchPage.clearFilters();
@@ -62,7 +79,8 @@ test.describe("Profile Editor", () => {
         tester.isGoingTo("Navigate to the Alison Chan profile page");
         await profilePage.goto("43");
         await profilePage.checkFieldIsVisible("Role");
-        tester.isGoingTo("As Jack coles, Ensure the role field is presented on Jenni profile page");
+        await profilePage.checkFieldIsVisible("Campus");
+        tester.isGoingTo("As Jack coles, Ensure the role & Campus field is presented on Jenni profile page");
         await searchPage.goto();
         await searchPage.inputKeyword("Jenni Reed");
         await searchPage.clearFilters();
@@ -70,6 +88,7 @@ test.describe("Profile Editor", () => {
         tester.isGoingTo("Navigate to the Jenni profile page");
         await profilePage.goto("27");
         await profilePage.checkFieldIsVisible("Role");
+        await profilePage.checkFieldIsVisible("Campus");
     });
 
     /**

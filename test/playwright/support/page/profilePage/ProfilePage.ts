@@ -104,10 +104,11 @@ export default class ProfilePage {
     }
 
     /**
-     * Verify if a specified field is visible on the page.
-     * @param fieldName - The name of the field to check (e.g., "Role", "Campus")
+     * Verify if a specified field is visible within the profile section.
+     * @param fieldName - The name of the field to check (e.g., "Role", "Campus", "Class Profile")
      */
     async checkFieldIsVisible(fieldName: string): Promise<void> {
-        await expect(this.page.getByText(fieldName)).toBeVisible();
+        const fieldLocator = this.page.locator(`dl.profile dt`, { hasText: fieldName });
+        await expect(fieldLocator).toBeVisible();
     }
 }
