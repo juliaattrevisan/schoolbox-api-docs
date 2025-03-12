@@ -12,7 +12,7 @@ test.describe("Test the pastoral care modules expiry feature", () => {
         await tester.impersonateTeacher();
     });
 
-    test("Update the Award/Achievement type with a default expiry of 1 month", async ({ tester, page }) => {
+    test("Update the Academic > Award/Achievement type with a default expiry of 1 Month", async ({ tester, page }) => {
         const manageRecordSettings = new ManageRecordSettings(page);
 
         tester.isGoingTo("Visit the Award/Achievement page");
@@ -32,5 +32,30 @@ test.describe("Test the pastoral care modules expiry feature", () => {
 
         tester.isGoingTo("Confirm the changes have been saved");
         await manageRecordSettings.expectDefaultExpiryToBe("1 month");
+    });
+
+    test("Update the Academic > Learning Difficulties type with a default expiry of 6 Months", async ({
+        tester,
+        page,
+    }) => {
+        const manageRecordSettings = new ManageRecordSettings(page);
+
+        tester.isGoingTo("Visit the Learning Difficulties page");
+        await manageRecordSettings.gotoLearningDifficulties();
+
+        tester.isGoingTo("Select Alert flag");
+        await manageRecordSettings.selectFlag("Alert");
+
+        tester.isGoingTo("Set the flag color to red");
+        await manageRecordSettings.fillFlagColor("#ff0000");
+
+        tester.isGoingTo("Set the default expiry to 6 Months");
+        await manageRecordSettings.selectDefaultExpiry("6 Months");
+
+        tester.isGoingTo("Save the changes");
+        await manageRecordSettings.clickSave();
+
+        tester.isGoingTo("Confirm the changes have been saved");
+        await manageRecordSettings.expectDefaultExpiryToBe("6 months");
     });
 });

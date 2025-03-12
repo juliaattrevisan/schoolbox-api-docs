@@ -37,7 +37,7 @@ export default class PastoralExpiry {
      * Navigates to the Manage Academic › Learning Difficulties type
      */
     async gotoLearningDifficulties(): Promise<void> {
-        await this.page.goto(PastoralExpiry.URL_AWARD_ACHIEVEMENT);
+        await this.page.goto(PastoralExpiry.URL_LEARNING_DIFFICULTIES);
     }
 
     /**
