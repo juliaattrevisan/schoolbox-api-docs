@@ -227,9 +227,12 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         $data = $this->getAssessmentAsTwigArray($context, $assessment);
 
-        /* Curriculum Codes prefilled from those associated with context folder
+        /* When creating a new assessment, no curriculum nodes are selected by default
+         *
+         * At a future point, we may want to "suggest" nodes to select based on the context,
+         * to retrieve those nodes, we can use $context->getFolder()->getViewableCurriculumNodes()->reindex(); and pass them down with a new key
          */
-        $data['curriculumNodes'] = $context->getFolder()->getViewableCurriculumNodes();
+        $data['curriculumNodes'] = [];
 
         /* Default Visibility comes from an LMS Policy setting in config
          */
