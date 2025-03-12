@@ -182,7 +182,7 @@ class Processor
              */
             if (null !== $this->folderCode && $folderCode !== $this->folderCode) {
                 $this->log(sprintf(
-                    'Row %s: folder code %s does not match requested %s. Skipping',
+                    'Row %s: folder code %s does not match requested %s.',
                     $i,
                     $folderCode,
                     $this->folderCode
@@ -205,7 +205,7 @@ class Processor
                     ];
                 } catch (\Schoolbox\Mapper\Exception $e) {
                     $this->log(sprintf(
-                        'Row %s: did not find folder code %s. Skipping',
+                        'Row %s: did not find folder code %s.',
                         $i,
                         $folderCode
                     ), self::WARNING);
@@ -237,7 +237,7 @@ class Processor
                     ];
                 } catch (\Schoolbox\Mapper\Exception $e) {
                     $this->log(sprintf(
-                        'Row %s: student %s not found; skipping',
+                        'Row %s: student %s not found.',
                         $i,
                         $externalId
                     ), self::WARNING);
