@@ -72,6 +72,14 @@ export default class PastoralExpiry {
     }
 
     /**
+     * Expects the default expiry to be a certain value
+     * @param value - The value of the default expiry to select
+     */
+    async expectDefaultExpiryToBe(value: string): Promise<void> {
+        await expect(this.page.getByTestId(PastoralExpiry.DATATEST_DEFAULT_EXPIRY_SELECT)).toHaveValue(value);
+    }
+
+    /**
      * Click save button
      */
     async clickSave(): Promise<void> {

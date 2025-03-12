@@ -7,15 +7,15 @@
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import ManageRecordSettings from "@schoolboxTest/playwright/support/page/pastoralCare/ManageRecordSettings";
 
-test.describe("Curriculum Coverage Report Tests", () => {
+test.describe("Test the pastoral care modules expiry feature", () => {
     test.beforeEach(async ({ tester }) => {
         await tester.impersonateTeacher();
     });
 
-    test("Generate a report", async ({ tester, page }) => {
+    test("Update the Award/Achievement type with a default expiry of 1 month", async ({ tester, page }) => {
         const manageRecordSettings = new ManageRecordSettings(page);
 
-        tester.isGoingTo("Visit the Manage Award/Achievement page");
+        tester.isGoingTo("Visit the Award/Achievement page");
         await manageRecordSettings.gotoAwardAchievement();
 
         tester.isGoingTo("Select Achievement flag");
@@ -29,5 +29,8 @@ test.describe("Curriculum Coverage Report Tests", () => {
 
         tester.isGoingTo("Save the changes");
         await manageRecordSettings.clickSave();
+
+        tester.isGoingTo("Confirm the changes have been saved");
+        await manageRecordSettings.expectDefaultExpiryToBe("1 month");
     });
 });
