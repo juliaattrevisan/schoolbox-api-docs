@@ -1,6 +1,8 @@
 import { test } from "@schoolboxTest/playwright/support/integrations";
 import ProfileEditor from "@schoolboxTest/playwright/support/page/admin/userManagement/ProfileEditor";
 import ProfilePage from "@schoolboxTest/playwright/support/page/profilePage/ProfilePage";
+import Common from "@schoolboxTest/playwright/support/page/Common";
+import SearchPage from "@schoolboxTest/playwright/support/page/search/SearchPage";
 
 /**
  * This test checks the profile editor
@@ -18,17 +20,56 @@ test.describe("Profile Editor", () => {
         await tester.loginAsAdmin();
     });
 
-    test("Click on the positionTitle field", async ({ tester, page }) => {
+    test("Verify fields on staff profile pages", async ({ tester, page }) => {
         const profileEditor = new ProfileEditor(tester, page);
-        tester.isGoingTo("Navigate to the student profile editor page");
-        await profileEditor.goto("student");
-        tester.isGoingTo("Click on the cog of positon title field");
-        await profileEditor.clickFieldCog("positionTitle", "student");
-        tester.isGoingTo("Click on the visibility checkbox of positon title field");
-        await profileEditor.clickFieldCheckbox("positionTitle", "student", "visibility", "student");
-        tester.isGoingTo("Click on the availability checkbox of positon title field");
-        await profileEditor.clickFieldCheckbox("positionTitle", "student", "availability", "1");
-        await profileEditor.clickFieldUpdateButton("positionTitle", "student");
+        const profilePage = new ProfilePage(tester, page);
+        const searchPage = new SearchPage(page);
+        const teacher = Common.USER_JACKCOLES;
+        tester.isGoingTo("Navigate to the staff profile editor page");
+        await profileEditor.goto("staff");
+        tester.isGoingTo("Add Role field to staff profile editor page");
+        await profileEditor.clickFieldsTab("Internal Fields");
+        await profileEditor.clickAvailableField("staff", "role");
+        tester.isGoingTo("Click on the cog of role field");
+        await profileEditor.clickFieldCog("staff", "role");
+        tester.isGoingTo("Click on the visibility checkbox of role field");
+        await profileEditor.clickFieldCheckbox("staff", "role", "visibility", "self");
+        await profileEditor.clickFieldCheckbox("staff", "role", "visibility", "student");
+        await profileEditor.clickFieldCheckbox("staff", "role", "visibility", "staff");
+        await profileEditor.clickFieldCheckbox("staff", "role", "visibility", "parent");
+        tester.isGoingTo("Click on the availability checkbox of role field");
+        await profileEditor.clickFieldCheckbox("staff", "role", "availability", "1");
+        await profileEditor.clickFieldCheckbox("staff", "role", "availability", "2");
+        await profileEditor.clickFieldUpdateButton("staff", "role");
+        tester.isGoingTo("Navigate to the Jack Coles profile page");
+        await tester.impersonate(teacher);
+        await profilePage.goto("22");
+        tester.isGoingTo("Ensure the role field is presented on staff profile page");
+        await profilePage.checkFieldIsVisible("Role");
+        tester.isGoingTo("As Jack coles, Ensure the role field is presented on Jana Reed profile page");
+        await searchPage.goto();
+        await searchPage.inputKeyword("Jana Reed");
+        await searchPage.clearFilters();
+        await searchPage.clickSearchButton();
+        tester.isGoingTo("Navigate to the Jana Reed profile page");
+        await profilePage.goto("25");
+        await profilePage.checkFieldIsVisible("Role");
+        tester.isGoingTo("As Jack coles, Ensure the role field is presented on Alison Chan profile page");
+        await searchPage.goto();
+        await searchPage.inputKeyword("Alison Chan");
+        await searchPage.clearFilters();
+        await searchPage.clickSearchButton();
+        tester.isGoingTo("Navigate to the Alison Chan profile page");
+        await profilePage.goto("43");
+        await profilePage.checkFieldIsVisible("Role");
+        tester.isGoingTo("As Jack coles, Ensure the role field is presented on Jenni profile page");
+        await searchPage.goto();
+        await searchPage.inputKeyword("Jenni Reed");
+        await searchPage.clearFilters();
+        await searchPage.clickSearchButton();
+        tester.isGoingTo("Navigate to the Jenni profile page");
+        await profilePage.goto("27");
+        await profilePage.checkFieldIsVisible("Role");
     });
 
     /**

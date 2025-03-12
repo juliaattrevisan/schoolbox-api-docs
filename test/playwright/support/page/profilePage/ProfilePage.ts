@@ -102,4 +102,12 @@ export default class ProfilePage {
             ),
         );
     }
+
+    /**
+     * Verify if a specified field is visible on the page.
+     * @param fieldName - The name of the field to check (e.g., "Role", "Campus")
+     */
+    async checkFieldIsVisible(fieldName: string): Promise<void> {
+        await expect(this.page.getByText(fieldName)).toBeVisible();
+    }
 }

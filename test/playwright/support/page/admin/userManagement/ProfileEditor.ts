@@ -12,6 +12,8 @@ export default class ProfileEditor {
 
     static readonly SELECTOR_UPDATE_BUTTON = ".button.submit";
 
+    static readonly SELECTOR_PROFILE_TABS = "#profile-editor-container";
+
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
@@ -23,6 +25,7 @@ export default class ProfileEditor {
      */
     async goto(type: string): Promise<void> {
         await this.page.goto(ProfileEditor.URL.replace("{type}", type));
+        await this.page.waitForLoadState("load");
     }
 
     /**
@@ -51,43 +54,52 @@ export default class ProfileEditor {
     /**
      * Click the cog of a field
      * @param fieldName - The field name
-     * @param userType - The user type: student, staff, parent
+     * @param roleType - The user type: student, staff, parent
      */
 
-    async clickFieldCog(fieldName: string, userType: string): Promise<void> {
-        await this.page.getByTestId(`pe-${userType}-fields-active-item-${fieldName}-settings`).click();
+    async clickFieldCog(roleType: string, fieldName: string): Promise<void> {
+        await this.page.getByTestId(`pe-${roleType}-fields-active-item-${fieldName}-settings`).click();
     }
     /**
      * Click the field visibility or availability checkbox
      * @param fieldName - The field name
-     * @param userType - The user type: student, staff, parent
+     * @param roleType - The user type: student, staff, parent
      * @param option - The option to click: visibility or availability
      * @param optionValue - The option value to click: student, 1
      */
 
-    async clickFieldCheckbox(fieldName: string, userType: string, option: string, optionValue: string): Promise<void> {
+    async clickFieldCheckbox(roleType: string, fieldName: string, option: string, optionValue: string): Promise<void> {
         await this.page
-            .getByTestId(`pe-${userType}-fields-active-item-${fieldName}-setting-${option}-option-${optionValue}`)
+            .getByTestId(`pe-${roleType}-fields-active-item-${fieldName}-setting-${option}-option-${optionValue}`)
             .click();
     }
 
     /**
      * Click the update button of a field
      * @param fieldName - The field name
-     * @param userType - The user type: student, staff, parent
+     * @param roleType - The user type: student, staff, parent
      */
 
-    async clickFieldUpdateButton(fieldName: string, userType: string): Promise<void> {
-        await this.page.getByTestId(`pe-${userType}-fields-active-item-${fieldName}-settings-confirm`).click();
+    async clickFieldUpdateButton(roleType: string, fieldName: string): Promise<void> {
+        await this.page.getByTestId(`pe-${roleType}-fields-active-item-${fieldName}-settings-confirm`).click();
     }
 
     /**
      * Click the available field to add in the active field
      * @param fieldName - The field name
-     * @param userType - The user type: student, staff, parent
+     * @param roleType - The user type: student, staff, parent
      */
 
-    async clickAvailableField(fieldName: string, userType: string): Promise<void> {
-        await this.page.getByTestId(`pe-${userType}-fields-available-item-${fieldName}`).click();
+    async clickAvailableField(roleType: string, fieldName: string): Promise<void> {
+        await this.page.getByTestId(`pe-${roleType}-fields-available-item-${fieldName}`).click();
+        // await this.page.getByTestId(`pe-parent-fields-available-item-campusCollection`).click();
+    }
+
+    /**
+     * Click a specified fields tab
+     * @param tabName - The name of the tab to click: External Fields or Internal Fields
+     */
+    async clickFieldsTab(tabName: "External Fields" | "Internal Fields"): Promise<void> {
+        await this.page.getByText(tabName).click();
     }
 }
