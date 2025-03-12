@@ -58,7 +58,7 @@ class Config
     ): Sentry\State\HubInterface {
         // DSN not set: construct from token and project
         if (!isset($sentryDsn) || $sentryDsn === '') {
-            if (isset($sentryToken, $sentryProject)) {
+            if (isset($sentryToken, $sentryProject) && $sentryToken !== '' && $sentryProject !== '') {
                 $sentryDsn = sprintf(self::DEFAULT_SENTRY_DSN, $sentryToken, $sentryProject);
             }
         }
