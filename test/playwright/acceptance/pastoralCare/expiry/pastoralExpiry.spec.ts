@@ -1,11 +1,11 @@
 /**
  * Test the pastoral care modules expiry feature
  * 1. Provision sales.tar.gz data
- * 2. Execute npx playwright test pastoralExpiry.spec.ts
+ * 2. Execute npx playwright test manageRecordSettings.spec.ts
  */
 
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
-import PastoralExpiry from "@schoolboxTest/playwright/support/page/pastoralCare/expiry/PastoralExpiry";
+import ManageRecordSettings from "@schoolboxTest/playwright/support/page/pastoralCare/ManageRecordSettings";
 
 test.describe("Curriculum Coverage Report Tests", () => {
     test.beforeEach(async ({ tester }) => {
@@ -13,21 +13,21 @@ test.describe("Curriculum Coverage Report Tests", () => {
     });
 
     test("Generate a report", async ({ tester, page }) => {
-        const pastoralExpiry = new PastoralExpiry(page);
+        const manageRecordSettings = new ManageRecordSettings(page);
 
         tester.isGoingTo("Visit the Manage Award/Achievement page");
-        await pastoralExpiry.gotoManageAwardAchievement();
+        await manageRecordSettings.gotoAwardAchievement();
 
         tester.isGoingTo("Select Achievement flag");
-        await pastoralExpiry.selectFlag("Achievement");
+        await manageRecordSettings.selectFlag("Achievement");
 
         tester.isGoingTo("Set the flag color to green");
-        await pastoralExpiry.fillFlagColor("#00ff1e");
+        await manageRecordSettings.fillFlagColor("#00ff1e");
 
         tester.isGoingTo("Set the default expiry to 1 Month");
-        await pastoralExpiry.selectDefaultExpiry("1 Month");
+        await manageRecordSettings.selectDefaultExpiry("1 Month");
 
         tester.isGoingTo("Save the changes");
-        await pastoralExpiry.clickSave();
+        await manageRecordSettings.clickSave();
     });
 });

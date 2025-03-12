@@ -8,11 +8,11 @@ import { expect } from "@playwright/test";
 export default class PastoralExpiry {
     private page: Page;
 
-    static readonly URL_MANAGE_AWARD_ACHIEVEMENT = "/pastoral/management/audience/subtype/1/modify";
+    static readonly URL_AWARD_ACHIEVEMENT = "/pastoral/management/audience/subtype/1/modify";
 
-    static readonly URL_MANAGE_LEARNING_DIFFICULTIES = "/pastoral/management/audience/subtype/2/modify";
+    static readonly URL_LEARNING_DIFFICULTIES = "/pastoral/management/audience/subtype/2/modify";
 
-    static readonly URL_MANAGE_ATTENDANCE = "/pastoral/management/audience/type/2/modify";
+    static readonly URL_ATTENDANCE = "/pastoral/management/audience/type/2/modify";
 
     static readonly DATATEST_FLAG_SELECT = "audiences-modify-pastoral-flag-select";
 
@@ -29,22 +29,22 @@ export default class PastoralExpiry {
     /**
      * Navigates to the Manage Academic › Award/Achievement type
      */
-    async gotoManageAwardAchievement(): Promise<void> {
-        await this.page.goto(PastoralExpiry.URL_MANAGE_AWARD_ACHIEVEMENT);
+    async gotoAwardAchievement(): Promise<void> {
+        await this.page.goto(PastoralExpiry.URL_AWARD_ACHIEVEMENT);
     }
 
     /**
      * Navigates to the Manage Academic › Learning Difficulties type
      */
-    async gotoManageLearningDifficulties(): Promise<void> {
-        await this.page.goto(PastoralExpiry.URL_MANAGE_AWARD_ACHIEVEMENT);
+    async gotoLearningDifficulties(): Promise<void> {
+        await this.page.goto(PastoralExpiry.URL_AWARD_ACHIEVEMENT);
     }
 
     /**
      * Navigates to the Manage Attendance type
      */
-    async gotoManageAttendance(): Promise<void> {
-        await this.page.goto(PastoralExpiry.URL_MANAGE_ATTENDANCE);
+    async gotoAttendance(): Promise<void> {
+        await this.page.goto(PastoralExpiry.URL_ATTENDANCE);
     }
 
     /**
