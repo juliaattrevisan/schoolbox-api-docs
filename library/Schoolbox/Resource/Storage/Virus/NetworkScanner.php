@@ -10,6 +10,8 @@ declare(strict_types=1);
 namespace Schoolbox\Resource\Storage\Virus;
 
 use Schoolbox\File\Exception as FileException;
+use SplFileObject;
+use Throwable;
 
 /**
  * Virus scanner implementation, which uses a network-available `clamd` daemon.
@@ -32,19 +34,26 @@ class NetworkScanner implements IScanner
     private const DELIMITER = "\0";
 
     /**
+     * The size (in bytes) of each chunk to write to `clamd`, when streaming a
+     * file to be scanned.
+     */
+    private const CHUNK_SIZE_WRITE = 1024;
+
+    /**
+     * The size (in bytes) of each chunk to read from `clamd`, when receiving a
+     * response.
+     */
+    private const CHUNK_SIZE_READ = 1024;
+
+    /**
      * Constructor
      *
-     * @param string $sharedDirectory     The shared directory on this host to copy files to.
-     * @param string $clamDaemonHost      The hostname the ClamAV daemon is available on.
-     * @param int    $clamDaemonPort      The port the ClamAV daemon is listening on.
-     * @param string $clamDaemonDirectory The directory on the ClamAV host from which it will read files to scan.
-     *                                    It's assumed that this and `$sharedDirectory` are a shared mount.
+     * @param string $clamDaemonHost The hostname the ClamAV daemon is available on.
+     * @param int    $clamDaemonPort The port the ClamAV daemon is listening on.
      */
     public function __construct(
-        private string $sharedDirectory,
         private string $clamDaemonHost,
         private int $clamDaemonPort,
-        private string $clamDaemonDirectory,
     ) {
     }
 
@@ -53,26 +62,13 @@ class NetworkScanner implements IScanner
      */
     public function scan(string $fileLocation): void
     {
-        // Copy file to temp, presuming it exists
-        if (!file_exists($fileLocation)) {
-            throw new DaemonException('File does not exist');
+        // Stream file to socket
+        try {
+            $file = new SplFileObject($fileLocation, 'r');
+        } catch (Throwable $e) {
+            throw new DaemonException('File could not be opened for reading', 0, $e);
         }
-        $tempFile = tempnam($this->sharedDirectory, '');
-        if (!$tempFile) {
-            throw new DaemonException('Failed to create temp file');
-        }
-        $copied = copy($fileLocation, $tempFile);
-        if (!$copied) {
-            throw new DaemonException('Failed to copy file to temp file');
-        }
-
-        // For now make said file world-readable (for clamav host)
-        if (!chmod($tempFile, 0644)) {
-            throw new DaemonException('Failed to change permissions on temp file');
-        }
-
-        // And finally scan
-        $response = $this->executeCommand('SCAN ' . $this->clamDaemonDirectory . '/' . basename($tempFile), 60);
+        $response = $this->executeCommand('INSTREAM', 60, $file);
         if (str_ends_with($response, 'OK')) {
             return;
         }
@@ -105,12 +101,13 @@ class NetworkScanner implements IScanner
     /**
      * Attempt to send a command to the socket.
      *
-     * @param string $command The command to send.
-     * @param int    $timeout How many seconds to wait for a response.
+     * @param string             $command The command to send.
+     * @param int                $timeout How many seconds to wait for a response.
+     * @param SplFileObject|null $file    If provided: stream this file to the socket.
      * @return string The response to the command.
      * @throws DaemonException if the command failed to run.
      */
-    private function executeCommand(string $command, int $timeout): string
+    private function executeCommand(string $command, int $timeout, ?SplFileObject $file = null): string
     {
         if (!extension_loaded('sockets')) {
             throw new DaemonException('PHP sockets extension is not loaded');
@@ -120,12 +117,26 @@ class NetworkScanner implements IScanner
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         socket_connect($socket, $this->clamDaemonHost, $this->clamDaemonPort);
 
-        // Send the command, and wait for a response
+        // Send the command, streaming $file if set, and wait for a response
         socket_write($socket, self::COMMAND_PREFIX . $command . self::DELIMITER);
+        if ($file) {
+            while (!$file->eof()) {
+                $bytes = $file->fread(self::CHUNK_SIZE_WRITE);
+                if ($bytes === false) {
+                    break;
+                }
+                $len = pack('N', strlen($bytes));
+                socket_write($socket, $len);
+                socket_write($socket, $bytes);
+            }
+            socket_write($socket, pack('N', 0));
+        }
+
+        // Read the response from the socket
         $response    = '';
         $timeoutTime = microtime(true) + $timeout;
         while (microtime(true) < $timeoutTime) {
-            $response .= socket_read($socket, 1024);
+            $response .= socket_read($socket, self::CHUNK_SIZE_READ);
 
             // If last byte is the delimiter: we have a fully realised response.
             if (str_ends_with($response, self::DELIMITER)) {
