@@ -58,4 +58,20 @@ test.describe("Test the pastoral care modules expiry feature", () => {
         tester.isGoingTo("Confirm the changes have been saved");
         await manageRecordSettings.expectDefaultExpiryToBe("6 months");
     });
+
+    test("Update the Attendance type with a default expiry of 2 weeks", async ({ tester, page }) => {
+        const manageRecordSettings = new ManageRecordSettings(page);
+
+        tester.isGoingTo("Visit the Attendance page");
+        await manageRecordSettings.gotoAttendance();
+
+        tester.isGoingTo("Set the default expiry to 2 Weeks");
+        await manageRecordSettings.selectDefaultExpiry("2 Weeks");
+
+        tester.isGoingTo("Save the changes");
+        await manageRecordSettings.clickSave();
+
+        tester.isGoingTo("Confirm the changes have been saved");
+        await manageRecordSettings.expectDefaultExpiryToBe("2 weeks");
+    });
 });
