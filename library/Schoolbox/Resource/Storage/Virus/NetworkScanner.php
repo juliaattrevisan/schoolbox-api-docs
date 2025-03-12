@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage\Virus;
 
+use League\Flysystem\Filesystem;
 use Schoolbox\File\Exception as FileException;
 use SplFileObject;
 use Throwable;
@@ -48,10 +49,13 @@ class NetworkScanner implements IScanner
     /**
      * Constructor
      *
-     * @param string $clamDaemonHost The hostname the ClamAV daemon is available on.
-     * @param int    $clamDaemonPort The port the ClamAV daemon is listening on.
+     * @param Filesystem $tempFileSystem The temporary file system: quarantined files are moved to
+     *                                   `IScanner::VIRUS_QUARANTINE` in this file system.
+     * @param string     $clamDaemonHost The hostname the ClamAV daemon is available on.
+     * @param int        $clamDaemonPort The port the ClamAV daemon is listening on.
      */
     public function __construct(
+        private Filesystem $tempFileSystem,
         private string $clamDaemonHost,
         private int $clamDaemonPort,
     ) {
@@ -73,6 +77,13 @@ class NetworkScanner implements IScanner
             return;
         }
         if (str_ends_with($response, 'FOUND')) {
+            // If found: quarantine (this mimics `clamscand --move`)
+            unset($file);
+            $this->tempFileSystem->writeStream(
+                self::VIRUS_QUARANTINE . '/' . basename($fileLocation),
+                fopen($fileLocation, 'r'),
+            );
+            unlink($fileLocation);
             throw new FileException(
                 sprintf('Virus scanner received response "%s": looks like a virus', $response)
             );
