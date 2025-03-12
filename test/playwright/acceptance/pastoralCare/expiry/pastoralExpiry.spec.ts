@@ -87,5 +87,8 @@ test.describe("Test the pastoral care modules expiry feature", () => {
 
         tester.isGoingTo("Add a new pastoral record to Jana Reed");
         await createPastoralRecord.goto(25);
+
+        tester.isGoingTo("Set type to Academic > Award Achievement");
+        await createPastoralRecord.selectType("1");
     });
 });

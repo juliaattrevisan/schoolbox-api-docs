@@ -52,11 +52,18 @@ export default class CreatePastoralRecord {
 
     /**
      * click one of the types by passing its int value: 1 for Academic, 2 for Attendance, 3 for Medical, 4 for Bullying, 5 for Discipline
-     * click one of the subtype by passing its int value: if type Academic then subtypes 1 for Award/Achievement, 2 for Learning Difficulties etc
      * @param type - The type of the pastoral record
      */
-    async selectTypeSubType(type: string): Promise<void> {
-        await this.page.locator("#typeId").selectOption({ value: type });
+    async selectType(type: string): Promise<void> {
+        await this.page.locator(CreatePastoralRecord.PASTORAL_TYPE).selectOption({ value: type });
+    }
+
+    /**
+     * click one of the subtype by passing its int value: if type Academic then subtypes 1 for Award/Achievement, 2 for Learning Difficulties etc
+     * @param subType - The sub type of the pastoral record
+     */
+    async selectSubType(subType: string): Promise<void> {
+        await this.page.locator(CreatePastoralRecord.PASTORAL_SUB_TYPE).selectOption({ value: subType });
     }
 
     /**

@@ -68,7 +68,7 @@ test.describe("Pastoral Records", () => {
         await pastoralProfile.clickCreatePastoralRecord();
         await createPastoralRecord.typeTitle(pastoralTitle);
         await createPastoralRecord.clickTypeDropdown();
-        await createPastoralRecord.selectTypeSubType("1");
+        await createPastoralRecord.selectType("1");
         const body = page.locator(`#body_public`);
         await tester.fillCKEditorByLocator(body, pastoralDescription);
         await createPastoralRecord.clickVisibilityLink("Role");
@@ -133,7 +133,7 @@ test.describe("Pastoral Records", () => {
         tester.isGoingTo("get the pastoral record updated");
         await createPastoralRecord.typeTitle(pastoralTitle);
         await createPastoralRecord.clickTypeDropdown();
-        await createPastoralRecord.selectTypeSubType("2");
+        await createPastoralRecord.selectType("2");
         await createPastoralRecord.clickSave();
         tester.isGoingTo("ensure the record are properly updated");
         await pastoralProfile.goto(studentId);
@@ -185,7 +185,7 @@ test.describe("Pastoral Records", () => {
         await pastoralProfile.clickCreatePastoralRecord();
         await createPastoralRecord.typeTitle(pastoralTitle);
         await createPastoralRecord.clickTypeDropdown();
-        await createPastoralRecord.selectTypeSubType("1");
+        await createPastoralRecord.selectType("1");
         const body = page.locator(`#body_public`);
         await tester.fillCKEditorByLocator(body, pastoralDescription);
         await createPastoralRecord.clickVisibilityLink("Role");
