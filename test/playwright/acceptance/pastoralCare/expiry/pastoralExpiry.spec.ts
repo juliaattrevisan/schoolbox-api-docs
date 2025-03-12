@@ -30,6 +30,8 @@ test.describe("Test the pastoral care modules expiry feature", () => {
         tester.isGoingTo("Save the changes");
         await manageRecordSettings.clickSave();
 
+        await page.reload();
+
         tester.isGoingTo("Confirm the changes have been saved");
         await manageRecordSettings.expectDefaultExpiryToBe("1 month");
     });
@@ -55,6 +57,8 @@ test.describe("Test the pastoral care modules expiry feature", () => {
         tester.isGoingTo("Save the changes");
         await manageRecordSettings.clickSave();
 
+        await page.reload();
+
         tester.isGoingTo("Confirm the changes have been saved");
         await manageRecordSettings.expectDefaultExpiryToBe("6 months");
     });
@@ -70,6 +74,8 @@ test.describe("Test the pastoral care modules expiry feature", () => {
 
         tester.isGoingTo("Save the changes");
         await manageRecordSettings.clickSave();
+
+        await page.reload();
 
         tester.isGoingTo("Confirm the changes have been saved");
         await manageRecordSettings.expectDefaultExpiryToBe("2 weeks");
