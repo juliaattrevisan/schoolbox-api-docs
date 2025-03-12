@@ -31,30 +31,12 @@ class Processor
 
     /**
      * Used to find a relationship between a folder and a particular
-     * assessment by its id.
+     * assessment by its (assessment title, worktype) combo
      */
-    private const QUERY_ASSESSMENT_ID = "
+    private const QUERY_ASSESSMENT_TITLE_WORKTYPE = "
         SELECT 
             a.id AS assessment_id, 
-            sb.id AS box_id
-        FROM mv_assessment_relation mvar
-        INNER JOIN assessment a ON a.id = mvar.assessment_id
-        INNER JOIN submission_box sb ON sb.assessment_id = a.id
-        INNER JOIN folder f ON mvar.folder_id = f.id
-        WHERE mvar.folder_id = :folderId
-        AND a.id = :assessmentId
-        AND a.deleted_at IS NULL
-        AND f.deleted_at IS NULL
-    ";
-
-
-    /**
-     * Used to find a relationship between a folder and a particular
-     * assessment by its (worktype, assessment title) combo
-     */
-    private const QUERY_ASSESSMENT_WORKTYPE = "
-        SELECT 
-            a.id AS assessment_id, 
+            a.title AS assessment_title,
             sb.id AS box_id
         FROM mv_assessment_relation mvar
         INNER JOIN assessment a ON a.id = mvar.assessment_id
@@ -123,7 +105,7 @@ class Processor
      * @param UserMapper $userMapper
      * @param Mapper $folderMapper
      * @param string $assessmentTitle
-     * @param int|null $workTypeId
+     * @param int $workTypeId
      * @param \Alaress_Date_Format $publishAt
      * @param string|null $folderCode
      * @param bool $perform
@@ -134,19 +116,14 @@ class Processor
         private \Schoolbox\UserMapper $userMapper,
         private \Schoolbox\Resource\Folder\Mapper $folderMapper,
         private string $assessmentTitle,
-        private ?int $workTypeId,
+        private int $workTypeId,
         private \Alaress_Date_Format $publishAt,
         private ?string $folderCode,
         private bool $perform
     ) {
         /* We're going to reuse this a lot
          */
-        if (null !== $this->workTypeId) {
-            $this->assessmentQuery = $this->userMapper->getDatabase()->prepare(self::QUERY_ASSESSMENT_WORKTYPE);
-        } else {
-            $this->assessmentQuery = $this->userMapper->getDatabase()->prepare(self::QUERY_ASSESSMENT_ID);
-        }
-
+        $this->assessmentQuery = $this->userMapper->getDatabase()->prepare(self::QUERY_ASSESSMENT_TITLE_WORKTYPE);
         $this->feedbackQuery = $this->userMapper->getDatabase()->prepare(self::QUERY_FEEDBACK);
     }
 
@@ -169,7 +146,7 @@ class Processor
          */
         $reader = new Reader($this->filesystemProxy->readStream($file), true);
         $reader->setExpectedColumns([
-            'Assessment ID',
+            'Assessment Title',
             'Class Code',
             'Student External ID',
             'Normalised Mark',
@@ -266,32 +243,29 @@ class Processor
 
             /* Then find the assessment's corresponding submission box id
              */
-            if ($this->workTypeId) {
-                $this->assessmentQuery->execute([
-                    'assessmentTitle' => $this->assessmentTitle,
-                    'workTypeId' => $this->workTypeId,
-                    'folderId' => $folder['id']
-                ]);
-            } else {
-                $this->assessmentQuery->execute([
-                    'assessmentId' => trim((string)$row['Assessment ID']),
-                    'folderId' => $folder['id']
-                ]);
-            }
+            $this->assessmentQuery->execute([
+                'assessmentTitle' => $this->assessmentTitle,
+                'workTypeId' => $this->workTypeId,
+                'folderId' => $folder['id']
+            ]);
 
             /* Add a feedback for every assessment that might match the title/worktype combo
-             * This is kind of maybe too loose?
+             *
+             * FIXME This is kind of maybe too loose? You can inadvertently populate more than you intended,
+             *  simply by pure accident/mistake
              */
             while ($data = $this->assessmentQuery->fetch(\PDO::FETCH_ASSOC)) {
                 $boxId = $data['box_id'] ?? null;
                 $assessmentId = $data['assessment_id'] ?? null;
+                $assessmentTitle = $data['assessment_title'] ?? null;
 
                 /* For some reason this homepage doesn't have the assessment set up
                  */
                 if (null === $boxId) {
                     $this->log(sprintf(
-                        'Row %s: unknown submission_box for assessment in folder %s (%s)',
+                        'Row %s: unknown submission_box for assessment "%s" in folder %s (%s)',
                         $i,
+                        $assessmentTitle,
                         $folder['title'],
                         $folderCode
                     ), self::WARNING);

@@ -197,7 +197,7 @@ class Controller extends Base
         $assessmentTitle = trim((string)$postVar['assessmentTitle']);
 
         if ('' === $assessmentTitle) {
-            throw new \DomainException('Assessment Title was omitted.');
+            throw new \DomainException('Assessment title was omitted.');
         }
 
         /* Worktype chosen should maybe exist
