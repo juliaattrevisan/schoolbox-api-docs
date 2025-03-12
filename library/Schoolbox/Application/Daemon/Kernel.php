@@ -483,4 +483,23 @@ EOL;
         $di->set('react.loop', $di->lazy(Loop::get(...)));
         return $di;
     }
+
+    /**
+     * Deprecation as past of 25.0 [SA-18702]
+     *
+     * if you are still using this script, please add a comment of this scripts name into SA-19334
+     * @deprecated
+     */
+    public function deprecationNotice(): void
+    {
+        /**
+         * Deprecation notice
+         */
+        $this->logger()->error('/******************************************************************************************/');
+        $this->logger()->error('/***************     Deprecated NOTICE - this will be deleted in future    ****************/');
+        $this->logger()->error('/*    If you are running this, please add a comment of this scripts name into SA-19334    */');
+        $this->logger()->error(sprintf("Script name: %s", get_class($this)));
+        $this->logger()->error('/******************************************************************************************/');
+        $this->logger()->error('/******************************************************************************************/');
+    }
 }
