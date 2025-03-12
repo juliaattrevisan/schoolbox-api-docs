@@ -30,10 +30,16 @@ class Config
      * Initialise the Sentry hub as much as it can be before the instance's
      * configuration is known.
      *
-     * @param string|null $sentryDsn
-     * @param float|null  $errorSampleRate
-     * @param float|null  $traceSampleRate
-     * @param float|null  $profileSampleRate
+     * @param string|null $sentryDsn         The URL to send Sentry events to.
+     * @param float|null  $errorSampleRate   The rate at which to sample errors (1: all, 0: none).
+     * @param float|null  $traceSampleRate   The rate at which to sample performance traces (1: all, 0: none).
+     * @param float|null  $profileSampleRate The rate at which to sample profiles (1: all, 0: none).
+     *                                       Note that this is relative to `$traceSampleRate`, as profiles are only
+     *                                       sampled if the trace is.
+     * @param string|null $sentryToken       Deprecated parameter for the token component of the Sentry DSN:
+     *                                       only used if `$sentryDsn` isn't set.
+     * @param string|null $sentryProject     Deprecated parameter for the project component of the Sentry DSN:
+     *                                       only used if `$sentryDsn` isn't set.
      * @return Sentry\State\HubInterface
      */
     public static function init(
@@ -41,6 +47,8 @@ class Config
         ?float $errorSampleRate,
         ?float $traceSampleRate,
         ?float $profileSampleRate,
+        ?string $sentryToken,
+        ?string $sentryProject,
     ): Sentry\State\HubInterface {
         if (!isset($sentryDsn) || $sentryDsn === '') {
             $hub = new NullHub();

@@ -31,7 +31,14 @@ if (!defined('INSTANCE_ID') || trim((string)INSTANCE_ID) === '') {
 require __DIR__ . '/../../vendor/autoload.php';
 
 // Init Sentry before almost anything else
-Config::init(SENTRY_DSN, SENTRY_ERROR_SAMPLE_RATE, SENTRY_TRACE_SAMPLE_RATE, SENTRY_PROFILE_SAMPLE_RATE);
+Config::init(
+    SENTRY_DSN,
+    SENTRY_ERROR_SAMPLE_RATE,
+    SENTRY_TRACE_SAMPLE_RATE,
+    SENTRY_PROFILE_SAMPLE_RATE,
+    SENTRY_TOKEN,
+    SENTRY_PROJECT,
+);
 
 // Global functions and constants
 require_once __DIR__ . '/../../www/include/stdfuncs.php';
