@@ -27,6 +27,12 @@ class Config
     private const ERROR_REPORTING = E_ALL & ~E_NOTICE & ~E_USER_NOTICE & ~E_STRICT;
 
     /**
+     * Deprecated default sentry DSN, for when `$sentryDsn` isn't provided to
+     * `init`.
+     */
+    private const DEFAULT_SENTRY_DSN = "https://%s@sentry.io/%s";
+
+    /**
      * Initialise the Sentry hub as much as it can be before the instance's
      * configuration is known.
      *
@@ -47,9 +53,17 @@ class Config
         ?float $errorSampleRate,
         ?float $traceSampleRate,
         ?float $profileSampleRate,
-        ?string $sentryToken,
-        ?string $sentryProject,
+        ?string $sentryToken = null,
+        ?string $sentryProject = null,
     ): Sentry\State\HubInterface {
+        // DSN not set: construct from token and project
+        if (!isset($sentryDsn) || $sentryDsn === '') {
+            if (isset($sentryToken, $sentryProject)) {
+                $sentryDsn = sprintf(self::DEFAULT_SENTRY_DSN, $sentryToken, $sentryProject);
+            }
+        }
+
+        // DSN still not set? Don't use Sentry
         if (!isset($sentryDsn) || $sentryDsn === '') {
             $hub = new NullHub();
             Sentry\SentrySdk::setCurrentHub($hub);
