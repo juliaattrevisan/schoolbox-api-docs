@@ -36,7 +36,7 @@
                 <section class="content">
                     <div>
                         <ul class="information-list">
-                            {% for row in outcome %}
+                            {% for row in outcome.messages %}
                                 <li>
                                     {% if row.type == 'warning' %}
                                         <span style="color:red">{{ row.message }}</span>
@@ -51,17 +51,23 @@
             {% endif %}
         </div>
 
-        {# Recycle the form params for immediate effect #}
-        {% set formRoute = routeLookupIfAuthorized('adminBulkAssessmentResult.postPerform') %}
+        {# The existence of a single problem prevents schools from continuing with a mass import
+         # that might be devastatingly wrong somehow. All warnings are considered error states
+         # and their causes must be repaired first before schools can continue.
+         #}
+        {% if not outcome.errors %}
+            {# Recycle the form params for immediate effect #}
+            {% set formRoute = routeLookupIfAuthorized('adminBulkAssessmentResult.postPerform') %}
 
-        <div class="small-12 columns">
-            <form action="{{ formRoute }}" method="post">
-                <input type="hidden" name="assessmentTitle" value="{{ settings.assessmentTitle }}" />
-                <input type="hidden" name="worktypeId" value="{{ settings.worktype.id }}" />
-                <input type="hidden" name="attachment" value="{{ settings.sourceFile.hash }}" />
-                <input type="hidden" name="userId" value="{{ settings.feedbackAuthor.id }}" />
-                <input type="submit" value="Perform Import" />
-            </form>
-        </div>
+            <div class="small-12 columns">
+                <form action="{{ formRoute }}" method="post">
+                    <input type="hidden" name="assessmentTitle" value="{{ settings.assessmentTitle }}" />
+                    <input type="hidden" name="worktypeId" value="{{ settings.worktype.id }}" />
+                    <input type="hidden" name="attachment" value="{{ settings.sourceFile.hash }}" />
+                    <input type="hidden" name="userId" value="{{ settings.feedbackAuthor.id }}" />
+                    <input type="submit" value="Perform Import" />
+                </form>
+            </div>
+        {% endif %}
     </div>
 </div>

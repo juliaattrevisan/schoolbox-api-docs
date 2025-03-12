@@ -16,6 +16,7 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Resource\Folder\Mapper;
 use Schoolbox\Resource\Storage\FilesystemProxy;
+use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Resource\Storage\Model;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -94,7 +95,7 @@ class Processor
      *
      * @var array
      */
-    private array $outcome = [];
+    private array $messages = [];
 
 
     /**
@@ -105,7 +106,7 @@ class Processor
      * @param UserMapper $userMapper
      * @param Mapper $folderMapper
      * @param string $assessmentTitle
-     * @param int $workTypeId
+     * @param \Schoolbox\Learning\Assessment\WorkType\Model $workType
      * @param \Alaress_Date_Format $publishAt
      * @param string|null $folderCode
      * @param bool $perform
@@ -116,7 +117,7 @@ class Processor
         private \Schoolbox\UserMapper $userMapper,
         private \Schoolbox\Resource\Folder\Mapper $folderMapper,
         private string $assessmentTitle,
-        private int $workTypeId,
+        private \Schoolbox\Learning\Assessment\WorkType\Model $workType,
         private \Alaress_Date_Format $publishAt,
         private ?string $folderCode,
         private bool $perform
@@ -139,9 +140,13 @@ class Processor
      * @throws Deleted
      */
     public function parseFeedbacks(
-        \Schoolbox\Resource\Storage\Model $file,
+        IStorage $file,
         \Schoolbox\User $creator,
     ): array {
+        /* A list of warnings/errors/scenarios that schools must fix before we can continue
+         */
+        $errors = 0;
+
         /* Load a particular file
          */
         $reader = new Reader($this->filesystemProxy->readStream($file), true);
@@ -183,6 +188,8 @@ class Processor
                     $this->folderCode
                 ), self::WARNING);
 
+                $errors++;
+
                 continue;
             }
 
@@ -202,6 +209,8 @@ class Processor
                         $i,
                         $folderCode
                     ), self::WARNING);
+
+                    $errors++;
 
                     continue;
                 }
@@ -233,6 +242,8 @@ class Processor
                         $externalId
                     ), self::WARNING);
 
+                    $errors++;
+
                     continue;
                 }
             }
@@ -245,30 +256,49 @@ class Processor
              */
             $this->assessmentQuery->execute([
                 'assessmentTitle' => $this->assessmentTitle,
-                'workTypeId' => $this->workTypeId,
+                'workTypeId' => $this->workType->getId(),
                 'folderId' => $folder['id']
             ]);
 
-            /* Add a feedback for every assessment that might match the title/worktype combo
+            /* There's only meant to be one assessment that matches the (title, worktype, folder) tuple.
+             * Multiple assessments that match means we can't determine where feedback is meant to go.
+             * We need the schools to resolve the conflicting assessments.
              *
-             * FIXME This is kind of maybe too loose? You can inadvertently populate more than you intended,
-             *  simply by pure accident/mistake
+             * There can be only be one, highlander.
              */
-            while ($data = $this->assessmentQuery->fetch(\PDO::FETCH_ASSOC)) {
+            $candidateAssessments = $this->assessmentQuery->fetchAll(\PDO::FETCH_ASSOC);
+
+            if (\count($candidateAssessments) > 1) {
+                $this->log(sprintf(
+                    'Row %s: multiple assessments found for assessment "%s" in folder "%s" using worktype "%s" (%s). 
+                    Please ensure assessments are uniquely identifiable before continuing.',
+                    $i,
+                    $this->assessmentTitle,
+                    $folder['title'],
+                    $this->workType->getName(),
+                    $this->workType->getId()
+                ), self::WARNING);
+
+                $errors++;
+
+                continue;
+            }
+
+            foreach ($candidateAssessments as $data) {
                 $boxId = $data['box_id'] ?? null;
                 $assessmentId = $data['assessment_id'] ?? null;
-                $assessmentTitle = $data['assessment_title'] ?? null;
 
                 /* For some reason this homepage doesn't have the assessment set up
                  */
                 if (null === $boxId) {
                     $this->log(sprintf(
-                        'Row %s: unknown submission_box for assessment "%s" in folder %s (%s)',
+                        'Row %s: unknown submission_box for assessment "%s" in folder %s',
                         $i,
-                        $assessmentTitle,
+                        $this->assessmentTitle,
                         $folder['title'],
-                        $folderCode
                     ), self::WARNING);
+
+                    $errors++;
 
                     continue;
                 }
@@ -318,7 +348,7 @@ class Processor
                 }
 
                 $this->log(sprintf(
-                    'Row %s: added grade %s (instructor grade %s, normalised mark %s) for %s (%s) in assessment "%s" (%s) found in folder %s (%s)',
+                    'Row %s: added grade %s (instructor grade %s, normalised mark %s) for %s (%s) in assessment "%s" (%s) found in folder %s',
                     $i,
                     $humanReadableMark,
                     $instructorHumanReadableMark,
@@ -328,17 +358,19 @@ class Processor
                     $assessment->getTitle(),
                     $assessment->getId(),
                     $folder['id'],
-                    $folderCode
                 ), self::INFO);
             }
         }
 
-        return $this->outcome;
+        return [
+            'messages' => $this->messages,
+            'errors' => $errors
+        ];
     }
 
 
     /**
-     * Log outcomes to multiple places
+     * Log messages to multiple places
      *
      * @param string $message
      * @param string $type
@@ -346,9 +378,9 @@ class Processor
      */
     private function log(string $message, string $type): void
     {
-        $this->outcome[] = [
+        $this->messages[] = [
             'message' => $message,
-            'type' => $type
+            'type' => $type,
         ];
     }
 }
