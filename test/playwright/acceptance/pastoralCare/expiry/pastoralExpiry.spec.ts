@@ -94,20 +94,37 @@ test.describe("Test the pastoral care modules expiry feature", () => {
 
         tester.isGoingTo("Check expires at date is 1 month from today");
         const dateOneMonth = dayjs().add(1, "month").format("DD/MM/YYYY");
-        createPastoralRecord.expectExpiresAtToBe(dateOneMonth);
+        await createPastoralRecord.expectExpiresAtToBe(dateOneMonth);
 
         tester.isGoingTo("Set sub type to Academic > Learning Difficulties");
         await createPastoralRecord.selectSubType("2");
 
         tester.isGoingTo("Check expires at date is 6 month from today");
         const dateSixMonths = dayjs().add(6, "month").format("DD/MM/YYYY");
-        createPastoralRecord.expectExpiresAtToBe(dateSixMonths);
+        await createPastoralRecord.expectExpiresAtToBe(dateSixMonths);
 
         tester.isGoingTo("Set type to Attendance");
         await createPastoralRecord.selectType("2");
 
-        tester.isGoingTo("Check expires at date is 6 month from today");
+        tester.isGoingTo("Check expires at date is 2 weeks from today");
         const date2Weeks = dayjs().add(2, "weeks").format("DD/MM/YYYY");
-        createPastoralRecord.expectExpiresAtToBe(date2Weeks);
+        await createPastoralRecord.expectExpiresAtToBe(date2Weeks);
+    });
+
+    test("Check manual date entry takes precedence over type/subtype selection", async ({ tester, page }) => {
+        const createPastoralRecord = new CreatePastoralRecord(page);
+
+        tester.isGoingTo("Add a new pastoral record to Jana Reed");
+        await createPastoralRecord.goto(25);
+
+        tester.isGoingTo("Set the expires at date to 01/01/2050");
+        const date = "01/01/2050";
+        await createPastoralRecord.setExpiresAt(date);
+
+        tester.isGoingTo("Set type to Academic > Award Achievement");
+        await createPastoralRecord.selectType("1");
+
+        tester.isGoingTo("Check expires at date is still 01/01/2050");
+        await createPastoralRecord.expectExpiresAtToBe(date);
     });
 });

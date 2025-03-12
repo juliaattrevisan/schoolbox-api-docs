@@ -83,6 +83,20 @@ export default class CreatePastoralRecord {
     }
 
     /**
+     * Set the expires at input to a certain value
+     * @param value - The value of the expires at input
+     */
+    async setExpiresAt(value: string): Promise<void> {
+        const input = this.page.getByTestId(CreatePastoralRecord.DATATEST_EXPIRES_AT_INPUT);
+        await input.fill(value);
+        // trigger the change event as that's how our code detects if there's been a manual change to the input
+        // see library/Schoolbox/Pastoral/templates/modify_scripts_add_record.twig - $("#expiresAt").on("change", function () {
+        await input.evaluate((element) => {
+            element.dispatchEvent(new Event("change", { bubbles: true }));
+        });
+    }
+
+    /**
      * Expects the expires at input to be a certain value
      * @param value - The value of the expires at input
      */
