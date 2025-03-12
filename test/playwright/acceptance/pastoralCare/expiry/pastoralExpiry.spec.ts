@@ -19,9 +19,15 @@ test.describe("Curriculum Coverage Report Tests", () => {
         await pastoralExpiry.gotoManageAwardAchievement();
 
         tester.isGoingTo("Select Achievement flag");
-        await pastoralExpiry.selectFlagByLabel("Achievement");
+        await pastoralExpiry.selectFlag("Achievement");
 
         tester.isGoingTo("Set the flag color to green");
-        await pastoralExpiry.setFlagColor("green");
+        await pastoralExpiry.fillFlagColor("#00ff1e");
+
+        tester.isGoingTo("Set the default expiry to 1 Month");
+        await pastoralExpiry.selectDefaultExpiry("1 Month");
+
+        tester.isGoingTo("Save the changes");
+        await pastoralExpiry.clickSave();
     });
 });

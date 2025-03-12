@@ -72,7 +72,7 @@
                             </p>
                             <div class="row">
                                 <div class="small-12 columns">
-                                    <select id="defaultExpiry" name="defaultExpiry">
+                                    <select id="defaultExpiry" name="defaultExpiry" data-test="audiences-modify-pastoral-default-expiry-select">
                                         {% for key, expiry in defaultExpiry %}
                                             <option value="{{ expiry }}"
                                                     label="{{ key | title }}"
@@ -354,7 +354,7 @@
                         visibilityLocked: false,
                     } only %}
 
-                <input type="submit" value="Save">
+                <input type="submit" value="Save" data-test="audiences-modify-pastoral-save-button"/>
             </form>
             <script>
             $(function () {
