@@ -1,4 +1,5 @@
 import type { Page } from "@playwright/test";
+import { expect } from "@playwright/test";
 
 export default class CreatePastoralRecord {
     private page: Page;
@@ -12,6 +13,8 @@ export default class CreatePastoralRecord {
     static readonly PASTORAL_SUB_TYPE = "select#subtypeId";
 
     static readonly SAVE_BUTTON = "input.submit";
+
+    static readonly DATATEST_EXPIRES_AT_INPUT = "modify-section-general-pastoral-expires-at-input";
 
     constructor(page: Page) {
         this.page = page;
@@ -62,6 +65,14 @@ export default class CreatePastoralRecord {
      */
     async clickPastoralRole(role: string): Promise<void> {
         await this.page.click(`li[data-role-name="${role}"]`);
+    }
+
+    /**
+     * Expects the expires at input to be a certain value
+     * @param value - The value of the expires at input
+     */
+    async expectExpiresAtToBe(value: string): Promise<void> {
+        await expect(this.page.getByTestId(CreatePastoralRecord.DATATEST_EXPIRES_AT_INPUT)).toHaveValue(value);
     }
 
     /**
