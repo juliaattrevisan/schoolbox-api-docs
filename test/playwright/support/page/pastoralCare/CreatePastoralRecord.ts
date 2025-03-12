@@ -1,9 +1,6 @@
-import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import type { Page } from "@playwright/test";
 
 export default class CreatePastoralRecord {
-    private tester: AcceptanceTester;
-
     private page: Page;
 
     static readonly URL = "/pastoral/student/{studentId}/record/insert";
@@ -16,8 +13,7 @@ export default class CreatePastoralRecord {
 
     static readonly SAVE_BUTTON = "input.submit";
 
-    constructor(tester: AcceptanceTester, page: Page) {
-        this.tester = tester;
+    constructor(page: Page) {
         this.page = page;
     }
 
@@ -49,7 +45,6 @@ export default class CreatePastoralRecord {
      * @param type - The type of the pastoral record
      */
     async selectTypeSubType(type: string): Promise<void> {
-        // await this.page.click(`option[value="${type}"]`);
         await this.page.locator("#typeId").selectOption({ value: type });
     }
 

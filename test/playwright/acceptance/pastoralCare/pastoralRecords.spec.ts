@@ -56,7 +56,7 @@ test.describe("Pastoral Records", () => {
     test("Create Pastoral Record", async ({ tester, page }) => {
         const profilePage = new ProfilePage(tester, page);
         const pastoralProfile = new PastoralProfile(tester, page);
-        const createPastoralRecord = new CreatePastoralRecord(tester, page);
+        const createPastoralRecord = new CreatePastoralRecord(page);
         const studentId = "25";
         const pastoralTitle = "Automation Test Pastoral Record";
         const pastoralDescription = "This is an automation pastoral record";
@@ -119,7 +119,7 @@ test.describe("Pastoral Records", () => {
 
     test("Modify Pastoral Record", async ({ tester, page, db }) => {
         const pastoralProfile = new PastoralProfile(tester, page);
-        const createPastoralRecord = new CreatePastoralRecord(tester, page);
+        const createPastoralRecord = new CreatePastoralRecord(page);
         const studentId = "25";
         const pastoralTitle = "This is an automation pastoral record updated";
         tester.isGoingTo("navigate to the pastoral record and click the modify button");
@@ -173,7 +173,7 @@ test.describe("Pastoral Records", () => {
     test("View Pastoral Record", async ({ tester, page, db }) => {
         const profilePage = new ProfilePage(tester, page);
         const pastoralProfile = new PastoralProfile(tester, page);
-        const createPastoralRecord = new CreatePastoralRecord(tester, page);
+        const createPastoralRecord = new CreatePastoralRecord(page);
         const studentId = "25";
         const pastoralTitle = "Automation Test View Pastoral Record";
         const pastoralDescription = "This is an automation pastoral record";
