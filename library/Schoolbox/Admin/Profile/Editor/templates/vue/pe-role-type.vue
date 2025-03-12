@@ -8,6 +8,14 @@ import type { ProfileEditorRoleType } from "./types/profileEditorTypes";
 
 const peStore = useProfileEditorStore();
 
+window.Vue.onMounted(() => {
+    /* When users manually change the hash in the url rather than using the ui
+     */
+    window.addEventListener("hashchange", () => {
+        window.location.reload();
+    });
+});
+
 /**
  * When the role type changes, change the url hash
  * @param role The role type to set
