@@ -125,8 +125,7 @@ class NetworkScanner implements IScanner
                 if ($bytes === false) {
                     break;
                 }
-                $len = pack('N', strlen($bytes));
-                socket_write($socket, $len);
+                socket_write($socket, pack('N', strlen($bytes)));
                 socket_write($socket, $bytes);
             }
             socket_write($socket, pack('N', 0));
