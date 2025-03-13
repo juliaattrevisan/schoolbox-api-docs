@@ -4,11 +4,12 @@
  * 2. Execute npx playwright test pastoralExpiry.spec.ts
  */
 
+import dayjs from "dayjs";
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import ManageRecordSettings from "@schoolboxTest/playwright/support/page/pastoralCare/ManageRecordSettings";
 import CreatePastoralRecord from "@schoolboxTest/playwright/support/page/pastoralCare/CreatePastoralRecord";
 import PastoralProfile from "@schoolboxTest/playwright/support/page/pastoralCare/PastoralProfile";
-import dayjs from "dayjs";
+import ClassReport from "@schoolboxTest/playwright/support/page/pastoralCare/ClassReport";
 
 test.describe("Test the pastoral care modules expiry feature", () => {
     test.beforeEach(async ({ tester }) => {
@@ -139,7 +140,7 @@ test.describe("Test the pastoral care modules expiry feature", () => {
         tester.isGoingTo("Check that three records are visible");
         expect(await pastoralProfile.getRecords()).toHaveLength(3);
 
-        tester.isGoingTo("Modify the expired at date of the first record to 2010");
+        tester.isGoingTo("Modify the expired at date of the 'Out of uniform' record to 2010");
         await pastoralProfile.clickModifyIcon(25, 1);
         await createPastoralRecord.setExpiresAt("01/01/2010");
         await createPastoralRecord.clickSave();
@@ -153,11 +154,31 @@ test.describe("Test the pastoral care modules expiry feature", () => {
         expect(await pastoralProfile.getRecords()).toHaveLength(3);
     });
 
+    test("Confirm expired records are hidden by default on the class Pastoral Care Report", async ({
+        tester,
+        page,
+    }) => {
+        const classReport = new ClassReport(page);
+
+        tester.isGoingTo("Visit the 9A English (9ENGA) class pastoral care report");
+        await classReport.goto(83);
+
+        tester.isGoingTo("Check that the 'Out of uniform' record is not visible by default");
+        expect(await classReport.getStudentRecord(25)).not.toContainText("Out of uniform");
+
+        tester.isGoingTo("Add the Status > Archived filter and check that the 'Out of uniform' record is visible");
+        await classReport.clickStatusFilter();
+        await classReport.clickArchivedCheckbox();
+        await classReport.clickApplyFiltersButton();
+        await page.waitForLoadState("load"); // Waits for full page reload
+        expect(await classReport.getStudentRecord(25)).toContainText("Out of uniform");
+    });
+
     /**
      * Resetting data to not impact other tests
      */
     test.afterAll(async ({ baseTester, db }) => {
-        baseTester.isGoingTo("reset the expires_at date for the first record");
+        baseTester.isGoingTo("reset the expires_at date for the Jana Reeds Out of uniform record");
         await db.updateInDatabase("pastoral", { expires_at: null }, { id: 1 });
     });
 });
