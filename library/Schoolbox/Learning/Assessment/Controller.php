@@ -15,6 +15,7 @@ use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
 use DomainException;
 use InvalidArgumentException;
+use Schoolbox\Learning\Assessment\Translator\Participations;
 use LearnositySdk\Utils\Uuid;
 use LogicException;
 use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
@@ -856,5 +857,43 @@ abstract class Controller extends ListController implements IAssessmentControlle
     protected function getTermMapper(): \Schoolbox\Assessment\Term\Mapper
     {
         return $this->termMapper;
+    }
+
+    /**
+     * Student custom participation page
+     *
+     * @param IAssessable $assessment
+     * @return void
+     * @throws Error
+     * @throws RouteNotFound
+     */
+    public function getAssessmentParticipationForm(IAssessable $assessment): void
+    {
+        $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment);
+
+        $data = $this->getAssessmentAsTwigArray($assessment->getContext(), $assessment);
+
+        $breadcrumbs = $this->getBakery()
+                            ->produceFromAssessment(
+                                $assessment,
+                                $this->getUser()
+                            )->add([$assessment->getTitle()]);
+
+        $data['breadcrumbs'] = $breadcrumbs;
+        $data['returnUrlName'] = Redirect::RETURN_URL;
+        $data['returnUrl'] = $this->requestQuery->get(Redirect::RETURN_URL);
+
+        $data['pastoralEnabled'] =
+            $this->getConfigLoader()->get('pastoral_enabled') && $this->getUser()->isStaffWithPastoralAccess();
+
+        $data['studentsPastoralCountsUrl'] = $this->getRouteIfAuthorized('pastoral.getStudentsCount');
+
+        $data['allParticipants'] = $assessment->getAllParticipants()->map(new Participations())->reindex();
+
+
+        $this->response = $this->responseFromTemplate(
+            '@learningAssessment/participation/update.twig',
+            $data
+        );
     }
 }
