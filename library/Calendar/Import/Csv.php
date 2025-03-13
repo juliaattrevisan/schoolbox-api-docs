@@ -148,8 +148,11 @@ class Csv extends Base
                 /* Check if roles provided are valid
                  */
                 foreach ($roles as $roleName) {
+                    $roleName = trim($roleName);
+                    if (!strlen($roleName)) {
+                        continue;
+                    }
                     try {
-                        $roleName = trim($roleName);
                         $role             = $roleMapper->findOneByColumn('name', $roleName);
                         $roleCollection[] = $role->getId();
                     } catch (MapperException $e) {
