@@ -362,6 +362,12 @@ class ConfigMapper extends Mapper
     public const NAME_NOTIFICATION_BLACKOUT_END_TIME   = 'notification_blackout_end_time';
 
 
+    // Virus scanner settings
+    public const NAME_CLAMD_HOST          = 'clamd_host';
+    public const NAME_CLAMD_PORT          = 'clamd_port';
+    public const NAME_CLAMD_MAX_FILE_SIZE = 'clamd_max_file_size';
+
+
     /**
      * Config settings which may affect the behaviour of the router daemon.
      *

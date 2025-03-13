@@ -22,6 +22,11 @@ use Throwable;
 class NetworkScanner implements IScanner
 {
     /**
+     * The default value for `$this->maxFileSize` (20 MiB).
+     */
+    public const DEFAULT_MAX_FILE_SIZE = 1024 * 1024 * 20;
+
+    /**
      * Prefix for commands.
      *
      * This implementation prefixes commands with a `z`, so that a null byte is
@@ -53,13 +58,13 @@ class NetworkScanner implements IScanner
      *                                   `IScanner::VIRUS_QUARANTINE` in this file system.
      * @param string     $clamDaemonHost The hostname the ClamAV daemon is available on.
      * @param int        $clamDaemonPort The port the ClamAV daemon is listening on.
-     * @param int        $maxFileSize    Don't attempt to scan files larger than this.
+     * @param int        $maxFileSize    Don't attempt to scan files larger than this: defaults to 20MiB.
      */
     public function __construct(
         private Filesystem $tempFileSystem,
         private string $clamDaemonHost,
         private int $clamDaemonPort,
-        private int $maxFileSize,
+        private int $maxFileSize = self::DEFAULT_MAX_FILE_SIZE,
     ) {
     }
 
