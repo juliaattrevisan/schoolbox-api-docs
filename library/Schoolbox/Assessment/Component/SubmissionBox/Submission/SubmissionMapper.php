@@ -230,9 +230,10 @@ class SubmissionMapper extends BaseMapper
         );
 
         $remainingExistingFiles = $existingFiles->diffBy($updatedFiles, 'id');
+        $remainingSubmittedFiles = $submittedFiles->diffBy($updatedFiles, 'id');
 
-        $removedFiles = $remainingExistingFiles->diffBy($submittedFiles, 'hash');
-        $addedFiles = $submittedFiles->diffBy($remainingExistingFiles, 'hash');
+        $removedFiles = $remainingExistingFiles->diffBy($remainingSubmittedFiles, 'hash');
+        $addedFiles = $remainingSubmittedFiles->diffBy($remainingExistingFiles, 'hash');
 
         $joinMapper->softDelete($removedFiles);
 
