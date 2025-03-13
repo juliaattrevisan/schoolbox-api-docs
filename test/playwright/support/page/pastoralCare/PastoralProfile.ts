@@ -1,9 +1,6 @@
-import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import type { Page } from "@playwright/test";
 
 export default class PastoralProfile {
-    private tester: AcceptanceTester;
-
     private page: Page;
 
     static readonly URL = "/pastoral/student/{studentId}";
@@ -18,8 +15,7 @@ export default class PastoralProfile {
 
     static readonly PASTORAL_RECORD_UPDATE = "a[href='/pastoral/student/{studentId}/record/{recordId}/update']";
 
-    constructor(tester: AcceptanceTester, page: Page) {
-        this.tester = tester;
+    constructor(page: Page) {
         this.page = page;
     }
 

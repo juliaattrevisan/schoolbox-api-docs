@@ -127,4 +127,9 @@ test.describe("Test the pastoral care modules expiry feature", () => {
         tester.isGoingTo("Check expires at date is still 01/01/2050");
         await createPastoralRecord.expectExpiresAtToBe(date);
     });
+
+    test("Check that archived records are hidden by default on a students pastoral profile page", async ({
+        tester,
+        page,
+    }) => {});
 });
