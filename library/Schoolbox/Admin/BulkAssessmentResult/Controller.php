@@ -63,7 +63,7 @@ class Controller extends Base
             ->setMimeFilter('.csv,text/csv')
             ->setReadOnly(false)
             ->setMulti(false)
-            /* Expire 30 minutes from now, to minimise the existence in publicly-available storage
+            /* Expire 15 minutes from now, to minimise the existence in publicly-available storage
              */
             ->setExpiryDate(\Alaress_Date_Format::now()->addMinutes(self::CSV_DURATION));
 
