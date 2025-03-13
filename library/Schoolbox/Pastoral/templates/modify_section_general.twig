@@ -73,9 +73,14 @@
         <div class="small-12 medium-6 columns">
             {# This label is intentionally unusual, there exists custom JS that PST uses occasionally which targets
              this <input> field, moving up one will break the form. See SA-18992 for more. #}
-            <label> Points
-                <input id="points" type="text" inputmode="numeric" name="points" value="{{ record.points }}" {% if canModifyDefaults == false %}readonly {% endif %}/>
-            </label>
+            {% if config.pastoral_point_enabled %}
+                <label> Points
+                    <input id="points" type="text" inputmode="numeric" name="points" value="{{ record.points }}" {% if canModifyDefaults == false %}readonly {% endif %}/>
+                </label>
+            {% else %}
+            {# We want to preserve the points when they toggle the pastoral points off#}
+                <input id="points" type="hidden" inputmode="numeric" name="points" value="{{ record.points }}"/>
+            {% endif %}
         </div>
         <div class="small-12 medium-6 columns">
             <label> Tags
