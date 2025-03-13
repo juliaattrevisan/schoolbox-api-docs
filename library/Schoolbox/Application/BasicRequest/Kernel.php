@@ -554,6 +554,7 @@ class Kernel extends WebKernelAbstract
                     'tempFilesystem'         => $di->lazyGet('filesystem.temp'),
                     // CLI scripts have no current user, thus this is null
                     'currentUser'            => (PHP_SAPI === 'cli' ? null : $di->lazyGet('user')),
+                    'virusScanner'           => $di->lazyGet('virus.scanner'),
                 ],
             )
         );
