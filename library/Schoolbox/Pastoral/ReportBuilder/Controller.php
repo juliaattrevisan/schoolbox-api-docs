@@ -393,9 +393,13 @@ class Controller extends Base
         if ($this->getConfigLoader()->get('pastoral_severity')) {
             $headings['Severity'] = 'Severity';
         }
+        $headings['Tags'] = 'Tags';
+
+        if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_POINT_ENABLED)) {
+            $headings['Points'] = 'Points';
+        }
+
         $headings = array_merge($headings, [
-            'Tags'         => 'Tags',
-            'Points'       => 'Points',
             'Body'         => 'Body',
             'Created Date' => 'Created Date',
             'Created By'   => 'Created By',
