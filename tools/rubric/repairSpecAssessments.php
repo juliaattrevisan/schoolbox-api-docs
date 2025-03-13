@@ -371,14 +371,7 @@ $kernel->run(new class extends App {
      */
     public function run(ContainerInterface $di, LoopInterface $loop, Logger $log, array $opts, string $flags): void
     {
-        /**
-         * Deprecation notice
-         */
-        echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;
-        echo "\033[1;33m/***************     Deprecated NOTICE - this will be deleted in future    ****************/\033[0m" . PHP_EOL;
-        echo "\033[1;33m/*    If you are running this, please add a comment of this scripts name into SA-19334    */\033[0m" . PHP_EOL;
-        echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;
-        echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;
+        $this->deprecationNotice("SA-19334");
 
         // Install logger and DB
         $this->log     = $log;
@@ -475,14 +468,7 @@ $kernel->run(new class extends App {
             $this->log->warning('No assessments affected');
         }
 
-        /**
-         * Deprecation notice
-         */
-        echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;
-        echo "\033[1;33m/***************     Deprecated NOTICE - this will be deleted in future    ****************/\033[0m" . PHP_EOL;
-        echo "\033[1;33m/*    If you are running this, please add a comment of this scripts name into SA-19334    */\033[0m" . PHP_EOL;
-        echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;
-        echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;
+        $this->deprecationNotice("SA-19334");
     }
 
 
@@ -947,5 +933,46 @@ $kernel->run(new class extends App {
                 $this->log->warning(self::indent(2) . $event);
             }
         }
+    }
+
+    /**
+     * Returns the filename of of the script that invoked this App, suitable for generating help output.
+     *
+     * The following should all return "./myTool.php"
+     * * "./relative/path/to/myTool.php"
+     * * "relative/path/to/myTool.php"
+     * * "./../relative/path/to/myTool.php"
+     * * "/absolute/path/to/myTool.php"
+     *
+     * @return string
+     */
+    public function getToolFilename(): string
+    {
+        $scriptName = $_SERVER['SCRIPT_NAME'];
+        $lastIndex  = strrpos($scriptName, DIRECTORY_SEPARATOR);
+        if ($lastIndex !== false) {
+            $scriptName = substr($scriptName, $lastIndex + 1);
+        }
+        return "./$scriptName";
+    }
+
+    /**
+     * Deprecation notice
+     *
+     * if you are still using this script, please add a comment of this scripts name into string $jiraNumber
+     * @param string $jiraNumber Jira ticket number to prevent deprecation
+     * @deprecated
+     */
+    public function deprecationNotice(string $jiraNumber): void
+    {
+        /**
+         * Deprecation notice
+         */
+        $this->log->error('/******************************************************************************************/');
+        $this->log->error('/***************     Deprecated NOTICE - this will be deleted in future    ****************/');
+        $this->log->error("/*    If you are running this, please add a comment of this scripts name into $jiraNumber    */");
+        $this->log->error(sprintf("Script file: %s", $this->getToolFilename()));
+        $this->log->error('/******************************************************************************************/');
+        $this->log->error('/******************************************************************************************/');
     }
 });
