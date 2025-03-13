@@ -320,6 +320,7 @@ class Controller extends Base
             ->setBodyPublic($this->requestPost->get('body_public'))
             ->setPoints($this->requestPost->getFloat('points'))
             ->setImportedAt(null)
+            ->setExpiresAt(\Alaress_Date_Format::newLocalShort($this->requestPost->get('expiresAt'))->startOfDay())
         ;
 
         // Create tags
@@ -509,6 +510,7 @@ class Controller extends Base
                     ->setBodyPublic($tokenReplacer->replace($import->getBodyPublic(), $student))
                     ->setBodyPrivate('')
                     ->setExternalId(null)
+                    ->setExpiresAt($import->getExpiresAt())
                 ;
 
                 // Create access

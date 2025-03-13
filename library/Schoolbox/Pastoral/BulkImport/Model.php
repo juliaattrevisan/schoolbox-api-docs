@@ -156,6 +156,14 @@ class Model implements ISoftDeletable
     private GenericCollection $tags;
 
     /**
+     * The date which the record should expire
+     *
+     * @var Alaress_Date_Format|null
+     */
+    private ?Alaress_Date_Format $expiresAt = null;
+
+
+    /**
      * Constructor: creates empty access and tag collections.
      */
     public function __construct()
@@ -470,5 +478,16 @@ class Model implements ISoftDeletable
     {
         $this->tags = $tags;
         return $this;
+    }
+
+    public function setExpiresAt(?Alaress_Date_Format $expiresAt): self
+    {
+        $this->expiresAt = $expiresAt;
+        return $this;
+    }
+
+    public function getExpiresAt(): ?Alaress_Date_Format
+    {
+        return $this->expiresAt;
     }
 }
