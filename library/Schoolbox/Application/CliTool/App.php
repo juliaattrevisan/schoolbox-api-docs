@@ -608,6 +608,7 @@ abstract class App
         $this->getLogger()->notice('/******************************************************************************************/');
         $this->getLogger()->notice('/***************     Deprecated NOTICE - this will be deleted in future    ****************/');
         $this->getLogger()->notice("/*    If you are running this, please add a comment of this scripts name into $jiraNumber    */");
+        $this->getLogger()->notice(sprintf("Class name: %s", get_class($this)));
         $this->getLogger()->notice(sprintf("Script file: %s", $this->getToolFilename()));
         $this->getLogger()->notice('/******************************************************************************************/');
         $this->getLogger()->notice('/******************************************************************************************/');
