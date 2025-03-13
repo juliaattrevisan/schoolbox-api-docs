@@ -53,11 +53,13 @@ class NetworkScanner implements IScanner
      *                                   `IScanner::VIRUS_QUARANTINE` in this file system.
      * @param string     $clamDaemonHost The hostname the ClamAV daemon is available on.
      * @param int        $clamDaemonPort The port the ClamAV daemon is listening on.
+     * @param int        $maxFileSize    Don't attempt to scan files larger than this.
      */
     public function __construct(
         private Filesystem $tempFileSystem,
         private string $clamDaemonHost,
         private int $clamDaemonPort,
+        private int $maxFileSize,
     ) {
     }
 
@@ -72,6 +74,12 @@ class NetworkScanner implements IScanner
         } catch (Throwable $e) {
             throw new DaemonException('File could not be opened for reading', 0, $e);
         }
+
+        // Too large to scan? Don't attempt to scan it.
+        if ($file->getSize() > $this->maxFileSize) {
+            return;
+        }
+
         $response = $this->executeCommand('INSTREAM', 60, $file);
         if (str_ends_with($response, 'OK')) {
             return;
