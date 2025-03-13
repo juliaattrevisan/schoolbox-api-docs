@@ -27,7 +27,7 @@
                 </thead>
                 <tbody>
                 {% for event in allEvents %}
-                    <tr>
+                    <tr class="{% if event.error != 'OK' %}alert {% endif %}">
                         <td>{{ event.name }}</td>
                         <td>
                             {% if event.error == 'OK' %}
