@@ -283,6 +283,23 @@ class Processor
                 continue;
             }
 
+            /* No assessments found
+             */
+            if (0 === \count($candidateAssessments)) {
+                $this->log(sprintf(
+                    'Row %s: no assessments found for "%s" in folder "%s" using worktype "%s" (%s).',
+                    $i,
+                    $this->assessmentTitle,
+                    $folder['title'],
+                    $this->workType->getName(),
+                    $this->workType->getId()
+                ), self::WARNING);
+
+                $errors++;
+
+                continue;
+            }
+
             foreach ($candidateAssessments as $data) {
                 $boxId = $data['box_id'] ?? null;
                 $assessmentId = $data['assessment_id'] ?? null;
