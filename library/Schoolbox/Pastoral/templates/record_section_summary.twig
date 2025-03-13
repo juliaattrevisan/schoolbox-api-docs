@@ -52,7 +52,7 @@
 
 
 
-                {% if record.points is not empty %}
+                {% if config.pastoral_point_enabled and record.points is not empty %}
                     <dt class="small-4 medium-3 columns">Points:</dt>
                     <dd class="small-8 medium-9 columns">{{ record.points }}</dd>
                 {% endif %}
