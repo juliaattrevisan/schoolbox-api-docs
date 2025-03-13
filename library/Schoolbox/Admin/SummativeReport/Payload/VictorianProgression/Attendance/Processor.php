@@ -108,7 +108,6 @@ class Processor
      * @param string $assessmentTitle
      * @param \Schoolbox\Learning\Assessment\WorkType\Model $workType
      * @param \Alaress_Date_Format $publishAt
-     * @param string|null $folderCode
      * @param bool $perform
      */
     public function __construct(
@@ -119,7 +118,6 @@ class Processor
         private string $assessmentTitle,
         private \Schoolbox\Learning\Assessment\WorkType\Model $workType,
         private \Alaress_Date_Format $publishAt,
-        private ?string $folderCode,
         private bool $perform
     ) {
         /* We're going to reuse this a lot
@@ -175,22 +173,6 @@ class Processor
             /* Process feedbacks
              */
             $folderCode = trim((string)$row['Class Code']);
-
-            /* If we specified a folder code, decide if this matches
-             * If not, skip it
-             */
-            if (null !== $this->folderCode && $folderCode !== $this->folderCode) {
-                $this->log(sprintf(
-                    'Row %s: folder code %s does not match requested %s.',
-                    $i,
-                    $folderCode,
-                    $this->folderCode
-                ), self::WARNING);
-
-                $errors++;
-
-                continue;
-            }
 
             /* Assume this exists, I guess, for now
              */

@@ -115,7 +115,6 @@ class Controller extends Base
             $settings['assessmentTitle'],
             $settings['worktype'],
             $settings['publishAt'],
-            null,
             false,
         ))->parseFeedbacks($settings['sourceFile'], $settings['feedbackAuthor']);
 
@@ -161,7 +160,6 @@ class Controller extends Base
             $settings['assessmentTitle'],
             $settings['worktype'],
             $settings['publishAt'],
-            null,
             true,
         ))->parseFeedbacks($settings['sourceFile'], $settings['feedbackAuthor']);
 
