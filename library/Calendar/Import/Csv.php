@@ -79,7 +79,7 @@ class Csv extends Base
          */
         $hasCampusColumn = array_key_exists('campus', $headerColumns);
         $hasRolesColumn = array_key_exists('role', $headerColumns);
-        $hasOwnerColumn = array_key_exists('calendar owner', $headerColumns);
+        $hasOwnerColumn = array_key_exists('event owner', $headerColumns);
 
         /* Starting transaction
          */
@@ -103,7 +103,7 @@ class Csv extends Base
             $folderIds    = $this->getColumnValues($headerColumns, $thisRow, 'folderIds');
             $campuses     = $this->getColumnValues($headerColumns, $thisRow, 'campus', true);
             $roles        = $this->getColumnValues($headerColumns, $thisRow, 'role', true);
-            $owner        = $this->getColumnValues($headerColumns, $thisRow, 'calendar owner');
+            $owner        = $this->getColumnValues($headerColumns, $thisRow, 'event owner');
 
             $cloneCampuses = $allCampuses;
             if ($hasCampusColumn) {
