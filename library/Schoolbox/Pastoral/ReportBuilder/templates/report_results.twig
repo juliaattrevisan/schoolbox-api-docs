@@ -71,7 +71,7 @@
 
                                 {% if record.points != 0 or (record.tags | length) > 0 %}
                                     <p class="spaced">
-                                        {% if record.points != 0 %}
+                                        {% if config.pastoral_point_enabled and record.points != 0 %}
                                             {% if record.points < 0 %}
                                                 {% set labelClass='alert' %}
                                             {% else %}
