@@ -219,6 +219,21 @@ class SubmissionMapper extends BaseMapper
         $existingFiles = $joinMapper->findByColumn('student_submission_id', $object->getId());
         $removedFiles  = $existingFiles->diffBy($object->getFiles(), 'hash');
         $addedFiles    = $object->getFiles()->diffBy($existingFiles, 'hash');
+
+        // Because we are only diffing by hash above, if a file has been updated to have a different hash (but still
+        // has the same id as previously), that file will appear in both $removedFiles and $addedFiles.  If this occurs,
+        // it should be removed from $removedFiles, but remain in $addedFiles.
+        //     If the file was left in $removedFiles, it would be soft-deleted below, which would result in any linked
+        // kami_document row also being soft-deleted (due to Submission/SingleFile/Mapper->postKamiCallback()).
+        // That kami_document row would not be revived when $addedFiles are saved below.
+        $filesBothAddedAndRemoved = $removedFiles->intersect(
+            $addedFiles,
+            function ($a, $b) {
+                return $a->getId() === $b->getId();
+            }
+        );
+        $removedFiles = $removedFiles->diffBy($filesBothAddedAndRemoved, 'id');
+
         $joinMapper->softDelete($removedFiles);
 
         /* Save only files that are new
