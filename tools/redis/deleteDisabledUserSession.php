@@ -31,7 +31,7 @@ $app = new class extends CliTool\App {
     /** Hands off execution over to the App */
     public function run(): void
     {
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
 
         if ($this->perform()) {
             $this->getLogger()->info('Deleting remember me and sessions.');
@@ -99,7 +99,7 @@ $app = new class extends CliTool\App {
             }
         }
 
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
     }
 };
 

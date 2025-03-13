@@ -56,7 +56,7 @@ $app = new class extends CliTool\App
     /** @inheritDoc */
     public function run(): void
     {
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
 
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
@@ -186,7 +186,7 @@ HELP;
             }
         } while ($errors > 0);
 
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
     }
 };
 

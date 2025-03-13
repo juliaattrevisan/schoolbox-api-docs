@@ -45,7 +45,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
      */
     public function run(): void
     {
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
 
         // Get the taskd context, and send
         /** @var Producer $producer */
@@ -65,7 +65,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
 
         $producer->send($message);
 
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
     }
 });
 $kernel->runApp();

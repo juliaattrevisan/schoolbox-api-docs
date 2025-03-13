@@ -14,7 +14,7 @@ require_once __DIR__ . '/../conf/core/require.php';
 $app = new class extends CliTool\App {
     public function run(): void
     {
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
 
         /** @var Storage\Mapper $storageMapper */
         $storageMapper = $this->getDi()->get('mapperFactory')->get(Storage\Mapper::class);
@@ -43,7 +43,7 @@ $app = new class extends CliTool\App {
         }
         $this->getLogger()->notice("Completed scanning $countAll: $errorCount files missing, $okCount files found");
 
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
     }
 };
 

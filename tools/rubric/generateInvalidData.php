@@ -72,7 +72,7 @@ $app = new class extends CliTool\App {
     /** @inheritDoc */
     public function run(): void
     {
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
 
         $configMapper = ConfigMapper::getInstance();
         $configMapper->getDatabase()->query("UPDATE config SET value = 0 WHERE name = 'external_markbook'");
@@ -152,7 +152,7 @@ $app = new class extends CliTool\App {
         $capUD = $this->createCapability($unitSpecD->getFolder(), "{$suffix} D Capability\r\n");
         $this->createIndicator($capUD, "{$suffix} D Unit Indicator");
 
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
     }
 
     /**

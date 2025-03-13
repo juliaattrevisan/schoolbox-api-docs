@@ -39,7 +39,7 @@ $app    = new class extends CliTool\App {
 
     public function run(): void
     {
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
 
         if ($this->getOpt(self::OPT_SHORT_HELP) || $this->getOpt(self::OPT_LONG_HELP)) {
             $this->printHelp();
@@ -65,7 +65,7 @@ $app    = new class extends CliTool\App {
         }
         $this->generatePresignedUrl($objectKey, $expiry);
 
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
     }
 
 

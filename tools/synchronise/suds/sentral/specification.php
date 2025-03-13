@@ -45,7 +45,7 @@ $app = new class extends CliTool\App
      */
     public function run(): void
     {
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
 
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
@@ -70,7 +70,7 @@ HELP;
 
         $renderer->render($specification->check());
 
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
     }
 };
 

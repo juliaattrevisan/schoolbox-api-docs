@@ -20,7 +20,7 @@ $app = new class extends CliTool\App {
     /** @inheritDoc */
     public function run(): void
     {
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
 
         $userMapper = new UserMapper();
 
@@ -44,7 +44,7 @@ $app = new class extends CliTool\App {
             }
         }
 
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
     }
 };
 

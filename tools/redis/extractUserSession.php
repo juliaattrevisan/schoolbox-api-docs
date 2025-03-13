@@ -51,7 +51,7 @@ $app = new class extends CliTool\App {
      */
     public function run(): void
     {
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
 
         /** @var \Predis\ClientInterface $redis */
         $redis = $this->getDi()->get('redis.storage');
@@ -146,7 +146,7 @@ $app = new class extends CliTool\App {
         }
         session_abort();
 
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
     }
 };
 

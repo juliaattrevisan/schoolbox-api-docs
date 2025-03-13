@@ -45,7 +45,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
      */
     public function run(): void
     {
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
 
         $this->instanceId = $this->getOpt(self::OPT_LONG_INSTANCE_ID);
         if (empty($this->instanceId)) {
@@ -65,7 +65,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
             $this->getLogger()->debug(implode(',', array_keys($userIds)) . "\n");
         }
 
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
     }
 }, [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG, CliTool\Kernel::OPTION_ERRORS => E_ALL]);
 

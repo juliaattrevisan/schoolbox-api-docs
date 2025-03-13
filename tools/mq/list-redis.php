@@ -46,7 +46,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
      */
     public function run(): void
     {
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
 
         $this->instanceId = $this->getOpt(self::OPT_LONG_INSTANCE_ID);
         if (empty($this->instanceId)) {
@@ -110,7 +110,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
             $idx++;
         }
 
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
     }
 
 

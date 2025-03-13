@@ -54,7 +54,7 @@ HELP;
     /** @inheritDoc */
     public function run(): void
     {
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
 
         if ($this->getOpt('help')) {
             $this->displayHelp();
@@ -76,7 +76,7 @@ HELP;
 
         $this->getLogger()->info(sprintf('Updated %d videos to pending', $statement->rowCount()));
 
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
     }
 
     public function runAsRoot(): ?bool

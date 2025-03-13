@@ -21,7 +21,7 @@ $app = new class extends CliTool\App {
      */
     public function run(): void
     {
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
 
         if ($this->perform()) {
             $this->getLogger()->notice('Running in perform mode (-p): changes will be written to database');
@@ -102,7 +102,7 @@ $app = new class extends CliTool\App {
             }
         }
 
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
     }
 
     /**

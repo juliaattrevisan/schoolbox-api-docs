@@ -66,7 +66,7 @@ $kernel = new CliTool\Kernel(
         /** @inheritdoc */
         public function run(): void
         {
-            $this->deprecationNotice();
+            $this->deprecationNotice("SA-19334");
 
             $log = $this->getLogger();
 
@@ -103,7 +103,7 @@ HELP;
                 exit(1);
             }
 
-            $this->deprecationNotice();
+            $this->deprecationNotice("SA-19334");
         }
 
         /**

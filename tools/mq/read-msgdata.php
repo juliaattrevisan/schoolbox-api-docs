@@ -12,7 +12,7 @@ $app = new class extends CliTool\App
     /** @inheritDoc */
     public function run(): void
     {
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
 
         global $argv, $argc;
 
@@ -41,7 +41,7 @@ $app = new class extends CliTool\App
             $this->getLogger()->info("\n" . print_r($output, true));
         }
 
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
     }
 };
 

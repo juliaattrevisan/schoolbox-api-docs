@@ -42,7 +42,7 @@ $app = new class extends CliTool\App{
     /** @inheritDoc */
     public function run(): void
     {
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
 
         if ($this->getOpt('h') || $this->getOpt('help')) {
             $this->printHelp();
@@ -81,7 +81,7 @@ $app = new class extends CliTool\App{
 
         $this->checkRedis($args, $regexMode);
 
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
     }
 
 
