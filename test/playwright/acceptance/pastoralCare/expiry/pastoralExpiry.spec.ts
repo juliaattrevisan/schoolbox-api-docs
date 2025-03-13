@@ -129,16 +129,35 @@ test.describe("Test the pastoral care modules expiry feature", () => {
         await createPastoralRecord.expectExpiresAtToBe(date);
     });
 
-    test("Check that archived records are hidden by default on a students pastoral profile page", async ({
-        tester,
-        page,
-    }) => {
+    test("Check the show archived records toggle on a users pastoral profile page", async ({ tester, page }) => {
         const pastoralProfile = new PastoralProfile(page);
+        const createPastoralRecord = new CreatePastoralRecord(page);
 
         tester.isGoingTo("Visit the pastoral profile page for Jana Reed");
         await pastoralProfile.goto(25);
 
-        // tester.isGoingTo("Check that three records are visible");
-        // await expect(page).not.toHaveSelector("a[aria-label='Archived Record']");
+        tester.isGoingTo("Check that three records are visible");
+        expect(await pastoralProfile.getRecords()).toHaveLength(3);
+
+        tester.isGoingTo("Modify the expired at date of the first record to 2010");
+        await pastoralProfile.clickModifyIcon(25, 1);
+        await createPastoralRecord.setExpiresAt("01/01/2010");
+        await createPastoralRecord.clickSave();
+
+        tester.isGoingTo("Check that two records are now visible");
+        await pastoralProfile.goto(25);
+        expect(await pastoralProfile.getRecords()).toHaveLength(2);
+
+        tester.isGoingTo("Toggle the show archived records and check that all three records are visible again");
+        await pastoralProfile.clickShowArchivedRecordsToggle();
+        expect(await pastoralProfile.getRecords()).toHaveLength(3);
+    });
+
+    /**
+     * Resetting data to not impact other tests
+     */
+    test.afterAll(async ({ tester, db }) => {
+        tester.isGoingTo("reset the expires_at date for the first record");
+        await db.updateInDatabase("pastoral", { expires_at: null }, { id: 1 });
     });
 });
