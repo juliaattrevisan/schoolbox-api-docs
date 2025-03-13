@@ -151,7 +151,6 @@ class Processor
          */
         $reader = new Reader($this->filesystemProxy->readStream($file), true);
         $reader->setExpectedColumns([
-            'Assessment Title',
             'Class Code',
             'Student External ID',
             'Normalised Mark',
