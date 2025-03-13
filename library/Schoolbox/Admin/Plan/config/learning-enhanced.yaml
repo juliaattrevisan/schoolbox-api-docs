@@ -35,6 +35,7 @@ config:
   pastoral_create_tag_enable: {hide: false}
   pastoral_action_enable: {hide: false}
   pastoral_bulk_import_enabled: {hide: false}
+  pastoral_point_enabled: {hide: false}
 
   #Learning Moments
   evidence_parent_create: {hide: false}
