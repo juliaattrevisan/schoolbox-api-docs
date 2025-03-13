@@ -50,6 +50,15 @@
                         </ul>
                     </div>
                 </section>
+
+                <h2 class="subheader">Shortcuts</h2>
+                <section class="content">
+                    <ul class="information-list">
+                        {% for folderTitle, assessmentData in outcome.links %}
+                            <li><a href="{{ routeLookup('learningAssessment.getStatus', {assessmentId: assessmentData.id}) }}">Status for {{ assessmentData.title }} in folder {{ folderTitle }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </section>
             {% endif %}
         </div>
     </div>

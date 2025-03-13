@@ -145,6 +145,10 @@ class Processor
          */
         $errors = 0;
 
+        /* A shortcut to status screens
+         */
+        $links = [];
+
         /* Load a particular file
          */
         $reader = new Reader($this->filesystemProxy->readStream($file), true);
@@ -348,6 +352,15 @@ class Processor
                     ]);
                 }
 
+                /* Some convenient shortcuts
+                 * Note that $folder['title'] also contains the class code, so we can reasonably presume
+                 * that this is unique.
+                 */
+                $links[$folder['title']] = [
+                    'id' => $assessmentId,
+                    'title' => $assessment->getTitle(),
+                ];
+
                 $this->log(sprintf(
                     'Row %s: added grade %s (instructor grade %s, normalised mark %s) for %s (%s) in assessment "%s" (%s) found in folder "%s" (%s)',
                     $i,
@@ -366,7 +379,8 @@ class Processor
 
         return [
             'messages' => $this->messages,
-            'errors' => $errors
+            'errors' => $errors,
+            'links' => $links
         ];
     }
 
