@@ -11,25 +11,13 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\CalendarImport;
 
-use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
 use Alaress\Twig\Loader\IChainLoader;
-use Component_ConfigDefinitionMapper;
-use Component_ConfigMapper;
-use Component_InstanceMapper;
-use Schoolbox\Assessment\Course\Import\ImportFactory;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
-use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\Storage\FilesystemProxy;
-use Schoolbox\UserMapper;
 
 class Module extends BaseModule
 {
