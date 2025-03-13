@@ -4,7 +4,7 @@ VALUES (
            'pastoral_point_enabled',
            1,
            'Enable Pastoral Points',
-           'If toggled to ON, pastoral moderator may add default points to types/subtypes, and points will be assigned to records created of the said types/subtypes',
+           'If toggled to ON, points can be assigned to pastoral records',
            (SELECT id FROM lu_config_field WHERE `field` = 'boolean'),
            '',
            (SELECT id FROM lu_config_type WHERE `type` = 'Pastoral Care'),
