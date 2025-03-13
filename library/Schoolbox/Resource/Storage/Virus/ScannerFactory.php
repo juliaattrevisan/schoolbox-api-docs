@@ -17,7 +17,7 @@ use Schoolbox\IConfigLoader;
 /**
  * Factory for `IScanner` implementations.
  */
-class Factory
+class ScannerFactory
 {
     /**
      * Constructor

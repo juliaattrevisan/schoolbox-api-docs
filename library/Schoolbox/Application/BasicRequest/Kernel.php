@@ -576,6 +576,22 @@ class Kernel extends WebKernelAbstract
             ),
         );
 
+        // Virus scanner
+        $di->set(
+            'virus.scannerFactory',
+            $di->lazyNew(
+                \Schoolbox\Resource\Storage\Virus\ScannerFactory::class,
+                [
+                    'config'         => $config,
+                    'tempFilesystem' => $di->lazyGet('filesystem.temp'),
+                ]
+            )
+        );
+        $di->set(
+            'virus.scanner',
+            $di->lazyGetCall('virus.scannerFactory', 'build'),
+        );
+
         // Search dependencies
         $di->set(
             'search.indexBuilder',
