@@ -6,13 +6,11 @@ export default class ProfileEditor {
 
     private page: Page;
 
-    static readonly URL = "/adminv2/profile-editor#{type}";
+    static readonly URL = "/adminv2/profile-editor";
 
     static readonly SELECTOR_NAME_DISPLAY_FIELD = "#pe-name-format";
 
     static readonly SELECTOR_UPDATE_BUTTON = ".button.submit";
-
-    static readonly SELECTOR_PROFILE_TABS = "#profile-editor-container";
 
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
@@ -21,11 +19,20 @@ export default class ProfileEditor {
 
     /**
      * Navigates to the profile editor page
-     * @param type - The user type: student, staff, parent
      */
-    async goto(type: string): Promise<void> {
-        await this.page.goto(ProfileEditor.URL.replace("{type}", type));
+    async goto(): Promise<void> {
+        await this.page.goto(ProfileEditor.URL);
         await this.page.waitForLoadState("load");
+    }
+
+    /**
+     * Clicks on the specified role type inside the profile editor container.
+     * @param roleType - The role type to click (e.g., "Parent", "Staff", "Student")
+     */
+    async clickRoleType(roleType: string): Promise<void> {
+        const tabName = this.page.locator("#profile-editor-container").getByText(roleType);
+        await tabName.scrollIntoViewIfNeeded();
+        await tabName.click();
     }
 
     /**
@@ -101,5 +108,14 @@ export default class ProfileEditor {
      */
     async clickFieldsTab(tabName: "External Fields" | "Internal Fields"): Promise<void> {
         await this.page.getByText(tabName).click();
+    }
+    /**
+     * Click the cog of a field
+     * @param fieldName - The field name
+     * @param roleType - The user type: student, staff, parent
+     */
+
+    async scrolltoFind(roleType: string, fieldName: string): Promise<void> {
+        await this.page.getByTestId(`pe-${roleType}-fields-active-item-${fieldName}-settings`).scrollIntoViewIfNeeded();
     }
 }

@@ -111,4 +111,13 @@ export default class ProfilePage {
         const fieldLocator = this.page.locator(`dl.profile dt`, { hasText: fieldName });
         await expect(fieldLocator).toBeVisible();
     }
+
+    /**
+     * Verify if a specified field is NOT visible within the profile section.
+     * @param fieldName - The name of the field to check (e.g., "Role", "Campus", "Class Profile")
+     */
+    async checkFieldIsNotVisible(fieldName: string): Promise<void> {
+        const fieldLocator = this.page.locator(`dl.profile dt`, { hasText: fieldName });
+        await expect(fieldLocator).not.toBeVisible();
+    }
 }
