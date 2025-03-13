@@ -18,7 +18,6 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Exception as ResourceException;
 use Schoolbox\Role;
 use Schoolbox\User;
@@ -74,42 +73,27 @@ class Controller extends Base
         // Use the paginator to limit searches
         $this->paginator->setUrl($this->request->getUri()->__toString());
         $list = $this->mapper->createCollection();
-        if (strlen($search) > 0) {
-            $total = $this->mapper->searchCount($search);
-            $this->paginator->setTotal($total);
-            if ($total > 0) {
-                $list = $this->mapper->search(
-                    $search,
-                    null,
-                    $this->paginator->getOffset($page),
-                    $this->paginator->getPageSize(),
-                    'name',
-                    'asc'
-                );
+        if ($catId) {
+            try {
+                $category = $this->mapper->getJoinMapper('category')->findById($catId);
+            } catch (SchoolboxNotFoundException $e) {
+                $this->response = $this->responseEmpty(404);
+                return;
             }
-        } else {
-            if ($catId) {
-                try {
-                    $category = $this->mapper->getJoinMapper('category')->findById($catId);
-                } catch (SchoolboxNotFoundException $e) {
-                    $this->response = $this->responseEmpty(404);
-                    return;
-                }
-            }
+        }
 
-            // Get count before running list
-            $total = $this->mapper->searchCount($search, $catId);
-            $this->paginator->setTotal($total);
-            if ($total > 0) {
-                $list = $this->mapper->search(
-                    $search,
-                    $catId,
-                    $this->paginator->getOffset($page),
-                    $this->paginator->getPageSize(),
-                    'name',
-                    'asc'
-                );
-            }
+        // Get count before running list
+        $total = $this->mapper->searchCount($search, $catId);
+        $this->paginator->setTotal($total);
+        if ($total > 0) {
+            $list = $this->mapper->search(
+                $search,
+                $catId,
+                $this->paginator->getOffset($page),
+                $this->paginator->getPageSize(),
+                'name',
+                'asc'
+            );
         }
 
         $this->response = $this->responseFromTemplate(
