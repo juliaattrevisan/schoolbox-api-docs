@@ -226,6 +226,8 @@ class SubmissionMapper extends BaseMapper
         //     If the file was left in $removedFiles, it would be soft-deleted below, which would result in any linked
         // kami_document row also being soft-deleted (due to Submission/SingleFile/Mapper->postKamiCallback()).
         // That kami_document row would not be revived when $addedFiles are saved below.
+        //     Another way to look at this, is to see that this step allows this function to deal with updated files as
+        // well as added and removed files.
         $filesBothAddedAndRemoved = $removedFiles->intersect(
             $addedFiles,
             function ($a, $b) {
