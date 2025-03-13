@@ -201,52 +201,50 @@ class SubmissionMapper extends BaseMapper
      * Post-save callback.
      *
      * Persists all files that have been attached to this submission.
+     * This handles added, removed, and updated files.
      *
      * @param Submission $object
-     * @param Submission $previous
+     * @param Submission $previous (present because this function is used as a post-save callback).
      * @throws BaseMapper\DefinitionException
-     * @throws \PDOException
+     * @throws \PDOException|MapperException
      */
     public function persistFiles(Submission $object, Submission $previous = null)
     {
-        if ($object->getFiles() === null) {
+        $submittedFiles = $object->getFiles();
+
+        if ($submittedFiles === null) {
             // Join not hydrated, nothing to do.
             return;
         }
+
         $joinMapper = $this->getJoinMapper('files');
-
-        // Delete files that were attached but aren't now
         $existingFiles = $joinMapper->findByColumn('student_submission_id', $object->getId());
-        $removedFiles  = $existingFiles->diffBy($object->getFiles(), 'hash');
-        $addedFiles    = $object->getFiles()->diffBy($existingFiles, 'hash');
 
-        // Because we are only diffing by hash above, if a file has been updated to have a different hash (but still
-        // has the same id as previously), that file will appear in both $removedFiles and $addedFiles.  If this occurs,
-        // it should be removed from $removedFiles, but remain in $addedFiles.
-        //     If the file was left in $removedFiles, it would be soft-deleted below, which would result in any linked
-        // kami_document row also being soft-deleted (due to Submission/SingleFile/Mapper->postKamiCallback()).
-        // That kami_document row would not be revived when $addedFiles are saved below.
-        //     Another way to look at this, is to see that this step allows this function to deal with updated files as
-        // well as added and removed files.
-        $filesBothAddedAndRemoved = $removedFiles->intersect(
-            $addedFiles,
+        // Note updated files must be handled separately.  Otherwise, the same file could
+        // appear in both $addedFiles and $removedFiles below, and problems would result.
+        $updatedFiles = $existingFiles->intersect(
+            $submittedFiles,
             function ($a, $b) {
                 return $a->getId() === $b->getId();
             }
         );
-        $removedFiles = $removedFiles->diffBy($filesBothAddedAndRemoved, 'id');
+
+        $remainingExistingFiles = $existingFiles->diffBy($updatedFiles, 'id');
+
+        $removedFiles = $remainingExistingFiles->diffBy($submittedFiles, 'hash');
+        $addedFiles = $submittedFiles->diffBy($remainingExistingFiles, 'hash');
 
         $joinMapper->softDelete($removedFiles);
 
-        /* Save only files that are new
-         */
-        foreach ($addedFiles as $file) {
+        // Save added and updated files.
+        $addedAndUpdatedFiles = $addedFiles->union($updatedFiles);
+        foreach ($addedAndUpdatedFiles as $file) {
             $file->setSubmission($object);
         }
-        $joinMapper->save($addedFiles);
+        $joinMapper->save($addedAndUpdatedFiles);
 
         // Set IDs on files that are not new
-        foreach ($object->getFiles() as $file) {
+        foreach ($submittedFiles as $file) {
             if (!$file->getId()) {
                 foreach ($existingFiles as $existingFile) {
                     if ($file->getStorage()->getHash() == $existingFile->getStorage()->getHash()) {
