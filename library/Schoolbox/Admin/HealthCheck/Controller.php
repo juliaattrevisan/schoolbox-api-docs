@@ -200,6 +200,7 @@ class Controller extends Base
                     $this->taskDHelper->addSource('', 'olcstatsQuizAttempts');
                     $this->taskDHelper->addSource('', 'olcstatsTaskCompletions');
                     $this->taskDHelper->addSource('', 'olcstatsDueWorkSubmissions');
+                    break;
                 default:
                     throw new SchoolboxException("Report '{$report}' Does not exist.");
             }
