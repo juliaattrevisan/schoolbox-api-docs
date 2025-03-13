@@ -238,6 +238,10 @@ class Controller extends Base
                     ->setMulti(false)
                     ->useImportExpiryDate()
                     ->getTwigContext(),
+//                'canModifyDefaults'     => $this->user->hasServicePermission(
+//                    UserAccess::SERVICE_PASTORAL,
+//                    UserAccess::ACCESS_WRITE),
+                'canModifyDefaults' => true,
                 'moderator'        => $this->getUser()->hasServicePermission(
                     UserAccess::SERVICE_PASTORAL,
                     UserAccess::ACCESS_READ,
