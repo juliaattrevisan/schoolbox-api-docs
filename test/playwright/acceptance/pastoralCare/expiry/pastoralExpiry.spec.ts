@@ -156,8 +156,8 @@ test.describe("Test the pastoral care modules expiry feature", () => {
     /**
      * Resetting data to not impact other tests
      */
-    test.afterAll(async ({ tester, db }) => {
-        tester.isGoingTo("reset the expires_at date for the first record");
+    test.afterAll(async ({ baseTester, db }) => {
+        baseTester.isGoingTo("reset the expires_at date for the first record");
         await db.updateInDatabase("pastoral", { expires_at: null }, { id: 1 });
     });
 });
