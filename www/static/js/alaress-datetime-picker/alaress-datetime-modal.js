@@ -160,7 +160,6 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
         onReady: function (selectedDates, dateStr, instance) {
             renderAllDaySwitch();
-            renderHeatMapHelp();
 
             if (pickerOptions.allDaySwitch === true) {
                 if ($("#hideTime" + twigVars.id).is(":checked")) {
@@ -1110,18 +1109,6 @@ $.fn.alaressDateTimeModal = function (twigVars) {
             // apply callback synchronously if the cache is hot
             onSuccess();
         }
-    }
-
-    /**
-     * Append a tool tip regarding heatmap
-     */
-    function renderHeatMapHelp() {
-        // TODO allow this to be injected by construction
-        var tt =
-            'The "heat" of a day represents the largest number of assessments any of your students has due that day, capped at 5.';
-
-        var $monthDiv = $modal.find(".flatpickr-current-month");
-        $monthDiv.append($('<a class="icon-help" />').attr("title", tt));
     }
 
     /**
