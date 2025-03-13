@@ -23,7 +23,7 @@ export default class PastoralProfile {
      * Navigates to the profile page
      * @param id - The user id
      */
-    async goto(id: string): Promise<void> {
+    async goto(id: number): Promise<void> {
         await this.page.goto(PastoralProfile.URL.replace("{studentId}", id.toString()));
     }
 
@@ -61,7 +61,7 @@ export default class PastoralProfile {
      * @param studentId - The student id
      * @param recordId - The record id
      */
-    async clickPastoralRecord(studentId: string, recordId: number): Promise<void> {
+    async clickPastoralRecord(studentId: number, recordId: number): Promise<void> {
         await this.page.click(
             PastoralProfile.PASTORAL_RECORD.replace("{studentId}", studentId.toString()).replace(
                 "{recordId}",

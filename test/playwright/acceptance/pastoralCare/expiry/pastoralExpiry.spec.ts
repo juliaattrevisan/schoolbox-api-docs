@@ -7,6 +7,7 @@
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import ManageRecordSettings from "@schoolboxTest/playwright/support/page/pastoralCare/ManageRecordSettings";
 import CreatePastoralRecord from "@schoolboxTest/playwright/support/page/pastoralCare/CreatePastoralRecord";
+import PastoralProfile from "@schoolboxTest/playwright/support/page/pastoralCare/PastoralProfile";
 import dayjs from "dayjs";
 
 test.describe("Test the pastoral care modules expiry feature", () => {
@@ -131,5 +132,13 @@ test.describe("Test the pastoral care modules expiry feature", () => {
     test("Check that archived records are hidden by default on a students pastoral profile page", async ({
         tester,
         page,
-    }) => {});
+    }) => {
+        const pastoralProfile = new PastoralProfile(page);
+
+        tester.isGoingTo("Visit the pastoral profile page for Jana Reed");
+        await pastoralProfile.goto(25);
+
+        // tester.isGoingTo("Check that three records are visible");
+        // await expect(page).not.toHaveSelector("a[aria-label='Archived Record']");
+    });
 });

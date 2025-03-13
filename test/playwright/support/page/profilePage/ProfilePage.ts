@@ -20,7 +20,7 @@ export default class ProfilePage {
      * Navigates to the profile page
      * @param id - The user id
      */
-    async goto(id: string): Promise<void> {
+    async goto(id: number): Promise<void> {
         await this.page.goto(ProfilePage.URL.replace("{id}", id.toString()));
     }
 

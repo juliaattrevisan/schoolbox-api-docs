@@ -57,7 +57,7 @@ test.describe("Pastoral Records", () => {
         const profilePage = new ProfilePage(tester, page);
         const pastoralProfile = new PastoralProfile(page);
         const createPastoralRecord = new CreatePastoralRecord(page);
-        const studentId = "25";
+        const studentId = 25;
         const pastoralTitle = "Automation Test Pastoral Record";
         const pastoralDescription = "This is an automation pastoral record";
         tester.isGoingTo("navigate to the student profile page");
@@ -90,7 +90,7 @@ test.describe("Pastoral Records", () => {
 
     test("Comment Pastoral Record", async ({ tester, page, db }) => {
         const pastoralProfile = new PastoralProfile(page);
-        const studentId = "25";
+        const studentId = 25;
         const pastoralComment = "This is an automation pastoral comment";
         tester.isGoingTo("navigate to the student pastoral profile page");
         await pastoralProfile.goto(studentId);
@@ -120,7 +120,7 @@ test.describe("Pastoral Records", () => {
     test("Modify Pastoral Record", async ({ tester, page, db }) => {
         const pastoralProfile = new PastoralProfile(page);
         const createPastoralRecord = new CreatePastoralRecord(page);
-        const studentId = "25";
+        const studentId = 25;
         const pastoralTitle = "This is an automation pastoral record updated";
         tester.isGoingTo("navigate to the pastoral record and click the modify button");
         await pastoralProfile.goto(studentId);
@@ -149,7 +149,7 @@ test.describe("Pastoral Records", () => {
      */
     test("Delete Pastoral Record", async ({ tester, page, db }) => {
         const pastoralProfile = new PastoralProfile(page);
-        const studentId = "25";
+        const studentId = 25;
         tester.isGoingTo("navigate to the pastoral profile page and delete a pastoral record");
         await pastoralProfile.goto(studentId);
         const pastoralTitle = "This is an automation pastoral record updated";
@@ -174,7 +174,7 @@ test.describe("Pastoral Records", () => {
         const profilePage = new ProfilePage(tester, page);
         const pastoralProfile = new PastoralProfile(page);
         const createPastoralRecord = new CreatePastoralRecord(page);
-        const studentId = "25";
+        const studentId = 25;
         const pastoralTitle = "Automation Test View Pastoral Record";
         const pastoralDescription = "This is an automation pastoral record";
         tester.isGoingTo("navigate to the student profile page");
