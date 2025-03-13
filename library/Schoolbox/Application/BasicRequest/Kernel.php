@@ -584,7 +584,7 @@ class Kernel extends WebKernelAbstract
                 \Schoolbox\Resource\Storage\Virus\ScannerFactory::class,
                 [
                     'config'         => $config,
-                    'tempFilesystem' => $di->lazyGet('filesystem.temp'),
+                    'tempFileSystem' => $di->lazyGet('filesystem.temp'),
                 ]
             )
         );
