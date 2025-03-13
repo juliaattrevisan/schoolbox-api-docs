@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @copyright Copyright 2022, Schoolbox Pty Ltd
+ * @copyright Copyright 2025, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 
@@ -34,9 +34,8 @@ use Bulk_Calendar;
 /**
  * Class Controller
  *
- * Bulk import courses to classes admin page
+ * Bulk import calendar in admin page
  *
- * @package Schoolbox\Admin\BulkCourseImport
  */
 class Controller extends Base
 {
