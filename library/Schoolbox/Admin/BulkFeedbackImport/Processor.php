@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\SummativeReport\Payload\VictorianProgression\Attendance;
+namespace Schoolbox\Admin\BulkFeedbackImport;
 
 use League\Flysystem\FilesystemException;
 use Schoolbox\Admin\Import\Profile\Reader;
