@@ -41,7 +41,7 @@ SET name        = 'clamd_port',
 
 INSERT INTO config
 SET name        = 'clamd_max_file_size',
-    value       = '20M',
+    value       = '20 MB',
     title       = 'ClamAV Daemon Max File Size',
     description = 'Maximum file size which the ClamAV virus scanning daemon will attempt to scan.',
     field_id    = (SELECT id FROM lu_config_field WHERE field = 'bytes'),
