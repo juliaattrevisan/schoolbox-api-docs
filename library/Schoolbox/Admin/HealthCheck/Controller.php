@@ -193,7 +193,7 @@ class Controller extends Base
                     $this->taskDHelper->addSource('', 'unitplannerComponents');
                     $this->taskDHelper->addSource('', 'unitplannerAssessments');
                     break;
-                case 'olcstats';
+                case 'olcstats':
                     /**
                      * list of reports for OLC Reporting Stats
                      */
