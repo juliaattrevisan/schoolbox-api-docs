@@ -1,7 +1,7 @@
 /**
  * Test the pastoral care modules expiry feature
  * 1. Provision sales.tar.gz data
- * 2. Execute npx playwright test manageRecordSettings.spec.ts
+ * 2. Execute npx playwright test pastoralExpiry.spec.ts
  */
 
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";

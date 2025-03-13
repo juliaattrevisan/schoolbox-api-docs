@@ -219,7 +219,6 @@ test.describe("Pastoral Records", () => {
     /**
      * Soft deleting data to not impact the tests
      */
-
     test.afterAll(async ({ baseTester, db }) => {
         baseTester.isGoingTo(
             "update delete_at for the data created in this test so it does impact next suite of tests",
@@ -227,17 +226,12 @@ test.describe("Pastoral Records", () => {
         await db.updateInDatabase(
             "pastoral",
             { deleted_at: "2022-01-15 11:22:34" },
-            { heading: "Automation Test Pastoral Record%" },
+            { heading: "Automation Test View Pastoral Record" },
         );
         await db.updateInDatabase(
             "pastoral",
             { deleted_at: "2022-01-15 11:22:34" },
-            { heading: "Automation Test View Pastoral Record%" },
-        );
-        await db.updateInDatabase(
-            "pastoral",
-            { deleted_at: "2022-01-15 11:22:34" },
-            { heading: "This is an automation pastoral record updated%" },
+            { heading: "This is an automation pastoral record updated" },
         );
         await db.updateInDatabase("config", { value: 0 }, { name: "pastoral_student_access" });
     });
