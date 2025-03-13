@@ -29,7 +29,7 @@ class Controller extends Base
      *      /adminv2/health-check-export/audit?report=uxui
      *      /adminv2/health-check-export/audit?report=uxui,lms,community
      *
-     * Current options for this are: assessment, uxui, user, lms, community, sva, implementation, unitplanner
+     * Current options for this are: assessment, uxui, user, lms, community, sva, implementation, unitplanner, olcstats
      */
 
     /**
