@@ -888,7 +888,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         $data['studentsPastoralCountsUrl'] = $this->getRouteIfAuthorized('pastoral.getStudentsCount');
 
-        $data['allParticipants'] = $assessment->getAllParticipants()->map(new Participations());
+        $data['allParticipants'] = $assessment->getAllParticipants()->map(new Participations())->reindex();
+
 
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/participation/update.twig',

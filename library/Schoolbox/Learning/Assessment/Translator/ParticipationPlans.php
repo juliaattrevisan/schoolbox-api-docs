@@ -18,7 +18,7 @@ class ParticipationPlans
 {
     /**
      * @param Plan $plan
-     * @return array
+     * @return ?array
      */
     public function __invoke(Plan $plan): array|null
     {
