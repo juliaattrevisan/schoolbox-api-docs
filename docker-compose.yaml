@@ -37,7 +37,6 @@ services:
       - ./docker/php-fpm/config/99-error-reporting.ini:/usr/local/etc/php/conf.d/99-error-reporting.ini
       - ./docker/php-fpm/config/99-xdebug.ini:/usr/local/etc/php/conf.d/99-xdebug.ini
       - ./docker/php-fpm/config/99-session.ini:/usr/local/etc/php/conf.d/99-session.ini
-      - clamav-temp:/var/lib/clamav-temp
     # After building: create data dirs, and make mount writable by www-data
     # Cannot currently use create-data-dirs.sh, as /bin/bash isn't available,
     # and /bin/sh doesn't support {} expansion
@@ -49,7 +48,6 @@ services:
       - command: mkdir -p /var/lib/schoolbox/docker/purifier
       - command: mkdir -p /var/lib/schoolbox/docker/twig
       - command: chown -R www-data:www-data /var/lib/schoolbox/docker/
-      - command: chown -R www-data:www-data /var/lib/clamav-temp/
 
   # Image intended for running command-line processes:
   # * command-line tools
@@ -68,7 +66,6 @@ services:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
       - schoolbox-config:/etc/schoolbox
-      - clamav-temp:/var/lib/clamav-temp
     # After building: create data dirs
     post_start:
       - command : mkdir -p /var/lib/schoolbox/docker/cache/portrait
@@ -199,7 +196,6 @@ services:
       context: ./docker/clamav
     volumes:
       - clamav-data:/var/lib/clamav
-      - clamav-temp:/var/lib/clamav-temp
 
 volumes:
   # Volume for Schoolbox's code base
@@ -268,6 +264,3 @@ volumes:
 
   # Volume for ClamAV signatures
   clamav-data:
-
-  # Shared temp folder for uploading files to be scanned by ClamAV
-  clamav-temp:
