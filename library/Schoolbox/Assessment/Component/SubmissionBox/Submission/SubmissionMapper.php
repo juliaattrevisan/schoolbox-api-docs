@@ -222,8 +222,9 @@ class SubmissionMapper extends BaseMapper
 
         // Note updated files must be handled separately.  Otherwise, the same file could
         // appear in both $addedFiles and $removedFiles below, and problems would result.
-        $updatedFiles = $existingFiles->intersect(
-            $submittedFiles,
+        // Updated files are all the submitted files whose ids match existing files.
+        $updatedFiles = $submittedFiles->intersect(
+            $existingFiles,
             function ($a, $b) {
                 return $a->getId() === $b->getId();
             }
