@@ -251,11 +251,12 @@ class Processor
 
             if (\count($candidateAssessments) > 1) {
                 $this->log(sprintf(
-                    'Row %s: multiple assessments found for assessment "%s" in folder "%s" using worktype "%s" (%s). 
+                    'Row %s: multiple assessments found for assessment "%s" in folder "%s" (%s) using worktype "%s" (%s). 
                     Please ensure assessments are uniquely identifiable before continuing.',
                     $i,
                     $this->assessmentTitle,
                     $folder['title'],
+                    $folder['id'],
                     $this->workType->getName(),
                     $this->workType->getId()
                 ), self::WARNING);
@@ -269,10 +270,11 @@ class Processor
              */
             if (0 === \count($candidateAssessments)) {
                 $this->log(sprintf(
-                    'Row %s: no assessments found for "%s" in folder "%s" using worktype "%s" (%s).',
+                    'Row %s: no assessments found for "%s" in folder "%s" (%s) using worktype "%s" (%s).',
                     $i,
                     $this->assessmentTitle,
                     $folder['title'],
+                    $folder['id'],
                     $this->workType->getName(),
                     $this->workType->getId()
                 ), self::WARNING);
@@ -290,10 +292,11 @@ class Processor
                  */
                 if (null === $boxId) {
                     $this->log(sprintf(
-                        'Row %s: unknown submission_box for assessment "%s" in folder %s',
+                        'Row %s: unknown submission_box for assessment "%s" in folder "%s" (%s)',
                         $i,
                         $this->assessmentTitle,
                         $folder['title'],
+                        $folder['id']
                     ), self::WARNING);
 
                     $errors++;
@@ -346,7 +349,7 @@ class Processor
                 }
 
                 $this->log(sprintf(
-                    'Row %s: added grade %s (instructor grade %s, normalised mark %s) for %s (%s) in assessment "%s" (%s) found in folder %s',
+                    'Row %s: added grade %s (instructor grade %s, normalised mark %s) for %s (%s) in assessment "%s" (%s) found in folder "%s" (%s)',
                     $i,
                     $humanReadableMark,
                     $instructorHumanReadableMark,
@@ -355,7 +358,8 @@ class Processor
                     $externalId,
                     $assessment->getTitle(),
                     $assessment->getId(),
-                    $folder['id'],
+                    $folder['title'],
+                    $folder['id']
                 ), self::INFO);
             }
         }
