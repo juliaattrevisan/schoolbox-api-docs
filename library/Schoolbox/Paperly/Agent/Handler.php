@@ -1593,17 +1593,18 @@ class Handler
                 }
                 return is_numeric($value) && $value >= -180 && $value <= 180;
             },
-            'Phone' => function ($value) {
+            'PhoneActual' => function ($value) {
                 if (empty($value) || $value == 'null') {
                     return true;
                 }
-                return is_numeric($value);
+                return is_numeric(str_replace(' ', '', $value));
             },
             'MobilePhone' => function ($value) {
                 if (empty($value) || $value == 'null') {
                     return true;
                 }
-                return is_numeric($value) && strlen($value) <= 15;
+                $cleanValue = str_replace(' ', '', $value);
+                return is_numeric($cleanValue) && strlen($cleanValue) <= 15;
             },
             'Email' => function ($value) {
                 return filter_var($value, FILTER_VALIDATE_EMAIL) && strlen($value) <= 100;
@@ -1968,7 +1969,7 @@ class Handler
             'HomeAddressDPID',
             'HomeAddressLatitude',
             'HomeAddressLongitude',
-            'Phone'
+            'PhoneActual'
         ];
         foreach ($addressKeys as $key) {
             if (isset($data[$key])) {
