@@ -97,7 +97,7 @@ class RepairDuplicateUnits extends App
     {
         $log = $this->getLogger();
 
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
 
         if ($this->perform() && !$this->isInteractive()) {
             $log->error('This tool requires an interactive session if performing changes.');
@@ -196,7 +196,7 @@ class RepairDuplicateUnits extends App
             }
         }
 
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
 
         exit(CliKernelAbstract::EXIT_STATUS_OK);
     }

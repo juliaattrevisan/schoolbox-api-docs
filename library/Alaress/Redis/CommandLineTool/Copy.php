@@ -102,7 +102,7 @@ Copies an instance's redis data to the specified server
      */
     public function run(): void
     {
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
 
         if ($this->getOpt(self::OPT_SHORT_HELP) || $this->getOpt(self::OPT_LONG_HELP)) {
             $this->printHelp();
@@ -246,7 +246,7 @@ Copies an instance's redis data to the specified server
             $this->getLogger()->info(sprintf('%d Keys will be %s. Total size: %d', $this->count, $this->isDelete ? 'deleted' : 'migrated', $this->totalLength));
         }
 
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
     }
 
     /**

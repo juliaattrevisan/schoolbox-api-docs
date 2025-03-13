@@ -18,7 +18,7 @@ class Update extends CliTool\App
 {
     public function run(): void
     {
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
 
 
         global $argv;
@@ -93,6 +93,6 @@ HELP
             break;
         }
 
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
     }
 }

@@ -66,7 +66,7 @@ class InstanceIdManager extends CliTool\App
      */
     public function run(): void
     {
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
 
         $this->redis = $this->getDi()->get('redis.cache');
 
@@ -86,7 +86,7 @@ class InstanceIdManager extends CliTool\App
 
         $this->getLogger()->notice('INSTANCE_ID update successful');
 
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
     }
 
     /**

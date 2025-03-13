@@ -81,7 +81,7 @@ class DisableExpensiveComponents extends App
     /** @inheritDoc */
     public function run(): void
     {
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
 
         // Did user request help?
         if ($this->getOpt(self::OPT_LONG_HELP)) {
@@ -103,7 +103,7 @@ class DisableExpensiveComponents extends App
                 break;
         }
 
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
     }
 
     /**

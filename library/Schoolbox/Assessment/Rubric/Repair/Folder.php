@@ -71,7 +71,7 @@ class Folder extends Composite
      */
     public function run(): void
     {
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
 
         /** @var IConnector $db */
         $db = $this->getDi()->get('databaseInternal');
@@ -90,6 +90,6 @@ class Folder extends Composite
             $db->rollBack();
         }
 
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
     }
 }

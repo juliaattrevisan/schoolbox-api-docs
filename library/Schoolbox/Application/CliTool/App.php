@@ -594,20 +594,21 @@ abstract class App
 
 
     /**
-     * Deprecation as past of 25.0 [SA-18702]
+     * Deprecation notice
      *
-     * if you are still using this script, please add a comment of this scripts name into SA-19334
+     * if you are still using this script, please add a comment of this scripts name into string $jiraNumber
+     * @param string $jiraNumber Jira ticket number to prevent deprecation
      * @deprecated
      */
-    public function deprecationNotice(): void
+    public function deprecationNotice(string $jiraNumber): void
     {
         /**
          * Deprecation notice
          */
         $this->getLogger()->notice('/******************************************************************************************/');
         $this->getLogger()->notice('/***************     Deprecated NOTICE - this will be deleted in future    ****************/');
-        $this->getLogger()->notice('/*    If you are running this, please add a comment of this scripts name into SA-19334    */');
-        $this->getLogger()->notice(sprintf("Script name: %s", get_class($this)));
+        $this->getLogger()->notice("/*    If you are running this, please add a comment of this scripts name into $jiraNumber    */");
+        $this->getLogger()->notice(sprintf("Script file: %s", $this->getToolFilename()));
         $this->getLogger()->notice('/******************************************************************************************/');
         $this->getLogger()->notice('/******************************************************************************************/');
 

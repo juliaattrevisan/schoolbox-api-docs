@@ -147,7 +147,7 @@ class FileNester extends CliTool\App
      */
     public function run(): void
     {
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
 
 
         $this->startTime = time();
@@ -157,7 +157,7 @@ class FileNester extends CliTool\App
         $this->processFiles();
         $this->printResults();
 
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
     }
 
 

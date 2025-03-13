@@ -49,7 +49,7 @@ class RepairRowFormat extends CliTool\App
      */
     public function run(): void
     {
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
 
         if ($this->getOpt(self::OPT_LONG_HELP) || $this->getOpt(self::OPT_SHORT_HELP)) {
             $file       = $this->getToolFilename();
@@ -158,7 +158,7 @@ HELP;
                 : sprintf('%d tables would have been repaired: run with the `-p` flag to repair', $successCount)
         );
 
-        $this->deprecationNotice();
+        $this->deprecationNotice("SA-19334");
 
         exit($failureCount > 0 ? CliTool\Kernel::EXIT_STATUS_APP_ERROR : CliTool\Kernel::EXIT_STATUS_OK);
     }
