@@ -1,7 +1,7 @@
 INSERT INTO config (name, value, title, description, field_id, options, type_id, editable, hidden, required,
                     module, sequence)
 VALUES (
-           'pastoral_point_enable',
+           'pastoral_point_enabled',
            1,
            'Enable Pastoral Points',
            'If toggled to ON, pastoral moderator may add default points to types/subtypes, and points will be assigned to records created of the said types/subtypes',
