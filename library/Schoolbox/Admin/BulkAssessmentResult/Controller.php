@@ -129,7 +129,7 @@ class Controller extends Base
                 'settings' => $settings,
                 'outcome' => $outcome
             ],
-            'Bulk Assessment Result Preview',
+            'Bulk Feedback Import Preview',
         );
     }
 
@@ -175,7 +175,7 @@ class Controller extends Base
                 'settings' => $settings,
                 'outcome' => $outcome,
             ],
-            'Bulk Assessment Result',
+            'Bulk Feedback Import Result',
         );
     }
 
