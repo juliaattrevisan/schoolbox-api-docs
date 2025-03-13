@@ -27,15 +27,8 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Redis Notif Messup', [
     'expiry'  => max(1, $opts['x'] ?? 3600),
 ]);
 
-$kernel->run(function (ContainerInterface $di, LoopInterface $loop, Logger $log, array $opts) {
-    /**
-     * Deprecation notice
-     */
-    echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;
-    echo "\033[1;33m/***************     Deprecated NOTICE - this will be deleted in future    ****************/\033[0m" . PHP_EOL;
-    echo "\033[1;33m/*    If you are running this, please add a comment of this scripts name into SA-19334    */\033[0m" . PHP_EOL;
-    echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;
-    echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;
+$kernel->run(function (ContainerInterface $di, LoopInterface $loop, Logger $log, array $opts) use ($kernel) {
+    $kernel->deprecationNotice("SA-19334");
 
     $redis  = Redis::getStorageClientInstance();
     $count  = (int)$opts['count'];
@@ -45,12 +38,5 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, Logger $log,
         $redis->setex(sprintf('msg:%s:e:%d', INSTANCE_ID, $i), $expiry, '');
     }
 
-    /**
-     * Deprecation notice
-     */
-    echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;
-    echo "\033[1;33m/***************     Deprecated NOTICE - this will be deleted in future    ****************/\033[0m" . PHP_EOL;
-    echo "\033[1;33m/*    If you are running this, please add a comment of this scripts name into SA-19334    */\033[0m" . PHP_EOL;
-    echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;
-    echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;
+    $kernel->deprecationNotice("SA-19334");
 });

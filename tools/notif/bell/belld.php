@@ -27,15 +27,8 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Bell');
 
 
 // CREATE BELL APP
-$kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags) {
-    /**
-     * Deprecation notice
-     */
-    echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;
-    echo "\033[1;33m/***************     Deprecated NOTICE - this will be deleted in future    ****************/\033[0m" . PHP_EOL;
-    echo "\033[1;33m/*    If you are running this, please add a comment of this scripts name into SA-19334    */\033[0m" . PHP_EOL;
-    echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;
-    echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;
+$kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags) use ($kernel) {
+    $kernel->deprecationNotice("SA-19334");
 
     try {
         /** @var IConfigLoader $conf */
@@ -57,12 +50,5 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
         $n->alert('RabbitMQ is offline');
         throw $e;
     }
-    /**
-     * Deprecation notice
-     */
-    echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;
-    echo "\033[1;33m/***************     Deprecated NOTICE - this will be deleted in future    ****************/\033[0m" . PHP_EOL;
-    echo "\033[1;33m/*    If you are running this, please add a comment of this scripts name into SA-19334    */\033[0m" . PHP_EOL;
-    echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;
-    echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;
+    $kernel->deprecationNotice("SA-19334");
 });
