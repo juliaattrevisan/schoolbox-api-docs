@@ -1981,6 +1981,9 @@ class Controller extends Base
                 $row['textboxBody'] ?? 'NULL',
             ]);
         }
+
+        fclose($fp);
+
         exit(1);
     }
 
@@ -2219,6 +2222,8 @@ class Controller extends Base
             ]);
         }
 
+        fclose($fp);
+
         exit(1);
     }
 
@@ -2350,6 +2355,8 @@ class Controller extends Base
                 $row['count'] ?? 'NULL',
             ]);
         }
+
+        fclose($fp);
 
         exit(1);
     }
@@ -2577,6 +2584,9 @@ class Controller extends Base
                 $row['textboxBody'] ?? 'NULL',
             ]);
         }
+
+        fclose($fp);
+
         exit(1);
     }
 
