@@ -400,7 +400,7 @@ class Controller extends Base
      *
      * @param Kami\Model $kami
      * @throws Exception
-     * @throws Exception/Deleted
+     * @throws Exception\Deleted
      * @throws GuzzleException
      * @api POST /kami/{kamiId:\d+}/poll
      * @since 24.0
