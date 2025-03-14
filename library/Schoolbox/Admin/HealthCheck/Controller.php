@@ -218,8 +218,8 @@ class Controller extends Base
             ORDER BY
                 name ASC; ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'HomepageTemplates.csv');
+
+        (new Helper())->queryToCSV($statement, 'HomepageTemplates.csv');
     }
 
     /**
@@ -257,8 +257,8 @@ class Controller extends Base
         ORDER BY
             sort_order asc; ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'TopMenuReport.csv');
+
+        (new Helper())->queryToCSV($statement, 'TopMenuReport.csv');
     }
 
     /**
@@ -304,8 +304,7 @@ class Controller extends Base
             ms.title,'Campus';
             ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'SideMenuReport.csv');
+        (new Helper())->queryToCSV($statement, 'SideMenuReport.csv');
     }
 
     /**
@@ -354,8 +353,8 @@ class Controller extends Base
             f.deleted_at IS NULL;
             ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'ResourceBrowser.csv');
+
+        (new Helper())>queryToCSV($statement, 'ResourceBrowser.csv');
     }
 
     /**
@@ -381,8 +380,8 @@ class Controller extends Base
             g.NAME;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'listOfRoles.csv');
+
+        (new Helper())->queryToCSV($statement, 'listOfRoles.csv');
     }
 
     /**
@@ -408,8 +407,8 @@ class Controller extends Base
             c.NAME;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'listOfCampuses.csv');
+
+        (new Helper())->queryToCSV($statement, 'listOfCampuses.csv');
     }
 
     /**
@@ -435,8 +434,7 @@ class Controller extends Base
             lyl.NAME;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'listOfYearLevels.csv');
+        (new Helper())->queryToCSV($statement, 'listOfYearLevels.csv');
     }
 
     /**
@@ -462,8 +460,7 @@ class Controller extends Base
             h.house;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'listOfHouses.csv');
+        (new Helper())->queryToCSV($statement, 'listOfHouses.csv');
     }
 
     /**
@@ -505,8 +502,7 @@ class Controller extends Base
             ua.service,ua.type,ua.sid,u.id;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'servicePermissions.csv');
+        (new Helper())->queryToCSV($statement, 'servicePermissions.csv');
     }
 
     /**
@@ -527,8 +523,7 @@ class Controller extends Base
             u.deleted_at IS NULL;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'listOfSuperusers.csv');
+        (new Helper())->queryToCSV($statement, 'listOfSuperusers.csv');
     }
 
     /**
@@ -550,8 +545,7 @@ class Controller extends Base
             submission_grade_group sgg ON sg.submission_grade_group_id = sgg.id;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'gradeGroups.csv');
+        (new Helper())->queryToCSV($statement, 'gradeGroups.csv');
     }
 
     /**
@@ -571,8 +565,7 @@ class Controller extends Base
             term;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'academicPeriods.csv');
+        (new Helper())->queryToCSV($statement, 'academicPeriods.csv');
     }
 
     /**
@@ -595,8 +588,7 @@ class Controller extends Base
             sequence ASC;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'workTypes.csv');
+        (new Helper())->queryToCSV($statement, 'workTypes.csv');
     }
 
     /**
@@ -619,8 +611,7 @@ class Controller extends Base
             sequence ASC;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'submissionStates.csv');
+        (new Helper())->queryToCSV($statement, 'submissionStates.csv');
     }
 
     /**
@@ -700,8 +691,7 @@ class Controller extends Base
             c.sequence;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'lmsSettings.csv');
+        (new Helper())->queryToCSV($statement, 'lmsSettings.csv');
     }
 
     /**
@@ -737,8 +727,7 @@ class Controller extends Base
             BY sequence ASC;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'yearLevelPermissions.csv');
+        (new Helper())->queryToCSV($statement, 'yearLevelPermissions.csv');
     }
 
     /**
@@ -760,8 +749,7 @@ class Controller extends Base
             sequence;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'newsTopics.csv');
+        (new Helper())->queryToCSV($statement, 'newsTopics.csv');
     }
 
     /**
@@ -788,8 +776,7 @@ class Controller extends Base
           service = '3';
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'newsServicePermissions.csv');
+        (new Helper())->queryToCSV($statement, 'newsServicePermissions.csv');
     }
 
     /**
@@ -823,8 +810,7 @@ class Controller extends Base
           sequence;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'newsSettings.csv');
+        (new Helper())->queryToCSV($statement, 'newsSettings.csv');
     }
 
     /**
@@ -847,8 +833,7 @@ class Controller extends Base
                 sequence ASC;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'eventTypes.csv');
+        (new Helper())->queryToCSV($statement, 'eventTypes.csv');
     }
 
     /**
@@ -882,8 +867,7 @@ class Controller extends Base
                   ua.uid;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'calendarServicePermissions.csv');
+        (new Helper())->queryToCSV($statement, 'calendarServicePermissions.csv');
     }
 
     /**
@@ -913,8 +897,7 @@ class Controller extends Base
             g.id;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'parentNewsNotifications.csv');
+        (new Helper())->queryToCSV($statement, 'parentNewsNotifications.csv');
     }
 
     // ===============================================================================================
@@ -946,8 +929,7 @@ class Controller extends Base
           ll.username,month;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'svaMonthlyLogins.csv');
+        (new Helper())->queryToCSV($statement, 'svaMonthlyLogins.csv');
     }
 
     /**
@@ -973,8 +955,7 @@ class Controller extends Base
             article_id;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'svaNewsArticleViews.csv');
+        (new Helper())->queryToCSV($statement, 'svaNewsArticleViews.csv');
     }
     /**
      * SVA
@@ -1008,8 +989,7 @@ class Controller extends Base
             article_id,role_id;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'svaNewsArticleViewsPerRolePerArticle.csv');
+        (new Helper())->queryToCSV($statement, 'svaNewsArticleViewsPerRolePerArticle.csv');
     }
     /**
      * SVA
@@ -1045,8 +1025,7 @@ class Controller extends Base
             cnas.article_id, month;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'svaNewsArticleViewsPerMonthBySKC.csv');
+        (new Helper())->queryToCSV($statement, 'svaNewsArticleViewsPerMonthBySKC.csv');
     }
     /**
      * SVA
@@ -1082,8 +1061,7 @@ class Controller extends Base
             cnas.article_id, month;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'svaNewsArticleViewsPerMonthByActiveAlumni.csv');
+        (new Helper())->queryToCSV($statement, 'svaNewsArticleViewsPerMonthByActiveAlumni.csv');
     }
     // ===============================================================================================
     // =================== TO DO: ADD 'News Article Views (Specific)' Here ===========================
@@ -1112,8 +1090,7 @@ class Controller extends Base
             cna.created_at;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'svaNewsCreatedBySVATeam.csv');
+        (new Helper())->queryToCSV($statement, 'svaNewsCreatedBySVATeam.csv');
     }
     /**
      * SVA
@@ -1142,8 +1119,7 @@ class Controller extends Base
             hv.date,hv.category_id,hv.user_group_id;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'svaHomepageViewsByKSC.csv');
+        (new Helper())->queryToCSV($statement, 'svaHomepageViewsByKSC.csv');
     }
     /**
      * SVA
@@ -1170,8 +1146,7 @@ class Controller extends Base
             hv.date,hv.category_id,hv.user_group_id;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'svaHomepageViewsByAllPerRolePerMonth.csv');
+        (new Helper())->queryToCSV($statement, 'svaHomepageViewsByAllPerRolePerMonth.csv');
     }
     // ===============================================================================================
     // ====================== TO DO: ADD 'Homepage views per user' Here ==============================
@@ -1203,8 +1178,7 @@ class Controller extends Base
             hv.date,hv.category_id,hv.user_group_id;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'svaHomepageViewsForCommunityForumsPage.csv');
+        (new Helper())->queryToCSV($statement, 'svaHomepageViewsForCommunityForumsPage.csv');
     }
     /**
      * SVA
@@ -1233,8 +1207,7 @@ class Controller extends Base
             hv.date,hv.category_id,hv.user_group_id;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'svaHomepageViewsForOpportunitiesPage.csv');
+        (new Helper())->queryToCSV($statement, 'svaHomepageViewsForOpportunitiesPage.csv');
     }
     /**
      * SVA
@@ -1267,8 +1240,7 @@ class Controller extends Base
             hv.user_group_id,hv.category_id,hv.date;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'svaHomepageViewsForProfessionalReadingPage.csv');
+        (new Helper())->queryToCSV($statement, 'svaHomepageViewsForProfessionalReadingPage.csv');
     }
     /**
      * SVA
@@ -1297,8 +1269,7 @@ class Controller extends Base
             hv.date,hv.category_id,hv.user_group_id;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'svaHomepageViewsForEvaluationPage.csv');
+        (new Helper())->queryToCSV($statement, 'svaHomepageViewsForEvaluationPage.csv');
     }
     /**
      * SVA
@@ -1331,8 +1302,7 @@ class Controller extends Base
             hv.user_group_id,hv.category_id,hv.date;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'svaHomepageViewsForActiveAlumniPage.csv');
+        (new Helper())->queryToCSV($statement, 'svaHomepageViewsForActiveAlumniPage.csv');
     }
     /**
      * SVA
@@ -1365,8 +1335,7 @@ class Controller extends Base
             hv.user_group_id,hv.category_id,hv.date;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'svaHomepageViewsForRrrHubSchoolsPage.csv');
+        (new Helper())->queryToCSV($statement, 'svaHomepageViewsForRrrHubSchoolsPage.csv');
     }
     /**
      * SVA
@@ -1390,8 +1359,7 @@ class Controller extends Base
             f.name,ft.date;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'svaForumThreadsViews.csv');
+        (new Helper())->queryToCSV($statement, 'svaForumThreadsViews.csv');
     }
     /**
      * SVA
@@ -1416,8 +1384,7 @@ class Controller extends Base
             ft.threadID,ft.date;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'svaForumReplies.csv');
+        (new Helper())->queryToCSV($statement, 'svaForumReplies.csv');
     }
     // ===============================================================================================
     // ============= TO DO: ADD 'Social Stream Posts (per month, per page)' Here =====================
@@ -1464,8 +1431,7 @@ class Controller extends Base
             u.deleted_at IS NULL;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'implementationServicePermissions.csv');
+        (new Helper())->queryToCSV($statement, 'implementationServicePermissions.csv');
     }
 
     //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1495,8 +1461,7 @@ class Controller extends Base
             g.NAME;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'implementationRoleList.csv');
+        (new Helper())->queryToCSV($statement, 'implementationRoleList.csv');
     }
 
     //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1526,8 +1491,7 @@ class Controller extends Base
             c.NAME;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'implementationCampusList.csv');
+        (new Helper())->queryToCSV($statement, 'implementationCampusList.csv');
     }
 
     //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1557,8 +1521,7 @@ class Controller extends Base
             h.house;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'implementationHouseList.csv');
+        (new Helper())->queryToCSV($statement, 'implementationHouseList.csv');
     }
 
     //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1588,8 +1551,7 @@ class Controller extends Base
             lyl.NAME;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'implementationYearLevels.csv');
+        (new Helper())->queryToCSV($statement, 'implementationYearLevels.csv');
     }
 
     //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1614,8 +1576,7 @@ class Controller extends Base
             sequence;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'implementationNewsTopics.csv');
+        (new Helper())->queryToCSV($statement, 'implementationNewsTopics.csv');
     }
 
     //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1642,8 +1603,7 @@ class Controller extends Base
                 sequence ASC;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'implementationCalendarEventTypes.csv');
+        (new Helper())->queryToCSV($statement, 'implementationCalendarEventTypes.csv');
     }
 
     //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1678,8 +1638,7 @@ class Controller extends Base
             ms.description,g.id;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'implementationNotificationSettings.csv');
+        (new Helper())->queryToCSV($statement, 'implementationNotificationSettings.csv');
     }
     /**
      * IMPLEMENTATION
@@ -1709,8 +1668,7 @@ class Controller extends Base
           menu_side_section mss;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'implementationSideMenuReport.csv');
+        (new Helper())->queryToCSV($statement, 'implementationSideMenuReport.csv');
     }
     /**
      * IMPLEMENTATION
@@ -1734,8 +1692,7 @@ class Controller extends Base
             lu_year_level lyl on tyl.year_level_id = lyl.id;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'implementationAcademicPeriods.csv');
+        (new Helper())->queryToCSV($statement, 'implementationAcademicPeriods.csv');
     }
     // ===============================================================================================
     // =============================== END IMPLEMENTATION REPORTS ====================================
@@ -1773,8 +1730,7 @@ class Controller extends Base
             cs.deleted_at IS NULL;
         ");
         $statement->execute(['URL' => $urlBase]);
-        $help = new Helper();
-        $help->queryToCSV($statement, 'unitplannerFrameworks.csv');
+        (new Helper())->queryToCSV($statement, 'unitplannerFrameworks.csv');
     }
 
     //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
