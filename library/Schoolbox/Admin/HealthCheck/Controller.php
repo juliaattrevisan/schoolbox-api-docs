@@ -354,7 +354,7 @@ class Controller extends Base
             ");
         $statement->execute();
 
-        (new Helper())>queryToCSV($statement, 'ResourceBrowser.csv');
+        (new Helper())->queryToCSV($statement, 'ResourceBrowser.csv');
     }
 
     /**
