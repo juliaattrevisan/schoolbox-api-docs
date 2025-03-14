@@ -365,6 +365,7 @@
         const typesIndexPrivate = {{ typesIndexPrivate|json_encode|raw }};
         const typesIndexDefaultPoints = {{ typesIndexDefaultPoints|json_encode|raw }};
 
+        const isPointsEnabled = {% if config.pastoral_point_enabled and config.pastoral_enabled %}true{% else %}false{% endif %};
         const isExistingRecord = {{ record.id != '' ? "true" : "false"  }};
         const currentPoints = '{{ record.points ? record.points : null }}';
 
@@ -380,13 +381,13 @@
         });
 
         /**
-         * Check if the expires at date can be updated when the type/sub-type is changed
-         * We prevent updating the expires at date if the record is existing, the expires at date is set,
-         * or if there is a manual input for the expires at date
+         * Check if the points can be updated when the type/sub-type is changed
+         * We prevent updating the points if points are not enabled, the record is existing, the points is set,
+         * or if there is a manual input for the points
          * @returns boolean
          */
         function canUpdatePoints() {
-            return !isExistingRecord && currentPoints === "" && !hasManualPointsInput;
+            return isPointsEnabled && !isExistingRecord && currentPoints === "" && !hasManualPointsInput;
         }
 
         /**
