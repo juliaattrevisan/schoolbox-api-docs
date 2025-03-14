@@ -424,7 +424,8 @@ form {
     margin: 0 0 calc($form-spacing / 2) 0;
 }
 
-label {
+label,
+legend {
     display: block;
     &.required:after,
     span.required-with-tip:after {
