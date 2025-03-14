@@ -116,6 +116,7 @@
                             </div>
                         </div>
                     </fieldset>
+                    {% if config.pastoral_point_enabled and config.pastoral_enabled %}
                     <fieldset class="content">
                         <div class="small-12 columns">
                             <label for="defaultPoints">Default Points</label>
@@ -127,6 +128,7 @@
                             </div>
                         </div>
                     </fieldset>
+                    {% endif %}
                     {% if config.pastoral_action_enable %}
                     <fieldset class="content">
                         <div class="small-12 columns">
