@@ -19,8 +19,10 @@ use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral;
+use Schoolbox\Pastoral\ExpiryHelper;
 use Schoolbox\Pastoral\TemplateDataHelper;
 use Schoolbox\Pastoral\Translator\VisibilityTranslator;
+use Schoolbox\Pastoral\Type\TypeAbstract;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
@@ -89,7 +91,9 @@ class Controller extends Base
         private Storage\FilesystemProxy $filesystemProxy,
         private Storage\Receiver $receiver,
         private Pastoral\RecordProcessor $recordProcessor,
-        private RosettaStone $rosettaStone
+        private RosettaStone $rosettaStone,
+        private Pastoral\Mapper $pastoralMapper,
+        private \Schoolbox\Assessment\Term\Mapper $termMapper,
     ) {
     }
 
@@ -219,6 +223,13 @@ class Controller extends Base
                 ["Create", null],
             ];
         }
+
+        //Helper for loading default expiry date
+        $expiryHelper = new ExpiryHelper(
+            $this->pastoralMapper,
+            $this->termMapper
+        );
+
         $this->response = $this->responseFromTemplate(
             '@pastoralBulkImport/form.twig',
             $templateData + [
@@ -238,6 +249,15 @@ class Controller extends Base
                     ->setMulti(false)
                     ->useImportExpiryDate()
                     ->getTwigContext(),
+                'canModifyDefaults'     => $this->user->hasServicePermission(
+                    UserAccess::SERVICE_PASTORAL,
+                    UserAccess::ACCESS_WRITE
+                ),
+                'calculatedExpiresAt' => array_map(fn($expiry) => $expiryHelper->calculateExpireDate(
+                    Alaress_Date_Format::now(),
+                    $expiry,
+                    null
+                )?->getUsingFormat('d/m/Y'), TypeAbstract::PASTORAL_EXPIRY),
                 'moderator'        => $this->getUser()->hasServicePermission(
                     UserAccess::SERVICE_PASTORAL,
                     UserAccess::ACCESS_READ,
@@ -300,6 +320,7 @@ class Controller extends Base
             ->setBodyPublic($this->requestPost->get('body_public'))
             ->setPoints($this->requestPost->getFloat('points'))
             ->setImportedAt(null)
+            ->setExpiresAt(\Alaress_Date_Format::newLocalShort($this->requestPost->get('expiresAt'))->startOfDay())
         ;
 
         // Create tags
@@ -489,6 +510,7 @@ class Controller extends Base
                     ->setBodyPublic($tokenReplacer->replace($import->getBodyPublic(), $student))
                     ->setBodyPrivate('')
                     ->setExternalId(null)
+                    ->setExpiresAt($import->getExpiresAt())
                 ;
 
                 // Create access

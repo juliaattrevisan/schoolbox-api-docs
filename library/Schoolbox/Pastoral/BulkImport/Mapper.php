@@ -50,6 +50,7 @@ class Mapper extends BaseMapper
         $this->uses('heading', self::TYPE_STRING);
         $this->uses('body_public', self::TYPE_STRING);
         $this->uses('points', self::TYPE_DECIMAL);
+        $this->uses('expires_at', self::TYPE_DATE);
 
         $this->uses('imported_at', self::TYPE_DATETIME);
         $this->joins('imported_by', UserMapper::class, 'id', null, null, 'importedBy', 'importedBy');

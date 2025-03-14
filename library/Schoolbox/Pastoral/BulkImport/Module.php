@@ -170,6 +170,8 @@ class Module extends BaseModule
             $this->injector->get('filesystem.receiver'),
             $pastoralRecordProcessor,
             $this->injector->get('l10n'),
+            $this->getMapperFactory()->get(Pastoral\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Assessment\Term\Mapper::class),
         );
     }
 
