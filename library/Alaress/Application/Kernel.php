@@ -187,6 +187,7 @@ use Schoolbox\User\Token\Mapper as TokenMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Version\Version;
 use Scrub;
+use Sentry\SentrySdk;
 use SitePage;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\RedisStore;
@@ -303,9 +304,8 @@ abstract class Kernel
             throw new LogicException("The 'config' dependency should have been installed.");
         }
 
-        // initialise Sentry without doing anything with it just yet:
-        // required so that stack traces always go through to Sentry.
-        Tracer::getDefaultTrace()->setHub($this->di->get('sentry'));
+        // Configure Sentry with the current instance, now it's known.
+        \Alaress\Sentry\Config::useInstance($this->di->get('instance'));
 
         self::dieGracefullyIfInMaintenanceMode($config);
         session_save_path(PipeManager::getSessionSavePath($config->get(ConfigMapper::NAME_REDIS_URL), INSTANCE_ID));
@@ -1836,21 +1836,7 @@ abstract class Kernel
         // add sentry to the DI
         $di->set(
             'sentry',
-            $di->lazy(
-                static function () use ($di, $config) {
-                    $sentryToken   = defined('SENTRY_TOKEN') ? SENTRY_TOKEN : null;
-                    $sentryProject = defined('SENTRY_PROJECT') ? SENTRY_PROJECT : null;
-                    /** @var Instance $sb */
-                    $sb = $di->get('instance');
-                    return (new \Alaress\Sentry\Factory())->build(
-                        $sb,
-                        Instance::APPLICATION_NAME,
-                        $sentryToken,
-                        $sentryProject,
-                        $config,
-                    );
-                }
-            )
+            $di->lazy(SentrySdk::getCurrentHub(...)),
         );
 
 
