@@ -130,6 +130,27 @@ test.describe("Test the pastoral care modules expiry feature", () => {
         await createPastoralRecord.expectExpiresAtToBe(date);
     });
 
+    test("Check Apply to existing records updates existing records", async ({ tester, page }) => {
+        const manageRecordSettings = new ManageRecordSettings(page);
+        const createPastoralRecord = new CreatePastoralRecord(page);
+
+        tester.isGoingTo("Visit the manage Bullying page");
+        await manageRecordSettings.gotoBullying();
+
+        tester.isGoingTo("Set the default expiry to 1 Month");
+        await manageRecordSettings.selectDefaultExpiry("1 Month");
+
+        tester.isGoingTo("Check the Apply Default Expiry checkbox");
+        await manageRecordSettings.clickApplyDefaultExpiry();
+
+        tester.isGoingTo("Save the changes");
+        await manageRecordSettings.clickSave();
+
+        tester.isGoingTo("Check an existing Bullying record and confirm the expiry date is 1 month from today");
+        await createPastoralRecord.gotoExisting(25, 2);
+        await createPastoralRecord.expectExpiresAtToBe("01/12/2017");
+    });
+
     test("Check the show archived records toggle on a users pastoral profile page", async ({ tester, page }) => {
         const pastoralProfile = new PastoralProfile(page);
         const createPastoralRecord = new CreatePastoralRecord(page);
@@ -180,6 +201,9 @@ test.describe("Test the pastoral care modules expiry feature", () => {
      */
     test.afterAll(async ({ baseTester, db }) => {
         baseTester.isGoingTo("reset the expires_at date for the Jana Reeds Out of uniform record");
-        await db.updateInDatabase("pastoral", { expires_at: null }, { id: 1 });
+        await db.updateInDatabase("pastoral", { expires_at: null }, { heading: "Out of uniform" });
+
+        baseTester.isGoingTo("reset the expires_at date for the Cyber Bullying records");
+        await db.updateInDatabase("pastoral", { expires_at: null }, { heading: "Cyber Bullying" });
     });
 });

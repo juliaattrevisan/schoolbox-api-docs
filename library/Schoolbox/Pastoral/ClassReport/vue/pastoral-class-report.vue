@@ -215,7 +215,7 @@ export default {
                 </div>
             </div>
 
-            <ul class="action-list threaded content-container">
+            <ul class="action-list threaded content-container" data-test="pastoral-class-report-student-list">
                 <template
                     v-for="(studentData, studentIndex) in data"
                     :key="'student-' + String(studentData.student.id)"

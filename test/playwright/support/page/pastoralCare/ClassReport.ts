@@ -5,6 +5,8 @@ export default class ClassReport {
 
     static readonly URL = "/pastoral/class/{classId}?30=&31=&32=&35[includeActiveRecords]=1";
 
+    static readonly DATATEST_STUDENT_LIST = "pastoral-class-report-student-list";
+
     static readonly DATATEST_STUDENT_RECORD = "pastoral-class-report-student-{studentId}";
 
     static readonly DATATEST_STATUS_FILTER = "sbx-pop-out-filter-component-35-button";
@@ -23,6 +25,14 @@ export default class ClassReport {
      */
     async goto(id: number): Promise<void> {
         await this.page.goto(ClassReport.URL.replace("{classId}", id.toString()));
+    }
+
+    /**
+     * Returns the students list
+     * @returns - The locator for the student record
+     */
+    getStudentList(): Locator {
+        return this.page.getByTestId(ClassReport.DATATEST_STUDENT_LIST);
     }
 
     /**

@@ -14,11 +14,15 @@ export default class PastoralExpiry {
 
     static readonly URL_ATTENDANCE = "/pastoral/management/audience/type/2/modify";
 
+    static readonly URL_BULLYING = "/pastoral/management/audience/type/4/modify";
+
     static readonly DATATEST_FLAG_SELECT = "audiences-modify-pastoral-flag-select";
 
     static readonly DATATEST_FLAG_COLOR_INPUT = "audiences-modify-pastoral-flag-color-input";
 
     static readonly DATATEST_DEFAULT_EXPIRY_SELECT = "audiences-modify-pastoral-default-expiry-select";
+
+    static readonly DATATEST_APPLY_DEFAULT_EXPIRY_CHECKBOX = "audiences-modify-apply-default-expiry";
 
     static readonly DATATEST_MANAGE_SAVE_BUTTON = "audiences-modify-pastoral-save-button";
 
@@ -45,6 +49,13 @@ export default class PastoralExpiry {
      */
     async gotoAttendance(): Promise<void> {
         await this.page.goto(PastoralExpiry.URL_ATTENDANCE);
+    }
+
+    /**
+     * Navigates to the Bullying type
+     */
+    async gotoBullying(): Promise<void> {
+        await this.page.goto(PastoralExpiry.URL_BULLYING);
     }
 
     /**
@@ -77,6 +88,13 @@ export default class PastoralExpiry {
      */
     async expectDefaultExpiryToBe(value: string): Promise<void> {
         await expect(this.page.getByTestId(PastoralExpiry.DATATEST_DEFAULT_EXPIRY_SELECT)).toHaveValue(value);
+    }
+
+    /**
+     * Click apply default expiry checkbox
+     */
+    async clickApplyDefaultExpiry(): Promise<void> {
+        await this.page.getByTestId(PastoralExpiry.DATATEST_APPLY_DEFAULT_EXPIRY_CHECKBOX).click();
     }
 
     /**

@@ -6,6 +6,8 @@ export default class CreatePastoralRecord {
 
     static readonly URL = "/pastoral/student/{studentId}/record/insert";
 
+    static readonly URL_EXISTING = "pastoral/student/{studentId}/record/{recordId}/update";
+
     static readonly PASTORAL_TITLE = "input#heading";
 
     static readonly PASTORAL_TYPE = "select#typeId";
@@ -26,6 +28,20 @@ export default class CreatePastoralRecord {
      */
     async goto(userId: number): Promise<void> {
         await this.page.goto(CreatePastoralRecord.URL.replace("{studentId}", userId.toString()));
+    }
+
+    /**
+     * Navigates to the Edit Pastoral Record page
+     * @param userId - The id of the user to add the pastoral record to
+     * @param recordId - The id of the record to edit
+     */
+    async gotoExisting(userId: number, recordId: number): Promise<void> {
+        await this.page.goto(
+            CreatePastoralRecord.URL_EXISTING.replace("{studentId}", userId.toString()).replace(
+                "{recordId}",
+                recordId.toString(),
+            ),
+        );
     }
 
     /**
