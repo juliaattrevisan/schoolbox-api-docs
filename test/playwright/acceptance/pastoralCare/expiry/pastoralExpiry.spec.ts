@@ -200,10 +200,14 @@ test.describe("Test the pastoral care modules expiry feature", () => {
      * Resetting data to not impact other tests
      */
     test.afterAll(async ({ baseTester, db }) => {
-        baseTester.isGoingTo("reset the expires_at date for the Jana Reeds Out of uniform record");
-        await db.updateInDatabase("pastoral", { expires_at: null }, { heading: "Out of uniform" });
+        baseTester.isGoingTo("reset the default_expiry date for any changed types/subtypes");
+        await db.updateInDatabase("lu_pastoral_type", { default_expiry: null }, { name: "Attendance" });
+        await db.updateInDatabase("lu_pastoral_type", { default_expiry: null }, { name: "Bullying" });
+        await db.updateInDatabase("lu_pastoral_subtype", { default_expiry: null }, { name: "Award/Achievement" });
+        await db.updateInDatabase("lu_pastoral_subtype", { default_expiry: null }, { name: "Learning Difficulties" });
 
-        baseTester.isGoingTo("reset the expires_at date for the Cyber Bullying records");
+        baseTester.isGoingTo("reset the expires_at date for any modified records");
+        await db.updateInDatabase("pastoral", { expires_at: null }, { heading: "Out of uniform" });
         await db.updateInDatabase("pastoral", { expires_at: null }, { heading: "Cyber Bullying" });
     });
 });
