@@ -164,14 +164,15 @@ test.describe("Test the pastoral care modules expiry feature", () => {
         await classReport.goto(83);
 
         tester.isGoingTo("Check that the 'Out of uniform' record is not visible by default");
-        expect(await classReport.getStudentRecord(25)).not.toContainText("Out of uniform");
+        const studentRecord = classReport.getStudentRecord(25);
+        await expect(studentRecord).not.toContainText("Out of uniform");
 
         tester.isGoingTo("Add the Status > Archived filter and check that the 'Out of uniform' record is visible");
         await classReport.clickStatusFilter();
         await classReport.clickArchivedCheckbox();
         await classReport.clickApplyFiltersButton();
         await page.waitForLoadState("load"); // Waits for full page reload
-        expect(await classReport.getStudentRecord(25)).toContainText("Out of uniform");
+        await expect(studentRecord).toContainText("Out of uniform");
     });
 
     /**
