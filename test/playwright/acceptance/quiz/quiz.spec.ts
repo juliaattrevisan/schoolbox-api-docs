@@ -79,7 +79,7 @@ async function createClassPage(
     await page.waitForTimeout(1000); // wait to be able to update the db
 }
 
-test.describe("Quiz Create Tests", () => {
+test.describe("Quiz Tests: create, modify, delete quiz, submit and vertical review", () => {
     // Run tests serially, as tests rely on prior tests to have been run
     test.describe.configure({ mode: "serial" });
 
