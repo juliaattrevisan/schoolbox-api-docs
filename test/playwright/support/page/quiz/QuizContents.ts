@@ -29,8 +29,7 @@ export default class QuizContentsPage {
     async clickCreateItemButton(): Promise<void> {
         await expect(this.page.locator(QuizContentsPage.ITEM_BUTTON).getByText("Create item")).toBeVisible();
         await this.page.locator(QuizContentsPage.ITEM_BUTTON).getByText("Create item").click();
-        // adding a timeout to avoid waiting for something that is from learnosity side
-        await this.page.waitForTimeout(1000);
+        await expect(this.page.locator(QuizContentsPage.ADD_NEW_BUTTON)).toBeVisible();
     }
 
     /**
@@ -41,8 +40,7 @@ export default class QuizContentsPage {
     async clickAddNewButton(): Promise<void> {
         await expect(this.page.locator(QuizContentsPage.ADD_NEW_BUTTON)).toBeVisible();
         await this.page.locator(QuizContentsPage.ADD_NEW_BUTTON).click();
-        // adding a timeout to avoid waiting for something that is from learnosity side
-        await this.page.waitForTimeout(1000);
+        await expect(this.page.locator("a.lrn-qe-a.lrn-qe-tile-preview").first()).toBeVisible();
     }
 
     /**
@@ -53,8 +51,11 @@ export default class QuizContentsPage {
     async clickQuestionType(questionType: string): Promise<void> {
         await expect(this.page.getByLabel(questionType)).toBeVisible();
         await this.page.getByLabel(questionType).click();
-        // adding a timeout to avoid waiting for something that is from learnosity side
-        await this.page.waitForTimeout(1000);
+        await expect(
+            this.page
+                .locator("button.lrn-btn-save.lrn-btn.lrn-btn-legacy.lrn-btn-primary.lrn-btn-primary-legacy")
+                .first(),
+        ).toBeVisible();
     }
 
     /**
@@ -64,7 +65,6 @@ export default class QuizContentsPage {
      */
     async clickSaveButton(): Promise<void> {
         await this.page.locator(QuizContentsPage.SAVE_BUTTON).first().click();
-        // adding a timeout to avoid waiting for something that is from learnosity side
-        await this.page.waitForTimeout(1000);
+        await expect(this.page.locator("button.lrn-btn-save.lrn-btn.lrn-btn-legacy.lrn-btn-success")).toBeVisible();
     }
 }

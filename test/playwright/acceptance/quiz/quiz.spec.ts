@@ -186,6 +186,7 @@ test.describe("Quiz Create Tests", () => {
         const assessmentStatusPage = new StatusPage(tester, page);
         const assessmentPage = new AssessmentPage(tester, page);
         const profilePage = new ProfilePage(tester, page);
+        const common = new Common(page);
 
         if (folderId === null || quizId === null) {
             throw new Error("Folder ID or Quiz ID not found");
@@ -195,7 +196,7 @@ test.describe("Quiz Create Tests", () => {
         await tester.impersonate("Eden Reed");
         await assessmentPage.goto(quizId, 6);
         tester.isGoingTo("as  Eden Reed Start the Quiz");
-        await page.locator("a.button.submit").click();
+        await common.clickSubmitButton();
         await expect(page.getByLabel("Review screen").first()).toBeVisible();
         tester.isGoingTo("as  Eden Reed tick the first question option");
         await page.locator("li.lrn-mcq-option").first().click();
@@ -214,9 +215,10 @@ test.describe("Quiz Create Tests", () => {
         await page.locator(StatusPage.SELECTOR_MARK).fill("60");
         await page.locator(StatusPage.SELECTOR_COMMENT_QUIZ_REVIEW).click();
         await expect(page.locator("div.alert-box.f-no-margins.success")).toBeVisible();
+        await expect(page.locator("div.alert-box.f-no-margins.success")).toBeHidden();
         await page.keyboard.type("This is a vertical review comment");
         await expect(page.locator("div.alert-box.f-no-margins.success")).toBeVisible();
-        await page.waitForTimeout(1000);
+        await expect(page.locator("div.alert-box.f-no-margins.success")).toBeHidden();
         await page.locator("button.button.full-width.icon-approve.submit").click();
         await page.locator("button.button.icon-approve.submit").getByText("Yes").click();
         await page.waitForTimeout(1000);
