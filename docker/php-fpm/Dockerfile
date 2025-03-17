@@ -5,7 +5,7 @@ RUN apk --no-cache add ${PHPIZE_DEPS} && \
     apk add libzip-dev zip unzip libxml2-dev oniguruma-dev icu-dev curl-dev openldap-dev \
             imagemagick-dev imagemagick-heic imagemagick-raw imagemagick-svg imagemagick-tiff imagemagick-webp \
             unixodbc-dev gnupg && \
-    pecl install redis xdebug imagick pdo_sqlsrv \
+    pecl install redis xdebug imagick pdo_sqlsrv excimer
 
 # https://hub.docker.com/_/php for directions on installing extensions
 RUN docker-php-ext-install zip && \
@@ -22,7 +22,8 @@ RUN docker-php-ext-install zip && \
     docker-php-ext-enable redis && \
     docker-php-ext-enable xdebug && \
     docker-php-ext-enable imagick && \
-    docker-php-ext-enable pdo_sqlsrv
+    docker-php-ext-enable pdo_sqlsrv && \
+    docker-php-ext-enable excimer
 
 # Install ODBC driver
 COPY bin/install-odbc-driver.sh /opt/bin/install-odbc-driver.sh
