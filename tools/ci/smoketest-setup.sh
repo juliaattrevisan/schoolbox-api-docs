@@ -128,6 +128,9 @@ mariadb schoolbox -e "UPDATE config SET value='1',editable='true' WHERE name = '
 echo "re building project result Cache" # When we upgrade sales to after 23.0.alpha1 we can remove this
 php assessment/projectResultCacheReload.php --perform
 
+# Avoid twig file permission issues (i.e. "Unable to write in the cache directory")
+./tools/set-data-dir-perms.sh
+
 # Force the persistent instance again
 mariadb schoolbox -e "$use_redis_persistent_instance_sql"
 
