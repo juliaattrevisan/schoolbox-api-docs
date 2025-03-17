@@ -71,8 +71,11 @@
                 <div class="small-12 medium-12 columns">
                     <label for="expiresAt">
                         Expires At
-                        <span class="hint has-tip tip-top" data-tooltip title="Select when the record will expire.
-                Expired records will move to an archived state.">?</span>
+                        <span
+                            class="hint has-tip tip-top"
+                            data-tooltip
+                            title="Select when the record will expire. Expired records will move to an archived state."
+                        >?</span>
                     </label>
                     <input type="text" name="expiresAt" id="expiresAt" maxlength="50" value="" {% if canModifyDefaults %}data-datepicker{% else %}readonly{% endif %} />
                 </div>
