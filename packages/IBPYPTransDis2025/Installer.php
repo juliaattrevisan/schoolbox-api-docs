@@ -5,7 +5,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-namespace IBTransdisciplinary;
+namespace IBPYPTransDis2025;
 
 use Schoolbox\Admin\Package;
 
