@@ -1,4 +1,4 @@
-import { test, expect } from "@schoolboxTest/playwright/support/integrations";
+import { test } from "@schoolboxTest/playwright/support/integrations";
 import ProfileEditor from "@schoolboxTest/playwright/support/page/admin/userManagement/ProfileEditor";
 import ProfilePage from "@schoolboxTest/playwright/support/page/profilePage/ProfilePage";
 import Common from "@schoolboxTest/playwright/support/page/Common";
