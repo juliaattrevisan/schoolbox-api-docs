@@ -82,7 +82,7 @@ class Controller extends Base
         $post = $this->requestPost;
 
         $file = $post->get('csvFilePath');
-        $ownerId = $post->get('ownerid');
+        $ownerId = $post->get('userId');
 
         if (!$file) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
