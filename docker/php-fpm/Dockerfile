@@ -23,3 +23,7 @@ RUN docker-php-ext-install zip && \
     docker-php-ext-enable xdebug && \
     docker-php-ext-enable imagick && \
     docker-php-ext-enable pdo_sqlsrv
+
+# Install ODBC driver
+COPY bin/install-odbc-driver.sh /opt/bin/install-odbc-driver.sh
+RUN /opt/bin/install-odbc-driver.sh
