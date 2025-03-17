@@ -13,6 +13,7 @@ import PdcUpcomingItem from "./pdc-upcoming-item.vue";
 
 interface Props {
     getPaperlyViewEndpoint: string; // The endpoint for fetching the list of Paperly items and its iframe urls
+    openItemsInNewTab: boolean; // Whether to open the Paperly items in a new tab
 }
 
 const props = defineProps<Props>();
@@ -93,7 +94,13 @@ const upcoming = window.Vue.computed<UpcomingItem[]>(() => {
                 <i class="icon-paperly-forms"></i>
                 <p>There are currently no upcoming tasks that require action.</p>
             </div>
-            <pdc-upcoming-item v-for="item in upcoming" v-else :key="item.url" :item="item" />
+            <pdc-upcoming-item
+                v-for="item in upcoming"
+                v-else
+                :key="item.url"
+                :item="item"
+                :open-items-in-new-tab="props.openItemsInNewTab"
+            />
         </div>
         <div v-if="paperlyPayload && paperlyPayload.upcoming.length > 3 && !viewMore" class="component-action">
             <section>
