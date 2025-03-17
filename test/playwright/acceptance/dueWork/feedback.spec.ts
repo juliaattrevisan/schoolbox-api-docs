@@ -23,6 +23,7 @@ test.describe("Feedback Tests", () => {
         const className = Common.CLASS_9AENG;
         const classId = Common.CLASS_ID_9AENG;
         const student = Common.USER_LOUISASMITH;
+        const studentId = Common.USER_ID_LOUISASMITH;
         const teacher = Common.USER_JACKCOLES;
         const dueworkTitle1 = `Cest One ${Common.genText(6)}`;
         const filename = path.join(__dirname, "../../support/file/test-80x80.png");
@@ -81,8 +82,8 @@ test.describe("Feedback Tests", () => {
         const grade = Math.floor(Math.random() * 50) + 50; // Random grade between 50 and 100
 
         const feedbackForm = new FeedbackForm(tester, page);
-        await feedbackForm.setGrade(grade);
-        await feedbackForm.setComment(Common.genText(200));
+        await feedbackForm.setGrade(grade, studentId);
+        await feedbackForm.setComment(Common.genText(200), studentId);
         await feedbackForm.publish();
 
         tester.isGoingTo("As Louisa Smith, check notification");

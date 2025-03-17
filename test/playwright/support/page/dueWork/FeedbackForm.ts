@@ -9,11 +9,11 @@ export default class FeedbackForm {
 
     static readonly URL = "/learning/assessments/{assessment_id}/{user_id}/responses/{response_id}";
 
-    static readonly SELECTOR_GRADE_INPUT = "input[name='mark']";
-
-    static readonly SELECTOR_COMMENT_TEXTAREA = "textarea[name='comment']";
-
     static readonly SELECTOR_ATTACHMENT_ZONE = "#feedbackFiles-zone";
+
+    static readonly DATATEST_ASSESSMENT_FEEDBACK_MARK_INPUT = "assessment-feedback-mark-input"; // Append "-[userId]"
+
+    static readonly DATATEST_ASSESSMENT_FEEDBACK_COMMENT_TEXTAREA = "assessment-feedback-comment-textarea"; // Append "-[userId]"
 
     static readonly DATATEST_ASSESSMENT_FEEDBACK_PUBLISH_BUTTON = "assessment-feedback-publish-button";
 
@@ -40,18 +40,26 @@ export default class FeedbackForm {
     /**
      * Sets grade in the feedback form
      * @param grade - The grade to set
+     * @param participantId - The ID of the participant to set the grade for
      */
-    async setGrade(grade: number): Promise<void> {
-        await this.page.fill(FeedbackForm.SELECTOR_GRADE_INPUT, grade.toString());
+    async setGrade(grade: string | number, participantId: string | number): Promise<void> {
+        await this.page
+            .getByTestId(`${FeedbackForm.DATATEST_ASSESSMENT_FEEDBACK_MARK_INPUT}-${participantId}`)
+            .fill(grade.toString());
     }
 
     /**
      * Sets comment in the feedback form
      * @param comment - The comment to set
+     * @param participantId - The ID of the participant to set the comment for
      */
-    async setComment(comment: string): Promise<void> {
-        await this.page.locator(FeedbackForm.SELECTOR_COMMENT_TEXTAREA).click();
+    async setComment(comment: string, participantId: string | number): Promise<void> {
+        await this.page.locator(FeedbackForm.DATATEST_ASSESSMENT_FEEDBACK_COMMENT_TEXTAREA).click();
         await this.page.keyboard.type(comment);
+        const commentEditor = this.page.getByTestId(
+            `${FeedbackForm.DATATEST_ASSESSMENT_FEEDBACK_COMMENT_TEXTAREA}-${participantId}`,
+        );
+        await this.tester.fillCKEditorByLocator(commentEditor, comment);
     }
 
     /**
