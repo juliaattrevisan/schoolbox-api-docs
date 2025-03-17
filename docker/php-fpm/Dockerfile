@@ -4,7 +4,8 @@ RUN apk --no-cache add ${PHPIZE_DEPS} && \
     apk add --update linux-headers && \
     apk add libzip-dev zip unzip libxml2-dev oniguruma-dev icu-dev curl-dev openldap-dev \
             imagemagick-dev imagemagick-heic imagemagick-raw imagemagick-svg imagemagick-tiff imagemagick-webp \
-            unixodbc-dev gnupg && \
+            unixodbc-dev gnupg \
+            bind-tools && \
     pecl install redis xdebug imagick pdo_sqlsrv excimer
 
 # https://hub.docker.com/_/php for directions on installing extensions
