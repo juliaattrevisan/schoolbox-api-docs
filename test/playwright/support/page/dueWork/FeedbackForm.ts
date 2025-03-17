@@ -54,8 +54,6 @@ export default class FeedbackForm {
      * @param participantId - The ID of the participant to set the comment for
      */
     async setComment(comment: string, participantId: string | number): Promise<void> {
-        await this.page.locator(FeedbackForm.DATATEST_ASSESSMENT_FEEDBACK_COMMENT_TEXTAREA).click();
-        await this.page.keyboard.type(comment);
         const commentEditor = this.page.getByTestId(
             `${FeedbackForm.DATATEST_ASSESSMENT_FEEDBACK_COMMENT_TEXTAREA}-${participantId}`,
         );
