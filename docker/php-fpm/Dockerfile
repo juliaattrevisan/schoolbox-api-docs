@@ -3,8 +3,9 @@ FROM php:8.2-fpm-alpine
 RUN apk --no-cache add ${PHPIZE_DEPS} && \
     apk add --update linux-headers && \
     apk add libzip-dev zip unzip libxml2-dev oniguruma-dev icu-dev curl-dev openldap-dev \
-            imagemagick-dev imagemagick-heic imagemagick-raw imagemagick-svg imagemagick-tiff imagemagick-webp && \
-    pecl install redis xdebug imagick
+            imagemagick-dev imagemagick-heic imagemagick-raw imagemagick-svg imagemagick-tiff imagemagick-webp \
+            unixodbc-dev && \
+    pecl install redis xdebug imagick pdo_sqlsrv \
 
 # https://hub.docker.com/_/php for directions on installing extensions
 RUN docker-php-ext-install zip && \
@@ -20,4 +21,5 @@ RUN docker-php-ext-install zip && \
     docker-php-ext-install exif && \
     docker-php-ext-enable redis && \
     docker-php-ext-enable xdebug && \
-    docker-php-ext-enable imagick
+    docker-php-ext-enable imagick && \
+    docker-php-ext-enable pdo_sqlsrv
