@@ -1,4 +1,4 @@
-import { test } from "@schoolboxTest/playwright/support/integrations";
+import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import ProfileEditor from "@schoolboxTest/playwright/support/page/admin/userManagement/ProfileEditor";
 import ProfilePage from "@schoolboxTest/playwright/support/page/profilePage/ProfilePage";
 import Common from "@schoolboxTest/playwright/support/page/Common";
@@ -20,121 +20,142 @@ test.describe("Profile Editor", () => {
     });
 
     /**
-     * Test Case 1: Verify Field Visibility Across Profile Pages
-     *
-     * Steps:
-     * 1. Navigate to the Profile Editor.
-     * 2. Select "All" for "Appears On" and "Visible For" checkboxes under Campuses and Roles.
-     * 3. Add "Role" in Staff tab and "Campus" in Parent tab.
-     * 4. Enable all checkboxes for both fields and save.
-     * 5. Verify Role & Campus fields are visible on profiles:
-     *    - Jack Coles: Jana Reed, Alison Chan, Jenni Reed
-     *    - Jana Reed: Jack Coles, Eden Reed, Jenni Reed
-     *    - Jenni Reed: Jana Reed, Jack Coles
+     * Set Up Field Visibility and Availability
+     * 1. Update Rebecca White’s email in the database (ID: 24).
+     * 2. Student Tab:
+     *    - Student ID: "Appears On" = Secondary “Visible for”= All
+     *    - Year Level: "Appears On" = All  “Visible for”= Satff
+     *    - Campus: "Appears On" = All “Visible for”= None
+     * 3. Staff Tab:
+     *    - Add Role field
+     *    - Role: "Appears On" = Secondary “Visible for”= All
+     *    - Email: "Appears On" = Secondary “Visible for”= Self
+     *    - Campus: "Appears On" = None “Visible for”= None
+     * 4. Parent Tab:
+     *    - Campus: "Appears On" = All “Visible for”= None
+     *    - Role: "Appears On" = All “Visible for”= All
      */
 
-    test("Verify fields on profile pages", async ({ tester, page }) => {
+    test("Setting up fields on profile pages", async ({ tester, page, db }) => {
+        // Update alt_email for Rebecca White
+        tester.isGoingTo("update alt_email for Rebecca White so data is consistent for this test run");
+        await db.updateInDatabase("user", { alt_email: "test@schoolbox.com.au" }, { id: 24 });
+
         const profileEditor = new ProfileEditor(tester, page);
         const profilePage = new ProfilePage(tester, page);
-        const teacher = Common.USER_JACKCOLES;
 
         // Navigate to the profile editor page
         tester.isGoingTo("Navigate to the profile editor page");
         await profileEditor.goto();
+        tester.isGoingTo("Click on the student role type");
+
+        // Select the "Student ID" field and open settings
+        tester.isGoingTo("Click on the cog of Student ID field");
+        await profileEditor.clickFieldCog("student", "externalId");
+
+        // Set visibility & availability checkboxes: Secondary and Student checkboxes
+        tester.isGoingTo("Click on the Primary and Student checkboxes for Student ID field");
+        await profileEditor.clickFieldCheckbox("student", "externalId", "visibility", "student");
+        await profileEditor.clickFieldCheckbox("student", "externalId", "availability", "2");
+        await profileEditor.clickFieldUpdateButton("student", "externalId");
+
+        // Select the "Year Level" field and open settings
+        tester.isGoingTo("Click on the cog of Year Level field");
+        await profileEditor.clickFieldCog("student", "yearLevel");
+
+        // Set visibility & availability checkboxes: Self and Parent checkboxes
+        tester.isGoingTo("Click on the Self and Parent checkboxes for Year Level field");
+        await profileEditor.clickFieldCheckbox("student", "yearLevel", "visibility", "self");
+        await profileEditor.clickFieldCheckbox("student", "yearLevel", "visibility", "parent");
+        await profileEditor.clickFieldUpdateButton("student", "yearLevel");
+
+        // Select the "Campus" field and open settings
+
+        tester.isGoingTo("Click on the cog of Campus field");
+        await profileEditor.clickFieldCog("student", "campusCollection");
+
+        // Set visibility & availability checkboxes: Only all "Appears On" checkboxes
+        tester.isGoingTo("Click on the Self, Staff, and Parent checkboxes for Campus field");
+        await profileEditor.clickFieldCheckbox("student", "campusCollection", "visibility", "self");
+        await profileEditor.clickFieldCheckbox("student", "campusCollection", "visibility", "staff");
+        await profileEditor.clickFieldCheckbox("student", "campusCollection", "visibility", "parent");
+        await profileEditor.clickFieldUpdateButton("student", "campusCollection");
 
         // Select the "Staff" role type and add the "Role" field
         tester.isGoingTo("Click on the staff role type");
-        await profileEditor.clickRoleType("Staff");
+        await profileEditor.clickRoleType("staff");
+        tester.isGoingTo("Adding role field to staff profile editor page");
         await profileEditor.clickFieldsTab("Internal Fields");
         await profileEditor.clickAvailableField("staff", "role");
 
-        // Open settings (cog) for the "Role" field
+        // Select the "Role" field and open settings
         tester.isGoingTo("Click on the cog of role field");
         await profileEditor.clickFieldCog("staff", "role");
 
-        /// Set visibility & availability checkboxes
+        /// Set visibility & availability checkboxes: All checkboxes
         tester.isGoingTo("Click on the visibility checkbox of role field");
         await profileEditor.clickFieldCheckbox("staff", "role", "visibility", "self");
         await profileEditor.clickFieldCheckbox("staff", "role", "visibility", "student");
         await profileEditor.clickFieldCheckbox("staff", "role", "visibility", "staff");
         await profileEditor.clickFieldCheckbox("staff", "role", "visibility", "parent");
-
-        // Set availability for different options
         tester.isGoingTo("Click on the availability checkbox of role field");
         await profileEditor.clickFieldCheckbox("staff", "role", "availability", "1");
         await profileEditor.clickFieldCheckbox("staff", "role", "availability", "2");
-
-        // Save changes for "Role" field
         await profileEditor.clickFieldUpdateButton("staff", "role");
+
+        // Select the "Campus" field and open settings
+        tester.isGoingTo("Click on the cog of Campus field");
+        await profileEditor.clickFieldCog("staff", "campusCollection");
+
+        // Set visibility checkboxes: All checkboxes
+        tester.isGoingTo("Click on the visibility checkbox of Campus field");
+        await profileEditor.clickFieldCheckbox("staff", "campusCollection", "visibility", "self");
+        await profileEditor.clickFieldCheckbox("staff", "campusCollection", "visibility", "staff");
+        await profileEditor.clickFieldUpdateButton("staff", "campusCollection");
+        await page.waitForTimeout(2000);
+        await expect(page.getByTestId("toast")).toHaveAttribute("data-test-is-success", "true");
+
+        // Select the "Email" field and open settings
+        tester.isGoingTo("Click on the cog of Email field");
+        await profileEditor.clickFieldCog("staff", "email");
+
+        // Set visibility checkboxes: Secondary & Self
+        tester.isGoingTo("Click on the visibility checkbox of Email field");
+        await profileEditor.clickFieldCheckbox("staff", "email", "visibility", "staff");
+        await profileEditor.clickFieldCheckbox("staff", "email", "availability", "2");
+        await profileEditor.clickFieldUpdateButton("staff", "email");
 
         // Switch to the "Parent" role type
         tester.isGoingTo("Click on the parent role type");
-        await page.waitForTimeout(1000); // Small wait to ensure UI updates
-        await profileEditor.clickRoleType("Parent");
+        await profileEditor.clickRoleType("parent");
 
-        // Add "Campus" field to the parent profile editor page
+        // Add "Campus" field and Open settings (cog) for the "Campus" field
         tester.isGoingTo("Add campus field to parent profile editor page");
         await profileEditor.clickFieldsTab("External Fields");
         await profileEditor.clickAvailableField("parent", "campusCollection");
-
-        // Open settings (cog) for the "Campus" field
         tester.isGoingTo("Click on the cog of campus field");
         await profileEditor.clickFieldCog("parent", "campusCollection");
 
-        // Set visibility & availability checkboxes
-        tester.isGoingTo("Click on the visibility checkbox of campus field");
-        await profileEditor.clickFieldCheckbox("parent", "campusCollection", "visibility", "self");
-        await profileEditor.clickFieldCheckbox("parent", "campusCollection", "visibility", "student");
-        await profileEditor.clickFieldCheckbox("parent", "campusCollection", "visibility", "staff");
-        await profileEditor.clickFieldCheckbox("parent", "campusCollection", "visibility", "parent");
+        // Set visibility & availability checkboxes: only Appears on checked
         tester.isGoingTo("Click on the availability checkbox of campus field");
         await profileEditor.clickFieldCheckbox("parent", "campusCollection", "availability", "1");
         await profileEditor.clickFieldCheckbox("parent", "campusCollection", "availability", "2");
         await profileEditor.clickFieldUpdateButton("parent", "campusCollection");
 
-        // Impersonate Jack Coles and navigate to his profile
-        tester.isGoingTo("Navigate to the Jack Coles profile page");
-        await tester.impersonate(teacher);
-        await profilePage.goto("22");
+        // Select the "Role" field and open settings
+        tester.isGoingTo("Click on the cog of Role field");
+        await profileEditor.clickFieldCog("parent", "role");
 
-        // Verify the "Role" and "Campus" fields are visible on Jack Coles' profile
-        tester.isGoingTo("Ensure the role field is presented on staff profile page");
-
-        await profilePage.checkFieldIsVisible("Role");
-        await profilePage.checkFieldIsVisible("Campus");
-
-        // Search for Jana Reed and verify "Role" and "Campus" fields on her profile
-        tester.isGoingTo("As Jack Coles, ensure the Role & Campus fields are presented on Jana Reed's profile page");
-        await tester.common.search("Jana Reed");
-        tester.isGoingTo("Navigate to the Jana Reed profile page");
-        await profilePage.goto("25");
-        await profilePage.checkFieldIsVisible("Role");
-        await profilePage.checkFieldIsVisible("Campus");
-
-        // Search for Alison Chan and verify "Role" and "Campus" fields on her profile
-        tester.isGoingTo("As Jack Coles, ensure the Role & Campus fields are presented on Alison Chan's profile page");
-        await tester.common.search("Alison Chan");
-        tester.isGoingTo("Navigate to the Alison Chan profile page");
-        await profilePage.goto("43");
-        await profilePage.checkFieldIsVisible("Role");
-        await profilePage.checkFieldIsVisible("Campus");
-
-        // Search for Jenni Reed and verify "Role" and "Campus" fields on her profile
-        tester.isGoingTo("As Jack Coles, ensure the Role & Campus fields are presented on Jenni Reed's profile page");
-        await tester.common.search("Jeeni Reed");
-        tester.isGoingTo("Navigate to the Jenni profile page");
-        await profilePage.goto("27");
-        await profilePage.checkFieldIsVisible("Role");
-        await profilePage.checkFieldIsVisible("Campus");
+        // Set visibility checkbox: Student
+        tester.isGoingTo("Click on the visibility checkbox of Role field for Student");
+        await profileEditor.clickFieldCheckbox("parent", "role", "visibility", "student");
+        await profileEditor.clickFieldUpdateButton("parent", "role");
     });
 
     /**
-     * Test Case 2: Verify Fields Are Not Visible When No Roles Are Selected
+     * Verify Field Visibility Across Profile Pages
      *
-     * Steps:
-     * 1. Navigate to the Profile Editor.
-     * 2. In all three tabs (Student, Staff, Parent), untick all checkboxes under "Visible For" and save.
-     * 4. Verify that "Role" & "Campus" fields are not visible on profiles:
+     *  Verify that
      *    - Jack Coles: Jana Reed, Alison Chan, Jenni Reed
      *    - Jana Reed: Jack Coles, Eden Reed, Jenni Reed
      *    - Jenni Reed: Jana Reed, Jack Coles
@@ -147,272 +168,144 @@ test.describe("Profile Editor", () => {
         const student = Common.USER_JANAREED;
         const parent = Common.USER_JENNIREED;
 
-        // Navigate to the profile editor page
-        tester.isGoingTo("Navigate to the profile editor page");
-        await profileEditor.goto();
-
-        // Configure visibility settings for the "Role" field under "Student" role
-        tester.isGoingTo("Click on the cog of role field");
-        await profileEditor.clickFieldCog("student", "role");
-        tester.isGoingTo("Click on the visibility checkbox of role field");
-        await profileEditor.clickFieldCheckbox("student", "role", "visibility", "self");
-        await profileEditor.clickFieldCheckbox("student", "role", "visibility", "student");
-        await profileEditor.clickFieldCheckbox("student", "role", "visibility", "staff");
-        await profileEditor.clickFieldCheckbox("student", "role", "visibility", "parent");
-        await profileEditor.clickFieldUpdateButton("student", "role");
-
-        // Configure visibility settings for the "Campus" field under "Student" role
-        tester.isGoingTo("Click on the visibility checkbox of campus field");
-        await profileEditor.scrolltoFind("student", "campusCollection");
-        await profileEditor.clickFieldCog("student", "campusCollection");
-        await profileEditor.clickFieldCheckbox("student", "campusCollection", "visibility", "self");
-        await profileEditor.clickFieldCheckbox("student", "campusCollection", "visibility", "staff");
-        await profileEditor.clickFieldCheckbox("student", "campusCollection", "visibility", "parent");
-        await profileEditor.clickFieldUpdateButton("student", "campusCollection");
-
-        // Navigate back to the profile editor and switch to "Staff" role type
-        tester.isGoingTo("Click on the staff role type");
-        await profileEditor.goto();
-        await profileEditor.clickRoleType("Staff");
-
-        // Configure visibility settings for the "Role" field under "Staff" role
-        tester.isGoingTo("Click on the cog of role field");
-        await profileEditor.clickFieldCog("staff", "role");
-        tester.isGoingTo("Click on the visibility checkbox of role field");
-        await profileEditor.clickFieldCheckbox("staff", "role", "visibility", "self");
-        await profileEditor.clickFieldCheckbox("staff", "role", "visibility", "student");
-        await profileEditor.clickFieldCheckbox("staff", "role", "visibility", "staff");
-        await profileEditor.clickFieldCheckbox("staff", "role", "visibility", "parent");
-        await profileEditor.clickFieldUpdateButton("staff", "role");
-
-        // Configure visibility settings for the "Campus" field under "Staff" role
-        tester.isGoingTo("Click on the visibility checkbox of campus field");
-        await profileEditor.scrolltoFind("staff", "campusCollection");
-        await profileEditor.clickFieldCog("staff", "campusCollection");
-        await profileEditor.clickFieldCheckbox("staff", "campusCollection", "visibility", "self");
-        await profileEditor.clickFieldCheckbox("staff", "campusCollection", "visibility", "staff");
-        await profileEditor.clickFieldUpdateButton("staff", "campusCollection");
-
-        // Switch to "Parent" role type
-        tester.isGoingTo("Click on the parent role type");
-        await page.waitForTimeout(1000);
-        await profileEditor.clickRoleType("Parent");
-
-        // Configure visibility settings for the "Campus" field under "Parent" role
-        tester.isGoingTo("Click on the cog of campus field");
-        await profileEditor.clickFieldCog("parent", "campusCollection");
-        tester.isGoingTo("Click on the visibility checkbox of campus field");
-        await profileEditor.clickFieldCheckbox("parent", "campusCollection", "visibility", "self");
-        await profileEditor.clickFieldCheckbox("parent", "campusCollection", "visibility", "student");
-        await profileEditor.clickFieldCheckbox("parent", "campusCollection", "visibility", "staff");
-        await profileEditor.clickFieldCheckbox("parent", "campusCollection", "visibility", "parent");
-        await profileEditor.clickFieldUpdateButton("parent", "campusCollection");
-
-        // Configure visibility settings for the "Role" field under "Parent" role
-        tester.isGoingTo("Click on the cog of role field");
-        await profileEditor.clickFieldCog("parent", "role");
-        tester.isGoingTo("Click on the visibility checkbox of role field");
-        await profileEditor.clickFieldCheckbox("parent", "role", "visibility", "self");
-        await profileEditor.clickFieldCheckbox("parent", "role", "visibility", "staff");
-        await profileEditor.clickFieldCheckbox("parent", "role", "visibility", "parent");
-        await profileEditor.clickFieldUpdateButton("parent", "role");
-
-        // Impersonate as Jack Coles
+        // Impersonate Jack Coles and navigate to his profile
         tester.isGoingTo("Navigate to the Jack Coles profile page");
         await tester.impersonate(teacher);
 
-        // Search for Jana Reed and verify "Role" and "Campus" fields are not present on her profile
+        // As Jack Coles , Navigating to own profile and verify role, email are presented and campus is not presented
+        await profilePage.goto("22");
         tester.isGoingTo(
-            "As Jack Coles, ensure the Role & Campus fields are not presented on Jana Reed's profile page",
+            "As Jack Coles, ensure role, email are presented and campus is not presented on his own profile page",
         );
-        await tester.common.search("Jana Reed");
+        await profilePage.checkFieldIsVisible("Role");
+        await profilePage.checkFieldIsVisible("Email");
+        await profilePage.checkFieldIsNotVisible("Campus");
+
+        // As Jack Coles , Navigating to Jana Reed and verify role, student id, year level are presented and campus is not presented
+
         tester.isGoingTo("Navigate to the Jana Reed profile page");
         await profilePage.goto("25");
-        await profilePage.checkFieldIsNotVisible("Role");
+        tester.isGoingTo(
+            "As Jack Coles, ensure role, student id, year level are presented and campus is not presented on Jana Reed's profile page",
+        );
+        await profilePage.checkFieldIsVisible("Role");
+        await profilePage.checkFieldIsVisible("Student ID");
         await profilePage.checkFieldIsNotVisible("Campus");
 
-        // Search for Alison Chan and verify "Role" and "Campus" fields are not present on her profile
+        // As Jack Coles, Navigating to Eden Reed and verify role, year level  are presented and campus, student id are not presented
+
+        tester.isGoingTo("Navigate to the Eden Reed profile page");
+        await profilePage.goto("6");
         tester.isGoingTo(
-            "As Jack Coles, ensure the Role & Campus fields are not presented on Alison Chan's profile page",
+            "As Jack coles, ensure role, year level  are presented and campus, student id are not presented on Eden Reed's profile page",
         );
-        await tester.common.search("Alison Chan");
-        tester.isGoingTo("Navigate to the Alison Chan profile page");
-        await profilePage.goto("43");
-        await profilePage.checkFieldIsNotVisible("Role");
+        await profilePage.checkFieldIsVisible("Role");
+        await profilePage.checkFieldIsVisible("Year Level");
+        await profilePage.checkFieldIsNotVisible("Campus");
+        await profilePage.checkFieldIsNotVisible("Student ID");
+
+        //As Jack Coles, Navigating to Rebecca White and verify role is presented and campus, email are not presented
+
+        tester.isGoingTo("Navigate to Rebecca White profile page");
+        await profilePage.goto("24");
+        tester.isGoingTo(
+            "As Jack Coles, ensure the Role & Campus fields are presented on Rebecca White's profile page",
+        );
+        await profilePage.checkFieldIsVisible("Role");
+        await profilePage.checkFieldIsNotVisible("Email");
         await profilePage.checkFieldIsNotVisible("Campus");
 
-        // Search for Jenni Reed and verify "Role" and "Campus" fields are not present on her profile
-        tester.isGoingTo(
-            "As Jack Coles, ensure the Role & Campus fields are not presented on Jenni Reed's profile page",
-        );
-        await tester.common.search("Jeeni Reed");
+        //As Jack Coles, Navigating to Jenni Reed and verify role is presented and campus is not presented
         tester.isGoingTo("Navigate to the Jenni profile page");
         await profilePage.goto("27");
-        await profilePage.checkFieldIsNotVisible("Role");
+        tester.isGoingTo("As Jack Coles, ensure the Role & Campus fields are presented on Jenni Reed's profile page");
+        await profilePage.checkFieldIsVisible("Role");
         await profilePage.checkFieldIsNotVisible("Campus");
 
         // Impersonate Jana Reed
-        tester.isGoingTo("Navigate to the Jack Coles profile page");
+        tester.isGoingTo("Impersonate as Jana Reed");
         await tester.impersonate(student);
 
-        // Search for Jack Coles and verify "Role" and "Campus" fields are not present on her profile
-        tester.isGoingTo(
-            "As Jana Reed, ensure the Role & Campus fields are not presented on Jack Coles's profile page",
-        );
-        await tester.common.search("Jack Coles");
-        tester.isGoingTo("Navigate to the Jack Coles profile page");
+        // As Jana Reed , Navigating to own profile and verify role, student Id are presented and  campus, year level are  not presented
+        await profilePage.goto("25");
+        tester.isGoingTo("Jana Reed naviagting to her own profile page");
         await profilePage.goto("22");
-        await profilePage.checkFieldIsNotVisible("Role");
+        tester.isGoingTo(
+            "As Jana Reed, ensure role, student Id are presented and campus, year level are  not presented on her own profile page",
+        );
+        await profilePage.checkFieldIsVisible("Role");
+        await profilePage.checkFieldIsVisible("Student ID");
         await profilePage.checkFieldIsNotVisible("Campus");
+        await profilePage.checkFieldIsNotVisible("Year Level");
 
-        // Search for Eden Reed and verify "Role" and "Campus" fields are not present on her profile
-        tester.isGoingTo("As Jana Reed, ensure the Role & Campus fields are not presented on Eden Reed's profile page");
-        await tester.common.search("Eden Reed");
+        // As Jana Reed , Navigating to Eden Reed profile and verify role is presented and student id, year level and campus  are  not presented
+
         tester.isGoingTo("Navigate to the Eden Reed profile page");
         await profilePage.goto("6");
+        tester.isGoingTo(
+            "As Jana Reed, ensure the role is presented and student id, year level and campus  are  not presented on Eden Reed's profile page",
+        );
+        await profilePage.checkFieldIsVisible("Role");
+        await profilePage.checkFieldIsNotVisible("Student ID");
+        await profilePage.checkFieldIsNotVisible("Year Level");
+        await profilePage.checkFieldIsNotVisible("Campus");
+
+        //  As Jana Reed , Navigating to Jack Coles and verify role is presented and email, Campus fields are not presented
+
+        tester.isGoingTo("Navigate to the Jack Coles profile page");
+        await profilePage.goto("22");
+        tester.isGoingTo(
+            "As Jana Reed, ensure the Role is presented and email, Campus fields are not presented on Jack Coles's profile page",
+        );
+        await profilePage.checkFieldIsVisible("Role");
         await profilePage.checkFieldIsNotVisible("Role");
         await profilePage.checkFieldIsNotVisible("Campus");
 
-        // Search for Jenni Reed and verify "Role" and "Campus" fields are not present on her profile
-        tester.isGoingTo(
-            "As Jana Reed, ensure the Role & Campus fields are not presented on Jenni Reed's profile page",
-        );
-        await tester.common.search("Jeeni Reed");
+        // As Jana Reed , Navigating to Jenni Reed and verify role is presented and campus field are not presented
         tester.isGoingTo("Navigate to the Jenni profile page");
         await profilePage.goto("27");
-        await profilePage.checkFieldIsNotVisible("Role");
+        tester.isGoingTo(
+            "As Jana Reed, ensure Role is presented and Campus field are not presented on Jenni Reed's profile page",
+        );
+        await profilePage.checkFieldIsVisible("Role");
         await profilePage.checkFieldIsNotVisible("Campus");
 
         // Impersonate Jenni Reed
-        tester.isGoingTo("Navigate to the Jack Coles profile page");
+        tester.isGoingTo("Impersonating as Jenni Reed");
         await tester.impersonate(parent);
 
-        // Search for Jack Coles and verify "Role" and "Campus" fields are not present on her profile
+        // As Jenni Reed , Navigating to Jack Coles and verify "Role" is presented and student id, year level and campus fields are  not presented
+        tester.isGoingTo("Navigate to the Jack Coles profile page");
+        await profilePage.goto("22");
         tester.isGoingTo(
-            "As Jenni Reed, ensure the Role & Campus fields are not presented on Jack Coles's profile page",
+            "As Jenni Reed, ensure Role is presented and student id, year level & campus fields are  not presented on Jack Coles's profile page",
         );
-        await tester.common.search("Jack Coles");
-        tester.isGoingTo("Navigate to the Jack Coles profile page");
-        await profilePage.goto("22");
-        await profilePage.checkFieldIsNotVisible("Role");
-        await profilePage.checkFieldIsNotVisible("Campus");
-
-        // Search for Jana Reed and verify "Role" and "Campus" fields are not present on her profile
-        tester.isGoingTo("As Jenni Reed, ensure the Role & Campus fields are presented on Jana Reed's profile page");
-        await tester.common.search("Jana Reed");
-        tester.isGoingTo("Navigate to the Jana Reed profile page");
-        await profilePage.goto("25");
-        await profilePage.checkFieldIsNotVisible("Role");
-        await profilePage.checkFieldIsNotVisible("Campus");
-    });
-
-    /**
-     * Test Case 3: Verify "Appears on" and "Visible for" Combinations in Profile Pages
-     *
-     * Setup:
-     * -Student Tab:
-     *   -Role Field: "Appears on" = Secondary, "Visible for" = All checkboxes selected.
-     *   -Campus Field: "Appears on" = All checkboxes, "Visible for" = Staff only.
-     * -Staff Tab:
-     *   -Campus Field: "Appears on" = Secondary, "Visible for" = Self only.
-     */
-
-    test("Verify Appears on and Visible for Combinations in Profile Pages", async ({ tester, page }) => {
-        const profileEditor = new ProfileEditor(tester, page);
-        const profilePage = new ProfilePage(tester, page);
-        const teacher = Common.USER_JACKCOLES;
-        const student = Common.USER_JANAREED;
-
-        // Navigate to the profile editor page
-        tester.isGoingTo("Navigate to the profile editor page");
-        await profileEditor.goto();
-
-        // Configure visibility & Availability settings for the "Role" field under "Student" role
-        tester.isGoingTo("Click on the cog of role field");
-        await profileEditor.clickFieldCog("student", "role");
-        tester.isGoingTo("Click on the visibility checkbox of role field");
-        await profileEditor.clickFieldCheckbox("student", "role", "visibility", "self");
-        await profileEditor.clickFieldCheckbox("student", "role", "visibility", "student");
-        await profileEditor.clickFieldCheckbox("student", "role", "visibility", "staff");
-        await profileEditor.clickFieldCheckbox("student", "role", "visibility", "parent");
-        await profileEditor.clickFieldCheckbox("student", "role", "availability", "2");
-        await profileEditor.clickFieldUpdateButton("student", "role");
-
-        // Configure visibility settings for the "Campus" field under "Student" role
-        tester.isGoingTo("Click on the visibility checkbox of campus field");
-        await profileEditor.scrolltoFind("student", "campusCollection");
-        await profileEditor.scrolltoFind("student", "campusCollection");
-        await profileEditor.clickFieldCog("student", "campusCollection");
-        await profileEditor.clickFieldCheckbox("student", "campusCollection", "visibility", "staff");
-        await profileEditor.clickFieldUpdateButton("student", "campusCollection");
-
-        // Navigate back to the profile editor and switch to "Staff" role type
-        tester.isGoingTo("Click on the staff role type");
-        await profileEditor.goto();
-        await profileEditor.clickRoleType("Staff");
-
-        // Configure visibility settings for the "Role" field under "Staff" role
-        tester.isGoingTo("Click on the cog of role field");
-        await profileEditor.scrolltoFind("staff", "campusCollection");
-        await profileEditor.clickFieldCog("staff", "campusCollection");
-
-        await profileEditor.clickFieldCheckbox("staff", "campusCollection", "visibility", "self");
-        await profileEditor.clickFieldCheckbox("staff", "campusCollection", "availability", "2");
-        await profileEditor.clickFieldUpdateButton("staff", "campusCollection");
-
-        // Impersonate as Jack Coles
-        tester.isGoingTo("Navigate to the Jack Coles profile page");
-        await tester.impersonate(teacher);
-
-        // Verify the "Campus" field is visible on Jack Coles' profile
-        tester.isGoingTo("Jack Coles navigating to his own profile should see Campus field");
-        await profilePage.goto("22");
-        await profilePage.checkFieldIsVisible("Campus");
-
-        // Search for Jana Reed and verify "Role" and "Campus" fields are not present on her profile
-        tester.isGoingTo("As Jack Coles, ensure the Role & Campus fields are presented on Jana Reed's profile page");
-        await tester.common.search("Jana Reed");
-        tester.isGoingTo("Navigate to the Jana Reed profile page");
-        await profilePage.goto("25");
         await profilePage.checkFieldIsVisible("Role");
-        await profilePage.checkFieldIsVisible("Campus");
-
-        // Search for Eden Reed and verify "Role" and "Campus" fields are not present on her profile
-        tester.isGoingTo("As Jack Coles navigating to Eden Reed profile page should see Campus but not Role");
-        await tester.common.search("Eden Reed");
-        tester.isGoingTo("Navigate to the Eden Reed profile page");
-        await profilePage.goto("6");
-        await profilePage.checkFieldIsVisible("Campus");
-        await profilePage.checkFieldIsNotVisible("Role");
-
-        // / Search for Rebecca White and verify "Campus" field is not present on her profile
-        tester.isGoingTo("Jack Coles navigating to Rebecca White profile page should not see Campus field");
-        await tester.common.search("Rebecca White");
-        tester.isGoingTo("Navigate to the Eden Reed profile page");
-        await profilePage.goto("24");
         await profilePage.checkFieldIsNotVisible("Campus");
+        await profilePage.checkFieldIsNotVisible("Student ID");
+        await profilePage.checkFieldIsNotVisible("Year Level");
 
-        // Impersonate Jana Reed
-        tester.isGoingTo("Navigate to the Jack Coles profile page");
-        await tester.impersonate(student);
+        // As Jenni Reed , Navigating to Jana Reed and verify "Role" , "Student id" are presented and "Campus" and  Year Level fields are not presented
 
-        // Search for Jack Coles and verify "Role" and "Campus" fields are not present on her profile
+        tester.isGoingTo("Navigate to the Jana Reed profile page");
+        await profilePage.goto("25");
         tester.isGoingTo(
-            "As Jana Reed, ensure the Role & Campus fields are not presented on Jack Coles's profile page",
+            "As Jenni Reed, ensure Role, Student id are presented and Campus, Year Level fields are not presented on Jana Reed's profile page",
         );
-        await tester.common.search("Jack Coles");
-        tester.isGoingTo("Navigate to the Jack Coles profile page");
-        await profilePage.goto("22");
-        await profilePage.checkFieldIsNotVisible("Role");
+        await profilePage.checkFieldIsVisible("Role");
+        await profilePage.checkFieldIsVisible("Student ID");
         await profilePage.checkFieldIsNotVisible("Campus");
+        await profilePage.checkFieldIsNotVisible("Year Level");
 
-        // Search for Eden Reed and verify "Role" and "Campus" fields are not present on her profile
-        tester.isGoingTo("As Jana Reed navigating to Eden Reed profile page should not see Role or Campus fields");
-        await tester.common.search("Eden Reed");
+        // As Jenni Reed , Navigating to Eden Reed profile and verify role is presented and campus is not presented
+
         tester.isGoingTo("Navigate to the Eden Reed profile page");
         await profilePage.goto("6");
+        tester.isGoingTo(
+            "As Jenni Reed, ensure role is presented and campus is not presented on Eden Reed's profile page",
+        );
+        await profilePage.checkFieldIsVisible("Role");
         await profilePage.checkFieldIsNotVisible("Campus");
-        await profilePage.checkFieldIsNotVisible("Role");
     });
 
     /**
@@ -420,7 +313,7 @@ test.describe("Profile Editor", () => {
      * navigate to the student profile page
      * Ensure the student name is presented
      */
-    test("Clear Student Name Display Options", async ({ tester, page }) => {
+    test("Clear Student Name Display Options: defaults to title firstname lastname", async ({ tester, page }) => {
         const profileEditor = new ProfileEditor(tester, page);
         const profilePage = new ProfilePage(tester, page);
 
@@ -441,22 +334,21 @@ test.describe("Profile Editor", () => {
      * navigate to the staff profile page
      * Ensure the staff first and last names and Test are presented
      */
-    test("Set Staff Name Display Options", async ({ tester, page }) => {
+    test("Set Staff Name Display Options: tokens and text are presented in the profile page", async ({
+        tester,
+        page,
+    }) => {
         const profileEditor = new ProfileEditor(tester, page);
         const profilePage = new ProfilePage(tester, page);
 
         tester.isGoingTo("Navigate to the staff profile editor page");
         await profileEditor.goto();
-        await page.waitForTimeout(1000);
-        await profileEditor.clickRoleType("Staff");
-
+        await profileEditor.clickRoleType("staff");
         tester.isGoingTo("Set up the field name with {firstname} {lastname} Test");
         await profileEditor.clearFieldName();
         await profileEditor.typeFieldName("{firstname} {lastname} Test");
-
         tester.isGoingTo("Click the update button");
         await profileEditor.clickUpdateButton();
-        await page.waitForTimeout(1000);
         tester.isGoingTo("Navigate to the staff profile page");
         await profilePage.goto(22);
         tester.isGoingTo("Ensure the staff first and last names and Test are presented");
@@ -468,20 +360,22 @@ test.describe("Profile Editor", () => {
      * navigate to the parent profile page
      * Ensure the parent preferred name and last name are presented
      */
-    test("Set Parent Name Display Options", async ({ tester, page }) => {
+    test("Set Parent Name Display Options to preferredname: when there is no preferred name defaults to firstname", async ({
+        tester,
+        page,
+    }) => {
         const profileEditor = new ProfileEditor(tester, page);
         const profilePage = new ProfilePage(tester, page);
 
         tester.isGoingTo("Navigate to the parent profile editor page");
         await profileEditor.goto();
-        await profileEditor.clickRoleType("Staff");
-        await profileEditor.clickRoleType("Parent");
+        await profileEditor.clickRoleType("staff");
+        await profileEditor.clickRoleType("parent");
         tester.isGoingTo("Set up the field name with {preferredname} {lastname}");
         await profileEditor.clearFieldName();
         await profileEditor.typeFieldName("{preferredname} {lastname}");
         tester.isGoingTo("Click the update button");
         await profileEditor.clickUpdateButton();
-        await page.waitForTimeout(1000);
         tester.isGoingTo("Navigate to the parent profile page");
         await profilePage.goto(27);
         tester.isGoingTo("Ensure the parent preferred name and last name are presented");
@@ -507,5 +401,14 @@ test.describe("Profile Editor", () => {
             { value: "{title} {firstname} {lastname}" },
             { "name like": "name_format_parent" },
         );
+
+        baseTester.isGoingTo("reset alt_email for Rebecca White");
+        await db.updateInDatabase("user", { alt_email: null }, { id: 24 });
+
+        baseTester.isGoingTo("Remove Role field from Staff tab");
+        await db.updateInDatabase("profile_field", { enabled: 0 }, { roletype: "staff", field: "role" });
+
+        baseTester.isGoingTo("Remove Campus field from Parent tab");
+        await db.updateInDatabase("profile_field", { enabled: 0 }, { roletype: "parent", field: "campusCollection" });
     });
 });

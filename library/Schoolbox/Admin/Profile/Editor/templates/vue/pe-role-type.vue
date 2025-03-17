@@ -40,6 +40,7 @@ function setSelectedRoleType(role: ProfileEditorRoleType): void {
             <a
                 :aria-selected="role === peStore.selectedRoleType"
                 :tabindex="role === peStore.selectedRoleType ? 0 : -1"
+                :data-test="`pe-role-type-${role.roleType}`"
                 @click="setSelectedRoleType(role)"
             >
                 {{ capitalizeFirstLetter(role.roleType) }}
