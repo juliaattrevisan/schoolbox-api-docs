@@ -1,0 +1,27 @@
+id,curriculum_node_parent_id,_curriculum_learning_level_id,_curriculum_learning_area_id,name,code,reference,order,description,enabled,created_at,modified_at,deleted_at,uuid
+3674,NULL,NULL,NULL,"IB Curriculum",,NULL,0,,1,"2025-01-16 11:53:34","2025-01-16 11:53:34",NULL,NULL
+3675,3674,NULL,NULL,"PYP Transdisciplinary themes (2025)",,NULL,0,,1,"2025-01-16 11:55:30","2025-01-16 11:55:30",NULL,NULL
+3676,3675,NULL,NULL,"Who we are",P25-TT-WW,NULL,0,,1,"2025-01-16 11:56:06","2025-01-16 12:18:37",NULL,NULL
+3677,3675,NULL,NULL,"Where we are in place and time",P25-TT-PT,NULL,0,,1,"2025-01-16 11:56:19","2025-01-16 12:18:22",NULL,NULL
+3678,3675,NULL,NULL,"How we express ourselves",P25-TT-EX,NULL,0,,1,"2025-01-16 11:56:27","2025-01-16 12:17:31",NULL,NULL
+3679,3675,NULL,NULL,"How the world works",P25-TT-WO,NULL,0,,1,"2025-01-16 11:56:36","2025-01-16 12:16:23",NULL,NULL
+3680,3675,NULL,NULL,"How we organize ourselves",P25-TT-OR,NULL,0,,1,"2025-01-16 11:56:47","2025-01-16 12:17:53",NULL,NULL
+3681,3675,NULL,NULL,"Sharing the planet",P25-TT-SH,NULL,0,,1,"2025-01-16 11:56:55","2025-01-16 12:18:06",NULL,NULL
+3682,3679,NULL,NULL,"An inquiry into understandings of the world and phenomena through patterns, cycles and systems",P25-TT-WO-c,NULL,0,,1,"2025-01-16 11:57:55","2025-01-16 12:21:36",NULL,NULL
+3683,3679,NULL,NULL,"An inquiry into understandings of the world and phenomena through diverse practices, methods and tools",P25-TT-WO-b,NULL,0,,1,"2025-01-16 11:58:12","2025-01-16 12:21:30",NULL,NULL
+3684,3679,NULL,NULL,"An inquiry into understandings of the world and phenomena through discovery, design, innovation: possibilities and impacts",P25-TT-WO-a,NULL,0,,1,"2025-01-16 11:58:34","2025-01-16 12:21:23",NULL,NULL
+3685,3678,NULL,NULL,"An inquiry into the diversity of voice, perspectives, and expression through inspiration, imagination and creativity",P25-TT-EX-a,NULL,0,,1,"2025-01-16 11:59:07","2025-01-16 12:19:22",NULL,NULL
+3686,3678,NULL,NULL,"An inquiry into the diversity of voice, perspectives, and expression through personal, social and cultural modes and practices of communication",P25-TT-EX-c,NULL,0,,1,"2025-01-16 11:59:42","2025-01-16 12:19:37",NULL,NULL
+3687,3678,NULL,NULL,"An inquiry into the diversity of voice, perspectives, and expression through intentions, perceptions, interceptions and responses",P25-TT-EX-b,NULL,0,,1,"2025-01-16 12:00:01","2025-01-16 12:19:29",NULL,NULL
+3688,3680,NULL,NULL,"An inquiry into systems, structures and networks through interactions within and between social and ecological systems",P25-TT-OR-b,NULL,0,,1,"2025-01-16 12:00:39","2025-01-16 12:20:01",NULL,NULL
+3689,3680,NULL,NULL,"An inquiry into systems, structures and networks through approaches to livelihoods and trade practices: intended and unintended consequences",P25-TT-OR-a,NULL,0,,1,"2025-01-16 12:01:06","2025-01-16 12:19:56",NULL,NULL
+3690,3680,NULL,NULL,"An inquiry into systems, structures and networks through representation, collaboration and decision-making",P25-TT-OR-c,NULL,0,,1,"2025-01-16 12:01:36","2025-01-16 12:20:08",NULL,NULL
+3691,3681,NULL,NULL,"An inquiry into the interdependence of human and natural worlds through rights, responsibilities and dignity of all",P25-TT-SH-c,NULL,0,,1,"2025-01-16 12:03:34","2025-01-16 12:21:09",NULL,NULL
+3692,3681,NULL,NULL,"An inquiry into the interdependence of human and natural worlds through pathways to just, peaceful and reimagined futures",P25-TT-SH-b,NULL,0,,1,"2025-01-16 12:03:53","2025-01-16 12:21:04",NULL,NULL
+3693,3681,NULL,NULL,"An inquiry into the interdependence of human and natural worlds through nature, complexity, coexistence and wisdom",P25-TT-SH-a,NULL,0,,1,"2025-01-16 12:04:18","2025-01-16 12:20:59",NULL,NULL
+3694,3677,NULL,NULL,"An inquiry into histories and orientation in place, space and time through periods, events and artefacts",P25-TT-PT-c,NULL,0,,1,"2025-01-16 12:04:49","2025-01-16 12:20:33",NULL,NULL
+3695,3677,NULL,NULL,"An inquiry into histories and orientation in place, space and time through communities, heritage, culture and environment",P25-TT-PT-a,NULL,0,,1,"2025-01-16 12:05:06","2025-01-16 12:20:20",NULL,NULL
+3696,3677,NULL,NULL,"An inquiry into histories and orientation in place, space and time through natural and human drivers of movement, adaptation and transformation",P25-TT-PT-b,NULL,0,,1,"2025-01-16 12:05:34","2025-01-16 12:20:26",NULL,NULL
+3697,3676,NULL,NULL,"An inquiry into identity as individuals and as part of a collective through physical, emotional and spiritual health and well-being",P25-TT-WW-b,NULL,0,,1,"2025-01-16 12:06:03","2025-01-16 12:21:56",NULL,NULL
+3698,3676,NULL,NULL,"An inquiry into identity as individuals and as part of a collective through relationships and belonging",P25-TT-WW-c,NULL,0,,1,"2025-01-16 12:06:16","2025-01-16 12:22:02",NULL,NULL
+3699,3676,NULL,NULL,"An inquiry into identity as individuals and as part of a collective through learning and growing",P25-TT-WW-a,NULL,0,,1,"2025-01-16 12:06:25","2025-01-16 12:21:51",NULL,NULL
