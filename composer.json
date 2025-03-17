@@ -116,7 +116,8 @@
         "google/common-protos": "^4.8",
         "ext-xmlreader": "*",
         "ext-dom": "*",
-        "violet/streaming-json-encoder": "^1.1"
+        "violet/streaming-json-encoder": "^1.1",
+        "ext-exif": "*"
     },
     "autoload-dev": {
       "psr-4": {
