@@ -9,8 +9,8 @@ services:
       - code:/usr/share/schoolbox
       - caddy-config:/etc/caddy
     ports:
-      - '8080:80'
-      - '8443:443'
+      - '80:80'
+      - '443:443'
     # Make this host available across the network as docker.dev.schoolbox.cloud
     networks:
       default:

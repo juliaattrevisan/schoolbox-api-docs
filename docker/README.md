@@ -42,7 +42,7 @@ within a self-contained development environment.
   mariadb -h mariadb -u root -D schoolbox < docker/schoolbox/sql/post-setup.sql
   tools/notif/route/refresh-binding-cache.php
   ```
-- finally, visit https://docker.dev.schoolbox.cloud:8443
+- finally, visit https://docker.dev.schoolbox.cloud
   - you may be asked to accept an unsigned certificate or similar: accept it
   - if the right-side notification panel is stuck in "Connecting...": bring up
     the Docker containers again:
