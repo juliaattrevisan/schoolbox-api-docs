@@ -52,9 +52,7 @@ export default class QuizContentsPage {
         await expect(this.page.getByLabel(questionType)).toBeVisible();
         await this.page.getByLabel(questionType).click();
         await expect(
-            this.page
-                .locator("button.lrn-btn-save.lrn-btn.lrn-btn-legacy.lrn-btn-primary.lrn-btn-primary-legacy")
-                .first(),
+            this.page.locator("button.lrn-qe-form-label.lrn-qe-margin-top-none.lrn-qe-more-options").last(),
         ).toBeVisible();
     }
 
@@ -65,6 +63,6 @@ export default class QuizContentsPage {
      */
     async clickSaveButton(): Promise<void> {
         await this.page.locator(QuizContentsPage.SAVE_BUTTON).first().click();
-        await expect(this.page.locator("button.lrn-btn-save.lrn-btn.lrn-btn-legacy.lrn-btn-success")).toBeVisible();
+        await expect(this.page.getByText("Item successfully added to the Activity").last()).toBeVisible();
     }
 }
