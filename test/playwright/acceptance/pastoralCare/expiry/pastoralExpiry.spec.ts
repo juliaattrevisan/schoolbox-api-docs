@@ -17,52 +17,7 @@ test.describe("Test the pastoral care modules expiry feature", () => {
         await tester.impersonateTeacher();
     });
 
-    test("Update the Academic > Award/Achievement type with a default expiry of 1 Month", async ({
-        tester,
-        page,
-        db,
-    }) => {
-        const manageRecordSettings = new ManageRecordSettings(page);
-
-        tester.isGoingTo("Visit the Award/Achievement page");
-        await manageRecordSettings.gotoAwardAchievement();
-
-        tester.isGoingTo("Set the default expiry to 1 Month");
-        await manageRecordSettings.selectDefaultExpiry("1 Month");
-
-        tester.isGoingTo("Save the changes");
-        await manageRecordSettings.clickSave();
-
-        await page.reload();
-
-        tester.isGoingTo("Confirm the changes have been saved");
-        await manageRecordSettings.expectDefaultExpiryToBe("1 month");
-
-        await db.updateInDatabase("lu_pastoral_subtype", { default_expiry: null }, { name: "Award/Achievement" });
-    });
-
-    test("Update the Academic > Learning Difficulties type with a default expiry of 6 Months", async ({
-        tester,
-        page,
-    }) => {
-        const manageRecordSettings = new ManageRecordSettings(page);
-
-        tester.isGoingTo("Visit the Learning Difficulties page");
-        await manageRecordSettings.gotoLearningDifficulties();
-
-        tester.isGoingTo("Set the default expiry to 6 Months");
-        await manageRecordSettings.selectDefaultExpiry("6 Months");
-
-        tester.isGoingTo("Save the changes");
-        await manageRecordSettings.clickSave();
-
-        await page.reload();
-
-        tester.isGoingTo("Confirm the changes have been saved");
-        await manageRecordSettings.expectDefaultExpiryToBe("6 months");
-    });
-
-    test("Update the Attendance type with a default expiry of 2 weeks", async ({ tester, page }) => {
+    test("Confirm default expiry changes are saved", async ({ tester, page, db }) => {
         const manageRecordSettings = new ManageRecordSettings(page);
 
         tester.isGoingTo("Visit the Attendance page");
@@ -78,10 +33,40 @@ test.describe("Test the pastoral care modules expiry feature", () => {
 
         tester.isGoingTo("Confirm the changes have been saved");
         await manageRecordSettings.expectDefaultExpiryToBe("2 weeks");
+
+        await db.updateInDatabase("lu_pastoral_type", { default_expiry: null }, { name: "Attendance" });
     });
 
-    test("Check the expires at changes based on the current type/subtype selection", async ({ tester, page }) => {
+    test("Check type/subtype changes just the expires at", async ({ tester, page, db }) => {
+        const manageRecordSettings = new ManageRecordSettings(page);
         const createPastoralRecord = new CreatePastoralRecord(page);
+
+        tester.isGoingTo("Visit the Award/Achievement page");
+        await manageRecordSettings.gotoAwardAchievement();
+
+        tester.isGoingTo("Set the default expiry to 1 Month");
+        await manageRecordSettings.selectDefaultExpiry("1 Month");
+
+        tester.isGoingTo("Save the changes");
+        await manageRecordSettings.clickSave();
+
+        tester.isGoingTo("Visit the Learning Difficulties page");
+        await manageRecordSettings.gotoLearningDifficulties();
+
+        tester.isGoingTo("Set the default expiry to 6 Months");
+        await manageRecordSettings.selectDefaultExpiry("6 Months");
+
+        tester.isGoingTo("Save the changes");
+        await manageRecordSettings.clickSave();
+
+        tester.isGoingTo("Visit the Attendance page");
+        await manageRecordSettings.gotoAttendance();
+
+        tester.isGoingTo("Set the default expiry to 2 Weeks");
+        await manageRecordSettings.selectDefaultExpiry("2 Weeks");
+
+        tester.isGoingTo("Save the changes");
+        await manageRecordSettings.clickSave();
 
         tester.isGoingTo("Add a new pastoral record to Jana Reed");
         await createPastoralRecord.goto(25);
@@ -106,10 +91,24 @@ test.describe("Test the pastoral care modules expiry feature", () => {
         tester.isGoingTo("Check expires at date is 2 weeks from today");
         const date2Weeks = dayjs().add(2, "weeks").format("DD/MM/YYYY");
         await createPastoralRecord.expectExpiresAtToBe(date2Weeks);
+
+        await db.updateInDatabase("lu_pastoral_type", { default_expiry: null }, { name: "Attendance" });
+        await db.updateInDatabase("lu_pastoral_type", { default_expiry: null }, { name: "Bullying" });
+        await db.updateInDatabase("lu_pastoral_subtype", { default_expiry: null }, { name: "Learning Difficulties" });
     });
 
-    test("Check manual date entry takes precedence over type/subtype selection", async ({ tester, page }) => {
+    test("Check manual date entry takes precedence over type/subtype selection", async ({ tester, page, db }) => {
+        const manageRecordSettings = new ManageRecordSettings(page);
         const createPastoralRecord = new CreatePastoralRecord(page);
+
+        tester.isGoingTo("Visit the Award/Achievement page");
+        await manageRecordSettings.gotoAwardAchievement();
+
+        tester.isGoingTo("Set the default expiry to 1 Month");
+        await manageRecordSettings.selectDefaultExpiry("1 Month");
+
+        tester.isGoingTo("Save the changes");
+        await manageRecordSettings.clickSave();
 
         tester.isGoingTo("Add a new pastoral record to Jana Reed");
         await createPastoralRecord.goto(25);
@@ -123,11 +122,16 @@ test.describe("Test the pastoral care modules expiry feature", () => {
 
         tester.isGoingTo("Check expires at date is still 01/01/2050");
         await createPastoralRecord.expectExpiresAtToBe(date);
+
+        await db.updateInDatabase("lu_pastoral_subtype", { default_expiry: null }, { name: "Award/Achievement" });
     });
 
-    test("Check Apply to existing records updates existing records", async ({ tester, page }) => {
+    test("Check Apply to existing records updates existing records", async ({ tester, page, db }) => {
         const manageRecordSettings = new ManageRecordSettings(page);
         const createPastoralRecord = new CreatePastoralRecord(page);
+
+        await createPastoralRecord.gotoExisting(25, 2);
+        await createPastoralRecord.expectExpiresAtToBe("");
 
         tester.isGoingTo("Visit the manage Bullying page");
         await manageRecordSettings.gotoBullying();
@@ -141,12 +145,17 @@ test.describe("Test the pastoral care modules expiry feature", () => {
         tester.isGoingTo("Save the changes");
         await manageRecordSettings.clickSave();
 
-        tester.isGoingTo("Check an existing Bullying record and confirm the expiry date is 1 month from today");
+        tester.isGoingTo(
+            "Check an existing Bullying record and confirm the expiry date is 1 month from the created date",
+        );
         await createPastoralRecord.gotoExisting(25, 2);
         await createPastoralRecord.expectExpiresAtToBe("01/12/2017");
+
+        await db.updateInDatabase("lu_pastoral_type", { default_expiry: null }, { name: "Bullying" });
+        await db.updateInDatabase("pastoral", { expires_at: null }, { heading: "Cyber Bullying" });
     });
 
-    test("Check the show archived records toggle on a users pastoral profile page", async ({ tester, page }) => {
+    test("Check the show archived records toggle on a users pastoral profile page", async ({ tester, page, db }) => {
         const pastoralProfile = new PastoralProfile(page);
         const createPastoralRecord = new CreatePastoralRecord(page);
 
@@ -168,13 +177,26 @@ test.describe("Test the pastoral care modules expiry feature", () => {
         tester.isGoingTo("Toggle the show archived records and check that all three records are visible again");
         await pastoralProfile.clickShowArchivedRecordsToggle();
         expect(await pastoralProfile.getRecords()).toHaveLength(3);
+
+        await db.updateInDatabase("pastoral", { expires_at: null }, { heading: "Out of uniform" });
     });
 
     test("Confirm expired records are hidden by default on the class Pastoral Care Report", async ({
         tester,
         page,
+        db,
     }) => {
+        const pastoralProfile = new PastoralProfile(page);
+        const createPastoralRecord = new CreatePastoralRecord(page);
         const classReport = new ClassReport(page);
+
+        tester.isGoingTo("Visit the pastoral profile page for Jana Reed");
+        await pastoralProfile.goto(25);
+
+        tester.isGoingTo("Modify the expired at date of the 'Out of uniform' record to 2010");
+        await pastoralProfile.clickModifyIcon(25, 1);
+        await createPastoralRecord.setExpiresAt("01/01/2010");
+        await createPastoralRecord.clickSave();
 
         tester.isGoingTo("Visit the 9A English (9ENGA) class pastoral care report");
         await classReport.goto(83);
@@ -189,9 +211,11 @@ test.describe("Test the pastoral care modules expiry feature", () => {
         await classReport.clickApplyFiltersButton();
         await page.waitForLoadState("load"); // Waits for full page reload
         await expect(studentRecord).toContainText("Out of uniform");
+
+        await db.updateInDatabase("pastoral", { expires_at: null }, { heading: "Out of uniform" });
     });
 
-    test("Confirm expired pastoral flags do not appear on student profile", async ({ tester, page }) => {
+    test("Confirm expired pastoral flags do not appear on student profile", async ({ tester, page, db }) => {
         const manageRecordSettings = new ManageRecordSettings(page);
         const profilePage = new ProfilePage(tester, page);
 
@@ -202,7 +226,7 @@ test.describe("Test the pastoral care modules expiry feature", () => {
         await manageRecordSettings.selectFlag("Achievement");
 
         tester.isGoingTo("Set the flag color to green");
-        await manageRecordSettings.fillFlagColor("#00ff1e");
+        await manageRecordSettings.fillFlagColor();
 
         tester.isGoingTo("Save the changes");
         await manageRecordSettings.clickSave();
@@ -230,21 +254,12 @@ test.describe("Test the pastoral care modules expiry feature", () => {
 
         tester.isGoingTo("Check that the Achievement flag is no longer visible");
         await expect(profilePage.getFlag(1, 1)).not.toBeVisible();
-    });
 
-    /**
-     * Resetting data to not impact other tests
-     */
-    test.afterAll(async ({ baseTester, db }) => {
-        baseTester.isGoingTo("reset the default_expiry date for any changed types/subtypes");
-        await db.updateInDatabase("lu_pastoral_type", { default_expiry: null }, { name: "Attendance" });
-        await db.updateInDatabase("lu_pastoral_type", { default_expiry: null }, { name: "Bullying" });
-        // await db.updateInDatabase("lu_pastoral_subtype", { default_expiry: null }, { name: "Award/Achievement" });
-        await db.updateInDatabase("lu_pastoral_subtype", { default_expiry: null }, { name: "Learning Difficulties" });
-
-        baseTester.isGoingTo("reset the expires_at date for any modified records");
-        await db.updateInDatabase("pastoral", { expires_at: null }, { heading: "Out of uniform" });
-        await db.updateInDatabase("pastoral", { expires_at: null }, { heading: "Cyber Bullying" });
+        await db.updateInDatabase(
+            "lu_pastoral_subtype",
+            { color: null, icon: null, default_expiry: null },
+            { name: "Award/Achievement" },
+        );
         await db.updateInDatabase(
             "pastoral",
             { expires_at: null },

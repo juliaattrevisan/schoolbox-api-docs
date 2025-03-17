@@ -67,11 +67,13 @@ export default class PastoralExpiry {
     }
 
     /**
-     * Sets the flag color
-     * @param color - The color to set the flag to
+     * Sets the flag color (we just use the first swatch for now)
+     * I was having trouble just using .fill() to set the color,
+     * so I'm using the swatch button instead
      */
-    async fillFlagColor(color: string): Promise<void> {
-        await this.page.getByTestId(PastoralExpiry.DATATEST_FLAG_COLOR_INPUT).fill(color);
+    async fillFlagColor(): Promise<void> {
+        await this.page.getByTestId(PastoralExpiry.DATATEST_FLAG_COLOR_INPUT).click();
+        await this.page.getByRole("button", { name: "Color swatch rgb(0, 102, 176)" }).click();
     }
 
     /**
