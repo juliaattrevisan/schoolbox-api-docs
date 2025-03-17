@@ -140,10 +140,10 @@ test.describe("Curriculum Coverage Report Tests", () => {
 
         tester.isGoingTo("disable Year 4 History");
 
-        // Check Year 4
+        tester.isGoingTo("Check Year 4");
         await manageCurriculum.checkNode("Year 4 History");
 
-        // Click Disable button
+        tester.isGoingTo("Click Disable button");
         await disableNodes.clickDisableButton();
 
         tester.isGoingTo("Ensure the confirmation modal appears");
@@ -172,15 +172,34 @@ test.describe("Curriculum Coverage Report Tests", () => {
 
         tester.isGoingTo("Confirm the disabled node is visible");
         await expect(coverageReport.getTable()).toContainText("Year 4 History");
+
+        await manageCurriculum.goto();
+
+        tester.isGoingTo("enable Year 4 History");
+
+        tester.isGoingTo("Check Year 4");
+        await manageCurriculum.checkNode("Year 4 History");
+
+        tester.isGoingTo("Click Enable button");
+        await disableNodes.clickEnableButton();
+
+        tester.isGoingTo("Ensure the confirmation modal appears");
+        await disableNodes.waitForConfirmModal();
+
+        tester.isGoingTo("Confirm the disable action");
+        await disableNodes.clickConfirmButton();
+
+        tester.isGoingTo("Ensure the toast message is shown");
+        await expect(page.getByTestId("toast")).toContainText("Outcome successfully enabled");
     });
 
     /**
      * Soft deleting data to not impact the tests
      */
-    test.afterAll(async ({ baseTester, db }) => {
-        // Soft-delete data to not interfere with other tests
-        baseTester.isGoingTo("update enabled on the Year 4 History so it does not impact next suite of tests");
-        // reset the enabled status of Year 4 History
-        await db.updateInDatabase("curriculum_node", { enabled: 1 }, { "name like": "Year 4 History" });
-    });
+    // test.afterAll(async ({ baseTester, db }) => {
+    //     // Soft-delete data to not interfere with other tests
+    //     baseTester.isGoingTo("update enabled on the Year 4 History so it does not impact next suite of tests");
+    //     // reset the enabled status of Year 4 History
+    //     await db.updateInDatabase("curriculum_node", { enabled: 1 }, { name: "Year 4 History" });
+    // });
 });
