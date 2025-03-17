@@ -371,8 +371,6 @@ $kernel->run(new class extends App {
      */
     public function run(ContainerInterface $di, LoopInterface $loop, Logger $log, array $opts, string $flags): void
     {
-        $this->deprecationNotice("SA-19334");
-
         // Install logger and DB
         $this->log     = $log;
         $this->db      = $di->get('databaseInternal');
@@ -381,6 +379,7 @@ $kernel->run(new class extends App {
         $config        = $di->get('config');
         $this->fqdn    = trim($config->get('site_hostname') . "." . $config->get('site_domain'), ';.');
 
+        $this->deprecationNotice("SA-19334");
 
         // log perform / dry run
         if ($this->perform) {
