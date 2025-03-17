@@ -31,6 +31,17 @@
             },
         }));
 
+        /**
+        * Ensure at least one of these inputs has a value applied
+        */
+        $.validator.addMethod(
+            "atLeastOneInputRequired",
+            function (value, element, { campusElement, studentsElement } ) {
+                return $(element).val() !== "" || $(campusElement).val() !== "" || $(studentsElement).val() !== "";
+            },
+            "Please enter at least one Student Selection",
+        );
+
         $('#summative-report-form').alaressValidate({
             rules: {
                 'title': {
@@ -38,6 +49,12 @@
                 },
                 'terms': {
                     requiredNotBlank: true
+                },
+                'yearLevels': {
+                    atLeastOneInputRequired: {
+                        campusElement: '#report-campuses',
+                        studentsElement: '#report-students'
+                    }
                 }
             },
             messages: {
@@ -125,6 +142,9 @@
                 data: {
                     roleTypeID: 'student',
                 },
+            },
+            selectize: {
+                placeholder: 'Search students',
             },
         });
 
@@ -442,13 +462,14 @@
                         </div>
                     </fieldset>
 
-                    <fieldset class="content">
-                        <legend class="no-margin">Student Selection</legend>
+                    <fieldset class="content" data-has-error-placeholder>
+                        <legend class="no-margin required">Student Selection</legend>
                         <div class="small-12 columns">
                             <p class="meta">
                                 Select the students to be included in the report export.
                                 All users from each field will be included in the final export.
                             </p>
+                            <div class="error-placeholder"></div>
 
                             <div class="row">
                                 <div class="small-12 large-6 columns">
