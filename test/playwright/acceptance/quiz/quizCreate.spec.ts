@@ -156,10 +156,10 @@ test.describe("Quiz Create Tests", () => {
         tester.isGoingTo("navigate to the quiz status page, grade a submission and publish the grade");
         await assessmentStatusPage.goto(quizId);
         await assessmentStatusPage.gradeSubmission(25, 80, "Great work!");
-        tester.isGoingTo("check the grade is published via attempt history and studennt profile page");
+        tester.isGoingTo("check the grade is published via attempt history and student profile page");
         await assessmentPage.goto(quizId, 25);
         await expect(page.locator("table.attempts-table")).toContainText("80 %");
-        await profilePage.goto("25");
+        await profilePage.goto(25);
         await expect(page.locator("li.feed-item").first()).toContainText("80 %");
         await expect(page.locator("li.feed-item").first()).toContainText("Great work!");
     });

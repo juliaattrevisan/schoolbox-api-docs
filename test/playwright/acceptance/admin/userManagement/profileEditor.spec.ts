@@ -34,7 +34,7 @@ test.describe("Profile Editor", () => {
         tester.isGoingTo("Click the update button");
         await profileEditor.clickUpdateButton();
         tester.isGoingTo("Navigate to the student profile page");
-        await profilePage.goto("25");
+        await profilePage.goto(25);
         tester.isGoingTo("Ensure the student name is presented");
         await profilePage.checkFieldNameIsPresented("Ms Jana Reed");
     });
@@ -58,7 +58,7 @@ test.describe("Profile Editor", () => {
         await profileEditor.clickUpdateButton();
         await page.waitForTimeout(1000);
         tester.isGoingTo("Navigate to the staff profile page");
-        await profilePage.goto("22");
+        await profilePage.goto(22);
         tester.isGoingTo("Ensure the staff first and last names and Test are presented");
         await profilePage.checkFieldNameIsPresented("Jack Coles Test");
     });
@@ -81,7 +81,7 @@ test.describe("Profile Editor", () => {
         await profileEditor.clickUpdateButton();
         await page.waitForTimeout(1000);
         tester.isGoingTo("Navigate to the parent profile page");
-        await profilePage.goto("27");
+        await profilePage.goto(27);
         tester.isGoingTo("Ensure the parent preferred name and last name are presented");
         await profilePage.checkFieldNameIsPresented("Jenni Reed");
     });
