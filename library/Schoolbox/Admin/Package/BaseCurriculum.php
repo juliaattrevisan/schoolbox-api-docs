@@ -12,21 +12,21 @@ abstract class BaseCurriculum implements IPackageInstall
     /**
      * Safety mechanism to avoid infinite loops
      */
-    private const MAX_CALLS = 100;
+    protected const MAX_CALLS = 100;
 
 
     /**
      * Some kind of export includes this word for a column with
      * the datatype null, instead of leaving it empty
      */
-    private const NULL_STRING = 'NULL';
+    protected const NULL_STRING = 'NULL';
 
     /**
      * A list of (csv row id, model id) tuples
      *
      * @var array
      */
-    private array $parentLookup = [];
+    protected array $parentLookup = [];
 
     /**
      * list of packages this depends on existing in the system
