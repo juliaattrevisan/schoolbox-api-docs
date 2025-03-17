@@ -10,23 +10,22 @@ import ManageRecordSettings from "@schoolboxTest/playwright/support/page/pastora
 import CreatePastoralRecord from "@schoolboxTest/playwright/support/page/pastoralCare/CreatePastoralRecord";
 import PastoralProfile from "@schoolboxTest/playwright/support/page/pastoralCare/PastoralProfile";
 import ClassReport from "@schoolboxTest/playwright/support/page/pastoralCare/ClassReport";
+import ProfilePage from "@schoolboxTest/playwright/support/page/profilePage/ProfilePage";
 
 test.describe("Test the pastoral care modules expiry feature", () => {
     test.beforeEach(async ({ tester }) => {
         await tester.impersonateTeacher();
     });
 
-    test("Update the Academic > Award/Achievement type with a default expiry of 1 Month", async ({ tester, page }) => {
+    test("Update the Academic > Award/Achievement type with a default expiry of 1 Month", async ({
+        tester,
+        page,
+        db,
+    }) => {
         const manageRecordSettings = new ManageRecordSettings(page);
 
         tester.isGoingTo("Visit the Award/Achievement page");
         await manageRecordSettings.gotoAwardAchievement();
-
-        tester.isGoingTo("Select Achievement flag");
-        await manageRecordSettings.selectFlag("Achievement");
-
-        tester.isGoingTo("Set the flag color to green");
-        await manageRecordSettings.fillFlagColor("#00ff1e");
 
         tester.isGoingTo("Set the default expiry to 1 Month");
         await manageRecordSettings.selectDefaultExpiry("1 Month");
@@ -38,6 +37,8 @@ test.describe("Test the pastoral care modules expiry feature", () => {
 
         tester.isGoingTo("Confirm the changes have been saved");
         await manageRecordSettings.expectDefaultExpiryToBe("1 month");
+
+        await db.updateInDatabase("lu_pastoral_subtype", { default_expiry: null }, { name: "Award/Achievement" });
     });
 
     test("Update the Academic > Learning Difficulties type with a default expiry of 6 Months", async ({
@@ -48,12 +49,6 @@ test.describe("Test the pastoral care modules expiry feature", () => {
 
         tester.isGoingTo("Visit the Learning Difficulties page");
         await manageRecordSettings.gotoLearningDifficulties();
-
-        tester.isGoingTo("Select Alert flag");
-        await manageRecordSettings.selectFlag("Alert");
-
-        tester.isGoingTo("Set the flag color to red");
-        await manageRecordSettings.fillFlagColor("#ff0000");
 
         tester.isGoingTo("Set the default expiry to 6 Months");
         await manageRecordSettings.selectDefaultExpiry("6 Months");
@@ -196,6 +191,47 @@ test.describe("Test the pastoral care modules expiry feature", () => {
         await expect(studentRecord).toContainText("Out of uniform");
     });
 
+    test("Confirm expired pastoral flags do not appear on student profile", async ({ tester, page }) => {
+        const manageRecordSettings = new ManageRecordSettings(page);
+        const profilePage = new ProfilePage(tester, page);
+
+        tester.isGoingTo("Visit the Award/Achievement page");
+        await manageRecordSettings.gotoAwardAchievement();
+
+        tester.isGoingTo("Select Achievement flag");
+        await manageRecordSettings.selectFlag("Achievement");
+
+        tester.isGoingTo("Set the flag color to green");
+        await manageRecordSettings.fillFlagColor("#00ff1e");
+
+        tester.isGoingTo("Save the changes");
+        await manageRecordSettings.clickSave();
+
+        tester.isGoingTo("Visit the profile page for Penelope Li");
+        await profilePage.goto(29);
+
+        tester.isGoingTo("Check that the Achievement flag is visible");
+        await expect(profilePage.getFlag(1, 1)).toBeVisible();
+
+        tester.isGoingTo("Visit the manage Award/Achievement page");
+        await manageRecordSettings.gotoAwardAchievement();
+
+        tester.isGoingTo("Set the default expiry to 1 Month");
+        await manageRecordSettings.selectDefaultExpiry("1 Month");
+
+        tester.isGoingTo("Check the Apply Default Expiry checkbox");
+        await manageRecordSettings.clickApplyDefaultExpiry();
+
+        tester.isGoingTo("Save the changes");
+        await manageRecordSettings.clickSave();
+
+        tester.isGoingTo("Visit the profile page for Penelope Li again");
+        await profilePage.goto(29);
+
+        tester.isGoingTo("Check that the Achievement flag is no longer visible");
+        await expect(profilePage.getFlag(1, 1)).not.toBeVisible();
+    });
+
     /**
      * Resetting data to not impact other tests
      */
@@ -203,11 +239,16 @@ test.describe("Test the pastoral care modules expiry feature", () => {
         baseTester.isGoingTo("reset the default_expiry date for any changed types/subtypes");
         await db.updateInDatabase("lu_pastoral_type", { default_expiry: null }, { name: "Attendance" });
         await db.updateInDatabase("lu_pastoral_type", { default_expiry: null }, { name: "Bullying" });
-        await db.updateInDatabase("lu_pastoral_subtype", { default_expiry: null }, { name: "Award/Achievement" });
+        // await db.updateInDatabase("lu_pastoral_subtype", { default_expiry: null }, { name: "Award/Achievement" });
         await db.updateInDatabase("lu_pastoral_subtype", { default_expiry: null }, { name: "Learning Difficulties" });
 
         baseTester.isGoingTo("reset the expires_at date for any modified records");
         await db.updateInDatabase("pastoral", { expires_at: null }, { heading: "Out of uniform" });
         await db.updateInDatabase("pastoral", { expires_at: null }, { heading: "Cyber Bullying" });
+        await db.updateInDatabase(
+            "pastoral",
+            { expires_at: null },
+            { heading: "Academic Achievement Award - Semester 2" },
+        );
     });
 });

@@ -1,5 +1,5 @@
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
-import type { Page } from "@playwright/test";
+import type { Page, Locator } from "@playwright/test";
 import { expect } from "@playwright/test";
 
 export default class ProfilePage {
@@ -10,6 +10,8 @@ export default class ProfilePage {
     static readonly URL = "/search/user/{id}";
 
     static readonly DATA_TEST_PROFILE_NAME = "user-profile-name";
+
+    static readonly DATATEST_PROFILE_FLAG = "student-profile-pastoral-flag-{typeId}-{subtypeId}";
 
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
@@ -84,5 +86,20 @@ export default class ProfilePage {
 
     async checkFieldNameIsPresented(fieldName: string): Promise<void> {
         await expect(this.page.getByTestId(ProfilePage.DATA_TEST_PROFILE_NAME)).toHaveText(fieldName);
+    }
+
+    /**
+     * Returns the locator for the flag
+     * @param typeId - The type id
+     * @param subTypeId - The sub type id
+     * @returns - The locator for the flag
+     */
+    getFlag(typeId: number, subTypeId: number): Locator {
+        return this.page.getByTestId(
+            ProfilePage.DATATEST_PROFILE_FLAG.replace("{typeId}", typeId.toString()).replace(
+                "{subtypeId}",
+                subTypeId.toString(),
+            ),
+        );
     }
 }
