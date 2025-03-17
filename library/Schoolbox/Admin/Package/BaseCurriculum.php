@@ -136,7 +136,7 @@ abstract class BaseCurriculum implements IPackageInstall
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function importAncestors(array $graph, array $row): void
+    protected function importAncestors(array $graph, array $row): void
     {
         $next = $row['curriculum_node_parent_id'];
 
