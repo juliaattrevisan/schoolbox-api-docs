@@ -1,5 +1,6 @@
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import type { Page } from "@playwright/test";
+import { expect } from "@playwright/test";
 
 export default class ProfileEditor {
     private tester: AcceptanceTester;
@@ -57,8 +58,8 @@ export default class ProfileEditor {
 
     /**
      * Click the cog of a field
-     * @param fieldName - The field name
      * @param roleType - The user type: student, staff, parent
+     * @param fieldName - The field name
      */
     async clickFieldCog(roleType: string, fieldName: string): Promise<void> {
         await this.page.getByTestId(`pe-${roleType}-fields-active-item-${fieldName}-settings`).click();
@@ -66,8 +67,8 @@ export default class ProfileEditor {
 
     /**
      * Click the field visibility or availability checkbox
-     * @param fieldName - The field name
      * @param roleType - The user type: student, staff, parent
+     * @param fieldName - The field name
      * @param option - The option to click: visibility or availability
      * @param optionValue - The option value to click: student, 1
      */
@@ -79,21 +80,22 @@ export default class ProfileEditor {
 
     /**
      * Click the update button of a field
-     * @param fieldName - The field name
      * @param roleType - The user type: student, staff, parent
+     * @param fieldName - The field name
      */
     async clickFieldUpdateButton(roleType: string, fieldName: string): Promise<void> {
         await this.page.getByTestId(`pe-${roleType}-fields-active-item-${fieldName}-settings-confirm`).click();
+        await expect(this.page.getByTestId("toast")).toHaveAttribute("data-test-is-success", "true");
+        await expect(this.page.getByTestId("toast")).not.toBeVisible();
     }
 
     /**
      * Click the available field to add in the active field
-     * @param fieldName - The field name
      * @param roleType - The user type: student, staff, parent
+     * @param fieldName - The field name
      */
     async clickAvailableField(roleType: string, fieldName: string): Promise<void> {
         await this.page.getByTestId(`pe-${roleType}-fields-available-item-${fieldName}`).click();
-        // await this.page.getByTestId(`pe-parent-fields-available-item-campusCollection`).click();
     }
 
     /**

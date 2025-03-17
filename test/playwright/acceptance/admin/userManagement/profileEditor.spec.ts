@@ -107,8 +107,6 @@ test.describe("Profile Editor", () => {
         await profileEditor.clickFieldCheckbox("staff", "role", "availability", "1");
         await profileEditor.clickFieldCheckbox("staff", "role", "availability", "2");
         await profileEditor.clickFieldUpdateButton("staff", "role");
-        await expect(page.getByTestId("toast")).toHaveAttribute("data-test-is-success", "true");
-        await expect(page.getByTestId("toast")).not.toBeVisible();
 
         // Select the "Campus" field and open settings
         tester.isGoingTo("Click on the cog of Campus field");
@@ -118,9 +116,7 @@ test.describe("Profile Editor", () => {
         tester.isGoingTo("Click on the visibility checkbox of Campus field");
         await profileEditor.clickFieldCheckbox("staff", "campusCollection", "visibility", "self");
         await profileEditor.clickFieldCheckbox("staff", "campusCollection", "visibility", "staff");
-        await page.waitForTimeout(3000);
         await profileEditor.clickFieldUpdateButton("staff", "campusCollection");
-        await expect(page.getByTestId("toast")).toBeVisible();
 
         // Select the "Email" field and open settings
         tester.isGoingTo("Click on the cog of Email field");
