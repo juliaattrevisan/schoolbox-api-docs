@@ -17,6 +17,7 @@ RUN docker-php-ext-install zip && \
     docker-php-ext-install ldap && \
     docker-php-ext-install dom && \
     docker-php-ext-install sockets && \
+    docker-php-ext-install exif && \
     docker-php-ext-enable redis && \
     docker-php-ext-enable xdebug && \
     docker-php-ext-enable imagick
