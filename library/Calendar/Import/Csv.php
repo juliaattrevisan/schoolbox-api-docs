@@ -81,10 +81,6 @@ class Csv extends Base
         $hasRolesColumn = array_key_exists('role', $headerColumns);
         $hasOwnerColumn = array_key_exists('event owner', $headerColumns);
 
-        /* Starting transaction
-         */
-        $eventMapper->getDatabase()->beginTransaction();
-
         while (($thisRow = fgetcsv($handle, 0, ",")) !== false) {
             // The CSV file will not contain character encoding info, so just assume a compatible encoding has been used.
             // Previously we stripped non-ASCII characters here, but users complained about loss of data.
@@ -434,42 +430,55 @@ class Csv extends Base
                 $event->setAccess(Event::ACCESS_GROUP);
             }
 
+            if ($event->isCampusLevel()) {
+                if (empty($roleCollection)) {
+                    $output[] = array(
+                        'name'   => $name,
+                        'status' => 'Not Added',
+                        'error'  => 'Roles not provided',
+                    );
+
+                    continue;
+                }
+            }
+
             /* Save it
              */
-            $result = $eventMapper->save($event);
-            if (is_array($result) && count($result)) {
-                /* Assign Category relations:
-                 * log what it was added to
-                 */
-                if ($event->isGroupLevel()) {
-                    foreach ($folderList as $folderId) {
-                        $category = new Category();
-                        $category->setEventId($event->getId());
-                        $category->setCategoryId($folderId);
-                        $categoryRelationMapper->save($category);
+            $isSuccess = false;
+            if ($perform) {
+                try {
+                    $result = $eventMapper->save($event);
+                    if (is_array($result) && count($result)) {
+                        /* Assign Category relations:
+                         * log what it was added to
+                         */
+                        if ($event->isGroupLevel()) {
+                            foreach ($folderList as $folderId) {
+                                $category = new Category();
+                                $category->setEventId($event->getId());
+                                $category->setCategoryId($folderId);
+                                $categoryRelationMapper->save($category);
+                            }
+                        }
+
+                        /* Assign Role relations
+                         */
+                        if ($event->isCampusLevel()) {
+                            foreach ($roleCollection as $currentRole) {
+                                $role = new Role();
+                                $role->setEventId($event->getId());
+                                $role->setRoleId($currentRole);
+                                $roleRelationMapper->save($role);
+                            }
+                        }
+                        $isSuccess = true;
                     }
+                } catch (\Exception $e) {
+                    //noop
                 }
+            }
 
-                /* Assign Role relations
-                 */
-                if ($event->isCampusLevel()) {
-                    if (empty($roleCollection)) {
-                        $output[] = array(
-                            'name'   => $name,
-                            'status' => 'Not Added',
-                            'error'  => 'Roles not provided',
-                        );
-
-                        continue;
-                    }
-
-                    foreach ($roleCollection as $currentRole) {
-                        $role = new Role();
-                        $role->setEventId($event->getId());
-                        $role->setRoleId($currentRole);
-                        $roleRelationMapper->save($role);
-                    }
-                }
+            if ($isSuccess || !$perform) {
                 $output[] = array(
                     'name'   => $event->getTitle(),
                     'status' => 'Added',
@@ -485,14 +494,6 @@ class Csv extends Base
 
             /* Free memory */
             unset($publish_date, $start, $finish);
-        }
-
-        /* Should it do a dry run instead
-         */
-        if ($perform) {
-            $eventMapper->getDatabase()->commit();
-        } else {
-            $eventMapper->getDatabase()->rollback();
         }
 
         $this->setOutput($output);
