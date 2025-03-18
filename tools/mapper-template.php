@@ -18,6 +18,8 @@ require_once __DIR__ . '/../conf/core/require.php';
 
 $kernel = new \Schoolbox\Application\Daemon\Kernel(__FILE__);
 
+$kernel->deprecationNotice("SA-19334");
+
 $opts = getopt('t::');
 
 if (empty($opts['t'])) {
@@ -146,7 +148,7 @@ echo "
 }
 ";
 
-
+$kernel->deprecationNotice("SA-19334");
 
 
 /**

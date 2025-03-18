@@ -447,4 +447,45 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
         ];
         return $limits[$threshold];
     }
+
+    /**
+     * Returns the filename of of the script that invoked this App, suitable for generating help output.
+     *
+     * The following should all return "./myTool.php"
+     * * "./relative/path/to/myTool.php"
+     * * "relative/path/to/myTool.php"
+     * * "./../relative/path/to/myTool.php"
+     * * "/absolute/path/to/myTool.php"
+     *
+     * @return string
+     */
+    public function getToolFilename(): string
+    {
+        $scriptName = $_SERVER['SCRIPT_NAME'];
+        $lastIndex  = strrpos($scriptName, DIRECTORY_SEPARATOR);
+        if ($lastIndex !== false) {
+            $scriptName = substr($scriptName, $lastIndex + 1);
+        }
+        return "./$scriptName";
+    }
+
+    /**
+     * Deprecation notice
+     *
+     * if you are still using this script, please add a comment of this scripts name into string $jiraNumber
+     * @param string $jiraNumber Jira ticket number to prevent deprecation
+     * @deprecated
+     */
+    public function deprecationNotice(string $jiraNumber): void
+    {
+        /**
+         * Deprecation notice
+         */
+        $this->logger()->error('/******************************************************************************************/');
+        $this->logger()->error('/***************     Deprecated NOTICE - this will be deleted in future    ****************/');
+        $this->logger()->error("/*    If you are running this, please add a comment of this scripts name into $jiraNumber    */");
+        $this->logger()->error(sprintf("Script file: %s", $this->getToolFilename()));
+        $this->logger()->error('/******************************************************************************************/');
+        $this->logger()->error('/******************************************************************************************/');
+    }
 }

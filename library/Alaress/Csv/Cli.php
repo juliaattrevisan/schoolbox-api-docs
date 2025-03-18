@@ -43,6 +43,8 @@ class Cli extends CliTool\App
      */
     public function run(): void
     {
+        $this->deprecationNotice("SA-19334");
+
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
@@ -83,5 +85,7 @@ HELP;
 
         //dump all locations where UTF8 characters exist, including the BOM and headers.
         $valid->locateUTF8($this->getLogger());
+
+        $this->deprecationNotice("SA-19334");
     }
 }

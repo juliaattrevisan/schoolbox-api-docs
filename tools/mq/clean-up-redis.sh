@@ -1,4 +1,12 @@
 #!/bin/sh
+
+# Deprecation notice
+echo -e "\033[1;33m/******************************************************************************************/\033[0m"
+echo -e "\033[1;33m/***************     Deprecated NOTICE - this will be deleted in future    ****************/\033[0m"
+echo -e "\033[1;33m/*    If you are running this, please add a comment of this scripts name into SA-19334    */\033[0m"
+echo -e "\033[1;33m/******************************************************************************************/\033[0m"
+echo -e "\033[1;33m/******************************************************************************************/\033[0m"
+
 filepath=`readlink -f $0`;
 fullpath=${filepath%/*};
 
@@ -17,3 +25,10 @@ then
   ls -lh $redisfile;
 fi;
 php $fullpath/../../tools/mq/clean-up-redis.php &
+
+# Deprecation notice
+echo -e "\033[1;33m/******************************************************************************************/\033[0m"
+echo -e "\033[1;33m/***************     Deprecated NOTICE - this will be deleted in future    ****************/\033[0m"
+echo -e "\033[1;33m/*    If you are running this, please add a comment of this scripts name into SA-19334    */\033[0m"
+echo -e "\033[1;33m/******************************************************************************************/\033[0m"
+echo -e "\033[1;33m/******************************************************************************************/\033[0m"

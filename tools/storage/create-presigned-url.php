@@ -39,6 +39,8 @@ $app    = new class extends CliTool\App {
 
     public function run(): void
     {
+        $this->deprecationNotice("SA-19334");
+
         if ($this->getOpt(self::OPT_SHORT_HELP) || $this->getOpt(self::OPT_LONG_HELP)) {
             $this->printHelp();
             exit(CliTool\Kernel::EXIT_STATUS_OK);
@@ -62,6 +64,8 @@ $app    = new class extends CliTool\App {
             exit(CliTool\Kernel::EXIT_STATUS_APP_ERROR);
         }
         $this->generatePresignedUrl($objectKey, $expiry);
+
+        $this->deprecationNotice("SA-19334");
     }
 
 

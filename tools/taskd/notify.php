@@ -48,6 +48,8 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
      */
     public function run(): void
     {
+        $this->deprecationNotice("SA-19334");
+
         if ($this->getOpt(self::OPT_LONG_HELP) || $this->getOpt(self::OPT_SHORT_HELP)) {
             $helpText = <<<HELP
             Task daemon notifier
@@ -104,6 +106,8 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
         );
 
         $producer->send($message);
+
+        $this->deprecationNotice("SA-19334");
     }
 });
 $kernel->runApp();

@@ -20,7 +20,6 @@ use Schoolbox\Application\CliTool\App;
  */
 class DisableExpensiveComponents extends App
 {
-
     private const MODE_SHOW    = 'show';
     private const MODE_BACKUP  = 'backup';
     private const MODE_MODIFY  = 'modify';
@@ -82,6 +81,8 @@ class DisableExpensiveComponents extends App
     /** @inheritDoc */
     public function run(): void
     {
+        $this->deprecationNotice("SA-19334");
+
         // Did user request help?
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             $this->printHelp();
@@ -101,6 +102,8 @@ class DisableExpensiveComponents extends App
                 $this->restoreDashboardComponentConfig();
                 break;
         }
+
+        $this->deprecationNotice("SA-19334");
     }
 
     /**

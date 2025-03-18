@@ -11,6 +11,13 @@
 # @copyright   Copyright 2019, Schoolbox Pty Ltd
 # @link        https://schoolbox.com.au/
 
+# Deprecation notice
+echo -e "\033[1;33m/******************************************************************************************/\033[0m"
+echo -e "\033[1;33m/***************     Deprecated NOTICE - this will be deleted in future    ****************/\033[0m"
+echo -e "\033[1;33m/*    If you are running this, please add a comment of this scripts name into SA-19334    */\033[0m"
+echo -e "\033[1;33m/******************************************************************************************/\033[0m"
+echo -e "\033[1;33m/******************************************************************************************/\033[0m"
+
 echo
 echo "-------------------------------------------------------------------------------------------"
 echo "Microsoft SQL Server ODBC Driver 13 (PHP 7.1 / PDO_SQLSRV) Installer"
@@ -143,3 +150,9 @@ php -i | grep 'PDO drivers'
 echo "Log file available at: ~/php_7.1_pdosqlsrv_install.log"
 echo
 
+# Deprecation notice
+echo -e "\033[1;33m/******************************************************************************************/\033[0m"
+echo -e "\033[1;33m/***************     Deprecated NOTICE - this will be deleted in future    ****************/\033[0m"
+echo -e "\033[1;33m/*    If you are running this, please add a comment of this scripts name into SA-19334    */\033[0m"
+echo -e "\033[1;33m/******************************************************************************************/\033[0m"
+echo -e "\033[1;33m/******************************************************************************************/\033[0m"

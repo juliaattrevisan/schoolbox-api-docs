@@ -11,6 +11,8 @@ use Schoolbox\Realtime\Routing\Cache\WritableCache;
 require_once __DIR__ . '/../../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\Daemon\Kernel(__FILE__);
 
+$kernel->deprecationNotice("SA-19334");
+
 // Manage options
 $options = getopt('v', ['perform-update', 'user::', 'structure::', 'timetable::', 'enrolment::',]);
 $update  = isset($options['perform-update']);
@@ -152,3 +154,5 @@ if (isset($options['user']) || isset($options['enrolment'])) {
         $logger->error($e->getMessage(), [ 'exception' => $e ]);
     }
 }
+
+$kernel->deprecationNotice("SA-19334");

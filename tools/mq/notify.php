@@ -40,6 +40,8 @@ if ($argc < 3) {
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new Schoolbox\Application\Daemon\Kernel(__FILE__);
 
+$kernel->deprecationNotice("SA-19334");
+
 $levels = array_combine(Level::NAMES, Level::VALUES);
 
 $map = array(
@@ -100,3 +102,5 @@ $n = \Schoolbox\Notif\Notifactory::create($topic, ConfigLoader::getInstance());
 $n->log($values['severity'], "$instance");
 
 echo "Message '$body' sent via '$topic' at severity {$values['severity']}\n";
+
+$kernel->deprecationNotice("SA-19334");

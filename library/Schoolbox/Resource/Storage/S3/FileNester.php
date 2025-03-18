@@ -147,12 +147,17 @@ class FileNester extends CliTool\App
      */
     public function run(): void
     {
+        $this->deprecationNotice("SA-19334");
+
+
         $this->startTime = time();
         $this->getLogger()->info(sprintf("S3 File Copy/Move to top-level directory '/%s'", FilesystemFactory::PREFIX_STORAGE));
         $this->parseArgs();
         $this->buildDependencies();
         $this->processFiles();
         $this->printResults();
+
+        $this->deprecationNotice("SA-19334");
     }
 
 

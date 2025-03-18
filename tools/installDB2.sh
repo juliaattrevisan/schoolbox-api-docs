@@ -8,6 +8,13 @@
 # @copyright   Copyright 2019, Schoolbox Pty Ltd
 # @link        https://schoolbox.com.au/
 
+# Deprecation notice
+echo -e "\033[1;33m/******************************************************************************************/\033[0m"
+echo -e "\033[1;33m/***************     Deprecated NOTICE - this will be deleted in future    ****************/\033[0m"
+echo -e "\033[1;33m/*    If you are running this, please add a comment of this scripts name into SA-19334    */\033[0m"
+echo -e "\033[1;33m/******************************************************************************************/\033[0m"
+echo -e "\033[1;33m/******************************************************************************************/\033[0m"
+
 echo
 echo "-------------------------------------------------------------------------------------------"
 echo "IBM DB2 PHP Module Installer"
@@ -95,3 +102,10 @@ echo "Log file available at: ~/ibm_db2_install.log"
 echo
 
 eval "cd ${USERPATH}"
+
+# Deprecation notice
+echo -e "\033[1;33m/******************************************************************************************/\033[0m"
+echo -e "\033[1;33m/***************     Deprecated NOTICE - this will be deleted in future    ****************/\033[0m"
+echo -e "\033[1;33m/*    If you are running this, please add a comment of this scripts name into SA-19334    */\033[0m"
+echo -e "\033[1;33m/******************************************************************************************/\033[0m"
+echo -e "\033[1;33m/******************************************************************************************/\033[0m"

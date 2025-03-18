@@ -13,6 +13,8 @@ use Schoolbox\Database\Factory;
 require_once __DIR__ . '/../../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\Daemon\Kernel(__FILE__);
 
+$kernel->deprecationNotice("SA-19334");
+
 if ($argc < 3) {
     die("Usage: php {$argv[0]} <sessionID> <count>\n");
 }
@@ -99,3 +101,5 @@ foreach ($allRss as $item) {
 
     echo "[ ] Response: $response\n";
 }
+
+$kernel->deprecationNotice("SA-19334");

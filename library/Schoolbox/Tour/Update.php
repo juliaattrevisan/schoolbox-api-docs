@@ -18,6 +18,9 @@ class Update extends CliTool\App
 {
     public function run(): void
     {
+        $this->deprecationNotice("SA-19334");
+
+
         global $argv;
 
         if (!isset($argv[1])) {
@@ -89,5 +92,7 @@ HELP
             // TODO: support more than one step
             break;
         }
+
+        $this->deprecationNotice("SA-19334");
     }
 }

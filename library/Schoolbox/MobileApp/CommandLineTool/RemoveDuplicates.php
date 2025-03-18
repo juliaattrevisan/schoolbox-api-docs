@@ -48,6 +48,8 @@ class RemoveDuplicates extends CliTool\App
      */
     public function run(): void
     {
+        $this->deprecationNotice("SA-19334");
+
         // Did user request help?
         if ($this->getOpt(self::OPT_SHORT_HELP) || $this->getOpt(self::OPT_LONG_HELP)) {
             $this->printHelp();
@@ -121,6 +123,8 @@ class RemoveDuplicates extends CliTool\App
             $this->getLogger()->notice('Rolling back changes');
             $db->rollBack();
         }
+
+        $this->deprecationNotice("SA-19334");
     }
 
     /**

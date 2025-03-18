@@ -90,6 +90,8 @@ class CleanserTool extends CliTool\App
      */
     public function run(): void
     {
+        $this->deprecationNotice("SA-19334");
+
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
@@ -233,6 +235,8 @@ HELP;
         /* Releasing control
          */
         $lock->release();
+
+        $this->deprecationNotice("SA-19334");
     }
 
 

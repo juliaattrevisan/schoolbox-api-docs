@@ -22,6 +22,8 @@ require_once __DIR__ . '/../conf/core/require.php';
 $kernel = new CliTool\Kernel(new class extends CliTool\App {
     public function run(): void
     {
+        $this->deprecationNotice("SA-19334");
+
         $this->getLogger()->notice("Testing primary...");
         $this->testLdap($this->getConfig()->get('ldap_host'), $this->getConfig()->get('ldap_user'));
 
@@ -30,6 +32,8 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App {
 
         $this->getLogger()->notice("Testing tertiary...");
         $this->testLdap($this->getConfig()->get('ldap_host_ter'), $this->getConfig()->get('ldap_user_ter'));
+
+        $this->deprecationNotice("SA-19334");
     }
 
     /**
