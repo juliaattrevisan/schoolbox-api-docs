@@ -18,6 +18,13 @@ const field = window.Vue.computed(() => {
     return lpStore.fields.find((f) => f.id === props.fieldId);
 });
 
+const fieldWasGenerated = window.Vue.computed(() => {
+    const currentField = field.value;
+    if (!currentField) return false;
+
+    return currentField.body.trim() !== currentField.initialBody.trim() && currentField.body.trim().length > 0;
+});
+
 const textareaEl = window.Vue.useTemplateRef<HTMLTextAreaElement>("textareaEl");
 
 window.Vue.onMounted(async () => {
@@ -80,7 +87,7 @@ window.Vue.onMounted(async () => {
             >
             </textarea>
             <a class="icon-chat lp-field-regenerate" @click="() => lpStore.openModal(props.fieldId)">
-                {{ field.body.trim() !== field.initialBody.trim() ? "Regenerate" : "Generate" }} with AI
+                {{ fieldWasGenerated ? "Regenerate" : "Generate" }} with AI
             </a>
         </div>
     </div>

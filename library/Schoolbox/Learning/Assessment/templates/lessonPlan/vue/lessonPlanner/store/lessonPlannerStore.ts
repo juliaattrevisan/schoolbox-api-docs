@@ -39,7 +39,9 @@ export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
      * I.e. should we show "Generate Lesson Plan" or "Regenerate Lesson Plan"?
      */
     const hasLessonContent = window.Vue.computed(() => {
-        return fields.value.some((field) => field.body.trim() !== field.initialBody.trim());
+        return fields.value.some(
+            (field) => field.body.trim() !== field.initialBody.trim() && field.body.trim().length > 0,
+        );
     });
 
     // If there was an error generating the lesson plan
