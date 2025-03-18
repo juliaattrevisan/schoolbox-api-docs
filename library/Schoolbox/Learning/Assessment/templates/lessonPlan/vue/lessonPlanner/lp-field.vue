@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { sbProps } from "@js/util/sbx/pageUtils";
 import { useEditor } from "@schoolboxVue/composables/editor/useEditor";
 import { useLessonPlannerStore } from "./store/lessonPlannerStore";
 import type { LessonPlanField } from "./lessonPlannerTypes";
@@ -86,7 +87,11 @@ window.Vue.onMounted(async () => {
                 :name="`field[${props.fieldRef}][body]`"
             >
             </textarea>
-            <a class="icon-chat lp-field-regenerate" @click="() => lpStore.openModal(props.fieldId)">
+            <a
+                v-if="sbProps.hasAIFeatures"
+                class="icon-chat lp-field-regenerate"
+                @click="() => lpStore.openModal(props.fieldId)"
+            >
                 {{ fieldWasGenerated ? "Regenerate" : "Generate" }} with AI
             </a>
         </div>

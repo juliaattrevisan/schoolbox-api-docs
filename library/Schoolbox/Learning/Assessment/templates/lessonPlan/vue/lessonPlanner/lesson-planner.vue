@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { sbProps } from "@js/util/sbx/pageUtils";
 import locale from "@js/terminology/rosettaStone";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import { useLessonPlannerStore } from "./store/lessonPlannerStore";
@@ -27,7 +28,12 @@ window.Vue.onMounted(() => {
         <slot name="title"></slot>
         <slot name="date"></slot>
 
-        <button type="button" class="button expand icon-chat" @click="() => lpStore.openModal()">
+        <button
+            v-if="sbProps.hasAIFeatures"
+            type="button"
+            class="button expand icon-chat"
+            @click="() => lpStore.openModal()"
+        >
             {{ lpStore.hasLessonContent ? "Regenerate" : "Generate" }}
             {{ locale.lessonPlan.singular() }}
             with AI
@@ -44,7 +50,7 @@ window.Vue.onMounted(() => {
         />
     </fieldset>
 
-    <basic-modal v-model:is-open="lpStore.isModalOpen">
+    <basic-modal v-if="sbProps.hasAIFeatures" v-model:is-open="lpStore.isModalOpen">
         <section>
             <lp-modal-generate v-if="lpStore.modalStep === LessonPlannerModalStep.GENERATE" />
             <div v-else-if="lpStore.modalStep === LessonPlannerModalStep.GENERATING" class="loader"></div>
