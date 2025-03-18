@@ -15,8 +15,18 @@ import type { Position } from "@ckeditor/ckeditor5-utils/src/dom/position";
 import type View from "@ckeditor/ckeditor5-ui/src/view";
 import type { PanelPosition } from "@ckeditor/ckeditor5-ui/src/dropdown/dropdownpanelview";
 import { insertElementAfter } from "@js/util/domUtils";
+import ResourceLinkEditing from "@js/editor/plugin/resourceLink/ResourceLinkEditing";
 
 export default class UITweaks extends Plugin {
+    /**
+     * Add in the ResourceLinkEditing command,
+     * which gets triggered when the Link Browse button is clicked
+     * @returns - the required plugins
+     */
+    public static get requires(): readonly (typeof Plugin)[] {
+        return [ResourceLinkEditing] as const;
+    }
+
     /**
      * We need to ensure everything has been set up before we can start modifying the panels
      */
@@ -108,11 +118,12 @@ export default class UITweaks extends Plugin {
     addLinkBrowseButton(): void {
         const linkUI = this.editor.plugins.get(LinkUI);
         const contextualBalloonPlugin = this.editor.plugins.get("ContextualBalloon");
-        // listen once to the link ui 'balloon' opening, so we can add the button
+        // listen to the link ui 'balloon' opening, so we can add the button
         this.listenTo(contextualBalloonPlugin, "change:visibleView", (evt, name, visibleView) => {
             if (visibleView === linkUI.formView) {
+                // only need to add the button once, so remove the listener
                 this.stopListening(contextualBalloonPlugin, "change:visibleView");
-
+                // create the button
                 const button = new ButtonView(this.editor.locale);
                 button.set({
                     label: "Browse",
@@ -120,8 +131,10 @@ export default class UITweaks extends Plugin {
                     tooltip: true,
                     class: "ck-button-resource-link",
                 });
+                // Open up the resource browser when clicking the "Browse" button
+                button.on("execute", () => this.editor.execute("insertResourceLink"));
                 button.render();
-
+                // attach the button to the link form view
                 const linkFormView = linkUI.formView;
                 if (linkFormView && linkFormView.urlInputView.fieldView.element) {
                     // Register the button under the link form view, it will handle its destruction.
