@@ -106,15 +106,15 @@ try {
 } catch (ConcurrentTransformationException | InvalidPresignedUrlDurationExecption $e) {
     // This transformation is already being processed.
     $kernel->outputResourceBeingProcessedHeader();
-    SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], $e->getHttpStatusCode());
+    SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'] ?? '', $e->getHttpStatusCode());
 } catch (\RuntimeException $e) {
     /* When you cannot access the requested image (access denied)
     */
-    SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 403);
+    SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'] ?? '', 403);
 } catch (\InvalidArgumentException $e) {
     /* Image/Portrait not found
     */
-    SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 404);
+    SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'] ?? '', 404);
 } catch (Exception $e) {
     /* All other exceptions
     * BadMethodCallException
@@ -126,5 +126,5 @@ try {
     $sentry = $kernel->getDependencyInjector()->get('sentry');
     $sentry->captureException($e);
 
-    SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size']);
+    SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'] ?? '');
 }
