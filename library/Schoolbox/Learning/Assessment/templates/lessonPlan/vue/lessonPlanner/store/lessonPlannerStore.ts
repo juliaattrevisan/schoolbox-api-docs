@@ -6,6 +6,12 @@ interface LessonPlanStoreField extends LessonPlanField {
     selected: boolean; // Whether the field is selected or not
     editorId: string | null; // The editor ID for the field in the main form, null if not yet created
     suggestedBody?: string; // The suggested body for the field, if it has been generated
+    /**
+     * Keep track of the initial body of the field, so we can determine whether it has been modified
+     * and to show "Generate Lesson Plan" or "Regenerate Lesson Plan". If modifying an existing lesson plan (i.e. field.lessonPlanTemplateField exists),
+     * assume that the field has been modified if it has any content in it. Otherwise, the initial body is what was provided in the template.
+     */
+    initialBody: string;
 }
 
 export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
@@ -24,15 +30,16 @@ export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
             ...field,
             selected: false,
             editorId: null,
+            initialBody: field.lessonPlanTemplateField === undefined ? field.body : "",
         }));
     }
 
     /**
-     * Do any of the fields have actual content in them?
+     * Do any of the fields have actual content in them that differs from the initial body?
      * I.e. should we show "Generate Lesson Plan" or "Regenerate Lesson Plan"?
      */
     const hasLessonContent = window.Vue.computed(() => {
-        return fields.value.some((field) => field.body.trim().length > 0);
+        return fields.value.some((field) => field.body.trim() !== field.initialBody.trim());
     });
 
     // If there was an error generating the lesson plan

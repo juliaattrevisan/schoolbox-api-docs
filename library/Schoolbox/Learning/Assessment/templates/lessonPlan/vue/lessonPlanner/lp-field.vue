@@ -80,7 +80,7 @@ window.Vue.onMounted(async () => {
             >
             </textarea>
             <a class="icon-chat lp-field-regenerate" @click="() => lpStore.openModal(props.fieldId)">
-                {{ field.body.trim().length > 0 ? "Regenerate" : "Generate" }} with AI
+                {{ field.body.trim() !== field.initialBody.trim() ? "Regenerate" : "Generate" }} with AI
             </a>
         </div>
     </div>
