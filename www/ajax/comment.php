@@ -12,6 +12,7 @@ use Schoolbox\Assessment\StudentReportCard\Comment;
 use Schoolbox\Assessment\StudentReportCard\CommentMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
+use Schoolbox\TokenReplacer;
 use Schoolbox\UserMapper;
 
 if (isset($this)) {
@@ -68,11 +69,17 @@ if (!isset($_REQUEST['commentId']) || !is_numeric($_REQUEST['commentId'])) {
     $uMap = UserMapper::getInstance();
     $cMap = FolderMapper::getInstance();
 
+    $student = $uMap->findById($studentId);
+
+    // Replace any tokens in the comment with the relevant details
+    $tokenReplacer = new TokenReplacer\Student(new TokenReplacer\Simple());
+    $body = $tokenReplacer->replace($body, $student);
+
     // set up this comment, ready to go
     $comment = new Comment();
     $comment->setCommenter($sessionUser);
     $comment->setBody($body);
-    $comment->setStudent($uMap->findById($studentId));
+    $comment->setStudent($student);
     $comment->setCategory($cMap->findById($categoryId));
     $comment->setStudentVisibility($visibility['student']);
     $comment->setParentVisibility($visibility['parent']);
@@ -137,7 +144,12 @@ if (!isset($_REQUEST['commentId']) || !is_numeric($_REQUEST['commentId'])) {
 
             if (isset($_POST['commentBody']) && strlen($_POST['commentBody'])) {
                 // update the comment body and set the modified timestamp
-                $comment->setBody($_POST['commentBody']);
+
+                // Replace any tokens in the comment with the relevant details
+                $tokenReplacer = new TokenReplacer\Student(new TokenReplacer\Simple());
+                $body = $tokenReplacer->replace($_POST['commentBody'], $comment->getStudent());
+
+                $comment->setBody($body);
             } else {
                 respond(400, 'Comment cannot be blank.');
             }
