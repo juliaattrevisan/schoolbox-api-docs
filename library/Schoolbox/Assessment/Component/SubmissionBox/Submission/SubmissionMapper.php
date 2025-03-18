@@ -222,6 +222,22 @@ class SubmissionMapper extends BaseMapper
 
         // Note updated files must be handled separately.  Otherwise, the same file could
         // appear in both $addedFiles and $removedFiles below, and problems would result.
+        // Example:
+        //  * assume one existing file: {id: 1, hash: 'abcd'}.
+        //  * assume one submitted file: {id: 1, hash: 'efgh'}.
+        //  * if removedFiles = existingFiles->diffBy(submittedFiles, 'hash'),
+        //    then the existing file will be identified as removed.
+        //  * if addedFiles = submittedFiles->diffBy(existingFiles, 'hash'),
+        //    then the submitted file will be identified as added.
+        //  * But these are the same file! (they have the same id).
+        //  ---
+        //  Then problems would result as follows:
+        //  We would have two objects that refer to the same file, one marked for removal and marked one for addition.
+        //  Confusion would ensue with post-save and post-soft-delete callbacks, and we would be left with linked
+        //  database rows incorrectly remaining soft-deleted.
+        //  ---
+        //  To avoid the situation described above, we treat updated files separately.
+
         // Updated files are all the submitted files whose ids match existing files.
         $updatedFiles = $submittedFiles->intersect(
             $existingFiles,
@@ -230,12 +246,15 @@ class SubmissionMapper extends BaseMapper
             }
         );
 
+        // Since we are dealing with the updated files separately, remove them from the existing and submitted lists.
         $remainingExistingFiles = $existingFiles->diffBy($updatedFiles, 'id');
         $remainingSubmittedFiles = $submittedFiles->diffBy($updatedFiles, 'id');
 
+        // Now that updated files have been removed, identifying removed and added files is straightforward.
         $removedFiles = $remainingExistingFiles->diffBy($remainingSubmittedFiles, 'hash');
         $addedFiles = $remainingSubmittedFiles->diffBy($remainingExistingFiles, 'hash');
 
+        // Soft-delete removed files.
         $joinMapper->softDelete($removedFiles);
 
         // Save added and updated files.
