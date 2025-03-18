@@ -120,6 +120,9 @@ class Module extends BaseModule
         $preloadLessonPlanAPI           = function ($params) {
             return $this->preloadLessonPlanAPI($params);
         };
+        $preloadAssessmentForParticipant = function ($params) {
+            return $this->preloadAssessmentForParticipant($params);
+        };
 
         // rules in use
         $isSuper                  = $this->getAuthRule('isSuperuser');
@@ -201,7 +204,7 @@ class Module extends BaseModule
         $this->register('GET', "$assRoute/overview", 'getOverview', $canViewStatus, $preloadAssessment); // a || c
         $this->register('GET', "$assRoute/overview/export", 'downloadOverview', $canViewStatus, $preloadAssessment); // a || c
         $this->register('GET', "$assRoute/submissions/download", 'downloadSubmissions', $canViewStatus, $preloadAssessment); // a || c
-        $this->register('GET', "$assRoute/participation/modify", 'getAssessmentParticipationForm', $canModify, $preloadAssessment);
+        $this->register('GET', "$assRoute/participation/modify", 'getAssessmentParticipationForm', $canModify, $preloadAssessmentForParticipant);
 
         $this->register('GET', "$assRoute/$studentParam", 'getSummary', $canViewSummary, $preloadParticipant); // s || p
         $this->register('GET', "$assRoute/$studentParam/seb", 'getSummaryViaSeb', $canViewSummary, $preloadParticipant); // s || p
@@ -500,6 +503,49 @@ class Module extends BaseModule
         return [
             'assessment' => $assessment,
             'linkedAssessment' => $linkedAssessment
+        ];
+    }
+
+    /**
+     * Convert route params into an assessment object for participant
+     *
+     * @param array     $params
+     * @param User|null $student
+     * @return array
+     * @throws ContainerExceptionInterface
+     * @throws MapperException\Deleted
+     * @throws NotFoundExceptionInterface
+     */
+    protected function preloadAssessmentForParticipant(array $params, User $student = null): array
+    {
+        try {
+            $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId'], $student);
+        } catch (MapperException\Deleted $e) {
+            throw new MapperException\Deleted(
+                'Sorry, the activity could not be updated. Please ensure the activity ' .
+                'still exists and contact your support if the problem persists.'
+            );
+        } catch (MapperException $e) {
+            // Possibly thrown by base findByOne() mapper call, but masked by overriding @method annotation
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
+        /* Only allow the assessment that can have custom participation have access
+         */
+        $assessmentType = AssessmentType::objectToString($assessment);
+        if (
+            AssessmentType::TYPE_PROJECT === $assessmentType ||
+            AssessmentType::TYPE_LESSON_PLAN === $assessmentType ||
+            AssessmentType::TYPE_LTI_ASSESSMENT === $assessmentType
+        ) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
+        // set the controller
+        $this->setControllerFromAssessment($assessment);
+
+        return [
+            'assessment' => $assessment
         ];
     }
 
