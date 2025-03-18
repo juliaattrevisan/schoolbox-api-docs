@@ -106,7 +106,7 @@ class Controller extends Base
                 'category'     => $category,
                 'categoryList' => $this->mapper->getJoinMapper('category')->findAll([
                     'order' => ['name' => 'asc',],
-                ]),
+                ])->filter(fn($cat) => $this->mapper->searchCount('', $cat->getId()) > 0),
                 'search'       => $search,
                 'paginator'    => $this->paginator,
                 'page'         => $page,
