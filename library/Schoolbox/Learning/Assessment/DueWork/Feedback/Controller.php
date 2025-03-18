@@ -32,6 +32,7 @@ use Schoolbox\Learning\Assessment\Project\ResultCache\Mapper;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
 use Schoolbox\Learning\InlineGrader\Kami\Connector;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\TokenReplacer;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
@@ -365,13 +366,17 @@ class Controller extends Base
             $hasRubric = true;
         }
 
+        // Replace any tokens in the comment with the relevant details
+        $tokenReplacer = new TokenReplacer\Student(new TokenReplacer\Simple());
+        $comment = $tokenReplacer->replace(trim((string)$postVars['comment']), $participant->getUser());
+
         $dueWorkFeedbackFactory = new DueWork\Feedback\Factory(
             $this->getFeedbackDataSource(),
             $participant,
             $this->getUser(),
             $postVars['mark'] ?? null,
             (bool)($postVars['resubmissionRequired'] ?? false),
-            $postVars['comment'] ?? '',
+            $comment,
             $postVars['publish'] ?? null,
             $postVars['attachment'] ?? null,
             $fromInlineGrader,
