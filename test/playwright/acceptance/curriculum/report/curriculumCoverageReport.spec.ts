@@ -140,7 +140,7 @@ test.describe("Curriculum Coverage Report Tests", () => {
 
         tester.isGoingTo("disable Year 4 History");
 
-        tester.isGoingTo("Check Year 4");
+        tester.isGoingTo("Check Year 4 History");
         await manageCurriculum.checkNode("Year 4 History");
 
         tester.isGoingTo("Click Disable button");
@@ -193,13 +193,59 @@ test.describe("Curriculum Coverage Report Tests", () => {
         await expect(page.getByTestId("toast")).toContainText("Outcome successfully enabled");
     });
 
-    /**
-     * Soft deleting data to not impact the tests
-     */
-    // test.afterAll(async ({ baseTester, db }) => {
-    //     // Soft-delete data to not interfere with other tests
-    //     baseTester.isGoingTo("update enabled on the Year 4 History so it does not impact next suite of tests");
-    //     // reset the enabled status of Year 4 History
-    //     await db.updateInDatabase("curriculum_node", { enabled: 1 }, { name: "Year 4 History" });
-    // });
+    test("Check hidden disabled children nodes don't impact total counts", async ({ tester, page, db }) => {
+        const manageCurriculum = new ManageCurriculum(page, tester);
+        const disableNodes = new DisableNodes(page, tester);
+        const coverageReport = new CurriculumCoverageReport(page);
+
+        await manageCurriculum.gotoNode(250);
+
+        await db.haveInDatabase("curriculum_node_for_category", { curriculum_node_id: 253, category_id: 65 });
+
+        tester.isGoingTo("Check First Contacts");
+        await manageCurriculum.checkNode("First Contacts");
+
+        tester.isGoingTo("Click Disable button");
+        await disableNodes.clickDisableButton();
+
+        tester.isGoingTo("Ensure the confirmation modal appears");
+        await disableNodes.waitForConfirmModal();
+
+        tester.isGoingTo("Confirm the disable action");
+        await disableNodes.clickConfirmButton();
+
+        tester.isGoingTo("Ensure the toast message is shown");
+        await expect(page.getByTestId("toast")).toContainText("Outcome successfully disabled");
+
+        tester.isGoingTo("Visit the curriculum coverage report page with disabled nodes preloaded");
+        await coverageReport.gotoDisabledTest();
+
+        tester.isGoingTo("Check Year 4 History > Year 4 has total usage of 1");
+        await expect(coverageReport.getYear4TotalUsageTableCell()).toHaveText("1");
+
+        tester.isGoingTo("Select the Show disabled outcomes toggle");
+        await coverageReport.clickShowDisabledToggle();
+
+        tester.isGoingTo("Check Year 4 History > Year 4 now has total usage of 0");
+        await expect(coverageReport.getYear4TotalUsageTableCell()).toHaveText("");
+
+        await manageCurriculum.gotoNode(250);
+
+        tester.isGoingTo("Check First Contacts");
+        await manageCurriculum.checkNode("First Contacts");
+
+        tester.isGoingTo("Click Enable button");
+        await disableNodes.clickEnableButton();
+
+        tester.isGoingTo("Ensure the confirmation modal appears");
+        await disableNodes.waitForConfirmModal();
+
+        tester.isGoingTo("Confirm the disable action");
+        await disableNodes.clickConfirmButton();
+
+        tester.isGoingTo("Ensure the toast message is shown");
+        await expect(page.getByTestId("toast")).toContainText("Outcome successfully enabled");
+
+        await db.dontHaveInDatabase("curriculum_node_for_category", { curriculum_node_id: 253, category_id: 65 });
+    });
 });
