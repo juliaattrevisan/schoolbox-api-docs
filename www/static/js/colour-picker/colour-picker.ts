@@ -30,7 +30,10 @@ document.addEventListener(colourPickerInitialiseEventName, (e) => {
         targetEl.value = `#${targetEl.value}`;
     }
 
-    Coloris(colorisOptions);
+    Coloris({
+        ...colorisOptions,
+        el: targetEl,
+    });
 });
 
 window.tinycolor = tinycolor;
