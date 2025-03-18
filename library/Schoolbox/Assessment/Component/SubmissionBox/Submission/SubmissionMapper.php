@@ -230,6 +230,9 @@ class SubmissionMapper extends BaseMapper
         //  * if addedFiles = submittedFiles->diffBy(existingFiles, 'hash'),
         //    then the submitted file will be identified as added.
         //  * But these are the same file! (they have the same id).
+        //  * (A situation like this occurs when this function is called from the 'submission' case in function
+        //     DueWork/Response/Controller->postKamiDownloadCallback().  To reproduce, make a submission to a due work
+        //     with 'interactive worksheet' enabled.)
         //  ---
         //  Then problems would result as follows:
         //  We would have two objects that refer to the same file, one marked for removal and marked one for addition.
