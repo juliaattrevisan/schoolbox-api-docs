@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d1e3e4aaf7bfd9e4bbc16ec3900e45ed",
+    "content-hash": "e421c2ed86cfaf9388bfde4e90e1d640",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
@@ -15615,7 +15615,12 @@
         "ext-ldap": "*",
         "ext-xmlreader": "*",
         "ext-dom": "*",
-        "ext-exif": "*"
+        "ext-exif": "*",
+        "ext-zlib": "*",
+        "ext-fileinfo": "*",
+        "ext-libxml": "*",
+        "ext-imap": "*",
+        "ext-sockets": "*"
     },
     "platform-dev": [],
     "plugin-api-version": "2.3.0"
