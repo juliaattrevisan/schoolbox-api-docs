@@ -2,7 +2,7 @@
  * Utility class for the Pastoral expiry feature
  */
 
-import type { Page, Locator } from "@playwright/test";
+import type { Page } from "@playwright/test";
 import { expect } from "@playwright/test";
 
 export default class PastoralExpiry {
