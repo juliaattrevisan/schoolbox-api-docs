@@ -62,10 +62,6 @@ if (!isset($_REQUEST['commentId']) || !is_numeric($_REQUEST['commentId'])) {
         );
     }
 
-    /**
-     * @var UserMapper   $uMap
-     * @var FolderMapper $cMap
-     */
     $uMap = UserMapper::getInstance();
     $cMap = FolderMapper::getInstance();
 
@@ -120,7 +116,6 @@ if (!isset($_REQUEST['commentId']) || !is_numeric($_REQUEST['commentId'])) {
         $sessionUser = $a->getSessionUser();
 
         try {
-            /** @var $comment Comment */
             $comment = checkOwnership($sessionUser->getId(), $_REQUEST['commentId']);
         } catch (\Schoolbox\Mapper\Exception $e) {
             respond(400, $e->getMessage());
@@ -129,7 +124,6 @@ if (!isset($_REQUEST['commentId']) || !is_numeric($_REQUEST['commentId'])) {
         if (isset($_POST['commentId'])) {
             // expecting an updated version of the comment or deletion request
 
-            /** @var $cMap CommentMapper */
             $cMap = CommentMapper::getInstance();
 
             if (isset($_POST['deleteComment']) && $_POST['deleteComment'] == true) {
@@ -203,19 +197,19 @@ if (!isset($_REQUEST['commentId']) || !is_numeric($_REQUEST['commentId'])) {
  * @param int $userId
  * @param int $commentId
  * @throws Schoolbox\Mapper\Exception
- * @return bool
+ * @return Comment
  */
-function checkOwnership($userId, $commentId)
+function checkOwnership(int $userId, int $commentId): Comment
 {
-    /** @var $cMap CommentMapper */
     $cMap = CommentMapper::getInstance();
-    /** @var $comment Comment */
-    $comment = $cMap->findById($commentId);
 
+    /** @var Comment $comment */
+    $comment = $cMap->findById($commentId);
 
     if ($comment->getCommenter()->getId() == $userId) {
         return $comment;
     }
+
     throw new \Schoolbox\Mapper\Exception("You are not the owner of that comment.");
 }
 
