@@ -45,9 +45,13 @@
         new CustomEvent("EDITOR__CREATE", {
             detail: {
                 targetElements: ["#comment-{{ participant.user.id }}"],
-                hasTokens: true,
                 showWordCount: true,
-                toolbar: {% if selfAssessment %}"comment"{% else %}"comment_ai"{% endif %},
+                {% if selfAssessment %}
+                    toolbar: "comment",
+                {% else %}
+                    hasTokens: true,
+                    toolbar: "comment_ai",
+                {% endif %}
                 mirrorChangeEvents: true, // To keep jquery.dynamic-feedback.js in sync
             },
         }),
