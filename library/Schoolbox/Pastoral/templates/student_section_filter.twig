@@ -37,7 +37,7 @@
                     <p class="meta">Whether records that have expired will be shown here.</p>
                     <div class="switch f-no-margins">
                         <input data-archived-filter id="showArchivedRecords" name="showArchivedRecords" {% if showArchived == 1 %}checked="checked"{% endif %} value="1" type="checkbox">
-                        <label for="showArchivedRecords">
+                        <label for="showArchivedRecords" data-test="student-section-filter-show-archived-records-toggle">
                             <span>On</span>
                             <span>Off</span>
                         </label>

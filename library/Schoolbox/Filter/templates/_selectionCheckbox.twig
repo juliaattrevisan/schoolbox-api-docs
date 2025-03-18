@@ -38,6 +38,6 @@
             {% block extraAttrs %}{% endblock %}
         >
         <label for="filter_selection_{{ userSelection.filter.id }}_{{ userSelection.key }}{{ idSuffix }}"
-               class="noselect">{{ label | nl2br }}</label>
+               class="noselect" data-test="selectionCheckbox-{{ userSelection.filter.id }}-{{ userSelection.key }}">{{ label | nl2br }}</label>
     </li>
 {% endif %}

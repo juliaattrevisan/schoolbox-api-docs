@@ -39,7 +39,7 @@
                             {% set color = (subtype ? subtype.color : type.color) %}
                             <div class="row">
                                 <div class="small-12 medium-8 columns">
-                                    <select id="pastoralIcon" name="icon">
+                                    <select id="pastoralIcon" name="icon" data-test="audiences-modify-pastoral-flag-select">
                                         <option value="">-- none selected --</option>
                                         {% for icon in icons %}
                                             <option value="{{ icon.name }}"
@@ -51,7 +51,7 @@
                                 </div>
                                 <div class="small-6 medium-2 columns">
                                     <input id="pastoralColor" name="color" type="text"
-                                           value="{{ flagColors.foreground }}"/>
+                                           value="{{ flagColors.foreground }}" data-test="audiences-modify-pastoral-flag-color-input" />
                                 </div>
                                 <div class="small-6 medium-2 columns">
                                     <span id="pastoralFlagPreview"
@@ -72,7 +72,7 @@
                             </p>
                             <div class="row">
                                 <div class="small-12 columns">
-                                    <select id="defaultExpiry" name="defaultExpiry">
+                                    <select id="defaultExpiry" name="defaultExpiry" data-test="audiences-modify-pastoral-default-expiry-select">
                                         {% for key, expiry in defaultExpiry %}
                                             <option value="{{ expiry }}"
                                                     label="{{ key | title }}"
@@ -89,7 +89,7 @@
                                     <ul class="option-list">
                                         <li>
                                             <input id="applyDefaultExpiry" name="applyDefaultExpiry" type="checkbox" value="1">
-                                            <label for="applyDefaultExpiry" class="f-no-margins">Apply to existing records
+                                            <label for="applyDefaultExpiry" class="f-no-margins" data-test="audiences-modify-apply-default-expiry">Apply to existing records
                                             <p class="meta">This will overwrite and apply the Default Expiry to all existing records of this type.</p>
                                         </label>
                                         </li>
@@ -356,7 +356,7 @@
                         visibilityLocked: false,
                     } only %}
 
-                <input type="submit" value="Save">
+                <input type="submit" value="Save" data-test="audiences-modify-pastoral-save-button"/>
             </form>
             <script>
             $(function () {

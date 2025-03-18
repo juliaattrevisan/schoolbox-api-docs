@@ -55,7 +55,7 @@
                 <span class="hint has-tip tip-top" data-tooltip title="Select when the record will expire.
                 Expired records will move to an archived state.">?</span>
             </label>
-            <input type="text" name="expiresAt" id="expiresAt" maxlength="50" value="{{ record.expiresAt ? record.expiresAt.localShort : null }}" {% if canModifyDefaults %}data-datepicker{% else %}readonly{% endif %} />
+            <input type="text" name="expiresAt" id="expiresAt" maxlength="50" value="{{ record.expiresAt ? record.expiresAt.localShort : null }}" {% if canModifyDefaults %}data-datepicker{% else %}readonly{% endif %}  data-test="modify-section-general-pastoral-expires-at-input" />
         </div>
         <div class="small-12 medium-6 columns">
             {% if severities | length %}

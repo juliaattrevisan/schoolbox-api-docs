@@ -190,7 +190,7 @@
                                                 <dt class="full-width">
                                                     <div class="pastoral-flags">
                                                         {% for pastoralCount in selectedField.value %}
-                                                            <a href="{{ pastoralCount.destinationUrl }}">
+                                                            <a href="{{ pastoralCount.destinationUrl }}" data-test="student-profile-pastoral-flag-{{ pastoralCount.typeId }}-{{ pastoralCount.subtypeId ?? 0 }}"
                                                             <span class="label neutral icon-{{ pastoralCount.icon }} pastoral-flag-in-profile"
                                                                 data-tooltip title="{{ pastoralCount.title }}"
                                                                 style="color: {{ pastoralCount.fgColor }}; background-color: {{ pastoralCount.bgColor }}"

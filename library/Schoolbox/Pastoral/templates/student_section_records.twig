@@ -23,7 +23,7 @@
             <section>
                 <ul class="information-list">
                     {% for record in records %}
-                        <li data-record-type="{{ record.type.id }}" class="actions-small-2 {% if record.isArchived %}faded{% endif %}" id="pastoral-{{ record.id }}">
+                        <li data-record-type="{{ record.type.id }}" class="actions-small-2 {% if record.isArchived %}faded{% endif %}" id="pastoral-{{ record.id }}" data-test="student-section-records-pastoral-record">
                             <div class="list-item">
                                 <div class="card small-12 wrap-down">
                                     <a href="{{ profile.link(record.owner) }}">

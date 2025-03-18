@@ -215,12 +215,12 @@ export default {
                 </div>
             </div>
 
-            <ul class="action-list threaded content-container">
+            <ul class="action-list threaded content-container" data-test="pastoral-class-report-student-list">
                 <template
                     v-for="(studentData, studentIndex) in data"
                     :key="'student-' + String(studentData.student.id)"
                 >
-                    <li class="list-item">
+                    <li class="list-item" :data-test="`pastoral-class-report-student-${studentData.student.id}`">
                         <!-- student profile -->
                         <div class="student-container">
                             <div class="student-card card small-12">
