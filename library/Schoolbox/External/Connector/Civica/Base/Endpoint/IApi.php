@@ -19,8 +19,11 @@ interface IApi
     /**
      * Decide how big each page size should be
      * Civica's default response is 1000
+     * (Note this has been increased to 3500 because of civica not loading all the data correctly, there might be a fix,
+     * but we don't know when they will implement it yet, so for the time being increasing this will allow the data to flow
+     * through, and it shouldn't heavily impact the performance, the data that wasn't truncated still return the same size of payload)
      */
-    public const PAGE_SIZE = 1000;
+    public const PAGE_SIZE = 3500;
 
 
     /**
