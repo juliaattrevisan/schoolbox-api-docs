@@ -13,7 +13,7 @@ import type { Position } from "@ckeditor/ckeditor5-utils/src/dom/position";
 import type View from "@ckeditor/ckeditor5-ui/src/view";
 import type { PanelPosition } from "@ckeditor/ckeditor5-ui/src/dropdown/dropdownpanelview";
 
-export default class PanelTweaks extends Plugin {
+export default class UITweaks extends Plugin {
     /**
      * We need to ensure everything has been set up before we can start modifying the panels
      */
