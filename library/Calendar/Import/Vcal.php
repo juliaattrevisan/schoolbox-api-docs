@@ -56,7 +56,6 @@ class Vcal extends Base
     /**
      * Load all events into schoolbox, generate outcome array
      *
-     * @param bool $perform should it be a dry-run instead
      * @return void
      *
      * @throws VObject\InvalidDataException
@@ -65,7 +64,7 @@ class Vcal extends Base
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function load(bool $perform = true): void
+    public function load(): void
     {
         $output = [];
 
