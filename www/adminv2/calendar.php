@@ -19,7 +19,13 @@ if (
 
 $type = $this->arg[0] ?? null;
 if ($type === null || strtolower($type) === 'import') {
-    SitePage::localRedir('/adminv2/calendar/import/school-events');
+    $importType = $this->arg[1] ?? null;
+    if ('' !== strtolower((string)$importType)) {
+        SitePage::localRedir("/adminv2/calendar/import/{$importType}");
+    } else {
+        //Fallback
+        SitePage::localRedir('/adminv2/calendar/import/school-events');
+    }
 } else {
     $selectedType = urldecode($type);
 }
