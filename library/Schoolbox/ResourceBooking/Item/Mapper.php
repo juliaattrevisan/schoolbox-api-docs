@@ -10,6 +10,7 @@
 
 namespace Schoolbox\ResourceBooking\Item;
 
+use Alaress\Database\Predicate\Builder;
 use PDO;
 use PDOStatement;
 use Schoolbox\Collection;
@@ -352,7 +353,7 @@ class Mapper extends BaseMapper
      * @param string   $sort_dir Sort direction, defaults to 'ASC'
      * @return Collection
      */
-    public function search($keyword, $category = null, $offset = 0, $limit = 20, $sort_by = 'name', $sort_dir = 'ASC')
+    public function search($keyword, $category = null, $offset = 0, $limit = 20, $sort_by = 'name', $sort_dir = 'ASC'): Collection
     {
         return $this->findByPredicates(
             $this->buildSearchPredicate($keyword, $category),
@@ -373,7 +374,7 @@ class Mapper extends BaseMapper
      * @return int
      * @throws \PDOException
      */
-    public function searchCount($keyword, $category = null)
+    public function searchCount($keyword, $category = null): int
     {
         return $this->countByPredicates(
             $this->buildSearchPredicate($keyword, $category)
@@ -385,9 +386,9 @@ class Mapper extends BaseMapper
      *
      * @param string      $keyword
      * @param string|null $category
-     * @return \Alaress\Database\Predicate\Builder
+     * @return Builder
      */
-    private function buildSearchPredicate(string $keyword, string $category = null)
+    private function buildSearchPredicate(string $keyword, string $category = null): Builder
     {
         $pb = $this->getPredicateBuilder();
 
