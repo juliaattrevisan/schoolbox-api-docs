@@ -4,6 +4,7 @@ RUN apk --no-cache add ${PHPIZE_DEPS} && \
     apk add --update linux-headers && \
     apk add libzip-dev zip unzip libxml2-dev oniguruma-dev icu-dev curl-dev openldap-dev \
             imagemagick-dev imagemagick-heic imagemagick-raw imagemagick-svg imagemagick-tiff imagemagick-webp \
+            imap_dev \
             unixodbc-dev gnupg \
             bind-tools && \
     pecl install redis xdebug imagick pdo_sqlsrv excimer
@@ -20,6 +21,7 @@ RUN docker-php-ext-install zip && \
     docker-php-ext-install dom && \
     docker-php-ext-install sockets && \
     docker-php-ext-install exif && \
+    docker-php-ext-install imap && \
     docker-php-ext-enable redis && \
     docker-php-ext-enable xdebug && \
     docker-php-ext-enable imagick && \
