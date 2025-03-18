@@ -119,8 +119,10 @@ abstract class Base
 
     /**
      * Load events from file into schoolbox
+     *
+     * @param bool $perform should it be a dry-run instead
      */
-    abstract public function load();
+    abstract public function load(bool $perform = true);
 
     /* Getters/Setters
      */

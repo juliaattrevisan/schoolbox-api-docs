@@ -56,6 +56,8 @@ class Vcal extends Base
     /**
      * Load all events into schoolbox, generate outcome array
      *
+     * @param bool $perform should it be a dry-run instead, this should always be true as this function
+     *                      does not use the perform mode
      * @return void
      *
      * @throws VObject\InvalidDataException
@@ -64,8 +66,16 @@ class Vcal extends Base
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function load(): void
+    public function load(bool $perform = true): void
     {
+        /* As this will execute regardless of $perform, should warn user if they attempt to run a dry-run
+         * and stop further execution
+         */
+        if (false === $perform) {
+            trigger_error('This method does not run in dry-run mode.', E_USER_WARNING);
+            return;
+        }
+
         $output = [];
 
         if (is_file($this->getFile())) {
