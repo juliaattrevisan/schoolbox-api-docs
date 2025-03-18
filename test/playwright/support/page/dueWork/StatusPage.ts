@@ -83,4 +83,13 @@ export default class StatusPage {
         await this.page.locator(`#header-options a.icon-${option}`).click();
         await this.tester.common.waitForPageLoad();
     }
+
+    /**
+     * enter a comment in the quiz review vertical
+     * @param comment
+     */
+    async verticalQuizReviewComment(comment: string): Promise<void> {
+        const commentEditor = this.page.locator(StatusPage.SELECTOR_COMMENT_QUIZ_REVIEW);
+        await this.tester.fillCKEditorByLocator(commentEditor, comment);
+    }
 }
