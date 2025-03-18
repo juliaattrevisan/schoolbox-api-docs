@@ -86,7 +86,7 @@ export default class StatusPage {
 
     /**
      * enter a comment in the quiz review vertical
-     * @param comment
+     * @param comment - overeall comment for the quiz review
      */
     async verticalQuizReviewComment(comment: string): Promise<void> {
         const commentEditor = this.page.locator(StatusPage.SELECTOR_COMMENT_QUIZ_REVIEW);
