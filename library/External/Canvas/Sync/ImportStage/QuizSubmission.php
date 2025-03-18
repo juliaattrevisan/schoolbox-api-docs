@@ -278,9 +278,6 @@ class QuizSubmission extends SubmissionAbstract
         $question = $section->getQuestions()?->first();
         $question->setSection($section);
 
-        // convert to plaintext first as a precaution
-        $plainComment = new Html2Text($canvasSubmission['comment']);
-
         $answers = $this->quizAnswerMapper->createCollection();
         $answer  = $this->quizAnswerMapper->createModel()
                                           ->setMark($normMark)
