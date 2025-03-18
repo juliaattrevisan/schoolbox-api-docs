@@ -305,6 +305,13 @@ class Controller extends Base
             }
         }
 
+        $expiresAt = $this->requestPost->get('expiresAt');
+        if ('' !== (string)$expiresAt) {
+            $expiresAt = \Alaress_Date_Format::newLocalShort($expiresAt)->startOfDay();
+        } else {
+            $expiresAt = null;
+        }
+
         $import = $this->pastoralBulkImportMapper->createModel()
             ->setOwner($this->getUser())
             ->setZip($zipStorage)
@@ -320,7 +327,7 @@ class Controller extends Base
             ->setBodyPublic($this->requestPost->get('body_public'))
             ->setPoints($this->requestPost->getFloat('points'))
             ->setImportedAt(null)
-            ->setExpiresAt(\Alaress_Date_Format::newLocalShort($this->requestPost->get('expiresAt'))->startOfDay())
+            ->setExpiresAt($expiresAt)
         ;
 
         // Create tags
