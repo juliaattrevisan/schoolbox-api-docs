@@ -6,7 +6,7 @@ require_once __DIR__ . '/../../conf/core/require.php';
 
 
 /**
- * Function to work with 'standard' subjects, that have strands and substrands
+ * Function to work with 'standard' subjects, that have strands and sub-strands
  * @param       $handle
  * @param array $output_rows
  * @param int   $lastSubject_id

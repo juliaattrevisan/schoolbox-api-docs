@@ -1,472 +1,473 @@
 id,curriculum_node_parent_id,name,code,order,description,uuid
-1,0,NSW Curriculum 2023,,0,,33a29c2f-23cd-4bd2-b543-15d8ac6a40f2
+1,,"NSW Curriculum 2023",,0,,33a29c2f-23cd-4bd2-b543-15d8ac6a40f2
 2,1,English,,0,,23d7da34-0332-4764-9f98-e65bf9a10a0e
 3,2,"Early Stage 1",,0,,174cb120-5de5-4f87-bb19-09b0cdcca92a
+18,3,"Creating written texts",,0,,1119c8ad-04d9-47d3-9de9-88b588499fb2
+19,18,"creates written texts that include at least 2 related ideas and correct simple sentences",ENE-CWT-01,0,,89da00ae-f5e6-4ffd-9b90-d5c8dbeca9ca
+22,3,Handwriting,,0,,9baa103f-c5a0-40a7-adbd-4a019317b326
+23,22,"produces all lower-case and upper-case letters to create texts",ENE-HANDW-01,0,,238656bd-f0f4-44af-bcf1-e103b5a6520c
 4,3,"Oral language and communication",,0,,b8a37876-b1d2-4a80-ade0-a229b2d25376
 5,4,"communicates effectively by using interpersonal conventions and language with familiar peers and adults",ENE-OLC-01,0,,d0dd30f3-d287-4d1e-9fec-26549d9a7012
-6,3,Vocabulary,,0,,ecd40b79-6363-4dbf-94f9-3034c4593dd1
-7,6,"understands and effectively uses Tier 1 words and Tier 2 words in familiar contexts",ENE-VOCAB-01,0,,a4fedc47-fcd8-4cb0-b8b8-40c903b459d6
+12,3,"Phonic knowledge",,0,,08fa52d3-499e-418b-9c99-8454c6545402
+13,12,"uses single-letter grapheme�phoneme correspondences and common digraphs to decode and encode words when reading and creating texts",ENE-PHOKW-01,0,,0a1118b4-c266-4a97-bf31-ba529a78dccc
 8,3,"Phonological awareness",,0,,18ab6bc9-11bf-46e8-8f77-ede73ac29cca
 9,8,"identifies, blends, segments and manipulates phonological units in spoken words as a strategy for reading and creating texts",ENE-PHOAW-01,0,,e6b0deb2-0f35-4778-abf4-67c9074af28c
 10,3,"Print conventions",,0,,aaac7df0-01a0-407c-8a20-4648b2207d47
 11,10,"tracks written text from left to right and from top to bottom of the page and identifies visual and spatial features of print",ENE-PRINT-01,0,,c68fe1ae-bf74-414e-8bbd-2f32a60811e5
-12,3,"Phonic knowledge",,0,,08fa52d3-499e-418b-9c99-8454c6545402
-13,12,"uses single-letter grapheme�phoneme correspondences and common digraphs to decode and encode words when reading and creating texts",ENE-PHOKW-01,0,,0a1118b4-c266-4a97-bf31-ba529a78dccc
-14,3,"Reading fluency",,0,,11f30318-bb37-469e-baba-f81706492b74
-15,14,"reads decodable texts aloud with automaticity",ENE-REFLU-01,0,,ace778b7-32a7-47b0-859c-273df9b9cbc5
 16,3,"Reading comprehension",,0,,1e2a70b1-0198-441b-9394-1ba33bd1d8e0
 17,16,"comprehends independently read texts using background knowledge, word knowledge and understanding of how sentences connect",ENE-RECOM-01,0,,afd42e34-7783-4cbb-ba18-f1cd725dc6c9
-18,3,"Creating written texts",,0,,1119c8ad-04d9-47d3-9de9-88b588499fb2
-19,18,"creates written texts that include at least 2 related ideas and correct simple sentences",ENE-CWT-01,0,,89da00ae-f5e6-4ffd-9b90-d5c8dbeca9ca
+14,3,"Reading fluency",,0,,11f30318-bb37-469e-baba-f81706492b74
+15,14,"reads decodable texts aloud with automaticity",ENE-REFLU-01,0,,ace778b7-32a7-47b0-859c-273df9b9cbc5
 20,3,Spelling,,0,,7d45ebfa-65fc-4734-b9d5-2981b001ebca
 21,20,"applies phonological, orthographic and morphological generalisations and strategies to spell taught familiar and high-frequency words when creating texts",ENE-SPELL-01,0,,52e758d8-d3ae-45b8-a10d-ff3b9d39dd99
-22,3,Handwriting,,0,,9baa103f-c5a0-40a7-adbd-4a019317b326
-23,22,"produces all lower-case and upper-case letters to create texts",ENE-HANDW-01,0,,238656bd-f0f4-44af-bcf1-e103b5a6520c
 24,3,"Understanding and responding to literature",,0,,28a92d45-e207-4d79-bed2-2742eb3cfe8b
 25,24,"understands and responds to literature read to them",ENE-UARL-01,0,,ecda0369-8ec7-4a24-9f08-d8a5be4a08ad
+6,3,Vocabulary,,0,,ecd40b79-6363-4dbf-94f9-3034c4593dd1
+7,6,"understands and effectively uses Tier 1 words and Tier 2 words in familiar contexts",ENE-VOCAB-01,0,,a4fedc47-fcd8-4cb0-b8b8-40c903b459d6
 26,2,"Stage 1",,0,,011db68a-d4ec-4f11-a266-43f0614b0687
-27,26,"Oral language and communication",,0,,c75130b4-cbd6-426c-aeaf-0ccfe5dddf54
-28,27,"communicates effectively by using interpersonal conventions and language to extend and elaborate ideas for social and learning interactions",EN1-OLC-01,0,,8b5604cb-e610-4f91-8b8f-1c7fb76307a0
-29,26,Vocabulary,,0,,bcfde24c-9c02-4d68-9345-12e1a4c562b2
-30,29,"understands and effectively uses Tier 1, taught Tier 2 and Tier 3 vocabulary to extend and elaborate ideas",EN1-VOCAB-01,0,,f04b4d85-861c-42b7-bf0d-31973d8e8349
-31,26,"Phonic knowledge",,0,,96d8008b-3f0d-442f-92de-64322cad7868
-32,31,"uses initial and extended phonics, including vowel digraphs, trigraphs to decode and encode words when reading and creating texts",EN1-PHOKW-01,0,,281b432a-d3b1-4cc6-a37c-44e29f2a27f2
-33,26,"Reading fluency",,0,,0ea87f40-95cc-4047-a3da-cbbe407ecbf7
-34,33,"sustains reading unseen texts with automaticity and prosody and self-corrects errors",EN1-REFLU-01,0,,b2d8fe96-67be-43f6-b918-ab405bd6653c
-35,26,"Reading comprehension",,0,,5864f14c-b714-4ac3-bae2-97a8483b332a
-36,35,"comprehends independently read texts that require sustained reading by activating background and word knowledge, connecting and understanding sentences and whole text, and monitoring for meaning",EN1-RECOM-01,0,,ef115d69-9570-41ea-941b-320b152f6041
 37,26,"Creating written texts",,0,,8f8c8ff8-82bc-42de-82c3-9fae7d96062b
 38,37,"plans, creates and revises texts written for different purposes, including paragraphs, using knowledge of vocabulary, text features and sentence structure",EN1-CWT-01,0,,60377eb8-b1d0-415b-ba18-6d7d6861c8c6
-39,26,Spelling,,0,,6461dd24-7b87-4054-ad2f-6af751153c69
-40,39,"applies phonological, orthographic and morphological generalisations and strategies when spelling words in a range of writing contexts",EN1-SPELL-01,0,,21bd5c2c-ca0d-4b7d-83c2-1e4b21ac9571
 41,26,Handwriting,,0,,0a41ed0c-b157-41b2-8b23-2ca0e3fddfe4
 42,41,"uses a legible, fluent and automatic handwriting style, and digital technology, including word-processing applications, when creating texts",EN1-HANDW-01,0,,20da4591-db1b-43ce-9c0c-116a92756211
-45,26,"Understanding and responding to literature",,0,,d9cd5fb5-c0c2-454c-9222-fe4599199551
-46,45,"understands and responds to literature by creating texts using similar structures, intentional language choices and features appropriate to audience and purpose",EN1-UARL-01,0,,212ce911-f32f-45af-a3e7-c16af3c90e12
-47,2,"Stage 2",,0,,d744093a-0ca8-4bdf-8087-50e652f7a851
-48,47,"Oral language and communication",,0,,14cc7d3a-1c70-4eb1-98c6-5d2c1925f4bb
-49,48,"communicates with familiar audiences for social and learning purposes, by interacting, understanding and presenting",EN2-OLC-01,0,,69fbcb81-9023-49b8-bb14-410924ae6603
-50,47,Vocabulary,,0,,f43a9819-31eb-49dc-a8ab-98ff83c32ee4
-51,50,"builds knowledge and use of Tier 1, Tier 2 and Tier 3 vocabulary through interacting, wide reading and writing, and by defining and analysing words",EN2-VOCAB-01,0,,bd79cc4e-630a-4ebb-825a-81c807f42ad3
-52,47,"Reading fluency",,0,,3ab9019e-e3b3-46fb-ba38-a827aa2f4d12
-53,52,"sustains independent reading with accuracy, automaticity, rate and prosody suited to purpose, audience and meaning",EN2-REFLU-01,0,,6a2fa8c0-7827-4b85-bd1e-1290692e0062
-54,47,"Reading comprehension",,0,,73464621-8240-4354-a035-a96ab3ecea58
-55,54,"reads and comprehends texts for wide purposes using knowledge of text structures and language, and by monitoring comprehension",EN2-RECOM-01,0,,cac0f029-2042-49ef-8ceb-fdfe5caf725c
-56,47,"Creating written texts",,0,,fe1aae59-e6f7-4ded-a838-6e04c9fc6ffc
-57,56,"plans, creates and revises written texts for imaginative purposes, using text features, sentence-level grammar, punctuation and word-level language for a target audience",EN2-CWT-01,0,,191808a3-94e9-41aa-8aec-b2b245a61a5e
-58,56,"plans, creates and revises written texts for informative purposes, using text features, sentence-level grammar, punctuation and word-level language for a target audience",EN2-CWT-02,0,,f048edee-177a-439b-a57e-cce31565ee18
-59,56,"plans, creates and revises written texts for persuasive purposes, using text features, sentence-level grammar, punctuation and word-level language for a target audience",EN2-CWT-03,0,,43268d0b-b5d5-4a01-a41d-67b8eb474636
-60,47,Spelling,,0,,6fb78d6e-451b-4f7d-8c7a-df163bcd6198
-61,60,"selects, applies and describes appropriate phonological, orthographic and morphological generalisations and strategies when spelling in a range of contexts",EN2-SPELL-01,0,,8aa40de8-3a4e-4eed-a775-9c059bb5a74e
-62,47,"Handwriting and digital transcription",,0,,0e67e59d-0594-4ad0-8c14-defab1edb66a
-63,62,"forms legible joined letters to develop handwriting fluency",EN2-HANDW-01,0,,2731b37c-6b02-41f5-8522-0aa960bab58f
-64,62,"uses digital technologies to create texts",EN2-HANDW-02,0,,f5606753-ecfa-46e9-9632-2facb31cf7c0
-65,47,"Understanding and responding to literature",,0,,dcb41a2a-e0ff-4b5d-8a4d-55ebc6a4cdb2
-66,65,"identifies and describes how ideas are represented in literature and strategically uses similar representations when creating texts",EN2-UARL-01,0,,6472bd5c-2d81-4dbb-bfc8-5502a19a4dc7
-67,2,"Stage 3",,0,,c8a4a76d-09d1-4db4-8664-405abddd317b
-68,67,"Oral language and communication",,0,,0a76ebac-a1e2-4fb9-99bc-126ad62a53aa
-69,68,"communicates to wide audiences with social and cultural awareness, by interacting and presenting, and by analysing and evaluating for understanding",EN3-OLC-01,0,,5fe547ef-ff12-41d7-a472-aa7122e81700
-70,67,Vocabulary,,0,,96dbb765-d9a2-44c6-a552-89ea1845ab4f
-71,70,"extends Tier 2 and Tier 3 vocabulary through interacting, wide reading and writing, morphological analysis and generating precise definitions for specific contexts",EN3-VOCAB-01,0,,96c86fb5-8271-4f2d-b7a7-ca778c2514d9
-72,67,"Reading comprehension",,0,,436b1d8b-84f3-443b-a350-96c73a42f63f
-73,72,"fluently reads and comprehends texts for wide purposes, analysing text structures and language, and by monitoring comprehension",EN3-RECOM-01,0,,d9500d76-ad81-4b21-be80-3449cbe7dcd4
-74,67,Creating,,0,,b4e0dfdb-bb1b-4148-a25d-4f38dfa49033
-75,74,"plans, creates and revises written texts for multiple purposes and audiences through selection of text features, sentence-level grammar, punctuation and word-level language",EN3-CWT-01,0,,52fdb7fc-02be-43ac-a39b-b3d20416bd86
-76,67,Spelling,,0,,74d152e1-8f12-4463-a53e-1525ee2e2cd1
-77,76,"automatically applies taught phonological, orthographic and morphological generalisations and strategies when spelling in a range of contexts, and justifies spelling strategies used to spell unfamiliar words",EN3-SPELL-01,0,,11f22ab1-483f-483d-9f1c-6420f42230bf
-78,67,"Handwriting and digital transcription",,0,,043256fe-4aea-49e6-bc6c-31fda6975fca
-79,78,"sustains a legible, fluent and automatic handwriting style",EN3-HANDW-01,0,,fb72897b-f5ea-4c11-94fe-784c92cd8f8d
-80,78,"selects digital technologies to suit audience and purpose to create texts",EN3-HANDW-02,0,,8386baf2-cdbf-480f-ba50-e2c8d9d62f42
-81,67,"Understanding and responding to literature",,0,,21bf372e-b76b-44d0-9195-9b1ca33adea3
-82,81,"analyses representations of ideas in literature through narrative, character, imagery, symbol and connotation, and adapts these representations when creating texts",EN3-UARL-01,0,,c14df01e-ca87-4171-a007-451f3dfbcbdf
-83,81,"analyses representations of ideas in literature through genre and theme that reflect perspective and context, argument and authority, and adapts these representations when creating texts",EN3-UARL-02,0,,c6f02035-05a8-4122-86b3-d3a7d0ce65e5
-84,2,"Stage 4",,0,,6bc8a2d6-7cdd-440d-8e56-f6f3a9af95a3
-85,84,"Reading, viewing and listening to texts",,0,,d2c294c7-b831-4eb0-bf70-c1050da4d20e
-86,85,"uses a range of personal, creative and critical strategies to read texts that are complex in their ideas and construction",EN4-RVL-01,0,,a9b285ab-6270-415b-b92a-a03b0d85569a
-87,84,"Understanding and responding to texts",,0,,c1f78ab9-4f9a-4312-9886-29c3249be2c2
-88,87,"analyses how meaning is created through the use of and response to language forms, features and structures",EN4-URA-01,0,,b88ee220-17b4-4b6a-8203-497f8e16dfb2
-89,87,"examines and explains how texts represent ideas, experiences and values",EN4-URB-01,0,,df3b5510-ae05-4e6a-87b0-9e5978a5b46b
-90,87,"identifies and explains ways of valuing texts and the connections between them",EN4-URC-01,0,,94aba9cb-f132-4ba6-b131-1526d07c5c15
-91,84,"Expressing ideas and composing texts",,0,,eafeddf9-6006-465c-98b0-a226bfdb2c45
-92,91,"creates personal, creative and critical texts for a range of audiences by using linguistic and stylistic conventions of language to express ideas",EN4-ECA-01,0,,119ca597-7b38-4f75-934f-e120dce49c61
-93,91,"uses processes of planning, monitoring, revising and reflecting to support and develop composition of texts",EN4-ECB-01,0,,fb22e8af-5199-45c3-8a12-f5d44e1ecfc0
-94,2,"Stage 5",,0,,287482df-5e2d-4e3b-9707-7ebee6197a81
-95,94,"Reading, viewing and listening to texts",,0,,aa8a39cc-967f-4623-9205-245b1d98e289
-96,95,"uses a range of personal, creative and critical strategies to interpret complex texts",EN5-RVL-01,0,,942a4d85-2a2d-47fa-8997-0df0f8419d5a
-97,94,"Understanding and responding to texts",,0,,448b8f42-99ed-4c2e-866b-e9bd29bd73d7
-98,97,"analyses how meaning is created through the use and interpretation of increasingly complex language forms, features and structures",EN5-URA-01,0,,d1055ae7-2a18-4736-b94b-4661acf480fb
-99,97,"evaluates how texts represent ideas and experiences, and how they can affirm or challenge values and attitudes",EN5-URB-01,0,,844f435b-d534-4453-85ec-8fbed129be79
-100,97,"investigates and explains ways of valuing texts and the relationships between them",EN5-URC-01,0,,2b404b6c-02eb-48b8-92ff-56b308a941fd
-101,94,"Expressing ideas and composing texts",,0,,87fa4a16-3189-40b3-92ee-58cd287cdfa0
-102,101,"crafts personal, creative and critical texts for a range of audiences by experimenting with and controlling language forms and features to shape meaning",EN5-ECA-01,0,,7637c63e-98f8-45f6-be46-53f1c5a7fbc8
-103,101,"uses processes of planning, monitoring, revising and reflecting to purposefully develop and refine composition of texts",EN5-ECB-01,0,,d0fdf54d-bc7b-4fe9-9343-f5b3136dc71b
-104,1,Mathematics,,0,,4ff24841-0056-4ef1-9814-f2db77bbaf30
-105,104,"Early Stage 1",,0,,cbe4cfd3-e4e2-4084-a065-b4b6ad670bf1
-106,105,"Representing numbers",,0,,abc8affe-3a60-4971-aab6-3268547d4960
-107,106,"demonstrates an understanding of how whole numbers indicate quantity",MAE-RWN-01,0,,1b9474a8-a7f7-40e9-8b87-e2c1e3faaefc
-108,106,"reads numerals and represents whole numbers to at least 20",MAE-RWN-02,0,,c545f0f6-7f14-485a-9a6a-1e4529a8b53f
-109,105,"Combining and separating quantities",,0,,c135d344-6b3a-440b-9c16-a6563c58d7bd
-110,109,"reasons about number relations to model addition and subtraction by combining and separating, and comparing collections",MAE-CSQ-01,0,,62370ea4-a86c-483d-a595-524a269d02bb
-111,109,"represents the relations between the parts that form the whole, with numbers up to 10",MAE-CSQ-02,0,,0913af36-105a-47eb-ac78-f5fe062b466a
-112,105,"Forming groups",,0,,d8794a25-2db1-4618-89f4-e966ab9d9540
-113,112,"recognises, describes and continues repeating patterns",MAE-FG-01,0,,3bcba1fa-eb48-4880-8470-0f38505e6d93
-114,112,"forms equal groups by sharing and counting collections of objects",MAE-FG-02,0,,d0635a41-6e6f-4201-94c8-e9cddc6a7254
-115,105,"Geometric measure",,0,,f599da8a-9c82-4fde-bff3-5f79b1f8c699
-116,115,"describes position and gives and follows simple directions",MAE-GM-01,0,,746eca4d-6365-45c4-a2ba-75d45b109368
-117,115,"describes and compares lengths",MAE-GM-02,0,,7b944d9a-d1d4-41ba-bbf9-064ba1b4ba27
-118,115,"identifies half the length and the halfway point",MAE-GM-03,0,,68e0362e-250c-4bba-b72b-bc59814925f1
-119,105,"Two-dimensional (2D) spatial structure",,0,,d0c41545-86c9-4d7c-910f-6f1b27b2ec74
-120,119,"sorts, describes, names and makes two-dimensional shapes, including triangles, circles, squares and rectangles",MAE-2DS-01,0,,014262b0-e317-4bfa-aa6d-8077db7eb330
-121,119,"describes and compares areas of similar shapes",MAE-2DS-02,0,,b543e498-110f-4a89-b170-48d489c781a9
-122,105,"Three-dimensional (3D) spatial structure",,0,,a7b359c5-b071-478c-8c57-bec56c5bf953
-123,122,"manipulates, describes and sorts three-dimensional objects",MAE-3DS-01,0,,ab38d5c8-59bd-46ff-b266-458e78216c84
-124,122,"describes and compares volumes",MAE-3DS-02,0,,d9482cb6-d9c3-4949-845a-c4477c3f44fc
-125,105,"Non-spatial measure",,0,,b4d0dd0d-d1bb-4dbc-83f9-436950fa23bf
-126,125,"describes and compares the masses of objects",MAE-NSM-01,0,,b9015ac9-07e6-4889-aa54-a95a385468e1
-127,125,"sequences events and reads hour time on clocks",MAE-NSM-02,0,,c06393cb-1c2f-48ac-aff2-cbbebbeabcfd
-128,105,Data,,0,,d19d146f-35c6-4dba-a3d0-e633f3bb9916
-129,128,"contributes to collecting data and interprets data displays made from objects",MAE-DATA-01,0,,92d7d3c0-4dd7-44b7-9bdc-b9544122fc09
-130,104,"Stage 1",,0,,d33a0a86-3348-4dc2-ad6f-05f546e60989
-131,130,"Representing numbers",,0,,6f2fcde7-d17d-4849-8d46-388aa7b444d2
-132,131,"applies an understanding of place value and the role of zero to read, write and order two- and three-digit numbers",MA1-RWN-01,0,,e7a89450-ecbb-482c-9c13-197f62d20eaf
-133,131,"Reasons about representations of whole numbers to 1000, partitioning numbers to use and record quantity values",MA1-RWN-02,0,,af392f34-043a-4041-95ef-ed0a8f432db9
-134,130,"Combining and separating quantities",,0,,4fd4d708-5731-44ef-85d0-5ad044f05d78
-135,134,"uses number bonds and the relationship between addition and subtraction to solve problems involving partitioning",MA1-CSQ-01,0,,dc68e423-c39f-4180-894c-ed7b1a4de00b
-136,130,"Forming groups",,0,,85c84c55-1b48-4c2b-97de-ac725318e158
-137,136,"uses the structure of equal groups to solve multiplication problems, and shares or groups to solve division problems",MA1-FG-01,0,,a277af1d-6894-4c54-a6d0-7e1fc829f202
-138,130,"Geometric measure",,0,,85122889-da1b-4e37-9751-26f066303e19
-139,138,"represents and describes the positions of objects in familiar locations",MA1-GM-01,0,,7c3311d1-3251-42cd-8a55-3d0325a9f471
-140,138,"measures, records, compares and estimates lengths and distances using uniform informal units, as well as metres and centimetres",MA1-GM-02,0,,a49d6ff1-437e-465f-aca5-ea7c4a309bdd
-141,138,"creates and recognises halves, quarters and eighths as part measures of a whole length",MA1-GM-03,0,,ba69e818-ed81-4c86-82d0-72ab97cfff6c
-142,130,"Two-dimensional (2D) spatial structure",,0,,bf49d031-4bc7-4950-85b0-c21648cf651d
-143,142,"recognises, describes and represents shapes including quadrilaterals and other common polygons",MA1-2DS-01,0,,551771a4-f780-4a90-a99e-2b4440951a60
-144,142,"measures and compares areas using uniform informal units in rows and columns",MA1-2DS-02,0,,418e3506-50ab-4723-8cce-5e4da9729b4f
-145,130,"Three-dimensional (3D) spatial structure",,0,,8b16c3b2-a74b-43c6-a2c4-ee9ded922359
-146,145,"recognises, describes and represents familiar three-dimensional objects",MA1-3DS-01,0,,1be0d67c-2519-4be0-a2f2-50a31ca4f3e1
-147,145,"measures, records, compares and estimates internal volumes (capacities) and volumes using uniform informal units",MA1-3DS-02,0,,c9121949-f38b-46c1-bd7a-9f680219e6c8
-148,130,"Non-spatial measure",,0,,48018813-7b0c-4a92-b74f-56e5bc096ed1
-149,148,"measures, records, compares and estimates the masses of objects using uniform informal units",MA1-NSM-01,0,,228e9a31-066c-449b-bda5-1d31bb310995
-150,148,"describes, compares and orders durations of events, and reads half- and quarter-hour time",MA1-NSM-02,0,,5cb575e7-3f76-4e3e-a27f-c9fe93e143f5
-151,130,Data,,0,,ba4f76c4-28c0-4135-9032-13e6c5438d13
-152,151,"gathers and organises data, displays data in lists, tables and picture graphs",MA1-DATA-01,0,,2554839a-7670-4ee1-a567-4c3dc70db9e2
-153,151,"reasons about representations of data to describe and interpret the results",MA1-DATA-02,0,,3e61b0bf-6e14-498a-aae7-e5eda12079a6
-154,130,Chance,,0,,65126c72-27d2-4d6f-b10f-cdf5f1c8fdec
-155,154,"recognises and describes the element of chance in everyday events",MA1-CHAN-01,0,,866d37a2-d85c-4001-a90d-ef995612f3a4
-156,104,"Stage 2",,0,,d2c9e934-6059-4096-9d47-6ce4a07d0a72
-157,156,"Representing numbers",,0,,ae1788ad-0c9d-4707-8869-35293b416afc
-158,157,"applies an understanding of place value and the role of zero to represent numbers to at least tens of thousands",MA2-RN-01,0,,24a831b8-8526-42c1-9e19-7bfb727e9132
-159,157,"represents and compares decimals up to 2 decimal places using place value",MA2-RN-02,0,,a2c09e4a-805c-40f0-9cbf-b7b7d65d9441
-160,156,"Additive relations",,0,,42ed2164-fc4f-4899-a136-8145c0c0796a
-161,160,"selects and uses mental and written strategies for addition and subtraction involving 2- and 3-digit numbers",MA2-AR-01,0,,3d75c90a-20f9-48ba-a7b6-72b9f9bdb835
-162,160,"completes number sentences involving addition and subtraction by finding missing values",MA2-AR-02,0,,c979d382-7465-44ab-bf78-83ae4c23b730
-163,156,"Multiplicative relations",,0,,d842bb86-f339-4fec-a727-1fd92f9c73f5
-164,163,"represents and uses the structure of multiplicative relations to 10 × 10 to solve problems",MA2-MR-01,0,,9f28853f-e842-4615-b3dd-0c42138ac32d
-165,163,"completes number sentences involving multiplication and division by finding missing values",MA2-MR-02,0,,977ca6c7-ad0c-440a-ac77-1843a6fe3222
-166,156,Fractions,,0,,9b4f6af9-cd30-4319-ae46-2bdf49d9d088
-167,166,"represents and compares halves, quarters, thirds and fifths as lengths on a number line and their related fractions formed by halving (eighths, sixths and tenths)",MA2-PF-01,0,,4d396cc5-4a6d-48ef-8a82-520606bf12d6
-168,156,"Geometric measure",,0,,17716d78-e93f-4104-a5dc-013ceb9d9444
-169,168,"uses grid maps and directional language to locate positions and follow routes",MA2-GM-01,0,,f18ace5a-1fd7-4ff2-9fd0-e13ea20c0d09
-170,168,"measures and estimates lengths in metres, centimetres and millimetres",MA2-GM-02,0,,8c02a5fa-0dff-4cf5-8192-7e719233b7b4
-171,168,"identifies angles and classifies them by comparing to a right angle",MA2-GM-03,0,,698ed6a3-fafa-4088-917a-5fec9790c6ed
-172,156,"Two-dimensional (2D) spatial structure",,0,,bd587629-75f5-4669-bc05-7d7ba7bd8d37
-173,172,"compares two-dimensional shapes and describes their features",MA2-2DS-01,0,,55e795b5-8343-4ab0-841f-5a424872c9e1
-174,172,"performs transformations by combining and splitting two-dimensional shapes",MA2-2DS-02,0,,52f1df90-908c-4fcc-a592-cf55e94bceae
-175,172,"estimates, measures and compares areas using square centimetres and square metres",MA2-2DS-03,0,,b1179460-ae24-4409-a422-5c6ab745b769
-176,156,"Three-dimensional (3D) spatial structure",,0,,f6f82a63-7cd5-46be-a0ff-8070f829c9cd
-177,176,"makes and sketches models and nets of three-dimensional objects including prisms and pyramids",MA2-3DS-01,0,,74f9d280-3254-462e-b8f8-671e9968eb0d
-178,176,"estimates, measures and compares capacities (internal volumes) using litres, millilitres and volumes using cubic centimetres",MA2-3DS-02,0,,0330de0a-1ac9-4bc9-8758-66b6badb2c9d
-179,156,"Non-spatial measure",,0,,1b7c2e72-7d35-417c-9932-809eff5cec95
-180,179,"estimates, measures and compares the masses of objects using kilograms and grams",MA2-NSM-01,0,,8446cec8-f551-4f88-bc20-2b86b64bfc25
-181,179,"represents and interprets analog and digital time in hours, minutes and seconds",MA2-NSM-02,0,,8f082b99-2b5a-4f81-a054-0e31f1fb4ba9
-182,156,Data,,0,,613b9546-954e-43b8-9b8f-997adc2211ec
-183,182,"collects discrete data and constructs graphs using a given scale",MA2-DATA-01,0,,f624d7f0-bf3b-407a-8a89-25891177fa1b
-184,182,"interprets data in tables, dot plots and column graphs",MA2-DATA-02,0,,ebbf3668-38f6-4de9-86cc-e78251af8bab
-185,156,Chance,,0,,bc8bd6c2-12d0-467f-8cf3-fbd454f52afb
-186,185,"records and compares the results of chance experiments",MA2-CHAN-01,0,,9abdcc67-4d7f-4d88-bc0e-b9899c8c8634
-187,104,"Stage 3",,0,,6bfaaedc-1879-45d6-ac29-669cfac64f75
-188,187,"Representing numbers",,0,,cf5631ce-6a2b-49a3-abfc-84b7d82674e4
-189,188,"applies an understanding of place value and the role of zero to represent the properties of numbers",MA3-RN-01,0,,94fa597e-355f-473e-bd18-2aa0d9d83e68
-190,188,"compares and orders decimals up to 3 decimal places",MA3-RN-02,0,,8af5bcdc-72a3-4146-b47c-43d3ead697df
-191,188,"determines percentages of quantities, and finds equivalent fractions and decimals for benchmark percentage values",MA3-RN-03,0,,4bb110dc-f807-44c6-8bf5-f5dc058c16cc
-192,187,"Additive relations",,0,,1ad68049-e848-4d4c-979d-7c765ec69b26
-193,192,"selects and applies appropriate strategies to solve addition and subtraction problems",MA3-AR-01,0,,e9b35d04-687d-4717-a538-0e7237e14db2
-194,187,"Multiplicative relations",,0,,f64abfbd-f062-4fad-b1f2-f2125d378025
-195,194,"selects and applies appropriate strategies to solve multiplication and division problems",MA3-MR-01,0,,1201e16b-e11d-4595-80be-90c284ea0509
-196,194,"constructs and completes number sentences involving multiplicative relations, applying the order of operations to calculations",MA3-MR-02,0,,26ebe754-8824-4e6d-bd5e-d7c9f7076762
-197,187,Fractions,,0,,bec88336-be31-45d7-8de6-111fed34dd62
-198,197,"compares and orders fractions with denominators of 2, 3, 4, 5, 6, 8 and 10",MA3-RQF-01,0,,6f0b354c-f59d-47e8-8474-cb05b39aeb54
-199,197,"determines , ,  and  of measures and quantities",MA3-RQF-02,0,,608a8990-bc93-4702-9520-84cb64bbb11b
-200,187,"Geometric measure",,0,,9346abef-38d6-416a-b9bc-b59cc153aebc
-201,200,"locates and describes points on a coordinate plane",MA3-GM-01,0,,cc1e543a-f5b5-480f-855a-396f4742cbe0
-202,200,"selects and uses the appropriate unit and device to measure lengths and distances including perimeters",MA3-GM-02,0,,8c601e56-bbd5-4785-ab99-0bc6bf09a1db
-203,200,"measures and constructs angles, and identifies the relationships between angles on a straight line and angles at a point",MA3-GM-03,0,,2296ec67-b55b-43f0-874b-40550b3204a0
-204,187,"Two-dimensional (2D) spatial structure",,0,,e6acd95a-65e4-4de3-bdfd-3c148554350b
-205,204,"investigates and classifies two-dimensional shapes, including triangles and quadrilaterals based on their properties",MA3-2DS-01,0,,606022d2-3a53-40e3-8600-a694cfc535a0
-206,204,"selects and uses the appropriate unit to calculate areas, including areas of rectangles",MA3-2DS-02,0,,79211735-b256-4d36-bbd7-01d5376ea173
-207,204,"combines, splits and rearranges shapes to determine the area of parallelograms and triangles",MA3-2DS-03,0,,736fe604-a8e5-4dfc-8765-833f4a9653ab
-208,187,"Three-dimensional (3D) spatial structure",,0,,6b8b0f62-9b85-45ec-b988-38f4bed84028
-209,208,"visualises, sketches and constructs three-dimensional objects, including prisms and pyramids, making connections to two-dimensional representations",MA3-3DS-01,0,,3744e530-1fd3-4239-9410-afa448a76421
-210,208,"selects and uses the appropriate unit to estimate, measure and calculate volumes and capacities",MA3-3DS-02,0,,8d1c501a-8867-40e0-9724-3f9fba08df4f
-211,187,"Non-spatial measure",,0,,e991bfb0-b2e6-43b0-86b5-cfd6e7d07b7f
-212,211,"selects and uses the appropriate unit and device to measure the masses of objects",MA3-NSM-01,0,,cc2c6ca6-b13a-4623-9a35-a55c4408b6d9
-213,211,"measures and compares duration, using 12- and 24-hour time and am and pm notation",MA3-NSM-02,0,,485377cb-f152-472a-9c85-92b56dd85413
-214,187,Data,,0,,2c844508-00a9-4908-90f3-02c44e087f4f
-215,214,"constructs graphs using many-to-one scales",MA3-DATA-01,0,,059bf572-ebc4-4770-a41a-ad9b0f7be2d4
-216,214,"interprets data displays, including timelines and line graphs",MA3-DATA-02,0,,bfcaf804-5fba-489e-bef1-8b35e79dfb4a
-217,187,Chance,,0,,a443117e-252f-42a6-adb5-f8d4f65c6373
-218,217,"conducts chance experiments and quantifies the probability",MA3-CHAN-01,0,,63a905ca-6db5-4d1b-ba44-e2a88ca57377
-219,104,"Stage 4",,0,,3f5ddb8c-c5e6-4164-a1ab-8955004f6794
-220,219,"Ratios and rates",,0,,f8ae1a0d-210b-476d-9966-ced7a2f798b3
-221,220,"solves problems involving ratios and rates, and analyses distance–time graphs",MA4-RAT-C-01,0,,972e89ec-631a-47b8-9a71-ce9129387a11
-222,219,"Algebraic techniques",,0,,e887d2d1-c5e1-4949-b001-449355d0fcb6
-223,222,"generalises number properties to operate with algebraic expressions including expansion and factorisation",MA4-ALG-C-01,0,,f116b575-9ee0-4116-aca2-acf71bcd3384
-224,219,Indices,,0,,d74615a1-0247-41d9-b84d-9aa6c7dc83cc
-225,224,"operates with primes and roots, positive-integer and zero indices involving numerical bases and establishes the relevant index laws",MA4-IND-C-01,0,,5c43bbc2-d119-4453-a941-be0094d88b2d
-226,219,Equations,,0,,96932184-b45e-4713-be15-6ad5d407a34f
-227,226,"solves linear equations of up to 2 steps and quadratic equations of the form",MA4-EQU-C-01,0,,bece35f4-041e-42fa-baca-b5016d141b2b
-228,219,"Linear relationships",,0,,80bff785-7e3f-42d6-b2dc-b6c9d986ecc1
-229,228,"creates and displays number patterns and finds graphical solutions to problems involving linear relationships",MA4-LIN-C-01,0,,5d326e4b-6f94-4f9d-892d-01b83cdc2178
-230,219,"Pythagoras and trigonometry",,0,,f93282ff-4d59-4e00-bac5-9720ab7b0a2e
-231,230,"applies Pythagoras’ theorem to solve problems in various contexts",MA4-PYT-C-01,0,,368ddbb8-fa90-4d76-a3d8-133a6c4d93d5
-232,219,"Area and surface area",,0,,76c93393-f71e-433e-9834-11a0049e8086
-233,232,"applies knowledge of area and composite area involving triangles, quadrilaterals and circles to solve problems",MA4-ARE-C-01,0,,a45d8bdb-6020-4140-a5d3-a55b97410417
-234,219,Volume,,0,,1f38e742-d3f4-4940-b73d-fac29e399f58
-235,234,"applies knowledge of volume and capacity to solve problems involving right prisms and cylinders",MA4-VOL-C-01,0,,23fa3abf-a1f2-4452-9e04-071971fd8f2a
-236,219,"Properties of geometrical figures",,0,,617565c3-32a6-4558-ac2f-f655ff74d484
-237,236,"identifies and applies the properties of triangles and quadrilaterals to solve problems",MA4-GEO-C-01,0,,2e193ec2-5400-4448-aae6-68a34f516b1e
-238,219,"Data analysis",,0,,75ad2d15-5c67-4ee2-ac1c-ba0f65ba53da
-239,238,"analyses simple datasets using measures of centre, range and shape of the data",MA4-DAT-C-02,0,,23100afe-5439-49fa-8707-d6d39fae156b
-240,219,Probability,,0,,88212261-90bb-4f73-baaa-7771338c635e
-241,240,"solves problems involving the probabilities of simple chance experiments",MA4-PRO-C-01,0,,546ad106-fb53-45bb-9d31-d08a43e9dc6c
-242,219,"Computation with integers",,0,,124a9074-0680-452c-a6b0-3474a52354f5
-243,242,"compares, orders and calculates with integers to solve problems",MA4-INT-C-01,0,,1592d16e-55ec-4be7-8a55-bb89c8b8d833
-244,219,"Fractions, decimals and percentages",,0,,ca9ef631-fa48-46a5-b765-56c4a1b5a23d
-245,244,"represents and operates with fractions, decimals and percentages to solve problems",MA4-FRC-C-01,0,,87b86830-1216-49f7-a56e-682f34d9e52f
-246,219,Length,,0,,49121310-88fe-4de5-a6d0-24c8dc866394
-247,246,"applies knowledge of the perimeter of plane shapes and the circumference of circles to solve problems",MA4-LEN-C-01,0,,ec643463-ec78-443c-b35a-1467155fe911
-248,219,"Angle relationships",,0,,c948e0f4-506f-4d68-a1e7-5cc707f80e83
-249,248,"applies angle relationships to solve problems, including those related to transversals on sets of parallel lines",MA4-ANG-C-01,0,,227d9910-a0ec-4574-9b1a-6d94ed369fe6
-250,219,"Data classification and visualisation",,0,,f6da22b2-5f82-40a5-928a-5f790e9b0a39
-251,250,"classifies and displays data using a variety of graphical representations",MA4-DAT-C-01,0,,c2131f13-9af4-42a3-94bf-8947231d8c9d
-252,104,"Stage 5",,0,,fa1b5b39-6c3a-4752-b94b-9a2bcc668a4d
-253,252,"Ratios and rates",,0,,6478fb68-9d77-4c32-ab20-7e793e777816
-254,253,"identifies and solves problems involving direct and inverse variation and their graphical representations (Path: Stn, Adv)",MA5-RAT-P-01,0,,3e271598-9a79-4682-b5aa-f2e9f636d4b2
-255,253,"analyses and constructs graphs relating to rates of change (Path: Adv)",MA5-RAT-P-02,0,,7e90791e-fb1c-46fc-88d3-7a9cd0a16bf1
-256,252,"Algebraic techniques",,0,,de8e9947-74e6-431a-8a91-84d6c40068e7
-257,256,"simplifies algebraic fractions with numerical denominators and expands algebraic expressions",MA5-ALG-C-01,0,,80a2434b-75b3-4b04-96b1-3bb144c22ebd
-258,256,"simplifies algebraic fractions involving indices, and expands and factorises algebraic expressions (Path: Adv)",MA5-ALG-P-01,0,,730c6d2a-c5b1-468b-afe6-f13f2140ac46
-259,256,"selects and applies appropriate algebraic techniques to operate with algebraic fractions, and expands, factorises and simplifies algebraic expressions (Path: Adv)",MA5-ALG-P-02,0,,2220ac0b-1c81-4df9-871b-eada08d2b10d
-260,252,Indices,,0,,a6a436eb-393f-49f2-8aec-3c2d6fa26c43
-261,260,"simplifies algebraic expressions involving positive-integer and zero indices, and establishes the meaning of negative indices for numerical bases",MA5-IND-C-01,0,,0c300ce1-3c0e-4abb-bd91-f41c6c3b3c12
-262,260,"applies the index laws to operate with algebraic expressions involving negative-integer indices (Path: Adv)",MA5-IND-P-01,0,,64bd4ac1-9a2d-4223-b774-448fa17002b7
-263,260,"describes and performs operations with surds and fractional indices (Path: Adv)",MA5-IND-P-02,0,,33761e36-f01d-415d-9f04-7e64abefcc14
-264,252,Equations,,0,,8982b493-5fce-4da9-956a-af9d5a592bdf
-265,264,"solves linear equations of up to 3 steps, limited to one algebraic fraction",MA5-EQU-C-01,0,,1b635c75-69b1-4a8e-ab5c-3bb79a300e58
-266,264,"solves monic quadratic equations, linear inequalities and cubic equations of the form  (Path: Adv)",MA5-EQU-P-01,0,,4ea9a0a0-f119-4a44-a85d-32fc64da1f35
-267,264,"solves linear equations of more than 3 steps, monic and non-monic quadratic equations, and linear simultaneous equations (Path: Adv)",MA5-EQU-P-02,0,,83d09b08-e224-44e4-8b64-9425515b825d
-268,252,"Linear relationships",,0,,20650289-0002-4040-a548-3d0669b4b009
-269,268,"determines the midpoint, gradient and length of an interval, and graphs linear relationships, with and without digital tools",MA5-LIN-C-01,0,,af114f6c-8dfd-47ab-af19-62114a06b5b1
-270,268,"graphs and interprets linear relationships using the gradient/slope-intercept form",MA5-LIN-C-02,0,,4a303bec-4a0b-428c-8084-9e7b1610d141
-271,268,"describes and applies transformations, the midpoint, gradient/slope and distance formulas, and equations of lines to solve problems (Path: Adv)",MA5-LIN-P-01,0,,f4c11f47-3ec8-440f-bd89-1e520dbb17ce
-272,252,"Pythagoras and trigonometry",,0,,79659ea1-7576-413c-a9c9-15d56bf1c303
-273,272,"applies trigonometric ratios to solve right-angled triangle problems",MA5-TRG-C-01,0,,5e40f057-515d-4657-a688-cc7a44e76bab
-274,272,"applies trigonometry to solve problems, including bearings and angles of elevation and depression",MA5-TRG-C-02,0,,b2f75531-e7d8-4bde-894b-490ff08b3731
-275,272,"applies Pythagoras’ theorem and trigonometry to solve 3-dimensional problems and applies the sine, cosine and area rules to solve 2-dimensional problems, including bearings (Path: Stn, Adv)",MA5-TRG-P-01,0,,b40d1850-fb43-46b1-98b0-18a8e152c33b
-276,272,"establishes and applies the properties of trigonometric functions and finds solutions to trigonometric equations (Path: Adv)",MA5-TRG-P-02,0,,b97bc242-ac27-4af5-84b0-0b6511feab75
-277,252,"Area and surface area",,0,,3b49b544-32d2-47b6-bdb2-47cc7d06b026
-278,277,"solves problems involving the surface area of right prisms and practical problems involving the area of composite shapes and solids",MA5-ARE-C-01,0,,76029bf6-8df2-4f1b-9e6a-1ab7d6717519
-279,277,"applies knowledge of the surface area of right pyramids and cones, spheres and composite solids to solve problems (Path: Stn, Adv)",MA5-ARE-P-01,0,,0b9aea99-04e2-440e-b7c5-c935bf5ea01d
-280,252,Volume,,0,,a6de6ca5-05e7-4f3a-afc6-aaf6c990fcf7
-281,280,"solves problems involving the volume of composite solids consisting of right prisms and cylinders",MA5-VOL-C-01,0,,7ee58d25-f77e-42cb-a828-5eb90ea792b9
-282,280,"applies knowledge of the volume of right pyramids, cones and spheres to solve problems involving related composite solids (Path: Stn, Adv)",MA5-VOL-P-01,0,,67046a49-f298-4541-a5ff-030a8c54de77
-283,252,"Properties of geometrical figures",,0,,93754a6f-ad1f-4e2b-8157-880e9b7de1b3
-284,283,"identifies and applies the properties of similar figures and scale drawings to solve problems",MA5-GEO-C-01,0,,1db61e74-d62d-4503-869b-d35ea53de647
-285,283,"establishes conditions for congruent triangles and similar triangles and solves problems relating to properties of similar figures and plane shapes (Path: Ext)",MA5-GEO-P-01,0,,ea232081-8be2-41c4-a74b-7b72369b259d
-286,283,"constructs proofs involving congruent triangles and similar triangles and proves properties of plane shapes (Path:  Ext)",MA5-GEO-P-02,0,,e6b6900e-7791-44b6-aaed-af8428764ede
-287,252,"Data analysis",,0,,eefb75fa-f5b2-49a9-8c7f-f69a928206d1
-288,287,"compares and analyses datasets using summary statistics and graphical representations",MA5-DAT-C-01,0,,986702d9-ea9b-497b-926f-ec76cec70136
-289,287,"displays and interprets datasets involving bivariate data",MA5-DAT-C-02,0,,bd7ed947-78f1-48ad-8469-a21daf01b2d9
-290,287,"plans, conducts and reviews a statistical inquiry into a question of interest (Path: Stn, Adv)",MA5-DAT-P-01,0,,f65903c9-7b95-4de0-bbc6-f19bc1ae9486
-291,252,Probability,,0,,c40ed932-2e5a-4612-ac01-600c8531a116
-292,291,"solves problems involving probabilities in multistage chance experiments and simulations",MA5-PRO-C-01,0,,cac870bb-69da-4703-b36a-457bedb7f737
-293,291,"solves problems involving Venn diagrams, 2-way tables and conditional probability (Path: Adv)",MA5-PRO-P-01,0,,9881d201-d70a-4d4d-824b-f10619f6891e
-294,252,"Financial mathematics",,0,,89d66c45-207e-4f71-be75-a7090f897f6e
-295,294,"solves financial problems involving simple interest, earning money and spending money",MA5-FIN-C-01,0,,33d0d1e6-af2f-468f-98d9-6b0873722c1e
-296,294,"solves financial problems involving compound interest and depreciation",MA5-FIN-C-02,0,,369ac62d-3366-460b-a2a6-b2d8862a8023
-297,252,"Non-linear relationships",,0,,f0424a53-fee6-46fb-9b8b-fa61321897db
-298,297,"identifies connections between algebraic and graphical representations of quadratic and exponential relationships in various contexts",MA5-NLI-C-01,0,,c033b678-892c-4120-9170-9a155ddf1687
-299,297,"identifies and compares features of parabolas and exponential curves in various contexts",MA5-NLI-C-02,0,,8b054169-402b-4729-b759-12d4d0efc369
-300,297,"interprets and compares non-linear relationships and their transformations, both algebraically and graphically (Path: Adv)",MA5-NLI-P-01,0,,9024d372-f639-44e3-91bd-9825916a0c1e
-301,252,"Numbers of any magnitude",,0,,a48ee01d-8414-49b6-95bc-ce496cba5545
-302,301,"solves measurement problems by using scientific notation to represent numbers and rounding to a given number of significant figures",MA5-MAG-C-01,0,,a7f556a0-4e58-49c5-b3bf-5106d6a9f3c8
-303,252,"Polynomials (Path)",,0,,a95ca947-0eee-4262-aa15-aab532c6de4d
-304,303,"defines, operates with and graphs polynomials and applies the factor and remainder theorems to solve problems (Path: Adv, Ext)",MA5-POL-P-01,0,,a6f42cba-fe2a-4f9e-ba51-731263159e87
-305,252,"Logarithms (Path)",,0,,68093c4b-0d6c-4dae-8b28-ab2320181d0b
-306,305,"establishes and applies the laws of logarithms to solve problems (Path: Adv)",MA5-LOG-P-01,0,,44ed8eb8-dbf9-4589-b08f-2e213c28bf20
-307,252,"Functions and other graphs (Path)",,0,,128cfabd-afa9-4b45-81f9-14d29f77a2f0
-308,307,"uses function notation to describe and graph functions of one variable and graphs inequalities in one and 2 variables (Path: Adv)",MA5-FNC-P-01,0,,5919aed6-9378-46b9-ab8a-e6a3fab8c54d
-309,252,"Circle geometry (Path)",,0,,10c02134-d7a4-4c5b-9c4e-1aca6dc35ed7
-310,309,"applies deductive reasoning to prove circle theorems and solve related problems (Path: Ext)",MA5-CIR-P-01,0,,5476e385-e2ef-462f-893f-72f5916b5139
-311,252,"Introduction to networks (Path)",,0,,1dea3fcd-fe5f-478b-bc6a-65b40bbd0edd
-312,311,"solves problems involving the characteristics of graphs/networks, planar graphs and Eulerian trails and circuits (Path: Stn)",MA5-NET-P-01,0,,ca09b069-116d-4d66-86fb-d67c2a70ad38
-313,1,Technological and Applied Studies,,0,,a0ae3448-d105-4c67-9443-df34f71a47b5
-314,313,"Computing Technology",,0,,481cd8e2-7987-4a9a-83ca-d0f4609fe298
-315,314,"Stage 4",,0,,47f5d129-a864-4991-9b6e-9e751731a202
-316,315,"in Stage 4 teachers may adjust the Stage 5 outcomes as appropriate to the needs of students in Years 7 and 8",CT4-ADJ-01,0,,04f3eef6-7ac8-4582-9dac-9fec53e991d6
-317,314,"Stage 5",,0,,7b405b99-c2b5-4b87-8822-abec7c4516eb
-318,317,"selects and applies safe, secure and responsible practices in the ethical use of data and computing technology",CT5-SAF-01,0,,11493c5b-03ac-4ba3-92c8-613de95a79ff
-319,317,"applies iterative processes to define problems and plan, design, develop and evaluate computing solutions",CT5-DPM-01,0,,8e25e959-91b8-4ec2-a9ea-c3c4496ac84d
-320,317,"manages, documents and explains individual and collaborative work practices",CT5-COL-01,0,,fbb63ac9-1ac3-40f3-9a60-4c7dd57f3926
-321,317,"understands how innovation, enterprise and automation have inspired the evolution of computing technology",CT5-EVL-01,0,,fe62bb8b-2eb0-4972-b433-6da6dcda8e28
-322,317,"explains how data is stored, transmitted and secured in digital systems and how information is communicated in a range of contexts",CT5-DAT-01,0,,4cb8e698-be0a-466e-9d8e-6adad1725ec2
-323,317,"communicates ideas, processes and solutions using appropriate media",CT5-COM-01,0,,bbec310f-230d-4fdb-8b6d-a70573858f23
-324,317,"designs, produces and evaluates algorithms and implements them in a general-purpose and/or object-oriented programming language",CT5-OPL-01,0,,d775341d-82ae-416e-b17d-10a97f448b92
-325,317,"applies computational, design and systems thinking to the development of computing solutions",CT5-THI-01,0,,6519dfd6-5c95-4eaf-98e5-7a00743985fe
-326,317,"acquires, represents, analyses and visualises simple and structured data",CT5-DAT-02,0,,2bba2e50-a93f-4993-a644-cb533505e99b
-327,317,"designs and creates user interfaces and the user experience",CT5-DES-01,0,,b676eb51-35e0-462f-a19a-c8314723f70c
-328,1,Languages,,0,,3952660c-7452-4b64-a3c3-c3ccb20467ad
-329,328,"Aboriginal Languages K–10",,0,,48e11d4d-993b-4813-9949-d331f46a1ba3
-330,329,"Early Stage 1",,0,,ce348cfe-44a9-4381-b517-3ef07c34b62b
-331,330,Interacting,,0,,7cec2c3d-7329-4c5f-ae9f-19c48d42f4a9
-332,331,"uses modelled target language in simple exchanges",ALE-INT-01,0,,d7d1eba9-4da7-4e47-a6c1-76947a92a988
-333,330,Responding,,0,,9d5d6a90-9769-42f0-9f21-c4ec40488e31
-334,333,"responds to simple texts through words, gestures or expression",ALE-RES-01,0,,8b1d6445-ca84-4ea0-9ab1-c0a0504f2d90
-335,330,Composing,,0,,90494e9c-82a6-4553-8de0-e25c04afb3e0
-336,335,"composes simple texts in the target language using supports and other scaffolds",ALE-COM-01,0,,e9de4b8f-8b2d-4cf8-9d2a-c195b9f4f461
-337,330,"The role of language, culture and identity",,0,,3c1f3880-cde6-4bd7-b364-73491b1b4baf
-338,337,"recognises different languages and cultures in their immediate environment and the world",ALE-RLC-01,0,,6fdabb32-4003-4031-be54-aa81c3849c39
-339,330,"Language awareness and building",,0,,8fbc13aa-07f0-4ae3-bed5-bba69975d29b
-340,339,"recognises that some Aboriginal Languages are being maintained, revived and/or strengthened",ALE-LAB-01,0,,1a771cc7-2383-419b-9b54-d88bc3a55326
-341,329,"Stage 1",,0,,d6959619-9cdf-4c94-9e81-79561ec5db26
-342,341,Interacting,,0,,4788db29-9eab-4558-a568-0474c66db858
-343,342,"uses modelled target language to share information in familiar contexts",AL1-INT-01,0,,b7a4a642-ddf6-4cd5-89e6-a7f86fe7b340
-344,341,Responding,,0,,ed0c2a40-f5d0-4f7c-a496-89e30ff60046
-345,344,"recognises and responds to key words and known phrases in texts",AL1-RES-01,0,,8fc1c857-1a4f-42d4-8a1a-682d3dae8224
-346,341,Composing,,0,,cb5e43e3-2bff-4602-979d-7bde9fef374b
-347,346,"composes texts in the target language using modelled language",AL1-COM-01,0,,460b9c36-bb18-43c7-a2a0-f85e6e64a9da
-348,341,"The role of language, culture and identity",,0,,e55b5613-448c-4a62-b4d4-716a77635a14
-349,348,"recognises relationships between languages and cultures",AL1-RLC-01,0,,1da2e499-8b8a-4f39-9576-f64273144791
-350,341,"Language awareness and building",,0,,be6acbaf-6163-4315-b981-5d8644d57260
-351,350,"recognises resources available to maintain, revive and strengthen Aboriginal Languages",AL1-LAB-01,0,,bfcacfae-b1eb-41a5-8a13-2f5b21e32ad0
-352,329,"Stage 2",,0,,06602989-3671-49fa-99ba-ab3c7b597cdd
-353,352,Interacting,,0,,38b4230c-3b97-47dc-a7d7-615dcabd85b5
-354,353,"uses the target language to share information",AL2-INT-01,0,,5f3c07ed-3c4b-4014-bf03-ecf4c8fcd2ef
-355,352,Responding,,0,,55d527dd-fb95-40bc-8ccb-cb1e1b8bcacc
-356,355,"locates and responds to key words and information in texts",AL2-RES-01,0,,8eb1e43a-b519-4d50-9607-2f2d377f7d8d
-357,352,Composing,,0,,b0b24dd7-7c2f-4ed4-9eeb-44cef68fe1a2
-358,357,"composes texts in the target language using familiar words and expressions",AL2-COM-01,0,,410055fd-9633-4b52-9ca7-1f8a5eed9832
-359,352,"The role of language, culture and identity",,0,,720d7cc6-9e0e-49a5-8bd7-90eedda7eb45
-360,359,"recognises how terms and expressions reflect aspects of culture",AL2-RLC-01,0,,0ff54112-4406-4681-8a84-f3191f5e9056
-361,352,"Language awareness and building",,0,,cf74d933-bba1-4078-be82-43ca47071114
-362,361,"recognises ways of maintaining, reviving and strengthening Aboriginal Languages",AL2-LAB-01,0,,f1b0a7c2-5bca-4a35-96fc-72e53c8aad3e
-363,329,"Stage 3",,0,,8cace184-db3f-45ac-a004-ce6be51c359a
-364,363,Interacting,,0,,dd39e459-39d5-41c5-8ea0-180d372c4029
-365,364,"uses the target language to exchange information and ideas",AL3-INT-01,0,,da25a150-14dc-4fd4-a53e-d26f8d1079dc
-366,363,Responding,,0,,752db1f3-6a70-4cab-880a-e6550e2b3803
-367,366,"identifies and responds to information in texts",AL3-RES-01,0,,43c050a2-d85f-4b10-a0f1-9b4c1fa4baf2
-368,363,Composing,,0,,1ebde0d4-e73b-4964-a51e-fb64cd1f1688
-369,368,"composes texts in the target language using a series of sentences",AL3-COM-01,0,,1c11c2a2-5d4b-4c60-ba77-60637b742453
-370,363,"The role of language, culture and identity",,0,,c640ff50-be28-4b35-8f08-1ad95c1b5abe
-371,370,"makes connections between cultural practices and language use",AL3-RLC-01,0,,39f88b34-199b-4f1c-8701-f4861ddbbe61
-372,363,"Language awareness and building",,0,,a6032cc8-c69d-4f0f-b0df-3332ca47fdf7
-373,372,"identifies challenges to maintaining, reviving and strengthening Aboriginal Languages",AL3-LAB-01,0,,186ae1a7-e61a-4fd7-b2b2-c9aba065b898
-374,329,"Stage 4",,0,,eda56fa2-46b5-430f-b156-bc651d5c8410
-375,374,Interacting,,0,,8ccc407e-29a7-4236-b8c2-4d01963248bb
-376,375,"uses the target language to exchange information, ideas and opinions",AL4-INT-01,0,,70194df8-d10a-4622-8ecb-278f3215c83d
-377,374,Responding,,0,,b4269e44-833a-4d6e-8404-1014f5e3a253
-378,377,"responds to information and ideas in a range of texts",AL4-RES-01,0,,53aa2d38-bc7e-4a50-9427-39e35c49c287
-379,374,Composing,,0,,880a4e11-09f1-4b7b-ba9d-de7827b445c3
-380,379,"composes texts in the target language, using a range of linguistic structures for different audiences",AL4-COM-01,0,,e045c624-c757-4b15-b1c6-9fdb5371d53a
-381,374,"The role of language, culture and identity",,0,,3607e43a-875d-48d1-9c04-50fbb92eca49
-382,381,"identifies how language use reflects cultural ideas, values and beliefs",AL4-RLC-01,0,,a44e19a1-5451-42db-a04d-d5d54def01a7
-383,374,"Language awareness and building",,0,,c3d53466-0e5a-4318-80d8-82bc44d88f51
-384,383,"identifies protocols, programs and techniques to maintain and build Aboriginal Languages",AL4-LAB-01,0,,14899ac7-a28a-4c2f-9e97-019e29ba9de9
-385,329,"Stage 5",,0,,a39cdd36-8470-4e55-81ae-609635b4ad1b
-386,385,Interacting,,0,,c2d7389e-0941-440c-906c-a0f9b5383b59
-387,386,"manipulates the target language in sustained interactions to exchange information, ideas and opinions",AL5-INT-01,0,,e5d8f866-e45e-475a-82e5-d4985d1941ce
-388,385,Responding,,0,,9d6b5df4-aa46-4893-90d4-0286f2e6d4e2
-389,388,"responds to information, ideas and perspectives in a range of texts",AL5-RES-01,0,,26a3705c-9c67-47c0-b3d3-c03452763125
-390,385,Composing,,0,,f686a1a0-4708-4836-a7dc-e90597bd3bf4
-391,390,"composes texts in the target language, applying a range of linguistic structures for a variety of contexts, purposes and audiences",AL5-COM-01,0,,3eb945e7-1da7-49a7-8967-2988cd7f67eb
-392,385,"The role of language, culture and identity",,0,,7bfe2a1a-5c2e-4d3d-84df-db898c4985e3
-393,392,"explains the interrelationship between language, culture and identity",AL5-RLC-01,0,,92fd09b0-1c34-4bf8-9fdf-d56735997c0b
-394,385,"Language awareness and building",,0,,eae05050-d311-4927-bed7-5117efca6055
-395,394,"analyses and evaluates protocols, programs and techniques to maintain and build Aboriginal Languages",AL5-LAB-01,0,,42bb3e08-2c69-495a-86ca-f0ff357edca6
-396,328,"Modern Languages K–10",,0,,f681cdf0-0b9a-4ef6-8fde-832e5bd2257f
-397,396,"Early Stage 1",,0,,aa386974-48e8-4ed2-a571-7e54b8154317
-398,397,Interacting,,0,,c5e62fe8-e57c-4ba8-b1fd-04d1b6afdd56
-399,398,"exchanges meaning through play and actions by reproducing culturally appropriate modelled language",MLE-INT-01,0,,86edc191-1023-4429-8127-f1707d7ca5c1
-400,397,"Understanding texts",,0,,107edf19-f3de-4239-94a8-f1341cc1b83a
-401,400,"responds to information in simple texts in a variety of ways to demonstrate understanding",MLE-UND-01,0,,6471d1c4-c1a9-472e-9f8f-66242b52968c
-402,397,"Creating texts",,0,,ac347e43-4756-4673-b97c-5614219f1c9f
-403,402,"creates simple texts by reproducing culturally appropriate modelled vocabulary",MLE-CRT-01,0,,2c83afb9-435a-46e3-96ec-3a20c20bc1ee
-404,396,"Stage 1",,0,,d73ff53d-b19d-4f41-8afb-4f1966da667d
-405,404,Interacting,,0,,189c892f-c86e-4e86-8cda-0491ca19f20f
-406,405,"exchanges meaning by selecting culturally appropriate modelled language",ML1-INT-01,0,,366f207d-8cf9-4cd2-b5ab-74c77ba61ec0
-407,404,"Understanding texts",,0,,7c39fd44-9c59-47ad-9006-6ae8bc322144
-408,407,"recognises and responds to information in simple texts to demonstrate understanding",ML1-UND-01,0,,5bdb086d-5593-4375-9c22-8979a3c0b95e
-409,404,"Creating texts",,0,,f5ce3727-71e5-4d0b-b23d-eb845d5ac648
-410,409,"creates simple texts by selecting culturally appropriate modelled language",ML1-CRT-01,0,,25b40a2f-2008-490a-8c20-5c4f3a0dff2c
-411,396,"Stage 2",,0,,365036df-007e-4d50-bbf4-b52943ee44f8
-412,411,Interacting,,0,,329c5f2b-e90d-4dff-919a-f1b7d3934f45
-413,412,"exchanges information in familiar contexts by selecting culturally appropriate modelled language",ML2-INT-01,0,,1916486e-648c-4073-8aaa-34ba807103e5
-414,411,"Understanding texts",,0,,69881398-d3fb-40b9-a4bc-d10a81ae203a
-415,414,"identifies and responds to information in texts to demonstrate understanding",ML2-UND-01,0,,7b4a4461-da6d-4670-8cb6-739c58a5f413
-416,411,"Creating texts",,0,,e0765530-04a2-4d05-8b71-ffc7562ef7f9
-417,416,"creates texts for familiar communicative purposes by selecting culturally appropriate modelled language",ML2-CRT-01,0,,78397deb-7ace-4c3c-92c8-fe35f4e93468
-418,396,"Stage 3",,0,,f2d51f74-1336-44d0-baa3-c46467c2a2b2
-419,418,Interacting,,0,,a988adc6-01a6-4b6a-a6d5-dacd5ea8e355
-420,419,"exchanges information and opinions in familiar contexts by using culturally appropriate rehearsed language",ML3-INT-01,0,,a0c6a533-0a0b-4038-9699-4424cabd96fc
-421,418,"Understanding texts",,0,,d3718957-b9c8-40bc-86f6-93b1fdec7832
-422,421,"identifies and responds to information and opinions in texts to demonstrate understanding",ML3-UND-01,0,,68f3b97f-5e79-4435-adf1-52ac24b4c126
-423,418,"Creating texts",,0,,d6dc3429-8e5e-44bc-b4a6-7798c03dc7f4
-424,423,"creates a range of texts for familiar communicative purposes by using culturally appropriate rehearsed language",ML3-CRT-01,0,,74d68bdd-6160-42b2-ba7f-e1698d746856
-425,396,"Stage 4",,0,,25a611ad-6d00-48ee-a6fb-5d548f7adf26
-426,425,Interacting,,0,,d8607413-5001-4618-8112-7c71f81ace83
-427,426,"exchanges information and opinions in a range of familiar contexts by using culturally appropriate language",ML4-INT-01,0,,9ed7f67b-10db-4298-966d-c621bafa5b7c
-428,425,"Understanding texts",,0,,dd4439e9-a70b-45e4-94fe-d04728c9a220
-429,428,"interprets and responds to information, opinions and ideas in texts to demonstrate understanding",ML4-UND-01,0,,0fd0165e-a4b2-44c6-bb64-f54609d59b3b
-430,425,"Creating texts",,0,,a1e1e775-f6e2-4ce3-b1ac-d29c0c6b034f
-431,430,"creates a range of texts for familiar communicative purposes by using culturally appropriate language",ML4-CRT-01,0,,e74fb00c-5f12-4876-b7a8-e4c224599a31
-432,396,"Stage 5",,0,,6b0d65f8-a99b-4239-91a2-d58d1129f884
-433,432,Interacting,,0,,24a6845b-4a16-4bb4-bfeb-e89f60b2ce45
-434,433,"exchanges information, ideas and perspectives in a range of contexts by manipulating culturally appropriate language",ML5-INT-01,0,,6d09a8db-e5d0-42c3-b527-a8112dae88b0
-435,432,"Understanding texts",,0,,0a916f03-0f23-441e-b703-dc02c64cf919
-436,435,"analyses and responds to information, ideas and perspectives in a range of texts to demonstrate understanding",ML5-UND-01,0,,49e9f0c1-0278-4608-950f-1223d3c30f28
-437,432,"Creating texts",,0,,766d80d0-95e5-44bf-95ba-f30d45373d8e
-438,437,"creates a range of texts for diverse communicative purposes by manipulating culturally appropriate language",ML5-CRT-01,0,,f9450727-05db-4614-9710-692924c39c4d
-439,328,"Classical Languages K–10",,0,,724b943b-addc-4cf3-9336-8cf8014c17df
-440,439,"Early Stage 1",,0,,9358da88-cda2-4d30-8c9b-00a4a2c7a94c
-441,440,"Understanding texts",,0,,794fb00a-353d-463c-9943-6db2cfb57ef1
-442,441,"recognises and responds to information to demonstrate understanding of simple texts with modelled vocabulary, actions or visuals",CLE-UND-01,0,,57a12852-b9c1-4b88-8cf3-768e947e774f
-443,440,"Intercultural understanding",,0,,284f9860-6d18-4a07-90bb-46127396d5b1
-444,443,"identifies people and places of the past represented in the target language",CLE-ICU-01,0,,95eaba0d-0cd6-4b7b-9aeb-2201f383385a
-445,439,"Stage 1",,0,,48797c28-90e8-4402-aa44-f1e2989a1139
-446,445,"Understanding texts",,0,,61d14ee6-ab9c-46a4-b5df-42058694c00f
-447,446,"recognises and responds to information to demonstrate understanding of simple texts with modelled language",CL1-UND-01,0,,409f0ffa-123b-4746-af53-1bb4097cfb5c
-448,445,"Intercultural understanding",,0,,ca023add-95e2-44aa-853f-7f54323e84f2
-449,448,"identifies aspects of the target language and culture, and their own language(s) and culture(s)",CL1-ICU-01,0,,2ae8043f-0965-498a-9be6-19ef9af69514
-450,439,"Stage 2",,0,,aa426f14-ec40-46e0-8d96-0a6584a54cc7
-451,450,"Understanding texts",,0,,5b228522-de94-42db-a3c7-11033cdd12fc
-452,451,"identifies and responds to information to demonstrate understanding of texts with familiar vocabulary and language",CL2-UND-01,0,,0b4fdc24-ed01-492f-9f05-8958911b6049
-453,451,"translates modelled vocabulary and phrases into English",CL2-UND-02,0,,7ad7811e-ada0-4236-8484-e52334a997c8
-454,450,"Intercultural understanding",,0,,845e1f26-0344-4bb7-bbb6-5009f0a75e4e
-455,454,"compares aspects of the target language and culture, and their own language(s) and culture(s)",CL2-ICU-01,0,,efcb2e57-a368-4ea7-8ed2-49be0a79d270
-456,439,"Stage 3",,0,,39cb5b91-3004-496f-a4b9-ee4c56cae910
-457,456,"Understanding texts",,0,,01169f46-c8a3-4513-af76-6b036d80a4a1
-458,457,"identifies and responds to information to demonstrate understanding of texts with basic grammar and sentence structure",CL3-UND-01,0,,a9ab6c33-d55c-4128-83bb-3f7a775e73e1
-459,457,"translates simple texts into English",CL3-UND-02,0,,ea97fe0c-def8-4363-a95e-7b3632fa9d7c
-460,456,"Intercultural understanding",,0,,05fd3d5c-bc76-4124-94d8-e05729902352
-461,460,"identifies connections between contemporary and target languages, culture(s) and identity",CL3-ICU-01,0,,b4f2542b-eb48-486c-b801-1b0a446111fd
-462,439,"Stage 4",,0,,9c846365-a169-40bc-93ef-ecef3d8395d7
-463,462,"Understanding texts",,0,,a38597a7-f18b-479b-a0c0-b1d75231998a
-464,463,"interprets and responds to information to demonstrate understanding of a range of predictable texts",CL4-UND-01,0,,38e24681-d53a-4434-b223-95d0b0e63e9f
-465,463,"translates a range of predictable texts into English",CL4-UND-02,0,,de95832e-099c-40e7-b1b2-e1ac63df6a3d
-466,462,"Intercultural understanding",,0,,89278fb7-e2df-4a7e-9059-0fdfb395acec
-467,466,"describes the relationship between contemporary and target languages, culture(s) and identity",CL4-ICU-01,0,,c6e31942-bc3e-45ac-9e22-3caacfb9711d
-468,439,"Stage 5",,0,,95e056f6-2f35-4032-88b4-74cbf3344068
-469,468,"Understanding texts",,0,,91a3788f-552f-4700-bccf-744cab202d6e
-470,469,"analyses and responds to information to demonstrate understanding of a range of moderately complex texts",CL5-UND-01,0,,67e1140d-c93d-44c8-b0bb-80b5c8ab444a
-471,469,"translates a range of moderately complex texts into English",CL5-UND-02,0,,0385ddf5-23df-429e-aebf-c459a61c205b
-472,468,"Intercultural understanding",,0,,df4bb590-5829-4c35-ae75-cead03c723ce
-473,472,"analyses the relationship between contemporary and target languages, culture(s) and identity",CL5-ICU-01,0,,cae82a92-d1b4-4869-b86e-c7b3b590b511
+27,26,"Oral language and communication",,0,,c75130b4-cbd6-426c-aeaf-0ccfe5dddf54
+28,27,"communicates effectively by using interpersonal conventions and language to extend and elaborate ideas for social and learning interactions",EN1-OLC-01,0,,8b5604cb-e610-4f91-8b8f-1c7fb76307a0
+31,26,"Phonic knowledge",,0,,96d8008b-3f0d-442f-92de-64322cad7868
+32,31,"uses initial and extended phonics, including vowel digraphs, trigraphs to decode and encode words when reading and creating texts",EN1-PHOKW-01,0,,281b432a-d3b1-4cc6-a37c-44e29f2a27f2
+35,26,"Reading comprehension",,0,,5864f14c-b714-4ac3-bae2-97a8483b332a
+36,35,"comprehends independently read texts that require sustained reading by activating background and word knowledge, connecting and understanding sentences and whole text, and monitoring for meaning",EN1-RECOM-01,0,,ef115d69-9570-41ea-941b-320b152f6041
+33,26,"Reading fluency",,0,,0ea87f40-95cc-4047-a3da-cbbe407ecbf7
+34,33,"sustains reading unseen texts with automaticity and prosody and self-corrects errors",EN1-REFLU-01,0,,b2d8fe96-67be-43f6-b918-ab405bd6653c
+39,26,Spelling,,0,,6461dd24-7b87-4054-ad2f-6af751153c69
+40,39,"applies phonological, orthographic and morphological generalisations and strategies when spelling words in a range of writing contexts",EN1-SPELL-01,0,,21bd5c2c-ca0d-4b7d-83c2-1e4b21ac9571
+43,26,"Understanding and responding to literature",,0,,d9cd5fb5-c0c2-454c-9222-fe4599199551
+44,43,"understands and responds to literature by creating texts using similar structures, intentional language choices and features appropriate to audience and purpose",EN1-UARL-01,0,,212ce911-f32f-45af-a3e7-c16af3c90e12
+29,26,Vocabulary,,0,,bcfde24c-9c02-4d68-9345-12e1a4c562b2
+30,29,"understands and effectively uses Tier 1, taught Tier 2 and Tier 3 vocabulary to extend and elaborate ideas",EN1-VOCAB-01,0,,f04b4d85-861c-42b7-bf0d-31973d8e8349
+45,2,"Stage 2",,0,,d744093a-0ca8-4bdf-8087-50e652f7a851
+54,45,"Creating written texts",,0,,fe1aae59-e6f7-4ded-a838-6e04c9fc6ffc
+55,54,"plans, creates and revises written texts for imaginative purposes, using text features, sentence-level grammar, punctuation and word-level language for a target audience",EN2-CWT-01,0,,191808a3-94e9-41aa-8aec-b2b245a61a5e
+56,54,"plans, creates and revises written texts for informative purposes, using text features, sentence-level grammar, punctuation and word-level language for a target audience",EN2-CWT-02,0,,f048edee-177a-439b-a57e-cce31565ee18
+57,54,"plans, creates and revises written texts for persuasive purposes, using text features, sentence-level grammar, punctuation and word-level language for a target audience",EN2-CWT-03,0,,43268d0b-b5d5-4a01-a41d-67b8eb474636
+60,45,"Handwriting and digital transcription",,0,,0e67e59d-0594-4ad0-8c14-defab1edb66a
+61,60,"forms legible joined letters to develop handwriting fluency",EN2-HANDW-01,0,,2731b37c-6b02-41f5-8522-0aa960bab58f
+62,60,"uses digital technologies to create texts",EN2-HANDW-02,0,,f5606753-ecfa-46e9-9632-2facb31cf7c0
+46,45,"Oral language and communication",,0,,14cc7d3a-1c70-4eb1-98c6-5d2c1925f4bb
+47,46,"communicates with familiar audiences for social and learning purposes, by interacting, understanding and presenting",EN2-OLC-01,0,,69fbcb81-9023-49b8-bb14-410924ae6603
+52,45,"Reading comprehension",,0,,73464621-8240-4354-a035-a96ab3ecea58
+53,52,"reads and comprehends texts for wide purposes using knowledge of text structures and language, and by monitoring comprehension",EN2-RECOM-01,0,,cac0f029-2042-49ef-8ceb-fdfe5caf725c
+50,45,"Reading fluency",,0,,3ab9019e-e3b3-46fb-ba38-a827aa2f4d12
+51,50,"sustains independent reading with accuracy, automaticity, rate and prosody suited to purpose, audience and meaning",EN2-REFLU-01,0,,6a2fa8c0-7827-4b85-bd1e-1290692e0062
+58,45,Spelling,,0,,6fb78d6e-451b-4f7d-8c7a-df163bcd6198
+59,58,"selects, applies and describes appropriate phonological, orthographic and morphological generalisations and strategies when spelling in a range of contexts",EN2-SPELL-01,0,,8aa40de8-3a4e-4eed-a775-9c059bb5a74e
+63,45,"Understanding and responding to literature",,0,,dcb41a2a-e0ff-4b5d-8a4d-55ebc6a4cdb2
+64,63,"identifies and describes how ideas are represented in literature and strategically uses similar representations when creating texts",EN2-UARL-01,0,,6472bd5c-2d81-4dbb-bfc8-5502a19a4dc7
+48,45,Vocabulary,,0,,f43a9819-31eb-49dc-a8ab-98ff83c32ee4
+49,48,"builds knowledge and use of Tier 1, Tier 2 and Tier 3 vocabulary through interacting, wide reading and writing, and by defining and analysing words",EN2-VOCAB-01,0,,bd79cc4e-630a-4ebb-825a-81c807f42ad3
+65,2,"Stage 3",,0,,c8a4a76d-09d1-4db4-8664-405abddd317b
+72,65,Creating,,0,,b4e0dfdb-bb1b-4148-a25d-4f38dfa49033
+73,72,"plans, creates and revises written texts for multiple purposes and audiences through selection of text features, sentence-level grammar, punctuation and word-level language",EN3-CWT-01,0,,52fdb7fc-02be-43ac-a39b-b3d20416bd86
+76,65,"Handwriting and digital transcription",,0,,043256fe-4aea-49e6-bc6c-31fda6975fca
+77,76,"sustains a legible, fluent and automatic handwriting style",EN3-HANDW-01,0,,fb72897b-f5ea-4c11-94fe-784c92cd8f8d
+78,76,"selects digital technologies to suit audience and purpose to create texts",EN3-HANDW-02,0,,8386baf2-cdbf-480f-ba50-e2c8d9d62f42
+66,65,"Oral language and communication",,0,,0a76ebac-a1e2-4fb9-99bc-126ad62a53aa
+67,66,"communicates to wide audiences with social and cultural awareness, by interacting and presenting, and by analysing and evaluating for understanding",EN3-OLC-01,0,,5fe547ef-ff12-41d7-a472-aa7122e81700
+70,65,"Reading comprehension",,0,,436b1d8b-84f3-443b-a350-96c73a42f63f
+71,70,"fluently reads and comprehends texts for wide purposes, analysing text structures and language, and by monitoring comprehension",EN3-RECOM-01,0,,d9500d76-ad81-4b21-be80-3449cbe7dcd4
+74,65,Spelling,,0,,74d152e1-8f12-4463-a53e-1525ee2e2cd1
+75,74,"automatically applies taught phonological, orthographic and morphological generalisations and strategies when spelling in a range of contexts, and justifies spelling strategies used to spell unfamiliar words",EN3-SPELL-01,0,,11f22ab1-483f-483d-9f1c-6420f42230bf
+79,65,"Understanding and responding to literature",,0,,21bf372e-b76b-44d0-9195-9b1ca33adea3
+80,79,"analyses representations of ideas in literature through narrative, character, imagery, symbol and connotation, and adapts these representations when creating texts",EN3-UARL-01,0,,c14df01e-ca87-4171-a007-451f3dfbcbdf
+81,79,"analyses representations of ideas in literature through genre and theme that reflect perspective and context, argument and authority, and adapts these representations when creating texts",EN3-UARL-02,0,,c6f02035-05a8-4122-86b3-d3a7d0ce65e5
+68,65,Vocabulary,,0,,96dbb765-d9a2-44c6-a552-89ea1845ab4f
+69,68,"extends Tier 2 and Tier 3 vocabulary through interacting, wide reading and writing, morphological analysis and generating precise definitions for specific contexts",EN3-VOCAB-01,0,,96c86fb5-8271-4f2d-b7a7-ca778c2514d9
+82,2,"Stage 4",,0,,6bc8a2d6-7cdd-440d-8e56-f6f3a9af95a3
+89,82,"Expressing ideas and composing texts",,0,,eafeddf9-6006-465c-98b0-a226bfdb2c45
+90,89,"creates personal, creative and critical texts for a range of audiences by using linguistic and stylistic conventions of language to express ideas",EN4-ECA-01,0,,119ca597-7b38-4f75-934f-e120dce49c61
+91,89,"uses processes of planning, monitoring, revising and reflecting to support and develop composition of texts",EN4-ECB-01,0,,fb22e8af-5199-45c3-8a12-f5d44e1ecfc0
+83,82,"Reading, viewing and listening to texts",,0,,d2c294c7-b831-4eb0-bf70-c1050da4d20e
+84,83,"uses a range of personal, creative and critical strategies to read texts that are complex in their ideas and construction",EN4-RVL-01,0,,a9b285ab-6270-415b-b92a-a03b0d85569a
+85,82,"Understanding and responding to texts",,0,,c1f78ab9-4f9a-4312-9886-29c3249be2c2
+86,85,"analyses how meaning is created through the use of and response to language forms, features and structures",EN4-URA-01,0,,b88ee220-17b4-4b6a-8203-497f8e16dfb2
+87,85,"examines and explains how texts represent ideas, experiences and values",EN4-URB-01,0,,df3b5510-ae05-4e6a-87b0-9e5978a5b46b
+88,85,"identifies and explains ways of valuing texts and the connections between them",EN4-URC-01,0,,94aba9cb-f132-4ba6-b131-1526d07c5c15
+92,2,"Stage 5",,0,,287482df-5e2d-4e3b-9707-7ebee6197a81
+99,92,"Expressing ideas and composing texts",,0,,87fa4a16-3189-40b3-92ee-58cd287cdfa0
+100,99,"crafts personal, creative and critical texts for a range of audiences by experimenting with and controlling language forms and features to shape meaning",EN5-ECA-01,0,,7637c63e-98f8-45f6-be46-53f1c5a7fbc8
+101,99,"uses processes of planning, monitoring, revising and reflecting to purposefully develop and refine composition of texts",EN5-ECB-01,0,,d0fdf54d-bc7b-4fe9-9343-f5b3136dc71b
+93,92,"Reading, viewing and listening to texts",,0,,aa8a39cc-967f-4623-9205-245b1d98e289
+94,93,"uses a range of personal, creative and critical strategies to interpret complex texts",EN5-RVL-01,0,,942a4d85-2a2d-47fa-8997-0df0f8419d5a
+95,92,"Understanding and responding to texts",,0,,448b8f42-99ed-4c2e-866b-e9bd29bd73d7
+96,95,"analyses how meaning is created through the use and interpretation of increasingly complex language forms, features and structures",EN5-URA-01,0,,d1055ae7-2a18-4736-b94b-4661acf480fb
+97,95,"evaluates how texts represent ideas and experiences, and how they can affirm or challenge values and attitudes",EN5-URB-01,0,,844f435b-d534-4453-85ec-8fbed129be79
+98,95,"investigates and explains ways of valuing texts and the relationships between them",EN5-URC-01,0,,2b404b6c-02eb-48b8-92ff-56b308a941fd
+326,1,Languages,,0,,3952660c-7452-4b64-a3c3-c3ccb20467ad
+327,326,"Aboriginal Languages K–10",,0,,48e11d4d-993b-4813-9949-d331f46a1ba3
+328,327,"Early Stage 1",,0,,ce348cfe-44a9-4381-b517-3ef07c34b62b
+333,328,Composing,,0,,90494e9c-82a6-4553-8de0-e25c04afb3e0
+334,333,"composes simple texts in the target language using supports and other scaffolds",ALE-COM-01,0,,e9de4b8f-8b2d-4cf8-9d2a-c195b9f4f461
+329,328,Interacting,,0,,7cec2c3d-7329-4c5f-ae9f-19c48d42f4a9
+330,329,"uses modelled target language in simple exchanges",ALE-INT-01,0,,d7d1eba9-4da7-4e47-a6c1-76947a92a988
+337,328,"Language awareness and building",,0,,8fbc13aa-07f0-4ae3-bed5-bba69975d29b
+338,337,"recognises that some Aboriginal Languages are being maintained, revived and/or strengthened",ALE-LAB-01,0,,1a771cc7-2383-419b-9b54-d88bc3a55326
+331,328,Responding,,0,,9d5d6a90-9769-42f0-9f21-c4ec40488e31
+332,331,"responds to simple texts through words, gestures or expression",ALE-RES-01,0,,8b1d6445-ca84-4ea0-9ab1-c0a0504f2d90
+335,328,"The role of language, culture and identity",,0,,3c1f3880-cde6-4bd7-b364-73491b1b4baf
+336,335,"recognises different languages and cultures in their immediate environment and the world",ALE-RLC-01,0,,6fdabb32-4003-4031-be54-aa81c3849c39
+339,327,"Stage 1",,0,,d6959619-9cdf-4c94-9e81-79561ec5db26
+344,339,Composing,,0,,cb5e43e3-2bff-4602-979d-7bde9fef374b
+345,344,"composes texts in the target language using modelled language",AL1-COM-01,0,,460b9c36-bb18-43c7-a2a0-f85e6e64a9da
+340,339,Interacting,,0,,4788db29-9eab-4558-a568-0474c66db858
+341,340,"uses modelled target language to share information in familiar contexts",AL1-INT-01,0,,b7a4a642-ddf6-4cd5-89e6-a7f86fe7b340
+348,339,"Language awareness and building",,0,,be6acbaf-6163-4315-b981-5d8644d57260
+349,348,"recognises resources available to maintain, revive and strengthen Aboriginal Languages",AL1-LAB-01,0,,bfcacfae-b1eb-41a5-8a13-2f5b21e32ad0
+342,339,Responding,,0,,ed0c2a40-f5d0-4f7c-a496-89e30ff60046
+343,342,"recognises and responds to key words and known phrases in texts",AL1-RES-01,0,,8fc1c857-1a4f-42d4-8a1a-682d3dae8224
+346,339,"The role of language, culture and identity",,0,,e55b5613-448c-4a62-b4d4-716a77635a14
+347,346,"recognises relationships between languages and cultures",AL1-RLC-01,0,,1da2e499-8b8a-4f39-9576-f64273144791
+350,327,"Stage 2",,0,,06602989-3671-49fa-99ba-ab3c7b597cdd
+355,350,Composing,,0,,b0b24dd7-7c2f-4ed4-9eeb-44cef68fe1a2
+356,355,"composes texts in the target language using familiar words and expressions",AL2-COM-01,0,,410055fd-9633-4b52-9ca7-1f8a5eed9832
+351,350,Interacting,,0,,38b4230c-3b97-47dc-a7d7-615dcabd85b5
+352,351,"uses the target language to share information",AL2-INT-01,0,,5f3c07ed-3c4b-4014-bf03-ecf4c8fcd2ef
+359,350,"Language awareness and building",,0,,cf74d933-bba1-4078-be82-43ca47071114
+360,359,"recognises ways of maintaining, reviving and strengthening Aboriginal Languages",AL2-LAB-01,0,,f1b0a7c2-5bca-4a35-96fc-72e53c8aad3e
+353,350,Responding,,0,,55d527dd-fb95-40bc-8ccb-cb1e1b8bcacc
+354,353,"locates and responds to key words and information in texts",AL2-RES-01,0,,8eb1e43a-b519-4d50-9607-2f2d377f7d8d
+357,350,"The role of language, culture and identity",,0,,720d7cc6-9e0e-49a5-8bd7-90eedda7eb45
+358,357,"recognises how terms and expressions reflect aspects of culture",AL2-RLC-01,0,,0ff54112-4406-4681-8a84-f3191f5e9056
+361,327,"Stage 3",,0,,8cace184-db3f-45ac-a004-ce6be51c359a
+366,361,Composing,,0,,1ebde0d4-e73b-4964-a51e-fb64cd1f1688
+367,366,"composes texts in the target language using a series of sentences",AL3-COM-01,0,,1c11c2a2-5d4b-4c60-ba77-60637b742453
+362,361,Interacting,,0,,dd39e459-39d5-41c5-8ea0-180d372c4029
+363,362,"uses the target language to exchange information and ideas",AL3-INT-01,0,,da25a150-14dc-4fd4-a53e-d26f8d1079dc
+370,361,"Language awareness and building",,0,,a6032cc8-c69d-4f0f-b0df-3332ca47fdf7
+371,370,"identifies challenges to maintaining, reviving and strengthening Aboriginal Languages",AL3-LAB-01,0,,186ae1a7-e61a-4fd7-b2b2-c9aba065b898
+364,361,Responding,,0,,752db1f3-6a70-4cab-880a-e6550e2b3803
+365,364,"identifies and responds to information in texts",AL3-RES-01,0,,43c050a2-d85f-4b10-a0f1-9b4c1fa4baf2
+368,361,"The role of language, culture and identity",,0,,c640ff50-be28-4b35-8f08-1ad95c1b5abe
+369,368,"makes connections between cultural practices and language use",AL3-RLC-01,0,,39f88b34-199b-4f1c-8701-f4861ddbbe61
+372,327,"Stage 4",,0,,eda56fa2-46b5-430f-b156-bc651d5c8410
+377,372,Composing,,0,,880a4e11-09f1-4b7b-ba9d-de7827b445c3
+378,377,"composes texts in the target language, using a range of linguistic structures for different audiences",AL4-COM-01,0,,e045c624-c757-4b15-b1c6-9fdb5371d53a
+373,372,Interacting,,0,,8ccc407e-29a7-4236-b8c2-4d01963248bb
+374,373,"uses the target language to exchange information, ideas and opinions",AL4-INT-01,0,,70194df8-d10a-4622-8ecb-278f3215c83d
+381,372,"Language awareness and building",,0,,c3d53466-0e5a-4318-80d8-82bc44d88f51
+382,381,"identifies protocols, programs and techniques to maintain and build Aboriginal Languages",AL4-LAB-01,0,,14899ac7-a28a-4c2f-9e97-019e29ba9de9
+375,372,Responding,,0,,b4269e44-833a-4d6e-8404-1014f5e3a253
+376,375,"responds to information and ideas in a range of texts",AL4-RES-01,0,,53aa2d38-bc7e-4a50-9427-39e35c49c287
+379,372,"The role of language, culture and identity",,0,,3607e43a-875d-48d1-9c04-50fbb92eca49
+380,379,"identifies how language use reflects cultural ideas, values and beliefs",AL4-RLC-01,0,,a44e19a1-5451-42db-a04d-d5d54def01a7
+383,327,"Stage 5",,0,,a39cdd36-8470-4e55-81ae-609635b4ad1b
+388,383,Composing,,0,,f686a1a0-4708-4836-a7dc-e90597bd3bf4
+389,388,"composes texts in the target language, applying a range of linguistic structures for a variety of contexts, purposes and audiences",AL5-COM-01,0,,3eb945e7-1da7-49a7-8967-2988cd7f67eb
+384,383,Interacting,,0,,c2d7389e-0941-440c-906c-a0f9b5383b59
+385,384,"manipulates the target language in sustained interactions to exchange information, ideas and opinions",AL5-INT-01,0,,e5d8f866-e45e-475a-82e5-d4985d1941ce
+392,383,"Language awareness and building",,0,,eae05050-d311-4927-bed7-5117efca6055
+393,392,"analyses and evaluates protocols, programs and techniques to maintain and build Aboriginal Languages",AL5-LAB-01,0,,42bb3e08-2c69-495a-86ca-f0ff357edca6
+386,383,Responding,,0,,9d6b5df4-aa46-4893-90d4-0286f2e6d4e2
+387,386,"responds to information, ideas and perspectives in a range of texts",AL5-RES-01,0,,26a3705c-9c67-47c0-b3d3-c03452763125
+390,383,"The role of language, culture and identity",,0,,7bfe2a1a-5c2e-4d3d-84df-db898c4985e3
+391,390,"explains the interrelationship between language, culture and identity",AL5-RLC-01,0,,92fd09b0-1c34-4bf8-9fdf-d56735997c0b
+437,326,"Classical Languages K–10",,0,,724b943b-addc-4cf3-9336-8cf8014c17df
+438,437,"Early Stage 1",,0,,9358da88-cda2-4d30-8c9b-00a4a2c7a94c
+441,438,"Intercultural understanding",,0,,284f9860-6d18-4a07-90bb-46127396d5b1
+442,441,"identifies people and places of the past represented in the target language",CLE-ICU-01,0,,95eaba0d-0cd6-4b7b-9aeb-2201f383385a
+439,438,"Understanding texts",,0,,794fb00a-353d-463c-9943-6db2cfb57ef1
+440,439,"recognises and responds to information to demonstrate understanding of simple texts with modelled vocabulary, actions or visuals",CLE-UND-01,0,,57a12852-b9c1-4b88-8cf3-768e947e774f
+443,437,"Stage 1",,0,,48797c28-90e8-4402-aa44-f1e2989a1139
+446,443,"Intercultural understanding",,0,,ca023add-95e2-44aa-853f-7f54323e84f2
+447,446,"identifies aspects of the target language and culture, and their own language(s) and culture(s)",CL1-ICU-01,0,,2ae8043f-0965-498a-9be6-19ef9af69514
+444,443,"Understanding texts",,0,,61d14ee6-ab9c-46a4-b5df-42058694c00f
+445,444,"recognises and responds to information to demonstrate understanding of simple texts with modelled language",CL1-UND-01,0,,409f0ffa-123b-4746-af53-1bb4097cfb5c
+448,437,"Stage 2",,0,,aa426f14-ec40-46e0-8d96-0a6584a54cc7
+452,448,"Intercultural understanding",,0,,845e1f26-0344-4bb7-bbb6-5009f0a75e4e
+453,452,"compares aspects of the target language and culture, and their own language(s) and culture(s)",CL2-ICU-01,0,,efcb2e57-a368-4ea7-8ed2-49be0a79d270
+449,448,"Understanding texts",,0,,5b228522-de94-42db-a3c7-11033cdd12fc
+450,449,"identifies and responds to information to demonstrate understanding of texts with familiar vocabulary and language",CL2-UND-01,0,,0b4fdc24-ed01-492f-9f05-8958911b6049
+451,449,"translates modelled vocabulary and phrases into English",CL2-UND-02,0,,7ad7811e-ada0-4236-8484-e52334a997c8
+454,437,"Stage 3",,0,,39cb5b91-3004-496f-a4b9-ee4c56cae910
+458,454,"Intercultural understanding",,0,,05fd3d5c-bc76-4124-94d8-e05729902352
+459,458,"identifies connections between contemporary and target languages, culture(s) and identity",CL3-ICU-01,0,,b4f2542b-eb48-486c-b801-1b0a446111fd
+455,454,"Understanding texts",,0,,01169f46-c8a3-4513-af76-6b036d80a4a1
+456,455,"identifies and responds to information to demonstrate understanding of texts with basic grammar and sentence structure",CL3-UND-01,0,,a9ab6c33-d55c-4128-83bb-3f7a775e73e1
+457,455,"translates simple texts into English",CL3-UND-02,0,,ea97fe0c-def8-4363-a95e-7b3632fa9d7c
+460,437,"Stage 4",,0,,9c846365-a169-40bc-93ef-ecef3d8395d7
+464,460,"Intercultural understanding",,0,,89278fb7-e2df-4a7e-9059-0fdfb395acec
+465,464,"describes the relationship between contemporary and target languages, culture(s) and identity",CL4-ICU-01,0,,c6e31942-bc3e-45ac-9e22-3caacfb9711d
+461,460,"Understanding texts",,0,,a38597a7-f18b-479b-a0c0-b1d75231998a
+462,461,"interprets and responds to information to demonstrate understanding of a range of predictable texts",CL4-UND-01,0,,38e24681-d53a-4434-b223-95d0b0e63e9f
+463,461,"translates a range of predictable texts into English",CL4-UND-02,0,,de95832e-099c-40e7-b1b2-e1ac63df6a3d
+466,437,"Stage 5",,0,,95e056f6-2f35-4032-88b4-74cbf3344068
+470,466,"Intercultural understanding",,0,,df4bb590-5829-4c35-ae75-cead03c723ce
+471,470,"analyses the relationship between contemporary and target languages, culture(s) and identity",CL5-ICU-01,0,,cae82a92-d1b4-4869-b86e-c7b3b590b511
+467,466,"Understanding texts",,0,,91a3788f-552f-4700-bccf-744cab202d6e
+468,467,"analyses and responds to information to demonstrate understanding of a range of moderately complex texts",CL5-UND-01,0,,67e1140d-c93d-44c8-b0bb-80b5c8ab444a
+469,467,"translates a range of moderately complex texts into English",CL5-UND-02,0,,0385ddf5-23df-429e-aebf-c459a61c205b
+394,326,"Modern Languages K–10",,0,,f681cdf0-0b9a-4ef6-8fde-832e5bd2257f
+395,394,"Early Stage 1",,0,,aa386974-48e8-4ed2-a571-7e54b8154317
+400,395,"Creating texts",,0,,ac347e43-4756-4673-b97c-5614219f1c9f
+401,400,"creates simple texts by reproducing culturally appropriate modelled vocabulary",MLE-CRT-01,0,,2c83afb9-435a-46e3-96ec-3a20c20bc1ee
+396,395,Interacting,,0,,c5e62fe8-e57c-4ba8-b1fd-04d1b6afdd56
+397,396,"exchanges meaning through play and actions by reproducing culturally appropriate modelled language",MLE-INT-01,0,,86edc191-1023-4429-8127-f1707d7ca5c1
+398,395,"Understanding texts",,0,,107edf19-f3de-4239-94a8-f1341cc1b83a
+399,398,"responds to information in simple texts in a variety of ways to demonstrate understanding",MLE-UND-01,0,,6471d1c4-c1a9-472e-9f8f-66242b52968c
+402,394,"Stage 1",,0,,d73ff53d-b19d-4f41-8afb-4f1966da667d
+407,402,"Creating texts",,0,,f5ce3727-71e5-4d0b-b23d-eb845d5ac648
+408,407,"creates simple texts by selecting culturally appropriate modelled language",ML1-CRT-01,0,,25b40a2f-2008-490a-8c20-5c4f3a0dff2c
+403,402,Interacting,,0,,189c892f-c86e-4e86-8cda-0491ca19f20f
+404,403,"exchanges meaning by selecting culturally appropriate modelled language",ML1-INT-01,0,,366f207d-8cf9-4cd2-b5ab-74c77ba61ec0
+405,402,"Understanding texts",,0,,7c39fd44-9c59-47ad-9006-6ae8bc322144
+406,405,"recognises and responds to information in simple texts to demonstrate understanding",ML1-UND-01,0,,5bdb086d-5593-4375-9c22-8979a3c0b95e
+409,394,"Stage 2",,0,,365036df-007e-4d50-bbf4-b52943ee44f8
+414,409,"Creating texts",,0,,e0765530-04a2-4d05-8b71-ffc7562ef7f9
+415,414,"creates texts for familiar communicative purposes by selecting culturally appropriate modelled language",ML2-CRT-01,0,,78397deb-7ace-4c3c-92c8-fe35f4e93468
+410,409,Interacting,,0,,329c5f2b-e90d-4dff-919a-f1b7d3934f45
+411,410,"exchanges information in familiar contexts by selecting culturally appropriate modelled language",ML2-INT-01,0,,1916486e-648c-4073-8aaa-34ba807103e5
+412,409,"Understanding texts",,0,,69881398-d3fb-40b9-a4bc-d10a81ae203a
+413,412,"identifies and responds to information in texts to demonstrate understanding",ML2-UND-01,0,,7b4a4461-da6d-4670-8cb6-739c58a5f413
+416,394,"Stage 3",,0,,f2d51f74-1336-44d0-baa3-c46467c2a2b2
+421,416,"Creating texts",,0,,d6dc3429-8e5e-44bc-b4a6-7798c03dc7f4
+422,421,"creates a range of texts for familiar communicative purposes by using culturally appropriate rehearsed language",ML3-CRT-01,0,,74d68bdd-6160-42b2-ba7f-e1698d746856
+417,416,Interacting,,0,,a988adc6-01a6-4b6a-a6d5-dacd5ea8e355
+418,417,"exchanges information and opinions in familiar contexts by using culturally appropriate rehearsed language",ML3-INT-01,0,,a0c6a533-0a0b-4038-9699-4424cabd96fc
+419,416,"Understanding texts",,0,,d3718957-b9c8-40bc-86f6-93b1fdec7832
+420,419,"identifies and responds to information and opinions in texts to demonstrate understanding",ML3-UND-01,0,,68f3b97f-5e79-4435-adf1-52ac24b4c126
+423,394,"Stage 4",,0,,25a611ad-6d00-48ee-a6fb-5d548f7adf26
+428,423,"Creating texts",,0,,a1e1e775-f6e2-4ce3-b1ac-d29c0c6b034f
+429,428,"creates a range of texts for familiar communicative purposes by using culturally appropriate language",ML4-CRT-01,0,,e74fb00c-5f12-4876-b7a8-e4c224599a31
+424,423,Interacting,,0,,d8607413-5001-4618-8112-7c71f81ace83
+425,424,"exchanges information and opinions in a range of familiar contexts by using culturally appropriate language",ML4-INT-01,0,,9ed7f67b-10db-4298-966d-c621bafa5b7c
+426,423,"Understanding texts",,0,,dd4439e9-a70b-45e4-94fe-d04728c9a220
+427,426,"interprets and responds to information, opinions and ideas in texts to demonstrate understanding",ML4-UND-01,0,,0fd0165e-a4b2-44c6-bb64-f54609d59b3b
+430,394,"Stage 5",,0,,6b0d65f8-a99b-4239-91a2-d58d1129f884
+435,430,"Creating texts",,0,,766d80d0-95e5-44bf-95ba-f30d45373d8e
+436,435,"creates a range of texts for diverse communicative purposes by manipulating culturally appropriate language",ML5-CRT-01,0,,f9450727-05db-4614-9710-692924c39c4d
+431,430,Interacting,,0,,24a6845b-4a16-4bb4-bfeb-e89f60b2ce45
+432,431,"exchanges information, ideas and perspectives in a range of contexts by manipulating culturally appropriate language",ML5-INT-01,0,,6d09a8db-e5d0-42c3-b527-a8112dae88b0
+433,430,"Understanding texts",,0,,0a916f03-0f23-441e-b703-dc02c64cf919
+434,433,"analyses and responds to information, ideas and perspectives in a range of texts to demonstrate understanding",ML5-UND-01,0,,49e9f0c1-0278-4608-950f-1223d3c30f28
+102,1,Mathematics,,0,,4ff24841-0056-4ef1-9814-f2db77bbaf30
+103,102,"Early Stage 1",,0,,cbe4cfd3-e4e2-4084-a065-b4b6ad670bf1
+107,103,"Combining and separating quantities",,0,,c135d344-6b3a-440b-9c16-a6563c58d7bd
+108,107,"reasons about number relations to model addition and subtraction by combining and separating, and comparing collections",MAE-CSQ-01,0,,62370ea4-a86c-483d-a595-524a269d02bb
+109,107,"represents the relations between the parts that form the whole, with numbers up to 10",MAE-CSQ-02,0,,0913af36-105a-47eb-ac78-f5fe062b466a
+126,103,Data,,0,,d19d146f-35c6-4dba-a3d0-e633f3bb9916
+127,126,"contributes to collecting data and interprets data displays made from objects",MAE-DATA-01,0,,92d7d3c0-4dd7-44b7-9bdc-b9544122fc09
+110,103,"Forming groups",,0,,d8794a25-2db1-4618-89f4-e966ab9d9540
+111,110,"recognises, describes and continues repeating patterns",MAE-FG-01,0,,3bcba1fa-eb48-4880-8470-0f38505e6d93
+112,110,"forms equal groups by sharing and counting collections of objects",MAE-FG-02,0,,d0635a41-6e6f-4201-94c8-e9cddc6a7254
+113,103,"Geometric measure",,0,,f599da8a-9c82-4fde-bff3-5f79b1f8c699
+114,113,"describes position and gives and follows simple directions",MAE-GM-01,0,,746eca4d-6365-45c4-a2ba-75d45b109368
+115,113,"describes and compares lengths",MAE-GM-02,0,,7b944d9a-d1d4-41ba-bbf9-064ba1b4ba27
+116,113,"identifies half the length and the halfway point",MAE-GM-03,0,,68e0362e-250c-4bba-b72b-bc59814925f1
+123,103,"Non-spatial measure",,0,,b4d0dd0d-d1bb-4dbc-83f9-436950fa23bf
+124,123,"describes and compares the masses of objects",MAE-NSM-01,0,,b9015ac9-07e6-4889-aa54-a95a385468e1
+125,123,"sequences events and reads hour time on clocks",MAE-NSM-02,0,,c06393cb-1c2f-48ac-aff2-cbbebbeabcfd
+104,103,"Representing numbers",,0,,abc8affe-3a60-4971-aab6-3268547d4960
+105,104,"demonstrates an understanding of how whole numbers indicate quantity",MAE-RWN-01,0,,1b9474a8-a7f7-40e9-8b87-e2c1e3faaefc
+106,104,"reads numerals and represents whole numbers to at least 20",MAE-RWN-02,0,,c545f0f6-7f14-485a-9a6a-1e4529a8b53f
+120,103,"Three-dimensional (3D) spatial structure",,0,,a7b359c5-b071-478c-8c57-bec56c5bf953
+121,120,"manipulates, describes and sorts three-dimensional objects",MAE-3DS-01,0,,ab38d5c8-59bd-46ff-b266-458e78216c84
+122,120,"describes and compares volumes",MAE-3DS-02,0,,d9482cb6-d9c3-4949-845a-c4477c3f44fc
+117,103,"Two-dimensional (2D) spatial structure",,0,,d0c41545-86c9-4d7c-910f-6f1b27b2ec74
+118,117,"sorts, describes, names and makes two-dimensional shapes, including triangles, circles, squares and rectangles",MAE-2DS-01,0,,014262b0-e317-4bfa-aa6d-8077db7eb330
+119,117,"describes and compares areas of similar shapes",MAE-2DS-02,0,,b543e498-110f-4a89-b170-48d489c781a9
+128,102,"Stage 1",,0,,d33a0a86-3348-4dc2-ad6f-05f546e60989
+152,128,Chance,,0,,65126c72-27d2-4d6f-b10f-cdf5f1c8fdec
+153,152,"recognises and describes the element of chance in everyday events",MA1-CHAN-01,0,,866d37a2-d85c-4001-a90d-ef995612f3a4
+132,128,"Combining and separating quantities",,0,,4fd4d708-5731-44ef-85d0-5ad044f05d78
+133,132,"uses number bonds and the relationship between addition and subtraction to solve problems involving partitioning",MA1-CSQ-01,0,,dc68e423-c39f-4180-894c-ed7b1a4de00b
+149,128,Data,,0,,ba4f76c4-28c0-4135-9032-13e6c5438d13
+150,149,"gathers and organises data, displays data in lists, tables and picture graphs",MA1-DATA-01,0,,2554839a-7670-4ee1-a567-4c3dc70db9e2
+151,149,"reasons about representations of data to describe and interpret the results",MA1-DATA-02,0,,3e61b0bf-6e14-498a-aae7-e5eda12079a6
+134,128,"Forming groups",,0,,85c84c55-1b48-4c2b-97de-ac725318e158
+135,134,"uses the structure of equal groups to solve multiplication problems, and shares or groups to solve division problems",MA1-FG-01,0,,a277af1d-6894-4c54-a6d0-7e1fc829f202
+136,128,"Geometric measure",,0,,85122889-da1b-4e37-9751-26f066303e19
+137,136,"represents and describes the positions of objects in familiar locations",MA1-GM-01,0,,7c3311d1-3251-42cd-8a55-3d0325a9f471
+138,136,"measures, records, compares and estimates lengths and distances using uniform informal units, as well as metres and centimetres",MA1-GM-02,0,,a49d6ff1-437e-465f-aca5-ea7c4a309bdd
+139,136,"creates and recognises halves, quarters and eighths as part measures of a whole length",MA1-GM-03,0,,ba69e818-ed81-4c86-82d0-72ab97cfff6c
+146,128,"Non-spatial measure",,0,,48018813-7b0c-4a92-b74f-56e5bc096ed1
+147,146,"measures, records, compares and estimates the masses of objects using uniform informal units",MA1-NSM-01,0,,228e9a31-066c-449b-bda5-1d31bb310995
+148,146,"describes, compares and orders durations of events, and reads half- and quarter-hour time",MA1-NSM-02,0,,5cb575e7-3f76-4e3e-a27f-c9fe93e143f5
+129,128,"Representing numbers",,0,,6f2fcde7-d17d-4849-8d46-388aa7b444d2
+130,129,"applies an understanding of place value and the role of zero to read, write and order two- and three-digit numbers",MA1-RWN-01,0,,e7a89450-ecbb-482c-9c13-197f62d20eaf
+131,129,"Reasons about representations of whole numbers to 1000, partitioning numbers to use and record quantity values",MA1-RWN-02,0,,af392f34-043a-4041-95ef-ed0a8f432db9
+143,128,"Three-dimensional (3D) spatial structure",,0,,8b16c3b2-a74b-43c6-a2c4-ee9ded922359
+144,143,"recognises, describes and represents familiar three-dimensional objects",MA1-3DS-01,0,,1be0d67c-2519-4be0-a2f2-50a31ca4f3e1
+145,143,"measures, records, compares and estimates internal volumes (capacities) and volumes using uniform informal units",MA1-3DS-02,0,,c9121949-f38b-46c1-bd7a-9f680219e6c8
+140,128,"Two-dimensional (2D) spatial structure",,0,,bf49d031-4bc7-4950-85b0-c21648cf651d
+141,140,"recognises, describes and represents shapes including quadrilaterals and other common polygons",MA1-2DS-01,0,,551771a4-f780-4a90-a99e-2b4440951a60
+142,140,"measures and compares areas using uniform informal units in rows and columns",MA1-2DS-02,0,,418e3506-50ab-4723-8cce-5e4da9729b4f
+154,102,"Stage 2",,0,,d2c9e934-6059-4096-9d47-6ce4a07d0a72
+158,154,"Additive relations",,0,,42ed2164-fc4f-4899-a136-8145c0c0796a
+159,158,"selects and uses mental and written strategies for addition and subtraction involving 2- and 3-digit numbers",MA2-AR-01,0,,3d75c90a-20f9-48ba-a7b6-72b9f9bdb835
+160,158,"completes number sentences involving addition and subtraction by finding missing values",MA2-AR-02,0,,c979d382-7465-44ab-bf78-83ae4c23b730
+183,154,Chance,,0,,bc8bd6c2-12d0-467f-8cf3-fbd454f52afb
+184,183,"records and compares the results of chance experiments",MA2-CHAN-01,0,,9abdcc67-4d7f-4d88-bc0e-b9899c8c8634
+180,154,Data,,0,,613b9546-954e-43b8-9b8f-997adc2211ec
+181,180,"collects discrete data and constructs graphs using a given scale",MA2-DATA-01,0,,f624d7f0-bf3b-407a-8a89-25891177fa1b
+182,180,"interprets data in tables, dot plots and column graphs",MA2-DATA-02,0,,ebbf3668-38f6-4de9-86cc-e78251af8bab
+164,154,Fractions,,0,,9b4f6af9-cd30-4319-ae46-2bdf49d9d088
+165,164,"represents and compares halves, quarters, thirds and fifths as lengths on a number line and their related fractions formed by halving (eighths, sixths and tenths)",MA2-PF-01,0,,4d396cc5-4a6d-48ef-8a82-520606bf12d6
+166,154,"Geometric measure",,0,,17716d78-e93f-4104-a5dc-013ceb9d9444
+167,166,"uses grid maps and directional language to locate positions and follow routes",MA2-GM-01,0,,f18ace5a-1fd7-4ff2-9fd0-e13ea20c0d09
+168,166,"measures and estimates lengths in metres, centimetres and millimetres",MA2-GM-02,0,,8c02a5fa-0dff-4cf5-8192-7e719233b7b4
+169,166,"identifies angles and classifies them by comparing to a right angle",MA2-GM-03,0,,698ed6a3-fafa-4088-917a-5fec9790c6ed
+161,154,"Multiplicative relations",,0,,d842bb86-f339-4fec-a727-1fd92f9c73f5
+162,161,"represents and uses the structure of multiplicative relations to 10 × 10 to solve problems",MA2-MR-01,0,,9f28853f-e842-4615-b3dd-0c42138ac32d
+163,161,"completes number sentences involving multiplication and division by finding missing values",MA2-MR-02,0,,977ca6c7-ad0c-440a-ac77-1843a6fe3222
+177,154,"Non-spatial measure",,0,,1b7c2e72-7d35-417c-9932-809eff5cec95
+178,177,"estimates, measures and compares the masses of objects using kilograms and grams",MA2-NSM-01,0,,8446cec8-f551-4f88-bc20-2b86b64bfc25
+179,177,"represents and interprets analog and digital time in hours, minutes and seconds",MA2-NSM-02,0,,8f082b99-2b5a-4f81-a054-0e31f1fb4ba9
+155,154,"Representing numbers",,0,,ae1788ad-0c9d-4707-8869-35293b416afc
+156,155,"applies an understanding of place value and the role of zero to represent numbers to at least tens of thousands",MA2-RN-01,0,,24a831b8-8526-42c1-9e19-7bfb727e9132
+157,155,"represents and compares decimals up to 2 decimal places using place value",MA2-RN-02,0,,a2c09e4a-805c-40f0-9cbf-b7b7d65d9441
+174,154,"Three-dimensional (3D) spatial structure",,0,,f6f82a63-7cd5-46be-a0ff-8070f829c9cd
+175,174,"makes and sketches models and nets of three-dimensional objects including prisms and pyramids",MA2-3DS-01,0,,74f9d280-3254-462e-b8f8-671e9968eb0d
+176,174,"estimates, measures and compares capacities (internal volumes) using litres, millilitres and volumes using cubic centimetres",MA2-3DS-02,0,,0330de0a-1ac9-4bc9-8758-66b6badb2c9d
+170,154,"Two-dimensional (2D) spatial structure",,0,,bd587629-75f5-4669-bc05-7d7ba7bd8d37
+171,170,"compares two-dimensional shapes and describes their features",MA2-2DS-01,0,,55e795b5-8343-4ab0-841f-5a424872c9e1
+172,170,"performs transformations by combining and splitting two-dimensional shapes",MA2-2DS-02,0,,52f1df90-908c-4fcc-a592-cf55e94bceae
+173,170,"estimates, measures and compares areas using square centimetres and square metres",MA2-2DS-03,0,,b1179460-ae24-4409-a422-5c6ab745b769
+185,102,"Stage 3",,0,,6bfaaedc-1879-45d6-ac29-669cfac64f75
+190,185,"Additive relations",,0,,1ad68049-e848-4d4c-979d-7c765ec69b26
+191,190,"selects and applies appropriate strategies to solve addition and subtraction problems",MA3-AR-01,0,,e9b35d04-687d-4717-a538-0e7237e14db2
+215,185,Chance,,0,,a443117e-252f-42a6-adb5-f8d4f65c6373
+216,215,"conducts chance experiments and quantifies the probability",MA3-CHAN-01,0,,63a905ca-6db5-4d1b-ba44-e2a88ca57377
+212,185,Data,,0,,2c844508-00a9-4908-90f3-02c44e087f4f
+213,212,"constructs graphs using many-to-one scales",MA3-DATA-01,0,,059bf572-ebc4-4770-a41a-ad9b0f7be2d4
+214,212,"interprets data displays, including timelines and line graphs",MA3-DATA-02,0,,bfcaf804-5fba-489e-bef1-8b35e79dfb4a
+195,185,Fractions,,0,,bec88336-be31-45d7-8de6-111fed34dd62
+196,195,"compares and orders fractions with denominators of 2, 3, 4, 5, 6, 8 and 10",MA3-RQF-01,0,,6f0b354c-f59d-47e8-8474-cb05b39aeb54
+197,195,"determines , ,  and  of measures and quantities",MA3-RQF-02,0,,608a8990-bc93-4702-9520-84cb64bbb11b
+198,185,"Geometric measure",,0,,9346abef-38d6-416a-b9bc-b59cc153aebc
+199,198,"locates and describes points on a coordinate plane",MA3-GM-01,0,,cc1e543a-f5b5-480f-855a-396f4742cbe0
+200,198,"selects and uses the appropriate unit and device to measure lengths and distances including perimeters",MA3-GM-02,0,,8c601e56-bbd5-4785-ab99-0bc6bf09a1db
+201,198,"measures and constructs angles, and identifies the relationships between angles on a straight line and angles at a point",MA3-GM-03,0,,2296ec67-b55b-43f0-874b-40550b3204a0
+192,185,"Multiplicative relations",,0,,f64abfbd-f062-4fad-b1f2-f2125d378025
+193,192,"selects and applies appropriate strategies to solve multiplication and division problems",MA3-MR-01,0,,1201e16b-e11d-4595-80be-90c284ea0509
+194,192,"constructs and completes number sentences involving multiplicative relations, applying the order of operations to calculations",MA3-MR-02,0,,26ebe754-8824-4e6d-bd5e-d7c9f7076762
+209,185,"Non-spatial measure",,0,,e991bfb0-b2e6-43b0-86b5-cfd6e7d07b7f
+210,209,"selects and uses the appropriate unit and device to measure the masses of objects",MA3-NSM-01,0,,cc2c6ca6-b13a-4623-9a35-a55c4408b6d9
+211,209,"measures and compares duration, using 12- and 24-hour time and am and pm notation",MA3-NSM-02,0,,485377cb-f152-472a-9c85-92b56dd85413
+186,185,"Representing numbers",,0,,cf5631ce-6a2b-49a3-abfc-84b7d82674e4
+187,186,"applies an understanding of place value and the role of zero to represent the properties of numbers",MA3-RN-01,0,,94fa597e-355f-473e-bd18-2aa0d9d83e68
+188,186,"compares and orders decimals up to 3 decimal places",MA3-RN-02,0,,8af5bcdc-72a3-4146-b47c-43d3ead697df
+189,186,"determines percentages of quantities, and finds equivalent fractions and decimals for benchmark percentage values",MA3-RN-03,0,,4bb110dc-f807-44c6-8bf5-f5dc058c16cc
+206,185,"Three-dimensional (3D) spatial structure",,0,,6b8b0f62-9b85-45ec-b988-38f4bed84028
+207,206,"visualises, sketches and constructs three-dimensional objects, including prisms and pyramids, making connections to two-dimensional representations",MA3-3DS-01,0,,3744e530-1fd3-4239-9410-afa448a76421
+208,206,"selects and uses the appropriate unit to estimate, measure and calculate volumes and capacities",MA3-3DS-02,0,,8d1c501a-8867-40e0-9724-3f9fba08df4f
+202,185,"Two-dimensional (2D) spatial structure",,0,,e6acd95a-65e4-4de3-bdfd-3c148554350b
+203,202,"investigates and classifies two-dimensional shapes, including triangles and quadrilaterals based on their properties",MA3-2DS-01,0,,606022d2-3a53-40e3-8600-a694cfc535a0
+204,202,"selects and uses the appropriate unit to calculate areas, including areas of rectangles",MA3-2DS-02,0,,79211735-b256-4d36-bbd7-01d5376ea173
+205,202,"combines, splits and rearranges shapes to determine the area of parallelograms and triangles",MA3-2DS-03,0,,736fe604-a8e5-4dfc-8765-833f4a9653ab
+217,102,"Stage 4",,0,,3f5ddb8c-c5e6-4164-a1ab-8955004f6794
+220,217,"Algebraic techniques",,0,,e887d2d1-c5e1-4949-b001-449355d0fcb6
+221,220,"generalises number properties to operate with algebraic expressions including expansion and factorisation",MA4-ALG-C-01,0,,f116b575-9ee0-4116-aca2-acf71bcd3384
+246,217,"Angle relationships",,0,,c948e0f4-506f-4d68-a1e7-5cc707f80e83
+247,246,"applies angle relationships to solve problems, including those related to transversals on sets of parallel lines",MA4-ANG-C-01,0,,227d9910-a0ec-4574-9b1a-6d94ed369fe6
+230,217,"Area and surface area",,0,,76c93393-f71e-433e-9834-11a0049e8086
+231,230,"applies knowledge of area and composite area involving triangles, quadrilaterals and circles to solve problems",MA4-ARE-C-01,0,,a45d8bdb-6020-4140-a5d3-a55b97410417
+240,217,"Computation with integers",,0,,124a9074-0680-452c-a6b0-3474a52354f5
+241,240,"compares, orders and calculates with integers to solve problems",MA4-INT-C-01,0,,1592d16e-55ec-4be7-8a55-bb89c8b8d833
+236,217,"Data analysis",,0,,75ad2d15-5c67-4ee2-ac1c-ba0f65ba53da
+237,236,"analyses simple datasets using measures of centre, range and shape of the data",MA4-DAT-C-02,0,,23100afe-5439-49fa-8707-d6d39fae156b
+248,217,"Data classification and visualisation",,0,,f6da22b2-5f82-40a5-928a-5f790e9b0a39
+249,248,"classifies and displays data using a variety of graphical representations",MA4-DAT-C-01,0,,c2131f13-9af4-42a3-94bf-8947231d8c9d
+224,217,Equations,,0,,96932184-b45e-4713-be15-6ad5d407a34f
+225,224,"solves linear equations of up to 2 steps and quadratic equations of the form",MA4-EQU-C-01,0,,bece35f4-041e-42fa-baca-b5016d141b2b
+242,217,"Fractions, decimals and percentages",,0,,ca9ef631-fa48-46a5-b765-56c4a1b5a23d
+243,242,"represents and operates with fractions, decimals and percentages to solve problems",MA4-FRC-C-01,0,,87b86830-1216-49f7-a56e-682f34d9e52f
+222,217,Indices,,0,,d74615a1-0247-41d9-b84d-9aa6c7dc83cc
+223,222,"operates with primes and roots, positive-integer and zero indices involving numerical bases and establishes the relevant index laws",MA4-IND-C-01,0,,5c43bbc2-d119-4453-a941-be0094d88b2d
+244,217,Length,,0,,49121310-88fe-4de5-a6d0-24c8dc866394
+245,244,"applies knowledge of the perimeter of plane shapes and the circumference of circles to solve problems",MA4-LEN-C-01,0,,ec643463-ec78-443c-b35a-1467155fe911
+226,217,"Linear relationships",,0,,80bff785-7e3f-42d6-b2dc-b6c9d986ecc1
+227,226,"creates and displays number patterns and finds graphical solutions to problems involving linear relationships",MA4-LIN-C-01,0,,5d326e4b-6f94-4f9d-892d-01b83cdc2178
+238,217,Probability,,0,,88212261-90bb-4f73-baaa-7771338c635e
+239,238,"solves problems involving the probabilities of simple chance experiments",MA4-PRO-C-01,0,,546ad106-fb53-45bb-9d31-d08a43e9dc6c
+234,217,"Properties of geometrical figures",,0,,617565c3-32a6-4558-ac2f-f655ff74d484
+235,234,"identifies and applies the properties of triangles and quadrilaterals to solve problems",MA4-GEO-C-01,0,,2e193ec2-5400-4448-aae6-68a34f516b1e
+228,217,"Pythagoras and trigonometry",,0,,f93282ff-4d59-4e00-bac5-9720ab7b0a2e
+229,228,"applies Pythagoras’ theorem to solve problems in various contexts",MA4-PYT-C-01,0,,368ddbb8-fa90-4d76-a3d8-133a6c4d93d5
+218,217,"Ratios and rates",,0,,f8ae1a0d-210b-476d-9966-ced7a2f798b3
+219,218,"solves problems involving ratios and rates, and analyses distance–time graphs",MA4-RAT-C-01,0,,972e89ec-631a-47b8-9a71-ce9129387a11
+232,217,Volume,,0,,1f38e742-d3f4-4940-b73d-fac29e399f58
+233,232,"applies knowledge of volume and capacity to solve problems involving right prisms and cylinders",MA4-VOL-C-01,0,,23fa3abf-a1f2-4452-9e04-071971fd8f2a
+250,102,"Stage 5",,0,,fa1b5b39-6c3a-4752-b94b-9a2bcc668a4d
+254,250,"Algebraic techniques",,0,,de8e9947-74e6-431a-8a91-84d6c40068e7
+255,254,"simplifies algebraic fractions with numerical denominators and expands algebraic expressions",MA5-ALG-C-01,0,,80a2434b-75b3-4b04-96b1-3bb144c22ebd
+256,254,"simplifies algebraic fractions involving indices, and expands and factorises algebraic expressions (Path: Adv)",MA5-ALG-P-01,0,,730c6d2a-c5b1-468b-afe6-f13f2140ac46
+257,254,"selects and applies appropriate algebraic techniques to operate with algebraic fractions, and expands, factorises and simplifies algebraic expressions (Path: Adv)",MA5-ALG-P-02,0,,2220ac0b-1c81-4df9-871b-eada08d2b10d
+275,250,"Area and surface area",,0,,3b49b544-32d2-47b6-bdb2-47cc7d06b026
+276,275,"solves problems involving the surface area of right prisms and practical problems involving the area of composite shapes and solids",MA5-ARE-C-01,0,,76029bf6-8df2-4f1b-9e6a-1ab7d6717519
+277,275,"applies knowledge of the surface area of right pyramids and cones, spheres and composite solids to solve problems (Path: Stn, Adv)",MA5-ARE-P-01,0,,0b9aea99-04e2-440e-b7c5-c935bf5ea01d
+307,250,"Circle geometry (Path)",,0,,10c02134-d7a4-4c5b-9c4e-1aca6dc35ed7
+308,307,"applies deductive reasoning to prove circle theorems and solve related problems (Path: Ext)",MA5-CIR-P-01,0,,5476e385-e2ef-462f-893f-72f5916b5139
+285,250,"Data analysis",,0,,eefb75fa-f5b2-49a9-8c7f-f69a928206d1
+286,285,"compares and analyses datasets using summary statistics and graphical representations",MA5-DAT-C-01,0,,986702d9-ea9b-497b-926f-ec76cec70136
+287,285,"displays and interprets datasets involving bivariate data",MA5-DAT-C-02,0,,bd7ed947-78f1-48ad-8469-a21daf01b2d9
+288,285,"plans, conducts and reviews a statistical inquiry into a question of interest (Path: Stn, Adv)",MA5-DAT-P-01,0,,f65903c9-7b95-4de0-bbc6-f19bc1ae9486
+262,250,Equations,,0,,8982b493-5fce-4da9-956a-af9d5a592bdf
+263,262,"solves linear equations of up to 3 steps, limited to one algebraic fraction",MA5-EQU-C-01,0,,1b635c75-69b1-4a8e-ab5c-3bb79a300e58
+264,262,"solves monic quadratic equations, linear inequalities and cubic equations of the form  (Path: Adv)",MA5-EQU-P-01,0,,4ea9a0a0-f119-4a44-a85d-32fc64da1f35
+265,262,"solves linear equations of more than 3 steps, monic and non-monic quadratic equations, and linear simultaneous equations (Path: Adv)",MA5-EQU-P-02,0,,83d09b08-e224-44e4-8b64-9425515b825d
+292,250,"Financial mathematics",,0,,89d66c45-207e-4f71-be75-a7090f897f6e
+293,292,"solves financial problems involving simple interest, earning money and spending money",MA5-FIN-C-01,0,,33d0d1e6-af2f-468f-98d9-6b0873722c1e
+294,292,"solves financial problems involving compound interest and depreciation",MA5-FIN-C-02,0,,369ac62d-3366-460b-a2a6-b2d8862a8023
+305,250,"Functions and other graphs (Path)",,0,,128cfabd-afa9-4b45-81f9-14d29f77a2f0
+306,305,"uses function notation to describe and graph functions of one variable and graphs inequalities in one and 2 variables (Path: Adv)",MA5-FNC-P-01,0,,5919aed6-9378-46b9-ab8a-e6a3fab8c54d
+258,250,Indices,,0,,a6a436eb-393f-49f2-8aec-3c2d6fa26c43
+259,258,"simplifies algebraic expressions involving positive-integer and zero indices, and establishes the meaning of negative indices for numerical bases",MA5-IND-C-01,0,,0c300ce1-3c0e-4abb-bd91-f41c6c3b3c12
+260,258,"applies the index laws to operate with algebraic expressions involving negative-integer indices (Path: Adv)",MA5-IND-P-01,0,,64bd4ac1-9a2d-4223-b774-448fa17002b7
+261,258,"describes and performs operations with surds and fractional indices (Path: Adv)",MA5-IND-P-02,0,,33761e36-f01d-415d-9f04-7e64abefcc14
+309,250,"Introduction to networks (Path)",,0,,1dea3fcd-fe5f-478b-bc6a-65b40bbd0edd
+310,309,"solves problems involving the characteristics of graphs/networks, planar graphs and Eulerian trails and circuits (Path: Stn)",MA5-NET-P-01,0,,ca09b069-116d-4d66-86fb-d67c2a70ad38
+266,250,"Linear relationships",,0,,20650289-0002-4040-a548-3d0669b4b009
+267,266,"determines the midpoint, gradient and length of an interval, and graphs linear relationships, with and without digital tools",MA5-LIN-C-01,0,,af114f6c-8dfd-47ab-af19-62114a06b5b1
+268,266,"graphs and interprets linear relationships using the gradient/slope-intercept form",MA5-LIN-C-02,0,,4a303bec-4a0b-428c-8084-9e7b1610d141
+269,266,"describes and applies transformations, the midpoint, gradient/slope and distance formulas, and equations of lines to solve problems (Path: Adv)",MA5-LIN-P-01,0,,f4c11f47-3ec8-440f-bd89-1e520dbb17ce
+303,250,"Logarithms (Path)",,0,,68093c4b-0d6c-4dae-8b28-ab2320181d0b
+304,303,"establishes and applies the laws of logarithms to solve problems (Path: Adv)",MA5-LOG-P-01,0,,44ed8eb8-dbf9-4589-b08f-2e213c28bf20
+295,250,"Non-linear relationships",,0,,f0424a53-fee6-46fb-9b8b-fa61321897db
+296,295,"identifies connections between algebraic and graphical representations of quadratic and exponential relationships in various contexts",MA5-NLI-C-01,0,,c033b678-892c-4120-9170-9a155ddf1687
+297,295,"identifies and compares features of parabolas and exponential curves in various contexts",MA5-NLI-C-02,0,,8b054169-402b-4729-b759-12d4d0efc369
+298,295,"interprets and compares non-linear relationships and their transformations, both algebraically and graphically (Path: Adv)",MA5-NLI-P-01,0,,9024d372-f639-44e3-91bd-9825916a0c1e
+299,250,"Numbers of any magnitude",,0,,a48ee01d-8414-49b6-95bc-ce496cba5545
+300,299,"solves measurement problems by using scientific notation to represent numbers and rounding to a given number of significant figures",MA5-MAG-C-01,0,,a7f556a0-4e58-49c5-b3bf-5106d6a9f3c8
+301,250,"Polynomials (Path)",,0,,a95ca947-0eee-4262-aa15-aab532c6de4d
+302,301,"defines, operates with and graphs polynomials and applies the factor and remainder theorems to solve problems (Path: Adv, Ext)",MA5-POL-P-01,0,,a6f42cba-fe2a-4f9e-ba51-731263159e87
+289,250,Probability,,0,,c40ed932-2e5a-4612-ac01-600c8531a116
+290,289,"solves problems involving probabilities in multistage chance experiments and simulations",MA5-PRO-C-01,0,,cac870bb-69da-4703-b36a-457bedb7f737
+291,289,"solves problems involving Venn diagrams, 2-way tables and conditional probability (Path: Adv)",MA5-PRO-P-01,0,,9881d201-d70a-4d4d-824b-f10619f6891e
+281,250,"Properties of geometrical figures",,0,,93754a6f-ad1f-4e2b-8157-880e9b7de1b3
+282,281,"identifies and applies the properties of similar figures and scale drawings to solve problems",MA5-GEO-C-01,0,,1db61e74-d62d-4503-869b-d35ea53de647
+283,281,"establishes conditions for congruent triangles and similar triangles and solves problems relating to properties of similar figures and plane shapes (Path: Ext)",MA5-GEO-P-01,0,,ea232081-8be2-41c4-a74b-7b72369b259d
+284,281,"constructs proofs involving congruent triangles and similar triangles and proves properties of plane shapes (Path:  Ext)",MA5-GEO-P-02,0,,e6b6900e-7791-44b6-aaed-af8428764ede
+270,250,"Pythagoras and trigonometry",,0,,79659ea1-7576-413c-a9c9-15d56bf1c303
+271,270,"applies trigonometric ratios to solve right-angled triangle problems",MA5-TRG-C-01,0,,5e40f057-515d-4657-a688-cc7a44e76bab
+272,270,"applies trigonometry to solve problems, including bearings and angles of elevation and depression",MA5-TRG-C-02,0,,b2f75531-e7d8-4bde-894b-490ff08b3731
+273,270,"applies Pythagoras’ theorem and trigonometry to solve 3-dimensional problems and applies the sine, cosine and area rules to solve 2-dimensional problems, including bearings (Path: Stn, Adv)",MA5-TRG-P-01,0,,b40d1850-fb43-46b1-98b0-18a8e152c33b
+274,270,"establishes and applies the properties of trigonometric functions and finds solutions to trigonometric equations (Path: Adv)",MA5-TRG-P-02,0,,b97bc242-ac27-4af5-84b0-0b6511feab75
+251,250,"Ratios and rates",,0,,6478fb68-9d77-4c32-ab20-7e793e777816
+252,251,"identifies and solves problems involving direct and inverse variation and their graphical representations (Path: Stn, Adv)",MA5-RAT-P-01,0,,3e271598-9a79-4682-b5aa-f2e9f636d4b2
+253,251,"analyses and constructs graphs relating to rates of change (Path: Adv)",MA5-RAT-P-02,0,,7e90791e-fb1c-46fc-88d3-7a9cd0a16bf1
+278,250,Volume,,0,,a6de6ca5-05e7-4f3a-afc6-aaf6c990fcf7
+279,278,"solves problems involving the volume of composite solids consisting of right prisms and cylinders",MA5-VOL-C-01,0,,7ee58d25-f77e-42cb-a828-5eb90ea792b9
+280,278,"applies knowledge of the volume of right pyramids, cones and spheres to solve problems involving related composite solids (Path: Stn, Adv)",MA5-VOL-P-01,0,,67046a49-f298-4541-a5ff-030a8c54de77
+472,102,"Working Mathematically",MAO-WM-01,0,"<p><span style=""background-color:rgb(255,255,255);color:rgba(0,0,0,0.87);font-family:&quot;Public Sans&quot;, sans-serif;font-size:16px;"">develops understanding and fluency in mathematics through exploring and connecting mathematical concepts, choosing and applying mathematical techniques to solve problems, and communicating their thinking and reasoning coherently and clearly</span></p>",
+311,1,"Technological and Applied Studies",,0,,a0ae3448-d105-4c67-9443-df34f71a47b5
+312,311,"Computing Technology",,0,,481cd8e2-7987-4a9a-83ca-d0f4609fe298
+313,312,"Stage 4",,0,,47f5d129-a864-4991-9b6e-9e751731a202
+314,313,"in Stage 4 teachers may adjust the Stage 5 outcomes as appropriate to the needs of students in Years 7 and 8",CT4-ADJ-01,0,,04f3eef6-7ac8-4582-9dac-9fec53e991d6
+315,312,"Stage 5",,0,,7b405b99-c2b5-4b87-8822-abec7c4516eb
+318,315,"manages, documents and explains individual and collaborative work practices",CT5-COL-01,0,,fbb63ac9-1ac3-40f3-9a60-4c7dd57f3926
+321,315,"communicates ideas, processes and solutions using appropriate media",CT5-COM-01,0,,bbec310f-230d-4fdb-8b6d-a70573858f23
+320,315,"explains how data is stored, transmitted and secured in digital systems and how information is communicated in a range of contexts",CT5-DAT-01,0,,4cb8e698-be0a-466e-9d8e-6adad1725ec2
+324,315,"acquires, represents, analyses and visualises simple and structured data",CT5-DAT-02,0,,2bba2e50-a93f-4993-a644-cb533505e99b
+325,315,"designs and creates user interfaces and the user experience",CT5-DES-01,0,,b676eb51-35e0-462f-a19a-c8314723f70c
+317,315,"applies iterative processes to define problems and plan, design, develop and evaluate computing solutions",CT5-DPM-01,0,,8e25e959-91b8-4ec2-a9ea-c3c4496ac84d
+319,315,"understands how innovation, enterprise and automation have inspired the evolution of computing technology",CT5-EVL-01,0,,fe62bb8b-2eb0-4972-b433-6da6dcda8e28
+322,315,"designs, produces and evaluates algorithms and implements them in a general-purpose and/or object-oriented programming language",CT5-OPL-01,0,,d775341d-82ae-416e-b17d-10a97f448b92
+316,315,"selects and applies safe, secure and responsible practices in the ethical use of data and computing technology",CT5-SAF-01,0,,11493c5b-03ac-4ba3-92c8-613de95a79ff
+323,315,"applies computational, design and systems thinking to the development of computing solutions",CT5-THI-01,0,,6519dfd6-5c95-4eaf-98e5-7a00743985fe
