@@ -460,7 +460,7 @@ class SitePage
     public static function backToTheFuture($page)
     {
         /* In Dans honour, time is ours */
-        if (is_array($_SESSION['history'])) {
+        if (is_array($_SESSION['history'] ?? null)) {
             if (count($_SESSION['history']) >= $page) {
                 SitePage::localRedir($_SESSION['history'][$page - 1]);
             } else {

@@ -209,7 +209,7 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
     $threadMapper->save($thread);
 
     $page->backToTheFuture(1);
-} elseif (is_numeric($_GET['deleteThread'])) {
+} elseif (is_numeric($_GET['deleteThread'] ?? false)) {
     /* thread exists
      */
     try {
@@ -238,7 +238,7 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
     $threadMapper->delete($thread);
 
     SitePage::localRedir('/forum/' . $thread->getCategory()->getId());
-} elseif (is_array($_POST['deleteThreads'])) {
+} elseif (is_array($_POST['deleteThreads'] ?? false)) {
     foreach ($_POST['deleteThreads'] as $threadID) {
         /* thread exists
          */
@@ -258,7 +258,7 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
     }
 
     SitePage::localRedir('/forum/' . $categoryID);
-} elseif (is_numeric($_GET['deletePost'])) {
+} elseif (is_numeric($_GET['deletePost'] ?? false)) {
     /* post exists
      */
     try {
