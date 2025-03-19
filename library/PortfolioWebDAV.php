@@ -417,7 +417,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         $chunk_size = 10000000;
         $properties = $this->client->propFind($_SESSION['portfolioIdPathMap'][$id], ['{DAV:}getcontentlength']);
         $file_size = $properties['{DAV:}getcontentlength'];
-        $temp = sb_tempnam('dav');
+        $temp = tempnam(sys_get_temp_dir(), 'dav');
         if ($file_size <= $chunk_size) {
             $response = $this->client->request('GET', $_SESSION['portfolioIdPathMap'][$id]);
             file_put_contents($temp, $response['body'], LOCK_EX);

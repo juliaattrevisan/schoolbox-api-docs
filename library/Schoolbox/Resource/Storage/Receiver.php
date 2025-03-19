@@ -58,7 +58,7 @@ class Receiver implements IReceiver
     ): Model {
         // This might seem hacky, but to ensure all the safety checks pass, this data needs to be a tempfile
         // (just like an upload)
-        $tempLocation = sb_tempnam('otfs');
+        $tempLocation = tempnam(sys_get_temp_dir(), 'otfs');
 
         /* Temporary location didn't get created. There might be a number of reasons why that might
          * be the case; no write access to the specified location, disk full, etc.

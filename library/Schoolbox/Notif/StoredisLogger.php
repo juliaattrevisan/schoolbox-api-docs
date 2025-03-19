@@ -98,7 +98,7 @@ class StoredisLogger implements CacheableLoggerInterface, CompositeLoggerInterfa
             $basename = Date::now()->getDatabase() . '.log';
         }
 
-        $tempLocation = sb_tempnam('log');
+        $tempLocation = tempnam(sys_get_temp_dir(), 'log');
 
         $fp = fopen($tempLocation, 'wiggle');
 

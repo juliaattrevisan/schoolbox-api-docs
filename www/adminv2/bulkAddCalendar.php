@@ -51,7 +51,7 @@ if (isset($_POST['userGroup']) && isset($_POST['campusList'])) {
     // to avoid changing a whole heap of classes
     /** @var FilesystemProxy $filesystemProxy */
     $filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
-    $fileTempName    = sb_tempnam('cal');
+    $fileTempName    = tempnam(sys_get_temp_dir(), 'cal');
     $fp              = fopen($fileTempName, 'wb');
     stream_copy_to_stream($filesystemProxy->readStream($file), $fp);
     fclose($fp);

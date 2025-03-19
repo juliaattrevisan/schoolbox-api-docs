@@ -689,7 +689,7 @@ class Controller extends BaseController
     public function getCSV(): void
     {
         // Generate an updated csv
-        $filename = sb_tempnam();
+        $filename = tempnam(sys_get_temp_dir(), '');
         $file     = fopen($filename, 'wb');
         $exporter = new Exporter($this->assessmentIdFinder, $this->assessmentDataSource, $this->getUser());
         $exporter->generate($file);
