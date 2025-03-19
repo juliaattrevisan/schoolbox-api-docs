@@ -18,6 +18,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\RoleMapper;
 
 class Module extends BaseModule
 {
@@ -58,6 +59,27 @@ class Module extends BaseModule
             'postRunCalendarImport',
             $permission,
         );
+
+        $this->register(
+            self::METHOD_GET,
+            '/import/group-events',
+            'getCalendarGroupEventsImportForm',
+            $permission,
+        );
+
+        $this->register(
+            self::METHOD_POST,
+            '/import/group-events',
+            'postCalendarGroupEventsImport',
+            $permission,
+        );
+
+        $this->register(
+            self::METHOD_POST,
+            '/import/group-events/run',
+            'postRunCalendarGroupEventsImport',
+            $permission,
+        );
     }
 
     /**
@@ -68,6 +90,7 @@ class Module extends BaseModule
         return new Controller(
             $this->getMapperFactory()->get(ErrorMapper::class),
             $this->getMapperFactory()->get(CollectorFactory::class),
+            $this->getMapperFactory()->get(RoleMapper::class),
             $this->injector->get('filesystem.storageProxy'),
         );
     }
