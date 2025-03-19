@@ -46,13 +46,11 @@ class Controller extends Base
      *
      * @param ErrorMapper      $errorMapper
      * @param CollectorFactory $collectorFactory
-     * @param RoleMapper       $roleMapper
      * @param FilesystemProxy  $filesystemProxy
      */
     public function __construct(
         private ErrorMapper $errorMapper,
         private CollectorFactory $collectorFactory,
-        private RoleMapper $roleMapper,
         private FilesystemProxy $filesystemProxy,
     ) {
     }

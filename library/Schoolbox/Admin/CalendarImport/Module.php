@@ -90,7 +90,6 @@ class Module extends BaseModule
         return new Controller(
             $this->getMapperFactory()->get(ErrorMapper::class),
             $this->getMapperFactory()->get(CollectorFactory::class),
-            $this->getMapperFactory()->get(RoleMapper::class),
             $this->injector->get('filesystem.storageProxy'),
         );
     }
