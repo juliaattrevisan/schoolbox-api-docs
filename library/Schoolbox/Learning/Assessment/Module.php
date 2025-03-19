@@ -518,6 +518,12 @@ class Module extends BaseModule
      */
     protected function preloadAssessmentForParticipant(array $params, User $student = null): array
     {
+        /* Module is switched off no need to process further
+         */
+        if (!$this->getConfig()->get(ConfigMapper::NAME_CUSTOM_ASSESSMENT_PARTICIPATION)) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
         try {
             $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId'], $student);
         } catch (MapperException\Deleted $e) {
