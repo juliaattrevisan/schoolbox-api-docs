@@ -181,7 +181,7 @@ class ClassResults
      * @return array
      * @throws \JsonException
      */
-    public function collate(User $viewee, array $workTypeWhitelist = []): array
+    public function collate(User $viewee, array $workTypeWhitelist): array
     {
         /* Get all the assessments we need to analyse
          */

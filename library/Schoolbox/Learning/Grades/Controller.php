@@ -23,6 +23,8 @@ use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Codec;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
+use Schoolbox\Filter\Filters\Assessment\IdFinder;
+use Schoolbox\Filter\IFactoryFactory;
 use Schoolbox\Filter\Page as FilterPage;
 use Schoolbox\Filter\Selection as FilterSelection;
 use Schoolbox\GenericCollection;
@@ -42,6 +44,7 @@ use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Folder\Mapper;
 use Schoolbox\User;
 use Twig\Error\Error as TwigError;
 use TypeError;
@@ -52,14 +55,15 @@ use function func_get_args;
 class Controller extends Base
 {
     /**
-     * @param AssessmentMapperProxy      $assessmentMapperProxy
-     * @param Folder\Mapper              $folderMapper
-     * @param Term\Mapper                $termMapper
-     * @param RubricDataSource           $rubricMapper
-     * @param FilterSelection\Mapper     $filterSelectionMapper
-     * @param Access                     $access
-     * @param AssessmentFilters\IdFinder $assessmentIdFinder
-     * @param Filter\IFactoryFactory     $filterFactoryFactory
+     * @param AssessmentMapperProxy $assessmentMapperProxy
+     * @param Mapper $folderMapper
+     * @param Term\Mapper $termMapper
+     * @param RubricDataSource $rubricMapper
+     * @param FilterSelection\Mapper $filterSelectionMapper
+     * @param Access $access
+     * @param IdFinder $assessmentIdFinder
+     * @param IFactoryFactory $filterFactoryFactory
+     * @param WorkType\Mapper $workTypeMapper
      */
     public function __construct(
         private AssessmentMapperProxy $assessmentMapperProxy,
@@ -69,7 +73,8 @@ class Controller extends Base
         private FilterSelection\Mapper $filterSelectionMapper,
         private Access $access,
         private AssessmentFilters\IdFinder $assessmentIdFinder,
-        private Filter\IFactoryFactory $filterFactoryFactory
+        private Filter\IFactoryFactory $filterFactoryFactory,
+        private WorkType\Mapper $workTypeMapper,
     ) {
     }
 
@@ -380,6 +385,13 @@ class Controller extends Base
         $graph = [];
         $isCohort = false;
 
+        /* All worktypes should show up here, for now. There are no specific admin controls to decide
+         * which worktypes appear here: this means that non-statistical worktypes (e.g. for attendance
+         * and other basic reporting) will still get plotted on the graph. You'd need something like the
+         * checkboxes in Summative Reports to address this, or reuse the existing ones in admin somehow.
+         */
+        $workTypeIds = $this->workTypeMapper->findAll()->indexBy('id')->keys();
+
         if ($hasPermissionsAndSettings) {
             if ((new ValidUseCohortMarks())->isSatisfiedBy($this->getConfigLoader()->get('lms_cohort_comparison'), $subject)) {
                 $isCohort = true;
@@ -389,7 +401,7 @@ class Controller extends Base
                     $assessments,
                     $this->getUser(),
                     $term,
-                ))->collate($viewee);
+                ))->collate($viewee, $workTypeIds);
             } else {
                 $gradeHelper       = new Helper(
                     $this->folderMapper,
