@@ -36,8 +36,10 @@ RUN /opt/bin/install-odbc-driver.sh
 FROM php:8.2-fpm-alpine AS final
 
 # Install actual dependencies
-RUN apk add zip unzip \
+RUN apk add libzip icu-libs libldap \
             imagemagick-heic imagemagick-raw imagemagick-svg imagemagick-tiff imagemagick-webp \
+            c-client \
+            unixodbc \
             bind-tools
 
 # Copy previously built dependencies
