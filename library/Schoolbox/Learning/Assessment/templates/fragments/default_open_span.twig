@@ -11,8 +11,21 @@
     <label>
         Activity Duration
         <span class="hint has-tip tip-top" data-tooltip title="Enter the number of minutes you expect the activity to take. This will be used to automatically populate due dates when importing this course.">?</span>
-        <input id="activity-duration-{{ assessment.id }}" type="text" value="{{ assessment.defaultOpenSpan }}" data-default-open-span-input="{{ assessment.id }}" class="activity-duration" />
-        <input id="activity-duration-{{ assessment.id }}-value" type="number" inputmode="numeric" name="default_open_span" data-default-open-span-value="{{ assessment.id }}" value="{{ assessment.defaultOpenSpan }}" class="hide">
+        <input
+            type="text"
+            value="{{ assessment.defaultOpenSpan }}"
+            data-default-open-span-input="{{ assessment.id }}"
+            class="activity-duration"
+        />
+        <input
+            type="number"
+            inputmode="numeric"
+            name="default_open_span"
+            data-default-open-span-value="{{ assessment.id }}"
+            value="{{ assessment.defaultOpenSpan }}"
+            {# This is a hidden field that the below script keeps in sync with the value the user entered above, but as a number in minutes #}
+            class="hide"
+        >
     </label>
 
     <script>
@@ -70,7 +83,6 @@
                 .replace(/\band\b/g, ","); // replace "and" with ","
 
             const normalisedTimestamp = $.fn.strtotime(denaturalize(newUserInput)); // the user's input as a timestamp relative to now
-            console.warn(newUserInput, normalisedTimestamp);
             if (isNaN(normalisedTimestamp) || normalisedTimestamp === false) {
                 return null; // invalid input
             }
@@ -81,8 +93,6 @@
             // If it switches daylight savings, the diff will be off by an hour - so we need to offset that otherwise it'll keep increasing
             const offsetDiff = future.utcOffset() - now.utcOffset();
             future = future.add(offsetDiff, "minute");
-
-            console.warn(newUserInput, normalisedTimestamp, now, future, Math.round(future.diff(now, "minute", true)));
 
             // Get the difference in minutes between the normalised timestamp and now
             // need to round to the nearest minute because it may be off by a fraction of a second
@@ -116,8 +126,8 @@
             return readable.join(" ");
         }
 
-        const durationUserInput = document.getElementById("activity-duration-{{ assessment.id }}");
-        const durationValueInput = document.getElementById("activity-duration-{{ assessment.id }}-value");
+        const durationUserInput = document.querySelector("[data-default-open-span-input='{{ assessment.id }}']");
+        const durationValueInput = document.querySelector("[data-default-open-span-value='{{ assessment.id }}']");
 
         /**
          * When the user changes the duration input, update the hidden input with the normalised value and ensure it's >= 0
