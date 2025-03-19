@@ -37,7 +37,7 @@ FROM php:8.2-fpm-alpine AS final
 
 # Install actual dependencies
 RUN apk add libzip icu-libs libldap \
-            imagemagick-heic imagemagick-raw imagemagick-svg imagemagick-tiff imagemagick-webp \
+            imagemagick imagemagick-heic imagemagick-raw imagemagick-svg imagemagick-tiff imagemagick-webp \
             c-client \
             unixodbc \
             bind-tools
