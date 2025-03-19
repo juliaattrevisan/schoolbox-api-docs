@@ -238,13 +238,22 @@ class Submission extends SubmissionAbstract
 
         /** @var SubmissionBox\ReturnedWork $existingFeedback */
         foreach ($existingFeedbacks as $existingFeedback) {
+            /* When checking the comment, compare both plaintext and html versions.
+             * Historically, comments were converted to plaintext before saving (SA-18750) but as of SA-19512
+             * we now support HTML feedback, so to avoid creating duplicates, we need to check both.
+             */
+            $plainComment = new Html2Text($canvasSubmission['comment']);
+
             // Check whether the rest are the same
             // Floating point precision in Schoolbox's getMark() is less than in canvas, so an exact match won't always work.
             // We have to test equality somewhat approximately, but with reasonable certainty.
             if (
                 $existingFeedback->getOwner()->getId() === $reviewee->getId()
                 && $existingFeedback->getMarker()->getId() === $reviewer->getId()
-                && (string)$existingFeedback->getComment() === (string)$canvasSubmission['comment']
+                && (
+                    (string)$existingFeedback->getComment() === (string)$plainComment->getText()
+                    || (string)$existingFeedback->getComment() === (string)$canvasSubmission['comment']
+                )
                 && (string)$existingFeedback->getHumanReadableMark() === (string)$readableMark
                 && (string)$existingFeedback->getHumanReadableInstructorMark() === (string)$readableInstructorMark
                 && (abs((float)$existingFeedback->getNormalizedMark() - (float)$normMark) < 0.0001)
@@ -257,16 +266,13 @@ class Submission extends SubmissionAbstract
         // time string from Canvas is coming in UTC
         $feedbackTime = $this->convertTime($feedbackTime);
 
-        // convert to plaintext first as a precaution
-        $plainComment = new Html2Text($canvasSubmission['comment']);
-
         // Couldn't find. Creating a new feedback
         $feedback = $this->returnedWorkMapper->createModel();
         $feedback->setSubmissionBox($submissionBox)
                  ->setMarker($reviewer)
                  ->setOwner($reviewee)
                  ->setReviewRoute(SubmissionBox\ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
-                 ->setComment($plainComment->getText())
+                 ->setComment($canvasSubmission['comment'])
                  ->setHumanReadableMark($readableMark)
                  ->setHumanReadableInstructorMark($readableInstructorMark)
                  ->setNormalizedMark($normMark)
