@@ -82,12 +82,14 @@ class Controller extends Base
             }
         }
 
+        $user = $this->getUser();
         // Get count before running list
-        $total = $this->mapper->searchCount($search, $catId);
+        $total = $this->mapper->searchCount($search, $user, $catId);
         $this->paginator->setTotal($total);
         if ($total > 0) {
             $list = $this->mapper->search(
                 $search,
+                $user,
                 $catId,
                 $this->paginator->getOffset($page),
                 $this->paginator->getPageSize(),
@@ -106,7 +108,7 @@ class Controller extends Base
                 'category'     => $category,
                 'categoryList' => $this->mapper->getJoinMapper('category')->findAll([
                     'order' => ['name' => 'asc',],
-                ])->filter(fn($cat) => $this->mapper->searchCount('', $cat->getId()) > 0),
+                ])->filter(fn($cat) => $this->mapper->searchCount('', $user, $cat->getId()) > 0),
                 'search'       => $search,
                 'paginator'    => $this->paginator,
                 'page'         => $page,
@@ -123,7 +125,7 @@ class Controller extends Base
     {
         $excludedId = $this->requestQuery->get('thisId');
         $search     = trim($this->requestQuery->get('query'));
-        $data       = $this->mapper->search($search)
+        $data       = $this->mapper->search($search, $this->getUser())
                            ->filter(function (Model $item) use ($excludedId) {
                                return $item->getId() != $excludedId;
                            })

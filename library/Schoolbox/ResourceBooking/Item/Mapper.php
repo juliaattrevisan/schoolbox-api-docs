@@ -345,18 +345,19 @@ class Mapper extends BaseMapper
     /**
      * Searches for a resource that matches a search term.
      *
-     * @param string   $keyword
-     * @param ?string  $category
-     * @param int      $offset
-     * @param int      $limit
-     * @param string   $sort_by  Sort field, defaults to 'name' but can be 'modified_at'
-     * @param string   $sort_dir Sort direction, defaults to 'ASC'
+     * @param string  $keyword
+     * @param User    $user
+     * @param ?string $category
+     * @param int     $offset
+     * @param int     $limit
+     * @param string  $sort_by  Sort field, defaults to 'name' but can be 'modified_at'
+     * @param string  $sort_dir Sort direction, defaults to 'ASC'
      * @return Collection
      */
-    public function search($keyword, $category = null, $offset = 0, $limit = 20, $sort_by = 'name', $sort_dir = 'ASC'): Collection
+    public function search($keyword, $user, $category = null, $offset = 0, $limit = 20, $sort_by = 'name', $sort_dir = 'ASC'): Collection
     {
         return $this->findByPredicates(
-            $this->buildSearchPredicate($keyword, $category),
+            $this->buildSearchPredicate($keyword, $user, $category),
             [
                 'order' => [$sort_by => $sort_dir],
                 'limit' => intval($limit),
@@ -369,15 +370,16 @@ class Mapper extends BaseMapper
     /**
      * Gets count for a resource that matches a search term.
      *
-     * @param string $keyword
+     * @param string  $keyword
+     * @param User    $user
      * @param ?string $category
      * @return int
      * @throws \PDOException
      */
-    public function searchCount($keyword, $category = null): int
+    public function searchCount($keyword, $user, $category = null): int
     {
         return $this->countByPredicates(
-            $this->buildSearchPredicate($keyword, $category)
+            $this->buildSearchPredicate($keyword, $user, $category)
         );
     }
 
@@ -385,22 +387,22 @@ class Mapper extends BaseMapper
      * Setting up the predicate builder for searching resources
      *
      * @param string      $keyword
+     * @param User        $user
      * @param string|null $category
      * @return Builder
      */
-    private function buildSearchPredicate(string $keyword, string $category = null): Builder
+    private function buildSearchPredicate(string $keyword, User $user, string $category = null): Builder
     {
         $pb = $this->getPredicateBuilder();
 
-        $sessionUser = $this->getSessionUser();
         $hasAdminPermission =
-            $sessionUser->isSuperuser() ||
-            $sessionUser->hasServicePermission(UserAccess::SERVICE_RESOURCE_BOOKING, UserAccess::ACCESS_FULL);
+            $user->isSuperuser() ||
+            $user->hasServicePermission(UserAccess::SERVICE_RESOURCE_BOOKING, UserAccess::ACCESS_FULL);
 
         if ('' !== $keyword) {
             $pb->any(
                 $this->getPredicateBuilder()
-                     ->like('name', "%". $this->database->getQuoter()->escapeForLike($keyword) . "%")
+                     ->like('name', "%" . $this->database->getQuoter()->escapeForLike($keyword) . "%")
                      ->like('description', "%$keyword%")
                      ->equals('room_code', $keyword)
             );
@@ -411,10 +413,10 @@ class Mapper extends BaseMapper
                 $this->getPredicateBuilder()
                      ->all(
                          $this->getPredicateBuilder()
-                              ->equals('role.role_id', $sessionUser->getRole()->getId())
+                              ->equals('role.role_id', $user->getRole()->getId())
                               ->equals('role.allowed', 1)
                      )
-                     ->equals('m.moderator_id', $sessionUser->getId())
+                     ->equals('m.moderator_id', $user->getId())
             );
         }
 
