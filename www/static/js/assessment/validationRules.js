@@ -330,4 +330,18 @@ var beforeAttemptingSubmit = function () {
             },
         });
     }
+
+    // Validate duration if the
+    $('input[name="default_open_span"]').rules("add", {
+        required: false,
+        number: true,
+        min: 0,
+        messages: {
+            // This is a special field controlled by default_open_span.twig. The input this is targeting is actually
+            // hidden away from the user, and the user interacts with a dedicated input on its own.
+            // In the event the user inputs an invalid duration, the value of this is set to -1 - so the "min" message
+            // actually represents an invalid duration of some sort
+            min: "Please enter a valid duration.",
+        },
+    });
 };
