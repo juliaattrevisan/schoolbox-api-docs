@@ -400,7 +400,7 @@ class Mapper extends BaseMapper
         if ('' !== $keyword) {
             $pb->any(
                 $this->getPredicateBuilder()
-                     ->like('name', "%$keyword%")
+                     ->like('name', "%". $this->database->getQuoter()->escapeForLike($keyword) . "%")
                      ->like('description', "%$keyword%")
                      ->equals('room_code', $keyword)
             );
