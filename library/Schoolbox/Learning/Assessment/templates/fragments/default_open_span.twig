@@ -72,12 +72,12 @@
          */
         function normaliseDurationToMinutes(userInput) {
             // If the user input is just a number, assume it's in minutes
-            if (/^-?\d+$/.test(userInput)) {
-                return Math.abs(parseFloat(userInput, 10));
+            if (/^-?\d+$/.test(userInput.trim())) {
+                return Math.abs(parseFloat(userInput.trim(), 10));
             }
 
             // other replacements i've found - perhaps combine with denaturalize?
-            const newUserInput = userInput
+            const newUserInput = userInput.trim()
                 .replace(/\ban\b/g, "1") // replace "an" with "1"
                 .replace(/\ba\b/g, "1") // replace "a" with "1"
                 .replace(/\band\b/g, ","); // replace "and" with ","
