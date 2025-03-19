@@ -518,6 +518,12 @@ class Module extends BaseModule
      */
     protected function preloadAssessmentForParticipant(array $params, User $student = null): array
     {
+        /* Module is switched off so no need to process further
+         */
+        if (!$this->getConfig()->get(ConfigMapper::NAME_CUSTOM_ASSESSMENT_PARTICIPATION)) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
         try {
             $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId'], $student);
         } catch (MapperException\Deleted $e) {
@@ -538,6 +544,12 @@ class Module extends BaseModule
             AssessmentType::TYPE_LESSON_PLAN === $assessmentType ||
             AssessmentType::TYPE_LTI_ASSESSMENT === $assessmentType
         ) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
+        /* Should only have custom participation for implementations
+         */
+        if ($assessment->getBaseContext()->isSpecificationContext()) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
 

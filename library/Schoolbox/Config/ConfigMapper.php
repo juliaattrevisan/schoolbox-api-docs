@@ -206,6 +206,7 @@ class ConfigMapper extends Mapper
     public const NAME_RESTRICT_STUDENT_SUBMISSIONS = 'restrict_student_submissions';
     public const NAME_LTI_ASSESSMENTS_ENABLE = 'lti_assessments_enable';
 
+    public const NAME_CUSTOM_ASSESSMENT_PARTICIPATION = 'custom_assessment_participation';
     public const NAME_ASSESSMENT_CALENDAR_ENABLED = 'assessment_calendar_enabled';
     public const NAME_RESOURCE_BOOKING_ENABLED = 'resource_booking_enabled';
     public const NAME_FIXTURES_ENABLED = 'fixtures_enabled';
