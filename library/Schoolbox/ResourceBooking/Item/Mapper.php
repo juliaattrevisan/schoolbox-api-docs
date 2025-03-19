@@ -400,10 +400,11 @@ class Mapper extends BaseMapper
             $user->hasServicePermission(UserAccess::SERVICE_RESOURCE_BOOKING, UserAccess::ACCESS_FULL);
 
         if ('' !== $keyword) {
+            $likeKeyword = "%" . $this->database->getQuoter()->escapeForLike($keyword) . "%";
             $pb->any(
                 $this->getPredicateBuilder()
-                     ->like('name', "%" . $this->database->getQuoter()->escapeForLike($keyword) . "%")
-                     ->like('description', "%$keyword%")
+                     ->like('name', $likeKeyword)
+                     ->like('description', $likeKeyword)
                      ->equals('room_code', $keyword)
             );
         }
