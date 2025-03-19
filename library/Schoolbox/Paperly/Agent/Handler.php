@@ -252,14 +252,26 @@ class Handler
     {
         $params = [];
         $selectedView = $this->viewSelector->getView(ViewSelector::PAPERLY_VIEW_ALL_STAFF);
+
+        /* Check we need to use YearLevelCode column or NormalYearLevel/NormalYearLevel2 columns instead
+         */
+        $useYearLevelCode = $this->columnExists("YearLevelCode", $selectedView);
+        /* Some school is not using certain Paperly module hence they have different script(s) running on their synergetic
+         * database, hence they have different columns, and we need to accommodate that until Paperly shift to use proxy
+         */
+        if ($useYearLevelCode) {
+            $customSelectColumn = "ClassCode, ClassDescription, YearLevelCode ";
+            $customFromColumn = "ClassDescription, YearLevelCode ";
+        } else {
+            $customSelectColumn = "NormalYearLevel, NormalYearLevel2 ";
+            $customFromColumn = "NormalYearLevel, NormalYearLevel2 ";
+        }
         $sql = "SELECT
                     StaffID,
                     StaffPreferred,
                     StaffSurname,
                     StaffEmail,
-                    ClassCode,
-                    ClassDescription,
-                    YearLevelCode
+                    {$customSelectColumn}
                 FROM (
                     SELECT
                         StaffID,
@@ -267,8 +279,7 @@ class Handler
                         StaffSurname,
                         StaffEmail,
                         ClassCode,
-                        ClassDescription,
-                        YearLevelCode
+                        {$customFromColumn}
                     FROM {$selectedView} WHERE 1=1
                 ";
 
@@ -289,7 +300,12 @@ class Handler
             $placeholders = implode(',', array_fill(0, count($yls), '?'));
             $params = array_merge($params, $yls);
 
-            $sql .= " AND YearLevelCode IN ($placeholders)";
+            $params = array_merge($params, $yls, $yls);
+            if ($useYearLevelCode) {
+                $sql .= " AND YearLevelCode IN ($placeholders)";
+            } else {
+                $sql .= " AND (NormalYearLevel IN ($placeholders) OR NormalYearLevel2 IN ($placeholders))";
+            }
         }
 
         if (isset($data['class_code'])) {
@@ -300,35 +316,56 @@ class Handler
         }
 
         $sql .= " ) filtered_results
-                GROUP BY StaffID, StaffPreferred, StaffSurname, StaffEmail, ClassCode, ClassDescription, YearLevelCode
+                GROUP BY StaffID, StaffPreferred, StaffSurname, StaffEmail, {$customSelectColumn}
                 ORDER BY StaffSurname";
 
-        $stmt = $this->externalDb->executeQuery($sql, $params);
+        $statement = $this->externalDb->prepareQuery($sql, $params);
+        $stmt = $statement->execute();
+
+        if ($stmt === false) {
+            throw new AlaressDatabaseException(
+                print_r($this->externalDb->errorInfo(), true)
+            );
+        }
+
         $staffs = [];
-        foreach ($stmt as $row) {
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $staffId = $row["StaffID"];
 
-            if (!isset($staffs[$staffId])) {
-                $staffs[$staffId] = [
-                    "ID"               => $row["StaffID"] ?? null,
-                    "Preferred"        => $row["StaffPreferred"] ?? null,
-                    "Surname"          => $row["StaffSurname"] ?? null,
-                    "Email"            => $row["StaffEmail"] ?? null,
-                    "Classes" => [
-                        [
-                            "ClassCode" => $row["ClassCode"],
-                            "ClassDescription" => $row["ClassDescription"],
-                            "YearLevelCode" => $row["YearLevelCode"],
+            if ($useYearLevelCode) {
+                if (!isset($staffs[$staffId])) {
+                    $staffs[$staffId] = [
+                        "ID"               => $row["StaffID"] ?? null,
+                        "Preferred"        => $row["StaffPreferred"] ?? null,
+                        "Surname"          => $row["StaffSurname"] ?? null,
+                        "Email"            => $row["StaffEmail"] ?? null,
+                        "Classes" => [
+                            [
+                                "ClassCode" => $row["ClassCode"] ?? null,
+                                "ClassDescription" => $row["ClassDescription"] ?? null,
+                                "YearLevelCode" => $row["YearLevelCode"] ?? null,
 
+                            ]
                         ]
-                    ]
-                ];
+                    ];
+                } else {
+                    $staffs[$staffId]["Classes"][] = [
+                        "ClassCode" => $row["ClassCode"] ?? null,
+                        "ClassDescription" => $row["ClassDescription"] ?? null,
+                        "YearLevelCode" => $row["YearLevelCode"] ?? null,
+                    ];
+                }
             } else {
-                $staffs[$staffId]["Classes"][] = [
-                    "ClassCode" => $row["ClassCode"],
-                    "ClassDescription" => $row["ClassDescription"],
-                    "YearLevelCode" => $row["YearLevelCode"],
-                ];
+                if (!isset($staffs[$staffId])) {
+                    $staffs[$staffId] = [
+                        "ID"               => $row["StaffID"] ?? null,
+                        "Preferred"        => $row["StaffPreferred"] ?? null,
+                        "Surname"          => $row["StaffSurname"] ?? null,
+                        "Email"            => $row["StaffEmail"] ?? null,
+                        "NormalYearLevel"  => $row["NormalYearLevel"] ?? null,
+                        "NormalYearLevel2" => $row["NormalYearLevel2"] ?? null,
+                    ];
+                }
             }
         }
 
