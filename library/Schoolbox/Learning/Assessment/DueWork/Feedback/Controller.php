@@ -367,8 +367,8 @@ class Controller extends Base
         }
 
         // Replace any tokens in the comment with the relevant details
-        $tokenReplacer = new TokenReplacer\Student(new TokenReplacer\Simple());
-        $comment = $tokenReplacer->replace(trim((string)$postVars['comment']), $participant->getUser());
+        $comment = (new TokenReplacer\Student(new TokenReplacer\Simple()))
+            ->replace(trim((string)$postVars['comment']), $participant->getUser());
 
         $dueWorkFeedbackFactory = new DueWork\Feedback\Factory(
             $this->getFeedbackDataSource(),

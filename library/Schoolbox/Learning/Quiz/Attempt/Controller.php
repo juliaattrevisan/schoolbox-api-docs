@@ -161,8 +161,8 @@ class Controller extends Base
         }
 
         // Replace any tokens in the comment with the relevant details
-        $tokenReplacer = new TokenReplacer\Student(new TokenReplacer\Simple());
-        $comment = $tokenReplacer->replace(trim((string)$postData['comment']), $student);
+        $comment = (new TokenReplacer\Student(new TokenReplacer\Simple()))
+            ->replace(trim((string)$postData['comment']), $student);
 
         /* Update the deets and save it
          */

@@ -68,8 +68,7 @@ if (!isset($_REQUEST['commentId']) || !is_numeric($_REQUEST['commentId'])) {
     $student = $uMap->findById($studentId);
 
     // Replace any tokens in the comment with the relevant details
-    $tokenReplacer = new TokenReplacer\Student(new TokenReplacer\Simple());
-    $body = $tokenReplacer->replace($body, $student);
+    $body = (new TokenReplacer\Student(new TokenReplacer\Simple()))->replace($body, $student);
 
     // set up this comment, ready to go
     $comment = new Comment();
@@ -140,8 +139,8 @@ if (!isset($_REQUEST['commentId']) || !is_numeric($_REQUEST['commentId'])) {
                 // update the comment body and set the modified timestamp
 
                 // Replace any tokens in the comment with the relevant details
-                $tokenReplacer = new TokenReplacer\Student(new TokenReplacer\Simple());
-                $body = $tokenReplacer->replace($_POST['commentBody'], $comment->getStudent());
+                $body = (new TokenReplacer\Student(new TokenReplacer\Simple()))
+                    ->replace($_POST['commentBody'], $comment->getStudent());
 
                 $comment->setBody($body);
             } else {
