@@ -67,7 +67,7 @@ class Receiver implements IReceiver
          * If you ended up following a fatal from a cli tool, you should try running it with sudo
          * Otherwise your logged-in account might not have write access to $tempLocation
          */
-        if ('' === $tempLocation) {
+        if (false === $tempLocation) {
             throw new FileException("Temporary location couldn't be created; check sudo, perms, disk usage");
         }
 
