@@ -307,7 +307,12 @@ class Controller extends Base
 
         $expiresAt = $this->requestPost->get('expiresAt');
         if ('' !== (string)$expiresAt) {
-            $expiresAt = \Alaress_Date_Format::newLocalShort($expiresAt)->startOfDay();
+            try {
+                $expiresAt = \Alaress_Date_Format::newLocalShort($expiresAt)->startOfDay();
+            } catch (\Exception $e) {
+                $locale = new \Alaress_Date_Locale_Config();
+                throw new SchoolboxException("Expires At must be in the format of {$locale->localShortFormat()}");
+            }
         } else {
             $expiresAt = null;
         }
