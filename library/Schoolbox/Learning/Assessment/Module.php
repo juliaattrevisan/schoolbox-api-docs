@@ -541,6 +541,12 @@ class Module extends BaseModule
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
 
+        /* Should only have custom participation for implementations
+         */
+        if ($assessment->getBaseContext()->isSpecificationContext()) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
         // set the controller
         $this->setControllerFromAssessment($assessment);
 
