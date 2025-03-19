@@ -9,6 +9,8 @@ export default class DisableNodes {
 
     static readonly DATATEST_DISABLE_BUTTON = "disable-nodes";
 
+    static readonly DATATEST_ENABLE_BUTTON = "enable-nodes";
+
     static readonly DATATEST_CONFIRM_BUTTON = "confirm-enable-nodes";
 
     constructor(page: Page, tester: AcceptanceTester) {
@@ -21,6 +23,13 @@ export default class DisableNodes {
      */
     async clickDisableButton(): Promise<void> {
         await this.page.getByTestId(DisableNodes.DATATEST_DISABLE_BUTTON).click();
+    }
+
+    /**
+     * Clicks the enable button for selected nodes
+     */
+    async clickEnableButton(): Promise<void> {
+        await this.page.getByTestId(DisableNodes.DATATEST_ENABLE_BUTTON).click();
     }
 
     /**

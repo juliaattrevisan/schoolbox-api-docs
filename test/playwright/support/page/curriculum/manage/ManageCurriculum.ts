@@ -9,6 +9,8 @@ export default class ManageCurriculum {
 
     static readonly URL = "/curriculum";
 
+    static readonly URL_NODE = "/curriculum/#{nodeId}";
+
     static readonly TOAST = ".toast";
 
     static readonly NODES = "[data-test-node]:not([data-test-view-node])";
@@ -29,6 +31,14 @@ export default class ManageCurriculum {
      */
     async goto(): Promise<void> {
         await this.page.goto(ManageCurriculum.URL);
+    }
+
+    /**
+     * Navigate to a specific node on the curriculum page
+     * @param nodeId - The id of the node
+     */
+    async gotoNode(nodeId: number): Promise<void> {
+        await this.page.goto(ManageCurriculum.URL_NODE.replace("{nodeId}", nodeId.toString()));
     }
 
     /**

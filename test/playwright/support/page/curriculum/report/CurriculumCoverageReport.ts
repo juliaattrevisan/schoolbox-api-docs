@@ -32,6 +32,8 @@ export default class CurriculumCoverageReport {
 
     static readonly SELECTOR_YEAR_9_TOTAL = "table tbody tr:nth-child(4) td:nth-child(2)"; // the Year 9 Curriculum total usage table cell at its default state
 
+    static readonly SELECTOR_YEAR_4_TOTAL = "table tbody tr:nth-child(4) td:nth-child(2)"; // the Year 4 Curriculum total usage table cell at its default state (on the URL DISABLED)
+
     constructor(page: Page) {
         this.page = page;
     }
@@ -120,6 +122,14 @@ export default class CurriculumCoverageReport {
      */
     getYear9TotalUsageTableCell(): Locator {
         return this.page.locator(CurriculumCoverageReport.SELECTOR_YEAR_9_TOTAL);
+    }
+
+    /**
+     * Returns the locator for the Year 4Curriculum total usage table cell
+     * @returns - The locator for the Year 4 Curriculum total usage table cell
+     */
+    getYear4TotalUsageTableCell(): Locator {
+        return this.page.locator(CurriculumCoverageReport.SELECTOR_YEAR_4_TOTAL);
     }
 
     /**

@@ -76,7 +76,7 @@ function onDeleteNodesSelected(): void {
                 <li v-else-if="selectedNodesStore.allNodesDisabled">
                     <button
                         class="button icon-view"
-                        data-test-enable-nodes
+                        data-test="enable-nodes"
                         @click.prevent="onEnableNodesSelected(true)"
                     >
                         Enable {{ selectedNodesSummary }}
