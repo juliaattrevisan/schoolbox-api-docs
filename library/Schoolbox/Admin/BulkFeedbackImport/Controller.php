@@ -8,13 +8,11 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\BulkAssessmentResult;
+namespace Schoolbox\Admin\BulkFeedbackImport;
 
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use League\Flysystem\FilesystemException;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\SummativeReport\Payload\VictorianProgression\Attendance\Processor;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
@@ -68,10 +66,10 @@ class Controller extends Base
             ->setExpiryDate(\Alaress_Date_Format::now()->addMinutes(self::CSV_DURATION));
 
         $this->response = $this->responseFromTemplate(
-            '@adminBulkAssessmentResult/index.twig',
+            '@adminBulkFeedbackImport/index.twig',
             [
-                'pageCurrent' => $this->routeGenerator->generate('adminBulkAssessmentResult.getIndex'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminBulkAssessmentResult.getIndex')),
+                'pageCurrent' => $this->routeGenerator->generate('adminBulkFeedbackImport.getIndex'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminBulkFeedbackImport.getIndex')),
                 /* Not sure if there's a shortcut to this: never seen one?
                  */
                 'roletypeStaff' => \Schoolbox\Role::STAFF,
@@ -122,10 +120,10 @@ class Controller extends Base
         ))->parseFeedbacks($settings['sourceFile'], $settings['feedbackAuthor']);
 
         $this->response = $this->responseFromTemplate(
-            '@adminBulkAssessmentResult/preview.twig',
+            '@adminBulkFeedbackImport/preview.twig',
             [
-                'pageCurrent' => $this->routeGenerator->generate('adminBulkAssessmentResult.getIndex'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminBulkAssessmentResult.getIndex')),
+                'pageCurrent' => $this->routeGenerator->generate('adminBulkFeedbackImport.getIndex'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminBulkFeedbackImport.getIndex')),
                 'settings' => $settings,
                 'outcome' => $outcome
             ],
@@ -168,10 +166,10 @@ class Controller extends Base
         ))->parseFeedbacks($settings['sourceFile'], $settings['feedbackAuthor']);
 
         $this->response = $this->responseFromTemplate(
-            '@adminBulkAssessmentResult/perform.twig',
+            '@adminBulkFeedbackImport/perform.twig',
             [
-                'pageCurrent' => $this->routeGenerator->generate('adminBulkAssessmentResult.getIndex'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminBulkAssessmentResult.getIndex')),
+                'pageCurrent' => $this->routeGenerator->generate('adminBulkFeedbackImport.getIndex'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminBulkFeedbackImport.getIndex')),
                 'settings' => $settings,
                 'outcome' => $outcome,
             ],

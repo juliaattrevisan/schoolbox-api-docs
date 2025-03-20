@@ -1,5 +1,5 @@
 {##
- # Bulk Assessment Result configuration
+ # Bulk Feedback Import configuration
  #
  # @param string $pageCurrent    The current page we're on
  # @param array $allBreadcrumbs  A set of breadcrumb nodes, as defined by Admin Subnav
@@ -10,22 +10,22 @@
 
 <script>
     $(function() {
-        let bulkAssessmentResultForm = $('#bulkAssessmentResult');
+        let bulkFeedbackImportForm = $('#bulkFeedbackImport');
 
-        bulkAssessmentResultForm.find('input[data-selectizeuser]')
+        bulkFeedbackImportForm.find('input[data-selectizeuser]')
             .userSelectizeSelector({
                 ajax: {
                     data: {roleTypeID: '{{ roletypeStaff }}'},
                 }
             })
             .on('selectize.item_add', function() {
-                bulkAssessmentResultForm.find(':submit').prop('disabled', false).focus();
+                bulkFeedbackImportForm.find(':submit').prop('disabled', false).focus();
             })
             .on('selectize.item_remove', function() {
-                bulkAssessmentResultForm.find(':submit').prop('disabled', true);
+                bulkFeedbackImportForm.find(':submit').prop('disabled', true);
             });
 
-        bulkAssessmentResultForm.alaressValidate({
+        bulkFeedbackImportForm.alaressValidate({
             rules: {
                 'userId': {
                     'required': true
@@ -98,9 +98,9 @@
             </section>
         </div>
         <div class="small-12 island">
-            {% set formRoute = routeLookupIfAuthorized('adminBulkAssessmentResult.postPreview') %}
+            {% set formRoute = routeLookupIfAuthorized('adminBulkFeedbackImport.postPreview') %}
 
-            <form action="{{ formRoute }}" method="post" id="bulkAssessmentResult">
+            <form action="{{ formRoute }}" method="post" id="bulkFeedbackImport">
                 <section>
                     <fieldset class="content">
                         <div class="small-12 columns">

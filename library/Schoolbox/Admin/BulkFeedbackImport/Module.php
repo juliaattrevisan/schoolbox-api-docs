@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\BulkAssessmentResult;
+namespace Schoolbox\Admin\BulkFeedbackImport;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
@@ -22,7 +22,7 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    protected $basename = 'adminBulkAssessmentResult';
+    protected $basename = 'adminBulkFeedbackImport';
 
 
     /**

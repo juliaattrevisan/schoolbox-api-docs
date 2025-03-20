@@ -58,7 +58,7 @@
          #}
         {% if not outcome.errors %}
             {# Recycle the form params for immediate effect #}
-            {% set formRoute = routeLookupIfAuthorized('adminBulkAssessmentResult.postPerform') %}
+            {% set formRoute = routeLookupIfAuthorized('adminBulkFeedbackImport.postPerform') %}
 
             <div class="small-12 columns">
                 <form action="{{ formRoute }}" method="post">

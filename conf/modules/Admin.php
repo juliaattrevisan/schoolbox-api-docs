@@ -144,8 +144,8 @@ class Admin extends ModuleLoader
          */
         $this->loadModule($di, \Schoolbox\Admin\CalendarImport\Module::class, '/adminv2/calendar');
 
-        /* Bulk Assessment Results
+        /* Bulk Feedback Import
          */
-        $this->loadModule($di, \Schoolbox\Admin\BulkAssessmentResult\Module::class, '/adminv2/bulk-assessment-result');
+        $this->loadModule($di, \Schoolbox\Admin\BulkFeedbackImport\Module::class, '/adminv2/bulk-feedback-import');
     }
 }
