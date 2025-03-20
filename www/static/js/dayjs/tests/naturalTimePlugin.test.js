@@ -3,7 +3,7 @@ import naturalTimePlugin from "../naturalTimePlugin"; // adjust the path as need
 
 dayjs.extend(naturalTimePlugin);
 
-describe("naturalTimePlugin", () => {
+describe("dayjsnaturalTimePlugin", () => {
     test("attaches the parseNatural method to dayjs", () => {
         expect(typeof dayjs.parseNatural).toBe("function");
     });
@@ -39,6 +39,20 @@ describe("naturalTimePlugin", () => {
     test("parses '27/04/2025' correctly", () => {
         const result = dayjs.parseNatural("27/04/2025");
         const expected = dayjs("2025-04-27");
+        expect(result).not.toBeFalsy();
+        expect(result.unix()).toBe(expected.unix());
+    });
+
+    test("parses 'an hour' correctly", () => {
+        const result = dayjs.parseNatural("an hour");
+        const expected = dayjs().add(1, "hour");
+        expect(result).not.toBeFalsy();
+        expect(result.unix()).toBe(expected.unix());
+    });
+
+    test("parses 'an hour and two minutes' correctly", () => {
+        const result = dayjs.parseNatural("an hour");
+        const expected = dayjs().add(1, "hour");
         expect(result).not.toBeFalsy();
         expect(result.unix()).toBe(expected.unix());
     });

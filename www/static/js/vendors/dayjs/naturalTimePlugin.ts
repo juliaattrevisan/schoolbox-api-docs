@@ -30,7 +30,10 @@ function denaturalize(text: string): string {
         .replace(/eleven/g, "11")
         .replace(/twelve/g, "12")
         .replace(/\//g, "-")
-        .replace(/\s+/g, " ");
+        .replace(/\s+/g, " ")
+        .replace(/\ban\b/g, "1") // replace "an" with "1"
+        .replace(/\ba\b/g, "1") // replace "a" with "1"
+        .replace(/\band\b/g, ","); // replace "and" with ","
 }
 
 /**
