@@ -68,7 +68,7 @@
          * Converts an arbitrary time span to a duration in minutes relative to the current time
          * Similar to how datepickers are able to parse "in 5 days", "tomorrow", "1 month", etc via alaress-datetime-picker.js
          * @param {string} userInput - The user input to parse (representing an arbitrary time span or date)
-         * @returns {number|null} - The duration in minutes, or null if the input is invalid
+         * @returns {number|false} - The duration in minutes, or null if the input is invalid
          */
         function normaliseDurationToMinutes(userInput) {
             // If the user input is just a number, assume it's in minutes
@@ -89,6 +89,10 @@
 
             const now = dayjs();
             let future = dayjs.unix(normalisedTimestamp);
+
+            if (future === false) {
+                return false; // invalid input
+            }
 
             // If it switches daylight savings, the diff will be off by an hour - so we need to offset that otherwise it'll keep increasing
             const offsetDiff = future.utcOffset() - now.utcOffset();
@@ -138,10 +142,10 @@
                 return;
             }
 
-            // normalise the user input to a duration in minutes, or null if invalid
+            // normalise the user input to a duration in minutes, or false if invalid
             const normalisedDuration = normaliseDurationToMinutes(durationUserInput.value);
 
-            if (normalisedDuration === null) {
+            if (normalisedDuration === false) {
                 // alaress validate will handle this
                 durationValueInput.value = -1;
             } else {
