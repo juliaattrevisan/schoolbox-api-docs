@@ -12,6 +12,7 @@ use Schoolbox\Assessment\StudentReportCard\Comment;
 use Schoolbox\Assessment\StudentReportCard\CommentMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
+use Schoolbox\TokenReplacer;
 use Schoolbox\UserMapper;
 
 if (isset($this)) {
@@ -61,18 +62,19 @@ if (!isset($_REQUEST['commentId']) || !is_numeric($_REQUEST['commentId'])) {
         );
     }
 
-    /**
-     * @var UserMapper   $uMap
-     * @var FolderMapper $cMap
-     */
     $uMap = UserMapper::getInstance();
     $cMap = FolderMapper::getInstance();
+
+    $student = $uMap->findById($studentId);
+
+    // Replace any tokens in the comment with the relevant details
+    $body = (new TokenReplacer\Student(new TokenReplacer\Simple()))->replace($body, $student);
 
     // set up this comment, ready to go
     $comment = new Comment();
     $comment->setCommenter($sessionUser);
     $comment->setBody($body);
-    $comment->setStudent($uMap->findById($studentId));
+    $comment->setStudent($student);
     $comment->setCategory($cMap->findById($categoryId));
     $comment->setStudentVisibility($visibility['student']);
     $comment->setParentVisibility($visibility['parent']);
@@ -113,7 +115,6 @@ if (!isset($_REQUEST['commentId']) || !is_numeric($_REQUEST['commentId'])) {
         $sessionUser = $a->getSessionUser();
 
         try {
-            /** @var $comment Comment */
             $comment = checkOwnership($sessionUser->getId(), $_REQUEST['commentId']);
         } catch (\Schoolbox\Mapper\Exception $e) {
             respond(400, $e->getMessage());
@@ -122,7 +123,6 @@ if (!isset($_REQUEST['commentId']) || !is_numeric($_REQUEST['commentId'])) {
         if (isset($_POST['commentId'])) {
             // expecting an updated version of the comment or deletion request
 
-            /** @var $cMap CommentMapper */
             $cMap = CommentMapper::getInstance();
 
             if (isset($_POST['deleteComment']) && $_POST['deleteComment'] == true) {
@@ -137,7 +137,12 @@ if (!isset($_REQUEST['commentId']) || !is_numeric($_REQUEST['commentId'])) {
 
             if (isset($_POST['commentBody']) && strlen($_POST['commentBody'])) {
                 // update the comment body and set the modified timestamp
-                $comment->setBody($_POST['commentBody']);
+
+                // Replace any tokens in the comment with the relevant details
+                $body = (new TokenReplacer\Student(new TokenReplacer\Simple()))
+                    ->replace($_POST['commentBody'], $comment->getStudent());
+
+                $comment->setBody($body);
             } else {
                 respond(400, 'Comment cannot be blank.');
             }
@@ -191,19 +196,19 @@ if (!isset($_REQUEST['commentId']) || !is_numeric($_REQUEST['commentId'])) {
  * @param int $userId
  * @param int $commentId
  * @throws Schoolbox\Mapper\Exception
- * @return bool
+ * @return Comment
  */
-function checkOwnership($userId, $commentId)
+function checkOwnership(int $userId, int $commentId): Comment
 {
-    /** @var $cMap CommentMapper */
     $cMap = CommentMapper::getInstance();
-    /** @var $comment Comment */
-    $comment = $cMap->findById($commentId);
 
+    /** @var Comment $comment */
+    $comment = $cMap->findById($commentId);
 
     if ($comment->getCommenter()->getId() == $userId) {
         return $comment;
     }
+
     throw new \Schoolbox\Mapper\Exception("You are not the owner of that comment.");
 }
 
