@@ -121,7 +121,10 @@ class Controller extends Base
             '@adminBulkFeedbackImport/preview.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminBulkFeedbackImport.getIndex'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminBulkFeedbackImport.getIndex')),
+                'allBreadcrumbs' => array_merge(
+                    (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminBulkFeedbackImport.getIndex')),
+                    [['Preview', null]]
+                ),
                 'settings' => $settings,
                 'outcome' => $outcome
             ],
@@ -166,7 +169,10 @@ class Controller extends Base
             '@adminBulkFeedbackImport/perform.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminBulkFeedbackImport.getIndex'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminBulkFeedbackImport.getIndex')),
+                'allBreadcrumbs' => array_merge(
+                    (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminBulkFeedbackImport.getIndex')),
+                    [['Results', null]]
+                ),
                 'settings' => $settings,
                 'outcome' => $outcome,
             ],
