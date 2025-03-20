@@ -11,9 +11,24 @@
 use Schoolbox\External\Exception as ExternalException;
 use Schoolbox\Error\Mapper as ErrorMapper;
 
-// Ensure parameters are correct
+// Ensure online attendance is enabled.
+if (!Config::get('external_attendance')) {
+    error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+}
 
-$externalClass = new External_Synergetic_Class();
+/* This only works with the Synergetic connector.
+ * An alternative to 404 would be errors:
+ *  210 Cannot get attendance list. Please contact system administrator.
+ *  169 Access to this module is denied
+ *  19 You do not have permission to view this page.
+ *
+ * ...but none of those really fit the context as to why you'd be unable to access this place.
+ */
+if (\External\IConnector::EXTERNAL_TYPE_SYNERGETIC !== Config::get('external_type')) {
+    error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+}
+
+$externalClass = new External_Class();
 
 /* getDatabase() promoted to `public` because we need to inspect whether
  * External_Synergetic_Class spawned with a NullConnector instance; that
