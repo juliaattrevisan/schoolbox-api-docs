@@ -98,7 +98,7 @@ class Controller extends Base
 
         /* Augment with a storage file
          */
-        if (!\is_array($post['attachment'])) {
+        if (!\is_array($post['attachment'] ?? null)) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
@@ -189,7 +189,7 @@ class Controller extends Base
     {
         /* Assessment Title should maybe exist
          */
-        $assessmentTitle = trim((string)$postVar['assessmentTitle']);
+        $assessmentTitle = trim((string)($postVar['assessmentTitle'] ?? ''));
 
         if ('' === $assessmentTitle) {
             throw new \DomainException('Assessment title was omitted.');
