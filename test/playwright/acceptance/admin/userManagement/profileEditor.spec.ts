@@ -20,7 +20,7 @@ test.describe("Profile Editor", () => {
     });
 
     /**
-     * Set Up Field Visibility and Availability
+     * Set Up Fields on profile pages
      * 1. Update Rebecca White’s email in the database (ID: 24).
      * 2. Student Tab:
      *    - Student ID: "Appears On" = Secondary “Visible for”= All
@@ -47,7 +47,7 @@ test.describe("Profile Editor", () => {
         tester.isGoingTo("Navigate to the profile editor page");
         await profileEditor.goto();
 
-        // Part A: Set up fields on staff profile page
+        // Part A: Set up fields on student profile page
         tester.isGoingTo("Set up fields on Student profile editor page");
         tester.isGoingTo("Click on the student role type");
 
@@ -157,7 +157,7 @@ test.describe("Profile Editor", () => {
     });
 
     /**
-     * Verify Field Visibility Across Profile Pages
+     * Verify fields Availability & Visibility across Profile Pages
      *
      *  Verify that
      *    - Jack Coles: Jana Reed, Alison Chan, Jenni Reed
@@ -165,8 +165,10 @@ test.describe("Profile Editor", () => {
      *    - Jenni Reed: Jana Reed, Jack Coles
      */
 
-    test("Verify fields are not visible on profile pages when no roles are selected", async ({ tester, page }) => {
+    test("Profile Editor fields visibility check", async ({ tester, page }) => {
         const profilePage = new ProfilePage(tester, page);
+        const profileEditor = new ProfileEditor(tester, page);
+
         const teacher = Common.USER_JACKCOLES;
         const student = Common.USER_JANAREED;
         const parent = Common.USER_JENNIREED;
@@ -194,6 +196,7 @@ test.describe("Profile Editor", () => {
         );
         await profilePage.checkFieldIsVisible("Role");
         await profilePage.checkFieldIsVisible("Student ID");
+        await profilePage.checkFieldIsVisible("Year Level");
         await profilePage.checkFieldIsNotVisible("Campus");
 
         // As Jack Coles, Navigating to Eden Reed and verify role, year level  are presented and campus, student id are not presented
@@ -213,7 +216,7 @@ test.describe("Profile Editor", () => {
         tester.isGoingTo("Navigate to Rebecca White profile page");
         await profilePage.goto("24");
         tester.isGoingTo(
-            "As Jack Coles, ensure the Role & Campus fields are presented on Rebecca White's profile page",
+            "As Jack Coles, ensure the role is presented and campus , email are not presented on Rebecca White's profile page",
         );
         await profilePage.checkFieldIsVisible("Role");
         await profilePage.checkFieldIsNotVisible("Email");
@@ -222,7 +225,9 @@ test.describe("Profile Editor", () => {
         // As Jack Coles, Navigating to Jenni Reed and verify role is presented and campus is not presented
         tester.isGoingTo("Navigate to the Jenni profile page");
         await profilePage.goto("27");
-        tester.isGoingTo("As Jack Coles, ensure the Role & Campus fields are presented on Jenni Reed's profile page");
+        tester.isGoingTo(
+            "As Jack Coles, ensure the role is presented and campus is not presented on Jenni Reed's profile page",
+        );
         await profilePage.checkFieldIsVisible("Role");
         await profilePage.checkFieldIsNotVisible("Campus");
 
@@ -253,12 +258,12 @@ test.describe("Profile Editor", () => {
         await profilePage.checkFieldIsNotVisible("Year Level");
         await profilePage.checkFieldIsNotVisible("Campus");
 
-        //  As Jana Reed , Navigating to Jack Coles and verify role is presented and email, Campus fields are not presented
+        //  As Jana Reed , Navigating to Jack Coles and verify role is presented and campus , email fields are not presented
 
         tester.isGoingTo("Navigate to the Jack Coles profile page");
         await profilePage.goto("22");
         tester.isGoingTo(
-            "As Jana Reed, ensure the Role is presented and email, Campus fields are not presented on Jack Coles's profile page",
+            "As Jana Reed, ensure the role is presented and campus, email fields are not presented on Jack Coles's profile page",
         );
         await profilePage.checkFieldIsVisible("Role");
         await profilePage.checkFieldIsNotVisible("Email");
@@ -268,7 +273,7 @@ test.describe("Profile Editor", () => {
         tester.isGoingTo("Navigate to the Jenni profile page");
         await profilePage.goto("27");
         tester.isGoingTo(
-            "As Jana Reed, ensure Role is presented and Campus field are not presented on Jenni Reed's profile page",
+            "As Jana Reed, ensure role is presented and campus field are not presented on Jenni Reed's profile page",
         );
         await profilePage.checkFieldIsVisible("Role");
         await profilePage.checkFieldIsNotVisible("Campus");
@@ -277,38 +282,85 @@ test.describe("Profile Editor", () => {
         tester.isGoingTo("Impersonating as Jenni Reed");
         await tester.impersonate(parent);
 
-        // As Jenni Reed , Navigating to Jack Coles and verify "Role" is presented and student id, year level and campus fields are  not presented
+        // As Jenni Reed , Navigating to Jack Coles and verify Role is presented and campus field is not presented
         tester.isGoingTo("Navigate to the Jack Coles profile page");
         await profilePage.goto("22");
         tester.isGoingTo(
-            "As Jenni Reed, ensure Role is presented and student id, year level & campus fields are  not presented on Jack Coles's profile page",
+            "As Jenni Reed, ensure role is presented and campus field is not presented on Jack Coles's profile page",
         );
         await profilePage.checkFieldIsVisible("Role");
         await profilePage.checkFieldIsNotVisible("Campus");
-        await profilePage.checkFieldIsNotVisible("Student ID");
-        await profilePage.checkFieldIsNotVisible("Year Level");
 
-        // As Jenni Reed , Navigating to Jana Reed and verify "Role" , "Student id" are presented and "Campus" and  Year Level fields are not presented
+        // As Jenni Reed , Navigating to Jana Reed and verify Role , Student id are presented and Campus, Year Level fields are not presented
 
         tester.isGoingTo("Navigate to the Jana Reed profile page");
         await profilePage.goto("25");
         tester.isGoingTo(
-            "As Jenni Reed, ensure Role, Student id are presented and Campus, Year Level fields are not presented on Jana Reed's profile page",
+            "As Jenni Reed, ensure role, student id are presented and campus, year level fields are not presented on Jana Reed's profile page",
         );
         await profilePage.checkFieldIsVisible("Role");
         await profilePage.checkFieldIsVisible("Student ID");
         await profilePage.checkFieldIsNotVisible("Campus");
         await profilePage.checkFieldIsNotVisible("Year Level");
 
-        // As Jenni Reed , Navigating to Eden Reed profile and verify role is presented and campus is not presented
+        // As Jenni Reed , Navigating to Eden Reed profile and verify role, campus are presented and student id, year level are not presented
 
         tester.isGoingTo("Navigate to the Eden Reed profile page");
         await profilePage.goto("6");
         tester.isGoingTo(
-            "As Jenni Reed, ensure role is presented and campus is not presented on Eden Reed's profile page",
+            "As Jenni Reed, ensure role, campus are presented and student id, year level are not presented on Eden Reed's profile page",
         );
         await profilePage.checkFieldIsVisible("Role");
         await profilePage.checkFieldIsNotVisible("Campus");
+        await profilePage.checkFieldIsNotVisible("Student ID");
+        await profilePage.checkFieldIsNotVisible("Year Level");
+
+        // Navigate to the profile editor page to restore fields for student, staff & parent
+        await tester.logout();
+        await tester.loginAsAdmin();
+        tester.isGoingTo("Navigate to the profile editor page to restore fields");
+        await profileEditor.goto();
+
+        // Part A: Restoring fields on student profile editor page
+        tester.isGoingTo("Restore fields on Student profile editor page");
+        tester.isGoingTo("Restore the Student ID field");
+        await profileEditor.clickFieldCog("student", "externalId");
+        await profileEditor.clickFieldCheckbox("student", "externalId", "visibility", "student");
+        await profileEditor.clickFieldCheckbox("student", "externalId", "availability", "2");
+        await profileEditor.clickFieldUpdateButton("student", "externalId");
+        tester.isGoingTo("Restore the Student: Year Level field");
+        await profileEditor.clickFieldCog("student", "yearLevel");
+        await profileEditor.clickFieldCheckbox("student", "yearLevel", "visibility", "self");
+        await profileEditor.clickFieldCheckbox("student", "yearLevel", "visibility", "parent");
+        await profileEditor.clickFieldUpdateButton("student", "yearLevel");
+        tester.isGoingTo("Restore the Student: Campus field");
+        await profileEditor.clickFieldCog("student", "campusCollection");
+        await profileEditor.clickFieldCheckbox("student", "campusCollection", "visibility", "self");
+        await profileEditor.clickFieldCheckbox("student", "campusCollection", "visibility", "staff");
+        await profileEditor.clickFieldCheckbox("student", "campusCollection", "visibility", "parent");
+        await profileEditor.clickFieldUpdateButton("student", "campusCollection");
+
+        // Part B: Restoring fields on staff profile editor page
+        tester.isGoingTo("Restore fields on Staff profile editor page");
+        await profileEditor.clickRoleType("staff");
+        tester.isGoingTo("Restore the Staff: email field");
+        await profileEditor.clickFieldCog("staff", "email");
+        await profileEditor.clickFieldCheckbox("staff", "email", "visibility", "staff");
+        await profileEditor.clickFieldCheckbox("staff", "email", "availability", "2");
+        await profileEditor.clickFieldUpdateButton("staff", "email");
+        tester.isGoingTo("Restore the Staff: Campus field");
+        await profileEditor.clickFieldCog("staff", "campusCollection");
+        await profileEditor.clickFieldCheckbox("staff", "campusCollection", "visibility", "self");
+        await profileEditor.clickFieldCheckbox("staff", "campusCollection", "visibility", "staff");
+        await profileEditor.clickFieldUpdateButton("staff", "campusCollection");
+
+        // Part C: Restoring fields on Parent profile Editor page
+        tester.isGoingTo("Restore fields on Parent profile editor page");
+        await profileEditor.clickRoleType("parent");
+        tester.isGoingTo("Restore the Parent: Role field");
+        await profileEditor.clickFieldCog("parent", "role");
+        await profileEditor.clickFieldCheckbox("parent", "role", "visibility", "student");
+        await profileEditor.clickFieldUpdateButton("parent", "role");
     });
 
     /**
@@ -385,55 +437,6 @@ test.describe("Profile Editor", () => {
         await profilePage.goto(27);
         tester.isGoingTo("Ensure the parent preferred name and last name are presented");
         await profilePage.checkFieldNameIsPresented("Jenni Reed");
-    });
-
-    test("Restore fields on profile Editor", async ({ tester, page }) => {
-        const profileEditor = new ProfileEditor(tester, page);
-
-        // Navigate to the profile editor page
-        tester.isGoingTo("Navigate to the profile editor page");
-        await profileEditor.goto();
-
-        // Part A: Restoring fields on student profile page
-        tester.isGoingTo("Restore fields on Student profile editor page");
-        tester.isGoingTo("Restore the Student ID field");
-        await profileEditor.clickFieldCog("student", "externalId");
-        await profileEditor.clickFieldCheckbox("student", "externalId", "visibility", "student");
-        await profileEditor.clickFieldCheckbox("student", "externalId", "availability", "2");
-        await profileEditor.clickFieldUpdateButton("student", "externalId");
-        tester.isGoingTo("Restore the Student: Year Level field");
-        await profileEditor.clickFieldCog("student", "yearLevel");
-        await profileEditor.clickFieldCheckbox("student", "yearLevel", "visibility", "self");
-        await profileEditor.clickFieldCheckbox("student", "yearLevel", "visibility", "parent");
-        await profileEditor.clickFieldUpdateButton("student", "yearLevel");
-        tester.isGoingTo("Restore the Student: Campus field");
-        await profileEditor.clickFieldCog("student", "campusCollection");
-        await profileEditor.clickFieldCheckbox("student", "campusCollection", "visibility", "student");
-        await profileEditor.clickFieldCheckbox("student", "campusCollection", "availability", "1");
-        await profileEditor.clickFieldCheckbox("student", "campusCollection", "availability", "2");
-        await profileEditor.clickFieldUpdateButton("student", "campusCollection");
-
-        // Part B: Restoring fields on staff profile editor page
-        tester.isGoingTo("Restore fields on Staff profile editor page");
-        await profileEditor.clickRoleType("staff");
-        tester.isGoingTo("Restore the Staff: email field");
-        await profileEditor.clickFieldCog("staff", "email");
-        await profileEditor.clickFieldCheckbox("staff", "email", "visibility", "staff");
-        await profileEditor.clickFieldCheckbox("staff", "email", "availability", "2");
-        await profileEditor.clickFieldUpdateButton("staff", "email");
-        tester.isGoingTo("Restore the Staff: Campus field");
-        await profileEditor.clickFieldCog("staff", "campusCollection");
-        await profileEditor.clickFieldCheckbox("staff", "campusCollection", "visibility", "self");
-        await profileEditor.clickFieldCheckbox("staff", "campusCollection", "visibility", "staff");
-        await profileEditor.clickFieldUpdateButton("staff", "campusCollection");
-
-        // Part C: Restoring fields on Parent profile Editor page
-        tester.isGoingTo("Restore fields on Parent profile editor page");
-        await profileEditor.clickRoleType("parent");
-        tester.isGoingTo("Restore the Parent: Role field");
-        await profileEditor.clickFieldCog("parent", "role");
-        await profileEditor.clickFieldCheckbox("parent", "role", "visibility", "student");
-        await profileEditor.clickFieldUpdateButton("parent", "role");
     });
 
     test.afterAll(async ({ baseTester, db }) => {
