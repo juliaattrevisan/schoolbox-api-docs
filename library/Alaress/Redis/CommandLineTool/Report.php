@@ -108,6 +108,13 @@ class Report extends CliTool\App
     ];
 
     /**
+     * Const for Redis keys without an instance ID.
+     *
+     * This should only include keys for sessions and other systems.
+     */
+    private const NULL_INSTANCE_ID = 'null';
+
+    /**
      * @inheritdoc
      */
     public function getShortOpts(): array
@@ -156,10 +163,17 @@ class Report extends CliTool\App
 
             $this->getLogger()->notice("Scanning redis connection: $instanceName");
             $rawData                   = $this->scanKeys($redis, $instanceName);
-            $aggregated[$instanceName] = $this->aggregateData($rawData);
+            foreach ($rawData as $instanceId => $rawDataByInstanceId) {
+                $aggregated[$instanceName][$instanceId] = $this->aggregateData($rawDataByInstanceId);
+            }
         }
         foreach (self::REDIS_INSTANCES as $instanceName) {
-            $this->renderResults($aggregated[$instanceName], $instanceName);
+            // Sort aggregated data by instance ID
+            $aggregatedByInstance = $aggregated[$instanceName];
+            uksort($aggregatedByInstance, $this->sortByInstanceId(...));
+            foreach ($aggregatedByInstance as $instanceId => $aggregatedByInstanceId) {
+                $this->renderResults($aggregatedByInstanceId, $instanceName, $instanceId);
+            }
         }
     }
 
@@ -187,7 +201,7 @@ class Report extends CliTool\App
                 $processed = $this->processKey($redis, $key, $instanceName);
                 if (isset($processed)) {
                     [$keyPattern, $instanceId, $payload, $ttl, $length, $status] = $processed;
-                    $rawData[$keyPattern][$payload][] = [
+                    $rawData[$instanceId][$keyPattern][$payload][] = [
                         'ttl'    => $ttl,
                         'length' => $length,
                         'status' => $status,
@@ -241,12 +255,12 @@ class Report extends CliTool\App
         // Search this instance's key patterns
         $keyPattern = null;
         $status     = false;
-        $instanceId = null;
+        $instanceId = self::NULL_INSTANCE_ID;
         foreach (Registry::KEY_PATTERNS[$instanceName] as $pattern) {
             if (preg_match("/$pattern/", $key, $matches)) {
                 $keyPattern = $pattern;
                 $status     = 'ok';
-                $instanceId = $matches['instanceId'] ?? null;
+                $instanceId = $matches['instanceId'] ?? self::NULL_INSTANCE_ID;
                 break;
             }
         }
@@ -289,7 +303,7 @@ class Report extends CliTool\App
                         );
                         $keyPattern = $pattern;
                         $status     = 'misp';
-                        $instanceId = $matches['instanceId'] ?? null;
+                        $instanceId = $matches['instanceId'] ?? self::NULL_INSTANCE_ID;
                         break;
                     }
                 }
@@ -392,9 +406,12 @@ class Report extends CliTool\App
      * Renders aggregated raw data into a suitable display format
      *
      * @param array  $aggregated
-     * @param string $instanceName
+     * @param string $instanceName The name of the Redis instance
+     * @param string $instanceId   The ID of the Schoolbox instance, or
+     *                             `self::NULL_INSTANCE_ID` if this data is not
+     *                             associated with an instance.
      */
-    private function renderResults(array $aggregated, string $instanceName): void
+    private function renderResults(array $aggregated, string $instanceName, string $instanceId): void
     {
         // Calculate column widths from widest column header or value
         $columnWidths = [];
@@ -452,11 +469,34 @@ class Report extends CliTool\App
             $this->getOutStream(),
             sprintf(
                 (empty($table)
-                    ? "\nNo usage for instance \"%s\" found."
-                    : "\nUsage for instance \"%s\":"),
+                    ? "\nNo usage for Redis instance \"%s\", Schoolbox instance \"%s\" found."
+                    : "\nUsage for instance \"%s\", Schoolbox instance \"%s\":"),
                 $instanceName,
+                $instanceId,
             )
         );
         fwrite($this->getOutStream(), "\n" . implode("\n", $table) . "\n");
+    }
+
+    /**
+     * Sort method for Schoolbox instance IDs: sort alphabetically, but ensure
+     * the null instance ID is at the end of the list.
+     *
+     * @param string $instanceIdA
+     * @param string $instanceIdB
+     * @return int
+     */
+    private function sortByInstanceId(string $instanceIdA, string $instanceIdB): int
+    {
+        if ($instanceIdA === $instanceIdB) {
+            return 0;
+        }
+        if ($instanceIdA === self::NULL_INSTANCE_ID) {
+            return 1;
+        }
+        if ($instanceIdB === self::NULL_INSTANCE_ID) {
+            return -1;
+        }
+        return strcmp($instanceIdA, $instanceIdB);
     }
 }
