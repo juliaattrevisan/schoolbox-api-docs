@@ -87,7 +87,6 @@
         "qrcode.vue": "~3.6.0",
         "sanitize-html": "~2.14.0",
         "sortablejs": "~1.15.6",
-        "strtotime": "~1.0.0",
         "swiper": "~11.2.2",
         "tinycolor2": "~1.6.0",
         "ts-ebml": "~3.0.1",
@@ -25319,11 +25318,6 @@
         "node": ">=0.1.98"
       }
     },
-    "node_modules/strtotime": {
-      "version": "1.0.0",
-      "resolved": "https://registry.npmjs.org/strtotime/-/strtotime-1.0.0.tgz",
-      "integrity": "sha1-ETAZA12aQC0486jx35KBWd9rbxY="
-    },
     "node_modules/style-loader": {
       "version": "4.0.0",
       "resolved": "https://registry.npmjs.org/style-loader/-/style-loader-4.0.0.tgz",
@@ -47062,11 +47056,6 @@
         "then-read-stream": "^1.5.0",
         "token-types": "^1.0.1"
       }
-    },
-    "strtotime": {
-      "version": "1.0.0",
-      "resolved": "https://registry.npmjs.org/strtotime/-/strtotime-1.0.0.tgz",
-      "integrity": "sha1-ETAZA12aQC0486jx35KBWd9rbxY="
     },
     "style-loader": {
       "version": "4.0.0",
