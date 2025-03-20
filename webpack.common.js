@@ -43,7 +43,7 @@ module.exports = {
             "./www/static/js/editor/jquery.proxy-replacement.js",
 
             // DateTime
-            "./www/static/js/vendors/dayjs/dayjsWithPlugins.ts",
+            "./www/static/js/dayjs/dayjsWithPlugins.ts",
 
             // Files And Resource Browser
             "./www/static/js/socialstream/browser/browser.js",
