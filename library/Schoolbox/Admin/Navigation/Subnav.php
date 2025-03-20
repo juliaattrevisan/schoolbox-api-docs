@@ -363,7 +363,7 @@ class Subnav
                     ],
                     '/adminv2/bulk-feedback-import' => [
                         'name'        => 'Bulk Feedback Import',
-                        'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
+                        'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED) && $userIsSuperuser,
                         'description' => 'Import multiple feedbacks per assessment with a csv file.',
                     ],
                     '/adminv2/bulkCourseImport' => [
