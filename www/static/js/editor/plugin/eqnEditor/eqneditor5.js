@@ -82,7 +82,7 @@ export default class Eqneditor5 extends Plugin {
             viewDocument,
             "dblclick",
             function (e, dat) {
-                console.log(dat);
+                // console.log(dat);
                 if (dat.domTarget.nodeName.toLowerCase() == "img") {
                     var sName = dat.domTarget.src.match(/(gif|svg)\.image\?(.*)/);
                     if (sName != null) this._initEqnEditor(null, sName[2]);
