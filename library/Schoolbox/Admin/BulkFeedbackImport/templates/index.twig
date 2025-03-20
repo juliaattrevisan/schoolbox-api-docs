@@ -17,12 +17,6 @@
                 ajax: {
                     data: {roleTypeID: '{{ roletypeStaff }}'},
                 }
-            })
-            .on('selectize.item_add', function() {
-                bulkFeedbackImportForm.find(':submit').prop('disabled', false).focus();
-            })
-            .on('selectize.item_remove', function() {
-                bulkFeedbackImportForm.find(':submit').prop('disabled', true);
             });
 
         bulkFeedbackImportForm.alaressValidate({
