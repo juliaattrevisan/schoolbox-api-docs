@@ -127,7 +127,7 @@ export default class Eqneditor5 extends Plugin {
          */
         const encoded = inp.replace(/&space;/g, " ");
         const decoded = decodeURIComponent(encoded);
-        this.textarea.insert(decoded);
+        this.textarea.insert(decoded, decoded.length);
     }
 
     _createEqnEditorView() {
