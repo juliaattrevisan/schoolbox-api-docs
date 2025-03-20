@@ -12,6 +12,7 @@ import StatusPage from "@schoolboxTest/playwright/support/page/dueWork/StatusPag
 import AssessmentPage from "@schoolboxTest/playwright/support/page/dueWork/AssessmentPage";
 import ProfilePage from "@schoolboxTest/playwright/support/page/profilePage/ProfilePage";
 import ManageGroup from "@schoolboxTest/playwright/support/page/group/ManageGroup";
+import QuizContentsPage from "@schoolboxTest/playwright/support/page/quiz/QuizContents";
 
 /**
  * covenience function to create a homepage
@@ -68,10 +69,18 @@ async function createClassPage(
     await manageGroup.clickFromRadioButton("role");
     await manageGroup.clickAddMembers();
     await page.waitForTimeout(1000); // wait to be able to update the db
+
+    tester.isGoingTo("Add Eden Reed into the group via manage group page");
+    await manageGroup.clickFromRadioButton("name");
+    await manageGroup.search("Eden Reed");
+    await manageGroup.selectUser(6);
+    await manageGroup.clickFromRadioButton("role");
+    await manageGroup.clickAddMembers();
+    await page.waitForTimeout(1000); // wait to be able to update the db
 }
 
-test.describe("Quiz Create Tests", () => {
-    // Run tests serially, as tests rely on prior tests to have been run.
+test.describe("Quiz Tests: create, modify, delete quiz, submit and vertical review", () => {
+    // Run tests serially, as tests rely on prior tests to have been run
     test.describe.configure({ mode: "serial" });
 
     const folderName = "Test Class Homepage Quiz";
@@ -89,6 +98,7 @@ test.describe("Quiz Create Tests", () => {
         const homepage = new Homepage(page);
         const assessmentForm = new AssessmentForm(tester, page);
         const quiz = new QuizSettingPage(tester, page);
+        const quizContent = new QuizContentsPage(tester, page);
 
         tester.isGoingTo("create a homepage, navigate to the class page and add a quiz component");
         await createClassPage(tester, page, db, folderName);
@@ -105,7 +115,15 @@ test.describe("Quiz Create Tests", () => {
         await quiz.setTitle(quizName);
         await assessmentForm.setWorkType(AssessmentForm.WORKTYPE_ASSESSMENT_TASK);
         await assessmentForm.setMarkType(AssessmentForm.MARK_TYPE_PERCENTAGE);
+        await assessmentForm.setOpenDate(Common.getTodayAtMidnightAM());
+        await assessmentForm.setPublishDate(Common.getTodayAtMidnightAM());
         await quiz.create(quizName);
+
+        tester.isGoingTo("Add a question");
+        await quizContent.clickCreateItemButton();
+        await quizContent.clickAddNewButton();
+        await quizContent.clickQuestionType("Standard Multiple choice question.");
+        await quizContent.clickSaveButton();
 
         tester.isGoingTo("navigate to the homepage and ensure the quiz is presented");
         await homepage.goto(parseInt(folderId, 10));
@@ -156,12 +174,56 @@ test.describe("Quiz Create Tests", () => {
         tester.isGoingTo("navigate to the quiz status page, grade a submission and publish the grade");
         await assessmentStatusPage.goto(quizId);
         await assessmentStatusPage.gradeSubmission(25, 80, "Great work!");
-        tester.isGoingTo("check the grade is published via attempt history and student profile page");
+        tester.isGoingTo("check the grade is published via attempt history and studennt profile page");
         await assessmentPage.goto(quizId, 25);
         await expect(page.locator("table.attempts-table")).toContainText("80 %");
         await profilePage.goto(25);
         await expect(page.locator("li.feed-item").first()).toContainText("80 %");
         await expect(page.locator("li.feed-item").first()).toContainText("Great work!");
+    });
+
+    test("Submit the quiz and vertical review it", async ({ tester, page }) => {
+        const assessmentStatusPage = new StatusPage(tester, page);
+        const assessmentPage = new AssessmentPage(tester, page);
+        const profilePage = new ProfilePage(tester, page);
+        const common = new Common(page);
+
+        if (folderId === null || quizId === null) {
+            throw new Error("Folder ID or Quiz ID not found");
+        }
+
+        tester.isGoingTo("as  Eden Reed submit the Quiz");
+        await tester.impersonate("Eden Reed");
+        await assessmentPage.goto(quizId, 6);
+        tester.isGoingTo("as  Eden Reed Start the Quiz");
+        await common.clickSubmitButton();
+        await expect(page.getByLabel("Review screen").first()).toBeVisible();
+        tester.isGoingTo("as  Eden Reed tick the first question option");
+        await page.locator("li.lrn-mcq-option").first().click();
+        tester.isGoingTo("as  Eden Reed click Review and Finsh buttons");
+        await page.getByLabel("Review screen").last().click();
+        await page.locator("button.lrn_btn.lrn_btn_blue.test-submit.btn-lg.review-screen-focus-element").click();
+        tester.isGoingTo("as  Eden Reed confirm the submission in the dialog");
+        await expect(page.locator("button.test-dialog-save-submit.lrn_btn_blue")).toBeVisible();
+        await page.locator("button.test-dialog-save-submit.lrn_btn_blue").click();
+        await expect(page.locator("h2.subheader").first()).toContainText("Result Summary");
+        tester.isGoingTo("review the attempt");
+        await tester.logout();
+        await tester.loginAsAdmin();
+        await assessmentStatusPage.goto(quizId);
+        await page.locator("a:has-text('Review Attempt')").first().click();
+        await page.locator(StatusPage.SELECTOR_MARK).fill("60");
+        await assessmentStatusPage.verticalQuizReviewComment("This is a vertical review comment");
+        await expect(page.locator("div.alert-box.f-no-margins.success").last()).toBeVisible();
+        await expect(page.locator("div.alert-box.f-no-margins.success").last()).toBeHidden();
+        await page.locator("button.button.full-width.icon-approve.submit").click();
+        await page.locator("button.button.icon-approve.submit").getByText("Yes").click();
+        await page.waitForTimeout(1000);
+        await expect(page.getByTestId("assessment-status-meta-title")).toBeVisible();
+        tester.isGoingTo("check the proper review is presented in the profile page");
+        await profilePage.goto(6);
+        await expect(page.locator("li.feed-item").first()).toContainText("60 %");
+        await expect(page.locator("li.feed-item").first()).toContainText("This is a vertical review comment");
     });
 
     test("Delete a quiz", async ({ tester, page }) => {

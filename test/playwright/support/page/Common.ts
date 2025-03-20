@@ -395,6 +395,16 @@ export default class Common {
     }
 
     /**
+     * Get today's date at 00:00 AM
+     * @returns - the date object
+     */
+    static getTodayAtMidnightAM(): Date {
+        const today = new Date();
+        today.setHours(0, 0, 1, 999);
+        return today;
+    }
+
+    /**
      * Format a date into a string
      * @param date - the date to format
      * @param includeTime - whether to include the time in the formatted date

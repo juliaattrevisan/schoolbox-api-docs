@@ -13,6 +13,8 @@ export default class StatusPage {
 
     static readonly SELECTOR_COMMENT = "textarea[name='comment']";
 
+    static readonly SELECTOR_COMMENT_QUIZ_REVIEW = "textarea[id='final-review-comment-schoolbox-student']";
+
     static readonly SELECTOR_BUTTON_PUBLISH = "a[data-draft='publish']";
 
     static readonly DATA_TEST_JELLY_TOT = "sbx-pop-out-header-options-button";
@@ -80,5 +82,14 @@ export default class StatusPage {
         await expect(this.page.locator(`#header-options a.icon-${option}`)).toBeVisible();
         await this.page.locator(`#header-options a.icon-${option}`).click();
         await this.tester.common.waitForPageLoad();
+    }
+
+    /**
+     * enter a comment in the quiz review vertical
+     * @param comment - overeall comment for the quiz review
+     */
+    async verticalQuizReviewComment(comment: string): Promise<void> {
+        const commentEditor = this.page.locator(StatusPage.SELECTOR_COMMENT_QUIZ_REVIEW);
+        await this.tester.fillCKEditorByLocator(commentEditor, comment);
     }
 }
