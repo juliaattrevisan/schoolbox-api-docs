@@ -361,6 +361,11 @@ class Subnav
                         'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
                         'description' => 'Configure the blocks of time that assessments will be visible within, often called terms or semesters.',
                     ],
+                    '/adminv2/bulk-feedback-import' => [
+                        'name'        => 'Bulk Feedback Import',
+                        'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED) && $userIsSuperuser,
+                        'description' => 'Import multiple feedbacks per assessment with a csv file.',
+                    ],
                     '/adminv2/bulkCourseImport' => [
                         'name'        => 'Bulk Course Import',
                         'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
