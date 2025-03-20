@@ -417,7 +417,7 @@ class Report extends CliTool\App
             foreach ($row as $columnKey => $columnValue) {
                 $columnTitle = self::LABELS[$columnKey];
                 $columnWidths[$columnKey] = max(
-                    strlen((string)$columnValue),
+                    strlen(str_replace(Registry::INSTANCE_ID_MATCH, $instanceId, (string)$columnValue)),
                     $columnWidths[$columnKey] ?? 0,
                     strlen($columnTitle),
                 );
@@ -444,7 +444,12 @@ class Report extends CliTool\App
             }
             foreach ($row as $columnKey => $columnValue) {
                 $width                      = $columnWidths[$columnKey];
-                $table[$nextRow + $rowId][] = str_pad((string)$columnValue, $width, ' ', self::ALIGNMENTS[$columnKey]);
+                $table[$nextRow + $rowId][] = str_pad(
+                    str_replace(Registry::INSTANCE_ID_MATCH, $instanceId, (string)$columnValue),
+                    $width,
+                    ' ',
+                    self::ALIGNMENTS[$columnKey],
+                );
             }
         }
 
