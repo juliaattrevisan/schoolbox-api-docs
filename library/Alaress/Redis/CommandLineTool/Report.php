@@ -186,7 +186,7 @@ class Report extends CliTool\App
                 $this->getLogger()->log($level, "$count) $key");
                 $processed = $this->processKey($redis, $key, $instanceName);
                 if (isset($processed)) {
-                    [$keyPattern, $payload, $ttl, $length, $status] = $processed;
+                    [$keyPattern, $instanceId, $payload, $ttl, $length, $status] = $processed;
                     $rawData[$keyPattern][$payload][] = [
                         'ttl'    => $ttl,
                         'length' => $length,
@@ -208,9 +208,9 @@ class Report extends CliTool\App
      * @param string                 $instanceName The name of the instance to
      *                                             scan: used to filter the list
      *                                             of keys to process
-     * @return array{string, string, int, int, string}|null
-     *         [key pattern, payload type, ttl, length, status], or null if this
-     *         key is to be ignored completely in the report.
+     * @return array{string, string, string, int, int, string}|null
+     *         [key pattern, instance ID, payload type, ttl, length, status],
+     *         or null if this key is to be ignored completely in the report.
      *         (This happens if this key is not in `$instanceName`'s keys, but
      *          is in an alias' keys.)
      */
@@ -241,10 +241,12 @@ class Report extends CliTool\App
         // Search this instance's key patterns
         $keyPattern = null;
         $status     = false;
+        $instanceId = null;
         foreach (Registry::KEY_PATTERNS[$instanceName] as $pattern) {
-            if (preg_match("/$pattern/", $key)) {
+            if (preg_match("/$pattern/", $key, $matches)) {
                 $keyPattern = $pattern;
                 $status     = 'ok';
+                $instanceId = $matches['instanceId'] ?? null;
                 break;
             }
         }
@@ -258,7 +260,7 @@ class Report extends CliTool\App
                     continue;
                 }
                 foreach ($patterns as $pattern) {
-                    if (preg_match("/$pattern/", $key)) {
+                    if (preg_match("/$pattern/", $key, $matches)) {
                         // Check each alias
                         // @phpstan-ignore-next-line: this is currently empty, but may not always be
                         foreach (self::REDIS_INSTANCE_ALIASES as $alias) {
@@ -287,6 +289,7 @@ class Report extends CliTool\App
                         );
                         $keyPattern = $pattern;
                         $status     = 'misp';
+                        $instanceId = $matches['instanceId'] ?? null;
                         break;
                     }
                 }
@@ -299,7 +302,7 @@ class Report extends CliTool\App
             $status     = 'unrec';
             $this->getLogger()->warning("Unrecognised key: $key");
         }
-        return [$keyPattern, $type->getPayload(), $ttl, $length, $status];
+        return [$keyPattern, $instanceId, $type->getPayload(), $ttl, $length, $status];
     }
 
 
