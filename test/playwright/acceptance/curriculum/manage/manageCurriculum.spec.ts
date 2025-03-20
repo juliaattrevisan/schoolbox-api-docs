@@ -245,8 +245,6 @@ test.describe("Manage Curriculum Tests", () => {
 
         await db.updateInDatabase("curriculum_node", { deleted_at: null }, { "name like": "Year 12 French" });
 
-        await db.updateInDatabase("curriculum_node", { enabled: 1 }, { "name like": "Year 4 History" });
-
-        await db.updateInDatabase("curriculum_node", { enabled: 1 }, { "name like": "Year 9 History" });
+        await db.updateInDatabase("curriculum_node", { enabled: 1 });
     });
 });

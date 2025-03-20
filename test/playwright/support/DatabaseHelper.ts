@@ -152,11 +152,10 @@ export default class DatabaseHelper {
             ...Object.values(data),
             ...Object.values(criteria).filter((value) => value !== null && value !== "NOT NULL"),
         ];
-
-        await this.pool.execute(
-            `UPDATE ${table} SET ${dataKeys.join(", ")} WHERE ${criteriaKeys.join(" AND ")}`,
-            values,
-        );
+        // only add WHERE clause if there are criteria
+        const whereQuery = criteriaKeys.length > 0 ? ` WHERE ${criteriaKeys.join(" AND ")}` : "";
+        // execute the update query
+        await this.pool.execute(`UPDATE ${table} SET ${dataKeys.join(", ")}${whereQuery}`, values);
     }
 
     /**
