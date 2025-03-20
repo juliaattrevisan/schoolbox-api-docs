@@ -5,16 +5,16 @@
  * https://day.js.org/
  */
 
-import dayjs from 'dayjs';
-import advancedFormat from 'dayjs/plugin/advancedFormat';
-import customParseFormat from 'dayjs/plugin/customParseFormat';
-import duration from 'dayjs/plugin/duration';
-import relativeTime from 'dayjs/plugin/relativeTime';
-import isBetween from 'dayjs/plugin/isBetween';
-import arraySupport from 'dayjs/plugin/arraySupport';
-import weekOfYear from 'dayjs/plugin/weekOfYear';
-import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
-import naturalTimePlugin from './naturalTimePlugin';
+import dayjs from "dayjs";
+import advancedFormat from "dayjs/plugin/advancedFormat";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+import duration from "dayjs/plugin/duration";
+import relativeTime from "dayjs/plugin/relativeTime";
+import isBetween from "dayjs/plugin/isBetween";
+import arraySupport from "dayjs/plugin/arraySupport";
+import weekOfYear from "dayjs/plugin/weekOfYear";
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
+import naturalTimePlugin from "./naturalTimePlugin";
 
 // AdvancedFormat extends dayjs().format API to supply more format options: https://day.js.org/docs/en/plugin/advanced-format
 dayjs.extend(advancedFormat);
