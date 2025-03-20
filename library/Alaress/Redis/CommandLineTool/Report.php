@@ -154,25 +154,25 @@ class Report extends CliTool\App
         }
 
         $aggregated = [];
-        foreach (self::REDIS_INSTANCES as $instanceName) {
-            $redis = Redis::getClientInstance($instanceName);
+        foreach (self::REDIS_INSTANCES as $redisInstanceName) {
+            $redis = Redis::getClientInstance($redisInstanceName);
             if (!$redis) {
-                $this->getLogger()->error("Unable to fetch redis connection: $instanceName");
+                $this->getLogger()->error("Unable to fetch redis connection: $redisInstanceName");
                 exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
             }
 
-            $this->getLogger()->notice("Scanning redis connection: $instanceName");
-            $rawData                   = $this->scanKeys($redis, $instanceName);
+            $this->getLogger()->notice("Scanning redis connection: $redisInstanceName");
+            $rawData                   = $this->scanKeys($redis, $redisInstanceName);
             foreach ($rawData as $instanceId => $rawDataByInstanceId) {
-                $aggregated[$instanceName][$instanceId] = $this->aggregateData($rawDataByInstanceId);
+                $aggregated[$redisInstanceName][$instanceId] = $this->aggregateData($rawDataByInstanceId);
             }
         }
-        foreach (self::REDIS_INSTANCES as $instanceName) {
+        foreach (self::REDIS_INSTANCES as $redisInstanceName) {
             // Sort aggregated data by instance ID
-            $aggregatedByInstance = $aggregated[$instanceName];
+            $aggregatedByInstance = $aggregated[$redisInstanceName];
             uksort($aggregatedByInstance, $this->sortByInstanceId(...));
             foreach ($aggregatedByInstance as $instanceId => $aggregatedByInstanceId) {
-                $this->renderResults($aggregatedByInstanceId, $instanceName, $instanceId);
+                $this->renderResults($aggregatedByInstanceId, $redisInstanceName, $instanceId);
             }
         }
     }
@@ -181,13 +181,12 @@ class Report extends CliTool\App
     /**
      * Scans all keys in redis, groups by key pattern, and gets each key's TTL and data size
      *
-     * @param Predis\ClientInterface $redis
-     * @param string                 $instanceName The name of the instance to
-     *                                             scan: used to filter the list
-     *                                             of keys to process
+     * @param Predis\ClientInterface   $redis
+     * @param string&Redis::INSTANCE_* $redisInstanceName The name of the Redis instance to scan: used to filter the
+     *                                                    list of keys to process.
      * @return array
      */
-    private function scanKeys(Predis\ClientInterface $redis, string $instanceName): array
+    private function scanKeys(Predis\ClientInterface $redis, string $redisInstanceName): array
     {
         $rawData = [];
         $cursor  = null;
@@ -198,7 +197,7 @@ class Report extends CliTool\App
                 // Log every 1000 at a higher level to show progression at less verbosity
                 $level = $count % 1000 === 0 ? Logger::NOTICE : Logger::DEBUG;
                 $this->getLogger()->log($level, "$count) $key");
-                $processed = $this->processKey($redis, $key, $instanceName);
+                $processed = $this->processKey($redis, $key, $redisInstanceName);
                 if (isset($processed)) {
                     [$keyPattern, $instanceId, $payload, $ttl, $length, $status] = $processed;
                     $rawData[$instanceId][$keyPattern][$payload][] = [
@@ -217,18 +216,17 @@ class Report extends CliTool\App
     /**
      * Get TTL + DataSize for a single redis key, aggregate by key pattern
      *
-     * @param Predis\ClientInterface $redis
-     * @param string                 $key
-     * @param string                 $instanceName The name of the instance to
-     *                                             scan: used to filter the list
-     *                                             of keys to process
+     * @param Predis\ClientInterface   $redis
+     * @param string                   $key                The key to process.
+     * @param string&Redis::INSTANCE_* $redisInstanceName  The name of the Redis instance to scan: used to filter the
+     *                                                     list of keys to process.
      * @return array{string, string, string, int, int, string}|null
      *         [key pattern, instance ID, payload type, ttl, length, status],
      *         or null if this key is to be ignored completely in the report.
      *         (This happens if this key is not in `$instanceName`'s keys, but
      *          is in an alias' keys.)
      */
-    private function processKey(Predis\ClientInterface $redis, string $key, string $instanceName): ?array
+    private function processKey(Predis\ClientInterface $redis, string $key, string $redisInstanceName): ?array
     {
         /** @var Predis\Response\Status $type */
         $type = $redis->type($key);
@@ -256,7 +254,7 @@ class Report extends CliTool\App
         $keyPattern = null;
         $status     = false;
         $instanceId = self::NULL_INSTANCE_ID;
-        foreach (Registry::KEY_PATTERNS[$instanceName] as $pattern) {
+        foreach (Registry::KEY_PATTERNS[$redisInstanceName] as $pattern) {
             if (preg_match("/$pattern/", $key, $matches)) {
                 $keyPattern = $pattern;
                 $status     = 'ok';
@@ -270,7 +268,7 @@ class Report extends CliTool\App
         // instance, report on it
         if (!isset($keyPattern)) {
             foreach (Registry::KEY_PATTERNS as $keyPatternInstanceName => $patterns) {
-                if ($keyPatternInstanceName === $instanceName) {
+                if ($keyPatternInstanceName === $redisInstanceName) {
                     continue;
                 }
                 foreach ($patterns as $pattern) {
@@ -278,14 +276,14 @@ class Report extends CliTool\App
                         // Check each alias
                         // @phpstan-ignore-next-line: this is currently empty, but may not always be
                         foreach (self::REDIS_INSTANCE_ALIASES as $alias) {
-                            if (in_array($instanceName, $alias) && in_array($keyPatternInstanceName, $alias)) {
+                            if (in_array($redisInstanceName, $alias) && in_array($keyPatternInstanceName, $alias)) {
                                 // This key pattern is referred to in an alias:
                                 // ignore it completely
                                 $this->getLogger()->debug(
                                     sprintf(
                                         'Aliased key: %s found in %s (expected in alias %s)',
                                         $key,
-                                        $instanceName,
+                                        $redisInstanceName,
                                         $keyPatternInstanceName,
                                     )
                                 );
@@ -297,7 +295,7 @@ class Report extends CliTool\App
                             sprintf(
                                 'Misplaced key: %s found in %s (expected in %s)',
                                 $key,
-                                $instanceName,
+                                $redisInstanceName,
                                 $keyPatternInstanceName,
                             )
                         );
@@ -406,12 +404,12 @@ class Report extends CliTool\App
      * Renders aggregated raw data into a suitable display format
      *
      * @param array  $aggregated
-     * @param string $instanceName The name of the Redis instance
-     * @param string $instanceId   The ID of the Schoolbox instance, or
-     *                             `self::NULL_INSTANCE_ID` if this data is not
-     *                             associated with an instance.
+     * @param string $redisInstanceName The name of the Redis instance
+     * @param string $instanceId        The ID of the Schoolbox instance, or
+     *                                  `self::NULL_INSTANCE_ID` if this data is
+     *                                  not associated with an instance.
      */
-    private function renderResults(array $aggregated, string $instanceName, string $instanceId): void
+    private function renderResults(array $aggregated, string $redisInstanceName, string $instanceId): void
     {
         // Calculate column widths from widest column header or value
         $columnWidths = [];
@@ -465,14 +463,17 @@ class Report extends CliTool\App
             $table[$idx] = "|" . implode('|', $row) . '|';
         }
 
+        $instanceIdOutput = $instanceId === self::NULL_INSTANCE_ID
+            ? 'no Schoolbox instance'
+            : sprintf('Schoolbox instance "%s"', $instanceId);
         fwrite(
             $this->getOutStream(),
             sprintf(
                 (empty($table)
-                    ? "\nNo usage for Redis instance \"%s\", Schoolbox instance \"%s\" found."
-                    : "\nUsage for instance \"%s\", Schoolbox instance \"%s\":"),
-                $instanceName,
-                $instanceId,
+                    ? "\nNo usage for Redis instance \"%s\", %s found."
+                    : "\nUsage for instance \"%s\", %s:"),
+                $redisInstanceName,
+                $instanceIdOutput,
             )
         );
         fwrite($this->getOutStream(), "\n" . implode("\n", $table) . "\n");
