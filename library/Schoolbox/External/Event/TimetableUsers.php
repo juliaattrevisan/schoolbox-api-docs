@@ -166,7 +166,12 @@ class TimetableUsers
                 }
 
                 /* Get a list of events between $startTimestamp and $endTimestamp
-                 * along with an ordered list of their overrides
+                 * along with their overrides.
+                 *
+                 * Secondary ordering of overrides by their sequence _was_ done,
+                 * but is no longer: this is because doing so created a temp
+                 * table, significantly slowing the query. Instead, we now order
+                 * overrides when processing the event list.
                  */
                 $query = "
                     SELECT se.id, se.code, seuo.*
@@ -176,7 +181,7 @@ class TimetableUsers
                     AND se.classification = :classification
                     AND se.start_at >= :from
                     AND se.start_at <= :to
-                    ORDER BY se.id ASC, seuo.sequence ASC
+                    ORDER BY se.id ASC
                 ";
 
                 $statement = $this->eventMapper->getDatabase()->prepare($query);
@@ -201,7 +206,7 @@ class TimetableUsers
                  *   manifest instead, but I was overridden
                  */
                 while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-                    $stack[$row['code']]['overrides'][] = [
+                    $stack[$row['code']]['overrides'][$row['sequence']][] = [
                         'external_id' => $row['external_id'],
                         'action' => $row['action']
                     ];
@@ -211,7 +216,7 @@ class TimetableUsers
                  */
                 $manifest = $this->applicator->apply(
                     $stack[$classCode]['usuals'] ?? [],
-                    $stack[$classCode]['overrides'] ?? [],
+                    $this->reorderOverrides($stack[$classCode]['overrides'] ?? []),
                 );
 
                 /* Since we're explicitly looking for staff members in this method
@@ -622,5 +627,23 @@ class TimetableUsers
             [$startDatetime, $finishDatetime, $folderCodes],
             \Config::get('external_cache_timeout')
         );
+    }
+
+    /**
+     * Reorder overrides, provided as an array of array of overrides keyed by
+     * sequence number, into a single ordered list of overrides.
+     *
+     * @param array{int, array<array{external_id: string, action: string}>} $overrides key: sequence number,
+     *                                                                                 value: a list of overrides.
+     * @return array<array{external_id: string, action: string}>
+     */
+    private function reorderOverrides(array $overrides): array
+    {
+        $reorderedOverrides = [];
+        ksort($overrides, SORT_NUMERIC);
+        foreach ($overrides as $overridesBySequence) {
+            $reorderedOverrides = array_merge($reorderedOverrides, $overridesBySequence);
+        }
+        return $reorderedOverrides;
     }
 }
