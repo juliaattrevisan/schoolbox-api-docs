@@ -187,7 +187,8 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
             sprintf(" WHERE (%s)", implode(') AND (', $sqlFilter)) :
             '';
 
-        $joins = "LEFT JOIN user AS impersonator ON impersonator.username = user_assume_log.user";
+        $joins = "LEFT JOIN user AS impersonator ON impersonator.username = user_assume_log.user
+                  LEFT JOIN user AS impersonated ON impersonated.username = user_assume_log.assumed";
 
         // Get count separately from data
         $countStatement = $this->db->prepare("SELECT COUNT(*) FROM user_assume_log $joins $sqlFilterString");
@@ -208,7 +209,12 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
                         impersonator.title AS impersonator_title,
                         impersonator.firstname AS impersonator_firstname,
                         impersonator.preferred_name AS impersonator_preferred_name,
-                        impersonator.lastname AS impersonator_lastname
+                        impersonator.lastname AS impersonator_lastname,
+                        impersonated.id AS impersonated_id,
+                        impersonated.title AS impersonated_title,
+                        impersonated.firstname AS impersonated_firstname,
+                        impersonated.preferred_name AS impersonated_preferred_name,
+                        impersonated.lastname AS impersonated_lastname
                       FROM user_assume_log
                       $joins
                       $sqlFilterString
@@ -279,11 +285,20 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
                     'lastname'       => $log['impersonator_lastname'],
                 );
 
+                $impersonatedNameShards = array(
+                    'title'          => $log['impersonated_title'],
+                    'firstname'      => $log['impersonated_firstname'],
+                    'preferred_name' => $log['impersonated_preferred_name'],
+                    'lastname'       => $log['impersonated_lastname'],
+                );
+
                 $page->setVar(
                     array(
-                        'IMPERSONATOR_ID'    => Scrub::text($log['impersonator_id']),
                         'DATE'               => Scrub::text($log['created_at']),
+                        'IMPERSONATOR_ID'    => Scrub::text($log['impersonator_id']),
                         'IMPERSONATOR'       => Scrub::text($userHandler->formatName($impersonatorNameShards)),
+                        'IMPERSONATED_ID'    => Scrub::text($log['impersonated_id']),
+                        'IMPERSONATED'       => Scrub::text($userHandler->formatName($impersonatedNameShards)),
                         'IP'                 => Scrub::text($log['ip']),
                     )
                 );

@@ -4,6 +4,7 @@
             <tr>
                 <th><a href="/adminv2/reports/{SORT_BASE}/date/{SORT_DATE_DIR}">Date</a></th>
                 <th><a href="/adminv2/reports/{SORT_BASE}/user/{SORT_USER_DIR}">Impersonator</a></th>
+                <th><a href="/adminv2/reports/{SORT_BASE}/user/{SORT_USER_DIR}">Impersonated</a></th>
                 <th><a href="/adminv2/reports/{SORT_BASE}/ip/{SORT_IP_DIR}">Originating IP</a></th>
             </tr>
         </thead>
@@ -12,6 +13,7 @@
         <tr>
             <td>{DATE}</td>
             <td><a href="/search/user/{IMPERSONATOR_ID}">{IMPERSONATOR}</a></td>
+            <td><a href="/search/user/{IMPERSONATED_ID}">{IMPERSONATED}</a></td>
             <td>{IP}</td>
         </tr>
         <!-- END activity -->
