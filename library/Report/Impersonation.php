@@ -78,9 +78,9 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
     {
         // set blocks
         $this->db = Factory::getInstanceInternal();
-        $this->getPage()->setFile('activity_t', 'adminv2/report/login.html');
+        $this->getPage()->setFile('activity_t', 'adminv2/report/impersonation.html');
         $this->getPage()->setBlock('activity_t', 'activity', 'activity_block');
-        $this->getPage()->setTitle('Login Report');
+        $this->getPage()->setTitle('Impersonation Report');
     }
 
     public function setIndexID($groupID)
@@ -95,7 +95,7 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
 
     public function getReportTitle()
     {
-        return "Login";
+        return "Impersonation";
     }
 
     public function setFields($fields)
@@ -275,7 +275,7 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
                 array(
                     'COUNTABLE_COUNT' => $this->dataCount,
                     'REPORT_TITLE'    => Scrub::text($this->getReportTitle()),
-                    'SORT_BASE'       => "login/{$this->getIndexID()}",
+                    'SORT_BASE'       => "Impersonation/{$this->getIndexID()}",
                     'COUNTABLE'       => 'events'
                 )
             );
