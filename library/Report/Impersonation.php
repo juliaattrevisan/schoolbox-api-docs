@@ -18,8 +18,9 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
 
     // visible field mapping: index => human readable
     private $fields = array(
-        'user_assume_log.created_at' => 'user_assume_log.created_at',
-        'user'       => 'user',
+        'created_at' => 'created_at',
+        'impersonator' => 'impersonator',
+        'impersonated' => 'impersonated',
         'ip'         => 'ip',
     );
 
@@ -34,10 +35,10 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
     );
 
     // fields that we will permit sorting on
-    private $sortable = array('user_assume_log.created_at', 'user', 'ip');
+    private $sortable = array('created_at');
 
     // default sorting if none provided
-    private $defaultOrderBy = 'user_assume_log.created_at';
+    private $defaultOrderBy = 'created_at';
 
     // fields we permit filtering by
     private $filterable = array(
@@ -209,7 +210,7 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
 
         $dataQuery = "SELECT
                         user_assume_log.user,
-                        user_assume_log.created_at,
+                        user_assume_log.created_at AS created_at,
                         ip,
                         impersonator.id AS impersonator_id,
                         impersonator.title AS impersonator_title,
