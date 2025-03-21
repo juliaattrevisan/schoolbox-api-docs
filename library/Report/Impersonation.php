@@ -204,11 +204,11 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
                         user_assume_log.user,
                         user_assume_log.created_at,
                         ip,
-                        user.id AS user_id,
-                        title,
-                        firstname,
-                        preferred_name,
-                        lastname
+                        user.id AS impersonator_id,
+                        title AS impersonator_title,
+                        firstname AS impersonator_firstname,
+                        preferred_name AS impersonator_preferred_name,
+                        lastname AS impersonator_lastname
                       FROM user_assume_log
                       $joins
                       $sqlFilterString
@@ -273,18 +273,17 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
                 $userHandler = new User();
 
                 $nameShards = array(
-                    'title'          => $log['title'],
-                    'firstname'      => $log['firstname'],
-                    'preferred_name' => $log['preferred_name'],
-                    'lastname'       => $log['lastname']
+                    'title'          => $log['impersonator_title'],
+                    'firstname'      => $log['impersonator_firstname'],
+                    'preferred_name' => $log['impersonator_preferred_name'],
+                    'lastname'       => $log['impersonator_lastname'],
                 );
 
                 $page->setVar(
                     array(
-                        'UID'                => Scrub::text($log['user_id']),
+                        'IMPERSONATOR_ID'    => Scrub::text($log['impersonator_id']),
                         'DATE'               => Scrub::text($log['created_at']),
-                        // 'USERNAME'           => Scrub::text($log['username']),
-                        'DISPLAYNAME'        => Scrub::text($userHandler->formatName($nameShards)),
+                        'IMPERSONATOR'       => Scrub::text($userHandler->formatName($nameShards)),
                         'IP'                 => Scrub::text($log['ip']),
                     )
                 );
