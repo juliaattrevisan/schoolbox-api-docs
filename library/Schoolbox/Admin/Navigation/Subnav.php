@@ -837,7 +837,7 @@ class Subnav
                         'visible'     => true,
                         'description' => 'Setup a new user account for use in the platform.',
                     ],
-                    '/adminv2/reports/impersonation' => [
+                    '/adminv2/reports/impersonation/all' => [
                         'name'        => 'Impersonation Log',
                         'visible'     => true,
                         'description' => 'View a log of all users who have impersonated other users.',
