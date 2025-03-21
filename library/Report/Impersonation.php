@@ -41,10 +41,11 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
 
     // fields we permit filtering by
     private $filterable = array(
-        'user'       => 'username, real name or partial',
-        'ip'         => 'x.x.x.x',
-        'after'      => 'eg. 2012-01-06, yesterday',
-        'before'     => 'eg. July 1, 3 days ago'
+        'impersonator' => 'username, real name or partial',
+        'impersonated' => 'username, real name or partial',
+        'Originating IP' => 'x.x.x.x',
+        'after'        => 'eg. 2012-01-06, yesterday',
+        'before'       => 'eg. July 1, 3 days ago'
     );
 
     /**
@@ -159,10 +160,15 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
         foreach ($resultFilter as $key => $value) {
             if (in_array($key, $this->getFilterFields())) {
                 // custom filter by user
-                if ($key == 'user') {
-                    $sqlFilter[] = "user.username LIKE :value
-                                        OR user.firstname LIKE :value
-                                        OR user.lastname LIKE :value";
+                if ($key == 'impersonator') {
+                    $sqlFilter[] = "impersonator.username LIKE :value
+                                        OR impersonator.firstname LIKE :value
+                                        OR impersonator.lastname LIKE :value";
+                    $params['value'] = '%' . $this->db->getQuoter()->escapeForLike($value) . '%';
+                } elseif ($key == 'impersonated') {
+                    $sqlFilter[] = "impersonated.username LIKE :value
+                                        OR impersonated.firstname LIKE :value
+                                        OR impersonated.lastname LIKE :value";
                     $params['value'] = '%' . $this->db->getQuoter()->escapeForLike($value) . '%';
                 } elseif ($key == 'after') {
                     if ($date = strtotime($value)) {
