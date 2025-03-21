@@ -19,7 +19,6 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
     // visible field mapping: index => humanreadable
     private $fields = array(
         'date'       => 'date',
-        'login'      => 'action',
         'user'       => 'user',
         'role'       => 'role',
         'ip'         => 'ip',
@@ -28,7 +27,6 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
     // csv mappings
     private $csvFields = array(
         'date'       => 'date',
-        'login'      => 'login success',
         'username'   => 'username',
         'user'       => 'user id',
         'firstname'  => 'firstname',
@@ -213,7 +211,6 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
         $dataQuery = "SELECT
                         `login_log`.`username`,
                         `date`,
-                        login,
                         ip,
                         user.id AS user,
                         title,
