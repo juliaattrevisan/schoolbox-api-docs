@@ -13,7 +13,6 @@
  */
 class Report_Factory
 {
-
     /**
      * Allowed report types
      */
