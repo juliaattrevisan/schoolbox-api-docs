@@ -12,7 +12,7 @@ import StatusPage from "@schoolboxTest/playwright/support/page/dueWork/StatusPag
 import AssessmentPage from "@schoolboxTest/playwright/support/page/dueWork/AssessmentPage";
 import ProfilePage from "@schoolboxTest/playwright/support/page/profilePage/ProfilePage";
 import ManageGroup from "@schoolboxTest/playwright/support/page/group/ManageGroup";
-import QuizContentsPage from "@schoolboxTest/playwright/support/page/quiz/QuizContents";
+// import QuizContentsPage from "@schoolboxTest/playwright/support/page/quiz/QuizContents";
 // import dayjs from "dayjs";
 
 /**
