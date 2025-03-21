@@ -12,6 +12,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Engagement\Login;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\LogMapper;
 use Schoolbox\Admin\Home\SamlCertHelper;
 
@@ -23,7 +24,22 @@ $kernel->setupSentryTrace(__FILE__);
 $page = $kernel->get('sitePage');
 $page->initSession();
 
-if (!$_SESSION['user']->isSuperuser()) {
+/**
+ * only super or service moderators
+ */
+if (
+    !$_SESSION['user']->isSuperuser() &&
+    !$_SESSION['user']->hasServicePermission(UserAccess::SERVICE_CMS, UserAccess::ACCESS_FULL) &&
+    !$_SESSION['user']->hasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL) &&
+    !$_SESSION['user']->hasServicePermission(UserAccess::SERVICE_CALENDAR, UserAccess::ACCESS_FULL) &&
+    !$_SESSION['user']->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL) &&
+    !$_SESSION['user']->hasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL) &&
+    !$_SESSION['user']->hasServicePermission(UserAccess::SERVICE_BADGE, UserAccess::ACCESS_FULL) &&
+    !$_SESSION['user']->hasServicePermission(UserAccess::SERVICE_CMS, UserAccess::ACCESS_FULL) &&
+    !$_SESSION['user']->hasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL) &&
+    !$_SESSION['user']->hasServicePermission(UserAccess::SERVICE_TIMETABLE, UserAccess::ACCESS_FULL)
+)
+{
     throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
