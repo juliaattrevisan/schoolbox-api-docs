@@ -551,7 +551,7 @@ class TimetableUsers
                         ];
                     }
 
-                    $stack[$row['eventId']]['overrides'][] = [
+                    $stack[$row['eventId']]['overrides'][$row['sequence']][] = [
                         'external_id' => $row['external_id'],
                         'action'      => $row['action'],
                     ];
@@ -560,7 +560,10 @@ class TimetableUsers
                 /* Perform mutations
                  */
                 foreach ($stack as $eventId => &$data) {
-                    $data['manifest'] = $this->applicator->apply($data['usuals'], $data['overrides']);
+                    $data['manifest'] = $this->applicator->apply(
+                        $data['usuals'],
+                        $this->reorderOverrides($data['overrides']),
+                    );
 
                     /* Only care about events the current user is in today
                      */
@@ -596,7 +599,10 @@ class TimetableUsers
                 $stack = [];
 
                 /* Get a list of events between $startTimestamp and $endTimestamp
-                 * along with an ordered list of their overrides
+                 * along with a list of their overrides.
+                 *
+                 * As with the query in `findTeachersForClassCode`: this query
+                 * no longer has a secondary ordering on `sequence`.
                  */
                 $query = "
                     SELECT se.id AS eventId, se.code, seuo.*
@@ -619,7 +625,7 @@ class TimetableUsers
                     $params   = array_merge($params, $bindings->getParams());
                 }
 
-                $query .= " ORDER BY se.id ASC, seuo.sequence ASC";
+                $query .= " ORDER BY se.id ASC ASC";
 
                 $statement = $this->eventMapper->getDatabase()->prepare($query);
                 $statement->execute($params);
