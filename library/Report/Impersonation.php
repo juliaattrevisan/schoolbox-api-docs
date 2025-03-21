@@ -20,7 +20,6 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
     private $fields = array(
         'date'       => 'date',
         'user'       => 'user',
-        'role'       => 'role',
         'ip'         => 'ip',
     );
 
@@ -31,13 +30,11 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
         'user'       => 'user id',
         'firstname'  => 'firstname',
         'lastname'   => 'lastname',
-        'role'       => 'role',
-        'roletype'   => 'roletype',
         'ip'         => 'originating ip address',
     );
 
     // fields that we will permit sorting on
-    private $sortable = array('date', 'user', 'ip', 'role');
+    private $sortable = array('date', 'user', 'ip');
 
     // default sorting if none provided
     private $defaultOrderBy = 'date';
@@ -45,7 +42,6 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
     // fields we permit filtering by
     private $filterable = array(
         'user'       => 'username, realname or partial',
-        'role'       => '',
         'ip'         => 'x.x.x.x',
         'after'      => 'eg. 2012-01-06, yesterday',
         'before'     => 'eg. July 1, 3 days ago'
@@ -162,10 +158,6 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
         $params = array();
         foreach ($resultFilter as $key => $value) {
             if (in_array($key, $this->getFilterFields())) {
-                if ($key == 'role') {
-                    $key = 'name'; //convert role to group name
-                }
-
                 // custom filter by user
                 if ($key == 'user') {
                     $sqlFilter[] = "user.username LIKE :value
@@ -195,7 +187,7 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
             sprintf(" WHERE (%s)", implode(') AND (', $sqlFilter)) :
             '';
 
-        $joins = "LEFT JOIN `user` ON `user`.`username` = login_log.username AND `user`.`deleted_at` IS NULL LEFT JOIN `groups` ON `user`.`group_id` = `groups`.id";
+        $joins = "LEFT JOIN `user` ON `user`.`username` = login_log.username AND `user`.`deleted_at` IS NULL";
 
         // Get count separately from data
         $countStatement = $this->db->prepare("SELECT COUNT(*) FROM login_log $joins $sqlFilterString");
@@ -216,10 +208,7 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
                         title,
                         firstname,
                         preferred_name,
-                        lastname,
-                        `groups`.name as role,
-                        `groups`.group_type as roletype,
-                        jwt_id
+                        lastname
                       FROM login_log
                       $joins
                       $sqlFilterString
@@ -297,7 +286,6 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
                         'USERNAME'           => Scrub::text($log['username']),
                         'DISPLAYNAME'        => Scrub::text($userHandler->formatName($nameShards)),
                         'IP'                 => Scrub::text($log['ip']),
-                        'ROLE'               => Scrub::text($log['role']),
                     )
                 );
 
