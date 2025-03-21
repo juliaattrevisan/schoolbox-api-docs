@@ -179,7 +179,7 @@ test.describe("Profile Editor", () => {
 
         // As Jack Coles , Navigating to own profile and verify role, email are presented and campus is not presented
         tester.isGoingTo("Navigate to the Jack Coles profile page");
-        await profilePage.goto("22");
+        await profilePage.goto(22);
         tester.isGoingTo(
             "As Jack Coles, ensure role, email are presented and campus is not presented on his own profile page",
         );
@@ -190,7 +190,7 @@ test.describe("Profile Editor", () => {
         // As Jack Coles , Navigating to Jana Reed and verify role, student id, year level are presented and campus is not presented
 
         tester.isGoingTo("Navigate to the Jana Reed profile page");
-        await profilePage.goto("25");
+        await profilePage.goto(25);
         tester.isGoingTo(
             "As Jack Coles, ensure role, student id, year level are presented and campus is not presented on Jana Reed's profile page",
         );
@@ -202,7 +202,7 @@ test.describe("Profile Editor", () => {
         // As Jack Coles, Navigating to Eden Reed and verify role, year level  are presented and campus, student id are not presented
 
         tester.isGoingTo("Navigate to the Eden Reed profile page");
-        await profilePage.goto("6");
+        await profilePage.goto(6);
         tester.isGoingTo(
             "As Jack coles, ensure role, year level  are presented and campus, student id are not presented on Eden Reed's profile page",
         );
@@ -214,7 +214,7 @@ test.describe("Profile Editor", () => {
         // As Jack Coles, Navigating to Rebecca White and verify role is presented and campus, email are not presented
 
         tester.isGoingTo("Navigate to Rebecca White profile page");
-        await profilePage.goto("24");
+        await profilePage.goto(24);
         tester.isGoingTo(
             "As Jack Coles, ensure the role is presented and campus , email are not presented on Rebecca White's profile page",
         );
@@ -224,7 +224,7 @@ test.describe("Profile Editor", () => {
 
         // As Jack Coles, Navigating to Jenni Reed and verify role is presented and campus is not presented
         tester.isGoingTo("Navigate to the Jenni profile page");
-        await profilePage.goto("27");
+        await profilePage.goto(27);
         tester.isGoingTo(
             "As Jack Coles, ensure the role is presented and campus is not presented on Jenni Reed's profile page",
         );
@@ -237,7 +237,7 @@ test.describe("Profile Editor", () => {
         // As Jana Reed , Navigating to own profile and verify role, student Id are presented and  campus, year level are  not presented
 
         tester.isGoingTo("Jana Reed navigating to her own profile page");
-        await profilePage.goto("25");
+        await profilePage.goto(25);
         tester.isGoingTo(
             "As Jana Reed, ensure role, student Id are presented and campus, year level are  not presented on her own profile page",
         );
@@ -249,7 +249,7 @@ test.describe("Profile Editor", () => {
         // As Jana Reed , Navigating to Eden Reed profile and verify role is presented and student id, year level and campus  are  not presented
 
         tester.isGoingTo("Navigate to the Eden Reed profile page");
-        await profilePage.goto("6");
+        await profilePage.goto(6);
         tester.isGoingTo(
             "As Jana Reed, ensure the role is presented and student id, year level and campus  are  not presented on Eden Reed's profile page",
         );
@@ -261,7 +261,7 @@ test.describe("Profile Editor", () => {
         //  As Jana Reed , Navigating to Jack Coles and verify role is presented and campus , email fields are not presented
 
         tester.isGoingTo("Navigate to the Jack Coles profile page");
-        await profilePage.goto("22");
+        await profilePage.goto(22);
         tester.isGoingTo(
             "As Jana Reed, ensure the role is presented and campus, email fields are not presented on Jack Coles's profile page",
         );
@@ -271,7 +271,7 @@ test.describe("Profile Editor", () => {
 
         // As Jana Reed , Navigating to Jenni Reed and verify role is presented and campus field are not presented
         tester.isGoingTo("Navigate to the Jenni profile page");
-        await profilePage.goto("27");
+        await profilePage.goto(27);
         tester.isGoingTo(
             "As Jana Reed, ensure role is presented and campus field are not presented on Jenni Reed's profile page",
         );
@@ -284,7 +284,7 @@ test.describe("Profile Editor", () => {
 
         // As Jenni Reed , Navigating to Jack Coles and verify Role is presented and campus field is not presented
         tester.isGoingTo("Navigate to the Jack Coles profile page");
-        await profilePage.goto("22");
+        await profilePage.goto(22);
         tester.isGoingTo(
             "As Jenni Reed, ensure role is presented and campus field is not presented on Jack Coles's profile page",
         );
@@ -294,7 +294,7 @@ test.describe("Profile Editor", () => {
         // As Jenni Reed , Navigating to Jana Reed and verify Role , Student id are presented and Campus, Year Level fields are not presented
 
         tester.isGoingTo("Navigate to the Jana Reed profile page");
-        await profilePage.goto("25");
+        await profilePage.goto(25);
         tester.isGoingTo(
             "As Jenni Reed, ensure role, student id are presented and campus, year level fields are not presented on Jana Reed's profile page",
         );
@@ -306,7 +306,7 @@ test.describe("Profile Editor", () => {
         // As Jenni Reed , Navigating to Eden Reed profile and verify role, campus are presented and student id, year level are not presented
 
         tester.isGoingTo("Navigate to the Eden Reed profile page");
-        await profilePage.goto("6");
+        await profilePage.goto(6);
         tester.isGoingTo(
             "As Jenni Reed, ensure role, campus are presented and student id, year level are not presented on Eden Reed's profile page",
         );
