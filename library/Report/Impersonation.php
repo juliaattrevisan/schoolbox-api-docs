@@ -18,7 +18,7 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
 
     // visible field mapping: index => human readable
     private $fields = array(
-        'login_log.date' => 'login_log.date',
+        'user_assume_log.created_at' => 'user_assume_log.created_at',
         'user'       => 'user',
         'ip'         => 'ip',
     );
@@ -34,10 +34,10 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
     );
 
     // fields that we will permit sorting on
-    private $sortable = array('login_log.date', 'user', 'ip');
+    private $sortable = array('user_assume_log.created_at', 'user', 'ip');
 
     // default sorting if none provided
-    private $defaultOrderBy = 'login_log.date';
+    private $defaultOrderBy = 'user_assume_log.created_at';
 
     // fields we permit filtering by
     private $filterable = array(
@@ -167,13 +167,13 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
                 } elseif ($key == 'after') {
                     if ($date = strtotime($value)) {
                         $date = date('Y-m-d H:i:s', $date);
-                        $sqlFilter[] = "login_log.date >= :after";
+                        $sqlFilter[] = "user_assume_log.created_at >= :after";
                         $params['after'] = $date;
                     }
                 } elseif ($key == 'before') {
                     if ($date = strtotime($value)) {
                         $date = date('Y-m-d H:i:s', $date);
-                        $sqlFilter[] = "login_log.date <= :before";
+                        $sqlFilter[] = "user_assume_log.created_at <= :before";
                         $params['before'] = $date;
                     }
                 } else {
@@ -187,10 +187,10 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
             sprintf(" WHERE (%s)", implode(') AND (', $sqlFilter)) :
             '';
 
-        $joins = "LEFT JOIN user ON user.username = login_log.username AND user.deleted_at IS NULL";
+        $joins = "LEFT JOIN user ON user.username = user_assume_log.user AND user.deleted_at IS NULL";
 
         // Get count separately from data
-        $countStatement = $this->db->prepare("SELECT COUNT(*) FROM login_log $joins $sqlFilterString");
+        $countStatement = $this->db->prepare("SELECT COUNT(*) FROM user_assume_log $joins $sqlFilterString");
         foreach ($params as $name => $value) {
             $countStatement->bindValue($name, $value);
         }
@@ -201,15 +201,15 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
         }
 
         $dataQuery = "SELECT
-                        login_log.username,
-                        login_log.date,
+                        user_assume_log.user,
+                        user_assume_log.created_at,
                         ip,
                         user.id AS user_id,
                         title,
                         firstname,
                         preferred_name,
                         lastname
-                      FROM login_log
+                      FROM user_assume_log
                       $joins
                       $sqlFilterString
                       ORDER BY $orderBy $orderDir
@@ -282,8 +282,8 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
                 $page->setVar(
                     array(
                         'UID'                => Scrub::text($log['user_id']),
-                        'DATE'               => Scrub::text($log['date']),
-                        'USERNAME'           => Scrub::text($log['username']),
+                        'DATE'               => Scrub::text($log['created_at']),
+                        // 'USERNAME'           => Scrub::text($log['username']),
                         'DISPLAYNAME'        => Scrub::text($userHandler->formatName($nameShards)),
                         'IP'                 => Scrub::text($log['ip']),
                     )
