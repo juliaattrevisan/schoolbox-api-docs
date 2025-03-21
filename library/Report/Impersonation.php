@@ -16,7 +16,7 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
     private $dataCount;
     private $filter;
 
-    // visible field mapping: index => humanreadable
+    // visible field mapping: index => human readable
     private $fields = array(
         'login_log.date' => 'login_log.date',
         'user'       => 'user',
@@ -27,7 +27,7 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
     private $csvFields = array(
         'date'  => 'date',
         'username'   => 'username',
-        'user_id'       => 'user id',
+        'user_id'    => 'user id',
         'firstname'  => 'firstname',
         'lastname'   => 'lastname',
         'ip'         => 'originating ip address',
@@ -41,7 +41,7 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
 
     // fields we permit filtering by
     private $filterable = array(
-        'user'       => 'username, realname or partial',
+        'user'       => 'username, real name or partial',
         'ip'         => 'x.x.x.x',
         'after'      => 'eg. 2012-01-06, yesterday',
         'before'     => 'eg. July 1, 3 days ago'
