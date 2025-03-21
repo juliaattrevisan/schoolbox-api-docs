@@ -13,6 +13,7 @@ import AssessmentPage from "@schoolboxTest/playwright/support/page/dueWork/Asses
 import ProfilePage from "@schoolboxTest/playwright/support/page/profilePage/ProfilePage";
 import ManageGroup from "@schoolboxTest/playwright/support/page/group/ManageGroup";
 import QuizContentsPage from "@schoolboxTest/playwright/support/page/quiz/QuizContents";
+import dayjs from "dayjs";
 
 /**
  * covenience function to create a homepage
@@ -113,10 +114,11 @@ test.describe("Quiz Tests: create, modify, delete quiz, submit and vertical revi
         const position = 1;
         await homepage.clickComponentEmptyStateLink(layout, position);
         await quiz.setTitle(quizName);
+        const datePast = dayjs().add(-2, "days");
+        await page.getByTestId("assessment-form-input-date-open").fill(Common.formatDate(datePast.toDate(), true));
+        await page.getByTestId("assessment-form-input-date-publish").fill(Common.formatDate(datePast.toDate(), true));
         await assessmentForm.setWorkType(AssessmentForm.WORKTYPE_ASSESSMENT_TASK);
         await assessmentForm.setMarkType(AssessmentForm.MARK_TYPE_PERCENTAGE);
-        await assessmentForm.setOpenDate(Common.getTodayAtMidnightAM());
-        await assessmentForm.setPublishDate(Common.getTodayAtMidnightAM());
         await quiz.create(quizName);
 
         tester.isGoingTo("Add a question");
