@@ -400,7 +400,7 @@ class Controller extends Base
      *
      * @param Kami\Model $kami
      * @throws Exception
-     * @throws Exception/Deleted
+     * @throws Exception\Deleted
      * @throws GuzzleException
      * @api POST /kami/{kamiId:\d+}/poll
      * @since 24.0
@@ -456,7 +456,7 @@ class Controller extends Base
      * @param DueWorkResponse|null $response
      * @param Feedback|null $feedback
      * @throws Exception
-     * @throws Exception/Deleted
+     * @throws Exception\Deleted
      * @throws GuzzleException
      * @throws \Schoolbox\File\Exception
      * @api POST /kami/{kamiId:\d+}/{action:\w+}/poll
@@ -465,6 +465,10 @@ class Controller extends Base
      */
     public function postKamiDownloadCallback(Kami\Model $kami, string $action, ?DueWork $assessment = null, ?User $student = null, ?DueWorkResponse $response = null, ?Feedback $feedback = null)
     {
+        if ($kami->getJobReference() === null) {
+            throw new \InvalidArgumentException("Kami job reference is null for document {$kami->getId()}.");
+        }
+
         // kami is ready to download
         $export = $this->kamiConnector->getExport($kami->getJobReference());
         $expiryAt = null;

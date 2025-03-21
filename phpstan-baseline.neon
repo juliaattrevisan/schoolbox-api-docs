@@ -4645,18 +4645,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Factory.php
 
 		-
-			message: '#^PHPDoc tag @throws has invalid value \(Exception/Deleted\)\: Unexpected token "/Deleted", expected TOKEN_HORIZONTAL_WS at offset 161 on line 6$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/Controller.php
-
-		-
-			message: '#^PHPDoc tag @throws has invalid value \(Exception/Deleted\)\: Unexpected token "/Deleted", expected TOKEN_HORIZONTAL_WS at offset 493 on line 10$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/Controller.php
-
-		-
 			message: '#^Method Schoolbox\\Learning\\Assessment\\DueWork\\Response\\ValidSelfAssessable\:\:getDueWork\(\) should return Schoolbox\\Learning\\Assessment\\DueWork\\Model but returns Schoolbox\\Learning\\Assessment\\IAssessable\.$#'
 			identifier: return.type
 			count: 1
