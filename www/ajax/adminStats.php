@@ -10,6 +10,7 @@
 
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Engagement\Login;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\LogMapper;
 use Schoolbox\Admin\Home\SamlCertHelper;
@@ -21,6 +22,10 @@ $kernel->setupSentryTrace(__FILE__);
 /** @var SitePage $page */
 $page = $kernel->get('sitePage');
 $page->initSession();
+
+if (!$_SESSION['user']->isSuperuser()) {
+    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+}
 
 $output = array();
 
