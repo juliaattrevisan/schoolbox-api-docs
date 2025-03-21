@@ -187,7 +187,7 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
             sprintf(" WHERE (%s)", implode(') AND (', $sqlFilter)) :
             '';
 
-        $joins = "LEFT JOIN user ON user.username = user_assume_log.user AND user.deleted_at IS NULL";
+        $joins = "LEFT JOIN user AS impersonator ON impersonator.username = user_assume_log.user";
 
         // Get count separately from data
         $countStatement = $this->db->prepare("SELECT COUNT(*) FROM user_assume_log $joins $sqlFilterString");
@@ -204,11 +204,11 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
                         user_assume_log.user,
                         user_assume_log.created_at,
                         ip,
-                        user.id AS impersonator_id,
-                        title AS impersonator_title,
-                        firstname AS impersonator_firstname,
-                        preferred_name AS impersonator_preferred_name,
-                        lastname AS impersonator_lastname
+                        impersonator.id AS impersonator_id,
+                        impersonator.title AS impersonator_title,
+                        impersonator.firstname AS impersonator_firstname,
+                        impersonator.preferred_name AS impersonator_preferred_name,
+                        impersonator.lastname AS impersonator_lastname
                       FROM user_assume_log
                       $joins
                       $sqlFilterString
@@ -272,7 +272,7 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
 
                 $userHandler = new User();
 
-                $nameShards = array(
+                $impersonatorNameShards = array(
                     'title'          => $log['impersonator_title'],
                     'firstname'      => $log['impersonator_firstname'],
                     'preferred_name' => $log['impersonator_preferred_name'],
@@ -283,7 +283,7 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
                     array(
                         'IMPERSONATOR_ID'    => Scrub::text($log['impersonator_id']),
                         'DATE'               => Scrub::text($log['created_at']),
-                        'IMPERSONATOR'       => Scrub::text($userHandler->formatName($nameShards)),
+                        'IMPERSONATOR'       => Scrub::text($userHandler->formatName($impersonatorNameShards)),
                         'IP'                 => Scrub::text($log['ip']),
                     )
                 );
