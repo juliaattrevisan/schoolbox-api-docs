@@ -18,26 +18,26 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
 
     // visible field mapping: index => humanreadable
     private $fields = array(
-        'date'       => 'date',
+        'login_log.date' => 'login_log.date',
         'user'       => 'user',
         'ip'         => 'ip',
     );
 
     // csv mappings
     private $csvFields = array(
-        'date'       => 'date',
+        'date'  => 'date',
         'username'   => 'username',
-        'user'       => 'user id',
+        'user_id'       => 'user id',
         'firstname'  => 'firstname',
         'lastname'   => 'lastname',
         'ip'         => 'originating ip address',
     );
 
     // fields that we will permit sorting on
-    private $sortable = array('date', 'user', 'ip');
+    private $sortable = array('login_log.date', 'user', 'ip');
 
     // default sorting if none provided
-    private $defaultOrderBy = 'date';
+    private $defaultOrderBy = 'login_log.date';
 
     // fields we permit filtering by
     private $filterable = array(
@@ -187,7 +187,7 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
             sprintf(" WHERE (%s)", implode(') AND (', $sqlFilter)) :
             '';
 
-        $joins = "LEFT JOIN `user` ON `user`.`username` = login_log.username AND `user`.`deleted_at` IS NULL";
+        $joins = "LEFT JOIN user ON user.username = login_log.username AND user.deleted_at IS NULL";
 
         // Get count separately from data
         $countStatement = $this->db->prepare("SELECT COUNT(*) FROM login_log $joins $sqlFilterString");
@@ -201,8 +201,8 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
         }
 
         $dataQuery = "SELECT
-                        `login_log`.`username`,
-                        `login_log`.`date`,
+                        login_log.username,
+                        login_log.date,
                         ip,
                         user.id AS user_id,
                         title,
