@@ -13,7 +13,7 @@ import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
  * @returns - the toolbar display
  */
 function getToolbarAI(): string[] {
-    if (window.sbProps.hasEditorAI) {
+    if (window.sbProps.hasAIFeatures) {
         return ["|", "aiCommands", "aiAssistant"];
     }
     return [];
