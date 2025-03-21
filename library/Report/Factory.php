@@ -17,7 +17,7 @@ class Report_Factory
     /**
      * Allowed report types
      */
-    public const ALLOWED_REPORTS = ['group', 'activity', 'login'];
+    public const ALLOWED_REPORTS = ['group', 'activity', 'login', 'impersonation'];
 
 
     /**
