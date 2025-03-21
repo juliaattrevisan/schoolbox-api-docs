@@ -166,7 +166,12 @@ class TimetableUsers
                 }
 
                 /* Get a list of events between $startTimestamp and $endTimestamp
-                 * along with an ordered list of their overrides
+                 * along with their overrides.
+                 *
+                 * Secondary ordering of overrides by their sequence _was_ done,
+                 * but is no longer: this is because doing so created a temp
+                 * table, significantly slowing the query. Instead, we now order
+                 * overrides when processing the event list.
                  */
                 $query = "
                     SELECT se.id, se.code, seuo.*
@@ -176,7 +181,7 @@ class TimetableUsers
                     AND se.classification = :classification
                     AND se.start_at >= :from
                     AND se.start_at <= :to
-                    ORDER BY se.id ASC, seuo.sequence ASC
+                    ORDER BY se.id ASC
                 ";
 
                 $statement = $this->eventMapper->getDatabase()->prepare($query);
@@ -201,7 +206,7 @@ class TimetableUsers
                  *   manifest instead, but I was overridden
                  */
                 while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-                    $stack[$row['code']]['overrides'][] = [
+                    $stack[$row['code']]['overrides'][$row['sequence']][] = [
                         'external_id' => $row['external_id'],
                         'action' => $row['action']
                     ];
@@ -211,7 +216,7 @@ class TimetableUsers
                  */
                 $manifest = $this->applicator->apply(
                     $stack[$classCode]['usuals'] ?? [],
-                    $stack[$classCode]['overrides'] ?? [],
+                    $this->reorderOverrides($stack[$classCode]['overrides'] ?? []),
                 );
 
                 /* Since we're explicitly looking for staff members in this method
@@ -313,7 +318,10 @@ class TimetableUsers
 
                 /* Find all the events within the time interval specified, because $user
                  * could have been affected by any of their overrides - you won't know
-                 * until you play through all the mutations
+                 * until you play through all the mutations.
+                 *
+                 * As with the query in `findTeachersForClassCode`: this query
+                 * no longer has a secondary ordering on `sequence`.
                  */
                 $query = "
                     SELECT se.code, se.title, se.id, seuo.*
@@ -322,7 +330,7 @@ class TimetableUsers
                     WHERE se.classification = :classification
                     AND se.start_at >= :from
                     AND se.start_at <= :to
-                    ORDER BY se.id, seuo.sequence
+                    ORDER BY se.id
                 ";
 
                 $statement = $this->eventMapper->getDatabase()->prepare($query);
@@ -356,7 +364,7 @@ class TimetableUsers
 
                     /* Manufacture a list of overrides for each event id
                      */
-                    $lookup[$row['code']]['overrides'][$row['id']][] = [
+                    $lookup[$row['code']]['overrides'][$row['id']][$row['sequence']][] = [
                         'external_id' => $row['external_id'],
                         'action' => $row['action']
                     ];
@@ -368,7 +376,10 @@ class TimetableUsers
                  */
                 foreach ($lookup as $classCode => &$data) {
                     foreach ($data['overrides'] as $eventId => $overrides) {
-                        $manifest = $this->applicator->apply($data['usuals'], $overrides);
+                        $manifest = $this->applicator->apply(
+                            $data['usuals'],
+                            $this->reorderOverrides($overrides),
+                        );
 
                         /* When we use this to calculate My Subjects in the side menu
                          * it's actually a union of the usual guys and the survivors
@@ -540,7 +551,7 @@ class TimetableUsers
                         ];
                     }
 
-                    $stack[$row['eventId']]['overrides'][] = [
+                    $stack[$row['eventId']]['overrides'][$row['sequence']][] = [
                         'external_id' => $row['external_id'],
                         'action'      => $row['action'],
                     ];
@@ -549,7 +560,10 @@ class TimetableUsers
                 /* Perform mutations
                  */
                 foreach ($stack as $eventId => &$data) {
-                    $data['manifest'] = $this->applicator->apply($data['usuals'], $data['overrides']);
+                    $data['manifest'] = $this->applicator->apply(
+                        $data['usuals'],
+                        $this->reorderOverrides($data['overrides']),
+                    );
 
                     /* Only care about events the current user is in today
                      */
@@ -585,7 +599,10 @@ class TimetableUsers
                 $stack = [];
 
                 /* Get a list of events between $startTimestamp and $endTimestamp
-                 * along with an ordered list of their overrides
+                 * along with a list of their overrides.
+                 *
+                 * As with the query in `findTeachersForClassCode`: this query
+                 * no longer has a secondary ordering on `sequence`.
                  */
                 $query = "
                     SELECT se.id AS eventId, se.code, seuo.*
@@ -608,7 +625,7 @@ class TimetableUsers
                     $params   = array_merge($params, $bindings->getParams());
                 }
 
-                $query .= " ORDER BY se.id ASC, seuo.sequence ASC";
+                $query .= " ORDER BY se.id ASC";
 
                 $statement = $this->eventMapper->getDatabase()->prepare($query);
                 $statement->execute($params);
@@ -622,5 +639,23 @@ class TimetableUsers
             [$startDatetime, $finishDatetime, $folderCodes],
             \Config::get('external_cache_timeout')
         );
+    }
+
+    /**
+     * Reorder overrides, provided as an array of arrays of overrides keyed by
+     * sequence number, into a single ordered list of overrides.
+     *
+     * @param array{int, array<array{external_id: string, action: string}>} $overrides key: sequence number,
+     *                                                                                 value: a list of overrides.
+     * @return array<array{external_id: string, action: string}>
+     */
+    private function reorderOverrides(array $overrides): array
+    {
+        $reorderedOverrides = [];
+        ksort($overrides, SORT_NUMERIC);
+        foreach ($overrides as $overridesBySequence) {
+            $reorderedOverrides = array_merge($reorderedOverrides, $overridesBySequence);
+        }
+        return $reorderedOverrides;
     }
 }
