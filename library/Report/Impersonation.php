@@ -21,17 +21,21 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
         'created_at' => 'created_at',
         'impersonator' => 'impersonator',
         'impersonated' => 'impersonated',
-        'ip'         => 'ip',
+        'ip' => 'ip',
     );
 
     // csv mappings
     private $csvFields = array(
-        'date'  => 'date',
-        'username'   => 'username',
-        'user_id'    => 'user id',
-        'firstname'  => 'firstname',
-        'lastname'   => 'lastname',
-        'ip'         => 'originating ip address',
+        'created_at' => 'Date',
+        'impersonator_id' => 'Impersonator ID',
+        'impersonator_username' => 'Impersonator Username',
+        'impersonator_firstname' => 'Impersonator First Name',
+        'impersonator_lastname'  => 'Impersonator Last Name',
+        'impersonated_id' => 'Impersonated ID',
+        'impersonated_username' => 'Impersonated Username',
+        'impersonated_firstname' => 'Impersonated First Name',
+        'impersonated_lastname' => 'Impersonated Last Name',
+        'ip' => 'Originating IP',
     );
 
     // fields that we will permit sorting on
@@ -213,11 +217,13 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
                         user_assume_log.created_at AS created_at,
                         ip,
                         impersonator.id AS impersonator_id,
+                        impersonator.username AS impersonator_username,
                         impersonator.title AS impersonator_title,
                         impersonator.firstname AS impersonator_firstname,
                         impersonator.preferred_name AS impersonator_preferred_name,
                         impersonator.lastname AS impersonator_lastname,
                         impersonated.id AS impersonated_id,
+                        impersonated.username AS impersonated_username,
                         impersonated.title AS impersonated_title,
                         impersonated.firstname AS impersonated_firstname,
                         impersonated.preferred_name AS impersonated_preferred_name,
