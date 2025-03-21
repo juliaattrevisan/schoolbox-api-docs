@@ -625,7 +625,7 @@ class TimetableUsers
                     $params   = array_merge($params, $bindings->getParams());
                 }
 
-                $query .= " ORDER BY se.id ASC ASC";
+                $query .= " ORDER BY se.id ASC";
 
                 $statement = $this->eventMapper->getDatabase()->prepare($query);
                 $statement->execute($params);
