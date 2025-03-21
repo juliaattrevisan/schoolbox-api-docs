@@ -23,7 +23,6 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
         'user'       => 'user',
         'role'       => 'role',
         'ip'         => 'ip',
-        'identifier' => 'identifier',
     );
 
     // csv mappings
@@ -32,7 +31,6 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
         'login'      => 'login success',
         'username'   => 'username',
         'user'       => 'user id',
-        'identifier' => 'session identifier',
         'firstname'  => 'firstname',
         'lastname'   => 'lastname',
         'role'       => 'role',
@@ -41,7 +39,7 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
     );
 
     // fields that we will permit sorting on
-    private $sortable = array('date', 'user', 'ip', 'role', 'identifier');
+    private $sortable = array('date', 'user', 'ip', 'role');
 
     // default sorting if none provided
     private $defaultOrderBy = 'date';
@@ -49,7 +47,6 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
     // fields we permit filtering by
     private $filterable = array(
         'user'       => 'username, realname or partial',
-        'identifier' => 'session identifier',
         'role'       => '',
         'ip'         => 'x.x.x.x',
         'after'      => 'eg. 2012-01-06, yesterday',
@@ -216,7 +213,6 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
         $dataQuery = "SELECT
                         `login_log`.`username`,
                         `date`,
-                        identifier,
                         login,
                         ip,
                         user.id AS user,
@@ -302,7 +298,6 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
                         'UID'                => Scrub::text($log['user']),
                         'DATE'               => Scrub::text($log['date']),
                         'USERNAME'           => Scrub::text($log['username']),
-                        'SESSION_IDENTIFIER' => Scrub::text($log['identifier'] ?? ''),
                         'DISPLAYNAME'        => Scrub::text($userHandler->formatName($nameShards)),
                         'IP'                 => Scrub::text($log['ip']),
                         'ROLE'               => Scrub::text($log['role']),
