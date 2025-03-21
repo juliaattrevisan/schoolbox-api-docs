@@ -167,13 +167,13 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
                 } elseif ($key == 'after') {
                     if ($date = strtotime($value)) {
                         $date = date('Y-m-d H:i:s', $date);
-                        $sqlFilter[] = "`date` >= :after";
+                        $sqlFilter[] = "login_log.date >= :after";
                         $params['after'] = $date;
                     }
                 } elseif ($key == 'before') {
                     if ($date = strtotime($value)) {
                         $date = date('Y-m-d H:i:s', $date);
-                        $sqlFilter[] = "`date` <= :before";
+                        $sqlFilter[] = "login_log.date <= :before";
                         $params['before'] = $date;
                     }
                 } else {
@@ -202,7 +202,7 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
 
         $dataQuery = "SELECT
                         `login_log`.`username`,
-                        `date`,
+                        `login_log`.`date`,
                         ip,
                         user.id AS user_id,
                         title,
