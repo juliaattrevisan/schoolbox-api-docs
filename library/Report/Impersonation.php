@@ -287,7 +287,6 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
                         'log_no_user_block' => '',
                     ]
                 );
-                $action = $log['login'] == 0 ? "Failed login" : "Logged in";
 
                 $userHandler = new User();
 
@@ -305,7 +304,6 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
                         'USERNAME'           => Scrub::text($log['username']),
                         'SESSION_IDENTIFIER' => Scrub::text($log['identifier'] ?? ''),
                         'DISPLAYNAME'        => Scrub::text($userHandler->formatName($nameShards)),
-                        'ACTION'             => Scrub::text($action),
                         'IP'                 => Scrub::text($log['ip']),
                         'ROLE'               => Scrub::text($log['role']),
                     )
