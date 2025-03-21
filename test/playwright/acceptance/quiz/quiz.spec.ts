@@ -99,7 +99,7 @@ test.describe("Quiz Tests: create, modify, delete quiz, submit and vertical revi
         const homepage = new Homepage(page);
         const assessmentForm = new AssessmentForm(tester, page);
         const quiz = new QuizSettingPage(tester, page);
-        const quizContent = new QuizContentsPage(tester, page);
+        // const quizContent = new QuizContentsPage(tester, page);
 
         tester.isGoingTo("create a homepage, navigate to the class page and add a quiz component");
         await createClassPage(tester, page, db, folderName);
