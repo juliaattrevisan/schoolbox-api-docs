@@ -308,7 +308,6 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
                         'ACTION'             => Scrub::text($action),
                         'IP'                 => Scrub::text($log['ip']),
                         'ROLE'               => Scrub::text($log['role']),
-                        'BY_TOKEN'           => $log['jwt_id'] ? '&#10004;' : '',
                     )
                 );
 
