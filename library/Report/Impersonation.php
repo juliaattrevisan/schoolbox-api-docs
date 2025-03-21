@@ -204,7 +204,7 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
                         `login_log`.`username`,
                         `date`,
                         ip,
-                        user.id AS user,
+                        user.id AS user_id,
                         title,
                         firstname,
                         preferred_name,
@@ -281,7 +281,7 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
 
                 $page->setVar(
                     array(
-                        'UID'                => Scrub::text($log['user']),
+                        'UID'                => Scrub::text($log['user_id']),
                         'DATE'               => Scrub::text($log['date']),
                         'USERNAME'           => Scrub::text($log['username']),
                         'DISPLAYNAME'        => Scrub::text($userHandler->formatName($nameShards)),
