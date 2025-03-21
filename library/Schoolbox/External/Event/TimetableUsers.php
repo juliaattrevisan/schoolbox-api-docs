@@ -642,7 +642,7 @@ class TimetableUsers
     }
 
     /**
-     * Reorder overrides, provided as an array of array of overrides keyed by
+     * Reorder overrides, provided as an array of arrays of overrides keyed by
      * sequence number, into a single ordered list of overrides.
      *
      * @param array{int, array<array{external_id: string, action: string}>} $overrides key: sequence number,
