@@ -318,7 +318,10 @@ class TimetableUsers
 
                 /* Find all the events within the time interval specified, because $user
                  * could have been affected by any of their overrides - you won't know
-                 * until you play through all the mutations
+                 * until you play through all the mutations.
+                 *
+                 * As with the query in `findTeachersForClassCode`: this query
+                 * no longer has a secondary ordering on `sequence`.
                  */
                 $query = "
                     SELECT se.code, se.title, se.id, seuo.*
@@ -327,7 +330,7 @@ class TimetableUsers
                     WHERE se.classification = :classification
                     AND se.start_at >= :from
                     AND se.start_at <= :to
-                    ORDER BY se.id, seuo.sequence
+                    ORDER BY se.id
                 ";
 
                 $statement = $this->eventMapper->getDatabase()->prepare($query);
@@ -361,7 +364,7 @@ class TimetableUsers
 
                     /* Manufacture a list of overrides for each event id
                      */
-                    $lookup[$row['code']]['overrides'][$row['id']][] = [
+                    $lookup[$row['code']]['overrides'][$row['id']][$row['sequence']][] = [
                         'external_id' => $row['external_id'],
                         'action' => $row['action']
                     ];
@@ -373,7 +376,10 @@ class TimetableUsers
                  */
                 foreach ($lookup as $classCode => &$data) {
                     foreach ($data['overrides'] as $eventId => $overrides) {
-                        $manifest = $this->applicator->apply($data['usuals'], $overrides);
+                        $manifest = $this->applicator->apply(
+                            $data['usuals'],
+                            $this->reorderOverrides($overrides),
+                        );
 
                         /* When we use this to calculate My Subjects in the side menu
                          * it's actually a union of the usual guys and the survivors
