@@ -24,21 +24,23 @@ $kernel->setupSentryTrace(__FILE__);
 $page = $kernel->get('sitePage');
 $page->initSession();
 
+/** @var \Schoolbox\User $user */
+$user = $_SESSION['user'];
+$hasAccess =
+    $user->isSuperuser() ||
+    $user->hasServicePermission(UserAccess::SERVICE_CMS, UserAccess::ACCESS_FULL) ||
+    $user->hasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL) ||
+    $user->hasServicePermission(UserAccess::SERVICE_CALENDAR, UserAccess::ACCESS_FULL) ||
+    $user->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL) ||
+    $user->hasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL) ||
+    $user->hasServicePermission(UserAccess::SERVICE_BADGE, UserAccess::ACCESS_FULL) ||
+    $user->hasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL) ||
+    $user->hasServicePermission(UserAccess::SERVICE_TIMETABLE, UserAccess::ACCESS_FULL);
+
 /**
  * only super or service moderators
  */
-if (
-    !$_SESSION['user']->isSuperuser() &&
-    !$_SESSION['user']->hasServicePermission(UserAccess::SERVICE_CMS, UserAccess::ACCESS_FULL) &&
-    !$_SESSION['user']->hasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL) &&
-    !$_SESSION['user']->hasServicePermission(UserAccess::SERVICE_CALENDAR, UserAccess::ACCESS_FULL) &&
-    !$_SESSION['user']->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL) &&
-    !$_SESSION['user']->hasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL) &&
-    !$_SESSION['user']->hasServicePermission(UserAccess::SERVICE_BADGE, UserAccess::ACCESS_FULL) &&
-    !$_SESSION['user']->hasServicePermission(UserAccess::SERVICE_CMS, UserAccess::ACCESS_FULL) &&
-    !$_SESSION['user']->hasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL) &&
-    !$_SESSION['user']->hasServicePermission(UserAccess::SERVICE_TIMETABLE, UserAccess::ACCESS_FULL)
-) {
+if (!$hasAccess) {
     throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
@@ -55,7 +57,8 @@ $config = $kernel->get('config');
 switch ($_POST['module']) {
     // cases mirror categories listed
     case 'users':
-        if ($_SESSION['user']->isSuperuser()) {
+        // only superusers can see this, not other moderators
+        if ($user->isSuperuser()) {
             $login      = new Login($kernel->get('databaseInternal'), $config->get('session_length'));
             $summary    = $login->userSummary(null);
             $totalUser  = 0;
@@ -255,7 +258,8 @@ switch ($_POST['module']) {
         $output = ['diff' => abs($timestamp - time())];
         break;
     case 'logs':
-        if ($_SESSION['user']->isSuperuser()) {
+        // only superusers can see this, not other moderators
+        if ($user->isSuperuser()) {
             $logsRecent = LogMapper::getInstance()->findRecent();
 
             foreach ($logsRecent as $log) {
