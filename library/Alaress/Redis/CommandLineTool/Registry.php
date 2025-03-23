@@ -42,7 +42,7 @@ class Registry
 
             // Old and new vCal cache
             "^vcal.[0-9a-f]{64}",
-            "^vcal:" . INSTANCE_ID . ":[0-9a-f]{64}",
+            "^vcal:" . self::INSTANCE_ID_MATCH . ":[0-9a-f]{64}",
 
             // Locks
             '^lock:' . self::INSTANCE_ID_MATCH . ':',
