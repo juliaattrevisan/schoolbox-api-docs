@@ -351,7 +351,7 @@ export default window.Vue.defineComponent({
             >
                 <li
                     v-for="(result, index) in resultsList"
-                    :key="result.name"
+                    :key="`${result.name}-${index}`"
                     ref="searchResultListItems"
                     :data-index="index"
                 >
