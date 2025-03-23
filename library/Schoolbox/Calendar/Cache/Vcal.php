@@ -25,7 +25,7 @@ use Sabre\VObject\Reader;
  */
 class Vcal
 {
-    private const CACHE_KEY_BASE = 'vcal.%s';
+    private const CACHE_KEY_BASE = 'vcal:%s:%s';
 
 
     // Cache expiry: 2 hours?
@@ -185,6 +185,6 @@ class Vcal
     {
         // Can't use config's PK, as it doesn't exist in the encoded object.
         // We can only use its URL.
-        return sprintf(self::CACHE_KEY_BASE, hash('sha256', $config->getUrl()));
+        return sprintf(self::CACHE_KEY_BASE, INSTANCE_ID, hash('sha256', $config->getUrl()));
     }
 }

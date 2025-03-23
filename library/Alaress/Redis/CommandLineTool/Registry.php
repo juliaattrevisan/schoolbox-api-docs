@@ -34,9 +34,9 @@ class Registry
             "^External_.+",
             '^fc:' . INSTANCE_ID . ':External_',
 
-            // vCal cache: not partitioned by instance ID
-            // (it may need to be one day)
+            // Old and new vCal cache
             "^vcal.[0-9a-f]{64}",
+            "^vcal:" . INSTANCE_ID . ":[0-9a-f]{64}",
 
             // Locks
             '^lock:' . INSTANCE_ID . ':',
