@@ -738,7 +738,30 @@ abstract class Kernel
                         $request->getBody()->rewind();
                         $content = $request->getBody()->getContents();
                         $request->getBody()->rewind();
-                        $request = $request->withParsedBody(json_decode($content, true));
+                        try {
+                            $decodedContent = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+                        } catch (\JsonException) {
+                            // Treat invalid JSON as null content.  Null content can then be interpreted by the
+                            // relevant Controller as either not supplied or invalid/undecodable.
+                            $decodedContent = null;
+                        }
+                        // Note json_decode(.., true) can many data types after a successful decode:
+                        //  * json_decode('null', true) returns null
+                        //  * json_decode('false', true) returns false
+                        //  * json_decode('true', true) returns true
+                        //  * json_decode('123', true) returns int(123)
+                        //  * json_decode(' -12.054e3 ', true) returns float(-12054)
+                        //  * json_decode('[]', true) returns []
+                        //  * json_decode('{}', true) returns []
+                        // All the example responses above are valid JSON data.  Ideally the relevant Controller would
+                        // be able to decide what to do with that data.  However, since $request->withParsedBody() only
+                        // accepts object, array, or null, other data types must be converted to null before being
+                        // passed to the Controller via $request->withParsedBody().
+                        // (No need to check for object, since json_decode(..., true) converts objects to arrays.)
+                        if (!is_array($decodedContent) && !is_null($decodedContent)) {
+                            $decodedContent = null;
+                        }
+                        $request = $request->withParsedBody($decodedContent);
                     }
                     return $request;
                 }
