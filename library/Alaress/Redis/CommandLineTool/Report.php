@@ -126,6 +126,11 @@ class Report extends CliTool\App
     private const NULL_INSTANCE_ID = 'null';
 
     /**
+     * Const for the instance ID to render results in, if results are grouped.
+     */
+    private const GROUPED_INSTANCE_ID = 'INSTANCE_ID';
+
+    /**
      * @inheritdoc
      */
     public function getShortOpts(): array
@@ -193,7 +198,10 @@ class Report extends CliTool\App
             $redisInstances = self::REDIS_INSTANCES;
         }
 
-        $aggregated = [];
+        // Are results grouped across all instances,
+        // or separated by instance ID?
+        $groupResults = $this->getOpt(self::OPT_GROUP_RESULTS);
+        $aggregated   = [];
         foreach ($redisInstances as $redisInstanceName) {
             $redis = Redis::getClientInstance($redisInstanceName);
             if (!$redis) {
@@ -202,7 +210,7 @@ class Report extends CliTool\App
             }
 
             $this->getLogger()->notice("Scanning redis connection: $redisInstanceName");
-            $rawData                   = $this->scanKeys($redis, $redisInstanceName);
+            $rawData                   = $this->scanKeys($redis, $redisInstanceName, $groupResults);
             foreach ($rawData as $instanceId => $rawDataByInstanceId) {
                 $aggregated[$redisInstanceName][$instanceId] = $this->aggregateData($rawDataByInstanceId);
             }
@@ -212,7 +220,7 @@ class Report extends CliTool\App
             $aggregatedByInstance = $aggregated[$redisInstanceName];
             uksort($aggregatedByInstance, $this->sortByInstanceId(...));
             foreach ($aggregatedByInstance as $instanceId => $aggregatedByInstanceId) {
-                $this->renderResults($aggregatedByInstanceId, $redisInstanceName, $instanceId);
+                $this->renderResults($aggregatedByInstanceId, $redisInstanceName, $instanceId, $groupResults);
             }
         }
     }
@@ -224,9 +232,11 @@ class Report extends CliTool\App
      * @param Predis\ClientInterface   $redis
      * @param string&Redis::INSTANCE_* $redisInstanceName The name of the Redis instance to scan: used to filter the
      *                                                    list of keys to process.
+     * @param bool $groupResults                          true: group results for all Schoolbox instances,
+     *                                                    false: segregate by instance.
      * @return array
      */
-    private function scanKeys(Predis\ClientInterface $redis, string $redisInstanceName): array
+    private function scanKeys(Predis\ClientInterface $redis, string $redisInstanceName, bool $groupResults): array
     {
         $rawData = [];
         $cursor  = null;
@@ -240,6 +250,9 @@ class Report extends CliTool\App
                 $processed = $this->processKey($redis, $key, $redisInstanceName);
                 if (isset($processed)) {
                     [$keyPattern, $instanceId, $payload, $ttl, $length, $status] = $processed;
+                    if ($groupResults) {
+                        $instanceId = self::GROUPED_INSTANCE_ID;
+                    }
                     $rawData[$instanceId][$keyPattern][$payload][] = [
                         'ttl'    => $ttl,
                         'length' => $length,
@@ -448,9 +461,15 @@ class Report extends CliTool\App
      * @param string $instanceId        The ID of the Schoolbox instance, or
      *                                  `self::NULL_INSTANCE_ID` if this data is
      *                                  not associated with an instance.
+     * @param bool   $groupResults      true: group results for all Schoolbox
+     *                                  instances, false: segregate by instance.
      */
-    private function renderResults(array $aggregated, string $redisInstanceName, string $instanceId): void
-    {
+    private function renderResults(
+        array $aggregated,
+        string $redisInstanceName,
+        string $instanceId,
+        bool $groupResults,
+    ): void {
         // Calculate column widths from widest column header or value
         $columnWidths = [];
         foreach ($aggregated as $row) {
@@ -508,15 +527,19 @@ class Report extends CliTool\App
             $table[$idx] = "|" . implode('|', $row) . '|';
         }
 
-        $instanceIdOutput = $instanceId === self::NULL_INSTANCE_ID
-            ? 'no Schoolbox instance'
-            : sprintf('Schoolbox instance "%s"', $instanceId);
+        if ($groupResults) {
+            $instanceIdOutput = '';
+        } else {
+            $instanceIdOutput = $instanceId === self::NULL_INSTANCE_ID
+                ? ', no Schoolbox instance'
+                : sprintf(', Schoolbox instance "%s"', $instanceId);
+        }
         fwrite(
             $this->getOutStream(),
             sprintf(
                 (empty($table)
-                    ? "\nNo usage for Redis instance \"%s\", %s found."
-                    : "\nUsage for instance \"%s\", %s:"),
+                    ? "\nNo usage for Redis instance \"%s\"%s found."
+                    : "\nUsage for instance \"%s\"%s:"),
                 $redisInstanceName,
                 $instanceIdOutput,
             )
