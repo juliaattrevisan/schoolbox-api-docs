@@ -98,8 +98,8 @@ class Registry
             '^msg:' . self::INSTANCE_ID_MATCH . ':q:\d+:digest',
             '^msg:' . self::INSTANCE_ID_MATCH . ':q:\d+:mobile',
             // Not sure if the below are used
-            //            '^msg:' . self::INSTANCE_ID_TEMPLATE . ':q:\d+:push',
-            //            '^msg:' . self::INSTANCE_ID_TEMPLATE . ':q:\d+:alert',
+            //            '^msg:' . self::INSTANCE_ID_MATCH . ':q:\d+:push',
+            //            '^msg:' . self::INSTANCE_ID_MATCH . ':q:\d+:alert',
 
             // Message route cache
             "^m:" . self::INSTANCE_ID_MATCH . ":routes",
@@ -140,8 +140,8 @@ class Registry
         //  if queue patterns are found in cache and v.v.)
         //        Redis::INSTANCE_SIGNAL_QUEUE => [
         //            // Signal queues
-        //            'scheduled.' . self::INSTANCE_ID_TEMPLATE . '.*',
-        //            'routed.' . self::INSTANCE_ID_TEMPLATE . '.*',
+        //            'scheduled.' . self::INSTANCE_ID_MATCH . '.*',
+        //            'routed.' . self::INSTANCE_ID_MATCH . '.*',
         //        ],
     ];
 }

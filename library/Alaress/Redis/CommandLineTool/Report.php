@@ -267,7 +267,7 @@ class Report extends CliTool\App
                 // Log every 1000 at a higher level to show progression at less verbosity
                 $level = $count % 1000 === 0 ? Logger::NOTICE : Logger::DEBUG;
                 $this->getLogger()->log($level, "$count) $key");
-                $processed = $this->processKey($redis, $key, $redisInstanceName);
+                $processed = $this->processKey($redis, $key, $redisInstanceName, $groupResults);
                 if (isset($processed)) {
                     [$keyPattern, $instanceId, $payload, $ttl, $length, $status] = $processed;
                     if ($groupResults) {
@@ -293,14 +293,23 @@ class Report extends CliTool\App
      * @param string                   $key                The key to process.
      * @param string&Redis::INSTANCE_* $redisInstanceName  The name of the Redis instance to scan: used to filter the
      *                                                     list of keys to process.
+     * @param bool                     $groupResults       true: group results for all Schoolbox instances,
+     *                                                     false: segregate by instance.
      * @return array{string, string, string, int, int, string}|null
      *         [key pattern, instance ID, payload type, ttl, length, status],
      *         or null if this key is to be ignored completely in the report.
      *         (This happens if this key is not in `$instanceName`'s keys, but
      *          is in an alias' keys.)
+     *         The key pattern will always have the instance ID within it.
+     *         If grouping results: the instance ID will always be
+     *         `self::GROUPED_INSTANCE_ID`.
      */
-    private function processKey(Predis\ClientInterface $redis, string $key, string $redisInstanceName): ?array
-    {
+    private function processKey(
+        Predis\ClientInterface $redis,
+        string $key,
+        string $redisInstanceName,
+        bool $groupResults,
+    ): ?array {
         /** @var Predis\Response\Status $type */
         $type = $redis->type($key);
         switch ($type->getPayload()) {
@@ -386,6 +395,14 @@ class Report extends CliTool\App
             $keyPattern = 'unrecognised';
             $status     = 'unrec';
             $this->getLogger()->warning("Unrecognised key: $key");
+        }
+
+        // Replace the instance ID regexp match in the key pattern
+        if ($instanceId) {
+            if ($groupResults) {
+                $instanceId = self::GROUPED_INSTANCE_ID;
+            }
+            $keyPattern = str_replace(Registry::INSTANCE_ID_MATCH, $instanceId, $keyPattern);
         }
         return [$keyPattern, $instanceId, $type->getPayload(), $ttl, $length, $status];
     }
@@ -500,7 +517,7 @@ class Report extends CliTool\App
             foreach ($row as $columnKey => $columnValue) {
                 $columnTitle = self::LABELS[$columnKey];
                 $columnWidths[$columnKey] = max(
-                    strlen(str_replace(Registry::INSTANCE_ID_MATCH, $instanceId, (string)$columnValue)),
+                    strlen((string)$columnValue),
                     $columnWidths[$columnKey] ?? 0,
                     strlen($columnTitle),
                 );
@@ -527,12 +544,7 @@ class Report extends CliTool\App
             }
             foreach ($row as $columnKey => $columnValue) {
                 $width                      = $columnWidths[$columnKey];
-                $table[$nextRow + $rowId][] = str_pad(
-                    str_replace(Registry::INSTANCE_ID_MATCH, $instanceId, (string)$columnValue),
-                    $width,
-                    ' ',
-                    self::ALIGNMENTS[$columnKey],
-                );
+                $table[$nextRow + $rowId][] = str_pad((string)$columnValue, $width, ' ', self::ALIGNMENTS[$columnKey]);
             }
         }
 
