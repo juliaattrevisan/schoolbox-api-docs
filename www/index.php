@@ -27,6 +27,10 @@ $trace->startTransaction();
 register_shutdown_function($trace->finishTransaction(...));
 
 if ($path !== "/index.php" && preg_match('/.+\.php$/', $path) && file_exists(WEB_root . $path)) {
+    // First set a basic context for this request:
+    // this may be overwritten later if using the basic kernel.
+    $trace->setTransactionContextForSitePage(WEB_root . $path);
+
     // Script will load a Basic or Full Web kernel
     require WEB_root . $path;
 } else {
