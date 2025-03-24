@@ -19,13 +19,14 @@ use Sabre\VObject\Component\VCalendar;
 use Sabre\VObject\InvalidDataException;
 use Sabre\VObject\ParseException;
 use Sabre\VObject\Reader;
+use Sabre\VObject\Writer;
 
 /**
  * Cache helper for vCal events.
  */
 class Vcal
 {
-    private const CACHE_KEY_BASE = 'vcal.%s';
+    private const CACHE_KEY_BASE = 'vcal:%s:%s';
 
 
     // Cache expiry: 2 hours?
@@ -66,7 +67,7 @@ class Vcal
             $this->redis->setex(
                 $this->determineCacheKey($config),
                 self::CACHE_EXPIRY,
-                serialize($this->convertSourceToEvents($source))
+                Writer::writeJson($this->convertSourceToEvents($source))
             );
         }
     }
@@ -82,16 +83,12 @@ class Vcal
     {
         $cacheKey = $this->determineCacheKey($config);
         if ($this->redis->exists($cacheKey)) {
-            /** issues with extracting the cached calendar, we should delete and re fetch */
-            set_error_handler(function () use ($cacheKey) {
+            $cal = Reader::readJson($this->redis->get($cacheKey));
+            if (!$cal instanceof VCalendar) {
                 // If we can't unserialize the data, delete it.
                 $this->redis->del($cacheKey);
                 return null;
-            }, E_ALL);
-            $cal =  unserialize($this->redis->get($cacheKey), [VCalendar::class]);
-
-            // go back to the usual error handler
-            restore_error_handler();
+            }
 
             return $cal;
         }
@@ -185,6 +182,6 @@ class Vcal
     {
         // Can't use config's PK, as it doesn't exist in the encoded object.
         // We can only use its URL.
-        return sprintf(self::CACHE_KEY_BASE, hash('sha256', $config->getUrl()));
+        return sprintf(self::CACHE_KEY_BASE, INSTANCE_ID, hash('sha256', $config->getUrl()));
     }
 }
