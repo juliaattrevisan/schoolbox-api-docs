@@ -11,24 +11,31 @@
 use Schoolbox\External\Exception as ExternalException;
 use Schoolbox\Error\Mapper as ErrorMapper;
 
-// Ensure parameters are correct
-
-$externalClass = new External_Synergetic_Class();
-
-/* getDatabase() promoted to `public` because we need to inspect whether
- * External_Synergetic_Class spawned with a NullConnector instance; that
- * happens when misconfigured or network timeouts etc.
- *
- * At this point External_Synergetic_Class diverges from the interface anyway,
- * since it implements getClass() etc which aren't formally part of the interface;
- * only Synergetic supports it, so we kinda have to treat it specially
- *
- * You could move this check into the External_Synergetic_Class to shortcut an
- * error detection but that's a secondary evolution for the time being
- */
-if (null === $externalClass->getDatabase()) {
-    error(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
+// Ensure online attendance is enabled.
+if (!Config::get('external_attendance')) {
+    error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
+
+/* This only works with the Synergetic connector.
+ * An alternative to 404 would be errors:
+ *  210 Cannot get attendance list. Please contact system administrator.
+ *  169 Access to this module is denied
+ *  19 You do not have permission to view this page.
+ *
+ * ...but none of those really fit the context as to why you'd be unable to access this place.
+ */
+if (\External\IConnector::EXTERNAL_TYPE_SYNERGETIC !== Config::get('external_type')) {
+    error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+}
+
+/* Synergetic has an External_Synergetic_Class which can spawn via the factory,
+ * but it has a special method not defined in External_ClassInterface, breaking
+ * its contract: getClass()
+ *
+ * This inevitably forces you to spawn it directly instead.
+ * $externalClass = new External_Class();
+ */
+$externalClass = new External_Synergetic_Class();
 
 /* This is a POST only page
  * the 3 params are required and we should go back if they are not.
