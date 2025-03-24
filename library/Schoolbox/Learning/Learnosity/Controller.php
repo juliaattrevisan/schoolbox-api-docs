@@ -1841,30 +1841,16 @@ class Controller extends Base
          */
         $helper = (new Helper($this->api, $logger));
         $candidates[$source->getLearnosityReference()] = [
-            /* Spittin' facts
-             */
-            'assessment_id' => $source->getId(),
-            'title' => $source->getTitle(),
-            'finish' => $source->getCloseAt(),
-            'learnosity_reference' => $source->getLearnosityReference(),
-            /* A spec or an impl?
-             */
-            'type' => $source->isImplementation(),
-            /* Some info about where you might find it in the browzer
-             */
-            'folder_id' => $source->getBaseContext()->getFolder()->getId(),
-            'folder_name' => $source->getBaseContext()->getFolder()->getName(),
             /* These get updated as we discover information/facts from Learnosity itself
              */
             'status' => Helper::LEARNOSITY_STATUS_UNKNOWN,
         ];
 
         $result = $this->api->dataGetRequest('/itembank/activities', ['references' => [$source->getLearnosityReference()]]);
-        /* Collate some facts from learnosity's perspective
-             *
-             * Note that learnosity might give you a malformed data set for some reason or other
-             * Store them in a hash lookup for quick cross-referencing anyway
-             */
+
+        /* The data from learnosity... we should in theory only get 1 result, but let's be safe, and iterate through the 'single' result
+         * it may also be malformed, so check for safety
+         */
         foreach (($result['data'] ?? []) as $learnosityQuiz) {
             $this->refreshLock($lock);
             $candidates[$learnosityQuiz['reference']]['status'] = $learnosityQuiz['status'];
@@ -1892,7 +1878,7 @@ class Controller extends Base
             // if the quiz is not published, restore it
             if (Helper::LEARNOSITY_ITEM_STATUS_PUBLISHED !== $candidates[$learnosityQuiz['reference']]['status']) {
                 $logger->info('Restoring quiz', $candidates[$learnosityQuiz['reference']]);
-                $helper->restore($candidates[$learnosityQuiz['reference']]['learnosity_reference']);
+                $helper->restore($learnosityQuiz['reference']);
             }
         }
 
