@@ -116,14 +116,6 @@
             align-self: flex-end;
         }
 
-        s.field-description {
-            width: 100%;
-        }
-
-        .s-field-description textarea {
-            width: 100%;
-        }
-
         // Styles whilst an item is being dragged
         &.ui-sortable-helper {
             left: 1rem !important;
