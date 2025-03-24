@@ -126,6 +126,7 @@ class Registry
             '^group:g\.',
             '^session:s\.',
             "^groups$",
+            '^expressSessionSecrets:',
 
             // OIDC server cache, used for caching:
             // * auth codes
