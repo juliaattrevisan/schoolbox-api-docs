@@ -321,7 +321,7 @@ class Profile implements IStrategy
             /* Emergency Contacts
              */
             $emergencyContacts = [];
-            if (null === $student->emergencycontacts->contact ?? null) {
+            if (null === $student->emergencycontacts?->contact) {
                 $this->log->info(sprintf(
                     'No emergency contacts found for  %s',
                     trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
@@ -437,7 +437,7 @@ class Profile implements IStrategy
     {
         $siblingLink = trim((string)$student->siblinglink);
 
-        if (null === $student->caregivers->caregiver ?? null) {
+        if (null === $student->caregivers?->caregiver) {
             $this->log->info(sprintf(
                 'No caregivers found for  %s',
                 trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
