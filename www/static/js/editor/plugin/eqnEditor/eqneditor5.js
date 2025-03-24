@@ -82,7 +82,7 @@ export default class Eqneditor5 extends Plugin {
             viewDocument,
             "dblclick",
             function (e, dat) {
-                console.log(dat);
+                // console.log(dat);
                 if (dat.domTarget.nodeName.toLowerCase() == "img") {
                     var sName = dat.domTarget.src.match(/(gif|svg)\.image\?(.*)/);
                     if (sName != null) this._initEqnEditor(null, sName[2]);
@@ -121,7 +121,13 @@ export default class Eqneditor5 extends Plugin {
         }
 
         this.textarea.clear();
-        this.textarea.insert(inp.replace(/&space;/g, " "), inp.length);
+        /**
+         * As per below, we are using 'this.output.exportAs("urlencoded")' to avoid the bug in the 'html' export format.
+         * So if we edit the same equation (double click the image), we need to decode the URL encoded string to display the original equation.
+         */
+        const encoded = inp.replace(/&space;/g, " ");
+        const decoded = decodeURIComponent(encoded);
+        this.textarea.insert(decoded, decoded.length);
     }
 
     _createEqnEditorView() {
