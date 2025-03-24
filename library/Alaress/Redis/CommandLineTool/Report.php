@@ -231,14 +231,17 @@ class Report extends CliTool\App
             }
         }
 
+        // Sort aggregated data by instance ID
+        foreach ($redisInstances as $redisInstanceName) {
+            uksort($aggregated[$redisInstanceName], $this->sortByInstanceId(...));
+        }
+
+        // And finally output
         if ($jsonOutput) {
             echo json_encode($aggregated);
         } else {
             foreach ($redisInstances as $redisInstanceName) {
-                // Sort aggregated data by instance ID
-                $aggregatedByInstance = $aggregated[$redisInstanceName];
-                uksort($aggregatedByInstance, $this->sortByInstanceId(...));
-                foreach ($aggregatedByInstance as $instanceId => $aggregatedByInstanceId) {
+                foreach ($aggregated[$redisInstanceName] as $instanceId => $aggregatedByInstanceId) {
                     $this->renderResults($aggregatedByInstanceId, $redisInstanceName, $instanceId, $groupResults);
                 }
             }
