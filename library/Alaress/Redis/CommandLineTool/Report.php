@@ -38,6 +38,17 @@ class Report extends CliTool\App
      */
     private const OPT_SORT_BY_KEY_PATTERN = 'sort-by-key-pattern';
 
+    /**
+     * Report only on a single Redis instance
+     * (must be in `self::REDIS_INSTANCES`)
+     */
+    private const OPT_REDIS_INSTANCE = 'redis-instance:';
+
+    /**
+     * Group results from all instances together?
+     */
+    private const OPT_GROUP_RESULTS = 'group-results';
+
     private const COLUMN_KEY_PATTERN = 'keyPattern';
     private const COLUMN_PAYLOAD = 'payload';
     private const COLUMN_STATUS = 'status';
@@ -127,7 +138,12 @@ class Report extends CliTool\App
      */
     public function getLongOpts(): array
     {
-        return [self::OPT_LONG_HELP, self::OPT_SORT_BY_KEY_PATTERN,];
+        return [
+            self::OPT_LONG_HELP,
+            self::OPT_SORT_BY_KEY_PATTERN,
+            self::OPT_REDIS_INSTANCE,
+            self::OPT_GROUP_RESULTS,
+        ];
     }
 
     /** @inheritDoc */
@@ -139,12 +155,19 @@ class Report extends CliTool\App
                 Report upon Redis usage.
 
             Usage:
-                ./report.php [--sort-by-key-pattern] [-h] [--help]
+                ./report.php [OPTIONS]
 
             Options:
                 --sort-by-key-pattern:
                     If provided, sort the report alphabetically by key pattern:
                     otherwise, sort by the data size (largest first).
+                --redis-instance=[storage,cache]:
+                    If provided, report only on the given Redis instance:
+                    * storage: the persistent storage Redis instance
+                    * cache: the ephemeral cache Redis instance
+                --group-results:
+                    If provided, group results for all Schoolbox instances together;
+                    otherwise, provide separate results for each Schoolbox instance.
                 -h, --help:
                     Print this help text.
 
