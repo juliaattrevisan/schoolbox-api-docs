@@ -763,7 +763,7 @@ abstract class Kernel
                         // array is expected.  So we treat the edge-cases above as client errors, and send a 400
                         // response since we do not want errors such as these to end up in Sentry.
                         // (No need to check for object, since json_decode(..., true) converts objects to arrays.)
-                        if (!is_array($decodedContent) && !is_null($decodedContent)) {
+                        if (!is_array($decodedContent)) {
                             http_response_code(self::HTTP_RESPONSE_CODE_BAD_REQUEST);
                             header('Content-Type: text/plain');
                             die('Invalid JSON in request body');
