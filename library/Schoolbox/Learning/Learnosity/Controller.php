@@ -1831,7 +1831,7 @@ class Controller extends Base
          */
         $logger = $this->spawnLogger('learnosity_restore_web');
         try {
-            $lock = $this->acquireLock($logger, HELPER::LEARNOSITY_ACTIVITY_RESTORE_TOOL_NAME, Helper::LEARNOSITY_ACTIVITY_RESTORE_LOCK_TTL);
+            $lock = $this->acquireLock($logger, Helper::LEARNOSITY_ACTIVITY_RESTORE_TOOL_NAME, Helper::LEARNOSITY_ACTIVITY_RESTORE_LOCK_TTL);
         } catch (\RuntimeException $e) {
             return;
         }
