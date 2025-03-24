@@ -11,6 +11,8 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Learnosity;
 
 use Alaress\Database\Predicate\InvalidColumnException;
+use Alaress\Lock\InstanceLockFactory;
+use Alaress\Lock\LockRefreshException;
 use Alaress\Lumberjack\Logger;
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
@@ -21,6 +23,9 @@ use Interop\Queue\Exception\InvalidDestinationException;
 use Interop\Queue\Exception\InvalidMessageException;
 use LearnositySdk\Exceptions\ValidationException;
 use LearnositySdk\Utils\Uuid;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
+use Psr\Log\LoggerInterface;
 use Random\RandomException;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -53,6 +58,9 @@ use Schoolbox\Url\Factory;
 use Schoolbox\User;
 use Schoolbox\User\Translator\Author\ModelToArray;
 use Schoolbox\UserMapper;
+use Symfony\Component\Lock\Exception\LockAcquiringException;
+use Symfony\Component\Lock\Exception\LockConflictedException;
+use Symfony\Component\Lock\LockInterface;
 use Twig\Error\Error;
 
 class Controller extends Base
@@ -1823,6 +1831,82 @@ class Controller extends Base
      */
     public function postCopyQuizConstituents(QuizDomainObject $source, QuizDomainObject $destination): void
     {
+
+        /* Decide how loudly to announce lock acquisition failure
+         *
+         * Simply using $lock = $this->acquireLock() will keep you safe, even if you don't
+         * specifically check for acquisition
+         */
+        $logger = $this->spawnLogger('learnosity_restore_web');
+        try {
+            $lock = $this->acquireLock($logger, HELPER::LEARNOSITY_ACTIVITY_RESTORE_TOOL_NAME, Helper::LEARNOSITY_ACTIVITY_RESTORE_LOCK_TTL);
+        } catch (\RuntimeException $e) {
+            return;
+        }
+
+        /**
+         * check and restore both source and destination quizzes
+         */
+        $helper = (new Helper($this->api, $logger));
+        $candidates[$source->getLearnosityReference()] = [
+            /* Spittin' facts
+             */
+            'assessment_id' => $source->getId(),
+            'title' => $source->getTitle(),
+            'finish' => $source->getCloseAt(),
+            'learnosity_reference' => $source->getLearnosityReference(),
+            /* A spec or an impl?
+             */
+            'type' => $source->isImplementation(),
+            /* Some info about where you might find it in the browzer
+             */
+            'folder_id' => $source->getBaseContext()->getFolder()->getId(),
+            'folder_name' => $source->getBaseContext()->getFolder()->getName(),
+            /* These get updated as we discover information/facts from Learnosity itself
+             */
+            'status' => Helper::LEARNOSITY_STATUS_UNKNOWN,
+        ];
+
+        $result = $this->api->dataGetRequest('/itembank/activities', ['references' => [$source->getLearnosityReference()]]);
+        /* Collate some facts from learnosity's perspective
+             *
+             * Note that learnosity might give you a malformed data set for some reason or other
+             * Store them in a hash lookup for quick cross-referencing anyway
+             */
+        foreach (($result['data'] ?? []) as $learnosityQuiz) {
+            $this->refreshLock($lock);
+            $candidates[$learnosityQuiz['reference']]['status'] = $learnosityQuiz['status'];
+
+            /* If a quiz is already in the state requested, nothing to change
+            */
+            if (Helper::LEARNOSITY_ITEM_STATUS_PUBLISHED === $candidates[$learnosityQuiz['reference']]['status']) {
+                $logger->info(sprintf(
+                    '    This quiz status is already "%s"; nothing to change. Skipping',
+                    Helper::LEARNOSITY_ITEM_STATUS_PUBLISHED
+                ));
+
+                continue;
+            }
+
+            /* We can't...really restore quizzes learnosity doesn't understand.
+             * I'm not sure why it exists: might only be in vagrant demo data
+             */
+            if (Helper::LEARNOSITY_STATUS_UNKNOWN === $candidates[$learnosityQuiz['reference']]['status']) {
+                $logger->info('    Learnosity cannot figure out this quiz. Skipping');
+
+                continue;
+            }
+
+            // if the quiz is not published, restore it
+            if (Helper::LEARNOSITY_ITEM_STATUS_PUBLISHED !== $candidates[$learnosityQuiz['reference']]['status']) {
+                $logger->info('Restoring quiz', $candidates[$learnosityQuiz['reference']]);
+                $helper->restore($candidates[$learnosityQuiz['reference']]['learnosity_reference']);
+            }
+        }
+
+        $lock->release();
+        //now that things are restored, we can start the duplication process
+
         // Start duplicating and polling status of duplication
         $duplicator = $this->buildDuplicator();
         try {
@@ -2367,5 +2451,95 @@ class Controller extends Base
         /* Send it to task for async processing
          */
         $this->messageProducer->send($message);
+    }
+
+
+    /* Lock Acquisition
+     * cloned from cli land because we can perhaps give user feedback here
+     */
+
+    /**
+     * Acquires and returns a lock object.
+     *
+     * @param LoggerInterface $logger
+     * @param string          $lockName The name of the lock to acquire.
+     *                                  Will be automatically made unique across
+     *                                  separate instances.
+     * @param float|null      $timeout  The amount of time (in seconds) to hold the
+     *                                  lock for.
+     * @return LockInterface
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws \RuntimeException
+     */
+    protected function acquireLock(LoggerInterface $logger, string $lockName, ?float $timeout): LockInterface
+    {
+        /** @noinspection PhpUnhandledExceptionInspection */
+        /** @var InstanceLockFactory $lockFactory */
+        $lockFactory = $this->getDi()->get('lockFactory');
+        $lock        = $lockFactory->createLock($lockName, $timeout);
+
+        // Try to acquire this lock
+        try {
+            $acquired = $lock->acquire();
+        } catch (\Exception $e) {
+            /* Any weird exception being thrown here - lock-related or otherwise -
+             * is going to preclude a proper lock acquisition and you should be
+             * prevented from doing whatever you're doing
+             */
+            $message = 'This process is already running for this instance: trusting it will self-terminate on timeout';
+
+            $logger->warning($message);
+
+            throw new \RuntimeException($message);
+        }
+
+        /* You didn't die, but you also couldn't acquire a lock
+         * Drop a nice message because this is an intended behaviour
+         */
+        if (!$acquired) {
+            $message = sprintf(
+                'Could not acquire %s lock',
+                $lockName
+            );
+
+            $logger->warning($message);
+
+            throw new \RuntimeException($message);
+        }
+
+        return $lock;
+    }
+
+    /**
+     * An alias to refresh a lock but captures the exception thrown
+     * when a lock expires
+     *
+     * @param LockInterface $lock
+     * @return void
+     * @throws LockRefreshException
+     */
+    protected function refreshLock(LockInterface $lock): void
+    {
+        try {
+            $lock->refresh();
+        } catch (LockConflictedException | LockAcquiringException $e) {
+            $message = 'Could not refresh lock; perhaps expired';
+
+            $this->logger->warning($message);
+
+            throw new LockRefreshException($message);
+        }
+    }
+
+    /**
+     * Spawn a Logger instance, for the lock mechanism
+     *
+     * @return Logger
+     */
+    private function spawnLogger(string $module): Logger
+    {
+        return new Logger(STDOUT, STDOUT, \Monolog\Logger::INFO, [], true, $module);
     }
 }
