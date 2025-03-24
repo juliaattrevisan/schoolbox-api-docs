@@ -68,6 +68,12 @@ export const Default: Story = {
             </div>
             <div class="box-icon-wrapper">
                 <div class="box-icon">
+                    <sbx-icon name="ai"></sbx-icon>
+                </div>
+                <p>AI</p>
+            </div>
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
                     <sbx-icon name="audio"></sbx-icon>
                 </div>
                 <p>audio</p>
