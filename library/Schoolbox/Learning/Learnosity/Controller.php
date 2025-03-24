@@ -1846,7 +1846,7 @@ class Controller extends Base
             'status' => Helper::LEARNOSITY_STATUS_UNKNOWN,
         ];
 
-        $result = $this->api->dataGetRequest('/itembank/activities', ['references' => [$source->getLearnosityReference()]]);
+        $result = $this->api->dataGetRequest('/itembank/activities', ['references' => [$source->getLearnosityReference(), $destination->getLearnosityReference()]]);
 
         /* The data from learnosity... we should in theory only get 1 result, but let's be safe, and iterate through the 'single' result
          * it may also be malformed, so check for safety
