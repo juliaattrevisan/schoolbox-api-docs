@@ -743,8 +743,6 @@ abstract class Kernel
                         try {
                             $decodedContent = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
                         } catch (\JsonException) {
-                            // Treat invalid JSON as null content.  Null content can then be interpreted by the
-                            // relevant Controller as either not supplied or invalid/undecodable.
                             $decodedContent = null;
                         }
                         // Note json_decode(.., true) can return many data types after a successful decode:
@@ -760,8 +758,8 @@ abstract class Kernel
                         // accepts object, array, or null, other data types must be either converted to one of those
                         // types here, or dealt with here somehow.
                         //    In practice, everywhere JSON is expected in this application, JSON that decodes to an
-                        // array is expected.  So we treat the edge-cases above as client errors, and send a 400
-                        // response since we do not want errors such as these to end up in Sentry.
+                        // array is expected.  So we treat the edge-cases above as client errors (same as invalid JSON
+                        // data), and send a 400 response since we do not want errors such as these to end up in Sentry.
                         // (No need to check for object, since json_decode(..., true) converts objects to arrays.)
                         if (!is_array($decodedContent)) {
                             http_response_code(self::HTTP_RESPONSE_CODE_BAD_REQUEST);
