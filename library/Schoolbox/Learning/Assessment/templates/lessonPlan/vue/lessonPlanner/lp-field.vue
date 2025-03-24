@@ -71,7 +71,7 @@ window.Vue.onMounted(async () => {
             </div>
 
             <div>
-              <p class="meta">{{ field.description }}</p>
+                <p class="meta">{{ field.description }}</p>
             </div>
 
             <!-- The Lesson Plan Template field which is related to this Lesson Plan Field
