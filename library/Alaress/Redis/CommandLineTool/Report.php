@@ -176,8 +176,25 @@ class Report extends CliTool\App
             exit;
         }
 
+        // Which Redis instances to report on?
+        $redisInstance = $this->getOpt(self::OPT_REDIS_INSTANCE);
+        if ($redisInstance) {
+            if (!in_array($redisInstance, self::REDIS_INSTANCES)) {
+                $this->getLogger()->error(
+                    sprintf(
+                        "Redis instance does not exist: must be one of [%s]",
+                        implode(self::REDIS_INSTANCES),
+                    )
+                );
+                exit(CliKernelAbstract::EXIT_STATUS_KERNEL_ERROR);
+            }
+            $redisInstances = [$redisInstance];
+        } else {
+            $redisInstances = self::REDIS_INSTANCES;
+        }
+
         $aggregated = [];
-        foreach (self::REDIS_INSTANCES as $redisInstanceName) {
+        foreach ($redisInstances as $redisInstanceName) {
             $redis = Redis::getClientInstance($redisInstanceName);
             if (!$redis) {
                 $this->getLogger()->error("Unable to fetch redis connection: $redisInstanceName");
@@ -190,7 +207,7 @@ class Report extends CliTool\App
                 $aggregated[$redisInstanceName][$instanceId] = $this->aggregateData($rawDataByInstanceId);
             }
         }
-        foreach (self::REDIS_INSTANCES as $redisInstanceName) {
+        foreach ($redisInstances as $redisInstanceName) {
             // Sort aggregated data by instance ID
             $aggregatedByInstance = $aggregated[$redisInstanceName];
             uksort($aggregatedByInstance, $this->sortByInstanceId(...));
