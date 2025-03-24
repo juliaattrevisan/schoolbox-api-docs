@@ -396,7 +396,7 @@ class Csv extends Base
                     $output[] = [
                         'name'   => $name,
                         'status' => 'Not Added',
-                        'error'  => sprintf('Folder ID not provided'),
+                        'error'  => sprintf('Group IDs not provided'),
                     ];
                     continue;
                 }
@@ -414,7 +414,7 @@ class Csv extends Base
                         $output[] = [
                             'name'   => $name,
                             'status' => 'Not Added',
-                            'error'  => sprintf('Folder ID "%s" is not a number', $folderId),
+                            'error'  => sprintf('Group ID "%s" is not a number', $folderId),
                         ];
                         // If not skip this entire CSV row
                         continue 2;
@@ -427,7 +427,7 @@ class Csv extends Base
                         $output[] = [
                             'name'   => $name,
                             'status' => 'Not Added',
-                            'error'  => sprintf('Folder ID %d not found', $folderIdNum),
+                            'error'  => sprintf('Group ID %d not found', $folderIdNum),
                         ];
                         // If not skip this entire CSV row
                         continue 2;
