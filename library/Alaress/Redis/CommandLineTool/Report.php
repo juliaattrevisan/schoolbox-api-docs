@@ -49,6 +49,11 @@ class Report extends CliTool\App
      */
     private const OPT_GROUP_RESULTS = 'group-results';
 
+    /**
+     * Output JSON?
+     */
+    private const OPT_JSON = 'json';
+
     private const COLUMN_KEY_PATTERN = 'keyPattern';
     private const COLUMN_PAYLOAD = 'payload';
     private const COLUMN_STATUS = 'status';
@@ -148,6 +153,7 @@ class Report extends CliTool\App
             self::OPT_SORT_BY_KEY_PATTERN,
             self::OPT_REDIS_INSTANCE,
             self::OPT_GROUP_RESULTS,
+            self::OPT_JSON,
         ];
     }
 
@@ -173,6 +179,12 @@ class Report extends CliTool\App
                 --group-results:
                     If provided, group results for all Schoolbox instances together;
                     otherwise, provide separate results for each Schoolbox instance.
+                --json:
+                    If provided, output the results as JSON; otherwise, as human-readable text.
+                    When outputting as JSON, the results are keyed by format
+                    `\$redisInstance.\$schoolboxInstance`, and do not include totals
+                    (when working with machine-readable formats, calculate totals yourself).
+
                 -h, --help:
                     Print this help text.
 
@@ -198,6 +210,9 @@ class Report extends CliTool\App
             $redisInstances = self::REDIS_INSTANCES;
         }
 
+        // Output JSON?
+        $jsonOutput = $this->getOpt(self::OPT_JSON);
+
         // Are results grouped across all instances,
         // or separated by instance ID?
         $groupResults = $this->getOpt(self::OPT_GROUP_RESULTS);
@@ -212,15 +227,20 @@ class Report extends CliTool\App
             $this->getLogger()->notice("Scanning redis connection: $redisInstanceName");
             $rawData                   = $this->scanKeys($redis, $redisInstanceName, $groupResults);
             foreach ($rawData as $instanceId => $rawDataByInstanceId) {
-                $aggregated[$redisInstanceName][$instanceId] = $this->aggregateData($rawDataByInstanceId);
+                $aggregated[$redisInstanceName][$instanceId] = $this->aggregateData($rawDataByInstanceId, $jsonOutput);
             }
         }
-        foreach ($redisInstances as $redisInstanceName) {
-            // Sort aggregated data by instance ID
-            $aggregatedByInstance = $aggregated[$redisInstanceName];
-            uksort($aggregatedByInstance, $this->sortByInstanceId(...));
-            foreach ($aggregatedByInstance as $instanceId => $aggregatedByInstanceId) {
-                $this->renderResults($aggregatedByInstanceId, $redisInstanceName, $instanceId, $groupResults);
+
+        if ($jsonOutput) {
+            echo json_encode($aggregated);
+        } else {
+            foreach ($redisInstances as $redisInstanceName) {
+                // Sort aggregated data by instance ID
+                $aggregatedByInstance = $aggregated[$redisInstanceName];
+                uksort($aggregatedByInstance, $this->sortByInstanceId(...));
+                foreach ($aggregatedByInstance as $instanceId => $aggregatedByInstanceId) {
+                    $this->renderResults($aggregatedByInstanceId, $redisInstanceName, $instanceId, $groupResults);
+                }
             }
         }
     }
@@ -375,9 +395,11 @@ class Report extends CliTool\App
      * Aggregates raw data
      *
      * @param array $rawData
+     * @param bool  $jsonOutput If true, outputting JSON and thus do not include
+     *                          totals.
      * @return array
      */
-    private function aggregateData(array $rawData): array
+    private function aggregateData(array $rawData, bool $jsonOutput): array
     {
         $aggregated = [];
         foreach ($rawData as $pattern => $patternData) {
@@ -427,17 +449,19 @@ class Report extends CliTool\App
         });
 
 
-        // Column totals
+        // Column totals: exclude for JSON output
         $countRows = count($aggregated);
-        foreach (array_keys($aggregated[0] ?? []) as $idx => $columnTitle) {
-            if ($idx === 0) {
-                $columnValue = "Totals";
-            } elseif (stripos($columnTitle, 'count') !== false || stripos($columnTitle, 'size')) {
-                $columnValue = array_sum(array_column($aggregated, $columnTitle));
-            } else {
-                $columnValue = '';
+        if (!$jsonOutput) {
+            foreach (array_keys($aggregated[0] ?? []) as $idx => $columnTitle) {
+                if ($idx === 0) {
+                    $columnValue = "Totals";
+                } elseif (stripos($columnTitle, 'count') !== false || stripos($columnTitle, 'size')) {
+                    $columnValue = array_sum(array_column($aggregated, $columnTitle));
+                } else {
+                    $columnValue = '';
+                }
+                $aggregated[$countRows][$columnTitle] = $columnValue;
             }
-            $aggregated[$countRows][$columnTitle] = $columnValue;
         }
 
         // Format numbers
