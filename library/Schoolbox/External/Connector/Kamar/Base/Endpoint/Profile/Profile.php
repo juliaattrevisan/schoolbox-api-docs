@@ -323,7 +323,7 @@ class Profile implements IStrategy
             $emergencyContacts = [];
             if (null === $student->emergencycontacts?->contact) {
                 $this->log->info(sprintf(
-                    'No emergency contacts found for  %s',
+                    'No emergency contacts found for %s',
                     trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
                 ));
             } else {
@@ -439,7 +439,7 @@ class Profile implements IStrategy
 
         if (null === $student->caregivers?->caregiver) {
             $this->log->info(sprintf(
-                'No caregivers found for  %s',
+                'No caregivers found for %s',
                 trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
             ));
 
