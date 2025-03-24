@@ -1852,7 +1852,7 @@ class Controller extends Base
          * it may also be malformed, so check for safety
          */
         foreach (($result['data'] ?? []) as $learnosityQuiz) {
-            $this->refreshLock($lock);
+            $this->refreshLock($logger, $lock);
             $candidates[$learnosityQuiz['reference']]['status'] = $learnosityQuiz['status'];
 
             /* If a quiz is already in the state requested, nothing to change

@@ -943,6 +943,8 @@ abstract class Base
     /**
      * Acquires and returns a lock object.
      *
+     * DI is used to get the lock factory.
+     *
      * @param LoggerInterface $logger
      * @param string          $lockName The name of the lock to acquire.
      *                                  Will be automatically made unique across
@@ -998,18 +1000,19 @@ abstract class Base
      * An alias to refresh a lock but captures the exception thrown
      * when a lock expires
      *
-     * @param LockInterface $lock
+     * @param Logger $logger // log to inform the user of failed refresh
+     * @param LockInterface $lock // the lock to refresh
      * @return void
      * @throws LockRefreshException
      */
-    protected function refreshLock(LockInterface $lock): void
+    protected function refreshLock(LoggerInterface $logger, LockInterface $lock): void
     {
         try {
             $lock->refresh();
         } catch (LockConflictedException | LockAcquiringException $e) {
             $message = 'Could not refresh lock; perhaps expired';
 
-            $this->logger->warning($message);
+            $logger->warning($message);
 
             throw new LockRefreshException($message);
         }
@@ -1018,6 +1021,7 @@ abstract class Base
     /**
      * Spawn a Logger instance, for the lock mechanism
      *
+     * @param string $module // the module name to log under, this will show in STDOUT
      * @return Logger
      */
     protected function spawnLogger(string $module): Logger
