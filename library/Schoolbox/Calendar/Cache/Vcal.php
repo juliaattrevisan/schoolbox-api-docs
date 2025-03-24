@@ -29,8 +29,14 @@ class Vcal
     private const CACHE_KEY_BASE = 'vcal:%s:%s';
 
 
-    // Cache expiry: 2 hours?
-    private const CACHE_EXPIRY = 7200;
+    // Cache expiry: 3 hours.. Ensure longer than cron refresh time
+    /* The crontab entry refers to preparseVcalSubscription.php
+     * You need to keep a cached calendar around longer than the crontab interval so that
+     * people can accessed the older cached version while the new one is being built.
+     * If you don't, you could allow people to request a dynamically calculated result
+     * set and suffer a potential performance hit.
+     */
+    private const CACHE_EXPIRY = 10800;
 
 
     /**
