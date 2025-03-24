@@ -23,7 +23,6 @@ use SimpleXMLElement;
  */
 class Traverser
 {
-
     /**
      * Maximum number of emergency contacts we've permitted (3 by default)
      */
