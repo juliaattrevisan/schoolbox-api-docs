@@ -28,8 +28,8 @@ class Vcal
     private const CACHE_KEY_BASE = 'vcal.%s';
 
 
-    // Cache expiry: 2 hours?
-    private const CACHE_EXPIRY = 7200;
+    // Cache expiry: 3 hours.. Ensure longer than cron refresh time
+    private const CACHE_EXPIRY = 10800;
 
 
     /**
