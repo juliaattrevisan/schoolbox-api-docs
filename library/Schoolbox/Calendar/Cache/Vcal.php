@@ -67,7 +67,7 @@ class Vcal
             $this->redis->setex(
                 $this->determineCacheKey($config),
                 self::CACHE_EXPIRY,
-                Writer::write($this->convertSourceToEvents($source))
+                Writer::writeJson($this->convertSourceToEvents($source))
             );
         }
     }
@@ -83,7 +83,7 @@ class Vcal
     {
         $cacheKey = $this->determineCacheKey($config);
         if ($this->redis->exists($cacheKey)) {
-            $cal = Reader::read($this->redis->get($cacheKey));
+            $cal = Reader::readJson($this->redis->get($cacheKey));
             if (!$cal instanceof VCalendar) {
                 // If we can't unserialize the data, delete it.
                 $this->redis->del($cacheKey);
