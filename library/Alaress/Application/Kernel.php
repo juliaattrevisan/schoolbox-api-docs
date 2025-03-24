@@ -745,7 +745,7 @@ abstract class Kernel
                             // relevant Controller as either not supplied or invalid/undecodable.
                             $decodedContent = null;
                         }
-                        // Note json_decode(.., true) can many data types after a successful decode:
+                        // Note json_decode(.., true) can return many data types after a successful decode:
                         //  * json_decode('null', true) returns null
                         //  * json_decode('false', true) returns false
                         //  * json_decode('true', true) returns true
