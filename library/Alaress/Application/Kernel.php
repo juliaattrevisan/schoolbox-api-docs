@@ -224,6 +224,8 @@ abstract class Kernel
      */
     private $exceptionCallbacks = [];
 
+    private const HTTP_RESPONSE_CODE_BAD_REQUEST = 400;
+
     /**
      * @throws Di\Exception
      * @throws Di\Exception\ContainerLocked
@@ -755,11 +757,16 @@ abstract class Kernel
                         //  * json_decode('{}', true) returns []
                         // All the example responses above are valid JSON data.  Ideally the relevant Controller would
                         // be able to decide what to do with that data.  However, since $request->withParsedBody() only
-                        // accepts object, array, or null, other data types must be converted to null before being
-                        // passed to the Controller via $request->withParsedBody().
+                        // accepts object, array, or null, other data types must be either converted to one of those
+                        // types here, or dealt with here somehow.
+                        //    In practice, everywhere JSON is expected in this application, JSON that decodes to an
+                        // array is expected.  So we treat the edge-cases above as client errors, and send a 400
+                        // response since we do not want errors such as these to end up in Sentry.
                         // (No need to check for object, since json_decode(..., true) converts objects to arrays.)
                         if (!is_array($decodedContent) && !is_null($decodedContent)) {
-                            $decodedContent = null;
+                            http_response_code(self::HTTP_RESPONSE_CODE_BAD_REQUEST);
+                            header('Content-Type: text/plain');
+                            die('Invalid JSON in request body');
                         }
                         $request = $request->withParsedBody($decodedContent);
                     }
