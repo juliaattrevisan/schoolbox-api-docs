@@ -7,14 +7,14 @@
 
     <div class="admin-content">
         <div class="small-12 columns">
-            <h2 class="subheader">Preview bulk calendar event</h2>
+            <h2 class="subheader">{% if perform is not defined %}Preview {% endif %}bulk calendar event</h2>
             {% if perform is not defined %}
                 <div data-alert="" class="alert-box warning">
                     This is a preview only. Click 'Import' to perform import.
                 </div>
             {% else %}
                 <div data-alert="" class="alert-box success">
-                    The import was successfully completed.
+                    The import file was processed successfully.
                 </div>
             {% endif %}
             <table>
