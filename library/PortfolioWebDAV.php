@@ -168,6 +168,14 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                 $userYear = $user->getYear() ? $user->getYear()->getName() : '';
 
                 $path = $dav->getPath();
+
+                if ('' === (string)$path) {
+                    /* Given that we do not want the path to become a required field, we are assuming that if not path
+                     * assigned, it is pointing to the root
+                     */
+                    $path = "/";
+                }
+
                 $path = str_replace("{:username}", $user->getUsername(), $path);
                 $path = str_replace("{:yearlevel}", $userYear, $path);
                 $path = str_replace("{:calendaryear}", (int) date("Y"), $path);
