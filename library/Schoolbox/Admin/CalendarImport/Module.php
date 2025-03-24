@@ -18,6 +18,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\RoleMapper;
 
 class Module extends BaseModule
 {
@@ -56,6 +57,27 @@ class Module extends BaseModule
             self::METHOD_POST,
             '/import/school-events/run',
             'postRunCalendarImport',
+            $permission,
+        );
+
+        $this->register(
+            self::METHOD_GET,
+            '/import/group-events',
+            'getCalendarGroupEventsImportForm',
+            $permission,
+        );
+
+        $this->register(
+            self::METHOD_POST,
+            '/import/group-events',
+            'postCalendarGroupEventsImport',
+            $permission,
+        );
+
+        $this->register(
+            self::METHOD_POST,
+            '/import/group-events/run',
+            'postRunCalendarGroupEventsImport',
             $permission,
         );
     }

@@ -226,7 +226,12 @@ class Subnav
                     '/adminv2/calendar/import/school-events' => [
                         'name'        => 'Import School Events',
                         'visible'     => true,
-                        'description' => 'Import school events into the school calendar via CSV.',
+                        'description' => 'Import school events into the calendar via CSV.',
+                    ],
+                    '/adminv2/calendar/import/group-events' => [
+                        'name'        => 'Import Group Events',
+                        'visible'     => true,
+                        'description' => 'Import group events into the calendar via CSV.',
                     ],
                     '/adminv2/lists/calendar/event-type' => [
                         'name'        => 'Lists - Event Types',

@@ -80,6 +80,7 @@ class Csv extends Base
         $hasCampusColumn = array_key_exists('campus', $headerColumns);
         $hasRolesColumn = array_key_exists('role', $headerColumns);
         $hasOwnerColumn = array_key_exists('event owner', $headerColumns);
+        $hasGroupColumn = array_key_exists('group ids', $headerColumns);
 
         while (($thisRow = fgetcsv($handle, 0, ",")) !== false) {
             // The CSV file will not contain character encoding info, so just assume a compatible encoding has been used.
@@ -96,7 +97,7 @@ class Csv extends Base
             $event_type   = $this->getColumnValues($headerColumns, $thisRow, 'type');
             $publish_date = $this->getColumnValues($headerColumns, $thisRow, 'publish date');
             $attendance   = $this->getColumnValues($headerColumns, $thisRow, 'attendance');
-            $folderIds    = $this->getColumnValues($headerColumns, $thisRow, 'folderIds');
+            $folderIds    = $this->getColumnValues($headerColumns, $thisRow, 'group ids');
             $campuses     = $this->getColumnValues($headerColumns, $thisRow, 'campus', true);
             $roles        = $this->getColumnValues($headerColumns, $thisRow, 'role', true);
             $owner        = $this->getColumnValues($headerColumns, $thisRow, 'event owner');
@@ -391,6 +392,15 @@ class Csv extends Base
             // been set in the object
             $folderList = $this->categoryList;
             if (empty($folderList)) {
+                if ($hasGroupColumn && !strlen(trim($folderIds))) {
+                    $output[] = [
+                        'name'   => $name,
+                        'status' => 'Not Added',
+                        'error'  => sprintf('Group IDs not provided'),
+                    ];
+                    continue;
+                }
+
                 $folderList = [];
                 foreach (explode(',', $folderIds) as $folderId) {
                     // Empty folder ID: just ignore
@@ -404,7 +414,7 @@ class Csv extends Base
                         $output[] = [
                             'name'   => $name,
                             'status' => 'Not Added',
-                            'error'  => sprintf('Folder ID "%s" is not a number', $folderId),
+                            'error'  => sprintf('Group ID "%s" is not a number', $folderId),
                         ];
                         // If not skip this entire CSV row
                         continue 2;
@@ -417,7 +427,7 @@ class Csv extends Base
                         $output[] = [
                             'name'   => $name,
                             'status' => 'Not Added',
-                            'error'  => sprintf('Folder ID %d not found', $folderIdNum),
+                            'error'  => sprintf('Group ID %d not found', $folderIdNum),
                         ];
                         // If not skip this entire CSV row
                         continue 2;
