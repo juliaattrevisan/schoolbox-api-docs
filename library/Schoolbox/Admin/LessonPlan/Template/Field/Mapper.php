@@ -35,6 +35,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('lesson_plan_template_id', LessonPlanTemplateMapper::class, 'id', null, null, 'lessonPlanTemplate', 'lessonPlanTemplate');
         $this->uses('title', self::TYPE_STRING);
+        $this->uses('description', self::TYPE_STRING);
         $this->uses('body', self::TYPE_STRING);
         $this->uses('visibility', self::TYPE_STRING);
         $this->uses('sequence', self::TYPE_INTEGER);
