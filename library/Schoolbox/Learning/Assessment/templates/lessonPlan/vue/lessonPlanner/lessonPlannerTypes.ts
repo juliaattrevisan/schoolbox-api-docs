@@ -1,6 +1,7 @@
 export type LessonPlanField = {
     id: number;
     title: string;
+    description: string;
     body: string;
     description: string;
     visibility: "student" | "staff";
