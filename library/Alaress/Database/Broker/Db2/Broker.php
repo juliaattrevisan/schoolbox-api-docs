@@ -21,15 +21,19 @@ use PDO;
 
 class Broker extends Base
 {
-    // These return DB2 specific statement objects
+    /**
+     * Name of the driver to use: must exist in either `/etc/odbcinst.ini` or
+     * `/etc/odbc.ini`.
+     */
+    private const ODBC_DRIVER = 'IBM i Access ODBC Driver 64-bit';
 
     /**
      * @inheritdoc
      */
     public static function isAvailable()
     {
-        // DB2 is loaded as a PHP extension, not a PDO module
-        return extension_loaded('ibm_db2');
+        // DB2 now uses ODBC: can only assume that the driver actually exists.
+        return in_array('odbc', PDO::getAvailableDrivers(), true);
     }
 
     /**
@@ -75,7 +79,15 @@ class Broker extends Base
             $portString = "PORT={$this->connector->getPort()};";
         }
 
-        return "odbc:IBM i Access ODBC Driver 64-bit;DATABASE={$this->connector->getDatabase()};HOSTNAME={$this->connector->getHostname()};{$portString}PROTOCOL=TCPIP;UID={$this->connector->getUsername()};PWD={$this->connector->getPassword()};";
+        return sprintf(
+            "odbc:%s;DATABASE=%s;HOSTNAME=%s;%sPROTOCOL=TCPIP;UID=%s;PWD=%s;",
+            self::ODBC_DRIVER,
+            $this->connector->getDatabase(),
+            $this->connector->getHostname(),
+            $portString,
+            $this->connector->getUsername(),
+            $this->connector->getPassword(),
+        );
     }
 
     /**
