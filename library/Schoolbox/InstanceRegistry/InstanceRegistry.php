@@ -21,10 +21,13 @@ class InstanceRegistry
     /**
      * Constructor
      *
-     * @param IConfigLoader $config Schoolbox configuration
+     * @param IConfigLoader $config    Schoolbox configuration
+     * @param ApiClient     $apiClient Instance Registry API client
      */
-    public function __construct(private IConfigLoader $config)
-    {
+    public function __construct(
+        private IConfigLoader $config,
+        private ApiClient $apiClient,
+    ) {
     }
 
     /**
@@ -55,7 +58,7 @@ class InstanceRegistry
     public function getLatestVersionFull(): string
     {
         try {
-            return (new ApiClient($this->config))->getLatestRelease();
+            return $this->apiClient->getLatestRelease();
         } catch (Exception $e) {
             /**
              * we were unable to fetch the latest release version from the instance registry, so lets

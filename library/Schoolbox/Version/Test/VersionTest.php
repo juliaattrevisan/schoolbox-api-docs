@@ -11,6 +11,7 @@ namespace Schoolbox\Version\Test;
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Config\ArrayLoader;
+use Schoolbox\InstanceRegistry\ApiClient;
 use Schoolbox\InstanceRegistry\InstanceRegistry;
 use Schoolbox\Version\Version;
 
@@ -202,11 +203,12 @@ class VersionTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('getTestShowUpgradeReminderData')]
     public function testShowUpgradeReminder(?bool $expected, array $config): void
     {
-        $factoryVersion = new Version(new ArrayLoader($config));
+        $configLoader   = new ArrayLoader($config);
+        $factoryVersion = new Version($configLoader);
         $this->assertEquals(
             $expected,
             $factoryVersion->showUpgradeReminder(
-                new InstanceRegistry(new ArrayLoader($config)),
+                new InstanceRegistry($configLoader, new ApiClient($configLoader)),
             )
         );
     }
@@ -222,16 +224,20 @@ class VersionTest extends TestCase
         yield 'cloud hosted never needs a upgrade reminder' => [
             false,
             [
-                'site_version'     => '21.0.2-1',
-                'site_environment' => Version::SITE_ENVIRONMENT_CLOUD_SAAS,
+                'site_version'                  => '21.0.2-1',
+                'site_environment'              => Version::SITE_ENVIRONMENT_CLOUD_SAAS,
+                'instance_registry_url'         => '',
+                'instance_registry_api_caching' => 0,
             ],
         ];
 
         yield 'non client hosting never needs a upgrade reminder' => [
             false,
             [
-                'site_version'     => '21.0.2-1',
-                'site_environment' => 'unknown-hosted',
+                'site_version'                  => '21.0.2-1',
+                'site_environment'              => 'unknown-hosted',
+                'instance_registry_url'         => '',
+                'instance_registry_api_caching' => 0,
             ],
         ];
     }
