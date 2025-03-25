@@ -456,19 +456,44 @@ class Profile implements IStrategy
     {
         /* No schools? No trabajo
          */
+        if (!\count($schools)) {
+            return null;
+        }
 
         /* Inspect each $schools node and look for a meaningful reasonForLeaving
-         * If we encounter one $school with a MEANINGLESS reasonForLeaving, then
-         * maybe presume them to be in that school.
-         *
-         * If MULTIPLE $school have a meaningless reasonForLeaving, then it's inconclusive,
-         * and we need to inspect deeper.
          */
+        $candidateSchools = [];
 
-        /* If we need to inspect deeper, check out each $school enrolmentDetails node
+        foreach ($schools as $school) {
+            if ('' !== trim((string)$school['reasonForLeaving'])) {
+                $candidateSchools[] = $school;
+            }
+        }
+
+        /* No schools? No trabajo
+         * Apparently this person has left all schools
+         */
+        if (!\count($candidateSchools)) {
+            return null;
+        }
+
+        /* If we encounter one $school with a MEANINGLESS reasonForLeaving, then
+         * maybe presume them to be in that school.
+         */
+        if (1 === \count($candidateSchools)) {
+            return $candidateSchools[0];
+        }
+
+        /* If MULTIPLE $school have a meaningless reasonForLeaving, then it's inconclusive,
+         * and we need to inspect deeper.
+         *
+         * If we need to inspect deeper, check out each $school enrolmentDetails node
          * and see if there's an enrolment date that encompasses $now. If there is,
          * presume that $school to be the one we're in.
          */
+        foreach ($schools as $school) {
+
+        }
 
         /* Otherwise, no idea: return null, and skip them.
          * They're not known to be in any $school conclusively and is a civica data problem.
