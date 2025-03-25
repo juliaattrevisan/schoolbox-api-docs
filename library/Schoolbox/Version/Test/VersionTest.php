@@ -11,6 +11,7 @@ namespace Schoolbox\Version\Test;
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Config\ArrayLoader;
+use Schoolbox\InstanceRegistry\InstanceRegistry;
 use Schoolbox\Version\Version;
 
 /**
@@ -202,7 +203,12 @@ class VersionTest extends TestCase
     public function testShowUpgradeReminder(?bool $expected, array $config): void
     {
         $factoryVersion = new Version(new ArrayLoader($config));
-        $this->assertEquals($expected, $factoryVersion->showUpgradeReminder());
+        $this->assertEquals(
+            $expected,
+            $factoryVersion->showUpgradeReminder(
+                new InstanceRegistry(new ArrayLoader($config)),
+            )
+        );
     }
 
     /**

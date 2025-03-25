@@ -176,7 +176,7 @@ class Controller extends Base
                 'pageCurrent' => $this->routeGenerator->generate('adminHome.getIndex'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminHome.getIndex')),
                 'usageInGraph' => $usageInGraph,
-                'showUpgradeReminder'  => $version->showUpgradeReminder(),
+                'showUpgradeReminder'  => $version->showUpgradeReminder($this->instanceRegistry),
                 'major_site_version'   => $version->getMajor(),
                 'major_latest_version' => $this->instanceRegistry->getLatestVersionMajor(),
                 'disk_used' => $disk_used,
