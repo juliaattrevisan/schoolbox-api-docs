@@ -62,7 +62,7 @@ window.Vue.onMounted(async () => {
             <div class="lp-item-label">
                 <label>
                     {{ field.title }}
-                    <p v-if="field.meta" class="meta">{{ field.meta }}</p>
+                    <p v-if="field.meta.length" class="meta">{{ field.meta }}</p>
                 </label>
 
                 <p v-if="props.studentConst !== field.visibility" class="meta">

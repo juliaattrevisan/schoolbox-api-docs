@@ -17,7 +17,7 @@ const selectedFields = window.Vue.computed(() => {
         <hr v-if="i > 0" />
 
         <label :for="`lp-review-field-${field.id}`">{{ field.title }}</label>
-        <p v-if="field.meta" class="meta">{{ field.meta }}</p>
+        <p v-if="field.meta.length" class="meta">{{ field.meta }}</p>
         <textarea
             v-if="field.suggestedBody"
             :id="`lp-review-field-${field.id}`"
