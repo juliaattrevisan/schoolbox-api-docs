@@ -446,15 +446,15 @@ class Profile implements IStrategy
 
     /**
      * Figure out which school someone is in at the moment, based on a two-stage heuristic:
-     *     1. See if there's only one school that has a meaningless reasonForLeaving.
+     *     1. See if there's only one school that has a meaningless reasonforLeaving.
      *        The presence of "Exited" or some other truthy value means the student has
      *        left that school. Anything else means they're likely to be in that school still.
      *            1a. It's possible that civica allows you to leave a campus but still provide
-     *                no truthy reasonForLeaving, which means this is possibly inconclusive.
-     *            1b. It's possible that civica allows multiple schools to have no reasonForLeaving.
+     *                no truthy reasonforLeaving, which means this is possibly inconclusive.
+     *            1b. It's possible that civica allows multiple schools to have no reasonforLeaving.
      *            1c. It's possible that civica allows a student to be in no school at the moment
      *
-     *     2. If we can't be absolutely sure based on reasonForLeaving, inspect each enrolmentDetails
+     *     2. If we can't be absolutely sure based on reasonforLeaving, inspect each enrolmentDetails
      *        to see if there's an enrolment date that encompasses the current datetime. The first one
      *        to match will be the school we presume they're in (ie. you can't be in two schools at
      *        the same time simply by virtue of how a school works)
@@ -470,12 +470,12 @@ class Profile implements IStrategy
             return null;
         }
 
-        /* Inspect each $schools node and look for a meaningful reasonForLeaving
+        /* Inspect each $schools node and look for a meaningful reasonforLeaving
          */
         $candidateSchools = [];
 
         foreach ($schools as $school) {
-            if ('' !== trim((string)$school['reasonForLeaving'])) {
+            if ('' !== trim((string)$school['reasonforLeaving'])) {
                 $candidateSchools[] = $school;
             }
         }
@@ -487,7 +487,7 @@ class Profile implements IStrategy
             return null;
         }
 
-        /* If we encounter one $school with a MEANINGLESS reasonForLeaving, then
+        /* If we encounter one $school with a MEANINGLESS reasonforLeaving, then
          * maybe presume them to be in that school.
          */
         if (1 === \count($candidateSchools)) {
@@ -499,7 +499,7 @@ class Profile implements IStrategy
          */
         $now = \Alaress_Date_Format::now();
 
-        /* If MULTIPLE $school have a meaningless reasonForLeaving, then it's inconclusive,
+        /* If MULTIPLE $school have a meaningless reasonforLeaving, then it's inconclusive,
          * and we need to inspect deeper.
          *
          * If we need to inspect deeper, check out each $school enrolmentDetails node
