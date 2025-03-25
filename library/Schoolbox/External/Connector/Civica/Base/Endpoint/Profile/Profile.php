@@ -494,7 +494,7 @@ class Profile implements IStrategy
          */
         if (1 === \count($candidateSchools)) {
             $this->log->debug(sprintf(
-                'Candidate school found: %s',
+                'Candidate school found via reasonforLeaving: %s',
                 $candidateSchools[0]['schoolName']
             ));
 
