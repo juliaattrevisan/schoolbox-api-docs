@@ -108,6 +108,7 @@ class Decorator implements DecoratorInterface
                 $updatedField = $lessonPlanFieldMapper->createModel()
                     ->setLessonPlanTemplateField($lessonPlanTemplateField->getId())
                     ->setTitle($lessonPlanTemplateField->getTitle())
+                    ->setDescription($lessonPlanTemplateField->getDescription())
                     ->setVisibility($lessonPlanTemplateField->getVisibility())
                     ->setSequence($lessonPlanTemplateField->getSequence());
             } else {
