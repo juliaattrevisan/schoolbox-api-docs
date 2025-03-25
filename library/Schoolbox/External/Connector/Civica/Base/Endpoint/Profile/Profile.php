@@ -154,6 +154,11 @@ class Profile implements IStrategy
          */
         $pages = $this->api->retrieveForJurisdiction('GET', 'Students/Jurisdiction');
 
+        /* That's the current datetime, obviously, which we'll use to decide if someone is currently
+         * enrolled ni a school via enrolment details.
+         */
+        $now = \Alaress_Date_Format::now();
+
         foreach ($pages as $page) {
             foreach ($page['values'] as $student) {
                 $externalId = trim((string)$student['personId']);
@@ -166,7 +171,7 @@ class Profile implements IStrategy
 
                 /* Figure out which school they're currently in.
                  */
-                $currentSchool = $this->findSchool($student['schools']);
+                $currentSchool = $this->findSchool($student['schools'], $now);
 
                 /* Can't work out what school they're in; skip them
                  */
@@ -460,9 +465,10 @@ class Profile implements IStrategy
      *        the same time simply by virtue of how a school works)
      *
      * @param array $schools
+     * @param Alaress_Date_Format $now
      * @return array|null
      */
-    public function findSchool(array $schools): ?array
+    public function findSchool(array $schools, \Alaress_Date_Format $now): ?array
     {
         /* No schools? No trabajo
          */
@@ -500,11 +506,6 @@ class Profile implements IStrategy
 
             return $candidateSchools[0];
         }
-
-        /* That's the current datetime, obviously, which we'll use to decide if someone is currently
-         * enrolled ni a school via enrolment details.
-         */
-        $now = \Alaress_Date_Format::now();
 
         /* If MULTIPLE $school have a meaningless reasonforLeaving, then it's inconclusive,
          * and we need to inspect deeper.
