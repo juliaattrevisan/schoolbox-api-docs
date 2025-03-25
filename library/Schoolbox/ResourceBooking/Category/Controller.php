@@ -67,7 +67,7 @@ class Controller extends Base
                     'offset' => $this->paginator->getOffset($page),
                     'order'  => ['name' => 'asc',],
                 )
-            );
+            )->filter(fn ($cat) => $this->itemMapper->searchCount('', $this->getUser(), $cat->getId()));
         }
 
         $this->response = $this->responseFromTemplate(
@@ -127,7 +127,7 @@ class Controller extends Base
             'resource_category_id',
             $category->getId(),
             ['order' => ['name' => 'asc']]
-        );
+        )->filter(fn($item) => false !== $this->getRouteIfAuthorized("resourceItem.read", ['item' => $item]));
 
         foreach ($resources->getAll() as $resource) {
             /** @var \Schoolbox\ResourceBooking\Item\Model $resource */
