@@ -14,6 +14,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
 use Psr\SimpleCache\CacheInterface;
 use Psr\SimpleCache\InvalidArgumentException;
+use Schoolbox\Url\Uri;
 
 /**
  * HTTP client, with a cache wrapped around it: designed for caching the
@@ -76,6 +77,15 @@ class Cache
         // note that this implementation allows the UA to be overridden from
         // outside
         $headers = array_merge(self::DEFAULT_HEADERS, $headers);
+
+        // From SA-13472:
+        // Check scheme: if webcal, update the scheme to HTTP, as CURL
+        // (which HTTP client uses internally) doesn't understand that scheme.
+        // Hopefully the remote server will just redirect to HTTPS?
+        $url = new Uri($url);
+        if ('webcal' === $url->getScheme()) {
+            $url = $url->withScheme('http');
+        }
 
         // Make the request and store it
         $response     = $this->httpClient->request('GET', $url, [RequestOptions::HEADERS => $headers]);
