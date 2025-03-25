@@ -107,7 +107,7 @@ class PDOStatement extends BasePDOStatement
     /**
      * @inheritdoc
      */
-    public function fetch($fetch_style = null, $cursor_orientation = PDO::FETCH_ORI_NEXT, $cursor_offset = 0): mixed
+    public function fetch($fetch_style = null, $cursor_orientation = BasePDO::FETCH_ORI_NEXT, $cursor_offset = 0): mixed
     {
         if (!$this->statement) {
             return false;
@@ -134,9 +134,9 @@ class PDOStatement extends BasePDOStatement
     /**
      * @inheritdoc
      */
-    public function bindParam($parameter, &$variable, $data_type = PDO::PARAM_STR, $length = null, $driver_options = null): bool
+    public function bindParam($parameter, &$variable, $data_type = BasePDO::PARAM_STR, $length = null, $driver_options = null): bool
     {
-        if ($data_type & PDO::PARAM_INPUT_OUTPUT) {
+        if ($data_type & BasePDO::PARAM_INPUT_OUTPUT) {
             $parameterType = DB2_PARAM_INOUT;
         } else {
             $parameterType = DB2_PARAM_IN;
@@ -153,7 +153,7 @@ class PDOStatement extends BasePDOStatement
     /**
      * @inheritdoc
      */
-    public function bindValue($parameter, $value, $data_type = PDO::PARAM_STR): bool
+    public function bindValue($parameter, $value, $data_type = BasePDO::PARAM_STR): bool
     {
         $this->bindings[$parameter] = [
             'type' => DB2_PARAM_IN,
