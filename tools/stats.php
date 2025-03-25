@@ -42,6 +42,9 @@ $app = new class extends CliTool\App {
             'guests_disabled'   => 'SELECT count(*) FROM user u WHERE u.deleted_at IS NULL AND enabled <> 1 AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = "guest")',
             'guests_deleted'    => 'SELECT count(*) FROM user u WHERE u.deleted_at IS not NULL AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = "guest")',
             'superusers'        => 'SELECT count(*) FROM user u JOIN superusers s on u.id = s.id WHERE u.deleted_at IS NULL',
+            'students_junior'   => "SELECT count(*) FROM user u WHERE u.deleted_at IS NULL AND enabled = 1 AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = 'student') AND u.year_id IN ( SELECT id FROM lu_year_level WHERE REGEXP_REPLACE(name, '[^0-9]', '') != '' AND CAST(REGEXP_REPLACE(name, '[^0-9]', '') AS UNSIGNED) < 7 OR name LIKE 'ELC' OR name like 'Prep%' OR name like 'Kind%')",
+            'students_senior'   => "SELECT count(*) FROM user u WHERE u.deleted_at IS NULL AND enabled = 1 AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = 'student') AND u.year_id IN ( SELECT id FROM lu_year_level WHERE REGEXP_REPLACE(name, '[^0-9]', '') != '' AND CAST(REGEXP_REPLACE(name, '[^0-9]', '') AS UNSIGNED) > 6)",
+
 
             //Moderators
             'calendar_moderator'     => 'SELECT count(distinct u.id) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_CALENDAR . ' AND type=' . UserAccess::ACCESS_FULL, // distinct u.id, so we can see the count of humans, not service permissions.  A single human can have multiple Calendar service permissions.
@@ -57,7 +60,6 @@ $app = new class extends CliTool\App {
             'lms_moderator'          => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_LMS . ' AND type=' . UserAccess::ACCESS_FULL,
             'impersonator_moderator' => 'SELECT count(distinct u.id) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_IMPERSONATOR . ' AND type=' . UserAccess::ACCESS_FULL, // distinct u.id, so we can see the count of humans, not service permissions.  A single human can have multiple Impersonator service permissions.
 
-
             //Logins
             'unique_logins_yesterday' => "SELECT COUNT(DISTINCT username) FROM login_log WHERE login = 1 AND date >= SUBDATE(DATE(NOW()), INTERVAL 1 DAY) AND date < DATE(NOW())",
             'unique_logins_yesterday_student' => "SELECT COUNT( DISTINCT login_log.username) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON group_id = `groups`.id WHERE login = 1 AND date >= SUBDATE(DATE(NOW()), INTERVAL 1 DAY) AND date < DATE(NOW()) AND group_type = 'student'",
@@ -69,6 +71,10 @@ $app = new class extends CliTool\App {
             'logins_parent'    => 'SELECT count(*) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON user.group_id = `groups`.id WHERE login = 1 and `groups`.group_type = "parent"',
             'logins_student'    => 'SELECT count(*) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON user.group_id = `groups`.id WHERE login = 1 and `groups`.group_type = "student"',
             'logins'            => 'SELECT count(*) FROM login_log l WHERE login = 1',
+            'unique_logins_yesterday_student_junior' => "SELECT COUNT( DISTINCT login_log.username) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON group_id = `groups`.id WHERE login = 1 AND date >= SUBDATE(DATE(NOW()), INTERVAL 1 DAY) AND date < DATE(NOW()) AND group_type = 'student' AND
+                                                            user.year_id IN ( SELECT id FROM lu_year_level WHERE REGEXP_REPLACE(name, '[^0-9]', '') != '' AND CAST(REGEXP_REPLACE(name, '[^0-9]', '') AS UNSIGNED) < 7 OR name LIKE 'ELC' OR name like 'Prep%' OR name like 'Kind%')",
+            'unique_logins_yesterday_student_senior' => "SELECT COUNT( DISTINCT login_log.username) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON group_id = `groups`.id WHERE login = 1 AND date >= SUBDATE(DATE(NOW()), INTERVAL 1 DAY) AND date < DATE(NOW()) AND group_type = 'student' AND
+                                                            user.year_id IN ( SELECT id FROM lu_year_level WHERE REGEXP_REPLACE(name, '[^0-9]', '') != '' AND CAST(REGEXP_REPLACE(name, '[^0-9]', '') AS UNSIGNED) > 6)",
 
             //LMS
             'classes'           => 'SELECT count(f.id) from folder f JOIN folder_code fc ON f.id = fc.folder_id where f.deleted_at is null and fc.deleted_at is null',
@@ -90,6 +96,7 @@ $app = new class extends CliTool\App {
             'course_quiz'       => 'SELECT COUNT(*) FROM assessment JOIN assessment_course_unit_specification a on assessment.id = a.assessment_id JOIN assess ON assessment.id = assess.assessment_id WHERE assess.availability = "assess" AND assessment.deleted_at IS NULL',
             'course_tasks'      => 'SELECT COUNT(*) FROM assessment JOIN assessment_course_unit_specification a on assessment.id = a.assessment_id JOIN task ON assessment.id = task.assessment_id WHERE assessment.deleted_at IS NULL',
             'course_projects'   => 'SELECT COUNT(*) FROM assessment JOIN assessment_course_unit_specification a on assessment.id = a.assessment_id JOIN project ON assessment.id = project.assessment_id WHERE assessment.deleted_at IS NULL',
+            'course_framework'  => 'SELECT count(*) FROM courseTemplates WHERE deleted_at IS NULL',
             'assessments'       => 'SELECT count(*) FROM assessment WHERE deleted_at IS NULL',
             'quizzes'           => 'SELECT count(*) FROM assess WHERE availability = "assess" AND deleted_at IS NULL',
             'due_works'         => 'SELECT count(*) FROM submission_box sb JOIN assessment a ON a.id = sb.assessment_id WHERE a.deleted_at IS NULL',
@@ -217,28 +224,6 @@ $app = new class extends CliTool\App {
                 AND deleted_at IS NULL
             ",
 
-            // Quizzes with titles that contain utf8 chars
-            // these if imported prior to SA-17115 (2024-02-05)
-            // they may be in a hidden failed state, where we have a learnosity ID, but they didn't save anything
-            'quiz_title_utf8' => "
-                SELECT COUNT(*) FROM assess
-                WHERE LENGTH(title) != CHAR_LENGTH(title)
-                AND availability = 'assess'
-                AND deleted_at IS NULL;
-            ",
-
-            // Quizzes with short question answers longer than 250 characters will make the field blank
-            'quiz_short_ans_250' => "
-                select count(*) from assess
-                join assess_section on (assess_section.assess_id = assess.assess_id AND assess_section.deleted_at IS NULL)
-                join assess_question on (assess_question.section_id = assess_section.section_id AND assess_question.deleted_at IS NULL)
-                join assess_answer on (assess_question.question_id = assess_answer.question_id AND assess_answer.deleted_at IS NULL)
-                join assess_luQuestionType on (assess_luQuestionType.type_id = assess_question.type_id AND assess_luQuestionType.moodle = 'shortanswer' AND assess_luQuestionType.availability = 'assess')
-                where CHAR_LENGTH(assess_answer.answer) > 250
-                  AND assess.availability = 'assess'
-                  AND assess.deleted_at IS NULL;
-            ",
-
             //Homepages
             'forum_posts'       => 'SELECT count(*) FROM `forumPost` WHERE `deleted_at` IS NULL',
             'forum_thread'      => 'SELECT count(*) FROM forumThread WHERE `deleted_at` IS NULL',
@@ -354,6 +339,9 @@ $app = new class extends CliTool\App {
             //AI Usage
             'openai_success'    => 'SELECT COUNT(*) FROM openai_log WHERE return_code = 200',
             'openai_error'      => 'SELECT COUNT(*) FROM openai_log WHERE return_code != 200',
+
+            //Packages
+            'package_installed' => 'SELECT COUNT(*) FROM package WHERE installed = 1',
         ];
 
         $result['instance_id'] = INSTANCE_ID;
@@ -366,6 +354,7 @@ $app = new class extends CliTool\App {
         $db->executeDirectly('SET MAX_STATEMENT_TIME=300');
 
         foreach ($queryList as $name => $query) {
+            $this->getLogger()->debug($query);
             $statement = $db->executeQuery($query);
             $result[$name] = (int)$statement->fetchColumn(0);
         }
