@@ -18,6 +18,8 @@ use Psr\SimpleCache\InvalidArgumentException;
 /**
  * HTTP client, with a cache wrapped around it: designed for caching the
  * response from HTTP requests.
+ *
+ * Designed to replace `Alaress_Cache_Abstract`.
  */
 class Cache
 {

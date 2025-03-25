@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\RequestException as RequestException;
 use GuzzleHttp\Exception as GuzzleException;
@@ -8,9 +14,7 @@ use Schoolbox\Application\Exception\Exception as SchoolboxException;
 /**
  * Alaress_Cache_Abstract
  *
- * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * @deprecated use `\Alaress\Http\Cache` instead
  */
 abstract class Alaress_Cache_Abstract
 {
