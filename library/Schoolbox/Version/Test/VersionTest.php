@@ -221,7 +221,7 @@ class VersionTest extends TestCase
                         new Cache(
                             $this->getMockBuilder(Client::class)->getMock(),
                             new SimpleCacheBridge(new ArrayCachePool()),
-                            30,
+                            null,
                         )
                     )
                 ),

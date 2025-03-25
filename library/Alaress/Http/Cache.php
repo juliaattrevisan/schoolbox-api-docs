@@ -37,12 +37,12 @@ class Cache
      *
      * @param ClientInterface $httpClient      Client used for actually making HTTP requests.
      * @param CacheInterface  $internalCache   Cache implementation used to actually store responses.
-     * @param int             $defaultLifetime Default lifetime of cache keys.
+     * @param int|null        $defaultLifetime Default lifetime of cache keys, or null for no expiry.
      */
     public function __construct(
         private ClientInterface $httpClient,
         private CacheInterface $internalCache,
-        private int $defaultLifetime,
+        private int|null $defaultLifetime,
     ) {
     }
 
