@@ -71,7 +71,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(LogMapper::class),
             new InstanceRegistry(
                 $this->getConfig(),
-                new ApiClient($this->getConfig()),
+                new ApiClient($this->getConfig(), $this->injector->get('httpClient.cache')),
             ),
         );
     }

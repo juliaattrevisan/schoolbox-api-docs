@@ -9,6 +9,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\Version\Test;
 
+use Alaress\Http\Cache;
+use Cache\Adapter\PHPArray\ArrayCachePool;
+use Cache\Bridge\SimpleCache\SimpleCacheBridge;
+use GuzzleHttp\Client;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Config\ArrayLoader;
 use Schoolbox\InstanceRegistry\ApiClient;
@@ -205,10 +209,22 @@ class VersionTest extends TestCase
     {
         $configLoader   = new ArrayLoader($config);
         $factoryVersion = new Version($configLoader);
+
+        // showUpgradeReminder requires a whole lot of boilerplate currently
         $this->assertEquals(
             $expected,
             $factoryVersion->showUpgradeReminder(
-                new InstanceRegistry($configLoader, new ApiClient($configLoader)),
+                new InstanceRegistry(
+                    $configLoader,
+                    new ApiClient(
+                        $configLoader,
+                        new Cache(
+                            $this->getMockBuilder(Client::class)->getMock(),
+                            new SimpleCacheBridge(new ArrayCachePool()),
+                            30,
+                        )
+                    )
+                ),
             )
         );
     }
