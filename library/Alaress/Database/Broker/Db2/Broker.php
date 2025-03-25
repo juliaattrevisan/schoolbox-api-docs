@@ -15,9 +15,9 @@ use Alaress\Database\Exception;
 use Alaress\Database\Iterator\Db2\Iterator;
 use Alaress\Database\Statement\FunctionCall\Db2\FunctionCall;
 use Alaress\Database\Statement\StoredProcedure\Db2\StoredProcedure;
-use Alaress\Database\Wrapper\Db2\PDO;
 use Alaress\DebugBar\Instance as DebugBar;
 use DebugBar\DataCollector\DataCollectorInterface;
+use PDO;
 
 class Broker extends Base
 {
