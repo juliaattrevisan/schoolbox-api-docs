@@ -3,7 +3,6 @@ export type LessonPlanField = {
     title: string;
     description: string;
     body: string;
-    description: string;
     visibility: "student" | "staff";
     lessonPlanTemplateField?: number; // only exists when modifying an existing lesson plan
 };
