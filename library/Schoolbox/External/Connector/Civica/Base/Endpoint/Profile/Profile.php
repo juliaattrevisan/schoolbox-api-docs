@@ -164,11 +164,21 @@ class Profile implements IStrategy
                     continue;
                 }
 
-                /* FIXME There is an Omega Assumption about using $schools[0]
-                 *  because we don't have a means by which to choose which of $schools
-                 *  is the one to use...
+                /* Figure out which school they're currently in.
                  */
-                $currentSchool = $student['schools'][0];
+                $currentSchool = $this->findSchool($student['schools']);
+
+                /* Can't work out what school they're in; skip them
+                 */
+                if (null === $currentSchool) {
+                    $this->log->warning(sprintf(
+                        'Student %s has no school enrolment relevant to %s; skipping',
+                        $student['personId'],
+                        $this->now
+                    ));
+
+                    continue;
+                }
 
                 /* This is reused a lot but *only one* of these Enrolment Details is supposed
                  * to be relevant at any given time...supposedly
