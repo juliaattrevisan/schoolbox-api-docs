@@ -22,10 +22,9 @@ use PDO;
 class Broker extends Base
 {
     /**
-     * Name of the driver to use: must exist in either `/etc/odbcinst.ini` or
-     * `/etc/odbc.ini`.
+     * Name of the driver to use: must exist in `/etc/odbcinst.ini`.
      */
-    private const ODBC_DRIVER = 'IBM i Access ODBC Driver 64-bit';
+    private const ODBC_DRIVER = 'IBM i Access ODBC Driver';
 
     /**
      * @inheritdoc
@@ -80,7 +79,7 @@ class Broker extends Base
         }
 
         return sprintf(
-            "odbc:%s;DATABASE=%s;HOSTNAME=%s;%sPROTOCOL=TCPIP;UID=%s;PWD=%s;",
+            "odbc:DRIVER=%s;DATABASE=%s;SYSTEM=%s;%sPROTOCOL=TCPIP;UID=%s;PWD=%s;",
             self::ODBC_DRIVER,
             $this->connector->getDatabase(),
             $this->connector->getHostname(),
