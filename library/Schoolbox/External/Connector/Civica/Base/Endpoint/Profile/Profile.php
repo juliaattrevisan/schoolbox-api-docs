@@ -435,6 +435,49 @@ class Profile implements IStrategy
 
 
     /**
+     * Figure out which school someone is in at the moment, based on a two-stage heuristic:
+     *     1. See if there's only one school that has a meaningless reasonForLeaving.
+     *        The presence of "Exited" or some other truthy value means the student has
+     *        left that school. Anything else means they're likely to be in that school still.
+     *            1a. It's possible that civica allows you to leave a campus but still provide
+     *                no truthy reasonForLeaving, which means this is possibly inconclusive.
+     *            1b. It's possible that civica allows multiple schools to have no reasonForLeaving.
+     *            1c. It's possible that civica allows a student to be in no school at the moment
+     *
+     *     2. If we can't be absolutely sure based on reasonForLeaving, inspect each enrolmentDetails
+     *        to see if there's an enrolment date that encompasses the current datetime. The first one
+     *        to match will be the school we presume they're in (ie. you can't be in two schools at
+     *        the same time simply by virtue of how a school works)
+     *
+     * @param array $schools
+     * @return array|null
+     */
+    public function findSchool(array $schools): ?array
+    {
+        /* No schools? No trabajo
+         */
+
+        /* Inspect each $schools node and look for a meaningful reasonForLeaving
+         * If we encounter one $school with a MEANINGLESS reasonForLeaving, then
+         * maybe presume them to be in that school.
+         *
+         * If MULTIPLE $school have a meaningless reasonForLeaving, then it's inconclusive,
+         * and we need to inspect deeper.
+         */
+
+        /* If we need to inspect deeper, check out each $school enrolmentDetails node
+         * and see if there's an enrolment date that encompasses $now. If there is,
+         * presume that $school to be the one we're in.
+         */
+
+        /* Otherwise, no idea: return null, and skip them.
+         * They're not known to be in any $school conclusively and is a civica data problem.
+         */
+        return null;
+    }
+
+
+    /**
      * Find the most recent Campus someone was in; if there aren't any enrolment
      * details, return null I guess, and let UPS sort them out
      *
