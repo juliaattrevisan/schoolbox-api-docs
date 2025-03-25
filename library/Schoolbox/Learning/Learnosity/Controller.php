@@ -1875,11 +1875,10 @@ class Controller extends Base
                 continue;
             }
 
-            // if the quiz is not published, restore it
-            if (Helper::LEARNOSITY_ITEM_STATUS_PUBLISHED !== $candidates[$learnosityQuiz['reference']]['status']) {
-                $logger->info('Restoring quiz', $candidates[$learnosityQuiz['reference']]);
-                $helper->restore($learnosityQuiz['reference']);
-            }
+            // by this time we should have already confirmed the quiz is not published, and that learnosity does know it exists...
+            // lets restore it
+            $logger->info('Restoring quiz', $candidates[$learnosityQuiz['reference']]);
+            $helper->restore($learnosityQuiz['reference']);
         }
 
         $lock->release();
