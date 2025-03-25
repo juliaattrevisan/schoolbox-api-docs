@@ -16,6 +16,7 @@ import type View from "@ckeditor/ckeditor5-ui/src/view";
 import type { PanelPosition } from "@ckeditor/ckeditor5-ui/src/dropdown/dropdownpanelview";
 import { insertElementAfter } from "@js/util/domUtils";
 import ResourceLinkEditing from "@js/editor/plugin/resourceLink/ResourceLinkEditing";
+import type InsertResourceLinkCommand from "@js/editor/plugin/resourceLink/InsertResourceLinkCommand";
 
 export default class UITweaks extends Plugin {
     /**
@@ -141,6 +142,27 @@ export default class UITweaks extends Plugin {
                     linkFormView.registerChild(button);
                     // add the resource button after the url input
                     insertElementAfter(linkFormView.urlInputView.fieldView.element, button.element as HTMLElement);
+                    /**
+                     * Let's listen for the same event as packages/ckeditor5-ui/src/bindings/clickoutsidehandler.ts does,
+                     * but with higher priority.
+                     * It's important that the same emitter is used as by LinkUI (`formView`), because native DOM Events
+                     * are translated by packages/ckeditor5-utils/src/dom/emittermixin.ts. If different emitter were used,
+                     * we'd get different, non-related events.
+                     */
+                    linkFormView.listenTo(
+                        document,
+                        "mousedown",
+                        (mouseDownEvent) => {
+                            // while the resource modal is open, prevent the link ui from hiding
+                            const resourceLinkCommand = this.editor.commands.get(
+                                "insertResourceLink",
+                            ) as InsertResourceLinkCommand;
+                            if (resourceLinkCommand && resourceLinkCommand.isOn) {
+                                mouseDownEvent.stop();
+                            }
+                        },
+                        { priority: "high" },
+                    );
                 }
             }
         });
