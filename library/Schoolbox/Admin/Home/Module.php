@@ -14,6 +14,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\Connector\Log\Mapper as LogMapper;
+use Schoolbox\InstanceRegistry\InstanceRegistry;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Storage\S3\DisasterRecovery;
 
@@ -67,6 +68,7 @@ class Module extends BaseModule
             $this->injector->get('databaseExternal'),
             $this->getMapperFactory()->get(ConfigMapper::class),
             $this->getMapperFactory()->get(LogMapper::class),
+            new InstanceRegistry($this->injector->get('config')),
         );
     }
 

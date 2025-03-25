@@ -71,12 +71,14 @@ class Controller extends Base
      * @param IConnector|null  $databaseExternal Will be NULL if external is disabled in config, or if unable to connect
      * @param ConfigMapper     $configMapper
      * @param ImportLogMapper  $importLogMapper
+     * @param InstanceRegistry $instanceRegistry The instance registry API
      */
     public function __construct(
         Database\Factory $databaseFactory,
         ?IConnector $databaseExternal,
         ConfigMapper $configMapper,
-        ImportLogMapper $importLogMapper
+        ImportLogMapper $importLogMapper,
+        private InstanceRegistry $instanceRegistry,
     ) {
         $this->databaseFactory  = $databaseFactory;
         $this->databaseExternal = ($databaseExternal instanceof NullConnector) ? null : $databaseExternal;
@@ -93,7 +95,7 @@ class Controller extends Base
     public function dismissUpgradeReminder()
     {
         if ($this->getUser()->isSuperuser()) {
-            $latestVersionMajor = (new InstanceRegistry($this->getConfigLoader()))->getLatestVersionMajor();
+            $latestVersionMajor = $this->instanceRegistry->getLatestVersionMajor();
             $configDismissUpgradeReminder = $this->configMapper->findOneByColumn('name', 'dismiss_version');
 
             //update the config item with the current instance major version
@@ -176,7 +178,7 @@ class Controller extends Base
                 'usageInGraph' => $usageInGraph,
                 'showUpgradeReminder'  => $version->showUpgradeReminder(),
                 'major_site_version'   => $version->getMajor(),
-                'major_latest_version' => (new InstanceRegistry($this->getConfigLoader()))->getLatestVersionMajor(),
+                'major_latest_version' => $this->instanceRegistry->getLatestVersionMajor(),
                 'disk_used' => $disk_used,
                 //                    'disk_used' => Alaress_Byte_Format::bytesToString($disk_total - $disk_free),
                 'disk_total' => Alaress_Byte_Format::bytesToString($disk_total),
