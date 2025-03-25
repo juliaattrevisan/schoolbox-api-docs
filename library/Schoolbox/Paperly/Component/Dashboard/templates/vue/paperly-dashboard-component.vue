@@ -83,7 +83,13 @@ const upcoming = window.Vue.computed<UpcomingItem[]>(() => {
     <template v-else>
         <ul class="flex-list flex-wrap buttons">
             <li v-for="feature in paperlyPayload.features" :key="feature.url">
-                <a :class="feature.icon ?? ''" :href="feature.url ?? ''">{{ feature.title ?? "" }}</a>
+                <a
+                    :class="feature.icon ?? ''"
+                    :href="feature.url ?? ''"
+                    :target="props.openItemsInNewTab ? '_blank' : undefined"
+                >
+                    {{ feature.title ?? "" }}
+                </a>
             </li>
         </ul>
         <div class="c-island l-flex-col">
