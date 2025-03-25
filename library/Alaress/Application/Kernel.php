@@ -1679,6 +1679,33 @@ abstract class Kernel
             ),
         );
 
+        // Cache wrappers around HTTP clients
+        $di->set(
+            'httpClient.internalCache',
+            $di->lazy(
+                function () use ($di) {
+                    return new SimpleCacheBridge(
+                        new ItemPool(
+                            $di->get('redis.cache'),
+                            new Base64(),
+                            new KeyGenerator('httpClient', INSTANCE_ID),
+                        )
+                    );
+                }
+            ),
+        );
+        $di->set(
+            'httpClient.cache',
+            $di->lazyNew(
+                \Alaress\Http\Cache::class,
+                [
+                    'httpClient'      => $di->lazyGet('httpClient'),
+                    'internalCache'   => $di->lazyGet('httpClient.internalCache'),
+                    'defaultLifetime' => null,
+                ]
+            )
+        );
+
         // Kami connector, as used for communicating with Kami's API
         $di->set('kamiConnector', $di->lazyNew(Kami\Connector::class, [
             'client'            => $di->lazyGet('httpClient'),
@@ -2084,32 +2111,6 @@ abstract class Kernel
                         )
                     );
                 }
-            )
-        );
-
-        $di->set(
-            'httpClient.internalCache',
-            $di->lazy(
-                function () use ($di) {
-                    return new SimpleCacheBridge(
-                        new ItemPool(
-                            $di->get('redis.cache'),
-                            new Base64(),
-                            new KeyGenerator('httpClient', INSTANCE_ID),
-                        )
-                    );
-                }
-            ),
-        );
-        $di->set(
-            'httpClient.cache',
-            $di->lazyNew(
-                \Alaress\Http\Cache::class,
-                [
-                    'httpClient'      => $di->lazyGet('httpClient'),
-                    'internalCache'   => $di->lazyGet('httpClient.internalCache'),
-                    'defaultLifetime' => null,
-                ]
             )
         );
 
