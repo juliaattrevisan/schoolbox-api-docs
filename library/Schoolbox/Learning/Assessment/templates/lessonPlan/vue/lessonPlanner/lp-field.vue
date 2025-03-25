@@ -62,7 +62,6 @@ window.Vue.onMounted(async () => {
             <div class="lp-item-label">
                 <label>
                     {{ field.title }}
-                    <p v-if="field.meta" class="meta">{{ field.meta }}</p>
                 </label>
 
                 <p v-if="props.studentConst !== field.visibility" class="meta">
@@ -70,9 +69,11 @@ window.Vue.onMounted(async () => {
                 </p>
             </div>
 
+            <p v-if="field.description.length" class="meta lp-field-description">{{ field.description }}</p>
+
             <!-- The Lesson Plan Template field which is related to this Lesson Plan Field
-                Because of the swamp you need to know both since the same function fulfils
-                create and update phases in mapperProxy->save() -->
+              Because of the swamp you need to know both since the same function fulfils
+              create and update phases in mapperProxy->save() -->
 
             <!-- If field.lessonPlanTemplateField is defined, then we are modifying an existing field -->
             <input
@@ -102,5 +103,9 @@ window.Vue.onMounted(async () => {
 .lp-field-regenerate {
     float: right;
     color: var(--content-ui-foreground);
+}
+
+.lp-field-description {
+    white-space: pre-wrap;
 }
 </style>

@@ -126,6 +126,7 @@ class Controller extends Base
                  */
                 $field = $this->fieldMapper->createModel()
                     ->setTitle($fieldData['title'])
+                    ->setDescription($fieldData['description'])
                     ->setBody($fieldData['body'])
                     ->setLessonPlanTemplate($template)
                     ->setVisibility($visibility)
@@ -219,6 +220,7 @@ class Controller extends Base
                 /* Update all the pieces
                  */
                 $field->setTitle($fieldData['title'])
+                    ->setDescription($fieldData['description'])
                     ->setBody($fieldData['body'])
                     ->setLessonPlanTemplate($lessonPlanTemplate)
                     ->setVisibility($visibility)

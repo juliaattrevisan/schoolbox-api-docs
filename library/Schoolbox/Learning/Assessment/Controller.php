@@ -38,7 +38,6 @@ use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
-use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Permission\Access\Access;
@@ -382,7 +381,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
                         'id' => $field->getId(),
                         'title' => $field->getTitle(),
                         'body' => $field->getBody(),
-                        'meta' => null, // TODO: Implement this, can be string|null
+                        'description' => trim((string)$field->getDescription()),
                         'visibility' => $field->getVisibility(),
                     ];
                 }
@@ -506,7 +505,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
                     'id' => $field->getId(),
                     'title' => $field->getTitle(),
                     'body' => $field->getBody(),
-                    'meta' => null, // TODO: Implement this, can be string|null
+                    'description' => trim((string)$field->getDescription()),
                     'visibility' => $field->getVisibility(),
                     // this key only exists when modifying an existing lesson plan:
                     'lessonPlanTemplateField' => $field->getLessonPlanTemplateField(),

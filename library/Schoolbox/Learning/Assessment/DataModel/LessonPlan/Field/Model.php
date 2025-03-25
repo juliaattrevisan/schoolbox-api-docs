@@ -46,6 +46,16 @@ class Model implements ISoftDeletable
 
 
     /**
+     * A little extra text to help explain what this field is meant to provide.
+     * It's used as an instructional to humans, but also, as extra data point
+     * for an AI prompt to further refine its output
+     *
+     * @var string|null
+     */
+    private ?string $description = null;
+
+
+    /**
      * Corresponds to Role::STUDENT or Role::STAFF
      *
      * @var string|null
@@ -130,6 +140,26 @@ class Model implements ISoftDeletable
     public function setTitle(?string $title): self
     {
         $this->title = $title;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+
+    /**
+     * @param string|null $description
+     * @return $this
+     */
+    public function setDescription(?string $description): self
+    {
+        $this->description = $description;
         return $this;
     }
 
