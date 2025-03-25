@@ -492,7 +492,41 @@ class Profile implements IStrategy
          * presume that $school to be the one we're in.
          */
         foreach ($schools as $school) {
+            foreach ($school['enrolmentDetails'] as $enrolmentDetail) {
+                /* This...maybe could be null, but let's assume not for now
+                 */
+                $enrolmentStart = new \Alaress_Date_Format(sprintf(
+                    '%s 00:00:00',
+                    $enrolmentDetail['enrolmentDetailStartDate']
+                ), \Alaress_Date_Format::DATABASE_FORMAT);
 
+                /* This is definitely nullable, we saw a dataset where enrolmentEnd
+                 * was a meaningless empty string
+                 */
+                $enrolmentEnd = null;
+
+                if ($enrolmentDetail['enrolmentDetailEndDate']) {
+                    $enrolmentEnd = new \Alaress_Date_Format(sprintf(
+                        '%s 00:00:00',
+                        $enrolmentDetail['enrolmentDetailEndDate']
+                    ), \Alaress_Date_Format::DATABASE_FORMAT);
+                }
+
+                /* Now figure out if $now is between those enrolment dates.
+                 *
+                 * If $enrolmentEnd is null, then presume this to mean "the student hasn't
+                 * left this school yet" and thus is likely to be in it; check the $enrolmentStart
+                 * is in the past.
+                 *
+                 * If $enrolmentStart is in the past, and they haven't got an $enrolmentEnd,
+                 * then...I guess they're here
+                 */
+
+
+                /* Otherwise, check the conclusive dates in case they're scheduled to leave
+                 * a school at a particular date in the future
+                 */
+            }
         }
 
         /* Otherwise, no idea: return null, and skip them.
