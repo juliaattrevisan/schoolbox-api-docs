@@ -832,7 +832,10 @@ export default {
                                     </div>
                                     <div class="content">
                                         <blockquote v-if="evidence.object.comment">
-                                            {{ evidence.object.comment }}<br />
+                                            <media-article
+                                                data-test="activity-feed-assessment-comment"
+                                                :content="evidence.object.comment"
+                                            ></media-article>
                                         </blockquote>
                                         <a :href="evidence.object._links.summary"> View assessment details </a>
                                     </div>
