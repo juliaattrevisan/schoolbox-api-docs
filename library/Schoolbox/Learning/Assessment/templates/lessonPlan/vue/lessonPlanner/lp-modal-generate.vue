@@ -24,7 +24,7 @@ const allowGeneration = window.Vue.computed(() => {
                     {{ field.title }}
                     <template v-if="field.description.length">
                         <br />
-                        <span class="meta">{{ field.description }}</span>
+                        <p class="meta lp-field-description">{{ field.description }}</p>
                     </template>
                 </label>
             </li>
@@ -58,4 +58,8 @@ const allowGeneration = window.Vue.computed(() => {
     </button>
 </template>
 
-<style scoped></style>
+<style scoped>
+.lp-field-description {
+    white-space: pre-wrap;
+}
+</style>

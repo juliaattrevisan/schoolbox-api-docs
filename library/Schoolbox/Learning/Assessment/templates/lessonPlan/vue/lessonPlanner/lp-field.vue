@@ -62,7 +62,7 @@ window.Vue.onMounted(async () => {
             <div class="lp-item-label">
                 <label>
                     {{ field.title }}
-                    <p v-if="field.description.length" class="meta">{{ field.description }}</p>
+                    <p v-if="field.description.length" class="meta lp-field-description">{{ field.description }}</p>
                 </label>
 
                 <p v-if="props.studentConst !== field.visibility" class="meta">
@@ -102,5 +102,9 @@ window.Vue.onMounted(async () => {
 .lp-field-regenerate {
     float: right;
     color: var(--content-ui-foreground);
+}
+
+.lp-field-description {
+    white-space: pre-wrap;
 }
 </style>
