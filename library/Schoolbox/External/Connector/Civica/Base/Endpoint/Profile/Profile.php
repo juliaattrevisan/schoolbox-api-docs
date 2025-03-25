@@ -547,7 +547,7 @@ class Profile implements IStrategy
                 if ($enrolmentStart->lte($now) && null === $enrolmentEnd) {
                     $this->log->debug(sprintf(
                         'Candidate school found with null enrolment end date: %s',
-                        $school
+                        $school['schoolName']
                     ));
 
                     return $school;
@@ -562,7 +562,7 @@ class Profile implements IStrategy
                 if ($enrolmentStart->lte($now) && $enrolmentEnd->gte($now)) {
                     $this->log->debug(sprintf(
                         'Candidate school found with set enrolment start and enrolment end date: %s',
-                        $school
+                        $school['schoolName']
                     ));
 
                     return $school;
