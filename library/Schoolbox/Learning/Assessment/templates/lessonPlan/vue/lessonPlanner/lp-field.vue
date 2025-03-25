@@ -70,10 +70,6 @@ window.Vue.onMounted(async () => {
                 </p>
             </div>
 
-            <div>
-                <p class="meta">{{ field.description }}</p>
-            </div>
-
             <!-- The Lesson Plan Template field which is related to this Lesson Plan Field
                 Because of the swamp you need to know both since the same function fulfils
                 create and update phases in mapperProxy->save() -->
