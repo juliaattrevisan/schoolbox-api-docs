@@ -22,9 +22,9 @@ const allowGeneration = window.Vue.computed(() => {
                 <input :id="`lp-generate-field-${field.id}`" v-model="field.selected" type="checkbox" />
                 <label :for="`lp-generate-field-${field.id}`" class="checkbox-label">
                     {{ field.title }}
-                    <template v-if="field.meta.length">
+                    <template v-if="field.description.length">
                         <br />
-                        <span class="meta">{{ field.meta }}</span>
+                        <span class="meta">{{ field.description }}</span>
                     </template>
                 </label>
             </li>
