@@ -484,6 +484,11 @@ class Profile implements IStrategy
             return $candidateSchools[0];
         }
 
+        /* That's the current datetime, obviously, which we'll use to decide if someone is currently
+         * enrolled ni a school via enrolment details.
+         */
+        $now = \Alaress_Date_Format::now();
+
         /* If MULTIPLE $school have a meaningless reasonForLeaving, then it's inconclusive,
          * and we need to inspect deeper.
          *
@@ -521,16 +526,26 @@ class Profile implements IStrategy
                  * If $enrolmentStart is in the past, and they haven't got an $enrolmentEnd,
                  * then...I guess they're here
                  */
-
+                if ($enrolmentStart->lte($now) && null === $enrolmentEnd) {
+                    return $school;
+                }
 
                 /* Otherwise, check the conclusive dates in case they're scheduled to leave
-                 * a school at a particular date in the future
+                 * a school at a particular date in the future.
+                 *
+                 * If the enrolment started in the past, and the enrolment ends in the future,
+                 * then...I guess they're here
                  */
+                if ($enrolmentStart->lte($now) && $enrolmentEnd->gte($now)) {
+                    return $school;
+                }
             }
         }
 
         /* Otherwise, no idea: return null, and skip them.
          * They're not known to be in any $school conclusively and is a civica data problem.
+         * Or, they're enrolled "in the future" which might be a Future Families scenario
+         * but we aren't exploring that in civica just yet.
          */
         return null;
     }
