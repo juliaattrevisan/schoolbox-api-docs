@@ -10,14 +10,26 @@ declare(strict_types=1);
 namespace Alaress\Http;
 
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\RequestOptions;
 use Psr\SimpleCache\CacheInterface;
+use Psr\SimpleCache\InvalidArgumentException;
 
 /**
  * HTTP client, with a cache wrapped around it: designed for caching the
  * response from HTTP requests.
  */
-class Cache implements CacheInterface
+class Cache
 {
+    /**
+     * Default header for HTTP requests.
+     *
+     * (This is the original user agent header from `Alaress_Cache_Abstract`.)
+     */
+    private const DEFAULT_HEADERS = [
+        'User-Agent' => 'Mozilla/5.0 (Schoolbox)'
+    ];
+
     /**
      * Constructor
      *
@@ -33,73 +45,51 @@ class Cache implements CacheInterface
     }
 
     /**
-     * @inheritdoc
+     * Retrieve the response body of a URL from the cache: on miss, requests the
+     * URL via the HTTP client, and caches the response body.
+     *
+     * @param string      $url     The URL to retrieve.
+     * @param string|null $key     If provided: use this as the cache key,
+     *                             otherwise derive from `$url`.
+     * @param array       $headers Any headers to pass to the request.
+     * @param int|null    $ttl     If provided: cache for this amount of time,
+     *                             otherwise use `$this->defaultLifetime`.
+     *
+     * @return string
+     * @throws InvalidArgumentException if the cache key is somehow not valid
+     * @throws GuzzleException          if the HTTP request failed
      */
-    public function get($key, $default = null)
+    public function request(string $url, ?string $key = null, array $headers = [], ?int $ttl = null): string
     {
-        $result = $this->internalCache->get($key, $default);
-        if ($result === $default) {
+        // Attempt to load cached response
+        $key    ??= $this->hashKey($url);
+        $result = $this->internalCache->get($key);
+        if (isset($result)) {
             return $result;
         }
 
-        // Load result from HTTP
-        $response = $this->httpClient->request('GET', $key);
-        return $response->getBody()->getContents();
+        // Otherwise, load response from HTTP client
+
+        // User agent header from `Alaress_Cache_Abstract`:
+        // note that this implementation allows the UA to be overridden from
+        // outside
+        $headers = array_merge(self::DEFAULT_HEADERS, $headers);
+
+        // Make the request and store it
+        $response     = $this->httpClient->request('GET', $url, [RequestOptions::HEADERS => $headers]);
+        $responseBody = $response->getBody()->getContents();
+        $this->internalCache->set($key, $responseBody, $ttl ?? $this->defaultLifetime);
+        return $responseBody;
     }
 
     /**
-     * @inheritdoc
+     * Hash the key (in this case, a URL) before working with it.
+     *
+     * @param string $key
+     * @return string
      */
-    public function set($key, $value, $ttl = null): bool
+    private function hashKey(string $key): string
     {
-        return $this->internalCache->set($key, $value, $ttl ?? $this->defaultLifetime);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function delete($key): bool
-    {
-        return $this->internalCache->delete($key);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function clear(): bool
-    {
-        return $this->internalCache->clear();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getMultiple($keys, $default = null): iterable
-    {
-        return $this->internalCache->getMultiple($keys, $default);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setMultiple($values, $ttl = null): bool
-    {
-        return $this->internalCache->setMultiple($values, $ttl);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function deleteMultiple($keys): bool
-    {
-        return $this->internalCache->deleteMultiple($keys);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function has($key): bool
-    {
-        return $this->internalCache->has($key);
+        return hash('sha256', $key);
     }
 }
