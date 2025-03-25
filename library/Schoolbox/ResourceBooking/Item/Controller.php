@@ -69,33 +69,45 @@ class Controller extends Base
         $category = $this->mapper->getJoinMapper('category')->createModel();
         $category->setName('All');
 
-
         // Use the paginator to limit searches
         $this->paginator->setUrl($this->request->getUri()->__toString());
         $list = $this->mapper->createCollection();
-        if ($catId) {
-            try {
-                $category = $this->mapper->getJoinMapper('category')->findById($catId);
-            } catch (SchoolboxNotFoundException $e) {
-                $this->response = $this->responseEmpty(404);
-                return;
+        if (strlen($search) > 0) {
+            $total = $this->mapper->searchCount($search);
+            $this->paginator->setTotal($total);
+            if ($total > 0) {
+                $list = $this->mapper->search(
+                    $search,
+                    $this->paginator->getOffset($page),
+                    $this->paginator->getPageSize(),
+                    'name',
+                    'asc'
+                );
             }
-        }
+        } else {
+            if ($catId) {
+                $query['resource_category_id'] = $catId;
+                try {
+                    $category = $this->mapper->getJoinMapper('category')->findById($catId);
+                } catch (SchoolboxNotFoundException $e) {
+                    $this->response = $this->responseEmpty(404);
+                    return;
+                }
+            }
 
-        $user = $this->getUser();
-        // Get count before running list
-        $total = $this->mapper->searchCount($search, $user, $catId);
-        $this->paginator->setTotal($total);
-        if ($total > 0) {
-            $list = $this->mapper->search(
-                $search,
-                $user,
-                $catId,
-                $this->paginator->getOffset($page),
-                $this->paginator->getPageSize(),
-                'name',
-                'asc'
-            );
+            // Get count before running list
+            $total = $this->mapper->countByColumnList($query);
+            $this->paginator->setTotal($total);
+            if ($total > 0) {
+                $list = $this->mapper->findByColumnList(
+                    $query,
+                    [
+                        'order'  => ['name' => 'asc'],
+                        'limit'  => $this->paginator->getPageSize(),
+                        'offset' => $this->paginator->getOffset($page),
+                    ]
+                );
+            }
         }
 
         $this->response = $this->responseFromTemplate(
@@ -108,7 +120,7 @@ class Controller extends Base
                 'category'     => $category,
                 'categoryList' => $this->mapper->getJoinMapper('category')->findAll([
                     'order' => ['name' => 'asc',],
-                ])->filter(fn($cat) => $this->mapper->searchCount('', $user, $cat->getId()) > 0),
+                ]),
                 'search'       => $search,
                 'paginator'    => $this->paginator,
                 'page'         => $page,
@@ -125,7 +137,7 @@ class Controller extends Base
     {
         $excludedId = $this->requestQuery->get('thisId');
         $search     = trim($this->requestQuery->get('query'));
-        $data       = $this->mapper->search($search, $this->getUser())
+        $data       = $this->mapper->search($search)
                            ->filter(function (Model $item) use ($excludedId) {
                                return $item->getId() != $excludedId;
                            })
