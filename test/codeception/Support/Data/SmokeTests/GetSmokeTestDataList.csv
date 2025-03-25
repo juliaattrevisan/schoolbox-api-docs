@@ -1249,8 +1249,8 @@ LMS,"Curriculum Coverage",Parent,https://vagrant.dev.schoolbox.cloud/curriculum/
 "Resource Booking","View resource booking category",Parent,https://vagrant.dev.schoolbox.cloud/resource-booking/category/5,200
 "Resource Booking","View resource item",Superuser,https://vagrant.dev.schoolbox.cloud/resource-booking/item/5,200
 "Resource Booking","View resource item",Teacher,https://vagrant.dev.schoolbox.cloud/resource-booking/item/5,200
-"Resource Booking","View resource item",Student,https://vagrant.dev.schoolbox.cloud/resource-booking/item/5,403
-"Resource Booking","View resource item",Parent,https://vagrant.dev.schoolbox.cloud/resource-booking/item/5,403
+"Resource Booking","View resource item",Student,https://vagrant.dev.schoolbox.cloud/resource-booking/item/5,200
+"Resource Booking","View resource item",Parent,https://vagrant.dev.schoolbox.cloud/resource-booking/item/5,200
 "Resource Booking","Add new resource",Superuser,https://vagrant.dev.schoolbox.cloud/resource-booking/item/add,200
 "Resource Booking","Add new resource",Teacher,https://vagrant.dev.schoolbox.cloud/resource-booking/item/add,401
 "Resource Booking","Add new resource",Student,https://vagrant.dev.schoolbox.cloud/resource-booking/item/add,401
