@@ -484,6 +484,8 @@ class Profile implements IStrategy
          * Apparently this person has left all schools
          */
         if (!\count($candidateSchools)) {
+            $this->log->debug('No candidate schools found.');
+
             return null;
         }
 
@@ -491,6 +493,11 @@ class Profile implements IStrategy
          * maybe presume them to be in that school.
          */
         if (1 === \count($candidateSchools)) {
+            $this->log->debug(sprintf(
+                'Candidate school found: %s',
+                $candidateSchools[0]['schoolName']
+            ));
+
             return $candidateSchools[0];
         }
 
@@ -537,6 +544,11 @@ class Profile implements IStrategy
                  * then...I guess they're here
                  */
                 if ($enrolmentStart->lte($now) && null === $enrolmentEnd) {
+                    $this->log->debug(sprintf(
+                        'Candidate school found with null enrolment end date: %s',
+                        $school
+                    ));
+
                     return $school;
                 }
 
@@ -547,6 +559,11 @@ class Profile implements IStrategy
                  * then...I guess they're here
                  */
                 if ($enrolmentStart->lte($now) && $enrolmentEnd->gte($now)) {
+                    $this->log->debug(sprintf(
+                        'Candidate school found with set enrolment start and enrolment end date: %s',
+                        $school
+                    ));
+
                     return $school;
                 }
             }
