@@ -475,7 +475,7 @@ class Profile implements IStrategy
         $candidateSchools = [];
 
         foreach ($schools as $school) {
-            if ('' !== trim((string)$school['reasonforLeaving'])) {
+            if ('' === trim((string)$school['reasonforLeaving'])) {
                 $candidateSchools[] = $school;
             }
         }
