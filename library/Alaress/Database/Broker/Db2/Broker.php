@@ -75,7 +75,7 @@ class Broker extends Base
             $portString = "PORT={$this->connector->getPort()};";
         }
 
-        return "DATABASE={$this->connector->getDatabase()};HOSTNAME={$this->connector->getHostname()};{$portString}PROTOCOL=TCPIP;UID={$this->connector->getUsername()};PWD={$this->connector->getPassword()};";
+        return "odbc:IBM i Access ODBC Driver 64-bit;DATABASE={$this->connector->getDatabase()};HOSTNAME={$this->connector->getHostname()};{$portString}PROTOCOL=TCPIP;UID={$this->connector->getUsername()};PWD={$this->connector->getPassword()};";
     }
 
     /**
