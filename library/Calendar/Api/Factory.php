@@ -38,13 +38,13 @@ class Calendar_Api_Factory
      *
      * @param Assessment\MapperProxy $assessmentDataSource A data source for assessments.
      * @param ModuleChecker          $moduleChecker        Calendar module checker, for checking if calendar is enabled.
-     * @param IConfigLoader          $config               Schoolbox configuration.
+     * @param IConfigLoader          $configLoader         Schoolbox configuration.
      * @param null|IConnector        $databaseExternal     External database, if supported.
      */
     public function __construct(
         private Assessment\MapperProxy $assessmentDataSource,
         private ModuleChecker $moduleChecker,
-        private IConfigLoader $config,
+        private IConfigLoader $configLoader,
         private ?IConnector $databaseExternal = null,
 
     ) {
