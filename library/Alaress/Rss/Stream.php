@@ -77,7 +77,7 @@ class Alaress_Rss_Stream
         if ($this->getSource() !== null) {
             /* The Xml class already uses caching
              */
-            $this->setInput(new Xml($this->getSource(), $this->cache));
+            $this->setInput(new Xml($this->getSource(), $this->cache, $this->cacheTimeout));
 
             /* If there was data, try to interpret it
              */

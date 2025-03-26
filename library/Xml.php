@@ -24,17 +24,21 @@ class Xml
      *
      * @param string $url   The URL to fetch XML from.
      * @param Cache  $cache The HTTP client cache wrapper to use to fetch `$source`.
+     * @param int    $cacheTimeout
      * @throws InvalidArgumentException
      */
-    public function __construct(string $url, private Cache $cache)
-    {
+    public function __construct(
+        string $url,
+        private Cache $cache,
+        private int $cacheTimeout,
+    ) {
         if (empty($url)) {
             return;
         }
 
         // Load from cache
         try {
-            $response = $this->cache->request($url);
+            $response = $this->cache->request($url, $this->cacheTimeout);
         } catch (\GuzzleHttp\Exception\GuzzleException $e) {
             /**
              * Either requesting the RSS feed, or the RSS feed failed, error out here.
