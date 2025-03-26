@@ -91,11 +91,6 @@ class Report_Activity extends Report_Abstract implements Report_IReport
         return $this->sortable;
     }
 
-    public function addFields($fields)
-    {
-        array_merge($this->fields, $fields);
-    }
-
     public function getFields()
     {
         return $this->fields;

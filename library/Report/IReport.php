@@ -12,7 +12,6 @@ interface Report_IReport
     function getIndexID();
     function getReportTitle();
     function setFields($cols);
-    function addFields($cols);
     function getFields();
     function getDefaultOrderBy();
     function getSortableFields();
