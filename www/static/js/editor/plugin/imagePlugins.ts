@@ -2,8 +2,8 @@
  * Returns the image plugins for the editor
  */
 
-import { ImageInline, ImageToolbar, ImageStyle, ImageResize, ImageUpload } from "@ckeditor/ckeditor5-image";
-import LinkImage from "@js/editor/plugin/link/LinkImage";
+import { ImageInline, ImageBlock, ImageToolbar, ImageStyle, ImageResize, ImageUpload } from "@ckeditor/ckeditor5-image";
+import { LinkImage } from "@ckeditor/ckeditor5-link";
 import FullWidth from "@js/editor/plugin/fullWidth/FullWidth";
 
 /**
@@ -12,6 +12,7 @@ import FullWidth from "@js/editor/plugin/fullWidth/FullWidth";
  */
 export function getImagePlugins(): (
     | typeof ImageInline
+    | typeof ImageBlock
     | typeof ImageToolbar
     | typeof ImageStyle
     | typeof ImageResize
@@ -19,5 +20,5 @@ export function getImagePlugins(): (
     | typeof LinkImage
     | typeof FullWidth
 )[] {
-    return [ImageInline, ImageToolbar, ImageStyle, ImageResize, ImageUpload, LinkImage, FullWidth];
+    return [ImageInline, ImageBlock, ImageToolbar, ImageStyle, ImageResize, ImageUpload, LinkImage, FullWidth];
 }

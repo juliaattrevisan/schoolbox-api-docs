@@ -1,19 +1,34 @@
 /**
  * Any UI related tweaks that need to be made to the editor to fit
- * within the SB context should be added here.
+ * within the SBX context should be added here.
  */
 
 import { Plugin } from "@ckeditor/ckeditor5-core";
 import type { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
 import { getOptimalPosition } from "@ckeditor/ckeditor5-utils";
 import { EditorEvent } from "@js/editor/event/editorEvent";
+import { ButtonView } from "@ckeditor/ckeditor5-ui";
+import { LinkUI } from "@ckeditor/ckeditor5-link";
 import type { DropdownView } from "@ckeditor/ckeditor5-ui";
 import type ViewCollection from "@ckeditor/ckeditor5-ui/src/viewcollection";
-import type { Position } from "@ckeditor/ckeditor5-utils/src/dom/position";
 import type View from "@ckeditor/ckeditor5-ui/src/view";
 import type { PanelPosition } from "@ckeditor/ckeditor5-ui/src/dropdown/dropdownpanelview";
+import type { Position } from "@ckeditor/ckeditor5-utils/src/dom/position";
+import { insertElementAfter } from "@js/util/domUtils";
+import ResourceLinkEditing from "@js/editor/plugin/resourceLink/ResourceLinkEditing";
+import type InsertResourceLinkCommand from "@js/editor/plugin/resourceLink/InsertResourceLinkCommand";
 
-export default class PanelTweaks extends Plugin {
+export default class UITweaks extends Plugin {
+    /**
+     * Add in the ResourceLinkEditing command,
+     * which gets triggered when the Link Browse button is clicked
+     * and is also used to update the Link URL input when a resource is selected
+     * @returns - the required plugins
+     */
+    public static get requires(): readonly (typeof Plugin)[] {
+        return [ResourceLinkEditing] as const;
+    }
+
     /**
      * We need to ensure everything has been set up before we can start modifying the panels
      */
@@ -21,6 +36,7 @@ export default class PanelTweaks extends Plugin {
         (this.editor as ClassicEditor).sourceElement?.addEventListener(EditorEvent.EDITOR__CREATED, () => {
             this.updateDropdownPositions();
             this.checkForModal();
+            this.addLinkBrowseButton();
         });
     }
 
@@ -94,5 +110,61 @@ export default class PanelTweaks extends Plugin {
                 }
             });
         }
+    }
+
+    /**
+     * So we link to existing resources within SBX, we add a browse button within the link UI that
+     * opens up our resource modal. When a resource is selected, the modal will close and the
+     * resource will be linked into the Link URL text input
+     */
+    addLinkBrowseButton(): void {
+        const linkUI = this.editor.plugins.get(LinkUI);
+        const contextualBalloonPlugin = this.editor.plugins.get("ContextualBalloon");
+        // listen to the link ui 'balloon' opening, so we can add the button
+        this.listenTo(contextualBalloonPlugin, "change:visibleView", (event, name, visibleView) => {
+            if (visibleView === linkUI.formView) {
+                // only need to add the button once, so remove the listener
+                this.stopListening(contextualBalloonPlugin, "change:visibleView");
+                const button = new ButtonView(this.editor.locale);
+                button.set({
+                    label: "Browse",
+                    withText: true,
+                    tooltip: true,
+                    class: "ck-button-resource-link",
+                });
+                // Open up the resource browser when clicking the "Browse" button
+                button.on("execute", () => this.editor.execute("insertResourceLink"));
+                button.render();
+                // add the button into the link form view
+                const linkFormView = linkUI.formView;
+                if (linkFormView && linkFormView.urlInputView.fieldView.element) {
+                    // register the button under the link form view, so it's also managed within the view instance
+                    linkFormView.registerChild(button);
+                    // add the resource button after the url input
+                    insertElementAfter(linkFormView.urlInputView.fieldView.element, button.element as HTMLElement);
+                    /**
+                     * Let's listen for the same event as packages/ckeditor5-ui/src/bindings/clickoutsidehandler.ts does,
+                     * but with higher priority.
+                     * It's important that the same emitter is used as by LinkUI (`formView`), because native DOM Events
+                     * are translated by packages/ckeditor5-utils/src/dom/emittermixin.ts. If different emitter were used,
+                     * we'd get different, non-related events.
+                     */
+                    linkFormView.listenTo(
+                        document,
+                        "mousedown",
+                        (mouseDownEvent) => {
+                            // while the resource modal is open, prevent the link ui from hiding
+                            const resourceLinkCommand = this.editor.commands.get(
+                                "insertResourceLink",
+                            ) as InsertResourceLinkCommand;
+                            if (resourceLinkCommand && resourceLinkCommand.isOn) {
+                                mouseDownEvent.stop();
+                            }
+                        },
+                        { priority: "high" },
+                    );
+                }
+            }
+        });
     }
 }

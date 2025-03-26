@@ -4,13 +4,13 @@
 
 import { Essentials } from "@ckeditor/ckeditor5-essentials";
 import { Bold, Italic, Underline, Strikethrough } from "@ckeditor/ckeditor5-basic-styles";
+import { Link } from "@ckeditor/ckeditor5-link";
 import { DocumentList } from "@ckeditor/ckeditor5-list";
 import { BlockQuote } from "@ckeditor/ckeditor5-block-quote";
 import { GeneralHtmlSupport } from "@ckeditor/ckeditor5-html-support";
 import { PasteFromOffice } from "@ckeditor/ckeditor5-paste-from-office";
 import { PasteFromOfficeEnhanced } from "@ckeditor/ckeditor5-paste-from-office-enhanced";
 import { Notification } from "@ckeditor/ckeditor5-ui";
-import Link from "@js/editor/plugin/link/Link";
 import Legacy from "@js/editor/plugin/legacy/Legacy";
 
 /**

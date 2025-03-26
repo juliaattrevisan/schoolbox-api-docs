@@ -6,7 +6,6 @@ import { Command, type Editor } from "@ckeditor/ckeditor5-core";
 import { getSrc } from "@js/editor/plugin/resource/resourceUtils";
 import type { Resource } from "@js/editor/plugin/resource/resourceUtils";
 import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
-import type LinkUI from "@js/editor/plugin/link/LinkUI";
 
 export default class InsertResourceLinkCommand extends Command {
     /**
@@ -92,7 +91,7 @@ export default class InsertResourceLinkCommand extends Command {
      * @param value - the value to update the link to
      */
     updateLink(value: string): void {
-        const linkUI = this.editor.plugins.get("LinkUI") as LinkUI;
+        const linkUI = this.editor.plugins.get("LinkUI");
         const { formView } = linkUI;
         if (formView === null) return;
         formView.urlInputView.fieldView.focus();
