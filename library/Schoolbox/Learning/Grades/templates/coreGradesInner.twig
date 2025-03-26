@@ -78,6 +78,8 @@
             <script type="text/javascript">
                 $(function () {
                     $('[data-collapser]').collapsable();
+                    // As this can be loaded asynchonously, we need to reinitialise any media players inside the report
+                    $.fn.schoolboxResource_ProxyReplacement('.activity-list');
                 });
             </script>
 
