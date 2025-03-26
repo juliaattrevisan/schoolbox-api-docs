@@ -24,7 +24,6 @@ use Schoolbox\User;
  */
 class ApiFactory
 {
-
     /**
      * @var \Calendar_Api_Factory
      */

@@ -1792,7 +1792,13 @@ abstract class Kernel
                     $assessmentDataSource  = $di->get('assessmentDataSource');
                     /** @var IConfigLoader $config */
                     $config = $di->get('config');
-                    return new Calendar_Api_Factory($assessmentDataSource, new ModuleChecker($config), $config, $databaseExternal);
+                    return new Calendar_Api_Factory(
+                        $assessmentDataSource,
+                        new ModuleChecker($config),
+                        $config,
+                        $databaseExternal,
+                        $di->get('httpClient.cache'),
+                    );
                 }
             )
         );
@@ -1812,7 +1818,13 @@ abstract class Kernel
                     $assessmentDataSource  = $di->get('assessmentDataSource');
                     /** @var IConfigLoader $config */
                     $config = $di->get('config');
-                    return new \Schoolbox\Calendar\Component\Dashboard\ApiFactory($assessmentDataSource, new ModuleChecker($config), $config, $databaseExternal);
+                    return new \Schoolbox\Calendar\Component\Dashboard\ApiFactory(
+                        $assessmentDataSource,
+                        new ModuleChecker($config),
+                        $config,
+                        $databaseExternal,
+                        $di->get('httpClient.cache'),
+                    );
                 }
             )
         );

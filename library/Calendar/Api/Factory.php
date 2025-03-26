@@ -45,7 +45,8 @@ class Calendar_Api_Factory
         private Assessment\MapperProxy $assessmentDataSource,
         private ModuleChecker $moduleChecker,
         private IConfigLoader $config,
-        private ?IConnector $databaseExternal = null
+        private ?IConnector $databaseExternal = null,
+
     ) {
         $this->generateAvailableSubscriptions();
     }
