@@ -1,5 +1,7 @@
 <?php
 
+use Alaress\Http\Cache;
+
 /**
  * Alaress_Rss_Cache
  *
@@ -12,7 +14,6 @@
  */
 class Xml
 {
-
     /**
      * Stores the XML
      * @var SimpleXMLElement
@@ -29,7 +30,8 @@ class Xml
     /**
      * Constructor
      *
-     * @param string $url
+     * @param string $url   The URL to fetch XML from.
+     * @param Cache  $cache The HTTP client cache wrapper to use to fetch `$source`.
      * @throws InvalidArgumentException
      */
     public function __construct($url)
@@ -37,6 +39,9 @@ class Xml
         if (empty($url)) {
             return;
         }
+
+        // Load from cache
+//        $response = $this->cache->request($url)
 
         /* Set up cached file
          */

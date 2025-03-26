@@ -26,7 +26,7 @@ $count   = intval($argv[2]);
 Factory::getInstanceInternal()->execute("UPDATE news_items SET item_deleted = 1");
 
 
-$rss = new Alaress_Rss_Stream(Config::get('welcome_rss_url'));
+$rss = new Alaress_Rss_Stream(Config::get('welcome_rss_url'), $kernel->get('httpClient.cache'));
 $size = $count ?: Config::get('welcome_rss_limit');
 $rss->setLimit($size);
 try {

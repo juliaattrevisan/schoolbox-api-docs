@@ -18,8 +18,8 @@ class Component_Dashboard_RssController extends Component_Dashboard_ControllerAb
     {
         parent::__construct($instance, $user, $sitepage);
 
-
-        $this->rss = new Alaress_Rss_Stream($this->getConfig('url'));
+        // Get the DI container out of SitePage I guess?
+        $this->rss = new Alaress_Rss_Stream($this->getConfig('url'), $sitepage->getDi()->get('httpClient.cache'));
         $size = $this->getConfig('size');
         if (!$size) {
             $size = Config::get('welcome_rss_limit');
