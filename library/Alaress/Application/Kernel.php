@@ -1797,6 +1797,7 @@ abstract class Kernel
                         new ModuleChecker($config),
                         $config,
                         $databaseExternal,
+                        $di->get('redis.cache'),
                         $di->get('httpClient.cache'),
                     );
                 }

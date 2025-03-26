@@ -7,9 +7,9 @@
  */
 
 use Alaress\Http\Cache;
-use Alaress\Redis;
 use Calendar\Event\Type\Day\Event;
 use Calendar\Event\Type\EventInterface;
+use Predis\ClientInterface;
 use Sabre\VObject\Component\VCalendar;
 use Schoolbox\Calendar\Cache\Vcal;
 use Schoolbox\GenericCollection;
@@ -51,6 +51,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
         int $connectorId,
         User $user,
         User $viewer,
+        private ClientInterface $redis,
         private Cache $cache,
     ) {
         parent::__construct($connectorId, $user, $viewer);
@@ -196,7 +197,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
          */
         if ($decodedConfig->hasPermissions($this->getUser()->getCampusCollection()->getPropertyValues('id'), $this->getUser()->getRole()->getId())) {
             // Hit up the cache
-            $cache = new Vcal(Redis::getCacheClientInstance(), $this->cache);
+            $cache = new Vcal($this->redis, $this->cache);
 
             $decodedConfig->tokenReplaceUrl($this->getUser());
             // In general, calendar config is cached when saved from the admin page.
