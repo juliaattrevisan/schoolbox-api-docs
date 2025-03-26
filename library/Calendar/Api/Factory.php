@@ -32,44 +32,21 @@ class Calendar_Api_Factory
      */
     private ?array $allTypes = null;
 
-    /**
-     * A data source for assessments.
-     *
-     * @var Assessment\MapperProxy
-     */
-    private $assessmentDataSource;
-
-    /** @var null|IConnector */
-    private $databaseExternal;
-
-    /** @var IConfigLoader */
-    private $configLoader;
-
-    /**
-     * @var ModuleChecker
-     */
-    private ModuleChecker $moduleChecker;
-
 
     /**
      * Constructor
      *
-     * @param Assessment\MapperProxy $assessmentDataSource
-     * @param ModuleChecker          $moduleChecker
-     * @param IConfigLoader          $config
-     * @param null|IConnector        $databaseExternal
+     * @param Assessment\MapperProxy $assessmentDataSource A data source for assessments.
+     * @param ModuleChecker          $moduleChecker        Calendar module checker, for checking if calendar is enabled.
+     * @param IConfigLoader          $config               Schoolbox configuration.
+     * @param null|IConnector        $databaseExternal     External database, if supported.
      */
     public function __construct(
-        Assessment\MapperProxy $assessmentDataSource,
-        ModuleChecker $moduleChecker,
-        IConfigLoader $config,
-        IConnector $databaseExternal = null
+        private Assessment\MapperProxy $assessmentDataSource,
+        private ModuleChecker $moduleChecker,
+        private IConfigLoader $config,
+        private ?IConnector $databaseExternal = null
     ) {
-        $this->assessmentDataSource = $assessmentDataSource;
-        $this->databaseExternal = $databaseExternal;
-        $this->configLoader = $config;
-        $this->moduleChecker = $moduleChecker;
-
         $this->generateAvailableSubscriptions();
     }
 
