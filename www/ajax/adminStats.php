@@ -228,7 +228,11 @@ switch ($_POST['module']) {
     case 'rss':
         /** @var IConfigLoader $config */
         $config = $kernel->get('config');
-        $rss = new Alaress_Rss_Stream($config->get('release_notes_url'), $kernel->get('httpClient.cache'));
+        $rss = new Alaress_Rss_Stream(
+            $config->get('release_notes_url'),
+            $kernel->get('httpClient.cache'),
+            (int)$config->get(ConfigMapper::NAME_XML_CACHE_TIMEOUT),
+        );
         $rss->stream();
         $output = $rss->getOutput();
         break;
