@@ -15,17 +15,9 @@ use Alaress\Http\Cache;
 class Xml
 {
     /**
-     * Stores the XML
-     * @var SimpleXMLElement
+     * Stores the XML, if loaded
      */
-    public $xml;
-
-
-    /**
-     * @var Alaress_Rss_Cache
-     */
-    private $cache;
-
+    public ?SimpleXMLElement $xml;
 
     /**
      * Constructor
@@ -34,21 +26,15 @@ class Xml
      * @param Cache  $cache The HTTP client cache wrapper to use to fetch `$source`.
      * @throws InvalidArgumentException
      */
-    public function __construct($url)
+    public function __construct(string $url, private Cache $cache)
     {
         if (empty($url)) {
             return;
         }
 
         // Load from cache
-//        $response = $this->cache->request($url)
-
-        /* Set up cached file
-         */
-        $this->cache = new Alaress_Rss_Cache(2, 2);
-
         try {
-            $this->cache->init($url);
+            $response = $this->cache->request($url);
         } catch (\GuzzleHttp\Exception\GuzzleException $e) {
             /**
              * Either requesting the RSS feed, or the RSS feed failed, error out here.
@@ -57,11 +43,9 @@ class Xml
             return;
         }
 
-        /* Load from cached file
-         * Delete the cached file if it can't be loaded correctly
-         */
         try {
-            $this->xml = $this->cache->load();
+            libxml_use_internal_errors(true);
+            $this->xml = new SimpleXMLElement($response);
         } catch (Exception $e) {
             return;
         }
