@@ -161,15 +161,15 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
             if (in_array($key, $this->getFilterFields())) {
                 // custom filter by user
                 if ($key == 'impersonator') {
-                    $sqlFilter[] = "impersonator.username LIKE :value
-                                        OR impersonator.firstname LIKE :value
-                                        OR impersonator.lastname LIKE :value";
-                    $params['value'] = '%' . $this->db->getQuoter()->escapeForLike($value) . '%';
+                    $sqlFilter[] = "impersonator.username LIKE :impersonator
+                                        OR impersonator.firstname LIKE :impersonator
+                                        OR impersonator.lastname LIKE :impersonator";
+                    $params['impersonator'] = '%' . $this->db->getQuoter()->escapeForLike($value) . '%';
                 } elseif ($key == 'impersonated') {
-                    $sqlFilter[] = "impersonated.username LIKE :value
-                                        OR impersonated.firstname LIKE :value
-                                        OR impersonated.lastname LIKE :value";
-                    $params['value'] = '%' . $this->db->getQuoter()->escapeForLike($value) . '%';
+                    $sqlFilter[] = "impersonated.username LIKE :impersonated
+                                        OR impersonated.firstname LIKE :impersonated
+                                        OR impersonated.lastname LIKE :impersonated";
+                    $params['impersonated'] = '%' . $this->db->getQuoter()->escapeForLike($value) . '%';
                 } elseif ($key == 'after') {
                     if ($date = strtotime($value)) {
                         $date = date('Y-m-d H:i:s', $date);
