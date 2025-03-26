@@ -756,12 +756,9 @@ abstract class Kernel
                         //  * json_decode(' -12.054e3 ', true) returns float(-12054)
                         //  * json_decode('[]', true) returns []
                         //  * json_decode('{}', true) returns []
-                        // All the example responses above are valid JSON data.  Ideally the relevant Controller would
-                        // be able to decide what to do with that data.  However, since $request->withParsedBody() only
-                        // accepts object, array, or null, other data types must be either converted to one of those
-                        // types here, or dealt with here somehow.
-                        //    In practice, everywhere JSON is expected in this application, JSON that decodes to an
-                        // array is expected.  So we treat the edge-cases above as client errors, and send a 400
+                        // All the example responses above are valid JSON data.
+                        // However, $request->withParsedBody() only accepts object, array, or null.
+                        // So we treat the edge-cases above as client errors, and send a 400
                         // response since we do not want errors such as these to end up in Sentry.
                         // (No need to check for object, since json_decode(..., true) converts objects to arrays.)
                         if (!is_array($decodedContent) && !is_null($decodedContent)) {
