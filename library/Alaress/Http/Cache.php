@@ -61,6 +61,9 @@ class Cache
      * @return string
      * @throws InvalidArgumentException if the cache key is somehow not valid
      * @throws GuzzleException          if the HTTP request failed
+     * @phpstan-ignore-next-line `\Psr\SimpleCache\InvalidArgumentException`
+     *                            doesn't implement `Throwable`, but its
+     *                            implementations should
      */
     public function request(string $url, ?string $key = null, array $headers = [], ?int $ttl = null): string
     {
@@ -101,6 +104,9 @@ class Cache
      * @param string|null $key
      * @return void
      * @throws InvalidArgumentException
+     * @phpstan-ignore-next-line `\Psr\SimpleCache\InvalidArgumentException`
+     *                           doesn't implement `Throwable`, but its
+     *                           implementations should
      */
     public function invalidate(string $url, ?string $key = null): void
     {
