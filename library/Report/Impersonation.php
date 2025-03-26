@@ -2,6 +2,7 @@
 
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Database\Factory;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 /**
  *
@@ -62,7 +63,7 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
         $this->setGroupHandler(new Group());
 
         if (!$this->checkPermissions()) {
-            error(19);
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
         } else {
             $this->setPage($page);
             $this->setUserHandler(new User());
@@ -264,7 +265,7 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
     {
         // the group and the dataset must both not be null
         if ($this->getIndexID() == null || empty($this->dataSet)) {
-            error(19);
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
         }
 
         $page = $this->getPage();
