@@ -187,6 +187,7 @@ use Schoolbox\Url\Factory as UrlFactory;
 use Schoolbox\User\Token\Mapper as TokenMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Version\Version;
+use Schoolbox\Weather\WeatherstackClient;
 use Scrub;
 use Sentry\SentrySdk;
 use SitePage;
@@ -2243,6 +2244,19 @@ abstract class Kernel
                 [
                     'builder'      => $di->lazyGet('search.indexBuilder'),
                     'dbConnection' => $di->lazyGet('databaseInternal'),
+                ]
+            )
+        );
+
+        // Weather client
+        $di->set(
+            'weatherClient',
+            $di->lazyNew(
+                WeatherstackClient::class,
+                [
+                    'apiKey' => $config->get('weather_api_key'),
+                    'apiUrl' => $config->get('weather_api_url'),
+                    'cache'  => $di->lazyGet('httpClient.cache'),
                 ]
             )
         );

@@ -294,13 +294,13 @@ class Controller extends AbstractController
             }
         }
 
-        /* Tell me the weather
+        /* Tell me the weather:
+         * since this module is special, the weather client is not injected
+         * into the constructor: instead it must be conjured out of DI.
          */
-        /** @var Matchup $matchup */
-        $apiKey = $this->getConfigLoader()->get('weather_api_key');
-        $apiUrl = $this->getConfigLoader()->get('weather_api_url');
-        $weatherClient = new WeatherstackClient($apiKey, $apiUrl);
-        $forecast = new MatchupWeather($matchup, $weatherClient);
+        /** @var WeatherstackClient $weatherClient */
+        $weatherClient = $this->getDi()->get('weatherClient');
+        $forecast      = new MatchupWeather($matchup, $weatherClient);
         $forecast->loadForecast();
 
         /* Determine whether you've got write access or not
