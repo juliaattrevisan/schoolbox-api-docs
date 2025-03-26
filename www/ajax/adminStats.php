@@ -415,7 +415,9 @@ switch ($_POST['module']) {
         ];
         break;
     case 'service_saml_cert':
-        $samlCertHelper = new SamlCertHelper();
+        $samlCertHelper = new SamlCertHelper(
+            $kernel->get('httpClient.cache'),
+        );
 
         $samlWidget = $samlCertHelper->buildWidget(
             $config->get('saml_idp_certificate') ?? "",

@@ -3,8 +3,8 @@
 namespace Schoolbox\Admin\Home;
 
 use Alaress\Exception\UnreachableException;
+use Alaress\Http\Cache;
 use Alaress_Date_Format;
-use Alaress_Saml_Cache;
 use InvalidArgumentException;
 use Schoolbox\Url\Uri;
 use OneLogin\Saml2\IdPMetadataParser;
@@ -16,6 +16,8 @@ use Schoolbox\Application\Exception as SchoolboxException;
  */
 class SamlCertHelper
 {
+    private const SAML_CACHE_TIMEOUT = 3600;
+
     private const IDP_CERT_EMPTY      = 0;     // config field empty
     private const IDP_CERT_UNPARSABLE = 1;     // unable to parse cert from value
     private const IDP_CERT_OK         = 2;     // able to parse cert from value
@@ -29,18 +31,13 @@ class SamlCertHelper
     public const LIGHT_WARNING = 'warning';
     public const LIGHT_SUCCESS = 'success';
 
-    private Alaress_Saml_Cache $samlCache;
-
     /**
-     * @param Alaress_Saml_Cache|null $samlCache
+     * Constructor
+     *
+     * @param Cache $samlCache The HTTP client cache from which SAML config is fetched.
      */
-    public function __construct(Alaress_Saml_Cache $samlCache = null)
+    public function __construct(private Cache $samlCache)
     {
-        if ($samlCache) {
-            $this->samlCache = $samlCache;
-        } else {
-            $this->samlCache = new Alaress_Saml_Cache();
-        }
     }
 
     /**
@@ -118,14 +115,12 @@ class SamlCertHelper
         $validUrl = (string)$url;
 
         try {
-            $idpMetadataCache = $this->samlCache->init($validUrl);
+            return $this->samlCache->request($validUrl, ttl: self::SAML_CACHE_TIMEOUT);
         } catch (InvalidArgumentException $e) {
             // Should never get here. Only thrown in $idpMetadataUrl is not a string, which is
             // impossible due to method's param type declaration.
             throw new UnreachableException($e);
         }
-
-        return $idpMetadataCache->getStreamContents();
     }
 
 
