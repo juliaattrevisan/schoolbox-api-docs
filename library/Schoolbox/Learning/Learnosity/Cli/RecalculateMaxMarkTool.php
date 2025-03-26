@@ -1,0 +1,126 @@
+<?php
+
+namespace Schoolbox\Learning\Learnosity\Cli;
+
+use Schoolbox\Application\CliTool;
+use Schoolbox\Learning\Learnosity;
+
+/**
+ * Attempts can sometimes end up having a max_mark of 0, having been
+ * co-erced from null, as a result of SA-18703's tool. This prevents
+ * you from altering someone's grade, as zero denominators aren't
+ * permitted in our LMS, but are allowed to manifest via learnosity
+ * who doesn't mandate questions having a meaningful non-zero value.
+ *
+ * This divide-by-zero constraint effectively makes grades readonly
+ * since validation prevents you from changing grades values.
+ *
+ * This tool takes an attempt's Learnosity identifier and tries to do
+ * a deeper inspection about the attempt, to try and recalculate what
+ * the max_mark should have been.
+ */
+class RecalculateMaxMarkTool extends CliTool\App
+{
+    /**
+     * Name of this tool's lock.
+     */
+    public const LOCK_NAME = 'learnosity_recalculate_max_mark';
+
+
+    /**
+     * Help (long and short options)
+     */
+    private const OPT_SHORT_HELP = 'h';
+    private const OPT_LONG_HELP = 'help';
+
+
+    /**
+     * --reference
+     *
+     * Inspect a particular assess_attempt.learnosity_reference to see what
+     * max_mark perhaps *should* have been
+     */
+    private const OPT_LONG_ATTEMPT_REFERENCE = 'reference:';
+
+
+    /** @inheritdoc */
+    public function getLongOpts(): array
+    {
+        return [
+            self::OPT_LONG_HELP,
+            self::OPT_LONG_ATTEMPT_REFERENCE,
+        ];
+    }
+
+
+    /** @inheritDoc */
+    public function run(): void
+    {
+        if ($this->getOpt(self::OPT_LONG_HELP)) {
+            echo <<<HELP
+
+Sometimes attempts will have computed a max_score of null which got coerced into 0.00
+which prevents teachers from changing grades associated with these attempts.
+
+This tool asks Learnosity about what it knows and tries to update max_mark in our
+assesss_attempt table for the given learnosity reference.
+
+Note that the reference is that of the *attempt* which you can find in assess_attempt.
+
+Usage: recalculateMaxMarks.php [--reference=...] [-vvv] [--perform]
+Ex.    recalculateMaxMarks.php --reference=abc-123-def-456 -vvv --perform
+
+HELP;
+            exit;
+        }
+
+        /* Log the title first lol
+         */
+        $logger = $this->getLogger();
+        $logger->info('');
+        $logger->info('Learnosity Recalculate Max Marks');
+        $logger->info('');
+
+        /* Check mandatory args first
+         */
+        $attemptReference = trim((string)$this->getOpt(self::OPT_LONG_ATTEMPT_REFERENCE));
+
+        if ('' === $attemptReference) {
+            $this->getLogger()->info('Please provide an attempt reference to inspect.');
+
+            return;
+        }
+
+        /* Try to obtain the attempt
+         */
+        $statement = $this->getDatabaseInternal()->prepare("
+            SELECT *
+            FROM assess_attempt
+            WHERE learnosity_reference = :attemptReference
+            AND deleted_at IS NULL
+        ");
+
+        $statement->execute([
+            'attemptReference' => $attemptReference
+        ]);
+
+        $n = 0;
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $n++;
+
+            print_r($row);
+        }
+
+        /* No rows found; at least tell the operator
+         */
+        if (!$n) {
+            $this->getLogger()->info(sprintf(
+                'No attempts associated with reference %s',
+                $attemptReference
+            ));
+
+            return;
+        }
+    }
+}
