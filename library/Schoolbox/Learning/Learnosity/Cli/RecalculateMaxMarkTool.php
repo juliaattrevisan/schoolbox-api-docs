@@ -162,7 +162,6 @@ HELP;
         $this->getLogger()->info(sprintf(
             '    Schoolbox attempt max_mark: %s.',
             $attempt['max_mark'] ?? '(null)',
-
         ));
 
         $this->getLogger()->info(sprintf(
