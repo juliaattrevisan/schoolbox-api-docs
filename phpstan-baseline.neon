@@ -547,12 +547,6 @@ parameters:
 			path: library/Calendar.php
 
 		-
-			message: '#^Property Calendar_Api_Cache\:\:\$cachedTime \(null\) does not accept default value of type int\.$#'
-			identifier: property.defaultValue
-			count: 1
-			path: library/Calendar/Api/Cache.php
-
-		-
 			message: '#^Access to an undefined property Sabre\\VObject\\Component\\VEvent\:\:\$CATEGORIES\.$#'
 			identifier: property.notFound
 			count: 1
