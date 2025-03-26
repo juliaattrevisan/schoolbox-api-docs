@@ -1668,7 +1668,8 @@ class Handler
                 if (empty($value) || $value == 'null') {
                     return true;
                 }
-                return is_numeric($value) && strlen($value) <= 15;
+                $cleanValue = str_replace(' ', '', $value);
+                return is_numeric($cleanValue) && strlen($cleanValue) <= 15;
             },
             'OccupEmail' => function ($value) {
                 if (empty($value) || $value == 'null') {
@@ -1787,7 +1788,8 @@ class Handler
                 if (empty($value) || $value == 'null') {
                     return true;
                 }
-                return is_numeric($value) && strlen($value) <= 15;
+                $cleanValue = str_replace(' ', '', $value);
+                return is_numeric($cleanValue) && strlen($cleanValue) <= 15;
             },
             'DoctorAddress' => function ($value) {
                 if (empty($value) || $value == 'null') {
@@ -1805,7 +1807,8 @@ class Handler
                 if (empty($value) || $value == 'null') {
                     return true;
                 }
-                return is_numeric($value) && strlen($value) <= 15;
+                $cleanValue = str_replace(' ', '', $value);
+                return is_numeric($cleanValue) && strlen($cleanValue) <= 15;
             },
             'DentistAddress' => function ($value) {
                 if (empty($value) || $value == 'null') {
@@ -1829,13 +1832,15 @@ class Handler
                 if (empty($value) || $value == 'null') {
                     return true;
                 }
-                return is_numeric($value) && strlen($value) <= 15;
+                $cleanValue = str_replace(' ', '', $value);
+                return is_numeric($cleanValue) && strlen($cleanValue) <= 15;
             },
             'EmergencyPhoneAlt' => function ($value) {
                 if (empty($value) || $value == 'null') {
                     return true;
                 }
-                return is_numeric($value) && strlen($value) <= 15;
+                $cleanValue = str_replace(' ', '', $value);
+                return is_numeric($cleanValue) && strlen($cleanValue) <= 15;
             },
             'EmergencyRelat' => function ($value) {
                 if (empty($value) || $value == 'null') {
@@ -1859,13 +1864,15 @@ class Handler
                 if (empty($value) || $value == 'null') {
                     return true;
                 }
-                return is_numeric($value) && strlen($value) <= 15;
+                $cleanValue = str_replace(' ', '', $value);
+                return is_numeric($cleanValue) && strlen($cleanValue) <= 15;
             },
             'Emergency2PhoneAlt' => function ($value) {
                 if (empty($value) || $value == 'null') {
                     return true;
                 }
-                return is_numeric($value) && strlen($value) <= 15;
+                $cleanValue = str_replace(' ', '', $value);
+                return is_numeric($cleanValue) && strlen($cleanValue) <= 15;
             },
             'Emergency2Relat' => function ($value) {
                 if (empty($value) || $value == 'null') {
@@ -1889,13 +1896,15 @@ class Handler
                 if (empty($value) || $value == 'null') {
                     return true;
                 }
-                return is_numeric($value) && strlen($value) <= 15;
+                $cleanValue = str_replace(' ', '', $value);
+                return is_numeric($cleanValue) && strlen($cleanValue) <= 15;
             },
             'Emergency3PhoneAlt' => function ($value) {
                 if (empty($value) || $value == 'null') {
                     return true;
                 }
-                return is_numeric($value) && strlen($value) <= 15;
+                $cleanValue = str_replace(' ', '', $value);
+                return is_numeric($cleanValue) && strlen($cleanValue) <= 15;
             },
             'Emergency3Relat' => function ($value) {
                 if (empty($value) || $value == 'null') {
