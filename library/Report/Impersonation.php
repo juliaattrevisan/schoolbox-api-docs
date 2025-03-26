@@ -48,7 +48,7 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
     private $filterable = array(
         'impersonator' => 'username, real name or partial',
         'impersonated' => 'username, real name or partial',
-        'Originating IP' => 'x.x.x.x',
+        'originating_IP' => 'x.x.x.x',
         'after'        => 'eg. 2012-01-06, yesterday',
         'before'       => 'eg. July 1, 3 days ago'
     );
@@ -182,6 +182,9 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
                         $sqlFilter[] = "user_assume_log.created_at <= :before";
                         $params['before'] = $date;
                     }
+                } elseif ($key == 'originating_IP') {
+                    $sqlFilter[] = "ip LIKE :originating_IP";
+                    $params['originating_IP'] = '%' . $this->db->getQuoter()->escapeForLike($value) . '%';
                 } else {
                     $sqlFilter[] = $this->db->getQuoter()->quoteIdentifier($key) . " LIKE :$key";
                     $params[$key] = '%' . $this->db->getQuoter()->escapeForLike($value) . '%';
@@ -348,7 +351,7 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
         foreach ($this->filterable as $field => $pholder) {
             $output = array(
                 'FILTER_ID'          => $field,
-                'FILTER_NAME'        => ucwords($field),
+                'FILTER_NAME'        => ucwords(str_replace("_", " ", $field)),
                 'FILTER_PLACEHOLDER' => $pholder,
                 'FILTER_VALUE'       => $this->filter[$field] ?? '',
             );
