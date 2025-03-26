@@ -96,25 +96,22 @@ HELP;
         $statement = $this->getDatabaseInternal()->prepare("
             SELECT *
             FROM assess_attempt
-            WHERE learnosity_reference = :attemptReference
+            WHERE learnosity_reference = :attemptReference  
             AND deleted_at IS NULL
+            LIMIT 1
         ");
 
         $statement->execute([
             'attemptReference' => $attemptReference
         ]);
 
-        $n = 0;
-
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $n++;
-
-            print_r($row);
-        }
+        /* There should only be one record here
+         */
+        $row = $statement->fetchAll(\PDO::FETCH_ASSOC)[0] ?? null;
 
         /* No rows found; at least tell the operator
          */
-        if (!$n) {
+        if (null === $row) {
             $this->getLogger()->info(sprintf(
                 'No attempts associated with reference %s',
                 $attemptReference
@@ -122,5 +119,9 @@ HELP;
 
             return;
         }
+
+        /* Ask learnosity what it knows
+         */
+        print_r($row);
     }
 }
