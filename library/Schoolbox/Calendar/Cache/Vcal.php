@@ -10,12 +10,13 @@ declare(strict_types=1);
 namespace Schoolbox\Calendar\Cache;
 
 use Alaress\Http\Cache;
-use Calendar_Api_Cache;
 use Calendar_Api_Config_Connector_Vcal as CalendarConfig;
 use DateTimeImmutable;
 use DateTimeZone;
+use GuzzleHttp\Exception\GuzzleException;
 use InvalidArgumentException;
 use Predis\ClientInterface as RedisClient;
+use Psr\SimpleCache\InvalidArgumentException as CacheInvalidArgumentException;
 use Sabre\VObject\Component\VCalendar;
 use Sabre\VObject\InvalidDataException;
 use Sabre\VObject\ParseException;
@@ -111,7 +112,6 @@ class Vcal
      */
     private function retrieveSource(CalendarConfig $config): ?string
     {
-        $cache   = new Calendar_Api_Cache();
         $headers = [];
         if ($config->getAuthorization()) {
             $headers = ['Authorization' => 'Bearer ' . $config->getAuthorization()];
@@ -121,15 +121,15 @@ class Vcal
         // (Use the cache class because it contains logic for handling proxy
         //  servers, failures, relative URLs and probably other stuff.)
         try {
-            $cache->init($config->getUrl(), $headers);
-        } catch (InvalidArgumentException $e) {
+            $source = $this->cache->request($config->getUrl(), headers: $headers, ttl: $this->cacheTimeout);
+        } catch (GuzzleException | CacheInvalidArgumentException $e) {
             // The cached calendar wasn't able to be loaded.
             // Maybe the config's URL was invalid or empty?
             return null;
         }
 
-        $source = $cache->getStreamContents();
-        $cache->invalidateCache();
+        // The old cache invalidated the source: is this required anymore?
+        $this->cache->invalidate($config->getUrl());
         return $source;
     }
 
