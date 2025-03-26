@@ -1808,7 +1808,7 @@ abstract class Kernel
             $di->lazyNew(
                 \Schoolbox\Calendar\Component\Dashboard\ApiFactory::class,
                 [
-                    'factory' => $di->get('calendarApiFactory'),
+                    'factory' => $di->lazyGet('calendarApiFactory'),
                 ],
             )
         );
