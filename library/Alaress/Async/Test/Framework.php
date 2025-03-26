@@ -92,7 +92,7 @@ class Framework
      */
     public function ensureDirectories()
     {
-        return `mkdir -p {$this->logdir}`;
+        return shell_exec("mkdir -p {$this->logdir}");
     }
 
 
@@ -111,7 +111,7 @@ class Framework
 
         foreach (['schedule','route','socket','digest','bell'] as $d) {
             $killswitch = "service $service-{$d}d stop 2>&1";
-            $log->debug("Stop $d daemon: " . trim(`$killswitch`));
+            $log->debug("Stop $d daemon: " . trim(shell_exec("$killswitch")));
         }
 
         $log->info("All daemons stopped.", [ 'char' => '-' ]);
@@ -398,7 +398,7 @@ class Framework
     private function terminateProcess($ppid)
     {
         // check for children
-        $pids = preg_split('/\s+/', `ps -o pid --no-heading --ppid $ppid`);
+        $pids = preg_split('/\s+/', shell_exec("ps -o pid --no-heading --ppid $ppid"));
 
         foreach ($pids as $pid) {
             if (is_numeric($pid)) {

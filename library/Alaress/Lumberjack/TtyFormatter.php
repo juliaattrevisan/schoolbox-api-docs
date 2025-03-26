@@ -36,7 +36,7 @@ class TtyFormatter extends CliFormatter
                     // or points to an invalid directory - ensure this is not the case
                     chdir('/');
                 }
-                $this->tty = (int)`tput cols`;
+                $this->tty = (int)shell_exec("tput cols");
             } catch (\ErrorException $e) {
                 // noop - just leave tty as 0
             }

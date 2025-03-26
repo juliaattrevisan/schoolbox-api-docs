@@ -176,7 +176,7 @@ class Report extends CliTool\App
     private function scanKeys(Predis\ClientInterface $redis, string $instanceName): array
     {
         $rawData = [];
-        $cursor  = null;
+        $cursor  = 0;
         $count   = 1;
         while ($cursor !== '0') {
             [$cursor, $elements] = $redis->scan($cursor, ['MATCH' => '*', 'COUNT' => 10000]);

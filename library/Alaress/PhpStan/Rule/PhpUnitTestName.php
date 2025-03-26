@@ -36,6 +36,8 @@ class PhpUnitTestName implements Rule
     private const ERROR_MESSAGE_NON_TEST_PREFIX_MISMATCH = 'Non-test case file name "%s" must not start with "%s"';
     private const ERROR_MESSAGE_NON_TEST_SUFFIX_MISMATCH = 'Non-test case file name "%s" must not end with "%s"';
 
+    private const IDENTIFIER = 'phpunit.testName';
+
     /**
      * Constructor
      *
@@ -88,12 +90,12 @@ class PhpUnitTestName implements Rule
             if ($isTestCase && !$matchesPrefix) {
                 $messages[] = RuleErrorBuilder::message(
                     sprintf(self::ERROR_MESSAGE_TEST_PREFIX_MISMATCH, $basename, $this->prefix)
-                )->build();
+                )->identifier(self::IDENTIFIER)->build();
             }
             if (!$isTestCase && $matchesPrefix) {
                 $messages[] = RuleErrorBuilder::message(
                     sprintf(self::ERROR_MESSAGE_NON_TEST_PREFIX_MISMATCH, $basename, $this->prefix)
-                )->build();
+                )->identifier(self::IDENTIFIER)->build();
             }
         }
 
@@ -103,12 +105,12 @@ class PhpUnitTestName implements Rule
             if ($isTestCase && !$matchesSuffix) {
                 $messages[] = RuleErrorBuilder::message(
                     sprintf(self::ERROR_MESSAGE_TEST_SUFFIX_MISMATCH, $basename, $this->suffix)
-                )->build();
+                )->identifier(self::IDENTIFIER)->build();
             }
             if (!$isTestCase && $matchesSuffix) {
                 $messages[] = RuleErrorBuilder::message(
                     sprintf(self::ERROR_MESSAGE_NON_TEST_SUFFIX_MISMATCH, $basename, $this->suffix)
-                )->build();
+                )->identifier(self::IDENTIFIER)->build();
             }
         }
 
