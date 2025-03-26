@@ -740,13 +740,17 @@ abstract class Kernel
                         $request->getBody()->rewind();
                         $content = $request->getBody()->getContents();
                         $request->getBody()->rewind();
+                        $acceptInvalidJson = false;
                         try {
                             $decodedContent = json_decode($content, true, flags: JSON_THROW_ON_ERROR);
                         } catch (\JsonException) {
-                            // Treat decoding errors as null content.
-                            // Some of our API tests will fail if we return a 400 response here.
-                            // E.g. See use of sendGetAsJson() in CalendarEventAttendanceCest.
                             $decodedContent = null;
+                            if ($request->getMethod() === 'GET' && $content === '') {
+                                // Some of our API tests will fail if we return a 400 response here.
+                                // See for example the use of sendGetAsJson() in CalendarEventAttendanceCest, where an
+                                // empty JSON payload is sent in a GET request.
+                                $acceptInvalidJson = true;
+                            }
                         }
                         // Note json_decode(.., true) can return many data types after a successful decode:
                         //  * json_decode('null', true) returns null
@@ -756,12 +760,11 @@ abstract class Kernel
                         //  * json_decode(' -12.054e3 ', true) returns float(-12054)
                         //  * json_decode('[]', true) returns []
                         //  * json_decode('{}', true) returns []
-                        // All the example responses above are valid JSON data.
-                        // However, $request->withParsedBody() only accepts object, array, or null.
-                        // So we treat the edge-cases above as client errors, and send a 400
-                        // response since we do not want errors such as these to end up in Sentry.
+                        // All the example responses above are valid JSON data.  However, we are only interested in
+                        // JSON data that decodes to an array.  Treat all the edge-cases above as client errors, and
+                        // send a 400 response since we do not want errors such as these to end up in Sentry.
                         // (No need to check for object, since json_decode(..., true) converts objects to arrays.)
-                        if (!is_array($decodedContent) && !is_null($decodedContent)) {
+                        if (!is_array($decodedContent) && !$acceptInvalidJson) {
                             http_response_code(self::HTTP_RESPONSE_CODE_BAD_REQUEST);
                             header('Content-Type: text/plain');
                             die('Invalid JSON in request body');
