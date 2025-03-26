@@ -20,7 +20,6 @@ use Schoolbox\Weather\WeatherstackClient;
  */
 class Controller extends Component_Dashboard_ControllerAbstract
 {
-
     /**
      * Default number of days for the Forecast view which is what you see
      * on the dashboard component itself
