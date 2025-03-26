@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Calendar\Cache;
 
+use Alaress\Http\Cache;
 use Calendar_Api_Cache;
 use Calendar_Api_Config_Connector_Vcal as CalendarConfig;
 use DateTimeImmutable;
@@ -40,19 +41,17 @@ class Vcal
 
 
     /**
-     * @var RedisClient
-     */
-    private $redis;
-
-
-    /**
      * Constructor
      *
-     * @param RedisClient $redis
+     * @param RedisClient $redis        Redis client, for cached events once loaded from the vCal file.
+     * @param Cache       $cache        HTTP cache, for caching the vCal file itself from its remote URL.
+     * @param int         $cacheTimeout Timeout for the HTTP cache.
      */
-    public function __construct(RedisClient $redis)
-    {
-        $this->redis = $redis;
+    public function __construct(
+        private RedisClient $redis,
+        private Cache $cache,
+        private int $cacheTimeout = self::CACHE_EXPIRY,
+    ) {
     }
 
 
