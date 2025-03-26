@@ -764,7 +764,7 @@ abstract class Kernel
                         //  * json_decode('[]', true) returns []
                         //  * json_decode('{}', true) returns []
                         // All the example responses above are valid JSON data.  However, we are only interested in
-                        // JSON data that decodes to an array.  Also, the withParsedBody() function called below only
+                        // JSON data that decodes to an array.  Also, the withParsedBody() function called below
                         // requires that its parameter be either object, array, or null.  Therefore, treat all the edge
                         // cases above as client errors, and send a 400 response since we do not want these edge cases
                         // to cause errors that end up in Sentry.
