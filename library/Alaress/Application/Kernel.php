@@ -2254,9 +2254,10 @@ abstract class Kernel
             $di->lazyNew(
                 WeatherstackClient::class,
                 [
-                    'apiKey' => $config->get('weather_api_key'),
-                    'apiUrl' => $config->get('weather_api_url'),
-                    'cache'  => $di->lazyGet('httpClient.cache'),
+                    'apiKey'       => $config->get('weather_api_key'),
+                    'apiUrl'       => $config->get('weather_api_url'),
+                    'cache'        => $di->lazyGet('httpClient.cache'),
+                    'cacheTimeout' => $config->get('weather_api_caching'),
                 ]
             )
         );
