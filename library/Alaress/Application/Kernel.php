@@ -741,7 +741,7 @@ abstract class Kernel
                         $content = $request->getBody()->getContents();
                         $request->getBody()->rewind();
                         try {
-                            $decodedContent = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+                            $decodedContent = json_decode($content, true, flags: JSON_THROW_ON_ERROR);
                         } catch (\JsonException) {
                             // Treat decoding errors as null content.
                             // Some of our API tests will fail if we return a 400 response here.
