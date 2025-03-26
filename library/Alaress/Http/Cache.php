@@ -95,6 +95,19 @@ class Cache
     }
 
     /**
+     * Invalidates a cached value stored as part of `$this->request`.
+     *
+     * @param string      $url
+     * @param string|null $key
+     * @return void
+     * @throws InvalidArgumentException
+     */
+    public function invalidate(string $url, ?string $key = null): void
+    {
+        $this->internalCache->delete($key ?? $this->hashKey($url));
+    }
+
+    /**
      * Hash the key (in this case, a URL) before working with it.
      *
      * @param string $key
