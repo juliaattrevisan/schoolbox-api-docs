@@ -764,8 +764,10 @@ abstract class Kernel
                         //  * json_decode('[]', true) returns []
                         //  * json_decode('{}', true) returns []
                         // All the example responses above are valid JSON data.  However, we are only interested in
-                        // JSON data that decodes to an array.  Treat all the edge-cases above as client errors, and
-                        // send a 400 response since we do not want errors such as these to end up in Sentry.
+                        // JSON data that decodes to an array.  Also, the withParsedBody() function called below only
+                        // requires that its parameter be either object, array, or null.  Therefore, treat all the edge
+                        // cases above as client errors, and send a 400 response since we do not want these edge cases
+                        // to cause errors that end up in Sentry.
                         // (No need to check for object, since json_decode(..., true) converts objects to arrays.)
                         if (!is_array($decodedContent) && !$acceptInvalidJson) {
                             http_response_code(self::HTTP_RESPONSE_CODE_BAD_REQUEST);
