@@ -7,12 +7,6 @@ parameters:
 			path: conf/ModuleLoader.php
 
 		-
-			message: '#^Dead catch \- Alaress\\Database\\Exception is never thrown in the try block\.$#'
-			identifier: catch.neverThrown
-			count: 1
-			path: library/Alaress/Application/Kernel.php
-
-		-
 			message: '#^PHPDoc tag @var with type array\<Schoolbox\\LTI\\Provider\\Model\> is not subtype of native type object\.$#'
 			identifier: varTag.nativeType
 			count: 2
@@ -371,12 +365,6 @@ parameters:
 			identifier: new.static
 			count: 1
 			path: library/Alaress/Routing/Trie.php
-
-		-
-			message: '#^Property Xml\:\:\$xml \(SimpleXMLElement\) in isset\(\) is not nullable\.$#'
-			identifier: isset.property
-			count: 1
-			path: library/Alaress/Rss/Stream.php
 
 		-
 			message: '#^Method Alaress\\Rules\\Condition\:\:test\(\) should return bool but returns int\.$#'

@@ -98,13 +98,12 @@ class SamlCertHelper
 
     /**
      * Returns XML metadata content from the specified URL.
-     * May return NULL if caching fails for some reason.
      *
      * @param string $idpMetadataUrl
-     * @return string|null
-     * @throws UnreachableException
+     * @return string
+     * @throws UnreachableException if caching failed for some reason
      */
-    private function fetchMetadataXml(string $idpMetadataUrl): ?string
+    private function fetchMetadataXml(string $idpMetadataUrl): string
     {
         try {
             $url = new Uri($idpMetadataUrl);
