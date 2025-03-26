@@ -749,6 +749,9 @@ abstract class Kernel
                                 // Some of our API tests will fail if we return a 400 response here.
                                 // See for example the use of sendGetAsJson() in CalendarEventAttendanceCest, where an
                                 // empty JSON payload is sent in a GET request.
+                                // The root cause of the API test failures is the use of Codeception's sendGetAsJson().
+                                // That function does not properly handle the case of no JSON data being sent.
+                                // Either that or we are inappropriately using Codeception's sendGetAsJson() function.
                                 $acceptInvalidJson = true;
                             }
                         }
