@@ -4,6 +4,8 @@ namespace Schoolbox\Learning\Learnosity\Cli;
 
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Learnosity;
+use Schoolbox\Learning\Learnosity\Api;
+use Schoolbox\Url\Factory;
 
 /**
  * Attempts can sometimes end up having a max_mark of 0, having been
@@ -41,6 +43,14 @@ class RecalculateMaxMarkTool extends CliTool\App
      * max_mark perhaps *should* have been
      */
     private const OPT_LONG_ATTEMPT_REFERENCE = 'reference:';
+
+
+    /**
+     * A learnosity api instance
+     *
+     * @var Api
+     */
+    private Api $api;
 
 
     /** @inheritdoc */
@@ -107,11 +117,11 @@ HELP;
 
         /* There should only be one record here
          */
-        $row = $statement->fetchAll(\PDO::FETCH_ASSOC)[0] ?? null;
+        $attempt = $statement->fetchAll(\PDO::FETCH_ASSOC)[0] ?? null;
 
         /* No rows found; at least tell the operator
          */
-        if (null === $row) {
+        if (null === $attempt) {
             $this->getLogger()->info(sprintf(
                 'No attempts associated with reference %s',
                 $attemptReference
@@ -120,8 +130,32 @@ HELP;
             return;
         }
 
+        /* Build dependencies
+         */
+        $this->api = new Api(
+            (new Factory($this->getConfig()))->buildFullyQualified()->getHost(),
+            $this->getConfig()->get('learnosity_version'),
+            $this->getConfig()->get('learnosity_consumer_key'),
+            $this->getConfig()->get('learnosity_consumer_secret'),
+            $this->getLogger(),
+        );
+
         /* Ask learnosity what it knows
          */
-        print_r($row);
+        $result = $this->api->dataGetRequest('/sessions/scores', [
+            'session_id' => [
+                $attemptReference
+            ]
+        ])['data'][0] ?? null;
+
+        /* Compare what we know vs what learnosity knows
+         */
+        $this->getLogger()->info(sprintf(
+            'Schoolbox attempt max_mark: %s.  Learnosity session max_score: %s.',
+            $attempt['max_mark'] ?? '(null)',
+            $result['max_score']
+        ));
+
+        print_r($result);
     }
 }
