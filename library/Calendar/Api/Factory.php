@@ -14,6 +14,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Alaress\Http\Cache;
 use Calendar\Api\ModuleChecker;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Alaress\Database\Connector\IConnector;
@@ -40,13 +41,14 @@ class Calendar_Api_Factory
      * @param ModuleChecker          $moduleChecker        Calendar module checker, for checking if calendar is enabled.
      * @param IConfigLoader          $configLoader         Schoolbox configuration.
      * @param null|IConnector        $databaseExternal     External database, if supported.
+     * @param Cache                  $cache                HTTP cache: required by vCal calendar.
      */
     public function __construct(
         private Assessment\MapperProxy $assessmentDataSource,
         private ModuleChecker $moduleChecker,
         private IConfigLoader $configLoader,
-        private ?IConnector $databaseExternal = null,
-
+        private ?IConnector $databaseExternal,
+        private Cache $cache,
     ) {
         $this->generateAvailableSubscriptions();
     }
@@ -326,7 +328,7 @@ class Calendar_Api_Factory
             case Calendar_Api_EventType_Event_Schoolbox_Type::class:
                 return new Calendar_Api_EventType_Event_Schoolbox_Type($connectorId, $user, $viewer);
             case Calendar_Api_EventType_Event_Vcal_Default::class:
-                return new Calendar_Api_EventType_Event_Vcal_Default($connectorId, $user, $viewer);
+                return new Calendar_Api_EventType_Event_Vcal_Default($connectorId, $user, $viewer, $this->cache);
             case Calendar_Api_EventType_ResourceBooking_Booking_Default::class:
                 return new Calendar_Api_EventType_ResourceBooking_Booking_Default($connectorId, $user, $viewer);
             case Calendar_Api_EventType_ResourceBooking_Moderation_Default::class:
