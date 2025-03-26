@@ -73,7 +73,7 @@ Sometimes attempts will have computed a max_score of null which got coerced into
 which prevents teachers from changing grades associated with these attempts.
 
 This tool asks Learnosity about what it knows and tries to update max_mark in our
-assesss_attempt table for the given learnosity reference.
+assess_attempt table for the given learnosity reference.
 
 Note that the reference is that of the *attempt* which you can find in assess_attempt.
 
