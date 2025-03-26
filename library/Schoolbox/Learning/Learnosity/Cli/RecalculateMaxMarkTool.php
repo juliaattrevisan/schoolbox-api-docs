@@ -156,6 +156,34 @@ HELP;
             $result['max_score']
         ));
 
-        print_r($result);
+        if ($this->perform()) {
+            $this->getLogger()->info('Performing update...');
+
+            $this->getDatabaseInternal()->executeQuery("
+                UPDATE assess_attempt
+                SET max_mark = :maxMark
+                WHERE learnosity_reference = :attemptReference
+                LIMIT 1
+            ", [
+                'maxMark' => (float)$result['max_score'],
+                'attemptReference' => $attemptReference,
+            ]);
+
+            /* Verify outcome
+             */
+            $statement->execute([
+                'attemptReference' => $attemptReference,
+            ]);
+
+            $updatedAttempt = $statement->fetchAll(\PDO::FETCH_ASSOC)[0];
+
+            $this->getLogger()->info(sprintf(
+                "    Attempt %s now has max_mark of %s",
+                $updatedAttempt['learnosity_reference'],
+                $updatedAttempt['max_mark']
+            ));
+
+            $this->getLogger()->info('');
+        }
     }
 }
