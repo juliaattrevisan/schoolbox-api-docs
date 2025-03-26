@@ -3,7 +3,6 @@
 namespace Schoolbox\Learning\Learnosity\Cli;
 
 use Schoolbox\Application\CliTool;
-use Schoolbox\Learning\Learnosity;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Url\Factory;
 
@@ -30,9 +29,8 @@ class RecalculateMaxMarkTool extends CliTool\App
 
 
     /**
-     * Help (long and short options)
+     * Help
      */
-    private const OPT_SHORT_HELP = 'h';
     private const OPT_LONG_HELP = 'help';
 
 
