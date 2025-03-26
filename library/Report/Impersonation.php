@@ -74,7 +74,7 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
     protected function setup()
     {
         // set blocks
-        $this->db = Factory::getInstanceInternal();
+        $this->db = $this->getPage()->getDi()->get('databaseInternal');
         $this->getPage()->setFile('activity_t', 'adminv2/report/impersonation.html');
         $this->getPage()->setBlock('activity_t', 'activity', 'activity_block');
         $this->getPage()->setTitle('Impersonation Report');
