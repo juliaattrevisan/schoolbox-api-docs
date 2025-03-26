@@ -102,6 +102,10 @@ HELP;
         }
 
         /* Try to obtain the attempt
+         *
+         * Potential upgrade: let this scan multiple/all attempts looking for 0 max_mark
+         * rows in our assess_attempt, but that's a pretty big set of changes to touch.
+         * Maybe a bit too dangerous?
          */
         $statement = $this->getDatabaseInternal()->prepare("
             SELECT *
