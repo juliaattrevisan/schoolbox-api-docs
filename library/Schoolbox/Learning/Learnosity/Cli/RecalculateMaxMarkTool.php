@@ -130,6 +130,11 @@ HELP;
             return;
         }
 
+        $this->getLogger()->info(sprintf(
+            "Attempt %s",
+            $attemptReference,
+        ));
+
         /* Build dependencies
          */
         $this->api = new Api(
@@ -151,13 +156,18 @@ HELP;
         /* Compare what we know vs what learnosity knows
          */
         $this->getLogger()->info(sprintf(
-            'Schoolbox attempt max_mark: %s.  Learnosity session max_score: %s.',
+            '    Schoolbox attempt max_mark: %s.',
             $attempt['max_mark'] ?? '(null)',
+
+        ));
+
+        $this->getLogger()->info(sprintf(
+            '    Learnosity session max_score: %s.',
             $result['max_score']
         ));
 
         if ($this->perform()) {
-            $this->getLogger()->info('Performing update...');
+            $this->getLogger()->debug('Performing update...');
 
             $this->getDatabaseInternal()->executeQuery("
                 UPDATE assess_attempt
@@ -178,12 +188,11 @@ HELP;
             $updatedAttempt = $statement->fetchAll(\PDO::FETCH_ASSOC)[0];
 
             $this->getLogger()->info(sprintf(
-                "    Attempt %s now has max_mark of %s",
-                $updatedAttempt['learnosity_reference'],
+                "    Updated attempt to have max_mark of %s",
                 $updatedAttempt['max_mark']
             ));
-
-            $this->getLogger()->info('');
         }
+
+        $this->getLogger()->info('');
     }
 }
