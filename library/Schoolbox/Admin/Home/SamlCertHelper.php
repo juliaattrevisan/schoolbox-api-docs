@@ -5,10 +5,12 @@ namespace Schoolbox\Admin\Home;
 use Alaress\Exception\UnreachableException;
 use Alaress\Http\Cache;
 use Alaress_Date_Format;
+use GuzzleHttp\Exception\GuzzleException;
 use InvalidArgumentException;
 use Schoolbox\Url\Uri;
 use OneLogin\Saml2\IdPMetadataParser;
 use OneLogin\Saml2\Utils;
+use Psr\SimpleCache\InvalidArgumentException as CacheInvalidArgumentException;
 use Schoolbox\Application\Exception as SchoolboxException;
 
 /**
@@ -116,7 +118,7 @@ class SamlCertHelper
 
         try {
             return $this->samlCache->request($validUrl, ttl: self::SAML_CACHE_TIMEOUT);
-        } catch (InvalidArgumentException $e) {
+        } catch (InvalidArgumentException | GuzzleException | CacheInvalidArgumentException $e) {
             // Should never get here. Only thrown in $idpMetadataUrl is not a string, which is
             // impossible due to method's param type declaration.
             throw new UnreachableException($e);
