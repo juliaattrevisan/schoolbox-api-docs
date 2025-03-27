@@ -272,6 +272,7 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
         }
 
         $page = $this->getPage();
+        $userHandler = new User();
 
         // render users
         if (!empty($this->dataSet)) {
@@ -291,8 +292,6 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
                         'log_no_user_block' => '',
                     ]
                 );
-
-                $userHandler = new User();
 
                 $impersonatorNameShards = array(
                     'title'          => $log['impersonator_title'],
