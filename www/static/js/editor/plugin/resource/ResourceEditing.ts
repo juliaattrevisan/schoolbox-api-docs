@@ -1,5 +1,5 @@
 /**
- * To extend imageBlock and imageInline to allow for additional data attributes
+ * To extend imageInline to allow for additional data attributes
  * and add the insertResource command to the editor
  */
 
