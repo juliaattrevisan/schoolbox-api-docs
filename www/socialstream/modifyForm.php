@@ -91,8 +91,8 @@ if (is_numeric($_GET['delete'] ?? false)) {
         $data['url'],
         new CacheHashLoader(
             $kernel->get('httpClient'),
-            PostMapper::getInstance(),
-            StorageMapper::getInstance(),
+            $postMapper,
+            $kernel->get('filesystem.receiver'),
         ),
     );
     $newPost    = $creational->produce($data);

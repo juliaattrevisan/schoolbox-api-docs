@@ -58,7 +58,7 @@ if (!strlen($post->getThumbnail())) {
 $loader = new CacheHashLoader(
     $kernel->get('httpClient'),
     PostMapper::getInstance(),
-    Storage\Mapper::getInstance(),
+    $kernel->get('filesystem.receiver'),
 );
 $loader->load($post);
 //$cache = new Cache\Original();

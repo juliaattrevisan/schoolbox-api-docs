@@ -11,7 +11,7 @@ namespace SocialStream\Cache;
 
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
-use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Resource\Storage\Receiver;
 use SocialStream\PostMapper;
 use SocialStream\UrlDetection;
 use SocialStream_Post_Abstract;
@@ -27,14 +27,14 @@ class CacheHashLoader
     /**
      * Constructor
      *
-     * @param ClientInterface $client        For fetching the post's thumbnail.
-     * @param PostMapper      $postMapper    For saving the post.
-     * @param StorageMapper   $storageMapper For storing the cache hash to storage.
+     * @param ClientInterface $client     For fetching the post's thumbnail.
+     * @param PostMapper      $postMapper For saving the post.
+     * @param Receiver        $receiver   For storing the cache hash to storage.
      */
     public function __construct(
         private ClientInterface $client,
         private PostMapper $postMapper,
-        private StorageMapper $storageMapper,
+        private Receiver $receiver,
     ) {
     }
 
@@ -90,7 +90,7 @@ class CacheHashLoader
                 // but only after we've retrieved it in case some parts of the
                 // query were necessary.
                 $baseName = pathinfo(parse_url($thumbnail, PHP_URL_PATH), PATHINFO_BASENAME);
-                $storage  = $this->storageMapper->acceptStream($baseName, $response->getBody()->getContents(), true);
+                $storage  = $this->receiver->acceptStream($baseName, $response->getBody()->getContents(), true);
                 $post     = $post->setCacheHash($storage->getHash());
                 $save     = true;
             }
