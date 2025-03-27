@@ -11,7 +11,6 @@ namespace SocialStream\Cache;
 
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\RequestOptions;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use SocialStream\PostMapper;
 use SocialStream\UrlDetection;
@@ -25,6 +24,13 @@ use SocialStream_Post_Abstract;
  */
 class CacheHashLoader
 {
+    /**
+     * Constructor
+     *
+     * @param ClientInterface $client        For fetching the post's thumbnail.
+     * @param PostMapper      $postMapper    For saving the post.
+     * @param StorageMapper   $storageMapper For storing the cache hash to storage.
+     */
     public function __construct(
         private ClientInterface $client,
         private PostMapper $postMapper,
@@ -32,6 +38,12 @@ class CacheHashLoader
     ) {
     }
 
+    /**
+     * Load the post's cache hash, and the thumbnail into storage.
+     *
+     * @param SocialStream_Post_Abstract $post
+     * @return void
+     */
     public function load(SocialStream_Post_Abstract $post): void
     {
         if ($post->getCacheHash()) {
@@ -54,7 +66,7 @@ class CacheHashLoader
         }
 
         $hash         = null;
-        $urlDetection = new UrlDetection($post->getThumbnail());
+        $urlDetection = new UrlDetection($url);
         if ($urlDetection->isLocalUrl()) {
             if ($urlDetection->isStorageUrl()) {
                 // it's in storage - just grab the hash and be done with it
@@ -80,6 +92,7 @@ class CacheHashLoader
         // Only save post it if it actually already exists
         if ($hash && $post->getPostId()) {
             $this->postMapper->suppressNotification();
+            $post->setCacheHash($hash);
             try {
                 $this->postMapper->save($post);
                 return true;
@@ -87,47 +100,6 @@ class CacheHashLoader
                 $this->postMapper->restoreNotification();
             }
         }
-        return false;
-    }
-
-
-    /**
-     * Process url using fopen in the usual way
-     *
-     * @param string $url
-     * @return bool
-     * @throws \PDOException
-     * @throws \Schoolbox\File\Exception
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
-     */
-    private function processUrl($url): bool
-    {
-        $streamHandle = @fopen($url, 'r');
-
-        if ($streamHandle) {
-            // Remove any query string from the url,
-            // but only after we've retrieved it in case some parts of the query were necessary
-            $baseName = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_BASENAME);
-
-            $smapper = Storage\Mapper::getInstance();
-            $storage = $smapper->acceptStream($baseName, $streamHandle, true);
-
-            $this->post->setCacheHash($storage->getHash());
-
-            // only save it if it actually already exists
-            if ($this->post->getPostId()) {
-                $postMapper = PostMapper::getInstance();
-                $postMapper->suppressNotification();
-                $postMapper->save($this->post);
-                $postMapper->restoreNotification();
-            }
-
-            $this->file = $storage;
-
-            return true;
-        }
-
         return false;
     }
 }
