@@ -23,6 +23,7 @@ use Schoolbox\Resource\Storage;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
+use SocialStream\Cache\CacheHashLoader;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
@@ -54,8 +55,14 @@ if (!strlen($post->getThumbnail())) {
     exit;
 }
 
-$cache = new Cache\Original();
-$cache->initPost($post);
+$loader = new CacheHashLoader(
+    $kernel->get('httpClient'),
+    PostMapper::getInstance(),
+    Storage\Mapper::getInstance(),
+);
+$loader->load($post);
+//$cache = new Cache\Original();
+//$cache->initPost($post);
 
 $urlDetect = new UrlDetection($post->getUrl());
 
