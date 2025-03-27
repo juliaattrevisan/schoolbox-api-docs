@@ -554,6 +554,7 @@ class Kernel extends WebKernelAbstract
                     'tempFilesystem'         => $di->lazyGet('filesystem.temp'),
                     // CLI scripts have no current user, thus this is null
                     'currentUser'            => (PHP_SAPI === 'cli' ? null : $di->lazyGet('user')),
+                    'virusScanner'           => $di->lazyGet('virus.scanner'),
                 ],
             )
         );
@@ -574,6 +575,22 @@ class Kernel extends WebKernelAbstract
                     return new ProcessorFactory($storage, new HashGenerator());
                 }
             ),
+        );
+
+        // Virus scanner
+        $di->set(
+            'virus.scannerFactory',
+            $di->lazyNew(
+                \Schoolbox\Resource\Storage\Virus\ScannerFactory::class,
+                [
+                    'config'         => $config,
+                    'tempFileSystem' => $di->lazyGet('filesystem.temp'),
+                ]
+            )
+        );
+        $di->set(
+            'virus.scanner',
+            $di->lazyGetCall('virus.scannerFactory', 'build'),
         );
 
         // Search dependencies

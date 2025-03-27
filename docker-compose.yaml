@@ -190,6 +190,13 @@ services:
     image: schoolbox/epl:latest
     env_file: docker/schoolbox-etherpad/default.env
 
+  clamav:
+    container_name: clamav
+    build:
+      context: ./docker/clamav
+    volumes:
+      - clamav-data:/var/lib/clamav
+
 volumes:
   # Volume for Schoolbox's code base
   code:
@@ -254,3 +261,6 @@ volumes:
       type: none
       o: bind
       device: ./docker/redis-cache/config
+
+  # Volume for ClamAV signatures
+  clamav-data:

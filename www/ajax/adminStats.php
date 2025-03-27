@@ -15,6 +15,7 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\LogMapper;
 use Schoolbox\Admin\Home\SamlCertHelper;
+use Schoolbox\Resource\Storage\Virus\IScanner;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
@@ -418,7 +419,8 @@ switch ($_POST['module']) {
         ];
         break;
     case 'virus':
-        $virusScanner = new Schoolbox\Resource\Storage\Virus\Scanner($kernel->get('filesystem.temp'));
+        /** @var IScanner $virusScanner */
+        $virusScanner = $kernel->get('virus.scanner');
         $status = $virusScanner->checkExists();
 
         $output['virus_status'] = $status;

@@ -32,6 +32,7 @@ class Receiver implements IReceiver
      * @param ISanitizer        $sanitizer              Sanitizer for file content of storage objects.
      * @param Filesystem        $tempFilesystem         Temporary file system: files will be extracted from here.
      * @param User|null         $currentUser            The current user: used to determine if the file is acceptable.
+     * @param Virus\IScanner    $virusScanner           Virus scanner, for live scanning of uploaded files.
      */
     public function __construct(
         private Mapper $storageMapper,
@@ -40,6 +41,7 @@ class Receiver implements IReceiver
         private ISanitizer $sanitizer,
         private Filesystem $tempFilesystem,
         private ?User $currentUser,
+        private Virus\IScanner $virusScanner,
     ) {
     }
 
@@ -128,7 +130,7 @@ class Receiver implements IReceiver
         $storage->setPublic($public);
 
         // Run the virus scanner
-        (new Virus\Scanner($this->tempFilesystem))->scan($tempLocation);
+        $this->virusScanner->scan($tempLocation);
 
         $helper    = new Sanitizer\Helper($this->sanitizer);
         $sanitized = $helper->sanitize(
