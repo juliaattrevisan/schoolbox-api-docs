@@ -592,7 +592,7 @@ class Model implements ISoftDeletable, IModel
      */
     public function isArchived(): bool
     {
-        return $this->getExpiresAt() !== null && $this->getExpiresAt()->isPast();
+        return $this->getExpiresAt() !== null && $this->getExpiresAt()->endOfDay()->isPast();
     }
 
     /**
