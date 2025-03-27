@@ -81,7 +81,7 @@ if ($urlDetect->isStorageUrl()) {
         exit;
     }
 } else {
-    $storage = $cache->getFile();
+    $storage = Storage\Mapper::getInstance()->findByHash($post->getCacheHash());
     if (!$storage) {
         \SitePage::redirectToBrokenImageWithTransform('storage', $size, 400);
         exit;
