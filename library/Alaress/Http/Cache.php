@@ -91,6 +91,9 @@ class Cache
         }
 
         // Make the request and store it
+        // TODO consider timeout and connect_timeout here?
+        // TODO lock mechanism? if lock is present, wait until it times out?
+        // TODO ensure that base URL is the FQDN of the instance
         $response     = $this->httpClient->request('GET', $url, [RequestOptions::HEADERS => $headers]);
         $responseBody = $response->getBody()->getContents();
         $this->internalCache->set($key, $responseBody, $ttl ?? $this->defaultLifetime);
