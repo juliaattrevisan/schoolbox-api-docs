@@ -272,7 +272,6 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
         }
 
         $page = $this->getPage();
-        $userHandler = new User();
 
         // render users
         if (!empty($this->dataSet)) {
@@ -311,9 +310,9 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
                     array(
                         'DATE'               => Scrub::text($log['created_at']),
                         'IMPERSONATOR_ID'    => Scrub::text($log['impersonator_id']),
-                        'IMPERSONATOR'       => Scrub::text($userHandler->formatName($impersonatorNameShards)),
+                        'IMPERSONATOR'       => Scrub::text($this->getUserHandler()->formatName($impersonatorNameShards)),
                         'IMPERSONATED_ID'    => Scrub::text($log['impersonated_id']),
-                        'IMPERSONATED'       => Scrub::text($userHandler->formatName($impersonatedNameShards)),
+                        'IMPERSONATED'       => Scrub::text($this->getUserHandler()->formatName($impersonatedNameShards)),
                         'IP'                 => Scrub::text($log['ip']),
                     )
                 );
