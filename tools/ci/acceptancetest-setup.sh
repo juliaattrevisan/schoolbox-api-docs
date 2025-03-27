@@ -33,24 +33,24 @@ logdir=/var/log/schoolbox/smoketest
 /usr/share/schoolbox/tools/notif/syscheck.php -vvv
 
 echo "starting socketd"
-/usr/share/schoolbox/tools/socket/socketd.php --porcelain -vvv > $logdir/socketd.log 2>&1 &
+sudo -u www-data '/usr/share/schoolbox/tools/socket/socketd.php --porcelain -vvv' > $logdir/socketd.log 2>&1 &
 # kill -HUP $(pgrep -f socketd.php)
 
 echo "starting scheduled"
-/usr/share/schoolbox/tools/mq/schedule-safe-restart.php -vvv --perform --no-delay
-/usr/share/schoolbox/tools/mq/scheduled.php --porcelain -vvv --pid > $logdir/scheduled.log 2>&1 &
+sudo -u www-data '/usr/share/schoolbox/tools/mq/schedule-safe-restart.php -vvv --perform --no-delay'
+sudo -u www-data '/usr/share/schoolbox/tools/mq/scheduled.php --porcelain -vvv --pid' > $logdir/scheduled.log 2>&1 &
 # kill -HUP $(pgrep -f scheduled.php)
 
 echo "starting digestd"
-/usr/share/schoolbox/tools/digest/digestd.php --porcelain -vvv --pid > $logdir/digestd.log 2>&1 &
+sudo -u www-data '/usr/share/schoolbox/tools/digest/digestd.php --porcelain -vvv --pid' > $logdir/digestd.log 2>&1 &
 # kill -HUP $(pgrep -f digestd.php)
 
 echo "starting mobiled"
-/usr/share/schoolbox/tools/mobile/mobiled.php --porcelain -vvv --pid > $logdir/mobiled.log 2>&1 &
+sudo -u www-data '/usr/share/schoolbox/tools/mobile/mobiled.php --porcelain -vvv --pid' > $logdir/mobiled.log 2>&1 &
 # kill -HUP $(pgrep -f mobiled.php)
 
 echo "refreshing binding cache"
-/usr/share/schoolbox/tools/notif/route/refresh-binding-cache.php
+sudo -u www-data '/usr/share/schoolbox/tools/notif/route/refresh-binding-cache.php'
 
 ## ACCEPTANCE TESTS
 
