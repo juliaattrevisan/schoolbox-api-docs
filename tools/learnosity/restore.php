@@ -30,20 +30,6 @@ require_once __DIR__ . '/../../conf/core/require.php';
 $app = new class extends CliTool\App
 {
     /**
-     * Make sure to add your locking script to the Lock Inspector tool
-     * const LOCK_NAMES in Inspector.php
-     */
-    public const MY_TOOL_LOCK_NAME = 'learnosity_activity_restore';
-
-
-    /**
-     * Decide how long this should be based on your usage
-     * You might have to adjust it, but it should cover the cost of an iteration
-     */
-    private const LOCK_TTL = 60;
-
-
-    /**
      * --help
      *
      * Print help text for those who don't know how to use this tool
@@ -142,7 +128,7 @@ HELP;
          * specifically check for acquisition
          */
         try {
-            $lock = $this->acquireLock(self::MY_TOOL_LOCK_NAME, self::LOCK_TTL);
+            $lock = $this->acquireLock(Helper::LEARNOSITY_ACTIVITY_RESTORE_TOOL_NAME, Helper::LEARNOSITY_ACTIVITY_RESTORE_LOCK_TTL);
         } catch (\RuntimeException $e) {
             return;
         }

@@ -12,15 +12,12 @@ namespace Schoolbox\Admin\Import;
 
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\InvalidColumnException;
-use Alaress\Lock\InstanceLockFactory;
-use Alaress\Lumberjack\Logger;
 use Alaress\Module\Cache\Rebuilder;
 use Alaress\Web\Controller\ConfigController;
 use Aura\Router\Exception\RouteNotFound;
 use PDOException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 use ReflectionException;
 use Schoolbox\Admin\Import\Navigation\SchoolData;
@@ -39,7 +36,6 @@ use Schoolbox\External\Importer\Endpoint\Scheduler;
 use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
 use Schoolbox\External\Importer\Endpoint\ValidUsesScheduleTimetable;
 use Schoolbox\Mapper\Exception;
-use Symfony\Component\Lock\LockInterface;
 use Twig\Error\Error;
 use UnexpectedValueException;
 
@@ -143,7 +139,7 @@ class Controller extends ConfigController
                 /* Spawn a logger out of darkness
                  * Was there a particular way to do this?
                  */
-                $lock = $this->acquireLock($this->spawnLogger(), Scheduler::LOCK_NAME, 1);
+                $lock = $this->acquireLock($this->spawnLogger('suds'), Scheduler::LOCK_NAME, 1);
                 $lock->release();
 
                 $canPerformUpdate = true;
@@ -366,7 +362,6 @@ class Controller extends ConfigController
         $this->response = $this->redirectFound($this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex'));
     }
 
-
     /**
      * This lets you cancel a user-initiated sync if you're quick enough. For time-critical moments
      * such as daily org, this might save you minutes of processing.
@@ -385,77 +380,6 @@ class Controller extends ConfigController
             $this->importQueueMapper->delete($instance);
         }
     }
-
-
-    /* Lock Acquisition
-     * cloned from cli land because we can perhaps give user feedback here
-     */
-
-    /**
-     * Acquires and returns a lock object.
-     *
-     * @param LoggerInterface $logger
-     * @param string          $lockName The name of the lock to acquire.
-     *                                  Will be automatically made unique across
-     *                                  separate instances.
-     * @param float|null      $timeout  The amount of time (in seconds) to hold the
-     *                                  lock for.
-     * @return LockInterface
-     *
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     * @throws \RuntimeException
-     */
-    protected function acquireLock(LoggerInterface $logger, string $lockName, ?float $timeout): LockInterface
-    {
-        /** @noinspection PhpUnhandledExceptionInspection */
-        /** @var InstanceLockFactory $lockFactory */
-        $lockFactory = $this->getDi()->get('lockFactory');
-        $lock        = $lockFactory->createLock($lockName, $timeout);
-
-        // Try to acquire this lock
-        try {
-            $acquired = $lock->acquire();
-        } catch (\Exception $e) {
-            /* Any weird exception being thrown here - lock-related or otherwise -
-             * is going to preclude a proper lock acquisition and you should be
-             * prevented from doing whatever you're doing
-             */
-            $message = 'This process is already running for this instance: trusting it will self-terminate on timeout';
-
-            $logger->warning($message);
-
-            throw new \RuntimeException($message);
-        }
-
-        /* You didn't die, but you also couldn't acquire a lock
-         * Drop a nice message because this is an intended behaviour
-         */
-        if (!$acquired) {
-            $message = sprintf(
-                'Could not acquire %s lock',
-                $lockName
-            );
-
-            $logger->warning($message);
-
-            throw new \RuntimeException($message);
-        }
-
-        return $lock;
-    }
-
-
-    /**
-     * Spawn a Logger instance, for the lock mechanism
-     *
-     * @return Logger
-     */
-    private function spawnLogger(): Logger
-    {
-        return new Logger(STDOUT, STDOUT, \Monolog\Logger::INFO, [], true, 'suds');
-    }
-
 
     /**
      * Exports the contents of sis_event into a csv format

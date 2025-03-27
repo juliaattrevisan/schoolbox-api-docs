@@ -26,6 +26,7 @@ use Schoolbox\Learning\Learnosity\Cli\MaxZeroAttemptsTool;
 use Schoolbox\Learning\Learnosity\Importer\Cli\PollProcessingTool;
 use Schoolbox\Learning\Learnosity\Importer\Cli\ResetFailedTool;
 use Schoolbox\Learning\Learnosity\Importer\Cli\RestartPendingTool;
+use Schoolbox\Learning\Learnosity\Helper;
 use Schoolbox\Learning\Turnitin\Cli\CleanserTool;
 use Schoolbox\Learning\Turnitin\Cli\TransmitTool;
 use Schoolbox\Learning\Turnitin\Cli\ReportTool;
@@ -113,6 +114,7 @@ class Inspector extends CliTool\App
         ResetFailedTool::LOCK_NAME       => 'Reset failed quiz duplication (./tools/learnosity/reset-failed.php)',
         AutoscoreAttemptsTool::LOCK_NAME => 'Poll processing quiz attempts (./tools/learnosity/autoscore-attempts.php)',
         MaxZeroAttemptsTool::LOCK_NAME   => 'Poll processing quiz attempts (./tools/learnosity/maxzero-attempts.php)',
+        Helper::LEARNOSITY_ACTIVITY_RESTORE_TOOL_NAME => 'Restore Learnosity activity (./tools/learnosity/restore.php)',
 
         /* Penola Semester 2, 2023 Vic Curric Progression Points importer
          */

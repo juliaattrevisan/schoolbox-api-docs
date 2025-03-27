@@ -1823,6 +1823,67 @@ class Controller extends Base
      */
     public function postCopyQuizConstituents(QuizDomainObject $source, QuizDomainObject $destination): void
     {
+
+        /* Decide how loudly to announce lock acquisition failure
+         *
+         * Simply using $lock = $this->acquireLock() will keep you safe, even if you don't
+         * specifically check for acquisition
+         */
+        $logger = $this->spawnLogger('learnosity_restore_web');
+        try {
+            $lock = $this->acquireLock($logger, Helper::LEARNOSITY_ACTIVITY_RESTORE_TOOL_NAME, Helper::LEARNOSITY_ACTIVITY_RESTORE_LOCK_TTL);
+        } catch (\RuntimeException $e) {
+            return;
+        }
+
+        /**
+         * check and restore both source and destination quizzes
+         */
+        $helper = (new Helper($this->api, $logger));
+        $candidates[$source->getLearnosityReference()] = [
+            /* These get updated as we discover information/facts from Learnosity itself
+             */
+            'status' => Helper::LEARNOSITY_STATUS_UNKNOWN,
+        ];
+
+        $result = $this->api->dataGetRequest('/itembank/activities', ['references' => [$source->getLearnosityReference(), $destination->getLearnosityReference()]]);
+
+        /* The data from learnosity... we should in theory only get 1 result, but let's be safe, and iterate through the 'single' result
+         * it may also be malformed, so check for safety
+         */
+        foreach (($result['data'] ?? []) as $learnosityQuiz) {
+            $this->refreshLock($logger, $lock);
+            $candidates[$learnosityQuiz['reference']]['status'] = $learnosityQuiz['status'];
+
+            /* If a quiz is already in the state requested, nothing to change
+            */
+            if (Helper::LEARNOSITY_ITEM_STATUS_PUBLISHED === $candidates[$learnosityQuiz['reference']]['status']) {
+                $logger->info(sprintf(
+                    '    This quiz status is already "%s"; nothing to change. Skipping',
+                    Helper::LEARNOSITY_ITEM_STATUS_PUBLISHED
+                ));
+
+                continue;
+            }
+
+            /* We can't...really restore quizzes learnosity doesn't understand.
+             * I'm not sure why it exists: might only be in vagrant demo data
+             */
+            if (Helper::LEARNOSITY_STATUS_UNKNOWN === $candidates[$learnosityQuiz['reference']]['status']) {
+                $logger->info('    Learnosity cannot figure out this quiz. Skipping');
+
+                continue;
+            }
+
+            // by this time we should have already confirmed the quiz is not published, and that learnosity does know it exists...
+            // lets restore it
+            $logger->info('Restoring quiz', $candidates[$learnosityQuiz['reference']]);
+            $helper->restore($learnosityQuiz['reference']);
+        }
+
+        $lock->release();
+        //now that things are restored, we can start the duplication process
+
         // Start duplicating and polling status of duplication
         $duplicator = $this->buildDuplicator();
         try {
