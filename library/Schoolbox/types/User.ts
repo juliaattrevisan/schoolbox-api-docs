@@ -10,4 +10,5 @@ export type User = {
     lastname: string;
     preferredName: string | null;
     title: string | null;
+    pronoun: string | null;
 };
