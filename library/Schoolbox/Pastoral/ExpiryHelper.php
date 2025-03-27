@@ -103,9 +103,9 @@ class ExpiryHelper
         if (PastoralType::PASTORAL_EXPIRY['academic period'] === $defaultExpiry) {
             $expiryDate = $this->loadAcademicPeriod($fromDate, $yearLevel)->getDisplayFinish();
         } else if (PastoralType::PASTORAL_EXPIRY['academic year'] === $defaultExpiry) {
-            $expiryDate = (new Alaress_Date_Format($fromDate))->getStartOfSchoolYear()->addYears(1);
+            $expiryDate = (new Alaress_Date_Format($fromDate))->endOfSchoolYear();
         } else if (PastoralType::PASTORAL_EXPIRY['calendar year'] === $defaultExpiry) {
-            $expiryDate = (new Alaress_Date_Format($fromDate))->addYears(1)->startOfYear();
+            $expiryDate = (new Alaress_Date_Format($fromDate))->endOfYear();
         } else {
             $expiryDate = (new Alaress_Date_Format($fromDate))->modify("+{$defaultExpiry}");
         }
