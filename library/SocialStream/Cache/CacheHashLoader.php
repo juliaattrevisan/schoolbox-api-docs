@@ -60,39 +60,45 @@ class CacheHashLoader
      */
     private function saveStreamContents(SocialStream_Post_Abstract $post): bool
     {
-        $url = $post->getThumbnail();
-        if (!isset($url)) {
+        $thumbnail = $post->getThumbnail();
+        if (!isset($thumbnail)) {
             return false;
         }
 
-        $hash         = null;
-        $urlDetection = new UrlDetection($url);
+        $hash         = $post->getCacheHash();
+        $save         = false;
+        $urlDetection = new UrlDetection($thumbnail);
         if ($urlDetection->isLocalUrl()) {
             if ($urlDetection->isStorageUrl()) {
                 // it's in storage - just grab the hash and be done with it
-                $hash = $urlDetection->getHash();
+                $post = $post->setCacheHash($urlDetection->getHash());
+                $save = true;
             }
         } else {
             // Load the thumbnail from the HTTP client, and save it into storage
+            $response = null;
             try {
-                $response = $this->client->request('GET', $url);
+                $response = $this->client->request('GET', $thumbnail);
             } catch (GuzzleException $e) {
-                // Don't try to set anything?
-                return false;
+                // Could not download the thumbnail? Remove it if so.
+                $post = $post->setCacheHash(null)->setThumbnail(null);
+                $save = true;
             }
 
-            // Remove any query string from the url,
-            // but only after we've retrieved it in case some parts of the query
-            // were necessary.
-            $baseName = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_BASENAME);
-            $storage  = $this->storageMapper->acceptStream($baseName, $response->getBody()->getContents(), true);
-            $hash     = $storage->getHash();
+            if ($response) {
+                // Remove any query string from the url for the storage name,
+                // but only after we've retrieved it in case some parts of the
+                // query were necessary.
+                $baseName = pathinfo(parse_url($thumbnail, PHP_URL_PATH), PATHINFO_BASENAME);
+                $storage  = $this->storageMapper->acceptStream($baseName, $response->getBody()->getContents(), true);
+                $post     = $post->setCacheHash($storage->getHash());
+                $save     = true;
+            }
         }
 
-        // Only save post it if it actually already exists
-        if ($hash && $post->getPostId()) {
+        // Only save post it if it actually already exists?
+        if ($save && $post->getPostId()) {
             $this->postMapper->suppressNotification();
-            $post->setCacheHash($hash);
             try {
                 $this->postMapper->save($post);
                 return true;
