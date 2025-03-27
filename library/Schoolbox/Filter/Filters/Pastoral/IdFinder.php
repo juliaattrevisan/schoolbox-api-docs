@@ -124,7 +124,7 @@ class IdFinder extends AbstractIdFinder
                 $archivedBuilderPb->any(
                     $this->getMapper()->getPredicateBuilder()
                          ->isNull('p.expires_at')
-                         ->greaterThan('p.expires_at', \Alaress_Date_Format::now()->getDatabaseDate())
+                         ->greaterThanOrEqualTo('p.expires_at', \Alaress_Date_Format::now()->getDatabaseDate())
                 );
             }
 
