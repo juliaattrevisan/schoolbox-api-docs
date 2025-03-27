@@ -185,7 +185,7 @@ class DataSource
         $sql  = "SELECT count(*) FROM pastoral p WHERE {$where}";
 
         if (!$showArchived) {
-            $sql .= " AND (p.expires_at > NOW() OR p.expires_at IS NULL)";
+            $sql .= " AND (p.expires_at >= CURDATE() OR p.expires_at IS NULL)";
         }
         $stmt = $this->mapper->getDatabase()->query($sql, $params);
         return (int)$stmt->fetchColumn();
@@ -208,7 +208,7 @@ class DataSource
 
         $typeWheres     = [];
         $typeParams     = [];
-        $archiveWhere = " AND (expires_at > NOW() OR expires_at IS NULL) ";
+        $archiveWhere = " AND (expires_at >= CURDATE() OR expires_at IS NULL) ";
 
         if (!empty($typeIds)) {
             $typeBindings = Builder::getBindings($typeIds, 'typeId');
@@ -346,7 +346,7 @@ class DataSource
         if (!$showArchived) {
             $pb->any(
                 $this->getPredicateBuilder()
-                     ->any($this->getPredicateBuilder()->greaterThan('p.expires_at', \Alaress_Date_Format::now()->getDatabaseDate()))
+                     ->any($this->getPredicateBuilder()->greaterThanOrEqualTo('p.expires_at', \Alaress_Date_Format::now()->getDatabaseDate()))
                      ->any($this->getPredicateBuilder()->isNull('p.expires_at'))
             );
         }
