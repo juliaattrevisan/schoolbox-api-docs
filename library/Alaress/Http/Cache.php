@@ -16,6 +16,7 @@ use Psr\Http\Message\UriInterface;
 use Psr\SimpleCache\CacheInterface;
 use Psr\SimpleCache\InvalidArgumentException;
 use Random\RandomException;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Url\Uri;
 
 /**
@@ -144,20 +145,24 @@ class Cache
             $url = $url->withScheme('http');
         }
 
-        // Make the request and store it
-        // TODO should this cache something empty on error?
-        $response     = $this->httpClient->request(
-            'GET',
-            $url,
-            [
-                RequestOptions::HEADERS         => $headers,
-                RequestOptions::CONNECT_TIMEOUT => $this->connectTimeout,
-                RequestOptions::TIMEOUT         => $this->requestTimeout,
-            ]
-        );
+        // Make the request and store it, clearing the lock in the end
+        try {
+            $response = $this->httpClient->request(
+                'GET',
+                $url,
+                [
+                    RequestOptions::HEADERS         => $headers,
+                    RequestOptions::CONNECT_TIMEOUT => $this->connectTimeout,
+                    RequestOptions::TIMEOUT         => $this->requestTimeout,
+                ]
+            );
+        } catch (GuzzleException $e) {
+            throw new SchoolboxException("Guzzle Exception occurred", 0, $e);
+        } finally {
+            $this->internalCache->delete($lockKey);
+        }
         $responseBody = $response->getBody()->getContents();
         $this->internalCache->set($key, $responseBody, $ttl ?? $this->defaultLifetime);
-        $this->internalCache->delete($lockKey);
         return $responseBody;
     }
 
