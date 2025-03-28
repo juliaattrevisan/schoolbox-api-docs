@@ -3,6 +3,7 @@
 namespace Schoolbox\Learning\Learnosity\Cli;
 
 use Schoolbox\Application\CliTool;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Url\Factory;
 
@@ -135,9 +136,9 @@ HELP;
          */
         $this->api = new Api(
             (new Factory($this->getConfig()))->buildFullyQualified()->getHost(),
-            $this->getConfig()->get(\Schoolbox\Config\ConfigMapper::NAME_LEARNOSITY_VERSION),
-            $this->getConfig()->get(\Schoolbox\Config\ConfigMapper::NAME_LEARNOSITY_CONSUMER_KEY),
-            $this->getConfig()->get(\Schoolbox\Config\ConfigMapper::NAME_LEARNOSITY_CONSUMER_SECRET),
+            $this->getConfig()->get(ConfigMapper::NAME_LEARNOSITY_VERSION),
+            $this->getConfig()->get(ConfigMapper::NAME_LEARNOSITY_CONSUMER_KEY),
+            $this->getConfig()->get(ConfigMapper::NAME_LEARNOSITY_CONSUMER_SECRET),
             $this->getLogger(),
         );
 
