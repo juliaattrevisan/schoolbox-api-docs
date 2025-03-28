@@ -153,12 +153,12 @@ HELP;
         /* Compare what we know vs what learnosity knows
          */
         $this->getLogger()->info(sprintf(
-            '    Schoolbox attempt max_mark: %s.',
+            '    Schoolbox attempt max_mark: %s',
             $attempt['max_mark'] ?? '(null)',
         ));
 
         $this->getLogger()->info(sprintf(
-            '    Learnosity session max_score: %s.',
+            '    Learnosity session max_score: %s',
             $result['max_score']
         ));
 
