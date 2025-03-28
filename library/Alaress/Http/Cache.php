@@ -14,6 +14,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
 use Psr\SimpleCache\CacheInterface;
 use Psr\SimpleCache\InvalidArgumentException;
+use Random\RandomException;
 use Schoolbox\Url\Uri;
 
 /**
@@ -35,6 +36,20 @@ class Cache
      * establish a connection?
      */
     private const CONNECT_TIMEOUT = 10;
+
+    /**
+     * Prefix for the lock key within the cache.
+     *
+     * If the requested URL is in cache but the lock is, another process is
+     * requesting the cached URL: wait for that request to complete.
+     */
+    private const LOCK_KEY_PREFIX = ':lock';
+
+    /**
+     * The base exponential backoff value to wait for the lock to expire, in
+     * microseconds.
+     */
+    private const BASE_JITTER = 100_000;
 
     /**
      * Default header for HTTP requests.
@@ -82,13 +97,26 @@ class Cache
     public function request(string $url, ?string $key = null, array $headers = [], ?int $ttl = null): string
     {
         // Attempt to load cached response
-        $key    ??= $this->hashKey($url);
+        $key     ??= $this->hashKey($url);
+        $lockKey = self::LOCK_KEY_PREFIX . $key;
+        $maxWait = $this->connectTimeout + $this->requestTimeout;
+        $this->waitForLockToExpire($lockKey, microtime(true) + $maxWait);
+
         $result = $this->internalCache->get($key);
         if (isset($result)) {
             return $result;
         }
 
+
+
         // Otherwise, load response from HTTP client
+
+        // Is there a lock in place? If so, wait for it to expire
+        // (or for a max of $connectTimeout + $requestTimeout seconds) before
+        // attempting to fetch again.
+        if ($this->internalCache->has($lockKey)) {
+        }
+        $this->internalCache->set($lockKey, '', $maxWait);
 
         // User agent header from `Alaress_Cache_Abstract`:
         // note that this implementation allows the UA to be overridden from
@@ -107,6 +135,7 @@ class Cache
         // Make the request and store it
         // TODO lock mechanism? if lock is present, wait until it times out?
         // TODO ensure that base URL is the FQDN of the instance
+        // TODO should this cache something empty on error?
         $response     = $this->httpClient->request(
             'GET',
             $url,
@@ -118,6 +147,7 @@ class Cache
         );
         $responseBody = $response->getBody()->getContents();
         $this->internalCache->set($key, $responseBody, $ttl ?? $this->defaultLifetime);
+        $this->internalCache->delete($lockKey);
         return $responseBody;
     }
 
@@ -134,7 +164,9 @@ class Cache
      */
     public function invalidate(string $url, ?string $key = null): void
     {
-        $this->internalCache->delete($key ?? $this->hashKey($url));
+        $key     ??= $this->hashKey($url);
+        $lockKey = self::LOCK_KEY_PREFIX . $key;
+        $this->internalCache->deleteMultiple([$key, $lockKey]);
     }
 
     /**
@@ -146,5 +178,53 @@ class Cache
     private function hashKey(string $key): string
     {
         return hash('sha256', $key);
+    }
+
+    /**
+     * Wait for the lock to expire.
+     *
+     * This checks if the lock is there: if it is, wait using exponential
+     * backoff until it is not there, or until `$waitUntil` is reached.
+     *
+     * @param string $lockKey
+     * @param float  $waitUntil
+     * @param int    $iteration
+     * @return void
+     * @throws InvalidArgumentException
+     * @phpstan-ignore-next-line `\Psr\SimpleCache\InvalidArgumentException`
+     *                            doesn't implement `Throwable`, but its
+     *                            implementations should
+     */
+    private function waitForLockToExpire(string $lockKey, float $waitUntil, int $iteration = 1): void
+    {
+        // Short-circuit if too many iterations
+        if ($iteration >= 10) {
+            return;
+        }
+
+        // Short-circuit if `$waitUntil` is reached already
+        $now = microtime(true);
+        $microsecondsUntilWaitUntil = ($waitUntil - $now) * 1_000_000;
+        if ($microsecondsUntilWaitUntil <= 0) {
+            return;
+        }
+
+        // If there's no lock, return immediately
+        if (!$this->internalCache->has($lockKey)) {
+            return;
+        }
+
+        // Sleep until first of $waitUntil or ($now + $jitter)
+        try {
+            $jitterMicroseconds = random_int(0, self::BASE_JITTER * (2 ** $iteration));
+        } catch (RandomException) {
+            // In the unlikely event a random number can't be generated:
+            // wait for a value in the middle
+            $jitterMicroseconds = self::BASE_JITTER * (2 ** $iteration) / 2;
+        }
+        usleep(min($jitterMicroseconds, $microsecondsUntilWaitUntil));
+
+        // And wait again, for longer this time
+        $this->waitForLockToExpire($lockKey, $waitUntil, $iteration + 1);
     }
 }
