@@ -60,12 +60,21 @@ class CacheHashLoader
      */
     private function saveStreamContents(SocialStream_Post_Abstract $post): bool
     {
+        // Only save post it if it actually already exists?
+        // Not sure why this stipulation existed, but it did in
+        // `\SocialStream\Cache\Original`.
+        // (Possibly because the post is saved before the content is fully set,
+        //  and don't want to raise a notification from a partial post?)
+        if (!$post->getPostId()) {
+            return false;
+        }
+
+        // No thumbnail? exit early
         $thumbnail = $post->getThumbnail();
         if (!isset($thumbnail)) {
             return false;
         }
 
-        $hash         = $post->getCacheHash();
         $save         = false;
         $urlDetection = new UrlDetection($thumbnail);
         if ($urlDetection->isLocalUrl()) {
@@ -96,8 +105,7 @@ class CacheHashLoader
             }
         }
 
-        // Only save post it if it actually already exists?
-        if ($save && $post->getPostId()) {
+        if ($save) {
             $this->postMapper->suppressNotification();
             try {
                 $this->postMapper->save($post);
