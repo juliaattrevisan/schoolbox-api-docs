@@ -219,6 +219,9 @@ class InstanceIdManager extends CliTool\App
     /**
      * Renames a bunch of lock files on disk
      *
+     * @deprecated This should no longer be required, as process locks are now
+     *             stored in Redis.
+     *
      * @param string $oldInstanceId
      * @param string $newInstanceId
      */
