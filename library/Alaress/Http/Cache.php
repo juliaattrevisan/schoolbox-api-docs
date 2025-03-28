@@ -213,8 +213,8 @@ class Cache
         }
 
         // Short-circuit if `$waitUntil` is reached already
-        $now = microtime(true);
-        $microsecondsUntilWaitUntil = ($waitUntil - $now) * 1_000_000;
+        $now                        = microtime(true);
+        $microsecondsUntilWaitUntil = (int)(($waitUntil - $now) * 1_000_000);
         if ($microsecondsUntilWaitUntil <= 0) {
             return;
         }
