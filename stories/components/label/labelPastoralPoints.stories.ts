@@ -5,13 +5,16 @@ import StorybookSlot from "../../../vue/components/storybook-slot.vue";
 /**
  * **Source**: `vue/components/label/sbx-label-pastoral-points.ce.vue`
  *
- * To display a label
+ * ** Dependencies:** [Label](?path=/docs/components-labels-label--docs)
+ *
+ * To display pastoral points. If they are positive, they will be displayed with `success` styling.
+ * If they are negative, they will be displayed with `alert` styling.
  *
  * ## Properties
  *
- * | Property | Type     | Description                                                                                      | Default        | Options                                                                   |
- * | -------- | -------- | ------------------------------------------------------------------------------------------------ | -------------- | ------------------------------------------------------------------------- |
- * | `points`   | `number` | The number of points | `0`           |                                       |
+ * | Property | Type     | Description          | Default | Options |
+ * | -------- | -------- | -------------------- | ------- | ------- |
+ * | `points` | `number` | The number of points | `0`     |         |
  */
 const meta: Meta<typeof SbxLabelPastoralPoints> = {
     component: StorybookSlot,
@@ -32,7 +35,7 @@ type Story = StoryObj<typeof StorybookSlot>;
 /**
  *
  */
-export const Default: Story = {
+export const Positive: Story = {
     render: () => ({
         components: { StorybookSlot },
         template: `

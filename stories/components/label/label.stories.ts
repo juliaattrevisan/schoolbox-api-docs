@@ -9,10 +9,10 @@ import StorybookSlot from "../../../vue/components/storybook-slot.vue";
  *
  * ## Properties
  *
- * | Property | Type     | Description                                                                                      | Default        | Options                                                                   |
- * | -------- | -------- | ------------------------------------------------------------------------------------------------ | -------------- | ------------------------------------------------------------------------- |
- * | `title`   | `string` | The title of the label | `""`           |                                       |
- * | `sentiment`   | `string` | The sentiment of the label, which impacts the color of the label                                                                          | `neutral`            | "success" | "warning" | "alert" | "neutral" |
+ * | Property    | Type     | Description                                                      | Default   | Options                                  |
+ * | ----------- | -------- | ---------------------------------------------------------------- | --------- | ---------------------------------------- |
+ * | `title`     | `string` | The title of the label                                           | `""`      |                                          |
+ * | `sentiment` | `string` | The sentiment of the label, which impacts the color of the label | `neutral` | `success`, `warning`, `alert`, `neutral` |
  */
 const meta: Meta<typeof SbxLabel> = {
     component: StorybookSlot,
