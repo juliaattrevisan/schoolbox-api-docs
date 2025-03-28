@@ -102,6 +102,15 @@ class Cache
      */
     public function request(string $url, ?string $key = null, array $headers = [], ?int $ttl = null): string
     {
+        // Make `$url` absolute if it isn't already
+        if (str_starts_with($url, '/')) {
+            $parts    = parse_url($url);
+            $path     = $parts['path'] ?? '';
+            $query    = $parts['query'] ?? '';
+            $fragment = $parts['fragment'] ?? '';
+            $url      = $this->baseUrl->withPath($path)->withQuery($query)->withFragment($fragment)->__toString();
+        }
+
         // Attempt to load cached response
         $key     ??= $this->hashKey($url);
         $lockKey = self::LOCK_KEY_PREFIX . $key;
@@ -133,12 +142,6 @@ class Cache
         $url = new Uri($url);
         if ('webcal' === $url->getScheme()) {
             $url = $url->withScheme('http');
-        }
-        if (!$url->isAbsolutePath()) {
-            $url = $url
-                ->withScheme($this->baseUrl->getScheme())
-                ->withHost($this->baseUrl->getHost())
-                ->withPort($this->baseUrl->getPort());
         }
 
         // Make the request and store it
