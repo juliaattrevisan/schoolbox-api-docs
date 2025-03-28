@@ -25,6 +25,18 @@ use Schoolbox\Url\Uri;
 class Cache
 {
     /**
+     * Request timeout: how long should this cache's HTTP client wait for a
+     * request to complete?
+     */
+    private const REQUEST_TIMEOUT = 20;
+
+    /**
+     * Connection timeout: how long should this cache's HTTP client wait to
+     * establish a connection?
+     */
+    private const CONNECT_TIMEOUT = 10;
+
+    /**
      * Default header for HTTP requests.
      *
      * (This is the original user agent header from `Alaress_Cache_Abstract`.)
@@ -44,6 +56,8 @@ class Cache
         private ClientInterface $httpClient,
         private CacheInterface $internalCache,
         private int|null $defaultLifetime,
+        private int $requestTimeout = self::REQUEST_TIMEOUT,
+        private int $connectTimeout = self::CONNECT_TIMEOUT,
     ) {
     }
 
@@ -91,10 +105,17 @@ class Cache
         }
 
         // Make the request and store it
-        // TODO consider timeout and connect_timeout here?
         // TODO lock mechanism? if lock is present, wait until it times out?
         // TODO ensure that base URL is the FQDN of the instance
-        $response     = $this->httpClient->request('GET', $url, [RequestOptions::HEADERS => $headers]);
+        $response     = $this->httpClient->request(
+            'GET',
+            $url,
+            [
+                RequestOptions::HEADERS         => $headers,
+                RequestOptions::CONNECT_TIMEOUT => $this->connectTimeout,
+                RequestOptions::TIMEOUT         => $this->requestTimeout,
+            ]
+        );
         $responseBody = $response->getBody()->getContents();
         $this->internalCache->set($key, $responseBody, $ttl ?? $this->defaultLifetime);
         return $responseBody;
