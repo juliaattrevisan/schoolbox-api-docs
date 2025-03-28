@@ -17,6 +17,7 @@ use PHPUnit\Framework\TestCase;
 use Schoolbox\Config\ArrayLoader;
 use Schoolbox\InstanceRegistry\ApiClient;
 use Schoolbox\InstanceRegistry\InstanceRegistry;
+use Schoolbox\Url\Uri;
 use Schoolbox\Version\Version;
 
 /**
@@ -222,6 +223,7 @@ class VersionTest extends TestCase
                             $this->getMockBuilder(Client::class)->getMock(),
                             new SimpleCacheBridge(new ArrayCachePool()),
                             null,
+                            new Uri('https://vagrant.dev.schoolbox.cloud'),
                         )
                     )
                 ),
