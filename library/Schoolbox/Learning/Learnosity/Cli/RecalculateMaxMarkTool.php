@@ -23,12 +23,6 @@ use Schoolbox\Url\Factory;
 class RecalculateMaxMarkTool extends CliTool\App
 {
     /**
-     * Name of this tool's lock.
-     */
-    public const LOCK_NAME = 'learnosity_recalculate_max_mark';
-
-
-    /**
      * Help
      */
     private const OPT_LONG_HELP = 'help';
