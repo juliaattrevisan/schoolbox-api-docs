@@ -84,6 +84,19 @@ HELP;
         $logger->info('Learnosity Recalculate Max Marks');
         $logger->info('');
 
+        /* Multiple usages of --reference=... will cause OPT_LONG_ATTEMPT_REFERENCE to give
+         * you an array of strings, instead of just a string itself, so actively prevent that
+         * for now. Later, if there's need for it, add support for multiple --reference values
+         * and pump that into the $statement below with
+         *
+         * WHERE learnosity_reference IN ...
+         */
+        if (is_array($this->getOpt(self::OPT_LONG_ATTEMPT_REFERENCE))) {
+            $this->getLogger()->info('Please provide one attempt reference to inspect; you supplied multiple.');
+
+            return;
+        }
+
         /* Check mandatory args first
          */
         $attemptReference = trim((string)$this->getOpt(self::OPT_LONG_ATTEMPT_REFERENCE));
