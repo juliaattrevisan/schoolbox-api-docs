@@ -345,6 +345,13 @@ class ConfigMapper extends Mapper
     public const NAME_NAME_FORMAT_STAFF = 'name_format_staff';
     public const NAME_NAME_FORMAT_PARENT = 'name_format_parent';
 
+    /* Learnosity configuration/credentials
+     */
+    public const NAME_LEARNOSITY_VERSION = 'learnosity_version';
+    public const NAME_LEARNOSITY_CONSUMER_KEY = 'learnosity_consumer_key';
+    public const NAME_LEARNOSITY_CONSUMER_SECRET = 'learnosity_consumer_secret';
+
+
     public const NAME_DATASET_INSTANCE = 'dataset_instance';
     /**
      * Isams specific
