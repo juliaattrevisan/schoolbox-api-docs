@@ -337,7 +337,6 @@ abstract class Kernel
         register_shutdown_function($this->getShutdownHandler());
     }
 
-
     /**
      * @return Di\Container
      */
@@ -345,7 +344,6 @@ abstract class Kernel
     {
         return $this->di;
     }
-
 
     /**
      * Convenience method to retrieve service from DI
@@ -358,7 +356,6 @@ abstract class Kernel
     {
         return $this->getDependencyInjector()->get($service);
     }
-
 
     /**
      * @param callable $callable
@@ -390,7 +387,6 @@ abstract class Kernel
         }
     }
 
-
     /**
      * Ensures this kernel is being run in appropriate environment.
      *
@@ -401,7 +397,6 @@ abstract class Kernel
      * @throws WrongSapiException If this Kernel has been constructed in an invalid environment.
      */
     abstract protected function checkServerApiEnvironment(): void;
-
 
     /**
      * Install any internal dependencies into the kernel (routing, etc.)
@@ -1479,7 +1474,6 @@ abstract class Kernel
             )
         );
 
-
         /* DUE WORK SOURCES */
         $di->set(
             'submissionDataSource',
@@ -1495,7 +1489,6 @@ abstract class Kernel
                 ['mapper' => $mapperFactory->getLazy(ReturnedWorkMapper::class)]
             )
         );
-
 
         /* QUIZ SOURCES */
         $di->set(
@@ -1513,7 +1506,6 @@ abstract class Kernel
             )
         );
 
-
         /* TASK SOURCES */
         $di->set(
             'completionDataSource',
@@ -1530,7 +1522,6 @@ abstract class Kernel
             )
         );
 
-
         // LTI sources, without funny names
         $di->set(
             'ltiResponseDataSource',
@@ -1546,7 +1537,6 @@ abstract class Kernel
                 ['mapper' => $mapperFactory->getLazy(LtiScoreMapper::class)]
             )
         );
-
 
         // Register response data source
         $di->set(
@@ -1760,7 +1750,6 @@ abstract class Kernel
             return new Rule\Any($di->get('rule:isStaff'), $di->get('rule:isStudent'));
         }));
 
-
         // Calendar API factory - requires an assessment data source to build some types
         $di->set(
             'calendarApiFactory',
@@ -1802,7 +1791,6 @@ abstract class Kernel
                 }
             )
         );
-
 
         // Pastoral Care data source
         // TODO consider moving into a module's dependencies?
@@ -2230,7 +2218,6 @@ abstract class Kernel
      * @return array
      */
     abstract protected static function getKnownUserClassesFromSession(Di\Container $di): array;
-
 
     /**
      * Consistently register the 'session' and 'session.rememberer' DI services.
