@@ -7,6 +7,7 @@
 import SbxFreeStyle from "@schoolboxVue/components/generic/sbx-free-style.ce.vue";
 import SbxPopOut from "@schoolboxVue/components/popOut/sbx-pop-out.ce.vue";
 import SbxIcon from "@schoolboxVue/components/icon/sbx-icon.ce.vue";
+import SbxLabel from "@schoolboxVue/components/icon/sbx-label.ce.vue";
 
 /**
  * Register all web components here
@@ -18,6 +19,8 @@ export function register(): void {
     window.customElements.define("sbx-pop-out", SbxPopOutCE);
     const SbxIconCE = window.Vue.defineCustomElement(SbxIcon);
     window.customElements.define("sbx-icon", SbxIconCE);
+    const SbxLabelCE = window.Vue.defineCustomElement(SbxLabel);
+    window.customElements.define("sbx-label", SbxLabelCE);
 }
 
 register();
