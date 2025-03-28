@@ -981,7 +981,7 @@ class Mapper extends BaseMapper
         }
 
         if (!$includeArchivedRecords) {
-            $criteriaSql .= ' AND (pastoral.expires_at > NOW() OR pastoral.expires_at IS NULL) ';
+            $criteriaSql .= ' AND (pastoral.expires_at >= CURDATE() OR pastoral.expires_at IS NULL) ';
         }
 
         // Execute SQL
