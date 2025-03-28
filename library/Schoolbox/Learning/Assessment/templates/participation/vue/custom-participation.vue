@@ -2,11 +2,16 @@
 /**
  * Custom Participation Vue Component
  */
+import { isAbortError, hasErrorMessage } from "@js/util/errorUtils";
+import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
+import PastoralCountBadge from "@schoolboxLibrary/Pastoral/Count/vue/pastoral-count-badge";
 import type { Participant } from "../js/types/customParticipationTypes";
 
 interface Props {
     allParticipants: Participant[];
+    getStudentsPastoralCountsUrl: string;
 }
+
 const props = defineProps<Props>();
 
 // show the checkboxes if there are more than one participant
@@ -17,15 +22,57 @@ const selectedList = window.Vue.ref<number[]>([]);
 
 // Computed property to check if all are selected
 const allSelected = window.Vue.computed({
-    get: () => props.allParticipants.every((item) => selectedList.value.includes(item.id)),
+    get: () => props.allParticipants.every((participant) => selectedList.value.includes(participant.user.id)),
     set: (value) => {
-        selectedList.value = value ? props.allParticipants.map((item) => item.id) : [];
+        selectedList.value = value ? props.allParticipants.map((participant) => participant.user.id) : [];
     },
 });
-
 // Function to check if at least one is selected
 const isIndeterminate = window.Vue.computed(() => {
     return selectedList.value.length > 0 && selectedList.value.length < props.allParticipants.length;
+});
+
+const loadError = window.Vue.ref<string | null>(null);
+const studentPastoralCounts = window.Vue.ref<Record<number, number[]>>({});
+
+window.Vue.onMounted(async () => {
+    const url = props.getStudentsPastoralCountsUrl.replace(
+        "{studentIds}",
+        props.allParticipants.map((participant) => participant.user.id).join(","),
+    );
+    try {
+        console.warn("Fetching", url);
+        const response = await fetch(url, {
+            method: "GET",
+            headers: {
+                Accept: "application/json",
+            },
+        });
+        if (!response.ok) {
+            const errorMessage = await extractErrorMessage(response);
+            throw new Error(errorMessage);
+        }
+        const responseJson = (await response.json()) as CurriculumCoveragePayload;
+        console.warn("Response", responseJson);
+        if (typeof responseJson !== "object" || responseJson === null) {
+            throw new Error("Unexpected response format");
+        }
+        if (typeof responseJson === "object" && responseJson !== null) {
+            // get data
+            studentPastoralCounts.value = responseJson;
+        } else {
+            throw new Error("Unexpected response format");
+        }
+    } catch (error) {
+        // ignore abort errors, as the previous report was cancelled
+        if (isAbortError(error)) {
+            return;
+        }
+        if (error instanceof Error && hasErrorMessage(error)) {
+            loadError.value = error.message;
+        }
+        console.error(error);
+    }
 });
 </script>
 
@@ -56,7 +103,7 @@ const isIndeterminate = window.Vue.computed(() => {
                             :id="`id-${participant.user.id}`"
                             v-model="selectedList"
                             type="checkbox"
-                            :value="participant.id"
+                            :value="participant.user.id"
                         />
                         <label :for="`id-${participant.user.id}`" class="checkbox-label"></label>
                     </td>
@@ -67,7 +114,7 @@ const isIndeterminate = window.Vue.computed(() => {
                         />
                     </td>
                     <td>
-                        <template v-if="participant.id">
+                        <template v-if="participant.user.id">
                             <a :href="`/search/user/${participant.user.id}`">
                                 {{ participant.user.lastname + ", " + participant.user.firstname }}
                                 {{
@@ -89,16 +136,15 @@ const isIndeterminate = window.Vue.computed(() => {
                             }}
                             {{ participant.user.pronoun }}
                         </template>
-                        <!-- <span class="meta">({{ student.synergy_id }})</span>
-                        <span class="show-for-print"><br />{{ student.email }}</span
-                        ><br />
+                        <br />
+
                         <p class="meta inline-container">
                             <pastoral-count-badge
-                                v-for="studentBadge in studentPastoralCounts[student.id]"
+                                v-for="studentBadge in studentPastoralCounts[participant.user.id]"
                                 :key="studentBadge.id"
                                 v-bind="studentBadge"
-                            ></pastoral-count-badge>
-                        </p> -->
+                            />
+                        </p>
                     </td>
                     <td></td>
                     <td></td>

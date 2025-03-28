@@ -17,7 +17,9 @@
 </div>
 <div id="custom-participation-container" class="f-container">
     <custom-participation
-    :all-participants="{{ (allParticipants ?? []) | json_encode }}"/>
+    :all-participants="{{ (allParticipants ?? []) | json_encode }}"
+    get-students-pastoral-counts-url="{{ routeLookup('pastoral.getStudentsCount') }}"
+    />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/customParticipation.js?v={{ config.site_version }}"></script>
 {# TODO: Change this to use the table similar to the UI design #}
