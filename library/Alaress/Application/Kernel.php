@@ -1703,7 +1703,18 @@ abstract class Kernel
                     'httpClient'      => $di->lazyGet('httpClient'),
                     'internalCache'   => $di->lazyGet('httpClient.internalCache'),
                     'defaultLifetime' => null,
+                    'baseUrl'         => $di->lazyGet('baseUrl'),
                 ]
+            )
+        );
+
+        // Base URL: finally add this to DI
+        $di->set(
+            'baseUrl',
+            $di->lazy(
+                function () use ($config) {
+                    return (new \Schoolbox\Url\Factory($config))->buildFullyQualified();
+                }
             )
         );
 

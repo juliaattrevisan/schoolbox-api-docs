@@ -12,6 +12,7 @@ namespace Alaress\Http;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
+use Psr\Http\Message\UriInterface;
 use Psr\SimpleCache\CacheInterface;
 use Psr\SimpleCache\InvalidArgumentException;
 use Random\RandomException;
@@ -66,11 +67,16 @@ class Cache
      * @param ClientInterface $httpClient      Client used for actually making HTTP requests.
      * @param CacheInterface  $internalCache   Cache implementation used to actually store responses.
      * @param int|null        $defaultLifetime Default lifetime of cache keys, or null for no expiry.
+     * @param UriInterface    $baseUrl         The base URL of this Schoolbox instance: if a relative request is made,
+     *                                         it will be made from this base URL.
+     * @param int             $requestTimeout  The max amount of time the request is allowed to take.
+     * @param int             $connectTimeout  The max amount of time to wait when connecting to the server.
      */
     public function __construct(
         private ClientInterface $httpClient,
         private CacheInterface $internalCache,
         private int|null $defaultLifetime,
+        private UriInterface $baseUrl,
         private int $requestTimeout = self::REQUEST_TIMEOUT,
         private int $connectTimeout = self::CONNECT_TIMEOUT,
     ) {
@@ -128,9 +134,14 @@ class Cache
         if ('webcal' === $url->getScheme()) {
             $url = $url->withScheme('http');
         }
+        if (!$url->isAbsolutePath()) {
+            $url = $url
+                ->withScheme($this->baseUrl->getScheme())
+                ->withHost($this->baseUrl->getHost())
+                ->withPort($this->baseUrl->getPort());
+        }
 
         // Make the request and store it
-        // TODO ensure that base URL is the FQDN of the instance
         // TODO should this cache something empty on error?
         $response     = $this->httpClient->request(
             'GET',
