@@ -163,7 +163,7 @@ HELP;
         ));
 
         if ($this->perform()) {
-            $this->getLogger()->debug('Performing update...');
+            $this->getLogger()->debug('    Performing update...');
 
             $this->getDatabaseInternal()->executeQuery("
                 UPDATE assess_attempt
