@@ -104,13 +104,7 @@ class Cache
     public function request(string $url, ?string $key = null, array $headers = [], ?int $ttl = null): string
     {
         // Make `$url` absolute if it isn't already
-        if (str_starts_with($url, '/')) {
-            $parts    = parse_url($url);
-            $path     = $parts['path'] ?? '';
-            $query    = $parts['query'] ?? '';
-            $fragment = $parts['fragment'] ?? '';
-            $url      = $this->baseUrl->withPath($path)->withQuery($query)->withFragment($fragment)->__toString();
-        }
+        $url = $this->makeAbsolute($url);
 
         // Attempt to load cached response
         $key     ??= $this->hashKey($url);
@@ -177,6 +171,7 @@ class Cache
      */
     public function invalidate(string $url, ?string $key = null): void
     {
+        $url     = $this->makeAbsolute($url);
         $key     ??= $this->hashKey($url);
         $lockKey = self::LOCK_KEY_PREFIX . $key;
         $this->internalCache->deleteMultiple([$key, $lockKey]);
@@ -239,5 +234,23 @@ class Cache
 
         // And wait again, for longer this time
         $this->waitForLockToExpire($lockKey, $waitUntil, $iteration + 1);
+    }
+
+    /**
+     * Make `$url` absolute to `$this->baseUrl`, if it isn't already absolute.
+     *
+     * @param string $url
+     * @return string
+     */
+    private function makeAbsolute(string $url): string
+    {
+        if (str_starts_with($url, '/')) {
+            $parts    = parse_url($url);
+            $path     = $parts['path'] ?? '';
+            $query    = $parts['query'] ?? '';
+            $fragment = $parts['fragment'] ?? '';
+            return $this->baseUrl->withPath($path)->withQuery($query)->withFragment($fragment)->__toString();
+        }
+        return $url;
     }
 }
