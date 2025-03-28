@@ -154,6 +154,11 @@ class Profile implements IStrategy
          */
         $pages = $this->api->retrieveForJurisdiction('GET', 'Students/Jurisdiction');
 
+        /* That's the current datetime, obviously, which we'll use to decide if someone is currently
+         * enrolled ni a school via enrolment details.
+         */
+        $now = \Alaress_Date_Format::now();
+
         foreach ($pages as $page) {
             foreach ($page['values'] as $student) {
                 $externalId = trim((string)$student['personId']);
@@ -164,11 +169,21 @@ class Profile implements IStrategy
                     continue;
                 }
 
-                /* FIXME There is an Omega Assumption about using $schools[0]
-                 *  because we don't have a means by which to choose which of $schools
-                 *  is the one to use...
+                /* Figure out which school they're currently in.
                  */
-                $currentSchool = $student['schools'][0];
+                $currentSchool = $this->findSchool($student['schools'], $now);
+
+                /* Can't work out what school they're in; skip them
+                 */
+                if (null === $currentSchool) {
+                    $this->log->warning(sprintf(
+                        'Student %s has no school enrolment relevant to %s; skipping',
+                        $student['personId'],
+                        $this->now
+                    ));
+
+                    continue;
+                }
 
                 /* This is reused a lot but *only one* of these Enrolment Details is supposed
                  * to be relevant at any given time...supposedly
@@ -431,6 +446,136 @@ class Profile implements IStrategy
                 $this->importParentsOfStudent($externalId, $studentBaseProfile, $caregivers);
             }
         }
+    }
+
+
+    /**
+     * Figure out which school someone is in at the moment, based on a two-stage heuristic:
+     *     1. See if there's only one school that has a meaningless reasonforLeaving.
+     *        The presence of "Exited" or some other truthy value means the student has
+     *        left that school. Anything else means they're likely to be in that school still.
+     *            1a. It's possible that civica allows you to leave a campus but still provide
+     *                no truthy reasonforLeaving, which means this is possibly inconclusive.
+     *            1b. It's possible that civica allows multiple schools to have no reasonforLeaving.
+     *            1c. It's possible that civica allows a student to be in no school at the moment
+     *
+     *     2. If we can't be absolutely sure based on reasonforLeaving, inspect each enrolmentDetails
+     *        to see if there's an enrolment date that encompasses the current datetime. The first one
+     *        to match will be the school we presume they're in (ie. you can't be in two schools at
+     *        the same time simply by virtue of how a school works)
+     *
+     * @param array $schools
+     * @param Alaress_Date_Format $now
+     * @return array|null
+     */
+    public function findSchool(array $schools, \Alaress_Date_Format $now): ?array
+    {
+        /* No schools? No trabajo
+         */
+        if (!\count($schools)) {
+            return null;
+        }
+
+        /* Inspect each $schools node and look for a meaningful reasonforLeaving
+         */
+        $candidateSchools = [];
+
+        foreach ($schools as $school) {
+            if ('' === trim((string)$school['reasonforLeaving'])) {
+                $candidateSchools[] = $school;
+            }
+        }
+
+        /* No schools? No trabajo
+         * Apparently this person has left all schools
+         */
+        if (!\count($candidateSchools)) {
+            $this->log->debug('No candidate schools found.');
+
+            return null;
+        }
+
+        /* If we encounter one $school with a MEANINGLESS reasonforLeaving, then
+         * maybe presume them to be in that school.
+         */
+        if (1 === \count($candidateSchools)) {
+            $this->log->debug(sprintf(
+                'Candidate school found via reasonforLeaving: %s',
+                $candidateSchools[0]['schoolName']
+            ));
+
+            return $candidateSchools[0];
+        }
+
+        /* If MULTIPLE $school have a meaningless reasonforLeaving, then it's inconclusive,
+         * and we need to inspect deeper.
+         *
+         * If we need to inspect deeper, check out each $school enrolmentDetails node
+         * and see if there's an enrolment date that encompasses $now. If there is,
+         * presume that $school to be the one we're in.
+         */
+        foreach ($schools as $school) {
+            foreach ($school['enrolmentDetails'] as $enrolmentDetail) {
+                /* This...maybe could be null, but let's assume not for now
+                 */
+                $enrolmentStart = new \Alaress_Date_Format(sprintf(
+                    '%s 00:00:00',
+                    $enrolmentDetail['enrolmentDetailStartDate']
+                ), \Alaress_Date_Format::DATABASE_FORMAT);
+
+                /* This is definitely nullable, we saw a dataset where enrolmentEnd
+                 * was a meaningless empty string
+                 */
+                $enrolmentEnd = null;
+
+                if ($enrolmentDetail['enrolmentDetailEndDate']) {
+                    $enrolmentEnd = new \Alaress_Date_Format(sprintf(
+                        '%s 00:00:00',
+                        $enrolmentDetail['enrolmentDetailEndDate']
+                    ), \Alaress_Date_Format::DATABASE_FORMAT);
+                }
+
+                /* Now figure out if $now is between those enrolment dates.
+                 *
+                 * If $enrolmentEnd is null, then presume this to mean "the student hasn't
+                 * left this school yet" and thus is likely to be in it; check the $enrolmentStart
+                 * is in the past.
+                 *
+                 * If $enrolmentStart is in the past, and they haven't got an $enrolmentEnd,
+                 * then...I guess they're here
+                 */
+                if ($enrolmentStart->lte($now) && null === $enrolmentEnd) {
+                    $this->log->debug(sprintf(
+                        'Candidate school found with null enrolment end date: %s',
+                        $school['schoolName']
+                    ));
+
+                    return $school;
+                }
+
+                /* Otherwise, check the conclusive dates in case they're scheduled to leave
+                 * a school at a particular date in the future.
+                 *
+                 * If the enrolment started in the past, and the enrolment ends in the future,
+                 * then...I guess they're here
+                 */
+                if ($enrolmentStart->lte($now) && $enrolmentEnd->gte($now)) {
+                    $this->log->debug(sprintf(
+                        'Candidate school found with set enrolment start and enrolment end date: %s',
+                        $school['schoolName']
+                    ));
+
+                    return $school;
+                }
+            }
+        }
+
+        /* Otherwise, no idea: return null, and skip them.
+         * They're not known to be in any $school conclusively and is a civica data problem.
+         * Or, they're enrolled "in the future" which might be a Future Families scenario
+         * but we aren't exploring that in civica just yet.
+         */
+        return null;
     }
 
 
