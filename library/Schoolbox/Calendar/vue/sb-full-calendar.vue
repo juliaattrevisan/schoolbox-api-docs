@@ -534,8 +534,12 @@ export default {
                     body: getFormData(data),
                 },
             )
-                .then(() => {
-                    timeout({ text: "Event moved successfully" });
+                .then((response) => {
+                    if (response.ok) {
+                        timeout({ text: "Event moved successfully" });
+                    } else {
+                        timeout({ text: "Event could not be moved", isSuccess: false });
+                    }
                 })
                 .catch((error) => {
                     timeout({ text: "Event could not be moved", isSuccess: false });
