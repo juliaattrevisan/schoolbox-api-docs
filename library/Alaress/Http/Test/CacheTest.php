@@ -205,6 +205,5 @@ class CacheTest extends TestCase
 
         // Test what happens after the cache expires
         $this->assertEquals($result2, $cache->request('/test.php', ttl: 100));
-
     }
 }
