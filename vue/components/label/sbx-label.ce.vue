@@ -31,7 +31,8 @@ Long term they will reference the design colour tokens
 */
 .sbx-label {
     color: white;
-    font-size: 0.825rem;
+    font-size: 0.75rem;
+    font-weight: 700;
     padding: var(--spacing-xs) var(--spacing-s);
 }
 
