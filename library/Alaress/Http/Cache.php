@@ -156,8 +156,6 @@ class Cache
                     RequestOptions::TIMEOUT         => $this->requestTimeout,
                 ]
             );
-        } catch (GuzzleException $e) {
-            throw new SchoolboxException("Guzzle Exception occurred", 0, $e);
         } finally {
             $this->internalCache->delete($lockKey);
         }
