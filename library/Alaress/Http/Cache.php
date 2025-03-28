@@ -133,7 +133,6 @@ class Cache
         }
 
         // Make the request and store it
-        // TODO lock mechanism? if lock is present, wait until it times out?
         // TODO ensure that base URL is the FQDN of the instance
         // TODO should this cache something empty on error?
         $response     = $this->httpClient->request(
