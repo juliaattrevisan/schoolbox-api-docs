@@ -45,7 +45,7 @@ class Cache
      * If the requested URL is in cache but the lock is, another process is
      * requesting the cached URL: wait for that request to complete.
      */
-    private const LOCK_KEY_PREFIX = 'lock:';
+    private const LOCK_KEY_PREFIX = 'lock__';
 
     /**
      * The base exponential backoff value to wait for the lock to expire, in
