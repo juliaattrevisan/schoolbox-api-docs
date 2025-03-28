@@ -131,7 +131,7 @@ class IdFinder extends AbstractIdFinder
             if ($archivedSelection->offsetExists(Archived\Definition::KEY_INCLUDE_ARCHIVED_RECORDS)) {
                 $archivedBuilderPb->any(
                     $this->getMapper()->getPredicateBuilder()
-                         ->lessThanOrEqualTo('p.expires_at', \Alaress_Date_Format::now()->getDatabaseDate())
+                         ->lessThan('p.expires_at', \Alaress_Date_Format::now()->getDatabaseDate())
                 );
             }
             /* Note this will include all expires_at in WHERE condition, but it should be cleaner than
