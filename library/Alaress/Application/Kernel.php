@@ -268,7 +268,6 @@ abstract class Kernel
         return $this->shutdownHandler;
     }
 
-
     /**
      * Returns whether the current PHP process is being run by the system root user
      *
