@@ -30,6 +30,7 @@ use Alaress\Session\Session;
 use Alaress\Twig\Loader\ChainLoader;
 use Alaress\Twig\Method as TwigMethod;
 use Alaress\Web\Output;
+use Alaress\Web\Request\IsJson;
 use Alaress\Web\Response\Factory as ResponseFactory;
 use Alaress\Web\Response\Outputter;
 use Alaress\Web\Router\PathMatcher;
@@ -42,6 +43,7 @@ use Aura\Router\RouterContainer;
 use Cache\Bridge\SimpleCache\SimpleCacheBridge;
 use Calendar\Api\ModuleChecker;
 use Calendar_Api_Factory;
+use Crell\ApiProblem\ApiProblem;
 use enshrined\svgSanitize\Sanitizer as BaseSvgSanitizer;
 use External_Class;
 use External_ClassInterface;
@@ -770,9 +772,20 @@ abstract class Kernel
                         // to cause errors that end up in Sentry.
                         // (No need to check for object, since json_decode(..., true) converts objects to arrays.)
                         if (!is_array($decodedContent) && !$acceptInvalidJson) {
-                            http_response_code(self::HTTP_RESPONSE_CODE_BAD_REQUEST);
-                            header('Content-Type: text/plain');
-                            die('Invalid JSON in request body');
+                            $problem = (new ApiProblem('Invalid JSON in request body'))
+                                ->setStatus(self::HTTP_RESPONSE_CODE_BAD_REQUEST)
+                                ->asArray();
+                            /** @var ResponseFactory $responseFactory */
+                            $responseFactory = $di->get('httpResponseFactory');
+                            $response = (
+                                (new IsJson())->isSatisfiedBy($request)
+                                ? $responseFactory->buildJson($problem)
+                                : $responseFactory->buildHtml('common/error/general.twig', $problem)
+                            );
+                            /** @var Outputter $responseFactory */
+                            $responseOutputter = $di->get('httpResponseOutputter');
+                            $responseOutputter->output($response->withStatus(self::HTTP_RESPONSE_CODE_BAD_REQUEST));
+                            die;
                         }
                         $request = $request->withParsedBody($decodedContent);
                     }
