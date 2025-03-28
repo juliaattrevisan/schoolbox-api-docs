@@ -100,22 +100,19 @@ class Cache
         $key     ??= $this->hashKey($url);
         $lockKey = self::LOCK_KEY_PREFIX . $key;
         $maxWait = $this->connectTimeout + $this->requestTimeout;
+
+        // Is there a lock in place? If so, wait for it to expire before
+        // attempting to fetch.
         $this->waitForLockToExpire($lockKey, microtime(true) + $maxWait);
 
+        // Return cached result if there
         $result = $this->internalCache->get($key);
         if (isset($result)) {
             return $result;
         }
 
-
-
-        // Otherwise, load response from HTTP client
-
-        // Is there a lock in place? If so, wait for it to expire
-        // (or for a max of $connectTimeout + $requestTimeout seconds) before
-        // attempting to fetch again.
-        if ($this->internalCache->has($lockKey)) {
-        }
+        // Otherwise, load response from HTTP client: also lock this fetch so
+        // that other attempts are not waiting.
         $this->internalCache->set($lockKey, '', $maxWait);
 
         // User agent header from `Alaress_Cache_Abstract`:
