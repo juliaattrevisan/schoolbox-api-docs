@@ -43,13 +43,49 @@ export const Default: Story = {
 };
 
 /**
- * Changing the size
+ *
  */
-// export const Size: Story = {
-//     render: () => ({
-//         components: { StorybookSlot },
-//         template: `
-//             <sbx-icon name="help" size="xl"></sbx-icon>
-//         `,
-//     }),
-// };
+export const Success: Story = {
+    render: () => ({
+        components: { StorybookSlot },
+        template: `
+            <sbx-label title="Success" sentiment="success"></sbx-label>
+        `,
+    }),
+};
+
+/**
+ *
+ */
+export const Warning: Story = {
+    render: () => ({
+        components: { StorybookSlot },
+        template: `
+            <sbx-label title="Warning" sentiment="warning"></sbx-label>
+        `,
+    }),
+};
+
+/**
+ *
+ */
+export const Alert: Story = {
+    render: () => ({
+        components: { StorybookSlot },
+        template: `
+            <sbx-label title="Alert" sentiment="alert"></sbx-label>
+        `,
+    }),
+};
+
+/**
+ *
+ */
+export const Neutral: Story = {
+    render: () => ({
+        components: { StorybookSlot },
+        template: `
+            <sbx-label title="Neutral" sentiment="neutral"></sbx-label>
+        `,
+    }),
+};
