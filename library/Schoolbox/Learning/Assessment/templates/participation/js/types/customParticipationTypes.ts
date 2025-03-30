@@ -1,5 +1,4 @@
 import type { User } from "@schoolboxLibrary/types/User";
-
 /**
  * The expected payload for a plan associated with a participant
  */
@@ -28,24 +27,3 @@ export type Participant = {
     updatedAt: string;
     user: User;
 };
-
-/**
- * The expected payload for individual student in pastoral counts badges
- */
-export type StudentPastoralCount = {
-    bgColor: string;
-    count: string;
-    destinationUrl: string;
-    fgColor: string;
-    icon: string;
-    sequence: number;
-    subSequence: number;
-    subtypeId: number;
-    title: string;
-    typeId: number;
-};
-
-/**
- * The expected payload form the pastoral.student.counts endpoint
- */
-export type StudentPastoralCountsPayload = Record<string, StudentPastoralCount[]>;
