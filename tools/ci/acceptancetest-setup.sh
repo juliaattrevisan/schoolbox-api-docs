@@ -33,24 +33,24 @@ logdir=/var/log/schoolbox/smoketest
 /usr/share/schoolbox/tools/notif/syscheck.php -vvv
 
 echo "starting socketd"
-sudo -u www-data '/usr/share/schoolbox/tools/socket/socketd.php --porcelain -vvv' > $logdir/socketd.log 2>&1 &
+sudo -u www-data bash -c 'INSTANCE_ID=smoketest /usr/share/schoolbox/tools/socket/socketd.php --porcelain -vvv' > $logdir/socketd.log 2>&1 &
 # kill -HUP $(pgrep -f socketd.php)
 
 echo "starting scheduled"
-sudo -u www-data '/usr/share/schoolbox/tools/mq/schedule-safe-restart.php -vvv --perform --no-delay'
-sudo -u www-data '/usr/share/schoolbox/tools/mq/scheduled.php --porcelain -vvv --pid' > $logdir/scheduled.log 2>&1 &
+sudo -u www-data bash -c 'INSTANCE_ID=smoketest /usr/share/schoolbox/tools/mq/schedule-safe-restart.php -vvv --perform --no-delay'
+sudo -u www-data bash -c 'INSTANCE_ID=smoketest /usr/share/schoolbox/tools/mq/scheduled.php --porcelain -vvv --pid' > $logdir/scheduled.log 2>&1 &
 # kill -HUP $(pgrep -f scheduled.php)
 
 echo "starting digestd"
-sudo -u www-data '/usr/share/schoolbox/tools/digest/digestd.php --porcelain -vvv --pid' > $logdir/digestd.log 2>&1 &
+sudo -u www-data bash -c 'INSTANCE_ID=smoketest /usr/share/schoolbox/tools/digest/digestd.php --porcelain -vvv --pid' > $logdir/digestd.log 2>&1 &
 # kill -HUP $(pgrep -f digestd.php)
 
 echo "starting mobiled"
-sudo -u www-data '/usr/share/schoolbox/tools/mobile/mobiled.php --porcelain -vvv --pid' > $logdir/mobiled.log 2>&1 &
+sudo -u www-data bash -c 'INSTANCE_ID=smoketest /usr/share/schoolbox/tools/mobile/mobiled.php --porcelain -vvv --pid' > $logdir/mobiled.log 2>&1 &
 # kill -HUP $(pgrep -f mobiled.php)
 
 echo "refreshing binding cache"
-sudo -u www-data '/usr/share/schoolbox/tools/notif/route/refresh-binding-cache.php'
+sudo -u www-data bash -c 'INSTANCE_ID=smoketest /usr/share/schoolbox/tools/notif/route/refresh-binding-cache.php'
 
 ## ACCEPTANCE TESTS
 
