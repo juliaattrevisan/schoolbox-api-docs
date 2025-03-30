@@ -4,8 +4,8 @@
  */
 import { isAbortError, hasErrorMessage } from "@js/util/errorUtils";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
-import PastoralCountBadge from "@schoolboxLibrary/Pastoral/Count/vue/pastoral-count-badge";
-import type { Participant } from "../js/types/customParticipationTypes";
+import PastoralCountBadge from "@schoolboxLibrary/Pastoral/Count/vue/pastoral-count-badge.vue";
+import type { Participant, StudentPastoralCountsPayload } from "../js/types/customParticipationTypes";
 
 interface Props {
     allParticipants: Participant[];
@@ -33,17 +33,18 @@ const isIndeterminate = window.Vue.computed(() => {
 });
 
 const loadError = window.Vue.ref<string | null>(null);
-const studentPastoralCounts = window.Vue.ref<Record<number, number[]>>({});
+const studentPastoralCounts = window.Vue.ref<StudentPastoralCountsPayload>({});
 
-window.Vue.onMounted(async () => {
+/**
+ * Fetch the pastoral counts for the students
+ */
+async function getStudentPastoralCounts(): Promise<void> {
     const url = props.getStudentsPastoralCountsUrl.replace(
         "{studentIds}",
         props.allParticipants.map((participant) => participant.user.id).join(","),
     );
     try {
-        console.warn("Fetching", url);
         const response = await fetch(url, {
-            method: "GET",
             headers: {
                 Accept: "application/json",
             },
@@ -52,8 +53,7 @@ window.Vue.onMounted(async () => {
             const errorMessage = await extractErrorMessage(response);
             throw new Error(errorMessage);
         }
-        const responseJson = (await response.json()) as CurriculumCoveragePayload;
-        console.warn("Response", responseJson);
+        const responseJson = (await response.json()) as StudentPastoralCountsPayload;
         if (typeof responseJson !== "object" || responseJson === null) {
             throw new Error("Unexpected response format");
         }
@@ -73,6 +73,9 @@ window.Vue.onMounted(async () => {
         }
         console.error(error);
     }
+}
+window.Vue.onMounted(() => {
+    void getStudentPastoralCounts();
 });
 </script>
 
@@ -141,7 +144,7 @@ window.Vue.onMounted(async () => {
                         <p class="meta inline-container">
                             <pastoral-count-badge
                                 v-for="studentBadge in studentPastoralCounts[participant.user.id]"
-                                :key="studentBadge.id"
+                                :key="`badge-${studentBadge.typeId}-${studentBadge.subtypeId}`"
                                 v-bind="studentBadge"
                             />
                         </p>
