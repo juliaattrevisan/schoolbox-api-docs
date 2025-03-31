@@ -55,3 +55,15 @@ export const Negative: Story = {
         `,
     }),
 };
+
+/**
+ *
+ */
+export const ZeroPoints: Story = {
+    render: () => ({
+        components: { StorybookSlot },
+        template: `
+            <sbx-label-pastoral-points points="0"></sbx-label-pastoral-points>
+        `,
+    }),
+};
