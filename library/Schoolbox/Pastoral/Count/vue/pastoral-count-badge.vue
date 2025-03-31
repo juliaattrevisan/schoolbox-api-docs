@@ -5,7 +5,7 @@
 import type { StudentPastoralCount } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCount";
 
 interface Props {
-    studentPastoralCount: StudentPastoralCount;
+    badge: StudentPastoralCount;
 }
 
 const props = defineProps<Props>();
@@ -18,17 +18,17 @@ window.Vue.onMounted(() => {
 });
 </script>
 <template>
-    <a :href="props.studentPastoralCount.destinationUrl">
+    <a :href="props.badge.destinationUrl">
         <span
-            :class="`label neutral icon-${props.studentPastoralCount.icon}`"
+            :class="`label neutral icon-${props.badge.icon}`"
             data-tooltip
-            :title="props.studentPastoralCount.title"
+            :title="props.badge.title"
             :style="{
-                'background-color': props.studentPastoralCount.bgColor,
-                color: props.studentPastoralCount.fgColor,
+                'background-color': props.badge.bgColor,
+                color: props.badge.fgColor,
             }"
         >
-            {{ props.studentPastoralCount.count }}
+            {{ props.badge.count }}
         </span>
     </a>
 </template>

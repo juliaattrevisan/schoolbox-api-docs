@@ -146,7 +146,7 @@ window.Vue.onMounted(() => {
                             <pastoral-count-badge
                                 v-for="studentBadge in studentPastoralCounts[participant.user.id]"
                                 :key="`badge-${studentBadge.typeId}-${studentBadge.subtypeId}`"
-                                :student-pastoral-count="studentBadge"
+                                :badge="studentBadge"
                             />
                         </p>
                     </td>

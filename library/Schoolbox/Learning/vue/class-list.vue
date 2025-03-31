@@ -667,8 +667,8 @@ export default {
                                 <p class="meta inline-container">
                                     <pastoral-count-badge
                                         v-for="studentBadge in studentPastoralCounts[student.id]"
-                                        :key="studentBadge.id"
-                                        v-bind="studentBadge"
+                                        :key="`badge-${studentBadge.typeId}-${studentBadge.subtypeId}`"
+                                        :badge="studentBadge"
                                     ></pastoral-count-badge>
                                 </p>
 
