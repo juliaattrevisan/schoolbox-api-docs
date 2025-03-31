@@ -154,8 +154,6 @@ class Helper
         }
 
         $this->logMapper->save($log);
-
-        die();
     }
 
 
