@@ -9,26 +9,59 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\Translator;
 
+use Alaress\Authorizer\Authorizer;
+use Alaress\Authorizer\GetRouteIfAuthorized;
+use Aura\Router\Generator;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\User;
 
 /**
  * Translator for translating a Participant model into an array.
  */
 class Participations
 {
+    use GetRouteIfAuthorized;
+
+    /**
+     * Constructor
+     *
+     * @param Generator      $routeGenerator
+     * @param Authorizer     $authorizer
+     * @param User           $currentUser
+     *
+     */
+    public function __construct(
+        protected Generator $routeGenerator,
+        protected Authorizer $authorizer,
+        protected User $currentUser,
+    ) {
+    }
+
     /**
      * @param Participant $participation
      * @return array
      */
     public function __invoke(Participant $participation): array
     {
+        $assessId = $participation->getAssessable()->getId();
+        $userId = $participation->getUser()->getId();
         return [
-            'id' => $participation->getId(),
-            'user' => $participation->getUser(),
-            'plan' => call_user_func(new ParticipationPlans(), $participation->getPlan()),
-            'createdAt' => $participation->getCreatedAt()?->toRfc3339String(),
-            'updatedAt' => $participation->getUpdatedAt()?->toRfc3339String(),
+            'id'         => $participation->getId(),
+            'user'       => $participation->getUser(),
+            'plan'       => call_user_func(new ParticipationPlans(), $participation->getPlan()),
+            'createdAt'  => $participation->getCreatedAt()?->toRfc3339String(),
+            'updatedAt'  => $participation->getUpdatedAt()?->toRfc3339String(),
             'excludedAt' => $participation->getExcludedAt()?->toRfc3339String(),
+            '_links'     => [
+                'exclude' => $this->getRouteIfAuthorized('learningAssessment.postExclude', [
+                    'assessmentId' => $assessId,
+                    'studentId'    => $userId,
+                ]),
+                'include' => $this->getRouteIfAuthorized('learningAssessment.postInclude', [
+                    'assessmentId' => $assessId,
+                    'studentId'    => $userId,
+                ]),
+            ]
         ];
     }
 }

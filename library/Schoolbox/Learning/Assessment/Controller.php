@@ -923,7 +923,12 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         $data['studentsPastoralCountsUrl'] = $this->getRouteIfAuthorized('pastoral.getStudentsCount');
 
-        $data['allParticipants'] = $assessment->getAllParticipants()->map(new Participations())->reindex();
+        $participationModelToArray = new Participations(
+            $this->getRouteGenerator(),
+            $this->getAuthorizer(),
+            $this->getUser(),
+        );
+        $data['allParticipants'] = $assessment->getAllParticipants()->map($participationModelToArray)->reindex();
 
 
         $this->response = $this->responseFromTemplate(
