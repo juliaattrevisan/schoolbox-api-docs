@@ -42,7 +42,6 @@ FROM node:20-alpine AS npm
 
 WORKDIR /usr/share/schoolbox
 COPY --from=package /usr/share/schoolbox /usr/share/schoolbox
-RUN ls -al /usr/share/schoolbox
 
 # Need to somehow be logged in to Github in order to download some packages
 RUN npm ci
