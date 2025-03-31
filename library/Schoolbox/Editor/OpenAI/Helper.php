@@ -61,6 +61,12 @@ class Helper
      */
     public function chat(User $user, ?string $prompt = null, ?string $payload = null, ?array $responseFormat = null): ?string
     {
+        /* Assert that we're configured correctly
+         */
+        if (!$this->openAiKey) {
+            throw new \DomainException('OpenAI API key is unavailable');
+        }
+
         // either build or use the supplied payload
         $payload = $payload ?? $this->generatePayload($prompt, $responseFormat);
 
@@ -114,6 +120,12 @@ class Helper
      */
     public function async(User $user, ?string $prompt = null, ?string $payload = null): void
     {
+        /* Assert that we're configured correctly
+         */
+        if (!$this->openAiKey) {
+            throw new \DomainException('OpenAI API key is unavailable');
+        }
+
         $log = $this->logMapper->createModel();
         $log->setUser($user);
 

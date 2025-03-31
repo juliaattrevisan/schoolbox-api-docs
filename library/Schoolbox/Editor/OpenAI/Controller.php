@@ -11,6 +11,7 @@ namespace Schoolbox\Editor\OpenAI;
 use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
 use GuzzleHttp\Client;
+use Schoolbox\Mapper\Exception;
 
 /**
  * This controller acts as a proxy for OpenAI API.  It just appends the configured API key to the request in
@@ -36,26 +37,26 @@ class Controller extends Base
 
     public function postForward(): void
     {
-        $openAiKey = $this->getConfigLoader()->get('openai_key');
-
-        if (!$openAiKey) {
-            $problem        = (new ApiProblem('OpenAI API key is unavailable'))
+        try {
+            (new Helper(
+                trim((string)$this->getConfigLoader()->get('openai_endpoint')),
+                trim((string)$this->getConfigLoader()->get('openai_key')),
+                trim((string)$this->getConfigLoader()->get('openai_azure_resource_name')),
+                trim((string)$this->getConfigLoader()->get('openai_azure_deployment_id')),
+                trim((string)$this->getConfigLoader()->get('openai_model')),
+                $this->client,
+                $this->errorMapper,
+                $this->logMapper,
+            ))->async($this->getUser(), payload: $this->request->getBody()->getContents());
+        } catch (\DomainException $e) {
+            $problem = (new ApiProblem($e->getMessage()))
                 ->setStatus(404)
                 ->asArray();
+
             $this->response = $this->responseAsJson($problem)
-                                   ->withStatus(404);
+                ->withStatus(404);
+
             return;
         }
-
-        (new Helper(
-            trim((string)$this->getConfigLoader()->get('openai_endpoint')),
-            trim((string)$this->getConfigLoader()->get('openai_key')),
-            trim((string)$this->getConfigLoader()->get('openai_azure_resource_name')),
-            trim((string)$this->getConfigLoader()->get('openai_azure_deployment_id')),
-            trim((string)$this->getConfigLoader()->get('openai_model')),
-            $this->client,
-            $this->errorMapper,
-            $this->logMapper,
-        ))->async($this->getUser(), payload: $this->request->getBody()->getContents());
     }
 }
