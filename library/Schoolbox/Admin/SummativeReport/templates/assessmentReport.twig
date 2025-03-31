@@ -32,7 +32,7 @@
                  #}
                 {% if "1" == options.workType[assessment.workType.id].comments and feedback and feedback.comment %}
                     <div class="comment">
-                        <p>{{ feedback.comment | linkify | nl2br }}</p>
+                        <article>{{ feedback.comment | purify }}</article>
                     </div>
                 {% endif %}
             </div>
