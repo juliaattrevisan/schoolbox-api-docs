@@ -24,15 +24,16 @@ class Helper
     private const OPENAI_API_ENDPOINT = 'https://api.openai.com/v1/chat/completions';
     private const AZURE_API_ENDPOINT = 'https://%s.openai.azure.com/openai/deployments/%s/chat/completions?api-version=2023-12-01-preview';
 
-    private ErrorMapper $errorMapper;
-
 
     /**
      * Controller constructor.
      */
-    public function __construct(private Client $client, private Log\Mapper $logMapper, private IConfigLoader $config)
-    {
-        $this->errorMapper = ErrorMapper::GetInstance();
+    public function __construct(
+        private Client $client,
+        private \Schoolbox\Error\Mapper $errorMapper,
+        private Log\Mapper $logMapper,
+        private IConfigLoader $config
+    ) {
     }
 
 

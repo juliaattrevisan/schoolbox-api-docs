@@ -27,8 +27,11 @@ class Controller extends Base
     /**
      * Controller constructor.
      */
-    public function __construct(private Client $client, private Log\Mapper $logMapper)
-    {
+    public function __construct(
+        private Client $client,
+        private \Schoolbox\Error\Mapper $errorMapper,
+        private Log\Mapper $logMapper
+    ) {
     }
 
     public function postForward(): void
@@ -44,7 +47,12 @@ class Controller extends Base
             return;
         }
 
-        $ai = new Helper($this->client, $this->logMapper, $this->getConfigLoader());
+        $ai = new Helper(
+            $this->client,
+            $this->errorMapper,
+            $this->logMapper,
+            $this->getConfigLoader()
+        );
 
         $ai->async($this->getUser(), payload: $this->request->getBody()->getContents());
     }
