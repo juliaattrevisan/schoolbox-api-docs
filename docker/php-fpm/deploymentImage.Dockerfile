@@ -6,6 +6,10 @@ ARG ENV=dev
 # Deployable dockerfile; assumes that:
 # * an image from `Dockerfile` has been built, and is named `schoolbox-php-fpm`
 # * this is run from the base dir of the `schoolbox` project
+#
+# It may be built with the commands:
+# docker build -t schoolbox-php-fpm docker/php-fpm/
+# docker build -t schoolbox-php-fpm-deploy -f docker/php-fpm/deploymentImage.Dockerfile .
 FROM schoolbox-php-fpm
 
 WORKDIR /usr/share/schoolbox
