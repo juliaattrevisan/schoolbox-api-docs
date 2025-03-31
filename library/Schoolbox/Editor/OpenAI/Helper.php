@@ -15,7 +15,6 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
 use Psr\Http\Client\ClientExceptionInterface;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
 
@@ -29,10 +28,14 @@ class Helper
      * Controller constructor.
      */
     public function __construct(
+        private string $openAiEndpoint,
+        private string $openAiKey,
+        private string $openAiAzureResourceName,
+        private string $openAiAzureDeploymentId,
+        private string $openAiModel,
         private Client $client,
         private \Schoolbox\Error\Mapper $errorMapper,
         private Log\Mapper $logMapper,
-        private IConfigLoader $config
     ) {
     }
 
@@ -164,18 +167,18 @@ class Helper
      */
     private function getEndpoint(): string
     {
-        switch ($this->config->get('openai_endpoint')) {
+        switch ($this->openAiEndpoint) {
             case 'OpenAI':
                 return self::OPENAI_API_ENDPOINT;
             case 'Azure':
-                if (empty($this->config->get('openai_azure_resource_name')) || empty($this->config->get('openai_azure_deployment_id'))) {
+                if (empty($this->openAiAzureResourceName) || empty($this->openAiAzureDeploymentId)) {
                     throw new \UnexpectedValueException('Azure resource name and deployment ID are required');
                 }
 
                 return sprintf(
                     self::AZURE_API_ENDPOINT,
-                    $this->config->get('openai_azure_resource_name'),
-                    $this->config->get('openai_azure_deployment_id')
+                    $this->openAiAzureResourceName,
+                    $this->openAiAzureDeploymentId,
                 );
         }
         throw new \UnexpectedValueException('Endpoint must be configured');
@@ -188,11 +191,11 @@ class Helper
      */
     private function getAuthorization(): array
     {
-        switch ($this->config->get('openai_endpoint')) {
+        switch ($this->openAiEndpoint) {
             case 'OpenAI':
-                return ['Authorization' => 'Bearer ' . $this->config->get('openai_key')];
+                return ['Authorization' => 'Bearer ' . $this->openAiKey];
             case 'Azure':
-                return ['api-key' => $this->config->get('openai_key')];
+                return ['api-key' => $this->openAiKey];
         }
 
         throw new \UnexpectedValueException('Endpoint must be configured');
@@ -220,7 +223,7 @@ class Helper
                     "content" => $prompt
                 ],
             ],
-            "model" => $this->config->get('openai_model'),
+            "model" => $this->openAiModel,
             "max_tokens" => 2000,
             "temperature" => 1,
             "top_p" => 1,

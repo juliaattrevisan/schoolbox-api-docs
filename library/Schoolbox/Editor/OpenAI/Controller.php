@@ -47,13 +47,15 @@ class Controller extends Base
             return;
         }
 
-        $ai = new Helper(
+        (new Helper(
+            trim((string)$this->getConfigLoader()->get('openai_endpoint')),
+            trim((string)$this->getConfigLoader()->get('openai_key')),
+            trim((string)$this->getConfigLoader()->get('openai_azure_resource_name')),
+            trim((string)$this->getConfigLoader()->get('openai_azure_deployment_id')),
+            trim((string)$this->getConfigLoader()->get('openai_model')),
             $this->client,
             $this->errorMapper,
             $this->logMapper,
-            $this->getConfigLoader()
-        );
-
-        $ai->async($this->getUser(), payload: $this->request->getBody()->getContents());
+        ))->async($this->getUser(), payload: $this->request->getBody()->getContents());
     }
 }
