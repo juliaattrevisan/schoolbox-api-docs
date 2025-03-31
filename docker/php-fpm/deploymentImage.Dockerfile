@@ -28,6 +28,7 @@ COPY ./www           /usr/share/schoolbox/www
 COPY ./composer.json /usr/share/schoolbox
 COPY ./composer.lock /usr/share/schoolbox
 
+COPY ./.npmrc              /usr/share/schoolbox
 COPY ./babel.config.js     /usr/share/schoolbox
 COPY ./npm-shrinkwrap.json /usr/share/schoolbox
 COPY ./package.json        /usr/share/schoolbox
