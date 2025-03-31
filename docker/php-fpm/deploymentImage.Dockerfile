@@ -25,16 +25,23 @@ COPY ./templates     /usr/share/schoolbox/templates
 COPY ./tools         /usr/share/schoolbox/tools
 COPY ./updates       /usr/share/schoolbox/updates
 COPY ./www           /usr/share/schoolbox/www
+
+# Composer build requirements: outputs to vendor
 COPY ./composer.json /usr/share/schoolbox
 COPY ./composer.lock /usr/share/schoolbox
 
+# NPM build requirements: outputs to www/static/js/bundle
 COPY ./.npmrc              /usr/share/schoolbox
 COPY ./babel.config.js     /usr/share/schoolbox
 COPY ./npm-shrinkwrap.json /usr/share/schoolbox
 COPY ./package.json        /usr/share/schoolbox
+COPY ./tsconfig.json       /usr/share/schoolbox
 COPY ./webpack.common.js   /usr/share/schoolbox
 COPY ./webpack.dev.js      /usr/share/schoolbox
 COPY ./webpack.prod.js     /usr/share/schoolbox
+COPY ./stories             /usr/share/schoolbox/stories
+COPY ./types               /usr/share/schoolbox/types
+COPY ./vue                 /usr/share/schoolbox/vue
 
 
 # NPM build
@@ -51,7 +58,10 @@ RUN if [[ " prod production " =~ " $ENV " ]] ; then npm run publish ; else npm r
 # Composer build
 FROM schoolbox-php-fpm AS final
 
-COPY --from=npm /usr/share/schoolbox /usr/share/schoolbox
+WORKDIR /usr/share/schoolbox
+
+COPY --from=package /usr/share/schoolbox /usr/share/schoolbox
+COPY --from=npm     /usr/share/schoolbox/www/static/js/bundle /usr/share/schoolbox/www/static/js/bundle
 
 COPY --from=composer:2.8 /usr/bin/composer /usr/local/bin/composer
 RUN if [[ " prod production " =~ " $ENV " ]] ; then composer install -a --no-dev ; else composer install -a ; fi
