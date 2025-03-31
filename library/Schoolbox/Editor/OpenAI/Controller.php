@@ -49,12 +49,16 @@ class Controller extends Base
                 $this->logMapper,
             ))->async($this->getUser(), payload: $this->request->getBody()->getContents());
         } catch (\DomainException $e) {
+            /* Not configured? Not found
+             */
+            $returnCode = 404;
+
             $problem = (new ApiProblem($e->getMessage()))
-                ->setStatus(404)
+                ->setStatus($returnCode)
                 ->asArray();
 
             $this->response = $this->responseAsJson($problem)
-                ->withStatus(404);
+                ->withStatus($returnCode);
 
             return;
         }
