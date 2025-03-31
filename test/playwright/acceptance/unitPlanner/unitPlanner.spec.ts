@@ -106,80 +106,123 @@ test.describe("Unit Planner Tests", () => {
         expect(finalUnitOrder).toEqual(newUnitOrder);
     });
 
-    test("Create, modifying and deleting learning activities", async ({ tester, page }) => {
+    test("Create, modifying and deleting learning activities", async ({ tester, page, db }) => {
         const unitplanner = new UnitPlanner(tester, page);
         const assessmentForm = new AssessmentForm(tester, page);
 
-        tester.isGoingTo("create a due work for Persuasion and Media unit");
+        tester.isGoingTo("check all options are presented under Create Activity menu");
         await unitplanner.clickCreateActivityButton(persuasionUnitId);
-        await unitplanner.clickCreateActivityOption("due-work");
+        await unitPlanner.checkCreateActivityOptions("project", persuasionUnitId);
+        await unitPlanner.checkCreateActivityOptions("due-work", persuasionUnitId);
+        await unitPlanner.checkCreateActivityOptions("quiz", persuasionUnitId);
+        await unitPlanner.checkCreateActivityOptions("task", persuasionUnitId);
+        await unitPlanner.checkCreateActivityOptions("lesson-plan", persuasionUnitId);
 
-        tester.isGoingTo("Fill out the assessment form and submit it");
+        tester.isGoingTo("create a due work for Persuasion and Media unit via unit planner");
+        await unitplanner.clickCreateActivityOption("due-work", persuasionUnitId);
+
+        tester.isGoingTo("Fill out a due work assessment form and submit it");
         await assessmentForm.setTitle("Test Due Activity via unit planner");
         await assessmentForm.setWorkType(AssessmentForm.WORKTYPE_ASSESSMENT_TASK);
-        await assessmentForm.create();
+        await assessmentForm.clickCreate();
         tester.isGoingTo("checking the activity is presented in the learning activities list in the unit planner");
-        await expect(page.locator("div.unit-cell.overview-has-created-textbox")).toHaveText(
-            "Test Due Activity via unit planner",
+        await expect(page.getByText("Test Due Activity via unit planner")).toBeVisible();
+
+        const assessmentId = (await db.grabFromDatabase("assessment", "id", {
+            deleted_at: null,
+            "title like": "Test Due Activity via unit planner",
+        })) as number;
+
+        tester.isGoingTo("check all options are presented under the activiity menu");
+        await unitplanner.clickActivityDotMenu(assessmentId);
+        await unitplanner.checkActivityMenuOptions(assessmentId);
+
+        tester.isGoingTo("Modify a due work activity via unit planner");
+        await unitplanner.clickActivityModify(assessmentId);
+        await assessmentForm.setTitle("Updated via unit planner");
+        await assessmentForm.update();
+        tester.isGoingTo(
+            "checking the activity is presented updated in the learning activities list in the unit planner",
         );
+        await expect(page.getByTestId("unit-planner-textbox-action-create-17-overview-1")).toBeVisible();
+        await expect(page.getByText("Updated via unit planner")).toBeVisible();
+
+        tester.isGoingTo("Delete the due work assessment via unit planner");
+        await unitplanner.clickActivityDotMenu(assessmentId);
+        await unitplanner.clickActivityDelete(assessmentId);
+        tester.isGoingTo("checking the activity is not presented in the learning activities list in the unit planner");
+        await expect(page.getByText("Test Due Activity via unit planner")).not.toBeVisible();
+        await expect(page.getByText("Updated via unit planner")).not.toBeVisible();
     });
 
-    // test.afterEach(async ({ tester }) => {
-    //     await tester.logout();
-    // });
+    test.afterEach(async ({ tester }) => {
+        await tester.logout();
+    });
 
-    // test.afterAll(async ({ baseTester, db }) => {
-    //     baseTester.isGoingTo("find the textbox that was created in this test so it can be deleted");
+    test.afterAll(async ({ baseTester, db }) => {
+        baseTester.isGoingTo("find the textbox that was created in this test so it can be deleted");
 
-    //     const romeoUnitFolderId = (await db.grabFromDatabase("course_unit_specification", "folder_id", {
-    //         id: romeoUnitId,
-    //     })) as number | null;
-    //     expect(romeoUnitFolderId).not.toBeNull();
+        const romeoUnitFolderId = (await db.grabFromDatabase("course_unit_specification", "folder_id", {
+            id: romeoUnitId,
+        })) as number | null;
+        expect(romeoUnitFolderId).not.toBeNull();
 
-    //     const persuasionUnitFolderId = (await db.grabFromDatabase("course_unit_specification", "folder_id", {
-    //         id: persuasionUnitId,
-    //     })) as number | null;
-    //     expect(romeoUnitFolderId).not.toBeNull();
+        const persuasionUnitFolderId = (await db.grabFromDatabase("course_unit_specification", "folder_id", {
+            id: persuasionUnitId,
+        })) as number | null;
+        expect(romeoUnitFolderId).not.toBeNull();
 
-    //     const textBoxID = (await db.grabFromDatabase("textBox", "textBoxID", {
-    //         categoryID: romeoUnitFolderId,
-    //         heading: overviewColumnLabel,
-    //     })) as number | null;
+        const textBoxID = (await db.grabFromDatabase("textBox", "textBoxID", {
+            categoryID: romeoUnitFolderId,
+            heading: overviewColumnLabel,
+        })) as number | null;
 
-    //     if (textBoxID !== null) {
-    //         const textboxComponentDefinitionId = (await db.grabFromDatabase("component_definition", "id", {
-    //             class: "Schoolbox\\Resource\\Textbox\\Component\\Homepage\\Controller",
-    //         })) as number | null;
-    //         expect(textboxComponentDefinitionId).not.toBeNull();
+        if (textBoxID !== null) {
+            const textboxComponentDefinitionId = (await db.grabFromDatabase("component_definition", "id", {
+                class: "Schoolbox\\Resource\\Textbox\\Component\\Homepage\\Controller",
+            })) as number | null;
+            expect(textboxComponentDefinitionId).not.toBeNull();
 
-    //         const textboxComponentInstanceId = (await db.grabFromDatabase("component_instance", "id", {
-    //             module: "homepage",
-    //             identifier: romeoUnitFolderId,
-    //             component_definition_id: textboxComponentDefinitionId,
-    //         })) as number | null;
+            const textboxComponentInstanceId = (await db.grabFromDatabase("component_instance", "id", {
+                module: "homepage",
+                identifier: romeoUnitFolderId,
+                component_definition_id: textboxComponentDefinitionId,
+            })) as number | null;
 
-    //         if (textboxComponentInstanceId === null) {
-    //             baseTester.isGoingTo("skip deletion as the textbox component instance was not found");
-    //             return;
-    //         }
+            if (textboxComponentInstanceId === null) {
+                baseTester.isGoingTo("skip deletion as the textbox component instance was not found");
+                return;
+            }
 
-    //         baseTester.isGoingTo(`delete the textbox with ID ${textBoxID}`);
-    //         await db.dontHaveInDatabase("textBox", {
-    //             textBoxID,
-    //         });
+            baseTester.isGoingTo(`delete the textbox with ID ${textBoxID}`);
+            await db.dontHaveInDatabase("textBox", {
+                textBoxID,
+            });
 
-    //         baseTester.isGoingTo(`delete the component instance with ID ${textboxComponentInstanceId}`);
-    //         await db.dontHaveInDatabase("component_config_instance", {
-    //             component_instance_id: textboxComponentInstanceId,
-    //         });
+            baseTester.isGoingTo(`delete the component instance with ID ${textboxComponentInstanceId}`);
+            await db.dontHaveInDatabase("component_config_instance", {
+                component_instance_id: textboxComponentInstanceId,
+            });
 
-    //         await db.dontHaveInDatabase("component_instance", {
-    //             id: textboxComponentInstanceId,
-    //         });
-    //     }
+            await db.dontHaveInDatabase("component_instance", {
+                id: textboxComponentInstanceId,
+            });
+        }
 
-    //     baseTester.isGoingTo("update the unit order back to the original order");
-    //     await db.updateInDatabase("folder", { sequence: 3 }, { id: romeoUnitFolderId });
-    //     await db.updateInDatabase("folder", { sequence: 2 }, { id: persuasionUnitFolderId });
-    // });
+        baseTester.isGoingTo("update the unit order back to the original order");
+        await db.updateInDatabase("folder", { sequence: 3 }, { id: romeoUnitFolderId });
+        await db.updateInDatabase("folder", { sequence: 2 }, { id: persuasionUnitFolderId });
+
+        baseTester.isGoingTo("delete the due work assessment created in this test if it exists");
+        await db.updateInDatabase(
+            "assessment",
+            { deleted_at: "2022-01-15 11:22:34" },
+            { "title like": "Test Due Activity via unit planner" },
+        );
+        await db.updateInDatabase(
+            "assessment",
+            { deleted_at: "2022-01-15 11:22:34" },
+            { "title like": "Updated via unit planner" },
+        );
+    });
 });

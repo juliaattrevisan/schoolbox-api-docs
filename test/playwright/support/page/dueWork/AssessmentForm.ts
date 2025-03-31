@@ -134,6 +134,13 @@ export default class AssessmentForm {
     }
 
     /**
+     * Submits this form to create a duework
+     */
+    async clickCreate(): Promise<void> {
+        await this.page.getByTestId(AssessmentForm.SELECTOR_BUTTON_CREATE).click();
+    }
+
+    /**
      * Submits this form to update a duework
      */
     async update(): Promise<void> {
