@@ -592,10 +592,10 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
             // Make the field readonly
             $(t).prop("readonly", true);
 
-            const timestamp = dayjs.parseNatural(t.value);
+            const newDate = dayjs.parseNatural(t.value);
 
             // If it couldn't parse a date - show a validation error on the form
-            if (timestamp === false) {
+            if (newDate === false) {
                 if (!$fieldError.length) {
                     // don't create multiple errors
 
@@ -616,8 +616,6 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                     $fieldError.show();
                 }
             } else {
-                var newDate = dayjs.unix(timestamp);
-
                 // If field has all day switch data param and is end or start of day - make all day
                 var state = (newDate.format("HHmm") == "0000" || newDate.format("HHmm") == "2359") && opts.allDaySwitch;
 
