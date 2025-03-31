@@ -34,3 +34,5 @@ dayjs.extend(weekOfYear);
 dayjs.extend(isSameOrAfter);
 // Custom plugin to parse natural language dates
 dayjs.extend(naturalTimePlugin);
+
+export default dayjs;
