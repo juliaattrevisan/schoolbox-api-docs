@@ -18,15 +18,15 @@ RUN npm ci
 
 # Additional requirements for building JS requare all over the shop:
 # need to copy nearly everything from Schoolbox repository.
-COPY ./babel.config.js     /usr/share/schoolbox
-COPY ./tsconfig.json       /usr/share/schoolbox
-COPY ./webpack.common.js   /usr/share/schoolbox
-COPY ./webpack.dev.js      /usr/share/schoolbox
-COPY ./webpack.prod.js     /usr/share/schoolbox
-COPY ./library             /usr/share/schoolbox/library
-COPY ./stories             /usr/share/schoolbox/stories
-COPY ./templates           /usr/share/schoolbox/templates
-COPY ./types               /usr/share/schoolbox/types
-COPY ./vue                 /usr/share/schoolbox/vue
-COPY ./www/static          /usr/share/schoolbox/www/static
+COPY ./babel.config.js   /usr/share/schoolbox
+COPY ./tsconfig.json     /usr/share/schoolbox
+COPY ./webpack.common.js /usr/share/schoolbox
+COPY ./webpack.dev.js    /usr/share/schoolbox
+COPY ./webpack.prod.js   /usr/share/schoolbox
+COPY ./library           /usr/share/schoolbox/library
+COPY ./stories           /usr/share/schoolbox/stories
+COPY ./templates         /usr/share/schoolbox/templates
+COPY ./types             /usr/share/schoolbox/types
+COPY ./vue               /usr/share/schoolbox/vue
+COPY ./www/static        /usr/share/schoolbox/www/static
 RUN if [[ " prod production " =~ " $ENV " ]] ; then npm run publish ; else npm run build ; fi

@@ -7,12 +7,12 @@ ARG ENV=dev
 #
 # docker build -t schoolbox-composer -f docker/schoolbox-composer/Dockerfile .
 FROM php:8.2-alpine
+COPY --from=composer:2.8 /usr/bin/composer /usr/local/bin/composer
 
 WORKDIR /usr/share/schoolbox
 
 COPY ./composer.json /usr/share/schoolbox
 COPY ./composer.lock /usr/share/schoolbox
-COPY --from=composer:2.8 /usr/bin/composer /usr/local/bin/composer
 
 # Ignore platform requirements:
 # the base PHP image doesn't include all of the extensions in composer.json.
