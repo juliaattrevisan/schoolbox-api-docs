@@ -30,3 +30,4 @@ COPY ./composer.lock /usr/share/schoolbox
 # Composer build
 COPY --from=composer:2.8 /usr/bin/composer /usr/local/bin/composer
 RUN if [[ " prod production " =~ " $ENV " ]] ; then composer install -a --no-dev ; else composer install -a ; fi
+RUN rm /usr/local/bin/composer
