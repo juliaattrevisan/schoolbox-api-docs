@@ -25,6 +25,8 @@ class Helper
     private const AZURE_API_ENDPOINT = 'https://%s.openai.azure.com/openai/deployments/%s/chat/completions?api-version=2023-12-01-preview';
 
     private ErrorMapper $errorMapper;
+
+
     /**
      * Controller constructor.
      */
@@ -32,6 +34,7 @@ class Helper
     {
         $this->errorMapper = ErrorMapper::GetInstance();
     }
+
 
     /**
      * chat (no async)
@@ -48,9 +51,6 @@ class Helper
      */
     public function chat(User $user, ?string $prompt = null, ?string $payload = null, ?array $responseFormat = null): ?string
     {
-        /**
-         * @var Log\Model $log
-         */
         $log = $this->logMapper->createModel();
         $log->setUser($user);
 
@@ -96,9 +96,6 @@ class Helper
      */
     public function async(User $user, ?string $prompt = null, ?string $payload = null): void
     {
-        /**
-         * @var Log\Model $log
-         */
         $log = $this->logMapper->createModel();
         $log->setUser($user);
 
