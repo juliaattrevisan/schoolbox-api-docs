@@ -126,9 +126,6 @@ class Helper
             throw new \DomainException('OpenAI API key is unavailable');
         }
 
-        $log = $this->logMapper->createModel();
-        $log->setUser($user);
-
         // either build or use the supplied payload
         $payload = $payload ?? $this->generatePayload($prompt);
 
@@ -137,16 +134,30 @@ class Helper
                 $this->getAuthorization(),
                 ['Content-Type'  => 'application/json'],
             ), $payload);
-            $log->setPrompt($payload);
+
+            /* Log what the user tried to do if we made a vaguely-successful request
+             * and didn't somehow die long the way
+             */
+            $log = $this->logMapper->createModel()
+                ->setUser($user)
+                ->setPrompt($payload);
 
             $promise = $this->client->sendAsync($openAiRequest, ['stream' => true]);
 
             // Handle the response when it arrives
+            /* The two anonymous functions represent what happens when we succeed
+             * and when we didn't.
+             */
             $promise->then(
                 function ($response) use ($log): void {
-                    http_response_code(200);
-                    $log->setReturnCode(200);
-                    $log->setErrorMessage('');
+                    /* Set up presumed success conditions
+                     */
+                    $returnCode = 200;
+
+                    http_response_code($returnCode);
+
+                    $log->setReturnCode($returnCode)
+                        ->setErrorMessage('');
 
                     //header('X-Accel-Buffering: no');
                     header('Content-Type: application/json');
@@ -165,21 +176,25 @@ class Helper
                     }
                 },
                 function ($reason) use ($log): void {
+                    $returnCode = $reason->getCode();
+
                     /* @var ClientException $reason */
-                    http_response_code($reason->getCode());
+                    http_response_code($returnCode);
                     echo $reason->getMessage();
 
-                    $log->setReturnCode($reason->getCode());
-                    $log->setErrorMessage($reason->getMessage());
+                    /* We died; log the status code and epitaph
+                     */
+                    $log->setReturnCode($returnCode)
+                        ->setErrorMessage($reason->getMessage());
                 }
             );
 
             $promise->wait();
+
+            $this->logMapper->save($log);
         } catch (GuzzleException $e) {
             $this->errorMapper->generateException(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
         }
-
-        $this->logMapper->save($log);
     }
 
 
