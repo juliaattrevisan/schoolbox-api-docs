@@ -15,7 +15,13 @@
         </div>
     </div>
 </div>
-
+<div id="custom-participation-container" class="f-container">
+    <custom-participation
+    :all-participants="{{ (allParticipants ?? []) | json_encode }}"
+    get-students-pastoral-counts-url="{{ routeLookup('pastoral.getStudentsCount') }}"
+    />
+</div>
+<script src="{{ CDN_PREFIX }}/js/bundle/customParticipation.js?v={{ config.site_version }}"></script>
 {# TODO: Change this to use the table similar to the UI design #}
 {#<div class="column small-12 {% if not hasCustomisation %}hide{% endif %}" data-collapsable="participation" {% if hasCustomisation %} data-collapse-state="uncollapsed" {% else %} data-collapse-state="collapsed" {% endif %}>#}
 {#    {% if assessment.allParticipants | length %}#}

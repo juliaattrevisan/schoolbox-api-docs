@@ -1,77 +1,34 @@
-<script>
-/* eslint-disable eslint-comments/disable-enable-pair -- see below */
-/* eslint-disable eslint-comments/no-unlimited-disable -- see below */
-/* eslint-disable -- Ignore this file for ESLint checks for now (SA-18376) */
-/* eslint-enable vue/no-v-html */
+<script setup lang="ts">
 /**
  * render a single pastoral badge with a number that represents the number of occurrences that have been recorded
  */
-export default {
-    name: "pastoral-count-badge",
+import type { StudentPastoralCountBadge } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
 
-    props: {
-        /**
-         * The url which leads to the students pastoral page
-         */
-        destinationUrl: {
-            default: "/pastoral/student/25?type=1&subtype=1",
-            type: String,
-        },
-        /**
-         * The icon used to display and represent this pastoral event
-         */
-        icon: {
-            default: "achievement",
-            type: String,
-        },
-        /**
-         * the primary color used to display the font and icon
-         */
-        fgColor: {
-            default: "rgb(86, 172, 37)",
-            type: String,
-        },
-        /**
-         * the secondary color used to fill in the badges background
-         */
-        bgColor: {
-            default: "rgb(215, 243, 199)",
-            type: String,
-        },
-        /**
-         * the number of pastoral events recorded for this type & subtype combo
-         */
-        count: {
-            default: "2",
-            type: String,
-        },
-        /**
-         * the human readable description of the pastoral type & subtype combo
-         */
-        title: {
-            default: "Achievement",
-            type: String,
-        },
-    },
+interface Props {
+    badge: StudentPastoralCountBadge;
+}
 
-    mounted() {
-        // As vue loads the template after foundation has been initialised, we need to reinitialise the tooltips
-        $(document).foundation("tooltip", "reflow");
-    },
-};
+const props = defineProps<Props>();
+
+window.Vue.onMounted(() => {
+    // As vue loads the template after foundation has been initialised, we need to reinitialise the tooltips
+    // @ts-expect-error -- jquery plugin
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- see above
+    $(document).foundation("tooltip", "reflow");
+});
 </script>
 <template>
-    <a :href="destinationUrl">
+    <a :href="props.badge.destinationUrl">
         <span
-            :class="`label neutral icon-${icon}`"
+            :class="`label neutral icon-${props.badge.icon}`"
             data-tooltip
-            :title="title"
+            :title="props.badge.title"
             :style="{
-                'background-color': bgColor,
-                color: fgColor,
+                'background-color': props.badge.bgColor,
+                color: props.badge.fgColor,
             }"
         >
-            {{ count }}
+            {{ props.badge.count }}
         </span>
     </a>
 </template>
