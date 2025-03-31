@@ -255,7 +255,6 @@ class Controller extends Base
                 // if default points aren't enabled, any user can modify,
                 // otherwise only pastoral moderators with 'write' access or above can modify default expiry and point settings
                 'canModifyDefaults' => !$this->config->get(ConfigMapper::NAME_PASTORAL_DEFAULT_POINTS_ENABLED) ||
-                    $this->config->get(ConfigMapper::NAME_PASTORAL_DEFAULT_POINTS_ENABLED) &&
                     $this->user->hasServicePermission(
                         UserAccess::SERVICE_PASTORAL,
                         UserAccess::ACCESS_WRITE
