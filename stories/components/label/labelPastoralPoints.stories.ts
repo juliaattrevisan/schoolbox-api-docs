@@ -67,3 +67,15 @@ export const ZeroPoints: Story = {
         `,
     }),
 };
+
+/**
+ *
+ */
+export const SinglePoint: Story = {
+    render: () => ({
+        components: { StorybookSlot },
+        template: `
+            <sbx-label-pastoral-points points="1"></sbx-label-pastoral-points>
+        `,
+    }),
+};

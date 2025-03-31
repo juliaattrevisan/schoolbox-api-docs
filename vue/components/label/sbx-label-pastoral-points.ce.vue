@@ -23,10 +23,16 @@ const sentiment = window.Vue.computed(() => {
     }
     return "neutral";
 });
+const single = window.Vue.computed(() => {
+    if (props.points === 1 || props.points === -1) {
+        return true;
+    }
+    return false;
+});
 </script>
 
 <template>
-    <sbx-label :title="`${props.points} Points`" :sentiment="sentiment"></sbx-label>
+    <sbx-label :title="`${props.points} ${single ? 'Point' : 'Points'}`" :sentiment="sentiment"> </sbx-label>
 </template>
 
 <style scoped></style>
