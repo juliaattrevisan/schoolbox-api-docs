@@ -2,10 +2,10 @@
 /**
  * render a single pastoral badge with a number that represents the number of occurrences that have been recorded
  */
-import type { StudentPastoralCount } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCount";
+import type { StudentPastoralCountBadge } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
 
 interface Props {
-    badge: StudentPastoralCount;
+    badge: StudentPastoralCountBadge;
 }
 
 const props = defineProps<Props>();

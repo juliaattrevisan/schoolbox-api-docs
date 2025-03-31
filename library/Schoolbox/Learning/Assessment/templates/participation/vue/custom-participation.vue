@@ -5,7 +5,7 @@
 import { isAbortError, hasErrorMessage } from "@js/util/errorUtils";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import PastoralCountBadge from "@schoolboxLibrary/Pastoral/Count/vue/pastoral-count-badge.vue";
-import type { StudentPastoralCount } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCount";
+import type { StudentPastoralCountBadge } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
 import type { Participant } from "../js/types/customParticipationTypes";
 
 interface Props {
@@ -34,7 +34,7 @@ const isIndeterminate = window.Vue.computed(() => {
 });
 
 const loadError = window.Vue.ref<string | null>(null);
-const studentPastoralCounts = window.Vue.ref<Record<string, StudentPastoralCount[]>>({});
+const studentPastoralCounts = window.Vue.ref<Record<string, StudentPastoralCountBadge[]>>({});
 
 /**
  * Fetch the pastoral counts for the students
@@ -54,7 +54,7 @@ async function getStudentPastoralCounts(): Promise<void> {
             const errorMessage = await extractErrorMessage(response);
             throw new Error(errorMessage);
         }
-        const responseJson = (await response.json()) as Record<string, StudentPastoralCount[]>;
+        const responseJson = (await response.json()) as Record<string, StudentPastoralCountBadge[]>;
         if (typeof responseJson !== "object" || responseJson === null) {
             throw new Error("Unexpected response format");
         }

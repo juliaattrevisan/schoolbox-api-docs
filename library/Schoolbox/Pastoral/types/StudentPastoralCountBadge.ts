@@ -1,7 +1,7 @@
 /**
  * The expected payload for individual student in pastoral counts badges
  */
-export type StudentPastoralCount = {
+export type StudentPastoralCountBadge = {
     bgColor: string;
     count: string;
     destinationUrl: string;
