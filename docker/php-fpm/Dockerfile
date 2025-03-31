@@ -1,5 +1,12 @@
+# Build args:
+# ENV: if prod or production, build with prod dependencies only;
+#      otherwise, build with dev dependencies
+ARG ENV=dev
+
+
 # Stage 1: build dependencies
 FROM php:8.2-alpine AS build
+ARG ENV
 
 # Install dependencies for building PECL extensions
 RUN apk --no-cache add ${PHPIZE_DEPS} && \
@@ -11,7 +18,8 @@ RUN apk --no-cache add ${PHPIZE_DEPS} && \
             bind-tools
 
 # Install PECL extensions
-RUN pecl install redis xdebug imagick pdo_sqlsrv excimer
+RUN pecl install redis imagick pdo_sqlsrv excimer
+RUN if [[ ! " prod production " =~ " $ENV " ]] ; then pecl install xdebug ; fi
 
 # Install non-PECL extensions
 RUN docker-php-ext-install zip && \
@@ -34,6 +42,7 @@ RUN /opt/bin/install-odbc-driver.sh
 
 # Stage 2: build final image
 FROM php:8.2-fpm-alpine AS final
+ARG ENV
 
 # Install actual dependencies
 RUN apk add libzip icu-libs libldap \
@@ -50,6 +59,8 @@ COPY --from=build /opt/microsoft     /opt/microsoft
 COPY --from=build /opt/mssql-tools18 /opt/mssql-tools18
 # TODO use `php -r "echo ini_get('extension_dir')`
 COPY --from=build /usr/local/lib/php/extensions/no-debug-non-zts-20220829 /usr/local/lib/php/extensions/no-debug-non-zts-20220829
+
+# Build composer somewhere here
 
 # Enable all built dependencies
 RUN docker-php-ext-enable zip && \
