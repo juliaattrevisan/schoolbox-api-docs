@@ -10,11 +10,12 @@ ARG ENV=dev
 # It may be built with the commands:
 # docker build -t schoolbox-php-fpm docker/php-fpm/
 # docker build -t schoolbox-php-fpm-deploy -f docker/php-fpm/deploymentImage.Dockerfile .
-FROM schoolbox-php-fpm
+
+# Copy necessary files and folders only
+FROM schoolbox-php-fpm AS package
 
 WORKDIR /usr/share/schoolbox
 
-# Copy necessary files and folders only
 COPY ./conf          /usr/share/schoolbox/conf
 COPY ./dav           /usr/share/schoolbox/dav
 COPY ./library       /usr/share/schoolbox/library
@@ -27,7 +28,31 @@ COPY ./www           /usr/share/schoolbox/www
 COPY ./composer.json /usr/share/schoolbox
 COPY ./composer.lock /usr/share/schoolbox
 
+COPY ./babel.config.js     /usr/share/schoolbox
+COPY ./npm-shrinkwrap.json /usr/share/schoolbox
+COPY ./package.json        /usr/share/schoolbox
+COPY ./webpack.common.js   /usr/share/schoolbox
+COPY ./webpack.dev.js      /usr/share/schoolbox
+COPY ./webpack.prod.js     /usr/share/schoolbox
+
+
+# NPM build
+FROM node:20-alpine AS npm
+
+WORKDIR /usr/share/schoolbox
+COPY --from=package /usr/share/schoolbox /usr/share/schoolbox
+RUN ls -al /usr/share/schoolbox
+
+# Need to somehow be logged in to Github in order to download some packages
+RUN npm ci
+RUN if [[ " prod production " =~ " $ENV " ]] ; then npm run publish ; else npm run build ; fi
+
+
 # Composer build
+FROM schoolbox-php-fpm AS final
+
+COPY --from=npm /usr/share/schoolbox /usr/share/schoolbox
+
 COPY --from=composer:2.8 /usr/bin/composer /usr/local/bin/composer
 RUN if [[ " prod production " =~ " $ENV " ]] ; then composer install -a --no-dev ; else composer install -a ; fi
 RUN rm /usr/local/bin/composer
