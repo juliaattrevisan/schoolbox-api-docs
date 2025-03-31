@@ -24,6 +24,9 @@ class Helper
     private const AZURE_API_ENDPOINT = 'https://%s.openai.azure.com/openai/deployments/%s/chat/completions?api-version=2023-12-01-preview';
 
 
+    /**
+     * There are apparently two different endpoint flavours that we can chooze
+     */
     private const ENDPOINT_TYPE_OPENAI = 'OpenAI';
     private const ENDPOINT_TYPE_AZURE = 'Azure';
 
@@ -58,9 +61,6 @@ class Helper
      */
     public function chat(User $user, ?string $prompt = null, ?string $payload = null, ?array $responseFormat = null): ?string
     {
-        $log = $this->logMapper->createModel();
-        $log->setUser($user);
-
         // either build or use the supplied payload
         $payload = $payload ?? $this->generatePayload($prompt, $responseFormat);
 
@@ -69,24 +69,35 @@ class Helper
                 $this->getAuthorization(),
                 ['Content-Type'  => 'application/json'],
             ), $payload);
-            $log->setPrompt($payload);
 
             $response = $this->client->sendRequest($openAiRequest);
 
             http_response_code($response->getStatusCode());
 
-            $log->setReturnCode($response->getStatusCode());
+            /* Log some error messages, if applicable
+             */
+            $errorMessage = '';
+
             if ($response->getStatusCode() !== 200) {
-                $log->setErrorMessage($response->getReasonPhrase());
-            } else {
-                $log->setErrorMessage('');
+                $errorMessage = $response->getReasonPhrase();
             }
 
+            /* Log what the user tried to do if we made a vaguely-successful request
+             * and didn't somehow die long the way
+             */
+            $log = $this->logMapper->createModel()
+                ->setUser($user)
+                ->setPrompt($payload)
+                ->setReturnCode($response->getStatusCode())
+                ->setErrorMessage($errorMessage);
+
             $this->logMapper->save($log);
+
             return $response->getBody()->getContents();
         } catch (GuzzleException $e) {
             $this->errorMapper->generateException(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
         }
+
         return null;
     }
 
