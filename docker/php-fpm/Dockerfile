@@ -60,8 +60,6 @@ COPY --from=build /opt/mssql-tools18 /opt/mssql-tools18
 # TODO use `php -r "echo ini_get('extension_dir')`
 COPY --from=build /usr/local/lib/php/extensions/no-debug-non-zts-20220829 /usr/local/lib/php/extensions/no-debug-non-zts-20220829
 
-# Build composer somewhere here
-
 # Enable all built dependencies
 RUN docker-php-ext-enable zip && \
     docker-php-ext-enable pcntl && \
@@ -80,3 +78,4 @@ RUN docker-php-ext-enable zip && \
     docker-php-ext-enable imagick && \
     docker-php-ext-enable pdo_sqlsrv && \
     docker-php-ext-enable excimer
+
