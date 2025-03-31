@@ -109,13 +109,13 @@ if ($_SESSION['communityLogin'] ?? false) {
     }
 
     $password = $_SESSION['password'];
-    $formArray['__VIEWSTATE'] = $viewState[1];
-    $formArray['__EVENTVALIDATION'] = $eventValidation[1];
+    $formArray['__VIEWSTATE'] = $viewState[1] ?? '';
+    $formArray['__EVENTVALIDATION'] = $eventValidation[1] ?? '';
     $formArray['__EVENTARGUMENT'] = '';
     $formArray['__EVENTTARGET'] = '';
     $formArray['__LASTFOCUS'] = '';
-    $formArray['__VIEWSTATEGENERATOR'] = $viewStateGenerator[1];
-    $formArray['__VIEWSTATEENCRYPTED'] = $viewStateEncrypted[1];
+    $formArray['__VIEWSTATEGENERATOR'] = $viewStateGenerator[1] ?? '';
+    $formArray['__VIEWSTATEENCRYPTED'] = $viewStateEncrypted[1] ?? '';
     $formArray[$loginButton[1]] = 'Login';
     $formArray[$loginUsername[1]] = $user->getUsername();
     $formArray[$loginPassword[1]] = $password;
