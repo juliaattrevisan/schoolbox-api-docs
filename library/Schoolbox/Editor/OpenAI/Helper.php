@@ -24,6 +24,9 @@ class Helper
     private const AZURE_API_ENDPOINT = 'https://%s.openai.azure.com/openai/deployments/%s/chat/completions?api-version=2023-12-01-preview';
 
 
+    private const ENDPOINT_TYPE_OPENAI = 'OpenAI';
+    private const ENDPOINT_TYPE_AZURE = 'Azure';
+
     /**
      * Controller constructor.
      */
@@ -166,9 +169,9 @@ class Helper
     private function getEndpoint(): string
     {
         switch ($this->openAiEndpoint) {
-            case 'OpenAI':
+            case self::ENDPOINT_TYPE_OPENAI:
                 return self::OPENAI_API_ENDPOINT;
-            case 'Azure':
+            case self::ENDPOINT_TYPE_AZURE:
                 if (empty($this->openAiAzureResourceName) || empty($this->openAiAzureDeploymentId)) {
                     throw new \UnexpectedValueException('Azure resource name and deployment ID are required');
                 }
@@ -190,9 +193,9 @@ class Helper
     private function getAuthorization(): array
     {
         switch ($this->openAiEndpoint) {
-            case 'OpenAI':
+            case self::ENDPOINT_TYPE_OPENAI:
                 return ['Authorization' => 'Bearer ' . $this->openAiKey];
-            case 'Azure':
+            case self::ENDPOINT_TYPE_AZURE:
                 return ['api-key' => $this->openAiKey];
         }
 
