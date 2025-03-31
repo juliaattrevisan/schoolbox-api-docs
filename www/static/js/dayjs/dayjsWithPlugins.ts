@@ -5,15 +5,16 @@
  * https://day.js.org/
  */
 
-import dayjs from 'dayjs';
-import advancedFormat from 'dayjs/plugin/advancedFormat';
-import customParseFormat from 'dayjs/plugin/customParseFormat';
-import duration from 'dayjs/plugin/duration';
-import relativeTime from 'dayjs/plugin/relativeTime';
-import isBetween from 'dayjs/plugin/isBetween';
-import arraySupport from 'dayjs/plugin/arraySupport';
-import weekOfYear from 'dayjs/plugin/weekOfYear';
-import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+import dayjs from "dayjs";
+import advancedFormat from "dayjs/plugin/advancedFormat";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+import duration from "dayjs/plugin/duration";
+import relativeTime from "dayjs/plugin/relativeTime";
+import isBetween from "dayjs/plugin/isBetween";
+import arraySupport from "dayjs/plugin/arraySupport";
+import weekOfYear from "dayjs/plugin/weekOfYear";
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
+import naturalTimePlugin from "./naturalTimePlugin";
 
 // AdvancedFormat extends dayjs().format API to supply more format options: https://day.js.org/docs/en/plugin/advanced-format
 dayjs.extend(advancedFormat);
@@ -31,3 +32,7 @@ dayjs.extend(arraySupport);
 dayjs.extend(weekOfYear);
 // IsSameOrAfter adds .isSameOrAfter() API to return a boolean indicating if a date is the same or after another date: https://day.js.org/docs/en/plugin/is-same-or-after
 dayjs.extend(isSameOrAfter);
+// Custom plugin to parse natural language dates
+dayjs.extend(naturalTimePlugin);
+
+export default dayjs;

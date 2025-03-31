@@ -43,7 +43,7 @@ module.exports = {
             "./www/static/js/editor/jquery.proxy-replacement.js",
 
             // DateTime
-            "./www/static/js/vendors/dayjs/dayjsWithPlugins.ts",
+            "./www/static/js/dayjs/dayjsWithPlugins.ts",
 
             // Files And Resource Browser
             "./www/static/js/socialstream/browser/browser.js",
@@ -73,9 +73,6 @@ module.exports = {
             "./www/static/js/alaress-datetime-picker/attacher.datepicker.js",
             "./www/static/js/alaress-datetime-picker/alaress-datetime-picker.js",
             "./www/static/js/alaress-datetime-picker/alaress-datetime-modal.js",
-
-            // This is a Webpack-built module for strtotime
-            "./www/static/js/strtotime/strtotime.bundle.js",
 
             // Allow deference of form submit actions
             "./www/static/js/form/jquery.stallSubmit.js",
@@ -109,7 +106,6 @@ module.exports = {
         // Libraries
         intellischools: "./www/static/js/intellischools/schoolboxIntellischools.js",
         clipboard: "./www/static/js/clipboard/clipboard.js",
-        strtotime: "./www/static/js/alaress-datetime-picker/strtotime.js",
         highcharts: "./www/static/js/vendors/highcharts/highcharts.js",
         highchartsMore: "./www/static/js/vendors/highcharts/highchartsMore.js",
 

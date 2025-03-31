@@ -4,7 +4,7 @@
  * 2. Execute npx playwright test pastoralExpiry.spec.ts
  */
 
-import dayjs from "dayjs";
+import dayjs from "@js/dayjs/dayjsWithPlugins";
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import ManageRecordSettings from "@schoolboxTest/playwright/support/page/pastoralCare/ManageRecordSettings";
 import CreatePastoralRecord from "@schoolboxTest/playwright/support/page/pastoralCare/CreatePastoralRecord";
@@ -75,22 +75,25 @@ test.describe("Test the pastoral care modules expiry feature", () => {
         await createPastoralRecord.selectType("1");
 
         tester.isGoingTo("Check expires at date is 1 month from today");
-        const dateOneMonth = dayjs().add(1, "month").format("DD/MM/YYYY");
-        await createPastoralRecord.expectExpiresAtToBe(dateOneMonth);
+        const dateOneMonth = dayjs.parseNatural("in 1 month"); // use parseNatural as it aligns with the backend's datetime logic
+        if (dateOneMonth === false) throw new Error("Failed to parse date");
+        await createPastoralRecord.expectExpiresAtToBe(dateOneMonth.format("DD/MM/YYYY"));
 
         tester.isGoingTo("Set sub type to Academic > Learning Difficulties");
         await createPastoralRecord.selectSubType("2");
 
         tester.isGoingTo("Check expires at date is 6 month from today");
-        const dateSixMonths = dayjs().add(6, "month").format("DD/MM/YYYY");
-        await createPastoralRecord.expectExpiresAtToBe(dateSixMonths);
+        const dateSixMonths = dayjs.parseNatural("in 6 months");
+        if (dateSixMonths === false) throw new Error("Failed to parse date");
+        await createPastoralRecord.expectExpiresAtToBe(dateSixMonths.format("DD/MM/YYYY"));
 
         tester.isGoingTo("Set type to Attendance");
         await createPastoralRecord.selectType("2");
 
         tester.isGoingTo("Check expires at date is 2 weeks from today");
-        const date2Weeks = dayjs().add(2, "weeks").format("DD/MM/YYYY");
-        await createPastoralRecord.expectExpiresAtToBe(date2Weeks);
+        const date2Weeks = dayjs.parseNatural("in 2 weeks");
+        if (date2Weeks === false) throw new Error("Failed to parse date");
+        await createPastoralRecord.expectExpiresAtToBe(date2Weeks.format("DD/MM/YYYY"));
 
         await db.updateInDatabase("lu_pastoral_type", { default_expiry: null }, { name: "Attendance" });
         await db.updateInDatabase("lu_pastoral_type", { default_expiry: null }, { name: "Bullying" });
