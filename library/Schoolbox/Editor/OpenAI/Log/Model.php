@@ -29,44 +29,82 @@ class Model
     private int $return_code;
     private string $error_message;
 
+    /**
+     * @return User
+     */
     public function getUser(): User
     {
         return $this->user;
     }
 
+
+    /**
+     * @param User $user
+     * @return $this
+     */
     public function setUser(User $user): self
     {
         $this->user = $user;
         return $this;
     }
 
+
+    /**
+     * @return string
+     */
     public function getPrompt(): string
     {
         return $this->prompt;
     }
 
-    public function setPrompt(string $prompt): void
+
+    /**
+     * @param string $prompt
+     * @return $this
+     */
+    public function setPrompt(string $prompt): self
     {
         $this->prompt = $prompt;
+        return $this;
     }
 
+
+    /**
+     * @return int
+     */
     public function getReturnCode(): int
     {
         return $this->return_code;
     }
 
-    public function setReturnCode(int $return_code): void
+
+    /**
+     * @param int $return_code
+     * @return $this
+     */
+    public function setReturnCode(int $return_code): self
     {
         $this->return_code = $return_code;
+        return $this;
     }
 
+
+    /**
+     * @return string
+     */
     public function getErrorMessage(): string
     {
         return $this->error_message;
     }
 
-    public function setErrorMessage(string $error_message): void
+
+    /**
+     * @param string $error_message
+     * @return $this
+     */
+    public function setErrorMessage(string $error_message): self
     {
         $this->error_message = $error_message;
+        return $this;
     }
 }
