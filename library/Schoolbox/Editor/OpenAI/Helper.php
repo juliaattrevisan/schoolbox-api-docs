@@ -20,15 +20,15 @@ use Schoolbox\User;
 
 class Helper
 {
-    private const OPENAI_API_ENDPOINT = 'https://api.openai.com/v1/chat/completions';
-    private const AZURE_API_ENDPOINT = 'https://%s.openai.azure.com/openai/deployments/%s/chat/completions?api-version=2023-12-01-preview';
-
-
     /**
      * There are apparently two different endpoint flavours that we can chooze
      */
     private const ENDPOINT_TYPE_OPENAI = 'OpenAI';
+    private const ENDPOINT_HOST_OPENAI = 'https://api.openai.com/v1/chat/completions';
+
     private const ENDPOINT_TYPE_AZURE = 'Azure';
+    private const ENDPOINT_HOST_AZURE = 'https://%s.openai.azure.com/openai/deployments/%s/chat/completions?api-version=2023-12-01-preview';
+
 
     /**
      * Controller constructor.
@@ -193,14 +193,14 @@ class Helper
     {
         switch ($this->openAiEndpoint) {
             case self::ENDPOINT_TYPE_OPENAI:
-                return self::OPENAI_API_ENDPOINT;
+                return self::ENDPOINT_HOST_OPENAI;
             case self::ENDPOINT_TYPE_AZURE:
                 if (empty($this->openAiAzureResourceName) || empty($this->openAiAzureDeploymentId)) {
                     throw new \UnexpectedValueException('Azure resource name and deployment ID are required');
                 }
 
                 return sprintf(
-                    self::AZURE_API_ENDPOINT,
+                    self::ENDPOINT_HOST_AZURE,
                     $this->openAiAzureResourceName,
                     $this->openAiAzureDeploymentId,
                 );
