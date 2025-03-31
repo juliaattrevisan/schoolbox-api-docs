@@ -10,8 +10,6 @@
 
 namespace Schoolbox\Editor\OpenAI\Log;
 
-use Alaress_Date_Format;
-use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
 use Schoolbox\User;
 
@@ -20,14 +18,11 @@ class Model
     use ModelTrait\Id;
     use ModelTrait\CreatedAtDate;
 
-    /**
-     * @var User
-     */
-    private $user;
-
+    private User $user;
     private string $prompt;
-    private int $return_code;
-    private string $error_message;
+    private int $returnCode;
+    private string $errorMessage;
+
 
     /**
      * @return User
@@ -74,17 +69,17 @@ class Model
      */
     public function getReturnCode(): int
     {
-        return $this->return_code;
+        return $this->returnCode;
     }
 
 
     /**
-     * @param int $return_code
+     * @param int $returnCode
      * @return $this
      */
-    public function setReturnCode(int $return_code): self
+    public function setReturnCode(int $returnCode): self
     {
-        $this->return_code = $return_code;
+        $this->returnCode = $returnCode;
         return $this;
     }
 
@@ -94,17 +89,17 @@ class Model
      */
     public function getErrorMessage(): string
     {
-        return $this->error_message;
+        return $this->errorMessage;
     }
 
 
     /**
-     * @param string $error_message
+     * @param string $errorMessage
      * @return $this
      */
-    public function setErrorMessage(string $error_message): self
+    public function setErrorMessage(string $errorMessage): self
     {
-        $this->error_message = $error_message;
+        $this->errorMessage = $errorMessage;
         return $this;
     }
 }
