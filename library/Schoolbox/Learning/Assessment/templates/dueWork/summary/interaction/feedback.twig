@@ -179,7 +179,7 @@ Data:
                 data-collapse-state="{{ collapsed ? 'collapsed' : 'expanded' }}"
                 data-collapsable="feedback-{{ responseId }}-{{ currentFeedback.id }}"
                     {% endif %}>
-                {{ currentFeedback.comment|linkify|nl2br }}
+                {{ currentFeedback.comment|purify }}
             </blockquote>
         {% else %}
             <article>
