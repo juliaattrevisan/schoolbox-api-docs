@@ -44,7 +44,7 @@ class Controller extends Base
      * @throws Exception
      * @throws \JsonException
      */
-    public function postForward(): void
+    public function postAiAssistant(): void
     {
         try {
              (new Helper(

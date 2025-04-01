@@ -29,7 +29,7 @@ class Module extends BaseModule
         /* This /openai/ route is used by Little Robot Dude from the ckeditor
          * directly, to produce its output
          */
-        $this->register('POST', '', 'postForward', $isStaff);
+        $this->register('POST', '', 'postAiAssistant', $isStaff);
     }
 
     public function buildController(): Base
