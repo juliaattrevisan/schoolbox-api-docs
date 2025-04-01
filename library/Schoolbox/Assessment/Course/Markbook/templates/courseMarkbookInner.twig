@@ -230,7 +230,23 @@
                             {% set aImpl = courseImportAssessments[courseImpl.id][assessment.id] ?? null %}
                             {% set participant = aImpl.participantIfExtant(student) ?? null %}
                             {% if participant and not participant.isExcluded %}
-                                <td>
+                                <td
+                                    class="column-{{ assessment.id }} {% if not participant or participant.isExcluded %} excluded {% endif %} student-grade-cell"
+                                    data-assessment="{{ assessment.id }}"
+                                    {% if assessment is dueWork or assessment is quiz or assessment is lti or (assessment is project and (participant and not participant.isExcluded)) %}
+                                    data-pop-out-menu
+                                    {% endif %}
+                                    data-assessment-type="{{ assessment.getFamilyName }}"
+                                    data-endpoint="{{ routeLookupIfAuthorized('learningAssessmentTimeline.getFullTimeline', {assessment: aImpl, assessmentId: aImpl.id, userId: student.id }) }}"
+                                    data-update-route="{{ routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessment: aImpl, assessmentId: aImpl.id, student: student, studentId: student.id }) }}"
+                                    data-review-route="{{ routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessment: aImpl, assessmentId: aImpl.id, student: student, studentId: student.id }) }}"
+                                    data-publish-route="{{ routeLookupIfAuthorized('learningDueWorkFeedback.postPublishFeedback', {assessment: aImpl, assessmentId: aImpl.id, student: student, studentId: student.id }) }}"
+                                    data-exclude-route="{{ routeLookupIfAuthorized('learningAssessment.postExclude', {assessment: aImpl, assessmentId: aImpl.id, student: student, studentId: student.id }) }}"
+                                    data-include-route="{{ routeLookupIfAuthorized('learningAssessment.postInclude', {assessment: aImpl, assessmentId: aImpl.id, student: student, studentId: student.id }) }}"
+                                    data-is-participant="{% if participant %}true{% else %}false{% endif %}"
+                                    data-is-excluded="{% if participant and not participant.isExcluded %}false{% else %}true{% endif %}"
+                                    data-history-route="{{ routeLookupIfAuthorized('learningAssessment.getSummary', {assessment: aImpl, assessmentId: aImpl.id, student: student, studentId: student.id }) }}"
+                                >
                                 {% if assessment is task %}
                                     {% set progressStatus = taskProgress[courseImpl.id][assessment.id][student.id] %}
 
