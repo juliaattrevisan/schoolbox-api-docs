@@ -36,10 +36,16 @@ class Controller extends Base
     }
 
 
+    /**
+     * This is used by ckeditor's Little Robot Dude ai assistant which posts
+     * to /openai route via some direct javascript thing
+     *
+     * @return void
+     * @throws Exception
+     * @throws \JsonException
+     */
     public function postForward(): void
     {
-        $prompt = "Tell me something about Schoolbox";
-
         try {
              (new Helper(
                 trim((string)$this->getConfigLoader()->get('openai_endpoint')),
