@@ -7,8 +7,17 @@ include:
 
 services:
   # Also build NPM and Composer images, so that the container can be built
+  schoolbox-composer:
+    restart: no
+    build:
+      context: ./schoolbox-composer
 
-  php-fpm:
+  schoolbox-npm:
+    restart: no
+    build:
+      context: ./schoolbox-npm
+
+  schoolbox-php-fpm-deploy:
     container_name: php-fpm
     restart: always
     depends_on:
