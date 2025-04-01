@@ -31,6 +31,14 @@ class Helper
 
 
     /**
+     * The last successful json payload we obtained from our ai overlords
+     *
+     * @var string|null
+     */
+    private ?string $json = null;
+
+
+    /**
      * Controller constructor.
      */
     public function __construct(
@@ -114,11 +122,11 @@ class Helper
      * @param User $user // user to log the request against
      * @param string|null $prompt // if generating a payload, use this prompt
      * @param string|null $payload // use this payload instead of generating one
-     * @return void
+     * @return string
      * @throws \JsonException
      * @throws Exception
      */
-    public function async(User $user, ?string $prompt = null, ?string $payload = null): void
+    public function async(User $user, ?string $prompt = null, ?string $payload = null): string
     {
         /* Assert that we're configured correctly
          */
@@ -159,21 +167,24 @@ class Helper
                     $log->setReturnCode($returnCode)
                         ->setErrorMessage('');
 
-                    //header('X-Accel-Buffering: no');
-                    header('Content-Type: application/json');
-                    header('Content-Encoding: none');
-
                     ob_implicit_flush(true);
                     ob_end_flush();
 
                     $stream = $response->getBody();
 
                     // Read and proxy the data
+                    $this->json = '';
+
                     while (!$stream->eof()) {
-                        echo $stream->read(1024);
+                        $this->json .= $stream->read(1024);
                         //ob_flush();
                         //flush();
                     }
+
+                    /* Remove preformatted insanity by encoding it all away
+                     * https://stackoverflow.com/questions/23859713/remove-all-unnecessary-whitespaces-from-json-string-in-php
+                     */
+                    $this->json = json_decode(json_encode(json_decode($this->json, true)));
                 },
                 function ($reason) use ($log): void {
                     $returnCode = $reason->getCode();
@@ -196,8 +207,10 @@ class Helper
             /* The async method will still continue trying to render other aura stuff,
              * like the chrome etc. so people left a die(); here to forcibly terminate;
              * else you end up with a bunch of Warnings about headers already being sent
+             *
+             * You can dodge that using responseAsJson() instead
              */
-            die();
+            return $this->json;
         } catch (GuzzleException $e) {
             $this->errorMapper->generateException(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
         }

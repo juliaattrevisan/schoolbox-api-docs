@@ -40,7 +40,7 @@ class Controller extends Base
         $prompt = "Tell me something about Schoolbox";
 
         try {
-            (new Helper(
+            $json = (new Helper(
                 trim((string)$this->getConfigLoader()->get('openai_endpoint')),
                 trim((string)$this->getConfigLoader()->get('openai_key')),
                 trim((string)$this->getConfigLoader()->get('openai_azure_resource_name')),
@@ -50,6 +50,8 @@ class Controller extends Base
                 $this->errorMapper,
                 $this->logMapper,
             ))->async($this->getUser(), $prompt);
+
+            $this->response = $this->responseAsJson($json);
         } catch (\DomainException $e) {
             /* Not configured? Not found
              */
