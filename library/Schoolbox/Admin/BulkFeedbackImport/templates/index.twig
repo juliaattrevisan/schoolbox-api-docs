@@ -84,8 +84,29 @@
                             </ol>
                         </li>
                         <li>Upload the CSV file.</li>
-                        <li>Select Preview.</li>
-                    <ol>
+                        <li>
+                            <p>Select Preview.</p>
+                            <p>You will then be presented with the preview screen containing the outcome of each row of data imported and any errors that exist for review.</p>
+
+                            <p>Errors may include:</p>
+                            <ul>
+                                <li>Incorrect {{ locale.class.proper }} Codes</li>
+                                <li>Incorrect Student External IDs</li>
+                                <li>{{ locale.dueWork.proper }} Titles that do not exist or are not unique</li>
+                                <li>{{ locale.dueWork.proper }} Titles that do not correspond to the specified Work Type.</li>
+                                <li>Normalised marks that are not a value between 0 and 100. </li>
+                            </ul>
+                            <p>The error logs will not cover:</p>
+                            <ul>
+                                <li>User error of utilising total marks instead of normalised values</li>
+                                <li>Errors in comment formatting</li>
+                                <li>User error in comment content</li>
+                            </ul>
+                        </li>
+                        <li>Correct any errors in the CSV file and re-upload if needed.</li>
+                        <li>When no errors exist, utilise the 'Perform Import' button.</li>
+                    </ol>
+
                 </div>
                 <div class="component-action">
                     <section>
