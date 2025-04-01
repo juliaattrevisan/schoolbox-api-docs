@@ -1,6 +1,8 @@
 # docker-compose.yaml for testing of deployments.
 # Its PHP-FPM container contains Schoolbox's code within its image, thus it has
-# no access to the code on the local file system.
+# no live access to the code on the local file system.
+# Changes made to Schoolbox's code on the local file system will not propagate
+# to this file's PHP-FPM container.
 
 include:
   - base.docker-compose.yaml
@@ -30,7 +32,8 @@ services:
       - schoolbox-composer
       - schoolbox-npm
     build:
-      dockerfile: php-fpm/deployment-image.Dockerfile
+      context: ../
+      dockerfile: ./docker/php-fpm/deployment-image.Dockerfile
     volumes:
       - storage:/var/lib/schoolbox/docker/storage
       - schoolbox-config:/etc/schoolbox
