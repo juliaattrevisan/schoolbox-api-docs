@@ -274,7 +274,7 @@
                                     class="{{ urgency.marks(normalisedMark) }}"
                                     href="{{ participationRoute }}"
                                     {% if draftMark %} data-actual-mark {% endif %}
-                                    title="{{ participant.authoritativeFeedback(true) ? participant.authoritativeFeedback(true).comment|striptags : '' }}"
+                                    title="{{ participant.authoritativeFeedback(true) ? participant.authoritativeFeedback(true).comment|html2text : '' }}"
                                 >
                                     <span data-instructor-mark>{{ decorator.label(participant, true, true) }}</span>
                                     <span data-learner-mark style="display: none">{{ decorator.label(participant, true, false) }}</span>
@@ -285,7 +285,7 @@
                                         data-draft-mark
                                         style="display: none"
                                         class="meta"
-                                        title="{{ participant.authoritativeFeedback(false) ? participant.authoritativeFeedback(false).comment|striptags : '' }}"
+                                        title="{{ participant.authoritativeFeedback(false) ? participant.authoritativeFeedback(false).comment|html2text : '' }}"
                                     >
                                         <span data-instructor-mark>{{ decorator.label(participant, false, true) }}</span>
                                         <span data-learner-mark style="display: none">{{ decorator.label(participant, false, false) }}</span>
