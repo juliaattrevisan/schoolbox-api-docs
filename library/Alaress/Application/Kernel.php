@@ -733,7 +733,7 @@ abstract class Kernel
 
                     // TODO move to spec pattern or middleware?
                     // If the request content is JSON, and the content is non-empty, decode the JSON content.
-                    // (Empty content is ignored because attempting to json_decode() empty content leads to errors.)
+                    // (Empty content must be ignored because attempting to json_decode empty content leads to errors.)
                     if (str_contains($request->getHeaderLine('content-type'), 'application/json') && $content !== '') {
                         try {
                             $decodedContent = json_decode($content, true, flags: JSON_THROW_ON_ERROR);
