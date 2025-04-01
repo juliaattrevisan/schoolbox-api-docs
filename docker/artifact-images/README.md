@@ -8,6 +8,7 @@ To build the images:
 # Run from the base Schoolbox folder:
 # artifact images generally require access to Schoolbox's entire code base in
 # order to build their artifacts
+cd ../../
 sudo docker build -t schoolbox/$imageName -f docker/artifact-images/$imageName/Dockerfile .
 
 # Test that the image is at least built
