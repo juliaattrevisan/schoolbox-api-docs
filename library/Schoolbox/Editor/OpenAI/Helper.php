@@ -261,6 +261,8 @@ class Helper
     private function generatePayload(string $prompt, ?array $responseFormat = null, bool $stream = false): string
     {
         $payload = [
+            /* An ordered list of instructions for OpenAi
+             */
             "messages" => [
                 [
                     "role" => "system",
@@ -271,10 +273,22 @@ class Helper
                     "content" => $prompt
                 ],
             ],
+            /* Which variant of OpenAI to use
+             * Each has their own way of producing results in varying ways
+             * (pick one)
+             */
             "model" => $this->openAiModel,
+            /* A kind of OpenAI currency to use in this request
+             */
             "max_tokens" => 2000,
+            /* How "creative" the OpenAI response will be
+             * The bigger the number, the more creative it gets
+             * Goes between 0 and 2
+             */
             "temperature" => 1,
             "top_p" => 1,
+            /* For futureproofing: never really used atm
+             */
             "stream" => $stream
         ];
 
