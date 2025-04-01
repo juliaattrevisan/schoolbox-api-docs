@@ -4,8 +4,6 @@
 ARG ENV=dev
 
 # Build step for Composer's `vendor` folder.
-#
-# docker build -t schoolbox-composer -f docker/schoolbox-composer/Dockerfile .
 FROM php:8.2-alpine
 COPY --from=composer:2.8 /usr/bin/composer /usr/local/bin/composer
 

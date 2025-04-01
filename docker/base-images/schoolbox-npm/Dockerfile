@@ -4,8 +4,6 @@
 ARG ENV=dev
 
 # Build step for NPM's `www/static/js/bundle` folder.
-#
-# docker build -t schoolbox-npm -f docker/schoolbox-npm/Dockerfile .
 FROM node:20-alpine
 
 WORKDIR /usr/share/schoolbox

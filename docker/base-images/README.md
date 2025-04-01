@@ -6,10 +6,9 @@ These images are not intended to be run directly; they are intended as:
 
 To build the images:
 ```shell
-cd $imageDir
-
+# From the base Schoolbox folder:
 # Build image
-sudo docker build -t schoolbox/$imageName .
+sudo docker build -t schoolbox/$imageName -f docker/base-images/$imageName/Dockerfile .
 
 # Test that the image is at least built
 sudo docker run -a stdin -a stdout -i -t schoolbox/$imageName sh

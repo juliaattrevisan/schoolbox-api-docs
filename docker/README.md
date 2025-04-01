@@ -42,8 +42,8 @@ within a self-contained development environment.
   # images:
   # this more accurately matches a deployment, with Schoolbox's code built into
   # its image: thus changes made locally do not update the running container.
-  sudo docker build -t schoolbox-composer -f docker/schoolbox-composer/Dockerfile .
-  sudo docker build -t schoolbox-npm      -f docker/schoolbox-npm/Dockerfile      .
+  sudo docker build -t schoolbox-composer -f docker/base-images/schoolbox-composer/Dockerfile .
+  sudo docker build -t schoolbox-npm      -f docker/base-images/schoolbox-npm/Dockerfile      .
   sudo docker compose -f docker/deploy.docker-compose.yaml up -d
   ```
 - from the CLI container, setup database copied from Vagrant and reload
