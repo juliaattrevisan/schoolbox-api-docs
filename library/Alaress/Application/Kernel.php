@@ -726,29 +726,19 @@ abstract class Kernel
                     // That should be fine: they all obey the same interface.
                     /** @var Psr17Factory $httpFactory */
                     $httpFactory = $di->get('httpFactory');
-                    $request     = $httpFactory->createServerRequestFromGlobals();
+                    $request = $httpFactory->createServerRequestFromGlobals();
+                    $request->getBody()->rewind();
+                    $content = $request->getBody()->getContents();
+                    $request->getBody()->rewind();
 
-                    // If the request is JSON:
-                    // set the parsed body appropriately
                     // TODO move to spec pattern or middleware?
-                    if (str_contains($request->getHeaderLine('content-type'), 'application/json')) {
-                        $request->getBody()->rewind();
-                        $content = $request->getBody()->getContents();
-                        $request->getBody()->rewind();
-                        $acceptInvalidJson = false;
+                    // If the request content is JSON, and the content is non-empty, decode the JSON content.
+                    // (Empty is ignored because attempting to json_decode() empty content leads to errors.)
+                    if (str_contains($request->getHeaderLine('content-type'), 'application/json') && $content !== '') {
                         try {
                             $decodedContent = json_decode($content, true, flags: JSON_THROW_ON_ERROR);
                         } catch (\JsonException) {
                             $decodedContent = null;
-                            if ($request->getMethod() === 'GET' && $content === '') {
-                                // Some of our API tests will fail if we return a 400 response here.
-                                // See for example the use of sendGetAsJson() in CalendarEventAttendanceCest, where an
-                                // empty JSON payload is sent in a GET request.
-                                // The root cause of the API test failures is the use of Codeception's sendGetAsJson().
-                                // Either that function does not properly handle the case of no JSON data being sent,
-                                // or we are inappropriately using that function.
-                                $acceptInvalidJson = true;
-                            }
                         }
                         // Note json_decode(.., true) can return many data types after a successful decode:
                         //  * json_decode('null', true) returns null
@@ -764,14 +754,14 @@ abstract class Kernel
                         // cases above as client errors, and send a 400 response since we do not want these edge cases
                         // to cause errors that end up in Sentry.
                         // (No need to check for object, since json_decode(..., true) converts objects to arrays.)
-                        if (!is_array($decodedContent) && !$acceptInvalidJson) {
+                        if (!is_array($decodedContent)) {
                             $problem = (new ApiProblem('Invalid JSON in request body'))
                                 ->setStatus(self::HTTP_RESPONSE_CODE_BAD_REQUEST)
                                 ->asArray();
                             /** @var ResponseFactory $responseFactory */
                             $responseFactory = $di->get('httpResponseFactory');
                             $response = (
-                                (new IsJson())->isSatisfiedBy($request)
+                                (new IsJson())->isSatisfiedBy($request) // Note IsJson() means AcceptsJson().
                                 ? $responseFactory->buildJson($problem)
                                 : $responseFactory->buildHtml('common/error/general.twig', $problem)
                             );
