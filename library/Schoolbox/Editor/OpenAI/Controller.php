@@ -41,7 +41,7 @@ class Controller extends Base
         $prompt = "Tell me something about Schoolbox";
 
         try {
-            $json = (new Helper(
+             (new Helper(
                 trim((string)$this->getConfigLoader()->get('openai_endpoint')),
                 trim((string)$this->getConfigLoader()->get('openai_key')),
                 trim((string)$this->getConfigLoader()->get('openai_azure_resource_name')),
@@ -50,14 +50,8 @@ class Controller extends Base
                 $this->client,
                 $this->errorMapper,
                 $this->logMapper,
-            ))->async($this->getUser(), $prompt);
+            ))->async($this->getUser(), $this->request->getBody()->getContents());
 
-            //header('X-Accel-Buffering: no');
-            header('Content-Type: application/json');
-            header('Content-Encoding: none');
-
-            print_r(json_encode($json));
-            die();
         } catch (\DomainException $e) {
             /* Not configured? Not found
              */

@@ -119,6 +119,8 @@ class Helper
      * Asynchronously sends a request to the OpenAI API and returns the response to the user.
      * then die()
      *
+     * This is used by Little Robot Dude in the ckeditor ai assistant plugin thing
+     *
      * @param User $user // user to log the request against
      * @param string|null $prompt // if generating a payload, use this prompt
      * @param string|null $payload // use this payload instead of generating one
@@ -135,12 +137,12 @@ class Helper
         }
 
         // either build or use the supplied payload
-        $payload = $payload ?? $this->generatePayload($prompt);
+        $payload = $payload ?? $this->generatePayload($prompt, stream: true);
 
         try {
             $openAiRequest = new Request('POST', $this->getEndpoint(), array_merge(
                 $this->getAuthorization(),
-                ['Content-Type'  => 'application/json'],
+                ['Content-Type' => 'application/json'],
             ), $payload);
 
             /* Log what the user tried to do if we made a vaguely-successful request
@@ -170,7 +172,18 @@ class Helper
                     /* Remove preformatted insanity by encoding it all away
                      * https://stackoverflow.com/questions/23859713/remove-all-unnecessary-whitespaces-from-json-string-in-php
                      */
-                    $this->json = $response->getBody()->getContents();
+                    //header('X-Accel-Buffering: no');
+                    header('Content-Type: application/json');
+                    header('Content-Encoding: none');
+
+                    ob_implicit_flush(true);
+                    ob_end_flush();
+
+                    $stream = $response->getBody();
+
+                    while (!$stream->eof()) {
+                        echo $stream->read(1024);
+                    }
                 },
                 function ($reason) use ($log): void {
                     $returnCode = $reason->getCode();
@@ -200,7 +213,7 @@ class Helper
              *
              * You can dodge that using responseAsJson() instead
              */
-            return json_decode($this->json, true);
+            die();
         } catch (GuzzleException $e) {
             $this->errorMapper->generateException(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
         }
