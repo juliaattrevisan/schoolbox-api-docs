@@ -29,8 +29,19 @@ within a self-contained development environment.
   ```
 - from the base folder, stop and start Docker containers:
   ```shell
+  # stop containers for all docker-compose configurations
   sudo docker compose down
+  sudo docker compose -f docker/deploy.docker-compose.yaml down
+
+  # start default environment:
+  # this has Schoolbox's code folder mounted as a local mount, thus changes made
+  # locally are available immediately within the container.
   sudo docker compose up -d
+
+  # Alternately, start the deployment environment:
+  # this more accurately matches a deployment, with Schoolbox's code built into
+  # its image: thus changes made locally do not update the running container.
+  docker compose --progress plain -f docker/deploy.docker-compose.yaml up -d --build
   ```
 - from the CLI container, setup database copied from Vagrant and reload
   notification bindings:
