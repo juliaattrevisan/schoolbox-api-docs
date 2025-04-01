@@ -173,7 +173,7 @@ class Helper
      * @param User $viewer // user viewing the graph
      * @param Boolean $gradeGradient config.grade_gradient_enable
      * @param array $workTypeWhitelist A set of worktype ids that you want to include on the boxplot.
-     * @return array{info: string, assessments: string, data: string, scatter: string}
+     * @return array{info: array, assessments: array, data: array, scatter: array}
      */
     public function buildGraph(Markbook $markbook, User $viewee, User $viewer, bool $gradeGradient, array $workTypeWhitelist = []): array
     {
@@ -266,10 +266,10 @@ class Helper
         }
 
         return [
-            'info'        => json_encode($graphInfo),
-            'assessments' => json_encode($graphAssessments),
-            'data'        => json_encode($graphData),
-            'scatter'     => json_encode($graphScatter),
+            'info'        => $graphInfo,
+            'assessments' => $graphAssessments,
+            'data'        => $graphData,
+            'scatter'     => $graphScatter,
         ];
     }
 }

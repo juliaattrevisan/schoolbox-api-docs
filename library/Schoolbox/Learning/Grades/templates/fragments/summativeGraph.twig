@@ -13,9 +13,9 @@
     $(function() {
 
         // Gather the data sets
-        let graphData = {{ graph.scatter | purify }};
-        let allData = {{ graph.data | purify }};
-        let assessments = {{ graph.assessments | purify }};
+        let graphData = {{ graph.scatter | json_encode | raw }};
+        let allData = {{ graph.data | json_encode | raw }};
+        let assessments = {{ graph.assessments | json_encode | raw }};
 
         /**
          *  Reformat the data into an object, then check for results. If we don't have results,

@@ -427,7 +427,7 @@ class Controller extends Base
              * Having a set of data points being all null means you didn't get any results for your assessments
              * That's why we array_filter first
              */
-            $decodedResults = json_decode($graph['scatter']);
+            $decodedResults = $graph['scatter'];
             $hasDataToShow = false;
 
             if (null !== $decodedResults) {

@@ -405,10 +405,10 @@ class ClassResults
          * This is used by Grades/templates/fragments/graph.twig
          */
         return [
-            'info' => json_encode($statistics['graphInfo'], JSON_THROW_ON_ERROR),
-            'assessments' => json_encode($statistics['graphAssessments'], JSON_THROW_ON_ERROR),
-            'data' => json_encode($statistics['graphData'], JSON_THROW_ON_ERROR),
-            'scatter' => json_encode($statistics['graphScatter'], JSON_THROW_ON_ERROR),
+            'info' => $statistics['graphInfo'],
+            'assessments' => $statistics['graphAssessments'],
+            'data' => $statistics['graphData'],
+            'scatter' => $statistics['graphScatter'],
         ];
     }
 }
