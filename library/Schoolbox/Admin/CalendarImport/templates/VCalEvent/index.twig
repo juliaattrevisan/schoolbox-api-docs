@@ -104,26 +104,4 @@
                 });
     });
 </script>
-<script>
-    //Checkbox validation
-    $('#importForm').alaressValidate({
-        rules: {
-            "campusList[]": {
-                oneCheckbox: "campusList",
-            },
-            "userGroup[]": {
-                oneCheckbox: "userGroup",
-            },
-            "bulkadd-file": {
-                required: {
-                    depends: function () {
-                        return document.getElementById("bulkadd-zone").querySelector("[data-dz-previews]").children.length === 0;
-                    },
-                },
-            }
-        },
-        messages: {
-            "bulkadd-file": "Pleaes add a file to import"
-        }
-    });
-</script>
+{% include "@adminCalendarImport/zone_validation.twig" with { 'isICSImport': true } %}

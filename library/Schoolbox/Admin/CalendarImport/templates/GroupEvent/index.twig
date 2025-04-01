@@ -38,6 +38,7 @@
                             <fieldset class="content">
                                 <div class="small-12 columns">
                                     {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+                                    <input type="hidden" name="bulkadd-file" id="bulkadd-file" />
                                 </div>
                                 <div class="small-12 columns">
                                     <label>
@@ -80,3 +81,4 @@
                 });
     });
 </script>
+{% include "@adminCalendarImport/zone_validation.twig" %}
