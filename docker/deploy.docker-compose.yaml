@@ -10,12 +10,14 @@ services:
   schoolbox-composer:
     restart: no
     build:
-      context: ./schoolbox-composer
+      context: ../
+      dockerfile: ./docker/schoolbox-composer/Dockerfile
 
   schoolbox-npm:
     restart: no
     build:
-      context: ./schoolbox-npm
+      context: ../
+      dockerfile: ./docker/schoolbox-npm/Dockerfile
 
   schoolbox-php-fpm-deploy:
     container_name: php-fpm
@@ -25,8 +27,10 @@ services:
       - rabbitmq
       - redis-cache
       - redis-storage
+      - schoolbox-composer
+      - schoolbox-npm
     build:
-      dockerfile: docker/php-fpm/deployment-image.Dockerfile
+      dockerfile: php-fpm/deployment-image.Dockerfile
     volumes:
       - storage:/var/lib/schoolbox/docker/storage
       - schoolbox-config:/etc/schoolbox
