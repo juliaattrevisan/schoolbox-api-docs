@@ -1,9 +1,8 @@
 # Schoolbox Base Images
 
-These images are intended to be the base images upon which Schoolbox's images
-are built.
-
-Currently, they are the base for Schoolbox's PHP-FPM image
+These images are not intended to be run directly; they are intended as:
+- base images upon which other images may be built
+- images whose purpose is to generate artifacts for other images
 
 To build the images:
 ```shell
