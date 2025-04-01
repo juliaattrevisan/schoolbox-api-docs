@@ -41,7 +41,8 @@ class Module extends BaseModule
         return new Controller(
             $this->injector->get('httpClient'),
             $this->getMapperFactory()->get(\Schoolbox\Error\Mapper::class),
-            $this->getMapperFactory()->get(Mapper::class)
+            $this->getMapperFactory()->get(Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Curriculum\Node\Mapper::class),
         );
     }
 }
