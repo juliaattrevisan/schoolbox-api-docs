@@ -11,9 +11,13 @@ ARG ENV=dev
 # * this is run from the base dir of the `schoolbox` project
 #
 # It may be built with the commands:
-# docker build -t schoolbox-composer       -f docker/schoolbox-composer/Dockerfile      .
-# docker build -t schoolbox-npm            -f docker/schoolbox-npm/Dockerfile           .
-# docker build -t schoolbox-php-fpm-deploy -f docker/php-fpm/deploymentImage.Dockerfile .
+# docker build -t schoolbox-php-fpm        -f docker/schoolbox-fpm/Dockerfile            .
+# docker build -t schoolbox-composer       -f docker/schoolbox-composer/Dockerfile       .
+# docker build -t schoolbox-npm            -f docker/schoolbox-npm/Dockerfile            .
+# docker build -t schoolbox-php-fpm-deploy -f docker/php-fpm/deployment-image.Dockerfile .
+#
+# It may then be tested with the command:
+# docker compose -f docker/deploy.docker-compose.yaml
 
 FROM schoolbox-php-fpm
 
