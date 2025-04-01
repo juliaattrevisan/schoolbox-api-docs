@@ -126,7 +126,7 @@ class Helper
      * @throws \JsonException
      * @throws Exception
      */
-    public function async(User $user, ?string $prompt = null, ?string $payload = null): string
+    public function async(User $user, ?string $prompt = null, ?string $payload = null)
     {
         /* Assert that we're configured correctly
          */
@@ -167,24 +167,17 @@ class Helper
                     $log->setReturnCode($returnCode)
                         ->setErrorMessage('');
 
-                    ob_implicit_flush(true);
-                    ob_end_flush();
-
-                    $stream = $response->getBody();
-
-                    // Read and proxy the data
-                    $this->json = '';
-
-                    while (!$stream->eof()) {
-                        $this->json .= $stream->read(1024);
-                        //ob_flush();
-                        //flush();
-                    }
+                    /* For amri
+                     */
+                    header('Content-Type: application/json');
+                    header('Content-Encoding: none');
+                    $result = $response->getBody()->getContents();
+                    var_dump($result);die();
 
                     /* Remove preformatted insanity by encoding it all away
                      * https://stackoverflow.com/questions/23859713/remove-all-unnecessary-whitespaces-from-json-string-in-php
                      */
-                    $this->json = json_decode(json_encode(json_decode($this->json, true)));
+                    $this->json = json_decode(json_encode(json_decode($result)));
                 },
                 function ($reason) use ($log): void {
                     $returnCode = $reason->getCode();
