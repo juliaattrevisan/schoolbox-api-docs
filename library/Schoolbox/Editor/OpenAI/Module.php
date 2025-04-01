@@ -26,7 +26,10 @@ class Module extends BaseModule
             new Rule\HasRole(Role::STAFF),
         );
 
-        $this->register('GET', '', 'getForward', $isStaff);
+        /* This /openai/ route is used by Little Robot Dude from the ckeditor
+         * directly, to produce its output
+         */
+        $this->register('POST', '', 'postForward', $isStaff);
     }
 
     public function buildController(): Base

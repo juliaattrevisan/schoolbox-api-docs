@@ -35,7 +35,8 @@ class Controller extends Base
     ) {
     }
 
-    public function getForward(): void
+
+    public function postForward(): void
     {
         $prompt = "Tell me something about Schoolbox";
 
@@ -51,7 +52,12 @@ class Controller extends Base
                 $this->logMapper,
             ))->async($this->getUser(), $prompt);
 
-            $this->response = $this->responseAsJson($json);
+            //header('X-Accel-Buffering: no');
+            header('Content-Type: application/json');
+            header('Content-Encoding: none');
+
+            print_r(json_encode($json));
+            die();
         } catch (\DomainException $e) {
             /* Not configured? Not found
              */
