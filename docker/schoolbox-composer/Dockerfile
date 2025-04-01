@@ -11,6 +11,11 @@ COPY --from=composer:2.8 /usr/bin/composer /usr/local/bin/composer
 
 WORKDIR /usr/share/schoolbox
 
+# Include build requirements, as well as any files which are in the `autoload`
+# section of `composer.json`: these need to be known by composer so that their
+# classmap may be built.
+COPY ./conf          /usr/share/schoolbox/conf
+COPY ./library       /usr/share/schoolbox/library
 COPY ./composer.json /usr/share/schoolbox
 COPY ./composer.lock /usr/share/schoolbox
 
@@ -19,4 +24,3 @@ COPY ./composer.lock /usr/share/schoolbox
 RUN if [[ " prod production " =~ " $ENV " ]] ; \
     then composer install -a --ignore-platform-reqs --no-dev ; \
     else composer install -a --ignore-platform-reqs ; fi
-RUN rm /usr/local/bin/composer
