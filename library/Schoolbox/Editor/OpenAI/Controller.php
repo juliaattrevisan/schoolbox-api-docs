@@ -56,7 +56,7 @@ class Controller extends Base
                 $this->client,
                 $this->errorMapper,
                 $this->logMapper,
-            ))->async($this->getUser(), $this->request->getBody()->getContents());
+            ))->littleRobotDude($this->getUser(), $this->request->getBody()->getContents());
 
         } catch (\DomainException $e) {
             /* Not configured? Not found

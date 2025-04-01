@@ -121,6 +121,7 @@ class Helper
      * then die()
      *
      * This is used by Little Robot Dude in the ckeditor ai assistant plugin thing
+     * Any deviation from this causes it to stop working for one reason or another
      *
      * @param User $user // user to log the request against
      * @param string|null $prompt // if generating a payload, use this prompt
@@ -129,7 +130,7 @@ class Helper
      * @throws \JsonException
      * @throws Exception
      */
-    public function async(User $user, ?string $prompt = null, ?string $payload = null): ?array
+    public function littleRobotDude(User $user, ?string $prompt = null, ?string $payload = null): ?array
     {
         /* Assert that we're configured correctly
          */
