@@ -38,10 +38,13 @@ within a self-contained development environment.
   # locally are available immediately within the container.
   sudo docker compose up -d
 
-  # Alternately, start the deployment environment:
+  # Alternately, start the deployment environment, first building its dependent
+  # images:
   # this more accurately matches a deployment, with Schoolbox's code built into
   # its image: thus changes made locally do not update the running container.
-  docker compose --progress plain -f docker/deploy.docker-compose.yaml up -d --build
+  sudo docker build -t schoolbox-composer -f docker/schoolbox-composer/Dockerfile .
+  sudo docker build -t schoolbox-npm      -f docker/schoolbox-npm/Dockerfile      .
+  sudo docker compose -f docker/deploy.docker-compose.yaml up -d
   ```
 - from the CLI container, setup database copied from Vagrant and reload
   notification bindings:

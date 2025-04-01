@@ -21,11 +21,6 @@ services:
       context: ../
       dockerfile: ./docker/schoolbox-npm/Dockerfile
 
-  schoolbox-php-fpm:
-    build:
-      context: ../
-      dockerfile: ./docker/php-fpm/Dockerfile
-
   schoolbox-php-fpm-deploy:
     container_name: php-fpm
     restart: always
@@ -34,7 +29,6 @@ services:
       - rabbitmq
       - redis-cache
       - redis-storage
-      - schoolbox-php-fpm
       - schoolbox-composer
       - schoolbox-npm
     build:

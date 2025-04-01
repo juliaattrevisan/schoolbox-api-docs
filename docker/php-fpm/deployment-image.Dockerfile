@@ -3,19 +3,10 @@
 #      otherwise, build with dev dependencies
 ARG ENV=dev
 
-# Deployable dockerfile; assumes that:
-# * the following base images have been built, with the given names:
-#   * ../schoolbox-composer/Dockerfile => schoolbox-composer
-#   * ../schoolbox-npm/Dockerfile      => schoolbox-npm
-# * this is run from the base dir of the `schoolbox` project
-#
-# It may be built with the commands:
-# docker build -t schoolbox-composer       -f docker/schoolbox-composer/Dockerfile       .
-# docker build -t schoolbox-npm            -f docker/schoolbox-npm/Dockerfile            .
-# docker build -t schoolbox-php-fpm-deploy -f docker/php-fpm/deployment-image.Dockerfile .
-#
-# It may then be tested with the command:
-# docker compose -f docker/deploy.docker-compose.yaml
+# Deployable dockerfile; assumes that the following base images have been built,
+# with the given names:
+# * ../schoolbox-composer/Dockerfile => schoolbox-composer
+# * ../schoolbox-npm/Dockerfile      => schoolbox-npm
 
 FROM schoolbox/php82-fpm
 
