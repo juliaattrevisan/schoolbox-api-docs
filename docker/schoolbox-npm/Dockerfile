@@ -16,7 +16,7 @@ COPY ./npm-shrinkwrap.json /usr/share/schoolbox
 COPY ./package.json        /usr/share/schoolbox
 RUN npm ci
 
-# Additional requirements for building JS requare all over the shop:
+# Additional requirements for building JS are all over the shop:
 # need to copy nearly everything from Schoolbox repository.
 COPY ./babel.config.js   /usr/share/schoolbox
 COPY ./tsconfig.json     /usr/share/schoolbox
