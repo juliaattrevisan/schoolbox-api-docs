@@ -62,17 +62,17 @@
         <div class="small-12 island">
             <section>
                 <div class="content">
-                    <p>To bulk import feedback (normalised marks and/or comments) to existing {{ locale.dueWork.proper() }} items follow these steps:</p>
+                    <p>To bulk import feedback (normalised marks and/or comments) to existing {{ locale.dueWork.proper }} items follow these steps:</p>
 
                     <ol>
-                        <li>Insert the exact {{ locale.dueWork.proper() }} Title as it currently exists on all the class pages. The title must be unique for the import to work.</li>
-                        <li>Select the Work Type for the {{ locale.dueWork.proper() }} item. The Work Type must be the same one as used on all the class pages listed on the CSV.</li>
+                        <li>Insert the exact {{ locale.dueWork.proper }} Title as it currently exists on all the {{ locale.class }} pages. The title must be unique for the import to work.</li>
+                        <li>Select the Work Type for the {{ locale.dueWork.proper }} item. The Work Type must be the same one as used on all the {{ locale.dueWork.proper }} pages listed on the CSV.</li>
                         <li>Select a Feedback Author. This will determine who has given the feedback.</li>
                         <li>Download and edit the provided template CSV file.</li>
                         <li>
                             Add compulsory data to the CSV for:
                             <ol>
-                                <li><strong>Class Code(s):</strong> Feedback will only be imported to classes where the data on the CSV matches that on a homepage within Schoolbox. If a homepage utilises multiple class codes, a match will occur on any of the class codes on the homepage.</li>
+                                <li><strong>{{ locale.class.proper }} Code(s):</strong> Feedback will only be imported to {{ locale.class.plural }} where the data on the CSV matches that on a homepage within Schoolbox. If a homepage utilises multiple class codes, a match will occur on any of the class codes on the homepage.</li>
                                 <li><strong>Student External ID:</strong> This value will come from the Student Information System, but can be found on the user profile in Schoolbox.</li>
                             </ol>
                         </li>
@@ -101,7 +101,7 @@
                 <section>
                     <fieldset class="content">
                         <div class="small-12 columns">
-                            <label for="assessmentTitle" class="required">{{ locale.dueWork.proper() }} Title</label>
+                            <label for="assessmentTitle" class="required">{{ locale.dueWork.proper }} Title</label>
                             <input id="assessmentTitle" type="text" name="assessmentTitle" value='' />
                         </div>
 
