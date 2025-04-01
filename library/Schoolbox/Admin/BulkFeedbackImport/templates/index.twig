@@ -101,16 +101,16 @@
                 <section>
                     <fieldset class="content">
                         <div class="small-12 columns">
-                            <label for="assessmentTitle" class="required">
-                                {{ locale.dueWork.proper }} Title
+                            <label for="assessmentTitle">
+                                <span class="required-with-tip">{{ locale.dueWork.proper }} Title</span>
                                 <span class="hint has-tip tip-top" data-tooltip title="Enter a clear and concise title for the {{ locale.dueWork.proper }}. This will be visible to students and staff.">?</span>
                             </label>
                             <input id="assessmentTitle" type="text" name="assessmentTitle" value='' />
                         </div>
 
                         <div class="small-12 columns">
-                            <label for="worktype" class="required">
-                                Work Type
+                            <label for="worktype">
+                                <span class="required-with-tip">Work Type</span>
                                 <span class="hint has-tip tip-top" data-tooltip title="Select the assessment work type from the drop-down list (e.g., learning activity, assignment, formative or summative assessment task).">?</span>
                             </label>
 
@@ -122,16 +122,16 @@
                         </div>
 
                         <div class="small-12 columns">
-                            <label for="userId" class="required">
-                                Feedback Author
+                            <label for="userId">
+                                <span class="required-with-tip">Feedback Author</span>
                                 <span class="hint has-tip tip-top" data-tooltip title="Indicates the person who provided the feedback for this assessment.">?</span>
                             </label>
                             <input id="userId" data-selectizeuser type="text" name="userId" placeholder="Search Users">
                         </div>
 
                         <div class="small-12 columns">
-                            <label class="required">
-                                Source File
+                            <label>
+                                <span class="required-with-tip">Source File</span>
                                 <span class="hint has-tip tip-top" data-tooltip title="Specifies the bulk import source file associated with this assessment.">?</span>
                             </label>
                             {% include 'sub/attachzone.twig' with { attachzone: sourceFileZone } %}
