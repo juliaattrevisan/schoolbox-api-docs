@@ -55,7 +55,7 @@ class Helper
 
 
     /**
-     * chat (no async)
+     * request (no streaming, returns full json payload)
      * hits openAI and returns the string response (you need to json decode yourself...)
      *
      * @param User $user // user to log the request against
@@ -67,7 +67,7 @@ class Helper
      * @throws \JsonException
      * @throws ClientExceptionInterface
      */
-    public function chat(User $user, ?string $prompt = null, ?string $payload = null, ?array $responseFormat = null): ?string
+    public function request(User $user, ?string $prompt = null, ?string $payload = null, ?array $responseFormat = null): ?string
     {
         /* Assert that we're configured correctly
          */
