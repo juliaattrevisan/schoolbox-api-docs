@@ -15,6 +15,7 @@
 
     <div class="admin-content">
         <div class="small-12 island">
+            <h2 class="subheader">Summary</h2>
             <section>
                 <div class="content">
                     <ul>
@@ -34,7 +35,7 @@
             </section>
 
             {% if outcome|length %}
-                <h2 class="subheader">Result</h2>
+                <h2 class="subheader">Results</h2>
                 <section class="content">
                     <div>
                         <ul class="information-list">
@@ -51,7 +52,7 @@
                     </div>
                 </section>
 
-                <h2 class="subheader">Shortcuts</h2>
+                <h2 class="subheader">View Imported Feedback</h2>
                 <section class="content">
                     <ul class="information-list">
                         {% for folderTitle, assessmentData in outcome.links %}
