@@ -1,0 +1,36 @@
+include:
+  - docker-compose.yaml
+
+services:
+
+  # PHP-FPM server:
+  # point requests from Caddy to here
+  php-fpm:
+    container_name: php-fpm
+    restart: always
+    depends_on:
+      - mariadb
+      - rabbitmq
+      - redis-cache
+      - redis-storage
+    build:
+      dockerfile: docker/php-fpm/deploymentImage.Dockerfile
+    volumes:
+      # Do not mount code if using deployment image
+      - storage:/var/lib/schoolbox/docker/storage
+      - schoolbox-config:/etc/schoolbox
+      # Instead include configs in image?
+      - ./docker/php-fpm/config/99-error-reporting.ini:/usr/local/etc/php/conf.d/99-error-reporting.ini
+      - ./docker/php-fpm/config/99-xdebug.ini:/usr/local/etc/php/conf.d/99-xdebug.ini
+      - ./docker/php-fpm/config/99-session.ini:/usr/local/etc/php/conf.d/99-session.ini
+    # After building: create data dirs, and make mount writable by www-data
+    # Cannot currently use create-data-dirs.sh, as /bin/bash isn't available,
+    # and /bin/sh doesn't support {} expansion
+    post_start:
+      - command: mkdir -p /var/lib/schoolbox/docker/cache/portrait
+      - command: mkdir -p /var/lib/schoolbox/docker/cache/stream
+      - command: mkdir -p /var/lib/schoolbox/docker/cache/zip
+      - command: mkdir -p /var/lib/schoolbox/docker/files
+      - command: mkdir -p /var/lib/schoolbox/docker/purifier
+      - command: mkdir -p /var/lib/schoolbox/docker/twig
+      - command: chown -R www-data:www-data /var/lib/schoolbox/docker/

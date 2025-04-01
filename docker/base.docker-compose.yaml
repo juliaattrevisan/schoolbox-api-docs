@@ -90,7 +90,7 @@ services:
       - redis-storage
     build:
       context: ./schoolbox-digestd
-    env_file: docker/default.env
+    env_file: ./default.env
     volumes:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
@@ -105,7 +105,7 @@ services:
       - redis-storage
     build:
       context: ./schoolbox-scheduled
-    env_file: docker/default.env
+    env_file: ./default.env
     volumes:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
@@ -120,7 +120,7 @@ services:
       - redis-storage
     build:
       context: ./schoolbox-mobiled
-    env_file: docker/default.env
+    env_file: ./default.env
     volumes:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
@@ -135,7 +135,7 @@ services:
       - redis-storage
     build:
       context: ./schoolbox-socketd
-    env_file: docker/default.env
+    env_file: ./default.env
     volumes:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
@@ -160,7 +160,7 @@ services:
     depends_on:
       - redis-storage
     image: schoolbox/epl:latest
-    env_file: docker/schoolbox-etherpad/default.env
+    env_file: ./schoolbox-etherpad/default.env
 
   clamav:
     container_name: clamav
