@@ -27,6 +27,12 @@ within a self-contained development environment.
   # this will create a file somewhere in /var/lib/schoolbox: note that path
   cp $backupLocation /usr/share/schoolbox/vagrantcache/schoolbox.sql
   ```
+- optionally, rebuild the base Docker images
+  (these should be in Schoolbox's container repository):
+  ```shell
+  sudo docker build -t schoolbox/php82     docker/base-images/php82/
+  sudo docker build -t schoolbox/php82-fpm docker/base-images/php82-fpm/
+  ```
 - from the base folder, stop and start Docker containers:
   ```shell
   # stop containers for all docker-compose configurations

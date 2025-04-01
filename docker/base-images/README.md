@@ -2,7 +2,9 @@
 
 These images are not intended to be run directly; they are intended as base
 images upon which other images may be built.
-- images whose purpose is to generate artifacts for other images
+
+It is not expected that the base images will need to be rebuilt upon every merge
+or pull request: they should only need to be rebuilt periodically.
 
 To build the images:
 ```shell
