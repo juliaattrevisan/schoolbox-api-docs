@@ -20,10 +20,6 @@ services:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
       - schoolbox-config:/etc/schoolbox
-      # Instead include configs in image?
-      - ./php-fpm/config/99-error-reporting.ini:/usr/local/etc/php/conf.d/99-error-reporting.ini
-      - ./php-fpm/config/99-xdebug.ini:/usr/local/etc/php/conf.d/99-xdebug.ini
-      - ./php-fpm/config/99-session.ini:/usr/local/etc/php/conf.d/99-session.ini
     # After building: create data dirs, and make mount writable by www-data
     # Cannot currently use create-data-dirs.sh, as /bin/bash isn't available,
     # and /bin/sh doesn't support {} expansion
