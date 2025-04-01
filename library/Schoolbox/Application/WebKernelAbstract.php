@@ -179,7 +179,8 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
                     $code    = 599;
                     $message = 'Schoolbox is currently experiencing internal problems with its database. This issue has been logged.';
                     if (str_contains($e->getMessage(), "SQL Server")) {
-                        $message = "Unfortunately your query was taking too long. To avoid further disruption to the system we have stopped this request. Please try again later as this may be a temporary performance issue.";
+                        $message = "You have been rate limited. Please wait a minute before refreshing the page. If this persists, please contact your IT department to let them know.";
+                        $code    = 429;
                         $info    = $e->getMessage();
                     }
                 } elseif ($e instanceof RuntimeException) {
