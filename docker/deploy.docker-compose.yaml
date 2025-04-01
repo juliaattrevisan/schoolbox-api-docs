@@ -1,0 +1,38 @@
+# docker-compose.yaml for testing of deployments.
+# Its PHP-FPM container contains Schoolbox's code within its image, thus it has
+# no access to the code on the local file system.
+
+include:
+  - base.docker-compose.yaml
+
+services:
+  # Also build NPM and Composer images, so that the container can be built
+
+  php-fpm:
+    container_name: php-fpm
+    restart: always
+    depends_on:
+      - mariadb
+      - rabbitmq
+      - redis-cache
+      - redis-storage
+    build:
+      dockerfile: docker/php-fpm/deploymentImage.Dockerfile
+    volumes:
+      - storage:/var/lib/schoolbox/docker/storage
+      - schoolbox-config:/etc/schoolbox
+      # Instead include configs in image?
+      - ./php-fpm/config/99-error-reporting.ini:/usr/local/etc/php/conf.d/99-error-reporting.ini
+      - ./php-fpm/config/99-xdebug.ini:/usr/local/etc/php/conf.d/99-xdebug.ini
+      - ./php-fpm/config/99-session.ini:/usr/local/etc/php/conf.d/99-session.ini
+    # After building: create data dirs, and make mount writable by www-data
+    # Cannot currently use create-data-dirs.sh, as /bin/bash isn't available,
+    # and /bin/sh doesn't support {} expansion
+    post_start:
+      - command: mkdir -p /var/lib/schoolbox/docker/cache/portrait
+      - command: mkdir -p /var/lib/schoolbox/docker/cache/stream
+      - command: mkdir -p /var/lib/schoolbox/docker/cache/zip
+      - command: mkdir -p /var/lib/schoolbox/docker/files
+      - command: mkdir -p /var/lib/schoolbox/docker/purifier
+      - command: mkdir -p /var/lib/schoolbox/docker/twig
+      - command: chown -R www-data:www-data /var/lib/schoolbox/docker/

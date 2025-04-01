@@ -1,0 +1,238 @@
+# Base docker-compose.yaml for local running of a containerised Schoolbox
+# environment.
+# A PHP-FPM container must be defined in whichever compose.yaml includes this.
+
+services:
+  # Web server
+  caddy:
+    container_name: caddy
+    restart: always
+    build:
+      context: ./caddy
+    volumes:
+      - code:/usr/share/schoolbox
+      - caddy-config:/etc/caddy
+    ports:
+      - '80:80'
+      - '443:443'
+    # Make this host available across the network as docker.dev.schoolbox.cloud
+    networks:
+      default:
+        aliases:
+          - docker.dev.schoolbox.cloud
+
+  # Image intended for running command-line processes:
+  # * command-line tools
+  # * updates
+  # * cron tasks
+  #
+  # Basically, anything which we haven't yet figured out how to migrate into its
+  # own container will go here for now.
+  schoolbox-cli:
+    container_name: schoolbox-cli
+    restart: always
+    build:
+      context: ./schoolbox-cli
+    tty: true
+    volumes:
+      - code:/usr/share/schoolbox
+      - storage:/var/lib/schoolbox/docker/storage
+      - schoolbox-config:/etc/schoolbox
+    # After building: create data dirs
+    post_start:
+      - command : mkdir -p /var/lib/schoolbox/docker/cache/portrait
+      - command : mkdir -p /var/lib/schoolbox/docker/cache/stream
+      - command : mkdir -p /var/lib/schoolbox/docker/cache/zip
+      - command : mkdir -p /var/lib/schoolbox/docker/files
+      - command : mkdir -p /var/lib/schoolbox/docker/purifier
+      - command : mkdir -p /var/lib/schoolbox/docker/twig
+
+  # Database services:
+  # these are containers only in a development environment, they won't be on
+  # staging or production envs.
+  mariadb:
+    container_name: mariadb
+    image: mariadb:11.4
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    environment:
+      MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: 1
+
+  redis-storage:
+    container_name: redis-storage
+    image: redis:7.4
+    volumes:
+      - redis-storage-config:/usr/local/etc/redis
+      - redis-storage-data:/data
+
+  redis-cache:
+    container_name: redis-cache
+    image: redis:7.4
+    volumes:
+      - redis-cache-config:/usr/local/etc/redis
+      - redis-cache-data:/data
+
+  rabbitmq:
+    container_name: rabbitmq
+    build:
+      context: ./rabbitmq
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+
+  # Not-yet-essential services:
+  # These will be implemented as separate containers (if they aren't already).
+  schoolbox-digestd:
+    container_name: schoolbox-digestd
+    depends_on:
+      - mariadb
+      - rabbitmq
+      - redis-cache
+      - redis-storage
+    build:
+      context: ./schoolbox-digestd
+    env_file: docker/default.env
+    volumes:
+      - code:/usr/share/schoolbox
+      - storage:/var/lib/schoolbox/docker/storage
+      - schoolbox-config:/etc/schoolbox
+
+  schoolbox-scheduled:
+    container_name: schoolbox-scheduled
+    depends_on:
+      - mariadb
+      - rabbitmq
+      - redis-cache
+      - redis-storage
+    build:
+      context: ./schoolbox-scheduled
+    env_file: docker/default.env
+    volumes:
+      - code:/usr/share/schoolbox
+      - storage:/var/lib/schoolbox/docker/storage
+      - schoolbox-config:/etc/schoolbox
+
+  schoolbox-mobiled:
+    container_name: schoolbox-mobiled
+    depends_on:
+      - mariadb
+      - rabbitmq
+      - redis-cache
+      - redis-storage
+    build:
+      context: ./schoolbox-mobiled
+    env_file: docker/default.env
+    volumes:
+      - code:/usr/share/schoolbox
+      - storage:/var/lib/schoolbox/docker/storage
+      - schoolbox-config:/etc/schoolbox
+
+  schoolbox-socketd:
+    container_name: schoolbox-socketd
+    depends_on:
+      - mariadb
+      - rabbitmq
+      - redis-cache
+      - redis-storage
+    build:
+      context: ./schoolbox-socketd
+    env_file: docker/default.env
+    volumes:
+      - code:/usr/share/schoolbox
+      - storage:/var/lib/schoolbox/docker/storage
+      - schoolbox-config:/etc/schoolbox
+
+  schoolbox-taskd:
+    container_name: schoolbox-taskd
+    depends_on:
+      - redis-storage
+      - caddy
+    build:
+      context: ./schoolbox-taskd
+    environment:
+      REDIS_HOST: redis-storage
+
+  schoolbox-gotenberg:
+    container_name: schoolbox-gotenberg
+    image: gotenberg/gotenberg:7
+
+  schoolbox-etherpad:
+    container_name: schoolbox-etherpad
+    depends_on:
+      - redis-storage
+    image: schoolbox/epl:latest
+    env_file: docker/schoolbox-etherpad/default.env
+
+  clamav:
+    container_name: clamav
+    build:
+      context: ./clamav
+    volumes:
+      - clamav-data:/var/lib/clamav
+
+volumes:
+  # Volume for Schoolbox's code base
+  code:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./
+
+  # Volume for database data:
+  # mounted outside of filesystem
+  mariadb-data:
+
+  redis-storage-data:
+
+  redis-cache-data:
+
+  rabbitmq-data:
+
+  # Volume for storage
+  storage:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./data/docker/storage
+
+  # Volumes for config
+  schoolbox-config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./schoolbox/config
+
+  caddy-config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./caddy/config
+
+  # Want to overlay files in this folder over what's already in
+  # /usr/local/etc/php/conf.d/, but don't yet know how
+  php-fpm-config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./php-fpm/config
+
+  redis-storage-config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./redis-storage/config
+
+  redis-cache-config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./redis-cache/config
+
+  # Volume for ClamAV signatures
+  clamav-data:
