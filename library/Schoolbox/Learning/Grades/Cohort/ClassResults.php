@@ -15,6 +15,7 @@ use Schoolbox\Collection;
 use Schoolbox\Learning\Analytics\BoxPlot\Summary;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\User;
+use Scrub;
 
 /**
  * Class ClassResults
@@ -318,7 +319,7 @@ class ClassResults
                     $graphInfo[$specificationId] = [
                         'displayMark'  => $humanReadableMark,
                         'gradientMark' => $this->gradeGradientEnabled ? (int)($normalisedMark / 10) : 'none',
-                        'info'         => $comment ?? '',
+                        'info'         => Scrub::text($comment),
                     ];
                 } else {
                     /* Otherwise, nothing to show

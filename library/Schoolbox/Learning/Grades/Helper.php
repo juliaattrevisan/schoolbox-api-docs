@@ -28,6 +28,7 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
+use Scrub;
 
 /**
  * Helper class to generate grade pages
@@ -217,7 +218,7 @@ class Helper
                         $graphInfoValue = [
                             'displayMark'  => $humanReadableMark,
                             'gradientMark' => $gradeGradient ? (int)($normalisedMark / 10) : 'none',
-                            'info'         => $comment ?? '',
+                            'info'         => Scrub::text($comment),
                         ];
                     }
                 }
