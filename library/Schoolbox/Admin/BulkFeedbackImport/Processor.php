@@ -35,8 +35,8 @@ class Processor
      * assessment by its (assessment title, worktype) combo
      */
     private const QUERY_ASSESSMENT_TITLE_WORKTYPE = "
-        SELECT 
-            a.id AS assessment_id, 
+        SELECT
+            a.id AS assessment_id,
             a.title AS assessment_title,
             sb.id AS box_id
         FROM mv_assessment_relation mvar
@@ -255,7 +255,7 @@ class Processor
 
             if (\count($candidateAssessments) > 1) {
                 $this->log(sprintf(
-                    'Row %s: multiple assessments found for assessment "%s" in folder "%s" (%s) using worktype "%s" (%s). 
+                    'Row %s: multiple assessments found for assessment "%s" in folder "%s" (%s) using worktype "%s" (%s).
                     Please ensure assessments are uniquely identifiable before continuing.',
                     $i,
                     $this->assessmentTitle,
@@ -317,8 +317,21 @@ class Processor
                 $assessment = $this->assessmentMapperProxy->findById($assessmentId);
 
                 /* Compute human-readable mark from assessment's mark scheme instead
+                 * It must be between 0 and 100, inclusive
                  */
                 $normalisedMark = (float)trim((string)$row['Normalised Mark']);
+
+                if ($normalisedMark < 0 || $normalisedMark > 100) {
+                    $this->log(sprintf(
+                        'Row %s: normalised mark must be between 0 and 100 for assessment "%s"',
+                        $i,
+                        $this->assessmentTitle,
+                    ), self::WARNING);
+
+                    $errors++;
+
+                    continue;
+                }
 
                 /* This is what the student would see
                  */
