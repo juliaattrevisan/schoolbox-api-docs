@@ -122,11 +122,11 @@ class Helper
      * @param User $user // user to log the request against
      * @param string|null $prompt // if generating a payload, use this prompt
      * @param string|null $payload // use this payload instead of generating one
-     * @return string
+     * @return array|null
      * @throws \JsonException
      * @throws Exception
      */
-    public function async(User $user, ?string $prompt = null, ?string $payload = null): string
+    public function async(User $user, ?string $prompt = null, ?string $payload = null): ?array
     {
         /* Assert that we're configured correctly
          */
@@ -200,7 +200,7 @@ class Helper
              *
              * You can dodge that using responseAsJson() instead
              */
-            return $this->json;
+            return json_decode($this->json, true);
         } catch (GuzzleException $e) {
             $this->errorMapper->generateException(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
         }
