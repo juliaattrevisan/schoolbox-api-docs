@@ -30,6 +30,10 @@ class Module extends BaseModule
          * directly, to produce its output
          */
         $this->register('POST', '', 'postAiAssistant', $isStaff);
+
+        /* Lesson Plan field generators
+         */
+        $this->register('POST', '/lesson-plan', 'postLessonPlan', $isStaff);
     }
 
     public function buildController(): Base

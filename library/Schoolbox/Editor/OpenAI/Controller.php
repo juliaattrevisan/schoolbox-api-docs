@@ -37,6 +37,45 @@ class Controller extends Base
 
 
     /**
+     * Generates a payload about lesson plans
+     *
+     * @return void
+     * @throws Exception
+     * @throws \JsonException
+     */
+    public function postLessonPlan(): void
+    {
+        try {
+            $result = (new Helper(
+                trim((string)$this->getConfigLoader()->get('openai_endpoint')),
+                trim((string)$this->getConfigLoader()->get('openai_key')),
+                trim((string)$this->getConfigLoader()->get('openai_azure_resource_name')),
+                trim((string)$this->getConfigLoader()->get('openai_azure_deployment_id')),
+                trim((string)$this->getConfigLoader()->get('openai_model')),
+                $this->client,
+                $this->errorMapper,
+                $this->logMapper,
+            ))->request($this->getUser(), $this->requestPost->get('prompt'));
+
+            new \Alaress_Probe($result);
+        } catch (\DomainException $e) {
+            /* Not configured? Not found
+             */
+            $returnCode = 404;
+
+            $problem = (new ApiProblem($e->getMessage()))
+                ->setStatus($returnCode)
+                ->asArray();
+
+            $this->response = $this->responseAsJson($problem)
+                ->withStatus($returnCode);
+
+            return;
+        }
+    }
+
+
+    /**
      * This is used by ckeditor's Little Robot Dude ai assistant which posts
      * to /openai route via some direct javascript thing
      *
