@@ -11,6 +11,7 @@ namespace Schoolbox\Editor\OpenAI;
 use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
 use GuzzleHttp\Client;
+use Psr\Http\Client\ClientExceptionInterface;
 use Schoolbox\Mapper\Exception;
 
 /**
@@ -25,6 +26,9 @@ use Schoolbox\Mapper\Exception;
  */
 class Controller extends Base
 {
+    private Helper $helper;
+
+
     /**
      * Controller constructor.
      */
@@ -33,6 +37,16 @@ class Controller extends Base
         private \Schoolbox\Error\Mapper $errorMapper,
         private Log\Mapper $logMapper
     ) {
+        $this->helper = new Helper(
+            trim((string)$this->getConfigLoader()->get('openai_endpoint')),
+            trim((string)$this->getConfigLoader()->get('openai_key')),
+            trim((string)$this->getConfigLoader()->get('openai_azure_resource_name')),
+            trim((string)$this->getConfigLoader()->get('openai_azure_deployment_id')),
+            trim((string)$this->getConfigLoader()->get('openai_model')),
+            $this->client,
+            $this->errorMapper,
+            $this->logMapper,
+        );
     }
 
 
@@ -42,22 +56,12 @@ class Controller extends Base
      * @return void
      * @throws Exception
      * @throws \JsonException
+     * @throws ClientExceptionInterface
      */
     public function postLessonPlan(): void
     {
         try {
-            $result = (new Helper(
-                trim((string)$this->getConfigLoader()->get('openai_endpoint')),
-                trim((string)$this->getConfigLoader()->get('openai_key')),
-                trim((string)$this->getConfigLoader()->get('openai_azure_resource_name')),
-                trim((string)$this->getConfigLoader()->get('openai_azure_deployment_id')),
-                trim((string)$this->getConfigLoader()->get('openai_model')),
-                $this->client,
-                $this->errorMapper,
-                $this->logMapper,
-            ))->request($this->getUser(), $this->requestPost->get('prompt'));
-
-            new \Alaress_Probe($result);
+            $result = $this->helper->request($this->getUser(), $this->requestPost->get('prompt'));
         } catch (\DomainException $e) {
             /* Not configured? Not found
              */
@@ -86,17 +90,7 @@ class Controller extends Base
     public function postAiAssistant(): void
     {
         try {
-             (new Helper(
-                trim((string)$this->getConfigLoader()->get('openai_endpoint')),
-                trim((string)$this->getConfigLoader()->get('openai_key')),
-                trim((string)$this->getConfigLoader()->get('openai_azure_resource_name')),
-                trim((string)$this->getConfigLoader()->get('openai_azure_deployment_id')),
-                trim((string)$this->getConfigLoader()->get('openai_model')),
-                $this->client,
-                $this->errorMapper,
-                $this->logMapper,
-            ))->littleRobotDude($this->getUser(), $this->request->getBody()->getContents());
-
+             $this->helper->littleRobotDude($this->getUser(), $this->request->getBody()->getContents());
         } catch (\DomainException $e) {
             /* Not configured? Not found
              */
