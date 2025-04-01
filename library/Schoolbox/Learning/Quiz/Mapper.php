@@ -127,6 +127,7 @@ class Mapper extends BaseMapper
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteFromMarkbook'));
         $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'deleteAssessment']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteAssessment']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'postSoftDeleteRestoreAssessment']);
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'syncToExternalMarkbook']);
 
         $this->registerCallback(self::CALLBACK_PRESAVE, array($this, 'setWorkType'));
@@ -310,6 +311,25 @@ class Mapper extends BaseMapper
             $assessmentMapper->delete($assessment);
         }
         return true;
+    }
+
+
+    /**
+     * @param Model $object
+     * @return void
+     * @throws ValidationException
+     */
+    public function postSoftDeleteRestoreAssessment(Model $object): void
+    {
+        $api = new Api(
+            (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified()->getHost(),
+            $this->getConfigLoader()->get('learnosity_version'),
+            $this->getConfigLoader()->get('learnosity_consumer_key'),
+            $this->getConfigLoader()->get('learnosity_consumer_secret'),
+            new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')
+        );
+        $helper = new Schoolbox\Learning\Learnosity\Helper($api);
+        $helper->restore($object->getLearnosityReference());
     }
 
 
