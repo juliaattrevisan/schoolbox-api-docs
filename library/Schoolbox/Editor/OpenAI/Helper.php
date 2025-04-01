@@ -126,7 +126,7 @@ class Helper
      * @throws \JsonException
      * @throws Exception
      */
-    public function async(User $user, ?string $prompt = null, ?string $payload = null)
+    public function async(User $user, ?string $prompt = null, ?string $payload = null): string
     {
         /* Assert that we're configured correctly
          */
@@ -167,23 +167,20 @@ class Helper
                     $log->setReturnCode($returnCode)
                         ->setErrorMessage('');
 
-                    /* For amri
-                     */
-                    header('Content-Type: application/json');
-                    header('Content-Encoding: none');
-                    $result = $response->getBody()->getContents();
-                    var_dump($result);die();
-
                     /* Remove preformatted insanity by encoding it all away
                      * https://stackoverflow.com/questions/23859713/remove-all-unnecessary-whitespaces-from-json-string-in-php
                      */
-                    $this->json = json_decode(json_encode(json_decode($result)));
+                    $this->json = $response->getBody()->getContents();
                 },
                 function ($reason) use ($log): void {
                     $returnCode = $reason->getCode();
 
                     /* @var ClientException $reason */
                     http_response_code($returnCode);
+
+                    /* FIXME This probably needs to be in a standardised json error struct
+                     *  The last time we did this was in profile editor
+                     */
                     echo $reason->getMessage();
 
                     /* We died; log the status code and epitaph
