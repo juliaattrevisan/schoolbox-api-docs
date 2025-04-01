@@ -53,67 +53,67 @@ class Helper
     ) {
     }
 
-
-    /**
-     * chat (no async)
-     * hits openAI and returns the string response (you need to json decode yourself...)
-     *
-     * @param User $user // user to log the request against
-     * @param string|null $prompt // if generating a payload, use this prompt
-     * @param string|null $payload // use this payload instead of generating one
-     * @param array|null $responseFormat // null, or array of response format
-     * @return string|null
-     * @throws Exception
-     * @throws \JsonException
-     * @throws ClientExceptionInterface
-     */
-    public function chat(User $user, ?string $prompt = null, ?string $payload = null, ?array $responseFormat = null): ?string
-    {
-        /* Assert that we're configured correctly
-         */
-        if (!$this->openAiKey) {
-            throw new \DomainException('OpenAI API key is unavailable');
-        }
-
-        // either build or use the supplied payload
-        $payload = $payload ?? $this->generatePayload($prompt, $responseFormat);
-
-        try {
-            $openAiRequest = new Request('POST', $this->getEndpoint(), array_merge(
-                $this->getAuthorization(),
-                ['Content-Type'  => 'application/json'],
-            ), $payload);
-
-            $response = $this->client->sendRequest($openAiRequest);
-
-            http_response_code($response->getStatusCode());
-
-            /* Log some error messages, if applicable
-             */
-            $errorMessage = '';
-
-            if ($response->getStatusCode() !== 200) {
-                $errorMessage = $response->getReasonPhrase();
-            }
-
-            /* Log what the user tried to do if we made a vaguely-successful request
-             * and didn't somehow die long the way
-             */
-            $log = $this->logMapper->createModel()
-                ->setUser($user)
-                ->setPrompt($payload)
-                ->setReturnCode($response->getStatusCode())
-                ->setErrorMessage($errorMessage);
-
-            $this->logMapper->save($log);
-
-            return $response->getBody()->getContents();
-        } catch (GuzzleException $e) {
-            $this->errorMapper->generateException(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
-        }
-
-        return null;
-    }
+//
+//    /**
+//     * chat (no async)
+//     * hits openAI and returns the string response (you need to json decode yourself...)
+//     *
+//     * @param User $user // user to log the request against
+//     * @param string|null $prompt // if generating a payload, use this prompt
+//     * @param string|null $payload // use this payload instead of generating one
+//     * @param array|null $responseFormat // null, or array of response format
+//     * @return string|null
+//     * @throws Exception
+//     * @throws \JsonException
+//     * @throws ClientExceptionInterface
+//     */
+//    public function chat(User $user, ?string $prompt = null, ?string $payload = null, ?array $responseFormat = null): ?string
+//    {
+//        /* Assert that we're configured correctly
+//         */
+//        if (!$this->openAiKey) {
+//            throw new \DomainException('OpenAI API key is unavailable');
+//        }
+//
+//        // either build or use the supplied payload
+//        $payload = $payload ?? $this->generatePayload($prompt, $responseFormat);
+//
+//        try {
+//            $openAiRequest = new Request('POST', $this->getEndpoint(), array_merge(
+//                $this->getAuthorization(),
+//                ['Content-Type'  => 'application/json'],
+//            ), $payload);
+//
+//            $response = $this->client->sendRequest($openAiRequest);
+//
+//            http_response_code($response->getStatusCode());
+//
+//            /* Log some error messages, if applicable
+//             */
+//            $errorMessage = '';
+//
+//            if ($response->getStatusCode() !== 200) {
+//                $errorMessage = $response->getReasonPhrase();
+//            }
+//
+//            /* Log what the user tried to do if we made a vaguely-successful request
+//             * and didn't somehow die long the way
+//             */
+//            $log = $this->logMapper->createModel()
+//                ->setUser($user)
+//                ->setPrompt($payload)
+//                ->setReturnCode($response->getStatusCode())
+//                ->setErrorMessage($errorMessage);
+//
+//            $this->logMapper->save($log);
+//
+//            return $response->getBody()->getContents();
+//        } catch (GuzzleException $e) {
+//            $this->errorMapper->generateException(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
+//        }
+//
+//        return null;
+//    }
 
     /**
      * Asynchronously sends a request to the OpenAI API and returns the response to the user.
