@@ -176,7 +176,7 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: ./
+      device: ../
 
   # Volume for database data:
   # mounted outside of filesystem
@@ -194,7 +194,7 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: ./data/docker/storage
+      device: ../data/docker/storage
 
   # Volumes for config
   schoolbox-config:
