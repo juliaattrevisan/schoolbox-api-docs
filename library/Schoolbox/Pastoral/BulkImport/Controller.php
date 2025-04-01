@@ -28,7 +28,6 @@ use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Exception as ResourceException;
 use Schoolbox\Resource\Storage;
-use Schoolbox\IConfigLoader;
 use Schoolbox\Role;
 use Schoolbox\TokenReplacer;
 use Schoolbox\Url\Uri;
@@ -57,7 +56,6 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param IConfigLoader              $config                   For loading configuration values.
      * @param RosettaStone               $translator               For translating values used in the page title.
      * @param Mapper                     $pastoralBulkImportMapper For creating bulk import records.
      * @param Pastoral\DataSource        $pastoralDataSource       For creating pastoral records.
@@ -78,7 +76,6 @@ class Controller extends Base
      * @param RosettaStone               $rosettaStone             For translating values used in the page title.
      */
     public function __construct(
-        private IConfigLoader $config,
         private RosettaStone $translator,
         private Mapper $pastoralBulkImportMapper,
         private Pastoral\DataSource $pastoralDataSource,
@@ -254,7 +251,7 @@ class Controller extends Base
                     ->getTwigContext(),
                 // if default points aren't enabled, any user can modify,
                 // otherwise only pastoral moderators with 'write' access or above can modify default expiry and point settings
-                'canModifyDefaults' => !$this->config->get(ConfigMapper::NAME_PASTORAL_DEFAULT_POINTS_ENABLED) ||
+                'canModifyDefaults' => !$this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_DEFAULT_POINTS_ENABLED) ||
                     $this->user->hasServicePermission(
                         UserAccess::SERVICE_PASTORAL,
                         UserAccess::ACCESS_WRITE

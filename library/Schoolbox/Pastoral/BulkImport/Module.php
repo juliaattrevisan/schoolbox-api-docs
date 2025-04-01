@@ -154,7 +154,6 @@ class Module extends BaseModule
             $this->injector->get('sentry'),
         );
         return new Controller(
-            $this->injector->get('config'),
             $this->injector->get('l10n'),
             $this->getMapperFactory()->get(Mapper::class),
             $this->injector->get('pastoralDataSource'),
