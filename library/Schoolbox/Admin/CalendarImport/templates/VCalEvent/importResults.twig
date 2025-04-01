@@ -55,10 +55,12 @@
                     <a href="{{ RETURN_URL.previous.decoded }}">Back</a>
                 </li>
                 {% if perform is not defined %}
-                    {% set runRoute = routeLookupIfAuthorized('adminCalendarImport.postRunCalendarImport') %}
+                    {% set runRoute = routeLookupIfAuthorized('adminCalendarImport.postRunCalendarVcalImportForm') %}
                     <li>
                         <form class="top" enctype="multipart/form-data" method="post" data-disable-on-submit action="{{ runRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}">
-                            <input type="hidden" name="csvFilePath" value="{{ csvFilePath ?? null }}"/>
+                            <input type="hidden" name="icsFilePath" value="{{ icsFilePath ?? null }}"/>
+                            <input type="hidden" name="userGroups" value="{{ roleList }}"/>
+                            <input type="hidden" name="campusList" value="{{ campusList }}"/>
                             <input type="hidden" name="userId" value="{{ userId ?? null }}"/>
                             <input type="submit" value="Import" />
                         </form>
