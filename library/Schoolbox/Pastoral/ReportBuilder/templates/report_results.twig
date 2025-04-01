@@ -46,6 +46,9 @@
                                         {% if record.isArchived %}
                                             <sbx-icon name="archive" size="0.75rem" title="Record archived - {{ record.expiresAt | date('M d, Y') }}"></sbx-icon>
                                         {% endif %}
+                                        {% if record.points is not empty %}
+                                            <sbx-label-pastoral-points points="{{ record.points }}"></sbx-label-pastoral-points>
+                                        {% endif %}
                                     </h4>
                                 </a>
                                 <p class="meta">
@@ -67,32 +70,6 @@
                             <article>
                                 {% if record.bodyPublic is not empty %}
                                     {{ record.bodyPublic | purify }}
-                                {% endif %}
-
-                                {% if record.points != 0 or (record.tags | length) > 0 %}
-                                    <p class="spaced">
-                                        {% if config.pastoral_point_enabled and record.points != 0 %}
-                                            {% if record.points < 0 %}
-                                                {% set labelClass='alert' %}
-                                            {% else %}
-                                                {% set labelClass='success' %}
-                                            {% endif %}
-                                            <span class="{{ labelClass }} label hide-on-print">{{ record.points }}
-                                                Point{% if record.points < -1 or record.points > 1 %}s{% endif %}</span>
-                                            <b class="show-for-print"> {{ record.points }}
-                                                Point{% if record.points < -1 or record.points > 1 %}s{% endif %}</b>
-                                        {% endif %}
-                                        {% if record.tags | length > 0 %}
-                                            {% for tag in record.tags %}
-                                                <a class="neutral label hide-on-print"
-                                                    href="{{ routeLookup('pastoralReportBuilder.getReportTags', {tagId: tag.id}) }}"
-                                                    class="neutral label">
-                                                    {{ tag.name }}
-                                                </a>
-                                                <b class="show-for-print"> {{ tag.name }}</b>
-                                            {% endfor %}
-                                        {% endif %}
-                                    </p>
                                 {% endif %}
                             </article>
 
