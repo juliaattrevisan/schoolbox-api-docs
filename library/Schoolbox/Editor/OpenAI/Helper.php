@@ -192,6 +192,12 @@ class Helper
             $promise->wait();
 
             $this->logMapper->save($log);
+
+            /* The async method will still continue trying to render other aura stuff,
+             * like the chrome etc. so people left a die(); here to forcibly terminate;
+             * else you end up with a bunch of Warnings about headers already being sent
+             */
+            die();
         } catch (GuzzleException $e) {
             $this->errorMapper->generateException(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
         }

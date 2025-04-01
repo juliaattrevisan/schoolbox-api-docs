@@ -26,7 +26,7 @@ class Module extends BaseModule
             new Rule\HasRole(Role::STAFF),
         );
 
-        $this->register('POST', '', 'postForward', $isStaff, null);
+        $this->register('GET', '', 'getForward', $isStaff);
     }
 
     public function buildController(): Base

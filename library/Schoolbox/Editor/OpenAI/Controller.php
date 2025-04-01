@@ -35,8 +35,10 @@ class Controller extends Base
     ) {
     }
 
-    public function postForward(): void
+    public function getForward(): void
     {
+        $prompt = "Tell me something about Schoolbox";
+
         try {
             (new Helper(
                 trim((string)$this->getConfigLoader()->get('openai_endpoint')),
@@ -47,7 +49,7 @@ class Controller extends Base
                 $this->client,
                 $this->errorMapper,
                 $this->logMapper,
-            ))->async($this->getUser(), payload: $this->request->getBody()->getContents());
+            ))->async($this->getUser(), $prompt);
         } catch (\DomainException $e) {
             /* Not configured? Not found
              */
