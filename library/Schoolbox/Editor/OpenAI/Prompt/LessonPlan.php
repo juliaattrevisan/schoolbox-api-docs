@@ -11,7 +11,7 @@ class LessonPlan
      * A prompt template stolen from SA-19690 comment thread.
      */
     private const PROMPT_TEMPLATE = "
-        You are an expert [FOLDER] teacher, proficient in creating engaging, well-developed 
+        You are an expert [FOLDER] [YEAR LEVEL] teacher, proficient in creating engaging, well-developed 
         and effective lesson plans for your students. Your task is to come up with ideas for 
         lesson plans in our unit on [UNIT TOPIC]. The lesson plans should be [DURATION] minutes each and 
         should [MODE]. The lessons should focus on: [SPECIFIC UNIT TOPICS]. 
@@ -21,7 +21,8 @@ class LessonPlan
         synthesis/summary of student learning; and an assessment of learning.
     ";
 
-    private const PROMPT_TEMPLATE_NODES = 'be aligned to [NODES] and should ';
+    private const PROMPT_TEMPLATE_NODES = 'be aligned to the following: [NODES]. 
+        The lesson should ';
 
 
     /**
@@ -96,9 +97,9 @@ class LessonPlan
         $titles = [];
 
         foreach ($nodes as $node) {
-            $titles[] = $node->getTitle();
+            $titles[] = $node->getName();
         }
 
-        return implode(',', array_filter(array_unique($titles)));
+        return implode('; ', array_filter(array_unique($titles)));
     }
 }

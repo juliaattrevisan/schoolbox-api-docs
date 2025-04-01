@@ -27,9 +27,6 @@ use Schoolbox\Mapper\Exception;
  */
 class Controller extends Base
 {
-    private Helper $helper;
-
-
     /**
      * Controller constructor.
      */
@@ -53,14 +50,28 @@ class Controller extends Base
     public function postLessonPlan(): void
     {
         $post = [
-            'title' => '',
-            'duration' => '',
-            'folderTitle' => '',
-            'yearLevel' => '',
-            'curriculumIds' => []
+            'title' => 'Digital Literacy',
+            /* 45 minute example lesson
+             */
+            'duration' => 45,
+            'folderTitle' => 'English',
+            'unitTitle' => 'Unit 1',
+            'yearLevel' => 'Year 9',
+            'curriculumIds' => [
+                253,
+                256,
+                259
+            ]
         ];
 
-        $prompt = (new LessonPlan($this->curriculumNodeMapper))->generate($post);
+        $prompt = (new LessonPlan($this->curriculumNodeMapper))->generate(
+            $post['title'],
+            $post['duration'],
+            $post['folderTitle'],
+            $post['unitTitle'],
+            $post['yearLevel'],
+            $post['curriculumIds']
+        );
 
         try {
             $result = (new Helper(
@@ -73,6 +84,14 @@ class Controller extends Base
                 $this->errorMapper,
                 $this->logMapper,
             ))->request($this->getUser(), $prompt);
+
+            $data = json_decode($result, true);
+
+            foreach ($data['choices'] as $choice) {
+                echo $choice['message']['content'];
+            }
+
+            return;
         } catch (\DomainException $e) {
             /* Not configured? Not found
              */
