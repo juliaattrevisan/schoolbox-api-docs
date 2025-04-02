@@ -1,10 +1,8 @@
-# Do what needs to be done to build the PR.
 name: build-and-push-schoolbox-fpm
 
-# Trigger an artifact rebuild:
-# * whenever docker/base-images/php82 changes
-# * manually (workflow_dispatch)
-# * on a cron?
+# Build a new schoolbox-fpm image:
+# * when master or develop changes (tags: master, develop, commit hash)
+# * when a release is created (tags: release name)
 on:
   push:
     branches:
