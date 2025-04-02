@@ -52,11 +52,10 @@ class Controller extends Base
      */
     public function postLessonPlan(): void
     {
+        /** @var \Schoolbox\Learning\Assessment\LessonPlan\Model $lessonPlan */
         $lessonPlan = $this->mapperProxy->findById(1577);
 
         $lessonPlanTemplate = $this->lessonPlanTemplateMapper->findById($lessonPlan->getLessonPlanTemplate());
-
-        // new \Alaress_Probe($lessonPlanTemplate);
 
         $post = [
             'title' => 'Digital Literacy',
@@ -73,19 +72,8 @@ class Controller extends Base
             ]
         ];
 
-        $prompt = (new LessonPlan($this->curriculumNodeMapper))->generate(
-            $lessonPlan,
-            $lessonPlanTemplate,
-            $post['title'],
-            $post['duration'],
-            $post['folderTitle'],
-            $post['unitTitle'],
-            $post['yearLevel'],
-            $post['curriculumIds']
-        );
-
         try {
-            $result = (new Helper(
+            $helper = new Helper(
                 trim((string)$this->getConfigLoader()->get('openai_endpoint')),
                 trim((string)$this->getConfigLoader()->get('openai_key')),
                 trim((string)$this->getConfigLoader()->get('openai_azure_resource_name')),
@@ -94,12 +82,35 @@ class Controller extends Base
                 $this->client,
                 $this->errorMapper,
                 $this->logMapper,
-            ))->request($this->getUser(), $prompt);
+            );
 
-            $data = json_decode($result, true);
+            $promptGenerator = new LessonPlan($this->curriculumNodeMapper);
 
-            foreach ($data['choices'] as $choice) {
-                echo $choice['message']['content'];
+            /* FIXME
+             *  Obtain results for each field...ideally this wouldn't be necessary
+             *  and that you could get the resultant data struct back for the whole
+             *  plan grouped by fields, but I haven't seen the AI capable of doing
+             *  that yet. For now, just bash past the barrier: improve it later
+             */
+            foreach ($lessonPlanTemplate->getFields() as $lessonPlanTemplateField) {
+                $prompt = $promptGenerator->generate(
+                    $lessonPlan,
+                    $lessonPlanTemplateField,
+                    $post['title'],
+                    $post['duration'],
+                    $post['folderTitle'],
+                    $post['unitTitle'],
+                    $post['yearLevel'],
+                    $post['curriculumIds']
+                );
+
+                $result = $helper->request($this->getUser(), $prompt);
+
+                $data = json_decode($result, true);
+
+                foreach ($data['choices'] as $choice) {
+                    echo $choice['message']['content'];
+                }
             }
 
             return;

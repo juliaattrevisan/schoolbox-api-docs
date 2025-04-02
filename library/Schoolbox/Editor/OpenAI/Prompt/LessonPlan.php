@@ -19,7 +19,7 @@ class LessonPlan
         Compose some exercises that fulfil the following concepts:
             [FIELD_DATA].
         
-        Use these additional instructions: %s
+        Use these additional instructions: [FIELD_DESCRIPTION]
     ";
 
     /**
@@ -46,27 +46,24 @@ class LessonPlan
      * Generate a prompt using Luisa Words
      *
      * @param \Schoolbox\Learning\Assessment\LessonPlan\Model $lessonPlan
-     * @param Model $lessonPlanTemplate
+     * @param \Schoolbox\Admin\LessonPlan\Template\Field\Model $lessonPlanTemplateField
      * @param string $title
      * @param int $duration
      * @param string $folderTitle
      * @param string $unitTitle
      * @param string $yearLevel
      * @param array $curriculumNodeIds
-     * @param bool $compounding
      * @return string
-     * @throws DebugBarException
      */
     public function generate(
         \Schoolbox\Learning\Assessment\LessonPlan\Model $lessonPlan,
-        \Schoolbox\Admin\LessonPlan\Template\Model $lessonPlanTemplate,
+        \Schoolbox\Admin\LessonPlan\Template\Field\Model $lessonPlanTemplateField,
         string $title,
         int $duration,
         string $folderTitle,
         string $unitTitle,
         string $yearLevel,
         array $curriculumNodeIds,
-        bool $compounding = false
     ): string {
         /* wow
          * Get some info about the various contexts in which this lesson plan exists
@@ -82,99 +79,22 @@ class LessonPlan
 
         /* Find some details about how to use the template fields
          */
-        foreach ($lessonPlanTemplate->getFields() as $field) {
-            $description = trim((string)$field->getDescription());
+        $description = trim((string)$lessonPlanTemplateField->getDescription());
 
-            /* Conduct replacements
-             */
-            $replacements = [
-                '[CONTEXT]' => $context,
-                '[FOLDER]' => $folder,
-                '[FIELD_DATA]' => sprintf(self::PROMPT_TEMPLATE_FIELD,
-                    $field->getTitle(),
-                    $field->getBody(),
-                    $description ?: 'none',
-                )
-            ];
-
-            $prompt = strtr(self::PROMPT_TEMPLATE, $replacements);
-
-            new \Alaress_Probe($replacements, $prompt);
-        }
-
-        die();
-
-
-
-        //        /* Figure out what folder we were in
-//         */
-//        $query = "
-//            SELECT
-//                f1.name AS folderName,
-//                f2.name AS courseName
-//            FROM mv_assessment_relation mvar
-//            INNER JOIN folder f1 ON f1.id = mvar.folder_id
-//            INNER JOIN course_specification cs ON cs.id = mvar.course_specification_id
-//            INNER JOIN folder f2 ON f2.id = cs.folder_id
-//            WHERE assessment_id = :assessmentId
-//        ";
-//
-//        $statement = $this->curriculumNodeMapper->getDatabase()->executeQuery($query, [
-//            'assessmentId' => $lessonPlan->getId()
-//        ]);
-//
-//        $folderId = null;
-//
-//        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-//            $data = $row['folder_id'];
-//        }
-//
-//        new \Alaress_Probe($folderId);die();
-        /* The rest of the prompt's keywords
+        /* Conduct replacements
          */
-//        $replacements = [
-//            '[CONTEXT]' => sprintf(
-//                '%s %s %s',
-//                $folderTitle,
-//            '[UNIT TOPIC]' => $unitTitle,
-//            '[DURATION]' => $duration,
-//            '[MODE]' => $compounding ? 'build on each other' : 'stand alone',
-//            '[YEAR LEVEL]' => $yearLevel,
-//            '[NODES]' => $nodeTemplate,
-//        ];
+        $replacements = [
+            '[CONTEXT]' => $context,
+            '[FOLDER]' => $folder,
+            '[FIELD_DATA]' => sprintf(self::PROMPT_TEMPLATE_FIELD,
+                $lessonPlanTemplateField->getTitle(),
+                $lessonPlanTemplateField->getBody(),
+                $description ?: 'none',
+            ),
+            '[FIELD_DESCRIPTION]' => $lessonPlanTemplateField->getDescription()
+        ];
 
-//        /* Specifically craft a node template section, if ones were specified and meaningful
-//         */
-//        $nodes = $this->curriculumNodeMapper->findByColumn('id', $curriculumNodeIds);
-//
-//        $nodeTemplate = '';
-//
-//        if ($nodes->count()) {
-//            $replacements = [
-//                '[NODES]' => $this->compileNodeTitles($nodes)
-//            ];
-//
-//            $nodeTemplate = strtr(self::PROMPT_TEMPLATE_NODES, $replacements);
-//        }
-
-
-//        /* The rest of the prompt's keywords
-//         */
-//        $replacements = [
-//            '[FOLDER]' => $folderTitle,
-//            '[UNIT TOPIC]' => $unitTitle,
-//            '[DURATION]' => $duration,
-//            '[MODE]' => $compounding ? 'build on each other' : 'stand alone',
-//            '[YEAR LEVEL]' => $yearLevel,
-//            '[NODES]' => $nodeTemplate,
-//        ];
-
-
-
-        new \Alaress_Probe($replacements, $prompt);
-//        die();
-        $prompt = 'Write a shourt 4-paragraph biography about elon musk';
-        return $prompt;
+        return strtr(self::PROMPT_TEMPLATE, $replacements);
     }
 
 
