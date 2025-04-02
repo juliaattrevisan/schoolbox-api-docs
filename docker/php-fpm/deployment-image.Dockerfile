@@ -5,10 +5,13 @@ ARG ENV=dev
 
 # Deployable dockerfile; assumes that the following base images have been built,
 # with the given names:
-# * ../schoolbox-composer/Dockerfile => schoolbox-composer
-# * ../schoolbox-npm/Dockerfile      => schoolbox-npm
+# * ../artifact-images/schoolbox-composer/Dockerfile => schoolbox/composer
+# * ../artifact-images/schoolbox-npm/Dockerfile      => schoolbox/npm
+# The build platform doesn't matter, as the artifacts are platform-independent.
+FROM --platform=$BUILDPLATFORM schoolbox/composer AS composer
+FROM --platform=$BUILDPLATFORM schoolbox/npm      AS npm
 
-FROM schoolbox/php82-fpm
+FROM schoolbox/php82-fpm AS final
 
 WORKDIR /usr/share/schoolbox
 
@@ -22,5 +25,5 @@ COPY ./tools     /usr/share/schoolbox/tools
 COPY ./updates   /usr/share/schoolbox/updates
 COPY ./www       /usr/share/schoolbox/www
 
-COPY --from=schoolbox-composer /usr/share/schoolbox/vendor               /usr/share/schoolbox/vendor
-COPY --from=schoolbox-npm      /usr/share/schoolbox/www/static/js/bundle /usr/share/schoolbox/www/static/js/bundle
+COPY --from=composer /usr/share/schoolbox/vendor               /usr/share/schoolbox/vendor
+COPY --from=npm      /usr/share/schoolbox/www/static/js/bundle /usr/share/schoolbox/www/static/js/bundle
