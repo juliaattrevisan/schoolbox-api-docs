@@ -14,6 +14,8 @@ jobs:
   build-and-push-amd64:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -46,6 +48,8 @@ jobs:
   build-and-push-arm64:
     runs-on: ubuntu-arm
     steps:
+      - uses: actions/checkout@v3
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
