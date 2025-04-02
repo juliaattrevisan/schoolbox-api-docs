@@ -53,8 +53,7 @@ class LessonPlan
         string $yearLevel,
         array $curriculumNodeIds,
         bool $compounding = false
-    ): string
-    {
+    ): string {
         /* Specifically craft a node template section, if ones were specified and meaningful
          */
         $nodes = $this->curriculumNodeMapper->findByColumn('id', $curriculumNodeIds);
