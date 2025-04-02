@@ -251,9 +251,9 @@ class Controller extends Base
                     ->getTwigContext(),
                 // only pastoral moderators with 'write' access or above can modify default expiry
                 'canModifyExpiresAt' => $this->user->hasServicePermission(
-                        UserAccess::SERVICE_PASTORAL,
-                        UserAccess::ACCESS_WRITE
-                    ),
+                    UserAccess::SERVICE_PASTORAL,
+                    UserAccess::ACCESS_WRITE
+                ),
                 // if default points aren't enabled, any user can modify,
                 // otherwise only pastoral moderators with 'write' access or above can modify point settings
                 'canModifyPoints' => !$this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_DEFAULT_POINTS_ENABLED) ||
