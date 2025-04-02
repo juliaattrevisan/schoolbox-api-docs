@@ -7,7 +7,6 @@ test.describe("Unit Planner Tests", () => {
 
     let unitPlanner: UnitPlanner;
     const unitId = 15; // "Romeo and Juliet"
-    const overviewColumnId = "overview-1"; // "Unit Overview"
     const overviewColumnLabel = "Unit Overview";
     const romeoUnitId = 15; // "Romeo and Juliet"
     const persuasionUnitId = 17; // "Persuasion and the Media"
@@ -15,28 +14,22 @@ test.describe("Unit Planner Tests", () => {
     test.beforeEach(async ({ tester, page }) => {
         const teacher = "Jack Coles";
         unitPlanner = new UnitPlanner(tester, page);
+        await tester.loginAsAdmin();
         await tester.impersonate(teacher);
         await unitPlanner.goto(6);
     });
 
-    // TODO: Split selectors into a UnitPlannerPage support file
-
     test("Create a Textbox", async ({ tester, page }) => {
-        const textBoxCell = page.getByTestId(`unit-planner-textbox-action-create-${unitId}-${overviewColumnId}`);
-
         tester.isGoingTo("create a Unit Overview textbox for Romeo and Juliet");
-        await textBoxCell.click();
-        await page.waitForTimeout(500); // Wait for the textbox to be focused
+        await unitPlanner.clickCreateTextBoxButton(unitId);
 
         tester.isGoingTo("type in the textbox and click save");
         const textToType = "By the end of this unit, you will know everything about Snakes! 🐍";
         await page.keyboard.type(textToType);
-        await page.getByTestId(`unit-planner-textbox-action-save-${unitId}-${overviewColumnId}`).click();
+        await unitPlanner.clickTextBoxSaveButton(unitId);
 
         tester.isGoingTo("go to the unit homepage and verify the textbox content");
-        const homepageUrl = (await page.getByTestId(`unit-planner-unit-link-${unitId}`).getAttribute("href")) as string;
-        expect(homepageUrl).not.toBeNull();
-        await page.goto(homepageUrl);
+        await unitPlanner.clickUnitLink(unitId);
 
         const componentInstanceId = await page
             .getByTestId("homepage-component-titlebar-name")
@@ -47,51 +40,18 @@ test.describe("Unit Planner Tests", () => {
         await expect(page.getByTestId(`component-textbox-${componentInstanceId}`)).toHaveText(textToType);
     });
 
-    test("Resequence Units", async ({ tester, page }) => {
-        /**
-         * Get the current order of units
-         * @returns - The order of unit IDs
-         */
-        async function getUnitOrder(): Promise<string[]> {
-            const allUnitRowSelector = /^unit-row-/;
-            const pageOrder = await page
-                .getByTestId(allUnitRowSelector)
-                .evaluateAll((unitRows) => unitRows.map((unitRow) => unitRow.getAttribute("data-test-unit-id")));
-            return pageOrder.filter((id) => id !== null);
-        }
+    test("Re-sequence Units", async ({ tester, page }) => {
+        tester.isGoingTo("Get the current order of units");
+        const initialUnitOrder = await unitPlanner.getUnitOrder();
 
-        const initialUnitOrder = await getUnitOrder();
-
-        // Expect Persuasion and the Media to be below Romeo and Juliet
+        tester.isGoingTo("Verify Persuasion and the Media to be below Romeo and Juliet");
         expect(initialUnitOrder.indexOf(romeoUnitId.toString())).toBeLessThan(
             initialUnitOrder.indexOf(persuasionUnitId.toString()),
         );
 
-        const persuasionUnitRow = page.getByTestId(`unit-row-${persuasionUnitId}`);
-
         tester.isGoingTo("drag Persuasion and the Media above Romeo and Juliet");
-        const persuasionDragHandle = persuasionUnitRow.getByTestId("unit-row-drag-handle");
-        await persuasionDragHandle.scrollIntoViewIfNeeded();
-        await persuasionDragHandle.hover();
-        await page.mouse.down();
-
-        const unitPlannerContainer = page.getByTestId("unit-planner-container");
-
-        // Move mouse to top of container, then wait for the reorder to happen
-        await unitPlannerContainer.hover({ position: { x: 0, y: 0 } });
-
-        tester.isGoingTo("keep dragging and wait for the units to reorder");
-        let newUnitOrder = await getUnitOrder();
-        const startTime = Date.now();
-        while (
-            newUnitOrder.indexOf(persuasionUnitId.toString()) > newUnitOrder.indexOf(romeoUnitId.toString()) &&
-            Date.now() - startTime < 5000 // Timeout after 5 seconds
-        ) {
-            // eslint-disable-next-line no-await-in-loop -- Need to wait for the order to change, await is acceptable here.
-            newUnitOrder = await getUnitOrder();
-        }
-
-        await page.mouse.up();
+        await unitPlanner.dragAndDropUnit(persuasionUnitId, romeoUnitId);
+        const newUnitOrder = await unitPlanner.getUnitOrder();
 
         tester.isGoingTo("verify that the units have been correctly reordered");
         expect(newUnitOrder.indexOf(persuasionUnitId.toString())).toBeLessThan(
@@ -102,16 +62,15 @@ test.describe("Unit Planner Tests", () => {
 
         await page.reload();
 
-        const finalUnitOrder = await getUnitOrder();
+        const finalUnitOrder = await unitPlanner.getUnitOrder();
         expect(finalUnitOrder).toEqual(newUnitOrder);
     });
 
     test("Create, modifying and deleting learning activities", async ({ tester, page, db }) => {
-        const unitplanner = new UnitPlanner(tester, page);
         const assessmentForm = new AssessmentForm(tester, page);
 
         tester.isGoingTo("check all options are presented under Create Activity menu");
-        await unitplanner.clickCreateActivityButton(persuasionUnitId);
+        await unitPlanner.clickCreateActivityButton(persuasionUnitId);
         await unitPlanner.checkCreateActivityOptions("project", persuasionUnitId);
         await unitPlanner.checkCreateActivityOptions("due-work", persuasionUnitId);
         await unitPlanner.checkCreateActivityOptions("quiz", persuasionUnitId);
@@ -119,7 +78,7 @@ test.describe("Unit Planner Tests", () => {
         await unitPlanner.checkCreateActivityOptions("lesson-plan", persuasionUnitId);
 
         tester.isGoingTo("create a due work for Persuasion and Media unit via unit planner");
-        await unitplanner.clickCreateActivityOption("due-work", persuasionUnitId);
+        await unitPlanner.clickCreateActivityOption("due-work", persuasionUnitId);
 
         tester.isGoingTo("Fill out a due work assessment form and submit it");
         await assessmentForm.setTitle("Test Due Activity via unit planner");
@@ -133,12 +92,12 @@ test.describe("Unit Planner Tests", () => {
             "title like": "Test Due Activity via unit planner",
         })) as number;
 
-        tester.isGoingTo("check all options are presented under the activiity menu");
-        await unitplanner.clickActivityDotMenu(assessmentId);
-        await unitplanner.checkActivityMenuOptions(assessmentId);
+        tester.isGoingTo("check all options are presented under the activity menu");
+        await unitPlanner.clickActivityDotMenu(assessmentId);
+        await unitPlanner.checkActivityMenuOptions(assessmentId);
 
         tester.isGoingTo("Modify a due work activity via unit planner");
-        await unitplanner.clickActivityModify(assessmentId);
+        await unitPlanner.clickActivityModify(assessmentId);
         await assessmentForm.setTitle("Updated via unit planner");
         await assessmentForm.update();
         tester.isGoingTo(
@@ -148,15 +107,11 @@ test.describe("Unit Planner Tests", () => {
         await expect(page.getByText("Updated via unit planner")).toBeVisible();
 
         tester.isGoingTo("Delete the due work assessment via unit planner");
-        await unitplanner.clickActivityDotMenu(assessmentId);
-        await unitplanner.clickActivityDelete(assessmentId);
+        await unitPlanner.clickActivityDotMenu(assessmentId);
+        await unitPlanner.clickActivityDelete(assessmentId);
         tester.isGoingTo("checking the activity is not presented in the learning activities list in the unit planner");
         await expect(page.getByText("Test Due Activity via unit planner")).not.toBeVisible();
         await expect(page.getByText("Updated via unit planner")).not.toBeVisible();
-    });
-
-    test.afterEach(async ({ tester }) => {
-        await tester.logout();
     });
 
     test.afterAll(async ({ baseTester, db }) => {

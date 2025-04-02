@@ -9,6 +9,14 @@ export default class UnitPlanner {
 
     static readonly URL = "/course/plan/{course_id}";
 
+    static readonly DATA_TEST_UNIT_LINK = "unit-planner-unit-link-{unitId}";
+
+    static readonly DATA_TEST_CREATE_TEXT_BOX_BUTTON = "unit-planner-textbox-action-create-{unitId}-overview-1";
+
+    static readonly DATA_TEST_TEXT_BOX_SAVE_BUTTON = "unit-planner-textbox-action-save-{unitId}-overview-1";
+
+    static readonly DATA_TEST_UNIT_ROW = "unit-row-{unitId}";
+
     static readonly DATA_TEST_CREATE_ACTIVITY_BUTTON =
         "sbx-pop-out-dropdown-activities-list-activity-{unitId}-activities-1-button";
 
@@ -34,6 +42,80 @@ export default class UnitPlanner {
      */
     async goto(courseId: number): Promise<void> {
         await this.page.goto(UnitPlanner.URL.replace("{course_id}", courseId.toString()));
+    }
+
+    /**
+     * Click the link to a unit
+     * @param unitId - The ID of the unit
+     */
+    async clickUnitLink(unitId: number): Promise<void> {
+        await this.page.getByTestId(UnitPlanner.DATA_TEST_UNIT_LINK.replace("{unitId}", unitId.toString())).click();
+    }
+
+    /**
+     * Click the create text box button
+     * @param unitId - The ID of the unit
+     */
+    async clickCreateTextBoxButton(unitId: number): Promise<void> {
+        await this.page
+            .getByTestId(UnitPlanner.DATA_TEST_CREATE_TEXT_BOX_BUTTON.replace("{unitId}", unitId.toString()))
+            .click();
+        await this.page.waitForTimeout(500); // Wait for the textbox to be focused
+    }
+
+    /**
+     * Click the save button in the text box
+     * @param unitId - The ID of the unit
+     */
+    async clickTextBoxSaveButton(unitId: number): Promise<void> {
+        await this.page
+            .getByTestId(UnitPlanner.DATA_TEST_TEXT_BOX_SAVE_BUTTON.replace("{unitId}", unitId.toString()))
+            .click();
+    }
+
+    /**
+     * Get the current order of units
+     * @returns - The order of unit IDs
+     */
+    async getUnitOrder(): Promise<string[]> {
+        const allUnitRowSelector = /^unit-row-/;
+        const pageOrder = await this.page
+            .getByTestId(allUnitRowSelector)
+            .evaluateAll((unitRows) => unitRows.map((unitRow) => unitRow.getAttribute("data-test-unit-id")));
+        return pageOrder.filter((id) => id !== null);
+    }
+
+    /**
+     * drag and drop a unit to a new position
+     * @param unitIdToDrag - The ID of the unit to drag to
+     * @param unitIdToDragFrom - The ID of the unit to drag from
+     */
+    async dragAndDropUnit(unitIdToDrag: number, unitIdToDragFrom: number): Promise<void> {
+        const unitRow = this.page.getByTestId(
+            UnitPlanner.DATA_TEST_UNIT_ROW.replace("{unitId}", unitIdToDrag.toString()),
+        );
+        const unitDragHandle = unitRow.getByTestId("unit-row-drag-handle");
+        await unitDragHandle.scrollIntoViewIfNeeded();
+        await unitDragHandle.hover();
+        await this.page.mouse.down();
+
+        const unitPlannerContainer = this.page.getByTestId("unit-planner-container");
+
+        // Move mouse to top of container, then wait for the reorder to happen
+        await unitPlannerContainer.hover({ position: { x: 0, y: 0 } });
+
+        this.tester.isGoingTo("keep dragging and wait for the units to reorder");
+        let newUnitOrder = await this.getUnitOrder();
+        const startTime = Date.now();
+        while (
+            newUnitOrder.indexOf(unitIdToDrag.toString()) > newUnitOrder.indexOf(unitIdToDragFrom.toString()) &&
+            Date.now() - startTime < 5000 // Timeout after 5 seconds
+        ) {
+            // eslint-disable-next-line no-await-in-loop -- Need to wait for the order to change, await is acceptable here.
+            newUnitOrder = await this.getUnitOrder();
+        }
+
+        await this.page.mouse.up();
     }
 
     /**
@@ -95,7 +177,7 @@ export default class UnitPlanner {
     }
 
     /**
-     * Checks if the optioins under Create Activity menu are presented
+     * Checks if the options under Create Activity menu are presented
      * @param activityType - The type of activity to create:: project, due-work, quiz, task or lesson-plan
      * @param unitId - The ID of the unit
      */
@@ -111,7 +193,7 @@ export default class UnitPlanner {
     }
 
     /**
-     * Checks if the optioins under the activity menu are presented:: export to classes, modify and delete
+     * Checks if the options under the activity menu are presented:: export to classes, modify and delete
      * @param activityId - The ID of the activity
      */
     async checkActivityMenuOptions(activityId: number): Promise<void> {
