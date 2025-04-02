@@ -33,11 +33,27 @@ jobs:
           name: schoolbox-vendor
           path: vendor/
           retention-days: 1
-#  build-npm:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v3
-#      - uses: ./.github/workflows/node.js.yml@build
+
+  build-npm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+
+      - run: npm ci
+
+      - run: npm run publish
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: schoolbox-npm
+          path: www/static/js/bundle
+          retention-days: 1
 
 #  build-and-push-amd64:
 #    runs-on: ubuntu-latest
