@@ -9,12 +9,12 @@ To build the images:
 # artifact images generally require access to Schoolbox's entire code base in
 # order to build their artifacts
 cd ../../
-sudo docker build -t schoolbox/$imageName -f docker/artifact-images/$imageName/Dockerfile .
+sudo docker build -t alaress/$imageName -f docker/artifact-images/$imageName/Dockerfile .
 
 # Test that the image is at least built
-sudo docker run -a stdin -a stdout -i -t schoolbox/$imageName sh
+sudo docker run -a stdin -a stdout -i -t alaress/$imageName sh
 
 # Push to Dockerhub (and maybe ECR?)
 sudo docker login -u alaress -p
-sudo docker push schoolbox/$imageName
+sudo docker push alaress/$imageName
 ```

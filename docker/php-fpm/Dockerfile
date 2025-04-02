@@ -3,4 +3,4 @@
 #      otherwise, build with dev dependencies
 ARG ENV=dev
 
-FROM schoolbox/php82-fpm
+FROM alaress/php82-fpm-alpine

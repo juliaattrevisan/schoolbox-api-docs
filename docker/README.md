@@ -30,8 +30,8 @@ within a self-contained development environment.
 - optionally, rebuild the base Docker images
   (these should be in Schoolbox's container repository):
   ```shell
-  sudo docker build -t schoolbox/php82     docker/base-images/php82/
-  sudo docker build -t schoolbox/php82-fpm docker/base-images/php82-fpm/
+  sudo docker build -t alaress/php82-alpine     docker/base-images/php82-alpine/
+  sudo docker build -t alaress/php82-fpm-alpine docker/base-images/php82-fpm-alpine/
   ```
 - from the base folder, stop and start Docker containers:
   ```shell
@@ -48,8 +48,8 @@ within a self-contained development environment.
   # images:
   # this more accurately matches a deployment, with Schoolbox's code built into
   # its image: thus changes made locally do not update the running container.
-  sudo docker build -t schoolbox/composer -f docker/artifact-images/composer/Dockerfile .
-  sudo docker build -t schoolbox/npm      -f docker/artifact-images/npm/Dockerfile      .
+  sudo docker build -t alaress/schoolbox-composer -f docker/artifact-images/schoolbox-composer/Dockerfile .
+  sudo docker build -t alaress/schoolbox-npm      -f docker/artifact-images/schoolbox-npm/Dockerfile      .
   sudo docker compose -f docker/deploy.docker-compose.yaml up -d
   ```
 - from the CLI container, setup database copied from Vagrant and reload

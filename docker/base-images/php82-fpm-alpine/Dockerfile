@@ -6,8 +6,8 @@
 ARG ENV=dev
 
 
-# Stage 1: base off of schoolbox/php82
-FROM schoolbox/php82 AS build
+# Stage 1: base off of alaress/php82-alpine
+FROM alaress/php82-alpine AS build
 
 
 # Stage 2: build final image
