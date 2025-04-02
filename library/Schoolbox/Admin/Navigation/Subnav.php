@@ -233,8 +233,8 @@ class Subnav
                         'visible'     => true,
                         'description' => 'Import group events into the calendar via CSV.',
                     ],
-                    '/adminv2/calendar/import/ics-events' => [
-                        'name'        => 'Import ICS Events',
+                    '/adminv2/calendar/import/icalendar-events' => [
+                        'name'        => 'Import iCalendar Events',
                         'visible'     => true,
                         'description' => 'Import school events into the calendar via ICS.',
                     ],

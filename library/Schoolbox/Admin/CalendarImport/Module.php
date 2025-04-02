@@ -84,21 +84,21 @@ class Module extends BaseModule
 
         $this->register(
             self::METHOD_GET,
-            '/import/ics-events',
+            '/import/icalendar-events',
             'getCalendarVcalImportForm',
             $permission,
         );
 
         $this->register(
             self::METHOD_POST,
-            '/import/ics-events',
+            '/import/icalendar-events',
             'postCalendarVcalImportForm',
             $permission,
         );
 
         $this->register(
             self::METHOD_POST,
-            '/import/ics-events/run',
+            '/import/icalendar-events/run',
             'postRunCalendarVcalImportForm',
             $permission,
         );

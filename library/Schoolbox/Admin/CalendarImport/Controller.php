@@ -332,14 +332,14 @@ class Controller extends Base
     }
 
     /**
-     * Display bulk ICS upload admin page
+     * Display bulk iCalendar upload admin page
      *
      * @throws UnexpectedValueException
      * @throws RouteNotFound
      * @throws \ReflectionException
      *
      * @since 25.0.0
-     * @api   GET /adminv2/calendar/import/ics-events
+     * @api   GET /adminv2/calendar/import/icalendar-events
      */
     public function getCalendarVcalImportForm(): void
     {
@@ -370,7 +370,7 @@ class Controller extends Base
      * @throws \Twig\Error\Error
      *
      * @since 25.0.0
-     * @api   POST /adminv2/calendar/import/ics-events
+     * @api   POST /adminv2/calendar/import/icalendar-events
      */
     public function postCalendarVcalImportForm(): void
     {
@@ -437,7 +437,7 @@ class Controller extends Base
      * @throws \Twig\Error\Error
      *
      * @since 25.0.0
-     * @api   POST /adminv2/calendar/import/ics-events/run
+     * @api   POST /adminv2/calendar/import/icalendar-events/run
      */
     public function postRunCalendarVcalImportForm(): void
     {
