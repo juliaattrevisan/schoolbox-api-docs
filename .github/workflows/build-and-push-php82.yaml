@@ -31,7 +31,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: "{{defaultContext}}:docker/base-images/php82-alpine"
-#          push: true
+          push: true
           build-args: |
             ENV=prod
           platforms: linux/amd64,linux/arm64
