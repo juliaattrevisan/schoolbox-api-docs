@@ -24,7 +24,8 @@ jobs:
           dev: no
           args: --profile --ignore-platform-reqs -a
           php_version: '8.2'
-#          version: '2.8.x'
+          # The Composer action takes `2.2.x` but not `2.8.x`? Srsly?
+          version: '2.8.6'
 
 #  build-npm:
 #    runs-on: ubuntu-latest
