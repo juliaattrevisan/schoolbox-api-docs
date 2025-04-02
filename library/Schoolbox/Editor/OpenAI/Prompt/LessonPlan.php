@@ -13,21 +13,22 @@ class LessonPlan
      * A prompt template stolen from SA-19690 comment thread.
      */
     private const PROMPT_TEMPLATE = "
-        You are an expert [CONTEXT] teacher for a class [FOLDER], proficient in creating engaging, well-developed 
-        and effective lesson plans for your students. Each lesson plan is grouped into one or
-        more fields, as follows and for each field, compose some ideas that fulfil the descriptions
-        if they were provided.
+        You are an expert \"[CONTEXT]\" teacher for a class \"[FOLDER]\", proficient in creating engaging, 
+        well-developed and effective lesson plans for your students. 
         
-        [FIELD_LIST] 
+        Compose some exercises that fulfil the following concepts:
+            [FIELD_DATA].
         
-        Come up with  
-        lesson plans in our unit on [UNIT TOPIC]. The lesson plans should be [DURATION] minutes each and 
-        should [MODE]. The lessons should focus on: [SPECIFIC UNIT TOPICS]. 
-        Each lesson should be engaging and appropriate for [YEAR LEVEL] students. Each lesson should 
-        [NODES]include: learning objectives; a list of key vocabulary; a 
-        lesson outline that includes direct instruction, an engaging activity, and a closure with a 
-        synthesis/summary of student learning; and an assessment of learning.
+        Use these additional instructions: %s
     ";
+
+    /**
+     * Each field's basic synopsis.
+     */
+    private const PROMPT_TEMPLATE_FIELD = '
+        Field Topic: %s.
+        Concepts: %s.
+    ';
 
     private const PROMPT_TEMPLATE_NODES = 'be aligned to the following: [NODES]. 
         The lesson should ';
@@ -79,15 +80,31 @@ class LessonPlan
 
         $folder = $lessonPlan->getContext()->getFolder()->getName();
 
-        /* Conduct replacements
+        /* Find some details about how to use the template fields
          */
-        $replacements = [
-            '[CONTEXT]' => $context,
-            '[FOLDER]' => $folder
-        ];
+        foreach ($lessonPlanTemplate->getFields() as $field) {
+            $description = trim((string)$field->getDescription());
 
-        new \Alaress_Probe($replacements);
+            /* Conduct replacements
+             */
+            $replacements = [
+                '[CONTEXT]' => $context,
+                '[FOLDER]' => $folder,
+                '[FIELD_DATA]' => sprintf(self::PROMPT_TEMPLATE_FIELD,
+                    $field->getTitle(),
+                    $field->getBody(),
+                    $description ?: 'none',
+                )
+            ];
+
+            $prompt = strtr(self::PROMPT_TEMPLATE, $replacements);
+
+            new \Alaress_Probe($replacements, $prompt);
+        }
+
         die();
+
+
 
         //        /* Figure out what folder we were in
 //         */
@@ -126,32 +143,38 @@ class LessonPlan
 //            '[NODES]' => $nodeTemplate,
 //        ];
 
-        /* Specifically craft a node template section, if ones were specified and meaningful
-         */
-        $nodes = $this->curriculumNodeMapper->findByColumn('id', $curriculumNodeIds);
+//        /* Specifically craft a node template section, if ones were specified and meaningful
+//         */
+//        $nodes = $this->curriculumNodeMapper->findByColumn('id', $curriculumNodeIds);
+//
+//        $nodeTemplate = '';
+//
+//        if ($nodes->count()) {
+//            $replacements = [
+//                '[NODES]' => $this->compileNodeTitles($nodes)
+//            ];
+//
+//            $nodeTemplate = strtr(self::PROMPT_TEMPLATE_NODES, $replacements);
+//        }
 
-        $nodeTemplate = '';
 
-        if ($nodes->count()) {
-            $replacements = [
-                '[NODES]' => $this->compileNodeTitles($nodes)
-            ];
+//        /* The rest of the prompt's keywords
+//         */
+//        $replacements = [
+//            '[FOLDER]' => $folderTitle,
+//            '[UNIT TOPIC]' => $unitTitle,
+//            '[DURATION]' => $duration,
+//            '[MODE]' => $compounding ? 'build on each other' : 'stand alone',
+//            '[YEAR LEVEL]' => $yearLevel,
+//            '[NODES]' => $nodeTemplate,
+//        ];
 
-            $nodeTemplate = strtr(self::PROMPT_TEMPLATE_NODES, $replacements);
-        }
 
-        /* The rest of the prompt's keywords
-         */
-        $replacements = [
-            '[FOLDER]' => $folderTitle,
-            '[UNIT TOPIC]' => $unitTitle,
-            '[DURATION]' => $duration,
-            '[MODE]' => $compounding ? 'build on each other' : 'stand alone',
-            '[YEAR LEVEL]' => $yearLevel,
-            '[NODES]' => $nodeTemplate,
-        ];
 
-        return strtr(self::PROMPT_TEMPLATE, $replacements);
+        new \Alaress_Probe($replacements, $prompt);
+//        die();
+        $prompt = 'Write a shourt 4-paragraph biography about elon musk';
+        return $prompt;
     }
 
 
