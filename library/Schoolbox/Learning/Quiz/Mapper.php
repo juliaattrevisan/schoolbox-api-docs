@@ -61,7 +61,7 @@ class Mapper extends BaseMapper
     protected $learnosityHelper = null;
 
     /**
-     *
+     * Override parent constructor so $this->learnosityHelper can be added.
      */
     public function __construct()
     {
