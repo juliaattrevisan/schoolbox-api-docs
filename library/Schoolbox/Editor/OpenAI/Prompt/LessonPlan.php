@@ -2,6 +2,7 @@
 
 namespace Schoolbox\Editor\OpenAI\Prompt;
 
+use Schoolbox\Admin\LessonPlan\Template\Model;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\GenericCollection;
 
@@ -36,6 +37,7 @@ class LessonPlan
     /**
      * Generate a prompt using Luisa Words
      *
+     * @param Model $lessonPlanTemplate
      * @param string $title
      * @param int $duration
      * @param string $folderTitle
@@ -46,6 +48,7 @@ class LessonPlan
      * @return string
      */
     public function generate(
+        \Schoolbox\Admin\LessonPlan\Template\Model $lessonPlanTemplate,
         string $title,
         int $duration,
         string $folderTitle,

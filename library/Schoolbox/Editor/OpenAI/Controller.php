@@ -13,6 +13,7 @@ use Crell\ApiProblem\ApiProblem;
 use GuzzleHttp\Client;
 use Psr\Http\Client\ClientExceptionInterface;
 use Schoolbox\Editor\OpenAI\Prompt\LessonPlan;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Mapper\Exception;
 
 /**
@@ -35,6 +36,8 @@ class Controller extends Base
         private \Schoolbox\Error\Mapper $errorMapper,
         private Log\Mapper $logMapper,
         private \Schoolbox\Curriculum\Node\Mapper $curriculumNodeMapper,
+        private AssessmentMapperProxy $mapperProxy,
+        private \Schoolbox\Admin\LessonPlan\Template\Mapper $lessonPlanTemplateMapper,
     ) {
     }
 
@@ -49,6 +52,12 @@ class Controller extends Base
      */
     public function postLessonPlan(): void
     {
+        $lessonPlan = $this->mapperProxy->findById(1576);
+
+        $lessonPlanTemplate = $this->lessonPlanTemplateMapper->findById($lessonPlan->getLessonPlanTemplate());
+
+        // new \Alaress_Probe($lessonPlanTemplate);
+
         $post = [
             'title' => 'Digital Literacy',
             /* 45 minute example lesson
@@ -65,6 +74,7 @@ class Controller extends Base
         ];
 
         $prompt = (new LessonPlan($this->curriculumNodeMapper))->generate(
+            $lessonPlanTemplate,
             $post['title'],
             $post['duration'],
             $post['folderTitle'],
