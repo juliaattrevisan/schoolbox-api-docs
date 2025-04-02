@@ -1,0 +1,30 @@
+name: build-composer-artifact
+
+on:
+  workflow_call:
+
+jobs:
+  build-composer-artifact:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/cache@v4
+        id: cache-vendor
+        with:
+          path: /tmp/composer-cache
+          key: vendor-${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+
+      - uses: php-actions/composer@v6
+        with:
+          dev: no
+          args: --profile --ignore-platform-reqs -a
+          php_version: '8.2'
+          # The Composer action takes `2.2.x` but not `2.8.x`? Srsly?
+          version: '2.8.6'
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: schoolbox-vendor
+          path: vendor/
+          retention-days: 1
