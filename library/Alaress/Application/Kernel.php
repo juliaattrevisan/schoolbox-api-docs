@@ -755,19 +755,26 @@ abstract class Kernel
                         // to cause errors that end up in Sentry.
                         // (No need to check for object, since json_decode(..., true) converts objects to arrays.)
                         if (!is_array($decodedContent)) {
-                            $problem = (new ApiProblem('Invalid JSON in request body'))
-                                ->setStatus(self::HTTP_RESPONSE_CODE_BAD_REQUEST)
-                                ->asArray();
-                            /** @var ResponseFactory $responseFactory */
-                            $responseFactory = $di->get('httpResponseFactory');
-                            $response = (
-                                (new IsJson())->isSatisfiedBy($request) // Note IsJson() means AcceptsJson().
-                                ? $responseFactory->buildJson($problem)
-                                : $responseFactory->buildHtml('common/error/general.twig', $problem)
-                            );
-                            /** @var Outputter $responseFactory */
-                            $responseOutputter = $di->get('httpResponseOutputter');
-                            $responseOutputter->output($response->withStatus(self::HTTP_RESPONSE_CODE_BAD_REQUEST));
+                            $message = 'Invalid JSON in request body';
+
+                            if ((new IsJson())->isSatisfiedBy($request)) { // Note IsJson() means AcceptsJson().
+                                $problem = (new ApiProblem($message))
+                                    ->setStatus(self::HTTP_RESPONSE_CODE_BAD_REQUEST)
+                                    ->asArray();
+
+                                /** @var ResponseFactory $responseFactory */
+                                $responseFactory = $di->get('httpResponseFactory');
+
+                                $response = $responseFactory->buildJson($problem);
+
+                                /** @var Outputter $responseFactory */
+                                $responseOutputter = $di->get('httpResponseOutputter');
+                                $responseOutputter->output($response->withStatus(self::HTTP_RESPONSE_CODE_BAD_REQUEST));
+                            } else {
+                                http_response_code(self::HTTP_RESPONSE_CODE_BAD_REQUEST);
+                                header('Content-Type: text/plain');
+                                echo "$message\n";
+                            }
                             die;
                         }
                         $request = $request->withParsedBody($decodedContent);
