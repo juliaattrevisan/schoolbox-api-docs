@@ -589,6 +589,15 @@ class Handler
         return $stuArr;
     }
 
+    /**
+     * Handle request for fetching students and their parents' details
+     *
+     * @param array $data `$data['id']` must be a student ID(s).
+     * @return array
+     *
+     * @throws OutOfBoundsException if `$data['id']` is not provided
+     *
+     */
     public function handleGetStudentDetailsData(array $data): array
     {
         $id = $data['id'] ?? null;
