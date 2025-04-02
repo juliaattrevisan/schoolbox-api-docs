@@ -63,6 +63,8 @@ class Handler
                 return $this->handleGetStudentsMedicalRequest($data);
             case 'getStudentsFromParent':
                 return $this->handleGetStudentsFromParentRequest($data);
+            case 'getStudentDetailsData':
+                return $this->handleGetStudentDetailsData($data);
             case 'allParents':
                 return $this->handleAllParentsRequest($data);
             case 'getDetailsData':
@@ -585,6 +587,100 @@ class Handler
         }
 
         return $stuArr;
+    }
+
+    public function handleGetStudentDetailsData(array $data): array
+    {
+        $id = $data['id'] ?? null;
+        if (!isset($id)) {
+            throw new OutOfBoundsException('Student ID is not provided');
+        }
+
+        $stuIDs = is_array($data['id']) ? $data['id'] : explode(',', (string)$data['id']);
+        $placeholders = implode(',', array_fill(0, count($stuIDs), '?'));
+
+        $studentView = $this->viewSelector->getView(ViewSelector::PAPERLY_VIEW_ALL_STUDENTS);
+        $parentView = $this->viewSelector->getView(ViewSelector::PAPERLY_VIEW_ALL_PARENTS);
+
+        $sql = "SELECT
+            s.StudentID, s.StudentPreferred, s.StudentSurname, s.StudentYearLevel, s.StudentYearLevelDescription,
+            s.StudentBoarder, s.StudentTutor, s.StudentHouse, s.StudentHouseDescription, s.StudentGender,
+            s.StudentEmail, s.StudentBirthDate,
+            s.ContactID, s.ContactRelationship,
+            p.Gender AS ContactGender, p.Surname AS ContactSurname, p.Preferred AS ContactPreferred, p.Given1 AS ContactGiven1,
+            p.Address1 AS ContactAddress, p.Address2 AS ContactAddress2, p.Address3 AS ContactAddress3,
+            p.Suburb AS ContactSuburb, p.State AS ContactState, p.Postcode AS ContactPostcode,
+            p.Phone AS ContactHomePhone, p.MobilePhone AS ContactMobile, p.Email AS ContactEmail
+        FROM $studentView s
+        LEFT JOIN $parentView p ON s.ContactID = p.ID
+        WHERE s.StudentID IN ($placeholders)";
+
+        $params = $stuIDs;
+        $statement = $this->externalDb->prepareQuery($sql, $params);
+        $stmt = $statement->execute();
+
+        if ($stmt === false) {
+            throw new AlaressDatabaseException(
+                print_r($this->externalDb->errorInfo(), true)
+            );
+        }
+
+        $students = array();
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $studentId = $row["StudentID"] ?? null;
+            $birthDate = $row["StudentBirthDate"] ?? null;
+
+            $formattedBirthDate = ($birthDate !== null)
+                ? (\Alaress_Date_Format::newFromTimestamp(strtotime($birthDate)))->getUsingFormat('Y-m-d')
+                : null;
+
+            if (!isset($students[$studentId])) {
+                $students[$studentId] = [
+                    "ID" => $row["StudentID"] ?? null,
+                    "Preferred" => $row["StudentPreferred"] ?? null,
+                    "Surname" => $row["StudentSurname"] ?? null,
+                    "YearLevelCode" => $row["StudentYearLevel"] ?? null,
+                    "YearLevelDescription" => $row["StudentYearLevelDescription"] ?? null,
+                    "Boarder" => $row["StudentBoarder"] ?? null,
+                    "RollGroup" => $row["StudentTutor"] ?? null,
+                    "HouseCode" => $row["StudentHouse"] ?? null,
+                    "HouseDescription" => $row["StudentHouseDescription"] ?? null,
+                    "Gender" => $row["StudentGender"] ?? null,
+                    "Email" => $row["StudentEmail"] ?? null,
+                    "BirthDate" => $formattedBirthDate,
+                    "Contact1Data" => [],
+                    "Contact2Data" => [],
+                ];
+            }
+
+            $contact = [
+                "ID" => $row["ContactID"] ?? null,
+                "Relationship" => $row["ContactRelationship"] ?? null,
+                "Gender" => $row["ContactGender"] ?? null,
+                "Surname" => $row["ContactSurname"] ?? null,
+                "Preferred" => $row["ContactPreferred"] ?? null,
+                "Given1" => $row["ContactGiven1"] ?? null,
+                "Address" => $row["ContactAddress"] ?? null,
+                "Address2" => $row["ContactAddress2"] ?? null,
+                "Address3" => $row["ContactAddress3"] ?? null,
+                "Suburb" => $row["ContactSuburb"] ?? null,
+                "State" => $row["ContactState"] ?? null,
+                "Postcode" => $row["ContactPostcode"] ?? null,
+                "HomePhone" => $row["ContactHomePhone"] ?? null,
+                "Mobile" => $row["ContactMobile"] ?? null,
+                "Email" => $row["ContactEmail"] ?? null,
+            ];
+
+            if (!empty($row["ContactID"])) {
+                if (empty($students[$studentId]["Contact1Data"])) {
+                    $students[$studentId]["Contact1Data"] = $contact;
+                } elseif (empty($students[$studentId]["Contact2Data"])) {
+                    $students[$studentId]["Contact2Data"] = $contact;
+                }
+            }
+        }
+
+        return array_values($students);
     }
 
     /**
