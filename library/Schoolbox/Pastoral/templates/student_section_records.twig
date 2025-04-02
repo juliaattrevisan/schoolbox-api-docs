@@ -41,7 +41,7 @@
                                             {% if record.isArchived %}
                                                 <sbx-icon name="archive" size="0.75rem" title="Record archived - {{ record.expiresAt | date('M d, Y') }}"></sbx-icon>
                                             {% endif %}
-                                            {% if record.points is not empty %}
+                                            {% if config.pastoral_point_enabled and record.points is not empty %}
                                                 <sbx-label-pastoral-points points="{{ record.points }}"></sbx-label-pastoral-points>
                                             {% endif %}
                                         </h3>
