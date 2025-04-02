@@ -338,6 +338,10 @@ class Mapper extends BaseMapper
 
 
     /**
+     * Post-restore callback.
+     * This ensures that when a soft-deleted quiz is restored in Schoolbox,
+     * the matching quiz data in Learnosity is also restored.
+     *
      * @param Model $object
      * @return void
      * @throws ValidationException
