@@ -34,15 +34,15 @@ jobs:
           platforms: linux/amd64
           tags: alaress/php82-alpine:latest
 
-#      - name: build-and-push
-#        uses: docker/build-push-action@v6
-#        with:
-#          context: "{{defaultContext}}:docker/base-images/php82-fpm-alpine"
+      - name: build-and-push
+        uses: docker/build-push-action@v6
+        with:
+          context: "{{defaultContext}}:docker/base-images/php82-fpm-alpine"
 #          push: true
-#          build-args: |
-#            ENV=prod
-#          platforms: linux/amd64,linux/arm64
-#          tags: alaress/php82-fpm-alpine:latest
+          build-args: |
+            ENV=prod
+          platforms: linux/amd64
+          tags: alaress/php82-fpm-alpine:latest
 
   build-and-push-arm64:
     runs-on: ubuntu-arm
@@ -65,3 +65,13 @@ jobs:
             ENV=prod
           platforms: linux/arm64
           tags: alaress/php82-alpine:latest
+
+      - name: build-and-push
+        uses: docker/build-push-action@v6
+        with:
+          context: "{{defaultContext}}:docker/base-images/php82-fpm-alpine"
+#          push: true
+          build-args: |
+            ENV=prod
+          platforms: linux/arm64
+          tags: alaress/php82-fpm-alpine:latest
