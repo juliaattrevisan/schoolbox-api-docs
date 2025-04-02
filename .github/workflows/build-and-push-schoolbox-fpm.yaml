@@ -42,11 +42,17 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-#          cache: 'npm'
-#          cache-dependency-path: '**/package-lock.json'
 
+      - uses: actions/cache@v4
+        id: cache-npm-ci
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-${{ hashFiles('**/npm-shrinkwrap.json') }}
       - run: npm ci
+        if: steps.cache-npm-ci.outputs.cache-hit != 'true'
 
+      # Cannot reliably cache the result of npm run publish:
+      # too many possible inputs.
       - run: npm run publish
 
       - uses: actions/upload-artifact@v4
