@@ -8,19 +8,6 @@ include:
   - base.docker-compose.yaml
 
 services:
-  # Build artifact images
-  schoolbox-composer:
-    restart: no
-    build:
-      context: ../
-      dockerfile: ./docker/artifact-images/schoolbox-composer/Dockerfile
-
-  schoolbox-npm:
-    restart: no
-    build:
-      context: ../
-      dockerfile: ./docker/artifact-images/schoolbox-npm/Dockerfile
-
   schoolbox-php-fpm-deploy:
     container_name: php-fpm
     restart: always
@@ -29,8 +16,6 @@ services:
       - rabbitmq
       - redis-cache
       - redis-storage
-      - schoolbox-composer
-      - schoolbox-npm
     build:
       context: ../
       dockerfile: ./docker/php-fpm/deployment-image.Dockerfile
