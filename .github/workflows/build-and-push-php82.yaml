@@ -9,12 +9,19 @@ name: build-and-push-php82
 on:
   workflow_dispatch:
 
-# Separate jobs are required for AMD64 and ARM64 builds, so that the build runs
-# on the same architecture as the image it's building: QEMU building an ARM64
-# image on an AMD64 arch is too slow to be acceptable.
+# Separate job variants are required for AMD64 and ARM64 builds, so that the
+# build runs on the same architecture as the image it's building:
+# QEMU building an ARM64 image on an AMD64 arch is too slow to be acceptable.
 jobs:
-  build-and-push-amd64:
-    runs-on: ubuntu-latest
+  build-and-push:
+    strategy:
+      matrix:
+        build:
+          - runs-on: ubuntu-latest
+            platform: linux/amd64
+          - runs-on: ubuntu-arm
+            platform: linux/arm64
+    runs-on: ${{ matrix.build.runs-on }}
     steps:
       - uses: actions/checkout@v3
 
@@ -34,7 +41,7 @@ jobs:
           push: true
           build-args: |
             ENV=prod
-          platforms: linux/amd64
+          platforms: ${{ matrix.build.platform }}
           tags: alaress/php82-alpine:latest
 
       - name: build-and-push
@@ -44,39 +51,5 @@ jobs:
           push: true
           build-args: |
             ENV=prod
-          platforms: linux/amd64
-          tags: alaress/php82-fpm-alpine:latest
-
-  build-and-push-arm64:
-    runs-on: ubuntu-arm
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: build-and-push
-        uses: docker/build-push-action@v6
-        with:
-          context: "{{defaultContext}}:docker/base-images/php82-alpine"
-          push: true
-          build-args: |
-            ENV=prod
-          platforms: linux/arm64
-          tags: alaress/php82-alpine:latest
-
-      - name: build-and-push
-        uses: docker/build-push-action@v6
-        with:
-          context: "{{defaultContext}}:docker/base-images/php82-fpm-alpine"
-          push: true
-          build-args: |
-            ENV=prod
-          platforms: linux/arm64
+          platforms: ${{ matrix.build.platform }}
           tags: alaress/php82-fpm-alpine:latest
