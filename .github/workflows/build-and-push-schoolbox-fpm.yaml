@@ -1,0 +1,96 @@
+# Do what needs to be done to build the PR.
+name: build-and-push-schoolbox-fpm
+
+# Trigger an artifact rebuild:
+# * whenever docker/base-images/php82 changes
+# * manually (workflow_dispatch)
+# * on a cron?
+on:
+  pull_request:
+
+jobs:
+  build-composer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/cache@v3
+        with:
+          path: /tmp/composer-cache
+          key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+
+      - uses: php-actions/composer@v6
+        with:
+          dev: no
+          args: --profile --ignore-platform-reqs -a
+          php_version: '8.2'
+          version: '2.8'
+
+  build-npm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ./.github/workflows/node.js.yml@build
+
+#  build-and-push-amd64:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Set up Docker Buildx
+#        uses: docker/setup-buildx-action@v3
+#
+#      - name: Login to Docker Hub
+#        uses: docker/login-action@v3
+#        with:
+#          username: ${{ secrets.DOCKERHUB_USERNAME }}
+#          password: ${{ secrets.DOCKERHUB_TOKEN }}
+#
+#      - name: build-and-push
+#        uses: docker/build-push-action@v6
+#        with:
+#          context: "{{defaultContext}}:docker/base-images/php82-alpine"
+#          push: true
+#          build-args: |
+#            ENV=prod
+#          platforms: linux/amd64
+#          tags: alaress/php82-alpine:latest
+#
+#      - name: build-and-push
+#        uses: docker/build-push-action@v6
+#        with:
+#          context: "{{defaultContext}}:docker/base-images/php82-fpm-alpine"
+#          push: true
+#          build-args: |
+#            ENV=prod
+#          platforms: linux/amd64
+#          tags: alaress/php82-fpm-alpine:latest
+#
+#  build-and-push-arm64:
+#    runs-on: ubuntu-arm
+#    steps:
+#      - name: Set up Docker Buildx
+#        uses: docker/setup-buildx-action@v3
+#
+#      - name: Login to Docker Hub
+#        uses: docker/login-action@v3
+#        with:
+#          username: ${{ secrets.DOCKERHUB_USERNAME }}
+#          password: ${{ secrets.DOCKERHUB_TOKEN }}
+#
+#      - name: build-and-push
+#        uses: docker/build-push-action@v6
+#        with:
+#          context: "{{defaultContext}}:docker/base-images/php82-alpine"
+#          push: true
+#          build-args: |
+#            ENV=prod
+#          platforms: linux/arm64
+#          tags: alaress/php82-alpine:latest
+#
+#      - name: build-and-push
+#        uses: docker/build-push-action@v6
+#        with:
+#          context: "{{defaultContext}}:docker/base-images/php82-fpm-alpine"
+#          push: true
+#          build-args: |
+#            ENV=prod
+#          platforms: linux/arm64
+#          tags: alaress/php82-fpm-alpine:latest
