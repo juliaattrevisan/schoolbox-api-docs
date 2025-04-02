@@ -6,6 +6,7 @@ name: build-and-push-php82
 # * on a cron?
 on:
   workflow_dispatch:
+  pull_request:
 
 # What actually happens?
 # * supply the Dockerhub username+token
