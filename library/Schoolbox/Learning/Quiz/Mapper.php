@@ -69,9 +69,9 @@ class Mapper extends BaseMapper
 
         $api = new Api(
             (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified()->getHost(),
-            $this->getConfigLoader()->get('learnosity_version'),
-            $this->getConfigLoader()->get('learnosity_consumer_key'),
-            $this->getConfigLoader()->get('learnosity_consumer_secret'),
+            $this->getConfigLoader()->get(Schoolbox\Config\ConfigMapper::NAME_LEARNOSITY_VERSION),
+            $this->getConfigLoader()->get(Schoolbox\Config\ConfigMapper::NAME_LEARNOSITY_CONSUMER_KEY),
+            $this->getConfigLoader()->get(Schoolbox\Config\ConfigMapper::NAME_LEARNOSITY_CONSUMER_SECRET),
             new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')
         );
 
