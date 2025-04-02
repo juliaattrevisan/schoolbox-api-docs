@@ -5,11 +5,13 @@ ARG ENV=dev
 
 # Deployable dockerfile; assumes that the following base images have been built,
 # with the given names:
-# * ../artifact-images/schoolbox-composer/Dockerfile => schoolbox/composer
-# * ../artifact-images/schoolbox-npm/Dockerfile      => schoolbox/npm
+# * ../artifact-images/schoolbox-composer/Dockerfile => alaress/schoolbox-composer
+# * ../artifact-images/schoolbox-npm/Dockerfile      => alaress/schoolbox-npm
 # The build platform doesn't matter, as the artifacts are platform-independent.
-FROM --platform=$BUILDPLATFORM schoolbox/composer AS composer
-FROM --platform=$BUILDPLATFORM schoolbox/npm      AS npm
+# In fact, the Github Actions build process probably won't even use the artifact
+# images.
+FROM --platform=$BUILDPLATFORM alaress/schoolbox-composer AS composer
+FROM --platform=$BUILDPLATFORM alaress/schoolbox-npm      AS npm
 
 FROM schoolbox/php82-fpm AS final
 

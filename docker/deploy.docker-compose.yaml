@@ -8,18 +8,18 @@ include:
   - base.docker-compose.yaml
 
 services:
-  # Build ancestor images: NPM, Composer, base FPM
+  # Build artifact images
   schoolbox-composer:
     restart: no
     build:
       context: ../
-      dockerfile: ./docker/schoolbox-composer/Dockerfile
+      dockerfile: ./docker/artifact-images/schoolbox-composer/Dockerfile
 
   schoolbox-npm:
     restart: no
     build:
       context: ../
-      dockerfile: ./docker/schoolbox-npm/Dockerfile
+      dockerfile: ./docker/artifact-images/schoolbox-npm/Dockerfile
 
   schoolbox-php-fpm-deploy:
     container_name: php-fpm
