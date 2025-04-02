@@ -43,6 +43,12 @@ export default {
             type: Boolean,
             default: true,
         },
+        // Is pastoral point enabled?
+        pastoralPointEnabled: {
+            type: Boolean,
+            required: false,
+            default: true,
+        },
     },
     data() {
         return {
@@ -283,7 +289,11 @@ export default {
                                                         :title="`Record archived - ${formatDateArchived(record.expiresAt)}`"
                                                     ></sbx-icon>
                                                     <sbx-label-pastoral-points
-                                                        v-if="record.points !== undefined && record.points !== null"
+                                                        v-if="
+                                                            pastoralPointEnabled &&
+                                                            record.points !== undefined &&
+                                                            record.points !== null
+                                                        "
                                                         :points="record.points"
                                                     >
                                                     </sbx-label-pastoral-points>
