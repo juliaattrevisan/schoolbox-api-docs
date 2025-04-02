@@ -82,7 +82,7 @@ class Controller extends Base
         try {
             $this->response = $this->responseAsJson($this->handler->handle($data));
         } catch (OutOfBoundsException $e) {
-            $this->sendJsonError($e->getMessage(), Response::HTTP_NOT_FOUND);
+            $this->sendJsonError($e->getMessage(), Response::HTTP_BAD_REQUEST);
         } catch (AlaressDatabaseException | \Exception $e) {
             //Catching external database exception and return useful message in json
             $this->sendJsonError($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
