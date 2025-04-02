@@ -31,14 +31,6 @@ class Helper
 
 
     /**
-     * The last successful json payload we obtained from our ai overlords
-     *
-     * @var string|null
-     */
-    private ?string $json = null;
-
-
-    /**
      * Controller constructor.
      */
     public function __construct(
@@ -126,11 +118,11 @@ class Helper
      * @param User $user // user to log the request against
      * @param string|null $prompt // if generating a payload, use this prompt
      * @param string|null $payload // use this payload instead of generating one
-     * @return array|null
+     * @return void
      * @throws \JsonException
      * @throws Exception
      */
-    public function littleRobotDude(User $user, ?string $prompt = null, ?string $payload = null): ?array
+    public function littleRobotDude(User $user, ?string $prompt = null, ?string $payload = null): void
     {
         /* Assert that we're configured correctly
          */
