@@ -6,11 +6,9 @@
 # rebuilt every time Docker Compose is run.
 
 # Build args:
-# ENV:  if prod or production, build with prod dependencies only;
-#       otherwise, build with dev dependencies.
-# ARCH: the processor architecture to build for (amd64, arm)
+# ENV: if prod or production, build with prod dependencies only;
+#      otherwise, build with dev dependencies.
 ARG ENV=dev
-ARG ARCH
 
 FROM php:8.2-alpine
 

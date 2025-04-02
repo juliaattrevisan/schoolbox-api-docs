@@ -1,11 +1,9 @@
 # PHP-FPM Schoolbox image
 
 # Build args:
-# ENV:  if prod or production, build with prod dependencies only;
-#       otherwise, build with dev dependencies.
-# ARCH: the processor architecture to build for (amd64, arm)
+# ENV: if prod or production, build with prod dependencies only;
+#      otherwise, build with dev dependencies.
 ARG ENV=dev
-ARG ARCH
 
 
 # Stage 1: base off of schoolbox/php82
