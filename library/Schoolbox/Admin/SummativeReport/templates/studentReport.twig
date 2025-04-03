@@ -490,7 +490,7 @@
         }
     }
 
-    {{ customReportStyle ?? '' }}
+    {{ (customReportStyle ?? '') | purify }}
 </style>
 
 <div class="summative-report">
