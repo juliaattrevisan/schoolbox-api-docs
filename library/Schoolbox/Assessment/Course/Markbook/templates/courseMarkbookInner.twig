@@ -229,83 +229,83 @@
                         {% for assessment in collapsedAssessments %}
                             {% set aImpl = courseImportAssessments[courseImpl.id][assessment.id] ?? null %}
                             {% set participant = aImpl.participantIfExtant(student, false) ?? null %}
-                                {% if aImpl %}
-                                <td
-                                    class="column-{{ assessment.id }} {% if not participant or participant.isExcluded %} excluded {% endif %} student-grade-cell"
-                                    data-assessment="{{ assessment.id }}"
-                                    {% if assessment is dueWork or assessment is quiz or assessment is lti or (assessment is project and (participant and not participant.isExcluded)) %}
-                                    data-pop-out-menu
-                                    {% endif %}
-                                    data-assessment-type="{{ assessment.getFamilyName }}"
-                                    data-is-participant="{% if participant %}true{% else %}false{% endif %}"
-                                    data-is-excluded="{% if participant and not participant.isExcluded %}false{% else %}true{% endif %}"
-                                    data-endpoint="{{ routeLookupIfAuthorized('learningAssessmentTimeline.getFullTimeline', {assessment: aImpl, assessmentId: aImpl.id, userId: student.id }) }}"
-                                    data-update-route="{{ routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessment: aImpl, assessmentId: aImpl.id, student: student, studentId: student.id }) }}"
-                                    data-review-route="{{ routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessment: aImpl, assessmentId: aImpl.id, student: student, studentId: student.id }) }}"
-                                    data-publish-route="{{ routeLookupIfAuthorized('learningDueWorkFeedback.postPublishFeedback', {assessment: aImpl, assessmentId: aImpl.id, student: student, studentId: student.id }) }}"
-                                    data-exclude-route="{{ routeLookupIfAuthorized('learningAssessment.postExclude', {assessment: aImpl, assessmentId: aImpl.id, student: student, studentId: student.id }) }}"
-                                    data-include-route="{{ routeLookupIfAuthorized('learningAssessment.postInclude', {assessment: aImpl, assessmentId: aImpl.id, student: student, studentId: student.id }) }}"
-                                    data-history-route="{{ routeLookupIfAuthorized('learningAssessment.getSummary', {assessment: aImpl, assessmentId: aImpl.id, student: student, studentId: student.id }) }}"
-                                >
-                                {% if participant and not participant.isExcluded %}
-                                    {% if assessment is task %}
-                                        {% set progressStatus = taskProgress[courseImpl.id][assessment.id][student.id] %}
+                            {% if aImpl %}
+                            <td
+                                class="column-{{ assessment.id }} {% if not participant or participant.isExcluded %} excluded {% endif %} student-grade-cell"
+                                data-assessment="{{ assessment.id }}"
+                                {% if assessment is dueWork or assessment is quiz or assessment is lti or (assessment is project and (participant and not participant.isExcluded)) %}
+                                data-pop-out-menu
+                                {% endif %}
+                                data-assessment-type="{{ assessment.getFamilyName }}"
+                                data-is-participant="{% if participant %}true{% else %}false{% endif %}"
+                                data-is-excluded="{% if participant and not participant.isExcluded %}false{% else %}true{% endif %}"
+                                data-endpoint="{{ routeLookupIfAuthorized('learningAssessmentTimeline.getFullTimeline', {assessment: aImpl, assessmentId: aImpl.id, userId: student.id }) }}"
+                                data-update-route="{{ routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessment: aImpl, assessmentId: aImpl.id, student: student, studentId: student.id }) }}"
+                                data-review-route="{{ routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessment: aImpl, assessmentId: aImpl.id, student: student, studentId: student.id }) }}"
+                                data-publish-route="{{ routeLookupIfAuthorized('learningDueWorkFeedback.postPublishFeedback', {assessment: aImpl, assessmentId: aImpl.id, student: student, studentId: student.id }) }}"
+                                data-exclude-route="{{ routeLookupIfAuthorized('learningAssessment.postExclude', {assessment: aImpl, assessmentId: aImpl.id, student: student, studentId: student.id }) }}"
+                                data-include-route="{{ routeLookupIfAuthorized('learningAssessment.postInclude', {assessment: aImpl, assessmentId: aImpl.id, student: student, studentId: student.id }) }}"
+                                data-history-route="{{ routeLookupIfAuthorized('learningAssessment.getSummary', {assessment: aImpl, assessmentId: aImpl.id, student: student, studentId: student.id }) }}"
+                            >
+                            {% if participant and not participant.isExcluded %}
+                                {% if assessment is task %}
+                                    {% set progressStatus = taskProgress[courseImpl.id][assessment.id][student.id] %}
 
-                                        {# Tasks do not have drafts #}
-                                        {% set style = 'style="margin-bottom:0; position:absolute; top:0px;"' %}
-                                        {% if taskProgressComplete == progressStatus %}
-                                            {% set progressClass = 'reviewed' %}
-                                        {% elseif taskProgressPending == progressStatus %}
-                                            {# note there is no such thing as draft task masks #}
-                                            {% set progressClass = 'pending' %}
-                                        {% else %}
-                                            {% set progressClass = 'readonly' %}
-                                        {% endif %}
-
-                                        <div
-                                            {{ style | raw  }}
-                                            class="no-text progress-tick {{ progressClass }}"
-                                            title="Incomplete"
-                                            data-progress-tick-status="incomplete"></div>
+                                    {# Tasks do not have drafts #}
+                                    {% set style = 'style="margin-bottom:0; position:absolute; top:0px;"' %}
+                                    {% if taskProgressComplete == progressStatus %}
+                                        {% set progressClass = 'reviewed' %}
+                                    {% elseif taskProgressPending == progressStatus %}
+                                        {# note there is no such thing as draft task masks #}
+                                        {% set progressClass = 'pending' %}
                                     {% else %}
-                                        {% set participationRoute = routeLookup('learningAssessment.getSummary', {assessmentId: aImpl.id, studentId: student.id}) %}
-                                        {% set comment            = studentComments[courseImpl.id][student.id][assessment.id] ?? '' %}
-                                        {% set marks              = studentMarks[courseImpl.id][assessment.id][student.id] ?? null %}
-                                        {% set publishedMark      = marks.published ?? null %}
-                                        {% set draftMark          = marks.draft ?? null %}
+                                        {% set progressClass = 'readonly' %}
+                                    {% endif %}
 
+                                    <div
+                                        {{ style | raw  }}
+                                        class="no-text progress-tick {{ progressClass }}"
+                                        title="Incomplete"
+                                        data-progress-tick-status="incomplete"></div>
+                                {% else %}
+                                    {% set participationRoute = routeLookup('learningAssessment.getSummary', {assessmentId: aImpl.id, studentId: student.id}) %}
+                                    {% set comment            = studentComments[courseImpl.id][student.id][assessment.id] ?? '' %}
+                                    {% set marks              = studentMarks[courseImpl.id][assessment.id][student.id] ?? null %}
+                                    {% set publishedMark      = marks.published ?? null %}
+                                    {% set draftMark          = marks.draft ?? null %}
+
+                                    <a
+                                        class="{{ urgency.marks(participant.normalisedMark(true)) }}"
+                                        href="{{ participationRoute }}"
+                                        {% if marks.draft is defined %}data-actual-mark{% endif %}
+                                        title="{{ comment }}"
+                                    >
+                                        <span data-instructor-mark>{{ decorator.label(participant, true, true) }}</span>
+                                        <span data-learner-mark style="display: none">{{ decorator.label(participant, true, false) }}</span>
+                                    </a>
+                                    {% if marks.draft is defined %}
                                         <a
-                                            class="{{ urgency.marks(participant.normalisedMark(true)) }}"
                                             href="{{ participationRoute }}"
-                                            {% if marks.draft is defined %}data-actual-mark{% endif %}
-                                            title="{{ comment }}"
+                                            data-draft-mark
+                                            style="display: none"
+                                            data-tooltip="right"
+                                            class="has-tip tip-right meta"
+                                            data-width="105"
+                                            title="Draft Mark"
                                         >
-                                            <span data-instructor-mark>{{ decorator.label(participant, true, true) }}</span>
-                                            <span data-learner-mark style="display: none">{{ decorator.label(participant, true, false) }}</span>
+                                            <span data-instructor-mark>{{ decorator.label(participant, false, true) }}</span>
+                                            <span data-learner-mark style="display: none">{{ decorator.label(participant, false, false) }}</span>
                                         </a>
-                                        {% if marks.draft is defined %}
-                                            <a
-                                                href="{{ participationRoute }}"
-                                                data-draft-mark
-                                                style="display: none"
-                                                data-tooltip="right"
-                                                class="has-tip tip-right meta"
-                                                data-width="105"
-                                                title="Draft Mark"
-                                            >
-                                                <span data-instructor-mark>{{ decorator.label(participant, false, true) }}</span>
-                                                <span data-learner-mark style="display: none">{{ decorator.label(participant, false, false) }}</span>
-                                            </a>
-                                        {% endif %}
-                                        {% if participant.hasSubmittedResponse or participant.resubmissionRequired or participant.hasPublishedFeedback or draftMark %}
-                                            <span class="legend-indicator indicator-{{ decorator.indicator(participant, draftMark) }}" title="{{ decorator.notchTitle(participant, draftMark) }}"></span>
-                                        {% endif %}
+                                    {% endif %}
+                                    {% if participant.hasSubmittedResponse or participant.resubmissionRequired or participant.hasPublishedFeedback or draftMark %}
+                                        <span class="legend-indicator indicator-{{ decorator.indicator(participant, draftMark) }}" title="{{ decorator.notchTitle(participant, draftMark) }}"></span>
                                     {% endif %}
                                 {% endif %}
-                                </td>
-                                {% else %}
-                                <td class="na"></td>
-                                {% endif %}
+                            {% endif %}
+                            </td>
+                            {% else %}
+                            <td class="na"></td>
+                            {% endif %}
                         {% endfor %}
                     </tr>
                 {% endfor %}
