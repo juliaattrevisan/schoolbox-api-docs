@@ -105,6 +105,9 @@
                                         // Sortable table
                                         $(function () {
                                             $('table[data-sortable="{{ child.user.id }}-recordCollection"]').DataTable({
+                                                info: true,
+                                                paging: true,
+                                                searching: true,
                                                 {# order by the dateTimeFields, desc by default
                                                  # technically this limits to only default sorting by date fields, but it's a start.
                                                  # this means the date field can be in any position, rather than just the leftmost column
