@@ -2,13 +2,15 @@ name: build-and-push-schoolbox-fpm
 
 # Build a new schoolbox-fpm image:
 # * when master or develop changes (tags: master, develop, commit hash)
-# * when a release is created (tags: release name)
+# * when a release is created (tags: release name (github.ref_name))
 on:
   push:
     branches:
-#      - master
+      - master
       - develop
-  workflow_dispatch:
+  release:
+    types:
+      - published
 
 jobs:
   build-composer-artifact:
@@ -52,7 +54,12 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: build-and-push
+      # Different build-and-push depending on trigger:
+      # push: {{ github.ref_name }}-latest, {{ github.ref_name }}-{{ github.sha }}
+      #       (ref_name should be master or develop)
+      # release: {{ github.ref_name }}
+      - name: Build and push - push
+        if: github.event_name == 'push'
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -61,4 +68,16 @@ jobs:
           build-args: |
             ENV=prod
           platforms: ${{ matrix.build.platform }}
-          tags: alaress/schoolbox-fpm:latest
+          tags: alaress/schoolbox-fpm:{{ github.ref_name }}-latest, alaress/schoolbox-fpm:{{ github.ref_name }}-{{ github.sha }}
+
+      - name: Build and push - release
+        if: github.event_name == 'release'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/php-fpm/deployment-image.Dockerfile
+          push: true
+          build-args: |
+            ENV=prod
+          platforms: ${{ matrix.build.platform }}
+          tags: alaress/schoolbox-fpm:{{ github.ref_name }}
