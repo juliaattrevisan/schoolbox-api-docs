@@ -366,6 +366,7 @@
         const typesIndexDefaultPoints = {{ typesIndexDefaultPoints|json_encode|raw }};
 
         const isPointsEnabled = {% if config.pastoral_point_enabled and config.pastoral_enabled %}true{% else %}false{% endif %};
+        const isDefaultPointsEnabled = {% if config.pastoral_point_enabled and config.pastoral_default_points_enabled %}true{% else %}false{% endif %};
         const isExistingRecord = {{ record.id != '' ? "true" : "false"  }};
         const currentPoints = '{{ record.points ? record.points : null }}';
 
@@ -382,12 +383,14 @@
 
         /**
          * Check if the points can be updated when the type/sub-type is changed
-         * We prevent updating the points if points are not enabled, the record is existing, the points is set,
+         * We prevent updating the points if points are not enabled,
+         * default points are not enabled (so we don't need to change on type/subtype change),
+         * the record is existing, the points is set,
          * or if there is a manual input for the points
          * @returns boolean
          */
         function canUpdatePoints() {
-            return isPointsEnabled && !isExistingRecord && currentPoints === "" && !hasManualPointsInput;
+            return isPointsEnabled && isDefaultPointsEnabled && !isExistingRecord && currentPoints === "" && !hasManualPointsInput;
         }
 
         /**

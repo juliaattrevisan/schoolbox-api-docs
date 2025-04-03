@@ -116,11 +116,11 @@
                             </div>
                         </div>
                     </fieldset>
-                    {% if config.pastoral_point_enabled and config.pastoral_enabled %}
+                    {% set currentPoints  = (subtype ? subtype.defaultPoints : type.defaultPoints) %}
+                    {% if config.pastoral_point_enabled and config.pastoral_enabled and config.pastoral_default_points_enabled %}
                     <fieldset class="content">
                         <div class="small-12 columns">
                             <label for="defaultPoints">Default Points</label>
-                            {% set currentPoints  = (subtype ? subtype.defaultPoints : type.defaultPoints) %}
                             <div class="row">
                                 <div class="small-12 columns">
                                     <input id="defaultPoints" name="defaultPoints" type="text" value="{{ currentPoints }}">
@@ -128,6 +128,8 @@
                             </div>
                         </div>
                     </fieldset>
+                    {% else  %}
+                        <input id="defaultPoints" name="defaultPoints" type="hidden" value="{{ currentPoints }}">
                     {% endif %}
                     {% if config.pastoral_action_enable %}
                     <fieldset class="content">

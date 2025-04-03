@@ -242,6 +242,7 @@ class ConfigMapper extends Mapper
     public const NAME_PASTORAL_STUDENT_ACCESS_ENABLED = 'pastoral_student_access';
     public const NAME_PASTORAL_BULK_IMPORT_ENABLED    = 'pastoral_bulk_import_enabled';
     public const NAME_PASTORAL_POINT_ENABLED    = 'pastoral_point_enabled';
+    public const NAME_PASTORAL_DEFAULT_POINTS_ENABLED    = 'pastoral_default_points_enabled';
 
     public const NAME_REPORT_TITLE = 'report_title';
 

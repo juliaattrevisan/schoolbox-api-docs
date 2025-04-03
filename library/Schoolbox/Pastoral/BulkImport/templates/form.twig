@@ -77,7 +77,7 @@
                             title="Select when the record will expire. Expired records will move to an archived state."
                         >?</span>
                     </label>
-                    <input type="text" name="expiresAt" id="expiresAt" maxlength="50" value="" {% if canModifyDefaults %}data-datepicker{% else %}readonly{% endif %} />
+                    <input type="text" name="expiresAt" id="expiresAt" maxlength="50" value="" {% if canModifyExpiresAt %}data-datepicker{% else %}readonly{% endif %} />
                 </div>
                 <div class="small-12 medium-6 columns">
                     {% if severities | length %}
@@ -93,7 +93,7 @@
                     <div class="small-12 medium-6 columns">
                         {# This label is intentionally unusual, there exists custom JS that PST uses occasionally which targets
                          this <input> field, moving up one will break the form. See SA-18992 for more. #}
-                        <label> Points <input id="points" type="text" inputmode="numeric" name="points" /> </label>
+                        <label> Points <input id="points" type="text" inputmode="numeric" name="points" {% if canModifyPoints == false %}readonly {% endif %}/> </label>
                     </div>
                 {% endif %}
                 <div class="small-12 columns">
