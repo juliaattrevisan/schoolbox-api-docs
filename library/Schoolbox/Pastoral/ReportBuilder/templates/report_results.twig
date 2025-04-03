@@ -71,6 +71,20 @@
                                 {% if record.bodyPublic is not empty %}
                                     {{ record.bodyPublic | purify }}
                                 {% endif %}
+                                 {% if record.points != 0 or (record.tags | length) > 0 %}
+                                    <p class="spaced">
+                                        {% if record.tags | length > 0 %}
+                                            {% for tag in record.tags %}
+                                                <a class="neutral label hide-on-print"
+                                                    href="{{ routeLookup('pastoralReportBuilder.getReportTags', {tagId: tag.id}) }}"
+                                                    class="neutral label">
+                                                    {{ tag.name }}
+                                                </a>
+                                                <b class="show-for-print"> {{ tag.name }}</b>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </p>
+                                {% endif %}
                             </article>
 
                             {% if record.comments | length %}
