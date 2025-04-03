@@ -246,7 +246,7 @@ class Subnav
                     '/adminv2/calendar/Subscribe' => [
                         'name'        => 'Subscribe',
                         'visible'     => true,
-                        'description' => 'Control which additional calendars are included into a users calendar. This includes VCAL events, modules and the SIS.',
+                        'description' => 'Control which additional calendars are included into a users calendar. This includes iCal, vCal or ics events, modules and the SIS.',
                     ],
                 ],
             ],

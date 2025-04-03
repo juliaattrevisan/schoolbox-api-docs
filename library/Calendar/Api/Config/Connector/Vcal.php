@@ -21,7 +21,7 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
      */
     public function getDefaultLabel(): string
     {
-        return 'VCal Events';
+        return 'iCalendar Events';
     }
 
     // DANGER! Private variables of this class must not be renamed
