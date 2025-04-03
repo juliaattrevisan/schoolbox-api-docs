@@ -14,6 +14,8 @@ on:
     paths:
       - 'docker/base-images/**'
   workflow_dispatch:
+  # Testing only
+  pull_request:
 
 # Separate job variants are required for AMD64 and ARM64 builds, so that the
 # build runs on the same architecture as the image it's building:
@@ -22,6 +24,8 @@ jobs:
   build:
     strategy:
       matrix:
+        # Add image names as build steps, but note that php82-fpm-alpine relies
+        # upon php82-alpine
         build:
           - runs-on: ubuntu-latest
             platform: linux/amd64
@@ -74,3 +78,37 @@ jobs:
           name: php82-alpine-{{ matrix.build.platform }}
           path: ${{ runner.temp }}/php82-fpm-alpine-{{ matrix.build.platform }}.tar
           retention-days: 1
+
+  # Push artifacts from previous steps
+  push-to-dockerhub:
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        build:
+          - platform: linux/amd64
+          - platform: linux/arm64
+        image:
+          - php82-alpine
+          - php82-fpm-alpine
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: {{ matrix.image }}-{{ matrix.build.platform }}
+          path: ${{ runner.temp }}/{{ matrix.image }}-{{ matrix.build.platform }}.tar
+
+      - name: Load image
+        run: |
+          docker image load --input ${{ runner.temp }}/{{ matrix.image }}-{{ matrix.build.platform }}.tar
+
+      - name: Login to Dockerhub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Push image
+        run: |
+          docker push -a alaress/{{ matrix.image }} --platform {{ matrix.build.platform }}
