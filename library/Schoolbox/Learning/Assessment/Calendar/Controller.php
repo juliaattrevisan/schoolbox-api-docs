@@ -106,14 +106,23 @@ class Controller extends Base
             $queryArgs
         );
 
+        $eventTypes = $this->eventTypeMapper->findAll(['deleted' => true]);
+
+        foreach ($eventTypes as $eventType) {
+            if ($eventType->isDeleted()) {
+                // TODO: Detect deleted event types when rendering, and style as deleted instead of adding suffix here.
+                $eventType->setType($eventType->getType() . ' (deleted)');
+            }
+        }
+
         $this->response = $this->responseFromTemplate(
             '@learningAssessmentCalendar/index.twig',
             [
                 'user'        => $this->getUser(),
                 'filterPanel' => $filterPanel,
                 'termDates'   => $this->getAvailableTermDates(),
-                'eventTypes'  => $this->eventTypeMapper->findAll(),
-                'inContext'   =>  $inContext,
+                'eventTypes'  => $eventTypes,
+                'inContext'   => $inContext,
             ],
             'Assessment Calendar',
             $pageTitle
