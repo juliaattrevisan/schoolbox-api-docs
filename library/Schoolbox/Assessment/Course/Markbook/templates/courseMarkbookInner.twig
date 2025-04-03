@@ -228,7 +228,7 @@
 
                         {% for assessment in collapsedAssessments %}
                             {% set aImpl = courseImportAssessments[courseImpl.id][assessment.id] ?? null %}
-                            {% set participant = aImpl.participantIfExtant(student) ?? null %}
+                            {% set participant = aImpl.participantIfExtant(student, false) ?? null %}
                                 <td
                                     class="column-{{ assessment.id }} {% if not participant or participant.isExcluded %} excluded {% endif %} student-grade-cell"
                                     data-assessment="{{ assessment.id }}"
