@@ -114,3 +114,47 @@ jobs:
         if: ${{ github.event_name != 'pull_request' }}
         run: |
           docker push -a alaress/{{ matrix.image }} --platform {{ matrix.build.platform }}
+
+  push-to-ecr:
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        build:
+          - platform: linux/amd64
+          - platform: linux/arm64
+        image:
+          - php82-alpine
+          - php82-fpm-alpine
+        region:
+          - ap-southeast-2
+#          - ap-southeast-1
+#          - me-south-1
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: {{ matrix.image }}-{{ matrix.build.platform }}
+          path: ${{ runner.temp }}/{{ matrix.image }}-{{ matrix.build.platform }}.tar
+
+      - name: Load image
+        run: |
+          docker image load --input ${{ runner.temp }}/{{ matrix.image }}-{{ matrix.build.platform }}.tar
+
+      - name: Configure AWS Credentials
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ECR_ROLE }}
+          aws-region: ${{ matrix.region }}
+
+      - name: Login to Amazon ECR Private
+        if: ${{ github.event_name != 'pull_request' }}
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Push image
+        if: ${{ github.event_name != 'pull_request' }}
+        run: |
+          docker push -a ${{ steps.login-ecr.outputs.registry }}/{{ matrix.image }} --platform {{ matrix.build.platform }}
