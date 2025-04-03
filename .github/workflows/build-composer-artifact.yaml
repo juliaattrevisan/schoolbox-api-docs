@@ -7,15 +7,18 @@ jobs:
   build-composer-artifact:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
 
-      - uses: actions/cache@v4
+      - name: Load vendor cache
+        uses: actions/cache@v4
         id: cache-vendor
         with:
           path: /tmp/composer-cache
           key: vendor-${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
 
-      - uses: php-actions/composer@v6
+      - name: Composer install
+        uses: php-actions/composer@v6
         with:
           dev: no
           args: --profile --ignore-platform-reqs -a
@@ -23,8 +26,9 @@ jobs:
           # The Composer action takes `2.2.x` but not `2.8.x`? Srsly?
           version: '2.8.6'
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload composer artifact
+        uses: actions/upload-artifact@v4
         with:
-          name: schoolbox-vendor
+          name: schoolbox-composer
           path: vendor/
           retention-days: 1

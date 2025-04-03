@@ -32,18 +32,21 @@ jobs:
             platform: linux/arm64
     runs-on: ${{ matrix.build.runs-on }}
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
       # Extract artifacts
-      - uses: actions/download-artifact@v4
+      - name: Download composer artifact
+        uses: actions/download-artifact@v4
         with:
-          name: schoolbox-vendor
+          name: schoolbox-composer
           path: vendor/
 
-      - uses: actions/download-artifact@v4
+      - name: Download npm artifact
+        uses: actions/download-artifact@v4
         with:
           name: schoolbox-npm
           path: www/static/js/bundle/
