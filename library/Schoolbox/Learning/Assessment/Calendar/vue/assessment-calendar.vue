@@ -230,7 +230,7 @@ export default {
             dateClick: this.onDateClick,
             datesSet: this.datesSet,
             resourceOrder: "title", // sort resources(events) by the event title
-            viewDidMount: this.onRenderingComplete,
+            resourceLabelDidMount: this.resourceLabelDidMount,
         };
     },
 
@@ -629,31 +629,28 @@ export default {
         },
 
         /**
+         * After the resource label section on the left of the page has been rendered:
          * Add a class to any deleted event types so they can be visually distinguished form non-deleted event types.
          */
-        onRenderingComplete() {
+        resourceLabelDidMount() {
             const eventTypes = this.config.eventTypes;
 
-            // TODO: Find the right callback to trigger this so the setTimeout() below can be removed.
-            //       Tried: viewDidMount, resourcesSet, viewClassNames
-            setTimeout(function () {
-                for (const eventType of eventTypes) {
-                    if (eventType.isDeleted) {
-                        const elements = document.querySelectorAll(
-                            '[data-resource-id="' + RESOURCE_EVENT_TYPE_PREFIX + eventType.id + '"]',
-                        );
+            for (const eventType of eventTypes) {
+                if (eventType.isDeleted) {
+                    const elements = document.querySelectorAll(
+                        '[data-resource-id="' + RESOURCE_EVENT_TYPE_PREFIX + eventType.id + '"]',
+                    );
 
-                        for (const element of elements) {
-                            // Events having this event type have the same class are also selected by the above
-                            // call to document.querySelectorAll().  So we need to check the textContent to find the
-                            // element we seek.
-                            if (element.textContent === eventType.type) {
-                                element.classList.add("meta"); // Add 'meta' class to distinguish deleted from non-deleted event types.
-                            }
+                    for (const element of elements) {
+                        // Events having this event type have the same class are also selected by the above
+                        // call to document.querySelectorAll().  So we need to check the textContent to find the
+                        // element we seek.
+                        if (element.textContent === eventType.type) {
+                            element.classList.add("meta"); // Add 'meta' class to distinguish deleted from non-deleted event types.
                         }
                     }
                 }
-            }, 2000);
+            }
         },
 
         /**
