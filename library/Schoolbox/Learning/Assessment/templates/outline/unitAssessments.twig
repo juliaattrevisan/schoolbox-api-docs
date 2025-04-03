@@ -131,6 +131,7 @@
                         {% if hasAssessmentRoutes %}
                             <li class="separator">{{ locale.translate('activity', false, true) }}</li>
                             {% if statusRoute %}<li><a href="{{ statusRoute }}" class="icon-progress">View Status</a></li>{% endif %}
+                                <li><a class="icon-task" href="#" >View and {{ locale.grades }} submission</a></li>
                             {% if assessment is dueWork and assessment.enableWorksheet and assessment.kamiWorksheetTemplate and kamiWorksheetRoute %}
                                 <li>
                                     <a id="kamiWorksheet" class="icon-surveys" href="{{ kamiWorksheetRoute }}">Class View</a>
