@@ -1,3 +1,4 @@
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/dataTables.js?v={{ config.site_version }}"></script>
 <div class="small-12 island">
     <h2 class="subheader">{{ register.name }}</h2>
         <div class="l-flex-col l-gap-m">
@@ -59,7 +60,8 @@
                             {% for collection in recordCollection %}
                                 <h2>{{ collection.groupName }}</h2>
                                 {% if collection.data ?? [] is not empty %}
-                                    <table>
+                                    {% set dateTimeFields = [] %} {# This is used to create a default ordering later on.. #}
+                                    <table data-sortable="{{ child.user.id }}-recordCollection">
                                         <thead>
                                         <tr>
                                             {% for key, name in (collection.headers ?? []) %}
@@ -72,7 +74,24 @@
                                             <tr>
                                                 {% for key, field in record %}
                                                     {% set fieldValue = field.value ?? '' %}
-                                                    <td>
+                                                    <td
+                                                        {% if field.type == 'DateTimeField' %}
+                                                            {# Twig can't pass the date value as "DD/MM/YYYY",
+                                                             # so we need to convert it to "YYYY-MM-DD" first to do the sorting #}
+                                                            {% if fieldValue is not empty %}
+                                                                {% set parts = fieldValue|split('/') %}
+                                                                {% if parts|length == 3 %}
+                                                                    {% set formattedDate = parts[2] ~ '-' ~ parts[1] ~ '-' ~ parts[0] %}
+                                                                    data-order="{{ formattedDate|date('U') }}"
+                                                                {% endif %}
+                                                            {% endif %}
+
+                                                            {# Add the field's index to dateTimeFields if it isn't already there #}
+                                                            {% if key not in dateTimeFields %}
+                                                                {% set dateTimeFields = dateTimeFields|merge([key]) %}
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    >
                                                         {% if field.type == 'url' and fieldValue %}
                                                             <a href="{{ fieldValue }}">{{ collection.headers[key] }}</a>
                                                         {% elseif field.type == 'html' %}
@@ -86,6 +105,35 @@
                                         {% endfor %}
                                         </tbody>
                                     </table>
+                                    <script type="text/javascript">
+                                        // Sortable table
+                                        $(function () {
+                                            $('table[data-sortable="{{ child.user.id }}-recordCollection"]').DataTable({
+                                                info: true,
+                                                paging: true,
+                                                searching: true,
+                                                drawCallback: function() {
+                                                    {# The most jank workaround, this aligns the datatables pagination buttons to our styles... #}
+                                                    $('.dataTables_paginate .paginate_button.previous').text('‹');
+                                                    $('.dataTables_paginate .paginate_button').addClass('button');
+                                                    $('.dataTables_paginate .ellipsis').addClass('button disabled');
+                                                    $('.dataTables_paginate .paginate_button.next').text('›');
+
+                                                    {# Disable the current page button (as it's not a <ul> list so our styles won't work) #}
+                                                    $('.dataTables_paginate .paginate_button.current').addClass('disabled');
+                                                },
+                                                {# order by the dateTimeFields, desc by default
+                                                 # technically this limits to only default sorting by date fields, but it's a start.
+                                                 # this means the date field can be in any position, rather than just the leftmost column
+                                                 #}
+                                                {% if dateTimeFields is not empty %}
+                                                    order: [
+                                                        {% for field in dateTimeFields %}[{{ field }}, 'desc'],{% endfor %}
+                                                    ],
+                                                {% endif %}
+                                            });
+                                        });
+                                    </script>
                                 {% else %}
                                     <p><em>No data available.</em></p>
                                 {% endif %}
