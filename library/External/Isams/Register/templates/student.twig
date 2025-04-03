@@ -74,7 +74,20 @@
                                             <tr>
                                                 {% for key, field in record %}
                                                     {% set fieldValue = field.value ?? '' %}
-                                                    <td>
+                                                    <td
+                                                        {% if field.type == 'DateTimeField' %}
+                                                            {# Twig can't pass the date value as "DD/MM/YYYY",
+                                                             # so we need to convert it to "YYYY-MM-DD" first to do the sorting #}
+                                                            {% set parts = fieldValue|split('/') %}
+                                                            {% set formattedDate = parts[2] ~ '-' ~ parts[1] ~ '-' ~ parts[0] %}
+                                                            data-order="{{ formattedDate|date('U') }}"
+
+                                                            {# Add the field's index to dateTimeFields if it isn't already there #}
+                                                            {% if key not in dateTimeFields %}
+                                                                {% set dateTimeFields = dateTimeFields|merge([key]) %}
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    >
                                                         {% if field.type == 'url' and fieldValue %}
                                                             <a href="{{ fieldValue }}">{{ collection.headers[key] }}</a>
                                                         {% elseif field.type == 'html' %}
@@ -92,9 +105,15 @@
                                         // Sortable table
                                         $(function () {
                                             $('table[data-sortable="{{ child.user.id }}-recordCollection"]').DataTable({
-                                                info: false,
-                                                paging: false,
-                                                searching: false,
+                                                {# order by the dateTimeFields, desc by default
+                                                 # technically this limits to only default sorting by date fields, but it's a start.
+                                                 # this means the date field can be in any position, rather than just the leftmost column
+                                                 #}
+                                                {% if dateTimeFields is not empty %}
+                                                    order: [
+                                                        {% for field in dateTimeFields %}[{{ field }}, 'desc'],{% endfor %}
+                                                    ],
+                                                {% endif %}
                                             });
                                         });
                                     </script>
