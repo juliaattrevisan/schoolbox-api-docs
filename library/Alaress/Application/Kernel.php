@@ -14,7 +14,6 @@ use Alaress\Codec\Json\Base64;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Connector\NullConnector;
 use Alaress\Database\Exception as AlaressDatabaseException;
-use Alaress\Database\Factory as AlaressDatabaseFactory;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Image\ProcessorFactory;
 use Alaress\Module\Cache as ModuleCache;
@@ -30,6 +29,7 @@ use Alaress\Session\Session;
 use Alaress\Twig\Loader\ChainLoader;
 use Alaress\Twig\Method as TwigMethod;
 use Alaress\Web\Output;
+use Alaress\Web\Request\IsJson;
 use Alaress\Web\Response\Factory as ResponseFactory;
 use Alaress\Web\Response\Outputter;
 use Alaress\Web\Router\PathMatcher;
@@ -42,6 +42,7 @@ use Aura\Router\RouterContainer;
 use Cache\Bridge\SimpleCache\SimpleCacheBridge;
 use Calendar\Api\ModuleChecker;
 use Calendar_Api_Factory;
+use Crell\ApiProblem\ApiProblem;
 use enshrined\svgSanitize\Sanitizer as BaseSvgSanitizer;
 use External_Class;
 use External_ClassInterface;
@@ -224,6 +225,8 @@ abstract class Kernel
      */
     private $exceptionCallbacks = [];
 
+    private const HTTP_RESPONSE_CODE_BAD_REQUEST = 400;
+
     /**
      * @throws Di\Exception
      * @throws Di\Exception\ContainerLocked
@@ -264,7 +267,6 @@ abstract class Kernel
     {
         return $this->shutdownHandler;
     }
-
 
     /**
      * Returns whether the current PHP process is being run by the system root user
@@ -335,7 +337,6 @@ abstract class Kernel
         register_shutdown_function($this->getShutdownHandler());
     }
 
-
     /**
      * @return Di\Container
      */
@@ -343,7 +344,6 @@ abstract class Kernel
     {
         return $this->di;
     }
-
 
     /**
      * Convenience method to retrieve service from DI
@@ -356,7 +356,6 @@ abstract class Kernel
     {
         return $this->getDependencyInjector()->get($service);
     }
-
 
     /**
      * @param callable $callable
@@ -388,7 +387,6 @@ abstract class Kernel
         }
     }
 
-
     /**
      * Ensures this kernel is being run in appropriate environment.
      *
@@ -399,7 +397,6 @@ abstract class Kernel
      * @throws WrongSapiException If this Kernel has been constructed in an invalid environment.
      */
     abstract protected function checkServerApiEnvironment(): void;
-
 
     /**
      * Install any internal dependencies into the kernel (routing, etc.)
@@ -729,16 +726,58 @@ abstract class Kernel
                     // That should be fine: they all obey the same interface.
                     /** @var Psr17Factory $httpFactory */
                     $httpFactory = $di->get('httpFactory');
-                    $request     = $httpFactory->createServerRequestFromGlobals();
+                    $request = $httpFactory->createServerRequestFromGlobals();
+                    $request->getBody()->rewind();
+                    $content = $request->getBody()->getContents();
+                    $request->getBody()->rewind();
 
-                    // If the request is JSON:
-                    // set the parsed body appropriately
                     // TODO move to spec pattern or middleware?
-                    if (str_contains($request->getHeaderLine('content-type'), 'application/json')) {
-                        $request->getBody()->rewind();
-                        $content = $request->getBody()->getContents();
-                        $request->getBody()->rewind();
-                        $request = $request->withParsedBody(json_decode($content, true));
+                    // If the request content is JSON, and the content is non-empty, decode the JSON content.
+                    // (Empty content must be ignored because attempting to json_decode empty content leads to errors.)
+                    if (str_contains($request->getHeaderLine('content-type'), 'application/json') && $content !== '') {
+                        try {
+                            $decodedContent = json_decode($content, true, flags: JSON_THROW_ON_ERROR);
+                        } catch (\JsonException) {
+                            $decodedContent = null;
+                        }
+                        // Note json_decode(.., true) can return many data types after a successful decode:
+                        //  * json_decode('null', true) returns null
+                        //  * json_decode('false', true) returns false
+                        //  * json_decode('true', true) returns true
+                        //  * json_decode('123', true) returns int(123)
+                        //  * json_decode(' -12.054e3 ', true) returns float(-12054)
+                        //  * json_decode('[]', true) returns []
+                        //  * json_decode('{}', true) returns []
+                        // All the example responses above are valid JSON data.  However, we are only interested in
+                        // JSON data that decodes to an array.  Also, the withParsedBody() function called below
+                        // requires that its parameter be either object, array, or null.  Therefore, treat all the edge
+                        // cases above as client errors, and send a 400 response since we do not want these edge cases
+                        // to cause errors that end up in Sentry.
+                        // (No need to check for object, since json_decode(..., true) converts objects to arrays.)
+                        if (!is_array($decodedContent)) {
+                            $message = 'Invalid JSON in request body';
+
+                            if ((new IsJson())->isSatisfiedBy($request)) { // Note IsJson() means AcceptsJson().
+                                $problem = (new ApiProblem($message))
+                                    ->setStatus(self::HTTP_RESPONSE_CODE_BAD_REQUEST)
+                                    ->asArray();
+
+                                /** @var ResponseFactory $responseFactory */
+                                $responseFactory = $di->get('httpResponseFactory');
+
+                                $response = $responseFactory->buildJson($problem);
+
+                                /** @var Outputter $responseFactory */
+                                $responseOutputter = $di->get('httpResponseOutputter');
+                                $responseOutputter->output($response->withStatus(self::HTTP_RESPONSE_CODE_BAD_REQUEST));
+                            } else {
+                                http_response_code(self::HTTP_RESPONSE_CODE_BAD_REQUEST);
+                                header('Content-Type: text/plain');
+                                echo "$message\n";
+                            }
+                            die;
+                        }
+                        $request = $request->withParsedBody($decodedContent);
                     }
                     return $request;
                 }
@@ -1432,7 +1471,6 @@ abstract class Kernel
             )
         );
 
-
         /* DUE WORK SOURCES */
         $di->set(
             'submissionDataSource',
@@ -1448,7 +1486,6 @@ abstract class Kernel
                 ['mapper' => $mapperFactory->getLazy(ReturnedWorkMapper::class)]
             )
         );
-
 
         /* QUIZ SOURCES */
         $di->set(
@@ -1466,7 +1503,6 @@ abstract class Kernel
             )
         );
 
-
         /* TASK SOURCES */
         $di->set(
             'completionDataSource',
@@ -1483,7 +1519,6 @@ abstract class Kernel
             )
         );
 
-
         // LTI sources, without funny names
         $di->set(
             'ltiResponseDataSource',
@@ -1499,7 +1534,6 @@ abstract class Kernel
                 ['mapper' => $mapperFactory->getLazy(LtiScoreMapper::class)]
             )
         );
-
 
         // Register response data source
         $di->set(
@@ -1713,7 +1747,6 @@ abstract class Kernel
             return new Rule\Any($di->get('rule:isStaff'), $di->get('rule:isStudent'));
         }));
 
-
         // Calendar API factory - requires an assessment data source to build some types
         $di->set(
             'calendarApiFactory',
@@ -1755,7 +1788,6 @@ abstract class Kernel
                 }
             )
         );
-
 
         // Pastoral Care data source
         // TODO consider moving into a module's dependencies?
@@ -2200,7 +2232,6 @@ abstract class Kernel
      * @return array
      */
     abstract protected static function getKnownUserClassesFromSession(Di\Container $di): array;
-
 
     /**
      * Consistently register the 'session' and 'session.rememberer' DI services.

@@ -973,7 +973,7 @@ class Controller extends Base
             ]);
         } else {
             if ($this->isJsonRequest()) {
-                $this->response = $this->responseAsJson('')->withStatus(204); // HTTP status 204 means 'No Content'.
+                $this->response = $this->responseEmpty()->withStatus(204); // HTTP status 204 means 'No Content'.
             } else {
                 $this->response = $this->redirectFound($redirect);
             }
