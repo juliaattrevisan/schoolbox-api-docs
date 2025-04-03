@@ -108,6 +108,16 @@
                                                 info: true,
                                                 paging: true,
                                                 searching: true,
+                                                drawCallback: function() {
+                                                    {# The most jank workaround, this aligns the datatables pagination buttons to our styles... #}
+                                                    $('.dataTables_paginate .paginate_button.previous').text('‹');
+                                                    $('.dataTables_paginate .paginate_button').addClass('button');
+                                                    $('.dataTables_paginate .ellipsis').addClass('button disabled');
+                                                    $('.dataTables_paginate .paginate_button.next').text('›');
+
+                                                    {# Disable the current page button (as it's not a <ul> list so our styles won't work) #}
+                                                    $('.dataTables_paginate .paginate_button.current').addClass('disabled');
+                                                },
                                                 {# order by the dateTimeFields, desc by default
                                                  # technically this limits to only default sorting by date fields, but it's a start.
                                                  # this means the date field can be in any position, rather than just the leftmost column
