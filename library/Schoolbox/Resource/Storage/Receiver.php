@@ -58,7 +58,7 @@ class Receiver implements IReceiver
     ): Model {
         // This might seem hacky, but to ensure all the safety checks pass, this data needs to be a tempfile
         // (just like an upload)
-        $tempLocation = sb_tempnam('otfs');
+        $tempLocation = tempnam(sys_get_temp_dir(), 'otfs');
 
         /* Temporary location didn't get created. There might be a number of reasons why that might
          * be the case; no write access to the specified location, disk full, etc.
@@ -67,7 +67,7 @@ class Receiver implements IReceiver
          * If you ended up following a fatal from a cli tool, you should try running it with sudo
          * Otherwise your logged-in account might not have write access to $tempLocation
          */
-        if ('' === $tempLocation) {
+        if (false === $tempLocation) {
             throw new FileException("Temporary location couldn't be created; check sudo, perms, disk usage");
         }
 

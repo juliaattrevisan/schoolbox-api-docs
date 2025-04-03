@@ -251,10 +251,6 @@ function setResponseOptions()
     // Disable output compression
 
     ini_set('zlib.output_compression', 0);
-
-    if (substr_count(strtolower(php_sapi_name()), 'apache') > 0) {
-        apache_setenv('no-gzip', 1);
-    }
 }
 
 /**

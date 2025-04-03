@@ -290,7 +290,7 @@ class Locator implements Resource\File\ILocator, Resource\Folder\ILocator, Fetch
             throw new OutOfBoundsException("No url found for download");
         }
 
-        $destination = sb_tempnam('365');
+        $destination = tempnam(sys_get_temp_dir(), '365');
 
         if (!($fp = fopen($destination, 'w'))) {
             throw new OutOfBoundsException("Could not open target");

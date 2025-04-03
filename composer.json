@@ -117,7 +117,12 @@
         "ext-xmlreader": "*",
         "ext-dom": "*",
         "violet/streaming-json-encoder": "^1.1",
-        "ext-exif": "*"
+        "ext-exif": "*",
+        "ext-zlib": "*",
+        "ext-fileinfo": "*",
+        "ext-libxml": "*",
+        "ext-imap": "*",
+        "ext-sockets": "*"
     },
     "autoload-dev": {
       "psr-4": {
@@ -141,9 +146,6 @@
         "codeception/module-rest": "^3.4",
         "codeception/module-phpbrowser": "^3.0",
         "rector/rector": "^2.0.7"
-    },
-    "suggest" : {
-        "ext-sockets": "For calling ClamAV over a TCP socket"
     },
     "config": {
         "allow-plugins": {
