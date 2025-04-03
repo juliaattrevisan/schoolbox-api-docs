@@ -26,9 +26,11 @@ jobs:
       matrix:
         build:
           - runs-on: ubuntu-latest
-            platform: linux/amd64
+            platform: linux
+            arch: amd64
           - runs-on: ubuntu-arm
-            platform: linux/arm64
+            platform: linux
+            arch: arm64
     runs-on: ${{ matrix.build.runs-on }}
     steps:
       - name: Checkout
@@ -41,17 +43,17 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: "{{defaultContext}}:docker/base-images/php82-alpine"
-          outputs: type=docker,dest=${{ runner.temp }}/php82-alpine-${{ matrix.build.platform }}.tar
+          outputs: type=docker,dest=${{ runner.temp }}/php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
           build-args: |
             ENV=prod
-          platforms: ${{ matrix.build.platform }}
+          platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           tags: alaress/php82-alpine:latest
 
       - name: Upload php82-alpine artifact
         uses: actions/upload-artifact@v4
         with:
-          name: php82-alpine-${{ matrix.build.platform }}
-          path: ${{ runner.temp }}/php82-alpine-${{ matrix.build.platform }}.tar
+          name: php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}
+          path: ${{ runner.temp }}/php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
           retention-days: 1
 
   build-php82-fpm-alpine:
@@ -61,9 +63,11 @@ jobs:
       matrix:
         build:
           - runs-on: ubuntu-latest
-            platform: linux/amd64
+            platform: linux
+            arch: amd64
           - runs-on: ubuntu-arm
-            platform: linux/arm64
+            platform: linux
+            arch: arm64
     runs-on: ${{ matrix.build.runs-on }}
     steps:
       - name: Checkout
@@ -75,28 +79,28 @@ jobs:
       - name: Download php82-alpine artifact
         uses: actions/download-artifact@v4
         with:
-          name: php82-alpine-${{ matrix.build.platform }}
-          path: ${{ runner.temp }}/php82-alpine-${{ matrix.build.platform }}.tar
+          name: php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}
+          path: ${{ runner.temp }}/php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
 
       - name: Load php82-alpine image
         run: |
-          docker image load --input ${{ runner.temp }}/php82-alpine-${{ matrix.build.platform }}.tar
+          docker image load --input ${{ runner.temp }}/php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
 
       - name: Build php82-fpm-alpine
         uses: docker/build-push-action@v6
         with:
           context: "{{defaultContext}}:docker/base-images/php82-fpm-alpine"
-          outputs: type=docker,dest=${{ runner.temp }}/php82-fpm-alpine-${{ matrix.build.platform }}.tar
+          outputs: type=docker,dest=${{ runner.temp }}/php82-fpm-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
           build-args: |
             ENV=prod
-          platforms: ${{ matrix.build.platform }}
+          platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           tags: alaress/php82-fpm-alpine:latest
 
       - name: Upload php82-fpm-alpine artifact
         uses: actions/upload-artifact@v4
         with:
-          name: php82-alpine-${{ matrix.build.platform }}
-          path: ${{ runner.temp }}/php82-fpm-alpine-${{ matrix.build.platform }}.tar
+          name: php82-fpm-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}
+          path: ${{ runner.temp }}/php82-fpm-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
           retention-days: 1
 
   # Push artifacts from previous steps
@@ -108,8 +112,10 @@ jobs:
     strategy:
       matrix:
         build:
-          - platform: linux/amd64
-          - platform: linux/arm64
+          - platform: linux
+            arch: amd64
+          - platform: linux
+            arch: arm64
         image:
           - php82-alpine
           - php82-fpm-alpine
@@ -117,12 +123,12 @@ jobs:
       - name: Download ${{ matrix.image }} artifact
         uses: actions/download-artifact@v4
         with:
-          name: ${{ matrix.image }}-${{ matrix.build.platform }}
-          path: ${{ runner.temp }}/${{ matrix.image }}-${{ matrix.build.platform }}.tar
+          name: ${{ matrix.image }}-${{ matrix.build.platform }}-${{ matrix.build.arch }}
+          path: ${{ runner.temp }}/${{ matrix.image }}-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
 
       - name: Load ${{ matrix.image }} image
         run: |
-          docker image load --input ${{ runner.temp }}/${{ matrix.image }}-${{ matrix.build.platform }}.tar
+          docker image load --input ${{ runner.temp }}/${{ matrix.image }}-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
 
       - name: Login to Dockerhub
         if: ${{ github.event_name != 'pull_request' }}
@@ -134,7 +140,7 @@ jobs:
       - name: Push ${{ matrix.image }} image
         if: ${{ github.event_name != 'pull_request' }}
         run: |
-          docker push -a alaress/${{ matrix.image }} --platform ${{ matrix.build.platform }}
+          docker push -a alaress/${{ matrix.image }} --platform ${{ matrix.build.platform }}/${{ matrix.build.arch }}
 
   push-to-ecr:
     needs:
@@ -144,8 +150,10 @@ jobs:
     strategy:
       matrix:
         build:
-          - platform: linux/amd64
-          - platform: linux/arm64
+          - platform: linux
+            arch: amd64
+          - platform: linux
+            arch: arm64
         image:
           - php82-alpine
           - php82-fpm-alpine
@@ -157,12 +165,12 @@ jobs:
       - name: Download ${{ matrix.image }} artifact
         uses: actions/download-artifact@v4
         with:
-          name: ${{ matrix.image }}-${{ matrix.build.platform }}
-          path: ${{ runner.temp }}/${{ matrix.image }}-${{ matrix.build.platform }}.tar
+          name: ${{ matrix.image }}-${{ matrix.build.platform }}-${{ matrix.build.arch }}
+          path: ${{ runner.temp }}/${{ matrix.image }}-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
 
       - name: Load ${{ matrix.image }} image
         run: |
-          docker image load --input ${{ runner.temp }}/${{ matrix.image }}-${{ matrix.build.platform }}.tar
+          docker image load --input ${{ runner.temp }}/${{ matrix.image }}-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
 
       - name: Configure AWS Credentials
         if: ${{ github.event_name != 'pull_request' }}
@@ -179,4 +187,4 @@ jobs:
       - name: Push ${{ matrix.image }} image
         if: ${{ github.event_name != 'pull_request' }}
         run: |
-          docker push -a ${{ steps.login-ecr.outputs.registry }}/${{ matrix.image }} --platform ${{ matrix.build.platform }}
+          docker push -a ${{ steps.login-ecr.outputs.registry }}/${{ matrix.image }} --platform ${{ matrix.build.platform }}/${{ matrix.build.arch }}
