@@ -1,0 +1,72 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(breadcrumbs) }}
+
+<div class="admin-container row">
+
+    {{ renderAdminNavigation(pageCurrent) }}
+
+    <div class="admin-content">
+        <div class="small-12 columns">
+            <h2 class="subheader">{% if perform is not defined %}Preview {% endif %}bulk calendar event</h2>
+            {% if perform is not defined %}
+                <div data-alert="" class="alert-box warning">
+                    This is a preview only. Click 'Import' to perform import.
+                </div>
+            {% else %}
+                <div data-alert="" class="alert-box success">
+                    The import file was processed successfully.
+                </div>
+            {% endif %}
+            <table>
+                <thead>
+                <tr>
+                    <th>Event Name</th>
+                    <th>Action<span class="hint has-tip tip-top" data-tooltip title="The function Schoolbox has attempted to complete.">?</span></th>
+                    <th>Response<span class="hint has-tip tip-top" data-tooltip title="Schoolbox's feedback after attempting to complete the requested function.">?</span></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for event in allEvents %}
+                    <tr class="{% if event.error != 'OK' %}alert {% endif %}">
+                        <td>{{ event.name }}</td>
+                        <td>
+                            {% if event.error == 'OK' %}
+                                {% if perform is not defined %}
+                                    Will be added
+                                {% else %}
+                                    Added
+                                {% endif %}
+                            {% else %}
+                                {% if perform is not defined %}
+                                    Will not be added
+                                {% else %}
+                                    Not added
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                        <td>{{ event.error }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+            <ul class="flex-list buttons">
+                <li>
+                    <a href="{{ RETURN_URL.previous.decoded }}">Back</a>
+                </li>
+                {% if perform is not defined %}
+                    {% set runRoute = routeLookupIfAuthorized('adminCalendarImport.postRunCalendarVcalImportForm') %}
+                    <li>
+                        <form class="top" enctype="multipart/form-data" method="post" data-disable-on-submit action="{{ runRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}">
+                            <input type="hidden" name="icsFilePath" value="{{ icsFilePath ?? null }}"/>
+                            <input type="hidden" name="userGroup" value="{{ roleList }}"/>
+                            <input type="hidden" name="campusList" value="{{ campusList }}"/>
+                            <input type="hidden" name="userId" value="{{ userId ?? null }}"/>
+                            <input type="submit" value="Import" />
+                        </form>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</div>

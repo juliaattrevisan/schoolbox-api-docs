@@ -68,14 +68,6 @@ class Vcal extends Base
      */
     public function load(bool $perform = true): void
     {
-        /* As this will execute regardless of $perform, should warn user if they attempt to run a dry-run
-         * and stop further execution
-         */
-        if (false === $perform) {
-            trigger_error('This method does not run in dry-run mode.', E_USER_WARNING);
-            return;
-        }
-
         $output = [];
 
         if (is_file($this->getFile())) {
@@ -175,31 +167,37 @@ class Vcal extends Base
                 $event->setAttendance(0);
                 $event->setCompleted(0);
 
-                /* Save it
-                 */
-                $result = $eventMapper->save($event);
+                $isSuccessful = false;
+                if ($perform) {
+                    /* Save it
+                     */
+                    $result = $eventMapper->save($event);
 
-                /* Assign Category relations
-                 */
-                foreach ($this->getCategoryList() as $currentCategory) {
-                    $category = new Category();
-                    $category->setEventId($event->getId());
-                    $category->setCategoryId($currentCategory);
-                    $categoryRelationMapper->save($category);
+                    /* Assign Category relations
+                     */
+                    foreach ($this->getCategoryList() as $currentCategory) {
+                        $category = new Category();
+                        $category->setEventId($event->getId());
+                        $category->setCategoryId($currentCategory);
+                        $categoryRelationMapper->save($category);
+                    }
+
+                    /* Assign Role relations
+                     */
+                    foreach ($this->getGroupList() as $currentRole) {
+                        $role = new Role();
+                        $role->setEventId($event->getId());
+                        $role->setRoleId($currentRole);
+                        $roleRelationMapper->save($role);
+                    }
+
+                    if (\is_array($result) && \count($result)) {
+                        $isSuccessful = true;
+                    }
                 }
-
-                /* Assign Role relations
-                 */
-                foreach ($this->getGroupList() as $currentRole) {
-                    $role = new Role();
-                    $role->setEventId($event->getId());
-                    $role->setRoleId($currentRole);
-                    $roleRelationMapper->save($role);
-                }
-
                 /* Output messages
                  */
-                if (\is_array($result) && \count($result)) {
+                if ($isSuccessful || !$perform) {
                     $output[] = array(
                         'name'   => $event->getTitle(),
                         'status' => 'Added',

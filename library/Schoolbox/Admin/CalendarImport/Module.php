@@ -15,6 +15,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
 use Alaress\Twig\Loader\IChainLoader;
+use Schoolbox\CampusMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
@@ -80,6 +81,27 @@ class Module extends BaseModule
             'postRunCalendarGroupEventsImport',
             $permission,
         );
+
+        $this->register(
+            self::METHOD_GET,
+            '/import/icalendar-events',
+            'getCalendarVcalImportForm',
+            $permission,
+        );
+
+        $this->register(
+            self::METHOD_POST,
+            '/import/icalendar-events',
+            'postCalendarVcalImportForm',
+            $permission,
+        );
+
+        $this->register(
+            self::METHOD_POST,
+            '/import/icalendar-events/run',
+            'postRunCalendarVcalImportForm',
+            $permission,
+        );
     }
 
     /**
@@ -91,6 +113,8 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(ErrorMapper::class),
             $this->getMapperFactory()->get(CollectorFactory::class),
             $this->injector->get('filesystem.storageProxy'),
+            $this->getMapperFactory()->get(CampusMapper::class),
+            $this->getMapperFactory()->get(RoleMapper::class),
         );
     }
 
