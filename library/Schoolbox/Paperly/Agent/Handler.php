@@ -286,7 +286,7 @@ class Handler
                 ";
 
         if (isset($data['id'])) {
-            $ids          = is_array($data['id']) ? $data['id'] : explode(',', $data['id']);
+            $ids          = is_array($data['id']) ? $data['id'] : explode(',', (string)$data['id']);
             $placeholders = implode(',', array_fill(0, count($ids), '?'));
             $sql          .= " AND StaffID IN ($placeholders)";
             $params       = array_merge($params, $ids);
@@ -398,7 +398,7 @@ class Handler
         $sql    = "SELECT * FROM {$selectedView} WHERE 1=1";
 
         if (isset($data['id'])) {
-            $ids          = is_array($data['id']) ? $data['id'] : explode(',', $data['id']);
+            $ids          = is_array($data['id']) ? $data['id'] : explode(',', (string)$data['id']);
             $placeholders = implode(',', array_fill(0, count($ids), '?'));
             $sql          .= " AND StudentID IN ($placeholders)";
             $params       = array_merge($params, $ids);
@@ -492,7 +492,7 @@ class Handler
         $sql = "SELECT DISTINCT ID, {$columnToUse} FROM {$selectedView} WHERE 1=1";
 
         if (isset($data['id'])) {
-            $ids          = is_array($data['id']) ? $data['id'] : explode(',', $data['id']);
+            $ids          = is_array($data['id']) ? $data['id'] : explode(',', (string)$data['id']);
             $placeholders = implode(',', array_fill(0, count($ids), '?'));
             $sql          .= " AND ID IN ($placeholders)";
             $params       = array_merge($params, $ids);
@@ -530,7 +530,7 @@ class Handler
         $sql = "SELECT * FROM {$selectedView} WHERE 1=1";
 
         if (isset($data['id'])) {
-            $ids          = is_array($data['id']) ? $data['id'] : explode(',', $data['id']);
+            $ids          = is_array($data['id']) ? $data['id'] : explode(',', (string)$data['id']);
             $placeholders = implode(',', array_fill(0, count($ids), '?'));
             $sql          .= " AND ID IN ($placeholders)";
             $params       = array_merge($params, $ids);
@@ -707,7 +707,7 @@ class Handler
         $sql       = "SELECT * FROM {$selectedView} WHERE 1=1";
 
         if (isset($data['id'])) {
-            $ids          = is_array($data['id']) ? $data['id'] : explode(',', $data['id']);
+            $ids          = is_array($data['id']) ? $data['id'] : explode(',', (string)$data['id']);
             $placeholders = implode(',', array_fill(0, count($ids), '?'));
             $sql          .= " AND ID IN ($placeholders)";
             $params       = array_merge($params, $ids);
