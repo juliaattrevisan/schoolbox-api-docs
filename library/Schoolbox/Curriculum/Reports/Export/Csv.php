@@ -81,8 +81,8 @@ class Csv
      */
     private function outputHeaderRows($fp, Collection $structure): void
     {
-        $headerRows    = [''];
-        $subheaderRows = ['Curriculum'];
+        $headerRows    = ['', ''];
+        $subheaderRows = ['Curriculum', 'Total'];
         foreach ($structure as $course) {
             $headerRows[]    = 'Course';
             $subheaderRows[] = $course['name'];
@@ -132,7 +132,7 @@ class Csv
         if ($depth > 0) {
             $curriculumName = sprintf('%s %s', str_repeat('*', $depth), $curriculumName);
         }
-        $row = [$curriculumName];
+        $row = [];
 
         // Not assuming that courses in usage are in same order as in structure:
         // instead, iterate the structure and extract usages from `$usage`
@@ -167,6 +167,9 @@ class Csv
                 $row[] = $unitUsageCount;
             }
         }
+        // Calculate the total usage count
+        $totalCount = array_sum($row);
+        $row = array_merge([$curriculumName, $totalCount], $row);
         fputcsv($fp, $row);
 
         // And output usage for child nodes
