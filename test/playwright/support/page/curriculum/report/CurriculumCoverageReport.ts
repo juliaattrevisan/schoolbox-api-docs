@@ -12,6 +12,10 @@ export default class CurriculumCoverageReport {
 
     static readonly URL_DISABLED = "/curriculum/reports/coverage?courseId=4&nodeId=247%2C1"; // url used to check the disabled toggle
 
+    static readonly URL_COURSE = "/curriculum/reports/coverage?courseId={courseId}";
+
+    static readonly URL_COURSE_CURRICULUM = "/curriculum/reports/coverage?courseId={courseId}&nodeId={curriculumId}";
+
     static readonly DATATEST_GENERATE_REPORT_BUTTON = "cc-input-button";
 
     static readonly DATATEST_REPORT_LOADING = "cc-report-loading";
@@ -43,6 +47,28 @@ export default class CurriculumCoverageReport {
      */
     async goto(): Promise<void> {
         await this.page.goto(CurriculumCoverageReport.URL);
+    }
+
+    /**
+     * Navigates to the curriculum coverage report page for a specific course
+     * @param courseId - The id of the course to navigate to
+     */
+    async gotoReportCourse(courseId: number): Promise<void> {
+        await this.page.goto(CurriculumCoverageReport.URL_COURSE.replace("{courseId}", courseId.toString()));
+    }
+
+    /**
+     * Navigates to the curriculum coverage report page for a specific course and curriculum node
+     * @param courseId - The id of the course to navigate to
+     * @param curriculumId  - The id of the curriculum node to navigate to
+     */
+    async gotoReportCourseCurriculum(courseId: number, curriculumId: number): Promise<void> {
+        await this.page.goto(
+            CurriculumCoverageReport.URL_COURSE_CURRICULUM.replace("{courseId}", courseId.toString()).replace(
+                "{curriculumId}",
+                curriculumId.toString(),
+            ),
+        );
     }
 
     /**

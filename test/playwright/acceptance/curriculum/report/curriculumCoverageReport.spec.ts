@@ -248,4 +248,77 @@ test.describe("Curriculum Coverage Report Tests", () => {
 
         await db.dontHaveInDatabase("curriculum_node_for_category", { curriculum_node_id: 253, category_id: 65 });
     });
+
+    test("Check wether the course and unit are presented or not according to the folder permissions", async ({
+        tester,
+        page,
+        db,
+    }) => {
+        const coverageReport = new CurriculumCoverageReport(page);
+
+        tester.isGoingTo("Set Teacher permission to none to the course '20th Century History'");
+        // cid = homepage id, gid = role id, type = 0  none, 1 read, 2 write
+        await db.updateInDatabase("perms", { type: 0 }, { cid: 265, gid: 2 });
+
+        tester.isGoingTo("Set Teacher permission to read to the course 'Unit 3 & 4 English'");
+        await db.updateInDatabase("perms", { type: 1 }, { cid: 98, gid: 2 });
+
+        tester.isGoingTo("Set Teacher  permission to read to the unit 'Unit 1 - Jerry Jerry!'");
+        await db.updateInDatabase("perms", { type: 1 }, { cid: 17, gid: 2 });
+
+        tester.isGoingTo("Set Teacher permission to none to the unit 'Unit 2 - Mon Monde Ideal!");
+        await db.updateInDatabase("perms", { type: 0 }, { cid: 18, gid: 2 });
+
+        tester.isGoingTo(
+            "As Jack Coles navigate to the curriculum coverage report page and check the '20th Century History' course  is not selected in courses",
+        );
+        await tester.impersonateTeacher();
+        await coverageReport.gotoReportCourse(14);
+        await expect(page.getByTestId("ss-selected-item-select-14")).not.toBeVisible();
+
+        tester.isGoingTo(
+            "As Jack Coles navigate to the curriculum coverage report page and check the 'Unit 3 & 4 English' course  is elected in courses",
+        );
+        await coverageReport.gotoReportCourse(9);
+        await expect(page.getByTestId("ss-selected-item-container-9")).toBeVisible();
+        await expect(page.getByTestId("ss-selected-item-select-9")).toBeVisible();
+
+        tester.isGoingTo(
+            "As Jack Coles navigate to the curriculum coverage report page and check for 'Year 9 French' course  the 'Unit 1 - Jerry Jerry!' unit is presented in the results grid",
+        );
+        await coverageReport.gotoReportCourseCurriculum(2, 135);
+        await expect(page.getByTestId("cc-report-table")).toContainText("Unit 1 - Jerry Jerry!");
+
+        tester.isGoingTo(
+            "As Jack Coles navigate to the curriculum coverage report page and check for 'Year 9 French' course  the 'Unit 2 - Mon Monde Ideal!' unit is not presented in the results grid",
+        );
+        await expect(page.getByTestId("cc-report-table")).not.toContainText("Unit 2 - Mon Monde Ideal!");
+
+        tester.isGoingTo(
+            "As Jack Coles navigate to the curriculum coverage report page they have write permission and check the 'Year 9 English' course  is selected in courses",
+        );
+        await coverageReport.gotoReportCourseCurriculum(6, 135);
+        await expect(page.getByTestId("ss-selected-item-container-6")).toBeVisible();
+        await expect(page.getByTestId("ss-selected-item-select-6")).toBeVisible();
+        await expect(page.getByTestId("cc-report-table")).toContainText("Romeo and Juliet");
+        await expect(page.getByTestId("cc-report-table")).toContainText("To Kill a Mockingbird");
+        await expect(page.getByTestId("cc-report-table")).toContainText("Persuasion and the Media");
+    });
+
+    test.afterAll(async ({ baseTester, db }) => {
+        // Soft-delete data to not interfere with other tests
+        baseTester.isGoingTo("update the folder permissions so it does not impact next suite of tests");
+
+        // cid = homepage id, gid = role id, type = 0  none, 1 read, 2 write
+        await db.updateInDatabase("perms", { type: 2 }, { cid: 265, gid: 2 });
+
+        baseTester.isGoingTo("Set Teacher permission to read to the course 'Unit 3 & 4 English'");
+        await db.updateInDatabase("perms", { type: 2 }, { cid: 98, gid: 2 });
+
+        baseTester.isGoingTo("Set Teacher  permission to read to the unit 'Unit 1 - Jerry Jerry!'");
+        await db.updateInDatabase("perms", { type: 2 }, { cid: 17, gid: 2 });
+
+        baseTester.isGoingTo("Set Teacher permission to none to the unit 'Unit 2 - Mon Monde Ideal!");
+        await db.updateInDatabase("perms", { type: 2 }, { cid: 18, gid: 2 });
+    });
 });
