@@ -1204,7 +1204,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         $comment   = $feedback->getComment();
         return [
             'mark'             => $markValue,
-            'topicComment'     => $comment,
+            'topicComment'     => Scrub::html2text($comment),
             'resultDate'       => $activity->getDueAt()->getDatabase(),
             'markerExternalId' => $marker->getExternalId(),
         ];
