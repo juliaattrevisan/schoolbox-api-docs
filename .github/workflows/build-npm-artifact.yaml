@@ -28,7 +28,7 @@ jobs:
         id: cache-npm-publish
         with:
           path: www/static/js/bundle
-          key: npm-publish-${{ runner.os }}-${{ hashFiles('**/npm-shrinkwrap.json,babel.config.js,tsconfig.json,webpack*.js,**/*.js,**/*.ts,**/*.vue,**/*.css,**/*.scss') }}
+          key: npm-publish-${{ runner.os }}-${{ hashFiles('**/npm-shrinkwrap.json', 'babel.config.js', 'tsconfig.json', 'webpack*.js', '**/*.js', '**/*.ts', '**/*.vue', '**/*.css', '**/*.scss') }}
       - run: npm run publish
         if: steps.cache-npm-publish.outputs.cache-hit != 'true'
 

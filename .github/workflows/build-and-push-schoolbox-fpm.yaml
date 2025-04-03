@@ -9,6 +9,7 @@ on:
 #      - master
       - develop
   workflow_dispatch:
+  pull_request:
 
 jobs:
   build-composer-artifact:
@@ -17,48 +18,48 @@ jobs:
   build-npm-artifact:
     uses: ./.github/workflows/build-npm-artifact.yaml
 
-  build-and-push:
-    needs:
-      - build-composer-artifact
-      - build-npm-artifact
-    strategy:
-      matrix:
-        build:
-          - runs-on: ubuntu-latest
-            platform: linux/amd64
-          - runs-on: ubuntu-arm
-            platform: linux/arm64
-    runs-on: ${{ matrix.build.runs-on }}
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      # Extract artifacts
-      - uses: actions/download-artifact@v4
-        with:
-          name: schoolbox-vendor
-          path: vendor/
-
-      - uses: actions/download-artifact@v4
-        with:
-          name: schoolbox-npm
-          path: www/static/js/bundle/
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: build-and-push
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: docker/php-fpm/deployment-image.Dockerfile
-          push: true
-          build-args: |
-            ENV=prod
-          platforms: ${{ matrix.build.platform }}
-          tags: alaress/schoolbox-fpm:latest
+#  build-and-push:
+#    needs:
+#      - build-composer-artifact
+#      - build-npm-artifact
+#    strategy:
+#      matrix:
+#        build:
+#          - runs-on: ubuntu-latest
+#            platform: linux/amd64
+#          - runs-on: ubuntu-arm
+#            platform: linux/arm64
+#    runs-on: ${{ matrix.build.runs-on }}
+#    steps:
+#      - uses: actions/checkout@v3
+#
+#      - name: Set up Docker Buildx
+#        uses: docker/setup-buildx-action@v3
+#
+#      # Extract artifacts
+#      - uses: actions/download-artifact@v4
+#        with:
+#          name: schoolbox-vendor
+#          path: vendor/
+#
+#      - uses: actions/download-artifact@v4
+#        with:
+#          name: schoolbox-npm
+#          path: www/static/js/bundle/
+#
+#      - name: Login to Docker Hub
+#        uses: docker/login-action@v3
+#        with:
+#          username: ${{ secrets.DOCKERHUB_USERNAME }}
+#          password: ${{ secrets.DOCKERHUB_TOKEN }}
+#
+#      - name: build-and-push
+#        uses: docker/build-push-action@v6
+#        with:
+#          context: .
+#          file: docker/php-fpm/deployment-image.Dockerfile
+#          push: true
+#          build-args: |
+#            ENV=prod
+#          platforms: ${{ matrix.build.platform }}
+#          tags: alaress/schoolbox-fpm:latest
