@@ -104,11 +104,13 @@ jobs:
           docker image load --input ${{ runner.temp }}/{{ matrix.image }}-{{ matrix.build.platform }}.tar
 
       - name: Login to Dockerhub
+        if: ${{ github.event_name != 'pull_request' }}
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Push image
+        if: ${{ github.event_name != 'pull_request' }}
         run: |
           docker push -a alaress/{{ matrix.image }} --platform {{ matrix.build.platform }}
