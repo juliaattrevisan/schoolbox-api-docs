@@ -1,3 +1,4 @@
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/dataTables.js?v={{ config.site_version }}"></script>
 <div class="small-12 island">
     <h2 class="subheader">{{ register.name }}</h2>
         <div class="l-flex-col l-gap-m">
@@ -59,7 +60,8 @@
                             {% for collection in recordCollection %}
                                 <h2>{{ collection.groupName }}</h2>
                                 {% if collection.data ?? [] is not empty %}
-                                    <table>
+                                    {% set dateTimeFields = [] %} {# This is used to create a default ordering later on.. #}
+                                    <table data-sortable="{{ child.user.id }}-recordCollection">
                                         <thead>
                                         <tr>
                                             {% for key, name in (collection.headers ?? []) %}
@@ -86,6 +88,16 @@
                                         {% endfor %}
                                         </tbody>
                                     </table>
+                                    <script type="text/javascript">
+                                        // Sortable table
+                                        $(function () {
+                                            $('table[data-sortable="{{ child.user.id }}-recordCollection"]').DataTable({
+                                                info: false,
+                                                paging: false,
+                                                searching: false,
+                                            });
+                                        });
+                                    </script>
                                 {% else %}
                                     <p><em>No data available.</em></p>
                                 {% endif %}
