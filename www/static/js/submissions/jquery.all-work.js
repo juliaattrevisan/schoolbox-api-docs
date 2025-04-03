@@ -12,7 +12,10 @@
 
         var config = init(options, $(this));
 
-        setupRichTextEditor(document.querySelector(config.comment.newForm.id).querySelector("textarea").id);
+        const newCommentForm = document.querySelector(config.comment.newForm.id);
+        if (newCommentForm) {
+            setupRichTextEditor(newCommentForm.querySelector("textarea").id);
+        }
         setupSaveComment();
         setupModifyComment();
         setupDeleteComment();
