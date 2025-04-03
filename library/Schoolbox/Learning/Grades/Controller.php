@@ -427,14 +427,9 @@ class Controller extends Base
              * Having a set of data points being all null means you didn't get any results for your assessments
              * That's why we array_filter first
              */
-            $decodedResults = json_decode($graph['scatter']);
-            $hasDataToShow = false;
-
-            if (null !== $decodedResults) {
-                $hasDataToShow = count(array_filter($decodedResults, function ($item) {
-                    return $item !== null;
-                })) > 0;
-            }
+            $hasDataToShow = count(array_filter($graph['scatter'], function ($item) {
+                return $item !== null;
+            })) > 0;
         }
 
         /* The Cohort Results graph is visible when two conditions are met:

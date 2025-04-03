@@ -15,6 +15,7 @@ use Schoolbox\Collection;
 use Schoolbox\Learning\Analytics\BoxPlot\Summary;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\User;
+use Scrub;
 
 /**
  * Class ClassResults
@@ -318,7 +319,7 @@ class ClassResults
                     $graphInfo[$specificationId] = [
                         'displayMark'  => $humanReadableMark,
                         'gradientMark' => $this->gradeGradientEnabled ? (int)($normalisedMark / 10) : 'none',
-                        'info'         => $comment ?? '',
+                        'info'         => Scrub::text($comment),
                     ];
                 } else {
                     /* Otherwise, nothing to show
@@ -405,10 +406,10 @@ class ClassResults
          * This is used by Grades/templates/fragments/graph.twig
          */
         return [
-            'info' => json_encode($statistics['graphInfo'], JSON_THROW_ON_ERROR),
-            'assessments' => json_encode($statistics['graphAssessments'], JSON_THROW_ON_ERROR),
-            'data' => json_encode($statistics['graphData'], JSON_THROW_ON_ERROR),
-            'scatter' => json_encode($statistics['graphScatter'], JSON_THROW_ON_ERROR),
+            'info' => $statistics['graphInfo'],
+            'assessments' => $statistics['graphAssessments'],
+            'data' => $statistics['graphData'],
+            'scatter' => $statistics['graphScatter'],
         ];
     }
 }
