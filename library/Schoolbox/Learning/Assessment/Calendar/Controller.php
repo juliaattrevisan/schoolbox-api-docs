@@ -108,11 +108,15 @@ class Controller extends Base
 
         $eventTypes = $this->eventTypeMapper->findAll(['deleted' => true]);
 
+        // Cheap ModelToArray implementation.  TODO: Do this in a ModelToArray class?
+        $eventTypeArrays = [];
         foreach ($eventTypes as $eventType) {
-            if ($eventType->isDeleted()) {
-                // TODO: Detect deleted event types when rendering, and style as deleted instead of adding suffix here.
-                $eventType->setType($eventType->getType() . ' (deleted)');
-            }
+            $eventTypeArrays[] = [
+                'id' => $eventType->getId(),
+                'type' => $eventType->getType() . ($eventType->isDeleted() ? ' (deleted)' : ''),
+                'color' => $eventType->getColor(),
+                'isDeleted' => $eventType->isDeleted(),
+            ];
         }
 
         $this->response = $this->responseFromTemplate(
@@ -121,7 +125,7 @@ class Controller extends Base
                 'user'        => $this->getUser(),
                 'filterPanel' => $filterPanel,
                 'termDates'   => $this->getAvailableTermDates(),
-                'eventTypes'  => $eventTypes,
+                'eventTypes'  => $eventTypeArrays,
                 'inContext'   => $inContext,
             ],
             'Assessment Calendar',
