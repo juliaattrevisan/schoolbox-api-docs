@@ -80,7 +80,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}
-          path: ${{ runner.temp }}/php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
+          path: ${{ runner.temp }}
 
       - name: Load php82-alpine image
         run: |
@@ -124,7 +124,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ matrix.image }}-${{ matrix.build.platform }}-${{ matrix.build.arch }}
-          path: ${{ runner.temp }}/${{ matrix.image }}-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
+          path: ${{ runner.temp }}
 
       - name: Load ${{ matrix.image }} image
         run: |
@@ -166,7 +166,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ matrix.image }}-${{ matrix.build.platform }}-${{ matrix.build.arch }}
-          path: ${{ runner.temp }}/${{ matrix.image }}-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
+          path: ${{ runner.temp }}
 
       - name: Load ${{ matrix.image }} image
         run: |
