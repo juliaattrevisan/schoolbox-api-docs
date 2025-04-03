@@ -230,6 +230,7 @@ export default {
             dateClick: this.onDateClick,
             datesSet: this.datesSet,
             resourceOrder: "title", // sort resources(events) by the event title
+            viewDidMount: this.onRenderingComplete,
         };
     },
 
@@ -628,6 +629,34 @@ export default {
         },
 
         /**
+         * Add a class to any deleted event types so they can be visually distinguished form non-deleted event types.
+         */
+        onRenderingComplete() {
+            const eventTypes = this.config.eventTypes;
+
+            // TODO: Find the right callback to trigger this so the setTimeout() below can be removed.
+            //       Tried: viewDidMount, resourcesSet, viewClassNames
+            setTimeout(function () {
+                for (const eventType of eventTypes) {
+                    if (eventType.isDeleted) {
+                        const elements = document.querySelectorAll(
+                            '[data-resource-id="' + RESOURCE_EVENT_TYPE_PREFIX + eventType.id + '"]',
+                        );
+
+                        for (const element of elements) {
+                            // Events having this event type have the same class are also selected by the above
+                            // call to document.querySelectorAll().  So we need to check the textContent to find the
+                            // element we seek.
+                            if (element.textContent === eventType.type) {
+                                element.classList.add("meta"); // Add 'meta' class to distinguish deleted from non-deleted event types.
+                            }
+                        }
+                    }
+                }
+            }, 2000);
+        },
+
+        /**
          * Customise today button behaviour for semester view.
          *
          * Clicking today button while on semester view will navigate to
@@ -897,6 +926,7 @@ export default {
                     id: RESOURCE_EVENT_TYPE_PREFIX + String(a.id),
                     title: a.type,
                     eventBackgroundColor: a.color,
+                    isDeleted: a.isDeleted,
                 };
             });
         },
