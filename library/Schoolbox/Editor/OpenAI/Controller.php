@@ -97,10 +97,6 @@ class Controller extends Base
                 [772, 773]
             );
 
-            /* FIXME shortcircuit the prompt for inspection
-             */
-            new \Alaress_Probe($prompt);die();
-
             $result = $helper->request($this->getUser(), $prompt);
 
             $data = json_decode($result, true);
