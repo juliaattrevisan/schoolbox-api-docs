@@ -151,13 +151,17 @@ window.Vue.onUnmounted(() => {
                         :href="getReturnUrl(props.activity._links.export)"
                         class="icon-export"
                         title="Copy this task into classes"
+                        :data-test="`unit-planner-export-activity-${props.activity.id}`"
                         >Export to Classes</a
                     >
                 </li>
                 <li v-if="props.activity._links.modify">
-                    <a :href="getReturnUrl(props.activity._links.modify)" class="icon-modify">{{
-                        props.activity.assessmentType === "quiz" ? "Modify Settings" : "Modify"
-                    }}</a>
+                    <a
+                        :href="getReturnUrl(props.activity._links.modify)"
+                        class="icon-modify"
+                        :data-test="`unit-planner-modify-activity-${props.activity.id}`"
+                        >{{ props.activity.assessmentType === "quiz" ? "Modify Settings" : "Modify" }}</a
+                    >
                 </li>
                 <li v-if="props.activity._links.modifyContent">
                     <a :href="getReturnUrl(props.activity._links.modifyContent)" class="icon-modify">Modify Contents</a>
@@ -165,6 +169,7 @@ window.Vue.onUnmounted(() => {
                 <li v-if="props.activity._links.delete">
                     <a
                         class="icon-delete"
+                        :data-test="`unit-planner-delete-activity-${props.activity.id}`"
                         @click.prevent="activitiesListDeleteModalStore.prompt(props.activity, () => emit('deleted'))"
                         >Delete</a
                     >
