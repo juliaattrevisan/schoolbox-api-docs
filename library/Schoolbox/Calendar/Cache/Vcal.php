@@ -28,6 +28,7 @@ use Sabre\VObject\Writer;
  */
 class Vcal
 {
+    private const CACHE_PREFIX   = 'vcal_';
     private const CACHE_KEY_BASE = 'vcal:%s:%s';
 
 
@@ -121,7 +122,7 @@ class Vcal
         // (Use the cache class because it contains logic for handling proxy
         //  servers, failures, relative URLs and probably other stuff.)
         try {
-            $source = $this->cache->request($config->getUrl(), headers: $headers, ttl: $this->cacheTimeout);
+            $source = $this->cache->request($config->getUrl(), self::CACHE_PREFIX, $headers, $this->cacheTimeout);
         } catch (GuzzleException | CacheInvalidArgumentException $e) {
             // The cached calendar wasn't able to be loaded.
             // Maybe the config's URL was invalid or empty?

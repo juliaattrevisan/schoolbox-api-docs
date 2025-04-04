@@ -72,8 +72,8 @@ class Registry
             '^fc:' . self::INSTANCE_ID_MATCH . ':system_usage_',
 
             // HTTP client cache
-            '^httpClient:' . self::INSTANCE_ID_MATCH . ':' . Redis\Cache\ItemPool::SET_KEY,
-            '^httpClient:' . self::INSTANCE_ID_MATCH . ':',
+            'httpClient:' . self::INSTANCE_ID_MATCH . ':' . Redis\Cache\ItemPool::SET_KEY,
+            'httpClient:' . self::INSTANCE_ID_MATCH . ':',
         ],
         // Storage-only patterns go here
         Redis::INSTANCE_STORAGE => [

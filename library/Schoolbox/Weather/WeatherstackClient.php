@@ -30,6 +30,8 @@ class WeatherstackClient
      */
     private const NOW = 'Now';
 
+    private const CACHE_PREFIX = 'weather_';
+
     /**
      * Constructor
      *
@@ -101,7 +103,12 @@ class WeatherstackClient
     {
         // Cache the request
         try {
-            $response = $this->cache->request("{$this->apiUrl}/{$requestUrl}", ttl: $this->cacheTimeout);
+            $response = $this->cache->request(
+                "{$this->apiUrl}/{$requestUrl}",
+                self::CACHE_PREFIX,
+                [],
+                $this->cacheTimeout,
+            );
         } catch (GuzzleException | InvalidArgumentException $e) {
             throw new \DomainException('Invalid Weather API endpoint', 0, $e);
         }

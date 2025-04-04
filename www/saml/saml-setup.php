@@ -1,6 +1,7 @@
 <?php
 
 use Alaress\Http\Cache;
+use Schoolbox\Admin\Home\SamlCertHelper;
 use Wolfcast\BrowserDetection;
 use Symfony\Component\HttpFoundation\IpUtils;
 use OneLogin\Saml2\Constants;
@@ -54,7 +55,12 @@ try {
 
     /** @var Cache $cache */
     $cache       = $kernel->get('httpClient.cache');
-    $idpMetadata = $cache->request($idpMetadataUrl, ttl: 3600);
+    $idpMetadata = $cache->request(
+        $idpMetadataUrl,
+        SamlCertHelper::SAML_CACHE_PREFIX,
+        [],
+        SamlCertHelper::SAML_CACHE_TIMEOUT,
+    );
 
     // if cache exists, update $setting info from cache
     if (!empty($idpMetadata)) {

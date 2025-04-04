@@ -18,7 +18,8 @@ use Schoolbox\Application\Exception as SchoolboxException;
  */
 class SamlCertHelper
 {
-    private const SAML_CACHE_TIMEOUT = 3600;
+    public const SAML_CACHE_TIMEOUT = 3600;
+    public const SAML_CACHE_PREFIX  = 'saml_';
 
     private const IDP_CERT_EMPTY      = 0;     // config field empty
     private const IDP_CERT_UNPARSABLE = 1;     // unable to parse cert from value
@@ -116,7 +117,7 @@ class SamlCertHelper
         $validUrl = (string)$url;
 
         try {
-            return $this->samlCache->request($validUrl, ttl: self::SAML_CACHE_TIMEOUT);
+            return $this->samlCache->request($validUrl, self::SAML_CACHE_PREFIX, [], self::SAML_CACHE_TIMEOUT);
         } catch (InvalidArgumentException | GuzzleException | CacheInvalidArgumentException $e) {
             // Should never get here. Only thrown in $idpMetadataUrl is not a string, which is
             // impossible due to method's param type declaration.
