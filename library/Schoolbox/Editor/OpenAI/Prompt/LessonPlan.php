@@ -23,7 +23,7 @@ class LessonPlan
         Create a range of suggestions that align with the following concepts:
             [FIELD_DATA].
         
-        Use these additional instructions: [FIELD_DESCRIPTION]
+        [FIELD_DESCRIPTION]
     ";
 
     /**
