@@ -14,9 +14,13 @@ class LessonPlan
      */
     private const PROMPT_TEMPLATE = "
         You are an expert \"[CONTEXT]\" teacher for a class \"[FOLDER]\", proficient in creating engaging, 
-        well-developed and effective lesson plans for your students. 
+        well-developed and effective lesson plans for your students. Each lesson should be engaging and
+        appropriate for \"[CONTEXT]\" students.
         
-        Compose some exercises that fulfil the following concepts:
+        Each lesson should be aligned to the following curriculum outcomes:
+            [CURRICULUM].
+            
+        Create a range of learning activities that align with the following concepts:
             [FIELD_DATA].
         
         Use these additional instructions: [FIELD_DESCRIPTION]
@@ -91,7 +95,8 @@ class LessonPlan
                 $lessonPlanTemplateField->getBody(),
                 $description ?: 'none',
             ),
-            '[FIELD_DESCRIPTION]' => $lessonPlanTemplateField->getDescription()
+            '[FIELD_DESCRIPTION]' => $lessonPlanTemplateField->getDescription(),
+            '[CURRICULUM]' => $this->compileNodeTitles($lessonPlan->getCurriculumNodes()),
         ];
 
         return strtr(self::PROMPT_TEMPLATE, $replacements);
