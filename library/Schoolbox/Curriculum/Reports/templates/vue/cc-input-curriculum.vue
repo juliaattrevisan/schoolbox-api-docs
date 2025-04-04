@@ -45,6 +45,7 @@ store.init({
     isSelectAll: true,
     canSelectChildren: false,
     includeChildren: false,
+    includeDisabled: true,
 });
 const selectedStore = useSelectedNodesStore();
 props.preselected.forEach((preselected) => selectedStore.add(preselected));
