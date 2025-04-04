@@ -29,7 +29,7 @@ class Controller extends Base
      *      /adminv2/health-check-export/audit?report=uxui
      *      /adminv2/health-check-export/audit?report=uxui,lms,community
      *
-     * Current options for this are: assessment, uxui, user, lms, community, sva, implementation, unitplanner
+     * Current options for this are: assessment, uxui, user, lms, community, sva, implementation, unitplanner, olcstats
      */
 
     /**
@@ -192,6 +192,14 @@ class Controller extends Base
                     $this->taskDHelper->addSource('', 'unitplannerUnitTextboxes');
                     $this->taskDHelper->addSource('', 'unitplannerComponents');
                     $this->taskDHelper->addSource('', 'unitplannerAssessments');
+                    break;
+                case 'olcstats':
+                    /**
+                     * list of reports for OLC Reporting Stats
+                     */
+                    $this->taskDHelper->addSource('', 'olcstatsQuizAttempts');
+                    $this->taskDHelper->addSource('', 'olcstatsTaskCompletions');
+                    $this->taskDHelper->addSource('', 'olcstatsDueWorkSubmissions');
                     break;
                 default:
                     throw new SchoolboxException("Report '{$report}' Does not exist.");
@@ -2548,5 +2556,102 @@ class Controller extends Base
 
     // ===============================================================================================
     // ================================ END UNIT PLANNER REPORTS =====================================
+    // ===============================================================================================
+
+    // ===============================================================================================
+    // ================================ START OLC STATS REPORTS ======================================
+    // ===============================================================================================
+
+    /**
+     * OLCSTATS
+     * olcstatsQuizAttempts.csv
+     */
+
+    public function olcstatsQuizAttempts()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            concat((YEAR(aa.start)),' ',MONTHNAME(aa.start)) AS 'Month',
+            count(*) AS 'Quiz Attempts'
+        FROM
+            course_implementation ci
+        JOIN
+            mv_assessment_relation mvar ON ci.id = mvar.course_implementation_id AND ci.course_specification_id = '34'
+        JOIN
+            assess a ON mvar.assessment_id = a.assessment_id
+        JOIN
+            assess_attempt aa ON a.assess_id = aa.assess_id AND aa.deleted_at is NULL AND aa.finish IS NOT NULL
+        GROUP BY     YEAR(aa.start),MONTHNAME(aa.start)
+        ORDER BY     YEAR(aa.start),MONTH(aa.start);
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'olcstatsQuizAttempts.csv');
+    }
+
+    /**
+     * OLCSTATS
+     * olcstatsTaskCompletions.csv
+     */
+
+    public function olcstatsTaskCompletions()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            concat((YEAR(tc.completion_date)),' ',MONTHNAME(tc.completion_date)) AS 'Month',
+            count(*) AS 'Quiz Attempts'
+        FROM
+            course_implementation ci
+        JOIN
+            mv_assessment_relation mvar ON ci.id = mvar.course_implementation_id AND ci.course_specification_id = '34'
+        JOIN
+            task t ON mvar.assessment_id = t.assessment_id
+        JOIN
+            task_completion tc ON t.id = tc.task_id and tc.completion_status = '3'
+        GROUP BY
+            YEAR(tc.completion_date),MONTHNAME(tc.completion_date)
+        ORDER BY
+            YEAR(tc.completion_date),MONTH(tc.completion_date);
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'olcstatsTaskCompletions.csv');
+    }
+
+    /**
+     * OLCSTATS
+     * olcstatsDueWorkSubmissions.csv
+     */
+
+    public function olcstatsDueWorkSubmissions()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT concat((YEAR(ss.submitted_at)),' ',MONTHNAME(ss.submitted_at)) as 'Month',
+            count(*) as 'Submissions'
+        FROM
+            course_implementation ci
+        JOIN
+            mv_assessment_relation mvar on ci.id = mvar.course_implementation_id and ci.course_specification_id = '34'
+        JOIN
+            submission_box sb on mvar.assessment_id = sb.assessment_id
+        JOIN
+            student_submission ss on sb.id = ss.box_id and ss.submitted_at is NOT NULL
+        JOIN
+            assessment a on sb.assessment_id = a.id and a.deleted_at is NULL
+        GROUP BY
+            YEAR(ss.submitted_at),MONTHNAME(ss.submitted_at)
+        ORDER BY
+            YEAR(ss.submitted_at),MONTH(ss.submitted_at);
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'olcstatsDueWorkSubmissions.csv');
+    }
+
+    // ===============================================================================================
+    // ================================= END OLC STATS REPORTS =======================================
     // ===============================================================================================
 }

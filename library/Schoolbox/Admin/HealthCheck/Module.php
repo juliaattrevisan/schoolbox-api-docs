@@ -84,6 +84,10 @@ class Module extends BaseModule
         $this->register('GET', '/audit/unitplannerUnitTextboxes', 'unitplannerUnitTextboxes', $isAlaress);
         $this->register('GET', '/audit/unitplannerComponents', 'unitplannerComponents', $isAlaress);
         $this->register('GET', '/audit/unitplannerAssessments', 'unitplannerAssessments', $isAlaress);
+        // OLCStats Reports
+        $this->register('GET', '/audit/olcstatsQuizAttempts', 'olcstatsQuizAttempts', $isAlaress);
+        $this->register('GET', '/audit/olcstatsTaskCompletions', 'olcstatsTaskCompletions', $isAlaress);
+        $this->register('GET', '/audit/olcstatsDueWorkSubmissions', 'olcstatsDueWorkSubmissions', $isAlaress);
     }
 
     /**
