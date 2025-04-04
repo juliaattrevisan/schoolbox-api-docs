@@ -12,7 +12,6 @@ use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
 use GuzzleHttp\Client;
 use Psr\Http\Client\ClientExceptionInterface;
-use Schoolbox\Editor\OpenAI\Prompt\LessonPlan;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Mapper\Exception;
 
@@ -65,17 +64,11 @@ class Controller extends Base
                 $this->logMapper,
             );
 
-            $promptGenerator = new LessonPlan(
+            $promptGenerator = new Prompt\LessonPlan(
                 $this->lessonPlanFieldTemplateFieldMapper,
                 $this->curriculumNodeMapper
             );
 
-            /* FIXME
-             *  Obtain results for each field...ideally this wouldn't be necessary
-             *  and that you could get the resultant data struct back for the whole
-             *  plan grouped by fields, but I haven't seen the AI capable of doing
-             *  that yet. For now, just bash past the barrier: improve it later
-             */
             /* Used for an existing lesson plan, typically, via the Modify screen
              */
             /** @var \Schoolbox\Learning\Assessment\LessonPlan\Model $lessonPlan */
@@ -96,7 +89,7 @@ class Controller extends Base
 //                [772, 773]
 //            );
 
-            $result = $helper->request($this->getUser(), $prompt, responseFormat: LessonPlan::RESPONSE_FORMAT);
+            $result = $helper->request($this->getUser(), $prompt, responseFormat: Prompt\LessonPlan::RESPONSE_FORMAT);
 
             $data = json_decode($result, true);
 
