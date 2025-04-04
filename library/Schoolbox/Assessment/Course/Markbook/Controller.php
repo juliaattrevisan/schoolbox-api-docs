@@ -165,6 +165,7 @@ class Controller extends WebController\Base
                 'courseSpec'  => $courseSpec,
                 'viewee'      => $this->getUser(),
                 'filterPanel' => $filterPanel,
+                'canAccessPopOut' => false,
             ],
             "Course Markbook: {$courseSpec->getTitle()}",
             'submission'
@@ -265,6 +266,7 @@ class Controller extends WebController\Base
                     'taskProgressPending'     => Completion::STATUS_SELF_ASSESSED_COMPLETE,
                     'taskProgressComplete'    => Completion::STATUS_TEACHER_ASSESSED_COMPLETE,
                     'queryArgs'               => $codec->convertSelectionsToQueryString($selectionsPerFilter),
+                    'canAccessPopOut'         => true,
                 ]
             );
             $this->response = $this->responseAsJson([

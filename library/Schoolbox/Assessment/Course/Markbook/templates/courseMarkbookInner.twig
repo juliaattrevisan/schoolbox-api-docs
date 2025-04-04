@@ -233,7 +233,7 @@
                             <td
                                 class="column-{{ assessment.id }} {% if not participant or participant.isExcluded %} excluded {% endif %} student-grade-cell"
                                 data-assessment="{{ assessment.id }}"
-                                {% if assessment is dueWork or assessment is quiz or assessment is lti or (assessment is project and (participant and not participant.isExcluded)) %}
+                                {% if canAccessPopOut and (assessment is dueWork or assessment is quiz or assessment is lti or (assessment is project and (participant and not participant.isExcluded))) %}
                                 data-pop-out-menu
                                 {% endif %}
                                 data-assessment-type="{{ assessment.getFamilyName }}"
