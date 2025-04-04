@@ -24,7 +24,10 @@ class LessonPlan
     ";
 
     /**
-     * Each field's basic synopsis.
+     * Each field's basic synopsis: each %s represents, respectively,
+     *    Lesson Plan Template Field Title
+     *    Lesson Plan Template Field Description (which also contains extra ai instructions)
+     *    Lesson Plan Template Field Body
      */
     private const PROMPT_TEMPLATE_FIELD = '
         Field Topic: %s.
@@ -32,6 +35,10 @@ class LessonPlan
         %s
     ';
 
+
+    /**
+     * This ends up being a semicolon+newline separated list of curriculum node names.
+     */
     private const PROMPT_TEMPLATE_CURRICULUM = '
         Each lesson should be aligned to the following curriculum outcomes:
 %s.
