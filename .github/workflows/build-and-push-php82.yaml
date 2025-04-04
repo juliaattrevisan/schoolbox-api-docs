@@ -114,16 +114,11 @@ jobs:
           name: php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}
           path: ${{ runner.temp }}
 
-      - name: Load php82-alpine image
+      - name: Load php82-alpine image, build php82-fpm-alpine image
         if: steps.cache-php82-fpm-alpine.outputs.cache-hit != 'true'
         run: |
           docker image load --input ${{ runner.temp }}/php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
           docker image ls
-
-      - name: Build php82-fpm-alpine
-#        uses: docker/build-push-action@v6
-        if: steps.cache-php82-fpm-alpine.outputs.cache-hit != 'true'
-        run: |
           docker buildx build \
             -t alaress/php82-fpm-alpine:latest \
             -o type=docker,dest=${{ runner.temp }}/php82-fpm-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar \
