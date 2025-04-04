@@ -107,25 +107,28 @@ function onNameSelected(): void {
 </script>
 
 <template>
-    <show-matches
-        v-if="isButton"
-        tag="button"
-        class="button-name"
-        :title="`View ${props.title}`"
-        :disabled="isDisabled"
-        :text="props.title"
-        :query="modalSearchStore.query"
-        :is-searching="modalSearchStore.isActive"
-        @click="onNameSelected"
-    />
-    <show-matches
-        v-else
-        tag="span"
-        class="name"
-        :text="props.title"
-        :query="modalSearchStore.query"
-        :is-searching="modalSearchStore.isActive"
-    />
+    <div class="l-width-100 l-flex-row l-flex--no-wrap l-flex--align-center l-gap-xs">
+        <sbx-icon v-if="!props.node.enabled" name="hidden" title="This outcome is disabled" />
+        <show-matches
+            v-if="isButton"
+            tag="button"
+            class="button-name"
+            :title="`View ${props.title}`"
+            :disabled="isDisabled"
+            :text="props.title"
+            :query="modalSearchStore.query"
+            :is-searching="modalSearchStore.isActive"
+            @click="onNameSelected"
+        />
+        <show-matches
+            v-else
+            tag="span"
+            class="name"
+            :text="props.title"
+            :query="modalSearchStore.query"
+            :is-searching="modalSearchStore.isActive"
+        />
+    </div>
 </template>
 
 <style lang="scss">
