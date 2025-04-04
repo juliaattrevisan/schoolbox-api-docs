@@ -176,7 +176,7 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
                     $code    = 500;
                     $message = 'Schoolbox is currently experiencing internal problems with its database. This issue has been logged.';
                     if (str_contains($e->getMessage(), "SQL Server")) {
-                        $message = "You have been rate limited. Please wait a minute before refreshing the page. If this persists, please contact your IT department to let them know.";
+                        $message = "An error occurred while Schoolbox attempted to access your SIS's database. Please wait a minute before refreshing the page. If this persists, please contact your IT department to let them know.";
                         $code    = 429;
                         $info    = $e->getMessage();
                     }
@@ -184,7 +184,7 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
                     $code    = 599;
                     $message = 'Schoolbox is currently experiencing internal problems with its database. This issue has been logged.';
                     if (str_contains($e->getMessage(), "SQL Server")) {
-                        $message = "You have been rate limited. Please wait a minute before refreshing the page. If this persists, please contact your IT department to let them know.";
+                        $message = "An error occurred while Schoolbox attempted to access your SIS's database. Please wait a minute before refreshing the page. If this persists, please contact your IT department to let them know.";
                         $code    = 429;
                         $info    = $e->getMessage();
                     }
