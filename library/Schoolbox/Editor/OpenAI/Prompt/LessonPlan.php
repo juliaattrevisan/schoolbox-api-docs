@@ -20,7 +20,7 @@ class LessonPlan
         [CURRICULUM]
             
         Create a range of suggestions in html that align with the following field topics; each field topic should
-        use the lessonPlanFieldsResponseFormat json response format, 
+        use the fields_format json response format, 
             [FIELDS]
     ";
 
@@ -46,6 +46,30 @@ class LessonPlan
         Each lesson should be aligned to the following curriculum outcomes:
 %s.
     ';
+
+
+    /**
+     * A structure that AI is supposed to obey, but...I don't think it cares
+     */
+    public const RESPONSE_FORMAT = [
+        'name' => 'fields_format',
+        'type' => 'json_schema',
+        'items' => [
+            'type' => 'object',
+            'properties' => [
+                'id' => [
+                    'type' => 'string',
+                ],
+                'title' => [
+                    'type' => 'string',
+                ],
+                'body' => [
+                    'type' => 'string',
+                ],
+            ],
+            'required' => ['id', 'title', 'body']
+        ],
+    ];
 
 
     /**

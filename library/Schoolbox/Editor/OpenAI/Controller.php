@@ -96,34 +96,11 @@ class Controller extends Base
 //                [772, 773]
 //            );
 
-            $responseFormat = [
-                'name' => 'lessonPlanFieldsResponseFormat',
-                'type' => 'json_schema',
-                'items' => [
-                    'type' => 'object',
-                    'properties' => [
-                        'id' => [
-                            'type' => 'string',
-                        ],
-                        'title' => [
-                            'type' => 'string',
-                        ],
-                        'body' => [
-                            'type' => 'string',
-                        ],
-                    ],
-                    'required' => ['id', 'title', 'body']
-                ],
-            ];
-
-            $result = $helper->request($this->getUser(), $prompt, responseFormat: $responseFormat);
+            $result = $helper->request($this->getUser(), $prompt, responseFormat: LessonPlan::RESPONSE_FORMAT);
 
             $data = json_decode($result, true);
 
-            new \Alaress_Probe($data);die();
-            foreach ($data['choices'] as $choice) {
-                echo $choice['message']['content'];
-            }
+            echo $data['choices'][0]['message']['content'] ?? null;
 
             return;
         } catch (\DomainException $e) {
