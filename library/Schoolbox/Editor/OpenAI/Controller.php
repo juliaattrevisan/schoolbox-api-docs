@@ -92,19 +92,22 @@ class Controller extends Base
              *  plan grouped by fields, but I haven't seen the AI capable of doing
              *  that yet. For now, just bash past the barrier: improve it later
              */
-            foreach ($lessonPlanTemplate->getFields() as $lessonPlanTemplateField) {
-                $prompt = $promptGenerator->generateFromInstances(
-                    $lessonPlan,
-                    $lessonPlanTemplateField,
-                );
+            $prompt = $promptGenerator->generateFromInstances(
+                $lessonPlan,
+                $lessonPlanTemplate->getFields(),
+                $lessonPlan->getCurriculumNodes(),
+            );
 
-                $result = $helper->request($this->getUser(), $prompt);
+            /* FIXME shortcircuit the prompt for inspection
+             */
+            new \Alaress_Probe($prompt);die();
 
-                $data = json_decode($result, true);
+            $result = $helper->request($this->getUser(), $prompt);
 
-                foreach ($data['choices'] as $choice) {
-                    echo $choice['message']['content'];
-                }
+            $data = json_decode($result, true);
+
+            foreach ($data['choices'] as $choice) {
+                echo $choice['message']['content'];
             }
 
             return;

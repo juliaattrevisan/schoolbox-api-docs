@@ -4,6 +4,7 @@ namespace Schoolbox\Editor\OpenAI\Prompt;
 
 use Schoolbox\Curriculum\Node;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\LessonPlan\Model;
 
 class LessonPlan
 {
@@ -17,10 +18,8 @@ class LessonPlan
         
         [CURRICULUM]
             
-        Create a range of suggestions that align with the following concepts:
-            [FIELD_DATA].
-        
-        [FIELD_DESCRIPTION]
+        Create a range of suggestions that align with the following field topics:
+            [FIELDS]
     ";
 
     /**
@@ -28,7 +27,8 @@ class LessonPlan
      */
     private const PROMPT_TEMPLATE_FIELD = '
         Field Topic: %s.
-        %s.
+        %s
+        %s
     ';
 
     private const PROMPT_TEMPLATE_CURRICULUM = '
@@ -48,13 +48,15 @@ class LessonPlan
     /**
      * Derive prompt attributes from an existing Lesson Plan and Lesson Plan Template.
      *
-     * @param \Schoolbox\Learning\Assessment\LessonPlan\Model $lessonPlan
-     * @param \Schoolbox\Admin\LessonPlan\Template\Field\Model $lessonPlanTemplateField
+     * @param Model $lessonPlan
+     * @param GenericCollection $lessonPlanTemplateFields
+     * @param GenericCollection $curriculumNodes
      * @return string
      */
     public function generateFromInstances(
         \Schoolbox\Learning\Assessment\LessonPlan\Model $lessonPlan,
-        \Schoolbox\Admin\LessonPlan\Template\Field\Model $lessonPlanTemplateField,
+        GenericCollection $lessonPlanTemplateFields,
+        GenericCollection $curriculumNodes,
     ): string
     {
         /* wow
@@ -69,17 +71,15 @@ class LessonPlan
 
         $folder = $lessonPlan->getContext()->getFolder()->getName();
 
-        /* Find some details about how to use the template fields
+        /* Details about how to use each field
          */
-        $fieldTitle = trim((string)$lessonPlanTemplateField->getTitle());
-        $fieldDescription = trim((string)$lessonPlanTemplateField->getDescription());
-        $fieldBody = trim((string)$lessonPlanTemplateField->getBody());
+        $fields = $this->compileFields($lessonPlanTemplateFields);
 
         /* Find some curriculum node names, if any were chosen
          */
         $curriculum = '';
 
-        $curriculumNames = $this->compileNodeTitles($lessonPlan->getCurriculumNodes());
+        $curriculumNames = $this->compileNodeTitles($curriculumNodes);
 
         if ('' !== $curriculumNames) {
             $curriculum = sprintf(
@@ -91,9 +91,7 @@ class LessonPlan
         return $this->generate(
             $context,
             $folder,
-            $fieldTitle,
-            $fieldDescription,
-            $fieldBody,
+            $fields,
             $curriculum
         );
     }
@@ -106,18 +104,14 @@ class LessonPlan
      *
      * @param string $context
      * @param string $folder
-     * @param string $fieldTitle
-     * @param string $fieldDescription
-     * @param string $fieldBody
+     * @param string $fields
      * @param string $curriculum
      * @return string
      */
     public function generate(
         string $context,
         string $folder,
-        string $fieldTitle,
-        string $fieldDescription,
-        string $fieldBody,
+        string $fields,
         string $curriculum,
     ): string {
         /* Conduct replacements
@@ -125,16 +119,41 @@ class LessonPlan
         $replacements = [
             '[CONTEXT]' => $context,
             '[FOLDER]' => $folder,
-            '[FIELD_DATA]' => sprintf(
-                self::PROMPT_TEMPLATE_FIELD,
-                $fieldTitle,
-                $fieldBody,
-            ),
-            '[FIELD_DESCRIPTION]' => $fieldDescription,
+            '[FIELDS]' => $fields,
             '[CURRICULUM]' => $curriculum
         ];
 
         return strtr(self::PROMPT_TEMPLATE, $replacements);
+    }
+
+
+    /**
+     * Compose the prompt piece that talks about each Lesson Plan Template Field
+     * and its contents
+     *
+     * @param GenericCollection $lessonPlanTemplateFields
+     * @return string
+     */
+    private function compileFields(GenericCollection $lessonPlanTemplateFields): string
+    {
+        $fields = [];
+
+        /* Find some details about how to use the template fields
+         */
+        foreach ($lessonPlanTemplateFields as $lessonPlanTemplateField) {
+            $fieldTitle = trim((string)$lessonPlanTemplateField->getTitle());
+            $fieldDescription = trim((string)$lessonPlanTemplateField->getDescription());
+            $fieldBody = trim((string)$lessonPlanTemplateField->getBody());
+
+            $fields[] = sprintf(
+                self::PROMPT_TEMPLATE_FIELD,
+                $fieldTitle,
+                $fieldBody,
+                $fieldDescription,
+            );
+        }
+
+        return implode("\n\n", $fields);
     }
 
 
