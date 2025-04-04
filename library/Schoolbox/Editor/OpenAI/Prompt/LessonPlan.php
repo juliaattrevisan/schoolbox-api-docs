@@ -19,7 +19,8 @@ class LessonPlan
         
         [CURRICULUM]
             
-        Create a range of suggestions that align with the following field topics:
+        Create a range of suggestions in html that align with the following field topics; each field topic should
+        use the lessonPlanFieldsResponseFormat json response format, 
             [FIELDS]
     ";
 
@@ -30,7 +31,8 @@ class LessonPlan
      *    Lesson Plan Template Field Body
      */
     private const PROMPT_TEMPLATE_FIELD = '
-        Field Topic: %s.
+        Field ID: %s.
+        Topic: %s.
         %s
         %s
     ';
@@ -126,7 +128,7 @@ class LessonPlan
     ): string {
         /* Details about how to use each field
          */
-        $fields = $this->compileFields($this->lessonPlanTemplateFieldMapper->findByColumn('id', $lessonPlanTemplateFieldIds));
+        $lessonPlanTemplateFields = $this->compileFields($this->lessonPlanTemplateFieldMapper->findByColumn('id', $lessonPlanTemplateFieldIds));
 
         /* Find some curriculum node names, if any were chosen
          */
@@ -144,7 +146,7 @@ class LessonPlan
         return $this->generate(
             $context,
             $folder,
-            $fields,
+            $lessonPlanTemplateFields,
             $curriculum
         );
     }
@@ -157,14 +159,14 @@ class LessonPlan
      *
      * @param string $context
      * @param string $folder
-     * @param string $fields
+     * @param string $lessonPlanTemplateFields
      * @param string $curriculum
      * @return string
      */
     private function generate(
         string $context,
         string $folder,
-        string $fields,
+        string $lessonPlanTemplateFields,
         string $curriculum,
     ): string {
         /* Conduct replacements
@@ -172,7 +174,7 @@ class LessonPlan
         $replacements = [
             '[CONTEXT]' => $context,
             '[FOLDER]' => $folder,
-            '[FIELDS]' => $fields,
+            '[FIELDS]' => $lessonPlanTemplateFields,
             '[CURRICULUM]' => $curriculum
         ];
 
@@ -194,12 +196,14 @@ class LessonPlan
         /* Find some details about how to use the template fields
          */
         foreach ($lessonPlanTemplateFields as $lessonPlanTemplateField) {
+            $fieldId = $lessonPlanTemplateField->getId();
             $fieldTitle = trim((string)$lessonPlanTemplateField->getTitle());
             $fieldDescription = trim((string)$lessonPlanTemplateField->getDescription());
             $fieldBody = trim((string)$lessonPlanTemplateField->getBody());
 
             $fields[] = sprintf(
                 self::PROMPT_TEMPLATE_FIELD,
+                $fieldId,
                 $fieldTitle,
                 $fieldBody,
                 $fieldDescription,
