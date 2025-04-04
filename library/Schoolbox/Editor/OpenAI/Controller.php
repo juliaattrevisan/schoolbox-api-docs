@@ -99,20 +99,20 @@ class Controller extends Base
             $responseFormat = [
                 'name' => 'lessonPlanFieldsResponseFormat',
                 'type' => 'json_schema',
-                'schema' => [
+                'items' => [
                     'type' => 'object',
                     'properties' => [
-                        'field_id' => [
+                        'id' => [
                             'type' => 'string',
                         ],
-                        'field_title' => [
+                        'title' => [
                             'type' => 'string',
                         ],
-                        'field_body' => [
+                        'body' => [
                             'type' => 'string',
                         ],
                     ],
-                    'required' => ['field_id', 'field_title', 'field_body']
+                    'required' => ['id', 'title', 'body']
                 ],
             ];
 

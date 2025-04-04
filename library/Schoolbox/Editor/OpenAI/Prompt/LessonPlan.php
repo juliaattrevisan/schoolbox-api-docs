@@ -26,14 +26,15 @@ class LessonPlan
 
     /**
      * Each field's basic synopsis: each %s represents, respectively,
+     *    Lesson Plan Template Field ID
      *    Lesson Plan Template Field Title
-     *    Lesson Plan Template Field Description (which also contains extra ai instructions)
      *    Lesson Plan Template Field Body
+     *    Lesson Plan Template Field Description (which also contains extra ai instructions)
      */
     private const PROMPT_TEMPLATE_FIELD = '
-        Field ID: %s.
-        Topic: %s.
-        %s
+        id: %s.
+        title: %s.
+        body: %s.
         %s
     ';
 
