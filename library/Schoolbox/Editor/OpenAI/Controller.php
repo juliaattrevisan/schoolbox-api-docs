@@ -12,6 +12,7 @@ use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
 use GuzzleHttp\Client;
 use Psr\Http\Client\ClientExceptionInterface;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Mapper\Exception;
 
@@ -54,11 +55,11 @@ class Controller extends Base
     {
         try {
             $helper = new Helper(
-                trim((string)$this->getConfigLoader()->get('openai_endpoint')),
-                trim((string)$this->getConfigLoader()->get('openai_key')),
-                trim((string)$this->getConfigLoader()->get('openai_azure_resource_name')),
-                trim((string)$this->getConfigLoader()->get('openai_azure_deployment_id')),
-                trim((string)$this->getConfigLoader()->get('openai_model')),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_ENDPOINT)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_KEY)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_RESOURCE_NAME)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_DEPLOYMENT_ID)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_MODEL)),
                 $this->client,
                 $this->errorMapper,
                 $this->logMapper,
@@ -125,11 +126,11 @@ class Controller extends Base
     {
         try {
             (new Helper(
-                trim((string)$this->getConfigLoader()->get('openai_endpoint')),
-                trim((string)$this->getConfigLoader()->get('openai_key')),
-                trim((string)$this->getConfigLoader()->get('openai_azure_resource_name')),
-                trim((string)$this->getConfigLoader()->get('openai_azure_deployment_id')),
-                trim((string)$this->getConfigLoader()->get('openai_model')),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_ENDPOINT)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_KEY)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_RESOURCE_NAME)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_DEPLOYMENT_ID)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_MODEL)),
                 $this->client,
                 $this->errorMapper,
                 $this->logMapper,
