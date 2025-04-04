@@ -56,7 +56,7 @@ jobs:
         run: |
           docker image build \
             -t alaress/php82-alpine:latest \
-            -o type=docker,dest=${{ runner.temp }}/php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
+            -o type=docker,dest=${{ runner.temp }}/php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar \
             --build-arg ENV=prod \
             --platform ${{ matrix.build.platform }}/${{ matrix.build.arch }} \
             docker/base-images/php82-alpine
@@ -126,7 +126,7 @@ jobs:
         run: |
           docker image build \
             -t alaress/php82-fpm-alpine:latest \
-            -o type=docker,dest=${{ runner.temp }}/php82-fpm-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
+            -o type=docker,dest=${{ runner.temp }}/php82-fpm-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar \
             --build-arg ENV=prod \
             --platform ${{ matrix.build.platform }}/${{ matrix.build.arch }} \
             docker/base-images/php82-fpm-alpine
