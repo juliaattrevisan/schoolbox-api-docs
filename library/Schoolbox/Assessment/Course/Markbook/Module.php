@@ -21,6 +21,7 @@ use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Filter;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
+use Schoolbox\Permission\Access\Access;
 
 class Module extends \Alaress\Module\Module
 {
@@ -92,6 +93,7 @@ class Module extends \Alaress\Module\Module
             $this->injector->get('assessmentDataSource'),
             $this->getMapperFactory()->get(CourseImpl\Mapper::class),
             $this->getMapperFactory()->get(UnitImpl\Mapper::class),
+            $this->getMapperFactory()->get(Access::class),
         );
     }
 

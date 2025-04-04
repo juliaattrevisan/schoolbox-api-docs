@@ -22,6 +22,8 @@ use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Throwable;
 
 use function array_combine;
@@ -50,6 +52,8 @@ class Controller extends WebController\Base
     /** @var UnitImpl\Mapper */
     private $unitImplMapper;
 
+    /** @var Access */
+    private $access;
 
     /**
      * @param Filter\IFactoryFactory             $filterFactoryFactory
@@ -67,7 +71,8 @@ class Controller extends WebController\Base
         Filter\Filters\Assessment\IdFinder $assessmentIdFinder,
         Assessment\MapperProxy $assessmentMapperProxy,
         CourseImpl\Mapper $courseImplMapper,
-        UnitImpl\Mapper $unitImplMapper
+        UnitImpl\Mapper $unitImplMapper,
+        Access $access
     ) {
         $this->filterFactoryFactory  = $filterFactoryFactory;
         $this->filterMapper          = $filterMapper;
@@ -76,6 +81,7 @@ class Controller extends WebController\Base
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->courseImplMapper      = $courseImplMapper;
         $this->unitImplMapper        = $unitImplMapper;
+        $this->access                = $access;
     }
 
 
@@ -159,13 +165,18 @@ class Controller extends WebController\Base
         $route       = $this->routeGenerator->generate('courseMarkbook.postMarkbook', ['courseSpecId' => $courseSpec->getId()]);
         $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $this->getUser(), func_get_args(), $queryArgs);
 
+        $test = $courseSpec->getCourseImplementations();
+
         $this->response = $this->responseFromTemplate(
             '@courseMarkbook/courseMarkbookOuter.twig',
             [
                 'courseSpec'  => $courseSpec,
                 'viewee'      => $this->getUser(),
                 'filterPanel' => $filterPanel,
-                'canAccessPopOut' => false,
+                'canAccessPopOut' => $this->access->getFolderAccess(
+                    $this->getUser(),
+                    $courseSpec->getId(),
+                ) >= UserAccess::ACCESS_WRITE,
             ],
             "Course Markbook: {$courseSpec->getTitle()}",
             'submission'
