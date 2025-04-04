@@ -87,12 +87,12 @@ class Cache
      * Retrieve the response body of a URL from the cache: on miss, requests the
      * URL via the HTTP client, and caches the response body.
      *
-     * @param string      $url     The URL to retrieve.
-     * @param string|null $key     If provided: use this as the cache key,
-     *                             otherwise derive from `$url`.
-     * @param array       $headers Any headers to pass to the request.
-     * @param int|null    $ttl     If provided: cache for this amount of time,
-     *                             otherwise use `$this->defaultLifetime`.
+     * @param string   $url     The URL to retrieve.
+     * @param string   $prefix  Prefix to apply to the cache key.
+     *                          (The main key is always derived from `$url`.)
+     * @param array    $headers Any headers to pass to the request.
+     * @param int|null $ttl     If provided: cache for this amount of time,
+     *                          otherwise use `$this->defaultLifetime`.
      *
      * @return string
      * @throws InvalidArgumentException if the cache key is somehow not valid
@@ -101,13 +101,13 @@ class Cache
      *                            doesn't implement `Throwable`, but its
      *                            implementations should
      */
-    public function request(string $url, ?string $key = null, array $headers = [], ?int $ttl = null): string
+    public function request(string $url, string $prefix = '', array $headers = [], ?int $ttl = null): string
     {
         // Make `$url` absolute if it isn't already
         $url = $this->makeAbsolute($url);
 
         // Attempt to load cached response
-        $key     ??= $this->hashKey($url);
+        $key     = $prefix . $this->hashKey($url);
         $lockKey = self::LOCK_KEY_PREFIX . $key;
         $maxWait = $this->connectTimeout + $this->requestTimeout;
 
@@ -161,18 +161,18 @@ class Cache
     /**
      * Invalidates a cached value stored as part of `$this->request`.
      *
-     * @param string      $url
-     * @param string|null $key
+     * @param string $url
+     * @param string $prefix
      * @return void
      * @throws InvalidArgumentException
      * @phpstan-ignore-next-line `\Psr\SimpleCache\InvalidArgumentException`
      *                           doesn't implement `Throwable`, but its
      *                           implementations should
      */
-    public function invalidate(string $url, ?string $key = null): void
+    public function invalidate(string $url, string $prefix = ''): void
     {
         $url     = $this->makeAbsolute($url);
-        $key     ??= $this->hashKey($url);
+        $key     = $prefix . $this->hashKey($url);
         $lockKey = self::LOCK_KEY_PREFIX . $key;
         $this->internalCache->deleteMultiple([$key, $lockKey]);
     }
