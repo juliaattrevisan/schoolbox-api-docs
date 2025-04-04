@@ -53,7 +53,7 @@ class Controller extends Base
     public function postLessonPlan(): void
     {
         /** @var \Schoolbox\Learning\Assessment\LessonPlan\Model $lessonPlan */
-        $lessonPlan = $this->mapperProxy->findById(1577);
+        $lessonPlan = $this->mapperProxy->findById(1580);
 
         $lessonPlanTemplate = $this->lessonPlanTemplateMapper->findById($lessonPlan->getLessonPlanTemplate());
 

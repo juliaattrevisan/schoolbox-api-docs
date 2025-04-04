@@ -20,7 +20,7 @@ class LessonPlan
         Each lesson should be aligned to the following curriculum outcomes:
             [CURRICULUM].
             
-        Create a range of learning activities that align with the following concepts:
+        Create a range of suggestions that align with the following concepts:
             [FIELD_DATA].
         
         Use these additional instructions: [FIELD_DESCRIPTION]
