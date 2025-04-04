@@ -52,7 +52,7 @@ class Controller extends Base
      */
     public function postLessonPlan(): void
     {
-        $lessonPlan = $this->mapperProxy->findById(1576);
+        $lessonPlan = $this->mapperProxy->findById(1577);
 
         $lessonPlanTemplate = $this->lessonPlanTemplateMapper->findById($lessonPlan->getLessonPlanTemplate());
 
@@ -74,6 +74,7 @@ class Controller extends Base
         ];
 
         $prompt = (new LessonPlan($this->curriculumNodeMapper))->generate(
+            $lessonPlan,
             $lessonPlanTemplate,
             $post['title'],
             $post['duration'],
