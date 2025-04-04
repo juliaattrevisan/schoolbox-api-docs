@@ -120,7 +120,7 @@ const props = defineProps({
         default: false,
     },
     /**
-     * Show disabled nodes in browser
+     * whether to display disabled nodes
      */
     includeDisabled: {
         type: Boolean,

@@ -91,7 +91,9 @@ export const useNodesStore = defineStore(`csNodes`, {
         async loadRemote() {
             const store = useStore();
             try {
-                const response = await fetch(`${apiEndpoint}/?topLevelOnly=1&enabled=1&descendants=1&limit=50`);
+                const response = await fetch(
+                    `${apiEndpoint}/?topLevelOnly=1&${store.includeDisabled ? "" : "enabled=1"}&descendants=1&limit=50`,
+                );
                 if (response.ok) {
                     const topLevelNodes = await response.json();
                     await this.setTopLevel(topLevelNodes);
