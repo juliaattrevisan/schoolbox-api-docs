@@ -61,8 +61,7 @@ class LessonPlan
     public function generateFromInstances(
         \Schoolbox\Learning\Assessment\LessonPlan\Model $lessonPlan,
         GenericCollection $lessonPlanTemplateFields,
-    ): string
-    {
+    ): string {
         /* wow
          * Get some info about the various contexts in which this lesson plan exists
          * such as the over-arching course name, unit name, and folder name
@@ -220,6 +219,6 @@ class LessonPlan
             $titles[] = $node->getName();
         }
 
-        return implode(";\n" , array_filter(array_unique($titles)));
+        return implode(";\n", array_filter(array_unique($titles)));
     }
 }
