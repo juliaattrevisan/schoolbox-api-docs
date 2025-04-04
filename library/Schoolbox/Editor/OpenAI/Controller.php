@@ -38,6 +38,7 @@ class Controller extends Base
         private \Schoolbox\Curriculum\Node\Mapper $curriculumNodeMapper,
         private AssessmentMapperProxy $mapperProxy,
         private \Schoolbox\Admin\LessonPlan\Template\Mapper $lessonPlanTemplateMapper,
+        private \Schoolbox\Admin\LessonPlan\Template\Field\Mapper $lessonPlanFieldTemplateFieldMapper,
     ) {
     }
 
@@ -52,7 +53,6 @@ class Controller extends Base
      */
     public function postLessonPlan(): void
     {
-
         try {
             $helper = new Helper(
                 trim((string)$this->getConfigLoader()->get('openai_endpoint')),
@@ -66,7 +66,7 @@ class Controller extends Base
             );
 
             $promptGenerator = new LessonPlan(
-                \Schoolbox\Admin\LessonPlan\Template\Field\Mapper::getInstance(),
+                $this->lessonPlanFieldTemplateFieldMapper,
                 $this->curriculumNodeMapper
             );
 
