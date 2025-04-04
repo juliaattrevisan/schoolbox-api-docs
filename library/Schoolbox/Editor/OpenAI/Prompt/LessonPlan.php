@@ -2,6 +2,7 @@
 
 namespace Schoolbox\Editor\OpenAI\Prompt;
 
+use Schoolbox\Admin\LessonPlan\Template\Field\Mapper;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\LessonPlan\Model;
@@ -33,20 +34,25 @@ class LessonPlan
 
     private const PROMPT_TEMPLATE_CURRICULUM = '
         Each lesson should be aligned to the following curriculum outcomes:
-            %s.
+%s.
     ';
 
 
     /**
+     * @param Mapper $lessonPlanTemplateFieldMapper
      * @param Node\Mapper $curriculumNodeMapper
      */
-    public function __construct(private Node\Mapper $curriculumNodeMapper)
-    {
+    public function __construct(
+        private \Schoolbox\Admin\LessonPlan\Template\Field\Mapper $lessonPlanTemplateFieldMapper,
+        private Node\Mapper $curriculumNodeMapper
+    ) {
     }
 
 
     /**
      * Derive prompt attributes from an existing Lesson Plan and Lesson Plan Template.
+     *
+     * This lets you supply already pre-hydrated object instances
      *
      * @param Model $lessonPlan
      * @param GenericCollection $lessonPlanTemplateFields
@@ -98,6 +104,49 @@ class LessonPlan
 
 
     /**
+     * Derive prompt attributes from an existing Lesson Plan and Lesson Plan Template.
+     *
+     * This lets you supply scalar ids, which are resolved to actual instances via mappers
+     *
+     * @param string $context
+     * @param string $folder
+     * @param array $lessonPlanTemplateFieldIds
+     * @param array $curriculumNodeIds
+     * @return string
+     */
+    public function generateFromScalars(
+        string $context,
+        string $folder,
+        array $lessonPlanTemplateFieldIds,
+        array $curriculumNodeIds
+    ): string {
+        /* Details about how to use each field
+         */
+        $fields = $this->compileFields($this->lessonPlanTemplateFieldMapper->findByColumn('id', $lessonPlanTemplateFieldIds));
+
+        /* Find some curriculum node names, if any were chosen
+         */
+        $curriculum = '';
+
+        $curriculumNames = $this->compileNodeTitles($this->curriculumNodeMapper->findByColumn('id', $curriculumNodeIds));
+
+        if ('' !== $curriculumNames) {
+            $curriculum = sprintf(
+                self::PROMPT_TEMPLATE_CURRICULUM,
+                $curriculumNames
+            );
+        }
+
+        return $this->generate(
+            $context,
+            $folder,
+            $fields,
+            $curriculum
+        );
+    }
+
+
+    /**
      * Generate a prompt using Luisa Words, using the prompt attributes directly from the args.
      * These could come from a POST array or similar; generateFromInstances() lets you supply
      * actual Lesson Plan and Lesson Plan Template instances, saving you extracting this manually.
@@ -108,7 +157,7 @@ class LessonPlan
      * @param string $curriculum
      * @return string
      */
-    public function generate(
+    private function generate(
         string $context,
         string $folder,
         string $fields,
@@ -173,6 +222,6 @@ class LessonPlan
             $titles[] = $node->getName();
         }
 
-        return implode('; ', array_filter(array_unique($titles)));
+        return implode(";\n" , array_filter(array_unique($titles)));
     }
 }

@@ -52,25 +52,6 @@ class Controller extends Base
      */
     public function postLessonPlan(): void
     {
-        /** @var \Schoolbox\Learning\Assessment\LessonPlan\Model $lessonPlan */
-        $lessonPlan = $this->mapperProxy->findById(1580);
-
-        $lessonPlanTemplate = $this->lessonPlanTemplateMapper->findById($lessonPlan->getLessonPlanTemplate());
-
-        $post = [
-            'title' => 'Digital Literacy',
-            /* 45 minute example lesson
-             */
-            'duration' => 45,
-            'folderTitle' => 'English',
-            'unitTitle' => 'Unit 1',
-            'yearLevel' => 'Year 9',
-            'curriculumIds' => [
-                253,
-                256,
-                259
-            ]
-        ];
 
         try {
             $helper = new Helper(
@@ -84,7 +65,10 @@ class Controller extends Base
                 $this->logMapper,
             );
 
-            $promptGenerator = new LessonPlan($this->curriculumNodeMapper);
+            $promptGenerator = new LessonPlan(
+                \Schoolbox\Admin\LessonPlan\Template\Field\Mapper::getInstance(),
+                $this->curriculumNodeMapper
+            );
 
             /* FIXME
              *  Obtain results for each field...ideally this wouldn't be necessary
@@ -92,10 +76,25 @@ class Controller extends Base
              *  plan grouped by fields, but I haven't seen the AI capable of doing
              *  that yet. For now, just bash past the barrier: improve it later
              */
-            $prompt = $promptGenerator->generateFromInstances(
-                $lessonPlan,
-                $lessonPlanTemplate->getFields(),
-                $lessonPlan->getCurriculumNodes(),
+//            /* Used for an existing lesson plan, typically, via the Modify screen
+//             */
+//            /** @var \Schoolbox\Learning\Assessment\LessonPlan\Model $lessonPlan */
+//            $lessonPlan = $this->mapperProxy->findById(1580);
+//            $lessonPlanTemplate = $this->lessonPlanTemplateMapper->findById($lessonPlan->getLessonPlanTemplate());
+//
+//            $prompt = $promptGenerator->generateFromInstances(
+//                $lessonPlan,
+//                $lessonPlanTemplate->getFields(),
+//                $lessonPlan->getCurriculumNodes(),
+//            );
+
+            /* From a POST payload
+             */
+            $prompt = $promptGenerator->generateFromScalars(
+                '9 English',
+                '9A English',
+                [104, 105, 106, 107],
+                [772, 773]
             );
 
             /* FIXME shortcircuit the prompt for inspection
