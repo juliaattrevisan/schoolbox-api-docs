@@ -108,12 +108,13 @@ class Controller extends Base
 
         $eventTypes = $this->eventTypeMapper->findAll(['deleted' => true]);
 
-        // Cheap ModelToArray implementation.  TODO: Do this in a ModelToArray class?
+        // Convert event type objects into arrays for consumption by Twig, and add extra parameter 'isDeleted'.
+        // Extra parameter 'isDeleted' is not needed by FullCalendar, but is needed in assessment-calendar.vue.
         $eventTypeArrays = [];
         foreach ($eventTypes as $eventType) {
             $eventTypeArrays[] = [
                 'id' => $eventType->getId(),
-                'type' => $eventType->getType() . ($eventType->isDeleted() ? ' (deleted)' : ''),
+                'type' => $eventType->getType(),
                 'color' => $eventType->getColor(),
                 'isDeleted' => $eventType->isDeleted(),
             ];
