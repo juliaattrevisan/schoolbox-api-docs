@@ -38,7 +38,7 @@ class Xml
 
         // Load from cache
         try {
-            $response = $this->cache->request($url, $this->cacheTimeout);
+            $response = $this->cache->request($url, ttl: $this->cacheTimeout);
         } catch (\GuzzleHttp\Exception\GuzzleException $e) {
             /**
              * Either requesting the RSS feed, or the RSS feed failed, error out here.
