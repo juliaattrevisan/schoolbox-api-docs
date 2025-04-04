@@ -647,6 +647,7 @@ export default {
                         // element we seek.
                         if (element.textContent === eventType.type) {
                             element.classList.add("meta"); // Add 'meta' class to distinguish deleted from non-deleted event types.
+                            element.title = "This event type has been deleted.";
                         }
                     }
                 }
