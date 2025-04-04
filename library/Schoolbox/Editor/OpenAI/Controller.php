@@ -94,7 +94,7 @@ class Controller extends Base
 
             $data = json_decode($result, true);
 
-            echo $data['choices'][0]['message']['content'] ?? null;
+            $this->response = $this->responseAsJson($data['choices'][0]['message']['content'] ?? null);
 
             return;
         } catch (\DomainException $e) {
