@@ -92,7 +92,7 @@ export const useNodesStore = defineStore(`csNodes`, {
             const store = useStore();
             try {
                 const response = await fetch(
-                    `${apiEndpoint}/?topLevelOnly=1&${store.includeDisabled ? "" : "enabled=1"}&descendants=1&limit=50`,
+                    `${apiEndpoint}/?topLevelOnly=1${store.includeDisabled ? "" : "&enabled=1"}&descendants=1&limit=50`,
                 );
                 if (response.ok) {
                     const topLevelNodes = await response.json();
