@@ -56,13 +56,11 @@ class LessonPlan
      *
      * @param Model $lessonPlan
      * @param GenericCollection $lessonPlanTemplateFields
-     * @param GenericCollection $curriculumNodes
      * @return string
      */
     public function generateFromInstances(
         \Schoolbox\Learning\Assessment\LessonPlan\Model $lessonPlan,
         GenericCollection $lessonPlanTemplateFields,
-        GenericCollection $curriculumNodes,
     ): string
     {
         /* wow
@@ -85,7 +83,7 @@ class LessonPlan
          */
         $curriculum = '';
 
-        $curriculumNames = $this->compileNodeTitles($curriculumNodes);
+        $curriculumNames = $this->compileNodeTitles($lessonPlan->getCurriculumNodes());
 
         if ('' !== $curriculumNames) {
             $curriculum = sprintf(

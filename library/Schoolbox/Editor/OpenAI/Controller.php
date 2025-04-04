@@ -76,26 +76,25 @@ class Controller extends Base
              *  plan grouped by fields, but I haven't seen the AI capable of doing
              *  that yet. For now, just bash past the barrier: improve it later
              */
-//            /* Used for an existing lesson plan, typically, via the Modify screen
-//             */
-//            /** @var \Schoolbox\Learning\Assessment\LessonPlan\Model $lessonPlan */
-//            $lessonPlan = $this->mapperProxy->findById(1580);
-//            $lessonPlanTemplate = $this->lessonPlanTemplateMapper->findById($lessonPlan->getLessonPlanTemplate());
-//
-//            $prompt = $promptGenerator->generateFromInstances(
-//                $lessonPlan,
-//                $lessonPlanTemplate->getFields(),
-//                $lessonPlan->getCurriculumNodes(),
-//            );
-
-            /* From a POST payload
+            /* Used for an existing lesson plan, typically, via the Modify screen
              */
-            $prompt = $promptGenerator->generateFromScalars(
-                '9 English',
-                '9A English',
-                [104, 105, 106, 107],
-                [772, 773]
+            /** @var \Schoolbox\Learning\Assessment\LessonPlan\Model $lessonPlan */
+            $lessonPlan = $this->mapperProxy->findById(1580);
+            $lessonPlanTemplate = $this->lessonPlanTemplateMapper->findById($lessonPlan->getLessonPlanTemplate());
+
+            $prompt = $promptGenerator->generateFromInstances(
+                $lessonPlan,
+                $lessonPlanTemplate->getFields(),
             );
+
+//            /* From a POST payload
+//             */
+//            $prompt = $promptGenerator->generateFromScalars(
+//                '9 English',
+//                '9A English',
+//                [104, 105, 106, 107],
+//                [772, 773]
+//            );
 
             $result = $helper->request($this->getUser(), $prompt);
 
