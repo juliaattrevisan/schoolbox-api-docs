@@ -93,15 +93,9 @@ class Controller extends Base
              *  that yet. For now, just bash past the barrier: improve it later
              */
             foreach ($lessonPlanTemplate->getFields() as $lessonPlanTemplateField) {
-                $prompt = $promptGenerator->generate(
+                $prompt = $promptGenerator->generateFromInstances(
                     $lessonPlan,
                     $lessonPlanTemplateField,
-                    $post['title'],
-                    $post['duration'],
-                    $post['folderTitle'],
-                    $post['unitTitle'],
-                    $post['yearLevel'],
-                    $post['curriculumIds']
                 );
 
                 $result = $helper->request($this->getUser(), $prompt);

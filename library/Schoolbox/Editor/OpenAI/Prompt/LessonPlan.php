@@ -46,28 +46,17 @@ class LessonPlan
 
 
     /**
-     * Generate a prompt using Luisa Words
+     * Derive prompt attributes from an existing Lesson Plan and Lesson Plan Template.
      *
      * @param \Schoolbox\Learning\Assessment\LessonPlan\Model $lessonPlan
      * @param \Schoolbox\Admin\LessonPlan\Template\Field\Model $lessonPlanTemplateField
-     * @param string $title
-     * @param int $duration
-     * @param string $folderTitle
-     * @param string $unitTitle
-     * @param string $yearLevel
-     * @param array $curriculumNodeIds
      * @return string
      */
-    public function generate(
+    public function generateFromInstances(
         \Schoolbox\Learning\Assessment\LessonPlan\Model $lessonPlan,
         \Schoolbox\Admin\LessonPlan\Template\Field\Model $lessonPlanTemplateField,
-        string $title,
-        int $duration,
-        string $folderTitle,
-        string $unitTitle,
-        string $yearLevel,
-        array $curriculumNodeIds,
-    ): string {
+    ): string
+    {
         /* wow
          * Get some info about the various contexts in which this lesson plan exists
          * such as the over-arching course name, unit name, and folder name
@@ -82,7 +71,9 @@ class LessonPlan
 
         /* Find some details about how to use the template fields
          */
-        $description = trim((string)$lessonPlanTemplateField->getDescription());
+        $fieldTitle = trim((string)$lessonPlanTemplateField->getTitle());
+        $fieldDescription = trim((string)$lessonPlanTemplateField->getDescription());
+        $fieldBody = trim((string)$lessonPlanTemplateField->getBody());
 
         /* Find some curriculum node names, if any were chosen
          */
@@ -97,6 +88,38 @@ class LessonPlan
             );
         }
 
+        return $this->generate(
+            $context,
+            $folder,
+            $fieldTitle,
+            $fieldDescription,
+            $fieldBody,
+            $curriculum
+        );
+    }
+
+
+    /**
+     * Generate a prompt using Luisa Words, using the prompt attributes directly from the args.
+     * These could come from a POST array or similar; generateFromInstances() lets you supply
+     * actual Lesson Plan and Lesson Plan Template instances, saving you extracting this manually.
+     *
+     * @param string $context
+     * @param string $folder
+     * @param string $fieldTitle
+     * @param string $fieldDescription
+     * @param string $fieldBody
+     * @param string $curriculum
+     * @return string
+     */
+    public function generate(
+        string $context,
+        string $folder,
+        string $fieldTitle,
+        string $fieldDescription,
+        string $fieldBody,
+        string $curriculum,
+    ): string {
         /* Conduct replacements
          */
         $replacements = [
@@ -104,11 +127,10 @@ class LessonPlan
             '[FOLDER]' => $folder,
             '[FIELD_DATA]' => sprintf(
                 self::PROMPT_TEMPLATE_FIELD,
-                $lessonPlanTemplateField->getTitle(),
-                $lessonPlanTemplateField->getBody(),
-                $description ?: 'none',
+                $fieldTitle,
+                $fieldBody,
             ),
-            '[FIELD_DESCRIPTION]' => $lessonPlanTemplateField->getDescription(),
+            '[FIELD_DESCRIPTION]' => $fieldDescription,
             '[CURRICULUM]' => $curriculum
         ];
 
