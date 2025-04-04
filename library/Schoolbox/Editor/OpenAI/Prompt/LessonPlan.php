@@ -15,8 +15,7 @@ class LessonPlan
         well-developed and effective lesson plans for your students. Each lesson should be engaging and
         appropriate for \"[CONTEXT]\" students.
         
-        Each lesson should be aligned to the following curriculum outcomes:
-            [CURRICULUM].
+        [CURRICULUM]
             
         Create a range of suggestions that align with the following concepts:
             [FIELD_DATA].
@@ -30,6 +29,11 @@ class LessonPlan
     private const PROMPT_TEMPLATE_FIELD = '
         Field Topic: %s.
         %s.
+    ';
+
+    private const PROMPT_TEMPLATE_CURRICULUM = '
+        Each lesson should be aligned to the following curriculum outcomes:
+            %s.
     ';
 
 
@@ -80,6 +84,19 @@ class LessonPlan
          */
         $description = trim((string)$lessonPlanTemplateField->getDescription());
 
+        /* Find some curriculum node names, if any were chosen
+         */
+        $curriculum = '';
+
+        $curriculumNames = $this->compileNodeTitles($lessonPlan->getCurriculumNodes());
+
+        if ('' !== $curriculumNames) {
+            $curriculum = sprintf(
+                self::PROMPT_TEMPLATE_CURRICULUM,
+                $curriculumNames
+            );
+        }
+
         /* Conduct replacements
          */
         $replacements = [
@@ -92,7 +109,7 @@ class LessonPlan
                 $description ?: 'none',
             ),
             '[FIELD_DESCRIPTION]' => $lessonPlanTemplateField->getDescription(),
-            '[CURRICULUM]' => $this->compileNodeTitles($lessonPlan->getCurriculumNodes()),
+            '[CURRICULUM]' => $curriculum
         ];
 
         return strtr(self::PROMPT_TEMPLATE, $replacements);
