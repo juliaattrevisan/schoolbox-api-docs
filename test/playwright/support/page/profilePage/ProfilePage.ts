@@ -11,7 +11,7 @@ export default class ProfilePage {
 
     static readonly DATA_TEST_PROFILE_NAME = "user-profile-name";
 
-    static readonly DATATEST_PROFILE_FLAG = "student-profile-pastoral-flag-{typeId}-{subtypeId}";
+    static readonly DATA_TEST_PROFILE_FLAG = "student-profile-pastoral-flag-{typeId}-{subtypeId}";
 
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
@@ -96,7 +96,7 @@ export default class ProfilePage {
      */
     getFlag(typeId: number, subTypeId: number): Locator {
         return this.page.getByTestId(
-            ProfilePage.DATATEST_PROFILE_FLAG.replace("{typeId}", typeId.toString()).replace(
+            ProfilePage.DATA_TEST_PROFILE_FLAG.replace("{typeId}", typeId.toString()).replace(
                 "{subtypeId}",
                 subTypeId.toString(),
             ),

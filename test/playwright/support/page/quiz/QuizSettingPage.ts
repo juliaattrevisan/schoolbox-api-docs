@@ -11,7 +11,7 @@ export default class QuizSettingsPage {
 
     static readonly SELECTOR_TITLE = "input#title";
 
-    static readonly DATATEST_BUTTON_CREATE = "assessment-form-button-submit-Create";
+    static readonly DATA_TEST_BUTTON_CREATE = "assessment-form-button-submit-Create";
 
     // Constants for data-test selectors
     static readonly SELECTOR_FORM = "assessment-form";
@@ -34,7 +34,7 @@ export default class QuizSettingsPage {
      * @param quizTitle - The title of the quiz
      */
     async create(quizTitle: string): Promise<void> {
-        await this.page.getByTestId(QuizSettingsPage.DATATEST_BUTTON_CREATE).click();
+        await this.page.getByTestId(QuizSettingsPage.DATA_TEST_BUTTON_CREATE).click();
         await expect(this.page.locator("#container")).toContainText(`Modify ${quizTitle}`);
     }
 }

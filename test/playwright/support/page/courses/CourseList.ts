@@ -5,7 +5,7 @@ export default class CourseList {
 
     static readonly URL = "/course/list";
 
-    static readonly DATATEST_COURSE_DOT_MENU = "sbx-pop-out-courseDropdown"; // Append "-[courseDropdownNumber]"
+    static readonly DATA_TEST_COURSE_DOT_MENU = "sbx-pop-out-courseDropdown"; // Append "-[courseDropdownNumber]"
 
     constructor(page: Page) {
         this.page = page;
@@ -23,7 +23,7 @@ export default class CourseList {
      * @param courseDropdownNumber - The course dropdown number to click
      */
     async clickCourseDotMenu(courseDropdownNumber: number): Promise<void> {
-        await this.page.getByTestId(`${CourseList.DATATEST_COURSE_DOT_MENU}-${courseDropdownNumber}`).click();
+        await this.page.getByTestId(`${CourseList.DATA_TEST_COURSE_DOT_MENU}-${courseDropdownNumber}`).click();
     }
 
     /**

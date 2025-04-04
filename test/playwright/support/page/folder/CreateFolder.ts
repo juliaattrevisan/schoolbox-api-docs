@@ -12,13 +12,13 @@ export default class CreateFolder {
 
     static readonly URL_RESOURCES = "/resources";
 
-    static readonly DATATEST_FOLDER_FORM_INPUT_NAME = "folder-form-input-name";
+    static readonly DATA_TEST_FOLDER_FORM_INPUT_NAME = "folder-form-input-name";
 
-    static readonly DATATEST_FOLDER_FORM_SELECT_TEMPLATE = "folder-form-select-template";
+    static readonly DATA_TEST_FOLDER_FORM_SELECT_TEMPLATE = "folder-form-select-template";
 
-    static readonly DATATEST_FOLDER_FORM_RADIO_ACCESS_GROUP = "folder-form-radio-access-group"; // Append "-[type]-[groupID]"
+    static readonly DATA_TEST_FOLDER_FORM_RADIO_ACCESS_GROUP = "folder-form-radio-access-group"; // Append "-[type]-[groupID]"
 
-    static readonly DATATEST_FOLDER_FORM_SUBMIT = "folder-form-submit";
+    static readonly DATA_TEST_FOLDER_FORM_SUBMIT = "folder-form-submit";
 
     static readonly SELECTOR_CREATE_GROUP = "label[for=groupcheck]";
 
@@ -48,7 +48,7 @@ export default class CreateFolder {
      * @param folderName - The folder name to type
      */
     async typeName(folderName: string): Promise<void> {
-        await this.page.getByTestId(CreateFolder.DATATEST_FOLDER_FORM_INPUT_NAME).fill(folderName);
+        await this.page.getByTestId(CreateFolder.DATA_TEST_FOLDER_FORM_INPUT_NAME).fill(folderName);
     }
 
     /**
@@ -56,7 +56,7 @@ export default class CreateFolder {
      * @param option - The option to set (by label - e.g. "Blog" or "Course")
      */
     async setHomepageTemplate(option: string): Promise<void> {
-        await this.page.getByTestId(CreateFolder.DATATEST_FOLDER_FORM_SELECT_TEMPLATE).selectOption({ label: option });
+        await this.page.getByTestId(CreateFolder.DATA_TEST_FOLDER_FORM_SELECT_TEMPLATE).selectOption({ label: option });
     }
 
     /**
@@ -66,7 +66,7 @@ export default class CreateFolder {
      */
     async setAccessPermission(groupId: string | number, permissionLevel: "none" | "read" | "write"): Promise<void> {
         await this.page
-            .getByTestId(`${CreateFolder.DATATEST_FOLDER_FORM_RADIO_ACCESS_GROUP}-${permissionLevel}-${groupId}`)
+            .getByTestId(`${CreateFolder.DATA_TEST_FOLDER_FORM_RADIO_ACCESS_GROUP}-${permissionLevel}-${groupId}`)
             .check();
     }
 
@@ -91,7 +91,7 @@ export default class CreateFolder {
      * Clicks the create folder button
      */
     async submit(): Promise<void> {
-        await this.page.getByTestId(CreateFolder.DATATEST_FOLDER_FORM_SUBMIT).click();
+        await this.page.getByTestId(CreateFolder.DATA_TEST_FOLDER_FORM_SUBMIT).click();
     }
 
     /**

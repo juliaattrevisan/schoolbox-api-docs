@@ -34,7 +34,7 @@ export default class Homepage {
 
     static readonly ELEMENT_EDIT_COLUMNS_TAB = "#tabs-2";
 
-    static readonly DATATEST_LINK_MENU_BUTTON = "sbx-pop-out-tab-control-button";
+    static readonly DATA_TEST_LINK_MENU_BUTTON = "sbx-pop-out-tab-control-button";
 
     static readonly ELEMENT_COMPONENT_LAYOUT = "#component-layout";
 
@@ -62,13 +62,13 @@ export default class Homepage {
 
     static readonly REMOVE_BUTTON_CONFIRMATION_MESSAGE = "Remove";
 
-    static readonly DATATEST_ASSESSMENT_COMPONENT_TOT_MENU = "sbx-pop-out-duework-options";
+    static readonly DATA_TEST_ASSESSMENT_COMPONENT_TOT_MENU = "sbx-pop-out-duework-options";
 
-    static readonly DATATEST_ASSESSMENT_COMPONENT_TITLE = "component-assessment-title-";
+    static readonly DATA_TEST_ASSESSMENT_COMPONENT_TITLE = "component-assessment-title-";
 
     static readonly ASSESSMENT_COMPONENT_TOT_MENU_MODIFY = "a.icon-modify";
 
-    static readonly DATATEST_ASSESSMENT_COMPONENT_TOT_MENU_DELETE = "component-assessment-actions-delete-";
+    static readonly DATA_TEST_ASSESSMENT_COMPONENT_TOT_MENU_DELETE = "component-assessment-actions-delete-";
 
     constructor(page: Page) {
         this.page = page;
@@ -252,7 +252,7 @@ export default class Homepage {
      * @param assessmentId - The assessment ID.
      */
     async clickAssessmentComponentTOTMenu(assessmentId: number): Promise<void> {
-        await this.page.getByTestId(`${Homepage.DATATEST_ASSESSMENT_COMPONENT_TOT_MENU}${assessmentId}`).click();
+        await this.page.getByTestId(`${Homepage.DATA_TEST_ASSESSMENT_COMPONENT_TOT_MENU}${assessmentId}`).click();
     }
 
     /**
@@ -260,7 +260,7 @@ export default class Homepage {
      * @param assessmentId - The assessment ID.
      */
     async clickAssessmentComponentTitle(assessmentId: number): Promise<void> {
-        await this.page.getByTestId(`${Homepage.DATATEST_ASSESSMENT_COMPONENT_TITLE}${assessmentId}`).click();
+        await this.page.getByTestId(`${Homepage.DATA_TEST_ASSESSMENT_COMPONENT_TITLE}${assessmentId}`).click();
     }
 
     /**
@@ -277,6 +277,8 @@ export default class Homepage {
      * .
      */
     async clickDeleteViaAssessmentComponent(assessmentId: number): Promise<void> {
-        await this.page.getByTestId(`${Homepage.DATATEST_ASSESSMENT_COMPONENT_TOT_MENU_DELETE}${assessmentId}`).click();
+        await this.page
+            .getByTestId(`${Homepage.DATA_TEST_ASSESSMENT_COMPONENT_TOT_MENU_DELETE}${assessmentId}`)
+            .click();
     }
 }

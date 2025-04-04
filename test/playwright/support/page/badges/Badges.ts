@@ -15,9 +15,9 @@ export default class Badges {
 
     static readonly BUTTON_CONFIRM_DELETE = "a.button.submit";
 
-    static readonly DATATEST_LIST_BOX_GOAL_ACHIEVEMENT = "ss-query-input";
+    static readonly DATA_TEST_LIST_BOX_GOAL_ACHIEVEMENT = "ss-query-input";
 
-    static readonly DATATEST_SELECTED_STUDENT = "ss-results-item-container"; // append -[userId]
+    static readonly DATA_TEST_SELECTED_STUDENT = "ss-results-item-container"; // append -[userId]
 
     static readonly DATA_TEST_MODAL_BUTTON_SET_GOAL_ACHIEVEMENT = "badge-award-confirm";
 
@@ -112,10 +112,10 @@ export default class Badges {
      */
     async selectStudentSetGoalOrAchievement(studentName: string): Promise<void> {
         const openModal = await this.tester.common.waitForModalToBeOpen();
-        await openModal.getByTestId(Badges.DATATEST_LIST_BOX_GOAL_ACHIEVEMENT).fill(studentName);
+        await openModal.getByTestId(Badges.DATA_TEST_LIST_BOX_GOAL_ACHIEVEMENT).fill(studentName);
         // Find the student in the list and click it (need to generalise the data-test as it's dynamic)
         await openModal
-            .locator(`[data-test^="${Badges.DATATEST_SELECTED_STUDENT}"]`) // (starts with)
+            .locator(`[data-test^="${Badges.DATA_TEST_SELECTED_STUDENT}"]`) // (starts with)
             .filter({
                 hasText: studentName,
             })

@@ -5,15 +5,15 @@ export default class ClassReport {
 
     static readonly URL = "/pastoral/class/{classId}?30=&31=&32=&35[includeActiveRecords]=1";
 
-    static readonly DATATEST_STUDENT_LIST = "pastoral-class-report-student-list";
+    static readonly DATA_TEST_STUDENT_LIST = "pastoral-class-report-student-list";
 
-    static readonly DATATEST_STUDENT_RECORD = "pastoral-class-report-student-{studentId}";
+    static readonly DATA_TEST_STUDENT_RECORD = "pastoral-class-report-student-{studentId}";
 
-    static readonly DATATEST_STATUS_FILTER = "sbx-pop-out-filter-component-35-button";
+    static readonly DATA_TEST_STATUS_FILTER = "sbx-pop-out-filter-component-35-button";
 
-    static readonly DATATEST_STATUS_FILTER_ARCHIVED_CHECKBOX = "selectionCheckbox-35-includeArchivedRecords";
+    static readonly DATA_TEST_STATUS_FILTER_ARCHIVED_CHECKBOX = "selectionCheckbox-35-includeArchivedRecords";
 
-    static readonly DATATEST_APPLY_FILTERS_BUTTON = "panel-apply-filters-button";
+    static readonly DATA_TEST_APPLY_FILTERS_BUTTON = "panel-apply-filters-button";
 
     constructor(page: Page) {
         this.page = page;
@@ -32,7 +32,7 @@ export default class ClassReport {
      * @returns - The locator for the student record
      */
     getStudentList(): Locator {
-        return this.page.getByTestId(ClassReport.DATATEST_STUDENT_LIST);
+        return this.page.getByTestId(ClassReport.DATA_TEST_STUDENT_LIST);
     }
 
     /**
@@ -41,27 +41,27 @@ export default class ClassReport {
      * @returns - The locator for the student record
      */
     getStudentRecord(studentId: number): Locator {
-        return this.page.getByTestId(ClassReport.DATATEST_STUDENT_RECORD.replace("{studentId}", studentId.toString()));
+        return this.page.getByTestId(ClassReport.DATA_TEST_STUDENT_RECORD.replace("{studentId}", studentId.toString()));
     }
 
     /**
      * Clicks the status filter
      */
     async clickStatusFilter(): Promise<void> {
-        await this.page.getByTestId(ClassReport.DATATEST_STATUS_FILTER).click();
+        await this.page.getByTestId(ClassReport.DATA_TEST_STATUS_FILTER).click();
     }
 
     /**
      * Clicks the archived checkbox within the status filter
      */
     async clickArchivedCheckbox(): Promise<void> {
-        await this.page.getByTestId(ClassReport.DATATEST_STATUS_FILTER_ARCHIVED_CHECKBOX).click();
+        await this.page.getByTestId(ClassReport.DATA_TEST_STATUS_FILTER_ARCHIVED_CHECKBOX).click();
     }
 
     /**
      * Clicks the apply filters button
      */
     async clickApplyFiltersButton(): Promise<void> {
-        await this.page.getByTestId(ClassReport.DATATEST_APPLY_FILTERS_BUTTON).click();
+        await this.page.getByTestId(ClassReport.DATA_TEST_APPLY_FILTERS_BUTTON).click();
     }
 }

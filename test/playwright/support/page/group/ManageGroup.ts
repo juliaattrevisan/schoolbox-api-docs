@@ -13,7 +13,7 @@ export default class ManageGroup {
 
     static readonly ELEMENT_SEARCH = "#search-text";
 
-    static readonly DATATEST_MANAGE_GROUP_ADD_MEMBERS = "manage-group-add-members-submit";
+    static readonly DATA_TEST_MANAGE_GROUP_ADD_MEMBERS = "manage-group-add-members-submit";
 
     constructor(page: Page) {
         this.page = page;
@@ -82,6 +82,6 @@ export default class ManageGroup {
      * Clicks the Add Members button
      */
     async clickAddMembers(): Promise<void> {
-        await this.page.getByTestId(ManageGroup.DATATEST_MANAGE_GROUP_ADD_MEMBERS).click();
+        await this.page.getByTestId(ManageGroup.DATA_TEST_MANAGE_GROUP_ADD_MEMBERS).click();
     }
 }

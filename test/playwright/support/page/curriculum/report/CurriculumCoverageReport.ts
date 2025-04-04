@@ -16,23 +16,23 @@ export default class CurriculumCoverageReport {
 
     static readonly URL_COURSE_CURRICULUM = "/curriculum/reports/coverage?courseId={courseId}&nodeId={curriculumId}";
 
-    static readonly DATATEST_GENERATE_REPORT_BUTTON = "cc-input-button";
+    static readonly DATA_TEST_GENERATE_REPORT_BUTTON = "cc-input-button";
 
-    static readonly DATATEST_REPORT_LOADING = "cc-report-loading";
+    static readonly DATA_TEST_REPORT_LOADING = "cc-report-loading";
 
-    static readonly DATATEST_TABLE = "cc-report-table";
+    static readonly DATA_TEST_TABLE = "cc-report-table";
 
-    static readonly DATATEST_TABLE_NODE_EXPAND_BUTTON = "cc-report-table-node-expand-button-";
+    static readonly DATA_TEST_TABLE_NODE_EXPAND_BUTTON = "cc-report-table-node-expand-button-";
 
-    static readonly DATATEST_FILTER_COURSE = "cc-report-filters-label-course";
+    static readonly DATA_TEST_FILTER_COURSE = "cc-report-filters-label-course";
 
-    static readonly DATATEST_FILTER_UNIT = "cc-report-filters-label-unit";
+    static readonly DATA_TEST_FILTER_UNIT = "cc-report-filters-label-unit";
 
-    static readonly DATATEST_FILTER_ACTIVITY = "cc-report-filters-label-activity";
+    static readonly DATA_TEST_FILTER_ACTIVITY = "cc-report-filters-label-activity";
 
-    static readonly DATATEST_ACELA1553_ROMEO = "cc-report-table-node-total-pop-out-button-6-88-149"; // ACELA1553 / Romeo & Juliet table cell
+    static readonly DATA_TEST_ACELA1553_ROMEO = "cc-report-table-node-total-pop-out-button-6-88-149"; // ACELA1553 / Romeo & Juliet table cell
 
-    static readonly DATATEST_DISABLED_TOGGLE = "cc-report-filters-disabled-toggle";
+    static readonly DATA_TEST_DISABLED_TOGGLE = "cc-report-filters-disabled-toggle";
 
     static readonly SELECTOR_YEAR_9_TOTAL = "table tbody tr:nth-child(4) td:nth-child(2)"; // the Year 9 Curriculum total usage table cell at its default state
 
@@ -82,14 +82,14 @@ export default class CurriculumCoverageReport {
      * Clicks the generate report button
      */
     async submit(): Promise<void> {
-        await this.page.getByTestId(CurriculumCoverageReport.DATATEST_GENERATE_REPORT_BUTTON).click();
+        await this.page.getByTestId(CurriculumCoverageReport.DATA_TEST_GENERATE_REPORT_BUTTON).click();
     }
 
     /**
      * Expect the loading spinner to be visible
      */
     async expectLoading(): Promise<void> {
-        await expect(this.page.getByTestId(CurriculumCoverageReport.DATATEST_REPORT_LOADING)).toBeVisible();
+        await expect(this.page.getByTestId(CurriculumCoverageReport.DATA_TEST_REPORT_LOADING)).toBeVisible();
     }
 
     /**
@@ -97,7 +97,7 @@ export default class CurriculumCoverageReport {
      * @returns - The locator for the report table
      */
     getTable(): Locator {
-        return this.page.getByTestId(CurriculumCoverageReport.DATATEST_TABLE);
+        return this.page.getByTestId(CurriculumCoverageReport.DATA_TEST_TABLE);
     }
 
     /**
@@ -109,7 +109,7 @@ export default class CurriculumCoverageReport {
         for (const id of ids) {
             // eslint-disable-next-line no-await-in-loop -- need to click each item sequentially
             await this.page
-                .getByTestId(`${CurriculumCoverageReport.DATATEST_TABLE_NODE_EXPAND_BUTTON}${id.toString()}`)
+                .getByTestId(`${CurriculumCoverageReport.DATA_TEST_TABLE_NODE_EXPAND_BUTTON}${id.toString()}`)
                 .click();
         }
     }
@@ -118,28 +118,28 @@ export default class CurriculumCoverageReport {
      * Clicks the course filter
      */
     async clickCourseFilter(): Promise<void> {
-        await this.page.getByTestId(CurriculumCoverageReport.DATATEST_FILTER_COURSE).click();
+        await this.page.getByTestId(CurriculumCoverageReport.DATA_TEST_FILTER_COURSE).click();
     }
 
     /**
      * Clicks the unit filter
      */
     async clickUnitFilter(): Promise<void> {
-        await this.page.getByTestId(CurriculumCoverageReport.DATATEST_FILTER_UNIT).click();
+        await this.page.getByTestId(CurriculumCoverageReport.DATA_TEST_FILTER_UNIT).click();
     }
 
     /**
      * Clicks the activity filter
      */
     async clickActivityFilter(): Promise<void> {
-        await this.page.getByTestId(CurriculumCoverageReport.DATATEST_FILTER_ACTIVITY).click();
+        await this.page.getByTestId(CurriculumCoverageReport.DATA_TEST_FILTER_ACTIVITY).click();
     }
 
     /**
      * Clicks the show disabled toggle
      */
     async clickShowDisabledToggle(): Promise<void> {
-        await this.page.getByTestId(CurriculumCoverageReport.DATATEST_DISABLED_TOGGLE).click();
+        await this.page.getByTestId(CurriculumCoverageReport.DATA_TEST_DISABLED_TOGGLE).click();
     }
 
     /**
@@ -163,6 +163,6 @@ export default class CurriculumCoverageReport {
      * @returns - The locator for the ACELA1553 / Romeo & Juliet table cell
      */
     acela1553RomeoTableCell(): Locator {
-        return this.page.getByTestId(CurriculumCoverageReport.DATATEST_ACELA1553_ROMEO);
+        return this.page.getByTestId(CurriculumCoverageReport.DATA_TEST_ACELA1553_ROMEO);
     }
 }

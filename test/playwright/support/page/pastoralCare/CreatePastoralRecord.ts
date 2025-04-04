@@ -16,7 +16,7 @@ export default class CreatePastoralRecord {
 
     static readonly SAVE_BUTTON = "input.submit";
 
-    static readonly DATATEST_EXPIRES_AT_INPUT = "modify-section-general-pastoral-expires-at-input";
+    static readonly DATA_TEST_EXPIRES_AT_INPUT = "modify-section-general-pastoral-expires-at-input";
 
     constructor(page: Page) {
         this.page = page;
@@ -103,7 +103,7 @@ export default class CreatePastoralRecord {
      * @param value - The value of the expires at input
      */
     async setExpiresAt(value: string): Promise<void> {
-        const input = this.page.getByTestId(CreatePastoralRecord.DATATEST_EXPIRES_AT_INPUT);
+        const input = this.page.getByTestId(CreatePastoralRecord.DATA_TEST_EXPIRES_AT_INPUT);
         await input.fill(value);
         // trigger the change event as that's how our code detects if there's been a manual change to the input
         // see library/Schoolbox/Pastoral/templates/modify_scripts_add_record.twig - $("#expiresAt").on("change", function () {
@@ -117,7 +117,7 @@ export default class CreatePastoralRecord {
      * @param value - The value of the expires at input
      */
     async expectExpiresAtToBe(value: string): Promise<void> {
-        await expect(this.page.getByTestId(CreatePastoralRecord.DATATEST_EXPIRES_AT_INPUT)).toHaveValue(value);
+        await expect(this.page.getByTestId(CreatePastoralRecord.DATA_TEST_EXPIRES_AT_INPUT)).toHaveValue(value);
     }
 
     /**

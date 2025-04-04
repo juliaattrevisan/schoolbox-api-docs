@@ -32,17 +32,17 @@ export default class AssessmentForm {
 
     static readonly SELECTOR_DUE_DATE = "assessment-form-input-date-due";
 
-    static readonly DATATEST_MARK_TYPE = "assessment-form-select-markType";
+    static readonly DATA_TEST_MARK_TYPE = "assessment-form-select-markType";
 
-    static readonly DATATEST_INSTRUCTOR_MARK_TYPE = "assessment-form-select-instructor-markType";
+    static readonly DATA_TEST_INSTRUCTOR_MARK_TYPE = "assessment-form-select-instructor-markType";
 
     static readonly SELECTOR_BUTTON_CREATE = "assessment-form-button-submit-Create";
 
     static readonly SELECTOR_BUTTON_UPDATE = "assessment-form-button-submit-Update";
 
-    static readonly DATATEST_SUBMISSION_TYPE_CONTAINER = "assessment-form-submission-type-container";
+    static readonly DATA_TEST_SUBMISSION_TYPE_CONTAINER = "assessment-form-submission-type-container";
 
-    static readonly DATATEST_SUBMISSION_TYPE_LABEL = "assessment-form-submission-type"; // Append "-[submissionType]"
+    static readonly DATA_TEST_SUBMISSION_TYPE_LABEL = "assessment-form-submission-type"; // Append "-[submissionType]"
 
     static readonly SELECTOR_PARTICIPATION_BUTTON_SAVE = "participation-plan-form-button-save";
 
@@ -64,7 +64,7 @@ export default class AssessmentForm {
 
     static readonly SELECTOR_HOMEPAGE_TABS = "homepage-tabs";
 
-    static readonly DATATEST_MODIFY_PLANS = "sbx-pop-out-plan-options-button";
+    static readonly DATA_TEST_MODIFY_PLANS = "sbx-pop-out-plan-options-button";
 
     static readonly SELECTOR_WORKSHEET_ATTACHMENT_ZONE = "#WorksheetZone";
 
@@ -161,7 +161,7 @@ export default class AssessmentForm {
      * @param markType - The mark type to set
      */
     async setMarkType(markType: number): Promise<void> {
-        const markTypeSelectEl = this.page.getByTestId(AssessmentForm.DATATEST_MARK_TYPE);
+        const markTypeSelectEl = this.page.getByTestId(AssessmentForm.DATA_TEST_MARK_TYPE);
         await markTypeSelectEl.selectOption({ value: markType.toString() });
     }
 
@@ -170,7 +170,7 @@ export default class AssessmentForm {
      * @param markType - The mark type to set
      */
     async setInstructorMarkType(markType: number): Promise<void> {
-        const markTypeSelectEl = this.page.getByTestId(AssessmentForm.DATATEST_INSTRUCTOR_MARK_TYPE);
+        const markTypeSelectEl = this.page.getByTestId(AssessmentForm.DATA_TEST_INSTRUCTOR_MARK_TYPE);
         await markTypeSelectEl.selectOption({ value: markType.toString() });
     }
 
@@ -211,9 +211,9 @@ export default class AssessmentForm {
             | typeof AssessmentForm.TEXT_EDITOR
             | typeof AssessmentForm.TYPE_FILES,
     ): Promise<void> {
-        const submissionTypeContainer = this.page.getByTestId(AssessmentForm.DATATEST_SUBMISSION_TYPE_CONTAINER);
+        const submissionTypeContainer = this.page.getByTestId(AssessmentForm.DATA_TEST_SUBMISSION_TYPE_CONTAINER);
         await expect(submissionTypeContainer).toContainText("Select the type of submission allowed");
-        await this.page.getByTestId(`${AssessmentForm.DATATEST_SUBMISSION_TYPE_LABEL}-${submissionType}`).click();
+        await this.page.getByTestId(`${AssessmentForm.DATA_TEST_SUBMISSION_TYPE_LABEL}-${submissionType}`).click();
     }
 
     /**
@@ -304,7 +304,7 @@ export default class AssessmentForm {
      * Modify a learning plan
      */
     async clickModifyLearningPlan(): Promise<void> {
-        await this.page.getByTestId(AssessmentForm.DATATEST_MODIFY_PLANS).click();
+        await this.page.getByTestId(AssessmentForm.DATA_TEST_MODIFY_PLANS).click();
     }
 
     /**

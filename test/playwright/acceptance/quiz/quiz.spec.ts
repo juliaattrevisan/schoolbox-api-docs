@@ -133,7 +133,7 @@ test.describe("Quiz Tests: create, modify, delete quiz, submit and vertical revi
             deleted_at: null,
             "title like": quizName,
         })) as number;
-        await expect(page.getByTestId(`${Homepage.DATATEST_ASSESSMENT_COMPONENT_TITLE}${quizId}`)).toContainText(
+        await expect(page.getByTestId(`${Homepage.DATA_TEST_ASSESSMENT_COMPONENT_TITLE}${quizId}`)).toContainText(
             quizName,
         );
     });

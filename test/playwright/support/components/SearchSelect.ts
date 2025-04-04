@@ -9,9 +9,9 @@ import { expect } from "@playwright/test";
 export default class SearchSelect {
     private page: Page;
 
-    static readonly DATATEST_SELECTED = "ss-selected";
+    static readonly DATA_TEST_SELECTED = "ss-selected";
 
-    static readonly DATATEST_BUTTON = "search-select-button-";
+    static readonly DATA_TEST_BUTTON = "search-select-button-";
 
     constructor(page: Page) {
         this.page = page;
@@ -22,7 +22,7 @@ export default class SearchSelect {
      * @param name - The name of the selected SearchSelectItem
      */
     async expectItemSelected(name: string): Promise<void> {
-        await expect(this.page.getByTestId(SearchSelect.DATATEST_SELECTED)).toContainText(name);
+        await expect(this.page.getByTestId(SearchSelect.DATA_TEST_SELECTED)).toContainText(name);
     }
 
     /**
@@ -30,6 +30,6 @@ export default class SearchSelect {
      * @param id - The id of the button
      */
     async selectButton(id: string): Promise<void> {
-        await this.page.getByTestId(`${SearchSelect.DATATEST_BUTTON}${id}`).click();
+        await this.page.getByTestId(`${SearchSelect.DATA_TEST_BUTTON}${id}`).click();
     }
 }
