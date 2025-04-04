@@ -163,9 +163,11 @@ class CacheTest extends TestCase
         // verify that I'm kept waiting about 2s (request + connect timeout)
         // between the two.
         $this->assertEquals($result1, $cache1->request('/test.php', ttl: 1));
-        $time = microtime(true);
-        $this->assertEquals($result2, $cache2->request('/test.php', ttl: 1));
-        $this->assertEqualsWithDelta($lockTimeout, microtime(true) - $time, 0.1);
+        $time          = microtime(true);
+        $result2Actual = $cache2->request('/test.php', ttl: 1);
+        $time          = microtime(true) - $time;
+        $this->assertEquals($result2, $result2Actual);
+        $this->assertEqualsWithDelta($lockTimeout, $time, 0.1);
     }
 
     /**
