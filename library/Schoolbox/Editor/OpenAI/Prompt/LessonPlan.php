@@ -85,7 +85,8 @@ class LessonPlan
         $replacements = [
             '[CONTEXT]' => $context,
             '[FOLDER]' => $folder,
-            '[FIELD_DATA]' => sprintf(self::PROMPT_TEMPLATE_FIELD,
+            '[FIELD_DATA]' => sprintf(
+                self::PROMPT_TEMPLATE_FIELD,
                 $lessonPlanTemplateField->getTitle(),
                 $lessonPlanTemplateField->getBody(),
                 $description ?: 'none',
