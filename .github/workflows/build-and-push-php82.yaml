@@ -55,7 +55,8 @@ jobs:
             -t alaress/php82-alpine:latest \
             -o type=docker,dest=${{ runner.temp }}/php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
             --build-arg ENV=prod \
-            --platform ${{ matrix.build.platform }}/${{ matrix.build.arch }}
+            --platform ${{ matrix.build.platform }}/${{ matrix.build.arch }} \
+            docker/base-images/php82-alpine
 
 #        with:
 #          context: "{{defaultContext}}:docker/base-images/php82-alpine"
@@ -121,7 +122,8 @@ jobs:
             -t alaress/php82-fpm-alpine:latest \
             -o type=docker,dest=${{ runner.temp }}/php82-fpm-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
             --build-arg ENV=prod \
-            --platform ${{ matrix.build.platform }}/${{ matrix.build.arch }}
+            --platform ${{ matrix.build.platform }}/${{ matrix.build.arch }} \
+            docker/base-images/php82-fpm-alpine
 #        with:
 #          context: "{{defaultContext}}:docker/base-images/php82-fpm-alpine"
 #          outputs: type=docker,dest=${{ runner.temp }}/php82-fpm-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
