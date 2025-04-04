@@ -2,8 +2,6 @@
 
 namespace Schoolbox\Editor\OpenAI\Prompt;
 
-use DebugBar\DebugBarException;
-use Schoolbox\Admin\LessonPlan\Template\Model;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\GenericCollection;
 
@@ -31,11 +29,8 @@ class LessonPlan
      */
     private const PROMPT_TEMPLATE_FIELD = '
         Field Topic: %s.
-        Concepts: %s.
+        %s.
     ';
-
-    private const PROMPT_TEMPLATE_NODES = 'be aligned to the following: [NODES]. 
-        The lesson should ';
 
 
     /**
