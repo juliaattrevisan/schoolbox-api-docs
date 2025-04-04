@@ -100,12 +100,11 @@ jobs:
           name: php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}
           path: ${{ runner.temp }}
 
-      - name: Load and tag php82-alpine image
+      - name: Load php82-alpine image
         if: steps.cache-php82-fpm-alpine.outputs.cache-hit != 'true'
         run: |
-          IMAGE_ID=$(docker image load --input ${{ runner.temp }}/php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar)
+          docker image load --input ${{ runner.temp }}/php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
           docker image ls
-          docker image tag $IMAGE_ID alaress/php82-alpine:latest
 
       - name: Build php82-fpm-alpine
         uses: docker/build-push-action@v6
