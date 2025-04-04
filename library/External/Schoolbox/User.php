@@ -487,6 +487,9 @@ class External_Schoolbox_User implements External_UserInterface
         }
 
         $statement = $this->internalDatabase->executeQuery($query, $params);
+        /**
+         * array map to trim is needed for both these as browsers may be inserting \r\n and it also still needs to remove excessive ` ` or other whitespace
+         */
         $positionTitlesBlacklist = array_map('trim', explode("\n", (string)$config->get('staff_dir_position_title_restrict')));
         while ($row = $statement->fetch()) {
             // filter out rows that collide with the config restriction
