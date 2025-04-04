@@ -7,6 +7,7 @@
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import { getEmptyNode, allChildrenDisabled } from "@schoolboxCurriculum/js/nodeUtils";
 import ShowMatches from "@schoolboxVue/components/search/show-matches.vue";
+import { useStore } from "../store/curriculumSelectorStore";
 import { useNodesStore } from "../store/csNodesStore";
 import { useModalViewNodesStore } from "../store/csModalViewNodesStore";
 import { useModalSearchStore } from "../store/csModalSearchStore";
@@ -24,6 +25,7 @@ const props = withDefaults(defineProps<Props>(), {
     isActive: false,
 });
 
+const store = useStore();
 const nodesStore = useNodesStore();
 const modalViewNodesStore = useModalViewNodesStore();
 const modalSearchStore = useModalSearchStore();
@@ -72,6 +74,10 @@ const isButton = window.Vue.computed(() => {
     if (props.node.children?.length === 0) {
         // there's no children to display, so no point going further
         return false;
+    }
+    if (store.includeDisabled) {
+        // if we are including disabled nodes, we can always go further
+        return true;
     }
     if (allChildrenDisabled(props.node)) {
         // all children are disabled, so no point going further
