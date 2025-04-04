@@ -487,11 +487,12 @@ class External_Schoolbox_User implements External_UserInterface
         }
 
         $statement = $this->internalDatabase->executeQuery($query, $params);
-        $positionTitlesBlacklist = explode('\n', (string)$config->get('staff_dir_position_title_restrict'));
+        $positionTitlesBlacklist = array_map('trim', explode("\n", (string)$config->get('staff_dir_position_title_restrict')));
         while ($row = $statement->fetch()) {
             // filter out rows that collide with the config restriction
-            $staffPositionTitles = explode(',', trim((string)($row['JobPositionDescription'] ?? null)));
-            if (!empty(array_intersect($staffPositionTitles, $positionTitlesBlacklist)) && (0 === count($staffPositionTitles))) {
+            $staffPositionTitles = array_map('trim', explode(',', trim((string)($row['JobPositionDescription'] ?? null))));
+            $int = array_intersect($staffPositionTitles, $positionTitlesBlacklist);
+            if (!empty($int)) {
                 // position title has data and that data is in the blacklist, ignore this human
                 continue;
             }
