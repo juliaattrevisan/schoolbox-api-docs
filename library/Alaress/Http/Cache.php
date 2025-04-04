@@ -16,7 +16,6 @@ use Psr\Http\Message\UriInterface;
 use Psr\SimpleCache\CacheInterface;
 use Psr\SimpleCache\InvalidArgumentException;
 use Random\RandomException;
-use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Url\Uri;
 
 /**
@@ -230,6 +229,12 @@ class Cache
             // wait for a value in the middle
             $jitterMicroseconds = self::BASE_JITTER * (2 ** $iteration) / 2;
         }
+
+        // Sleep until the expiry time has been reached:
+        // need to recalculate time, as the lock wait is being measured to a
+        // resolution of 0.1s in the test.
+        $now                        = microtime(true);
+        $microsecondsUntilWaitUntil = (int)(($waitUntil - $now) * 1_000_000);
         usleep(min($jitterMicroseconds, $microsecondsUntilWaitUntil));
 
         // And wait again, for longer this time
