@@ -103,8 +103,9 @@ jobs:
       - name: Load and tag php82-alpine image
         if: steps.cache-php82-fpm-alpine.outputs.cache-hit != 'true'
         run: |
-          image_id=$(docker image load --input ${{ runner.temp }}/php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar)
-          docker image tag $image_id alaress/php82-alpine:latest
+          IMAGE_ID=$(docker image load --input ${{ runner.temp }}/php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar)
+          echo $IMAGE_ID
+          docker image tag $IMAGE_ID alaress/php82-alpine:latest
 
       - name: Build php82-fpm-alpine
         uses: docker/build-push-action@v6
@@ -149,8 +150,8 @@ jobs:
 
       - name: Load and tag ${{ matrix.image }} image
         run: |
-          image_id=$(docker image load --input ${{ runner.temp }}/${{ matrix.image }}-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar)
-          docker image tag $image_id alaress/${{ matrix.image }}:latest
+          IMAGE_ID=$(docker image load --input ${{ runner.temp }}/${{ matrix.image }}-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar)
+          docker image tag $IMAGE_ID alaress/${{ matrix.image }}:latest
 
       - name: Login to Dockerhub
         if: ${{ github.event_name != 'pull_request' }}
@@ -192,8 +193,8 @@ jobs:
 
       - name: Load and tag ${{ matrix.image }} image
         run: |
-          image_id=$(docker image load --input ${{ runner.temp }}/${{ matrix.image }}-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar)
-          docker image tag $image_id alaress/${{ matrix.image }}:latest
+          IMAGE_ID=$(docker image load --input ${{ runner.temp }}/${{ matrix.image }}-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar)
+          docker image tag $IMAGE_ID alaress/${{ matrix.image }}:latest
 
       - name: Configure AWS Credentials
         if: ${{ github.event_name != 'pull_request' }}
