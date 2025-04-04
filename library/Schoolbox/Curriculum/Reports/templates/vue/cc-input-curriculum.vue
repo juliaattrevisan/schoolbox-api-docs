@@ -50,7 +50,7 @@ store.init({
 const selectedStore = useSelectedNodesStore();
 props.preselected.forEach((preselected) => selectedStore.add(preselected));
 const modalStore = useModalStore();
-const endpoint = `${props.endpoint}?enabled=1&limit=50&includeWithoutCode=1&`; // The endpoint to retrieve the curriculum data from
+const endpoint = `${props.endpoint}?limit=50&includeWithoutCode=1&`; // The endpoint to retrieve the curriculum data from
 const results = window.Vue.ref<Node[]>([]);
 
 /**
