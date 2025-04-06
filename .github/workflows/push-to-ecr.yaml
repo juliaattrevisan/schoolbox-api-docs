@@ -10,7 +10,6 @@ on:
 
           Must have had an artifact built for it already.
         required : true
-
     secrets:
       AWS_ECR_ROLE:
         description: |
@@ -22,7 +21,8 @@ on:
 # QEMU building an ARM64 image on an AMD64 arch is too slow to be acceptable.
 jobs:
   push-to-ecr:
-    secrets: inherit
+    env:
+      AWS_ECR_ROLE: ${{ secrets.AWS_ECR_ROLE }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -47,18 +47,18 @@ jobs:
           docker image load --input ${{ runner.temp }}/${{ inputs.image }}-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
 
       - name: Configure AWS Credentials
-        if: secrets.AWS_ECR_ROLE != ''
+        if: env.AWS_ECR_ROLE != ''
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ECR_ROLE }}
           aws-region: ${{ matrix.region }}
 
       - name: Login to Amazon ECR Private
-        if: secrets.AWS_ECR_ROLE != ''
+        if: env.AWS_ECR_ROLE != ''
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Push ${{ matrix.image }} image
-        if: secrets.AWS_ECR_ROLE != ''
+        if: env.AWS_ECR_ROLE != ''
         run: |
           docker push -a ${{ steps.login-ecr.outputs.registry }}/${{ inputs.image }} --platform ${{ matrix.build.platform }}/${{ matrix.build.arch }}
