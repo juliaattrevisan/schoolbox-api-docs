@@ -22,6 +22,7 @@ on:
 # QEMU building an ARM64 image on an AMD64 arch is too slow to be acceptable.
 jobs:
   push-to-ecr:
+    secrets: inherit
     runs-on: ubuntu-latest
     strategy:
       matrix:
