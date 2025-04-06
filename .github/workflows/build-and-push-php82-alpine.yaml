@@ -49,19 +49,19 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-#      # TODO remove caching before this goes to prod
-#      - name: Load php82-alpine cache
-#        uses: actions/cache@v4
-#        id: cache-php82-alpine
-#        with:
-#          path: ${{ runner.temp }}/php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
-#          key: php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}
+      # TODO remove caching before this goes to prod
+      - name: Load php82-alpine cache
+        uses: actions/cache@v4
+        id: cache-php82-alpine
+        with:
+          path: ${{ runner.temp }}/php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
+          key: php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}
 
       # Not sure if pushing a same tagged image with a different platform will
       # make the image available for different platforms.
       - name: Build and push php82-alpine
         uses: docker/build-push-action@v6
-#        if: steps.cache-php82-alpine.outputs.cache-hit != 'true'
+        if: steps.cache-php82-alpine.outputs.cache-hit != 'true'
         with:
           context: docker/base-images/php82-alpine
           push: ${{ github.event_name != 'pull_request' }}
@@ -81,45 +81,8 @@ jobs:
   push-to-ecr:
     needs:
       - build-php82-alpine
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        build:
-          - platform: linux
-            arch: amd64
-          - platform: linux
-            arch: arm64
-        image:
-          - php82-alpine
-          - php82-fpm-alpine
-        region:
-          - ap-southeast-2
-#          - ap-southeast-1
-#          - me-south-1
-    steps:
-      - name: Download ${{ matrix.image }} artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{ matrix.image }}-${{ matrix.build.platform }}-${{ matrix.build.arch }}
-          path: ${{ runner.temp }}
-
-      - name: Load ${{ matrix.image }} image
-        run: |
-          docker image load --input ${{ runner.temp }}/${{ matrix.image }}-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
-
-      - name: Configure AWS Credentials
-        if: ${{ github.event_name != 'pull_request' }}
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.AWS_ECR_ROLE }}
-          aws-region: ${{ matrix.region }}
-
-      - name: Login to Amazon ECR Private
-        if: ${{ github.event_name != 'pull_request' }}
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Push ${{ matrix.image }} image
-        if: ${{ github.event_name != 'pull_request' }}
-        run: |
-          docker push -a ${{ steps.login-ecr.outputs.registry }}/${{ matrix.image }} --platform ${{ matrix.build.platform }}/${{ matrix.build.arch }}
+    uses: ./.github/workflows/push-to-ecr.yaml
+    with:
+      image: php82-alpine
+    secrets:
+      AWS_ECR_ROLE: ${{ secrets.AWS_ECR_ROLE || '' }}
