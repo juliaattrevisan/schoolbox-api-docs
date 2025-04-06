@@ -49,19 +49,19 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # TODO remove caching before this goes to prod
-      - name: Load php82-alpine cache
-        uses: actions/cache@v4
-        id: cache-php82-alpine
-        with:
-          path: ${{ runner.temp }}/php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
-          key: php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}
+#      # TODO remove caching before this goes to prod
+#      - name: Load php82-alpine cache
+#        uses: actions/cache@v4
+#        id: cache-php82-alpine
+#        with:
+#          path: ${{ runner.temp }}/php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
+#          key: php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}
 
       # Not sure if pushing a same tagged image with a different platform will
       # make the image available for different platforms.
       - name: Build and push php82-alpine
         uses: docker/build-push-action@v6
-        if: steps.cache-php82-alpine.outputs.cache-hit != 'true'
+#        if: steps.cache-php82-alpine.outputs.cache-hit != 'true'
         with:
           context: docker/base-images/php82-alpine
           push: ${{ github.event_name != 'pull_request' }}
