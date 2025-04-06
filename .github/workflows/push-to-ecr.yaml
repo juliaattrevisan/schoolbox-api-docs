@@ -1,0 +1,57 @@
+name: push-to-ecr
+
+on:
+  workflow_call:
+    inputs:
+      image:
+        type: string
+        description: |
+          The name of the image to push.
+
+          Must have had an artifact built for it already.
+        required : true
+
+# Separate job variants are required for AMD64 and ARM64 builds, so that the
+# build runs on the same architecture as the image it's building:
+# QEMU building an ARM64 image on an AMD64 arch is too slow to be acceptable.
+jobs:
+  push-to-ecr:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        build:
+          - platform: linux
+            arch: amd64
+          - platform: linux
+            arch: arm64
+        region:
+          - ap-southeast-2
+#          - ap-southeast-1
+#          - me-south-1
+    steps:
+      - name: Download ${{ inputs.image }} artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.image }}-${{ matrix.build.platform }}-${{ matrix.build.arch }}
+          path: ${{ runner.temp }}
+
+      - name: Load ${{ inputs.image }} image
+        run: |
+          docker image load --input ${{ runner.temp }}/${{ inputs.image }}-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
+
+      - name: Configure AWS Credentials
+        if: secrets.AWS_ECR_ROLE
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ECR_ROLE }}
+          aws-region: ${{ matrix.region }}
+
+      - name: Login to Amazon ECR Private
+        if: ${{ secrets.AWS_ECR_ROLE }}
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Push ${{ matrix.image }} image
+        if: ${{ secrets.AWS_ECR_ROLE }}
+        run: |
+          docker push -a ${{ steps.login-ecr.outputs.registry }}/${{ inputs.image }} --platform ${{ matrix.build.platform }}/${{ matrix.build.arch }}
