@@ -53,11 +53,11 @@ jobs:
           aws-region: ${{ matrix.region }}
 
       - name: Login to Amazon ECR Private
-        if: ${{ secrets.AWS_ECR_ROLE }}
+        if: secrets.AWS_ECR_ROLE
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Push ${{ matrix.image }} image
-        if: ${{ secrets.AWS_ECR_ROLE }}
+        if: secrets.AWS_ECR_ROLE
         run: |
           docker push -a ${{ steps.login-ecr.outputs.registry }}/${{ inputs.image }} --platform ${{ matrix.build.platform }}/${{ matrix.build.arch }}
