@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Application;
 
 use Alaress\Application\WrongSapiException;
+use Alaress\Database\Exception as DatabaseException;
 use Alaress\Sentry\Tracing\Tracer;
 use Alaress\Session\Session;
 use Alaress\Web\Response\Factory as ResponseFactory;
@@ -174,6 +175,19 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
                 } elseif ($e instanceof \PDOException) {
                     $code    = 500;
                     $message = 'Schoolbox is currently experiencing internal problems with its database. This issue has been logged.';
+                    if (str_contains($e->getMessage(), "SQL Server")) {
+                        $message = "An error occurred while Schoolbox attempted to access your SIS's database. Please wait a minute before refreshing the page. If this persists, please contact your IT department to let them know.";
+                        $code    = 429;
+                        $info    = $e->getMessage();
+                    }
+                } elseif ($e instanceof DatabaseException) {
+                    $code    = 599;
+                    $message = 'Schoolbox is currently experiencing internal problems with its database. This issue has been logged.';
+                    if (str_contains($e->getMessage(), "SQL Server")) {
+                        $message = "An error occurred while Schoolbox attempted to access your SIS's database. Please wait a minute before refreshing the page. If this persists, please contact your IT department to let them know.";
+                        $code    = 429;
+                        $info    = $e->getMessage();
+                    }
                 } elseif ($e instanceof RuntimeException) {
                     $code    = 500;
                     $message = 'Schoolbox is currently down due to an internal service being inactive.';
