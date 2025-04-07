@@ -15,7 +15,9 @@ use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Calendar\Registry;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\DSN;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
+use Schoolbox\External\Profile\Student\Model;
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Exception;
 
 /**
  * Downloads the eDiary contents for each student
@@ -96,9 +98,9 @@ class EDiary implements IStrategy
          *
          * This algorithmic complexity is about to take a toll on tass
          */
-        $feeds = $this->getFeedList('S');
+        $feedCodes = $this->getFeedList('S');
 
-        if ($feeds) {
+        if ('' !== $feedCodes) {
             /* Get a list of Student external ids
              * Use the profile mappers to get a 1D array of those
              * For each person in that set,
@@ -107,15 +109,13 @@ class EDiary implements IStrategy
             $userProfiles = $this->studentProfileMapper->findAll();
 
             /* TODO getStudentEDiary allegedly supports multiple feed codes
-             * in the endpoint params, but:
+             *  in the endpoint params, but:
              *    - I can't tell which feed codes we actually need/want
-             *    - Presumably they meant a csv separated value
-             *    - Not sure if this actually works (untried)
+             *
+             *  https://github.com/TheAlphaSchoolSystemPTYLTD/school-calendar-and-notices/blob/master/getStudentEDiary.md
              */
-            foreach ($feeds['calendar'] as $feed) {
-                foreach ($userProfiles as $userProfile) {
-                    $this->importStudentEvents($userProfile, $feed);
-                }
+            foreach ($userProfiles as $userProfile) {
+                $this->importStudentEvents($userProfile, $feedCodes);
             }
         } else {
             $this->log->info('No feed data found; skipping');
@@ -126,9 +126,9 @@ class EDiary implements IStrategy
          *
          * This algorithmic complexity is about to take a toll on tass
          */
-        $feeds = $this->getFeedList('T');
+        $feedCodes = $this->getFeedList('T');
 
-        if ($feeds) {
+        if ('' !== $feedCodes) {
             /* Get a list of Staff external ids
              * Use the profile mappers to get a 1D array of those
              *
@@ -138,15 +138,13 @@ class EDiary implements IStrategy
             $userProfiles = $this->staffProfileMapper->findAll();
 
             /* TODO getTeacherEDiary allegedly supports multiple feed codes
-             * in the endpoint params, but:
+             *  in the endpoint params, but:
              *    - I can't tell which feed codes we actually need/want
-             *    - Presumably they meant a csv separated value
-             *    - Not sure if this actually works (untried)
+             *
+             *  https://github.com/TheAlphaSchoolSystemPTYLTD/school-calendar-and-notices/blob/master/getTeacherEDiary.md
              */
-            foreach ($feeds['calendar'] as $feed) {
-                foreach ($userProfiles as $userProfile) {
-                    $this->importStaffEvents($userProfile, $feed);
-                }
+            foreach ($userProfiles as $userProfile) {
+                $this->importStaffEvents($userProfile, $feedCodes);
             }
         } else {
             $this->log->info('No feed data found; skipping');
@@ -158,9 +156,9 @@ class EDiary implements IStrategy
      * Get a list of ediary feeds which categorise all ediary events for everyone
      *
      * @param string $type
-     * @return array|null
+     * @return string
      */
-    private function getFeedList(string $type): ?array
+    private function getFeedList(string $type): string
     {
         $endpoint = 'getEDiaryFeeds';
 
@@ -170,13 +168,38 @@ class EDiary implements IStrategy
             $type
         ));
 
-        return $this->api[DSN::MODULE_SCHOOL_CALENDAR_AND_NOTICES]->retrieveDocument(
+        $feeds = $this->api[DSN::MODULE_SCHOOL_CALENDAR_AND_NOTICES]->retrieveDocument(
             $endpoint,
             [
                 'type' => $type
             ],
             Api::VERSION_2
         );
+
+        $feedCodes = [];
+
+        /* Not sure if "tt" or "Timetable" is customisable in tass.
+         * For some reason they're avoiding answering this question.
+         * Therefore just assume that anything with "tt" or "Timetable"
+         * can be excluded by using the code and desc respectively.
+         */
+        foreach ($feeds['calendar'] as $feed) {
+            /* Blacklist all timetable-ish feeds
+             */
+            if ('tt' === $feed['code']) {
+                continue;
+            }
+
+            if ('Timetable' === $feed['desc']) {
+                continue;
+            }
+
+            /* Accept everything else
+             */
+            $feedCodes[] = $feed['code'];
+        }
+
+        return implode(',', $feedCodes);
     }
 
 
@@ -185,14 +208,12 @@ class EDiary implements IStrategy
      * Process each of those into SUDS Events, as per tradition,
      * for everyone contained in $users
      *
-     * @param \Schoolbox\External\Profile\Student\Model $userProfile
-     * @param array                                     $feed
+     * @param Model $userProfile
+     * @param string $feedCodes
      * @return void
-     * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
+     * @throws Exception
      */
-    private function importStudentEvents(\Schoolbox\External\Profile\Student\Model $userProfile, array $feed): void
+    private function importStudentEvents(\Schoolbox\External\Profile\Student\Model $userProfile, string $feedCodes): void
     {
         $endpoint = 'getStudentEDiary';
         $userExternalId = $userProfile->getBaseProfile()->getExternalId();
@@ -209,7 +230,7 @@ class EDiary implements IStrategy
         $this->log->info(sprintf(
             'Accessing endpoint %s using feed code %s for human with external id %s',
             $endpoint,
-            $feed['code'],
+            $feedCodes,
             $userExternalId
         ));
 
@@ -221,14 +242,14 @@ class EDiary implements IStrategy
                 $endpoint,
                 [
                     'studcode' => $userExternalId,
-                    'feedcode' => $feed['code'],
+                    'feedcode' => $feedCodes,
                     'start_date' => $this->from->getUsingFormat('d/m/Y'),
                     'end_date' => $this->to->getUsingFormat('d/m/Y')
                 ],
                 Api::VERSION_2
             );
 
-            $this->importEvents($endpoint, $userExternalId, $feed, $tassEvents);
+            $this->importEvents($endpoint, $userExternalId, $tassEvents);
         } catch (\RuntimeException $e) {
             $this->log->warning(sprintf(
                 'Could not process events for %s: %s',
@@ -245,13 +266,11 @@ class EDiary implements IStrategy
      * for everyone contained in $users
      *
      * @param \Schoolbox\External\Profile\Staff\Model $userProfile
-     * @param array                                   $feed
+     * @param string $feedCodes
      * @return void
-     * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
+     * @throws Exception
      */
-    private function importStaffEvents(\Schoolbox\External\Profile\Staff\Model $userProfile, array $feed): void
+    private function importStaffEvents(\Schoolbox\External\Profile\Staff\Model $userProfile, string $feedCodes): void
     {
         $endpoint = 'getTeacherEDiary';
         $userExternalId = $userProfile->getBaseProfile()->getExternalId();
@@ -281,7 +300,7 @@ class EDiary implements IStrategy
         $this->log->info(sprintf(
             'Accessing endpoint %s using feed code %s for human with external id %s',
             $endpoint,
-            $feed['code'],
+            $feedCodes,
             $userExternalId
         ));
 
@@ -290,14 +309,14 @@ class EDiary implements IStrategy
                 $endpoint,
                 [
                     'tchcode' => $userExternalId,
-                    'feedcode' => $feed['code'],
+                    'feedcode' => $feedCodes,
                     'start_date' => $this->from->getUsingFormat('d/m/Y'),
                     'end_date' => $this->to->getUsingFormat('d/m/Y')
                 ],
                 Api::VERSION_2
             );
 
-            $this->importEvents($endpoint, $userExternalId, $feed, $tassEvents);
+            $this->importEvents($endpoint, $userExternalId, $tassEvents);
         } catch (\RuntimeException $e) {
             $this->log->warning(sprintf(
                 'Could not process events for %s: %s',
@@ -311,16 +330,13 @@ class EDiary implements IStrategy
     /**
      * Shank in all the events from the api endpoint into SUDS Events
      *
-     * @param string     $endpoint
-     * @param string     $userExternalId
-     * @param array      $feed
+     * @param string $endpoint
+     * @param string $userExternalId
      * @param array|null $tassEvents
      * @return void
-     * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
+     * @throws Exception
      */
-    private function importEvents(string $endpoint, string $userExternalId, array $feed, ?array $tassEvents): void
+    private function importEvents(string $endpoint, string $userExternalId, ?array $tassEvents): void
     {
         /* This might be null, or buggy
          * Exit early in that scenario
@@ -435,7 +451,7 @@ class EDiary implements IStrategy
              * These ediary events don't come with a type; I think it's specified
              * by the ediary feed name
              */
-            $eventType = $feed['desc'];
+            $eventType = $tassEvent['feed'];
 
             /* Find an event instance that used guid
              */
