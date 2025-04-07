@@ -49,7 +49,7 @@ class Factory
     /**
      * Collect events to this many months in the future
      */
-    private const TO = 12;
+    private const TO = 6;
 
 
     /**
