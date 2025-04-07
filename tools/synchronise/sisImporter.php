@@ -237,7 +237,7 @@ NULLTYPE;
         }
 
         /* Announce lock release
-          */
+         */
         $this->getLogger()->debug('Releasing lock');
 
         $lock->release();
