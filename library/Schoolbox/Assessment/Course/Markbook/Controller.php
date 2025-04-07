@@ -165,18 +165,13 @@ class Controller extends WebController\Base
         $route       = $this->routeGenerator->generate('courseMarkbook.postMarkbook', ['courseSpecId' => $courseSpec->getId()]);
         $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $this->getUser(), func_get_args(), $queryArgs);
 
-        $test = $courseSpec->getCourseImplementations();
-
         $this->response = $this->responseFromTemplate(
             '@courseMarkbook/courseMarkbookOuter.twig',
             [
                 'courseSpec'  => $courseSpec,
                 'viewee'      => $this->getUser(),
                 'filterPanel' => $filterPanel,
-                'canAccessPopOut' => $this->access->getFolderAccess(
-                    $this->getUser(),
-                    $courseSpec->getId(),
-                ) >= UserAccess::ACCESS_WRITE,
+                'canAccessPopOut' => $this->getCanAccessPopOut($courseSpec),
             ],
             "Course Markbook: {$courseSpec->getTitle()}",
             'submission'
@@ -277,7 +272,7 @@ class Controller extends WebController\Base
                     'taskProgressPending'     => Completion::STATUS_SELF_ASSESSED_COMPLETE,
                     'taskProgressComplete'    => Completion::STATUS_TEACHER_ASSESSED_COMPLETE,
                     'queryArgs'               => $codec->convertSelectionsToQueryString($selectionsPerFilter),
-                    'canAccessPopOut'         => true,
+                    'canAccessPopOut'         => $this->getCanAccessPopOut($courseSpec),
                 ]
             );
             $this->response = $this->responseAsJson([
@@ -417,5 +412,33 @@ class Controller extends WebController\Base
             ]);
         }
         $this->response = $this->responseAsJson($data);
+    }
+
+    /**
+     * Helper method to check if current user can access the pop out
+     *
+     * @param CourseSpec\Model $courseSpec
+     * @return boolean
+     */
+    private function getCanAccessPopOut(CourseSpec\Model $courseSpec)
+    {
+        // first check if the user has write access to the course
+        $hasCourseWriteAccess = $this->access->getFolderAccess(
+            $this->getUser(),
+            $courseSpec->getId(),
+        ) >= UserAccess::ACCESS_WRITE;
+        // then check if the user has write access to all the course implementations
+        $hasClassWriteAccess = true;
+        foreach ($courseSpec->getCourseImplementations() as $classImplementation) {
+            $hasAccess = $this->access->getFolderAccess(
+                $this->getUser(),
+                $classImplementation->getFolder()->getId()
+            ) >= UserAccess::ACCESS_WRITE;
+            if (!$hasAccess) {
+                $hasClassWriteAccess = false;
+                break;
+            }
+        }
+        return $hasCourseWriteAccess && $hasClassWriteAccess;
     }
 }
