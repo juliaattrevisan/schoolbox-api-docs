@@ -14,6 +14,7 @@ use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Instance;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
+use Schoolbox\User;
 use Sentry;
 
 /**
@@ -96,17 +97,22 @@ class Config
      * Configure the Sentry hub with details from the instance.
      *
      * @param Instance $instance
+     * @param User $user
      * @return void
      */
-    public static function useInstance(Instance $instance): void
+    public static function useInstance(Instance $instance, \Schoolbox\User $user): void
     {
-        Sentry\configureScope(static function (Sentry\State\Scope $scope) use ($instance): void {
+        Sentry\configureScope(static function (Sentry\State\Scope $scope) use ($instance, $user): void {
             $scope->setTags([
                 'instance_id'      => $instance->getId(),
                 'php_version'      => PHP_VERSION,
                 'site_environment' => $instance->getSiteEnvironment(),
                 'site_version'     => $instance->getVersion(),
                 'site_school_code' => $instance->getSchoolCode(),
+            ]);
+
+            $scope->setUser([
+                'id' => $user->getId(),
             ]);
         });
 

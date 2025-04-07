@@ -271,7 +271,9 @@ abstract class Kernel
             operation: 'app.bootstrap.di',
         );
         $this->postInstallDependencies($bypassMaintenanceModeCheck);
+        $this->configureSentry();
         $this->checkServerApiEnvironment();
+
         Tracer::getDefaultTrace()->finishSpan();
     }
 
@@ -321,11 +323,21 @@ abstract class Kernel
             throw new LogicException("The 'config' dependency should have been installed.");
         }
 
-        // Configure Sentry with the current instance, now it's known.
-        \Alaress\Sentry\Config::useInstance($this->di->get('instance'));
-
         self::dieGracefullyIfInMaintenanceMode($config);
         session_save_path(PipeManager::getSessionSavePath($config->get(ConfigMapper::NAME_REDIS_URL), INSTANCE_ID));
+    }
+
+
+    /**
+     * Called after sessions are initialised so we can inject user identifiers into sentry reports.
+     *
+     * @return void
+     * @throws Di\Exception\ServiceNotFound
+     */
+    protected function configureSentry(): void
+    {
+        // Configure Sentry with the current instance, now it's known.
+        \Alaress\Sentry\Config::useInstance($this->di->get('instance'), $this->di->get('user'));
     }
 
     /**
