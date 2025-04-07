@@ -89,25 +89,7 @@ class Config
             'profiles_sample_rate' => $profileSampleRate,
         ]);
 
-        $hub = Sentry\SentrySdk::getCurrentHub();
-
-        // The equivalent of the old Raven_ErrorHandler's register methods
-        // (The transaction and request integrations are new)
-        $integrationClasses = [
-            Sentry\Integration\ErrorListenerIntegration::class,
-            Sentry\Integration\ExceptionListenerIntegration::class,
-            Sentry\Integration\FatalErrorListenerIntegration::class,
-            Sentry\Integration\TransactionIntegration::class,
-            Sentry\Integration\RequestIntegration::class,
-        ];
-        foreach ($integrationClasses as $integrationClass) {
-            $integration = $hub->getIntegration($integrationClass);
-            if ($integration) {
-                $integration->setupOnce();
-            }
-        }
-
-        return $hub;
+        return Sentry\SentrySdk::getCurrentHub();
     }
 
     /**
