@@ -58,7 +58,7 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Push ${{ matrix.image }} image
+      - name: Push ${{ inputs.image }} image
         if: env.AWS_ECR_ROLE != ''
         run: |
           docker push -a ${{ steps.login-ecr.outputs.registry }}/${{ inputs.image }} --platform ${{ matrix.build.platform }}/${{ matrix.build.arch }}
