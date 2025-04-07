@@ -17,7 +17,7 @@
 
     $(function () {
 
-        let ii, configurator;
+        let configurator;
 
         configurator = $('#configurator').msgconfig({
             sourceSelector: '[data-source]',
@@ -32,7 +32,7 @@
                     detail: { text: "Saving..." }
                 }));
 
-                // Disable all inputs while it's saving
+                // Disable all inputs within the same set while it's saving
                 form.find('input').prop('disabled', true);
 
                 // Serialize the form
