@@ -23,6 +23,8 @@ jobs:
     with:
       image: php82-alpine
       context: docker/base-images/php82-alpine
+      tags: |
+        alaress/php82-alpine:latest
     secrets: inherit
 
   push-php82-alpine-to-ecr:
@@ -40,6 +42,8 @@ jobs:
     with:
       image: php82-fpm-alpine
       context: docker/base-images/php82-fpm-alpine
+      tags: |
+        alaress/php82-fpm-alpine:latest
     secrets: inherit
 
   push-php82-fpm-alpine-to-ecr:

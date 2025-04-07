@@ -27,10 +27,9 @@ on:
         required: false
       tags:
         type: string
-        default: |
-          alaress/${{ inputs.image }}:latest
         description: |
           A comma-separated list of tags for the image.
+        required: true
     secrets:
       DOCKERHUB_USERNAME:
         description: |
