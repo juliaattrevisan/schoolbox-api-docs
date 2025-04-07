@@ -71,7 +71,9 @@ jobs:
           build-args: |
             ENV=prod
           platforms: ${{ matrix.build.platform }}
-          tags: alaress/schoolbox-fpm:{{ github.ref_name }}-latest, alaress/schoolbox-fpm:{{ github.ref_name }}-{{ github.sha }}
+          tags: |
+            alaress/schoolbox-fpm:{{ github.ref_name }}-latest
+            alaress/schoolbox-fpm:{{ github.ref_name }}-{{ github.sha }}
 
       - name: Build and push - release
         if: github.event_name == 'release'
@@ -83,4 +85,5 @@ jobs:
           build-args: |
             ENV=prod
           platforms: ${{ matrix.build.platform }}
-          tags: alaress/schoolbox-fpm:{{ github.ref_name }}
+          tags: |
+            alaress/schoolbox-fpm:{{ github.ref_name }}
