@@ -28,39 +28,30 @@
             persist: function () {
                 let form = this.closest('form[method=post]');
 
-                // clear any previous cache-timeout
-                if (ii) {
-                    clearTimeout(ii);
-                }
+                document.dispatchEvent(new CustomEvent("TOAST__ACTIVATE", {
+                    detail: { text: "Saving..." }
+                }));
 
-                ii = setTimeout(function () {
+                // Disable all inputs while it's saving
+                form.find('input').prop('disabled', true);
 
-                    document.dispatchEvent(new CustomEvent("TOAST__ACTIVATE", {
-                        detail: { text: "Saving..." }
-                    }));
+                // Serialize the form
+                let formSerialized = form.serializeArray();
 
-                    // Disable all inputs while it's saving
-                    form.find('input').prop('disabled', true);
+                // Go through disabled inputs and add selected to the serialized form
+                form.find('input[disabled]').each(function() {
+                    if ($(this).is(':checked')) {
+                        formSerialized.push({name: $(this).attr('name'), value: $(this).val()});
+                    }
+                });
 
-                    // Serialize the form
-                    let formSerialized = form.serializeArray();
-
-                    // Go through disabled inputs and add selected to the serialized form
-                    form.find('input[disabled]').each(function() {
-                        if ($(this).is(':checked')) {
-                            formSerialized.push({name: $(this).attr('name'), value: $(this).val()});
-                        }
+                $.post(form.attr('action'), formSerialized)
+                    .done(customiserCallback)
+                    .fail(() => {
+                        document.dispatchEvent(new CustomEvent("TOAST__TIMEOUT", {
+                            detail: { text: "Save failed, please contact your support if the problem persists", isSuccess: false }
+                        }));
                     });
-
-                    $.post(form.attr('action'), formSerialized)
-                        .done(customiserCallback)
-                        .fail(() => {
-                            document.dispatchEvent(new CustomEvent("TOAST__TIMEOUT", {
-                                detail: { text: "Save failed, please contact your support if the problem persists", isSuccess: false }
-                            }));
-                        });
-
-                }, 500);
 
             },
             describe: function () {
