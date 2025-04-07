@@ -11,7 +11,7 @@ import StorybookSlot from "../../../vue/components/storybook-slot.vue";
  *
  * | Property | Type     | Description                                                                                      | Default        | Options                                                                   |
  * | -------- | -------- | ------------------------------------------------------------------------------------------------ | -------------- | ------------------------------------------------------------------------- |
- * | `name`   | `string` | The name of the icon, as specified [here](?path=/docs/getting-started-design-tokens-icons--docs) | `""`           | Any string name linked to an icon                                         |
+ * | `name`   | `string` | The name of the icon, as specified [here](?path=/docs/icons-icons--docs)                         | `""`           | Any string name linked to an icon                                         |
  * | `size`   | `string` | The size of the icon                                                                             | `m`            | `xs`, `s`, `m`, `l`, `xl`, or any other appropriate size value like `36px` |
  * | `color`  | `string` | The color of the icon.                                                                           | `currentColor` | Can accept any valid CSS colour value, including custom properties.       |
  */

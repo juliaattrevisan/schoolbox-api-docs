@@ -21,6 +21,9 @@ import { ref, computed, watch, onMounted, onUnmounted, onBeforeUnmount, nextTick
 import SbxPopOut from "@schoolboxVue/components/popOut/sbx-pop-out.ce.vue";
 import SbxIcon from "@schoolboxVue/components/icon/sbx-icon.ce.vue";
 import SbxFreeStyle from "@schoolboxVue/components/generic/sbx-free-style.ce.vue";
+import SbxLabel from "@schoolboxVue/components/label/sbx-label.ce.vue";
+import SbxLabelPastoralPoints from "@schoolboxVue/components/label/sbx-label-pastoral-points.ce.vue";
+
 window.Vue = {};
 window.Vue.ref = ref;
 window.Vue.computed = computed;
@@ -53,6 +56,10 @@ export function register() {
     window.customElements.define("sbx-icon", SbxIconCE);
     const SbxFreeStyleCE = window.Vue.defineCustomElement(SbxFreeStyle);
     window.customElements.define("sbx-free-style", SbxFreeStyleCE);
+    const SbxLabelCE = window.Vue.defineCustomElement(SbxLabel);
+    window.customElements.define("sbx-label", SbxLabelCE);
+    const SbxLabelPastoralPointsCE = window.Vue.defineCustomElement(SbxLabelPastoralPoints);
+    window.customElements.define("sbx-label-pastoral-points", SbxLabelPastoralPointsCE);
 }
 register();
 
