@@ -119,6 +119,14 @@ const props = defineProps({
         required: false,
         default: false,
     },
+    /**
+     * whether to display disabled nodes
+     */
+    includeDisabled: {
+        type: Boolean,
+        required: false,
+        default: false,
+    },
 });
 
 const store = useStore();

@@ -7,6 +7,7 @@
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import { getEmptyNode, allChildrenDisabled } from "@schoolboxCurriculum/js/nodeUtils";
 import ShowMatches from "@schoolboxVue/components/search/show-matches.vue";
+import { useStore } from "../store/curriculumSelectorStore";
 import { useNodesStore } from "../store/csNodesStore";
 import { useModalViewNodesStore } from "../store/csModalViewNodesStore";
 import { useModalSearchStore } from "../store/csModalSearchStore";
@@ -24,6 +25,7 @@ const props = withDefaults(defineProps<Props>(), {
     isActive: false,
 });
 
+const store = useStore();
 const nodesStore = useNodesStore();
 const modalViewNodesStore = useModalViewNodesStore();
 const modalSearchStore = useModalSearchStore();
@@ -73,6 +75,10 @@ const isButton = window.Vue.computed(() => {
         // there's no children to display, so no point going further
         return false;
     }
+    if (store.includeDisabled) {
+        // if we are including disabled nodes, we can always go further
+        return true;
+    }
     if (allChildrenDisabled(props.node)) {
         // all children are disabled, so no point going further
         return false;
@@ -101,25 +107,28 @@ function onNameSelected(): void {
 </script>
 
 <template>
-    <show-matches
-        v-if="isButton"
-        tag="button"
-        class="button-name"
-        :title="`View ${props.title}`"
-        :disabled="isDisabled"
-        :text="props.title"
-        :query="modalSearchStore.query"
-        :is-searching="modalSearchStore.isActive"
-        @click="onNameSelected"
-    />
-    <show-matches
-        v-else
-        tag="span"
-        class="name"
-        :text="props.title"
-        :query="modalSearchStore.query"
-        :is-searching="modalSearchStore.isActive"
-    />
+    <div class="l-width-100 l-flex-row l-flex--no-wrap l-flex--align-center l-gap-xs">
+        <sbx-icon v-if="!props.node.enabled" name="hidden" title="This outcome is disabled" />
+        <show-matches
+            v-if="isButton"
+            tag="button"
+            class="button-name"
+            :title="`View ${props.title}`"
+            :disabled="isDisabled"
+            :text="props.title"
+            :query="modalSearchStore.query"
+            :is-searching="modalSearchStore.isActive"
+            @click="onNameSelected"
+        />
+        <show-matches
+            v-else
+            tag="span"
+            class="name"
+            :text="props.title"
+            :query="modalSearchStore.query"
+            :is-searching="modalSearchStore.isActive"
+        />
+    </div>
 </template>
 
 <style lang="scss">

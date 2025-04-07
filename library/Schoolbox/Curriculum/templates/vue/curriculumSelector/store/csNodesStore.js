@@ -91,7 +91,9 @@ export const useNodesStore = defineStore(`csNodes`, {
         async loadRemote() {
             const store = useStore();
             try {
-                const response = await fetch(`${apiEndpoint}/?topLevelOnly=1&enabled=1&descendants=1&limit=50`);
+                const response = await fetch(
+                    `${apiEndpoint}/?topLevelOnly=1${store.includeDisabled ? "" : "&enabled=1"}&descendants=1&limit=50`,
+                );
                 if (response.ok) {
                     const topLevelNodes = await response.json();
                     await this.setTopLevel(topLevelNodes);
@@ -209,10 +211,13 @@ export const useNodesStore = defineStore(`csNodes`, {
                 if (response.ok) {
                     const newNode = await response.json();
                     newNode.children?.forEach((node) => useModalSelectedNodesStore().checkIfSelected(node));
-                    const newNodeChildrenEnabled = newNode.children.filter((node) => node.enabled); //only show those nodes with children enabled, this can be handled with enabled=1 on just topLevelOnly
+                    const store = useStore();
+                    const newNodeChildren = store.includeDisabled
+                        ? newNode.children
+                        : newNode.children.filter((node) => node.enabled); //only show those nodes with children enabled, this can be handled with enabled=1 on just topLevelOnly
                     const oldNode = findById(this.nodes.children, id);
                     useModalSelectedNodesStore().checkIfSelected(oldNode);
-                    oldNode.children = newNodeChildrenEnabled; //we just grab the loaded children and overwrite the old property that was previously null
+                    oldNode.children = newNodeChildren; //we just grab the loaded children and overwrite the old property that was previously null
                 } else {
                     console.warn(response);
                     this.hasLoadError = true;
