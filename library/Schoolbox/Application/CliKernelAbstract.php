@@ -189,9 +189,6 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
      */
     public function onError($errNum, $errStr, $errFile, $errLine): ?bool
     {
-        if (is_callable($this->previousErrorHandler)) {
-            call_user_func($this->previousErrorHandler, $errNum, $errStr, $errFile, $errLine);
-        }
         if (!(error_reporting() & $errNum)) {
             // This error code is not included in error_reporting:
             // * should it be silenced (return true), or;
@@ -345,7 +342,14 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
      */
     protected function registerExceptionHandling(): void
     {
-        \set_exception_handler([$this, 'onException']);
+        $this->previousExceptionHandler = \set_exception_handler(
+            function ($e) {
+                if (is_callable($this->previousExceptionHandler)) {
+                    call_user_func($this->previousExceptionHandler, $e);
+                }
+                $this->onException($e);
+            }
+        );
     }
 
 
@@ -369,7 +373,14 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
      */
     protected function registerErrorHandling(): void
     {
-        $this->previousErrorHandler = \set_error_handler([$this, 'onError']);
+        $this->previousErrorHandler = \set_error_handler(
+            function ($code, $message, $file, $line) {
+                if (is_callable($this->previousErrorHandler)) {
+                    call_user_func($this->previousErrorHandler, $code, $message, $file, $line);
+                }
+                return $this->onError($code, $message, $file, $line);
+            }
+        );
     }
 
 

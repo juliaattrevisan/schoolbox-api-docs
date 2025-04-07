@@ -287,7 +287,14 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
      */
     protected function registerExceptionHandling(): void
     {
-        set_exception_handler([$this, 'shutdownSafely']);
+        $this->previousExceptionHandler = set_exception_handler(
+            function ($e) {
+                if (is_callable($this->previousExceptionHandler)) {
+                    call_user_func($this->previousExceptionHandler, $e);
+                }
+                $this->shutdownSafely($e);
+            }
+        );
     }
 
     /**
