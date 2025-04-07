@@ -55,9 +55,7 @@
                 {% if config.pastoral_point_enabled and record.points is not empty %}
                     <dt class="small-4 medium-3 columns">Points:</dt>
                     <dd class="small-8 medium-9 columns">
-                        {% if config.pastoral_point_enabled and record.points is not empty %}
-                            <sbx-label-pastoral-points points="{{ record.points }}"></sbx-label-pastoral-points>
-                        {% endif %}
+                        <sbx-label-pastoral-points points="{{ record.points }}"></sbx-label-pastoral-points>
                     </dd>
                 {% endif %}
             </dl>
