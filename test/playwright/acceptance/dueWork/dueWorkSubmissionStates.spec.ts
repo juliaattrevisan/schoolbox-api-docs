@@ -175,7 +175,7 @@ test.describe("Submission States functionality tests", () => {
         await expect(page.getByTestId("assessment-submission-save-draft")).toBeVisible();
         tester.isGoingTo("I have submitted my work in person is visible and editor and file upload are not visible");
         await expect(
-            page.getByTestId(SubmitForm.DATATEST_ASSESSMENT_SUBMISSION_CREATE_SUBMITTEDINPERSON),
+            page.getByTestId(SubmitForm.DATA_TEST_ASSESSMENT_SUBMISSION_CREATE_SUBMITTEDINPERSON),
         ).toBeVisible();
         await expect(page.locator("#FilesZone")).not.toBeVisible();
         await expect(page.locator("div.ck.ck-editor").first()).toHaveCount(0);
@@ -188,7 +188,7 @@ test.describe("Submission States functionality tests", () => {
         tester.isGoingTo("verify Text Editor  is visible and submit in person and upload zone are not presenteed");
         await expect(page.locator("div.ck.ck-editor").first()).toHaveCount(1);
         await expect(
-            page.getByTestId(SubmitForm.DATATEST_ASSESSMENT_SUBMISSION_CREATE_SUBMITTEDINPERSON),
+            page.getByTestId(SubmitForm.DATA_TEST_ASSESSMENT_SUBMISSION_CREATE_SUBMITTEDINPERSON),
         ).not.toBeVisible();
         await expect(page.locator("#FilesZone")).not.toBeVisible();
 
@@ -202,7 +202,7 @@ test.describe("Submission States functionality tests", () => {
         );
         await expect(page.locator("#FilesZone")).toBeVisible();
         await expect(
-            page.getByTestId(SubmitForm.DATATEST_ASSESSMENT_SUBMISSION_CREATE_SUBMITTEDINPERSON),
+            page.getByTestId(SubmitForm.DATA_TEST_ASSESSMENT_SUBMISSION_CREATE_SUBMITTEDINPERSON),
         ).not.toBeVisible();
         await expect(page.locator("div.ck.ck-editor").first()).toHaveCount(0);
     });

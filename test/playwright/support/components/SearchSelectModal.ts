@@ -8,9 +8,9 @@ import type { Page } from "@playwright/test";
 export default class SearchSelectModal {
     private page: Page;
 
-    static readonly DATATEST_RESULTS_ITEM_LABEL = "ss-results-item-label-";
+    static readonly DATA_TEST_RESULTS_ITEM_LABEL = "ss-results-item-label-";
 
-    static readonly DATATEST_SAVE_BUTTON = "ssm-footer-save-button";
+    static readonly DATA_TEST_SAVE_BUTTON = "ssm-footer-save-button";
 
     constructor(page: Page) {
         this.page = page;
@@ -24,7 +24,7 @@ export default class SearchSelectModal {
         // eslint-disable-next-line no-restricted-syntax -- need to loop through each sequentially, rather than in parallel with Promise.all
         for (const id of ids) {
             // eslint-disable-next-line no-await-in-loop -- need to click each item sequentially
-            await this.page.getByTestId(`${SearchSelectModal.DATATEST_RESULTS_ITEM_LABEL}${id.toString()}`).click();
+            await this.page.getByTestId(`${SearchSelectModal.DATA_TEST_RESULTS_ITEM_LABEL}${id.toString()}`).click();
         }
     }
 
@@ -32,6 +32,6 @@ export default class SearchSelectModal {
      * Select Save, closing the modal
      */
     async save(): Promise<void> {
-        await this.page.getByTestId(SearchSelectModal.DATATEST_SAVE_BUTTON).click();
+        await this.page.getByTestId(SearchSelectModal.DATA_TEST_SAVE_BUTTON).click();
     }
 }

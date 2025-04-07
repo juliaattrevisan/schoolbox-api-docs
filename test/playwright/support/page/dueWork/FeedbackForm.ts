@@ -11,13 +11,13 @@ export default class FeedbackForm {
 
     static readonly SELECTOR_ATTACHMENT_ZONE = "#feedbackFiles-zone";
 
-    static readonly DATATEST_ASSESSMENT_FEEDBACK_MARK_INPUT = "assessment-feedback-mark-input"; // Append "-[userId]"
+    static readonly DATA_TEST_ASSESSMENT_FEEDBACK_MARK_INPUT = "assessment-feedback-mark-input"; // Append "-[userId]"
 
-    static readonly DATATEST_ASSESSMENT_FEEDBACK_COMMENT_TEXTAREA = "assessment-feedback-comment-textarea"; // Append "-[userId]"
+    static readonly DATA_TEST_ASSESSMENT_FEEDBACK_COMMENT_TEXTAREA = "assessment-feedback-comment-textarea"; // Append "-[userId]"
 
-    static readonly DATATEST_ASSESSMENT_FEEDBACK_PUBLISH_BUTTON = "assessment-feedback-publish-button";
+    static readonly DATA_TEST_ASSESSMENT_FEEDBACK_PUBLISH_BUTTON = "assessment-feedback-publish-button";
 
-    static readonly DATATEST_ASSESSMENT_RESPONSE_INFO_SAVED_AS_DRAFT = "assessment-response-info-saved-as-draft";
+    static readonly DATA_TEST_ASSESSMENT_RESPONSE_INFO_SAVED_AS_DRAFT = "assessment-response-info-saved-as-draft";
 
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
@@ -44,7 +44,7 @@ export default class FeedbackForm {
      */
     async setGrade(grade: string | number, participantId: string | number): Promise<void> {
         await this.page
-            .getByTestId(`${FeedbackForm.DATATEST_ASSESSMENT_FEEDBACK_MARK_INPUT}-${participantId}`)
+            .getByTestId(`${FeedbackForm.DATA_TEST_ASSESSMENT_FEEDBACK_MARK_INPUT}-${participantId}`)
             .fill(grade.toString());
     }
 
@@ -55,7 +55,7 @@ export default class FeedbackForm {
      */
     async setComment(comment: string, participantId: string | number): Promise<void> {
         const commentEditor = this.page.getByTestId(
-            `${FeedbackForm.DATATEST_ASSESSMENT_FEEDBACK_COMMENT_TEXTAREA}-${participantId}`,
+            `${FeedbackForm.DATA_TEST_ASSESSMENT_FEEDBACK_COMMENT_TEXTAREA}-${participantId}`,
         );
         await this.tester.fillCKEditorByLocator(commentEditor, comment);
     }
@@ -74,9 +74,9 @@ export default class FeedbackForm {
      * Publishes the feedback
      */
     async publish(): Promise<void> {
-        await this.page.getByTestId(FeedbackForm.DATATEST_ASSESSMENT_RESPONSE_INFO_SAVED_AS_DRAFT).waitFor();
+        await this.page.getByTestId(FeedbackForm.DATA_TEST_ASSESSMENT_RESPONSE_INFO_SAVED_AS_DRAFT).waitFor();
         await this.page.waitForTimeout(2000); // Wait for auto-saving to finish
-        await this.page.getByTestId(FeedbackForm.DATATEST_ASSESSMENT_FEEDBACK_PUBLISH_BUTTON).click();
+        await this.page.getByTestId(FeedbackForm.DATA_TEST_ASSESSMENT_FEEDBACK_PUBLISH_BUTTON).click();
         await this.page.waitForTimeout(1000); // Wait for the feedback to be published
     }
 }

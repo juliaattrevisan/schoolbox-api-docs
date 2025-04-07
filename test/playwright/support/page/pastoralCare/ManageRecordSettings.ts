@@ -16,15 +16,15 @@ export default class PastoralExpiry {
 
     static readonly URL_BULLYING = "/pastoral/management/audience/type/4/modify";
 
-    static readonly DATATEST_FLAG_SELECT = "audiences-modify-pastoral-flag-select";
+    static readonly DATA_TEST_FLAG_SELECT = "audiences-modify-pastoral-flag-select";
 
-    static readonly DATATEST_FLAG_COLOR_INPUT = "audiences-modify-pastoral-flag-color-input";
+    static readonly DATA_TEST_FLAG_COLOR_INPUT = "audiences-modify-pastoral-flag-color-input";
 
-    static readonly DATATEST_DEFAULT_EXPIRY_SELECT = "audiences-modify-pastoral-default-expiry-select";
+    static readonly DATA_TEST_DEFAULT_EXPIRY_SELECT = "audiences-modify-pastoral-default-expiry-select";
 
-    static readonly DATATEST_APPLY_DEFAULT_EXPIRY_CHECKBOX = "audiences-modify-apply-default-expiry";
+    static readonly DATA_TEST_APPLY_DEFAULT_EXPIRY_CHECKBOX = "audiences-modify-apply-default-expiry";
 
-    static readonly DATATEST_MANAGE_SAVE_BUTTON = "audiences-modify-pastoral-save-button";
+    static readonly DATA_TEST_MANAGE_SAVE_BUTTON = "audiences-modify-pastoral-save-button";
 
     constructor(page: Page) {
         this.page = page;
@@ -63,7 +63,7 @@ export default class PastoralExpiry {
      * @param label - The label of the flag to select
      */
     async selectFlag(label: string): Promise<void> {
-        await this.page.getByTestId(PastoralExpiry.DATATEST_FLAG_SELECT).selectOption({ label });
+        await this.page.getByTestId(PastoralExpiry.DATA_TEST_FLAG_SELECT).selectOption({ label });
     }
 
     /**
@@ -72,7 +72,7 @@ export default class PastoralExpiry {
      * so I'm using the swatch button instead
      */
     async fillFlagColor(): Promise<void> {
-        await this.page.getByTestId(PastoralExpiry.DATATEST_FLAG_COLOR_INPUT).click();
+        await this.page.getByTestId(PastoralExpiry.DATA_TEST_FLAG_COLOR_INPUT).click();
         await this.page.getByRole("button", { name: "Color swatch rgb(0, 102, 176)" }).click();
     }
 
@@ -81,7 +81,7 @@ export default class PastoralExpiry {
      * @param label - The label of the default expiry to select
      */
     async selectDefaultExpiry(label: string): Promise<void> {
-        await this.page.getByTestId(PastoralExpiry.DATATEST_DEFAULT_EXPIRY_SELECT).selectOption({ label });
+        await this.page.getByTestId(PastoralExpiry.DATA_TEST_DEFAULT_EXPIRY_SELECT).selectOption({ label });
     }
 
     /**
@@ -89,20 +89,20 @@ export default class PastoralExpiry {
      * @param value - The value of the default expiry to select
      */
     async expectDefaultExpiryToBe(value: string): Promise<void> {
-        await expect(this.page.getByTestId(PastoralExpiry.DATATEST_DEFAULT_EXPIRY_SELECT)).toHaveValue(value);
+        await expect(this.page.getByTestId(PastoralExpiry.DATA_TEST_DEFAULT_EXPIRY_SELECT)).toHaveValue(value);
     }
 
     /**
      * Click apply default expiry checkbox
      */
     async clickApplyDefaultExpiry(): Promise<void> {
-        await this.page.getByTestId(PastoralExpiry.DATATEST_APPLY_DEFAULT_EXPIRY_CHECKBOX).click();
+        await this.page.getByTestId(PastoralExpiry.DATA_TEST_APPLY_DEFAULT_EXPIRY_CHECKBOX).click();
     }
 
     /**
      * Click save button
      */
     async clickSave(): Promise<void> {
-        await this.page.getByTestId(PastoralExpiry.DATATEST_MANAGE_SAVE_BUTTON).click();
+        await this.page.getByTestId(PastoralExpiry.DATA_TEST_MANAGE_SAVE_BUTTON).click();
     }
 }

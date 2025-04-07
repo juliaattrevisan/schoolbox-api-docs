@@ -8,9 +8,9 @@ import type { Page } from "@playwright/test";
 export default class CurriculumSelector {
     private page: Page;
 
-    static readonly DATATEST_MODAL_NODE_CHECKBOX_LABEL = "cs-modal-node-checkbox-label-";
+    static readonly DATA_TEST_MODAL_NODE_CHECKBOX_LABEL = "cs-modal-node-checkbox-label-";
 
-    static readonly DATATEST_MODAL_SAVE_BUTTON = "cs-modal-footer-save-button";
+    static readonly DATA_TEST_MODAL_SAVE_BUTTON = "cs-modal-footer-save-button";
 
     constructor(page: Page) {
         this.page = page;
@@ -25,7 +25,7 @@ export default class CurriculumSelector {
         for (const id of ids) {
             // eslint-disable-next-line no-await-in-loop -- need to click each item sequentially
             await this.page
-                .getByTestId(`${CurriculumSelector.DATATEST_MODAL_NODE_CHECKBOX_LABEL}${id.toString()}`)
+                .getByTestId(`${CurriculumSelector.DATA_TEST_MODAL_NODE_CHECKBOX_LABEL}${id.toString()}`)
                 .click();
         }
     }
@@ -34,6 +34,6 @@ export default class CurriculumSelector {
      * Select Save, closing the modal
      */
     async saveModal(): Promise<void> {
-        await this.page.getByTestId(CurriculumSelector.DATATEST_MODAL_SAVE_BUTTON).click();
+        await this.page.getByTestId(CurriculumSelector.DATA_TEST_MODAL_SAVE_BUTTON).click();
     }
 }

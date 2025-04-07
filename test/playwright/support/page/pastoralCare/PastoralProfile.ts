@@ -15,9 +15,9 @@ export default class PastoralProfile {
 
     static readonly PASTORAL_RECORD_UPDATE = "a[href='/pastoral/student/{studentId}/record/{recordId}/update']";
 
-    static readonly DATATEST_PASTORAL_RECORDS = "student-section-records-pastoral-record";
+    static readonly DATA_TEST_PASTORAL_RECORDS = "student-section-records-pastoral-record";
 
-    static readonly DATATEST_SHOW_ARCHIVED_RECORDS_TOGGLE = "student-section-filter-show-archived-records-toggle";
+    static readonly DATA_TEST_SHOW_ARCHIVED_RECORDS_TOGGLE = "student-section-filter-show-archived-records-toggle";
 
     constructor(page: Page) {
         this.page = page;
@@ -93,13 +93,13 @@ export default class PastoralProfile {
      * @returns - The current records
      */
     async getRecords(): Promise<Locator[]> {
-        return this.page.getByTestId(PastoralProfile.DATATEST_PASTORAL_RECORDS).all();
+        return this.page.getByTestId(PastoralProfile.DATA_TEST_PASTORAL_RECORDS).all();
     }
 
     /**
      * click post comment button
      */
     async clickShowArchivedRecordsToggle(): Promise<void> {
-        await this.page.getByTestId(PastoralProfile.DATATEST_SHOW_ARCHIVED_RECORDS_TOGGLE).click();
+        await this.page.getByTestId(PastoralProfile.DATA_TEST_SHOW_ARCHIVED_RECORDS_TOGGLE).click();
     }
 }

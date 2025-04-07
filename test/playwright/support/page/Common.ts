@@ -51,7 +51,7 @@ export default class Common {
     /**
      * Search icon selector
      */
-    static readonly DATATEST_SEARCH_ICON = "search-input-button";
+    static readonly DATA_TEST_SEARCH_ICON = "search-input-button";
 
     /**
      * Search field selector; used as a text input for site searches.
@@ -217,9 +217,9 @@ export default class Common {
      */
     async search(text: string): Promise<void> {
         await this.waitForPageLoad(); // When using the search bar, ensure it's interactable first
-        await this.page.getByTestId(Common.DATATEST_SEARCH_ICON).click();
+        await this.page.getByTestId(Common.DATA_TEST_SEARCH_ICON).click();
         await this.page.locator(Common.SELECTOR_SEARCH).fill(text);
-        await this.page.getByTestId(Common.DATATEST_SEARCH_ICON).click();
+        await this.page.getByTestId(Common.DATA_TEST_SEARCH_ICON).click();
     }
 
     /**
