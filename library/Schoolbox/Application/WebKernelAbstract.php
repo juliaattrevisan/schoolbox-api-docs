@@ -248,6 +248,15 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
         // We cannot catch 'em all (yet).
         $this->previousErrorHandler = set_error_handler(
             function ($code, $message, $file, $line) {
+                if (!(error_reporting() & $code)) {
+                    // This error code is not included in error_reporting:
+                    // * should it be silenced (return true), or;
+                    // * handled by standard error handler (return false)?
+                    // Currently it's silenced, but I'm not sure that's correct.
+                    return true;
+                }
+
+                // Call the previous error handler if appropriate
                 if (is_callable($this->previousErrorHandler)) {
                     call_user_func($this->previousErrorHandler, $code, $message, $file, $line);
                 }

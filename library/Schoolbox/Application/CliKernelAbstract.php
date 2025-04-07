@@ -193,7 +193,10 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
             call_user_func($this->previousErrorHandler, $errNum, $errStr, $errFile, $errLine);
         }
         if (!(error_reporting() & $errNum)) {
-            // This error code is not included in error_reporting
+            // This error code is not included in error_reporting:
+            // * should it be silenced (return true), or;
+            // * handled by standard error handler (return false)?
+            // Currently it's silenced, but I'm not sure that's correct.
             return true;
         }
 
