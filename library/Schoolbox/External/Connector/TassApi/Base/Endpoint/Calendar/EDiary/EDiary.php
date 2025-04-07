@@ -578,20 +578,20 @@ class EDiary implements IStrategy
             }
         }
 
-        /* Remember for the summary
-         */
-        $summarySchoolbox = sprintf(
-            'Imported %s events into schoolbox',
-            $n
-        );
-
-        $summaryData = [
-            $summaryTass,
-            $summarySchoolbox,
-            $brokenEventTypes
-        ];
-
-        $this->registry->remember($endpoint, $summaryData);
+//        /* Remember for the summary
+//         */
+//        $summarySchoolbox = sprintf(
+//            'Imported %s events into schoolbox',
+//            $n
+//        );
+//
+//        $summaryData = [
+//            $summaryTass,
+//            $summarySchoolbox,
+//            $brokenEventTypes
+//        ];
+//
+//        $this->registry->remember($endpoint, $summaryData);
     }
 
 
