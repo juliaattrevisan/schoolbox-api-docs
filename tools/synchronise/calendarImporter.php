@@ -143,10 +143,10 @@ NULLTYPE;
             $this->getLogger()
         );
 
-        $randomMapper = UserMapper::getInstance();
+        $logMapper = \Schoolbox\External\Connector\Log\Mapper::getInstance();
 
         // Queries should not be time-limited here
-        $randomMapper->getDatabase()->executeDirectly('SET MAX_STATEMENT_TIME=0;');
+        $logMapper->getDatabase()->executeDirectly('SET MAX_STATEMENT_TIME=0;');
 
         /* This identifier indicates that the two schedulers were part of this
          * script execution together
@@ -160,7 +160,7 @@ NULLTYPE;
             $type,
             $file,
             $this->getLogger(),
-            \Schoolbox\External\Connector\Log\Mapper::getInstance(),
+            $logMapper,
             $this->getDi()->get('sentry'),
         ))->run(time(), $runId, Endpoint\Scheduler::CALENDARIMPORTER_SCRIPT_NAME);
 
