@@ -577,21 +577,21 @@ class EDiary implements IStrategy
             unset($endDatetime);
         }
 
-        /* Tell someone these need to be configured in admin
-         */
-        $brokenEventTypes = [];
-
-        if (\count($missingEventTypes)) {
-            foreach ($missingEventTypes as $missingEventType) {
-                $brokenEventTypeMessage = sprintf(
-                    'Add this event type in admin: %s',
-                    $missingEventType
-                );
-
-                $this->log->warning($brokenEventTypeMessage);
-                $brokenEventTypes[] = $brokenEventTypeMessage;
-            }
-        }
+//        /* Tell someone these need to be configured in admin
+//         */
+//        $brokenEventTypes = [];
+//
+//        if (\count($missingEventTypes)) {
+//            foreach ($missingEventTypes as $missingEventType) {
+//                $brokenEventTypeMessage = sprintf(
+//                    'Add this event type in admin: %s',
+//                    $missingEventType
+//                );
+//
+//                $this->log->warning($brokenEventTypeMessage);
+//                $brokenEventTypes[] = $brokenEventTypeMessage;
+//            }
+//        }
 
 //        /* Remember for the summary
 //         */
