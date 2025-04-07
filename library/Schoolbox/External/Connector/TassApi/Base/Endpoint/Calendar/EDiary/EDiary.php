@@ -30,87 +30,6 @@ class EDiary implements IStrategy
 
 
     /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $log;
-
-
-    /**
-     * The "perform" flag from the cli tool
-     *
-     * @var bool
-     */
-    private bool $perform;
-
-
-    /**
-     * @var array
-     */
-    private array $api;
-
-
-    /**
-     * @var GenericCollection
-     */
-    private GenericCollection $eventTypes;
-
-
-    /**
-     * @var \Schoolbox\External\Profile\Student\Mapper
-     */
-    private \Schoolbox\External\Profile\Student\Mapper $studentProfileMapper;
-
-
-    /**
-     * @var \Schoolbox\External\Profile\Staff\Mapper
-     */
-    private \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper;
-
-
-    /**
-     * @var \Schoolbox\External\Event\Mapper
-     */
-    private \Schoolbox\External\Event\Mapper $eventMapper;
-
-
-    /**
-     * @var \Schoolbox\External\Event\User\Mapper
-     */
-    private \Schoolbox\External\Event\User\Mapper $userRelationMapper;
-
-
-    /**
-     * Event source is an arbitrary string that helps identify the thing that imported
-     * them into the local event table so you can do a mass remove if needed
-     *
-     * @var string
-     */
-    private string $source;
-
-
-    /**
-     * @var Registry
-     */
-    private Registry $registry;
-
-
-    /**
-     * Obtain events that started after this datetime
-     *
-     * @var \Alaress_Date_Format
-     */
-    private \Alaress_Date_Format $from;
-
-
-    /**
-     * Obtain events that start before this datetime
-     *
-     * @var \Alaress_Date_Format
-     */
-    private \Alaress_Date_Format $to;
-
-
-    /**
      * Constructor
      *
      * @param LoggerInterface                            $log
@@ -127,32 +46,24 @@ class EDiary implements IStrategy
      * @param \Alaress_Date_Format                       $to
      */
     public function __construct(
-        LoggerInterface $log,
-        bool $perform,
-        array $api,
-        GenericCollection $eventTypes,
-        \Schoolbox\External\Profile\Student\Mapper $studentProfileMapper,
-        \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper,
-        \Schoolbox\External\Event\Mapper $eventMapper,
-        \Schoolbox\External\Event\User\Mapper $userRelationMapper,
-        string $source,
-        Registry $registry,
-        \Alaress_Date_Format $from,
-        \Alaress_Date_Format $to
+        private LoggerInterface $log,
+        private bool $perform,
+        private array $api,
+        private GenericCollection $eventTypes,
+        private \Schoolbox\External\Profile\Student\Mapper $studentProfileMapper,
+        private \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper,
+        private \Schoolbox\External\Event\Mapper $eventMapper,
+        private \Schoolbox\External\Event\User\Mapper $userRelationMapper,
+        private string $source,
+        private Registry $registry,
+        private \Alaress_Date_Format $from,
+        private \Alaress_Date_Format $to
     ) {
-        $this->log = $log;
-        $this->perform = $perform;
-        $this->api = $api;
-        $this->eventTypes = $eventTypes;
-        $this->studentProfileMapper = $studentProfileMapper;
-        $this->staffProfileMapper = $staffProfileMapper;
-        $this->eventMapper = $eventMapper;
-        $this->userRelationMapper = $userRelationMapper;
-
         /* Event source is an arbitrary string that helps identify the thing that imported
          * them into the local event table so you can do a mass remove if needed
+         *
+         * $this->source = $source;
          */
-        $this->source = $source;
 
         /* Remember statistics generated procedurally from all the tass products
          * and dump them all at the very end, together - people weren't reading
@@ -161,13 +72,14 @@ class EDiary implements IStrategy
          * to be attributable to the entire import which isn't always true.
          *
          * Therefore collect all those notes and put them all together here
+         *
+         * $this->registry = $registry;
          */
-        $this->registry = $registry;
 
         /* Obtain events between these two datetimes
+         * $this->from = $from;
+         * $this->to = $to;
          */
-        $this->from = $from;
-        $this->to = $to;
     }
 
 
@@ -186,12 +98,12 @@ class EDiary implements IStrategy
          */
         $feeds = $this->getFeedList('S');
 
-        /* Get a list of Student external ids
-         * Use the profile mappers to get a 1D array of those
-         * For each person in that set,
-         * Hit the endpoint and grab their calendar
-         */
         if ($feeds) {
+            /* Get a list of Student external ids
+             * Use the profile mappers to get a 1D array of those
+             * For each person in that set,
+             * Hit the endpoint and grab their calendar
+             */
             $userProfiles = $this->studentProfileMapper->findAll();
 
             /* TODO getStudentEDiary allegedly supports multiple feed codes
