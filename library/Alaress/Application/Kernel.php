@@ -211,6 +211,20 @@ abstract class Kernel
     protected Di\Container $di;
 
     /**
+     * Previous error handler, if any.
+     *
+     * @var callable|null
+     */
+    protected $previousErrorHandler = null;
+
+    /**
+     * Previous exception handler, if any.
+     *
+     * @var callable|null
+     */
+    protected $previousExceptionHandler = null;
+
+    /**
      * Wrapper to enable prioritisation of shutdown functions
      *
      * @var ShutdownHandler

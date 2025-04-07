@@ -246,8 +246,11 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
         // Temporarily handle deprecation warnings, so that they may be
         // temporarily ignored.
         // We cannot catch 'em all (yet).
-        set_error_handler(
+        $this->previousErrorHandler = set_error_handler(
             function ($code, $message, $file, $line) {
+                if (is_callable($this->previousErrorHandler)) {
+                    call_user_func($this->previousErrorHandler, $code, $message, $file, $line);
+                }
                 return $this->shutdownSafely(
                     [
                         'type'    => $code,

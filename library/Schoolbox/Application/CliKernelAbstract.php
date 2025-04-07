@@ -189,6 +189,9 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
      */
     public function onError($errNum, $errStr, $errFile, $errLine): ?bool
     {
+        if (is_callable($this->previousErrorHandler)) {
+            call_user_func($this->previousErrorHandler, $errNum, $errStr, $errFile, $errLine);
+        }
         if (!(error_reporting() & $errNum)) {
             // This error code is not included in error_reporting
             return true;
@@ -363,7 +366,7 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
      */
     protected function registerErrorHandling(): void
     {
-        \set_error_handler([$this, 'onError']);
+        $this->previousErrorHandler = \set_error_handler([$this, 'onError']);
     }
 
 
