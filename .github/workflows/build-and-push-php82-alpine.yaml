@@ -1,4 +1,4 @@
-name: build-and-push-php82
+name: Build and push base images (php82-alpine, php82-fpm-alpine)
 
 # Build new php82-alpine and php82-fpm-alpine images:
 # * whenever docker/base-images/** changes?

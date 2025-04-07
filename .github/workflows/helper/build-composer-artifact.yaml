@@ -1,4 +1,4 @@
-name: build-composer-artifact
+name: Build Composer artifact
 
 on:
   workflow_call:

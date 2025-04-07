@@ -1,4 +1,4 @@
-name: build-npm-artifact
+name: Build NPM artifact
 
 on:
   workflow_call:

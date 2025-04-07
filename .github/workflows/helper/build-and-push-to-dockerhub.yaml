@@ -1,4 +1,4 @@
-name: build-and-push-to-dockerhub
+name: Build and push to AWS ECR
 
 on:
   workflow_call:
