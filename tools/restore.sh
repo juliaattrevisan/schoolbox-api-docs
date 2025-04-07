@@ -218,7 +218,7 @@ readsqlconfig() {
   local config_value;
   local sql_command;
   for config_name in "${PRESERVED_CONFIG[@]}"; do
-    sql_command="SELECT value FROM config WHERE name='$config_name'"
+    sql_command="SELECT ifnull(value, '') FROM config WHERE name='$config_name'"
     if ! config_value=$(mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "$sql_command" 2>/dev/null); then
       echo "Unable to fetch value for config '$config_name'" >&2
       exit 1
