@@ -15,10 +15,10 @@ on:
 jobs:
   # Build artifacts before building image
   build-composer-artifact:
-    uses: ./.github/workflows/helper/build-composer-artifact.yaml
+    uses: ./.github/workflows/helper-build-composer-artifact.yaml
 
   build-npm-artifact:
-    uses: ./.github/workflows/helper/build-npm-artifact.yaml
+    uses: ./.github/workflows/helper-build-npm-artifact.yaml
 
   # Build schoolbox-fpm image
   # TODO work artifacts into push-to-dockerhub

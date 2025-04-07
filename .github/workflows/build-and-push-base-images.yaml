@@ -19,7 +19,7 @@ on:
 jobs:
   # Build and push php82-alpine image first
   build-and-push-php82-alpine-to-dockerhub:
-    uses: ./.github/workflows/helper/build-and-push-to-dockerhub.yaml
+    uses: ./.github/workflows/helper-build-and-push-to-dockerhub.yaml
     with:
       image: php82-alpine
       context: docker/base-images/php82-alpine
@@ -30,7 +30,7 @@ jobs:
   push-php82-alpine-to-ecr:
     needs:
       - build-and-push-php82-alpine-to-dockerhub
-    uses: ./.github/workflows/helper/push-to-ecr.yaml
+    uses: ./.github/workflows/helper-push-to-ecr.yaml
     with:
       image: php82-alpine
     secrets: inherit
@@ -39,7 +39,7 @@ jobs:
   build-and-push-php82-fpm-alpine-to-dockerhub:
     needs:
       - build-and-push-php82-alpine-to-dockerhub
-    uses: ./.github/workflows/helper/build-and-push-to-dockerhub.yaml
+    uses: ./.github/workflows/helper-build-and-push-to-dockerhub.yaml
     with:
       image: php82-fpm-alpine
       context: docker/base-images/php82-fpm-alpine
@@ -50,7 +50,7 @@ jobs:
   push-php82-fpm-alpine-to-ecr:
     needs:
       - build-and-push-php82-fpm-alpine-to-dockerhub
-    uses: ./.github/workflows/helper/push-to-ecr.yaml
+    uses: ./.github/workflows/helper-push-to-ecr.yaml
     with:
       image: php82-fpm-alpine
     secrets: inherit
