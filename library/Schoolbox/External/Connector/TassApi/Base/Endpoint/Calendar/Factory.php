@@ -201,8 +201,8 @@ class Factory
                 $this->userRelationMapper,
                 self::SOURCE_NAME,
                 $registry,
-                $from,
-                $to
+                \Alaress_Date_Format::now()->startOfWeek()->addWeeks(EDiary::FROM),
+                \Alaress_Date_Format::now()->startOfWeek()->addWeeks(EDiary::TO)
             ));
         }
 

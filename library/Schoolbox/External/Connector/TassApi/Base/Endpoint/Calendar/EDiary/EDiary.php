@@ -20,10 +20,25 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception;
 
 /**
- * Downloads the eDiary contents for each student
+ * Downloads the eDiary contents for each student amd staff.
+ * Note that the FROM and TO settings for EDiary have been split from the tass calendar
+ * due to the sheer volume of data in this dumping ground of events, experienced throughout
+ * the fleet.
  */
 class EDiary implements IStrategy
 {
+    /**
+     * Number of WEEKS into the past, from today, to import data
+     */
+    public const FROM = -1;
+
+
+    /**
+     * Number of WEEKS into the future, from today, to import data
+     */
+    public const TO = 8;
+
+
     /**
      * Filter to specific people; set to null to disable filtering
      * e.g. ['051301', 'SKK', 'BAU', '051365', '052546'];
@@ -249,8 +264,8 @@ class EDiary implements IStrategy
                 [
                     'studcode' => $userExternalId,
                     'feedcode' => $feedCodes,
-                    'start_date' => $this->from->getUsingFormat('d/m/Y'),
-                    'end_date' => $this->to->getUsingFormat('d/m/Y')
+                    'start_date' => $this->from->getDatabaseDate(),
+                    'end_date' => $this->to->getDatabaseDate()
                 ],
                 Api::VERSION_2
             );
@@ -318,8 +333,8 @@ class EDiary implements IStrategy
                 [
                     'tchcode' => $userExternalId,
                     'feedcode' => $feedCodes,
-                    'start_date' => $this->from->getUsingFormat('d/m/Y'),
-                    'end_date' => $this->to->getUsingFormat('d/m/Y')
+                    'start_date' => $this->from->getDatabaseDate(),
+                    'end_date' => $this->to->getDatabaseDate()
                 ],
                 Api::VERSION_2
             );
