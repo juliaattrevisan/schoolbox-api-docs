@@ -11,17 +11,34 @@ interface Props {
     /**
      * The sentiment of the label, which impacts the color of the label
      */
-    sentiment: "success" | "warning" | "alert" | "neutral";
+    sentiment?: "success" | "warning" | "alert" | "neutral" | undefined;
+    /**
+     * The background color of the label
+     */
+    backgroundColor?: string | undefined;
+    /**
+     * The text color of the label
+     */
+    textColor?: string | undefined;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     title: "",
-    sentiment: "neutral",
+    sentiment: undefined,
+    backgroundColor: undefined,
+    textColor: undefined,
 });
 </script>
 
 <template>
-    <span :class="`sbx-label sbx-label--${props.sentiment}`">{{ props.title }}</span>
+    <span
+        :class="`sbx-label sbx-label--${props.sentiment}`"
+        :style="{
+            backgroundColor: props.backgroundColor ? props.backgroundColor : undefined,
+            color: props.textColor ? props.textColor : undefined,
+        }"
+        >{{ props.title }}</span
+    >
 </template>
 
 <style scoped>

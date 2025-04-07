@@ -89,3 +89,15 @@ export const Neutral: Story = {
         `,
     }),
 };
+
+/**
+ *
+ */
+export const CustomLabelColors: Story = {
+    render: () => ({
+        components: { StorybookSlot },
+        template: `
+            <sbx-label title="Label with custom colors" backgroundColor="teal" textColor="white"></sbx-label>
+        `,
+    }),
+};
