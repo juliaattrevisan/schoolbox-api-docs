@@ -12,7 +12,9 @@ import StorybookSlot from "../../../vue/components/storybook-slot.vue";
  * | Property    | Type     | Description                                                      | Default   | Options                                  |
  * | ----------- | -------- | ---------------------------------------------------------------- | --------- | ---------------------------------------- |
  * | `title`     | `string` | The title of the label                                           | `""`      |                                          |
- * | `sentiment` | `string` | The sentiment of the label, which impacts the color of the label | `neutral` | `success`, `warning`, `alert`, `neutral` |
+ * | `sentiment` | `string` | The sentiment of the label, which impacts the color of the label | `"neutral"` | `"success"`, `"warning"`, `"alert"`, `"neutral"` |
+ * | `backgroundColor` | `string` | To have total control of the background color of the label  | `undefined` | Any color allowed in the CSS spec |
+ * | `textColor` | `string` | To have total control of the text color of the label  | `undefined` | Any color allowed in the CSS spec |
  */
 const meta: Meta<typeof SbxLabel> = {
     component: StorybookSlot,
@@ -91,13 +93,14 @@ export const Neutral: Story = {
 };
 
 /**
- *
+ * We can also pass through a custom background color and text color to
+ * completely override the default sentiment colors.
  */
 export const CustomLabelColors: Story = {
     render: () => ({
         components: { StorybookSlot },
         template: `
-            <sbx-label title="Label with custom colors" backgroundColor="teal" textColor="white"></sbx-label>
+            <sbx-label title="Label with custom colors" background-color="teal" text-color="#FFF"></sbx-label>
         `,
     }),
 };

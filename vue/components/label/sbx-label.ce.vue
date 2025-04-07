@@ -24,7 +24,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
     title: "",
-    sentiment: undefined,
+    sentiment: "neutral",
     backgroundColor: undefined,
     textColor: undefined,
 });
