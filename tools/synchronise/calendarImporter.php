@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
 use Schoolbox\External\Importer\Endpoint;
+use Schoolbox\UserMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -101,14 +102,24 @@ NULLTYPE;
          */
         $perform = $this->perform();
 
+        /* Execute scheduler
+         */
+        $factory = new Endpoint\CalendarFactory(
+            $host,
+            $key,
+            $perform,
+            $this->getLogger()
+        );
+
+        $randomMapper = UserMapper::getInstance();
+
+        // Queries should not be time-limited here
+        $randomMapper->getDatabase()->executeDirectly('SET MAX_STATEMENT_TIME=0;');
+
         /* This identifier indicates that the two schedulers were part of this
          * script execution together
          */
         $runId = (new \Schoolbox\External\Connector\Log\Guid())->generate();
-
-        /* Execute scheduler
-         */
-        $factory = new Endpoint\CalendarFactory($host, $key, $perform, $this->getLogger());
 
         (new Endpoint\Scheduler(
             $frequency,
