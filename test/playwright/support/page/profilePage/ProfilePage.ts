@@ -1,5 +1,5 @@
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
-import type { Page, Locator } from "@playwright/test";
+import type { Page } from "@playwright/test";
 import { expect } from "@playwright/test";
 
 export default class ProfilePage {
@@ -89,22 +89,7 @@ export default class ProfilePage {
     }
 
     /**
-     * Returns the locator for the flag
-     * @param typeId - The type id
-     * @param subTypeId - The sub type id
-     * @returns - The locator for the flag
-     */
-    getFlag(typeId: number, subTypeId: number): Locator {
-        return this.page.getByTestId(
-            ProfilePage.DATA_TEST_PROFILE_FLAG.replace("{typeId}", typeId.toString()).replace(
-                "{subtypeId}",
-                subTypeId.toString(),
-            ),
-        );
-    }
-
-    /**
-     * Verify if a specified field is visible within the profile section.
+     * Verify if a specified field is visible on profile page
      * @param fieldName - The name of the field to check (e.g., "Role", "Campus", "Class Profile")
      */
     async checkFieldIsVisible(fieldName: string): Promise<void> {
@@ -113,11 +98,29 @@ export default class ProfilePage {
     }
 
     /**
-     * Verify if a specified field is NOT visible within the profile section.
+     * Verify if a specified field is NOT visible on profile page
      * @param fieldName - The name of the field to check (e.g., "Role", "Campus", "Class Profile")
      */
     async checkFieldIsNotVisible(fieldName: string): Promise<void> {
         const fieldLocator = this.page.locator(`dl.profile dt`, { hasText: fieldName });
         await expect(fieldLocator).not.toBeVisible();
+    }
+
+    /**
+     * Verify if a specified tab is visible on profile page
+     * @param tabName - The name of the tab to check (e.g., "Goals", "Achievements", "Classes")
+     */
+    async checkTabIsVisible(tabName: string): Promise<void> {
+        const tabLocator = this.page.locator(`a[href="#tab-${tabName}"]`);
+        await expect(tabLocator).toBeVisible();
+    }
+
+    /**
+     * Verify if a specified tab is NOT visible on profile page
+     * @param tabName - The name of the tab to check (e.g., "Goals", "Achievements", "Classes")
+     */
+    async checkTabIsNotVisible(tabName: string): Promise<void> {
+        const tabLocator = this.page.locator(`a[href="#tab-${tabName}"]`);
+        await expect(tabLocator).not.toBeVisible();
     }
 }

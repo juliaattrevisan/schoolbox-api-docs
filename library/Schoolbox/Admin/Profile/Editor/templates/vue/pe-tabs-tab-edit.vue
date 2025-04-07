@@ -56,6 +56,7 @@ async function onUpdateClicked(): Promise<void> {
                 type="submit"
                 :value="isUpdating ? 'Updating...' : 'Update'"
                 :disabled="isUpdating"
+                :data-test="`${peTabsStore.getTabIdentifier(props.tab.id)}-settings-confirm`"
                 @click="onUpdateClicked"
             />
         </div>

@@ -105,4 +105,37 @@ export default class ProfileEditor {
     async clickFieldsTab(tabName: "External Fields" | "Internal Fields"): Promise<void> {
         await this.page.getByText(tabName).click();
     }
+
+    /**
+     * Click the cog of a tabs
+     * @param roleType - The user type: student, staff, parent
+     * @param tabName - The tab name
+     */
+    async clickTabCog(roleType: string, tabName: string): Promise<void> {
+        await this.page.getByTestId(`pe-${roleType}-tabs-tab-${tabName}-settings`).click();
+    }
+
+    /**
+     * Click the field visibility or availability checkbox
+     * @param roleType - The user type: student, staff, parent
+     * @param tabName - The tab name
+     * @param option - The option to click: visibility or availability
+     * @param optionValue - The option value to click: self, 1
+     */
+    async clickTabCheckbox(roleType: string, tabName: string, option: string, optionValue: string): Promise<void> {
+        await this.page
+            .getByTestId(`pe-${roleType}-tabs-tab-${tabName}-setting-${option}-option-${optionValue}`)
+            .click();
+    }
+
+    /**
+     * Click the update button of a tab
+     * @param roleType - The user type: student, staff, parent
+     * @param tabName - The tab name
+     */
+    async clickTabUpdateButton(roleType: string, tabName: string): Promise<void> {
+        await this.page.getByTestId(`pe-${roleType}-tabs-tab-${tabName}-settings-confirm`).click();
+        await expect(this.page.getByTestId("toast")).toHaveAttribute("data-test-is-success", "true");
+        await expect(this.page.getByTestId("toast")).not.toBeVisible();
+    }
 }
