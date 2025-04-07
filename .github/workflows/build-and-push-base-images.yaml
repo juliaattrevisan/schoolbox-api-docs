@@ -13,8 +13,6 @@ on:
     paths:
       - 'docker/base-images/**'
   workflow_dispatch:
-  # For testing only
-  pull_request:
 
 jobs:
   # Build and push php82-alpine image first
