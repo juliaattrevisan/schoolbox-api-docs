@@ -117,6 +117,8 @@ class EDiary implements IStrategy
             foreach ($userProfiles as $userProfile) {
                 $this->importStudentEvents($userProfile, $feedCodes);
             }
+
+            unset($userProfiles);
         } else {
             $this->log->info('No feed data found; skipping');
         }
@@ -146,6 +148,8 @@ class EDiary implements IStrategy
             foreach ($userProfiles as $userProfile) {
                 $this->importStaffEvents($userProfile, $feedCodes);
             }
+
+            unset($userProfiles);
         } else {
             $this->log->info('No feed data found; skipping');
         }
@@ -199,6 +203,8 @@ class EDiary implements IStrategy
             $feedCodes[] = $feed['code'];
         }
 
+        unset($feeds);
+
         return implode(',', $feedCodes);
     }
 
@@ -250,6 +256,8 @@ class EDiary implements IStrategy
             );
 
             $this->importEvents($endpoint, $userExternalId, $tassEvents);
+
+            unset($tassEvents);
         } catch (\RuntimeException $e) {
             $this->log->warning(sprintf(
                 'Could not process events for %s: %s',
@@ -317,6 +325,8 @@ class EDiary implements IStrategy
             );
 
             $this->importEvents($endpoint, $userExternalId, $tassEvents);
+
+            unset($tassEvents);
         } catch (\RuntimeException $e) {
             $this->log->warning(sprintf(
                 'Could not process events for %s: %s',
@@ -545,6 +555,11 @@ class EDiary implements IStrategy
             /* Increase the count
              */
             $n++;
+
+            /* Clear these manually, maybe it saves mem
+             */
+            unset($startDatetime);
+            unset($endDatetime);
         }
 
         /* Tell someone these need to be configured in admin
