@@ -248,6 +248,11 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
         // We cannot catch 'em all (yet).
         $this->previousErrorHandler = set_error_handler(
             function ($code, $message, $file, $line) {
+                // Call the previous error handler if there
+                if (is_callable($this->previousErrorHandler)) {
+                    call_user_func($this->previousErrorHandler, $code, $message, $file, $line);
+                }
+
                 if (!(error_reporting() & $code)) {
                     // This error code is not included in error_reporting:
                     // * should it be silenced (return true), or;
@@ -256,21 +261,24 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
                     return true;
                 }
 
-                // Call the previous error handler if appropriate
-                if (is_callable($this->previousErrorHandler)) {
-                    call_user_func($this->previousErrorHandler, $code, $message, $file, $line);
+                // Shutdown for fatal errors
+                // (and deprecations, which must be handled to be ignored)
+                if ($code & (E_USER_ERROR | E_ERROR | E_CORE_ERROR | E_RECOVERABLE_ERROR | E_DEPRECATED | E_USER_DEPRECATED)) {
+                    return $this->shutdownSafely(
+                        [
+                            'type'    => $code,
+                            'message' => $message,
+                            'file'    => $file,
+                            'line'    => $line
+                        ],
+                        debug_backtrace(),
+                    );
                 }
-                return $this->shutdownSafely(
-                    [
-                        'type'    => $code,
-                        'message' => $message,
-                        'file'    => $file,
-                        'line'    => $line
-                    ],
-                    debug_backtrace(),
-                );
+
+                // It's not clear what should happen with errors not caught by
+                // the previous error reporting: I'll silence them for now.
+                return true;
             },
-            E_USER_ERROR | E_ERROR | E_CORE_ERROR | E_RECOVERABLE_ERROR | E_DEPRECATED | E_USER_DEPRECATED,
         );
     }
 
