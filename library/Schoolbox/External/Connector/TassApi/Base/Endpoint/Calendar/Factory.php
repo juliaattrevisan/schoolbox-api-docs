@@ -53,86 +53,6 @@ class Factory
 
 
     /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $log;
-
-
-    /**
-     * The "perform" flag from the cli tool
-     *
-     * @var bool
-     */
-    private bool $perform;
-
-
-    /**
-     * @var string
-     */
-    private string $host;
-
-
-    /**
-     * @var string
-     */
-    private string $key;
-
-
-    /**
-     * @var \Schoolbox\External\Profile\Student\Mapper
-     */
-    private \Schoolbox\External\Profile\Student\Mapper $studentProfileMapper;
-
-
-    /**
-     * @var \Schoolbox\External\Profile\Staff\Mapper
-     */
-    private \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper;
-
-
-    /**
-     * @var CampusMapper
-     */
-    private \Schoolbox\CampusMapper $campusMapper;
-
-
-    /**
-     * @var EventTypeMapper
-     */
-    private \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper;
-
-
-    /**
-     * @var \Schoolbox\External\Event\Mapper
-     */
-    private \Schoolbox\External\Event\Mapper $eventMapper;
-
-
-    /**
-     * @var \Schoolbox\External\Event\Roletype\Mapper
-     */
-    private \Schoolbox\External\Event\Roletype\Mapper $roletypeRelationMapper;
-
-
-    /**
-     * @var \Schoolbox\External\Event\Campus\Mapper
-     */
-    private \Schoolbox\External\Event\Campus\Mapper $campusRelationMapper;
-
-
-    /**
-     * @var \Schoolbox\External\Event\User\Mapper
-     */
-    private \Schoolbox\External\Event\User\Mapper $userRelationMapper;
-
-
-    /**
-     * @var RoleMapper
-     */
-    private RoleMapper $roleMapper;
-
-
-    /**
      * Factory constructor.
      *
      * @param LoggerInterface                            $log
@@ -150,33 +70,20 @@ class Factory
      * @param RoleMapper                                 $roleMapper
      */
     public function __construct(
-        LoggerInterface $log,
-        bool $perform,
-        string $host,
-        #[SensitiveParameter] string $key,
-        \Schoolbox\External\Profile\Student\Mapper $studentProfileMapper,
-        \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper,
-        \Schoolbox\CampusMapper $campusMapper,
-        \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper,
-        \Schoolbox\External\Event\Mapper $eventMapper,
-        \Schoolbox\External\Event\Roletype\Mapper $roletypeRelationMapper,
-        \Schoolbox\External\Event\Campus\Mapper $campusRelationMapper,
-        \Schoolbox\External\Event\User\Mapper $userRelationMapper,
-        RoleMapper $roleMapper
+        private LoggerInterface $log,
+        private bool $perform,
+        private string $host,
+        #[SensitiveParameter] private string $key,
+        private \Schoolbox\External\Profile\Student\Mapper $studentProfileMapper,
+        private \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper,
+        private \Schoolbox\CampusMapper $campusMapper,
+        private \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper,
+        private \Schoolbox\External\Event\Mapper $eventMapper,
+        private \Schoolbox\External\Event\Roletype\Mapper $roletypeRelationMapper,
+        private \Schoolbox\External\Event\Campus\Mapper $campusRelationMapper,
+        private \Schoolbox\External\Event\User\Mapper $userRelationMapper,
+        private RoleMapper $roleMapper
     ) {
-        $this->log = $log;
-        $this->perform = $perform;
-        $this->host = $host;
-        $this->key = $key;
-        $this->studentProfileMapper = $studentProfileMapper;
-        $this->staffProfileMapper = $staffProfileMapper;
-        $this->campusMapper = $campusMapper;
-        $this->eventTypeMapper = $eventTypeMapper;
-        $this->eventMapper = $eventMapper;
-        $this->roletypeRelationMapper = $roletypeRelationMapper;
-        $this->campusRelationMapper = $campusRelationMapper;
-        $this->userRelationMapper = $userRelationMapper;
-        $this->roleMapper = $roleMapper;
     }
 
 
