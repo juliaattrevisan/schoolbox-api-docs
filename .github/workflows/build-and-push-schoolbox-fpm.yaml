@@ -19,7 +19,7 @@ jobs:
   build-npm-artifact:
     uses: ./.github/workflows/build-npm-artifact.yaml
 
-  build-and-push:
+  build-and-push-schoolbox-fpm:
     needs:
       - build-composer-artifact
       - build-npm-artifact
@@ -61,13 +61,15 @@ jobs:
       # push: {{ github.ref_name }}-latest, {{ github.ref_name }}-{{ github.sha }}
       #       (ref_name should be master or develop)
       # release: {{ github.ref_name }}
-      - name: Build and push - push
+      # TODO work artifacts into push-to-dockerhub
+      - name: Build and push schoolbox-fpm (push)
         if: github.event_name == 'push'
         uses: docker/build-push-action@v6
         with:
           context: .
           file: docker/php-fpm/deployment-image.Dockerfile
           push: true
+          outputs: type=docker,dest=${{ runner.temp }}/schoolbox-fpm-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
           build-args: |
             ENV=prod
           platforms: ${{ matrix.build.platform }}
@@ -75,15 +77,31 @@ jobs:
             alaress/schoolbox-fpm:{{ github.ref_name }}-latest
             alaress/schoolbox-fpm:{{ github.ref_name }}-{{ github.sha }}
 
-      - name: Build and push - release
+      - name: Build and push schoolbox-fpm (release)
         if: github.event_name == 'release'
         uses: docker/build-push-action@v6
         with:
           context: .
           file: docker/php-fpm/deployment-image.Dockerfile
           push: true
+          outputs: type=docker,dest=${{ runner.temp }}/schoolbox-fpm-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
           build-args: |
             ENV=prod
           platforms: ${{ matrix.build.platform }}
           tags: |
             alaress/schoolbox-fpm:{{ github.ref_name }}
+
+      - name: Upload schoolbox-fpm artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.image }}-${{ matrix.build.arch }}
+          path: ${{ runner.temp }}/schoolbox-fpm-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
+          retention-days: 1
+
+  push-schoolbox-fpm-alpine-to-ecr:
+    needs:
+      - build-and-push-schoolbox-fpm
+    uses: ./.github/workflows/push-to-ecr.yaml
+    with:
+      image: schoolbox-fpm
+    secrets: inherit

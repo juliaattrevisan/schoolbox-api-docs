@@ -39,7 +39,7 @@ jobs:
       - name: Download ${{ inputs.image }} artifact
         uses: actions/download-artifact@v4
         with:
-          name: ${{ inputs.image }}-${{ matrix.build.platform }}-${{ matrix.build.arch }}
+          name: ${{ inputs.image }}-${{ matrix.build.arch }}
           path: ${{ runner.temp }}
 
       - name: Load ${{ inputs.image }} image
