@@ -441,15 +441,13 @@ class Base
 
         if (\count($missingEventTypes)) {
             foreach ($missingEventTypes as $missingEventType) {
-                $brokenEventTypeMessage = sprintf(
-                    'Add this event type in admin: %s',
-                    $missingEventType
-                );
-
-                $this->log->warning($brokenEventTypeMessage);
-                $brokenEventTypes[] = $brokenEventTypeMessage;
+                $brokenEventTypes[] = $missingEventType;
             }
         }
+
+        /* Sort alphabetically
+         */
+        sort($brokenEventTypes);
 
         /* Remember for the summary
          */
