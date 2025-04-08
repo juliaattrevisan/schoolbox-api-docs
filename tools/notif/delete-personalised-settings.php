@@ -106,7 +106,7 @@ HELP;
                   AND `groups`.deleted_at IS NULL";
         if (isset($targetNameSpace)) {
             $sql .= " AND msg_namespace.slug = :slug";
-            $params = ['slug' => $targetNameSpace];
+            $params = ['slug' => $targetNameSpace->getSlug()];
         }
         $statement = $msgNamespaceMapper->getDatabase()->query($select . $sql, $params);
         foreach ($statement->fetchAll() as $item) {
