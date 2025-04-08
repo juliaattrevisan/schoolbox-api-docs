@@ -131,7 +131,15 @@
                         {% if hasAssessmentRoutes %}
                             <li class="separator">{{ locale.translate('activity', false, true) }}</li>
                             {% if statusRoute %}<li><a href="{{ statusRoute }}" class="icon-progress">View Status</a></li>{% endif %}
-                            {% if assessment is dueWork %}<li><a class="icon-task" href="#" >View and {{ locale.grades }} submission</a></li>{% endif %}
+                            {% if assessment is dueWork %}
+                                {% set viewGradeRoute = routeLookupIfAuthorized('learningDueWorkResponse.getFirstParticipantResponse', {
+                                    assessmentId: assessment.id,
+                                    assessment: assessment,
+                                }) %}
+                                {% if viewGradeRoute %}
+                                <li><a class="icon-task" href="{{ viewGradeRoute }}" >View and {{ locale.grades }} submission</a></li>
+                                {% endif %}
+                            {% endif %}
                             {% if assessment is dueWork and assessment.enableWorksheet and assessment.kamiWorksheetTemplate and kamiWorksheetRoute %}
                                 <li>
                                     <a id="kamiWorksheet" class="icon-surveys" href="{{ kamiWorksheetRoute }}">Class View</a>
