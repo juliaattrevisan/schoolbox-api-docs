@@ -261,7 +261,7 @@
                                         class="{{ urgency.marks(participant.normalisedMark(true)) }}"
                                         href="{{ participationRoute }}"
                                         {% if marks.draft is defined %}data-actual-mark{% endif %}
-                                        title="{{ comment }}"
+                                        title="{{ comment|html2text }}"
                                     >
                                         <span data-instructor-mark>{{ decorator.label(participant, true, true) }}</span>
                                         <span data-learner-mark style="display: none">{{ decorator.label(participant, true, false) }}</span>
