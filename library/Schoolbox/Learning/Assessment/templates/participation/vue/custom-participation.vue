@@ -151,7 +151,13 @@ window.Vue.onMounted(() => {
                         </p>
                     </td>
                     <td></td>
-                    <td></td>
+                    <td class="no-pad">
+                        <div v-if="participant.user.id" class="actions-small-1">
+                            <nav>
+                                <sbx-pop-out :content-id="`participant-${participant.user.id}`"></sbx-pop-out>
+                            </nav>
+                        </div>
+                    </td>
                 </tr>
             </tbody>
         </table>
