@@ -185,7 +185,7 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
      * * silences deprecation notices
      * * otherwise, passes to the standard error handler
      */
-    protected function onError($errNum, $errStr, $errFile, $errLine): bool
+    protected function onError(int $errNum, string $errStr, string $errFile, int $errLine): bool
     {
         switch ($errNum) {
             case E_RECOVERABLE_ERROR:

@@ -369,7 +369,7 @@ abstract class Kernel
      * @param int    $errLine
      * @return bool
      */
-    abstract protected function onError($errNum, $errStr, $errFile, $errLine): bool;
+    abstract protected function onError(int $errNum, string $errStr, string $errFile, int $errLine): bool;
 
     /**
      * Register any out-the-top exception handling required

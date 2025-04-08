@@ -242,7 +242,7 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
      * This error handler displays a shutdown message if a fatal error was
      * raised, otherwise silences the error.
      */
-    protected function onError($errNum, $errStr, $errFile, $errLine): bool
+    protected function onError(int $errNum, string $errStr, string $errFile, int $errLine): bool
     {
         // Shutdown for fatal errors
         // (and deprecations, which must be handled to be ignored?)
