@@ -59,7 +59,7 @@
 
                 {% if record.expiresAt is not empty %}
                     <dt class="small-4 medium-3 columns">Expires At:</dt>
-                    <dd class="small-8 medium-9 columns">{{ record.expiresAt.long }}</dd>
+                    <dd class="small-8 medium-9 columns">{{ record.expiresAt.longDateOnly }}</dd>
                 {% endif %}
             </dl>
 
