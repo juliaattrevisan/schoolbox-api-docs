@@ -425,7 +425,7 @@ class Controller extends WebController\Base
         // first check if the user has write access to the course
         $hasCourseWriteAccess = $this->access->getFolderAccess(
             $this->getUser(),
-            $courseSpec->getId(),
+            $courseSpec->getFolder()->getId(),
         ) >= UserAccess::ACCESS_WRITE;
         // then check if the user has write access to all the course implementations
         $hasClassWriteAccess = true;
