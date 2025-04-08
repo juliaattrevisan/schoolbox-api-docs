@@ -20,7 +20,6 @@ use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\DSN;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Exception\MissingModule;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\GenericCollection;
-use Schoolbox\RoleMapper;
 use SensitiveParameter;
 
 /**
@@ -67,7 +66,6 @@ class Factory
      * @param \Schoolbox\External\Event\Roletype\Mapper  $roletypeRelationMapper
      * @param \Schoolbox\External\Event\Campus\Mapper    $campusRelationMapper
      * @param \Schoolbox\External\Event\User\Mapper      $userRelationMapper
-     * @param RoleMapper                                 $roleMapper
      */
     public function __construct(
         private LoggerInterface $log,
@@ -82,7 +80,6 @@ class Factory
         private \Schoolbox\External\Event\Roletype\Mapper $roletypeRelationMapper,
         private \Schoolbox\External\Event\Campus\Mapper $campusRelationMapper,
         private \Schoolbox\External\Event\User\Mapper $userRelationMapper,
-        private RoleMapper $roleMapper
     ) {
     }
 

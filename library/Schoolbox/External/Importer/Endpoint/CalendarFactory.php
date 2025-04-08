@@ -80,7 +80,6 @@ class CalendarFactory implements IFactory
                     \Schoolbox\External\Event\Roletype\Mapper::getInstance()->disableCache(),
                     \Schoolbox\External\Event\Campus\Mapper::getInstance()->disableCache(),
                     \Schoolbox\External\Event\User\Mapper::getInstance()->disableCache(),
-                    RoleMapper::getInstance()->disableCache()
                 ))->produce();
                 break;
 
