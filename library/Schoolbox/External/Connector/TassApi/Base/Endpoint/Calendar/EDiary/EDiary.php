@@ -415,7 +415,7 @@ class EDiary implements IStrategy
          */
         $missingEventTypes = [];
 
-        $nTassEvents = \count($tassEvents['calendar']) ?? 0;
+        $nTassEvents = \count($tassEvents['calendar'] ?? []);
         $n = 0;
 
         foreach ($tassEvents['calendar'] as $tassEvent) {
