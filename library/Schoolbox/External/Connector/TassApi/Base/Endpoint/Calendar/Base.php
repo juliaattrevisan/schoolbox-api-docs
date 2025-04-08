@@ -29,6 +29,14 @@ use Schoolbox\GenericCollection;
 abstract class Base
 {
     /**
+     * Endpoint specific to this event import
+     *
+     * @var string
+     */
+    protected string $endpoint = '';
+
+
+    /**
      * Base constructor.
      *
      * @param LoggerInterface                           $log
