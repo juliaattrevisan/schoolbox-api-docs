@@ -336,11 +336,26 @@ abstract class Kernel
     protected function registerErrorHandling(): void
     {
         $this->previousErrorHandler = set_error_handler(
-            function ($code, $message, $file, $line) {
+            function ($errNum, $errStr, $errFile, $errLine) {
+                // Consider returning early from silenced deprecations here?
+                // They should not be sent to Sentry.
+
+                // Call the previous error handler too:
+                // but what should be done with its return, and when should it
+                // be called?
                 if (is_callable($this->previousErrorHandler)) {
-                    call_user_func($this->previousErrorHandler, $code, $message, $file, $line);
+                    call_user_func($this->previousErrorHandler, $errNum, $errStr, $errFile, $errLine);
                 }
-                return $this->onError($code, $message, $file, $line);
+
+                if (!(error_reporting() & $errNum)) {
+                    // This error code is not included in error_reporting:
+                    // * should it be silenced (return true), or;
+                    // * handled by standard error handler (return false)?
+                    // Currently it's silenced, but I'm not sure that's correct.
+                    return true;
+                }
+
+                return $this->onError($errNum, $errStr, $errFile, $errLine);
             }
         );
     }

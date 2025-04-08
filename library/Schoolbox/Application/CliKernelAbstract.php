@@ -179,24 +179,14 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
 
 
     /**
-     * @param int    $errNum
-     * @param string $errStr
-     * @param string $errFile
-     * @param int    $errLine
-     * @return bool
-     * @throws ErrorException
-     * @throws \Psr\Container\ContainerExceptionInterface|\Psr\Container\NotFoundExceptionInterface
+     * This error handler:
+     * * raises an exception if a recoverable error was thrown
+     * * may raise an exception on notice or warning
+     * * silences deprecation notices
+     * * otherwise, passes to the standard error handler
      */
     protected function onError($errNum, $errStr, $errFile, $errLine): bool
     {
-        if (!(error_reporting() & $errNum)) {
-            // This error code is not included in error_reporting:
-            // * should it be silenced (return true), or;
-            // * handled by standard error handler (return false)?
-            // Currently it's silenced, but I'm not sure that's correct.
-            return true;
-        }
-
         switch ($errNum) {
             case E_RECOVERABLE_ERROR:
                 // for any of these errors, we want an exception we can catch

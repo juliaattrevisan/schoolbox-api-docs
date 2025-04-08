@@ -239,48 +239,30 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
     }
 
     /**
-     * @inheritdoc
+     * This error handler displays a shutdown message if a fatal error was
+     * raised, otherwise silences the error.
      */
-    protected function registerErrorHandling(): void
+    protected function onError($errNum, $errStr, $errFile, $errLine): bool
     {
-        // Temporarily handle deprecation warnings, so that they may be
-        // temporarily ignored.
-        // We cannot catch 'em all (yet).
-        $this->previousErrorHandler = set_error_handler(
-            function ($code, $message, $file, $line) {
-                // Call the previous error handler if there
-                if (is_callable($this->previousErrorHandler)) {
-                    call_user_func($this->previousErrorHandler, $code, $message, $file, $line);
-                }
+        // Shutdown for fatal errors
+        // (and deprecations, which must be handled to be ignored?)
+        if ($errNum & (E_USER_ERROR | E_ERROR | E_CORE_ERROR | E_RECOVERABLE_ERROR | E_DEPRECATED | E_USER_DEPRECATED)) {
+            return $this->shutdownSafely(
+                [
+                    'type'    => $errNum,
+                    'message' => $errStr,
+                    'file'    => $errFile,
+                    'line'    => $errLine
+                ],
+                debug_backtrace(),
+            );
+        }
 
-                if (!(error_reporting() & $code)) {
-                    // This error code is not included in error_reporting:
-                    // * should it be silenced (return true), or;
-                    // * handled by standard error handler (return false)?
-                    // Currently it's silenced, but I'm not sure that's correct.
-                    return true;
-                }
-
-                // Shutdown for fatal errors
-                // (and deprecations, which must be handled to be ignored)
-                if ($code & (E_USER_ERROR | E_ERROR | E_CORE_ERROR | E_RECOVERABLE_ERROR | E_DEPRECATED | E_USER_DEPRECATED)) {
-                    return $this->shutdownSafely(
-                        [
-                            'type'    => $code,
-                            'message' => $message,
-                            'file'    => $file,
-                            'line'    => $line
-                        ],
-                        debug_backtrace(),
-                    );
-                }
-
-                // It's not clear what should happen with errors not caught by
-                // the previous error reporting: I'll silence them for now.
-                return true;
-            },
-        );
+        // It's not clear what should happen with errors not caught by
+        // the previous error reporting: I'll silence them for now.
+        return true;
     }
+
 
     /**
      * @inheritdoc
