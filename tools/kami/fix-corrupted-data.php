@@ -7,6 +7,7 @@
 
 declare(strict_types=1);
 
+use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -36,6 +37,7 @@ $app = new class extends CliTool\App
     public function getLongOpts(): array
     {
         return [
+            self::OPT_LONG_ASSESSMENT_ID,
             self::OPT_LONG_HELP,
         ];
     }
@@ -46,69 +48,91 @@ $app = new class extends CliTool\App
     public function run(): void
     {
         if ($this->getOpt(self::OPT_LONG_HELP)) {
+            $filename = $this->getToolFilename();
             echo <<<HELP
 
-Kami corrupted data fixer
+NAME:
+    Kami corrupted data fixer
 
-Usage: fix-corrupted-data.php [--studentSubmissionId] [--perform]
+SYNOPSIS:
+    $filename [OPTION]...
 
-Parameters:
+DESCRIPTION
+    Fixes three types of data corruption found in Kami data.
+
+    Corrupted data type 1:
+        Deleted kami_document rows linked to non-deleted student_submission_file rows.
+        Solution: Set deleted_at=NULL on that kami_document row.
+
+    Corrupted data type 2:
+        Non-deleted kami_document rows not linked to submission_box or student_submission_file.
+        Solution: Mark these rows as deleted (can't do anything else since not enough information)
+
+    Corrupted data type 3:
+        Non-deleted submission_return rows linked to deleted student_submission rows.
+        Solution:
+        For each non-deleted submission_return row linked to a deleted student_submission row...
+         * Find the student_submission row that was most recently submitted at the time the submission_return row was
+           created.
+         * If found, link the non-deleted submission_return row to that row.
+         * Else make note of problem not fixed.
+
+OPTIONS
     --assessmentId [integer]
-       - Only consider data pertaining to one assessment.
-         If not supplied, consider all assessments.
+        - Only consider data pertaining to one assessment.
+            If not supplied, consider all assessments.
     --perform
-       - Include to actually make database changes.
-         If not supplied, hypothetical run only.
+        - Include to actually make database changes.
+            If not supplied, hypothetical run only.
 
-Examples:
+EXAMPLES
     Find corrupted data in assessment 4:
-        fix-corrupted-data.php --assessmentId=4
+        fix-corrupted-data.php --assessment=4
     Find and fix corrupted data in assessment 4:
-        fix-corrupted-data.php --assessmentId=4 --perform
+        fix-corrupted-data.php --assessment=4 --perform
+
+
 HELP;
             return;
         }
 
-        $assessmentId = $this->getOpt(self::OPT_LONG_ASSESSMENT_ID);
+        if (!$this->perform()) {
+            $this->getLogger()->info('Running in dry-run mode.  Run with the `-p` flag to perform changes.');
+        }
+
+        $assessmentId = $this->getOptAsInt(self::OPT_LONG_ASSESSMENT_ID);
+        if ($assessmentId) {
+            $this->getLogger()->info("Considering only Kami data linked to assessment $assessmentId.");
+        }
 
         try {
             $this->fixCorruptedDataProblem1($assessmentId);
             $this->fixCorruptedDataProblem2($assessmentId);
             $this->fixCorruptedDataProblem3($assessmentId);
-        } catch (\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             $this->getLogger()->warning($e->getMessage());
         }
     }
 
     /**
-     * FIXME Decide whether this script must be run as root
-     *  By default, this returns false (see CliTool\App) but if you're using methods that require
-     *  access to special folders (such as when you're creating files) you need to run this as root.
-     *  Otherwise it'll fail with a generic error that might mislead you
-     *
-     * @return bool|null
+     * @return bool
      */
-    public function runAsRoot(): ?bool
+    public function runAsRoot(): bool
     {
         return false;
     }
 
     /**
-     * Fix problem 1:
-     *  - Deleted kami_document rows linked to non-deleted student_submission_file rows.
-     * Solution:
-     *  - If that student_submission_file row does not have a linked non-deleted kami_document row
-     *     - Set deleted_at=NULL on that kami_document row
-     *    Else make note of problem not fixed.
+     * Fix corrupted data problem 1.  See --help text for definition.
+     * @param int|null $assessmentId
      */
     private function fixCorruptedDataProblem1(?int $assessmentId): void
     {
         $dbc = $this->getDatabaseInternal();
         $logger = $this->getLogger();
-        $quoter = $dbc->getQuoter();
 
         $query = (
-            'SELECT kd.id
+            'SELECT kd.id AS kamiDocumentId, sb.assessment_id AS assessmentId
             FROM kami_document kd
             JOIN student_submission_file ssf ON (kd.student_submission_file_id = ssf.id)
             JOIN student_submission ss ON (ssf.student_submission_id = ss.id)
@@ -123,15 +147,65 @@ HELP;
             $params[] = $assessmentId;
         }
 
-        $kamiDocumentIds = $dbc->executeQuery($query, $params)->fetchAll();
-var_dump($kamiDocumentIds);
-//        $logger->info();
+        // Add ORDER BY to increase readability of logs.
+        $query .= "\nORDER BY sb.assessment_id ASC";
+
+        $rows = $dbc->executeQuery($query, $params)->fetchAll();
+
+        if (count($rows) === 0) {
+            $logger->info('Found 0 deleted kami_document rows linked to undeleted student_submission_file rows.');
+            $logger->info('Nothing to do.');
+            return;
+        }
+
+        $kamiDocumentIdsByAssessmentId = [];
+        foreach ($rows as $row) {
+            if (!array_key_exists($row['assessmentId'], $kamiDocumentIdsByAssessmentId)) {
+                $kamiDocumentIdsByAssessmentId[$row['assessmentId']] = [];
+            }
+            $kamiDocumentIdsByAssessmentId[$row['assessmentId']][] = $row['kamiDocumentId'];
+        }
+
+        $logger->info(
+            'Found ' . count($rows) . ' deleted kami_document rows linked to undeleted student_submission_file rows,' .
+            ' in ' . count($kamiDocumentIdsByAssessmentId) . ' assessments.'
+        );
+
+        foreach ($kamiDocumentIdsByAssessmentId as $assessmentId => $kamiDocumentIds) {
+            if ($this->perform()) {
+                $logger->info(
+                    'Undeleting ' . count($kamiDocumentIds) . " kami_document rows for assessment $assessmentId..."
+                );
+                // NOTE: A UNIQUE key on kami_document ensures that there can only ever be one kami_document row linked
+                //       to a student_submission_file row (even after undeleting).
+                $statement = $dbc->executeQuery(
+                    'UPDATE kami_document
+                    SET deleted_at = NULL
+                    WHERE id IN (' . implode(',', array_map('intval', $kamiDocumentIds)) . ')'
+                );
+                $logger->info('Done.  ' . $statement->rowCount() . ' kami_document rows affected.');
+            } else {
+                $logger->info(
+                    'Would have undeleted ' . count($kamiDocumentIds) .
+                    " kami_document rows for assessment $assessmentId."
+                );
+            }
+            $logger->debug('kamiDocumentIds: ' . implode(',', $kamiDocumentIds));
+        }
     }
 
+    /**
+     * Fix corrupted data problem 2.  See --help text for definition.
+     * @param int|null $assessmentId
+     */
     private function fixCorruptedDataProblem2(?int $assessmentId): void
     {
     }
 
+    /**
+     * Fix corrupted data problem 3.  See --help text for definition.
+     * @param int|null $assessmentId
+     */
     private function fixCorruptedDataProblem3(?int $assessmentId): void
     {
     }
@@ -142,7 +216,7 @@ var_dump($kamiDocumentIds);
  * You should generally try to fix those, even though in some special cases php will throw notices
  * for its own expected behaviours which will inadvertently cause this to fail
  */
-$options = [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
+$options = [CliKernelAbstract::OPTION_LEVEL => Monolog\Logger::DEBUG, CliKernelAbstract::OPTION_ERRORS => E_ALL,];
 
 /** @noinspection PhpUnhandledExceptionInspection */
 (new Schoolbox\Application\CliTool\Kernel($app, $options))->runApp();
