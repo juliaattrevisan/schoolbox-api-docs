@@ -5,6 +5,7 @@
 import { isAbortError, hasErrorMessage } from "@js/util/errorUtils";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import PastoralCountBadge from "@schoolboxLibrary/Pastoral/Count/vue/pastoral-count-badge.vue";
+import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
 import type { StudentPastoralCountBadge } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
 import type { Participant } from "../js/types/customParticipationTypes";
 
@@ -174,7 +175,38 @@ window.Vue.onMounted(() => {
                 </tr>
             </tbody>
         </table>
+        <bottom-drawer :show-drawer="selectedList.length > 0">
+            <h3 class="selected-count">
+                <em>{{ selectedList.length }} selected</em>
+            </h3>
+            <button class="button-clear" @click.prevent="selectedList.length = 0">Clear selection</button>
+            <div class="modal-actions">
+                <a title="Set goal" class="icon-modify button submit">Modify</a>
+                <a title="Set goal" class="icon-staff-students button submit">Exclude</a>
+                <a title="Set goal" class="icon-copy button submit">Copy Activity</a>
+                <a title="Set goal" class="icon-submissions button submit">New Activity</a>
+            </div>
+        </bottom-drawer>
     </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.selected-count {
+    display: inline-block;
+    margin-right: 0.5rem;
+}
+
+.button-clear {
+    display: inline-block;
+    padding: 0px;
+    background: none;
+    vertical-align: baseline;
+    font-size: 0.8rem;
+}
+.modal-actions {
+    display: flex;
+    a {
+        margin: 0 1px;
+    }
+}
+</style>
