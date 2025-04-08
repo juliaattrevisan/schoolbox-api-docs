@@ -37,6 +37,14 @@ abstract class Base
 
 
     /**
+     * The RoleType to assign to each event in this import
+     *
+     * @var string
+     */
+    protected string $roleType = '';
+
+
+    /**
      * Base constructor.
      *
      * @param LoggerInterface                           $log
