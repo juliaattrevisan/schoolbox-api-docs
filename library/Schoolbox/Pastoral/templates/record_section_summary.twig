@@ -50,13 +50,16 @@
                     <dd class="small-8 medium-9 columns">{{ record.updatedAtDisplay.long }}</dd>
                 {% endif %}
 
-
-
                 {% if config.pastoral_point_enabled and record.points is not empty %}
                     <dt class="small-4 medium-3 columns">Points:</dt>
                     <dd class="small-8 medium-9 columns">
                         <sbx-label-pastoral-points points="{{ record.points }}"></sbx-label-pastoral-points>
                     </dd>
+                {% endif %}
+
+                {% if record.expiresAt is not empty %}
+                    <dt class="small-4 medium-3 columns">Expires At:</dt>
+                    <dd class="small-8 medium-9 columns">{{ record.expiresAt }}</dd>
                 {% endif %}
             </dl>
 
