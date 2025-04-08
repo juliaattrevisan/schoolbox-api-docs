@@ -181,10 +181,10 @@ window.Vue.onMounted(() => {
             </h3>
             <button class="button-clear" @click.prevent="selectedList.length = 0">Clear selection</button>
             <div class="modal-actions">
-                <a title="Set goal" class="icon-modify button submit">Modify</a>
-                <a title="Set goal" class="icon-staff-students button submit">Exclude</a>
-                <a title="Set goal" class="icon-copy button submit">Copy Activity</a>
-                <a title="Set goal" class="icon-submissions button submit">New Activity</a>
+                <a class="icon-modify submit">Modify</a>
+                <a class="icon-staff-students submit">Exclude</a>
+                <a class="icon-copy submit">Copy Activity</a>
+                <a class="icon-submissions submit">New Activity</a>
             </div>
         </bottom-drawer>
     </div>
