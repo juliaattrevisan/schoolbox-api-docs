@@ -163,11 +163,11 @@ window.Vue.onMounted(() => {
                                 move-to="#custom-participation-container"
                             >
                                 <li class="separator">Manage</li>
-                                <li><a>Modify</a></li>
-                                <li><a>Exclude</a></li>
+                                <li><a class="icon-modify">Modify</a></li>
+                                <li><a class="icon-staff-students">Exclude</a></li>
                                 <li class="separator">Create</li>
-                                <li><a>Copy Activity</a></li>
-                                <li><a>New Activity</a></li>
+                                <li><a class="icon-copy">Copy Activity</a></li>
+                                <li><a class="icon-submissions">New Activity</a></li>
                             </ul>
                         </div>
                     </td>
