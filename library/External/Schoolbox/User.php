@@ -459,6 +459,8 @@ class External_Schoolbox_User implements External_UserInterface
         $config = \Schoolbox\Config\Loader::getInstance();
         $params = [];
 
+        $staff = [];
+
         /* Staff Category blacklist
          */
         $staffCategorySql = $this->buildRestrictionSql('staffCategory', ',', (string)$config->get('staff_dir_category_restrict'));
@@ -484,7 +486,23 @@ class External_Schoolbox_User implements External_UserInterface
             ";
         }
 
-        return $this->internalDatabase->executeQuery($query, $params)->fetchAll();
+        $statement = $this->internalDatabase->executeQuery($query, $params);
+        /**
+         * array map to trim is needed for both these as browsers may be inserting \r\n and it also still needs to remove excessive ` ` or other whitespace
+         */
+        $positionTitlesBlacklist = array_map('trim', explode("\n", (string)$config->get('staff_dir_position_title_restrict')));
+        while ($row = $statement->fetch()) {
+            // filter out rows that collide with the config restriction
+            $staffPositionTitles = array_map('trim', explode(',', trim((string)($row['JobPositionDescription'] ?? null))));
+            $int = array_intersect($staffPositionTitles, $positionTitlesBlacklist);
+            if (!empty($int)) {
+                // position title has data and that data is in the blacklist, ignore this human
+                continue;
+            }
+            // position title either has no data, or is not in the blacklist use them
+            $staff[] = $row;
+        }
+        return $staff;
     }
 
 
