@@ -14,6 +14,7 @@ use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Calendar\Registry;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\DSN;
+use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile\Student\Model;
 use Schoolbox\GenericCollection;
@@ -43,7 +44,13 @@ class EDiary implements IStrategy
      * Filter to specific people; set to null to disable filtering
      * e.g. ['051301', 'SKK', 'BAU', '051365', '052546'];
      */
-    private const WATCHLIST = null;
+    private const WATCHLIST = [];
+
+
+    /**
+     * @var Watchlist
+     */
+    private Watchlist $watchlist;
 
 
     /**
@@ -111,6 +118,8 @@ class EDiary implements IStrategy
          * $this->from = $from;
          * $this->to = $to;
          */
+
+        $this->watchlist = new Watchlist();
     }
 
 
@@ -266,7 +275,7 @@ class EDiary implements IStrategy
 
         /* Only process people on the watchlist
          */
-        if (!$this->isOnWatchlist($userExternalId, self::WATCHLIST)) {
+        if (!$this->watchlist->isOnWatchlist($userExternalId, self::WATCHLIST)) {
             return;
         }
 
@@ -325,7 +334,7 @@ class EDiary implements IStrategy
 
         /* Only process people on the watchlist
          */
-        if (!$this->isOnWatchlist($userExternalId, self::WATCHLIST)) {
+        if (!$this->watchlist->isOnWatchlist($userExternalId, self::WATCHLIST)) {
             return;
         }
 
@@ -605,24 +614,5 @@ class EDiary implements IStrategy
          */
         $this->ediaryStats['counts']['numTassEvents'] += $nTassEvents;
         $this->ediaryStats['counts']['numSchoolboxEvents'] += $n;
-    }
-
-
-    /**
-     * Decide if $externalId is in $watchlist, which is a set of externalIds
-     *
-     * @param string|null $externalId
-     * @param array|null  $watchlist
-     * @return bool
-     */
-    private function isOnWatchlist(?string $externalId, ?array $watchlist): bool
-    {
-        /* "Everyone is on the watchlist"
-         */
-        if (null === $watchlist) {
-            return true;
-        }
-
-        return $watchlist && in_array($externalId, $watchlist, false);
     }
 }
