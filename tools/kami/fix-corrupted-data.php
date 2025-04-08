@@ -200,6 +200,72 @@ HELP;
      */
     private function fixCorruptedDataProblem2(?int $assessmentId): void
     {
+        $dbc = $this->getDatabaseInternal();
+        $logger = $this->getLogger();
+
+        $query = (
+            'SELECT kd.id AS kamiDocumentId, sb.assessment_id AS assessmentId
+            FROM kami_document kd
+            JOIN student_submission_file ssf ON (kd.student_submission_file_id = ssf.id)
+            JOIN student_submission ss ON (ssf.student_submission_id = ss.id)
+            JOIN submission_box sb ON (ss.box_id = sb.id)
+            WHERE kd.deleted_at IS NULL
+            AND kd.student_submission_file_id IS NULL
+            AND kd.worksheet_template_submission_box_id IS NULL'
+        );
+        $params = [];
+
+        if ($assessmentId !== null) {
+            $query .= "\nAND sb.assessment_id = ?";
+            $params[] = $assessmentId;
+        }
+
+        // Add ORDER BY to increase readability of logs.
+        $query .= "\nORDER BY sb.assessment_id ASC";
+        $rows = $dbc->executeQuery($query, $params)->fetchAll();
+
+        if (count($rows) === 0) {
+            $logger->info(
+                'Found 0 non-deleted kami_document rows not linked to any student_submission_file or' .
+                ' worksheet_template_submission_box.'
+            );
+            $logger->info('Nothing to do.');
+            return;
+        }
+
+        $kamiDocumentIdsByAssessmentId = [];
+        foreach ($rows as $row) {
+            if (!array_key_exists($row['assessmentId'], $kamiDocumentIdsByAssessmentId)) {
+                $kamiDocumentIdsByAssessmentId[$row['assessmentId']] = [];
+            }
+            $kamiDocumentIdsByAssessmentId[$row['assessmentId']][] = $row['kamiDocumentId'];
+        }
+
+        $logger->info(
+            'Found ' . count($rows) . ' non-deleted kami_document rows not linked to any student_submission_file or' .
+            ' worksheet_template_submission_box, in ' . count($kamiDocumentIdsByAssessmentId) . ' assessments.'
+        );
+
+        foreach ($kamiDocumentIdsByAssessmentId as $assessmentId => $kamiDocumentIds) {
+            if ($this->perform()) {
+                $logger->info(
+                    'Deleting ' . count($kamiDocumentIds) .
+                    " unlinked kami_document rows for assessment $assessmentId..."
+                );
+                $statement = $dbc->executeQuery(
+                    'UPDATE kami_document
+                    SET deleted_at = NOW()
+                    WHERE id IN (' . implode(',', array_map('intval', $kamiDocumentIds)) . ')'
+                );
+                $logger->info('Done.  ' . $statement->rowCount() . ' kami_document rows affected.');
+            } else {
+                $logger->info(
+                    'Would have deleted ' . count($kamiDocumentIds) .
+                    " unlinked kami_document rows for assessment $assessmentId."
+                );
+            }
+            $logger->debug('kamiDocumentIds: ' . implode(',', $kamiDocumentIds));
+        }
     }
 
     /**
