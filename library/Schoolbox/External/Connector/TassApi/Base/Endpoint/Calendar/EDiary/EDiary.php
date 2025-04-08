@@ -47,6 +47,20 @@ class EDiary implements IStrategy
 
 
     /**
+     * Some stats about what we saw in ediary data
+     *
+     * @var array
+     */
+    private array $ediaryStats = [
+        'missingEventTypes' => [],
+        'counts' => [
+            'numTassEvents' => 0,
+            'numSchoolboxEvents' => 0,
+        ]
+    ];
+
+
+    /**
      * Constructor
      *
      * @param LoggerInterface                            $log
@@ -168,6 +182,14 @@ class EDiary implements IStrategy
         } else {
             $this->log->info('No feed data found; skipping');
         }
+
+        /* Reforge the summary into something nice
+         */
+        $this->registry->remember('ediary', [
+            sprintf('Found %s events in tass', $this->ediaryStats['counts']['numTassEvents']),
+            sprintf('Imported %s events into schoolbox', $this->ediaryStats['counts']['numSchoolboxEvents']),
+            $this->ediaryStats['missingEventTypes']
+        ]);
     }
 
 
@@ -381,18 +403,7 @@ class EDiary implements IStrategy
          */
         $missingEventTypes = [];
 
-        /* Message to log to cli, and also to remember for the summary
-         */
-        $summaryTass = sprintf(
-            'Found %s events at endpoint %s between %s and %s',
-            \count($tassEvents['calendar']),
-            $endpoint,
-            $this->from->getUsingFormat('d/m/Y'),
-            $this->to->getUsingFormat('d/m/Y')
-        );
-
-        $this->log->info($summaryTass);
-
+        $nTassEvents = \count($tassEvents['calendar']) ?? 0;
         $n = 0;
 
         foreach ($tassEvents['calendar'] as $tassEvent) {
@@ -577,36 +588,20 @@ class EDiary implements IStrategy
             unset($endDatetime);
         }
 
-//        /* Tell someone these need to be configured in admin
-//         */
-//        $brokenEventTypes = [];
-//
-//        if (\count($missingEventTypes)) {
-//            foreach ($missingEventTypes as $missingEventType) {
-//                $brokenEventTypeMessage = sprintf(
-//                    'Add this event type in admin: %s',
-//                    $missingEventType
-//                );
-//
-//                $this->log->warning($brokenEventTypeMessage);
-//                $brokenEventTypes[] = $brokenEventTypeMessage;
-//            }
-//        }
+        /* Tell someone these need to be configured in admin
+         * Continually create a growing list of missing event types that need to be made,
+         * accumulated from all the endpoint accesses.
+         */
+        if (\count($missingEventTypes)) {
+            foreach ($missingEventTypes as $missingEventType) {
+                $this->ediaryStats['missingEventTypes'][$missingEventType] = $missingEventType;
+            }
+        }
 
-//        /* Remember for the summary
-//         */
-//        $summarySchoolbox = sprintf(
-//            'Imported %s events into schoolbox',
-//            $n
-//        );
-//
-//        $summaryData = [
-//            $summaryTass,
-//            $summarySchoolbox,
-//            $brokenEventTypes
-//        ];
-//
-//        $this->registry->remember($endpoint, $summaryData);
+        /* Add this count to the global count
+         */
+        $this->ediaryStats['counts']['numTassEvents'] += $nTassEvents;
+        $this->ediaryStats['counts']['numSchoolboxEvents'] += $n;
     }
 
 
