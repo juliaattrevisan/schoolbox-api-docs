@@ -328,11 +328,33 @@ abstract class Kernel
     }
 
     /**
-     * Register any error handling required
+     * Registers `$this->onError` as the error handling callback, and preserves
+     * the previous error handling callback to be called prior to that method.
      *
      * @return void
      */
-    abstract protected function registerErrorHandling(): void;
+    protected function registerErrorHandling(): void
+    {
+        $this->previousErrorHandler = set_error_handler(
+            function ($code, $message, $file, $line) {
+                if (is_callable($this->previousErrorHandler)) {
+                    call_user_func($this->previousErrorHandler, $code, $message, $file, $line);
+                }
+                return $this->onError($code, $message, $file, $line);
+            }
+        );
+    }
+
+    /**
+     * Error handling callback.
+     *
+     * @param int    $errNum
+     * @param string $errStr
+     * @param string $errFile
+     * @param int    $errLine
+     * @return bool
+     */
+    abstract protected function onError($errNum, $errStr, $errFile, $errLine): bool;
 
     /**
      * Register any out-the-top exception handling required

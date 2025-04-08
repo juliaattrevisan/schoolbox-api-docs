@@ -187,7 +187,7 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
      * @throws ErrorException
      * @throws \Psr\Container\ContainerExceptionInterface|\Psr\Container\NotFoundExceptionInterface
      */
-    public function onError($errNum, $errStr, $errFile, $errLine): ?bool
+    protected function onError($errNum, $errStr, $errFile, $errLine): bool
     {
         if (!(error_reporting() & $errNum)) {
             // This error code is not included in error_reporting:
@@ -376,22 +376,22 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
     }
 
 
-    /**
-     * Register any error handling required
-     *
-     * @return void
-     */
-    protected function registerErrorHandling(): void
-    {
-        $this->previousErrorHandler = \set_error_handler(
-            function ($code, $message, $file, $line) {
-                if (is_callable($this->previousErrorHandler)) {
-                    call_user_func($this->previousErrorHandler, $code, $message, $file, $line);
-                }
-                return $this->onError($code, $message, $file, $line);
-            }
-        );
-    }
+//    /**
+//     * Register any error handling required
+//     *
+//     * @return void
+//     */
+//    protected function registerErrorHandling(): void
+//    {
+//        $this->previousErrorHandler = \set_error_handler(
+//            function ($code, $message, $file, $line) {
+//                if (is_callable($this->previousErrorHandler)) {
+//                    call_user_func($this->previousErrorHandler, $code, $message, $file, $line);
+//                }
+//                return $this->onError($code, $message, $file, $line);
+//            }
+//        );
+//    }
 
 
     /**
