@@ -18,7 +18,6 @@ namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Calendar;
  */
 class Registry
 {
-
     /**
      * @var array
      */
