@@ -21,7 +21,7 @@ use Schoolbox\GenericCollection;
  * different endpoints/configs. I'm not sure why they're all identical
  * in Tass, but there's a lot of things about them that I don't understand.
  *
- * Anyway, I though of deploying these functionalities into a Helper class
+ * Anyway, I thought of deploying these functionalities into a Helper class
  * but consciously opted for this instead.
  *
  * @package Schoolbox\External\Connector\TassApi\Base\Endpoint\Calendar
@@ -93,7 +93,6 @@ class Base
      */
     public function import(): void
     {
-
         /* A list of missing event types which the admin needs to configure in schoolbox
          */
         $missingEventTypes = [];
