@@ -13,7 +13,6 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\DSN;
 use Schoolbox\GenericCollection;
-use Schoolbox\RoleMapper;
 
 /**
  * Class Base
@@ -40,7 +39,6 @@ class Base
      * @param \Schoolbox\External\Event\Mapper          $eventMapper
      * @param \Schoolbox\External\Event\Roletype\Mapper $roletypeRelationMapper
      * @param \Schoolbox\External\Event\Campus\Mapper   $campusRelationMapper
-     * @param RoleMapper                                $roleMapper
      * @param string                                    $source
      * @param Registry                                  $registry
      * @param \Alaress_Date_Format                      $from
@@ -55,7 +53,6 @@ class Base
         private \Schoolbox\External\Event\Mapper $eventMapper,
         private \Schoolbox\External\Event\Roletype\Mapper $roletypeRelationMapper,
         private \Schoolbox\External\Event\Campus\Mapper $campusRelationMapper,
-        private RoleMapper $roleMapper,
         private string $source,
         private Registry $registry,
         private \Alaress_Date_Format $from,
