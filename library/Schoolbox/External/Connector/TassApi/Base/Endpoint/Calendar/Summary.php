@@ -19,27 +19,12 @@ use Schoolbox\External\Importer\Endpoint\IStrategy;
  */
 class Summary implements IStrategy
 {
-
-    /**
-     * @var LoggerInterface
-     */
-    protected LoggerInterface $log;
-
-
-    /**
-     * @var Registry
-     */
-    private Registry $registry;
-
-
     /**
      * @param LoggerInterface $log
      * @param Registry        $registry
      */
-    public function __construct(LoggerInterface $log, Registry $registry)
+    public function __construct(private LoggerInterface $log, private Registry $registry)
     {
-        $this->log = $log;
-        $this->registry = $registry;
     }
 
 
