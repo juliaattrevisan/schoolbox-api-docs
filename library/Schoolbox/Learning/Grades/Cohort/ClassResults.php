@@ -319,7 +319,7 @@ class ClassResults
                     $graphInfo[$specificationId] = [
                         'displayMark'  => $humanReadableMark,
                         'gradientMark' => $this->gradeGradientEnabled ? (int)($normalisedMark / 10) : 'none',
-                        'info'         => Scrub::html2text($comment),
+                        'info'         => Scrub::text(Scrub::html2text($comment)),
                     ];
                 } else {
                     /* Otherwise, nothing to show

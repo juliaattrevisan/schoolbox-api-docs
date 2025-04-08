@@ -218,7 +218,7 @@ class Helper
                         $graphInfoValue = [
                             'displayMark'  => $humanReadableMark,
                             'gradientMark' => $gradeGradient ? (int)($normalisedMark / 10) : 'none',
-                            'info'         => Scrub::html2text($comment),
+                            'info'         => Scrub::text(Scrub::html2text($comment)),
                         ];
                     }
                 }
