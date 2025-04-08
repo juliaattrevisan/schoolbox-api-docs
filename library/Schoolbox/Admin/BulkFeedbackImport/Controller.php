@@ -162,7 +162,7 @@ class Controller extends Base
             $this->filesystemProxy,
             $this->userMapper,
             $this->folderMapper,
-            $this->l10nMapper,
+            $this->rosettaStone,
             $settings['assessmentTitle'],
             $settings['worktype'],
             $settings['publishAt'],
