@@ -156,6 +156,19 @@ window.Vue.onMounted(() => {
                             <nav>
                                 <sbx-pop-out :content-id="`participant-${participant.user.id}`"></sbx-pop-out>
                             </nav>
+                            <ul
+                                :id="`participant-${participant.user.id}`"
+                                data-dropdown-content=""
+                                class="f-dropdown"
+                                move-to="#custom-participation-container"
+                            >
+                                <li class="separator">Manage</li>
+                                <li><a>Modify</a></li>
+                                <li><a>Exclude</a></li>
+                                <li class="separator">Create</li>
+                                <li><a>Copy Activity</a></li>
+                                <li><a>New Activity</a></li>
+                            </ul>
                         </div>
                     </td>
                 </tr>
