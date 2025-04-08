@@ -21,6 +21,7 @@ use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Exception;
 use Schoolbox\Resource\Storage\FilesystemProxy;
+use Schoolbox\L10n\RosettaStone;
 use Twig\Error\Error;
 
 class Controller extends Base
@@ -42,6 +43,7 @@ class Controller extends Base
         private \Schoolbox\UserMapper $userMapper,
         private \Schoolbox\Resource\Folder\Mapper $folderMapper,
         private \Schoolbox\Resource\Storage\Mapper $storageMapper,
+        protected RosettaStone $rosettaStone,
     ) {
     }
 
@@ -111,6 +113,7 @@ class Controller extends Base
             $this->filesystemProxy,
             $this->userMapper,
             $this->folderMapper,
+            $this->rosettaStone,
             $settings['assessmentTitle'],
             $settings['worktype'],
             $settings['publishAt'],
@@ -159,6 +162,7 @@ class Controller extends Base
             $this->filesystemProxy,
             $this->userMapper,
             $this->folderMapper,
+            $this->l10nMapper,
             $settings['assessmentTitle'],
             $settings['worktype'],
             $settings['publishAt'],
