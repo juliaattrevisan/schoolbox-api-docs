@@ -56,7 +56,7 @@ class EDiary implements IStrategy
         'counts' => [
             'numTassEvents' => 0,
             'numSchoolboxEvents' => 0,
-        ]
+        ],
     ];
 
 
@@ -185,10 +185,13 @@ class EDiary implements IStrategy
 
         /* Reforge the summary into something nice
          */
+        $sortedEventTypes = $this->ediaryStats['missingEventTypes'];
+        sort($sortedEventTypes);
+
         $this->registry->remember('ediary', [
             sprintf('Found %s events in tass', $this->ediaryStats['counts']['numTassEvents']),
             sprintf('Imported %s events into schoolbox', $this->ediaryStats['counts']['numSchoolboxEvents']),
-            $this->ediaryStats['missingEventTypes']
+            $sortedEventTypes
         ]);
     }
 
