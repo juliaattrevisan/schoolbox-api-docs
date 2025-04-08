@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Application;
 
-use Alaress\Sentry\Tracing\Tracer;
 use Aura\Di\Container;
 use Alaress\Exception\IO\IOException;
 use ErrorException;
@@ -25,6 +24,7 @@ use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Deprecation\Registry;
 use Sentry\Monolog\Handler as SentryHandler;
 use Sentry\State\HubInterface;
+use Throwable;
 
 /**
  * Common implementation for all Cli Kernels
@@ -94,7 +94,7 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
 
     /**
      * @inheritDoc
-     * @throws \Throwable
+     * @throws Throwable
      */
     protected function postInstallDependencies(bool $bypassMaintenanceModeCheck = false): void
     {
@@ -126,9 +126,10 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
 
 
     /**
-     * @param \Exception $e
+     * This exception handler just logs and exits after calling any exception
+     * callbacks.
      */
-    public function onException($e): void
+    protected function onException(Throwable $e): void
     {
         $this->callExceptionCallbacks($e);
         try {
@@ -326,34 +327,6 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
 
 
     /**
-     * Register any out-the-top exception handling required
-     *
-     * @return void
-     */
-    protected function registerExceptionHandling(): void
-    {
-        $this->previousExceptionHandler = \set_exception_handler(
-            function ($e) {
-                if (is_callable($this->previousExceptionHandler)) {
-                    // The previous handler may rethrow the same exception.
-                    // If it does, catch and shutdown as per normal:
-                    // if it's different, something truly exceptional happened
-                    // so rethrow.
-                    try {
-                        call_user_func($this->previousExceptionHandler, $e);
-                    } catch (\Throwable $rethrow) {
-                        if ($rethrow !== $e) {
-                            throw $rethrow;
-                        }
-                    }
-                }
-                $this->onException($e);
-            }
-        );
-    }
-
-
-    /**
      * Register any shutdown handling required
      *
      * @return void
@@ -364,24 +337,6 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
         parent::registerShutdownHandling();
         $this->getShutdownHandler()->registerFunction([$this, 'onShutdown']);
     }
-
-
-//    /**
-//     * Register any error handling required
-//     *
-//     * @return void
-//     */
-//    protected function registerErrorHandling(): void
-//    {
-//        $this->previousErrorHandler = \set_error_handler(
-//            function ($code, $message, $file, $line) {
-//                if (is_callable($this->previousErrorHandler)) {
-//                    call_user_func($this->previousErrorHandler, $code, $message, $file, $line);
-//                }
-//                return $this->onError($code, $message, $file, $line);
-//            }
-//        );
-//    }
 
 
     /**

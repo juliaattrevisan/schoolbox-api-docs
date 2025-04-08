@@ -372,11 +372,41 @@ abstract class Kernel
     abstract protected function onError(int $errNum, string $errStr, string $errFile, int $errLine): bool;
 
     /**
-     * Register any out-the-top exception handling required
+     * Registers `$this->onException` as the exception handling callback, and
+     * preserves the previous exception handling callback to be called prior to
+     * that method.
      *
      * @return void
      */
-    abstract protected function registerExceptionHandling(): void;
+    protected function registerExceptionHandling(): void
+    {
+        $this->previousExceptionHandler = set_exception_handler(
+            function ($e) {
+                if (is_callable($this->previousExceptionHandler)) {
+                    // The previous handler may rethrow the same exception.
+                    // If it does, catch and shutdown as per normal:
+                    // if it's different, something truly exceptional happened
+                    // so rethrow.
+                    try {
+                        call_user_func($this->previousExceptionHandler, $e);
+                    } catch (Throwable $rethrow) {
+                        if ($rethrow !== $e) {
+                            throw $rethrow;
+                        }
+                    }
+                }
+                $this->onException($e);
+            }
+        );
+    }
+
+    /**
+     * Exception handling callback.
+     *
+     * @param Throwable $e
+     * @return void
+     */
+    abstract protected function onException(Throwable $e): void;
 
     /**
      * Register any shutdown handling required
