@@ -106,8 +106,8 @@ HELP;
         }
 
         try {
-            $this->fixCorruptedDataProblem1($assessmentId);
-            $this->fixCorruptedDataProblem2($assessmentId);
+//            $this->fixCorruptedDataProblem1($assessmentId);
+//            $this->fixCorruptedDataProblem2($assessmentId);
             $this->fixCorruptedDataProblem3($assessmentId);
         } catch (RuntimeException $e) {
             $this->getLogger()->warning($e->getMessage());
@@ -148,7 +148,7 @@ HELP;
         }
 
         // Add ORDER BY to increase readability of logs.
-        $query .= "\nORDER BY sb.assessment_id ASC";
+        $query .= "\nORDER BY sb.assessment_id ASC, kd.id ASC";
 
         $rows = $dbc->executeQuery($query, $params)->fetchAll();
 
@@ -221,7 +221,7 @@ HELP;
         }
 
         // Add ORDER BY to increase readability of logs.
-        $query .= "\nORDER BY sb.assessment_id ASC";
+        $query .= "\nORDER BY sb.assessment_id ASC, kd.id ASC";
         $rows = $dbc->executeQuery($query, $params)->fetchAll();
 
         if (count($rows) === 0) {
@@ -271,9 +271,117 @@ HELP;
     /**
      * Fix corrupted data problem 3.  See --help text for definition.
      * @param int|null $assessmentId
+     *
+     * Non-deleted submission_return rows linked to deleted student_submission rows.
+     * Solution:
+     * For each non-deleted submission_return row linked to a deleted student_submission row...
+     * Find the student_submission row that was most recently submitted at the time the submission_return row was
+     * created.
+     * If found, link the non-deleted submission_return row to that row.
+     * Else make note of problem not fixed.
      */
     private function fixCorruptedDataProblem3(?int $assessmentId): void
     {
+        $dbc = $this->getDatabaseInternal();
+        $logger = $this->getLogger();
+
+        $query = (
+            'SELECT
+            sr.id AS submissionReturnId,
+            sr.created_at AS submissionReturnCreatedAt,
+            sr.owner AS submissionReturnOwnerUserId,
+            sr.student_submission_id AS submissionReturnStudentSubmissionId,
+            sb.assessment_id AS assessmentId
+            FROM submission_return sr
+            JOIN student_submission ss ON (sr.student_submission_id = ss.id)
+            JOIN submission_box sb ON (ss.box_id = sb.id)
+            WHERE sr.deleted_at IS NULL
+            AND ss.deleted_at IS NOT NULL
+            AND EXISTS(
+                SELECT *
+                FROM kami_document kd
+                JOIN student_submission_file ssf ON (kd.student_submission_file_id = ssf.id)
+                WHERE ssf.student_submission_id = ss.id
+            )'
+        );
+        $params = [];
+
+        if ($assessmentId !== null) {
+            $query .= "\nAND sb.assessment_id = ?";
+            $params[] = $assessmentId;
+        }
+
+        // Add ORDER BY to increase readability of logs.
+        $query .= "\nORDER BY sb.assessment_id ASC, sr.id ASC";
+        $rows = $dbc->executeQuery($query, $params)->fetchAll();
+
+        if (count($rows) === 0) {
+            $logger->info('Found 0 non-deleted submission_return rows linked to deleted student_submission rows.');
+            $logger->info('Nothing to do.');
+            return;
+        }
+
+        $submissionReturnRowsByAssessmentId = [];
+        foreach ($rows as $row) {
+            if (!array_key_exists($row['assessmentId'], $submissionReturnRowsByAssessmentId)) {
+                $submissionReturnRowsByAssessmentId[$row['assessmentId']] = [];
+            }
+            $submissionReturnRowsByAssessmentId[$row['assessmentId']][] = [
+                'id' => $row['submissionReturnId'],
+                'createdAt' => $row['submissionReturnCreatedAt'],
+                'ownerUserId' => $row['submissionReturnOwnerUserId'],
+                'studentSubmissionId' => $row['submissionReturnStudentSubmissionId'],
+            ];
+        }
+
+        $logger->info(
+            'Found ' . count($rows) . ' non-deleted submission_return rows linked to deleted student_submission rows,' .
+            ' in ' . count($submissionReturnRowsByAssessmentId) . ' assessments.'
+        );
+
+        foreach ($submissionReturnRowsByAssessmentId as $assessmentId => $submissionReturnRows) {
+            $logger->info(
+                'Considering ' . count($submissionReturnRows) .
+                " submission_return rows linked to assessment $assessmentId."
+            );
+            foreach ($submissionReturnRows as $submissionReturnRow) {
+                $logger->info(
+                    " * Considering submission_return {$submissionReturnRow['id']}," .
+                    " linked to deleted student_submission {$submissionReturnRow['studentSubmissionId']}."
+                );
+                $candidateStudentSubmissionIds = $dbc->executeQuery(
+                    // Find the student_submission row that was most recently
+                    // submitted at the time the submission_return row was created.
+                    'SELECT ss.id
+                    FROM student_submission ss
+                    JOIN submission_box sb ON (ss.box_id = sb.id)
+                    WHERE sb.assessment_id = :assessmentId
+                    AND ss.owner = :ownerUserId
+                    AND ss.submitted_at < :submissionReturnCreatedAt
+                    AND ss.deleted_at IS NULL
+                    ORDER BY ss.submitted_at DESC',
+                    [
+                        'assessmentId' => $assessmentId,
+                        'ownerUserId' => $submissionReturnRow['ownerUserId'],
+                        'submissionReturnCreatedAt' => $submissionReturnRow['createdAt'],
+                    ]
+                )->fetchAll();
+                $logger->info(
+                    '   Found ' . count($candidateStudentSubmissionIds) .
+                    ' candidate student_submission rows to link to instead.'
+                );
+                if (count($candidateStudentSubmissionIds) > 0) {
+                    $chosenStudentSubmissionId = $candidateStudentSubmissionIds[0]['id'];
+                    if ($this->perform()) {
+                    } else {
+                        $logger->info(
+                            "   Would have linked submission_return {$submissionReturnRow['id']} to" .
+                            " student_submission $chosenStudentSubmissionId."
+                        );
+                    }
+                }
+            }
+        }
     }
 };
 
