@@ -345,7 +345,17 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
         $this->previousExceptionHandler = \set_exception_handler(
             function ($e) {
                 if (is_callable($this->previousExceptionHandler)) {
-                    call_user_func($this->previousExceptionHandler, $e);
+                    // The previous handler may rethrow the same exception.
+                    // If it does, catch and shutdown as per normal:
+                    // if it's different, something truly exceptional happened
+                    // so rethrow.
+                    try {
+                        call_user_func($this->previousExceptionHandler, $e);
+                    } catch (\Throwable $rethrow) {
+                        if ($rethrow !== $e) {
+                            throw $rethrow;
+                        }
+                    }
                 }
                 $this->onException($e);
             }
