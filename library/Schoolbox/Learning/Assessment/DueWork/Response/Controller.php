@@ -302,6 +302,34 @@ class Controller extends Base
     }
 
     /**
+     * Redirect user to inline grader of the first participant in the assessment list
+     *
+     * @param DueWork $assessment
+     * @return void
+     * @throws \Aura\Router\Exception\RouteNotFound
+     */
+    public function getFirstParticipantResponse(
+        DueWork $assessment,
+    ) {
+        $participants = $assessment->getAllParticipants()->filter(fn($participant) => !$participant->isExcluded());
+        $firstParticipant = $participants->first()?->getUser();
+
+        if ($firstParticipant instanceof User) {
+            $this->response = $this->redirectFound(
+                $this->routeGenerator->generate('learningDueWorkResponse.getParticularResponse', [
+                    'assessmentId' => $assessment->getId(),
+                    'assessment' => $assessment,
+                    'studentId' => $firstParticipant->getId(),
+                ])
+            );
+            return;
+        }
+        /* If the participant list is empty, nothing can be shown
+         */
+        throw $this->errorMapper->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+    }
+
+    /**
      * Display a kami document in an iFrame
      *
      * @api   /learning/kami/{kamiId}
