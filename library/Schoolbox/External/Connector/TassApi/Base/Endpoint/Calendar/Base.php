@@ -26,7 +26,7 @@ use Schoolbox\GenericCollection;
  *
  * @package Schoolbox\External\Connector\TassApi\Base\Endpoint\Calendar
  */
-class Base
+abstract class Base
 {
     /**
      * Base constructor.
