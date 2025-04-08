@@ -255,7 +255,7 @@ class Processor
 
             if (\count($candidateAssessments) > 1) {
                 $this->log(sprintf(
-                    'Row %s: multiple assessments found for assessment "%s" in folder "%s" (%s) using worktype "%s" (%s).
+                    'Row %s: multiple assessments found for assessment "%s" in folder "%s" (%s) using Work Type "%s" (%s).
                     Please ensure assessments are uniquely identifiable before continuing.',
                     $i,
                     $this->assessmentTitle,
@@ -274,7 +274,7 @@ class Processor
              */
             if (0 === \count($candidateAssessments)) {
                 $this->log(sprintf(
-                    'Row %s: no assessments found for "%s" in folder "%s" (%s) using worktype "%s" (%s).',
+                    'Row %s: no assessments found for "%s" in folder "%s" (%s) using Work Type "%s" (%s).',
                     $i,
                     $this->assessmentTitle,
                     $folder['title'],
