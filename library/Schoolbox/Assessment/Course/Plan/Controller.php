@@ -206,7 +206,7 @@ class Controller extends Base
         /**
          * Grab the list of Course Builders from the Unit Template
          */
-        [$courseBuilderTemplate, $activityKey] = $this->getTemplateCourseBuilder($course->getTemplate()?->getUnitTemplate()->getId());
+        [$courseBuilderTemplate, $activityKey, $activityDefId] = $this->getTemplateCourseBuilder($course->getTemplate()?->getUnitTemplate()->getId());
 
         /**
          * for each unit, generate the data...
@@ -225,6 +225,7 @@ class Controller extends Base
                     $activityKey,
                     $textboxDefId,
                     $curriculumDefId,
+                    $activityDefId
                 );
             }
         }
@@ -495,7 +496,7 @@ class Controller extends Base
 
             // return json of that unit specifically with components identically as the unit planner unit payload (part payload)
             [$curriculumTemplate, $curriculumKey, $curriculumDefId] = $this->getTemplateCurric($course->getTemplate()?->getUnitTemplate()->getId());
-            [$activityTemplate, $activityKey] = $this->getTemplateCourseBuilder($course->getTemplate()?->getUnitTemplate()->getId());
+            [$activityTemplate, $activityKey, $activityDefId] = $this->getTemplateCourseBuilder($course->getTemplate()?->getUnitTemplate()->getId());
             // Textbox and curriculum def ID can be null for now:
             // AFAICT this is unused
             $this->response = $this->responseAsJson(
@@ -506,6 +507,7 @@ class Controller extends Base
                     $activityKey,
                     null,
                     $curriculumDefId,
+                    $activityDefId
                 )
             )
                 ->withStatus(201);
@@ -758,6 +760,7 @@ class Controller extends Base
      * @param array    $curriculumKey   what curriculum components titles exist in the component, if any
      * @param int|null $textboxDefId    The definition ID of the textbox component, if any
      * @param int|null $curriculumDefId The definition ID of the curriculum component, if any
+     * @param int|null $curriculumDefId The definition ID of the course builder, if any
      * @return array
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \Schoolbox\Mapper\Exception\Deleted
@@ -769,7 +772,8 @@ class Controller extends Base
         array $curriculumKey,
         array $activityKey,
         ?int $textboxDefId,
-        ?int $curriculumDefId
+        ?int $curriculumDefId,
+        ?int $activityDefId
     ): array {
         /* Gather up the textboxes and extraTextboxes meta
          */
@@ -907,6 +911,8 @@ class Controller extends Base
             'createComponent'  => ($curriculumDefId && $hasUnitFolderWriteAccess) ? '/homepage/configForm.php' : null,
             'modifyCurriculum' => $this->getRouteIfAuthorized('curriculumApiUsageFolder.postFolderUsage', $folderParams) ?: null,
         ];
+        $activities['_routes']['createComponent'] = ($activityDefId && $hasUnitFolderWriteAccess) ? '/homepage/configForm.php' : null;
+
 
 
         /* Aggregated data for each unit appears as a row in the Unit Planner
@@ -1025,8 +1031,12 @@ class Controller extends Base
         $componentTemplate = [];
         $componentKey = [];
         $componentList = $this->componentInstanceMapper->findByContextAndClass($module, $courseTemplateId, $class);
+        $componentDefId = null;
 
         foreach ($componentList as $component) {
+            // grab the component ID, for use later
+            $componentDefId = $component->getDefinitionId();
+
             if ('' !== (string)$component->getConfigByKey('componentname')->getValue()) {
                 // if there is a value set for the component use that
                 $heading = trim($component->getConfigByKey('componentname')->getValue());
@@ -1043,7 +1053,7 @@ class Controller extends Base
             ];
             $componentKey[] = strtolower($heading);
         }
-        return [$componentTemplate, $componentKey];
+        return [$componentTemplate, $componentKey, $componentDefId];
     }
 
 

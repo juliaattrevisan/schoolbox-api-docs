@@ -96,6 +96,7 @@ export interface UnitTemplateTextboxComponent extends UnitTemplateComponent {
 export type UnitTemplate = {
     textboxDefId: null | number; // the textbox component definition ID
     curriculumDefId: null | number; // the curriculum component definition ID
+    activityDefId: null | number; // the course builder definition ID
     curriculum: UnitTemplateComponent[]; // Curriculum Overview components
     textboxes: UnitTemplateTextboxComponent[]; // Textbox components
     activities: UnitTemplateComponent[]; // course builder components

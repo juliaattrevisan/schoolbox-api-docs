@@ -8,9 +8,6 @@ import { useActivitiesListDragStore } from "./activities-list/store/activitiesLi
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import type {CurriculumOverviewComponent, Unit} from "./unitPlannerTypes";
 import type { Column } from "./unitPlannerConfig";
-import {
-  useUnitPlannerCurriculumStore
-} from "@schoolboxAssessment/Course/Plan/templates/vue/store/unitPlannerCurriculumStore";
 
 interface Props {
     unit: Unit; // the unit linked to the curriculum cell
@@ -26,9 +23,8 @@ const activitiesListStoreId = `${props.unit.id}-${props.column.id}`;
 const activitiesListStore = useActivitiesListStore(activitiesListStoreId);
 const activitiesListDragStore = useActivitiesListDragStore(activitiesListStoreId);
 
-const curriculumStore = useUnitPlannerCurriculumStore();
 const component = window.Vue.ref<CurriculumOverviewComponent | null>(
-    curriculumStore.getComponent(props.unit.activities.components, props.column),
+    activitiesListStore.getComponent(props.unit.activities.components, props.column),
 );
 
 window.Vue.onMounted(() => {
