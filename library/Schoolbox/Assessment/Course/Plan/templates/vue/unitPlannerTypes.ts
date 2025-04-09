@@ -42,7 +42,7 @@ export type Unit = {
     folderId: number;
     activities: {
         _routes: ActivitiesListRoutes;
-        items: Activity[];
+        items: Partial<Record<string, Activity>>;
     };
     curriculum: {
         _routes: {
@@ -71,6 +71,7 @@ export type Unit = {
     };
 
     extraTextboxes: number;
+    extraActivities: number;
     sequence: number;
 };
 
@@ -96,4 +97,5 @@ export type UnitTemplate = {
     curriculumDefId: null | number; // the curriculum component definition ID
     curriculum: UnitTemplateComponent[]; // Curriculum Overview components
     textboxes: UnitTemplateTextboxComponent[]; // Textbox components
+    courseBuilder: UnitTemplateComponent[]; // Textbox components
 };

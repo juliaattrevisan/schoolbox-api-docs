@@ -22,6 +22,7 @@ use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Component\CurriculumOverviewController;
 use Schoolbox\Curriculum\Node\Mapper;
+use Schoolbox\Learning\Assessment\Component\Homepage\Builder\Controller as CourseBuilderController;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Translator\UnitAssessments;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
@@ -239,6 +240,33 @@ class Controller extends Base
             $textboxKey[] = strtolower($heading);
         }
 
+        /** template course builder
+         */
+        /**
+         * Grab the list of Course Builders from the Unit Template
+         */
+        $module = \Component_Definition::MODULE_HOMEPAGE_TEMPLATE;
+        $class = CourseBuilderController::class;
+        $courseBuilderTemplate = [];
+        $templateComponents = $this->componentInstanceMapper->findByContextAndClass($module, $course->getTemplate()?->getUnitTemplate()->getId(), $class);
+
+        foreach ($templateComponents as $courseBuilderComponent) {
+            if ('' !== (string)$courseBuilderComponent->getConfigByKey('componentname')->getValue()) {
+                // if there is a value set for the component use that
+                $heading = trim($courseBuilderComponent->getConfigByKey('componentname')->getValue());
+            } elseif ('' !== $courseBuilderComponent->getConfigByKey('componentname')->getDefaultValue()) {
+                // is there a system default value for the component
+                $heading = trim($courseBuilderComponent->getConfigByKey('componentname')->getDefaultValue());
+            } else {
+                // Fallback of the php default title for textbox components
+                $heading = trim(CourseBuilderController::DEFAULT_COMPONENT_HEADING);
+            }
+
+            $courseBuilderTemplate[] = [
+                'heading' => $heading,
+            ];
+        }
+
         /**
          * for each unit, generate the data...
          *
@@ -267,6 +295,7 @@ class Controller extends Base
                 'curriculumDefId' => $curriculumDefId,
                 'textboxes' => $textboxTemplate,
                 'curriculum' => $curriculumTemplate,
+                'builder' => $courseBuilderTemplate
             ]
         ], "Unit Planner - {$course->getTitle()}");
     }
@@ -744,6 +773,112 @@ class Controller extends Base
         return $rubrics;
     }
 
+    /**
+     * Get Course Builder (all assessments)
+     */
+    private function findCourseBuilder(?int $unitTemplateId, Model $unit)
+    {
+        /* In case the course wasn't hydrated with all the parts
+                 */
+        if (null === $unitTemplateId) {
+            return [
+                'courseBuilder' => [],
+                'extraBuilders' => 0,
+            ];
+        }
+
+        /**
+         * Grab the list of Course Builders from the Unit Template
+         */
+        $module = \Component_Definition::MODULE_HOMEPAGE_TEMPLATE;
+        $class = CourseBuilderController::class;
+        $courseBuilder = [];
+        $courseBuilderKeys = [];
+        $templateComponents = $this->componentInstanceMapper->findByContextAndClass($module, $unitTemplateId, $class);
+
+        foreach ($templateComponents as $courseBuilderComponent) {
+            if ('' !== (string)$courseBuilderComponent->getConfigByKey('componentname')->getValue()) {
+                // if there is a value set for the component use that
+                $heading = trim($courseBuilderComponent->getConfigByKey('componentname')->getValue());
+            } elseif ('' !== $courseBuilderComponent->getConfigByKey('componentname')->getDefaultValue()) {
+                // is there a system default value for the component
+                $heading = trim($courseBuilderComponent->getConfigByKey('componentname')->getDefaultValue());
+            } else {
+                // Fallback of the php default title for textbox components
+                $heading = trim(CourseBuilderController::DEFAULT_COMPONENT_HEADING);
+            }
+
+            /*
+             * Provide a default value for the textbox with a negative ID to indicate it doesn't exist
+             * The frontend will use this to determine whether the textbox needs to be created or not.
+             * This saves needing to manipulate the initial data on the frontend on the first mount
+             *
+             * NOTE: This is the base structure for textbox data expected by the unit planner as per:
+             *   TextboxContent in library/Schoolbox/Assessment/Course/Plan/templates/vue/unitPlannerTypes.ts
+             */
+            $courseBuilder[strtolower($heading)] = [
+                'componentId' => -1,
+                'textboxId' => -1,
+                'body' => '', // Empty string and not null as frontend expects a string (easier to handle in Vue)
+                'inTemplate' => false,
+                '_links' => [
+                    'update' => null,
+                ]
+            ];
+
+            $courseBuilderKeys[strtolower($heading)] = $heading;
+        }
+
+        // fetch all for the unit
+        /* Find all the courseBuilder in this Unit Spec that happens to match
+         * the ones in the template; circumstantially matching courseBuilder
+         * appear as columns in the Unit Planner. Ones that aren't in the
+         * template are called "extraBuilders"
+         */
+        $extraBuilders = 0;
+
+        $unitComponents = $this->componentInstanceMapper->findByContextAndClass($module, $unit->getFolder()->getId(), $class);
+
+        $assessments = $this->assessmentMapper->findAllByUnitSpecificationId($unit->getId(), [
+            'order' => [
+                'sequence' => 'ASC',
+            ],
+        ]);
+
+        foreach ($templateComponents as $courseBuilderComponent) {
+            if ('' !== (string)$courseBuilderComponent->getConfigByKey('componentname')->getValue()) {
+                // if there is a value set for the component use that
+                $heading = trim($courseBuilderComponent->getConfigByKey('componentname')->getValue());
+            } elseif ('' !== $courseBuilderComponent->getConfigByKey('componentname')->getDefaultValue()) {
+                // is there a system default value for the component
+                $heading = trim($courseBuilderComponent->getConfigByKey('componentname')->getDefaultValue());
+            } else {
+                // Fallback of the php default title for textbox components
+                $heading = trim(CourseBuilderController::DEFAULT_COMPONENT_HEADING);
+            }
+
+            // as each component looks at the same collection of assessments, just assign the exact same assessments to each component instance.
+            if (array_key_exists(strtolower($heading), $courseBuilder)) {
+                $courseBuilder[strtolower($heading)]['assessments'] = $assessments->map(new UnitAssessments(
+                    $this->routeGenerator,
+                    $this->getAuthorizer(),
+                    $this->getUser(),
+                    $this->getUser()
+                ));
+                $courseBuilder[strtolower($heading)]['inTemplate'] = true; // It exists in the template if we've gotten here
+            } else {
+                // increase the extra courseBuilder by 1
+                // usually a teacher has added an additional textbox component, may not be an issue, but good to inform the teachers there is something non standard in the unit.
+                $extraBuilders++;
+            }
+        }
+
+        return [
+            'courseBuilder' => array_combine($courseBuilderKeys, $courseBuilder),
+            'extraBuilders' => $extraBuilders,
+        ];
+    }
+
 
     /**
      * Build the tree of curriculum nodes for the specified unit
@@ -803,11 +938,21 @@ class Controller extends Base
         $textboxData = $this->findTextboxes($templateId, $unit->getFolder());
 
         // Learning Activities
-        $assessments = $this->assessmentMapper->findAllByUnitSpecificationId($unit->getId(), [
-            'order' => [
-                'sequence' => 'ASC',
-            ],
-        ]);
+//        $assessments = $this->assessmentMapper->findAllByUnitSpecificationId($unit->getId(), [
+//            'order' => [
+//                'sequence' => 'ASC',
+//            ],
+//        ]);
+//        ->map(new UnitAssessments(
+//            $this->routeGenerator,
+//            $this->getAuthorizer(),
+//            $this->getUser(),
+//            $this->getUser()
+//        ))
+        $assessments = $this->findCourseBuilder(
+            $templateId,
+            $unit
+        );
 
         /* Get a set of rubrics that were used among all the assessment specs
          * This also comes with all the cap ids and indicator ids
@@ -923,13 +1068,9 @@ class Controller extends Base
              */
             'activities' => [
                 '_routes' => $activitiesListRoutes,
-                'items'   => $assessments->map(new UnitAssessments(
-                    $this->routeGenerator,
-                    $this->getAuthorizer(),
-                    $this->getUser(),
-                    $this->getUser()
-                )),
+                'items'   => $assessments['courseBuilder'],
             ],
+            'extraActivities' => $assessments['extraBuilders'],
             /* All the rubric capabilities and indicators that are in use among all
              * the assessment specs in this unit
              */
