@@ -335,7 +335,7 @@ class LessonPlan
             key processes of the rock cycle occur over different timescales........
          */
         foreach ($results as $result) {
-            $lastNodeId = $result[\count($result)-1]->getId();
+            $lastNodeId = $result[\count($result) - 1]->getId();
 
             $str = '';
 
