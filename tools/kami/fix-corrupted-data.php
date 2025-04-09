@@ -106,8 +106,8 @@ HELP;
         }
 
         try {
-            $this->fixCorruptedDataProblem1($assessmentId);
-//            $this->fixCorruptedDataProblem2($assessmentId);
+//            $this->fixCorruptedDataProblem1($assessmentId);
+            $this->fixCorruptedDataProblem2($assessmentId);
 //            $this->fixCorruptedDataProblem3($assessmentId);
         } catch (RuntimeException $e) {
             $this->getLogger()->warning($e->getMessage());
@@ -222,9 +222,9 @@ HELP;
 
         // Add ORDER BY to increase readability of logs.
         $query .= "\nORDER BY sb.assessment_id ASC, kd.id ASC";
-        $rows = $dbc->executeQuery($query, $params)->fetchAll();
+        $statement = $dbc->executeQuery($query, $params);
 
-        if (count($rows) === 0) {
+        if ($statement->rowCount() === 0) {
             $logger->info(
                 'Found 0 non-deleted kami_document rows not linked to any student_submission_file or' .
                 ' worksheet_template_submission_box.'
@@ -234,7 +234,7 @@ HELP;
         }
 
         $kamiDocumentIdsByAssessmentId = [];
-        foreach ($rows as $row) {
+        while ($row = $statement->fetch()) {
             if (!array_key_exists($row['assessmentId'], $kamiDocumentIdsByAssessmentId)) {
                 $kamiDocumentIdsByAssessmentId[$row['assessmentId']] = [];
             }
@@ -242,8 +242,9 @@ HELP;
         }
 
         $logger->info(
-            'Found ' . count($rows) . ' non-deleted kami_document rows not linked to any student_submission_file or' .
-            ' worksheet_template_submission_box, in ' . count($kamiDocumentIdsByAssessmentId) . ' assessments.'
+            'Found ' . $statement->rowCount() . ' non-deleted kami_document rows not linked to any' .
+            ' student_submission_file or worksheet_template_submission_box, in ' .
+            count($kamiDocumentIdsByAssessmentId) . ' assessments.'
         );
 
         foreach ($kamiDocumentIdsByAssessmentId as $assessmentId => $kamiDocumentIds) {
