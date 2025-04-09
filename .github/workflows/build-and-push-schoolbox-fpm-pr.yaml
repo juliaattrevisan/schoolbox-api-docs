@@ -57,7 +57,6 @@ jobs:
           context: docker/base-images/php82-alpine
           tags: |
             ghcr.io/alaress/php82-alpine:pr-${{ github.event.pull_request.number }}
-        secrets: inherit
 
       - name: Build and push php82-fpm-alpine
         uses: ./.github/workflows/helper-build-and-push-to-ghcr.yaml
@@ -70,7 +69,6 @@ jobs:
           file: docker/base-images/php82-fpm-alpine/ghcr.Dockerfile
           tags: |
             ghcr.io/alaress/php82-fpm-alpine:pr-${{ github.event.pull_request.number }}
-        secrets: inherit
 
 #      # TODO work artifacts into push-to-dockerhub
 #      # Different build-and-push depending on trigger:
