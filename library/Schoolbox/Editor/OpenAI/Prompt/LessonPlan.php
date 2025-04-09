@@ -22,20 +22,6 @@ class LessonPlan
             [FIELDS]
     ";
 
-    /**
-     * Each field's basic synopsis: each %s represents, respectively,
-     *    Lesson Plan Template Field ID
-     *    Lesson Plan Template Field Title
-     *    Lesson Plan Template Field Body
-     *    Lesson Plan Template Field Description (which also contains extra ai instructions)
-     */
-    private const PROMPT_TEMPLATE_FIELD = '
-        id: %s.
-        title: %s.
-        body: %s.
-        %s
-    ';
-
 
     /**
      * This ends up being a semicolon+newline separated list of curriculum node names.
@@ -60,7 +46,8 @@ class LessonPlan
     public const RESPONSE_FORMAT = [
         'name' => 'fields_format',
         'type' => 'json_schema',
-        'items' => [
+        'strict' => true,
+        'schema' => [
             'type' => 'object',
             'properties' => [
                 'id' => [
@@ -255,13 +242,27 @@ class LessonPlan
             $fieldDescription = trim((string)$lessonPlanTemplateField->getDescription());
             $fieldBody = trim((string)$lessonPlanTemplateField->getBody());
 
-            $fields[] = sprintf(
-                self::PROMPT_TEMPLATE_FIELD,
-                $fieldId,
-                $fieldTitle,
-                $fieldBody,
-                $fieldDescription,
-            );
+            /* Accumulate data, conditionally, if provided
+             * Each field's basic synopsis: each %s represents, respectively,
+             *    Lesson Plan Template Field ID
+             *    Lesson Plan Template Field Title
+             *    Lesson Plan Template Field Body
+             *    Lesson Plan Template Field Description (which also contains extra ai instructions)
+             */
+            $val = '';
+
+            $val .= "{$fieldId}\n";
+            $val .= "{$fieldTitle}\n";
+
+            if ('' !== $fieldDescription) {
+                $val .= "{$fieldDescription}\n";
+            }
+
+            if ('' !== $fieldBody) {
+                $val .= "{$fieldBody}\n";
+            }
+
+            $fields[] = $val;
         }
 
         return implode("\n\n", $fields);
