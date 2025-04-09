@@ -8,26 +8,24 @@ class LessonPlan
      * A structure that AI is supposed to obey, but...I don't think it cares
      */
     public const RESPONSE_FORMAT = [
-        'format' => [
-            'type' => 'json_schema',
-            'name' => 'fields_format',
-            'schema' => [
-                'type' => 'object',
-                'properties' => [
-                    'id' => [
-                        'type' => 'string',
-                    ],
-                    'title' => [
-                        'type' => 'string',
-                    ],
-                    'body' => [
-                        'type' => 'string',
-                    ],
+        'type' => 'json_schema',
+        'name' => 'fields_format',
+        'schema' => [
+            'type' => 'object',
+            'properties' => [
+                'id' => [
+                    'type' => 'string',
                 ],
-                'required' => ['id', 'title', 'body']
+                'title' => [
+                    'type' => 'string',
+                ],
+                'body' => [
+                    'type' => 'string',
+                ],
             ],
-            'strict' => true
-        ]
+            'required' => ['id', 'title', 'body']
+        ],
+        'strict' => true
     ];
 
 
@@ -80,6 +78,7 @@ class LessonPlan
             /* For futureproofing: never really used atm
              */
             "stream" => $stream,
+            'format' => self::RESPONSE_FORMAT
         ];
 
         return json_encode($payload, JSON_THROW_ON_ERROR);
