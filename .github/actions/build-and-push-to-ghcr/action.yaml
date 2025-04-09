@@ -38,7 +38,7 @@ runs:
       uses: actions/cache@v4
       id: cache-image
       with:
-        path: ${{ runner.temp }}/${{ inputs.image }}-${{ inputs.platform }}-${{ inputs.arch }}.tar
+        path: ${{ runner.temp }}/${{ inputs.image }}-${{ inputs.platform }}-${{ inputs.arch }}
         # TODO add file hashes to key?
         key: ${{ inputs.image }}-${{ inputs.platform }}-${{ inputs.arch }}
 
@@ -54,14 +54,26 @@ runs:
 
     # Not sure if pushing a same tagged image with a different platform will
     # make the image available for different platforms.
-    - name: Build and push ${{ inputs.image }}
+    - name: Build ${{ inputs.image }}
 #      if: steps.cache-image.outputs.cache-hit != 'true'
       uses: docker/build-push-action@v6
       with:
         context: ${{ inputs.context }}
         file: ${{ inputs.file || '' }}
+        push: false
+        cache-to: type=local,dest=${{ runner.temp }}/${{ inputs.image }}-${{ inputs.platform }}-${{ inputs.arch }}
+        build-args: |
+          ENV=prod
+        platforms: ${{ inputs.platform }}/${{ inputs.arch }}
+        tags: ${{ inputs.tags }}
+
+    - name: Push ${{ inputs.image }}
+      uses: docker/build-push-action@v6
+      with:
+        context: ${{ inputs.context }}
+        file: ${{ inputs.file || '' }}
         push: true
-        outputs: type=docker,dest=${{ runner.temp }}/${{ inputs.image }}-${{ inputs.platform }}-${{ inputs.arch }}.tar
+        cache-from: type=local,dest=${{ runner.temp }}/${{ inputs.image }}-${{ inputs.platform }}-${{ inputs.arch }}
         build-args: |
           ENV=prod
         platforms: ${{ inputs.platform }}/${{ inputs.arch }}
@@ -71,5 +83,5 @@ runs:
       uses: actions/upload-artifact@v4
       with:
         name: ${{ inputs.image }}-${{ inputs.arch }}
-        path: ${{ runner.temp }}/${{ inputs.image }}-${{ inputs.platform }}-${{ inputs.arch }}.tar
+        path: ${{ runner.temp }}/${{ inputs.image }}-${{ inputs.platform }}-${{ inputs.arch }}
         retention-days: 1
