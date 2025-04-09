@@ -101,14 +101,18 @@ class Controller extends Base
             );
 
             /* Send it and decode the result (if any: sometimes it returns null)
-             * and dodge around all its weird encoding business with a double-decode
+             * and dodge around all its weird encoding business with a double-decode,
+             * and ditching all its training markdown (lol) that it loves to use
+             *
+             * https://community.openai.com/t/json-returning-with-json/584818/6
              */
             $result = $helper->request($this->getUser(), $payload);
 
-            $data = json_decode(json_encode(json_decode($result, true), 512, JSON_THROW_ON_ERROR), true);
+            $data = json_decode($result, true);
 
+            $result = preg_replace('/\\n(\s)*/', '', $data['choices'][0]['message']['content']);
 
-            $this->response = $this->responseAsJson($data['choices'][0]['message']['content'] ?? null);
+            $this->response = $this->responseAsJson($result ?? null);
 
             return;
         } catch (\DomainException $e) {

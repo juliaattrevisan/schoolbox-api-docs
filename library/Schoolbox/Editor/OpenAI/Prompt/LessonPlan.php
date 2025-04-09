@@ -18,7 +18,7 @@ class LessonPlan
         appropriate for \"[CONTEXT]\" students.
         
         Create a range of suggestions in html that align with the following field topics; each field topic should
-        use the fields_format json response format, 
+        use the fields_format json response format.
             [FIELDS]
     ";
 
