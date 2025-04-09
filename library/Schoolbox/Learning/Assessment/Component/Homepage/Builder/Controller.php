@@ -34,7 +34,6 @@ use UnexpectedValueException;
 
 class Controller extends Component_Homepage_ControllerAbstract
 {
-
     /**
      * Default heading for this component.
      */

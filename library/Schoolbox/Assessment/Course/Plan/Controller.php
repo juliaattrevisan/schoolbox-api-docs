@@ -835,7 +835,7 @@ class Controller extends Base
                 'heading' => $heading,
                 'inTemplate'    => in_array($heading, $activityKey),
             ];
-       }
+        }
 
         /* Get a set of rubrics that were used among all the assessment specs
          * This also comes with all the cap ids and indicator ids
