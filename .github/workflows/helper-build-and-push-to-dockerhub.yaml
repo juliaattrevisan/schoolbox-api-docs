@@ -55,9 +55,9 @@ jobs:
         - runs-on: ubuntu-latest
           platform: linux
           arch: amd64
-        - runs-on: ubuntu-arm
-          platform: linux
-          arch: arm64
+#        - runs-on: ubuntu-arm
+#          platform: linux
+#          arch: arm64
     runs-on: ${{ matrix.build.runs-on }}
     steps:
       - name: Checkout

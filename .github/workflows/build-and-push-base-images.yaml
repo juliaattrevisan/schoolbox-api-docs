@@ -29,13 +29,13 @@ jobs:
         alaress/php82-alpine:latest
     secrets: inherit
 
-  push-php82-alpine-to-ecr:
-    needs:
-      - build-and-push-php82-alpine-to-dockerhub
-    uses: ./.github/workflows/helper-push-to-ecr.yaml
-    with:
-      image: php82-alpine
-    secrets: inherit
+#  push-php82-alpine-to-ecr:
+#    needs:
+#      - build-and-push-php82-alpine-to-dockerhub
+#    uses: ./.github/workflows/helper-push-to-ecr.yaml
+#    with:
+#      image: php82-alpine
+#    secrets: inherit
 
   # Once done, build and push php82-fpm-alpine image
   build-and-push-php82-fpm-alpine-to-dockerhub:
@@ -49,10 +49,10 @@ jobs:
         alaress/php82-fpm-alpine:latest
     secrets: inherit
 
-  push-php82-fpm-alpine-to-ecr:
-    needs:
-      - build-and-push-php82-fpm-alpine-to-dockerhub
-    uses: ./.github/workflows/helper-push-to-ecr.yaml
-    with:
-      image: php82-fpm-alpine
-    secrets: inherit
+#  push-php82-fpm-alpine-to-ecr:
+#    needs:
+#      - build-and-push-php82-fpm-alpine-to-dockerhub
+#    uses: ./.github/workflows/helper-push-to-ecr.yaml
+#    with:
+#      image: php82-fpm-alpine
+#    secrets: inherit
