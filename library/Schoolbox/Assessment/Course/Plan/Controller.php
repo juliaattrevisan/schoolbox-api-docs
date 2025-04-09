@@ -818,7 +818,6 @@ class Controller extends Base
              */
             $courseBuilder[strtolower($heading)] = [
                 'componentId' => -1,
-                'textboxId' => -1,
                 'body' => '', // Empty string and not null as frontend expects a string (easier to handle in Vue)
                 'inTemplate' => false,
                 '_links' => [
@@ -866,6 +865,7 @@ class Controller extends Base
                     $this->getUser()
                 ));
                 $courseBuilder[strtolower($heading)]['inTemplate'] = true; // It exists in the template if we've gotten here
+                $courseBuilder[strtolower($heading)]['componentId'] = $courseBuilderComponent->getId(); // It exists in the template if we've gotten here
             } else {
                 // increase the extra courseBuilder by 1
                 // usually a teacher has added an additional textbox component, may not be an issue, but good to inform the teachers there is something non standard in the unit.

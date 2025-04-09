@@ -43,6 +43,7 @@ export type Unit = {
     activities: {
         _routes: ActivitiesListRoutes;
         items: Partial<Record<string, Activity>>;
+        components: CurriculumOverviewComponent[];
     };
     curriculum: {
         _routes: {
