@@ -42,7 +42,7 @@ export type Unit = {
     folderId: number;
     activities: {
         _routes: ActivitiesListRoutes;
-        items: Partial<Record<string, Activity>>;
+        items: Activity[];
         components: CurriculumOverviewComponent[];
     };
     curriculum: {
