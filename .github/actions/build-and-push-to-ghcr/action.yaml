@@ -39,6 +39,7 @@ runs:
       id: cache-image
       with:
         path: ${{ runner.temp }}/${{ inputs.image }}-${{ inputs.platform }}-${{ inputs.arch }}.tar
+        # TODO add file hashes to key?
         key: ${{ inputs.image }}-${{ inputs.platform }}-${{ inputs.arch }}
 
     - name: Set up Docker Buildx
@@ -54,7 +55,7 @@ runs:
     # Not sure if pushing a same tagged image with a different platform will
     # make the image available for different platforms.
     - name: Build and push ${{ inputs.image }}
-      if: steps.cache-image.outputs.cache-hit != 'true'
+#      if: steps.cache-image.outputs.cache-hit != 'true'
       uses: docker/build-push-action@v6
       with:
         context: ${{ inputs.context }}
