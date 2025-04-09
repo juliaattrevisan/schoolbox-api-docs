@@ -93,7 +93,16 @@ class Controller extends Base
                 );
             }
 
-            $result = $helper->request($this->getUser(), $prompt);
+            /* Generate a payload for ai, using the prompt pieces for System and User info
+             */
+            $payload = (new Payload\LessonPlan(trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_MODEL))))->generate(
+                $prompt['system'],
+                $prompt['user'],
+            );
+
+            /* Send it and decode the result (if any: sometimes it returns null)
+             */
+            $result = $helper->request($this->getUser(), $payload);
 
             $data = json_decode($result, true);
 

@@ -51,26 +51,18 @@ class Helper
      * hits openAI and returns the string response (you need to json decode yourself...)
      *
      * @param User $user // user to log the request against
-     * @param array|null $prompt // if generating a payload, use this prompt
-     * @param string|null $payload // use this payload instead of generating one
+     * @param string $payload // use this payload instead of generating one
      * @return string|null
      * @throws ClientExceptionInterface
      * @throws Exception
-     * @throws \JsonException
      */
-    public function request(User $user, ?array $prompt = null, ?string $payload = null): ?string
+    public function request(User $user, string $payload): ?string
     {
         /* Assert that we're configured correctly
          */
         if (!$this->openAiKey) {
             throw new \DomainException('OpenAI API key is unavailable');
         }
-
-        // either build or use the supplied payload
-        $payload = $payload ?? (new Payload\LessonPlan($this->openAiModel))->generate(
-            $prompt['system'],
-            $prompt['user'],
-        );
 
         try {
             $openAiRequest = new Request('POST', $this->getEndpoint(), array_merge(
