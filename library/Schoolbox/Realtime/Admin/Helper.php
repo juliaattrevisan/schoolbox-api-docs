@@ -43,11 +43,11 @@ class Helper
      * @param int|null $roleId
      * @param string|null $roletype
      * @param string $namespace
-     * @param bool $isDryRun
+     * @param bool $isPerform
      * @return string[]
      * @throws Exception
      */
-    public function applyDefaultSettings(?int $roleId, ?string $roletype, string $namespace, bool $isDryRun = false): array
+    public function applyDefaultSettings(?int $roleId, ?string $roletype, string $namespace, bool $isPerform = true): array
     {
         // to return log messages
         $log = [];
@@ -82,6 +82,12 @@ class Helper
             $targetNamespace = $this->namespaceMapper->findOneBySlug($namespace);
         }
 
+        if ($isPerform) {
+            $log[] = "Deleting from database.";
+        } else {
+            $log[] = "Running in dry-run mode.";
+        }
+
         // begin SQL transaction
         $this->msgRerouteMapper->getDatabase()->beginTransaction();
         $roleIdList = implode(',', $roleIds);
@@ -111,7 +117,7 @@ class Helper
         $deleteStatement = $this->namespaceMapper->getDatabase()->prepare($delete . $sql);
         $deleteStatement->execute($params);
 
-        if ($isDryRun) {
+        if ($isPerform) {
             $this->msgRerouteMapper->getDatabase()->commit();
             $log[] = $deleteStatement->rowCount() . ' entries are deleted';
             return $log;

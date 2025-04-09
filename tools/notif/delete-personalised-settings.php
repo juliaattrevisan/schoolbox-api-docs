@@ -51,12 +51,6 @@ HELP;
             exit(0);
         }
 
-        if ($this->perform()) {
-            $this->getLogger()->info("Deleting from database.");
-        } else {
-            $this->getLogger()->info("Running in dry-run mode.");
-        }
-
         $msgRerouteMapper = \Schoolbox\Realtime\Message\RerouteMapper::getInstance();
         $msgSourceMapper  = \Schoolbox\Realtime\Message\SourceMapper::getInstance();
         $roleMapper       = RoleMapper::getInstance();
