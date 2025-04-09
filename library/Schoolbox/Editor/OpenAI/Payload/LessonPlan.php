@@ -54,7 +54,7 @@ class LessonPlan
             "messages" => [
                 [
                     "role" => "system",
-                    "content" => $systemContent . "\n\nDO NOT wrap the json code in markdown.",
+                    "content" => $systemContent . "\n\nyour entire response/output is going to consist of a single JSON object {}, and you will NOT wrap it within JSON md markers.",
                 ],
                 [
                     "role" => "user",
