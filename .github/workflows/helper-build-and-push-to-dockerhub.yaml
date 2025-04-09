@@ -76,9 +76,17 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Load ${{ inputs.image }} cache
+        uses: actions/cache@v4
+        id: cache-image
+        with:
+          path: ${{ runner.temp }}/${{ inputs.image }}-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
+          key: ${{ inputs.image }}-${{ matrix.build.platform }}-${{ matrix.build.arch }}
+
       # Not sure if pushing a same tagged image with a different platform will
       # make the image available for different platforms.
       - name: Build and push ${{ inputs.image }}
+        if: steps.cache-image.outputs.cache-hit != 'true'
         uses: docker/build-push-action@v6
         with:
           context: ${{ inputs.context }}

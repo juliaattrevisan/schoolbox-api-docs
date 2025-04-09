@@ -13,6 +13,10 @@ on:
     paths:
       - 'docker/base-images/**'
   workflow_dispatch:
+  pull_request:
+
+# When running on pull_request, use a local registry (with cached images):
+# otherwise, use Dockerhub.
 
 jobs:
   # Build and push php82-alpine image first
