@@ -331,6 +331,12 @@ class LessonPlan
      */
     private function collate(int $nodeId, array $stack, bool $first = false): array
     {
+        /* These nodes are only partially hydrated, at best:
+         * Parent nodes don't know THEIR parent nodes.
+         * Also, this services the scalar payload approach where you just know curric ids
+         *
+         * TODO: Maybe update curric node mapper's hydration
+         */
         $currentNode = $this->curriculumNodeMapper->findById($nodeId);
         $parentNode = $this->curriculumNodeMapper->findById($currentNode->getParent()->getId());
 
