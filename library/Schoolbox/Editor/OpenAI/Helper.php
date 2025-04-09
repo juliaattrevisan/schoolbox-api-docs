@@ -53,13 +53,12 @@ class Helper
      * @param User $user // user to log the request against
      * @param array|null $prompt // if generating a payload, use this prompt
      * @param string|null $payload // use this payload instead of generating one
-     * @param array|null $responseFormat // null, or array of response format
      * @return string|null
      * @throws ClientExceptionInterface
      * @throws Exception
      * @throws \JsonException
      */
-    public function request(User $user, ?array $prompt = null, ?string $payload = null, ?array $responseFormat = null): ?string
+    public function request(User $user, ?array $prompt = null, ?string $payload = null): ?string
     {
         /* Assert that we're configured correctly
          */
