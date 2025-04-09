@@ -293,7 +293,6 @@ class ServiceManager implements IServiceManager
      *
      * @param Storage\Model $storage
      * @return string
-     * @throws FilesystemException
      */
     private function getPemPath(Storage\Model $storage)
     {
