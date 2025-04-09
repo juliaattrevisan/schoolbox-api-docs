@@ -6,8 +6,11 @@ import ActivitiesListContent from "./activities-list/activities-list-content.vue
 import { useActivitiesListStore } from "./activities-list/store/activitiesListStore";
 import { useActivitiesListDragStore } from "./activities-list/store/activitiesListDragStore";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
-import type { Unit } from "./unitPlannerTypes";
+import type {CurriculumOverviewComponent, Unit} from "./unitPlannerTypes";
 import type { Column } from "./unitPlannerConfig";
+import {
+  useUnitPlannerCurriculumStore
+} from "@schoolboxAssessment/Course/Plan/templates/vue/store/unitPlannerCurriculumStore";
 
 interface Props {
     unit: Unit; // the unit linked to the curriculum cell
@@ -22,6 +25,11 @@ const activitiesListStoreId = `${props.unit.id}-${props.column.id}`;
 
 const activitiesListStore = useActivitiesListStore(activitiesListStoreId);
 const activitiesListDragStore = useActivitiesListDragStore(activitiesListStoreId);
+
+const curriculumStore = useUnitPlannerCurriculumStore();
+const component = window.Vue.ref<CurriculumOverviewComponent | null>(
+    curriculumStore.getComponent(props.unit.activities.components, props.column),
+);
 
 window.Vue.onMounted(() => {
     if (!props.preventStoreInit) {
@@ -50,7 +58,7 @@ defineExpose({ isEmpty });
 
 <template>
     <activities-list-content
-        v-if="!isEmpty"
+        v-if="component !== null && !isEmpty"
         :activities-list-store-id="activitiesListStoreId"
         :activities="props.unit.activities.items"
         :activities-list-routes="props.unit.activities._routes"

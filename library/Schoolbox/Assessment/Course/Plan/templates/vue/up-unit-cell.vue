@@ -174,6 +174,8 @@ function onContentClicked(event: MouseEvent): void {
 
 const extraCurriculumComponents = props.unit.curriculum.components.filter((component) => !component.inTemplate).length; // Number of extra components in the template
 
+const extraActivitiesComponents = props.unit.activities.components.filter((component) => !component.inTemplate).length; // Number of extra components in the template
+
 /**
  * To detect when the dimensions of the cell changes,
  * like when a different tab is selected
@@ -272,6 +274,11 @@ const isFirstUnit = window.Vue.computed(() => {
                             <li v-if="extraCurriculumComponents > 0" class="meta">
                                 {{ extraCurriculumComponents }} extra curriculum component{{
                                     extraCurriculumComponents === 1 ? "" : "s"
+                                }}
+                            </li>
+                            <li v-if="extraActivitiesComponents > 0" class="meta">
+                                {{ extraActivitiesComponents }} extra course builder component{{
+                                    extraActivitiesComponents === 1 ? "" : "s"
                                 }}
                             </li>
                         </ul>
