@@ -59,10 +59,6 @@ runs:
       with:
         context: ${{ inputs.context }}
         file: ${{ inputs.file || '' }}
-        # For now, dry run
-        push: false
-        # If both Dockerhub username and token are set: true, otherwise false
-        #          push: ${{ (env.DOCKERHUB_USERNAME && env.DOCKERHUB_TOKEN && true) || false}}
         outputs: type=docker,dest=${{ runner.temp }}/${{ inputs.image }}-${{ inputs.platform }}-${{ inputs.arch }}.tar
         build-args: |
           ENV=prod
