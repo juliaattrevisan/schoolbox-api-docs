@@ -54,7 +54,7 @@ class LessonPlan
             "messages" => [
                 [
                     "role" => "system",
-                    "content" => $systemContent,
+                    "content" => $systemContent . "\n\nDO NOT wrap the json code in markdown.",
                 ],
                 [
                     "role" => "user",
