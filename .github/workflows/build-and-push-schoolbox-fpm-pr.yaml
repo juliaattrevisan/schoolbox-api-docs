@@ -1,0 +1,92 @@
+name: Build and push schoolbox-fpm (pull request)
+
+# Build a new schoolbox-fpm image for this pull request, for CI.
+on:
+  pull_request:
+
+jobs:
+  # Build artifacts before building image
+  build-composer-artifact:
+    uses: ./.github/workflows/helper-build-composer-artifact.yaml
+
+  build-npm-artifact:
+    uses: ./.github/workflows/helper-build-npm-artifact.yaml
+
+  # Build schoolbox-fpm image
+  build-and-push-schoolbox-fpm:
+    needs:
+      - build-composer-artifact
+      - build-npm-artifact
+    strategy:
+      matrix:
+        build:
+          - runs-on: ubuntu-latest
+            platform: linux
+            arch: amd64
+          - runs-on: ubuntu-arm
+            platform: linux
+            arch: arm64
+    runs-on: ${{ matrix.build.runs-on }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Extract artifacts
+      - name: Download composer artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: schoolbox-composer
+          path: vendor/
+
+      - name: Download npm artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: schoolbox-npm
+          path: www/static/js/bundle/
+
+      - name: Build and push php82-alpine
+        uses: ./.github/workflows/helper-build-and-push-to-ghcr.yaml
+        with:
+          runs-on: ${{ matrix.build.runs-on }}
+          platform: ${{ matrix.build.platform }}
+          arch: ${{ matrix.build.arch }}
+          image: php82-alpine
+          context: docker/base-images/php82-alpine
+          tags: |
+            ghcr.io/alaress/php82-alpine:pr-${{ github.event.pull_request.number }}
+        secrets: inherit
+
+      - name: Build and push php82-fpm-alpine
+        uses: ./.github/workflows/helper-build-and-push-to-ghcr.yaml
+        with:
+          runs-on: ${{ matrix.build.runs-on }}
+          platform: ${{ matrix.build.platform }}
+          arch: ${{ matrix.build.arch }}
+          image: php82-alpine
+          context: docker/base-images/php82-fpm-alpine
+          tags: |
+            ghcr.io/alaress/php82-fpm-alpine:pr-${{ github.event.pull_request.number }}
+        secrets: inherit
+
+#      # TODO work artifacts into push-to-dockerhub
+#      # Different build-and-push depending on trigger:
+#      # push: {{ github.ref_name }}-latest, {{ github.ref_name }}-{{ github.sha }}
+#      #       (ref_name should be master or develop)
+#      # release: {{ github.ref_name }}
+#      - name: Build and push schoolbox-fpm
+#        if: github.event_name == 'push'
+#        uses: docker/build-push-action@v6
+#        with:
+#          context: .
+#          file: docker/php-fpm/deployment-image.Dockerfile
+#          push: false
+#          outputs: type=docker,dest=${{ runner.temp }}/schoolbox-fpm-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
+#          build-args: |
+#            ENV=prod
+#          platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
+#          tags: |
+#            alaress/schoolbox-fpm:{{ github.ref_name }}-latest
+#            alaress/schoolbox-fpm:{{ github.ref_name }}-{{ github.sha }}
