@@ -15,13 +15,14 @@ class LessonPlan
     /**
      * Generates the payload for the OpenAI API request.
      *
-     * @param string $prompt // user prompt to send to the API
+     * @param string $systemContent
+     * @param string $userContent
      * @param ?array $responseFormat
      * @param bool $stream
      * @return string
      * @throws \JsonException
      */
-    public function generate(string $prompt, ?array $responseFormat = null, bool $stream = false): string
+    public function generate(string $systemContent, string $userContent, ?array $responseFormat = null, bool $stream = false): string
     {
         $payload = [
             /* An ordered list of instructions for OpenAi
@@ -29,11 +30,11 @@ class LessonPlan
             "messages" => [
                 [
                     "role" => "system",
-                    "content" => "Your task is to execute the instruction using the provided HTML content. Follow the instruction closely. Your answer must be a properly formatted HTML code. Do not add any additional remarks or notes. Do not act like a chatbot or a real person.",
+                    "content" => $systemContent,
                 ],
                 [
                     "role" => "user",
-                    "content" => $prompt
+                    "content" => $userContent,
                 ],
             ],
             /* Which variant of OpenAI to use

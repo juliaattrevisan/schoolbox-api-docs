@@ -59,7 +59,7 @@ class Helper
      * @throws \JsonException
      * @throws ClientExceptionInterface
      */
-    public function request(User $user, ?string $prompt = null, ?string $payload = null, ?array $responseFormat = null): ?string
+    public function request(User $user, ?array $prompt = null, ?string $payload = null, ?array $responseFormat = null): ?string
     {
         /* Assert that we're configured correctly
          */
@@ -68,12 +68,16 @@ class Helper
         }
 
         // either build or use the supplied payload
-        $payload = $payload ?? (new Payload\LessonPlan($this->openAiModel))->generate($prompt, $responseFormat);
+        $payload = $payload ?? (new Payload\LessonPlan($this->openAiModel))->generate(
+            $prompt['system'],
+            $prompt['user'],
+            $responseFormat
+        );
 
         try {
             $openAiRequest = new Request('POST', $this->getEndpoint(), array_merge(
                 $this->getAuthorization(),
-                ['Content-Type'  => 'application/json'],
+                ['Content-Type' => 'application/json'],
             ), $payload);
 
             $response = $this->client->sendRequest($openAiRequest);

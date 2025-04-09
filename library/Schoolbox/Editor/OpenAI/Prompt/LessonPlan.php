@@ -17,8 +17,6 @@ class LessonPlan
         well-developed and effective lesson plans for your students. Each lesson should be engaging and
         appropriate for \"[CONTEXT]\" students.
         
-        [CURRICULUM]
-            
         Create a range of suggestions in html that align with the following field topics; each field topic should
         use the fields_format json response format, 
             [FIELDS]
@@ -45,6 +43,14 @@ class LessonPlan
     private const PROMPT_TEMPLATE_CURRICULUM = '
         Each lesson should be aligned to the following curriculum outcomes:
 %s.
+    ';
+
+
+    /**
+     * Additional instructions specified by the user
+     */
+    private const PROMPT_TEMPLATE_ADDITIONAL_CONTEXT = '
+        Additional Notes: %s
     ';
 
 
@@ -90,12 +96,14 @@ class LessonPlan
      *
      * @param Model $lessonPlan
      * @param GenericCollection $lessonPlanTemplateFields
-     * @return string
+     * @param string $additionalContext
+     * @return array
      */
     public function generateFromInstances(
         \Schoolbox\Learning\Assessment\LessonPlan\Model $lessonPlan,
         GenericCollection $lessonPlanTemplateFields,
-    ): string {
+        string $additionalContext = ''
+    ): array {
         /* wow
          * Get some info about the various contexts in which this lesson plan exists
          * such as the over-arching course name, unit name, and folder name
@@ -129,7 +137,8 @@ class LessonPlan
             $context,
             $folder,
             $fields,
-            $curriculum
+            $curriculum,
+            $additionalContext
         );
     }
 
@@ -143,14 +152,16 @@ class LessonPlan
      * @param string $folder
      * @param array $lessonPlanTemplateFieldIds
      * @param array $curriculumNodeIds
-     * @return string
+     * @param string $additionalContext
+     * @return array
      */
     public function generateFromScalars(
         string $context,
         string $folder,
         array $lessonPlanTemplateFieldIds,
-        array $curriculumNodeIds
-    ): string {
+        array $curriculumNodeIds,
+        string $additionalContext = ''
+    ): array {
         /* Details about how to use each field
          */
         $lessonPlanTemplateFields = $this->compileFields($this->lessonPlanTemplateFieldMapper->findByColumn('id', $lessonPlanTemplateFieldIds));
@@ -172,7 +183,8 @@ class LessonPlan
             $context,
             $folder,
             $lessonPlanTemplateFields,
-            $curriculum
+            $curriculum,
+            $additionalContext
         );
     }
 
@@ -186,24 +198,41 @@ class LessonPlan
      * @param string $folder
      * @param string $lessonPlanTemplateFields
      * @param string $curriculum
-     * @return string
+     * @param string $additionalContext
+     * @return array
      */
     private function generate(
         string $context,
         string $folder,
         string $lessonPlanTemplateFields,
         string $curriculum,
-    ): string {
+        string $additionalContext = ''
+    ): array {
         /* Conduct replacements
          */
-        $replacements = [
+        $systemContent = strtr(self::PROMPT_TEMPLATE, [
             '[CONTEXT]' => $context,
             '[FOLDER]' => $folder,
             '[FIELDS]' => $lessonPlanTemplateFields,
-            '[CURRICULUM]' => $curriculum
-        ];
+        ]);
 
-        return strtr(self::PROMPT_TEMPLATE, $replacements);
+        /* Something that shapes what the ai would make;
+         * provide additional instructions (if meaningful)
+         */
+        $userContent = '';
+
+        if ('' !== $curriculum) {
+            $userContent .= $curriculum;
+        }
+
+        if ('' !== $additionalContext) {
+            $userContent .= sprintf(self::PROMPT_TEMPLATE_ADDITIONAL_CONTEXT, $additionalContext);
+        }
+
+        return [
+            'system' => $systemContent,
+            'user' => $userContent
+        ];
     }
 
 
