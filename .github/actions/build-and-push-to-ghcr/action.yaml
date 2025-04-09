@@ -49,7 +49,7 @@ runs:
       with:
         registry: ghcr.io
         username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+        password: ${{ github.token }}
 
     # Not sure if pushing a same tagged image with a different platform will
     # make the image available for different platforms.
