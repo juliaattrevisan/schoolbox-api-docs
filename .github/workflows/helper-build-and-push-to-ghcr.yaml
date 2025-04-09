@@ -31,7 +31,7 @@ on:
           The build context for the image.
 
           Also determines what is checked out in the checkout step.
-        required: true
+        default: '.'
       file:
         type: string
         default: ''
