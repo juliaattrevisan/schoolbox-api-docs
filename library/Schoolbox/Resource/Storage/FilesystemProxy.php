@@ -260,12 +260,16 @@ class FilesystemProxy
 
         /* Create a copy of the remote file and return the local path
          */
-        $localCachePath = $this->localPath . '/' . $storage->getHash();
+        $localCachePath = sprintf(
+            "%s/local_%s_%s",
+            $this->localPath,
+            INSTANCE_ID,
+            $storage->getHash()
+        );
         if (!file_exists($localCachePath)) {
-            file_put_contents(
-                $localCachePath,
-                $fileContent,
-            );
+            if (false === file_put_contents($localCachePath, $fileContent,)) {
+                return false;
+            }
         }
 
         return $localCachePath;
