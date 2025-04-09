@@ -81,15 +81,17 @@ class Controller extends Base
                 $prompt = $promptGenerator->generateFromInstances(
                     $lessonPlan,
                     $lessonPlanTemplate->getFields(),
+                    $this->requestPost->get('additionalContext') ?? ''
                 );
             } else {
                 /* From a POST payload
                  */
                 $prompt = $promptGenerator->generateFromScalars(
-                    '9 English',
-                    '9A English',
-                    [104, 105, 106, 107],
-                    [772, 773]
+                    $this->requestPost->get('context'),
+                    $this->requestPost->get('folder'),
+                    explode(',', $this->requestPost->get('lessonPlanTemplateFieldIds')),
+                    explode(',', $this->requestPost->get('curriculumNodeIds')),
+                    $this->requestPost->get('additionalContext') ?? ''
                 );
             }
 

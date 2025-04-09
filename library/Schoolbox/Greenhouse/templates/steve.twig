@@ -1,9 +1,30 @@
-<form action="{{ routeLookup('openai.postLessonPlan') }}" method="post">
-    <label>Lesson Plan Id</label>
-    <input type="text" name="lessonPlanId" />
+<div class="small-12 island">
+    <section class="content">
+        <form action="{{ routeLookup('openai.postLessonPlan') }}" method="post">
+            <fieldset>
+                <label>Lesson Plan Id</label>
+                <input type="text" name="lessonPlanId" />
+            </fieldset>
 
-    <input type="submit" />
-</form>
+            <fieldset>
+                <label>Context</label>
+                <input type="text" name="context" />
+
+                <label>Folder</label>
+                <input type="text" name="folder" />
+
+                <label>Lesson Plan Template Field Ids</label>
+                <input type="text" name="lessonPlanTemplateFieldIds" />
+
+                <label>Curric Node Ids</label>
+                <input type="text" name="curriculumNodeIds" />
+            </fieldset>
+
+            <input type="submit" />
+        </form>
+    </section>
+</div>
+
 
 
 
