@@ -55,7 +55,9 @@ class LessonPlan
              */
             "stream" => $stream
         ];
-
+        header('Content-Type: application/json');
+        header('Content-Encoding: none');
+new \Alaress_Probe($payload);die();
         // only format if requested
         if ($responseFormat) {
             $payload['response_format'] = ["type" => "json_object"];
