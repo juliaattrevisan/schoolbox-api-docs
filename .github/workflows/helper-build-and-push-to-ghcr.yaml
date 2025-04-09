@@ -94,7 +94,7 @@ jobs:
           context: ${{ inputs.context }}
           file: ${{ inputs.file || '' }}
           # If both Dockerhub username and token are set: true, otherwise false
-          push: ${{ (env.DOCKERHUB_USERNAME && env.DOCKERHUB_TOKEN && true) || false}}
+#          push: ${{ (env.DOCKERHUB_USERNAME && env.DOCKERHUB_TOKEN && true) || false}}
           outputs: type=docker,dest=${{ runner.temp }}/${{ inputs.image }}-${{ inputs.platform }}-${{ inputs.arch }}.tar
           build-args: |
             ENV=prod

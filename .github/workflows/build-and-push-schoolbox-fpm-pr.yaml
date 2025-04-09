@@ -41,7 +41,8 @@ jobs:
           platform: ${{ matrix.build.platform }}
           arch: ${{ matrix.build.arch }}
           image: php82-alpine
-          context: docker/base-images/php82-alpine
+          context: .
+          file: docker/base-images/php82-alpine/Dockerfile
           tags: |
             ghcr.io/alaress/php82-alpine:pr-${{ github.event.pull_request.number }}
 
