@@ -2,6 +2,9 @@ import { defineStore } from "pinia";
 import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import type { Activity, ActivitiesListRoutes } from "@schoolboxAssessment/Types/assessmentTypes";
+import type { CurriculumOverviewComponent, Unit } from "../../../unitPlannerTypes";
+import type { Column } from "../../../unitPlannerConfig";
+import { useUnitPlannerStore } from "../../store/unitPlannerStore";
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- we want the inferred type from defineStore
 export const useActivitiesListStore = (activitiesListStoreId: string) =>
@@ -9,6 +12,7 @@ export const useActivitiesListStore = (activitiesListStoreId: string) =>
         const routes = window.Vue.ref<ActivitiesListRoutes>({
             create: null,
             reorder: null,
+            createComponent: null,
         });
         const activities = window.Vue.ref<Activity[]>([]);
 
