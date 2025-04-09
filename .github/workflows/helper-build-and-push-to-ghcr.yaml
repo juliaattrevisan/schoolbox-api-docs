@@ -78,6 +78,13 @@ jobs:
           path: ${{ runner.temp }}/${{ inputs.image }}-${{ inputs.platform }}-${{ inputs.arch }}.tar
           key: ${{ inputs.image }}-${{ inputs.platform }}-${{ inputs.arch }}
 
+      - name: Login to GHCR
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       # Not sure if pushing a same tagged image with a different platform will
       # make the image available for different platforms.
       - name: Build and push ${{ inputs.image }}
