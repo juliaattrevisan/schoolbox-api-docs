@@ -313,16 +313,16 @@ HELP;
 
         // Add ORDER BY to increase readability of logs.
         $query .= "\nORDER BY sb.assessment_id ASC, sr.id ASC";
-        $rows = $dbc->executeQuery($query, $params)->fetchAll();
+        $statement = $dbc->executeQuery($query, $params);
 
-        if (count($rows) === 0) {
+        if ($statement->rowCount() === 0) {
             $logger->info('Found 0 non-deleted submission_return rows linked to deleted student_submission rows.');
             $logger->info('Nothing to do.');
             return;
         }
 
         $submissionReturnRowsByAssessmentId = [];
-        foreach ($rows as $row) {
+        while ($row = $statement->fetch()) {
             if (!array_key_exists($row['assessmentId'], $submissionReturnRowsByAssessmentId)) {
                 $submissionReturnRowsByAssessmentId[$row['assessmentId']] = [];
             }
@@ -335,7 +335,7 @@ HELP;
         }
 
         $logger->info(
-            'Found ' . count($rows) . ' non-deleted submission_return rows linked to deleted student_submission rows,' .
+            'Found ' . $statement->rowCount() . ' non-deleted submission_return rows linked to deleted student_submission rows,' .
             ' in ' . count($submissionReturnRowsByAssessmentId) . ' assessments.'
         );
 
@@ -349,7 +349,7 @@ HELP;
                     " * Considering submission_return {$submissionReturnRow['id']}," .
                     " linked to deleted student_submission {$submissionReturnRow['studentSubmissionId']}."
                 );
-                $candidateStudentSubmissionIds = $dbc->executeQuery(
+                $statement = $dbc->executeQuery(
                     // Find the student_submission row that was most recently
                     // submitted at the time the submission_return row was created.
                     'SELECT ss.id
@@ -365,13 +365,12 @@ HELP;
                         'ownerUserId' => $submissionReturnRow['ownerUserId'],
                         'submissionReturnCreatedAt' => $submissionReturnRow['createdAt'],
                     ]
-                )->fetchAll();
-                $logger->info(
-                    '   Found ' . count($candidateStudentSubmissionIds) .
-                    ' candidate student_submission rows to link to instead.'
                 );
-                if (count($candidateStudentSubmissionIds) > 0) {
-                    $chosenStudentSubmissionId = $candidateStudentSubmissionIds[0]['id'];
+                $logger->info(
+                    '   Found ' . $statement->rowCount() . ' candidate student_submission rows to link to instead.'
+                );
+                if ($statement->rowCount() > 0) {
+                    $chosenStudentSubmissionId = $statement->fetch()['id'];
                     if ($this->perform()) {
                     } else {
                         $logger->info(
