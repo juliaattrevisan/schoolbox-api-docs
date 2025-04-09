@@ -55,7 +55,7 @@ runs:
     # Not sure if pushing a same tagged image with a different platform will
     # make the image available for different platforms.
     - name: Build ${{ inputs.image }}
-#      if: steps.cache-image.outputs.cache-hit != 'true'
+      if: steps.cache-image.outputs.cache-hit != 'true'
       uses: docker/build-push-action@v6
       with:
         context: ${{ inputs.context }}
@@ -73,6 +73,7 @@ runs:
         context: ${{ inputs.context }}
         file: ${{ inputs.file || '' }}
         push: true
+        cache-to: type=local,dest=${{ runner.temp }}/${{ inputs.image }}-${{ inputs.platform }}-${{ inputs.arch }}
         cache-from: type=local,dest=${{ runner.temp }}/${{ inputs.image }}-${{ inputs.platform }}-${{ inputs.arch }}
         build-args: |
           ENV=prod
