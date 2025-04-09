@@ -59,6 +59,7 @@ runs:
       with:
         context: ${{ inputs.context }}
         file: ${{ inputs.file || '' }}
+        push: true
         outputs: type=docker,dest=${{ runner.temp }}/${{ inputs.image }}-${{ inputs.platform }}-${{ inputs.arch }}.tar
         build-args: |
           ENV=prod
