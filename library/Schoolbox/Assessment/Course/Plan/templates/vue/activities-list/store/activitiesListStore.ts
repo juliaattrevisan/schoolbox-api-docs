@@ -2,8 +2,8 @@ import { defineStore } from "pinia";
 import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import type { Activity, ActivitiesListRoutes } from "@schoolboxAssessment/Types/assessmentTypes";
-import type { CurriculumOverviewComponent, Unit } from "../../../unitPlannerTypes";
-import type { Column } from "../../../unitPlannerConfig";
+import type { CurriculumOverviewComponent, Unit } from "../../unitPlannerTypes";
+import type { Column } from "../../unitPlannerConfig";
 import { useUnitPlannerStore } from "../../store/unitPlannerStore";
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- we want the inferred type from defineStore
