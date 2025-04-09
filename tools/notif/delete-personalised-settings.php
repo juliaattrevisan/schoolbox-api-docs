@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
 use Schoolbox\RoleMapper;
+use Schoolbox\Realtime\Admin\Helper;
 
 require __DIR__ . '/../../conf/core/require.php';
 
@@ -59,6 +60,8 @@ HELP;
         $msgRerouteMapper = \Schoolbox\Realtime\Message\RerouteMapper::getInstance();
         $msgSourceMapper  = \Schoolbox\Realtime\Message\SourceMapper::getInstance();
         $roleMapper       = RoleMapper::getInstance();
+
+        $helper = new Helper($roleMapper, $msgRerouteMapper, $msgNamespaceMapper);
 
         $roleId = $this->getOpt('role:');
         if ($roleId) {
