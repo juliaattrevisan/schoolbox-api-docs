@@ -101,7 +101,7 @@ class Controller extends Base
                 $prompt['system'],
                 $prompt['user'],
             );
-
+new \Alaress_Probe($payload);die();
             /* Send it and decode the result (if any: sometimes it returns null)
              * and dodge around all its weird encoding business with a double-decode,
              * and ditching all its training markdown (lol) that it loves to use

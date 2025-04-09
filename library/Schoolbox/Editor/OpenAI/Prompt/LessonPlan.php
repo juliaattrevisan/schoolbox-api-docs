@@ -2,10 +2,13 @@
 
 namespace Schoolbox\Editor\OpenAI\Prompt;
 
+use DebugBar\DebugBarException;
 use Schoolbox\Admin\LessonPlan\Template\Field\Mapper;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\LessonPlan\Model;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception\Deleted;
 
 class LessonPlan
 {
@@ -60,6 +63,9 @@ class LessonPlan
      * @param GenericCollection $lessonPlanTemplateFields
      * @param string $additionalContext
      * @return array
+     * @throws DebugBarException
+     * @throws Deleted
+     * @throws Exception
      */
     public function generateFromInstances(
         \Schoolbox\Learning\Assessment\LessonPlan\Model $lessonPlan,
@@ -86,14 +92,20 @@ class LessonPlan
          */
         $curriculum = '';
 
+        /* TODO This is currently a node's full ancestry, index by the node id
+         *  This goes into the payload in a different way than a string injection
+         *  so .........figure that out tomorrow
+         */
         $curriculumNames = $this->compileNodeTitles($lessonPlan->getCurriculumNodes());
 
-        if ('' !== $curriculumNames) {
-            $curriculum = sprintf(
-                self::PROMPT_TEMPLATE_CURRICULUM,
-                $curriculumNames
-            );
-        }
+        new \Alaress_Probe($curriculumNames);
+
+//        if ('' !== $curriculumNames) {
+//            $curriculum = sprintf(
+//                self::PROMPT_TEMPLATE_CURRICULUM,
+//                $curriculumNames
+//            );
+//        }
 
         return $this->generate(
             $context,
@@ -116,6 +128,9 @@ class LessonPlan
      * @param array $curriculumNodeIds
      * @param string $additionalContext
      * @return array
+     * @throws Deleted
+     * @throws Exception
+     * @throws DebugBarException
      */
     public function generateFromScalars(
         string $context,
@@ -132,14 +147,20 @@ class LessonPlan
          */
         $curriculum = '';
 
+        /* TODO This is currently a node's full ancestry, index by the node id
+         *  This goes into the payload in a different way than a string injection
+         *  so .........figure that out tomorrow
+         */
         $curriculumNames = $this->compileNodeTitles($this->curriculumNodeMapper->findByColumn('id', $curriculumNodeIds));
 
-        if ('' !== $curriculumNames) {
-            $curriculum = sprintf(
-                self::PROMPT_TEMPLATE_CURRICULUM,
-                $curriculumNames
-            );
-        }
+        new \Alaress_Probe($curriculumNames);
+
+        //        if ('' !== $curriculumNames) {
+        //            $curriculum = sprintf(
+        //                self::PROMPT_TEMPLATE_CURRICULUM,
+        //                $curriculumNames
+        //            );
+        //        }
 
         return $this->generate(
             $context,
@@ -244,22 +265,87 @@ class LessonPlan
     }
 
 
+    /* Curriculum Nodes
+     */
+
     /**
-     * Collect something human-readable via the node identifiers
+     * Collect something human-readable via the node identifiers:
+     * Compile all the ancestor nodes, right back to the root level
      *
      * @param GenericCollection $nodes
-     * @return string
+     * @return array
+     * @throws Exception
+     * @throws Deleted
      */
-    private function compileNodeTitles(GenericCollection $nodes): string
+    private function compileNodeTitles(GenericCollection $nodes): array
     {
-        /* A list of unique curriculum node titles
-         */
-        $titles = [];
+        $results = [];
 
-        foreach ($nodes as $node) {
-            $titles[] = $node->getName();
+        $nodeIds = $nodes->indexBy('id')->keys();
+
+        foreach ($nodeIds as $nodeId) {
+            $results[] = $this->collate($nodeId, [], true);
         }
 
-        return implode(";\n", array_filter(array_unique($titles)));
+        $stack = [];
+
+        /* Find the last node in the list and grab its id because we'll index its entire hierarchy
+         * against it, resulting in basically a list of nodes right to the top, like this:
+         *
+            Victorian Curriculum v2.0
+            Learning areas
+            Science
+            Science Understanding
+            Earth and space sciences
+            Levels 7 and 8
+            key processes of the rock cycle occur over different timescales........
+         */
+        foreach ($results as $result) {
+            $lastNodeId = $result[\count($result)-1]->getId();
+
+            $str = '';
+
+            foreach ($result as $node) {
+                $str .= sprintf(
+                    "%s\n",
+                    $node->getName()
+                );
+            }
+
+            $stack[$lastNodeId] = $str;
+        }
+
+        return $stack;
+    }
+
+
+    /**
+     * Recursively obtain the ancestry of a curriculum node
+     *
+     * @param int $nodeId
+     * @param array $stack
+     * @param bool $first
+     * @return array
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     */
+    private function collate(int $nodeId, array $stack, bool $first = false): array
+    {
+        $currentNode = $this->curriculumNodeMapper->findById($nodeId);
+        $parentNode = $this->curriculumNodeMapper->findById($currentNode->getParent()->getId());
+
+        $parentNode->getChildren()->setOffset($currentNode->getId(), $currentNode);
+
+        if ($first) {
+            $stack[] = $currentNode;
+        }
+
+        $stack[] = $parentNode;
+
+        if ($parentNode->getParent()?->getId()) {
+            return $this->collate($parentNode->getId(), $stack);
+        }
+
+        return array_reverse($stack);
     }
 }
