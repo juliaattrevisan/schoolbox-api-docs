@@ -237,7 +237,7 @@ class Controller extends Base
                 'curriculumDefId' => $curriculumDefId,
                 'textboxes' => $textboxTemplate,
                 'curriculum' => $curriculumTemplate,
-                'builder' => $courseBuilderTemplate
+                'activities' => $courseBuilderTemplate
             ]
         ], "Unit Planner - {$course->getTitle()}");
     }

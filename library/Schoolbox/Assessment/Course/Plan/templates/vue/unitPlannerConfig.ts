@@ -179,6 +179,10 @@ export function createTabs(template: UnitTemplate): Tab[] {
                 getColumns(tabColumns, newColumnBase, columnTypeID, template.curriculum);
                 return;
             }
+            if (columnTypeID === ColumnType.ACTIVITIES) {
+                getColumns(tabColumns, newColumnBase, columnTypeID, template.activities);
+                return;
+            }
             tabColumns.push(newColumnBase);
         });
 

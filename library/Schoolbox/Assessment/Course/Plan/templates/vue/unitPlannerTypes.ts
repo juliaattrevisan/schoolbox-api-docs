@@ -98,5 +98,5 @@ export type UnitTemplate = {
     curriculumDefId: null | number; // the curriculum component definition ID
     curriculum: UnitTemplateComponent[]; // Curriculum Overview components
     textboxes: UnitTemplateTextboxComponent[]; // Textbox components
-    courseBuilder: UnitTemplateComponent[]; // Textbox components
+    activities: UnitTemplateComponent[]; // course builder components
 };
