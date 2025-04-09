@@ -58,18 +58,18 @@ jobs:
 #          tags: |
 #            ghcr.io/alaress/php82-fpm-alpine:pr-${{ github.event.pull_request.number }}
 
-      # Extract artifacts
-      - name: Download composer artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: schoolbox-composer
-          path: vendor/
-
-      - name: Download npm artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: schoolbox-npm
-          path: www/static/js/bundle/
+#      # Extract artifacts
+#      - name: Download composer artifact
+#        uses: actions/download-artifact@v4
+#        with:
+#          name: schoolbox-composer
+#          path: vendor/
+#
+#      - name: Download npm artifact
+#        uses: actions/download-artifact@v4
+#        with:
+#          name: schoolbox-npm
+#          path: www/static/js/bundle/
 
 #      # TODO work artifacts into push-to-dockerhub
 #      # Different build-and-push depending on trigger:
