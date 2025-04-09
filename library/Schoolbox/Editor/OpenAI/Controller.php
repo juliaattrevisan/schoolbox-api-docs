@@ -72,23 +72,30 @@ class Controller extends Base
 
             /* Used for an existing lesson plan, typically, via the Modify screen
              */
-            /** @var \Schoolbox\Learning\Assessment\LessonPlan\Model $lessonPlan */
-            $lessonPlan = $this->mapperProxy->findById(1580);
-            $lessonPlanTemplate = $this->lessonPlanTemplateMapper->findById($lessonPlan->getLessonPlanTemplate());
+            if ($this->requestPost['lessonPlanId']) {
+                /** @var \Schoolbox\Learning\Assessment\LessonPlan\Model $lessonPlan */
+                $lessonPlan = $this->mapperProxy->findById($this->requestPost['lessonPlanId']);
 
-            $prompt = $promptGenerator->generateFromInstances(
-                $lessonPlan,
-                $lessonPlanTemplate->getFields(),
-            );
+                $lessonPlanTemplate = $this->lessonPlanTemplateMapper->findById($lessonPlan->getLessonPlanTemplate());
 
-//            /* From a POST payload
-//             */
-//            $prompt = $promptGenerator->generateFromScalars(
-//                '9 English',
-//                '9A English',
-//                [104, 105, 106, 107],
-//                [772, 773]
-//            );
+                $prompt = $promptGenerator->generateFromInstances(
+                    $lessonPlan,
+                    $lessonPlanTemplate->getFields(),
+                );
+            } else {
+                /* From a POST payload
+                 */
+                $prompt = $promptGenerator->generateFromScalars(
+                    '9 English',
+                    '9A English',
+                    [104, 105, 106, 107],
+                    [772, 773]
+                );
+            }
+
+            /* FIXME exploring
+             */
+            var_dump($prompt);
 
             $result = $helper->request($this->getUser(), $prompt, responseFormat: Prompt\LessonPlan::RESPONSE_FORMAT);
 

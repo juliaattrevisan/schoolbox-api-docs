@@ -1,7 +1,6 @@
 <form action="{{ routeLookup('openai.postLessonPlan') }}" method="post">
-    <textarea name="prompt">
-
-    </textarea>
+    <label>Lesson Plan Id</label>
+    <input type="text" name="lessonPlanId" />
 
     <input type="submit" />
 </form>
