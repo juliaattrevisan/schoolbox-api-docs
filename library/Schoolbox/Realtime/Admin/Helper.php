@@ -43,10 +43,11 @@ class Helper
      * @param int|null $roleId
      * @param string|null $roletype
      * @param string $namespace
+     * @param bool $isDryRun
      * @return string[]
      * @throws Exception
      */
-    public function applyDefaultSettings(?int $roleId, ?string $roletype, string $namespace): array
+    public function applyDefaultSettings(?int $roleId, ?string $roletype, string $namespace, bool $isDryRun = false): array
     {
         // to return log messages
         $log = [];
@@ -109,8 +110,13 @@ class Helper
         // execute the delete statement
         $deleteStatement = $this->namespaceMapper->getDatabase()->prepare($delete . $sql);
         $deleteStatement->execute($params);
-        $this->msgRerouteMapper->getDatabase()->commit();
 
-        return $log;
+         if ($isDryRun) {
+            $this->msgRerouteMapper->getDatabase()->rollBack();
+            return $log;
+        } else {
+            $this->msgRerouteMapper->getDatabase()->commit();
+            return $log;
+        }
     }
 }
