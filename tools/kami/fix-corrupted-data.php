@@ -106,9 +106,9 @@ HELP;
         }
 
         try {
-//            $this->fixCorruptedDataProblem1($assessmentId);
+            $this->fixCorruptedDataProblem1($assessmentId);
 //            $this->fixCorruptedDataProblem2($assessmentId);
-            $this->fixCorruptedDataProblem3($assessmentId);
+//            $this->fixCorruptedDataProblem3($assessmentId);
         } catch (RuntimeException $e) {
             $this->getLogger()->warning($e->getMessage());
         }
@@ -150,16 +150,16 @@ HELP;
         // Add ORDER BY to increase readability of logs.
         $query .= "\nORDER BY sb.assessment_id ASC, kd.id ASC";
 
-        $rows = $dbc->executeQuery($query, $params)->fetchAll();
+        $statement = $dbc->executeQuery($query, $params);
 
-        if (count($rows) === 0) {
+        if ($statement->rowCount() === 0) {
             $logger->info('Found 0 deleted kami_document rows linked to undeleted student_submission_file rows.');
             $logger->info('Nothing to do.');
             return;
         }
 
         $kamiDocumentIdsByAssessmentId = [];
-        foreach ($rows as $row) {
+        while ($row = $statement->fetch()) {
             if (!array_key_exists($row['assessmentId'], $kamiDocumentIdsByAssessmentId)) {
                 $kamiDocumentIdsByAssessmentId[$row['assessmentId']] = [];
             }
@@ -167,8 +167,8 @@ HELP;
         }
 
         $logger->info(
-            'Found ' . count($rows) . ' deleted kami_document rows linked to undeleted student_submission_file rows,' .
-            ' in ' . count($kamiDocumentIdsByAssessmentId) . ' assessments.'
+            'Found ' . $statement->rowCount() . ' deleted kami_document rows linked to undeleted' .
+            ' student_submission_file rows, in ' . count($kamiDocumentIdsByAssessmentId) . ' assessments.'
         );
 
         foreach ($kamiDocumentIdsByAssessmentId as $assessmentId => $kamiDocumentIds) {
