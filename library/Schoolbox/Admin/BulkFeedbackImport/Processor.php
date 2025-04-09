@@ -258,9 +258,12 @@ class Processor
 
             if (\count($candidateAssessments) > 1) {
                 $this->log(sprintf(
-                    'Row %s: multiple ' . $this->rosettaStone->translate('activity', true) . ' found for ' . $this->rosettaStone->translate('activity', false) . ' "%s" in folder "%s" (%s) using Work Type "%s" (%s).
-                    Please ensure ' . $this->rosettaStone->translate('activity', true) . ' are uniquely identifiable before continuing.',
+                    'Row %s: multiple %s found for %s "%s" in folder "%s" (%s) using Work Type "%s" (%s).
+                    Please ensure %s are uniquely identifiable before continuing.',
                     $i,
+                    $this->rosettaStone->translate('activity', true),
+                    $this->rosettaStone->translate('activity', false),
+                    $this->rosettaStone->translate('activity', true),
                     $this->assessmentTitle,
                     $folder['title'],
                     $folder['id'],
@@ -277,8 +280,9 @@ class Processor
              */
             if (0 === \count($candidateAssessments)) {
                 $this->log(sprintf(
-                    'Row %s: no ' . $this->rosettaStone->translate('activity', true) . ' found for "%s" in folder "%s" (%s) using Work Type "%s" (%s).',
+                    'Row %s: no %s found for "%s" in folder "%s" (%s) using Work Type "%s" (%s).',
                     $i,
+                    $this->rosettaStone->translate('activity', true),
                     $this->assessmentTitle,
                     $folder['title'],
                     $folder['id'],
@@ -299,8 +303,9 @@ class Processor
                  */
                 if (null === $boxId) {
                     $this->log(sprintf(
-                        'Row %s: unknown submission_box for ' . $this->rosettaStone->translate('activity', false) . ' "%s" in folder "%s" (%s)',
+                        'Row %s: unknown submission_box for %s "%s" in folder "%s" (%s)',
                         $i,
+                        $this->rosettaStone->translate('activity', false),
                         $this->assessmentTitle,
                         $folder['title'],
                         $folder['id']
@@ -326,8 +331,9 @@ class Processor
 
                 if ($normalisedMark < 0 || $normalisedMark > 100) {
                     $this->log(sprintf(
-                        'Row %s: normalised mark must be between 0 and 100 for ' . $this->rosettaStone->translate('activity', false) . ' "%s"',
+                        'Row %s: normalised mark must be between 0 and 100 for %s "%s"',
                         $i,
+                        $this->rosettaStone->translate('activity', false),
                         $this->assessmentTitle,
                     ), self::WARNING);
 
@@ -378,13 +384,14 @@ class Processor
                 ];
 
                 $this->log(sprintf(
-                    'Row %s: added grade %s (instructor grade %s, normalised mark %s) for %s (%s) in ' . $this->rosettaStone->translate('activity', false) . ' "%s" (%s) found in folder "%s" (%s)',
+                    'Row %s: added grade %s (instructor grade %s, normalised mark %s) for %s (%s) in %s "%s" (%s) found in folder "%s" (%s)',
                     $i,
                     $humanReadableMark,
                     $instructorHumanReadableMark,
                     $normalisedMark,
                     $learner['fullname'],
                     $externalId,
+                    $this->rosettaStone->translate('activity', false),
                     $assessment->getTitle(),
                     $assessment->getId(),
                     $folder['title'],
