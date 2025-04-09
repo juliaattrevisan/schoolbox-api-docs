@@ -17,7 +17,7 @@ class LessonPlan
         well-developed and effective lesson plans for your students. Each lesson should be engaging and
         appropriate for \"[CONTEXT]\" students.
         
-        Create a range of suggestions in html that align with the following field topics; each field topic should
+        Create a range of suggestions USING HTML that align with the following field topics; each field topic should
         use the fields_format json response format.
             [FIELDS]
     ";
