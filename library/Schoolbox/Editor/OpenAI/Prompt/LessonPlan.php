@@ -41,31 +41,6 @@ class LessonPlan
 
 
     /**
-     * A structure that AI is supposed to obey, but...I don't think it cares
-     */
-    public const RESPONSE_FORMAT = [
-        'name' => 'fields_format',
-        'type' => 'json_schema',
-        'strict' => true,
-        'schema' => [
-            'type' => 'object',
-            'properties' => [
-                'id' => [
-                    'type' => 'string',
-                ],
-                'title' => [
-                    'type' => 'string',
-                ],
-                'body' => [
-                    'type' => 'string',
-                ],
-            ],
-            'required' => ['id', 'title', 'body']
-        ],
-    ];
-
-
-    /**
      * @param Mapper $lessonPlanTemplateFieldMapper
      * @param Node\Mapper $curriculumNodeMapper
      */

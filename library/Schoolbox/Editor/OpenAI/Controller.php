@@ -93,7 +93,7 @@ class Controller extends Base
                 );
             }
 
-            $result = $helper->request($this->getUser(), $prompt, responseFormat: Prompt\LessonPlan::RESPONSE_FORMAT);
+            $result = $helper->request($this->getUser(), $prompt);
 
             $data = json_decode($result, true);
 

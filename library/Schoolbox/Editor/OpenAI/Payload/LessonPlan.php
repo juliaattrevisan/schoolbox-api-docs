@@ -5,6 +5,33 @@ namespace Schoolbox\Editor\OpenAI\Payload;
 class LessonPlan
 {
     /**
+     * A structure that AI is supposed to obey, but...I don't think it cares
+     */
+    public const RESPONSE_FORMAT = [
+        'format' => [
+            'type' => 'json_schema',
+            'name' => 'fields_format',
+            'schema' => [
+                'type' => 'object',
+                'properties' => [
+                    'id' => [
+                        'type' => 'string',
+                    ],
+                    'title' => [
+                        'type' => 'string',
+                    ],
+                    'body' => [
+                        'type' => 'string',
+                    ],
+                ],
+                'required' => ['id', 'title', 'body']
+            ],
+            'strict' => true
+        ]
+    ];
+
+
+    /**
      * @param string $openAiModel
      */
     public function __construct(private string $openAiModel)
@@ -17,12 +44,11 @@ class LessonPlan
      *
      * @param string $systemContent
      * @param string $userContent
-     * @param ?array $responseFormat
      * @param bool $stream
      * @return string
      * @throws \JsonException
      */
-    public function generate(string $systemContent, string $userContent, ?array $responseFormat = null, bool $stream = false): string
+    public function generate(string $systemContent, string $userContent, bool $stream = false): string
     {
         $payload = [
             /* An ordered list of instructions for OpenAi
@@ -53,16 +79,8 @@ class LessonPlan
             "top_p" => 1,
             /* For futureproofing: never really used atm
              */
-            "stream" => $stream
+            "stream" => $stream,
         ];
-        header('Content-Type: application/json');
-        header('Content-Encoding: none');
-new \Alaress_Probe($payload);die();
-        // only format if requested
-        if ($responseFormat) {
-            $payload['response_format'] = ["type" => "json_object"];
-            $payload['functions'] = [$responseFormat];
-        }
 
         return json_encode($payload, JSON_THROW_ON_ERROR);
     }

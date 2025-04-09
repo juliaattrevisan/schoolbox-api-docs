@@ -51,13 +51,13 @@ class Helper
      * hits openAI and returns the string response (you need to json decode yourself...)
      *
      * @param User $user // user to log the request against
-     * @param string|null $prompt // if generating a payload, use this prompt
+     * @param array|null $prompt // if generating a payload, use this prompt
      * @param string|null $payload // use this payload instead of generating one
      * @param array|null $responseFormat // null, or array of response format
      * @return string|null
+     * @throws ClientExceptionInterface
      * @throws Exception
      * @throws \JsonException
-     * @throws ClientExceptionInterface
      */
     public function request(User $user, ?array $prompt = null, ?string $payload = null, ?array $responseFormat = null): ?string
     {
@@ -71,7 +71,6 @@ class Helper
         $payload = $payload ?? (new Payload\LessonPlan($this->openAiModel))->generate(
             $prompt['system'],
             $prompt['user'],
-            $responseFormat
         );
 
         try {
