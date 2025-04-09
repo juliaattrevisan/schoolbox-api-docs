@@ -337,10 +337,15 @@ abstract class Kernel
     {
         $this->previousErrorHandler = set_error_handler(
             function ($errNum, $errStr, $errFile, $errLine) {
-                // Consider returning early from silenced deprecations here?
-                // They should not be sent to Sentry.
+                // Explicitly silenced deprecations should not be sent to
+                // Sentry, or otherwise handled.
+                if ($errNum & (E_DEPRECATED | E_USER_DEPRECATED)) {
+                    if (\Schoolbox\Deprecation\Registry::silenceWarningsForPath($errFile)) {
+                        return true;
+                    }
+                }
 
-                // Call the previous error handler too:
+                // Call the previous error handler (presumably Sentry's):
                 // but what should be done with its return, and when should it
                 // be called?
                 if (is_callable($this->previousErrorHandler)) {
