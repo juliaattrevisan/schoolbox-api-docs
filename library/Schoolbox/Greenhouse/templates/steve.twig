@@ -1,6 +1,21 @@
+<script>
+    $(function() {
+        $('#simForm').submit(function(event) {
+            event.preventDefault();
+
+            let data = $('#simForm').serializeArray();
+
+            $.post($('#simForm').attr('action'), data, function(responseText) {
+                let result = JSON.parse(responseText);
+
+                console.log(result);
+            })
+        })
+    });
+</script>
 <div class="small-12 island">
     <section class="content">
-        <form action="{{ routeLookup('openai.postLessonPlan') }}" method="post">
+        <form action="{{ routeLookup('openai.postLessonPlan') }}" method="post" id="simForm">
             <fieldset>
                 <label>Lesson Plan Id</label>
                 <input type="text" name="lessonPlanId" />
@@ -17,7 +32,7 @@
                 <input type="text" name="lessonPlanTemplateFieldIds" />
 
                 <label>Curric Node Ids</label>
-                <input type="text" name="curriculumNodeIds" />
+                <input type="text" name="curriculumNodeIds" id="submit" />
             </fieldset>
 
             <input type="submit" />
