@@ -61,7 +61,17 @@ HELP;
         $msgSourceMapper  = \Schoolbox\Realtime\Message\SourceMapper::getInstance();
         $roleMapper       = RoleMapper::getInstance();
 
-        $helper = new Helper($roleMapper, $msgRerouteMapper, $msgNamespaceMapper);
+        try {
+            $helper = new Helper($roleMapper, $msgRerouteMapper, $msgNamespaceMapper);
+            $logs = $helper->applyDefaultSettings($this->getOpt('role:'), $this->getOpt('roletype:'), $this->getOpt('namespace:'), $this->perform());
+            foreach ($logs as $log) {
+                $this->getLogger()->info($log);
+            }
+
+        } catch (\Exception $e) {
+            $this->getLogger()->error('Unable to start transaction: ' . $e->getMessage());
+            exit(0);
+        }
 
         // $roleId = $this->getOpt('role:');
         // if ($roleId) {

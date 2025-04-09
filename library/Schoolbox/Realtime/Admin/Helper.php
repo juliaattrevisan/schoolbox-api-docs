@@ -104,7 +104,7 @@ class Helper
         // the below currently results in an error: Cannot use object of type Schoolbox\Realtime\Message\NS as array
         $statement = $this->namespaceMapper->getDatabase()->query($select . $sql, $params);
         foreach ($statement->fetchAll() as $item) {
-            $log[] = sprintf('%s, %s, %s, %s', $item['user_id'], $item['slug'], $item['key'], $item['delivery']);
+            $log[] = sprintf('user id=%s, namespace=%s, type=%s, delivery=%s', $item['user_id'], $item['slug'], $item['key'], $item['delivery']);
         }
 
         // execute the delete statement
@@ -112,11 +112,11 @@ class Helper
         $deleteStatement->execute($params);
 
         if ($isDryRun) {
-            $this->msgRerouteMapper->getDatabase()->rollBack();
+            $this->msgRerouteMapper->getDatabase()->commit();
             $log[] = $deleteStatement->rowCount() . ' entries are deleted';
             return $log;
         } else {
-            $this->msgRerouteMapper->getDatabase()->commit();
+            $this->msgRerouteMapper->getDatabase()->rollBack();
             $log[] = $deleteStatement->rowCount() . ' entries will be deleted';
             return $log;
         }
