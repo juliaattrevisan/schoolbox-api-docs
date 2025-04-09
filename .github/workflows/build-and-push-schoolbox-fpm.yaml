@@ -105,7 +105,7 @@ jobs:
   push-schoolbox-fpm-alpine-to-ecr:
     needs:
       - build-and-push-schoolbox-fpm
-    uses: ./.github/workflows/push-to-ecr.yaml
+    uses: ./.github/workflows/helper-push-to-ecr.yaml
     with:
       image: schoolbox-fpm
     secrets: inherit

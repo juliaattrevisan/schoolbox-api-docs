@@ -1,4 +1,4 @@
-name: Build and push to AWS ECR
+name: Build and push to Dockerhub
 
 on:
   workflow_call:
@@ -45,7 +45,7 @@ on:
 # build runs on the same architecture as the image it's building:
 # QEMU building an ARM64 image on an AMD64 arch is too slow to be acceptable.
 jobs:
-  push-to-ecr:
+  build-and-push:
     env:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
