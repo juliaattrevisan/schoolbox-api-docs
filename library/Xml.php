@@ -1,5 +1,7 @@
 <?php
 
+use Alaress\Http\Cache;
+
 /**
  * Alaress_Rss_Cache
  *
@@ -12,38 +14,33 @@
  */
 class Xml
 {
+    private const CACHE_PREFIX = 'xml_';
 
     /**
-     * Stores the XML
-     * @var SimpleXMLElement
+     * Stores the XML, if loaded
      */
-    public $xml;
-
-
-    /**
-     * @var Alaress_Rss_Cache
-     */
-    private $cache;
-
+    public ?SimpleXMLElement $xml;
 
     /**
      * Constructor
      *
-     * @param string $url
+     * @param string $url   The URL to fetch XML from.
+     * @param Cache  $cache The HTTP client cache wrapper to use to fetch `$source`.
+     * @param int    $cacheTimeout
      * @throws InvalidArgumentException
      */
-    public function __construct($url)
-    {
+    public function __construct(
+        string $url,
+        private Cache $cache,
+        private int $cacheTimeout,
+    ) {
         if (empty($url)) {
             return;
         }
 
-        /* Set up cached file
-         */
-        $this->cache = new Alaress_Rss_Cache(2, 2);
-
+        // Load from cache
         try {
-            $this->cache->init($url);
+            $response = $this->cache->request($url, self::CACHE_PREFIX, [], $this->cacheTimeout);
         } catch (\GuzzleHttp\Exception\GuzzleException $e) {
             /**
              * Either requesting the RSS feed, or the RSS feed failed, error out here.
@@ -52,11 +49,9 @@ class Xml
             return;
         }
 
-        /* Load from cached file
-         * Delete the cached file if it can't be loaded correctly
-         */
         try {
-            $this->xml = $this->cache->load();
+            libxml_use_internal_errors(true);
+            $this->xml = new SimpleXMLElement($response);
         } catch (Exception $e) {
             return;
         }

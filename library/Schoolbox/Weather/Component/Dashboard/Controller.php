@@ -20,7 +20,6 @@ use Schoolbox\Weather\WeatherstackClient;
  */
 class Controller extends Component_Dashboard_ControllerAbstract
 {
-
     /**
      * Default number of days for the Forecast view which is what you see
      * on the dashboard component itself
@@ -51,10 +50,9 @@ class Controller extends Component_Dashboard_ControllerAbstract
         // 'days' param includes today, so we have to increment this by 1 to mimic previous API behavior
         $forecastLimit++;
 
-        $apiKey = $this->getConfigLoader()->get('weather_api_key');
-        $apiUrl = $this->getConfigLoader()->get('weather_api_url');
-
-        $this->weatherPayload                           = (new WeatherstackClient($apiKey, $apiUrl))->getForecast($forecastLimit, $location);
+        /** @var WeatherstackClient $weatherClient */
+        $weatherClient                                  = $this->getSitePage()->getDi()->get('weatherClient');
+        $this->weatherPayload                           = $weatherClient->getForecast($forecastLimit, $location);
         $this->weatherPayload['weeklyForecastLocation'] = $location;
 
         /* If the api couldn't understand your location, set the component name to some default

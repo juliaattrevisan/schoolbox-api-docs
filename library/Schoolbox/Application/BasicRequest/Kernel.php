@@ -290,6 +290,44 @@ class Kernel extends WebKernelAbstract
             ),
         );
 
+        // Cache wrappers around HTTP clients
+        $di->set(
+            'httpClient.internalCache',
+            $di->lazy(
+                function () use ($di) {
+                    return new SimpleCacheBridge(
+                        new ItemPool(
+                            $di->get('redis.cache'),
+                            new Base64(),
+                            new KeyGenerator('httpClient', INSTANCE_ID),
+                        )
+                    );
+                }
+            ),
+        );
+        $di->set(
+            'httpClient.cache',
+            $di->lazyNew(
+                \Alaress\Http\Cache::class,
+                [
+                    'httpClient'      => $di->lazyGet('httpClient'),
+                    'internalCache'   => $di->lazyGet('httpClient.internalCache'),
+                    'defaultLifetime' => null,
+                    'baseUrl'         => $di->lazyGet('baseUrl'),
+                ]
+            )
+        );
+
+        // Base URL: finally add this to DI
+        $di->set(
+            'baseUrl',
+            $di->lazy(
+                function () use ($config) {
+                    return (new \Schoolbox\Url\Factory($config))->buildFullyQualified();
+                }
+            )
+        );
+
         // add sentry to the DI
         $di->set(
             'sentry',

@@ -1,5 +1,7 @@
 <?php
 
+use Alaress\Http\Cache;
+
 /**
  * Alaress_Rss_Stream
  *
@@ -51,10 +53,15 @@ class Alaress_Rss_Stream
      * Optionally takes a source url as an input. You can override
      * this by using setSource() after instantiation
      *
-     * @param null|string $source
+     * @param null|string $source       The source URL to use, if any.
+     * @param Cache       $cache        The HTTP client cache wrapper to use to fetch `$source`.
+     * @param int         $cacheTimeout The timeout for the cache.
      */
-    public function __construct($source = null)
-    {
+    public function __construct(
+        ?string $source,
+        private Cache $cache,
+        private int $cacheTimeout,
+    ) {
         if ($source !== null && filter_var($source, FILTER_VALIDATE_URL)) {
             $this->setSource($source);
         }
@@ -70,7 +77,7 @@ class Alaress_Rss_Stream
         if ($this->getSource() !== null) {
             /* The Xml class already uses caching
              */
-            $this->setInput(new Xml($this->getSource()));
+            $this->setInput(new Xml($this->getSource(), $this->cache, $this->cacheTimeout));
 
             /* If there was data, try to interpret it
              */

@@ -187,6 +187,7 @@ use Schoolbox\Url\Factory as UrlFactory;
 use Schoolbox\User\Token\Mapper as TokenMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Version\Version;
+use Schoolbox\Weather\WeatherstackClient;
 use Scrub;
 use Sentry\SentrySdk;
 use SitePage;
@@ -1679,6 +1680,44 @@ abstract class Kernel
             ),
         );
 
+        // Cache wrappers around HTTP clients
+        $di->set(
+            'httpClient.internalCache',
+            $di->lazy(
+                function () use ($di) {
+                    return new SimpleCacheBridge(
+                        new ItemPool(
+                            $di->get('redis.cache'),
+                            new Base64(),
+                            new KeyGenerator('httpClient', INSTANCE_ID),
+                        )
+                    );
+                }
+            ),
+        );
+        $di->set(
+            'httpClient.cache',
+            $di->lazyNew(
+                \Alaress\Http\Cache::class,
+                [
+                    'httpClient'      => $di->lazyGet('httpClient'),
+                    'internalCache'   => $di->lazyGet('httpClient.internalCache'),
+                    'defaultLifetime' => null,
+                    'baseUrl'         => $di->lazyGet('baseUrl'),
+                ]
+            )
+        );
+
+        // Base URL: finally add this to DI
+        $di->set(
+            'baseUrl',
+            $di->lazy(
+                function () use ($config) {
+                    return (new \Schoolbox\Url\Factory($config))->buildFullyQualified();
+                }
+            )
+        );
+
         // Kami connector, as used for communicating with Kami's API
         $di->set('kamiConnector', $di->lazyNew(Kami\Connector::class, [
             'client'            => $di->lazyGet('httpClient'),
@@ -1764,28 +1803,25 @@ abstract class Kernel
                     $assessmentDataSource  = $di->get('assessmentDataSource');
                     /** @var IConfigLoader $config */
                     $config = $di->get('config');
-                    return new Calendar_Api_Factory($assessmentDataSource, new ModuleChecker($config), $config, $databaseExternal);
+                    return new Calendar_Api_Factory(
+                        $assessmentDataSource,
+                        new ModuleChecker($config),
+                        $config,
+                        $databaseExternal,
+                        $di->get('redis.cache'),
+                        $di->get('httpClient.cache'),
+                    );
                 }
             )
         );
 
         $di->set(
             'calendarDashboardApiFactory',
-            $di->lazy(
-                function () use ($di) {
-                    try {
-                        /** @var IConnector $databaseExternal */
-                        $databaseExternal = $di->get('databaseExternal');
-                    } catch (AlaressDatabaseException $e) {
-                        $databaseExternal = null;
-                    }
-
-                    /** @var AssessmentDataSource $assessmentDataSource */
-                    $assessmentDataSource  = $di->get('assessmentDataSource');
-                    /** @var IConfigLoader $config */
-                    $config = $di->get('config');
-                    return new \Schoolbox\Calendar\Component\Dashboard\ApiFactory($assessmentDataSource, new ModuleChecker($config), $config, $databaseExternal);
-                }
+            $di->lazyNew(
+                \Schoolbox\Calendar\Component\Dashboard\ApiFactory::class,
+                [
+                    'factory' => $di->lazyGet('calendarApiFactory'),
+                ],
             )
         );
 
@@ -2216,6 +2252,20 @@ abstract class Kernel
                 [
                     'builder'      => $di->lazyGet('search.indexBuilder'),
                     'dbConnection' => $di->lazyGet('databaseInternal'),
+                ]
+            )
+        );
+
+        // Weather client
+        $di->set(
+            'weatherClient',
+            $di->lazyNew(
+                WeatherstackClient::class,
+                [
+                    'apiKey'       => $config->get('weather_api_key'),
+                    'apiUrl'       => $config->get('weather_api_url'),
+                    'cache'        => $di->lazyGet('httpClient.cache'),
+                    'cacheTimeout' => (int)$config->get('weather_api_caching'),
                 ]
             )
         );

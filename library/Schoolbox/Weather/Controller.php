@@ -20,6 +20,15 @@ class Controller extends Base
     private const DEFAULT_FORECAST_LIMIT = 5;
 
     /**
+     * Constructor
+     *
+     * @param WeatherstackClient $weatherClient Client for reading weather
+     */
+    public function __construct(private WeatherstackClient $weatherClient)
+    {
+    }
+
+    /**
      * @api GET /weather
      */
     public function getWeatherDetails()
@@ -28,12 +37,7 @@ class Controller extends Base
          */
         $location = (new Location())->detect((string)$this->requestQuery->get('location'), $this->getConfigLoader()->get('weather_location'));
 
-        $apiKey = $this->getConfigLoader()->get('weather_api_key');
-        $apiUrl = $this->getConfigLoader()->get('weather_api_url');
-
-        $weatherClient = new WeatherstackClient($apiKey, $apiUrl);
-
-        $weatherPayload = $weatherClient->getForecast(self::DEFAULT_FORECAST_LIMIT, $location);
+        $weatherPayload = $this->weatherClient->getForecast(self::DEFAULT_FORECAST_LIMIT, $location);
 
         /* Overwrite the location for twig
          *

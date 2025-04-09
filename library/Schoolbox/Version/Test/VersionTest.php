@@ -9,8 +9,15 @@ declare(strict_types=1);
 
 namespace Schoolbox\Version\Test;
 
+use Alaress\Http\Cache;
+use Cache\Adapter\PHPArray\ArrayCachePool;
+use Cache\Bridge\SimpleCache\SimpleCacheBridge;
+use GuzzleHttp\Client;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Config\ArrayLoader;
+use Schoolbox\InstanceRegistry\ApiClient;
+use Schoolbox\InstanceRegistry\InstanceRegistry;
+use Schoolbox\Url\Uri;
 use Schoolbox\Version\Version;
 
 /**
@@ -201,8 +208,27 @@ class VersionTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('getTestShowUpgradeReminderData')]
     public function testShowUpgradeReminder(?bool $expected, array $config): void
     {
-        $factoryVersion = new Version(new ArrayLoader($config));
-        $this->assertEquals($expected, $factoryVersion->showUpgradeReminder());
+        $configLoader   = new ArrayLoader($config);
+        $factoryVersion = new Version($configLoader);
+
+        // showUpgradeReminder requires a whole lot of boilerplate currently
+        $this->assertEquals(
+            $expected,
+            $factoryVersion->showUpgradeReminder(
+                new InstanceRegistry(
+                    $configLoader,
+                    new ApiClient(
+                        $configLoader,
+                        new Cache(
+                            $this->getMockBuilder(Client::class)->getMock(),
+                            new SimpleCacheBridge(new ArrayCachePool()),
+                            null,
+                            new Uri('https://vagrant.dev.schoolbox.cloud'),
+                        )
+                    )
+                ),
+            )
+        );
     }
 
     /**
@@ -216,16 +242,20 @@ class VersionTest extends TestCase
         yield 'cloud hosted never needs a upgrade reminder' => [
             false,
             [
-                'site_version'     => '21.0.2-1',
-                'site_environment' => Version::SITE_ENVIRONMENT_CLOUD_SAAS,
+                'site_version'                  => '21.0.2-1',
+                'site_environment'              => Version::SITE_ENVIRONMENT_CLOUD_SAAS,
+                'instance_registry_url'         => '',
+                'instance_registry_api_caching' => 0,
             ],
         ];
 
         yield 'non client hosting never needs a upgrade reminder' => [
             false,
             [
-                'site_version'     => '21.0.2-1',
-                'site_environment' => 'unknown-hosted',
+                'site_version'                  => '21.0.2-1',
+                'site_environment'              => 'unknown-hosted',
+                'instance_registry_url'         => '',
+                'instance_registry_api_caching' => 0,
             ],
         ];
     }
