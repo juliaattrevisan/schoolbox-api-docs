@@ -10,11 +10,13 @@ namespace Schoolbox\Editor\OpenAI;
 
 use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
+use DebugBar\DebugBarException;
 use GuzzleHttp\Client;
 use Psr\Http\Client\ClientExceptionInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception\Deleted;
 
 /**
  * This controller acts as a proxy for OpenAI API.  It just appends the configured API key to the request in
@@ -48,8 +50,9 @@ class Controller extends Base
      *
      * @return void
      * @throws Exception
+     * @throws Deleted
+     * @throws DebugBarException
      * @throws \JsonException
-     * @throws ClientExceptionInterface
      */
     public function postLessonPlan(): void
     {
@@ -65,28 +68,30 @@ class Controller extends Base
                 $this->logMapper,
             );
 
-            $promptGenerator = new Prompt\LessonPlan(
+            $payloadGenerator = (new Payload\LessonPlan(
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_MODEL)),
                 $this->lessonPlanFieldTemplateFieldMapper,
                 $this->curriculumNodeMapper
-            );
+            ));
 
-            /* Used for an existing lesson plan, typically, via the Modify screen
-             */
             if ($this->requestPost['lessonPlanId']) {
+                /* Generate a payload for ai, using the prompt pieces for System and User info
+                 * Used for an existing lesson plan, typically, via the Modify screen
+                 */
                 /** @var \Schoolbox\Learning\Assessment\LessonPlan\Model $lessonPlan */
                 $lessonPlan = $this->mapperProxy->findById($this->requestPost['lessonPlanId']);
-
                 $lessonPlanTemplate = $this->lessonPlanTemplateMapper->findById($lessonPlan->getLessonPlanTemplate());
 
-                $prompt = $promptGenerator->generateFromInstances(
+                $payload = $payloadGenerator->generateFromInstances(
                     $lessonPlan,
                     $lessonPlanTemplate->getFields(),
                     $this->requestPost->get('additionalContext') ?? ''
                 );
             } else {
-                /* From a POST payload
+                /* Generate a payload for ai, using the prompt pieces for System and User info
+                 * From a POST payload
                  */
-                $prompt = $promptGenerator->generateFromScalars(
+                $payload = $payloadGenerator->generateFromScalars(
                     $this->requestPost->get('context'),
                     $this->requestPost->get('folder'),
                     explode(',', $this->requestPost->get('lessonPlanTemplateFieldIds')),
@@ -95,13 +100,8 @@ class Controller extends Base
                 );
             }
 
-            /* Generate a payload for ai, using the prompt pieces for System and User info
-             */
-            $payload = (new Payload\LessonPlan(trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_MODEL))))->generate(
-                $prompt['system'],
-                $prompt['user'],
-            );
-new \Alaress_Probe($payload);die();
+            new \Alaress_Probe($payload);die();
+
             /* Send it and decode the result (if any: sometimes it returns null)
              * and dodge around all its weird encoding business with a double-decode,
              * and ditching all its training markdown (lol) that it loves to use
