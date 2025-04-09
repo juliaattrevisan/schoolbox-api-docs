@@ -6,17 +6,17 @@ on:
 
 jobs:
   # Build artifacts before building image
-  build-composer-artifact:
-    uses: ./.github/workflows/helper-build-composer-artifact.yaml
-
-  build-npm-artifact:
-    uses: ./.github/workflows/helper-build-npm-artifact.yaml
+#  build-composer-artifact:
+#    uses: ./.github/workflows/helper-build-composer-artifact.yaml
+#
+#  build-npm-artifact:
+#    uses: ./.github/workflows/helper-build-npm-artifact.yaml
 
   # Build schoolbox-fpm image
   build-and-push-schoolbox-fpm:
-    needs:
-      - build-composer-artifact
-      - build-npm-artifact
+#    needs:
+#      - build-composer-artifact
+#      - build-npm-artifact
     strategy:
       matrix:
         build:
