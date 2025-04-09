@@ -74,7 +74,7 @@ runs:
         file: ${{ inputs.file || '' }}
         push: true
         cache-to: type=local,dest=${{ runner.temp }}/${{ inputs.image }}-${{ inputs.platform }}-${{ inputs.arch }}
-        cache-from: type=local,dest=${{ runner.temp }}/${{ inputs.image }}-${{ inputs.platform }}-${{ inputs.arch }}
+        cache-from: type=local,src=${{ runner.temp }}/${{ inputs.image }}-${{ inputs.platform }}-${{ inputs.arch }}
         build-args: |
           ENV=prod
         platforms: ${{ inputs.platform }}/${{ inputs.arch }}
