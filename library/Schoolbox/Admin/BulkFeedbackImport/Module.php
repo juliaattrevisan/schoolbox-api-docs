@@ -66,7 +66,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(\Schoolbox\UserMapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Resource\Folder\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Resource\Storage\Mapper::class),
-            (new RosettaStoneFactory())->build(L10nMapper::getInstance()),
+            $this->injector->get('l10n'),
         );
     }
 
