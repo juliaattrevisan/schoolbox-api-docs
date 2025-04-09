@@ -7,7 +7,14 @@ import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import PastoralCountBadge from "@schoolboxLibrary/Pastoral/Count/vue/pastoral-count-badge.vue";
 import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
 import type { StudentPastoralCountBadge } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
-import type { Participant } from "../js/types/customParticipationTypes";
+import type { Participant as BaseParticipant } from "../js/types/customParticipationTypes";
+
+interface Participant extends BaseParticipant {
+    _links?: {
+        exclude?: string;
+        include?: string;
+    };
+}
 
 interface Props {
     allParticipants: Participant[];
@@ -29,9 +36,18 @@ const allSelected = window.Vue.computed({
         selectedList.value = value ? props.allParticipants.map((participant) => participant.user.id) : [];
     },
 });
+
+// to add excluded participants to the list
+const excludedParticipants = window.Vue.ref<Set<number>>(new Set());
+
 // Function to check if at least one is selected
 const isIndeterminate = window.Vue.computed(() => {
     return selectedList.value.length > 0 && selectedList.value.length < props.allParticipants.length;
+});
+
+// Function to check if any selected participant is excluded
+const hasExcludedInSelection = window.Vue.computed(() => {
+    return selectedList.value.some((id) => excludedParticipants.value.has(id));
 });
 
 const loadError = window.Vue.ref<string | null>(null);
@@ -71,13 +87,125 @@ async function getStudentPastoralCounts(): Promise<void> {
             return;
         }
         if (error instanceof Error && hasErrorMessage(error)) {
-            loadError.value = error.message;
+            // Handle the error appropriately
         }
         console.error(error);
     }
 }
+/**
+ * Excludes a participant.
+ * @param participant - The participant to exclude.
+ * @returns A promise that resolves when the operation is complete.
+ */
+async function excludeParticipant(participant: Participant): Promise<void> {
+    const excludeUrl = participant._links?.exclude;
+    if (!excludeUrl) {
+        console.warn("No exclude URL available for participant", participant);
+        return;
+    }
+
+    try {
+        const response = await fetch(excludeUrl, {
+            method: "POST",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (!response.ok) {
+            const errorMessage = await extractErrorMessage(response);
+            throw new Error(errorMessage);
+        }
+        excludedParticipants.value.add(participant.user.id);
+        if (participant._links) {
+            participant._links.include = excludeUrl.replace("/exclude", "/include");
+        }
+        if (participant._links) {
+            delete participant._links.exclude;
+        }
+    } catch (error) {
+        if (error instanceof Error && hasErrorMessage(error)) {
+            loadError.value = error.message;
+        }
+        console.error("Error excluding participant:", error);
+    }
+}
+
+/**
+ * Includes a participant.
+ * @param participant - The participant to include.
+ * @returns A promise that resolves when the operation is complete.
+ */
+async function includeParticipant(participant: Participant): Promise<void> {
+    const includeUrl = participant._links?.include;
+    if (!includeUrl) {
+        console.warn("No include URL available for participant", participant);
+        return;
+    }
+
+    try {
+        const response = await fetch(includeUrl, {
+            method: "POST",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (!response.ok) {
+            const errorMessage = await extractErrorMessage(response);
+            throw new Error(errorMessage);
+        }
+
+        excludedParticipants.value.delete(participant.user.id);
+
+        if (participant._links) {
+            participant._links.exclude = includeUrl.replace("/include", "/exclude");
+        }
+        if (participant._links) {
+            delete participant._links.include;
+        }
+    } catch (error) {
+        if (error instanceof Error && hasErrorMessage(error)) {
+            loadError.value = error.message;
+        }
+        console.error("Error including participant:", error);
+    }
+}
+
+/**
+ * Excludes the selected participants.
+ * Clears the selection after the operation is complete.
+ * @returns A promise that resolves when all exclusions are complete.
+ */
+async function excludeSelected(): Promise<void> {
+    const participantsToExclude = props.allParticipants.filter((p) => selectedList.value.includes(p.user.id));
+
+    await Promise.all(participantsToExclude.map((participant) => excludeParticipant(participant)));
+
+    selectedList.value = []; // Clear after action
+}
+
+/**
+ * Includes the selected participants.
+ * Clears the selection after the operation is complete.
+ * @returns A promise that resolves when all inclusions are complete.
+ */
+async function includeSelected(): Promise<void> {
+    const participantsToInclude = props.allParticipants.filter((p) => selectedList.value.includes(p.user.id));
+    await Promise.all(participantsToInclude.map((participant) => includeParticipant(participant)));
+    selectedList.value = []; // Clear after action
+}
+
 window.Vue.onMounted(() => {
     void getStudentPastoralCounts();
+
+    props.allParticipants.forEach((participant) => {
+        if (participant._links?.include) {
+            excludedParticipants.value.add(participant.user.id);
+        }
+    });
 });
 </script>
 
@@ -151,7 +279,9 @@ window.Vue.onMounted(() => {
                             />
                         </p>
                     </td>
-                    <td></td>
+                    <td>
+                        <span v-if="excludedParticipants.has(participant.user.id)" class="excluded"> Excluded </span>
+                    </td>
                     <td class="no-pad">
                         <div v-if="participant.user.id" class="actions-small-1">
                             <nav>
@@ -163,12 +293,26 @@ window.Vue.onMounted(() => {
                                 class="f-dropdown"
                                 move-to="#custom-participation-container"
                             >
-                                <li class="separator">Manage</li>
-                                <li><a class="icon-modify">Modify</a></li>
-                                <li><a class="icon-staff-students">Exclude</a></li>
-                                <li class="separator">Create</li>
-                                <li><a class="icon-copy">Copy Activity</a></li>
-                                <li><a class="icon-submissions">New Activity</a></li>
+                                <template v-if="participant._links?.include">
+                                    <li class="separator">Manage</li>
+                                    <li>
+                                        <a class="icon-close" @click.prevent="includeParticipant(participant)"
+                                            >Remove Customisation</a
+                                        >
+                                    </li>
+                                </template>
+                                <template v-else>
+                                    <li class="separator">Manage</li>
+                                    <li><a class="icon-modify">Modify</a></li>
+                                    <li>
+                                        <a class="icon-staff-students" @click.prevent="excludeParticipant(participant)"
+                                            >Exclude</a
+                                        >
+                                    </li>
+                                    <li class="separator">Create</li>
+                                    <li><a class="icon-copy">Copy Activity</a></li>
+                                    <li><a class="icon-submissions">New Activity</a></li>
+                                </template>
                             </ul>
                         </div>
                     </td>
@@ -181,10 +325,15 @@ window.Vue.onMounted(() => {
             </h3>
             <button class="button-clear" @click.prevent="selectedList.length = 0">Clear selection</button>
             <div class="modal-actions">
-                <a class="icon-modify submit">Modify</a>
-                <a class="icon-staff-students submit">Exclude</a>
-                <a class="icon-copy submit">Copy Activity</a>
-                <a class="icon-submissions submit">New Activity</a>
+                <template v-if="hasExcludedInSelection">
+                    <a class="icon-close submit" @click.prevent="includeSelected">Remove Customisation</a>
+                </template>
+                <template v-else>
+                    <a class="icon-modify submit">Modify</a>
+                    <a class="icon-staff-students submit" @click.prevent="excludeSelected">Exclude</a>
+                    <a class="icon-copy submit">Copy Activity</a>
+                    <a class="icon-submissions submit">New Activity</a>
+                </template>
             </div>
         </bottom-drawer>
     </div>
@@ -208,5 +357,9 @@ window.Vue.onMounted(() => {
     a {
         margin: 0 1px;
     }
+}
+.excluded {
+    display: inline-block;
+    color: #666;
 }
 </style>
