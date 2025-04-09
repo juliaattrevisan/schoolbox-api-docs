@@ -35,7 +35,7 @@ jobs:
 #        uses: docker/setup-buildx-action@v3
 
       - name: Build and push php82-alpine
-        uses: ./.github/actions/helper-build-and-push-to-ghcr.yaml
+        uses: ./.github/actions/build-and-push-to-ghcr
         with:
           platform: ${{ matrix.build.platform }}
           arch: ${{ matrix.build.arch }}
@@ -46,7 +46,7 @@ jobs:
             ghcr.io/alaress/php82-alpine:pr-${{ github.event.pull_request.number }}
 
       - name: Build and push php82-fpm-alpine
-        uses: ./.github/actions/build-and-push-to-ghcr.yaml
+        uses: ./.github/actions/build-and-push-to-ghcr
         with:
           platform: ${{ matrix.build.platform }}
           arch: ${{ matrix.build.arch }}
