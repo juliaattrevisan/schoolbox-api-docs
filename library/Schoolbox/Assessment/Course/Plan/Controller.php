@@ -833,7 +833,7 @@ class Controller extends Base
             $activities['components'][] = [
                 'componentId' => $courseBuilderComponent->getId(),
                 'heading' => $heading,
-                'inTemplate'    => in_array($heading, $activityKey),
+                'inTemplate'    => in_array(strtolower($heading), $activityKey),
             ];
         }
 
