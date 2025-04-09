@@ -97,25 +97,27 @@ class Helper
                 AND `groups`.deleted_at IS NULL";
         if (isset($targetNamespace)) {
             $sql .= " AND msg_namespace.slug = :slug";
-            $params = ['slug' => $targetNamespace];
+            $params = ['slug' => $targetNamespace->getSlug()];
         }
 
         // fetch the records to be deleted and log them
         // the below currently results in an error: Cannot use object of type Schoolbox\Realtime\Message\NS as array
-        // $statement = $this->namespaceMapper->getDatabase()->query($select . $sql, $params);
-        // foreach ($statement->fetchAll() as $item) {
-        //     $log[] = sprintf('%s, %s, %s, %s', $item['user_id'], $item['slug'], $item['key'], $item['delivery']);
-        // }
+        $statement = $this->namespaceMapper->getDatabase()->query($select . $sql, $params);
+        foreach ($statement->fetchAll() as $item) {
+            $log[] = sprintf('%s, %s, %s, %s', $item['user_id'], $item['slug'], $item['key'], $item['delivery']);
+        }
 
         // execute the delete statement
         $deleteStatement = $this->namespaceMapper->getDatabase()->prepare($delete . $sql);
         $deleteStatement->execute($params);
 
-         if ($isDryRun) {
+        if ($isDryRun) {
             $this->msgRerouteMapper->getDatabase()->rollBack();
+            $log[] = $deleteStatement->rowCount() . ' entries are deleted';
             return $log;
         } else {
             $this->msgRerouteMapper->getDatabase()->commit();
+            $log[] = $deleteStatement->rowCount() . ' entries will be deleted';
             return $log;
         }
     }
