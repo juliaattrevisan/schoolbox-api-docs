@@ -60,6 +60,8 @@ class FilesystemProxy
         private HashGenerator $hashGenerator,
         private bool $verifyPrevious,
         private string $defaultVisibility,
+        private bool $isLocal,
+        private ?string $localPath,
     ) {
     }
 
@@ -234,6 +236,40 @@ class FilesystemProxy
         return $this->filesystem->readStream(self::getPathFromHash($storage->getHash()));
     }
 
+    /**
+     * Return file path for the storage item, if file not found then return false
+     *
+     * @param IStorage $storage
+     * @return bool|string
+     */
+    public function localPath(IStorage $storage): bool|string
+    {
+        try {
+            $fileContent = $this->read($storage);
+        } catch (FilesystemException $e) {
+            /* if file not found then terminate early and return false
+             */
+            return false;
+        }
+
+        if ($this->isLocal) {
+            /* Return local storage path if files are stored locally
+             */
+            return $this->localPath . '/' . self::getPathFromHash($storage->getHash());
+        }
+
+        /* Create a copy of the remote file and return the local path
+         */
+        $localCachePath = $this->localPath . '/' . $storage->getHash();
+        if (!file_exists($localCachePath)) {
+            file_put_contents(
+                $localCachePath,
+                $fileContent,
+            );
+        }
+
+        return $localCachePath;
+    }
 
     /**
      * Proxy for:

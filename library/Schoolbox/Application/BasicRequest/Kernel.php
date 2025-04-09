@@ -533,11 +533,15 @@ class Kernel extends WebKernelAbstract
                 function () use ($di, $config) {
                     /** @var Filesystem $storage */
                     $storage = $di->get('filesystem.storage');
+                    $adapter = $config->get(ConfigMapper::NAME_OTFS_ADAPTER);
+                    $isLocal = $adapter === FilesystemFactory::FILE_SYSTEM_ADAPTER_LOCAL;
                     return new FilesystemProxy(
                         $storage,
                         new HashGenerator(),
                         $config->get(ConfigMapper::NAME_OTFS_VERIFY_PREVIOUS_FILE),
-                        FilesystemFactory::buildDefaultVisibility($config->get(ConfigMapper::NAME_OTFS_ADAPTER)),
+                        FilesystemFactory::buildDefaultVisibility($adapter),
+                        $isLocal,
+                        $isLocal ? $config->get('storage_dir') : $config->get('stream_dir'),
                     );
                 }
             )
