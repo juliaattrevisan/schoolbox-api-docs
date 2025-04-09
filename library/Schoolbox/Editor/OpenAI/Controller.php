@@ -94,7 +94,7 @@ class Controller extends Base
             }
 
             $result = $helper->request($this->getUser(), $prompt);
-var_dump($result);
+
             $data = json_decode($result, true);
 
             $this->response = $this->responseAsJson($data['choices'][0]['message']['content'] ?? null);
