@@ -1,44 +1,38 @@
 name: Build and push to Github Container Registry
 
+inputs:
+  platform:
+    description: |
+      The platform of the image to build (e.g. `linux`).
+    required: true
+  arch:
+    description: |
+      The processor architecture of the image to build
+      (e.g. `amd64`, `arm64`).
+    required: true
+  image:
+    description: |
+      The name of the image to push.
+    required: true
+  context:
+    description: |
+      The build context for the image.
+
+      Also determines what is checked out in the checkout step.
+    default: '.'
+  file:
+    default: ''
+    description: |
+      A path to the Dockerfile to use to build the image: if not provided,
+      uses the Dockerfile in `inputs.context`.
+    required: false
+  tags:
+    description: |
+      A comma-separated list of tags for the image.
+    required: true
+
 runs:
   using: composite
-  inputs:
-    platform:
-      type: string
-      description: |
-        The platform of the image to build (e.g. `linux`).
-      required: true
-    arch:
-      type: string
-      description: |
-        The processor architecture of the image to build
-        (e.g. `amd64`, `arm64`).
-      required: true
-    image:
-      type: string
-      description: |
-        The name of the image to push.
-      required: true
-    context:
-      type: string
-      description: |
-        The build context for the image.
-
-        Also determines what is checked out in the checkout step.
-      default: '.'
-    file:
-      type: string
-      default: ''
-      description: |
-        A path to the Dockerfile to use to build the image: if not provided,
-        uses the Dockerfile in `inputs.context`.
-      required: false
-    tags:
-      type: string
-      description: |
-        A comma-separated list of tags for the image.
-      required: true
-
   steps:
     - name: Load ${{ inputs.image }} cache
       uses: actions/cache@v4
