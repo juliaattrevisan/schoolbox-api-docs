@@ -164,46 +164,7 @@ class Controller extends Base
         /**
          * Grab the list of curriculum components from the Unit Template
          */
-        $module = \Component_Definition::MODULE_HOMEPAGE_TEMPLATE;
-        $class = CurriculumOverviewController::class;
-        $curriculumTemplate = [];
-        $curriculumKey = [];
-        $curriculumDefId = null;
-        $unitCurricComp = $this->componentInstanceMapper->findByContextAndClass($module, $course->getTemplate()?->getUnitTemplate()->getId(), $class);
-
-        foreach ($unitCurricComp as $curricComponent) {
-            // grab the component ID, for use later
-            $curriculumDefId = $curricComponent->getDefinitionId();
-
-            if ('' !== (string)$curricComponent->getConfigByKey('componentname')->getValue()) {
-                // if there is a value set for the component use that
-                $heading = trim($curricComponent->getConfigByKey('componentname')->getValue());
-            } elseif ('' !== $curricComponent->getConfigByKey('componentname')->getDefaultValue()) {
-                // is there a system default value for the component
-                $heading = trim($curricComponent->getConfigByKey('componentname')->getDefaultValue());
-            } else {
-                // Fallback of the php default title for textbox components
-                $heading = trim(CurriculumOverviewController::DEFAULT_COMPONENT_HEADING);
-            }
-
-            /**
-             * we need to default and check if we have a valid curriculum filter, or just return null.
-             */
-            $curricFilter = $curricComponent->getConfigByKey('curriculumTreeFilter')->getValue();
-            /**
-             * the default value is '0' if we add a node and remove it it becomes '' and legacy components don't have the config so will be null
-             */
-            if ('0' === $curricFilter || '' === $curricFilter || null === $curricFilter) {
-                $curricFilter = null;
-            } else {
-                $curricFilter = $this->nodeMapper->findOneByColumnList(['id' => $curricFilter, 'enabled' => true,]);
-            }
-            $curriculumTemplate[] = [
-                'heading' => $heading,
-                'filter' => $curricFilter,
-            ];
-            $curriculumKey[] = strtolower($heading);
-        }
+        [$curriculumTemplate, $curriculumKey, $curriculumDefId] = $this->getTemplateCurric($course->getTemplate()?->getUnitTemplate()->getId());
 
         /**
          * Grab the list of textbox components from the Unit Template
@@ -533,8 +494,8 @@ class Controller extends Base
             $this->unitSpecificationMapper->save($unitSpec);
 
             // return json of that unit specifically with components identically as the unit planner unit payload (part payload)
-            [$curriculumTemplate, $curriculumKey] = $this->getTemplateCurric($course->getTemplate()->getUnitTemplate()->getId());
-            [$activityTemplate, $activityKey] = $this->getTemplateCourseBuilder($course->getTemplate()->getUnitTemplate()->getId());
+            [$curriculumTemplate, $curriculumKey, $curriculumDefId] = $this->getTemplateCurric($course->getTemplate()?->getUnitTemplate()->getId());
+            [$activityTemplate, $activityKey] = $this->getTemplateCourseBuilder($course->getTemplate()?->getUnitTemplate()->getId());
             // Textbox and curriculum def ID can be null for now:
             // AFAICT this is unused
             $this->response = $this->responseAsJson(
@@ -544,7 +505,7 @@ class Controller extends Base
                     $curriculumKey,
                     $activityKey,
                     null,
-                    null,
+                    $curriculumDefId,
                 )
             )
                 ->withStatus(201);
@@ -990,6 +951,14 @@ class Controller extends Base
         ];
     }
 
+    /**
+     * Fetch the Curriculum Overview component info for the specified template
+     *
+     * @param int $courseTemplateId
+     * @return array
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws \Schoolbox\Mapper\Exception\NotFound
+     */
     private function getTemplateCurric(int $courseTemplateId)
     {
         /**
@@ -1000,8 +969,12 @@ class Controller extends Base
         $curriculumTemplate = [];
         $curriculumKey = [];
         $unitCurricComp = $this->componentInstanceMapper->findByContextAndClass($module, $courseTemplateId, $class);
+        $curriculumDefId = null;
 
         foreach ($unitCurricComp as $curricComponent) {
+            // grab the component ID, for use later
+            $curriculumDefId = $curricComponent->getDefinitionId();
+
             if ('' !== (string)$curricComponent->getConfigByKey('componentname')->getValue()) {
                 // if there is a value set for the component use that
                 $heading = trim($curricComponent->getConfigByKey('componentname')->getValue());
@@ -1031,11 +1004,12 @@ class Controller extends Base
             ];
             $curriculumKey[] = strtolower($heading);
         }
-        return [$curriculumTemplate, $curriculumKey];
+        return [$curriculumTemplate, $curriculumKey, $curriculumDefId];
     }
 
     /**
      * Fetch the Course Builder component info for the specified template
+     *
      * @param int $courseTemplateId
      * @return array[]
      * @throws \Schoolbox\Mapper\Exception\Deleted
