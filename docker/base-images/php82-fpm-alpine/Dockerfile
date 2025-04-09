@@ -7,6 +7,8 @@ ARG ENV=dev
 
 
 # Stage 1: base off of alaress/php82-alpine
+# Note: this is a private repository, so need to set an alternate when building
+# from a pull request.
 FROM alaress/php82-alpine AS build
 
 
