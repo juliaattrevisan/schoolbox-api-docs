@@ -43,21 +43,20 @@ jobs:
           platform: ${{ matrix.build.platform }}
           arch: ${{ matrix.build.arch }}
           image: php82-alpine
-          context: .
-          file: docker/base-images/php82-alpine/Dockerfile
+          context: docker/base-images/php82-alpine/
           tags: |
             ghcr.io/alaress/php82-alpine:pr-${{ github.event.pull_request.number }}
 
-      - name: Build and push php82-fpm-alpine
-        uses: ./.github/actions/build-and-push-to-ghcr
-        with:
-          platform: ${{ matrix.build.platform }}
-          arch: ${{ matrix.build.arch }}
-          image: php82-alpine
-          context: docker/base-images/php82-fpm-alpine
-          file: ghcr.Dockerfile
-          tags: |
-            ghcr.io/alaress/php82-fpm-alpine:pr-${{ github.event.pull_request.number }}
+#      - name: Build and push php82-fpm-alpine
+#        uses: ./.github/actions/build-and-push-to-ghcr
+#        with:
+#          platform: ${{ matrix.build.platform }}
+#          arch: ${{ matrix.build.arch }}
+#          image: php82-alpine
+#          context: docker/base-images/php82-fpm-alpine
+#          file: ghcr.Dockerfile
+#          tags: |
+#            ghcr.io/alaress/php82-fpm-alpine:pr-${{ github.event.pull_request.number }}
 
       # Extract artifacts
       - name: Download composer artifact
