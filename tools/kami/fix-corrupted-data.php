@@ -58,7 +58,7 @@ SYNOPSIS:
     $filename [OPTION]...
 
 DESCRIPTION
-    Fixes three types of data corruption found in Kami data.
+    Fixes two types of data corruption found in Kami data.
 
     Corrupted data type 1:
         Deleted kami_document rows linked to non-deleted student_submission_file rows.
