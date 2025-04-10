@@ -56,6 +56,29 @@ class Mapper extends BaseMapper
     const WORK_TYPE_QUIZ = 11;
 
     /**
+     * @var Helper|null
+     */
+    protected $learnosityHelper = null;
+
+    /**
+     * Override parent constructor so $this->learnosityHelper can be added.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        $api = new Api(
+            (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified()->getHost(),
+            $this->getConfigLoader()->get(Schoolbox\Config\ConfigMapper::NAME_LEARNOSITY_VERSION),
+            $this->getConfigLoader()->get(Schoolbox\Config\ConfigMapper::NAME_LEARNOSITY_CONSUMER_KEY),
+            $this->getConfigLoader()->get(Schoolbox\Config\ConfigMapper::NAME_LEARNOSITY_CONSUMER_SECRET),
+            new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')
+        );
+
+        $this->learnosityHelper = new Schoolbox\Learning\Learnosity\Helper($api);
+    }
+
+    /**
      * SQL map definition
      */
     protected function mapping()
@@ -127,6 +150,7 @@ class Mapper extends BaseMapper
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteFromMarkbook'));
         $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'deleteAssessment']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteAssessment']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'postSoftDeleteRestoreAssessment']);
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'syncToExternalMarkbook']);
 
         $this->registerCallback(self::CALLBACK_PRESAVE, array($this, 'setWorkType'));
@@ -314,6 +338,21 @@ class Mapper extends BaseMapper
 
 
     /**
+     * Post-restore callback.
+     * This ensures that when a soft-deleted quiz is restored in Schoolbox,
+     * the matching quiz data in Learnosity is also restored.
+     *
+     * @param Model $object
+     * @return void
+     * @throws ValidationException
+     */
+    public function postSoftDeleteRestoreAssessment(Model $object): void
+    {
+        $this->learnosityHelper->restore($object->getLearnosityReference());
+    }
+
+
+    /**
      * Calculates and returns the statistics for the given online assessment
      *
      * @param int|Model $assess
@@ -450,9 +489,6 @@ class Mapper extends BaseMapper
         $duration = $quiz->getDuration();
 
         if ($quiz->getAttempts()) {
-            /* Start preparing a Helper instance; we might have something to do
-             */
-            $helper = null;
             $quizAttemptMapper = null;
 
             foreach ($quiz->getAttempts() as $attempt) {
@@ -461,20 +497,10 @@ class Mapper extends BaseMapper
                     $expiry = (clone $attempt->getStart())->addSeconds($duration);
 
                     if ($expiry->lt($now)) {
-                        /* If a Helper didn't already exist, spawn it with the necessary parts
+                        /* If a QuizAttemptMapper didn't already exist, spawn it.
                          * Otherwise, reuse what we made previously
                          */
-                        if (null === $helper && null === $quizAttemptMapper) {
-                            $api = new Api(
-                                (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified()->getHost(),
-                                $this->getConfigLoader()->get('learnosity_version'),
-                                $this->getConfigLoader()->get('learnosity_consumer_key'),
-                                $this->getConfigLoader()->get('learnosity_consumer_secret'),
-                                new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')
-                            );
-
-                            $helper = new Schoolbox\Learning\Learnosity\Helper($api);
-
+                        if (null === $quizAttemptMapper) {
                             /** @var QuizAttemptMapper $quizAttemptMapper */
                             $quizAttemptMapper = $this->getJoinMapper('attempt');
                         }
@@ -482,7 +508,7 @@ class Mapper extends BaseMapper
                         $attempt->setFinish($expiry);
                         $this->getJoinMapper('attempt')->save($attempt);
 
-                        $helper->processAttemptCompletion($quizAttemptMapper, $assessment, $attempt);
+                        $this->learnosityHelper->processAttemptCompletion($quizAttemptMapper, $assessment, $attempt);
                         $numChanged++;
                     }
                 }
