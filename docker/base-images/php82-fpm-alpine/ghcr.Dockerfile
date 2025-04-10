@@ -11,10 +11,10 @@ FROM ghcr.io/alaress/php82-alpine AS build
 
 
 # Stage 2: build final image
-FROM php:8.2-fpm-alpine AS final
+FROM shinsenter/php:8.2-fpm-alpine AS final
 ARG ENV
 
-# Install actual dependencies
+## Install actual dependencies
 RUN apk add libzip icu-libs libldap \
             imagemagick imagemagick-heic imagemagick-raw imagemagick-svg imagemagick-tiff imagemagick-webp \
             c-client \
@@ -27,25 +27,6 @@ COPY --from=build /etc/odbc.ini      /etc/odbc.ini
 COPY --from=build /etc/odbcinst.ini  /etc/odbcinst.ini
 COPY --from=build /opt/microsoft     /opt/microsoft
 COPY --from=build /opt/mssql-tools18 /opt/mssql-tools18
-# TODO use `php -r "echo ini_get('extension_dir')`
+## TODO use `php -r "echo ini_get('extension_dir')`
 COPY --from=build /usr/local/lib/php/extensions/no-debug-non-zts-20220829 /usr/local/lib/php/extensions/no-debug-non-zts-20220829
 COPY --from=build /usr/local/etc/php/conf.d/ /usr/local/etc/php/conf.d/
-
-# Enable all built dependencies
-RUN docker-php-ext-enable zip && \
-    docker-php-ext-enable pcntl && \
-    docker-php-ext-enable pdo && \
-    docker-php-ext-enable pdo_mysql && \
-    docker-php-ext-enable mbstring && \
-    docker-php-ext-enable intl && \
-    docker-php-ext-enable curl && \
-    docker-php-ext-enable ldap && \
-    docker-php-ext-enable dom && \
-    docker-php-ext-enable sockets && \
-    docker-php-ext-enable exif && \
-    docker-php-ext-enable imap && \
-    docker-php-ext-enable redis && \
-    docker-php-ext-enable xdebug && \
-    docker-php-ext-enable imagick && \
-    docker-php-ext-enable pdo_sqlsrv && \
-    docker-php-ext-enable excimer
