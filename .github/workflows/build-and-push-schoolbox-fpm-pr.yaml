@@ -61,7 +61,7 @@ jobs:
           push: false
           cache-from: type=local,src=${{ runner.temp }}/image-cache
           cache-to: type=local,dest=${{ runner.temp }}/image-cache
-          outputs: type=local,dest=${{ runner.temp }}/output/php82-alpine
+          outputs: type=docker,dest=${{ runner.temp }}/output/php82-alpine.tar
           build-args: |
             ENV=prod
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
@@ -87,7 +87,7 @@ jobs:
           cache-from: type=local,src=${{ runner.temp }}/image-cache
           cache-to: type=local,dest=${{ runner.temp }}/image-cache
           # Try build-contexts for telling this process to use a locally loaded package
-          build-contexts: alaress/php82-alpine=${{ runner.temp }}/output/php82-alpine
+          build-contexts: alaress/php82-alpine=${{ runner.temp }}/output/php82-alpine.tar
           build-args: |
             ENV=prod
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
