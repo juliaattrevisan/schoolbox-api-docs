@@ -209,16 +209,14 @@ HELP;
             AND worksheet_template_submission_box_id IS NULL'
         );
 
-        // Using fetchAll() here will not cause memory problems because we are only selecting a column of
-        // integers.  I could not find an alternative method with similar convenience.
-        $kamiDocumentIds = $dbc->executeQuery(
+        $statement = $dbc->executeQuery(
             "SELECT id AS kamiDocumentId
             FROM kami_document kd
             $sqlWhereClause
             ORDER BY id ASC"
-        )->fetchAll(PDO::FETCH_COLUMN);
+        );
 
-        if (count($kamiDocumentIds) === 0) {
+        if ($statement->rowCount() === 0) {
             $logger->info(
                 'Found 0 non-deleted kami_document rows not linked to any student_submission_file or' .
                 ' worksheet_template_submission_box.'
@@ -228,12 +226,12 @@ HELP;
         }
 
         $logger->info(
-            'Found ' . count($kamiDocumentIds) . ' non-deleted kami_document rows not linked to any' .
+            'Found ' . $statement->rowCount() . ' non-deleted kami_document rows not linked to any' .
             ' student_submission_file or worksheet_template_submission_box.'
         );
 
         if ($this->perform()) {
-            $logger->info('Soft-deleting ' . count($kamiDocumentIds) . ' unlinked kami_document rows.');
+            $logger->info('Soft-deleting ' . $statement->rowCount() . ' unlinked kami_document rows.');
             $statement = $dbc->executeQuery(
                 "UPDATE kami_document
                 SET deleted_at = NOW()
@@ -241,7 +239,11 @@ HELP;
             );                   // of values in an IN () clause.  Doing that can exceed MySQL query length constraints.
             $logger->info('Done.  ' . $statement->rowCount() . ' kami_document rows affected.');
         } else {
-            $logger->info('Would have marked as deleted ' . count($kamiDocumentIds) . ' unlinked kami_document rows.');
+            $logger->info('Would have marked as deleted ' . $statement->rowCount() . ' unlinked kami_document rows.');
+        }
+        $kamiDocumentIds = [];
+        while ($row = $statement->fetch()) {
+            $kamiDocumentIds[] = $row['kamiDocumentId'];
         }
         $logger->debug('kamiDocumentIds: ' . implode(',', $kamiDocumentIds));
     }
