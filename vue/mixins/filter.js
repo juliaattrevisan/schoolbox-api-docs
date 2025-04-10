@@ -53,7 +53,6 @@ export default {
                 this.$refs.toast.activate("Loading...");
             }
 
-
             // If the url already has search parameters append instead of starting one
             const urlSearch = new URL(`${window.location.origin}${this.filter_endpoint}`);
             const joinVar = urlSearch.searchParams.size > 0 ? "&" : "?";
