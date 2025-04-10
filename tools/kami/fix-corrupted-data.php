@@ -203,15 +203,19 @@ HELP;
         $dbc = $this->getDatabaseInternal();
         $logger = $this->getLogger();
 
+        $sqlWhereClause = (
+            'WHERE deleted_at IS NULL
+            AND student_submission_file_id IS NULL
+            AND worksheet_template_submission_box_id IS NULL'
+        );
+
         // Using fetchAll() here will not cause memory problems because we are only selecting a column of
         // integers.  I could not find an alternative method with similar convenience.
         $kamiDocumentIds = $dbc->executeQuery(
-            'SELECT id AS kamiDocumentId
+            "SELECT id AS kamiDocumentId
             FROM kami_document kd
-            WHERE deleted_at IS NULL
-            AND student_submission_file_id IS NULL
-            AND worksheet_template_submission_box_id IS NULL
-            ORDER BY id ASC'
+            $sqlWhereClause
+            ORDER BY id ASC"
         )->fetchAll(PDO::FETCH_COLUMN);
 
         if (count($kamiDocumentIds) === 0) {
@@ -231,10 +235,10 @@ HELP;
         if ($this->perform()) {
             $logger->info('Soft-deleting ' . count($kamiDocumentIds) . ' unlinked kami_document rows.');
             $statement = $dbc->executeQuery(
-                'UPDATE kami_document
+                "UPDATE kami_document
                 SET deleted_at = NOW()
-                WHERE id IN (' . implode(',', array_map('intval', $kamiDocumentIds)) . ')'
-            );
+                $sqlWhereClause" // The WHERE clause from above is used here to avoid supplying potentially thousands
+            );                   // of values in an IN () clause.  Doing that can exceed MySQL query length constraints.
             $logger->info('Done.  ' . $statement->rowCount() . ' kami_document rows affected.');
         } else {
             $logger->info('Would have marked as deleted ' . count($kamiDocumentIds) . ' unlinked kami_document rows.');
