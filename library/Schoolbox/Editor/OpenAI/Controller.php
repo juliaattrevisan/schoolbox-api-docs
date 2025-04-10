@@ -100,9 +100,6 @@ class Controller extends Base
                 );
             }
 
-//            new \Alaress_Probe($payload);
-//            die();
-
             /* Send it and decode the result (if any: sometimes it returns null)
              * and dodge around all its weird encoding business with a double-decode,
              * and ditching all its training markdown (lol) that it loves to use
@@ -115,6 +112,12 @@ class Controller extends Base
 
             $result = preg_replace('/\\n(\s)*/', '', $data['choices'][0]['message']['content']);
 
+header('Content-Type: application/json');
+header('Content-Encoding: none');
+print_r($payload);
+echo "\n\n\n";
+print_r($result);
+die();
             $this->response = $this->responseAsJson($result ?? null);
 
             return;

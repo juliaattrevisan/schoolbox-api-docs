@@ -12,20 +12,6 @@ use Schoolbox\Mapper\Exception\Deleted;
 class LessonPlan
 {
     /**
-     * A prompt template stolen from SA-19690 comment thread.
-     */
-    private const PROMPT_TEMPLATE = "
-        You are an expert \"[CONTEXT]\" teacher for a class \"[FOLDER]\", proficient in creating engaging, 
-        well-developed and effective lesson plans for your students. Each lesson should be engaging and
-        appropriate for \"[CONTEXT]\" students.
-        
-        Create a range of suggestions USING HTML that align with the following field topics; each field topic should
-        use the fields_format json response format.
-            [FIELDS]
-    ";
-
-
-    /**
      * This seems mostly the same across most usagse, other than specifiying that context
      * (some parts stolen directly from openai's docs)
      */
@@ -42,15 +28,6 @@ class LessonPlan
         Your entire response/output is going to consist of a single JSON object {}, and you will NOT 
         wrap it within JSON md markers.
     ";
-
-
-    /**
-     * This ends up being a semicolon+newline separated list of curriculum node names.
-     */
-    private const PROMPT_TEMPLATE_CURRICULUM = '
-        Each lesson should be aligned to the following curriculum outcomes:
-%s.
-    ';
 
 
     /**
@@ -100,7 +77,6 @@ class LessonPlan
      * @param GenericCollection $lessonPlanTemplateFields
      * @param string $additionalContext
      * @return string
-     * @throws DebugBarException
      * @throws Deleted
      * @throws Exception
      * @throws \JsonException
@@ -137,17 +113,10 @@ class LessonPlan
          */
         $curriculumNames = $this->compileNodeTitles($lessonPlan->getCurriculumNodes());
 
-        //        if ('' !== $curriculumNames) {
-        //            $curriculum = sprintf(
-        //                self::PROMPT_TEMPLATE_CURRICULUM,
-        //                $curriculumNames
-        //            );
-        //        }
-
         $prompt = $this->generatePrompt(
             $context,
             $folder,
-            $curriculum,
+            $curriculumNames,
             $additionalContext
         );
 
@@ -193,17 +162,10 @@ class LessonPlan
          */
         $curriculumNames = $this->compileNodeTitles($this->curriculumNodeMapper->findByColumn('id', $curriculumNodeIds));
 
-        //        if ('' !== $curriculumNames) {
-        //            $curriculum = sprintf(
-        //                self::PROMPT_TEMPLATE_CURRICULUM,
-        //                $curriculumNames
-        //            );
-        //        }
-
         $prompt = $this->generatePrompt(
             $context,
             $folder,
-            $curriculum,
+            $curriculumNames,
             $additionalContext
         );
 
@@ -218,17 +180,16 @@ class LessonPlan
      *
      * @param string $context
      * @param string $folder
-     * @param string $curriculum
+     * @param array $curriculumNames
      * @param string $additionalContext
      * @return array
      */
     private function generatePrompt(
         string $context,
         string $folder,
-        string $curriculum,
+        array $curriculumNames,
         string $additionalContext = ''
     ): array {
-
         /* Conduct replacements
          */
         $systemContent = strtr(self::PROMPT_SYSTEM_PERSONA, [
@@ -241,8 +202,12 @@ class LessonPlan
          */
         $userContent = '';
 
-        if ('' !== $curriculum) {
-            $userContent .= $curriculum;
+        if (\count($curriculumNames)) {
+            $userContent = "Create lesson plans aligned to the curriculum areas listed below.\n\n";
+
+            foreach ($curriculumNames as $fieldId => $val) {
+                $userContent .= $val;
+            }
         }
 
         if ('' !== $additionalContext) {
@@ -387,6 +352,7 @@ class LessonPlan
      *
      * @param string $systemContent
      * @param string $userContent
+     * @param array $responseFormat
      * @param bool $stream
      * @return string
      * @throws \JsonException
@@ -426,7 +392,6 @@ class LessonPlan
             'format' => $responseFormat
         ];
 
-        new \Alaress_Probe($payload);die();
         return json_encode($payload, JSON_THROW_ON_ERROR);
     }
 }
