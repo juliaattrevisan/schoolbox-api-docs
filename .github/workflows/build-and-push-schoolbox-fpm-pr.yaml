@@ -52,16 +52,23 @@ jobs:
 #        run: |
 #          mkdir -p ${{ runner.temp }}/image-cache
 
+      - name: Load php82-alpine image cache
+        uses: actions/cache@v4
+        id: cache-php82-alpine
+        with:
+          path: ${{ runner.temp }}/php82-alpine.tar
+          key: php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}-${{ hashFiles('docker/base-images/**/*') }}
+
       - name: Build php82-alpine
         uses: docker/build-push-action@v6
-#        if: steps.cache-base-images.outputs.cache-hit != 'true'
+        if: steps.cache-php82-alpine.outputs.cache-hit != 'true'
         with:
           context: docker/base-images/php82-alpine/
           load: true
           push: false
           cache-from: type=local,src=${{ runner.temp }}/image-cache
           cache-to: type=local,dest=${{ runner.temp }}/image-cache
-          outputs: type=docker,dest=${{ runner.temp }}/output/php82-alpine.tar
+          outputs: type=docker,dest=${{ runner.temp }}/php82-alpine.tar
           build-args: |
             ENV=prod
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
@@ -69,13 +76,20 @@ jobs:
             alaress/php82-alpine:pr-${{ github.event.pull_request.number }}
             alaress/php82-alpine:latest
 
-      - name: List images
-        run: |
-          docker image ls
+#      - name: List images
+#        run: |
+#          docker image ls
+#
+#      - name: List image cache
+#        run: |
+#          ls -al ${{ runner.temp }}/image-cache
 
-      - name: List image cache
-        run: |
-          ls -al ${{ runner.temp }}/image-cache
+#      - name: Load php82-fpm-alpine image cache
+#        uses: actions/cache@v4
+#        id: cache-php82-fpm-alpine
+#        with:
+#          path: ${{ runner.temp }}/output/php82-fpm-alpine.tar
+#          key: php82-fpm-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}-${{ hashFiles('docker/base-images/**/*') }}
 
       - name: Build php82-fpm-alpine
         uses: docker/build-push-action@v6
@@ -87,7 +101,7 @@ jobs:
           cache-from: type=local,src=${{ runner.temp }}/image-cache
           cache-to: type=local,dest=${{ runner.temp }}/image-cache
           # Try build-contexts for telling this process to use a locally loaded package
-          build-contexts: alaress/php82-alpine=${{ runner.temp }}/output/php82-alpine.tar
+          build-contexts: alaress/php82-alpine=${{ runner.temp }}/php82-alpine.tar
           build-args: |
             ENV=prod
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
