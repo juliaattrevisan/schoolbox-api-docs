@@ -21,6 +21,7 @@ import UpUnitCellTextboxEmpty from "./up-unit-cell-textbox-empty.vue";
 import UpUnitCellActivitiesListContent from "./up-unit-cell-activities-list-content.vue";
 import ActivitiesListAction from "./activities-list/activities-list-action.vue";
 import ActivitiesListEmpty from "./activities-list/activities-list-empty.vue";
+import UpUnitCellActivitiesListEmpty from "./up-unit-cell-activities-list-empty.vue";
 import UpUnitCellRubricCapabilitiesContent from "./up-unit-cell-rubric-capabilities-content.vue";
 import UpUnitCellRubricCapabilitiesAction from "./up-unit-cell-rubric-capabilities-action.vue";
 import UpUnitCellRubricCapabilitiesEmpty from "./up-unit-cell-rubric-capabilities-empty.vue";
@@ -339,7 +340,10 @@ const isFirstUnit = window.Vue.computed(() => {
                     @modify-clicked="textboxContentComponent?.focusEditor"
                     @create-clicked="textboxActionComponent?.onCreateClicked"
                 />
-                <activities-list-empty v-else-if="props.column.type === ColumnType.ACTIVITIES" />
+                <up-unit-cell-activities-list-empty
+                    :unit="props.unit"
+                    v-else-if="props.column.type === ColumnType.ACTIVITIES"
+                />
                 <up-unit-cell-rubric-capabilities-empty
                     v-else-if="props.column.type === ColumnType.RUBRIC_CAPABILITIES"
                     :unit="props.unit"
