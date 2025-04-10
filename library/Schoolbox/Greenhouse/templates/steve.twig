@@ -1,16 +1,16 @@
-<script>
-    $(function() {
-        $('#simForm').submit(function(event) {
-            event.preventDefault();
+{#<script>#}
+{#    $(function() {#}
+{#        $('#simForm').submit(function(event) {#}
+{#            event.preventDefault();#}
 
-            let data = $('#simForm').serializeArray();
+{#            let data = $('#simForm').serializeArray();#}
 
-            $.post($('#simForm').attr('action'), data, function(responseText) {
-                console.log(responseText);
-            })
-        })
-    });
-</script>
+{#            $.post($('#simForm').attr('action'), data, function(responseText) {#}
+{#                console.log(responseText);#}
+{#            })#}
+{#        })#}
+{#    });#}
+{#</script>#}
 <div class="small-12 island">
     <section class="content">
         <form action="{{ routeLookup('openai.postLessonPlan') }}" method="post" id="simForm">

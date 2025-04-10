@@ -84,6 +84,25 @@ class Controller extends Base
                 'additionalContext' => $this->requestPost->get('additionalContext') ?? ''
             ];
 
+//            $inputs = [
+//                'context' => 'Year 8 science',
+//                'folder' => 'Snakes',
+//                'fields' => [
+//                    [
+//                        'id' => 189235,
+//                        'title' => 'Stimsons Pythons',
+//                        'description' => 'Write a paragraph describing the life cycle of the Stimsons Python',
+//                        'visibility' => 'student',
+//                        'body' => 'bleah',
+//                        'selected' => true
+//                    ]
+//                ],
+//                'curriculumNodeIds' => [
+//                    7561, 6310, 6299
+//                ],
+//                'additionalContext' => '',
+//            ];
+
             $payload = $payloadGenerator->generate(
                 $inputs['context'],
                 $inputs['folder'],
