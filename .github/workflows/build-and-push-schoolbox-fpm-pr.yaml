@@ -79,7 +79,9 @@ jobs:
       - name: Extract php82-alpine
         run: |
           cd ${{ runner.temp }}
-          tar -xf php82-alpine.tar
+          mkdir php82-alpine
+          tar -tf php82-alpine.tar
+          tar -xf php82-alpine.tar -C php82-alpine
 
 #      - name: List images
 #        run: |
