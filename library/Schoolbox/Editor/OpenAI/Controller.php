@@ -109,6 +109,7 @@ class Controller extends Base
 
             $data = json_decode($result, true);
 
+            new \Alaress_Probe($data);
             $result = preg_replace('/\\n(\s)*/', '', $data['choices'][0]['message']['content']);
 
             $this->response = $this->responseAsJson(json_decode($result) ?? null);

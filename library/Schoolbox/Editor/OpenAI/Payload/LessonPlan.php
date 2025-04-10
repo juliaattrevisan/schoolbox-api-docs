@@ -23,7 +23,7 @@ class LessonPlan
      * (some parts stolen directly from openai's docs)
      */
     private const PROMPT_SYSTEM_PERSONA = "
-        You are a qualified teacher looking to generate a lesson plan for year 9 science.
+        You are a qualified teacher looking to generate a lesson plan for [CONTEXT] in a class called [FOLDER].
         
         Your entire response/output is going to consist of a single JSON object {}, and you will NOT 
         wrap it within JSON md markers.
@@ -136,7 +136,6 @@ class LessonPlan
      * @param array $curriculumNodeIds
      * @param string $additionalContext
      * @return string
-     * @throws DebugBarException
      * @throws Deleted
      * @throws Exception
      * @throws \JsonException
@@ -152,10 +151,6 @@ class LessonPlan
          */
         $responseFormat = self::RESPONSE_FORMAT;
         $responseFormat = $this->augmentProperties($responseFormat, $this->lessonPlanTemplateFieldMapper->findByColumn('id', $lessonPlanTemplateFieldIds));
-
-        /* Find some curriculum node names, if any were chosen
-         */
-        $curriculum = '';
 
         /* TODO This is currently a node's full ancestry, index by the node id
          *  This goes into the payload in a different way than a string injection
@@ -202,18 +197,18 @@ class LessonPlan
          * provide additional instructions (if meaningful)
          */
         $userContent = '';
-
-        if (\count($curriculumNames)) {
-            $userContent = "Create lesson plans aligned to the curriculum areas listed below.\n\n";
-
-            foreach ($curriculumNames as $fieldId => $val) {
-                $userContent .= $val;
-            }
-        }
-
-        if ('' !== $additionalContext) {
-            $userContent .= sprintf(self::PROMPT_TEMPLATE_ADDITIONAL_CONTEXT, $additionalContext);
-        }
+//
+//        if (\count($curriculumNames)) {
+//            $userContent = "Create lesson plans aligned to the curriculum areas listed below.\n\n";
+//
+//            foreach ($curriculumNames as $fieldId => $val) {
+//                $userContent .= $val;
+//            }
+//        }
+//
+//        if ('' !== $additionalContext) {
+//            $userContent .= sprintf(self::PROMPT_TEMPLATE_ADDITIONAL_CONTEXT, $additionalContext);
+//        }
 
         return [
             'system' => $systemContent,
@@ -392,9 +387,6 @@ class LessonPlan
             "stream" => $stream,
             'format' => $responseFormat
         ];
-
-//        new \Alaress_Probe($payload);
-//        die();
 
         return json_encode($payload, JSON_THROW_ON_ERROR);
     }

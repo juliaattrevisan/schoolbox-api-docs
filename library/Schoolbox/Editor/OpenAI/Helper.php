@@ -22,12 +22,22 @@ class Helper
 {
     /**
      * There are apparently two different endpoint flavours that we can chooze
+     *
+     * The CHAT endpoint is for Little Robot Dude, a conversational generator.
+     * The REQUEST endpoint is for everything else, obeys structured output
      */
     private const ENDPOINT_TYPE_OPENAI = 'OpenAI';
-    private const ENDPOINT_HOST_OPENAI = 'https://api.openai.com/v1/chat/completions';
+    private const ENDPOINT_HOST_OPENAI_CHAT = 'https://api.openai.com/v1/chat/completions';
+    private const ENDPOINT_HOST_OPENAI_REQUEST = 'https://api.openai.com/v1/completions';
 
     private const ENDPOINT_TYPE_AZURE = 'Azure';
     private const ENDPOINT_HOST_AZURE = 'https://%s.openai.azure.com/openai/deployments/%s/chat/completions?api-version=2023-12-01-preview';
+
+
+    /**
+     * Use the conversational chatgippity variant
+     */
+    private const CHAT = 'chat';
 
 
     /**
@@ -128,7 +138,7 @@ class Helper
         $payload = $payload ?? (new Payload\LittleRobotDude($this->openAiModel))->generate($prompt, stream: true);
 
         try {
-            $openAiRequest = new Request('POST', $this->getEndpoint(), array_merge(
+            $openAiRequest = new Request('POST', $this->getEndpoint(self::CHAT), array_merge(
                 $this->getAuthorization(),
                 ['Content-Type' => 'application/json'],
             ), $payload);
@@ -214,11 +224,15 @@ class Helper
      * Creates an endpoint URL string for the user selected endpoint.  They can choose between OpenAI and Azure.
      *
      */
-    private function getEndpoint(): string
+    private function getEndpoint($type = null): string
     {
         switch ($this->openAiEndpoint) {
             case self::ENDPOINT_TYPE_OPENAI:
-                return self::ENDPOINT_HOST_OPENAI;
+                if (self::CHAT === $type) {
+                    return self::ENDPOINT_HOST_OPENAI_CHAT;
+                }
+
+                return self::ENDPOINT_HOST_OPENAI_REQUEST;
             case self::ENDPOINT_TYPE_AZURE:
                 if (empty($this->openAiAzureResourceName) || empty($this->openAiAzureDeploymentId)) {
                     throw new \UnexpectedValueException('Azure resource name and deployment ID are required');
