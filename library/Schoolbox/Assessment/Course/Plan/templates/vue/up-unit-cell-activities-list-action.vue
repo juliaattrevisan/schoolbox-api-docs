@@ -17,9 +17,11 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const activitiesStore = useActivitiesListStore();
+const activitiesListStoreId = `${props.unit.id}-${props.column.id}`;
+
+const activitiesListStore = useActivitiesListStore(activitiesListStoreId);
 const component = window.Vue.ref<CurriculumOverviewComponent | null>(
-    activitiesStore().getComponent(props.unit.curriculum.components, props.column),
+    activitiesListStore().getComponent(props.unit.curriculum.components, props.column),
 );
 const isCreating = window.Vue.ref(false);
 
@@ -29,7 +31,7 @@ const isCreating = window.Vue.ref(false);
 window.Vue.watch(
     () => props.unit.curriculum.components,
     () => {
-      component.value = activitiesStore().getComponent(props.unit.curriculum.components, props.column);
+      component.value = activitiesListStore().getComponent(props.unit.curriculum.components, props.column);
     },
     { deep: true },
 );
@@ -54,7 +56,7 @@ async function onCreateSelected(): Promise<void> {
     return;
   }
   isCreating.value = true;
-  await activitiesStore().createComponent(props.unit, props.column);
+  await activitiesListStore().createComponent(props.unit, props.column);
   await window.Vue.nextTick();
   isCreating.value = false;
 }
