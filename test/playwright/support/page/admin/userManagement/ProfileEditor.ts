@@ -116,7 +116,7 @@ export default class ProfileEditor {
     }
 
     /**
-     * Click the field visibility or availability checkbox
+     * Click the tabs visibility or availability checkbox
      * @param roleType - The user type: student, staff, parent
      * @param tabName - The tab name
      * @param option - The option to click: visibility or availability
