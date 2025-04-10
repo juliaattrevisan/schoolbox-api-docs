@@ -491,6 +491,8 @@ class Component_InstanceMapper extends BaseMapper
                 'identifier' => $instance->getIdentifier(),
                 'position'   => $instance->getPosition()
             ]);
+            // remove any duplicates
+            $sourceInstanceCollection = $sourceInstanceCollection->getUnique('id');
 
             // Iterate a copy of the source instance collection, because it will be modified
 
