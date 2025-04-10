@@ -8,7 +8,6 @@
 
 namespace Schoolbox\Greenhouse;
 
-use Crell\ApiProblem\ApiProblem;
 use Alaress\Web\Controller\Base;
 use Twig\Error\Error;
 
@@ -26,37 +25,6 @@ class Controller extends Base
     {
     }
 
-
-    // /**
-    //  * TEMP until SA-19479 creates an endpoint for this
-    //  */
-    // public function postLessonPlan(): void
-    // {
-    //     try {
-    //         /** @var array<string,string> - Each requested field ID mapped to its new content */
-    //         $newFieldContent = [];
-
-    //         $fields = $this->requestPost->get("fields");
-    //         foreach ($fields as $field) {
-    //             $newFieldContent[$field["id"]] = $field["body"] . " (but now with added gippity flavouring)";
-    //         }
-
-    //         // simulate thinking...
-    //         sleep(1);
-
-    //         // but what if it died ?
-    //         throw new \Exception('oh no', 500);
-
-    //         $this->response = $this->responseAsJson($newFieldContent)->withStatus(200);
-    //     } catch (\Exception $e) {
-    //         $problem = (new ApiProblem($e->getMessage()))
-    //             ->setStatus($e->getCode())
-    //             ->asArray();
-    //         $this->response = $this->responseAsJson($problem)
-    //             ->withStatus($e->getCode());
-    //         return;
-    //     }
-    // }
 
     /**
      * Load $templateName
@@ -77,11 +45,11 @@ class Controller extends Base
     {
         $payload = [
             "model" => "gpt-4o",
-            "messages" => [
+            "input" => [
                 [
                     "role" => "system",
                     "content" =>
-                        "You are a qualified teacher looking to generate a lesson plan for year 9 science. Your response must be a JSON object matching the defined schema. Do not include any extra keys or text outside of the JSON object. Each field key should map to a string that can include HTML formatting.",
+                        "You are a qualified teacher looking to generate a lesson plan for year 9 science.",
                 ],
                 [
                     "role" => "user",
@@ -89,48 +57,50 @@ class Controller extends Base
                         "Create lesson plans aligned to the curriculum areas listed below.\n\nVictorian Curriculum v2.0\nLearning areas\nScience\nScience Understanding\nEarth and space sciences\nLevels 7 and 8\nkey processes of the rock cycle occur over different timescales; the properties of sedimentary, igneous and metamorphic rocks not only reflect their formation but also impact their usefulness and determine the methods used when mined\nVictorian Curriculum v2.0\nLearning areas\nScience\nScience Inquiry\nCommunicating\nLevels 7 and 8\ncommunicating ideas, findings and arguments for specific purposes and audiences involves the selection and use of appropriate presentation formats, scientific vocabulary, models and other representations, and may include the use of digital tools\n",
                 ],
             ],
-            "max_tokens" => 2000,
+            "max_output_tokens" => 2000,
             "temperature" => 1,
             "top_p" => 1,
             "stream" => false,
-            "format" => [
-                "type" => "json_schema",
-                "name" => "fields_format",
-                "schema" => [
-                    "type" => "object",
-                    "properties" => [
-                        "Learning Objectives" => [
-                            "type" => "string",
-                            "description" => ": What students should learn from the lesson\r\n",
+            "text" => [
+                "format" => [
+                    "type" => "json_schema",
+                    "name" => "fields_format",
+                    "schema" => [
+                        "type" => "object",
+                        "properties" => [
+                            "1" => [
+                                "type" => "string",
+                                "description" => "Learning Objectives: What students should learn from the lesson\r\n",
+                            ],
+                            "2" => [
+                                "type" => "string",
+                                "description" =>
+                                    "Lesson Structure and Activities: A detailed outline of the lesson with activities and teacher notes. Activities can include direct teaching as well as activities for students to complete. \r\n",
+                            ],
+                            "3" => [
+                                "type" => "string",
+                                "description" =>
+                                    "Differentiation: Describe the possible differentiation approaches for students with learning difficulties, including, Dyslexia, Dysgraphia, Auditory Processing Disorder\r\n",
+                            ],
+                            "4" => [
+                                "type" => "string",
+                                "description" => "Resources: Include resources which will support the delivery of this lesson\r\n",
+                            ],
+                            "5" => [
+                                "type" => "string",
+                                "description" =>
+                                    "Checks for Understanding: Provide detail on how to check for student understanding according to the learning objectives",
+                            ],
                         ],
-                        "Lesson Structure and Activities" => [
-                            "type" => "string",
-                            "description" =>
-                                "A detailed outline of the lesson with activities and teacher notes. Activities can include direct teaching as well as activities for students to complete. \r\n",
-                        ],
-                        "Differentiation" => [
-                            "type" => "string",
-                            "description" =>
-                                "Describe the possible differentiation approaches for students with learning difficulties, including, Dyslexia, Dysgraphia, Auditory Processing Disorder\r\n",
-                        ],
-                        "Resources" => [
-                            "type" => "string",
-                            "description" => "Include resources which will support the delivery of this lesson\r\n",
-                        ],
-                        "Checks for Understanding" => [
-                            "type" => "string",
-                            "description" =>
-                                "Provide detail on how to check for student understanding according to the learning objectives",
-                        ],
+                        "required" => ["1", "2", "3", "4", "5"],
+                        "additionalProperties" => false,
                     ],
-                    "required" => ["Learning Objectives", "Lesson Structure and Activities", "Differentiation", "Resources", "Checks for Understanding"],
-                    "additionalProperties" => false,
+                    "strict" => true,
                 ],
-                "strict" => true,
             ],
         ];
 
-        $endpoint = "https://api.openai.com/v1/chat/completions";
+        $endpoint = "https://api.openai.com/v1/responses";
         $token = $this->getConfigLoader()->get('openai_key');
 
         // do a request
@@ -148,7 +118,7 @@ class Controller extends Base
         $responseData = json_decode($response, true);
 
         /** @var array<string,string> - Each requested field ID mapped to its new content */
-        // $newFieldContent = [];
+        $newFieldContent = [];
 
         // $fields = $this->requestPost->get("fields");
         // foreach ($fields as $field) {
@@ -160,6 +130,11 @@ class Controller extends Base
 
         $fieldResponse = json_decode($responseData["output"][0]["content"][0]["text"], true);
 
-        $this->response = $this->responseAsJson($fieldResponse)->withStatus(200);
+        // idk just shove the keys in there for now
+        foreach ($fieldResponse as $key => $value) {
+            $newFieldContent[$key] = $value;
+        }
+
+        $this->response = $this->responseAsJson($newFieldContent)->withStatus(200);
     }
 }
