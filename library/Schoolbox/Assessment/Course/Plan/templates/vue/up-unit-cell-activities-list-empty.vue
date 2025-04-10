@@ -1,9 +1,10 @@
 <script setup lang="ts">
 /**
- * The empty state for a textbox cell on the unit planner
+ * The empty state for a activities cell on the unit planner
  * Shows when:
- * - The textbox is not created yet
- * - The textbox is created, but has no content
+ * - The course builder is not created yet
+ * - The course builder is created, but has no content
+ * - The course builder is created, but has the wrong name
  */
 import type { Unit } from "./unitPlannerTypes";
 import ActivitiesListEmpty from "./activities-list/activities-list-empty.vue";
@@ -18,12 +19,6 @@ const extraActivitiesComponents = props.unit.activities.components.filter((compo
 </script>
 
 <template>
-  <!--
-    3 options exist here;
-    * component exist, but is labelled incorrectly, we can only have 1 on the page, so err
-    * no component exist, allow creating component
-    * component exist, but are empty
-    -->
   <template v-if="extraActivitiesComponents">
     <i class="icon-due-work"></i>
     <p>Incorrectly named component</p>

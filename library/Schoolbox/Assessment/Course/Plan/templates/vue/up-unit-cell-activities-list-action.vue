@@ -1,8 +1,7 @@
 <script setup lang="ts">
 /**
- * To display the actions available for the curriculum overview component,
- * which is to modify the selected nodes via the curriculum selector modal
- */
+ * To display the actions available for the course builder / activities component,
+  */
 
 import ActivitiesListAction from "./activities-list/activities-list-action.vue";
 import { useActivitiesListStore } from "./activities-list/store/activitiesListStore";
@@ -10,8 +9,8 @@ import type { CurriculumOverviewComponent, Unit } from "./unitPlannerTypes";
 import type { Column } from "./unitPlannerConfig";
 
 interface Props {
-  unit: Unit; // the unit linked to the curriculum cell
-  column: Column; // the column linked to the curriculum cell
+  unit: Unit; // the unit linked to the activities cell
+  column: Column; // the column linked to the activities cell
   activitiesListStoreId: string; // the id of the activities list store
 
 }
@@ -24,7 +23,7 @@ const component = window.Vue.ref<CurriculumOverviewComponent | null>(
 const isCreating = window.Vue.ref(false);
 
 /**
- * To respond to a new curriculum component being created
+ * To respond to a new course builder component being created
  */
 window.Vue.watch(
     () => props.unit.activities.components,
@@ -47,7 +46,7 @@ const extraActivitiesComponents = props.unit.activities.components.filter((comp)
 
 
 /**
- * To create a new curriculum component, adding it to the relevant units homepage
+ * To create a new course builder component, adding it to the relevant units homepage
  */
 async function onCreateSelected(): Promise<void> {
   if (isCreating.value) {
