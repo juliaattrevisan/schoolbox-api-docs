@@ -31,27 +31,6 @@ use function func_get_args;
 
 class Controller extends WebController\Base
 {
-    /** @var Filter\IFactoryFactory */
-    private $filterFactoryFactory;
-
-    /** @var Filter\Mapper */
-    private $filterMapper;
-
-    /** @var Filter\Selection\Mapper */
-    private $filterSelectionMapper;
-
-    /** @var Filter\Filters\Assessment\IdFinder */
-    private $assessmentIdFinder;
-
-    /** @var Assessment\MapperProxy */
-    private $assessmentMapperProxy;
-
-    /** @var CourseImpl\Mapper */
-    private $courseImplMapper;
-
-    /** @var UnitImpl\Mapper */
-    private $unitImplMapper;
-
     /**
      * @param Filter\IFactoryFactory             $filterFactoryFactory
      * @param Filter\Mapper                      $filterMapper
@@ -63,13 +42,13 @@ class Controller extends WebController\Base
      * @param Access                             $access
      */
     public function __construct(
-        Filter\IFactoryFactory $filterFactoryFactory,
-        Filter\Mapper $filterMapper,
-        Filter\Selection\Mapper $filterSelectionMapper,
-        Filter\Filters\Assessment\IdFinder $assessmentIdFinder,
-        Assessment\MapperProxy $assessmentMapperProxy,
-        CourseImpl\Mapper $courseImplMapper,
-        UnitImpl\Mapper $unitImplMapper,
+        private Filter\IFactoryFactory $filterFactoryFactory,
+        private Filter\Mapper $filterMapper,
+        private Filter\Selection\Mapper $filterSelectionMapper,
+        private Filter\Filters\Assessment\IdFinder $assessmentIdFinder,
+        private Assessment\MapperProxy $assessmentMapperProxy,
+        private CourseImpl\Mapper $courseImplMapper,
+        private UnitImpl\Mapper $unitImplMapper,
         private Access $access
     ) {
         $this->filterFactoryFactory  = $filterFactoryFactory;
