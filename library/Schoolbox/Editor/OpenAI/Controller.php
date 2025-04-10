@@ -73,7 +73,6 @@ class Controller extends Base
              */
             $inputs = [
                 'context' => $this->requestPost->get('context'),
-                'folder' => $this->requestPost->get('folder'),
                 'fields' => $this->requestPost->get('fields'),
                 'curriculumNodeIds' => $this->requestPost->get('curriculumNodeIds'),
                 'additionalContext' => $this->requestPost->get('additionalContext') ?? ''
@@ -81,7 +80,6 @@ class Controller extends Base
 
 //            $inputs = [
 //                'context' => 'Year 8 science',
-//                'folder' => 'Snakes',
 //                'fields' => [
 //                    [
 //                        'id' => 189235,
@@ -100,7 +98,6 @@ class Controller extends Base
 
             $payload = $payloadGenerator->generate(
                 $inputs['context'],
-                $inputs['folder'],
                 $inputs['fields'],
                 $inputs['curriculumNodeIds'],
                 $inputs['additionalContext']

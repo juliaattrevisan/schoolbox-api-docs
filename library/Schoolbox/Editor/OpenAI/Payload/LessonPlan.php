@@ -20,7 +20,7 @@ class LessonPlan
      * (some parts stolen directly from openai's docs)
      */
     private const PROMPT_SYSTEM_PERSONA = "
-        You are an expert \"[CONTEXT]\" teacher for a class \"[FOLDER]\", proficient in creating engaging, 
+        You are an expert \"[CONTEXT]\" teacher for a class, proficient in creating engaging, 
         well-developed and effective lesson plans for your students. Each lesson should be engaging and
         appropriate for \"[CONTEXT]\" students.
         
@@ -86,7 +86,6 @@ class LessonPlan
      */
     public function generate(
         string $context,
-        string $folder,
         array $fields,
         array $curriculumNodeIds,
         string $additionalContext = ''
@@ -104,7 +103,6 @@ class LessonPlan
 
         $prompt = $this->generatePrompt(
             $context,
-            $folder,
             $curriculumNames,
             $additionalContext
         );
@@ -154,14 +152,12 @@ class LessonPlan
      * actual Lesson Plan and Lesson Plan Template instances, saving you extracting this manually.
      *
      * @param string $context
-     * @param string $folder
      * @param array $curriculumNames
      * @param string $additionalContext
      * @return array
      */
     private function generatePrompt(
         string $context,
-        string $folder,
         array $curriculumNames,
         string $additionalContext = ''
     ): array {
@@ -169,7 +165,6 @@ class LessonPlan
          */
         $systemContent = strtr(self::PROMPT_SYSTEM_PERSONA, [
             '[CONTEXT]' => $context,
-            '[FOLDER]' => $folder,
         ]);
 
         /* Something that shapes what the ai would make;
