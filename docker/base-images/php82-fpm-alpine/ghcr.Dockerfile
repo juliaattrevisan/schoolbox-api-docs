@@ -21,7 +21,7 @@ RUN apk add libzip icu-libs libldap \
             unixodbc \
             bind-tools
 
-# Copy previously built dependencies
+# Dependencies will be copied from a separately built base image.
 # (SQL Server client and config, built and installed PHP extensions)
 COPY --from=build /etc/odbc.ini      /etc/odbc.ini
 COPY --from=build /etc/odbcinst.ini  /etc/odbcinst.ini
