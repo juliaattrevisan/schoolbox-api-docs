@@ -75,7 +75,6 @@ class LessonPlan
      * This lets you supply scalar ids, which are resolved to actual instances via mappers
      *
      * @param string $context
-     * @param string $folder
      * @param array $fields
      * @param array $curriculumNodeIds
      * @param string $additionalContext
@@ -215,7 +214,10 @@ class LessonPlan
 
             $struct['schema']['properties'][$fieldId] = [
                 'type' => 'string',
-                'description' => $fieldDescription,
+                'description' => sprintf(
+                    "FIELD TITLE: %s\nFIELD DESCRIPTION: %s\nTEMPLATE: %s",
+                    $fieldTitle, $fieldDescription, $fieldBody
+                ),
             ];
 
             $struct['schema']['required'][] = $fieldId;
