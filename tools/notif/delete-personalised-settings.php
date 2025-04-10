@@ -15,7 +15,6 @@ use Schoolbox\Realtime\Admin\Helper;
 require __DIR__ . '/../../conf/core/require.php';
 
 $app = new class extends CliTool\App {
-
     /** @inheritDoc */
     public function getLongOpts(): array
     {
@@ -64,7 +63,6 @@ HELP;
             $this->getLogger()->error('Unable to start transaction: ' . $e->getMessage());
             exit(0);
         }
-
     }
 };
 
