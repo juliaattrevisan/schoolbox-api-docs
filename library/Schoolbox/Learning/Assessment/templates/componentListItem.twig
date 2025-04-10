@@ -46,7 +46,7 @@
                     assessment: assessable,
                 }) %}
                 {% if viewGradeRoute %}
-                    <li><a class="icon-task" href="{{ viewGradeRoute }}" >View and {{ locale.grades }} submission</a></li>
+                    <li><a class="icon-task" href="{{ viewGradeRoute }}" >View and {{ locale.grades }} submissions</a></li>
                 {% endif %}
                 {% if assessable is dueWork and assessable.enableWorksheet and assessable.kamiWorksheetTemplate and worksheetClassView %}
                     <li>
