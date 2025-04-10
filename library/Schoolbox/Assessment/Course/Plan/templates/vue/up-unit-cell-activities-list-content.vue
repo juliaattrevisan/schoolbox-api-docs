@@ -45,16 +45,27 @@ window.Vue.onMounted(() => {
  * Used by the parent component to determine whether to show the empty state
  */
 const isEmpty = window.Vue.computed(() => {
-    return activitiesListDragStore().orderedActivities.length === 0;
+    return activitiesListDragStore().orderedActivities.length === 0 || component.value === null;
 });
 
 // Allow the parent component to identify if the cell is empty
 defineExpose({ isEmpty });
+
+/**
+ * To respond to a new curriculum component being created
+ */
+window.Vue.watch(
+    () => props.unit.activities.components,
+    () => {
+      component.value = activitiesListStore().getComponent(props.unit.activities.components, props.column);
+    },
+    { deep: true },
+);
 </script>
 
 <template>
     <activities-list-content
-        v-if="component !== null && !isEmpty"
+        v-if="!isEmpty"
         :activities-list-store-id="activitiesListStoreId"
         :activities="props.unit.activities.items"
         :activities-list-routes="props.unit.activities._routes"
