@@ -50,8 +50,10 @@ jobs:
 
       - name: Build php82-alpine
         uses: docker/build-push-action@v6
+#        if: steps.cache-base-images.outputs.cache-hit != 'true'
         with:
           context: docker/base-images/php82-alpine/
+          load: true
           push: false
           cache-from: type=local,src=${{ runner.temp }}/image-cache
           cache-to: type=local,dest=${{ runner.temp }}/image-cache
@@ -62,8 +64,10 @@ jobs:
 
       - name: Build php82-fpm-alpine
         uses: docker/build-push-action@v6
+#        if: steps.cache-base-images.outputs.cache-hit != 'true'
         with:
           context: docker/base-images/php82-fpm-alpine/
+          load: true
           push: false
           cache-from: type=local,src=${{ runner.temp }}/image-cache
           cache-to: type=local,dest=${{ runner.temp }}/image-cache
