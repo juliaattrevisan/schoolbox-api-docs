@@ -7,14 +7,7 @@ import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import PastoralCountBadge from "@schoolboxLibrary/Pastoral/Count/vue/pastoral-count-badge.vue";
 import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
 import type { StudentPastoralCountBadge } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
-import type { Participant as BaseParticipant } from "../js/types/customParticipationTypes";
-
-type Participant = BaseParticipant & {
-    _links?: {
-        exclude?: string;
-        include?: string;
-    };
-};
+import type { Participant } from "../js/types/customParticipationTypes";
 
 interface Props {
     allParticipants: Participant[];
