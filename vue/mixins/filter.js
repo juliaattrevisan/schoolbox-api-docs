@@ -52,7 +52,12 @@ export default {
             if (showToast) {
                 this.$refs.toast.activate("Loading...");
             }
-            fetch(`${this.filter_endpoint}?${getSearchString(params)}`)
+
+            // If the url already has search parameters append instead of starting one
+            const urlSearch = new URL(`${window.location.origin}${this.filter_endpoint}`);
+            const joinVar = urlSearch.searchParams.size > 0 ? "&" : "?";
+
+            fetch(`${this.filter_endpoint}${joinVar}${getSearchString(params)}`)
                 .then((response) => response.json())
                 .then((response) => {
                     if (clear) {
