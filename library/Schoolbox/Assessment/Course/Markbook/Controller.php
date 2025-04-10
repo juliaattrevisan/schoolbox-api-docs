@@ -52,9 +52,6 @@ class Controller extends WebController\Base
     /** @var UnitImpl\Mapper */
     private $unitImplMapper;
 
-    /** @var Access */
-    private $access;
-
     /**
      * @param Filter\IFactoryFactory             $filterFactoryFactory
      * @param Filter\Mapper                      $filterMapper
@@ -63,6 +60,7 @@ class Controller extends WebController\Base
      * @param Assessment\MapperProxy             $assessmentMapperProxy
      * @param CourseImpl\Mapper                  $courseImplMapper
      * @param UnitImpl\Mapper                    $unitImplMapper
+     * @param Access                             $access
      */
     public function __construct(
         Filter\IFactoryFactory $filterFactoryFactory,
@@ -72,7 +70,7 @@ class Controller extends WebController\Base
         Assessment\MapperProxy $assessmentMapperProxy,
         CourseImpl\Mapper $courseImplMapper,
         UnitImpl\Mapper $unitImplMapper,
-        Access $access
+        private Access $access
     ) {
         $this->filterFactoryFactory  = $filterFactoryFactory;
         $this->filterMapper          = $filterMapper;
