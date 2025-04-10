@@ -18,7 +18,7 @@ import type { Unit } from "./unitPlannerTypes";
 import UpUnitCellTextboxContent from "./up-unit-cell-textbox-content.vue";
 import UpUnitCellTextboxAction from "./up-unit-cell-textbox-action.vue";
 import UpUnitCellTextboxEmpty from "./up-unit-cell-textbox-empty.vue";
-import UpUnitCellActivitiesListContent from "./up-unit-cell-activities-list-content.vue";
+import UpUnitCellActivitiesListAction from "./up-unit-cell-activities-list-action.vue";
 import ActivitiesListAction from "./activities-list/activities-list-action.vue";
 import ActivitiesListEmpty from "./activities-list/activities-list-empty.vue";
 import UpUnitCellActivitiesListEmpty from "./up-unit-cell-activities-list-empty.vue";
@@ -363,7 +363,9 @@ const isFirstUnit = window.Vue.computed(() => {
                     :column="props.column"
                     @modify-clicked="textboxContentComponent?.focusEditor"
                 />
-                <activities-list-action
+                <up-unit-cell-activities-list-action
+                    :unit="props.unit"
+                    :column="props.column"
                     v-else-if="props.column.type === ColumnType.ACTIVITIES"
                     :activities-list-store-id="`${props.unit.id}-${props.column.id}`"
                 />

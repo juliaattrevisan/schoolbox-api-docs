@@ -236,6 +236,7 @@ class Controller extends Base
             'template'  => [
                 'textboxDefId' => $textboxDefId,
                 'curriculumDefId' => $curriculumDefId,
+                'activityDefId' => $activityDefId,
                 'textboxes' => $textboxTemplate,
                 'curriculum' => $curriculumTemplate,
                 'activities' => $courseBuilderTemplate

@@ -15,7 +15,6 @@ const props = defineProps<Props>();
 
 const extraActivitiesComponents = props.unit.activities.components.filter((component) => !component.inTemplate).length; // Number of extra components in the template
 
-
 </script>
 
 <template>
