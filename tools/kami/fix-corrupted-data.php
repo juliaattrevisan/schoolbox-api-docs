@@ -65,8 +65,11 @@ DESCRIPTION
         Solution: Set deleted_at=NULL on that kami_document row.
 
     Corrupted data type 2:
-        Non-deleted kami_document rows not linked to submission_box or student_submission_file.
+        Non-deleted kami_document rows having null values for student_submission_file_id and
+        worksheet_template_submission_box_id.
         Solution: Mark these rows as deleted (can't do anything else since not enough information)
+        Since these rows will not be linked to assessments (as the link would be via the fields
+        with null values), this fix will only run if no --assessment parameter has been provided.
 
 OPTIONS
     --assessmentId [integer]
