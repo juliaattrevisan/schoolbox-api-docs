@@ -24,7 +24,7 @@ const activitiesListStore = useActivitiesListStore(activitiesListStoreId);
 const activitiesListDragStore = useActivitiesListDragStore(activitiesListStoreId);
 
 const component = window.Vue.ref<CurriculumOverviewComponent | null>(
-    activitiesListStore.getComponent(props.unit.activities.components, props.column),
+    activitiesListStore().getComponent(props.unit.activities.components, props.column),
 );
 
 window.Vue.onMounted(() => {
