@@ -72,6 +72,10 @@ jobs:
         run: |
           docker image ls
 
+      - name: List image cache
+        run: |
+          ls -al ${{ runner.temp }}/image-cache
+
       - name: Build php82-fpm-alpine
         uses: docker/build-push-action@v6
 #        if: steps.cache-base-images.outputs.cache-hit != 'true'
@@ -81,8 +85,8 @@ jobs:
           push: false
           cache-from: type=local,src=${{ runner.temp }}/image-cache
           cache-to: type=local,dest=${{ runner.temp }}/image-cache
-          # Try build-contexts for telling this process to use a locally built package
-          build-contexts: alaress/php82-alpine=docker-image://alaress/php82-alpine
+          # Try build-contexts for telling this process to use a locally loaded package
+          build-contexts: alaress/php82-alpine=${{ runner.temp }}/image-cache
           build-args: |
             ENV=prod
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
