@@ -12,6 +12,7 @@ use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
 use DebugBar\DebugBarException;
 use GuzzleHttp\Client;
+use Psr\Http\Client\ClientExceptionInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Mapper\Exception;
@@ -48,10 +49,10 @@ class Controller extends Base
      * Generates a payload about lesson plans
      *
      * @return void
-     * @throws Exception
      * @throws Deleted
-     * @throws DebugBarException
+     * @throws Exception
      * @throws \JsonException
+     * @throws ClientExceptionInterface
      */
     public function postLessonPlan(): void
     {
@@ -69,35 +70,27 @@ class Controller extends Base
 
             $payloadGenerator = (new Payload\LessonPlan(
                 trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_MODEL)),
-                $this->lessonPlanFieldTemplateFieldMapper,
                 $this->curriculumNodeMapper
             ));
 
-            if ($this->requestPost['lessonPlanId']) {
-                /* Generate a payload for ai, using the prompt pieces for System and User info
-                 * Used for an existing lesson plan, typically, via the Modify screen
-                 */
-                /** @var \Schoolbox\Learning\Assessment\LessonPlan\Model $lessonPlan */
-                $lessonPlan = $this->mapperProxy->findById($this->requestPost['lessonPlanId']);
-                $lessonPlanTemplate = $this->lessonPlanTemplateMapper->findById($lessonPlan->getLessonPlanTemplate());
+            /* Generate a payload for ai, using the prompt pieces for System and User info
+             * From a POST payload
+             */
+            $inputs = [
+                'context' => $this->requestPost->get('context'),
+                'folder' => $this->requestPost->get('folder'),
+                'fields' => $this->requestPost->get('fields'),
+                'curriculumNodeIds' => $this->requestPost->get('curriculumNodeIds'),
+                'additionalContext' => $this->requestPost->get('additionalContext') ?? ''
+            ];
 
-                $payload = $payloadGenerator->generateFromInstances(
-                    $lessonPlan,
-                    $lessonPlanTemplate->getFields(),
-                    $this->requestPost->get('additionalContext') ?? ''
-                );
-            } else {
-                /* Generate a payload for ai, using the prompt pieces for System and User info
-                 * From a POST payload
-                 */
-                $payload = $payloadGenerator->generateFromScalars(
-                    $this->requestPost->get('context'),
-                    $this->requestPost->get('folder'),
-                    explode(',', $this->requestPost->get('lessonPlanTemplateFieldIds')),
-                    explode(',', $this->requestPost->get('curriculumNodeIds')),
-                    $this->requestPost->get('additionalContext') ?? ''
-                );
-            }
+            $payload = $payloadGenerator->generate(
+                $inputs['context'],
+                $inputs['folder'],
+                $inputs['fields'],
+                $inputs['curriculumNodeIds'],
+                $inputs['additionalContext']
+            );
 
             /* Send it and decode the result (if any: sometimes it returns null)
              * and dodge around all its weird encoding business with a double-decode,

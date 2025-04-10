@@ -2,10 +2,7 @@
 
 namespace Schoolbox\Editor\OpenAI\Payload;
 
-use DebugBar\DebugBarException;
-use Schoolbox\Admin\LessonPlan\Template\Field\Mapper;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\LessonPlan\Model;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 
@@ -63,70 +60,12 @@ class LessonPlan
      * Constructor.
      *
      * @param string $openAiModel
-     * @param Mapper $lessonPlanTemplateFieldMapper
      * @param \Schoolbox\Curriculum\Node\Mapper $curriculumNodeMapper
      */
     public function __construct(
         private string $openAiModel,
-        private \Schoolbox\Admin\LessonPlan\Template\Field\Mapper $lessonPlanTemplateFieldMapper,
         private \Schoolbox\Curriculum\Node\Mapper $curriculumNodeMapper
     ) {
-    }
-
-
-    /**
-     * Derive prompt attributes from an existing Lesson Plan and Lesson Plan Template.
-     *
-     * This lets you supply already pre-hydrated object instances
-     *
-     * @param Model $lessonPlan
-     * @param GenericCollection $lessonPlanTemplateFields
-     * @param string $additionalContext
-     * @return string
-     * @throws Deleted
-     * @throws Exception
-     * @throws \JsonException
-     */
-    public function generateFromInstances(
-        \Schoolbox\Learning\Assessment\LessonPlan\Model $lessonPlan,
-        GenericCollection $lessonPlanTemplateFields,
-        string $additionalContext = ''
-    ): string {
-        /* wow
-         * Get some info about the various contexts in which this lesson plan exists
-         * such as the over-arching course name, unit name, and folder name
-         */
-        $context = sprintf(
-            '%s %s',
-            $lessonPlan->getSpecificationAssessment()->getBaseContext()->getFolder()->getUnitSpecification()->getCourse()->getFolder()->getName(),
-            $lessonPlan->getContext()->getTitle(),
-        );
-
-        $folder = $lessonPlan->getContext()->getFolder()->getName();
-
-        /* Details about how to use each field
-         */
-        $responseFormat = self::RESPONSE_FORMAT;
-        $responseFormat = $this->augmentProperties($responseFormat, $lessonPlanTemplateFields);
-
-        /* Find some curriculum node names, if any were chosen
-         */
-        $curriculum = '';
-
-        /* TODO This is currently a node's full ancestry, index by the node id
-         *  This goes into the payload in a different way than a string injection
-         *  so .........figure that out tomorrow
-         */
-        $curriculumNames = $this->compileNodeTitles($lessonPlan->getCurriculumNodes());
-
-        $prompt = $this->generatePrompt(
-            $context,
-            $folder,
-            $curriculumNames,
-            $additionalContext
-        );
-
-        return $this->generate($prompt['system'], $prompt['user'], $responseFormat);
     }
 
 
@@ -137,7 +76,7 @@ class LessonPlan
      *
      * @param string $context
      * @param string $folder
-     * @param array $lessonPlanTemplateFieldIds
+     * @param array $fields
      * @param array $curriculumNodeIds
      * @param string $additionalContext
      * @return string
@@ -145,17 +84,17 @@ class LessonPlan
      * @throws Exception
      * @throws \JsonException
      */
-    public function generateFromScalars(
+    public function generate(
         string $context,
         string $folder,
-        array $lessonPlanTemplateFieldIds,
+        array $fields,
         array $curriculumNodeIds,
         string $additionalContext = ''
     ): string {
         /* Details about how to use each field
          */
         $responseFormat = self::RESPONSE_FORMAT;
-        $responseFormat = $this->augmentProperties($responseFormat, $this->lessonPlanTemplateFieldMapper->findByColumn('id', $lessonPlanTemplateFieldIds));
+        $responseFormat = $this->augmentProperties($responseFormat, $fields);
 
         /* TODO This is currently a node's full ancestry, index by the node id
          *  This goes into the payload in a different way than a string injection
@@ -170,7 +109,42 @@ class LessonPlan
             $additionalContext
         );
 
-        return $this->generate($prompt['system'], $prompt['user'], $responseFormat);
+        $payload = [
+            /* An ordered list of instructions for OpenAi
+             */
+            "input" => [
+                [
+                    "role" => "system",
+                    "content" => $prompt['system'],
+                ],
+                [
+                    "role" => "user",
+                    "content" => $prompt['user'],
+                ],
+            ],
+            /* Which variant of OpenAI to use
+             * Each has their own way of producing results in varying ways
+             * (pick one)
+             */
+            "model" => $this->openAiModel,
+            /* A kind of OpenAI currency to use in this request
+             */
+            "max_output_tokens" => 2000,
+            /* How "creative" the OpenAI response will be
+             * The bigger the number, the more creative it gets
+             * Goes between 0 and 2
+             */
+            "temperature" => self::TEMPERATURE,
+            "top_p" => self::TOP_P,
+            /* For futureproofing: never really used atm
+             */
+            "stream" => false,
+            'text' => [
+                'format' => $responseFormat
+            ]
+        ];
+
+        return json_encode($payload, JSON_THROW_ON_ERROR);
     }
 
 
@@ -227,20 +201,22 @@ class LessonPlan
      * and its contents. These end up in the Properties node in the response format
      *
      * @param array $responseFormat
-     * @param GenericCollection $lessonPlanTemplateFields
+     * @param array $fields
      * @return array
      */
-    private function augmentProperties(array $responseFormat, GenericCollection $lessonPlanTemplateFields): array
+    private function augmentProperties(array $responseFormat, array $fields): array
     {
         $struct = $responseFormat;
 
         /* Find some details about how to use the template fields
          */
-        foreach ($lessonPlanTemplateFields as $lessonPlanTemplateField) {
-            $fieldId = (string)$lessonPlanTemplateField->getId();
-            $fieldTitle = trim((string)$lessonPlanTemplateField->getTitle());
-            $fieldDescription = trim((string)$lessonPlanTemplateField->getDescription());
-            $fieldBody = trim((string)$lessonPlanTemplateField->getBody());
+        foreach ($fields as $field) {
+            $fieldId = (string)$field['id'];
+            $fieldTitle = trim((string)$field['title']);
+            $fieldDescription = trim((string)$field['description']);
+            $fieldVisibility = trim((string)$field['visibility']);
+            $fieldBody = trim((string)$field['body']);
+            $fieldSelected = (bool)$field['selected'];
 
             $struct['schema']['properties'][$fieldId] = [
                 'type' => 'string',
@@ -342,59 +318,5 @@ class LessonPlan
         }
 
         return array_reverse($stack);
-    }
-
-
-    /* The Payload Itself
-     */
-
-    /**
-     * Generates the payload for the OpenAI API request.
-     *
-     * @param string $systemContent
-     * @param string $userContent
-     * @param array $responseFormat
-     * @param bool $stream
-     * @return string
-     * @throws \JsonException
-     */
-    private function generate(string $systemContent, string $userContent, array $responseFormat, bool $stream = false): string
-    {
-        $payload = [
-            /* An ordered list of instructions for OpenAi
-             */
-            "input" => [
-                [
-                    "role" => "system",
-                    "content" => $systemContent,
-                ],
-                [
-                    "role" => "user",
-                    "content" => $userContent,
-                ],
-            ],
-            /* Which variant of OpenAI to use
-             * Each has their own way of producing results in varying ways
-             * (pick one)
-             */
-            "model" => $this->openAiModel,
-            /* A kind of OpenAI currency to use in this request
-             */
-            "max_output_tokens" => 2000,
-            /* How "creative" the OpenAI response will be
-             * The bigger the number, the more creative it gets
-             * Goes between 0 and 2
-             */
-            "temperature" => self::TEMPERATURE,
-            "top_p" => self::TOP_P,
-            /* For futureproofing: never really used atm
-             */
-            "stream" => $stream,
-            'text' => [
-                'format' => $responseFormat
-            ]
-        ];
-
-        return json_encode($payload, JSON_THROW_ON_ERROR);
     }
 }
