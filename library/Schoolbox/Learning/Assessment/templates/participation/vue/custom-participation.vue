@@ -112,10 +112,6 @@ async function excludeParticipant(participant: Participant): Promise<void> {
             throw new Error(errorMessage);
         }
         participant.excludedAt = new Date().toISOString(); // Assigning a timestamp as a string
-
-        if (participant._links) {
-            participant._links.include = excludeUrl.replace("/exclude", "/include");
-        }
     } catch (error) {
         if (error instanceof Error && hasErrorMessage(error)) {
             loadError.value = error.message;
