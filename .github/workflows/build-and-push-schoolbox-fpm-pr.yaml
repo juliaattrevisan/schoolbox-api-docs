@@ -71,7 +71,7 @@ jobs:
             ENV=prod
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           tags: |
-            alaress/php82-alpine:latest
+            php82-alpine
 
       # Extract necessary artifacts out of image:
       # /etc/odbc.ini
@@ -82,7 +82,7 @@ jobs:
       # /usr/local/etc/php/conf.d/
       - name: Extract artifact files from php82-alpine
         run: |
-          docker create --name=temp alaress/php82-alpine:latest
+          docker create --name=temp php82-alpine
           mkdir -p \
             artifact/etc/ \
             artifact/opt/microsoft/ \
