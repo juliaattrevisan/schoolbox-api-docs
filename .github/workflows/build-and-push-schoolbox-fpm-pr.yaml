@@ -65,7 +65,7 @@ jobs:
         with:
           context: docker/base-images/php82-alpine/
           load: true
-          push: false
+          push: true
           cache-from: type=local,src=${{ runner.temp }}/image-cache
           cache-to: type=local,dest=${{ runner.temp }}/image-cache
 #          outputs: type=docker,dest=${{ runner.temp }}/php82-alpine.tar
@@ -73,8 +73,8 @@ jobs:
             ENV=prod
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           tags: |
-            alaress/php82-alpine:pr-${{ github.event.pull_request.number }}
-            alaress/php82-alpine:latest
+            ghcr.io/alaress/php82-alpine:pr-${{ github.event.pull_request.number }}
+#            ghcr.io/alaress/php82-alpine:latest
 
       - name: Get php82-alpine image ID
         id: php82-alpine-image-id
@@ -110,18 +110,18 @@ jobs:
         with:
           context: docker/base-images/php82-fpm-alpine/
           load: true
-          pull: false
-          push: false
+#          pull: false
+          push: true
           cache-from: type=local,src=${{ runner.temp }}/image-cache
           cache-to: type=local,dest=${{ runner.temp }}/image-cache
           # Try build-contexts for telling this process to use a locally loaded package
-#          build-contexts: alaress/php82-alpine:latest=docker-image://alaress/php82-alpine:latest@${{ steps.php82-alpine-image-id.outputs.id }}
+          build-contexts: ghcr.io/alaress/php82-alpine:latest=docker-image://ghcr.io/alaress/php82-alpine:pr-${{ github.event.pull_request.number }}@${{ steps.php82-alpine-image-id.outputs.id }}
           build-args: |
             ENV=prod
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           tags: |
-            alaress/php82-fpm-alpine:pr-${{ github.event.pull_request.number }}
-            alaress/php82-fpm-alpine:latest
+            ghcr.io/alaress/php82-fpm-alpine:pr-${{ github.event.pull_request.number }}
+#            alaress/php82-fpm-alpine:latest
 
 #      - name: Build and push php82-alpine
 #        uses: ./.github/actions/build-and-push-to-ghcr
