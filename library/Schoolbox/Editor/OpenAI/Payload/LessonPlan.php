@@ -170,6 +170,8 @@ class LessonPlan
          * provide additional instructions (if meaningful)
          */
         $userContent = '';
+
+//      TODO implement curriculum node support again
 //
 //        if (\count($curriculumNames)) {
 //            $userContent = "Create lesson plans aligned to the curriculum areas listed below.\n\n";
@@ -219,6 +221,8 @@ class LessonPlan
             $fieldVisibility = trim((string)$field['visibility']);
             $fieldBody = trim((string)$field['body']);
 
+            /* TODO apply visibility somewhere in all this prompt stuff
+             */
             $struct['schema']['properties'][$fieldId] = [
                 'type' => 'string',
                 'description' => sprintf(
