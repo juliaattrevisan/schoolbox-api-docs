@@ -112,12 +112,6 @@ class Controller extends Base
 
             $result = preg_replace('/\\n(\s)*/', '', $data['choices'][0]['message']['content']);
 
-header('Content-Type: application/json');
-header('Content-Encoding: none');
-print_r($payload);
-echo "\n\n\n";
-print_r($result);
-die();
             $this->response = $this->responseAsJson($result ?? null);
 
             return;

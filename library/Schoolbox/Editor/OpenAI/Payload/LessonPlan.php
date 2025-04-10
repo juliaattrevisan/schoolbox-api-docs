@@ -12,7 +12,7 @@ use Schoolbox\Mapper\Exception\Deleted;
 class LessonPlan
 {
     /**
-     * This seems mostly the same across most usagse, other than specifiying that context
+     * This seems mostly the same across most usages, other than specifying that context
      * (some parts stolen directly from openai's docs)
      */
     private const PROMPT_SYSTEM_PERSONA = "
@@ -169,7 +169,7 @@ class LessonPlan
             $additionalContext
         );
 
-        return $this->generate($prompt['system'], $prompt['user'],$responseFormat);
+        return $this->generate($prompt['system'], $prompt['user'], $responseFormat);
     }
 
 
@@ -391,6 +391,9 @@ class LessonPlan
             "stream" => $stream,
             'format' => $responseFormat
         ];
+
+        new \Alaress_Probe($payload);
+        die();
 
         return json_encode($payload, JSON_THROW_ON_ERROR);
     }
