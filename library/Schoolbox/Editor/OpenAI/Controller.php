@@ -10,11 +10,9 @@ namespace Schoolbox\Editor\OpenAI;
 
 use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
-use DebugBar\DebugBarException;
 use GuzzleHttp\Client;
 use Psr\Http\Client\ClientExceptionInterface;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 
@@ -38,9 +36,6 @@ class Controller extends Base
         private \Schoolbox\Error\Mapper $errorMapper,
         private Log\Mapper $logMapper,
         private \Schoolbox\Curriculum\Node\Mapper $curriculumNodeMapper,
-        private AssessmentMapperProxy $mapperProxy,
-        private \Schoolbox\Admin\LessonPlan\Template\Mapper $lessonPlanTemplateMapper,
-        private \Schoolbox\Admin\LessonPlan\Template\Field\Mapper $lessonPlanFieldTemplateFieldMapper,
     ) {
     }
 

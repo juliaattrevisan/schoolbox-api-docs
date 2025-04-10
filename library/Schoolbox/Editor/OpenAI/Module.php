@@ -43,9 +43,6 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(\Schoolbox\Error\Mapper::class),
             $this->getMapperFactory()->get(Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Curriculum\Node\Mapper::class),
-            $this->injector->get('assessmentDataSource'),
-            $this->getMapperFactory()->get(\Schoolbox\Admin\LessonPlan\Template\Mapper::class),
-            $this->getMapperFactory()->get(\Schoolbox\Admin\LessonPlan\Template\Field\Mapper::class),
         );
     }
 }
