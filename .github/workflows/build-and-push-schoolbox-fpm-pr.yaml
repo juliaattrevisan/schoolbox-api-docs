@@ -79,7 +79,7 @@ jobs:
       - name: Get php82-alpine image ID
         id: php82-alpine-image-id
         run: |
-          echo "id=${docker image ls alaress/php82-alpine:latest -q --no-trunc)" >> $GITHUB_OUTPUT
+          echo "id=$(docker image ls alaress/php82-alpine:latest -q --no-trunc)" >> $GITHUB_OUTPUT
 
 #      - name: Extract php82-alpine
 #        run: |
