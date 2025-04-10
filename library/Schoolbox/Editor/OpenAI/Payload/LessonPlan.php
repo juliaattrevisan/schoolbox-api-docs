@@ -45,23 +45,13 @@ class LessonPlan
     /**
      * A structure that AI is supposed to obey, but...I don't think it cares
      */
-    public const RESPONSE_FORMAT = [
+    private const RESPONSE_FORMAT = [
         'type' => 'json_schema',
         'name' => 'fields_format',
         'schema' => [
             'type' => 'object',
-            'properties' => [
-                'id' => [
-                    'type' => 'string',
-                ],
-                'title' => [
-                    'type' => 'string',
-                ],
-                'body' => [
-                    'type' => 'string',
-                ],
-            ],
-            'required' => ['id', 'title', 'body']
+            'properties' => [],
+            'required' => [],
         ],
         'strict' => true
     ];
@@ -115,7 +105,8 @@ class LessonPlan
 
         /* Details about how to use each field
          */
-        $fields = $this->compileFields($lessonPlanTemplateFields);
+        $responseFormat = self::RESPONSE_FORMAT;
+        $responseFormat = $this->augmentProperties($responseFormat, $lessonPlanTemplateFields);
 
         /* Find some curriculum node names, if any were chosen
          */
@@ -127,8 +118,6 @@ class LessonPlan
          */
         $curriculumNames = $this->compileNodeTitles($lessonPlan->getCurriculumNodes());
 
-        new \Alaress_Probe($curriculumNames);
-
         //        if ('' !== $curriculumNames) {
         //            $curriculum = sprintf(
         //                self::PROMPT_TEMPLATE_CURRICULUM,
@@ -139,12 +128,11 @@ class LessonPlan
         $prompt = $this->generatePrompt(
             $context,
             $folder,
-            $fields,
             $curriculum,
             $additionalContext
         );
 
-        return $this->generate($prompt['system'], $prompt['user']);
+        return $this->generate($prompt['system'], $prompt['user'], $responseFormat);
     }
 
 
@@ -173,7 +161,8 @@ class LessonPlan
     ): string {
         /* Details about how to use each field
          */
-        $lessonPlanTemplateFields = $this->compileFields($this->lessonPlanTemplateFieldMapper->findByColumn('id', $lessonPlanTemplateFieldIds));
+        $responseFormat = self::RESPONSE_FORMAT;
+        $responseFormat = $this->augmentProperties($responseFormat, $this->lessonPlanTemplateFieldMapper->findByColumn('id', $lessonPlanTemplateFieldIds));
 
         /* Find some curriculum node names, if any were chosen
          */
@@ -185,8 +174,6 @@ class LessonPlan
          */
         $curriculumNames = $this->compileNodeTitles($this->curriculumNodeMapper->findByColumn('id', $curriculumNodeIds));
 
-        new \Alaress_Probe($curriculumNames);
-
         //        if ('' !== $curriculumNames) {
         //            $curriculum = sprintf(
         //                self::PROMPT_TEMPLATE_CURRICULUM,
@@ -197,12 +184,11 @@ class LessonPlan
         $prompt = $this->generatePrompt(
             $context,
             $folder,
-            $lessonPlanTemplateFields,
             $curriculum,
             $additionalContext
         );
 
-        return $this->generate($prompt['system'], $prompt['user']);
+        return $this->generate($prompt['system'], $prompt['user'],$responseFormat);
     }
 
 
@@ -213,7 +199,6 @@ class LessonPlan
      *
      * @param string $context
      * @param string $folder
-     * @param string $lessonPlanTemplateFields
      * @param string $curriculum
      * @param string $additionalContext
      * @return array
@@ -221,7 +206,6 @@ class LessonPlan
     private function generatePrompt(
         string $context,
         string $folder,
-        string $lessonPlanTemplateFields,
         string $curriculum,
         string $additionalContext = ''
     ): array {
@@ -230,7 +214,6 @@ class LessonPlan
         $systemContent = strtr(self::PROMPT_TEMPLATE, [
             '[CONTEXT]' => $context,
             '[FOLDER]' => $folder,
-            '[FIELDS]' => $lessonPlanTemplateFields,
         ]);
 
         /* Something that shapes what the ai would make;
@@ -255,14 +238,15 @@ class LessonPlan
 
     /**
      * Compose the prompt piece that talks about each Lesson Plan Template Field
-     * and its contents
+     * and its contents. These end up in the Properties node in the response format
      *
+     * @param array $responseFormat
      * @param GenericCollection $lessonPlanTemplateFields
-     * @return string
+     * @return array
      */
-    private function compileFields(GenericCollection $lessonPlanTemplateFields): string
+    private function augmentProperties(array $responseFormat, GenericCollection $lessonPlanTemplateFields): array
     {
-        $fields = [];
+        $struct = $responseFormat;
 
         /* Find some details about how to use the template fields
          */
@@ -272,30 +256,15 @@ class LessonPlan
             $fieldDescription = trim((string)$lessonPlanTemplateField->getDescription());
             $fieldBody = trim((string)$lessonPlanTemplateField->getBody());
 
-            /* Accumulate data, conditionally, if provided
-             * Each field's basic synopsis: each %s represents, respectively,
-             *    Lesson Plan Template Field ID
-             *    Lesson Plan Template Field Title
-             *    Lesson Plan Template Field Body
-             *    Lesson Plan Template Field Description (which also contains extra ai instructions)
-             */
-            $val = '';
+            $struct['schema']['properties'][$fieldTitle] = [
+                'type' => 'string',
+                'description' => $lessonPlanTemplateField->getDescription(),
+            ];
 
-            $val .= "{$fieldId}\n";
-            $val .= "{$fieldTitle}\n";
-
-            if ('' !== $fieldDescription) {
-                $val .= "{$fieldDescription}\n";
-            }
-
-            if ('' !== $fieldBody) {
-                $val .= "{$fieldBody}\n";
-            }
-
-            $fields[] = $val;
+            $struct['schema']['required'][] = $fieldTitle;
         }
 
-        return implode("\n\n", $fields);
+        return $struct;
     }
 
 
@@ -402,7 +371,7 @@ class LessonPlan
      * @return string
      * @throws \JsonException
      */
-    private function generate(string $systemContent, string $userContent, bool $stream = false): string
+    private function generate(string $systemContent, string $userContent, array $responseFormat, bool $stream = false): string
     {
         $payload = [
             /* An ordered list of instructions for OpenAi
@@ -434,9 +403,10 @@ class LessonPlan
             /* For futureproofing: never really used atm
              */
             "stream" => $stream,
-            'format' => self::RESPONSE_FORMAT
+            'format' => $responseFormat
         ];
 
+        new \Alaress_Probe($payload);die();
         return json_encode($payload, JSON_THROW_ON_ERROR);
     }
 }

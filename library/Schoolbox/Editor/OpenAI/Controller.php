@@ -100,8 +100,8 @@ class Controller extends Base
                 );
             }
 
-            new \Alaress_Probe($payload);
-            die();
+//            new \Alaress_Probe($payload);
+//            die();
 
             /* Send it and decode the result (if any: sometimes it returns null)
              * and dodge around all its weird encoding business with a double-decode,
