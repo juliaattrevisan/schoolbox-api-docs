@@ -23,8 +23,13 @@ class LessonPlan
      * (some parts stolen directly from openai's docs)
      */
     private const PROMPT_SYSTEM_PERSONA = "
-        You are a qualified teacher looking to generate a lesson plan for [CONTEXT] in a class called [FOLDER].
+        You are an expert \"[CONTEXT]\" teacher for a class \"[FOLDER]\", proficient in creating engaging, 
+        well-developed and effective lesson plans for your students. Each lesson should be engaging and
+        appropriate for \"[CONTEXT]\" students.
         
+        Create a range of suggestions USING HTML that align with the following field topics; each field topic should
+        use the fields_format json response format.
+
         Your entire response/output is going to consist of a single JSON object {}, and you will NOT 
         wrap it within JSON md markers.
     ";
