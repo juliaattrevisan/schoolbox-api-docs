@@ -419,26 +419,28 @@ class Controller extends WebController\Base
      *
      * @param CourseSpec\Model $courseSpec
      * @return boolean
+     * @throws \Schoolbox\Mapper\Exception
      */
-    private function getCanAccessPopOut(CourseSpec\Model $courseSpec)
+    private function getCanAccessPopOut(CourseSpec\Model $courseSpec): bool
     {
         // first check if the user has write access to the course
         $hasCourseWriteAccess = $this->access->getFolderAccess(
             $this->getUser(),
             $courseSpec->getFolder()->getId(),
         ) >= UserAccess::ACCESS_WRITE;
+        if (!$hasCourseWriteAccess) {
+            return false;
+        }
         // then check if the user has write access to all the course implementations
-        $hasClassWriteAccess = true;
         foreach ($courseSpec->getCourseImplementations() as $classImplementation) {
             $hasAccess = $this->access->getFolderAccess(
                 $this->getUser(),
                 $classImplementation->getFolder()->getId()
             ) >= UserAccess::ACCESS_WRITE;
             if (!$hasAccess) {
-                $hasClassWriteAccess = false;
-                break;
+                return false;
             }
         }
-        return $hasCourseWriteAccess && $hasClassWriteAccess;
+        return true;
     }
 }
