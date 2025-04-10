@@ -340,8 +340,8 @@ const isFirstUnit = window.Vue.computed(() => {
                     @create-clicked="textboxActionComponent?.onCreateClicked"
                 />
                 <up-unit-cell-activities-list-empty
-                    :unit="props.unit"
                     v-else-if="props.column.type === ColumnType.ACTIVITIES"
+                    :unit="props.unit"
                 />
                 <up-unit-cell-rubric-capabilities-empty
                     v-else-if="props.column.type === ColumnType.RUBRIC_CAPABILITIES"
