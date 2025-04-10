@@ -38,7 +38,6 @@ class Helper
 
     /**
      * Apply default notification settings for a given role id or role type and namespace.
-     * TODO - update this helper so tools/notif/delete-personalised-settings.php can also access
      *
      * @param int|null $roleId
      * @param string|null $roletype
@@ -107,7 +106,6 @@ class Helper
         }
 
         // fetch the records to be deleted and log them
-        // the below currently results in an error: Cannot use object of type Schoolbox\Realtime\Message\NS as array
         $statement = $this->namespaceMapper->getDatabase()->query($select . $sql, $params);
         foreach ($statement->fetchAll() as $item) {
             $log[] = sprintf('user id=%s, namespace=%s, type=%s, delivery=%s', $item['user_id'], $item['slug'], $item['key'], $item['delivery']);
