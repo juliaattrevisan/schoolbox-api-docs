@@ -19,7 +19,7 @@ const props = defineProps<Props>();
 
 const activitiesListStore = useActivitiesListStore(props.activitiesListStoreId);
 const component = window.Vue.ref<CurriculumOverviewComponent | null>(
-    activitiesListStore().getComponent(props.unit.curriculum.components, props.column),
+    activitiesListStore().getComponent(props.unit.activities.components, props.column),
 );
 const isCreating = window.Vue.ref(false);
 
@@ -27,9 +27,9 @@ const isCreating = window.Vue.ref(false);
  * To respond to a new curriculum component being created
  */
 window.Vue.watch(
-    () => props.unit.curriculum.components,
+    () => props.unit.activities.components,
     () => {
-      component.value = activitiesListStore().getComponent(props.unit.curriculum.components, props.column);
+      component.value = activitiesListStore().getComponent(props.unit.activities.components, props.column);
     },
     { deep: true },
 );
@@ -42,7 +42,7 @@ const createText = window.Vue.computed(() => {
   return isCreating.value ? "Creating..." : "Create Component";
 });
 
-const hasComponent = props.unit.activities.components.length > 0;
+const anyComponent = props.unit.activities.components.length > 0;
 const extraActivitiesComponents = props.unit.activities.components.filter((comp) => !comp.inTemplate).length; // Number of extra components in the template
 
 
@@ -62,7 +62,7 @@ async function onCreateSelected(): Promise<void> {
 
 <template>
   <template v-if="props.unit.activities._routes.create">
-    <div v-if="!hasComponent" class="component-action">
+    <div v-if="component === null && !anyComponent" class="component-action">
       <section>
         <button @click.prevent="onCreateSelected">{{ createText }}</button>
       </section>

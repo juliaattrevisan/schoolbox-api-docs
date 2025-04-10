@@ -173,7 +173,7 @@ export const useActivitiesListStore = (activitiesListStoreId: string) =>
                     heading: column.label,
                     inTemplate: true,
                 };
-                unitPlannerStore.addCurriculumComponent(unit.id, newComponent);
+                unitPlannerStore.addCourseBuilderComponent(unit.id, newComponent);
 
                 timeout({ text: "Course builder created successfully" });
             } catch (error) {
