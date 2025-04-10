@@ -55,12 +55,9 @@ HELP;
 
         try {
             $helper = new Helper($roleMapper, $msgRerouteMapper, $msgNamespaceMapper);
-            $logs = $helper->applyDefaultSettings((int)$this->getOpt('role:'), $this->getOpt('roletype:'), $this->getOpt('namespace:'), $this->perform());
-            foreach ($logs as $log) {
-                $this->getLogger()->info($log);
-            }
+            $helper->applyDefaultSettings((int)$this->getOpt('role:'), $this->getOpt('roletype:'), $this->getOpt('namespace:'), $this->perform(), $this->getLogger());
         } catch (\Exception $e) {
-            $this->getLogger()->error('Unable to start transaction: ' . $e->getMessage());
+            $this->getLogger()->error('Unable to run transaction: ' . $e->getMessage());
             exit(0);
         }
     }

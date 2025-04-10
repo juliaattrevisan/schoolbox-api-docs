@@ -13,6 +13,7 @@ use Schoolbox\Realtime\Message\RerouteMapper;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\Application\Exception\Exception;
+use Psr\Log\LoggerInterface;
 
 class Helper
 {
@@ -43,14 +44,11 @@ class Helper
      * @param string|null $roletype
      * @param string $namespace
      * @param bool $isPerform
-     * @return string[]
+     * @param LoggerInterface|null $logger
      * @throws Exception
      */
-    public function applyDefaultSettings(?int $roleId, ?string $roletype, string $namespace, bool $isPerform = true): array
+    public function applyDefaultSettings(?int $roleId, ?string $roletype, string $namespace, bool $isPerform = true, ?LoggerInterface $logger = null): void
     {
-        // to return log messages
-        $log = [];
-
         // check for a valid role if set
         if ($roleId) {
             try {
@@ -82,9 +80,9 @@ class Helper
         }
 
         if ($isPerform) {
-            $log[] = "Deleting from database.";
+            $logger?->info("Deleting from database.");
         } else {
-            $log[] = "Running in dry-run mode.";
+            $logger?->info("Running in dry-run mode.");
         }
 
         // begin SQL transaction
@@ -108,7 +106,7 @@ class Helper
         // fetch the records to be deleted and log them
         $statement = $this->namespaceMapper->getDatabase()->query($select . $sql, $params);
         foreach ($statement->fetchAll() as $item) {
-            $log[] = sprintf('user id=%s, namespace=%s, type=%s, delivery=%s', $item['user_id'], $item['slug'], $item['key'], $item['delivery']);
+            $logger?->debug(sprintf('user id=%s, namespace=%s, type=%s, delivery=%s', $item['user_id'], $item['slug'], $item['key'], $item['delivery']));
         }
 
         // execute the delete statement
@@ -117,12 +115,10 @@ class Helper
 
         if ($isPerform) {
             $this->msgRerouteMapper->getDatabase()->commit();
-            $log[] = $deleteStatement->rowCount() . ' entries are deleted';
-            return $log;
+            $logger?->info($deleteStatement->rowCount() . ' entries are deleted');
         } else {
             $this->msgRerouteMapper->getDatabase()->rollBack();
-            $log[] = $deleteStatement->rowCount() . ' entries will be deleted';
-            return $log;
+            $logger?->info($deleteStatement->rowCount() . ' entries will be deleted');
         }
     }
 }
