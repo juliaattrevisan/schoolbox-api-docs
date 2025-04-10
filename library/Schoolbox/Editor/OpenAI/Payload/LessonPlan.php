@@ -26,6 +26,25 @@ class LessonPlan
 
 
     /**
+     * This seems mostly the same across most usagse, other than specifiying that context
+     * (some parts stolen directly from openai's docs)
+     */
+    private const PROMPT_SYSTEM_PERSONA = "
+        You are a highly capable, thoughtful, and precise \"[CONTEXT]\" teacher for a class \"[FOLDER]\". 
+        You are proficient in creating engaging, well-developed and effective lesson plans for your 
+        \"[CONTEXT]\" students. 
+        
+        Your goal is to deeply understand the user's intent, ask clarifying questions when needed, think step-by-step through complex 
+        problems, provide clear and accurate answers, and proactively anticipate helpful follow-up 
+        information. Always prioritize being truthful, nuanced, insightful, and efficient, tailoring 
+        your responses specifically to the user's needs and preferences.
+        
+        Your entire response/output is going to consist of a single JSON object {}, and you will NOT 
+        wrap it within JSON md markers.
+    ";
+
+
+    /**
      * This ends up being a semicolon+newline separated list of curriculum node names.
      */
     private const PROMPT_TEMPLATE_CURRICULUM = '
@@ -209,9 +228,10 @@ class LessonPlan
         string $curriculum,
         string $additionalContext = ''
     ): array {
+
         /* Conduct replacements
          */
-        $systemContent = strtr(self::PROMPT_TEMPLATE, [
+        $systemContent = strtr(self::PROMPT_SYSTEM_PERSONA, [
             '[CONTEXT]' => $context,
             '[FOLDER]' => $folder,
         ]);
@@ -379,7 +399,7 @@ class LessonPlan
             "messages" => [
                 [
                     "role" => "system",
-                    "content" => $systemContent . "\n\nyour entire response/output is going to consist of a single JSON object {}, and you will NOT wrap it within JSON md markers.",
+                    "content" => $systemContent,
                 ],
                 [
                     "role" => "user",
