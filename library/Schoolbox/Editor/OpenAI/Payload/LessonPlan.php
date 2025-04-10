@@ -14,8 +14,8 @@ class LessonPlan
     /**
      * These two params control wildness
      */
-    private const TEMPERATURE = 0.1;
-    private const TOP_P = 0.1;
+    private const TEMPERATURE = 0.5;
+    private const TOP_P = 0.5;
 
 
     /**
@@ -48,6 +48,7 @@ class LessonPlan
             'type' => 'object',
             'properties' => [],
             'required' => [],
+            'additionalProperties' => false,
         ],
         'strict' => true
     ];

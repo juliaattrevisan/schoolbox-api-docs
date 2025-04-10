@@ -12,7 +12,6 @@ use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
 use DebugBar\DebugBarException;
 use GuzzleHttp\Client;
-use Psr\Http\Client\ClientExceptionInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Mapper\Exception;
@@ -112,7 +111,7 @@ class Controller extends Base
 
             $result = preg_replace('/\\n(\s)*/', '', $data['choices'][0]['message']['content']);
 
-            $this->response = $this->responseAsJson($result ?? null);
+            $this->response = $this->responseAsJson(json_decode($result) ?? null);
 
             return;
         } catch (\DomainException $e) {
