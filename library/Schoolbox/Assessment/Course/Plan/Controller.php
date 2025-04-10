@@ -966,7 +966,7 @@ class Controller extends Base
      * @throws \Schoolbox\Mapper\Exception\Deleted
      * @throws \Schoolbox\Mapper\Exception\NotFound
      */
-    private function getTemplateCurric(int $courseTemplateId)
+    private function getTemplateCurric(int $courseTemplateId): array
     {
         /**
          * Grab the list of curriculum components from the Unit Template
@@ -1018,11 +1018,11 @@ class Controller extends Base
      * Fetch the Course Builder component info for the specified template
      *
      * @param int $courseTemplateId
-     * @return array[]
+     * @return array
      * @throws \Schoolbox\Mapper\Exception\Deleted
      * @throws \Schoolbox\Mapper\Exception\NotFound
      */
-    private function getTemplateCourseBuilder(int $courseTemplateId)
+    private function getTemplateCourseBuilder(int $courseTemplateId): array
     {
         /**
          * Grab the list of curriculum components from the Unit Template
