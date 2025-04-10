@@ -76,6 +76,11 @@ jobs:
             alaress/php82-alpine:pr-${{ github.event.pull_request.number }}
             alaress/php82-alpine:latest
 
+      - name: Extract php82-alpine
+        run: |
+          cd ${{ runner.temp }}
+          tar -xf php82-alpine.tar
+
 #      - name: List images
 #        run: |
 #          docker image ls
@@ -101,7 +106,7 @@ jobs:
           cache-from: type=local,src=${{ runner.temp }}/image-cache
           cache-to: type=local,dest=${{ runner.temp }}/image-cache
           # Try build-contexts for telling this process to use a locally loaded package
-          build-contexts: alaress/php82-alpine=${{ runner.temp }}/php82-alpine.tar
+          build-contexts: alaress/php82-alpine=${{ runner.temp }}/php82-alpine
           build-args: |
             ENV=prod
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
