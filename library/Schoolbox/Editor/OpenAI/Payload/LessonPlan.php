@@ -237,17 +237,17 @@ class LessonPlan
         /* Find some details about how to use the template fields
          */
         foreach ($lessonPlanTemplateFields as $lessonPlanTemplateField) {
-            $fieldId = $lessonPlanTemplateField->getId();
+            $fieldId = (string)$lessonPlanTemplateField->getId();
             $fieldTitle = trim((string)$lessonPlanTemplateField->getTitle());
             $fieldDescription = trim((string)$lessonPlanTemplateField->getDescription());
             $fieldBody = trim((string)$lessonPlanTemplateField->getBody());
 
-            $struct['schema']['properties'][$fieldTitle] = [
+            $struct['schema']['properties'][$fieldId] = [
                 'type' => 'string',
-                'description' => $lessonPlanTemplateField->getDescription(),
+                'description' => $fieldDescription,
             ];
 
-            $struct['schema']['required'][] = $fieldTitle;
+            $struct['schema']['required'][] = $fieldId;
         }
 
         return $struct;
