@@ -115,7 +115,7 @@ jobs:
           cache-from: type=local,src=${{ runner.temp }}/image-cache
           cache-to: type=local,dest=${{ runner.temp }}/image-cache
           # Try build-contexts for telling this process to use a locally loaded package
-#          build-contexts: alaress/php82-alpine:latest=@${{ steps.php82-alpine-image-id.outputs.id }}
+#          build-contexts: alaress/php82-alpine:latest=docker-image://alaress/php82-alpine:latest@${{ steps.php82-alpine-image-id.outputs.id }}
           build-args: |
             ENV=prod
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
