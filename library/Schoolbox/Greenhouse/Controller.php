@@ -49,7 +49,7 @@ class Controller extends Base
                 [
                     "role" => "system",
                     "content" =>
-                        "You are a qualified teacher looking to generate a lesson plan for year 9 science.",
+                        "You are an expert \"Scott Year 8 Science Earth and Space Science\" teacher for a class \"9A English\", proficient in creating engaging, \n        well-developed and effective lesson plans for your students. Each lesson should be engaging and\n        appropriate for \"Scott Year 8 Science Earth and Space Science\" students.\n        \n        Create a range of suggestions USING HTML that align with the following field topics; each field topic should\n        use the fields_format json response format.",
                 ],
                 [
                     "role" => "user",
@@ -68,37 +68,54 @@ class Controller extends Base
                     "schema" => [
                         "type" => "object",
                         "properties" => [
-                            "1" => [
-                                "type" => "string",
-                                "description" => "Learning Objectives: What students should learn from the lesson\r\n",
-                            ],
-                            "2" => [
-                                "type" => "string",
-                                "description" =>
-                                    "Lesson Structure and Activities: A detailed outline of the lesson with activities and teacher notes. Activities can include direct teaching as well as activities for students to complete. \r\n",
-                            ],
-                            "3" => [
-                                "type" => "string",
-                                "description" =>
-                                    "Differentiation: Describe the possible differentiation approaches for students with learning difficulties, including, Dyslexia, Dysgraphia, Auditory Processing Disorder\r\n",
-                            ],
-                            "4" => [
-                                "type" => "string",
-                                "description" => "Resources: Include resources which will support the delivery of this lesson\r\n",
-                            ],
-                            "5" => [
-                                "type" => "string",
-                                "description" =>
-                                    "Checks for Understanding: Provide detail on how to check for student understanding according to the learning objectives",
-                            ],
+                            // "1" => [
+                            //     "type" => "string",
+                            //     "description" => "Learning Objectives: What students should learn from the lesson\r\n",
+                            // ],
+                            // "2" => [
+                            //     "type" => "string",
+                            //     "description" =>
+                            //         "Lesson Structure and Activities: A detailed outline of the lesson with activities and teacher notes. Activities can include direct teaching as well as activities for students to complete. \r\n",
+                            // ],
+                            // "3" => [
+                            //     "type" => "string",
+                            //     "description" =>
+                            //         "Differentiation: Describe the possible differentiation approaches for students with learning difficulties, including, Dyslexia, Dysgraphia, Auditory Processing Disorder\r\n",
+                            // ],
+                            // "4" => [
+                            //     "type" => "string",
+                            //     "description" => "Resources: Include resources which will support the delivery of this lesson\r\n",
+                            // ],
+                            // "5" => [
+                            //     "type" => "string",
+                            //     "description" =>
+                            //         "Checks for Understanding: Provide detail on how to check for student understanding according to the learning objectives",
+                            // ],
                         ],
-                        "required" => ["1", "2", "3", "4", "5"],
+                        // "required" => ["1", "2", "3", "4", "5"],
+                        "required" => [],
                         "additionalProperties" => false,
                     ],
                     "strict" => true,
                 ],
             ],
         ];
+
+
+        // add the fields to the payload
+        $fields = $this->requestPost->get("fields");
+        foreach ($fields as $field) {
+            $payload["text"]["format"]["schema"]["properties"][(string)$field["id"]] = [
+                "type" => "string",
+                "description" => sprintf(
+                    "FIELD TITLE: %s\nFIELD DESCRIPTION: %s\nEXISTING CONTENT: %s",
+                    $field["title"],
+                    $field["description"],
+                    $field["body"]
+                ),
+            ];
+            $payload["text"]["format"]["schema"]["required"][] = (string)$field["id"];
+        }
 
         $endpoint = "https://api.openai.com/v1/responses";
         $token = $this->getConfigLoader()->get('openai_key');
@@ -127,6 +144,16 @@ class Controller extends Base
 
         // the fields end up in $responseData["output"][0]["content"][0]["text"]
         // although i expect there's more to that, and you may need to find the right ones in the lists, if there could be many
+
+        $responseError = array_key_exists("error", $responseData) ? $responseData["error"] : "Unknown error";
+        if ($responseError != null) {
+            $this->response = $this->responseAsJson([
+                "status" => "500",
+                "message" => $responseError,
+            ])->withStatus(500);
+
+            return;
+        }
 
         $fieldResponse = json_decode($responseData["output"][0]["content"][0]["text"], true);
 
