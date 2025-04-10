@@ -270,7 +270,7 @@ window.Vue.onMounted(() => {
                         </p>
                     </td>
                     <td>
-                        <span v-if="participant.excludedAt != null" class="excluded">Excluded</span>
+                        <span v-if="participant.excludedAt != null">Excluded</span>
                     </td>
                     <td class="no-pad">
                         <div v-if="participant.user.id" class="actions-small-1">
@@ -353,10 +353,6 @@ window.Vue.onMounted(() => {
 }
 .flex-item {
     flex: 1;
-}
-.excluded {
-    display: inline-block;
-    color: #666;
 }
 @media (max-width: 768px) {
     .flex-container {
