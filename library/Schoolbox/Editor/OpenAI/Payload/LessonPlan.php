@@ -32,12 +32,12 @@ class LessonPlan
     ";
 
 
-    /**
-     * Additional instructions specified by the user
-     */
-    private const PROMPT_TEMPLATE_ADDITIONAL_CONTEXT = '
-        Additional Notes: %s
-    ';
+//    /**
+//     * Additional instructions specified by the user
+//     */
+//    private const PROMPT_TEMPLATE_ADDITIONAL_CONTEXT = '
+//        Additional Notes: %s
+//    ';
 
 
     /**
@@ -223,7 +223,9 @@ class LessonPlan
                 'type' => 'string',
                 'description' => sprintf(
                     "FIELD TITLE: %s\nFIELD DESCRIPTION: %s\nTEMPLATE: %s",
-                    $fieldTitle, $fieldDescription, $fieldBody
+                    $fieldTitle,
+                    $fieldDescription,
+                    $fieldBody
                 ),
             ];
 
