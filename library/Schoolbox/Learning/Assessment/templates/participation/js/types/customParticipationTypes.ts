@@ -26,4 +26,8 @@ export type Participant = {
     plan: Plan;
     updatedAt: string;
     user: User;
+    _links?: {
+        exclude?: string;
+        include?: string;
+    };
 };
