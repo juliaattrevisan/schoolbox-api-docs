@@ -46,7 +46,7 @@ jobs:
         id: cache-base-images
         with:
           path: ${{ runner.temp }}/image-cache
-          key: base-images-${{ inputs.platform }}-${{ inputs.arch }}-${{ hashFiles('docker/base-images/**/*') }}
+          key: base-images-${{ matrix.build.platform }}-${{ matrix.build.arch }}-${{ hashFiles('docker/base-images/**/*') }}
 
       - name: Build php82-alpine
         uses: docker/build-push-action@v6
