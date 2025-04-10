@@ -55,8 +55,8 @@ export default {
 
 
             // If the url already has search parameters append instead of starting one
-            const urlSearch = new URLSearchParams(this.filter_endpoint);
-            const joinVar = urlSearch.size > 0 ? "&" : "?";
+            const urlSearch = new URL(`${window.location.origin}${this.filter_endpoint}`);
+            const joinVar = urlSearch.searchParams.size > 0 ? "&" : "?";
 
             fetch(`${this.filter_endpoint}${joinVar}${getSearchString(params)}`)
                 .then((response) => response.json())
