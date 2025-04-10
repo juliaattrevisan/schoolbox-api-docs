@@ -190,45 +190,6 @@ async function includeSelected(): Promise<void> {
     selectedList.value = [];
 }
 
-/**
- * To notify the backend of a change in the selected nodes
- */
-async function pushChanges(): Promise<void> {
-    try {
-        activate("Updating...");
-        isProcessing.value = true;
-        const response = await fetch(`/api/curriculum/usage/folder/${folderId}?returnFormat=tree&descendants=0`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify([...selectedNodes.value]),
-        });
-        if (response.ok) {
-            const newNodes = (await response.json()) as Node[];
-            nodes.value = newNodes;
-            timeout({ text: "Curriculum updated successfully" });
-            document.dispatchEvent(
-                new CustomEvent(FOLDER_NODES_UPDATED, {
-                    detail: {
-                        folderId,
-                        componentInstanceId,
-                        updatedNodes: newNodes,
-                        updatedSelectedNodes: selectedNodes.value,
-                    } as UpdateEventDetail,
-                }),
-            );
-        } else {
-            const responseText = (await response.json()) as { title: string; type: string; status: number };
-            timeout({ text: responseText.title, isSuccess: false });
-        }
-    } catch (error) {
-        timeout({ text: "There was an unexpected error", isSuccess: false });
-    } finally {
-        isProcessing.value = false;
-    }
-}
-
 window.Vue.onMounted(() => {
     void getStudentPastoralCounts();
 });
