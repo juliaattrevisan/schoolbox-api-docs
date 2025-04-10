@@ -48,9 +48,9 @@ jobs:
           path: ${{ runner.temp }}/image-cache
           key: base-images-${{ matrix.build.platform }}-${{ matrix.build.arch }}-${{ hashFiles('docker/base-images/**/*') }}
 
-      - name: Create image cache folder
-        run: |
-          mkdir -p ${{ runner.temp }}/image-cache
+#      - name: Create image cache folder
+#        run: |
+#          mkdir -p ${{ runner.temp }}/image-cache
 
       - name: Build php82-alpine
         uses: docker/build-push-action@v6
@@ -65,6 +65,10 @@ jobs:
             ENV=prod
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           tags: alaress/php82-alpine:pr-${{ github.event.pull_request.number }}
+
+      - name: List images
+        run: |
+          docker image ls
 
       - name: Build php82-fpm-alpine
         uses: docker/build-push-action@v6
