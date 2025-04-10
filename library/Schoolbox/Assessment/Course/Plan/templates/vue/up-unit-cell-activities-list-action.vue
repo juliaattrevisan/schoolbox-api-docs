@@ -17,9 +17,7 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const activitiesListStoreId = `${props.unit.id}-${props.column.id}`;
-
-const activitiesListStore = useActivitiesListStore(activitiesListStoreId);
+const activitiesListStore = useActivitiesListStore(props.activitiesListStoreId);
 const component = window.Vue.ref<CurriculumOverviewComponent | null>(
     activitiesListStore().getComponent(props.unit.curriculum.components, props.column),
 );
@@ -45,7 +43,7 @@ const createText = window.Vue.computed(() => {
 });
 
 const hasComponent = props.unit.activities.components.length > 0;
-const extraActivitiesComponents = props.unit.activities.components.filter((component) => !component.inTemplate).length; // Number of extra components in the template
+const extraActivitiesComponents = props.unit.activities.components.filter((comp) => !comp.inTemplate).length; // Number of extra components in the template
 
 
 /**

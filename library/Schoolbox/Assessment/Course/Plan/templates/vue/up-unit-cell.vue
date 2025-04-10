@@ -363,9 +363,9 @@ const isFirstUnit = window.Vue.computed(() => {
                     @modify-clicked="textboxContentComponent?.focusEditor"
                 />
                 <up-unit-cell-activities-list-action
+                    v-else-if="props.column.type === ColumnType.ACTIVITIES"
                     :unit="props.unit"
                     :column="props.column"
-                    v-else-if="props.column.type === ColumnType.ACTIVITIES"
                     :activities-list-store-id="`${props.unit.id}-${props.column.id}`"
                 />
                 <up-unit-cell-rubric-capabilities-action
