@@ -52,12 +52,12 @@ jobs:
 #        run: |
 #          mkdir -p ${{ runner.temp }}/image-cache
 
-      - name: Load php82-alpine image cache
-        uses: actions/cache@v4
-        id: cache-php82-alpine
-        with:
-          path: ${{ runner.temp }}/php82-alpine.tar
-          key: php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}-${{ hashFiles('docker/base-images/**/*') }}
+#      - name: Load php82-alpine image cache
+#        uses: actions/cache@v4
+#        id: cache-php82-alpine
+#        with:
+#          path: ${{ runner.temp }}/php82-alpine.tar
+#          key: php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}-${{ hashFiles('docker/base-images/**/*') }}
 
       - name: Build php82-alpine
         uses: docker/build-push-action@v6
