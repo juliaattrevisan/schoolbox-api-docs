@@ -205,12 +205,19 @@ class LessonPlan
         /* Find some details about how to use the template fields
          */
         foreach ($fields as $field) {
+            $fieldSelected = (bool)$field['selected'];
+
+            /* Skip past this field: user didn't want to update it
+             */
+            if (!$fieldSelected) {
+                continue;
+            }
+
             $fieldId = (string)$field['id'];
             $fieldTitle = trim((string)$field['title']);
             $fieldDescription = trim((string)$field['description']);
             $fieldVisibility = trim((string)$field['visibility']);
             $fieldBody = trim((string)$field['body']);
-            $fieldSelected = (bool)$field['selected'];
 
             $struct['schema']['properties'][$fieldId] = [
                 'type' => 'string',
