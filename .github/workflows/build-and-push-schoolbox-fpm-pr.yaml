@@ -64,7 +64,9 @@ jobs:
           build-args: |
             ENV=prod
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
-          tags: alaress/php82-alpine:pr-${{ github.event.pull_request.number }}
+          tags: |
+            alaress/php82-alpine:pr-${{ github.event.pull_request.number }}
+            alaress/php82-alpine:latest
 
       - name: List images
         run: |
@@ -79,10 +81,13 @@ jobs:
           push: false
           cache-from: type=local,src=${{ runner.temp }}/image-cache
           cache-to: type=local,dest=${{ runner.temp }}/image-cache
+          # Try build-contexts for telling this process to use a locally built package
           build-args: |
             ENV=prod
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
-          tags: alaress/php82-fpm-alpine:pr-${{ github.event.pull_request.number }}
+          tags: |
+            alaress/php82-fpm-alpine:pr-${{ github.event.pull_request.number }}
+            alaress/php82-fpm-alpine:latest
 
 #      - name: Build and push php82-alpine
 #        uses: ./.github/actions/build-and-push-to-ghcr
