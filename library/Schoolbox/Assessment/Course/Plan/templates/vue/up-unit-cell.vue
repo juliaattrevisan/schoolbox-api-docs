@@ -20,8 +20,6 @@ import UpUnitCellTextboxAction from "./up-unit-cell-textbox-action.vue";
 import UpUnitCellTextboxEmpty from "./up-unit-cell-textbox-empty.vue";
 import UpUnitCellActivitiesListAction from "./up-unit-cell-activities-list-action.vue";
 import UpUnitCellActivitiesListContent from "./up-unit-cell-activities-list-content.vue";
-import ActivitiesListAction from "./activities-list/activities-list-action.vue";
-import ActivitiesListEmpty from "./activities-list/activities-list-empty.vue";
 import UpUnitCellActivitiesListEmpty from "./up-unit-cell-activities-list-empty.vue";
 import UpUnitCellRubricCapabilitiesContent from "./up-unit-cell-rubric-capabilities-content.vue";
 import UpUnitCellRubricCapabilitiesAction from "./up-unit-cell-rubric-capabilities-action.vue";
