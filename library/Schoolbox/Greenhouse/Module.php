@@ -33,6 +33,9 @@ class Module extends BaseModule
         );
 
         $this->register('GET', '/{templateName}', 'getGreenhouse', $isAdministrator, null);
+
+        // TEMP until SA-19479 creates an endpoint for this
+        $this->register('POST', '/lessonPlanTest', 'postLessonPlan', null, null);
     }
 
 

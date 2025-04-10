@@ -13,13 +13,14 @@ interface Props {
     studentConst: string; // The const for student visibility
     fileBrowserCategoryId: number;
     fields: LessonPlanField[];
+    generatePlanRoute: string | null; // The route to generate the lesson plan with AI, if available
 }
 
 const props = defineProps<Props>();
 const lpStore = useLessonPlannerStore();
 
 window.Vue.onMounted(() => {
-    lpStore.init(props.fields);
+    lpStore.init(props.fields, props.generatePlanRoute);
 });
 </script>
 

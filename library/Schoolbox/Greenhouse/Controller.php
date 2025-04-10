@@ -37,4 +37,23 @@ class Controller extends Base
         $this->response = $this->responseFromTemplate('@greenhouse/' . $templateName . '.twig', [
         ]);
     }
+
+    /**
+     * TEMP until SA-19479 creates an endpoint for this
+     */
+    public function postLessonPlan(): void
+    {
+        /** @var array<string,string> - Each requested field ID mapped to its new content */
+        $newFieldContent = [];
+
+        $fields = $this->requestPost->get("fields");
+        foreach ($fields as $field) {
+            $newFieldContent[$field["id"]] = $field["body"] . " (but now with added gippity flavouring)";
+        }
+
+        // simulate thinking...
+        sleep(1);
+
+        $this->response = $this->responseAsJson($newFieldContent)->withStatus(200);
+    }
 }
