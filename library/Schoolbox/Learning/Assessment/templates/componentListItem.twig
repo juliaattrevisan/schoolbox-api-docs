@@ -41,6 +41,13 @@
         <ul data-dropdown-content class="f-dropdown" id="duework-options{{ assessable.id }}">
             {% apply spaceless %}
                 {% if statusRoute %}<li><a class="icon-progress" href="{{ statusRoute }}" data-test="component-assessment-actions-viewStatus-{{ assessable.id }}">View Status</a></li>{% endif %}
+                {% set viewGradeRoute = routeLookupIfAuthorized('learningDueWorkResponse.getFirstParticipantResponse', {
+                    assessmentId: assessable.id,
+                    assessment: assessable,
+                }) %}
+                {% if viewGradeRoute %}
+                    <li><a class="icon-task" href="{{ viewGradeRoute }}" >View and {{ locale.grades }} submissions</a></li>
+                {% endif %}
                 {% if assessable is dueWork and assessable.enableWorksheet and assessable.kamiWorksheetTemplate and worksheetClassView %}
                     <li>
                         <a id="kamiWorksheet" class="icon-surveys" href="{{ worksheetClassView }}">Class View</a>

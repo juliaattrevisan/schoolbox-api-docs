@@ -79,6 +79,10 @@ class Module extends BaseModule
             return $this->preloadKami($params);
         };
 
+        $preloadAssessment = function (array $params) {
+            return $this->preloadAssessment($params);
+        };
+
         $hasResponseAccess = new Rule\All(
             new Rule\IsLoggedIn(),
             $this->buildRuleHasWriteAccess(),
@@ -96,6 +100,12 @@ class Module extends BaseModule
                 }
                 throw new InvalidPath();
             })
+        );
+
+        $hasViewGradeAccess = new Rule\All(
+            new Rule\IsLoggedIn(),
+            $this->buildRuleHasWriteAccess(),
+            new CanViewAssessable(new Visibility(Access::getInstance()))
         );
 
         $hasKamiAccess = new Rule\All(
@@ -126,6 +136,8 @@ class Module extends BaseModule
 
         $this->register('GET', $participantPattern . '/responses/blind{/responseId:\d+}', 'getParticularResponseBlind', $hasResponseAccess, $preloadParticipant); // a || r
         $this->register('GET', $participantPattern . '/responses{/responseId:\d+}', 'getParticularResponse', $hasResponseAccess, $preloadParticipant); // a || r
+        //Redirecting route to find the first participant in the duework
+        $this->register('GET', $assessmentPattern . '/responses/view', 'getFirstParticipantResponse', $hasViewGradeAccess, $preloadAssessment); // a || r
 
         $this->register('GET', $turnitinPattern, 'getTurnitinReport', $hasSimilarityAccess, $preloadTurnitinWithAss); // a || r
         $this->register('GET', $turnitinPattern . '/iframe', 'getTurnitinReportContents', $hasSimilarityAccess, $preloadTurnitinWithAss); // a || r
@@ -343,6 +355,25 @@ class Module extends BaseModule
         ];
     }
 
+    /**
+     * @param array $params
+     * @return IAssessable[]
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     */
+    private function preloadAssessment(array $params): array
+    {
+        if (isset($params['assessment']) && $params['assessment'] instanceof IAssessable) {
+            $assessment = $params['assessment'];
+        } else {
+            try {
+                $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId']);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
+            }
+        }
+        return ['assessment' => $assessment];
+    }
 
     /**
      * @param array $params
