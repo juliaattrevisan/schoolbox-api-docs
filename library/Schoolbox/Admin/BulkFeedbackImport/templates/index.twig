@@ -62,25 +62,51 @@
         <div class="small-12 island">
             <section>
                 <div class="content">
-                    <p>To bulk import feedback (marks and/or comments) to due work items follow these instructions:</p>
+                    <p>To bulk import feedback (normalised marks and/or comments) to existing {{ locale.dueWork.proper }} items follow these steps:</p>
 
                     <ol>
-                        <li>Download and edit the template file using the link below.</li>
-                        <li>Add compulsory data to the CSV for:
+                        <li>Insert the exact {{ locale.dueWork.proper }} Title as it currently exists on all the {{ locale.class }} pages. The title must be unique for the import to work.</li>
+                        <li>Select the Work Type for the {{ locale.dueWork.proper }} item. The Work Type must be the same one as used on all the {{ locale.dueWork.proper }} pages listed on the CSV.</li>
+                        <li>Select a Feedback Author. This will determine who has given the feedback.</li>
+                        <li>Download and edit the provided template CSV file.</li>
+                        <li>
+                            Add compulsory data to the CSV for:
+                            <ol>
+                                <li><strong>{{ locale.class.proper }} Code(s):</strong> Feedback will only be imported to {{ locale.class.plural }} where the data on the CSV matches that on a homepage within Schoolbox. If a homepage utilises multiple class codes, a match will occur on any of the class codes on the homepage.</li>
+                                <li><strong>Student External ID:</strong> This value will come from the Student Information System, but can be found on the user profile in Schoolbox.</li>
+                            </ol>
+                        </li>
+                        <li>
+                            Add feedback to the CSV for either or both the:
+                            <ol>
+                                <li><strong>Normalised Mark:</strong> This must use a value between 0 and 100. If the mark type is set to 'Total Mark' or 'Letter Grade', Schoolbox will convert the grade on uploading the file. Leave this blank if using the mark type 'None'.</li>
+                                <li><strong>Comment:</strong> This will appear as written feedback and can be left blank if not wanting to add a comment. Comments within the CSV utilising commas, line breaks and quotation marks should be added using the RFC 4180 standard.</li>
+                            </ol>
+                        </li>
+                        <li>Upload the CSV file.</li>
+                        <li>
+                            <p>Select Preview.</p>
+                            <p>You will then be presented with the preview screen containing the outcome of each row of data imported and any errors that exist for review.</p>
+
+                            <p>Errors may include:</p>
                             <ul>
-                                <li><strong>Class Code(s).</strong> Feedback will only be imported to classes where the data on the CSV matches that on a homepage within Schoolbox. If a homepage utilises multiple class codes, a match will occur on any of the class codes on the homepage.</li>
-                                <li><strong>Student External ID.</strong> This value will come from the Student Information System, but can be found on the user profile in Schoolbox.</li>
+                                <li>Incorrect {{ locale.class.proper }} Codes</li>
+                                <li>Incorrect Student External IDs</li>
+                                <li>{{ locale.dueWork.proper }} Titles that do not exist or are not unique</li>
+                                <li>{{ locale.dueWork.proper }} Titles that do not correspond to the specified Work Type.</li>
+                                <li>Normalised marks that are not a value between 0 and 100. </li>
+                            </ul>
+                            <p>The error logs will not cover:</p>
+                            <ul>
+                                <li>User error of utilising total marks instead of normalised values</li>
+                                <li>Errors in comment formatting</li>
+                                <li>User error in comment content</li>
                             </ul>
                         </li>
-                        <li>Add optional data to the CSV for either 1 or 2 elements of feedback:
-                            <ul>
-                                <li><strong>Normalised Mark.</strong> This must use a value between 0 and 100. If the mark type is set to <em>Total Mark</em> or <em>Letter Grade</em>, Schoolbox will convert the grade on uploading the file. Leave this blank if using the mark type <em>None</em>.</li>
-                                <li><strong>Comment.</strong> This will appear as written feedback and can be left blank if not wanting to add a comment.</li>
-                            </ul>
-                        </li>
-                        <li>Select a Feedback Author below. Every feedback entry must be linked to a user for a successful import.</li>
-                        <li>Upload the file. You will be presented with a preview screen for confirming the Feedback Author, publish date of the feedback and the result of each row of data imported.</li>
+                        <li>Correct any errors in the CSV file and re-upload if needed.</li>
+                        <li>When no errors exist, utilise the 'Perform Import' button.</li>
                     </ol>
+
                 </div>
                 <div class="component-action">
                     <section>
@@ -96,12 +122,18 @@
                 <section>
                     <fieldset class="content">
                         <div class="small-12 columns">
-                            <label for="assessmentTitle" class="required">Assessment Title</label>
+                            <label for="assessmentTitle">
+                                <span class="required-with-tip">{{ locale.dueWork.proper }} Title</span>
+                                <span class="hint has-tip tip-top" data-tooltip title="Enter a clear and concise title for the {{ locale.dueWork.proper }}. This will be visible to students and staff.">?</span>
+                            </label>
                             <input id="assessmentTitle" type="text" name="assessmentTitle" value='' />
                         </div>
 
                         <div class="small-12 columns">
-                            <label for="worktype" class="required">Work Type</label>
+                            <label for="worktype">
+                                <span class="required-with-tip">Work Type</span>
+                                <span class="hint has-tip tip-top" data-tooltip title="Select the assessment work type from the drop-down list (e.g., learning activity, assignment, formative or summative assessment task).">?</span>
+                            </label>
 
                             <select id="worktype" name="worktypeId">
                                 {% for worktype in worktypes %}
@@ -111,12 +143,18 @@
                         </div>
 
                         <div class="small-12 columns">
-                            <label for="userId" class="required">Feedback Author</label>
+                            <label for="userId">
+                                <span class="required-with-tip">Feedback Author</span>
+                                <span class="hint has-tip tip-top" data-tooltip title="Indicates the person who provided the feedback for this assessment.">?</span>
+                            </label>
                             <input id="userId" data-selectizeuser type="text" name="userId" placeholder="Search Users">
                         </div>
 
                         <div class="small-12 columns">
-                            <label class="required">Source File</label>
+                            <label>
+                                <span class="required-with-tip">Source File</span>
+                                <span class="hint has-tip tip-top" data-tooltip title="Specifies the bulk import source file associated with this assessment.">?</span>
+                            </label>
                             {% include 'sub/attachzone.twig' with { attachzone: sourceFileZone } %}
                             <input type="hidden" name="sourceFile-file" id="sourceFile-file" />
                         </div>

@@ -18,6 +18,7 @@ use Schoolbox\Resource\Folder\Mapper;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Resource\Storage\Model;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -35,8 +36,8 @@ class Processor
      * assessment by its (assessment title, worktype) combo
      */
     private const QUERY_ASSESSMENT_TITLE_WORKTYPE = "
-        SELECT 
-            a.id AS assessment_id, 
+        SELECT
+            a.id AS assessment_id,
             a.title AS assessment_title,
             sb.id AS box_id
         FROM mv_assessment_relation mvar
@@ -105,6 +106,7 @@ class Processor
      * @param FilesystemProxy $filesystemProxy
      * @param UserMapper $userMapper
      * @param Mapper $folderMapper
+     * @param RosettaStone $rosettaStone
      * @param string $assessmentTitle
      * @param \Schoolbox\Learning\Assessment\WorkType\Model $workType
      * @param \Alaress_Date_Format $publishAt
@@ -115,6 +117,7 @@ class Processor
         private FilesystemProxy $filesystemProxy,
         private \Schoolbox\UserMapper $userMapper,
         private \Schoolbox\Resource\Folder\Mapper $folderMapper,
+        protected RosettaStone $rosettaStone,
         private string $assessmentTitle,
         private \Schoolbox\Learning\Assessment\WorkType\Model $workType,
         private \Alaress_Date_Format $publishAt,
@@ -255,9 +258,12 @@ class Processor
 
             if (\count($candidateAssessments) > 1) {
                 $this->log(sprintf(
-                    'Row %s: multiple assessments found for assessment "%s" in folder "%s" (%s) using worktype "%s" (%s). 
-                    Please ensure assessments are uniquely identifiable before continuing.',
+                    'Row %s: multiple %s found for %s "%s" in folder "%s" (%s) using Work Type "%s" (%s).
+                    Please ensure %s are uniquely identifiable before continuing.',
                     $i,
+                    $this->rosettaStone->translate('activity', true),
+                    $this->rosettaStone->translate('activity', false),
+                    $this->rosettaStone->translate('activity', true),
                     $this->assessmentTitle,
                     $folder['title'],
                     $folder['id'],
@@ -274,8 +280,9 @@ class Processor
              */
             if (0 === \count($candidateAssessments)) {
                 $this->log(sprintf(
-                    'Row %s: no assessments found for "%s" in folder "%s" (%s) using worktype "%s" (%s).',
+                    'Row %s: no %s found for "%s" in folder "%s" (%s) using Work Type "%s" (%s).',
                     $i,
+                    $this->rosettaStone->translate('activity', true),
                     $this->assessmentTitle,
                     $folder['title'],
                     $folder['id'],
@@ -296,8 +303,9 @@ class Processor
                  */
                 if (null === $boxId) {
                     $this->log(sprintf(
-                        'Row %s: unknown submission_box for assessment "%s" in folder "%s" (%s)',
+                        'Row %s: unknown submission_box for %s "%s" in folder "%s" (%s)',
                         $i,
+                        $this->rosettaStone->translate('activity', false),
                         $this->assessmentTitle,
                         $folder['title'],
                         $folder['id']
@@ -317,8 +325,22 @@ class Processor
                 $assessment = $this->assessmentMapperProxy->findById($assessmentId);
 
                 /* Compute human-readable mark from assessment's mark scheme instead
+                 * It must be between 0 and 100, inclusive
                  */
                 $normalisedMark = (float)trim((string)$row['Normalised Mark']);
+
+                if ($normalisedMark < 0 || $normalisedMark > 100) {
+                    $this->log(sprintf(
+                        'Row %s: normalised mark must be between 0 and 100 for %s "%s"',
+                        $i,
+                        $this->rosettaStone->translate('activity', false),
+                        $this->assessmentTitle,
+                    ), self::WARNING);
+
+                    $errors++;
+
+                    continue;
+                }
 
                 /* This is what the student would see
                  */
@@ -362,13 +384,14 @@ class Processor
                 ];
 
                 $this->log(sprintf(
-                    'Row %s: added grade %s (instructor grade %s, normalised mark %s) for %s (%s) in assessment "%s" (%s) found in folder "%s" (%s)',
+                    'Row %s: added grade %s (instructor grade %s, normalised mark %s) for %s (%s) in %s "%s" (%s) found in folder "%s" (%s)',
                     $i,
                     $humanReadableMark,
                     $instructorHumanReadableMark,
                     $normalisedMark,
                     $learner['fullname'],
                     $externalId,
+                    $this->rosettaStone->translate('activity', false),
                     $assessment->getTitle(),
                     $assessment->getId(),
                     $folder['title'],

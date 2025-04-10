@@ -15,10 +15,11 @@
 
     <div class="admin-content">
         <div class="small-12 island">
+            <h2 class="subheader">Summary</h2>
             <section>
                 <div class="content">
                     <ul>
-                        <li><strong>Assessment Title:</strong> {{ settings.assessmentTitle }}</li>
+                        <li><strong>{{ locale.dueWork.proper }} Title:</strong> {{ settings.assessmentTitle }}</li>
                         <li><strong>Work Type:</strong> {{ settings.worktype.name }}</li>
                         <li><strong>Feedback Author:</strong>
                             {% if settings.feedbackAuthor.deleted %}
