@@ -28,8 +28,10 @@ class Helper
      */
     private const ENDPOINT_TYPE_OPENAI = 'OpenAI';
     private const ENDPOINT_HOST_OPENAI_CHAT = 'https://api.openai.com/v1/chat/completions';
-    private const ENDPOINT_HOST_OPENAI_REQUEST = 'https://api.openai.com/v1/completions';
+    private const ENDPOINT_HOST_OPENAI_REQUEST = 'https://api.openai.com/v1/responses';
 
+    /* TODO Find the azure equivalent of chat and request
+     */
     private const ENDPOINT_TYPE_AZURE = 'Azure';
     private const ENDPOINT_HOST_AZURE = 'https://%s.openai.azure.com/openai/deployments/%s/chat/completions?api-version=2023-12-01-preview';
 

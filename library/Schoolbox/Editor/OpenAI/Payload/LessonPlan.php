@@ -358,7 +358,7 @@ class LessonPlan
         $payload = [
             /* An ordered list of instructions for OpenAi
              */
-            "messages" => [
+            "input" => [
                 [
                     "role" => "system",
                     "content" => $systemContent,
@@ -375,7 +375,7 @@ class LessonPlan
             "model" => $this->openAiModel,
             /* A kind of OpenAI currency to use in this request
              */
-            "max_tokens" => 2000,
+            "max_output_tokens" => 2000,
             /* How "creative" the OpenAI response will be
              * The bigger the number, the more creative it gets
              * Goes between 0 and 2
@@ -385,7 +385,9 @@ class LessonPlan
             /* For futureproofing: never really used atm
              */
             "stream" => $stream,
-            'format' => $responseFormat
+            'text' => [
+                'format' => $responseFormat
+            ]
         ];
 
         return json_encode($payload, JSON_THROW_ON_ERROR);
