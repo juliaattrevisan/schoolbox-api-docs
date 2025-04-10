@@ -10,7 +10,7 @@
 #      otherwise, build with dev dependencies.
 ARG ENV=dev
 
-FROM shinsenter/php:8.2-cli
+FROM shinsenter/php:8.2-alpine
 
 # Install dependencies for building PECL extensions
 #RUN apk --no-cache add ${PHPIZE_DEPS} && \

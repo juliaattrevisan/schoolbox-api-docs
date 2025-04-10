@@ -13,7 +13,7 @@ FROM alaress/php82-alpine AS build
 
 
 # Stage 2: build final image
-FROM shinsenter/php:8.2-fpm AS final
+FROM shinsenter/php:8.2-fpm-alpine AS final
 ARG ENV
 
 ## Install actual dependencies
