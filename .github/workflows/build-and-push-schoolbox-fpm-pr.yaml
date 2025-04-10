@@ -76,12 +76,18 @@ jobs:
             alaress/php82-alpine:pr-${{ github.event.pull_request.number }}
             alaress/php82-alpine:latest
 
-      - name: Extract php82-alpine
+      - name: Get php82-alpine image ID
+        id: php82-alpine-image-id
         run: |
-          cd ${{ runner.temp }}
-          mkdir php82-alpine
-          tar -tf php82-alpine.tar
-          tar -xf php82-alpine.tar -C php82-alpine
+          echo "id=${docker image ls alaress/php82-alpine:latest -q --no-trunc)" >> $GITHUB_OUTPUT
+
+#      - name: Extract php82-alpine
+#        run: |
+#          cd ${{ runner.temp }}
+#          mkdir php82-alpine
+#          tar -tf php82-alpine.tar
+#          tar -xf php82-alpine.tar -C php82-alpine
+#          ls -al php82-alpine/
 
 #      - name: List images
 #        run: |
@@ -104,11 +110,12 @@ jobs:
         with:
           context: docker/base-images/php82-fpm-alpine/
           load: true
+#          pull: false
           push: false
           cache-from: type=local,src=${{ runner.temp }}/image-cache
           cache-to: type=local,dest=${{ runner.temp }}/image-cache
           # Try build-contexts for telling this process to use a locally loaded package
-          build-contexts: alaress/php82-alpine=${{ runner.temp }}/php82-alpine
+          build-contexts: alaress/php82-alpine:latest=${{ steps.php82-alpine-image-id.outputs.id }}
           build-args: |
             ENV=prod
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
