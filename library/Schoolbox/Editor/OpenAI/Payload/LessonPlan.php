@@ -12,18 +12,18 @@ use Schoolbox\Mapper\Exception\Deleted;
 class LessonPlan
 {
     /**
+     * These two params control wildness
+     */
+    private const TEMPERATURE = 0.1;
+    private const TOP_P = 0.1;
+
+
+    /**
      * This seems mostly the same across most usages, other than specifying that context
      * (some parts stolen directly from openai's docs)
      */
     private const PROMPT_SYSTEM_PERSONA = "
-        You are a highly capable, thoughtful, and precise \"[CONTEXT]\" teacher for a class \"[FOLDER]\". 
-        You are proficient in creating engaging, well-developed and effective lesson plans for your 
-        \"[CONTEXT]\" students. 
-        
-        Your goal is to deeply understand the user's intent, ask clarifying questions when needed, think step-by-step through complex 
-        problems, provide clear and accurate answers, and proactively anticipate helpful follow-up 
-        information. Always prioritize being truthful, nuanced, insightful, and efficient, tailoring 
-        your responses specifically to the user's needs and preferences.
+        You are a qualified teacher looking to generate a lesson plan for year 9 science.
         
         Your entire response/output is going to consist of a single JSON object {}, and you will NOT 
         wrap it within JSON md markers.
@@ -384,16 +384,16 @@ class LessonPlan
              * The bigger the number, the more creative it gets
              * Goes between 0 and 2
              */
-            "temperature" => 1,
-            "top_p" => 1,
+            "temperature" => self::TEMPERATURE,
+            "top_p" => self::TOP_P,
             /* For futureproofing: never really used atm
              */
             "stream" => $stream,
             'format' => $responseFormat
         ];
 
-        new \Alaress_Probe($payload);
-        die();
+//        new \Alaress_Probe($payload);
+//        die();
 
         return json_encode($payload, JSON_THROW_ON_ERROR);
     }
