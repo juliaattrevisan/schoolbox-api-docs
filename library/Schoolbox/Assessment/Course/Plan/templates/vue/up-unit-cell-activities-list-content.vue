@@ -6,7 +6,7 @@ import ActivitiesListContent from "./activities-list/activities-list-content.vue
 import { useActivitiesListStore } from "./activities-list/store/activitiesListStore";
 import { useActivitiesListDragStore } from "./activities-list/store/activitiesListDragStore";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
-import type {CourseBuilderComponent, Unit} from "./unitPlannerTypes";
+import type { CourseBuilderComponent, Unit } from "./unitPlannerTypes";
 import type { Column } from "./unitPlannerConfig";
 
 interface Props {
@@ -57,7 +57,7 @@ defineExpose({ isEmpty });
 window.Vue.watch(
     () => props.unit.activities.components,
     () => {
-      component.value = activitiesListStore().getComponent(props.unit.activities.components, props.column);
+        component.value = activitiesListStore().getComponent(props.unit.activities.components, props.column);
     },
     { deep: true },
 );

@@ -100,10 +100,7 @@ export const useActivitiesListStore = (activitiesListStoreId: string) =>
          * @param column - the column to match
          * @returns - the component found or null
          */
-        function getComponent(
-            components: CourseBuilderComponent[],
-            column: Column,
-        ): CourseBuilderComponent | null {
+        function getComponent(components: CourseBuilderComponent[], column: Column): CourseBuilderComponent | null {
             // loop through the curriculum components on the unit, matching the component heading to the column label
             const matchedComponent = components.find(
                 (component) => component.heading.trim() === column.label.trim(), // Ignore trailing or leading whitespace
@@ -189,6 +186,6 @@ export const useActivitiesListStore = (activitiesListStoreId: string) =>
             resequenceActivities,
             removeActivity,
             getComponent,
-            createComponent
+            createComponent,
         };
     });
