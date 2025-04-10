@@ -5,7 +5,7 @@
 
 import ActivitiesListAction from "./activities-list/activities-list-action.vue";
 import { useActivitiesListStore } from "./activities-list/store/activitiesListStore";
-import { CourseBuilderComponent, Unit } from "./unitPlannerTypes";
+import type { CourseBuilderComponent, Unit } from "./unitPlannerTypes";
 import type { Column } from "./unitPlannerConfig";
 
 interface Props {
