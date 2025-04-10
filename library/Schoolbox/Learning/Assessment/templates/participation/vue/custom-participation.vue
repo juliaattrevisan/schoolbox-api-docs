@@ -7,7 +7,14 @@ import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import PastoralCountBadge from "@schoolboxLibrary/Pastoral/Count/vue/pastoral-count-badge.vue";
 import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
 import type { StudentPastoralCountBadge } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
-import type { Participant } from "../js/types/customParticipationTypes";
+import type { Participant as BaseParticipant } from "../js/types/customParticipationTypes";
+
+type Participant = BaseParticipant & {
+    _links?: {
+        exclude?: string;
+        include?: string;
+    };
+};
 
 interface Props {
     allParticipants: Participant[];
@@ -81,7 +88,7 @@ async function getStudentPastoralCounts(): Promise<void> {
             return;
         }
         if (error instanceof Error && hasErrorMessage(error)) {
-            // Handle the error appropriately
+            loadError.value = error.message;
         }
         console.error(error);
     }
