@@ -35,6 +35,15 @@ export type CurriculumOverviewComponent = {
     inTemplate: boolean; // whether the component is part of the Unit template, or just a component added to the Unit home page
 };
 
+/**
+ * A single Course Builder component that's been added to a Unit's home page
+ */
+export type CourseBuilderComponent = {
+    componentId: number;
+    heading: string;
+    inTemplate: boolean; // whether the component is part of the Unit template, or just a component added to the Unit home page
+};
+
 export type Unit = {
     id: number;
     title: string;
@@ -43,7 +52,7 @@ export type Unit = {
     activities: {
         _routes: ActivitiesListRoutes;
         items: Activity[];
-        components: CurriculumOverviewComponent[];
+        components: CourseBuilderComponent[];
     };
     curriculum: {
         _routes: {

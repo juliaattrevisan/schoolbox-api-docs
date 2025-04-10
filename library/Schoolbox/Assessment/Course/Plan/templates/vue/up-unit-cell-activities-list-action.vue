@@ -5,7 +5,7 @@
 
 import ActivitiesListAction from "./activities-list/activities-list-action.vue";
 import { useActivitiesListStore } from "./activities-list/store/activitiesListStore";
-import type { CurriculumOverviewComponent, Unit } from "./unitPlannerTypes";
+import {CourseBuilderComponent, Unit} from "./unitPlannerTypes";
 import type { Column } from "./unitPlannerConfig";
 
 interface Props {
@@ -17,7 +17,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const activitiesListStore = useActivitiesListStore(props.activitiesListStoreId);
-const component = window.Vue.ref<CurriculumOverviewComponent | null>(
+const component = window.Vue.ref<CourseBuilderComponent | null>(
     activitiesListStore().getComponent(props.unit.activities.components, props.column),
 );
 const isCreating = window.Vue.ref(false);

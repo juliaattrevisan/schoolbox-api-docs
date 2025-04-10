@@ -6,7 +6,7 @@ import ActivitiesListContent from "./activities-list/activities-list-content.vue
 import { useActivitiesListStore } from "./activities-list/store/activitiesListStore";
 import { useActivitiesListDragStore } from "./activities-list/store/activitiesListDragStore";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
-import type {CurriculumOverviewComponent, Unit} from "./unitPlannerTypes";
+import type {CourseBuilderComponent, Unit} from "./unitPlannerTypes";
 import type { Column } from "./unitPlannerConfig";
 
 interface Props {
@@ -23,7 +23,7 @@ const activitiesListStoreId = `${props.unit.id}-${props.column.id}`;
 const activitiesListStore = useActivitiesListStore(activitiesListStoreId);
 const activitiesListDragStore = useActivitiesListDragStore(activitiesListStoreId);
 
-const component = window.Vue.ref<CurriculumOverviewComponent | null>(
+const component = window.Vue.ref<CourseBuilderComponent | null>(
     activitiesListStore().getComponent(props.unit.activities.components, props.column),
 );
 
