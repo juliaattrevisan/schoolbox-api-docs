@@ -67,6 +67,7 @@ jobs:
         with:
           context: docker/base-images/php82-alpine/
           push: false
+          load: true
           build-args: |
             ENV=prod
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
