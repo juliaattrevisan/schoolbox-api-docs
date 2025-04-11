@@ -24,13 +24,13 @@ COPY --from=php82-alpine ./usr/ /usr/
 WORKDIR /usr/share/schoolbox
 
 # Copy all Schoolbox code from code context to image.
-COPY ./conf      /usr/share/schoolbox/conf
-COPY ./dav       /usr/share/schoolbox/dav
-COPY ./library   /usr/share/schoolbox/library
-COPY ./packages  /usr/share/schoolbox/packages
-COPY ./sql       /usr/share/schoolbox/sql
-COPY ./templates /usr/share/schoolbox/templates
-COPY ./tools     /usr/share/schoolbox/tools
-COPY ./updates   /usr/share/schoolbox/updates
-COPY ./vendor    /usr/share/schoolbox/vendor
-COPY ./www       /usr/share/schoolbox/www
+COPY --from=code ./conf      /usr/share/schoolbox/conf
+COPY --from=code ./dav       /usr/share/schoolbox/dav
+COPY --from=code ./library   /usr/share/schoolbox/library
+COPY --from=code ./packages  /usr/share/schoolbox/packages
+COPY --from=code ./sql       /usr/share/schoolbox/sql
+COPY --from=code ./templates /usr/share/schoolbox/templates
+COPY --from=code ./tools     /usr/share/schoolbox/tools
+COPY --from=code ./updates   /usr/share/schoolbox/updates
+COPY --from=code ./vendor    /usr/share/schoolbox/vendor
+COPY --from=code ./www       /usr/share/schoolbox/www
