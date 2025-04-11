@@ -47,6 +47,12 @@ class Cache
     private const LOCK_KEY_PREFIX = 'lock__';
 
     /**
+     * The base exponential backoff value to wait for the lock to expire, in
+     * microseconds.
+     */
+    private const BASE_JITTER = 100_000;
+
+    /**
      * Default header for HTTP requests.
      *
      * (This is the original user agent header from `Alaress_Cache_Abstract`.)
@@ -198,9 +204,6 @@ class Cache
      */
     private function waitForLockToExpire(string $lockKey, float $waitUntil, int $iteration = 1): void
     {
-        // Calculate base jitter from the request + connect timeout
-        $baseJitter = $this->requestTimeout + $this->connectTimeout * 1_000_000;
-
         // Short-circuit if too many iterations
         if ($iteration >= 10) {
             return;
@@ -220,11 +223,11 @@ class Cache
 
         // Sleep until first of $waitUntil or ($now + $jitter)
         try {
-            $jitterMicroseconds = random_int(0, $baseJitter * (2 ** $iteration));
+            $jitterMicroseconds = random_int(0, self::BASE_JITTER * (2 ** $iteration));
         } catch (RandomException) {
             // In the unlikely event a random number can't be generated:
             // wait for a value in the middle
-            $jitterMicroseconds = $baseJitter * (2 ** $iteration) / 2;
+            $jitterMicroseconds = self::BASE_JITTER * (2 ** $iteration) / 2;
         }
 
         // Sleep until the expiry time has been reached:
