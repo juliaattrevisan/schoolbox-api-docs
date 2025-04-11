@@ -87,23 +87,25 @@ jobs:
           image=$(docker image ls -q php82-alpine)
           docker create --name=temp $image
           mkdir -p \
-            artifact/etc/ \
-            artifact/opt/microsoft/ \
-            artifact/opt/mssql-tools18/ \
-            artifact/usr/local/lib/php/extensions/ \
-            artifact/usr/local/etc/php/
-          docker cp temp:/etc/odbc.ini                                           artifact/etc/
-          docker cp temp:/etc/odbcinst.ini                                       artifact/etc/
-          docker cp temp:/opt/microsoft                                          artifact/opt/
-          docker cp temp:/opt/mssql-tools18                                      artifact/opt/
-          docker cp temp:/usr/local/lib/php/extensions/no-debug-non-zts-20220829 artifact/usr/local/lib/php/extensions/
-          docker cp temp:/usr/local/etc/php/conf.d/                              artifact/usr/local/etc/php/
+            ${{ runner.temp }}/artifact/etc/ \
+            ${{ runner.temp }}/artifact/opt/microsoft/ \
+            ${{ runner.temp }}/artifact/opt/mssql-tools18/ \
+            ${{ runner.temp }}/artifact/usr/local/lib/php/extensions/ \
+            ${{ runner.temp }}/artifact/usr/local/etc/php/
+          docker cp temp:/etc/odbc.ini                                           ${{ runner.temp }}/artifact/etc/
+          docker cp temp:/etc/odbcinst.ini                                       ${{ runner.temp }}/artifact/etc/
+          docker cp temp:/opt/microsoft                                          ${{ runner.temp }}/artifact/opt/
+          docker cp temp:/opt/mssql-tools18                                      ${{ runner.temp }}/artifact/opt/
+          docker cp temp:/usr/local/lib/php/extensions/no-debug-non-zts-20220829 ${{ runner.temp }}/artifact/usr/local/lib/php/extensions/
+          docker cp temp:/usr/local/etc/php/conf.d/                              ${{ runner.temp }}/artifact/usr/local/etc/php/
 
+      # Don't upload artifact:
+      # instead, copy files into php82-fpm-alpine
       - name: Upload php82-alpine artifact
         uses: actions/upload-artifact@v4
         with:
           name: php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}
-          path: artifact
+          path: ${{ runner.temp }}/artifact
           retention-days: 1
 
 #      - name: Get php82-alpine image ID
@@ -138,21 +140,20 @@ jobs:
         uses: docker/build-push-action@v6
 #        if: steps.cache-base-images.outputs.cache-hit != 'true'
         with:
-          context: docker/base-images/php82-fpm-alpine/
-          file: ghcr.Dockerfile
+          context: .
+          file: docker/base-images/php82-fpm-alpine/pr.Dockerfile
+          build-contexts: php82-alpine=${{ runner.temp }}/artifact
+          push: false
           load: true
-#          pull: false
-          push: true
-          cache-from: type=local,src=${{ runner.temp }}/image-cache
-          cache-to: type=local,dest=${{ runner.temp }}/image-cache
+#          cache-from: type=local,src=${{ runner.temp }}/image-cache
+#          cache-to: type=local,dest=${{ runner.temp }}/image-cache
           # Try build-contexts for telling this process to use a locally loaded package
-          build-contexts: ghcr.io/alaress/php82-alpine:latest=docker-image://ghcr.io/alaress/php82-alpine:pr-${{ github.event.pull_request.number }}@${{ steps.php82-alpine-image-id.outputs.id }}
+#          build-contexts: ghcr.io/alaress/php82-alpine:latest=docker-image://ghcr.io/alaress/php82-alpine:pr-${{ github.event.pull_request.number }}@${{ steps.php82-alpine-image-id.outputs.id }}
           build-args: |
             ENV=prod
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           tags: |
-            ghcr.io/alaress/php82-fpm-alpine:pr-${{ github.event.pull_request.number }}
-#            alaress/php82-fpm-alpine:latest
+            php82-fpm-alpine
 
 #      - name: Build and push php82-alpine
 #        uses: ./.github/actions/build-and-push-to-ghcr
