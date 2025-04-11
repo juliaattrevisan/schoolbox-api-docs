@@ -96,6 +96,10 @@ class LessonPlan implements IAssessmentTypeTranslator
          */
         $dataModel->setVisibility($domainObject->getVisibility());
 
+        /* Duration, for the LLM
+         */
+        $dataModel->setDuration($domainObject->getDuration());
+
         /* Lesson Plans don't have any marking-related stuff
          * Andy's Filters and the Andy Markbook requires it for all assessment types
          * but we're hardcoding a None markscheme for LPs
@@ -182,6 +186,10 @@ class LessonPlan implements IAssessmentTypeTranslator
         /* The visibility of this Lesson Plan to its students
          */
         $domainObject->setVisibility($dataModel->getVisibility());
+
+        /* Duration, for the LLM
+         */
+        $domainObject->setDuration($dataModel->getDuration());
 
         /* Lesson Plans don't have any marking-related stuff
          * Andy's Filters and the Andy Markbook requires it for all assessment types
