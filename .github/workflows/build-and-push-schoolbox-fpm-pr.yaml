@@ -6,17 +6,17 @@ on:
 
 jobs:
   # Build artifacts before building image
-#  build-composer-artifact:
-#    uses: ./.github/workflows/helper-build-composer-artifact.yaml
-#
-#  build-npm-artifact:
-#    uses: ./.github/workflows/helper-build-npm-artifact.yaml
+  build-composer-artifact:
+    uses: ./.github/workflows/helper-build-composer-artifact.yaml
+
+  build-npm-artifact:
+    uses: ./.github/workflows/helper-build-npm-artifact.yaml
 
   # Build schoolbox-fpm image
   build-schoolbox-fpm:
-#    needs:
-#      - build-composer-artifact
-#      - build-npm-artifact
+    needs:
+      - build-composer-artifact
+      - build-npm-artifact
     strategy:
       matrix:
         build:
@@ -136,6 +136,19 @@ jobs:
 #          path: ${{ runner.temp }}/output/php82-fpm-alpine.tar
 #          key: php82-fpm-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}-${{ hashFiles('docker/base-images/**/*') }}
 
+      # Extract artifacts
+      - name: Download composer artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: schoolbox-composer
+          path: vendor/
+
+      - name: Download npm artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: schoolbox-npm
+          path: www/static/js/bundle/
+
       - name: Build schoolbox-fpm
         uses: docker/build-push-action@v6
 #        if: steps.cache-base-images.outputs.cache-hit != 'true'
@@ -178,18 +191,6 @@ jobs:
 #          tags: |
 #            ghcr.io/alaress/php82-fpm-alpine:pr-${{ github.event.pull_request.number }}
 
-#      # Extract artifacts
-#      - name: Download composer artifact
-#        uses: actions/download-artifact@v4
-#        with:
-#          name: schoolbox-composer
-#          path: vendor/
-#
-#      - name: Download npm artifact
-#        uses: actions/download-artifact@v4
-#        with:
-#          name: schoolbox-npm
-#          path: www/static/js/bundle/
 
 #      # TODO work artifacts into push-to-dockerhub
 #      # Different build-and-push depending on trigger:
