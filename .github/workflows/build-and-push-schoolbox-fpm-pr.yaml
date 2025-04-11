@@ -170,6 +170,28 @@ jobs:
           tags: |
             schoolbox-fpm
 
+      - name: Test schoolbox-fpm
+        run: |
+          docker image ls
+          image=$(docker image ls -q schoolbox-fpm)
+          docker run -it $image ls -al /opt/
+          docker run -it $image ls -al /etc/odbc*
+          docker run -it $image ls -al /usr/local/lib/php/extensions/no-debug-non-zts-20220829
+          docker run -it $image ls -al /usr/local/etc/php/conf.d/
+
+          docker run -it $image ls -al /usr/share/schoolbox/
+          docker run -it $image ls -al /usr/share/schoolbox/vendor/
+          docker run -it $image ls -al /usr/share/schoolbox/www/static/js/bundle/
+
+#      # Don't upload artifact:
+#      # instead, copy files into php82-fpm-alpine
+#      - name: Upload php82-alpine artifact
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}
+#          path: ${{ runner.temp }}/artifact
+#          retention-days: 1
+
 #      - name: Build and push php82-alpine
 #        uses: ./.github/actions/build-and-push-to-ghcr
 #        with:
