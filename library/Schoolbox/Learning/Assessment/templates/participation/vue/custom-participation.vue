@@ -4,6 +4,7 @@
  */
 import { isAbortError, hasErrorMessage } from "@js/util/errorUtils";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
+import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import PastoralCountBadge from "@schoolboxLibrary/Pastoral/Count/vue/pastoral-count-badge.vue";
 import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
 import type { StudentPastoralCountBadge } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
@@ -21,7 +22,7 @@ const allParticipants = window.Vue.ref<Participant[]>(props.allParticipants);
 // show the checkboxes if there are more than one participant
 const showCheckboxes = window.Vue.computed(() => allParticipants.value.length > 1);
 
-// selecteList is the items that are currently selected
+// selectedList is the items that are currently selected
 const selectedList = window.Vue.ref<number[]>([]);
 
 // Computed property to check if all are selected
@@ -40,7 +41,7 @@ const isIndeterminate = window.Vue.computed(() => {
 // Function to check if any selected participant is excluded
 const hasExcludedInSelection = window.Vue.computed(() => {
     return allParticipants.value.some(
-        (participant) => selectedList.value.includes(participant.user.id) && participant.excludedAt != null,
+        (participant) => selectedList.value.includes(participant.user.id) && participant.excludedAt !== null,
     );
 });
 
@@ -92,14 +93,9 @@ async function getStudentPastoralCounts(): Promise<void> {
  * @returns A promise that resolves when the operation is complete.
  */
 async function excludeParticipant(participant: Participant): Promise<void> {
-    const excludeUrl = participant._links?.exclude;
-    if (!excludeUrl) {
-        console.warn("No exclude URL available for participant", participant);
-        return;
-    }
-
+    activate("Excluding...");
     try {
-        const response = await fetch(excludeUrl, {
+        const response = await fetch(participant._links.exclude, {
             method: "POST",
             headers: {
                 Accept: "application/json",
@@ -112,6 +108,7 @@ async function excludeParticipant(participant: Participant): Promise<void> {
             throw new Error(errorMessage);
         }
         participant.excludedAt = new Date().toISOString(); // Assigning a timestamp as a string
+        timeout({ text: "Student Excluded Successfully" });
     } catch (error) {
         if (error instanceof Error && hasErrorMessage(error)) {
             loadError.value = error.message;
@@ -126,14 +123,10 @@ async function excludeParticipant(participant: Participant): Promise<void> {
  * @returns A promise that resolves when the operation is complete.
  */
 async function includeParticipant(participant: Participant): Promise<void> {
-    const includeUrl = participant._links?.include;
-    if (!includeUrl) {
-        console.warn("No include URL available for participant", participant);
-        return;
-    }
+    activate("Removing Customisation...");
 
     try {
-        const response = await fetch(includeUrl, {
+        const response = await fetch(participant._links.include, {
             method: "POST",
             headers: {
                 Accept: "application/json",
@@ -147,10 +140,7 @@ async function includeParticipant(participant: Participant): Promise<void> {
         }
 
         participant.excludedAt = null;
-
-        if (participant._links) {
-            participant._links.exclude = includeUrl.replace("/include", "/exclude");
-        }
+        timeout({ text: "Customisation Removed Successfully" });
     } catch (error) {
         if (error instanceof Error && hasErrorMessage(error)) {
             loadError.value = error.message;
@@ -196,6 +186,14 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
+    <div v-if="loadError" class="c-island l-pad-m">
+        <div class="alert-box alert f-no-margins">
+            Sorry, there was an error during report retrieval. Please
+            <a href="" title="refresh the page"> refresh the page </a>
+            to try again and contact your support if the problem persists.
+            <em>Further support info: {{ loadError }}</em>
+        </div>
+    </div>
     <div>
         <table>
             <thead>
@@ -209,10 +207,10 @@ window.Vue.onMounted(() => {
                         />
                         <label for="select-all" class="checkbox-label"></label>
                     </th>
-                    <th width="84"></th>
+                    <td width="84"></td>
                     <th>Name</th>
                     <th>Customisation</th>
-                    <th></th>
+                    <td></td>
                 </tr>
             </thead>
             <tbody>
@@ -238,7 +236,7 @@ window.Vue.onMounted(() => {
                                 {{ participant.user.lastname + ", " + participant.user.firstname }}
                                 {{
                                     participant.user.preferredName &&
-                                    participant.user.preferredName != participant.user.firstname
+                                    participant.user.preferredName !== participant.user.firstname
                                         ? "‘" + participant.user.preferredName + "’"
                                         : ""
                                 }}
@@ -249,7 +247,7 @@ window.Vue.onMounted(() => {
                             {{ participant.user.lastname + ", " + participant.user.firstname }}
                             {{
                                 participant.user.preferredName &&
-                                participant.user.preferredName != participant.user.firstname
+                                participant.user.preferredName !== participant.user.firstname
                                     ? "‘" + participant.user.preferredName + "’"
                                     : ""
                             }}
@@ -266,7 +264,7 @@ window.Vue.onMounted(() => {
                         </p>
                     </td>
                     <td>
-                        <span v-if="participant.excludedAt != null">Excluded</span>
+                        <span v-if="participant.excludedAt !== null">Excluded</span>
                     </td>
                     <td class="no-pad">
                         <div v-if="participant.user.id" class="actions-small-1">
@@ -282,18 +280,24 @@ window.Vue.onMounted(() => {
                                 <template v-if="participant.excludedAt !== null">
                                     <li class="separator">Manage</li>
                                     <li>
-                                        <a class="icon-close" @click.prevent="includeParticipant(participant)">
+                                        <button
+                                            class="icon-close foregroundColor"
+                                            @click.prevent="includeParticipant(participant)"
+                                        >
                                             Remove Customisation
-                                        </a>
+                                        </button>
                                     </li>
                                 </template>
                                 <template v-else>
                                     <li class="separator">Manage</li>
                                     <li><a class="icon-modify">Modify</a></li>
                                     <li>
-                                        <a class="icon-staff-students" @click.prevent="excludeParticipant(participant)">
+                                        <button
+                                            class="icon-staff-students foregroundColor"
+                                            @click.prevent="excludeParticipant(participant)"
+                                        >
                                             Exclude
-                                        </a>
+                                        </button>
                                     </li>
                                     <li class="separator">Create</li>
                                     <li><a class="icon-copy">Copy Activity</a></li>
@@ -310,17 +314,17 @@ window.Vue.onMounted(() => {
                 <em>{{ selectedList.length }} selected</em>
             </h3>
             <button class="button-clear" @click.prevent="selectedList.length = 0">Clear selection</button>
-            <div class="modal-actions l-flex-row l-gap-s l-flex--justify">
+            <div class="l-flex-row l-flex--justify l-gap-xs">
                 <template v-if="hasExcludedInSelection">
-                    <a class="icon-close submit" @click.prevent="includeSelected">Remove Customisation</a>
+                    <button class="icon-close submit" @click.prevent="includeSelected">Remove Customisation</button>
                 </template>
                 <template v-else>
-                    <div class="flex-item"><a class="icon-copy submit">Copy Activity</a></div>
-                    <div class="flex-item">
-                        <a class="icon-staff-students submit" @click.prevent="excludeSelected">Exclude</a>
+                    <div class="l-flex__item--1"><a class="icon-copy submit">Copy Activity</a></div>
+                    <div class="l-flex__item--1">
+                        <button class="icon-staff-students submit" @click.prevent="excludeSelected">Exclude</button>
                     </div>
-                    <div class="flex-item"><a class="icon-modify submit">Modify</a></div>
-                    <div class="flex-item"><a class="icon-submissions submit">New Activity</a></div>
+                    <div class="l-flex__item--1"><a class="icon-modify submit">Modify</a></div>
+                    <div class="l-flex__item--1"><a class="icon-submissions submit">New Activity</a></div>
                 </template>
             </div>
         </bottom-drawer>
@@ -340,22 +344,15 @@ window.Vue.onMounted(() => {
     vertical-align: baseline;
     font-size: 0.8rem;
 }
-.modal-actions {
-    display: flex;
-    width: 100%;
-    a {
-        margin: 0 1px;
-    }
-}
-.flex-item {
-    flex: 1;
+button.foregroundColor {
+    color: var(--content-ui-foreground);
 }
 @media (max-width: 768px) {
     .flex-container {
         flex-direction: column;
     }
 
-    .flex-item {
+    .l-flex__item--1 {
         flex: 1 1 100%;
     }
 }
