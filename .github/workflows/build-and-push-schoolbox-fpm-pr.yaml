@@ -82,6 +82,7 @@ jobs:
       # /usr/local/etc/php/conf.d/
       - name: Extract artifact files from php82-alpine
         run: |
+          docker image ls
           image=$(docker image ls -q php82-alpine)
           docker create --name=temp $image
           mkdir -p \
