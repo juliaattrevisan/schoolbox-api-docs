@@ -91,43 +91,6 @@ jobs:
           docker cp temp:/usr/local/lib/php/extensions/no-debug-non-zts-20220829 ${{ runner.temp }}/artifact/usr/local/lib/php/extensions/
           docker cp temp:/usr/local/etc/php/conf.d/                              ${{ runner.temp }}/artifact/usr/local/etc/php/
 
-      # Don't upload artifact:
-      # instead, copy files into php82-fpm-alpine
-      - name: Upload php82-alpine artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}
-          path: ${{ runner.temp }}/artifact
-          retention-days: 1
-
-#      - name: Get php82-alpine image ID
-#        id: php82-alpine-image-id
-#        run: |
-#          echo "id=$(docker image ls alaress/php82-alpine:latest -q --no-trunc)" >> $GITHUB_OUTPUT
-
-#      - name: Extract php82-alpine
-#        run: |
-#          cd ${{ runner.temp }}
-#          mkdir php82-alpine
-#          tar -tf php82-alpine.tar
-#          tar -xf php82-alpine.tar -C php82-alpine
-#          ls -al php82-alpine/
-
-#      - name: List images
-#        run: |
-#          docker image ls
-#
-#      - name: List image cache
-#        run: |
-#          ls -al ${{ runner.temp }}/image-cache
-
-#      - name: Load php82-fpm-alpine image cache
-#        uses: actions/cache@v4
-#        id: cache-php82-fpm-alpine
-#        with:
-#          path: ${{ runner.temp }}/output/php82-fpm-alpine.tar
-#          key: php82-fpm-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}-${{ hashFiles('docker/base-images/**/*') }}
-
       # Extract artifacts
       - name: Download composer artifact
         uses: actions/download-artifact@v4
@@ -143,7 +106,6 @@ jobs:
 
       - name: Build schoolbox-fpm
         uses: docker/build-push-action@v6
-#        if: steps.cache-base-images.outputs.cache-hit != 'true'
         with:
           context: .
           file: docker/php-fpm/pr.Dockerfile
@@ -154,10 +116,6 @@ jobs:
             code=${{ github.workspace }}
           push: false
           load: true
-#          cache-from: type=local,src=${{ runner.temp }}/image-cache
-#          cache-to: type=local,dest=${{ runner.temp }}/image-cache
-          # Try build-contexts for telling this process to use a locally loaded package
-#          build-contexts: ghcr.io/alaress/php82-alpine:latest=docker-image://ghcr.io/alaress/php82-alpine:pr-${{ github.event.pull_request.number }}@${{ steps.php82-alpine-image-id.outputs.id }}
           build-args: |
             ENV=prod
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
@@ -176,54 +134,3 @@ jobs:
           docker run -i $image ls -al /usr/share/schoolbox/
           docker run -i $image ls -al /usr/share/schoolbox/vendor/
           docker run -i $image ls -al /usr/share/schoolbox/www/static/js/bundle/
-
-#      # Don't upload artifact:
-#      # instead, copy files into php82-fpm-alpine
-#      - name: Upload php82-alpine artifact
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}
-#          path: ${{ runner.temp }}/artifact
-#          retention-days: 1
-
-#      - name: Build and push php82-alpine
-#        uses: ./.github/actions/build-and-push-to-ghcr
-#        with:
-#          platform: ${{ matrix.build.platform }}
-#          arch: ${{ matrix.build.arch }}
-#          image: php82-alpine
-#          context: docker/base-images/php82-alpine/
-#          tags: |
-#            ghcr.io/alaress/php82-alpine:pr-${{ github.event.pull_request.number }}
-
-#      - name: Build and push php82-fpm-alpine
-#        uses: ./.github/actions/build-and-push-to-ghcr
-#        with:
-#          platform: ${{ matrix.build.platform }}
-#          arch: ${{ matrix.build.arch }}
-#          image: php82-alpine
-#          context: docker/base-images/php82-fpm-alpine
-#          file: ghcr.Dockerfile
-#          tags: |
-#            ghcr.io/alaress/php82-fpm-alpine:pr-${{ github.event.pull_request.number }}
-
-
-#      # TODO work artifacts into push-to-dockerhub
-#      # Different build-and-push depending on trigger:
-#      # push: {{ github.ref_name }}-latest, {{ github.ref_name }}-{{ github.sha }}
-#      #       (ref_name should be master or develop)
-#      # release: {{ github.ref_name }}
-#      - name: Build and push schoolbox-fpm
-#        if: github.event_name == 'push'
-#        uses: docker/build-push-action@v6
-#        with:
-#          context: .
-#          file: docker/php-fpm/deployment-image.Dockerfile
-#          push: false
-#          outputs: type=docker,dest=${{ runner.temp }}/schoolbox-fpm-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
-#          build-args: |
-#            ENV=prod
-#          platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
-#          tags: |
-#            alaress/schoolbox-fpm:{{ github.ref_name }}-latest
-#            alaress/schoolbox-fpm:{{ github.ref_name }}-{{ github.sha }}
