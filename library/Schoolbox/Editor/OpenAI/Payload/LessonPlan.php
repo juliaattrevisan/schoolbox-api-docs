@@ -25,7 +25,9 @@ class LessonPlan
         appropriate for \"[CONTEXT]\" students.
         
         Create a range of suggestions USING HTML that align with the following field topics; each field topic should
-        use the fields_format json response format.
+        use the fields_format json response format. 
+        
+        Duration: [DURATION]
     ";
 
 
@@ -73,6 +75,7 @@ class LessonPlan
      *
      * @param string $context
      * @param array $fields
+     * @param string $duration
      * @param array $curriculumNodeIds
      * @param string $additionalContext
      * @return string
@@ -83,13 +86,14 @@ class LessonPlan
     public function generate(
         string $context,
         array $fields,
+        string $duration,
         array $curriculumNodeIds,
         string $additionalContext = ''
     ): string {
         /* Details about how to use each field
          */
         $responseFormat = self::RESPONSE_FORMAT;
-        $responseFormat = $this->augmentProperties($responseFormat, $fields);
+        $responseFormat = $this->augmentProperties($responseFormat, $fields, $duration);
 
         /* TODO This is currently a node's full ancestry, index by the node id
          *  This goes into the payload in a different way than a string injection
@@ -99,6 +103,7 @@ class LessonPlan
 
         $prompt = $this->generatePrompt(
             $context,
+            $duration,
             $curriculumNames,
             $additionalContext
         );
@@ -148,12 +153,14 @@ class LessonPlan
      * actual Lesson Plan and Lesson Plan Template instances, saving you extracting this manually.
      *
      * @param string $context
+     * @param string $duration
      * @param array $curriculumNames
      * @param string $additionalContext
      * @return array
      */
     private function generatePrompt(
         string $context,
+        string $duration,
         array $curriculumNames,
         string $additionalContext = ''
     ): array {
@@ -161,6 +168,7 @@ class LessonPlan
          */
         $systemContent = strtr(self::PROMPT_SYSTEM_PERSONA, [
             '[CONTEXT]' => $context,
+            '[DURATION]' => $duration,
         ]);
 
         /* Something that shapes what the ai would make;
@@ -195,9 +203,10 @@ class LessonPlan
      *
      * @param array $responseFormat
      * @param array $fields
+     * @param string $duration
      * @return array
      */
-    private function augmentProperties(array $responseFormat, array $fields): array
+    private function augmentProperties(array $responseFormat, array $fields, string $duration): array
     {
         $struct = $responseFormat;
 

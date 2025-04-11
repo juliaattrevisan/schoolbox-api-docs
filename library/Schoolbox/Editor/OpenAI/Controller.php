@@ -74,6 +74,7 @@ class Controller extends Base
             $inputs = [
                 'context' => $this->requestPost->get('context'),
                 'fields' => $this->requestPost->get('fields'),
+                'duration' => $this->requestPost->get('duration'),
                 'curriculumNodeIds' => $this->requestPost->get('curriculumNodeIds'),
                 'additionalContext' => $this->requestPost->get('additionalContext') ?? ''
             ];
@@ -90,6 +91,7 @@ class Controller extends Base
 //                        'selected' => true
 //                    ]
 //                ],
+//                'duration' => '17 minutes',
 //                'curriculumNodeIds' => [
 //                    7561, 6310, 6299
 //                ],
@@ -99,6 +101,7 @@ class Controller extends Base
             $payload = $payloadGenerator->generate(
                 $inputs['context'],
                 $inputs['fields'],
+                $inputs['duration'],
                 $inputs['curriculumNodeIds'],
                 $inputs['additionalContext']
             );
