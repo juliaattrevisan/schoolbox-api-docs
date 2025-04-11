@@ -20,6 +20,7 @@ jobs:
     needs:
       - build-composer-artifact
       - build-npm-artifact
+      - build-php82-alpine-artifacts
     strategy:
       matrix:
         build:
