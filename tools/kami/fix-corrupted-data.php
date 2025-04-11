@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @copyright   Copyright 2024, Schoolbox Pty Ltd
+ * @copyright   Copyright 2025, Schoolbox Pty Ltd
  * @link        http://www.schoolbox.com.au/
  */
 
@@ -209,14 +209,14 @@ HELP;
             AND worksheet_template_submission_box_id IS NULL'
         );
 
-        $statement = $dbc->executeQuery(
+        $statement1 = $dbc->executeQuery(
             "SELECT id AS kamiDocumentId
             FROM kami_document kd
             $sqlWhereClause
             ORDER BY id ASC"
         );
 
-        if ($statement->rowCount() === 0) {
+        if ($statement1->rowCount() === 0) {
             $logger->info(
                 'Found 0 non-deleted kami_document rows not linked to any student_submission_file or' .
                 ' worksheet_template_submission_box.'
@@ -226,23 +226,24 @@ HELP;
         }
 
         $logger->info(
-            'Found ' . $statement->rowCount() . ' non-deleted kami_document rows not linked to any' .
+            'Found ' . $statement1->rowCount() . ' non-deleted kami_document rows not linked to any' .
             ' student_submission_file or worksheet_template_submission_box.'
         );
 
         if ($this->perform()) {
-            $logger->info('Soft-deleting ' . $statement->rowCount() . ' unlinked kami_document rows.');
-            $statement = $dbc->executeQuery(
+            $logger->info('Soft-deleting ' . $statement1->rowCount() . ' unlinked kami_document rows.');
+            $statement2 = $dbc->executeQuery(
                 "UPDATE kami_document
                 SET deleted_at = NOW()
                 $sqlWhereClause" // The WHERE clause from above is used here to avoid supplying potentially thousands
             );                   // of values in an IN () clause.  Doing that can exceed MySQL query length constraints.
-            $logger->info('Done.  ' . $statement->rowCount() . ' kami_document rows affected.');
+            $logger->info('Done.  ' . $statement2->rowCount() . ' kami_document rows affected.');
         } else {
-            $logger->info('Would have marked as deleted ' . $statement->rowCount() . ' unlinked kami_document rows.');
+            $logger->info('Would have marked as deleted ' . $statement1->rowCount() . ' unlinked kami_document rows.');
         }
+
         $kamiDocumentIds = [];
-        while ($row = $statement->fetch()) {
+        while ($row = $statement1->fetch()) {
             $kamiDocumentIds[] = $row['kamiDocumentId'];
         }
         $logger->debug('kamiDocumentIds: ' . implode(',', $kamiDocumentIds));
