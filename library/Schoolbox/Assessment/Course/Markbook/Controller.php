@@ -22,6 +22,8 @@ use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Throwable;
 
 use function array_combine;
@@ -29,28 +31,6 @@ use function func_get_args;
 
 class Controller extends WebController\Base
 {
-    /** @var Filter\IFactoryFactory */
-    private $filterFactoryFactory;
-
-    /** @var Filter\Mapper */
-    private $filterMapper;
-
-    /** @var Filter\Selection\Mapper */
-    private $filterSelectionMapper;
-
-    /** @var Filter\Filters\Assessment\IdFinder */
-    private $assessmentIdFinder;
-
-    /** @var Assessment\MapperProxy */
-    private $assessmentMapperProxy;
-
-    /** @var CourseImpl\Mapper */
-    private $courseImplMapper;
-
-    /** @var UnitImpl\Mapper */
-    private $unitImplMapper;
-
-
     /**
      * @param Filter\IFactoryFactory             $filterFactoryFactory
      * @param Filter\Mapper                      $filterMapper
@@ -59,23 +39,18 @@ class Controller extends WebController\Base
      * @param Assessment\MapperProxy             $assessmentMapperProxy
      * @param CourseImpl\Mapper                  $courseImplMapper
      * @param UnitImpl\Mapper                    $unitImplMapper
+     * @param Access                             $access
      */
     public function __construct(
-        Filter\IFactoryFactory $filterFactoryFactory,
-        Filter\Mapper $filterMapper,
-        Filter\Selection\Mapper $filterSelectionMapper,
-        Filter\Filters\Assessment\IdFinder $assessmentIdFinder,
-        Assessment\MapperProxy $assessmentMapperProxy,
-        CourseImpl\Mapper $courseImplMapper,
-        UnitImpl\Mapper $unitImplMapper
+        private Filter\IFactoryFactory $filterFactoryFactory,
+        private Filter\Mapper $filterMapper,
+        private Filter\Selection\Mapper $filterSelectionMapper,
+        private Filter\Filters\Assessment\IdFinder $assessmentIdFinder,
+        private Assessment\MapperProxy $assessmentMapperProxy,
+        private CourseImpl\Mapper $courseImplMapper,
+        private UnitImpl\Mapper $unitImplMapper,
+        private Access $access
     ) {
-        $this->filterFactoryFactory  = $filterFactoryFactory;
-        $this->filterMapper          = $filterMapper;
-        $this->filterSelectionMapper = $filterSelectionMapper;
-        $this->assessmentIdFinder    = $assessmentIdFinder;
-        $this->assessmentMapperProxy = $assessmentMapperProxy;
-        $this->courseImplMapper      = $courseImplMapper;
-        $this->unitImplMapper        = $unitImplMapper;
     }
 
 
@@ -165,6 +140,7 @@ class Controller extends WebController\Base
                 'courseSpec'  => $courseSpec,
                 'viewee'      => $this->getUser(),
                 'filterPanel' => $filterPanel,
+                'canAccessPopOut' => $this->getCanAccessPopOut($courseSpec),
             ],
             "Course Markbook: {$courseSpec->getTitle()}",
             'submission'
@@ -265,6 +241,7 @@ class Controller extends WebController\Base
                     'taskProgressPending'     => Completion::STATUS_SELF_ASSESSED_COMPLETE,
                     'taskProgressComplete'    => Completion::STATUS_TEACHER_ASSESSED_COMPLETE,
                     'queryArgs'               => $codec->convertSelectionsToQueryString($selectionsPerFilter),
+                    'canAccessPopOut'         => $this->getCanAccessPopOut($courseSpec),
                 ]
             );
             $this->response = $this->responseAsJson([
@@ -404,5 +381,35 @@ class Controller extends WebController\Base
             ]);
         }
         $this->response = $this->responseAsJson($data);
+    }
+
+    /**
+     * Helper method to check if current user can access the pop out
+     *
+     * @param CourseSpec\Model $courseSpec
+     * @return boolean
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    private function getCanAccessPopOut(CourseSpec\Model $courseSpec): bool
+    {
+        // first check if the user has write access to the course
+        $hasCourseWriteAccess = $this->access->getFolderAccess(
+            $this->getUser(),
+            $courseSpec->getFolder()->getId(),
+        ) >= UserAccess::ACCESS_WRITE;
+        if (!$hasCourseWriteAccess) {
+            return false;
+        }
+        // then check if the user has write access to all the course implementations
+        foreach ($courseSpec->getCourseImplementations() as $classImplementation) {
+            $hasAccess = $this->access->getFolderAccess(
+                $this->getUser(),
+                $classImplementation->getFolder()->getId()
+            ) >= UserAccess::ACCESS_WRITE;
+            if (!$hasAccess) {
+                return false;
+            }
+        }
+        return true;
     }
 }

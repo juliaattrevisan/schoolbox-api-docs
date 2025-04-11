@@ -85,7 +85,7 @@ function onPopOutClosed(): void {
     referenceElement.value = null;
 }
 
-const { onButtonSelected } = usePopOut(
+const { onButtonSelected, close } = usePopOut(
     referenceElement,
     popOutElement,
     "",
@@ -208,6 +208,8 @@ function toggleExclusion(): void {
         const newValue = currentValue === "true" ? "false" : "true";
         element.setAttribute("data-is-excluded", newValue);
     }
+    // close once changed (this is also to avoid a bug where the pop out doesn't close onClickOutside any more)
+    close();
 }
 
 /**

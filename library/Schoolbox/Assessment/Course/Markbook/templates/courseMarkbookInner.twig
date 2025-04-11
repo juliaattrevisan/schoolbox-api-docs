@@ -228,9 +228,26 @@
 
                         {% for assessment in collapsedAssessments %}
                             {% set aImpl = courseImportAssessments[courseImpl.id][assessment.id] ?? null %}
-                            {% set participant = aImpl.participantIfExtant(student) ?? null %}
+                            {% set participant = aImpl.participantIfExtant(student, false) ?? null %}
+                            {% if aImpl %}
+                            <td
+                                class="column-{{ assessment.id }} {% if not participant or participant.isExcluded %} excluded {% endif %} student-grade-cell"
+                                data-assessment="{{ assessment.id }}"
+                                {% if canAccessPopOut and (assessment is dueWork or assessment is quiz or assessment is lti or (assessment is project and (participant and not participant.isExcluded))) %}
+                                data-pop-out-menu
+                                {% endif %}
+                                data-assessment-type="{{ assessment.getFamilyName }}"
+                                data-is-participant="{% if participant %}true{% else %}false{% endif %}"
+                                data-is-excluded="{% if participant and not participant.isExcluded %}false{% else %}true{% endif %}"
+                                data-endpoint="{{ routeLookupIfAuthorized('learningAssessmentTimeline.getFullTimeline', {assessment: aImpl, assessmentId: aImpl.id, userId: student.id }) }}"
+                                data-update-route="{{ routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessment: aImpl, assessmentId: aImpl.id, student: student, studentId: student.id }) }}"
+                                data-review-route="{{ routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessment: aImpl, assessmentId: aImpl.id, student: student, studentId: student.id }) }}"
+                                data-publish-route="{{ routeLookupIfAuthorized('learningDueWorkFeedback.postPublishFeedback', {assessment: aImpl, assessmentId: aImpl.id, student: student, studentId: student.id }) }}"
+                                data-exclude-route="{{ routeLookupIfAuthorized('learningAssessment.postExclude', {assessment: aImpl, assessmentId: aImpl.id, student: student, studentId: student.id }) }}"
+                                data-include-route="{{ routeLookupIfAuthorized('learningAssessment.postInclude', {assessment: aImpl, assessmentId: aImpl.id, student: student, studentId: student.id }) }}"
+                                data-history-route="{{ routeLookupIfAuthorized('learningAssessment.getSummary', {assessment: aImpl, assessmentId: aImpl.id, student: student, studentId: student.id }) }}"
+                            >
                             {% if participant and not participant.isExcluded %}
-                                <td>
                                 {% if assessment is task %}
                                     {% set progressStatus = taskProgress[courseImpl.id][assessment.id][student.id] %}
 
@@ -257,7 +274,7 @@
                                     {% set publishedMark      = marks.published ?? null %}
                                     {% set draftMark          = marks.draft ?? null %}
 
-                                     <a
+                                    <a
                                         class="{{ urgency.marks(participant.normalisedMark(true)) }}"
                                         href="{{ participationRoute }}"
                                         {% if marks.draft is defined %}data-actual-mark{% endif %}
@@ -284,9 +301,10 @@
                                         <span class="legend-indicator indicator-{{ decorator.indicator(participant, draftMark) }}" title="{{ decorator.notchTitle(participant, draftMark) }}"></span>
                                     {% endif %}
                                 {% endif %}
-                                </td>
+                            {% endif %}
+                            </td>
                             {% else %}
-                                <td class="na"></td>
+                            <td class="na"></td>
                             {% endif %}
                         {% endfor %}
                     </tr>
