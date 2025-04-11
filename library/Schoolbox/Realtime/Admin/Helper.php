@@ -13,6 +13,7 @@ use Schoolbox\Realtime\Message\RerouteMapper;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\Application\Exception\Exception;
+use Psr\Log\LoggerInterface;
 
 class Helper
 {
@@ -38,25 +39,23 @@ class Helper
 
     /**
      * Apply default notification settings for a given role id or role type and namespace.
-     * TODO - update this helper so tools/notif/delete-personalised-settings.php can also access
      *
      * @param int|null $roleId
      * @param string|null $roletype
      * @param string $namespace
-     * @return string[]
+     * @param bool $isPerform
+     * @param LoggerInterface|null $logger
      * @throws Exception
      */
-    public function applyDefaultSettings(?int $roleId, ?string $roletype, string $namespace): array
+    public function applyDefaultSettings(?int $roleId, ?string $roletype, string $namespace, bool $isPerform = true, ?LoggerInterface $logger = null): void
     {
-        // to return log messages
-        $log = [];
-
         // check for a valid role if set
         if ($roleId) {
             try {
                 $role  = $this->roleMapper->findById($roleId);
                 $roleIds = [$role->getId()];
             } catch (\Exception $e) {
+                $logger?->error("Sorry, we are unable to find a valid role for role id: $roleId");
                 throw new Exception("Sorry, we are unable to find a valid role for role id: $roleId");
             }
         }
@@ -68,17 +67,25 @@ class Helper
 
         // if no role type found either, throw an exception
         if (empty($roleIds)) {
+            $logger?->error("Please provide either valid role id or roletype");
             throw new Exception("Please provide either valid role id or roletype");
         }
 
         // check for a valid namespace
         if ($namespace !== "all" && !in_array($namespace, $this->namespaces)) {
+            $logger?->error("Please provide a valid namespace. No namespace found for: $namespace");
             throw new Exception("Please provide a valid namespace. No namespace found for: $namespace");
         }
 
         // retrieve the target namespace to add to the $params array later
         if ($namespace !== "all") {
             $targetNamespace = $this->namespaceMapper->findOneBySlug($namespace);
+        }
+
+        if ($isPerform) {
+            $logger?->info("Deleting from database.");
+        } else {
+            $logger?->info("Running in dry-run mode.");
         }
 
         // begin SQL transaction
@@ -96,21 +103,25 @@ class Helper
                 AND `groups`.deleted_at IS NULL";
         if (isset($targetNamespace)) {
             $sql .= " AND msg_namespace.slug = :slug";
-            $params = ['slug' => $targetNamespace];
+            $params = ['slug' => $targetNamespace->getSlug()];
         }
 
         // fetch the records to be deleted and log them
-        // the below currently results in an error: Cannot use object of type Schoolbox\Realtime\Message\NS as array
-        // $statement = $this->namespaceMapper->getDatabase()->query($select . $sql, $params);
-        // foreach ($statement->fetchAll() as $item) {
-        //     $log[] = sprintf('%s, %s, %s, %s', $item['user_id'], $item['slug'], $item['key'], $item['delivery']);
-        // }
+        $statement = $this->namespaceMapper->getDatabase()->query($select . $sql, $params);
+        foreach ($statement->fetchAll() as $item) {
+            $logger?->debug(sprintf('user id=%s, namespace=%s, type=%s, delivery=%s', $item['user_id'], $item['slug'], $item['key'], $item['delivery']));
+        }
 
         // execute the delete statement
         $deleteStatement = $this->namespaceMapper->getDatabase()->prepare($delete . $sql);
         $deleteStatement->execute($params);
-        $this->msgRerouteMapper->getDatabase()->commit();
 
-        return $log;
+        if ($isPerform) {
+            $this->msgRerouteMapper->getDatabase()->commit();
+            $logger?->info($deleteStatement->rowCount() . ' entries are deleted');
+        } else {
+            $this->msgRerouteMapper->getDatabase()->rollBack();
+            $logger?->info($deleteStatement->rowCount() . ' entries will be deleted');
+        }
     }
 }
