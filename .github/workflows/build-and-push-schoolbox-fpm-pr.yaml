@@ -55,6 +55,8 @@ jobs:
         if: steps.cache-php82-alpine-artifact.outputs.cache-hit != 'true'
         with:
           context: docker/base-images/php82-alpine/
+          cache-from: type=gha
+          cache-to: type=gha
           push: false
           load: true
           build-args: |
@@ -145,6 +147,8 @@ jobs:
         with:
           context: .
           file: docker/php-fpm/pr.Dockerfile
+          cache-from: type=gha
+          cache-to: type=gha
           build-contexts: |
             php82-alpine=${{ runner.temp }}/artifact
             code=${{ github.workspace }}
