@@ -195,7 +195,7 @@ HELP;
                     ($assessmentId === '' ? 'not linked to any assessment' : "for assessment $assessmentId") . '.'
                 );
             }
-            $logger->debug('kamiDocumentIds: ' . implode(',', $kamiDocumentIds));
+            $logger->debug('kami_document.id values: ' . implode(',', $kamiDocumentIds));
         }
     }
 
@@ -254,7 +254,7 @@ HELP;
         while ($row = $statement1->fetch()) {
             $kamiDocumentIds[] = $row['kamiDocumentId'];
         }
-        $logger->debug('kamiDocumentIds: ' . implode(',', $kamiDocumentIds));
+        $logger->debug('kami_document.id values: ' . implode(',', $kamiDocumentIds));
     }
 };
 
