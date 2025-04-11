@@ -136,13 +136,15 @@ jobs:
 #          path: ${{ runner.temp }}/output/php82-fpm-alpine.tar
 #          key: php82-fpm-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}-${{ hashFiles('docker/base-images/**/*') }}
 
-      - name: Build php82-fpm-alpine
+      - name: Build schoolbox-fpm
         uses: docker/build-push-action@v6
 #        if: steps.cache-base-images.outputs.cache-hit != 'true'
         with:
           context: .
-          file: docker/base-images/php82-fpm-alpine/pr.Dockerfile
-          build-contexts: php82-alpine=${{ runner.temp }}/artifact
+          file: docker/php-fpm/pr.Dockerfile
+          build-contexts: |
+            php82-alpine=${{ runner.temp }}/artifact
+            code=${{ github.workspace }}
           push: false
           load: true
 #          cache-from: type=local,src=${{ runner.temp }}/image-cache
@@ -153,7 +155,7 @@ jobs:
             ENV=prod
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           tags: |
-            php82-fpm-alpine
+            schoolbox-fpm
 
 #      - name: Build and push php82-alpine
 #        uses: ./.github/actions/build-and-push-to-ghcr
