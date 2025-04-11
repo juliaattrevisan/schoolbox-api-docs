@@ -19,6 +19,7 @@ use League\Flysystem\UnableToMoveFile;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\Filesystem;
 use League\Flysystem\MountManager;
+use League\Flysystem\UnableToWriteFile;
 use Schoolbox\Resource\FilesystemFactory;
 
 /**
@@ -244,16 +245,15 @@ class FilesystemProxy
      *
      * @param IStorage $storage
      * @return bool|string
+     *
+     * @throws FilesystemException
      */
     public function localPath(IStorage $storage): bool|string
     {
-        try {
-            $fileContent = $this->read($storage);
-        } catch (FilesystemException $e) {
-            /* if file not found then terminate early and return false
-             */
-            return false;
-        }
+
+        /* Not catching the exception here so that it can scream out as loud as it can
+         */
+        $fileContent = $this->read($storage);
 
         if ($this->isLocal) {
             /* Return local storage path if files are stored locally
@@ -272,7 +272,7 @@ class FilesystemProxy
         );
         if (!file_exists($localCachePath)) {
             if (false === file_put_contents($localCachePath, $fileContent)) {
-                return false;
+                throw new UnableToWriteFile("Local cache file could not be saved.");
             }
         }
 
