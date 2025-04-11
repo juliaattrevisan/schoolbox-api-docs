@@ -50,7 +50,12 @@ class Cache
      * The base exponential backoff value to wait for the lock to expire, in
      * microseconds.
      */
-    private const BASE_JITTER = 100_000;
+    private const BASE_JITTER = 1_000_000;
+
+    /**
+     * How many iterations to wait for the lock to expire before giving up?
+     */
+    private const MAX_ITERATIONS = 20;
 
     /**
      * Default header for HTTP requests.
@@ -205,7 +210,7 @@ class Cache
     private function waitForLockToExpire(string $lockKey, float $waitUntil, int $iteration = 1): void
     {
         // Short-circuit if too many iterations
-        if ($iteration >= 10) {
+        if ($iteration >= self::MAX_ITERATIONS) {
             return;
         }
 
