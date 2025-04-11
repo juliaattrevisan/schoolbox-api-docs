@@ -218,21 +218,32 @@ class LessonPlan
             $fieldId = (string)$field['id'];
             $fieldTitle = trim((string)$field['title']);
             $fieldDescription = trim((string)$field['description']);
-            $fieldVisibility = trim((string)$field['visibility']);
             $fieldBody = trim((string)$field['body']);
 
-            /* TODO apply visibility somewhere in all this prompt stuff
+            /* Add a visibility statement
+             */
+            if (trim((string)$field['visibility']) === \Schoolbox\Role::STUDENT) {
+                $fieldVisibility = 'This field is visible to students and staff.';
+            } else {
+                $fieldVisibility = 'This field is visible to staff.';
+            }
+
+            /* Make a giant prompt slab for each field
              */
             $struct['schema']['properties'][$fieldId] = [
                 'type' => 'string',
                 'description' => sprintf(
-                    "FIELD TITLE: %s\nFIELD DESCRIPTION: %s\nTEMPLATE: %s",
+                    "FIELD TITLE: %s\nFIELD DESCRIPTION: %s\nTEMPLATE: %s\nVISIBILITY: %s",
                     $fieldTitle,
                     $fieldDescription,
-                    $fieldBody
+                    $fieldBody,
+                    $fieldVisibility
                 ),
             ];
 
+            /* I think this forces the $fieldId to spawn in the json payload
+             * that openai gives back to us
+             */
             $struct['schema']['required'][] = $fieldId;
         }
 
