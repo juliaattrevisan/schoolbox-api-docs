@@ -55,6 +55,7 @@ class Helper
                 $role  = $this->roleMapper->findById($roleId);
                 $roleIds = [$role->getId()];
             } catch (\Exception $e) {
+                $logger?->error("Sorry, we are unable to find a valid role for role id: $roleId");
                 throw new Exception("Sorry, we are unable to find a valid role for role id: $roleId");
             }
         }
@@ -66,11 +67,13 @@ class Helper
 
         // if no role type found either, throw an exception
         if (empty($roleIds)) {
+            $logger?->error("Please provide either valid role id or roletype");
             throw new Exception("Please provide either valid role id or roletype");
         }
 
         // check for a valid namespace
         if ($namespace !== "all" && !in_array($namespace, $this->namespaces)) {
+            $logger?->error("Please provide a valid namespace. No namespace found for: $namespace");
             throw new Exception("Please provide a valid namespace. No namespace found for: $namespace");
         }
 

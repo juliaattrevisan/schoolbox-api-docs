@@ -57,7 +57,6 @@ HELP;
             $helper = new Helper($roleMapper, $msgRerouteMapper, $msgNamespaceMapper);
             $helper->applyDefaultSettings((int)$this->getOpt('role:'), $this->getOpt('roletype:'), $this->getOpt('namespace:'), $this->perform(), $this->getLogger());
         } catch (\Exception $e) {
-            $this->getLogger()->error('Unable to run transaction: ' . $e->getMessage());
             exit(0);
         }
     }
