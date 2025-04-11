@@ -175,8 +175,8 @@ jobs:
           docker image ls
           image=$(docker image ls -q schoolbox-fpm)
           docker run -i $image ls -al /opt/
-          docker run -i $image ls -al /etc/odbc*
-          docker run -i $image ls -al /usr/local/lib/php/extensions/no-debug-non-zts-20220829
+          docker run -i $image ls -al /etc/odbc*.ini
+          docker run -i $image ls -al /usr/local/lib/php/extensions/no-debug-non-zts-20220829/
           docker run -i $image ls -al /usr/local/etc/php/conf.d/
 
           docker run -i $image ls -al /usr/share/schoolbox/
