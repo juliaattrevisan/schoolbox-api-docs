@@ -54,6 +54,9 @@ class FilesystemProxy
      * @param string        $defaultVisibility Default visibility for newly uploaded files; should be:
      *                                         * `\League\Flysystem\Visibility::PUBLIC` for local filesystem
      *                                         * `\League\Flysystem\Visibility::PRIVATE` for S3
+     * @param bool          $isLocal           Is the proxy storing file locally?
+     * @param ?string       $localPath         Path to the local storage folder, or if stored remotely, the folder for
+     *                                         local cache storage folder
      */
     public function __construct(
         private Filesystem $filesystem,
