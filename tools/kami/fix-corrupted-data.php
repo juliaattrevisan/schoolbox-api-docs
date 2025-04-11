@@ -32,6 +32,11 @@ $app = new class extends CliTool\App
     private const OPT_LONG_ASSESSMENT_ID = 'assessment:';
 
     /**
+     * This value is used when setting deleted_at so we can easily identify rows modified by scripts.
+     */
+    private const SPECIAL_DELETED_AT_VALUE = '1970-01-01 00:00:00';
+
+    /**
      * @inheritdoc
      */
     public function getLongOpts(): array
@@ -233,10 +238,13 @@ HELP;
         if ($this->perform()) {
             $logger->info('Soft-deleting ' . $statement1->rowCount() . ' unlinked kami_document rows.');
             $statement2 = $dbc->executeQuery(
+                // The WHERE clause from above is used here to avoid supplying potentially thousands
+                // of values in an IN () clause.  Doing that can exceed MySQL query length constraints.
                 "UPDATE kami_document
-                SET deleted_at = NOW()
-                $sqlWhereClause" // The WHERE clause from above is used here to avoid supplying potentially thousands
-            );                   // of values in an IN () clause.  Doing that can exceed MySQL query length constraints.
+                SET deleted_at = ?
+                $sqlWhereClause",
+                [self::SPECIAL_DELETED_AT_VALUE]
+            );
             $logger->info('Done.  ' . $statement2->rowCount() . ' kami_document rows affected.');
         } else {
             $logger->info('Would have marked as deleted ' . $statement1->rowCount() . ' unlinked kami_document rows.');
