@@ -33,33 +33,27 @@
                     formdata = $('<form/>').append($input.clone()).serialize(),
                     sourceId = $input.data(dataField) || dataField;
 
-            if (iiCache[sourceId]) {
-                clearTimeout(iiCache[sourceId]);
+            document.dispatchEvent(new CustomEvent("TOAST__ACTIVATE", {
+                detail: { text: "Saving..." }
+            }));
+            try {
+                $.post(action, formdata)
+                    .done(() => {
+                        document.dispatchEvent(new CustomEvent("TOAST__TIMEOUT", {
+                            detail: { text: "Saved" }
+                        }));
+                    })
+                    .fail(() => {
+                        document.dispatchEvent(new CustomEvent("TOAST__TIMEOUT", {
+                            detail: { text: "Save failed, please contact your support if the problem persists", isSuccess: false }
+                        }));
+                    })
+            } catch (error) {
+                document.dispatchEvent(new CustomEvent("TOAST__TIMEOUT", {
+                    detail: { text: "Save failed, please contact your support if the problem persists", isSuccess: false }
+                }));
             }
 
-            iiCache[sourceId] = setTimeout(function () {
-                document.dispatchEvent(new CustomEvent("TOAST__ACTIVATE", {
-                    detail: { text: "Saving..." }
-                }));
-                try {
-                    $.post(action, formdata)
-                        .done(() => {
-                            document.dispatchEvent(new CustomEvent("TOAST__TIMEOUT", {
-                                detail: { text: "Saved" }
-                            }));
-                        })
-                        .fail(() => {
-                            document.dispatchEvent(new CustomEvent("TOAST__TIMEOUT", {
-                                detail: { text: "Save failed, please contact your support if the problem persists", isSuccess: false }
-                            }));
-                        })
-                } catch (error) {
-                    document.dispatchEvent(new CustomEvent("TOAST__TIMEOUT", {
-                        detail: { text: "Save failed, please contact your support if the problem persists", isSuccess: false }
-                    }));
-                }
-            }
-            , 500);
         }
 
     });
