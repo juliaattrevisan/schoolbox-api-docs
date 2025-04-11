@@ -26,9 +26,6 @@ class LessonPlan
         
         Create a range of suggestions USING HTML that align with the following field topics; each field topic should
         use the fields_format json response format.
-
-        Your entire response/output is going to consist of a single JSON object {}, and you will NOT 
-        wrap it within JSON md markers.
     ";
 
 

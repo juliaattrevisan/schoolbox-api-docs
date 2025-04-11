@@ -84,7 +84,7 @@ class Controller extends Base
 //                    [
 //                        'id' => 189235,
 //                        'title' => 'Stimsons Pythons',
-//                        'description' => 'Write a paragraph describing the life cycle of the Stimsons Python',
+//                        'description' => 'Write 4 paragraphs describing the life cycle of the Stimsons Python',
 //                        'visibility' => 'student',
 //                        'body' => 'bleah',
 //                        'selected' => true
