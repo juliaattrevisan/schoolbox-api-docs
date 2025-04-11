@@ -17,9 +17,12 @@ RUN apk add libzip icu-libs libldap \
 
 # Dependencies will be copied from a separately built base image.
 WORKDIR /
-COPY --from=php82-alpine ./etc/ /etc/
-COPY --from=php82-alpine ./opt/ /opt/
-COPY --from=php82-alpine ./usr/ /usr/
+COPY --from=php82-alpine ./etc/odbc.ini                                            /etc/odbc.ini
+COPY --from=php82-alpine ./etc/odbcinst.ini                                        /etc/odbcinst.ini
+COPY --from=php82-alpine ./opt/microsoft                                           /opt/microsoft
+COPY --from=php82-alpine ./opt/mssql-tools18                                       /opt/mssql-tools18
+COPY --from=php82-alpine ./usr/local/lib/php/extensions/no-debug-non-zts-20220829/ /usr/local/lib/php/extensions/no-debug-non-zts-20220829
+COPY --from=php82-alpine ./usr/local/etc/php/conf.d/                               /usr/local/etc/php/conf.d/
 
 WORKDIR /usr/share/schoolbox
 
