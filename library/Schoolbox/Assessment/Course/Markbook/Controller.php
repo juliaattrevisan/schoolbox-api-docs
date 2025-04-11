@@ -51,14 +51,6 @@ class Controller extends WebController\Base
         private UnitImpl\Mapper $unitImplMapper,
         private Access $access
     ) {
-        $this->filterFactoryFactory  = $filterFactoryFactory;
-        $this->filterMapper          = $filterMapper;
-        $this->filterSelectionMapper = $filterSelectionMapper;
-        $this->assessmentIdFinder    = $assessmentIdFinder;
-        $this->assessmentMapperProxy = $assessmentMapperProxy;
-        $this->courseImplMapper      = $courseImplMapper;
-        $this->unitImplMapper        = $unitImplMapper;
-        $this->access                = $access;
     }
 
 
