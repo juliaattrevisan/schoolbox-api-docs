@@ -11,7 +11,7 @@ export default class ProfilePage {
 
     static readonly DATA_TEST_PROFILE_NAME = "user-profile-name";
 
-    static readonly DATA_TEST_PROFILE_FLAG = "student-profile-pastoral-flag-{typeId}-{subtypeId}";
+    static readonly DATA_TEST_PROFILE_TAB = `a[href="#tab-{tabName}"]`;
 
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
@@ -111,7 +111,7 @@ export default class ProfilePage {
      * @param tabName - The name of the tab to check (e.g., "Goals", "Achievements", "Classes")
      */
     async checkTabIsVisible(tabName: string): Promise<void> {
-        const tabLocator = this.page.locator(`a[href="#tab-${tabName}"]`);
+        const tabLocator = this.page.locator(ProfilePage.DATA_TEST_PROFILE_TAB.replace("{tabName}", tabName));
         await expect(tabLocator).toBeVisible();
     }
 
@@ -120,7 +120,7 @@ export default class ProfilePage {
      * @param tabName - The name of the tab to check (e.g., "Goals", "Achievements", "Classes")
      */
     async checkTabIsNotVisible(tabName: string): Promise<void> {
-        const tabLocator = this.page.locator(`a[href="#tab-${tabName}"]`);
+        const tabLocator = this.page.locator(ProfilePage.DATA_TEST_PROFILE_TAB.replace("{tabName}", tabName));
         await expect(tabLocator).not.toBeVisible();
     }
 }
