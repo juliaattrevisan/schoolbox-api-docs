@@ -162,12 +162,15 @@ class CacheTest extends TestCase
         // Make the two requests:
         // verify that I'm kept waiting about 2s (request + connect timeout)
         // between the two.
+        // Note that the cache class works only at second-level accuracy, thus
+        // it is not possible to verify the wait at any higher resolution than
+        // one second.
         $this->assertEquals($result1, $cache1->request('/test.php', ttl: 1));
         $time          = microtime(true);
         $result2Actual = $cache2->request('/test.php', ttl: 1);
         $time          = microtime(true) - $time;
         $this->assertEquals($result2, $result2Actual);
-        $this->assertEqualsWithDelta($lockTimeout, $time, 0.1);
+        $this->assertEqualsWithDelta($lockTimeout, $time, 1);
     }
 
     /**
