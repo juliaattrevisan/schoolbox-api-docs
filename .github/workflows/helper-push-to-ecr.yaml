@@ -8,7 +8,8 @@ on:
         description: |
           The name of the image to push.
 
-          Must have had an artifact built for it already.
+          Must have had an artifact built for it already, named
+          `{{ inputs.image }}-{{ arch }}`
         required : true
     secrets:
       AWS_ECR_ROLE:
