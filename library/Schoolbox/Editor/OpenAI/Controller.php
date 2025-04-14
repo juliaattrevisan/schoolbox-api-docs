@@ -10,6 +10,7 @@ namespace Schoolbox\Editor\OpenAI;
 
 use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
+use DebugBar\DebugBarException;
 use GuzzleHttp\Client;
 use Psr\Http\Client\ClientExceptionInterface;
 use Schoolbox\Config\ConfigMapper;
@@ -44,10 +45,11 @@ class Controller extends Base
      * Generates a payload about lesson plans
      *
      * @return void
+     * @throws ClientExceptionInterface
      * @throws Deleted
      * @throws Exception
+     * @throws DebugBarException
      * @throws \JsonException
-     * @throws ClientExceptionInterface
      */
     public function postLessonPlan(): void
     {
