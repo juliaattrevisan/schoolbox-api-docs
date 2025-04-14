@@ -9,9 +9,9 @@ export default class ProfileEditor {
 
     static readonly URL = "/adminv2/profile-editor";
 
-    static readonly DATA_TEST_NAME_DISPLAY_FIELD = "#pe-name-format";
+    static readonly SELECTOR_NAME_DISPLAY_FIELD = "#pe-name-format";
 
-    static readonly DATA_TEST_NAME_UPDATE_BUTTON = ".button.submit";
+    static readonly SELECTOR_NAME_UPDATE_BUTTON = ".button.submit";
 
     static readonly DATA_TEST_ROLE_TYPE = "pe-role-type-{roleType}";
 
@@ -57,22 +57,22 @@ export default class ProfileEditor {
      * @param fieldName - The field name
      */
     async typeFieldName(fieldName: string): Promise<void> {
-        await this.page.locator(ProfileEditor.DATA_TEST_NAME_DISPLAY_FIELD).fill(fieldName);
+        await this.page.locator(ProfileEditor.SELECTOR_NAME_DISPLAY_FIELD).fill(fieldName);
     }
 
     /**
      * Select & Clear the field name
      */
     async clearFieldName(): Promise<void> {
-        await this.page.locator(ProfileEditor.DATA_TEST_NAME_DISPLAY_FIELD).click();
-        await this.page.locator(ProfileEditor.DATA_TEST_NAME_DISPLAY_FIELD).clear();
+        await this.page.locator(ProfileEditor.SELECTOR_NAME_DISPLAY_FIELD).click();
+        await this.page.locator(ProfileEditor.SELECTOR_NAME_DISPLAY_FIELD).clear();
     }
 
     /**
      * Click the update button
      */
     async clickUpdateButton(): Promise<void> {
-        await this.page.locator(ProfileEditor.DATA_TEST_NAME_UPDATE_BUTTON).click();
+        await this.page.locator(ProfileEditor.SELECTOR_NAME_UPDATE_BUTTON).click();
     }
 
     /**
