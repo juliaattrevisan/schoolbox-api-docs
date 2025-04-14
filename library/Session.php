@@ -295,24 +295,14 @@ class Session
                 $storageMapper   = StorageMapper::getInstance();
                 $ldapCaCert      = $storageMapper->findByHash($ldapCaCertHash);
                 $filesystemProxy = $storageMapper->getStorageFilesystemProxy();
-                $ldapCaCertPath  = sprintf(
-                    '%s/ldap-ca-cert-%s-%s',
-                    Config::get('stream_dir'),
-                    INSTANCE_ID,
-                    $ldapCaCert->getHash()
-                );
-                if (!file_exists($ldapCaCertPath)) {
-                    try {
-                        file_put_contents($ldapCaCertPath, $filesystemProxy->read($ldapCaCert));
-                    } catch (FilesystemException $e) {
-                        //can't read cert, just continue without the certificate
-                    }
-                }
 
-                // Now if the file _does_ exist: set ldap options
-                if (file_exists($ldapCaCertPath)) {
+                try {
+                    $ldapCaCertPath = $filesystemProxy->localPath($ldapCaCert);
+
                     ldap_set_option(null, LDAP_OPT_X_TLS_CACERTDIR, dirname($ldapCaCertPath));
                     ldap_set_option(null, LDAP_OPT_X_TLS_CACERTFILE, $ldapCaCertPath);
+                } catch (FilesystemException $e) {
+                    //can't read cert, just continue without the certificate
                 }
             }
             $ds = ldap_connect($host);
