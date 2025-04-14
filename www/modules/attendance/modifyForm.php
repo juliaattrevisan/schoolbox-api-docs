@@ -205,12 +205,12 @@ foreach ($attendancePeriods as $attendancePeriod) {
                 }
             }
 
-//            $attendanceRecord->update($data);
+            $attendanceRecord->update($data);
         }
 
-//        if (!$attendanceHandler->getAttendanceMaster()->save()) {
-//            error(ErrorMapper::ERROR_ATTENDANCE_SAVE);
-//        }
+        if (!$attendanceHandler->getAttendanceMaster()->save()) {
+            error(ErrorMapper::ERROR_ATTENDANCE_SAVE);
+        }
     }
 }
 
