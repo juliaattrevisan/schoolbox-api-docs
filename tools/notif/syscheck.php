@@ -51,7 +51,7 @@ $app = new class extends CliTool\App {
             // test database is online
             try {
                 $this->getDatabaseInternal()->execute('SELECT 1');
-            } catch (\Alaress\Database\Exception | PDOException $e) {
+            } catch (\Alaress\Database\Exception $e) {
                 throw new PDOException("Database is not connected", 0, $e);
             }
             $d->notice('MySQL is online', array('char' => '+'));
