@@ -48,7 +48,6 @@ class Controller extends Base
      * @throws ClientExceptionInterface
      * @throws Deleted
      * @throws Exception
-     * @throws DebugBarException
      * @throws \JsonException
      */
     public function postLessonPlan(): void
@@ -119,7 +118,6 @@ class Controller extends Base
 
             $data = json_decode($result, true);
 
-            new \Alaress_Probe($data);die();
             $this->response = $this->responseAsJson(json_decode($data['output'][0]['content'][0]['text']) ?? null);
 
             return;
