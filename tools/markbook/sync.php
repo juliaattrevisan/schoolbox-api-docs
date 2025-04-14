@@ -100,15 +100,15 @@ $app = new class extends CliTool\App
     /**
      * Display help text
      *
-     * @param IConfigLoader $config
+     * @param string $externalType
      */
-    private function help($config)
+    private function help(string $externalType)
     {
         $additionalParameters = "";
         $addParamsShort = "";
 
         // Synergetic receives some additional options around FileYear/FileSemester
-        if ($config->get(ConfigMapper::NAME_EXTERNAL_TYPE) === IConnector::EXTERNAL_TYPE_SYNERGETIC) {
+        if ($externalType === IConnector::EXTERNAL_TYPE_SYNERGETIC) {
             $additionalParameters .= "    --year=yyyy          Synergetic FileYear into which to export the markbook and student marks, format --year=2016 (must be used with semester parameter)\n";
             $additionalParameters .= "    --semester=s         Synergetic FileSemester into which to export the markbook and student marks, --semester=1 (must be used with year parameter)\n";
             $addParamsShort = "[--year=yyyy] [--semester=s] ";
@@ -116,7 +116,7 @@ $app = new class extends CliTool\App
 
         // Get pretty uppercased SIS name
 
-        $remoteSystemName = ucwords($config->get(ConfigMapper::NAME_EXTERNAL_TYPE));
+        $remoteSystemName = ucwords($externalType);
 
             echo <<<HELP
     
@@ -148,13 +148,14 @@ $app = new class extends CliTool\App
         // Make sure markbook sync is actually enabled
         /** @var IConfigLoader $config */
         $config = $this->getConfig();
+        $externalType = $config->get(ConfigMapper::NAME_EXTERNAL_TYPE);
         if (!$config->get(ConfigMapper::NAME_EXTERNAL_MARKBOOK)) {
             $this->getLogger()->error("ERROR: External markbook synchronisation is not enabled in Schoolbox. Please enable in your Schoolbox administrator settings and try again.");
             exit(1);
         }
 
         if ($this->getOpt(self::OPT_LONG_HELP) || $this->getOpt(self::OPT_SHORT_HELP)) {
-            $this->help($config);
+            $this->help($externalType);
             exit(0);
         }
 
@@ -166,12 +167,12 @@ $app = new class extends CliTool\App
         $folderMapper = FolderMapper::getInstance();
 
         // Synergetic Markbook uses FileYear/FileSemester and exposes command line parameters not available to other connectors.
-        if ($config->get(ConfigMapper::NAME_EXTERNAL_TYPE) === IConnector::EXTERNAL_TYPE_SYNERGETIC) {
+        if ($externalType === IConnector::EXTERNAL_TYPE_SYNERGETIC) {
             try {
                 $markbookExternal = new External_Synergetic_Markbook($config->get('synergetic_mark_sync_value'), $this->getLogger(), $year, $semester);
             } catch (InvalidArgumentException $e) {
                 $this->getLogger()->error("ERROR: {$e->getMessage()}");
-                $this->help($config);
+                $this->help($externalType);
                 exit(1);
             }
         } else {
