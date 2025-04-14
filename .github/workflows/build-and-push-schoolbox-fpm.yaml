@@ -1,4 +1,4 @@
-name: Build and push schoolbox-fpm
+name: Build and push schoolbox-fpm (push, release)
 
 # Build a new schoolbox-fpm image:
 # * when master or develop changes (tags: master, develop, commit hash)

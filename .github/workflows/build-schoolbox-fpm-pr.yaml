@@ -1,4 +1,4 @@
-name: Build and push schoolbox-fpm (pull request)
+name: Build schoolbox-fpm (pull request)
 
 # Build a new schoolbox-fpm image for this pull request, for CI.
 # Works around the fact that PRs can't use base images in repositories, by
