@@ -42,12 +42,12 @@ class CustomFields
         $unique = array_diff(array_keys($array), $array);
         $key = reset($unique);
         $value = $array[$key];
-        $result = array($key => $value);
+        $result = [$key => $value];
         // follow the values backwards until the key matches the value
         while ($key != $value) {
             $key = $array[$key] ?? null;
             $value = $array[$key] ?? null;
-            $result = array($key => $value) + $result;
+            $result = [$key => $value] + $result;
         }
 
         /* Remove dead elements: we don't need empty nodes etc.
