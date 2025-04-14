@@ -1,4 +1,4 @@
-# PHP-FPM Schoolbox image, for GHCR
+# PHP-FPM Schoolbox image, for staging, production and CI environments.
 
 # Build args:
 # ENV: if prod or production, build with prod dependencies only;
