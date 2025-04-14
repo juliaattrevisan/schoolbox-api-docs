@@ -489,12 +489,6 @@ class Sessions implements IStrategy
                             }
                         }
 
-                        if ($session['customFieldsData']['sessions_busReturnTime']) {
-                            print_r($session['customFieldsData']);
-                            print_r($customFields);
-                            sleep(2);
-                        }
-
                         /* Use a standard html break for a separator
                          * I assume each key/value appears on its own line
                          */
