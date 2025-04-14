@@ -135,7 +135,7 @@
                                     assessmentId: assessment.id,
                                     assessment: assessment,
                                 }) %}
-                                {% if viewGradeRoute &  assessment is dueWork %}
+                                {% if viewGradeRoute and assessment is dueWork %}
                                 <li><a class="icon-task" href="{{ viewGradeRoute }}" >View and {{ locale.grades }} submissions</a></li>
                                 {% endif %}
                             {% if assessment is dueWork and assessment.enableWorksheet and assessment.kamiWorksheetTemplate and kamiWorksheetRoute %}
