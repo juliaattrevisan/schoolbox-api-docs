@@ -280,10 +280,7 @@ window.Vue.onMounted(() => {
                                 <template v-if="participant.excludedAt !== null">
                                     <li class="separator">Manage</li>
                                     <li>
-                                        <button
-                                            class="icon-close foregroundColor"
-                                            @click.prevent="includeParticipant(participant)"
-                                        >
+                                        <button class="icon-close" @click.prevent="includeParticipant(participant)">
                                             Remove Customisation
                                         </button>
                                     </li>
@@ -293,7 +290,7 @@ window.Vue.onMounted(() => {
                                     <li><a class="icon-modify">Modify</a></li>
                                     <li>
                                         <button
-                                            class="icon-staff-students foregroundColor"
+                                            class="icon-staff-students"
                                             @click.prevent="excludeParticipant(participant)"
                                         >
                                             Exclude
@@ -344,9 +341,7 @@ window.Vue.onMounted(() => {
     vertical-align: baseline;
     font-size: 0.8rem;
 }
-button.foregroundColor {
-    color: var(--content-ui-foreground);
-}
+
 @media (max-width: 768px) {
     .flex-container {
         flex-direction: column;
