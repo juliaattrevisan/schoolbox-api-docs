@@ -28,23 +28,21 @@ $app = new class extends CliTool\App {
         $mail = isset($opts['mail']);
 
         try {
-            $kernel = new \Schoolbox\Application\Daemon\Kernel('System Check', [], true);
-
             /** @var Logger $d */
             $d = $this->getLogger();
             $d->info("Testing external dependencies are online...");
 
-        // test database is online
+            // test database is online
             try {
-                Factory::getInstanceInternal();
-            } catch (\Alaress\Database\Exception $e) {
+                $this->getDatabaseInternal()->execute('SELECT 1');
+            } catch (\Alaress\Database\Exception | PDOException $e) {
                 throw new PDOException("Database is not connected", 0, $e);
             }
             $d->notice('MySQL is online', array('char' => '+'));
 
             try {
                 // test redis cache is online
-                $r = $kernel->get('redis.cache');
+                $r = $this->getDi()->get('redis.cache');
                 $r->executeCommand($r->createCommand('get', array('test')));
                 $d->notice('Redis cache is online', array('char' => '+'));
             } catch (\Predis\PredisException $e) {
@@ -54,7 +52,7 @@ $app = new class extends CliTool\App {
 
             try {
                 // test redis storage is online
-                $r = $kernel->get('redis.storage');
+                $r = $this->getDi()->get('redis.storage');
                 $r->executeCommand($r->createCommand('get', array('test')));
                 $d->notice('Redis storage is online', array('char' => '+'));
             } catch (\Predis\PredisException $e) {
@@ -65,7 +63,7 @@ $app = new class extends CliTool\App {
             try {
                 // test amqp is online
                 /** @var AMQPConnector $amqp */
-                $amqp = $kernel->get('amqp');
+                $amqp = $this->getDi()->get('amqp');
                 $amqp->publish('Testing AMQP Connection', 'daemon.test');
                 $d->notice('RabbitMQ is online', array('char' => '+'));
             } catch (Exception $e) {
