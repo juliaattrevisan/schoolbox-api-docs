@@ -49,6 +49,16 @@ $app = new class extends CliTool\App
         ];
     }
 
+    /**
+     * `tools/image/worker.php` needs www-data specifically to run, so enforce that here
+     *
+     * @return string|null
+     */
+    public function getRequiredProcessUser(): ?string
+    {
+        return 'www-data';
+    }
+
     public function run(): void
     {
         $retryFailed = (bool)$this->getOpt(self::OPT_LONG_RETRY_FAILED);
