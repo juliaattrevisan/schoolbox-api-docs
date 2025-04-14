@@ -266,7 +266,7 @@ class Mapper extends \Schoolbox\Mapper
 
 
     /**
-     * Find awarded badges in the last year (the most recent rolling 12 months)
+     * Find all awarded badges
      *
      * @param User                     $user
      * @param string                   $awardStatus
@@ -288,14 +288,13 @@ class Mapper extends \Schoolbox\Mapper
 
         /* Otherwise get the $awardStatus records
          */
-        $from = Alaress_Date_Format::now()->addYears(-1);
         $to = Alaress_Date_Format::now();
 
         $pb = $this->getPredicateBuilder()
             ->equals('recipient_id', $user->getId())
             ->equals('status', $awardStatus)
             ->isNull('award_id')
-            ->betweenDates('awarded_at', $from, $to);
+            ->betweenDates('awarded_at', null, $to);
         if ($expiryDate) {
             $pb = $pb->any(
                 $this->getPredicateBuilder()
