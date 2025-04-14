@@ -121,7 +121,15 @@ foreach ($attendancePeriods as $attendancePeriod) {
     /** @var External_Synergetic_Attendance $attendanceHandler */
     $periodDefinition = $attendanceHandler->getAttendanceMaster()->findTimetablePeriod();
     $periodStart      = Alaress_Date_Format::newFromTimestamp(strtotime($periodDefinition['TimeFrom']))->getDatabaseTime();
-    $periodEnd        = Alaress_Date_Format::newFromTimestamp(strtotime($periodDefinition['TimeTo']))->getDatabaseTime();
+    $timeTo           = strtotime((string)$periodDefinition['TimeTo']);
+    $periodEnd        = Alaress_Date_Format::newFromTimestamp($timeTo);
+    if (false === $timeTo) {
+        /* If the period end is not defined (ie NULL), we are assuming that the period will end at the end of the day as
+         * we can not determine the actual end of period
+         */
+        $periodEnd = $periodEnd->endOfDay();
+    }
+    $periodEnd = $periodEnd->getDatabaseTime();
 
     // Create everyone's attendance initially
 
@@ -163,6 +171,13 @@ foreach ($attendancePeriods as $attendancePeriod) {
                 // don't mark them as late
                 $arrival     = Alaress_Date_Format::newFromTimestamp(strtotime(trim($_POST['LateArrivalTime'][$i])));
                 $arrivalTime = $arrival->getDatabaseTime();
+
+                /* periodEnd might actually be null from the synergetic stored proc.
+                 * This probably means some kind of broken data or weird nonstandard configuration,
+                 * but we interpret here as "this period never ends"
+                 *
+                 * This means you can't ever arrive after the period ends: it never does.
+                 */
                 if ($arrivalTime > $periodEnd) {
                     $data['AttendedFlag'] = 0;
                 } elseif ($arrivalTime >= $periodStart) {
@@ -179,17 +194,23 @@ foreach ($attendancePeriods as $attendancePeriod) {
                 if ($departureTime < $periodStart) {
                     $data['AttendedFlag'] = 0;
                 } elseif ($departureTime <= $periodEnd) {
+                    /* periodEnd might actually be null from the synergetic stored proc.
+                     * This probably means some kind of broken data or weird nonstandard configuration,
+                     * but we interpret here as "this period never ends"
+                     *
+                     * This means you can't ever arrive after the period ends: it never does.
+                     */
                     $data['EarlyDepartureFlag'] = 1;
                     $data['EarlyDepartureTime'] = $departure->getDatabase();
                 }
             }
 
-            $attendanceRecord->update($data);
+//            $attendanceRecord->update($data);
         }
 
-        if (!$attendanceHandler->getAttendanceMaster()->save()) {
-            error(ErrorMapper::ERROR_ATTENDANCE_SAVE);
-        }
+//        if (!$attendanceHandler->getAttendanceMaster()->save()) {
+//            error(ErrorMapper::ERROR_ATTENDANCE_SAVE);
+//        }
     }
 }
 
