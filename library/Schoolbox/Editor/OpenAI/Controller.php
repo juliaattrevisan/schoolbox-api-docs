@@ -65,6 +65,7 @@ class Controller extends Base
 
             $payloadGenerator = (new Payload\LessonPlan(
                 trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_MODEL)),
+                trim((string)$this->getConfigLoader()->get('spellcheck_language')),
                 $this->curriculumNodeMapper
             ));
 

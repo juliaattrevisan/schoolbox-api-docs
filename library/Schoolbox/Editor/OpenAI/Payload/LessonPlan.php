@@ -2,6 +2,7 @@
 
 namespace Schoolbox\Editor\OpenAI\Payload;
 
+use Schoolbox\Curriculum\Node\Mapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
@@ -59,10 +60,12 @@ class LessonPlan
      * Constructor.
      *
      * @param string $openAiModel
-     * @param \Schoolbox\Curriculum\Node\Mapper $curriculumNodeMapper
+     * @param string $language
+     * @param Mapper $curriculumNodeMapper
      */
     public function __construct(
         private string $openAiModel,
+        private string $language,
         private \Schoolbox\Curriculum\Node\Mapper $curriculumNodeMapper
     ) {
     }
@@ -169,9 +172,7 @@ class LessonPlan
         /* Conduct replacements
          */
         $systemContent = strtr(self::PROMPT_SYSTEM_PERSONA, [
-            /* TODO replace with config val
-             */
-            '[LANGUAGE]' => 'en_AU'
+            '[LANGUAGE]' => $this->language
         ]);
 
         /* Something that shapes what the ai would make;
