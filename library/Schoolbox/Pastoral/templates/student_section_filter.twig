@@ -7,9 +7,9 @@
     </div>
     <div class="small-12 island">
         <section>
-            {% if user.role.isStaff %}
             <fieldset class="content">
-                <div class="small-12 medium-6 columns">
+                {% if user.role.isStaff %}
+                <div class="small-12 medium-4 columns">
                     <label class="inline-block" for="typeId">Type</label>
                     <select data-type-filter name="typeId" id="typeId">
                         <option value="">Show All {{ locale.pastoral.proper }} Record Types</option>
@@ -19,7 +19,7 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div class="small-12 medium-6 columns">
+                <div class="small-12 medium-4 columns">
                     <label class="inline-block" for="subtypeId">Sub-type</label>
                     <select data-subtype-filter name="subtypeId" id="subtypeId">
                         <option value="">Show All {{ locale.pastoral.proper }} Record Sub-Types</option>
@@ -29,12 +29,9 @@
                         {% endfor %}
                     </select>
                 </div>
-            </fieldset>
-            {% endif %}
-            <fieldset class="content">
-                <div class="small-12 columns">
+                {% endif %}
+                <div class="small-12 medium-4 columns">
                     <label class="inline-block" for="showArchivedRecords">Show archived records</label>
-                    <p class="meta">Whether records that have expired will be shown here.</p>
                     <div class="switch f-no-margins">
                         <input data-archived-filter id="showArchivedRecords" name="showArchivedRecords" {% if showArchived == 1 %}checked="checked"{% endif %} value="1" type="checkbox">
                         <label for="showArchivedRecords" data-test="student-section-filter-show-archived-records-toggle">
