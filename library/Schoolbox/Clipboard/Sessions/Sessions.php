@@ -415,59 +415,63 @@ class Sessions implements IStrategy
                     if ($customFieldsMetadata && $session['customFieldsData']) {
                         $customFields = [];
 
-                        foreach ($session['customFieldsData'] as $key => $value) {
-                            /* Look up what this was meant to be called
-                             */
-                            if (!array_key_exists($key, $customFieldsMetadata)) {
-                                $this->log->debug(sprintf('Skipping custom field "%s"; because no metadata exists', $key));
-                                continue;
-                            }
+                        $customFieldLists = (new CustomFields())->generate($customFieldsMetadata);
 
-                            $label = (string)$customFieldsMetadata[$key]['label'];
+                        foreach ($customFieldLists as $type => $customFieldList) {
+                            foreach ($customFieldList as $key => $value) {
+                                /* Look up what this was meant to be called
+                                 */
+                                if (!array_key_exists($key, $customFieldsMetadata)) {
+                                    $this->log->debug(sprintf('Skipping custom field "%s"; because no metadata exists', $key));
+                                    continue;
+                                }
 
-                            /* We only care when Custom Fields are viewable by schoolbox users:
-                             *     * guardian
-                             *     * student
-                             *
-                             * Schools sometimes use staff-only custom metadata fields which
-                             * aren't intended for schoolbox users to see
-                             */
-                            if (!$this->visibleCustomMetadataField($customFieldsMetadata[$key])) {
-                                $this->log->debug(sprintf(
-                                    'Skipping custom field metadata for "%s"; it was not meant for students/parents',
-                                    $label
-                                ));
+                                $label = (string)$customFieldsMetadata[$key]['label'];
 
-                                continue;
-                            }
+                                /* We only care when Custom Fields are viewable by schoolbox users:
+                                 *     * guardian
+                                 *     * student
+                                 *
+                                 * Schools sometimes use staff-only custom metadata fields which
+                                 * aren't intended for schoolbox users to see
+                                 */
+                                if (!$this->visibleCustomMetadataField($customFieldsMetadata[$key])) {
+                                    $this->log->debug(sprintf(
+                                        'Skipping custom field metadata for "%s"; it was not meant for students/parents',
+                                        $label
+                                    ));
 
-                            /* If there's a meaningful value, stack it up
-                             * Otherwise ignore it
-                             *
-                             * Clipboard can send non-strings like arrays and objects here, which is odd.
-                             * Can't do much with those, so skip them. The current state of this implementation
-                             * is that they could potentially send you an array of clipboard-specific ids
-                             * which is mostly useless to us at the moment; those are the only known non-string
-                             * datatypes that clipboard is intending to send for now.
-                             *
-                             * Clipboard themselves recommended against processing these arrays of clipboard
-                             * ids...the sis probably doesn't even know about it:
-                             *
-                             * https://alaress.slack.com/archives/C01CQG1SCF4/p1715928707969979
-                             * "This may not be ideal for Schoolbox currently and for now it may be best to
-                             * just not display those specific custom fields." -- Clipboard James, May 20
-                             */
-                            if (is_scalar($value) && ('' !== trim((string)$value))) {
-                                $customFields[] = sprintf(
-                                    self::ADDITIONAL_FIELDS_TUPLE,
-                                    $label,
-                                    $value
-                                );
-                            } else {
-                                $this->log->debug(sprintf(
-                                    'Skipping custom field metadata for "%s"; not a scalar data type',
-                                    $label,
-                                ));
+                                    continue;
+                                }
+
+                                /* If there's a meaningful value, stack it up
+                                 * Otherwise ignore it
+                                 *
+                                 * Clipboard can send non-strings like arrays and objects here, which is odd.
+                                 * Can't do much with those, so skip them. The current state of this implementation
+                                 * is that they could potentially send you an array of clipboard-specific ids
+                                 * which is mostly useless to us at the moment; those are the only known non-string
+                                 * datatypes that clipboard is intending to send for now.
+                                 *
+                                 * Clipboard themselves recommended against processing these arrays of clipboard
+                                 * ids...the sis probably doesn't even know about it:
+                                 *
+                                 * https://alaress.slack.com/archives/C01CQG1SCF4/p1715928707969979
+                                 * "This may not be ideal for Schoolbox currently and for now it may be best to
+                                 * just not display those specific custom fields." -- Clipboard James, May 20
+                                 */
+                                if (is_scalar($value) && ('' !== trim((string)$value))) {
+                                    $customFields[] = sprintf(
+                                        self::ADDITIONAL_FIELDS_TUPLE,
+                                        $label,
+                                        $value
+                                    );
+                                } else {
+                                    $this->log->debug(sprintf(
+                                        'Skipping custom field metadata for "%s"; not a scalar data type',
+                                        $label,
+                                    ));
+                                }
                             }
                         }
 

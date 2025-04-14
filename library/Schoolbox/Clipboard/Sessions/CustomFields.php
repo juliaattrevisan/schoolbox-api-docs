@@ -24,10 +24,19 @@ class CustomFields
             }
         }
 
-        return [
-            'sessions' => $this->sorter($temp['sessions']),
-            'fixtures' => $this->sorter($temp['fixtures'])
-        ];
+        /* Return all the mini-lists in one big struct, already split and sorted
+         */
+        $output = [];
+
+        foreach (['sessions', 'fixtures'] as $key) {
+            $nodes = $this->sorter($temp[$key]);
+
+            foreach ($nodes as $current => $previous) {
+                $output[$key][$current] = $customFieldsMetadata[$current];
+            }
+        }
+
+        return $output;
     }
 
     /**
@@ -52,6 +61,6 @@ class CustomFields
 
         /* Remove dead elements: we don't need empty nodes etc.
          */
-        return array_keys(array_filter($result));
+        return array_filter($result);
     }
 }
