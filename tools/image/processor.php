@@ -9,6 +9,7 @@
 declare(strict_types=1);
 
 use Alaress\Image;
+use Alaress\Lumberjack\Logger;
 use Predis\ClientInterface;
 use Schoolbox\Application\CliTool;
 
@@ -50,7 +51,6 @@ $app = new class extends CliTool\App
 
     public function run(): void
     {
-        $opt = getopt('hv', ['help', 'verbose', 'retry-failed', 'time-interval:', 'max-workers:', 'limit:', 'max-attempts:']);
         $retryFailed = (bool)$this->getOpt(self::OPT_LONG_RETRY_FAILED);
         $timeInterval = $this->getOptAsInt(self::OPT_LONG_TIME_INTERVAL) ?: self::DEFAULT_TIME_INTERVAL_MINUTES;
         $workerCount = $this->getOptAsInt(self::OPT_LONG_MAX_WORKERS) ?: (int)max(1, ((int)shell_exec('nproc') * 0.50));
@@ -81,16 +81,20 @@ $app = new class extends CliTool\App
         proc_nice(10); // Always run with lower priority
 
         // TODO inject lock inspector instead of cache
+
+        /** @var Logger $logger */
+        $logger = $this->getLogger();
+
         /** @var ClientInterface $redis */
         $redis = $this->getDi()->get('redis.cache');
         $parent = new Image\Processor\Manager(
             $timeInterval,
             $imageCountLimit,
             $workerCount,
-            $this->getLogger(),
+            $logger,
             $retryFailed,
             $attemptsPerTransform,
-            $this->getLogger()->getThreshold() ?? 0, // get logging threshold or fallback to error only
+            $logger->getThreshold() ?? 0, // get logging threshold or fallback to error only
             $redis
         );
         $isInterrupted = $parent->run();
