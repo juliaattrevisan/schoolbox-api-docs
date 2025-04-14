@@ -11,8 +11,8 @@ class LessonPlan
     /**
      * These two params control wildness
      */
-    private const TEMPERATURE = 1;
-    private const TOP_P = 1;
+    private const TEMPERATURE = 0.7;
+    private const TOP_P = 0.9;
 
 
     /**
@@ -20,14 +20,14 @@ class LessonPlan
      * (some parts stolen directly from openai's docs)
      */
     private const PROMPT_SYSTEM_PERSONA = "
-        You are an expert \"[CONTEXT]\" teacher for a class, proficient in creating engaging, 
-        well-developed and effective lesson plans for your students. Each lesson should be engaging and
-        appropriate for \"[CONTEXT]\" students.
+        You are an expert teacher for a class, proficient in creating engaging, well-developed, and 
+        effective lesson plans for your students. The lesson plan you create is part of the course and 
+        unit described, which fall within a specific curriculum area. It should address the curriculum 
+        content and incorporate any additional notes provided by the user to ensure strong alignment. 
+        Your language of instruction is [LANGUAGE].
         
         Create a range of suggestions USING HTML that align with the following field topics; each field topic should
-        use the fields_format json response format. 
-        
-        Duration: [DURATION]
+        use the fields_format json response format.         
     ";
 
 
@@ -143,6 +143,8 @@ class LessonPlan
             ]
         ];
 
+//        new \Alaress_Probe($payload);die();
+
         return json_encode($payload, JSON_THROW_ON_ERROR);
     }
 
@@ -167,28 +169,57 @@ class LessonPlan
         /* Conduct replacements
          */
         $systemContent = strtr(self::PROMPT_SYSTEM_PERSONA, [
-            '[CONTEXT]' => $context,
-            '[DURATION]' => $duration,
+            /* TODO replace with config val
+             */
+            '[LANGUAGE]' => 'en_AU'
         ]);
 
         /* Something that shapes what the ai would make;
          * provide additional instructions (if meaningful)
          */
-        $userContent = '';
+        $userContent = "
+            Course/Unit Context: [CONTEXT]
+            Duration: [DURATION]
+        ";
 
-//      TODO implement curriculum node support again
-//
-//        if (\count($curriculumNames)) {
-//            $userContent = "Create lesson plans aligned to the curriculum areas listed below.\n\n";
-//
-//            foreach ($curriculumNames as $fieldId => $val) {
-//                $userContent .= $val;
-//            }
-//        }
-//
-//        if ('' !== $additionalContext) {
-//            $userContent .= sprintf(self::PROMPT_TEMPLATE_ADDITIONAL_CONTEXT, $additionalContext);
-//        }
+        $userContent = strtr($userContent, [
+            '[CONTEXT]' => $context,
+            '[DURATION]' => $duration,
+        ]);
+
+        if (\count($curriculumNames)) {
+            /* Yoink out the node's name
+             */
+            $nodes = [];
+
+            foreach ($curriculumNames as $fieldId => &$vals) {
+                $nodes[] = array_pop($vals);
+            }
+
+            unset($vals);
+
+            $curriculumContent = "Curriculum Content: " . implode(",\n", $nodes). "\n\n";
+
+            /* Yoink out the rest of each node's hierarchy, dedupe it, and then compile it into a csv
+             * Note that multiple hierarchies might exist in this cauldron of data
+             */
+            $areas = [];
+
+            foreach ($curriculumNames as $fieldId => $vals) {
+                $areas = array_merge($vals);
+            }
+
+            /* Slam it into the prompt, in a particular order I suppose
+             */
+            $userContent .= "Curriculum Area: " . implode(', ', $areas) . "\n\n";
+            $userContent .= $curriculumContent;
+        }
+
+        /* Whatever the user also instructed from the ui
+         */
+        if ('' !== $additionalContext) {
+            $userContent .= 'Additional Notes: ' . $additionalContext;
+        }
 
         return [
             'system' => $systemContent,
@@ -295,16 +326,9 @@ class LessonPlan
         foreach ($results as $result) {
             $lastNodeId = $result[\count($result) - 1]->getId();
 
-            $str = '';
-
             foreach ($result as $node) {
-                $str .= sprintf(
-                    "%s\n",
-                    $node->getName()
-                );
+                $stack[$lastNodeId][] = $node->getName();
             }
-
-            $stack[$lastNodeId] = $str;
         }
 
         return $stack;

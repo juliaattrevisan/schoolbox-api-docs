@@ -71,32 +71,32 @@ class Controller extends Base
             /* Generate a payload for ai, using the prompt pieces for System and User info
              * From a POST payload
              */
-            $inputs = [
-                'context' => $this->requestPost->get('context'),
-                'fields' => $this->requestPost->get('fields'),
-                'duration' => $this->requestPost->get('duration'),
-                'curriculumNodeIds' => $this->requestPost->get('curriculumNodeIds'),
-                'additionalContext' => $this->requestPost->get('additionalContext') ?? ''
-            ];
-
 //            $inputs = [
-//                'context' => 'Year 8 science',
-//                'fields' => [
-//                    [
-//                        'id' => 189235,
-//                        'title' => 'Stimsons Pythons',
-//                        'description' => 'Write 4 paragraphs describing the life cycle of the Stimsons Python',
-//                        'visibility' => 'student',
-//                        'body' => 'bleah',
-//                        'selected' => true
-//                    ]
-//                ],
-//                'duration' => '17 minutes',
-//                'curriculumNodeIds' => [
-//                    7561, 6310, 6299
-//                ],
-//                'additionalContext' => '',
+//                'context' => $this->requestPost->get('context'),
+//                'fields' => $this->requestPost->get('fields'),
+//                'duration' => $this->requestPost->get('duration'),
+//                'curriculumNodeIds' => $this->requestPost->get('curriculumNodeIds'),
+//                'additionalContext' => $this->requestPost->get('additionalContext') ?? ''
 //            ];
+
+            $inputs = [
+                'context' => 'Year 8 Science',
+                'fields' => [
+                    [
+                        'id' => 'Learning Objectives',
+                        'title' => 'Learning Objectives',
+                        'description' => 'What students should learn from the lesson',
+                        'visibility' => 'student',
+                        'body' => '',
+                        'selected' => true
+                    ]
+                ],
+                'duration' => '17 minutes',
+                'curriculumNodeIds' => [
+                    4156, 4157, 4160
+                ],
+                'additionalContext' => '',
+            ];
 
             $payload = $payloadGenerator->generate(
                 $inputs['context'],
@@ -116,6 +116,7 @@ class Controller extends Base
 
             $data = json_decode($result, true);
 
+            new \Alaress_Probe($data);die();
             $this->response = $this->responseAsJson(json_decode($data['output'][0]['content'][0]['text']) ?? null);
 
             return;
