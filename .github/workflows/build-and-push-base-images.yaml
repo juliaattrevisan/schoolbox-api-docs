@@ -15,7 +15,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-push:
+  build-and-push-to-dockerhub:
     strategy:
       matrix:
         build:
@@ -45,6 +45,7 @@ jobs:
           context: docker/base-images/php82-alpine
           cache-from: type=gha
           cache-to: type=gha
+          load: true
           push: true
           outputs: type=docker,dest=${{ runner.temp }}/php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
           build-args: |
@@ -59,6 +60,7 @@ jobs:
           context: docker/base-images/php82-fpm-alpine
           cache-from: type=gha
           cache-to: type=gha
+          load: true
           push: true
           outputs: type=docker,dest=${{ runner.temp }}/php82-fpm-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
           build-args: |
@@ -66,3 +68,33 @@ jobs:
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           tags: |
             alaress/php82-fpm-alpine:latest
+
+      - name: Upload php82-alpine artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: php82-alpine-${{ matrix.build.arch }}
+          path: ${{ runner.temp }}/php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
+          retention-days: 1
+
+      - name: Upload php82-fpm-alpine artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: php82-fpm-alpine-${{ matrix.build.arch }}
+          path: ${{ runner.temp }}/php82-fpm-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
+          retention-days: 1
+
+  push-php82-to-ecr:
+    needs:
+      - build-and-push-to-dockerhub
+    uses: ./.github/workflows/helper-push-to-ecr.yaml
+    with:
+      image: php82-alpine
+    secrets: inherit
+
+  push-php82-fpm-to-ecr:
+    needs:
+      - build-and-push-to-dockerhub
+    uses: ./.github/workflows/helper-push-to-ecr.yaml
+    with:
+      image: php82-fpm-alpine
+    secrets: inherit
