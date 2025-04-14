@@ -28,8 +28,6 @@ $app = new class extends CliTool\App
     private const OPT_LONG_MAX_WORKERS = 'max-workers:';
     private const OPT_LONG_LIMIT = 'limit:';
     private const OPT_LONG_MAX_ATTEMPTS = 'max-attempts:';
-    private const OPT_LONG_VERBOSE = 'verbose';
-    private const OPT_SHORT_VERBOSE = 'v';
 
     /** @inheritDoc */
     public function getShortOpts(): array
@@ -47,7 +45,6 @@ $app = new class extends CliTool\App
             self::OPT_LONG_MAX_WORKERS,
             self::OPT_LONG_LIMIT,
             self::OPT_LONG_MAX_ATTEMPTS,
-            self::OPT_LONG_VERBOSE,
         ];
     }
 
@@ -71,7 +68,7 @@ $app = new class extends CliTool\App
 
     Options:
         -h,--help           Print this help message and exit
-        -v,--verbose        Log with additional verbosity. Can be repeated up to 3 times.
+        -v                  Log with additional verbosity. Can be repeated up to 3 times.
         --retry-failed      If true, just retry previously failed transforms. Eg if hash file has now been restored.
         --time-interval N   Produce standard transforms for storages files uploaded in last N minutes. Default: 60
         --max-workers N     Maximum number of concurrent workers. Defaults to CPU count
