@@ -122,7 +122,7 @@ HELP;
      */
     public function runAsRoot(): bool
     {
-        return false;
+        return true;
     }
 
     /**
