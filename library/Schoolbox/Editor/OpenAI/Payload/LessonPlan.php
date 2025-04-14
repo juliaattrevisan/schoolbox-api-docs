@@ -32,14 +32,6 @@ class LessonPlan
     ";
 
 
-//    /**
-//     * Additional instructions specified by the user
-//     */
-//    private const PROMPT_TEMPLATE_ADDITIONAL_CONTEXT = '
-//        Additional Notes: %s
-//    ';
-
-
     /**
      * A structure that AI is supposed to obey, but...I don't think it cares
      */
@@ -98,12 +90,12 @@ class LessonPlan
         $responseFormat = self::RESPONSE_FORMAT;
         $responseFormat = $this->augmentProperties($responseFormat, $fields, $duration);
 
-        /* TODO This is currently a node's full ancestry, index by the node id
-         *  This goes into the payload in a different way than a string injection
-         *  so .........figure that out tomorrow
+        /* This is currently a node's full ancestry, indexed by the node id
          */
         $curriculumNames = $this->compileNodeTitles($this->curriculumNodeMapper->findByColumn('id', $curriculumNodeIds));
 
+        /* Generate the Systema nd User nodes for the prompt payload
+         */
         $prompt = $this->generatePrompt(
             $context,
             $duration,
@@ -145,8 +137,6 @@ class LessonPlan
                 'format' => $responseFormat
             ]
         ];
-
-//        new \Alaress_Probe($payload);die();
 
         return json_encode($payload, JSON_THROW_ON_ERROR);
     }
