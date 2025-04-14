@@ -14,10 +14,12 @@
  * @link        https://schoolbox.com.au/
  */
 
+use External\IConnector;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -50,7 +52,7 @@ $app = new class extends CliTool\App
     private const OPT_LONG_YEAR = 'year:';
     private const OPT_LONG_SEMESTER = 'semester:';
     private const OPT_LONG_UPDATE_ONLY = 'update-only';
-    private const OPT_LONG_DRY_RUN = 'dry-run';
+    private const OPT_LONG_PARENT = 'parent:';
 
     /** @inheritDoc */
     public function getShortOpts(): array
@@ -68,7 +70,7 @@ $app = new class extends CliTool\App
             self::OPT_LONG_YEAR,
             self::OPT_LONG_SEMESTER,
             self::OPT_LONG_UPDATE_ONLY,
-            self::OPT_LONG_DRY_RUN,
+            self::OPT_LONG_PARENT,
         ];
     }
 
@@ -106,7 +108,7 @@ $app = new class extends CliTool\App
         $addParamsShort = "";
 
         // Synergetic receives some additional options around FileYear/FileSemester
-        if ($config->get('external_type') === 'synergetic') {
+        if ($config->get(ConfigMapper::NAME_EXTERNAL_TYPE) === IConnector::EXTERNAL_TYPE_SYNERGETIC) {
             $additionalParameters .= "    --year=yyyy          Synergetic FileYear into which to export the markbook and student marks, format --year=2016 (must be used with semester parameter)\n";
             $additionalParameters .= "    --semester=s         Synergetic FileSemester into which to export the markbook and student marks, --semester=1 (must be used with year parameter)\n";
             $addParamsShort = "[--year=yyyy] [--semester=s] ";
@@ -114,19 +116,19 @@ $app = new class extends CliTool\App
 
         // Get pretty uppercased SIS name
 
-        $remoteSystemName = ucwords($config->get('external_type'));
+        $remoteSystemName = ucwords($config->get(ConfigMapper::NAME_EXTERNAL_TYPE));
 
             echo <<<HELP
     
     Schoolbox Markbook Sync Script
     
     Description:   Syncs existing markbook data from Schoolbox into {$remoteSystemName}
-    Usage:         php sync.php -p=[folderID] {$addParamsShort}[--start=yyyy-mm-dd] [--end=yyyy-mm-dd] [--dry-run] [--update-only]
+    Usage:         php sync.php --parent=[folderID] {$addParamsShort}[--start=yyyy-mm-dd] [--end=yyyy-mm-dd] [--perform] [--update-only]
     
-        -p=xxx               the Schoolbox ID of parent folder to start the traversal, defaults to 0, format -p=237
+        --parent=xxx         the Schoolbox ID of parent folder to start the traversal, defaults to 0, format --parent=237
         --start=yyyy-mm-dd   Only sync work due after this date, format --start=2016-04-20, defaults to current semester
         --end=yyyy-mm-dd     Only sync work due before this date, format --end=2016-08-15, default to current semester
-        --dry-run:           if set, does not actually update anything, but shows what would be updated
+        -p --perform:        if set, will actually update anything in the remote system, otherwise just a dry run
         --update-only:       if set, will not create any new items in the remote system, only updates existing markbooks
     {$additionalParameters}
     
@@ -136,18 +138,17 @@ $app = new class extends CliTool\App
 
     public function run(): void
     {
-        $parentId = $opts['p'] ?? 0;
-        $year = $opts['year'] ?? null;
-        $semester = $opts['semester'] ?? null;
-        $start = $opts['start'] ?? false;
-        $end = $opts['end'] ?? false;
-        $updateOnly = isset($opts['update-only']);
-        $dryRun = isset($opts['dry-run']);
+        $parentId = $this->getOptAsInt(self::OPT_LONG_PARENT, 0);
+        $year = $this->getOptAsInt(self::OPT_LONG_YEAR);
+        $semester = $this->getOptAsInt(self::OPT_LONG_SEMESTER);
+        $start = $this->getOpt(self::OPT_LONG_START);
+        $end = $this->getOpt(self::OPT_LONG_END);
+        $updateOnly = $this->getOpt(self::OPT_LONG_UPDATE_ONLY);
 
         // Make sure markbook sync is actually enabled
         /** @var IConfigLoader $config */
         $config = $this->getConfig();
-        if (!$config->get('external_markbook')) {
+        if (!$config->get(ConfigMapper::NAME_EXTERNAL_MARKBOOK)) {
             $this->getLogger()->error("ERROR: External markbook synchronisation is not enabled in Schoolbox. Please enable in your Schoolbox administrator settings and try again.");
             exit(1);
         }
@@ -165,9 +166,9 @@ $app = new class extends CliTool\App
         $folderMapper = FolderMapper::getInstance();
 
         // Synergetic Markbook uses FileYear/FileSemester and exposes command line parameters not available to other connectors.
-        if ($config->get('external_type') === 'synergetic') {
+        if ($config->get(ConfigMapper::NAME_EXTERNAL_TYPE) === IConnector::EXTERNAL_TYPE_SYNERGETIC) {
             try {
-                $markbookExternal = new External_Synergetic_Markbook($config->get('synergetic_mark_sync_value'), $log, $year, $semester);
+                $markbookExternal = new External_Synergetic_Markbook($config->get('synergetic_mark_sync_value'), $this->getLogger(), $year, $semester);
             } catch (InvalidArgumentException $e) {
                 $this->getLogger()->error("ERROR: {$e->getMessage()}");
                 $this->help($config);
@@ -286,7 +287,7 @@ $app = new class extends CliTool\App
                     $action = str_pad("Action:", 30, " ");
                     $this->getLogger()->info("    {$action}Create/Update");
 
-                    if (!$dryRun) {
+                    if ($this->perform()) {
                         $markbookExternal->syncAssessment($assessment);
                     }
                 } else {
@@ -295,7 +296,7 @@ $app = new class extends CliTool\App
                     $action = str_pad("Action:", 30, " ");
                     $this->getLogger()->info("    {$action}Update Only");
 
-                    if (!$dryRun && $markbookExternal->hasAssessment($assessment)) {
+                    if ($this->perform() && $markbookExternal->hasAssessment($assessment)) {
                         $markbookExternal->syncAssessment($assessment);
                     }
                 }
@@ -329,7 +330,7 @@ $app = new class extends CliTool\App
                     }
 
 
-                    if (!$dryRun && $feedback) {
+                    if ($feedback && $this->perform()) {
                         try {
                             $markbookExternal->syncFeedback($feedback);
                             $totalSuccess++;
