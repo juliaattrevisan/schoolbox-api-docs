@@ -12,13 +12,13 @@ use Alaress\Image;
 use Predis\ClientInterface;
 use Schoolbox\Application\CliTool;
 
-        require_once __DIR__ . '/../../conf/core/require.php';
+require_once __DIR__ . '/../../conf/core/require.php';
 
 $app = new class extends CliTool\App
 {
-private const DEFAULT_TIME_INTERVAL_MINUTES  = 60;                   // default time period in minutes to look up images for processing
-private const DEFAULT_IMAGE_COUNT_LIMIT      = 300;                  // default maximum amount of images to be processed
-private const DEFAULT_ATTEMPTS_PER_TRANSFORM = 3;                    // default maximum times to attempt each transformation
+    private const DEFAULT_TIME_INTERVAL_MINUTES  = 60;                   // default time period in minutes to look up images for processing
+    private const DEFAULT_IMAGE_COUNT_LIMIT      = 300;                  // default maximum amount of images to be processed
+    private const DEFAULT_ATTEMPTS_PER_TRANSFORM = 3;                    // default maximum times to attempt each transformation
 
     // --help: print help
     private const OPT_LONG_HELP = 'help';
@@ -52,14 +52,12 @@ private const DEFAULT_ATTEMPTS_PER_TRANSFORM = 3;                    // default 
 
 public function run(): void
 {
-
-
     $opt = getopt('hv', ['help', 'verbose', 'retry-failed', 'time-interval:', 'max-workers:', 'limit:', 'max-attempts:']);
-    $retryFailed = array_key_exists('retry-failed', $opt);
-    $timeInterval = array_key_exists('time-interval', $opt) ? (int)$opt['time-interval'] : self::DEFAULT_TIME_INTERVAL_MINUTES;
-    $workerCount = array_key_exists('max-workers', $opt) ? (int)$opt['max-workers'] : (int)max(1, ((int)shell_exec('nproc') * 0.50));
-    $imageCountLimit = array_key_exists('limit', $opt) ? (int)$opt['limit'] : self::DEFAULT_IMAGE_COUNT_LIMIT;
-    $attemptsPerTransform = array_key_exists('max-attempts', $opt) ? (int)$opt['max-attempts'] : self::DEFAULT_ATTEMPTS_PER_TRANSFORM;
+    $retryFailed = (bool)$this->getOpt(self::OPT_LONG_RETRY_FAILED);
+    $timeInterval = $this->getOptAsInt(self::OPT_LONG_TIME_INTERVAL) ?: self::DEFAULT_TIME_INTERVAL_MINUTES;
+    $workerCount = $this->getOptAsInt(self::OPT_LONG_MAX_WORKERS) ?: (int)max(1, ((int)shell_exec('nproc') * 0.50));
+    $imageCountLimit = $this->getOptAsInt(self::OPT_LONG_LIMIT) ?: self::DEFAULT_IMAGE_COUNT_LIMIT;
+    $attemptsPerTransform = $this->getOptAsInt(self::OPT_LONG_MAX_ATTEMPTS) ?: self::DEFAULT_ATTEMPTS_PER_TRANSFORM;
 
     if ($this->getOpt(self::OPT_LONG_HELP) || $this->getOpt(self::OPT_SHORT_HELP)) {
         echo <<<HELP
@@ -83,6 +81,13 @@ HELP;
         exit;
     }
     proc_nice(10); // Always run with lower priority
+
+    /**
+     * verbosity check to pass through the action option specified to the worker
+     * \Schoolbox\Application\CliKernelAbstract::getLoggingLevelFromVerbosity will replace this, if we can get it to this point
+     *
+     * \Alaress\Image\Processor\Manager::processTransformations is where we need the verbosity level to create the amount of verbosity for the /tools/image/worker.php php pass through
+     */
     $verboseFlagCount = 0;
     foreach (['v', 'verbose'] as $verboseFlag) {
         if (array_key_exists($verboseFlag, $opt)) {
@@ -104,7 +109,7 @@ HELP;
         $timeInterval,
         $imageCountLimit,
         $workerCount,
-        new Alaress\Lumberjack\Logger(STDOUT, STDERR, $limits[$verboseFlagCount]),
+        $this->getLogger(),
         $retryFailed,
         $attemptsPerTransform,
         $limits[$verboseFlagCount],
