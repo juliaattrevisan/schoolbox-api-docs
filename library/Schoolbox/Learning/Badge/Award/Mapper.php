@@ -275,7 +275,7 @@ class Mapper extends \Schoolbox\Mapper
      *                                              date.
      * @return GenericCollection
      */
-    public function findRecentForUser(
+    public function findForUser(
         User $user,
         string $awardStatus,
         ?Alaress_Date_Format $expiryDate
@@ -313,7 +313,7 @@ class Mapper extends \Schoolbox\Mapper
 
     /**
      * Find awards in specific badge categories given to users
-     * Logic should be similar to $this->findRecentForUser
+     * Logic should be similar to $this->findForUser
      * @param int[]    $userIds
      * @param int[]    $categoryIds
      * @param string[] $status
