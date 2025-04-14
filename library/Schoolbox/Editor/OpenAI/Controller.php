@@ -72,32 +72,32 @@ class Controller extends Base
             /* Generate a payload for ai, using the prompt pieces for System and User info
              * From a POST payload
              */
-//            $inputs = [
-//                'context' => $this->requestPost->get('context'),
-//                'fields' => $this->requestPost->get('fields'),
-//                'duration' => $this->requestPost->get('duration'),
-//                'curriculumNodeIds' => $this->requestPost->get('curriculumNodeIds'),
-//                'additionalContext' => $this->requestPost->get('additionalContext') ?? ''
-//            ];
-
             $inputs = [
-                'context' => 'Year 8 Science',
-                'fields' => [
-                    [
-                        'id' => 'Learning Objectives',
-                        'title' => 'Learning Objectives',
-                        'description' => 'What students should learn from the lesson',
-                        'visibility' => 'student',
-                        'body' => '',
-                        'selected' => true
-                    ]
-                ],
-                'duration' => '17 minutes',
-                'curriculumNodeIds' => [
-                    4156, 4157, 4160
-                ],
-                'additionalContext' => '',
+                'context' => $this->requestPost->get('context'),
+                'fields' => $this->requestPost->get('fields'),
+                'duration' => $this->requestPost->get('duration'),
+                'curriculumNodeIds' => $this->requestPost->get('curriculumNodeIds'),
+                'additionalContext' => $this->requestPost->get('additionalContext') ?? ''
             ];
+
+//            $inputs = [
+//                'context' => 'Year 8 Science',
+//                'fields' => [
+//                    [
+//                        'id' => 'Learning Objectives',
+//                        'title' => 'Learning Objectives',
+//                        'description' => 'What students should learn from the lesson',
+//                        'visibility' => 'student',
+//                        'body' => '',
+//                        'selected' => true
+//                    ]
+//                ],
+//                'duration' => '17 minutes',
+//                'curriculumNodeIds' => [
+//                    4156, 4157, 4160
+//                ],
+//                'additionalContext' => '',
+//            ];
 
             $payload = $payloadGenerator->generate(
                 $inputs['context'],
