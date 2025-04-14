@@ -18,7 +18,10 @@ services:
       - redis-storage
     build:
       context: ../
-      dockerfile: ./docker/php-fpm/deployment-image.Dockerfile
+      dockerfile: ./docker/php-fpm/pr-image.Dockerfile
+      additional_contexts:
+        - php82-alpine:docker-image:alaress/php82-alpine
+        - code:/usr/share/schoolbox
     volumes:
       - storage:/var/lib/schoolbox/docker/storage
       - schoolbox-config:/etc/schoolbox

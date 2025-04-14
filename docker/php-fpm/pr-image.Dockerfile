@@ -1,4 +1,8 @@
 # PHP-FPM Schoolbox image, for staging, production and CI environments.
+# Requires the following contexts:
+# * php82-alpine: a previously built php82-alpine container
+#                 (see ./docker/base-images/php82-alpine/Dockerfile)
+# * code:         Schoolbox's code base
 
 # Build args:
 # ENV: if prod or production, build with prod dependencies only;
