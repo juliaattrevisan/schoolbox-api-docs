@@ -15,40 +15,54 @@ on:
   workflow_dispatch:
 
 jobs:
-  # Build and push php82-alpine image first
-  build-and-push-php82-alpine-to-dockerhub:
-    uses: ./.github/workflows/helper-build-and-push-to-dockerhub.yaml
-    with:
-      image: php82-alpine
-      context: docker/base-images/php82-alpine
-      tags: |
-        alaress/php82-alpine:latest
-    secrets: inherit
+  build-and-push:
+    strategy:
+      matrix:
+        build:
+          - runs-on: ubuntu-latest
+            platform: linux
+            arch: amd64
+          - runs-on: ubuntu-arm
+            platform: linux
+            arch: arm64
+    runs-on: ${{ matrix.build.runs-on }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
 
-#  push-php82-alpine-to-ecr:
-#    needs:
-#      - build-and-push-php82-alpine-to-dockerhub
-#    uses: ./.github/workflows/helper-push-to-ecr.yaml
-#    with:
-#      image: php82-alpine
-#    secrets: inherit
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-  # Once done, build and push php82-fpm-alpine image
-  build-and-push-php82-fpm-alpine-to-dockerhub:
-    needs:
-      - build-and-push-php82-alpine-to-dockerhub
-    uses: ./.github/workflows/helper-build-and-push-to-dockerhub.yaml
-    with:
-      image: php82-fpm-alpine
-      context: docker/base-images/php82-fpm-alpine
-      tags: |
-        alaress/php82-fpm-alpine:latest
-    secrets: inherit
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-#  push-php82-fpm-alpine-to-ecr:
-#    needs:
-#      - build-and-push-php82-fpm-alpine-to-dockerhub
-#    uses: ./.github/workflows/helper-push-to-ecr.yaml
-#    with:
-#      image: php82-fpm-alpine
-#    secrets: inherit
+      - name: Build and push php82-alpine to Dockerhub
+        uses: docker/build-push-action@v6
+        with:
+          context: docker/base-images/php82-alpine
+          cache-from: type=gha
+          cache-to: type=gha
+          push: true
+          outputs: type=docker,dest=${{ runner.temp }}/php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
+          build-args: |
+            ENV=prod
+          platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
+          tags: |
+            alaress/php82-alpine:latest
+
+      - name: Build and push php82-fpm-alpine to Dockerhub
+        uses: docker/build-push-action@v6
+        with:
+          context: docker/base-images/php82-fpm-alpine
+          cache-from: type=gha
+          cache-to: type=gha
+          push: true
+          outputs: type=docker,dest=${{ runner.temp }}/php82-fpm-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
+          build-args: |
+            ENV=prod
+          platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
+          tags: |
+            alaress/php82-fpm-alpine:latest
