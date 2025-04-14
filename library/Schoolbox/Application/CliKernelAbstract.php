@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Application;
 
-use Alaress\Sentry\Tracing\Tracer;
 use Aura\Di\Container;
 use Alaress\Exception\IO\IOException;
 use ErrorException;
@@ -25,6 +24,7 @@ use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Deprecation\Registry;
 use Sentry\Monolog\Handler as SentryHandler;
 use Sentry\State\HubInterface;
+use Throwable;
 
 /**
  * Common implementation for all Cli Kernels
@@ -94,7 +94,7 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
 
     /**
      * @inheritDoc
-     * @throws \Throwable
+     * @throws Throwable
      */
     protected function postInstallDependencies(bool $bypassMaintenanceModeCheck = false): void
     {
@@ -126,9 +126,10 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
 
 
     /**
-     * @param \Exception $e
+     * This exception handler just logs and exits after calling any exception
+     * callbacks.
      */
-    public function onException($e): void
+    protected function onException(Throwable $e): void
     {
         $this->callExceptionCallbacks($e);
         try {
@@ -179,21 +180,14 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
 
 
     /**
-     * @param int    $errNum
-     * @param string $errStr
-     * @param string $errFile
-     * @param int    $errLine
-     * @return bool
-     * @throws ErrorException
-     * @throws \Psr\Container\ContainerExceptionInterface|\Psr\Container\NotFoundExceptionInterface
+     * This error handler:
+     * * raises an exception if a recoverable error was thrown
+     * * may raise an exception on notice or warning
+     * * silences deprecation notices
+     * * otherwise, passes to the standard error handler
      */
-    public function onError($errNum, $errStr, $errFile, $errLine): ?bool
+    protected function onError(int $errNum, string $errStr, string $errFile, int $errLine): bool
     {
-        if (!(error_reporting() & $errNum)) {
-            // This error code is not included in error_reporting
-            return true;
-        }
-
         switch ($errNum) {
             case E_RECOVERABLE_ERROR:
                 // for any of these errors, we want an exception we can catch
@@ -333,17 +327,6 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
 
 
     /**
-     * Register any out-the-top exception handling required
-     *
-     * @return void
-     */
-    protected function registerExceptionHandling(): void
-    {
-        \set_exception_handler([$this, 'onException']);
-    }
-
-
-    /**
      * Register any shutdown handling required
      *
      * @return void
@@ -353,17 +336,6 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
     {
         parent::registerShutdownHandling();
         $this->getShutdownHandler()->registerFunction([$this, 'onShutdown']);
-    }
-
-
-    /**
-     * Register any error handling required
-     *
-     * @return void
-     */
-    protected function registerErrorHandling(): void
-    {
-        \set_error_handler([$this, 'onError']);
     }
 
 

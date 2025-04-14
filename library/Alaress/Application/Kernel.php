@@ -212,6 +212,20 @@ abstract class Kernel
     protected Di\Container $di;
 
     /**
+     * Previous error handler, if any.
+     *
+     * @var callable|null
+     */
+    protected $previousErrorHandler = null;
+
+    /**
+     * Previous exception handler, if any.
+     *
+     * @var callable|null
+     */
+    protected $previousExceptionHandler = null;
+
+    /**
      * Wrapper to enable prioritisation of shutdown functions
      *
      * @var ShutdownHandler
@@ -315,18 +329,90 @@ abstract class Kernel
     }
 
     /**
-     * Register any error handling required
+     * Registers `$this->onError` as the error handling callback, and preserves
+     * the previous error handling callback to be called prior to that method.
      *
      * @return void
      */
-    abstract protected function registerErrorHandling(): void;
+    protected function registerErrorHandling(): void
+    {
+        $this->previousErrorHandler = set_error_handler(
+            function ($errNum, $errStr, $errFile, $errLine) {
+                // Explicitly silenced deprecations should not be sent to
+                // Sentry, or otherwise handled.
+                if ($errNum & (E_DEPRECATED | E_USER_DEPRECATED)) {
+                    if (\Schoolbox\Deprecation\Registry::silenceWarningsForPath($errFile)) {
+                        return true;
+                    }
+                }
+
+                // Call the previous error handler (presumably Sentry's):
+                // but what should be done with its return, and when should it
+                // be called?
+                if (is_callable($this->previousErrorHandler)) {
+                    call_user_func($this->previousErrorHandler, $errNum, $errStr, $errFile, $errLine);
+                }
+
+                if (!(error_reporting() & $errNum)) {
+                    // This error code is not included in error_reporting:
+                    // * should it be silenced (return true), or;
+                    // * handled by standard error handler (return false)?
+                    // Currently it's silenced, but I'm not sure that's correct.
+                    return true;
+                }
+
+                return $this->onError($errNum, $errStr, $errFile, $errLine);
+            }
+        );
+    }
 
     /**
-     * Register any out-the-top exception handling required
+     * Error handling callback.
+     *
+     * @param int    $errNum
+     * @param string $errStr
+     * @param string $errFile
+     * @param int    $errLine
+     * @return bool
+     */
+    abstract protected function onError(int $errNum, string $errStr, string $errFile, int $errLine): bool;
+
+    /**
+     * Registers `$this->onException` as the exception handling callback, and
+     * preserves the previous exception handling callback to be called prior to
+     * that method.
      *
      * @return void
      */
-    abstract protected function registerExceptionHandling(): void;
+    protected function registerExceptionHandling(): void
+    {
+        $this->previousExceptionHandler = set_exception_handler(
+            function ($e) {
+                if (is_callable($this->previousExceptionHandler)) {
+                    // The previous handler may rethrow the same exception.
+                    // If it does, catch and shutdown as per normal:
+                    // if it's different, something truly exceptional happened
+                    // so rethrow.
+                    try {
+                        call_user_func($this->previousExceptionHandler, $e);
+                    } catch (Throwable $rethrow) {
+                        if ($rethrow !== $e) {
+                            throw $rethrow;
+                        }
+                    }
+                }
+                $this->onException($e);
+            }
+        );
+    }
+
+    /**
+     * Exception handling callback.
+     *
+     * @param Throwable $e
+     * @return void
+     */
+    abstract protected function onException(Throwable $e): void;
 
     /**
      * Register any shutdown handling required
