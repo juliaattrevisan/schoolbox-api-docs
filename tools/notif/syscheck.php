@@ -21,11 +21,27 @@ error_reporting(E_ALL);
 require_once __DIR__ . '/../../conf/core/require.php';
 
 $app = new class extends CliTool\App {
+    private const OPT_LONG_MAIL = 'mail';
+    private const OPT_LONG_HELP = 'help';
+
+    /** @inheritdoc */
+    public function getLongOpts(): array
+    {
+        return [
+            self::OPT_LONG_MAIL,
+            self::OPT_LONG_HELP,
+        ];
+    }
+
     public function run(): void
     {
         $errors = array();
-        $opts = getopt('v', array('mail'));
-        $mail = isset($opts['mail']);
+        $mail = $this->getOpt(self::OPT_LONG_MAIL);
+
+        if ($this->getOpt(self::OPT_LONG_HELP)) {
+            echo "Usage: syscheck.php [--mail] [--help]\n";
+            exit(0);
+        }
 
         try {
             /** @var Logger $d */
