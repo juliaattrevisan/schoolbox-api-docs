@@ -6559,12 +6559,6 @@ parameters:
 			path: tools/mq/reset-ttls.php
 
 		-
-			message: '#^Variable \$d might not be defined\.$#'
-			identifier: variable.undefined
-			count: 2
-			path: tools/notif/syscheck.php
-
-		-
 			message: '#^Variable \$usersAdded in isset\(\) is never defined\.$#'
 			identifier: isset.variable
 			count: 1
