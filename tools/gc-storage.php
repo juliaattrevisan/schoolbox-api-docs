@@ -15,8 +15,6 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Alaress\Lumberjack\Logger;
-use Schoolbox\Database\Factory;
 use Schoolbox\Resource\Storage\GC;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Application\CliTool;
@@ -29,6 +27,11 @@ $app = new class extends CliTool\App
     // --help: print help
     private const OPT_LONG_HELP = 'help';
 
+    /** @inheritDoc */
+    public function getShortOpts(): array
+    {
+        return ['n:'];
+    }
 
     /** @inheritdoc */
     public function getLongOpts(): array
@@ -43,9 +46,7 @@ $app = new class extends CliTool\App
      */
     public function run(): void
     {
-        $opts    = getopt('pvn:');
-        $limit   = isset($opts['n']) ? (int)$opts['n'] : 1000;
-        $perform = isset($opts['p']);
+        $limit   = $this->getOptAsInt('n:', 1000);
 
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
@@ -59,35 +60,19 @@ HELP;
             exit;
         }
 
-        $pdo = Factory::getInstanceInternal();
-
-        $threshold = 0;
-        if (isset($opts['v'])) {
-            $threshold = 1;
-            if (is_array($opts['v'])) {
-                $threshold = min(3, count($opts['v']));
-            }
-        }
-
-        $limits = [
-            0 => 500, // nil verbosity: exceptional behaviour only
-            1 => 250, // min verbosity: significant events
-            2 => 200, // mod verbosity: most things
-            3 => 100  // max verbosity: EV-ER-Y-THING...
-        ];
+        $pdo = $this->getDatabaseInternal();
 
         $sm = StorageMapper::getInstance();
-        $log = new Logger(STDOUT, STDERR, $limits[$threshold]);
         $gc = new GC\GarbageCollector(
             [
                 new GC\Check\ExpiryDate($pdo, 2),
                 new GC\Check\HardLinks($pdo),
-                new GC\Check\SoftLinks($pdo, SQL_db, $log),
+                new GC\Check\SoftLinks($pdo, SQL_db, $this->getLogger()),
             ],
             $sm,
-            $log,
+            $this->getLogger(),
             $limit,
-            $perform
+            $this->perform()
         );
 
         $deleted = $gc->purge();
