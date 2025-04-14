@@ -15,9 +15,6 @@
  */
 
 use External\IConnector;
-use Psr\Container\ContainerInterface;
-use Psr\Log\LoggerInterface;
-use React\EventLoop\LoopInterface;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
@@ -26,22 +23,6 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 
 require_once __DIR__ . '/../../conf/core/require.php';
-//
-//$kernel = new CliTool\Kernel(
-//    'Schoolbox Markbook Sync Script',
-//    [
-//        CliTool\Kernel::OPTION_APP_SHORT_OPTS => 'vp:h',
-//        CliTool\Kernel::OPTION_APP_LONG_OPTS  => [
-//            'help',
-//            'start:',
-//            'end:',
-//            'year:',
-//            'semester:',
-//            'update-only',
-//            'dry-run',
-//        ],
-//    ]
-//);
 
 $app = new class extends CliTool\App
 {
