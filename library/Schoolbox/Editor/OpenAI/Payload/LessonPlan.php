@@ -189,7 +189,7 @@ class LessonPlan
 
             unset($vals);
 
-            $curriculumContent = "Curriculum Content: " . implode(",\n", $nodes). "\n\n";
+            $curriculumContent = "Curriculum Content: " . implode(",\n", $nodes) . "\n\n";
 
             /* Yoink out the rest of each node's hierarchy, dedupe it, and then compile it into a csv
              * Note that multiple hierarchies might exist in this cauldron of data
