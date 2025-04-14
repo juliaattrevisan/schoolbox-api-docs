@@ -474,12 +474,19 @@ class Sessions implements IStrategy
                                  */
                                 $value = $session['customFieldsData'][$key];
 
-                                if (is_scalar($value) && ('' !== trim((string)$value))) {
-                                    $customFields[] = sprintf(
-                                        self::ADDITIONAL_FIELDS_TUPLE,
-                                        $label,
-                                        $value
-                                    );
+                                if (is_scalar($value)) {
+                                    if ('' !== trim((string)$value)) {
+                                        $customFields[] = sprintf(
+                                            self::ADDITIONAL_FIELDS_TUPLE,
+                                            $label,
+                                            $value
+                                        );
+                                    } else {
+                                        $this->log->debug(sprintf(
+                                            'Skipping custom field metadata for "%s"; empty value',
+                                            $label,
+                                        ));
+                                    }
                                 } else {
                                     $this->log->debug(sprintf(
                                         'Skipping custom field metadata for "%s"; not a scalar data type',
