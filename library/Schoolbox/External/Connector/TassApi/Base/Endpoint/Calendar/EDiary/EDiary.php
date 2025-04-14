@@ -37,7 +37,7 @@ class EDiary implements IStrategy
     /**
      * Number of WEEKS into the future, from today, to import data
      */
-    public const TO = 8;
+    public const TO = 12;
 
 
     /**
