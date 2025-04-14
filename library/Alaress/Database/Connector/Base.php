@@ -610,7 +610,7 @@ class Base implements IConnector
      */
     public function legacyQuote($value): string
     {
-        return $this->broker->getPdo()->quote($value);
+        return $this->broker->getPdo()->quote((string)$value);
     }
 
     /**
