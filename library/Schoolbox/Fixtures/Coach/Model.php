@@ -99,7 +99,7 @@ class Model implements \JsonSerializable, ISoftDeletable
     {
         if ($this->getId()) {
             return self::PREFIX_EXISTING_TAG . ':' . $this->getId();
-        } elseif ($this->getUser()->getId()) {
+        } elseif ($this->getUser()?->getId()) {
             return self::PREFIX_NEW_FROM_USER . ':' . $this->getUser()->getId();
         } else {
             return self::PREFIX_NEW_FROM_INPUT . ':' . $this->getName();
@@ -113,7 +113,7 @@ class Model implements \JsonSerializable, ISoftDeletable
      */
     public function formatName()
     {
-        if ($this->getUser()->getId()) {
+        if ($this->getUser()?->getId()) {
             // Format similarly to ajax user
             $name = sprintf("%s - %s", $this->getUser()->formatName(), $this->getUser()->getRole()->getName());
             if ($this->getUser()->getExternalId()) {
