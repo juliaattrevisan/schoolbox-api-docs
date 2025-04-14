@@ -54,10 +54,14 @@ $f-dropdown-line-height: rem-calc(18) !default;
         &:focus {
             background: var(--content-ui-hover);
         }
-        a {
-            display: block;
-            padding: $f-dropdown-list-padding;
+        a,
+        button {
             color: var(--content-ui-foreground);
+            display: block;
+            margin: 0;
+            padding: $f-dropdown-list-padding;
+            text-align: left;
+            width: 100%;
             &:hover {
                 background-color: var(--content-ui-hover);
                 text-decoration: none;

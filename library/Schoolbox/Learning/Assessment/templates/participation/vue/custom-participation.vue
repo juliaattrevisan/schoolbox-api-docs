@@ -4,7 +4,9 @@
  */
 import { isAbortError, hasErrorMessage } from "@js/util/errorUtils";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
+import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import PastoralCountBadge from "@schoolboxLibrary/Pastoral/Count/vue/pastoral-count-badge.vue";
+import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
 import type { StudentPastoralCountBadge } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
 import type { Participant } from "../js/types/customParticipationTypes";
 
@@ -15,22 +17,32 @@ interface Props {
 
 const props = defineProps<Props>();
 
-// show the checkboxes if there are more than one participant
-const showCheckboxes = window.Vue.computed(() => props.allParticipants.length > 1);
+const allParticipants = window.Vue.ref<Participant[]>(props.allParticipants);
 
-// selecteList is the items that are currently selected
+// show the checkboxes if there are more than one participant
+const showCheckboxes = window.Vue.computed(() => allParticipants.value.length > 1);
+
+// selectedList is the items that are currently selected
 const selectedList = window.Vue.ref<number[]>([]);
 
 // Computed property to check if all are selected
 const allSelected = window.Vue.computed({
-    get: () => props.allParticipants.every((participant) => selectedList.value.includes(participant.user.id)),
+    get: () => allParticipants.value.every((participant) => selectedList.value.includes(participant.user.id)),
     set: (value) => {
-        selectedList.value = value ? props.allParticipants.map((participant) => participant.user.id) : [];
+        selectedList.value = value ? allParticipants.value.map((participant) => participant.user.id) : [];
     },
 });
+
 // Function to check if at least one is selected
 const isIndeterminate = window.Vue.computed(() => {
-    return selectedList.value.length > 0 && selectedList.value.length < props.allParticipants.length;
+    return selectedList.value.length > 0 && selectedList.value.length < allParticipants.value.length;
+});
+
+// Function to check if any selected participant is excluded
+const hasExcludedInSelection = window.Vue.computed(() => {
+    return allParticipants.value.some(
+        (participant) => selectedList.value.includes(participant.user.id) && participant.excludedAt !== null,
+    );
 });
 
 const loadError = window.Vue.ref<string | null>(null);
@@ -42,7 +54,7 @@ const studentPastoralCounts = window.Vue.ref<Record<string, StudentPastoralCount
 async function getStudentPastoralCounts(): Promise<void> {
     const url = props.getStudentsPastoralCountsUrl.replace(
         "{studentIds}",
-        props.allParticipants.map((participant) => participant.user.id).join(","),
+        allParticipants.value.map((participant) => participant.user.id).join(","),
     );
     try {
         const response = await fetch(url, {
@@ -75,12 +87,113 @@ async function getStudentPastoralCounts(): Promise<void> {
         console.error(error);
     }
 }
+/**
+ * Excludes a participant.
+ * @param participant - The participant to exclude.
+ * @returns A promise that resolves when the operation is complete.
+ */
+async function excludeParticipant(participant: Participant): Promise<void> {
+    activate("Excluding...");
+    try {
+        const response = await fetch(participant._links.exclude, {
+            method: "POST",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (!response.ok) {
+            const errorMessage = await extractErrorMessage(response);
+            throw new Error(errorMessage);
+        }
+        participant.excludedAt = new Date().toISOString(); // Assigning a timestamp as a string
+        timeout({ text: "Student Excluded Successfully" });
+    } catch (error) {
+        if (error instanceof Error && hasErrorMessage(error)) {
+            loadError.value = error.message;
+        }
+        console.error("Error excluding participant:", error);
+    }
+}
+
+/**
+ * Includes a participant.
+ * @param participant - The participant to include.
+ * @returns A promise that resolves when the operation is complete.
+ */
+async function includeParticipant(participant: Participant): Promise<void> {
+    activate("Removing Customisation...");
+
+    try {
+        const response = await fetch(participant._links.include, {
+            method: "POST",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (!response.ok) {
+            const errorMessage = await extractErrorMessage(response);
+            throw new Error(errorMessage);
+        }
+
+        participant.excludedAt = null;
+        timeout({ text: "Customisation Removed Successfully" });
+    } catch (error) {
+        if (error instanceof Error && hasErrorMessage(error)) {
+            loadError.value = error.message;
+        }
+        console.error("Error including participant:", error);
+    }
+}
+
+/**
+ * Excludes the selected participants.
+ * Clears the selection after the operation is complete.
+ * @returns A promise that resolves when all exclusions are complete.
+ */
+async function excludeSelected(): Promise<void> {
+    try {
+        const participantsToExclude = allParticipants.value.filter((p) => selectedList.value.includes(p.user.id));
+
+        await Promise.all(participantsToExclude.map((participant) => excludeParticipant(participant)));
+
+        selectedList.value = [];
+    } catch (error) {
+        if (error instanceof Error && hasErrorMessage(error)) {
+            loadError.value = error.message;
+        }
+        console.error("Error excluding selected participants:", error);
+    }
+}
+
+/**
+ * Includes the selected participants.
+ * Clears the selection after the operation is complete.
+ * @returns A promise that resolves when all inclusions are complete.
+ */
+async function includeSelected(): Promise<void> {
+    const participantsToInclude = allParticipants.value.filter((p) => selectedList.value.includes(p.user.id));
+    await Promise.all(participantsToInclude.map((participant) => includeParticipant(participant)));
+    selectedList.value = [];
+}
+
 window.Vue.onMounted(() => {
     void getStudentPastoralCounts();
 });
 </script>
 
 <template>
+    <div v-if="loadError" class="c-island l-pad-m">
+        <div class="alert-box alert f-no-margins">
+            Sorry, there was an error during report retrieval. Please
+            <a href="" title="refresh the page"> refresh the page </a>
+            to try again and contact your support if the problem persists.
+            <em>Further support info: {{ loadError }}</em>
+        </div>
+    </div>
     <div>
         <table>
             <thead>
@@ -94,14 +207,14 @@ window.Vue.onMounted(() => {
                         />
                         <label for="select-all" class="checkbox-label"></label>
                     </th>
-                    <th width="84"></th>
+                    <td width="84"></td>
                     <th>Name</th>
                     <th>Customisation</th>
-                    <th></th>
+                    <td></td>
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="participant in props.allParticipants" :key="participant.id">
+                <tr v-for="participant in allParticipants" :key="participant.id">
                     <td v-if="showCheckboxes">
                         <input
                             :id="`id-${participant.user.id}`"
@@ -123,7 +236,7 @@ window.Vue.onMounted(() => {
                                 {{ participant.user.lastname + ", " + participant.user.firstname }}
                                 {{
                                     participant.user.preferredName &&
-                                    participant.user.preferredName != participant.user.firstname
+                                    participant.user.preferredName !== participant.user.firstname
                                         ? "‘" + participant.user.preferredName + "’"
                                         : ""
                                 }}
@@ -134,7 +247,7 @@ window.Vue.onMounted(() => {
                             {{ participant.user.lastname + ", " + participant.user.firstname }}
                             {{
                                 participant.user.preferredName &&
-                                participant.user.preferredName != participant.user.firstname
+                                participant.user.preferredName !== participant.user.firstname
                                     ? "‘" + participant.user.preferredName + "’"
                                     : ""
                             }}
@@ -150,12 +263,92 @@ window.Vue.onMounted(() => {
                             />
                         </p>
                     </td>
-                    <td></td>
-                    <td></td>
+                    <td>
+                        <span v-if="participant.excludedAt !== null">Excluded</span>
+                    </td>
+                    <td class="no-pad">
+                        <div v-if="participant.user.id" class="actions-small-1">
+                            <nav>
+                                <sbx-pop-out :content-id="`participant-${participant.user.id}`"></sbx-pop-out>
+                            </nav>
+                            <ul
+                                :id="`participant-${participant.user.id}`"
+                                data-dropdown-content=""
+                                class="f-dropdown"
+                                move-to="#custom-participation-container"
+                            >
+                                <template v-if="participant.excludedAt !== null">
+                                    <li class="separator">Manage</li>
+                                    <li>
+                                        <button class="icon-close" @click.prevent="includeParticipant(participant)">
+                                            Remove Customisation
+                                        </button>
+                                    </li>
+                                </template>
+                                <template v-else>
+                                    <li class="separator">Manage</li>
+                                    <li><a class="icon-modify">Modify</a></li>
+                                    <li>
+                                        <button
+                                            class="icon-staff-students"
+                                            @click.prevent="excludeParticipant(participant)"
+                                        >
+                                            Exclude
+                                        </button>
+                                    </li>
+                                    <li class="separator">Create</li>
+                                    <li><a class="icon-copy">Copy Activity</a></li>
+                                    <li><a class="icon-submissions">New Activity</a></li>
+                                </template>
+                            </ul>
+                        </div>
+                    </td>
                 </tr>
             </tbody>
         </table>
+        <bottom-drawer :show-drawer="selectedList.length > 0">
+            <h3 class="selected-count">
+                <em>{{ selectedList.length }} selected</em>
+            </h3>
+            <button class="button-clear" @click.prevent="selectedList.length = 0">Clear selection</button>
+            <div class="l-flex-row l-flex--justify l-gap-xs">
+                <template v-if="hasExcludedInSelection">
+                    <button class="icon-close submit" @click.prevent="includeSelected">Remove Customisation</button>
+                </template>
+                <template v-else>
+                    <div class="l-flex__item--1"><a class="icon-copy submit">Copy Activity</a></div>
+                    <div class="l-flex__item--1">
+                        <button class="icon-staff-students submit" @click.prevent="excludeSelected">Exclude</button>
+                    </div>
+                    <div class="l-flex__item--1"><a class="icon-modify submit">Modify</a></div>
+                    <div class="l-flex__item--1"><a class="icon-submissions submit">New Activity</a></div>
+                </template>
+            </div>
+        </bottom-drawer>
     </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.selected-count {
+    display: inline-block;
+    margin-right: 0.5rem;
+}
+
+.button-clear {
+    display: inline-block;
+    padding: 0px;
+    background: none;
+    vertical-align: baseline;
+    font-size: 0.8rem;
+}
+
+@media (max-width: 768px) {
+    .flex-container {
+        flex-direction: column;
+    }
+
+    .l-flex__item--1 {
+        flex: 1 1 100%;
+    }
+}
+</style>
