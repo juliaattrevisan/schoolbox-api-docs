@@ -250,7 +250,7 @@ HELP;
                 }
                 if ($this->perform()) {
                     $this->getLogger()->notice("Soft Deleting Forum: '{$title}'");
-                    $forum->setDeleted(true);
+                    $forum->setDeletedAt(\Alaress_Date_Format::now());
                     $threadMapper->save($forum);
                 }
             }
