@@ -15,7 +15,8 @@ services:
       - redis-cache
       - redis-storage
     build:
-      context: ./php-fpm
+      context: ../
+      dockerfile: ./docker/php-fpm/dev-image.Dockerfile
     volumes:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
