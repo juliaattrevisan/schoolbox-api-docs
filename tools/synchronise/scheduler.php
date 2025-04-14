@@ -144,10 +144,10 @@ HELP;
 
         /* Used to shank a database instance
          */
-        $randomMapper = UserMapper::getInstance();
+        $logMapper = \Schoolbox\External\Connector\Log\Mapper::getInstance();
 
         // Queries should not be time-limited here
-        $randomMapper->getDatabase()->query('SET MAX_STATEMENT_TIME=0;');
+        $logMapper->getDatabase()->query('SET MAX_STATEMENT_TIME=0;');
 
         /* This identifier indicates that the two schedulers were part of this
          * script execution together
@@ -207,7 +207,7 @@ HELP;
                     $type,
                     $file,
                     $this->getLogger(),
-                    \Schoolbox\External\Connector\Log\Mapper::getInstance(),
+                    $logMapper,
                     $this->getDi()->get('sentry'),
                 ))->run($time, $runId, Endpoint\Scheduler::SCHEDULER_CALENDAR_SCRIPT_NAME);
             } else {
@@ -250,7 +250,7 @@ HELP;
                     $type,
                     $file,
                     $this->getLogger(),
-                    \Schoolbox\External\Connector\Log\Mapper::getInstance(),
+                    $logMapper,
                     $this->getDi()->get('sentry'),
                 ))->run($time, $runId, $logTitle);
             }

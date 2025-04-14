@@ -19,7 +19,6 @@ use Schoolbox\Role;
  */
 class StudentCalendar extends Base implements IStrategy
 {
-
     /**
      * Endpoint specific to this event import
      *

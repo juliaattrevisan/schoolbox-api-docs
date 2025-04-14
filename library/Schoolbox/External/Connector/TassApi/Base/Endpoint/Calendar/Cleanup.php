@@ -18,35 +18,6 @@ use Schoolbox\External\Importer\Endpoint\IStrategy;
 class Cleanup implements IStrategy
 {
     /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $log;
-
-
-    /**
-     * The "perform" flag from the cli tool
-     *
-     * @var bool
-     */
-    private bool $perform;
-
-
-    /**
-     * @var \Schoolbox\External\Event\Mapper
-     */
-    private \Schoolbox\External\Event\Mapper $eventMapper;
-
-
-    /**
-     * Event source is an arbitrary string that helps identify the thing that imported
-     * them into the local event table so you can do a mass remove if needed
-     *
-     * @var string
-     */
-    private string $source;
-
-
-    /**
      * Base constructor.
      *
      * @param LoggerInterface                  $log
@@ -55,19 +26,16 @@ class Cleanup implements IStrategy
      * @param string                           $source
      */
     public function __construct(
-        LoggerInterface $log,
-        bool $perform,
-        \Schoolbox\External\Event\Mapper $eventMapper,
-        string $source
+        private LoggerInterface $log,
+        private bool $perform,
+        private \Schoolbox\External\Event\Mapper $eventMapper,
+        private string $source
     ) {
-        $this->log = $log;
-        $this->perform = $perform;
-        $this->eventMapper = $eventMapper;
-
         /* Event source is an arbitrary string that helps identify the thing that imported
          * them into the local event table so you can do a mass remove if needed
+         *
+         * $this->source = $source;
          */
-        $this->source = $source;
     }
 
 

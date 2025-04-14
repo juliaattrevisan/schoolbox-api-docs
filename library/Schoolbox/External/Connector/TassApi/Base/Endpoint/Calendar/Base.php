@@ -13,7 +13,6 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\DSN;
 use Schoolbox\GenericCollection;
-use Schoolbox\RoleMapper;
 
 /**
  * Class Base
@@ -22,85 +21,13 @@ use Schoolbox\RoleMapper;
  * different endpoints/configs. I'm not sure why they're all identical
  * in Tass, but there's a lot of things about them that I don't understand.
  *
- * Anyway, I though of deploying these functionalities into a Helper class
+ * Anyway, I thought of deploying these functionalities into a Helper class
  * but consciously opted for this instead.
  *
  * @package Schoolbox\External\Connector\TassApi\Base\Endpoint\Calendar
  */
-class Base
+abstract class Base
 {
-    /**
-     * @var LoggerInterface
-     */
-    protected LoggerInterface $log;
-
-
-    /**
-     * The "perform" flag from the cli tool
-     *
-     * @var bool
-     */
-    protected bool $perform;
-
-
-    /**
-     * @var array
-     */
-    protected array $api;
-
-
-    /**
-     * @var GenericCollection
-     */
-    protected GenericCollection $campuses;
-
-
-    /**
-     * @var GenericCollection
-     */
-    protected GenericCollection $eventTypes;
-
-
-    /**
-     * @var \Schoolbox\External\Event\Mapper
-     */
-    protected \Schoolbox\External\Event\Mapper $eventMapper;
-
-
-    /**
-     * @var \Schoolbox\External\Event\Roletype\Mapper
-     */
-    protected \Schoolbox\External\Event\Roletype\Mapper $roletypeRelationMapper;
-
-
-    /**
-     * @var \Schoolbox\External\Event\Campus\Mapper
-     */
-    protected \Schoolbox\External\Event\Campus\Mapper $campusRelationMapper;
-
-
-    /**
-     * @var RoleMapper
-     */
-    protected RoleMapper $roleMapper;
-
-
-    /**
-     * Obtain events that started after this datetime
-     *
-     * @var \Alaress_Date_Format
-     */
-    protected \Alaress_Date_Format $from;
-
-
-    /**
-     * Obtain events that start before this datetime
-     *
-     * @var \Alaress_Date_Format
-     */
-    protected \Alaress_Date_Format $to;
-
-
     /**
      * Endpoint specific to this event import
      *
@@ -110,26 +37,11 @@ class Base
 
 
     /**
-     * Event source is an arbitrary string that helps identify the thing that imported
-     * them into the local event table so you can do a mass remove if needed
-     *
-     * @var string
-     */
-    protected string $source = '';
-
-
-    /**
      * The RoleType to assign to each event in this import
      *
      * @var string
      */
     protected string $roleType = '';
-
-
-    /**
-     * @var Registry
-     */
-    private Registry $registry;
 
 
     /**
@@ -143,46 +55,35 @@ class Base
      * @param \Schoolbox\External\Event\Mapper          $eventMapper
      * @param \Schoolbox\External\Event\Roletype\Mapper $roletypeRelationMapper
      * @param \Schoolbox\External\Event\Campus\Mapper   $campusRelationMapper
-     * @param RoleMapper                                $roleMapper
      * @param string                                    $source
      * @param Registry                                  $registry
      * @param \Alaress_Date_Format                      $from
      * @param \Alaress_Date_Format                      $to
      */
     public function __construct(
-        LoggerInterface $log,
-        bool $perform,
-        array $api,
-        GenericCollection $campuses,
-        GenericCollection $eventTypes,
-        \Schoolbox\External\Event\Mapper $eventMapper,
-        \Schoolbox\External\Event\Roletype\Mapper $roletypeRelationMapper,
-        \Schoolbox\External\Event\Campus\Mapper $campusRelationMapper,
-        RoleMapper $roleMapper,
-        string $source,
-        Registry $registry,
-        \Alaress_Date_Format $from,
-        \Alaress_Date_Format $to
+        private LoggerInterface $log,
+        private bool $perform,
+        private array $api,
+        private GenericCollection $campuses,
+        private GenericCollection $eventTypes,
+        private \Schoolbox\External\Event\Mapper $eventMapper,
+        private \Schoolbox\External\Event\Roletype\Mapper $roletypeRelationMapper,
+        private \Schoolbox\External\Event\Campus\Mapper $campusRelationMapper,
+        private string $source,
+        private Registry $registry,
+        private \Alaress_Date_Format $from,
+        private \Alaress_Date_Format $to
     ) {
-        $this->log = $log;
-        $this->perform = $perform;
-        $this->api = $api;
-        $this->campuses = $campuses;
-        $this->eventTypes = $eventTypes;
-        $this->eventMapper = $eventMapper;
-        $this->roletypeRelationMapper = $roletypeRelationMapper;
-        $this->campusRelationMapper = $campusRelationMapper;
-        $this->roleMapper = $roleMapper;
-
         /* Obtain events between these two datetimes
+         * $this->from = $from;
+         * $this->to = $to;
          */
-        $this->from = $from;
-        $this->to = $to;
 
         /* Event source is an arbitrary string that helps identify the thing that imported
          * them into the local event table so you can do a mass remove if needed
+         *
+         * $this->source = $source;
          */
-        $this->source = $source;
 
         /* Remember statistics generated procedurally from all the tass products
          * and dump them all at the very end, together - people weren't reading
@@ -191,8 +92,9 @@ class Base
          * to be attributable to the entire import which isn't always true.
          *
          * Therefore collect all those notes and put them all together here
+         *
+         * $this->registry = $registry;
          */
-        $this->registry = $registry;
     }
 
 
@@ -207,7 +109,6 @@ class Base
      */
     public function import(): void
     {
-
         /* A list of missing event types which the admin needs to configure in schoolbox
          */
         $missingEventTypes = [];
@@ -441,15 +342,13 @@ class Base
 
         if (\count($missingEventTypes)) {
             foreach ($missingEventTypes as $missingEventType) {
-                $brokenEventTypeMessage = sprintf(
-                    'Add this event type in admin: %s',
-                    $missingEventType
-                );
-
-                $this->log->warning($brokenEventTypeMessage);
-                $brokenEventTypes[] = $brokenEventTypeMessage;
+                $brokenEventTypes[] = $missingEventType;
             }
         }
+
+        /* Sort alphabetically
+         */
+        sort($brokenEventTypes);
 
         /* Remember for the summary
          */
