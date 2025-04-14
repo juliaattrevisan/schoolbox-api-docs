@@ -65,12 +65,19 @@ jobs:
       # push: {{ github.ref_name }}-latest, {{ github.ref_name }}-{{ github.sha }}
       #       (ref_name should be master or develop)
       # release: {{ github.ref_name }}
+      # For now this uses a remote image as its build context, later it may use
+      # an artifact built in this step?
       - name: Build and push schoolbox-fpm deployment image (latest)
         if: github.event_name == 'push'
         uses: docker/build-push-action@v6
         with:
           context: .
           file: docker/php-fpm/deploy-image.Dockerfile
+          cache-from: type=gha
+          cache-to: type=gha
+          build-contexts: |
+            php82-alpine=docker-image://alaress/php82-alpine
+            code=${{ github.workspace }}
           push: true
           outputs: type=docker,dest=${{ runner.temp }}/schoolbox-fpm-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
           build-args: |
@@ -86,6 +93,11 @@ jobs:
         with:
           context: .
           file: docker/php-fpm/deploy-image.Dockerfile
+          cache-from: type=gha
+          cache-to: type=gha
+          build-contexts: |
+            php82-alpine=docker-image://alaress/php82-alpine
+            code=${{ github.workspace }}
           push: true
           outputs: type=docker,dest=${{ runner.temp }}/schoolbox-fpm-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
           build-args: |
