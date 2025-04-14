@@ -8,10 +8,17 @@ include:
   - base.docker-compose.yaml
 
 services:
+  # This box is used only as an artifact context for schoolbox-php-fpm-deploy.
+  php82-alpine:
+    restart: no
+    build:
+      context : ./base-images/php82-alpine
+
   schoolbox-php-fpm-deploy:
     container_name: php-fpm
     restart: always
     depends_on:
+      - php82-alpine
       - mariadb
       - rabbitmq
       - redis-cache
@@ -20,8 +27,8 @@ services:
       context: ../
       dockerfile: ./docker/php-fpm/pr-image.Dockerfile
       additional_contexts:
-        - php82-alpine:docker-image:alaress/php82-alpine
-        - code:/usr/share/schoolbox
+        - php82-alpine=service:php82-alpine
+        - code=../
     volumes:
       - storage:/var/lib/schoolbox/docker/storage
       - schoolbox-config:/etc/schoolbox
