@@ -418,11 +418,23 @@ class Sessions implements IStrategy
                         $customFieldLists = (new CustomFields())->generate($customFieldsMetadata);
 
                         foreach ($customFieldLists as $type => $customFieldList) {
-                            foreach ($customFieldList as $key => $value) {
+                            foreach ($customFieldList as $key => $fieldData) {
                                 /* Look up what this was meant to be called
                                  */
                                 if (!array_key_exists($key, $customFieldsMetadata)) {
                                     $this->log->debug(sprintf('Skipping custom field "%s"; because no metadata exists', $key));
+                                    continue;
+                                }
+
+                                /* $sessions[customFieldsData] contains a different list than the one we're currently consuming
+                                 * Skip over it
+                                 */
+                                if (!array_key_exists($key, $session['customFieldsData'])) {
+                                    $this->log->debug(sprintf(
+                                        'Skipping custom field metadata for "%s" - that is not in session[customFieldsData] list',
+                                        $key
+                                    ));
+
                                     continue;
                                 }
 
@@ -460,6 +472,8 @@ class Sessions implements IStrategy
                                  * "This may not be ideal for Schoolbox currently and for now it may be best to
                                  * just not display those specific custom fields." -- Clipboard James, May 20
                                  */
+                                $value = $session['customFieldsData'][$key];
+
                                 if (is_scalar($value) && ('' !== trim((string)$value))) {
                                     $customFields[] = sprintf(
                                         self::ADDITIONAL_FIELDS_TUPLE,
@@ -473,6 +487,12 @@ class Sessions implements IStrategy
                                     ));
                                 }
                             }
+                        }
+
+                        if ($session['customFieldsData']['sessions_busReturnTime']) {
+                            print_r($session['customFieldsData']);
+                            print_r($customFields);
+                            sleep(2);
                         }
 
                         /* Use a standard html break for a separator
