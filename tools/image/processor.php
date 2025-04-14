@@ -29,6 +29,7 @@ $app = new class extends CliTool\App
     private const OPT_LONG_LIMIT = 'limit:';
     private const OPT_LONG_MAX_ATTEMPTS = 'max-attempts:';
     private const OPT_LONG_VERBOSE = 'verbose';
+    private const OPT_SHORT_VERBOSE = 'v';
 
     /** @inheritDoc */
     public function getShortOpts(): array
@@ -82,26 +83,6 @@ HELP;
     }
     proc_nice(10); // Always run with lower priority
 
-    /**
-     * verbosity check to pass through the action option specified to the worker
-     * \Schoolbox\Application\CliKernelAbstract::getLoggingLevelFromVerbosity will replace this, if we can get it to this point
-     *
-     * \Alaress\Image\Processor\Manager::processTransformations is where we need the verbosity level to create the amount of verbosity for the /tools/image/worker.php php pass through
-     */
-    $verboseFlagCount = 0;
-    foreach (['v', 'verbose'] as $verboseFlag) {
-        if (array_key_exists($verboseFlag, $opt)) {
-            $verboseFlagCount += count((array)$opt[$verboseFlag]);
-        }
-    }
-    $verboseFlagCount = min($verboseFlagCount, 3);
-    $limits = [
-        0 => Monolog\Logger::ERROR,    // nil verbosity: exceptional behaviour only
-        1 => Monolog\Logger::NOTICE,   // min verbosity: significant events
-        2 => Monolog\Logger::INFO,     // mod verbosity: most things
-        3 => Monolog\Logger::DEBUG,    // max verbosity: EV-ER-Y-THING...
-    ];
-
 // TODO inject lock inspector instead of cache
     /** @var ClientInterface $redis */
     $redis = $this->getDi()->get('redis.cache');
@@ -112,7 +93,7 @@ HELP;
         $this->getLogger(),
         $retryFailed,
         $attemptsPerTransform,
-        $limits[$verboseFlagCount],
+        $this->getLogger()->getThreshold() ?? 0, // get logging threshold or fallback to error only
         $redis
     );
     $isInterrupted = $parent->run();
