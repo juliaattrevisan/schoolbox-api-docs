@@ -25,7 +25,7 @@ services:
       - redis-storage
     build:
       context: ../
-      dockerfile: ./docker/php-fpm/pr-image.Dockerfile
+      dockerfile: ./docker/php-fpm/deploy-image.Dockerfile
       additional_contexts:
         - php82-alpine=service:php82-alpine
         - code=../

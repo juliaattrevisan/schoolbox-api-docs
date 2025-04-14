@@ -64,7 +64,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: docker/php-fpm/pr-image.Dockerfile
+          file: docker/php-fpm/deploy-image.Dockerfile
           cache-from: type=gha
           cache-to: type=gha
           build-contexts: |

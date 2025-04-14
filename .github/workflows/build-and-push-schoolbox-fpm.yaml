@@ -70,7 +70,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: docker/php-fpm/deployment-image.Dockerfile
+          file: docker/php-fpm/deploy-image.Dockerfile
           push: true
           outputs: type=docker,dest=${{ runner.temp }}/schoolbox-fpm-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
           build-args: |
@@ -85,7 +85,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: docker/php-fpm/deployment-image.Dockerfile
+          file: docker/php-fpm/deploy-image.Dockerfile
           push: true
           outputs: type=docker,dest=${{ runner.temp }}/schoolbox-fpm-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
           build-args: |
