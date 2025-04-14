@@ -52,9 +52,9 @@ $app = new class extends CliTool\App
     /**
      * `tools/image/worker.php` needs www-data specifically to run, so enforce that here
      *
-     * @return string|null
+     * @return string
      */
-    public function getRequiredProcessUser(): ?string
+    public function getRequiredProcessUser(): string
     {
         return 'www-data';
     }
