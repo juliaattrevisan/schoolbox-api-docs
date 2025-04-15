@@ -8,17 +8,19 @@
 
 import type { ToastActivateEventDetail, ToastLink, ToastTimeoutEventDetail } from "./sbxToastEvent";
 
-const STATE_HIDDEN = "hidden";
-const STATE_PENDING = "pending";
-const STATE_DONE = "done";
-const STATE_FAILED = "failed";
+enum ToastState {
+    HIDDEN = "hidden",
+    PENDING = "pending",
+    DONE = "done",
+    FAILED = "failed",
+}
 
 const DEFAULT_FADE_DURATION = 3000;
 const DEFAULT_DISPLAY_DURATION_SUCCESSFUL = 3000;
 const DEFAULT_DISPLAY_DURATION_UNSUCCESSFUL = 5000;
 
 const text = window.Vue.ref("");
-const state = window.Vue.ref(STATE_HIDDEN);
+const state = window.Vue.ref(ToastState.HIDDEN);
 const link = window.Vue.ref<ToastLink | null>(null);
 const fadeDuration = window.Vue.ref(DEFAULT_FADE_DURATION);
 const hidden = window.Vue.ref(true);
@@ -31,7 +33,7 @@ const activeTimeout = window.Vue.ref<{
  * Dismiss the active toast, and run the callback if there is one
  */
 function dismiss(): void {
-    state.value = STATE_HIDDEN;
+    state.value = ToastState.HIDDEN;
     hidden.value = true;
 
     // If there's a callback to run, run it
@@ -52,7 +54,7 @@ function activate($text: string, $link: ToastLink | null): void {
 
     link.value = $link;
     text.value = $text;
-    state.value = STATE_PENDING;
+    state.value = ToastState.PENDING;
     hidden.value = false;
 }
 
@@ -73,7 +75,7 @@ function timeout(
     timeoutCallback?: () => void,
 ): void {
     text.value = $text;
-    state.value = isSuccess || isSuccess === undefined ? STATE_DONE : STATE_FAILED;
+    state.value = isSuccess || isSuccess === undefined ? ToastState.DONE : ToastState.FAILED;
     let duration;
     if ($duration === undefined) {
         duration = isSuccess ? DEFAULT_DISPLAY_DURATION_SUCCESSFUL : DEFAULT_DISPLAY_DURATION_UNSUCCESSFUL;
@@ -107,11 +109,11 @@ window.Vue.onMounted(() => {
 
 <template>
     <div
-        v-if="state !== STATE_HIDDEN"
-        :class="{ pop: !hidden, toast: true, alert: state === STATE_FAILED, success: state === STATE_DONE }"
+        v-if="state !== ToastState.HIDDEN"
+        :class="{ pop: !hidden, toast: true, alert: state === ToastState.FAILED, success: state === ToastState.DONE }"
         :style="{ opacity: 1 }"
         data-test="toast"
-        :data-test-is-success="state === STATE_DONE"
+        :data-test-is-success="state === ToastState.DONE"
     >
         {{ text }}
         <a v-if="link !== null" :href="link.href">{{ link.text }}</a>
