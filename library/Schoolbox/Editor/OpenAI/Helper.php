@@ -105,6 +105,12 @@ class Helper
 
             $this->logMapper->save($log);
 
+            /* The async method will still continue trying to render other aura stuff,
+             * like the chrome etc. so people left a die(); here to forcibly terminate;
+             * else you end up with a bunch of Warnings about headers already being sent
+             *
+             * You can dodge that using responseAsJson() instead
+             */
             return $response->getBody()->getContents();
         } catch (GuzzleException $e) {
             $this->errorMapper->generateException(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
@@ -207,11 +213,7 @@ class Helper
 
             $this->logMapper->save($log);
 
-            /* The async method will still continue trying to render other aura stuff,
-             * like the chrome etc. so people left a die(); here to forcibly terminate;
-             * else you end up with a bunch of Warnings about headers already being sent
-             *
-             * You can dodge that using responseAsJson() instead
+            /* Intentionally die
              */
             die();
         } catch (GuzzleException $e) {
