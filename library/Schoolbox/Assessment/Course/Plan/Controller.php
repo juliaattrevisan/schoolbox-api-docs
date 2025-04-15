@@ -172,7 +172,7 @@ class Controller extends Base
         /**
          * Grab the list of curriculum components from the Unit Template
          */
-        [$curriculumTemplate, $curriculumKey, $curriculumDefId] = $this->getTemplateCurric($course->getTemplate()?->getUnitTemplate()->getId());
+        [$curriculumTemplate, $curriculumKey, $curriculumDefId] = $this->getTemplateCurric($course->getTemplate()->getUnitTemplate()->getId());
 
         /**
          * Grab the list of textbox components from the Unit Template
@@ -182,7 +182,7 @@ class Controller extends Base
         $textboxTemplate = [];
         $textboxKey = [];
         $textboxDefId = null;
-        $unitTextboxComp = $this->componentInstanceMapper->findByContextAndClass($module, $course->getTemplate()?->getUnitTemplate()->getId(), $class);
+        $unitTextboxComp = $this->componentInstanceMapper->findByContextAndClass($module, $course->getTemplate()->getUnitTemplate()->getId(), $class);
 
         foreach ($unitTextboxComp as $textboxComponent) {
             // grab the component ID, for use later
@@ -214,7 +214,7 @@ class Controller extends Base
         /**
          * Grab the list of Course Builders from the Unit Template
          */
-        [$courseBuilderTemplate, $activityKey, $activityDefId] = $this->getTemplateCourseBuilder($course->getTemplate()?->getUnitTemplate()->getId());
+        [$courseBuilderTemplate, $activityKey, $activityDefId] = $this->getTemplateCourseBuilder($course->getTemplate()->getUnitTemplate()->getId());
 
         /**
          * for each unit, generate the data...
@@ -228,7 +228,7 @@ class Controller extends Base
             if ($this->access->getFolderAccess($this->getUser(), $unit->getFolder()->getId()) >= UserAccess::ACCESS_READ) {
                 $units[] = $this->getUnitData(
                     $unit,
-                    $course->getTemplate()?->getUnitTemplate()->getId(),
+                    $course->getTemplate()->getUnitTemplate()->getId(),
                     $curriculumKey,
                     $activityKey,
                     $textboxDefId,
