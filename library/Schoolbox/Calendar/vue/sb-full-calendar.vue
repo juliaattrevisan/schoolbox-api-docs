@@ -241,6 +241,7 @@ export default {
          * @param callback  A function to call with the list of events.
          */
         events(fetchInfo, callback) {
+            console.warn(fetchInfo.end);
             activate("Retrieving calendar events...");
             const params = {
                 start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
@@ -701,6 +702,16 @@ export default {
                                     startDateValue.format("YYYY-MM-DD"),
                                     endDateValue.format("YYYY-MM-DD"),
                                 ) + 1;
+                            /**
+                             * Ensure the correct visibleRange is specified prior to calling gotoDate.
+                             * https://fullcalendar.io/docs/visibleRange
+                             * This seems to be required currently as FullCalendar seems to subtract
+                             * one day off the end on first press of the button.
+                             */
+                            this.calendarApi.setOption("visibleRange", {
+                                start: startDateValue.format("YYYY-MM-DD"),
+                                end: endDateValue.format("YYYY-MM-DD"),
+                            });
                             this.calendarApi.gotoDate(startDateValue.format("YYYY-MM-DD"));
                         }
                     }
