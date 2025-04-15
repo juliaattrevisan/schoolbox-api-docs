@@ -30,10 +30,30 @@ class Helper
     private const ENDPOINT_HOST_OPENAI_CHAT = 'https://api.openai.com/v1/chat/completions';
     private const ENDPOINT_HOST_OPENAI_REQUEST = 'https://api.openai.com/v1/responses';
 
-    /* TODO Find the azure equivalent of chat and request
-     */
     private const ENDPOINT_TYPE_AZURE = 'Azure';
     private const ENDPOINT_HOST_AZURE_CHAT = 'https://%s.openai.azure.com/openai/deployments/%s/chat/completions?api-version=2023-12-01-preview';
+    private const ENDPOINT_HOST_AZURE_REQUEST = 'https://%s.openai.azure.com/openai/responses?api-version=2025-03-01-preview';
+
+
+    /**
+     * Structured Outputs is only supported in certain models
+     */
+    private const SUPPORTED_STRUCTURED_OUTPUT_MODELS = [
+        self::ENDPOINT_TYPE_OPENAI => [
+            'gpt-3.5-turbo' => false,
+            'gpt-4' => true,
+            'gpt-4o' => true,
+            'gpt-4o-mini' => true,
+            'gpt-4-turbo' => true
+        ],
+        self::ENDPOINT_TYPE_AZURE => [
+            'gpt-3.5-turbo' => false,
+            'gpt-4' => false,
+            'gpt-4o' => true,
+            'gpt-4o-mini' => true,
+            'gpt-4-turbo' => false
+        ],
+    ];
 
 
     /**
@@ -76,6 +96,14 @@ class Helper
             throw new \DomainException('OpenAI API key is unavailable');
         }
 
+        /* Requires a particular minimum set of models to continue.
+         */
+        if (!$this->canUseStructuredOutputs()) {
+            throw new \DomainException('AI endpoint/model does not support Structured Outputs');
+        }
+
+        /* Minimum requirements met: let's send it and see what AI overlords think of our payload
+         */
         try {
             $openAiRequest = new Request('POST', $this->getEndpoint(), array_merge(
                 $this->getAuthorization(),
@@ -117,6 +145,17 @@ class Helper
         }
 
         return null;
+    }
+
+
+    /**
+     * Structured Outputs require a particular model
+     *
+     * @return bool
+     */
+    private function canUseStructuredOutputs(): bool
+    {
+        return self::SUPPORTED_STRUCTURED_OUTPUT_MODELS[$this->openAiEndpoint][$this->openAiModel] ?? false;
     }
 
 
@@ -248,13 +287,17 @@ class Helper
 
                 /* Little Robot Dude
                  */
-                return sprintf(
-                    self::ENDPOINT_HOST_AZURE_CHAT,
-                    $this->openAiAzureResourceName,
-                    $this->openAiAzureDeploymentId,
-                );
+                if (self::CHAT === $type) {
+                    return sprintf(
+                        self::ENDPOINT_HOST_AZURE_CHAT,
+                        $this->openAiAzureResourceName,
+                        $this->openAiAzureDeploymentId,
+                    );
+                }
 
-                /* Azure does not support structured outputs at the moment
+                /* This is for structured outputs (used in lesson plans)
+                 *
+                 * MAYBE Azure does not support structured outputs at the moment
                  * https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/responses?tabs=python-secure
                  *
                     Not currently supported:
@@ -263,11 +306,11 @@ class Helper
                     tool_choice
                     image_url pointing to an internet address
                     The web search tool is also not supported, and is not part of the 2025-03-01-preview API.
-
-                    if (self::CHAT === $type) {
-
-                    }
                  */
+                return sprintf(
+                    self::ENDPOINT_HOST_AZURE_REQUEST,
+                    $this->openAiAzureResourceName,
+                );
         }
         throw new \UnexpectedValueException('Endpoint must be configured');
     }
