@@ -83,24 +83,24 @@ class Controller extends Base
                 'additionalContext' => $this->requestPost->get('additionalContext') ?? ''
             ];
 
-            $inputs = [
-                'context' => 'Year 8 Science',
-                'fields' => [
-                    [
-                        'id' => 'Learning Objectives',
-                        'title' => 'Learning Objectives',
-                        'description' => 'What students should learn from the lesson',
-                        'visibility' => 'student',
-                        'body' => '',
-                        'selected' => true
-                    ]
-                ],
-                'duration' => '17 minutes',
-                'curriculumNodeIds' => [
-                    4156, 4157, 4160
-                ],
-                'additionalContext' => '',
-            ];
+//            $inputs = [
+//                'context' => 'Year 8 Science',
+//                'fields' => [
+//                    [
+//                        'id' => 'Learning Objectives',
+//                        'title' => 'Learning Objectives',
+//                        'description' => 'What students should learn from the lesson',
+//                        'visibility' => 'student',
+//                        'body' => '',
+//                        'selected' => true
+//                    ]
+//                ],
+//                'duration' => '17 minutes',
+//                'curriculumNodeIds' => [
+//                    4156, 4157, 4160
+//                ],
+//                'additionalContext' => '',
+//            ];
 
             $payload = $payloadGenerator->generate(
                 $inputs['context'],
