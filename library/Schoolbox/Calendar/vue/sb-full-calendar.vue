@@ -241,7 +241,6 @@ export default {
          * @param callback  A function to call with the list of events.
          */
         events(fetchInfo, callback) {
-            console.warn(fetchInfo.end);
             activate("Retrieving calendar events...");
             const params = {
                 start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
