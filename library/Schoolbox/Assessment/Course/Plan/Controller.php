@@ -19,6 +19,7 @@ use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use Component_Config_Componentname;
 use Crell\ApiProblem\ApiProblem;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Component\CurriculumOverviewController;
@@ -160,6 +161,10 @@ class Controller extends Base
      */
     public function getPlan(CourseSpecification $course): void
     {
+        if (null === $course->getTemplate()) {
+            throw new SchoolboxException('Course has no framework selected');
+        }
+
         /* A mega struct of all the Units' data
          */
         $units = [];
