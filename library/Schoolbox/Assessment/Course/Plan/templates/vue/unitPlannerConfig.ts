@@ -96,10 +96,7 @@ const columnConfig: Record<ColumnType, ColumnConfig> = {
     [ColumnType.UNIT]: { label: "Unit", fixedLeft: true },
     [ColumnType.OVERVIEW]: { label: null, fixedLeft: false }, // The label is set by the textbox keys
     [ColumnType.CURRICULUM_OVERVIEW]: { label: null, fixedLeft: false }, // The label is set by the curriculum component headings
-    [ColumnType.ACTIVITIES]: {
-        label: null,
-        fixedLeft: false,
-    },
+    [ColumnType.ACTIVITIES]: { label: null, fixedLeft: false }, // The label is set by the Course Builder component headings
     [ColumnType.RUBRIC_CAPABILITIES]: {
         label: `Rubric ${locale.rubricGroup.properPlural()}`,
         fixedLeft: false,

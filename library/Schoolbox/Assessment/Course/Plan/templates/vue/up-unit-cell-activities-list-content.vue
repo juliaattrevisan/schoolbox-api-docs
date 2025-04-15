@@ -52,7 +52,7 @@ const isEmpty = window.Vue.computed(() => {
 defineExpose({ isEmpty });
 
 /**
- * To respond to a new curriculum component being created
+ * To respond to a new Course Builder component being created
  */
 window.Vue.watch(
     () => props.unit.activities.components,
