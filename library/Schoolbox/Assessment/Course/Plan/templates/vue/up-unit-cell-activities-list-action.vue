@@ -16,21 +16,10 @@ interface Props {
 const props = defineProps<Props>();
 
 const unitPlannerActivityListStore = useUnitPlannerActivityListStore();
-const component = window.Vue.ref<CourseBuilderComponent | null>(
-    unitPlannerActivityListStore.getComponent(props.unit.activities.components, props.column),
-);
+const component = window.Vue.computed<CourseBuilderComponent | null>(() => {
+  return unitPlannerActivityListStore.getComponent(props.unit.activities.components, props.column);
+});
 const isCreating = window.Vue.ref(false);
-
-/**
- * To respond to a new course builder component being created
- */
-window.Vue.watch(
-    () => props.unit.activities.components,
-    () => {
-        component.value = unitPlannerActivityListStore.getComponent(props.unit.activities.components, props.column);
-    },
-    { deep: true },
-);
 
 /**
  * To display the appropriate text for the create button
