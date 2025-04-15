@@ -51,7 +51,7 @@ jobs:
         if: env.AWS_ECR_ROLE != ''
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_ECR_ROLE }}
+          role-to-assume: ${{ env.AWS_ECR_ROLE }}
           aws-region: ${{ matrix.region }}
 
       - name: Login to Amazon ECR Private
