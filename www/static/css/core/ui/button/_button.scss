@@ -323,4 +323,6 @@ button.submit {
     display: inline-block;
     vertical-align: middle;
     margin: 0 0.4rem;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
 }
