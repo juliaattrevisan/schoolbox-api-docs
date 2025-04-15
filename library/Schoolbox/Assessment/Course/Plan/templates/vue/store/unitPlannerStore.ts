@@ -3,7 +3,7 @@ import { Draggable } from "gsap/Draggable";
 import { ScrollToPlugin } from "gsap/all";
 import { defineStore } from "pinia";
 import type { Column } from "../unitPlannerConfig";
-import type {CourseBuilderComponent, CurriculumOverviewComponent, Unit, UnitTemplate} from "../unitPlannerTypes";
+import type { CourseBuilderComponent, CurriculumOverviewComponent, Unit, UnitTemplate } from "../unitPlannerTypes";
 
 gsap.registerPlugin(Draggable);
 gsap.registerPlugin(ScrollToPlugin);

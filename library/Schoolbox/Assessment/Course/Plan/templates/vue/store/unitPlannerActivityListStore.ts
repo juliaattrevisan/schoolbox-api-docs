@@ -4,14 +4,13 @@
  */
 
 import { defineStore } from "pinia";
-import type {CourseBuilderComponent, Unit} from "@schoolboxAssessment/Course/Plan/templates/vue/unitPlannerTypes";
-import type {Column} from "@schoolboxAssessment/Course/Plan/templates/vue/unitPlannerConfig";
-import {useUnitPlannerStore} from "@schoolboxAssessment/Course/Plan/templates/vue/store/unitPlannerStore";
-import {activate, timeout} from "@schoolboxVue/components/toast/sbxToastEvent";
-import {extractErrorMessage} from "@js/util/sbx/fetchUtils";
+import type { CourseBuilderComponent, Unit } from "@schoolboxAssessment/Course/Plan/templates/vue/unitPlannerTypes";
+import type { Column } from "@schoolboxAssessment/Course/Plan/templates/vue/unitPlannerConfig";
+import { useUnitPlannerStore } from "@schoolboxAssessment/Course/Plan/templates/vue/store/unitPlannerStore";
+import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
+import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 
 export const useUnitPlannerActivityListStore = defineStore(`unitPlannerActivityList`, () => {
-
     const unitPlannerStore = useUnitPlannerStore();
 
     /**

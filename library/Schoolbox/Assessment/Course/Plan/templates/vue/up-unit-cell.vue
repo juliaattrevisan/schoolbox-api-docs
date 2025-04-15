@@ -277,10 +277,8 @@ const isFirstUnit = window.Vue.computed(() => {
                                 }}
                             </li>
                             <li v-if="extraActivitiesComponents > 0" class="meta">
-                              Includes {{ extraActivitiesComponents }} additional Course Builder component
-                                {{
-                                    extraActivitiesComponents === 1 ? "" : "s"
-                                }}
+                                Includes {{ extraActivitiesComponents }} additional Course Builder component
+                                {{ extraActivitiesComponents === 1 ? "" : "s" }}
                             </li>
                         </ul>
                     </div>

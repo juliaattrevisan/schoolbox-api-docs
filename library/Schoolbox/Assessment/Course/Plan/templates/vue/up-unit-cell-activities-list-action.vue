@@ -47,7 +47,7 @@ const createText = window.Vue.computed(() => {
  * this may change in the future
  */
 const extraActivitiesComponents = window.Vue.computed(() => {
-  return props.unit.activities.components.filter((comp) => !comp.inTemplate).length;
+    return props.unit.activities.components.filter((comp) => !comp.inTemplate).length;
 });
 
 /**
