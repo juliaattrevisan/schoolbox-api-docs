@@ -97,11 +97,11 @@ class Config
      * Configure the Sentry hub with details from the instance.
      *
      * @param Instance $instance
-     * @param User $user
      * @return void
      */
     public static function useInstance(Instance $instance): void
     {
+        (new \Alaress_Log_File('/tmp/myfile.log'))->log('sentry', 'useInstanceWithSessionIdentifierAAAA');
         Sentry\configureScope(static function (Sentry\State\Scope $scope) use ($instance): void {
             $scope->setTags([
                 'instance_id'      => $instance->getId(),
@@ -123,12 +123,13 @@ class Config
      * Configure the Sentry hub with details from the instance.
      *
      * @param Instance $instance
-     * @param User $user
+     * @param string|null $sessionIdentifier
      * @return void
      */
-    public static function useInstanceWithUser(Instance $instance, \Schoolbox\User $user): void
+    public static function useInstanceWithSessionIdentifier(Instance $instance, ?string $sessionIdentifier): void
     {
-        Sentry\configureScope(static function (Sentry\State\Scope $scope) use ($instance, $user): void {
+        (new \Alaress_Log_File('/tmp/myfile.log'))->log('sentry', 'useInstanceWithSessionIdentifierBBBBBBBBB');
+        Sentry\configureScope(static function (Sentry\State\Scope $scope) use ($instance, $sessionIdentifier): void {
             $scope->setTags([
                 'instance_id'      => $instance->getId(),
                 'php_version'      => PHP_VERSION,
@@ -137,9 +138,13 @@ class Config
                 'site_school_code' => $instance->getSchoolCode(),
             ]);
 
-            $scope->setUser([
-                'id' => $user->getId(),
-            ]);
+            /* Logout leads to this possibility
+             */
+            if (null !== $sessionIdentifier) {
+                $scope->setUser([
+                    'id' => $sessionIdentifier,
+                ]);
+            }
         });
 
         Sentry\SentrySdk::getCurrentHub()->getClient()?->getOptions()
