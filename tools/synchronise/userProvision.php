@@ -10,21 +10,10 @@
  */
 
 use Alaress\Lumberjack\CompositeLoggerInterface;
-use Psr\Container\ContainerInterface;
-use Psr\Log\LoggerInterface;
-use React\EventLoop\LoopInterface;
-use Schoolbox\Realtime\Routing\Cache\WritableCache;
 use Schoolbox\Sync\Provisioner\Provisioner;
 use Schoolbox\Application\CliTool;
 
 require_once __DIR__ . '/../../conf/core/require.php';
-//$kernel = new CliTool\Kernel(
-//    'UPS',
-//    [
-//        CliTool\Kernel::OPTION_APP_SHORT_OPTS => 'r:',
-//        CliTool\Kernel::OPTION_APP_LONG_OPTS  => ['perform-update', 'instance::'],
-//    ]
-//);
 
 $app = new class extends CliTool\App {
 
@@ -32,7 +21,13 @@ $app = new class extends CliTool\App {
     private const OPT_LONG_INSTANCE = 'instance';
     private const OPT_LONG_HELP = 'help';
     private const OPT_SHORT_ROLE = 'r';
-    private const OPT_SHORT_INSTANCE = 'i';
+
+    public function getLongOpts(): array
+    {
+        return [
+            self::OPT_LONG_HELP,
+        ];
+    }
 
     public function getRequiredProcessUser(): string
     {
@@ -45,6 +40,18 @@ $app = new class extends CliTool\App {
         $perform = $this->getOpt(self::OPT_LONG_PERFORM_UPDATE);
         $instanceId = $this->getOpt(self::OPT_LONG_INSTANCE) ?? INSTANCE_ID;
         $roleType = $this->getOpt(self::OPT_SHORT_ROLE) ? in_array($this->getOpt(self::OPT_SHORT_ROLE), ['staff', 'student', 'parent']) : null;
+
+        if ($this->getOpt(self::OPT_LONG_HELP)) {
+            echo  <<<HELP
+Usage: userProvision.php [--perform-update] [--instance=instanceId] [-r roleType]
+Options:
+  --perform-update   Perform the update
+  --instance         Instance ID to use (default: INSTANCE_ID)
+  -r, --role         Role type (staff, student, parent)
+
+HELP;
+            exit(0);
+        }
 
         // AFAICT this is unused
         // $di->values['ups.redisKey'] = $instanceId . '.provision.user.' . getmypid();
