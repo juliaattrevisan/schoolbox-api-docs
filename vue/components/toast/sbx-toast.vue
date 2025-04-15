@@ -65,7 +65,9 @@ function timeout(toast: Toast, _detail?: ToastTimeoutDetail): Toast {
     toast.fadeDuration = detail.fadeDuration ?? DEFAULT_FADE_DURATION;
 
     let duration: number;
-    if (detail.duration === undefined) {
+    if (toast.hidden) {
+        duration = 0; // If this toast is already hidden, immediately run the callback
+    } else if (detail.duration === undefined) {
         duration = detail.isSuccess ? DEFAULT_DISPLAY_DURATION_SUCCESSFUL : DEFAULT_DISPLAY_DURATION_UNSUCCESSFUL;
     } else {
         duration = detail.duration;
