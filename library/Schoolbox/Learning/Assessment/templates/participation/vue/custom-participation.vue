@@ -102,13 +102,12 @@ async function excludeParticipant(participant: Participant): Promise<void> {
                 "Content-Type": "application/json",
             },
         });
-
         if (!response.ok) {
             const errorMessage = await extractErrorMessage(response);
             throw new Error(errorMessage);
         }
         participant.excludedAt = new Date().toISOString(); // Assigning a timestamp as a string
-        timeout({ text: "Student Excluded Successfully" });
+        timeout({ text: "Student excluded successfully" });
     } catch (error) {
         if (error instanceof Error && hasErrorMessage(error)) {
             loadError.value = error.message;
@@ -123,8 +122,7 @@ async function excludeParticipant(participant: Participant): Promise<void> {
  * @returns A promise that resolves when the operation is complete.
  */
 async function includeParticipant(participant: Participant): Promise<void> {
-    activate("Removing Customisation...");
-
+    activate("Removing customisation...");
     try {
         const response = await fetch(participant._links.include, {
             method: "POST",
@@ -133,14 +131,12 @@ async function includeParticipant(participant: Participant): Promise<void> {
                 "Content-Type": "application/json",
             },
         });
-
         if (!response.ok) {
             const errorMessage = await extractErrorMessage(response);
             throw new Error(errorMessage);
         }
-
         participant.excludedAt = null;
-        timeout({ text: "Customisation Removed Successfully" });
+        timeout({ text: "Customisation removed successfully" });
     } catch (error) {
         if (error instanceof Error && hasErrorMessage(error)) {
             loadError.value = error.message;
@@ -157,9 +153,7 @@ async function includeParticipant(participant: Participant): Promise<void> {
 async function excludeSelected(): Promise<void> {
     try {
         const participantsToExclude = allParticipants.value.filter((p) => selectedList.value.includes(p.user.id));
-
         await Promise.all(participantsToExclude.map((participant) => excludeParticipant(participant)));
-
         selectedList.value = [];
     } catch (error) {
         if (error instanceof Error && hasErrorMessage(error)) {
