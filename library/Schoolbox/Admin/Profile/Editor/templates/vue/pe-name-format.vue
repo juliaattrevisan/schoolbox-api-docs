@@ -2,7 +2,6 @@
 /**
  * To customise the name format for the current role type's user profile page
  */
-import * as toast from "@schoolboxVue/components/toast/sbxToastEvent";
 import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
 import { useProfileEditorStore } from "./store/profileEditorStore";
 
@@ -29,7 +28,7 @@ async function onUpdateClicked(): Promise<void> {
     if (isSaving.value) return;
     saveError.value = null;
     isSaving.value = true;
-    toast.activate("Updating name format...");
+    const toast = window.sbProps.toastActivate("Updating name format...");
     if (isNameFormatUnsaved()) {
         const saveResult = await peStore.saveNameFormat();
         if (saveResult !== true) {

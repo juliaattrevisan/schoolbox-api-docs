@@ -3,7 +3,6 @@
  * To be able to delete a node on confirmation
  */
 
-import * as toast from "@schoolboxVue/components/toast/sbxToastEvent";
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import { useSelectedNodesStore } from "./store/mcSelectedNodesStore";
 import { useDeleteNodesStore } from "./store/mcDeleteNodesStore";
@@ -40,7 +39,7 @@ async function onDeleteSelected(): Promise<void> {
  */
 deleteNodesStore.$onAction(({ name, after, onError }) => {
     if (name === "deleteNodes") {
-        toast.activate("Deleting...");
+        const toast = window.sbProps.toastActivate("Deleting...");
 
         after((result) => {
             toast.timeout({ text: result, isSuccess: true });

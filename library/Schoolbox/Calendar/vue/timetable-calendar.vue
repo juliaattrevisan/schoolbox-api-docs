@@ -15,7 +15,6 @@ import ViewEventModal from "@schoolboxVue/components/fullcalendar/view-event-mod
 import FlatPickr from "@schoolboxVue/components/fullcalendar/flat-pickr.vue";
 import fullCalendarHelper from "@schoolboxVue/components/fullcalendar/mixinFullCalendarHelper";
 import CustomisedCalendarEvent from "@schoolboxVue/components/fullcalendar/customised-calendar-event.vue";
-import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import ExportModal from "./export-modal.vue";
 import FilterModal from "./filter-modal.vue";
 
@@ -343,7 +342,7 @@ export default {
          * @param callback  A function to call with the list of events.
          */
         events(fetchInfo, callback) {
-            activate("Retrieving timetable events...");
+            const toast = window.sbProps.toastActivate("Retrieving timetable events...");
             const params = {
                 start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
                 end: Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
@@ -372,10 +371,10 @@ export default {
                     this.calendarApi.setOption("slotMinTime", slots.slotMinTime);
                     this.calendarApi.setOption("slotMaxTime", slots.slotMaxTime);
                     this.calendarApi.setOption("allDaySlot", slots.allDaySlot);
-                    timeout({ text: "Timetable retrieved successfully" });
+                    toast.timeout({ text: "Timetable retrieved successfully" });
                 })
                 .catch((error) => {
-                    timeout({ text: "Timetable could not be retrieved", isSuccess: false });
+                    toast.timeout({ text: "Timetable could not be retrieved", isSuccess: false });
                     console.error(error);
                 });
         },
