@@ -23,6 +23,24 @@ const state = window.Vue.ref(STATE_HIDDEN);
 const link = window.Vue.ref<ToastLink | null>(null);
 const fadeDuration = window.Vue.ref(DEFAULT_FADE_DURATION);
 const hidden = window.Vue.ref(true);
+const activeTimeout = window.Vue.ref<{
+    timeoutId: number;
+    callback?: () => void;
+} | null>(null);
+
+/**
+ * Dismiss the active toast, and run the callback if there is one
+ */
+function dismiss(): void {
+    state.value = STATE_HIDDEN;
+    hidden.value = true;
+
+    // If there's a callback to run, run it
+    if (activeTimeout.value && activeTimeout.value.callback instanceof Function) {
+        activeTimeout.value.callback();
+    }
+    activeTimeout.value = null;
+}
 
 /**
  * Activate this toast.
@@ -30,6 +48,9 @@ const hidden = window.Vue.ref(true);
  * @param $link - The link object, what it should say, where it should go
  */
 function activate($text: string, $link: ToastLink | null): void {
+    // dismiss any existing toast first (as there can only be one at a time)
+    dismiss();
+
     link.value = $link;
     text.value = $text;
     state.value = STATE_PENDING;
@@ -63,13 +84,11 @@ function timeout(
     if ($fadeDuration) {
         fadeDuration.value = $fadeDuration;
     }
-    setTimeout(() => {
-        state.value = STATE_HIDDEN;
-        hidden.value = true;
-        if (timeoutCallback instanceof Function) {
-            timeoutCallback();
-        }
-    }, duration);
+
+    activeTimeout.value = {
+        timeoutId: window.setTimeout(dismiss, duration),
+        callback: timeoutCallback,
+    };
 }
 
 /**
