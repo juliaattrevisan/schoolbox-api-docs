@@ -16,6 +16,7 @@ use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Database\Statement\Query\IQuery;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Web\Controller\Base;
+use Aura\Router\Exception\RouteNotFound;
 use Component_Config_Componentname;
 use Crell\ApiProblem\ApiProblem;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
@@ -31,6 +32,8 @@ use Schoolbox\Assessment\Rubric\DataModel\Indicator\Model as RubricIndicatorMode
 use Schoolbox\Curriculum\Node;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model;
+use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Model as FolderModel;
@@ -756,16 +759,18 @@ class Controller extends Base
 
     /**
      * helper common function to fetch the content of the unit and its components in a standard format
-     * @param Model    $unit
-     * @param int      $templateId      id of the homepage template used to standardize the unit
-     * @param array    $curriculumKey   what curriculum components titles exist in the component, if any
-     * @param int|null $textboxDefId    The definition ID of the textbox component, if any
+     * @param Model $unit
+     * @param int $templateId id of the homepage template used to standardize the unit
+     * @param array $curriculumKey what curriculum components titles exist in the component, if any
+     * @param array $activityKey
+     * @param int|null $textboxDefId The definition ID of the textbox component, if any
      * @param int|null $curriculumDefId The definition ID of the curriculum component, if any
-     * @param int|null $curriculumDefId The definition ID of the course builder, if any
+     * @param int|null $activityDefId The definition ID of the course builder, if any
      * @return array
-     * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \Schoolbox\Mapper\Exception\Deleted
-     * @throws \Schoolbox\Mapper\Exception\NotFound
+     * @throws RouteNotFound
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws Deleted
+     * @throws NotFound
      */
     private function getUnitData(
         Model $unit,
