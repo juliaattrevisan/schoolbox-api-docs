@@ -89,7 +89,6 @@ export const useActivitiesListStore = (activitiesListStoreId: string) =>
             activities.value = activities.value.filter((activity) => activity.id !== activityId);
         }
 
-
         return {
             init,
             activities,

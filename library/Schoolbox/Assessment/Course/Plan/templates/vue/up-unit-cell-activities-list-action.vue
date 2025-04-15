@@ -40,8 +40,15 @@ const createText = window.Vue.computed(() => {
     return isCreating.value ? "Creating..." : "Create Component";
 });
 
-const anyComponent = props.unit.activities.components.length > 0;
-const extraActivitiesComponents = props.unit.activities.components.filter((comp) => !comp.inTemplate).length; // Number of extra components in the template
+/**
+ * Number of extra components in the unit
+ *
+ * you CAN NOT have multiple course builder components in the same unit, so we need to check if there are any other components in the unit
+ * this may change in the future
+ */
+const extraActivitiesComponents = window.Vue.computed(() => {
+  return props.unit.activities.components.filter((comp) => !comp.inTemplate).length;
+});
 
 /**
  * To create a new course builder component, adding it to the relevant units homepage
@@ -59,7 +66,7 @@ async function onCreateSelected(): Promise<void> {
 
 <template>
     <template v-if="props.unit.activities._routes.create">
-        <div v-if="component === null && !anyComponent" class="component-action">
+        <div v-if="component === null && extraActivitiesComponents === 0" class="component-action">
             <section>
                 <button @click.prevent="onCreateSelected">{{ createText }}</button>
             </section>

@@ -47,5 +47,4 @@ export type Activity = {
 export type ActivitiesListRoutes = {
     create: string | null;
     reorder: string | null;
-    createComponent: string | null;
 };
