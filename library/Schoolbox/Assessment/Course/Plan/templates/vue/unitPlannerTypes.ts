@@ -50,7 +50,9 @@ export type Unit = {
     homepage: string;
     folderId: number;
     activities: {
-        _routes: ActivitiesListRoutes;
+        _routes: ActivitiesListRoutes & {
+            createComponent: string | null;
+        };
         items: Activity[];
         components: CourseBuilderComponent[];
     };
