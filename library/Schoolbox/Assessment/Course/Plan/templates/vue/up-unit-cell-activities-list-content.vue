@@ -26,7 +26,7 @@ const unitPlannerActivityListStore = useUnitPlannerActivityListStore();
 const activitiesListDragStore = useActivitiesListDragStore(activitiesListStoreId);
 
 const component = window.Vue.computed<CourseBuilderComponent | null>(() => {
-  return unitPlannerActivityListStore.getComponent(props.unit.activities.components, props.column);
+    return unitPlannerActivityListStore.getComponent(props.unit.activities.components, props.column);
 });
 
 window.Vue.onMounted(() => {
@@ -52,7 +52,6 @@ const isEmpty = window.Vue.computed(() => {
 
 // Allow the parent component to identify if the cell is empty
 defineExpose({ isEmpty });
-
 </script>
 
 <template>

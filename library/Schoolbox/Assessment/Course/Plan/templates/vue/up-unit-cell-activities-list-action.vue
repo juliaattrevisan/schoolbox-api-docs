@@ -17,7 +17,7 @@ const props = defineProps<Props>();
 
 const unitPlannerActivityListStore = useUnitPlannerActivityListStore();
 const component = window.Vue.computed<CourseBuilderComponent | null>(() => {
-  return unitPlannerActivityListStore.getComponent(props.unit.activities.components, props.column);
+    return unitPlannerActivityListStore.getComponent(props.unit.activities.components, props.column);
 });
 const isCreating = window.Vue.ref(false);
 
