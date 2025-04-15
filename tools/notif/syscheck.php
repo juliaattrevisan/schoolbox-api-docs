@@ -116,5 +116,5 @@ $app = new class extends CliTool\App {
 
 $kernel = new CliTool\Kernel($app, [
     CliTool\Kernel::OPTION_ERRORS => E_ALL
-]);
+], true);
 $kernel->runApp();
