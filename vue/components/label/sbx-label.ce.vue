@@ -69,4 +69,8 @@ Long term they will reference the design colour tokens
     background-color: #dddddd;
     color: #474747;
 }
+sbx-label {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
 </style>
