@@ -409,7 +409,15 @@ class Controller extends Base
                     $this->access,
                     $markSchemeFactory
                 );
-                $graph = $gradeHelper->buildGraph($filteredMarkbook, $viewee, $this->getUser(), $this->getConfigLoader()->get('grade_gradient_enable'));
+
+                /* All worktypes should show up here, for now. There are no specific admin controls to decide
+                 * which worktypes appear here: this means that non-statistical worktypes (e.g. for attendance
+                 * and other basic reporting) will still get plotted on the graph. You'd need something like the
+                 * checkboxes in Summative Reports to address this, or reuse the existing ones in admin somehow.
+                 */
+                $workTypeIds = $this->workTypeMapper->findAll()->indexBy('id')->keys();
+
+                $graph = $gradeHelper->buildGraph($filteredMarkbook, $viewee, $this->getUser(), $this->getConfigLoader()->get('grade_gradient_enable'), $workTypeIds);
             }
 
             // return [
