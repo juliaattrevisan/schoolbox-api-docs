@@ -115,11 +115,6 @@ function createToast(text: string, link?: ToastLink): Toast {
  */
 window.Vue.onMounted(() => {
     window.sbProps.toastActivate = createToast;
-    window.sbProps.toastTimeout = (detail?: ToastTimeoutDetail): void => {
-        // this is more for legacy support, as ideally toast.timeout() should be used directly
-        // in this scenario, dismiss all active toasts
-        toasts.value.filter((t) => !t.hidden).forEach((t) => t.timeout(detail));
-    };
 });
 </script>
 

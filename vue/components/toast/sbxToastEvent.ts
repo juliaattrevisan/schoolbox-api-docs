@@ -40,26 +40,3 @@ export type ToastTimeoutDetail = {
     fadeDuration?: number;
     timeoutCallback?: () => void;
 };
-
-// The following two functions (activate and timeout) are wrappers for sbProps
-// so we can continue to import them from sbxToastEvent as per usual...
-
-/**
- * Activate the toast with the given text
- * @param text - The text to display in the toast
- * @param link - An optional link for the toast to be clickable
- * @returns The toast instance
- */
-export function activate(text: string, link?: ToastLink): Toast {
-    return window.sbProps.toastActivate(text, link);
-}
-
-/**
- * Timeout the currently active toast, if one exists
- * Note, it is recommended to use the `timeout` method on the toast instance instead
- * to avoid accidentally timing out another toast created by another script asynchronously
- * @param eventDetail - The details of the timeout
- */
-export function timeout(eventDetail: ToastTimeoutDetail): void {
-    window.sbProps.toastTimeout(eventDetail);
-}
