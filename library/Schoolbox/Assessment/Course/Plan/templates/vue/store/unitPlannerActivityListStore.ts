@@ -7,7 +7,6 @@ import { defineStore } from "pinia";
 import type { CourseBuilderComponent, Unit } from "@schoolboxAssessment/Course/Plan/templates/vue/unitPlannerTypes";
 import type { Column } from "@schoolboxAssessment/Course/Plan/templates/vue/unitPlannerConfig";
 import { useUnitPlannerStore } from "@schoolboxAssessment/Course/Plan/templates/vue/store/unitPlannerStore";
-import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 
 export const useUnitPlannerActivityListStore = defineStore(`unitPlannerActivityList`, () => {
@@ -44,7 +43,7 @@ export const useUnitPlannerActivityListStore = defineStore(`unitPlannerActivityL
             throw new Error("No Course Builder components exist on the template,");
         }
 
-        activate("Creating course builder...");
+        const toast = window.sbProps.toastActivate("Creating course builder...");
         try {
             // First create a new component
             const createFormData = new FormData();
@@ -91,9 +90,9 @@ export const useUnitPlannerActivityListStore = defineStore(`unitPlannerActivityL
             };
             unitPlannerStore.addCourseBuilderComponent(unit.id, newComponent);
 
-            timeout({ text: "Course builder created successfully" });
+            toast.timeout({ text: "Course builder created successfully" });
         } catch (error) {
-            timeout({ text: error as string, isSuccess: false });
+            toast.timeout({ text: error as string, isSuccess: false });
         }
     }
     return {

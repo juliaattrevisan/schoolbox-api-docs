@@ -4,7 +4,6 @@
  */
 import { isAbortError, hasErrorMessage } from "@js/util/errorUtils";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
-import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import PastoralCountBadge from "@schoolboxLibrary/Pastoral/Count/vue/pastoral-count-badge.vue";
 import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
 import type { StudentPastoralCountBadge } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
@@ -93,7 +92,7 @@ async function getStudentPastoralCounts(): Promise<void> {
  * @returns A promise that resolves when the operation is complete.
  */
 async function excludeParticipant(participant: Participant): Promise<void> {
-    activate("Excluding...");
+    window.sbProps.toastActivate("Excluding...");
     try {
         const response = await fetch(participant._links.exclude, {
             method: "POST",
@@ -107,7 +106,7 @@ async function excludeParticipant(participant: Participant): Promise<void> {
             throw new Error(errorMessage);
         }
         participant.excludedAt = new Date().toISOString(); // Assigning a timestamp as a string
-        timeout({ text: "Student excluded successfully" });
+        toast.timeout({ text: "Student excluded successfully" });
     } catch (error) {
         if (error instanceof Error && hasErrorMessage(error)) {
             loadError.value = error.message;
@@ -122,7 +121,7 @@ async function excludeParticipant(participant: Participant): Promise<void> {
  * @returns A promise that resolves when the operation is complete.
  */
 async function includeParticipant(participant: Participant): Promise<void> {
-    activate("Removing customisation...");
+    window.sbProps.toastActivate("Removing customisation...");
     try {
         const response = await fetch(participant._links.include, {
             method: "POST",
@@ -136,7 +135,7 @@ async function includeParticipant(participant: Participant): Promise<void> {
             throw new Error(errorMessage);
         }
         participant.excludedAt = null;
-        timeout({ text: "Customisation removed successfully" });
+        toast.timeout({ text: "Customisation removed successfully" });
     } catch (error) {
         if (error instanceof Error && hasErrorMessage(error)) {
             loadError.value = error.message;
