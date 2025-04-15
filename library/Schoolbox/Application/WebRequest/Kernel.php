@@ -69,6 +69,19 @@ class Kernel extends WebKernelAbstract
 
 
     /**
+     * Called after sessions are initialised so we can inject user identifiers into sentry reports.
+     *
+     * @return void
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    protected function configureSentry(): void
+    {
+        // Configure Sentry with the current instance, now it's known.
+        \Alaress\Sentry\Config::useInstanceWithUser($this->di->get('instance'), $this->di->get('user'));
+    }
+
+
+    /**
      * @param bool $bool
      * @throws RuntimeException
      */
