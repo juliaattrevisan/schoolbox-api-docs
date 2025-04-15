@@ -33,7 +33,7 @@ class Helper
     /* TODO Find the azure equivalent of chat and request
      */
     private const ENDPOINT_TYPE_AZURE = 'Azure';
-    private const ENDPOINT_HOST_AZURE = 'https://%s.openai.azure.com/openai/deployments/%s/chat/completions?api-version=2023-12-01-preview';
+    private const ENDPOINT_HOST_AZURE_CHAT = 'https://%s.openai.azure.com/openai/deployments/%s/chat/completions?api-version=2023-12-01-preview';
 
 
     /**
@@ -232,21 +232,42 @@ class Helper
     {
         switch ($this->openAiEndpoint) {
             case self::ENDPOINT_TYPE_OPENAI:
+                /* Little Robot Dude
+                 */
                 if (self::CHAT === $type) {
                     return self::ENDPOINT_HOST_OPENAI_CHAT;
                 }
 
+                /* This is for structured outputs (used in lesson plans)
+                 */
                 return self::ENDPOINT_HOST_OPENAI_REQUEST;
             case self::ENDPOINT_TYPE_AZURE:
                 if (empty($this->openAiAzureResourceName) || empty($this->openAiAzureDeploymentId)) {
                     throw new \UnexpectedValueException('Azure resource name and deployment ID are required');
                 }
 
+                /* Little Robot Dude
+                 */
                 return sprintf(
-                    self::ENDPOINT_HOST_AZURE,
+                    self::ENDPOINT_HOST_AZURE_CHAT,
                     $this->openAiAzureResourceName,
                     $this->openAiAzureDeploymentId,
                 );
+
+                /* Azure does not support structured outputs at the moment
+                 * https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/responses?tabs=python-secure
+                 *
+                    Not currently supported:
+
+                    Structured outputs
+                    tool_choice
+                    image_url pointing to an internet address
+                    The web search tool is also not supported, and is not part of the 2025-03-01-preview API.
+
+                    if (self::CHAT === $type) {
+
+                    }
+                 */
         }
         throw new \UnexpectedValueException('Endpoint must be configured');
     }
