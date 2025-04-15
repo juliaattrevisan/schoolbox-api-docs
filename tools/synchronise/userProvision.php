@@ -15,16 +15,69 @@ use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Realtime\Routing\Cache\WritableCache;
 use Schoolbox\Sync\Provisioner\Provisioner;
-use Schoolbox\Application\Daemon;
+use Schoolbox\Application\CliTool;
 
 require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new Daemon\Kernel(
-    'UPS',
-    [
-        Daemon\Kernel::OPTION_APP_SHORT_OPTS => 'r:',
-        Daemon\Kernel::OPTION_APP_LONG_OPTS  => ['perform-update', 'instance::'],
-    ]
-);
+//$kernel = new CliTool\Kernel(
+//    'UPS',
+//    [
+//        CliTool\Kernel::OPTION_APP_SHORT_OPTS => 'r:',
+//        CliTool\Kernel::OPTION_APP_LONG_OPTS  => ['perform-update', 'instance::'],
+//    ]
+//);
+
+$app = new class extends CliTool\App {
+
+    private const OPT_LONG_PERFORM_UPDATE = 'perform-update';
+    private const OPT_LONG_INSTANCE = 'instance';
+    private const OPT_LONG_HELP = 'help';
+    private const OPT_SHORT_ROLE = 'r';
+    private const OPT_SHORT_INSTANCE = 'i';
+
+    public function getRequiredProcessUser(): string
+    {
+        // Ensure tool being run as www-data user
+        return 'www-data';
+    }
+
+    public function run(): void
+    {
+        $perform = $this->getOpt(self::OPT_LONG_PERFORM_UPDATE);
+        $instanceId = $this->getOpt(self::OPT_LONG_INSTANCE) ?? INSTANCE_ID;
+        $roleType = $this->getOpt(self::OPT_SHORT_ROLE) ? in_array($this->getOpt(self::OPT_SHORT_ROLE), ['staff', 'student', 'parent']) : null;
+
+        // AFAICT this is unused
+        // $di->values['ups.redisKey'] = $instanceId . '.provision.user.' . getmypid();
+
+        /** @var CompositeLoggerInterface $logger */
+        $logger = $this->getDi()->get('ups.logger');
+
+        // append the CLI logger to the main logger
+        $logger->pushComposite($this->getLogger());
+
+        /** @var Provisioner $ups */
+        $ups = $this->getDi()->get('ups.provisioner');
+
+        // Note that trying to overwrite the logger (and thus destroy the old one)
+        // will cause an exit as soon as stdout is written
+        // (because stdout is closed when the old logger is destroyed)
+        $ups->run($perform, $roleType);
+
+
+        if ($perform) {
+            // we need to manually refresh the routing cache now
+            /** @var \Schoolbox\Realtime\Routing\Cache\Redis\WriteCache $cache */
+            $cache = $this->getDi()->get('subscriptionCache');
+            $cache->setLog($this->getLogger());
+            $cache->cacheAllUsers($instanceId);
+        }
+    }
+};
+
+$kernel = new CliTool\Kernel($app, [
+    CliTool\Kernel::OPTION_ERRORS => E_ALL
+]);
+
 
 // Signal handling unique to the provisioner
 // (ticks required for pcntl_signal functions to work)
@@ -40,49 +93,4 @@ pcntl_signal(SIGTERM, $cleanup);
 pcntl_signal(SIGQUIT, $cleanup);
 $kernel->registerExceptionCallback($cleanup);
 
-$kernel->run(
-    function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
-
-        // Ensure tool being run as www-data user
-        $requiredUser = 'www-data';
-        $actualUser   = posix_getpwuid(posix_geteuid())['name'];
-        if ($actualUser !== $requiredUser) {
-            $log->error("Invalid process user. Required '$requiredUser', Actual: '$actualUser'");
-            $i = INSTANCE_ID;
-            $path = realpath(__FILE__);
-            $log->error("Maybe try something like:\n\tsudo -u $requiredUser INSTANCE_ID=$i $path");
-            exit(2);
-        }
-
-        $perform    = isset($opts['perform-update']);
-        $roleType   = (isset($opts['r']) && in_array($opts['r'], [ 'staff', 'student', 'parent' ])) ? $opts['r'] : null;
-        $instanceId = $opts["instance"] ?? INSTANCE_ID;
-
-
-        // AFAICT this is unused
-        // $di->values['ups.redisKey'] = $instanceId . '.provision.user.' . getmypid();
-
-        /** @var CompositeLoggerInterface $logger */
-        $logger = $di->get('ups.logger');
-
-        // append the CLI logger to the main logger
-        $logger->pushComposite($log);
-
-        /** @var Provisioner $ups */
-        $ups = $di->get('ups.provisioner');
-
-        // Note that trying to overwrite the logger (and thus destroy the old one)
-        // will cause an exit as soon as stdout is written
-        // (because stdout is closed when the old logger is destroyed)
-        $ups->run($perform, $roleType);
-
-
-        if ($perform) {
-            // we need to manually refresh the routing cache now
-            /** @var \Schoolbox\Realtime\Routing\Cache\Redis\WriteCache $cache */
-            $cache = $di->get('subscriptionCache');
-            $cache->setLog($log);
-            $cache->cacheAllUsers($instanceId);
-        }
-    }
-);
+$kernel->runApp();
