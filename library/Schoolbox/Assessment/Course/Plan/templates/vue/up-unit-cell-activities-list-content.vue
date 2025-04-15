@@ -8,6 +8,7 @@ import { useActivitiesListDragStore } from "./activities-list/store/activitiesLi
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import type { CourseBuilderComponent, Unit } from "./unitPlannerTypes";
 import type { Column } from "./unitPlannerConfig";
+import { useUnitPlannerActivityListStore } from "./store/unitPlannerActivityListStore";
 
 interface Props {
     unit: Unit; // the unit linked to the curriculum cell
@@ -21,10 +22,11 @@ const store = useUnitPlannerStore();
 const activitiesListStoreId = `${props.unit.id}-${props.column.id}`;
 
 const activitiesListStore = useActivitiesListStore(activitiesListStoreId);
+const unitPlannerActivityListStore = useUnitPlannerActivityListStore();
 const activitiesListDragStore = useActivitiesListDragStore(activitiesListStoreId);
 
 const component = window.Vue.ref<CourseBuilderComponent | null>(
-    activitiesListStore().getComponent(props.unit.activities.components, props.column),
+    unitPlannerActivityListStore.getComponent(props.unit.activities.components, props.column),
 );
 
 window.Vue.onMounted(() => {
@@ -57,7 +59,7 @@ defineExpose({ isEmpty });
 window.Vue.watch(
     () => props.unit.activities.components,
     () => {
-        component.value = activitiesListStore().getComponent(props.unit.activities.components, props.column);
+        component.value = unitPlannerActivityListStore.getComponent(props.unit.activities.components, props.column);
     },
     { deep: true },
 );

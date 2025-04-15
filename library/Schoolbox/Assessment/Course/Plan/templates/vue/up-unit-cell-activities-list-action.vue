@@ -4,9 +4,9 @@
  */
 
 import ActivitiesListAction from "./activities-list/activities-list-action.vue";
-import { useActivitiesListStore } from "./activities-list/store/activitiesListStore";
 import type { CourseBuilderComponent, Unit } from "./unitPlannerTypes";
 import type { Column } from "./unitPlannerConfig";
+import { useUnitPlannerActivityListStore } from "./store/unitPlannerActivityListStore";
 
 interface Props {
     unit: Unit; // the unit linked to the activities cell
@@ -15,9 +15,9 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const activitiesListStore = useActivitiesListStore(props.activitiesListStoreId);
+const unitPlannerActivityListStore = useUnitPlannerActivityListStore();
 const component = window.Vue.ref<CourseBuilderComponent | null>(
-    activitiesListStore().getComponent(props.unit.activities.components, props.column),
+    unitPlannerActivityListStore.getComponent(props.unit.activities.components, props.column),
 );
 const isCreating = window.Vue.ref(false);
 
@@ -27,7 +27,7 @@ const isCreating = window.Vue.ref(false);
 window.Vue.watch(
     () => props.unit.activities.components,
     () => {
-        component.value = activitiesListStore().getComponent(props.unit.activities.components, props.column);
+        component.value = unitPlannerActivityListStore.getComponent(props.unit.activities.components, props.column);
     },
     { deep: true },
 );
@@ -51,7 +51,7 @@ async function onCreateSelected(): Promise<void> {
         return;
     }
     isCreating.value = true;
-    await activitiesListStore().createComponent(props.unit, props.column);
+    await unitPlannerActivityListStore.createComponent(props.unit, props.column);
     await window.Vue.nextTick();
     isCreating.value = false;
 }
