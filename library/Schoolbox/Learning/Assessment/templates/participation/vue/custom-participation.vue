@@ -269,14 +269,12 @@ window.Vue.onMounted(() => {
                     <td class="no-pad">
                         <div v-if="participant.user.id" class="actions-small-1">
                             <nav>
-                                <sbx-pop-out :content-id="`participant-${participant.user.id}`"></sbx-pop-out>
+                                <sbx-pop-out
+                                    :content-id="`participant-${participant.user.id}`"
+                                    move-to="#pop-out-container"
+                                ></sbx-pop-out>
                             </nav>
-                            <ul
-                                :id="`participant-${participant.user.id}`"
-                                data-dropdown-content=""
-                                class="f-dropdown"
-                                move-to="#custom-participation-container"
-                            >
+                            <ul :id="`participant-${participant.user.id}`" data-dropdown-content="" class="f-dropdown">
                                 <template v-if="participant.excludedAt !== null">
                                     <li class="separator">Manage</li>
                                     <li>
@@ -306,6 +304,8 @@ window.Vue.onMounted(() => {
                 </tr>
             </tbody>
         </table>
+        <!-- container for the sbx-pop-out to be displayed in -->
+        <div id="pop-out-container"></div>
         <bottom-drawer :show-drawer="selectedList.length > 0">
             <h3 class="selected-count">
                 <em>{{ selectedList.length }} selected</em>
