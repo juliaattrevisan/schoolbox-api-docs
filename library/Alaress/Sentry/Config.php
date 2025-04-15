@@ -101,7 +101,6 @@ class Config
      */
     public static function useInstance(Instance $instance): void
     {
-        (new \Alaress_Log_File('/tmp/myfile.log'))->log('sentry', 'useInstanceWithSessionIdentifierAAAA');
         Sentry\configureScope(static function (Sentry\State\Scope $scope) use ($instance): void {
             $scope->setTags([
                 'instance_id'      => $instance->getId(),
@@ -128,7 +127,9 @@ class Config
      */
     public static function useInstanceWithSessionIdentifier(Instance $instance, ?string $sessionIdentifier): void
     {
-        (new \Alaress_Log_File('/tmp/myfile.log'))->log('sentry', 'useInstanceWithSessionIdentifierBBBBBBBBB');
+        /* TODO How much of this can be refactored into a spoc, idk...
+         *  It shares the guts of the other implementation useInstance()
+         */
         Sentry\configureScope(static function (Sentry\State\Scope $scope) use ($instance, $sessionIdentifier): void {
             $scope->setTags([
                 'instance_id'      => $instance->getId(),
