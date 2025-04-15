@@ -14,11 +14,10 @@ const DEFAULT_DISPLAY_DURATION_SUCCESSFUL = 3000;
 const DEFAULT_DISPLAY_DURATION_UNSUCCESSFUL = 5000;
 
 /**
- * The currently active toast to display
- * Note, it's fairly easy to change this to support multiple toasts at some
- * future point, but for now we only support one toast at a time...
+ * All toasts on the page
+ * Currently, we only support one toast at a time - but this makes it easy to change later
  */
-const activeToast = window.Vue.ref<Toast | null>(null);
+const toasts = window.Vue.ref<Toast[]>([]);
 
 /**
  * Activate a toast
@@ -28,14 +27,16 @@ const activeToast = window.Vue.ref<Toast | null>(null);
  * @returns The toast instance
  */
 function activate(toast: Toast, text: string, link?: ToastLink): Toast {
+    // dismiss any existing toast first (as currently there can only be one at a time)
+    toasts.value.filter((t) => !t.hidden).forEach((t) => t.timeout({ text: t.text, duration: 0 }));
+
     toast.text = text;
     toast.link = link ?? null;
     toast.state = ToastState.PENDING;
     toast.hidden = false;
 
-    // this is now the active toast...
-    activeToast.value = toast;
-    return activeToast.value;
+    toasts.value.push(toast);
+    return toast;
 }
 
 /**
@@ -80,7 +81,6 @@ function timeout(toast: Toast, _detail?: ToastTimeoutDetail): Toast {
                 toast.currentTimeout.callback();
             }
             toast.currentTimeout = null;
-            activeToast.value = null;
         }, duration),
         callback: detail.timeoutCallback,
     };
@@ -116,30 +116,31 @@ function createToast(text: string, link?: ToastLink): Toast {
 window.Vue.onMounted(() => {
     window.sbProps.toastActivate = createToast;
     window.sbProps.toastTimeout = (detail?: ToastTimeoutDetail): void => {
-        if (!activeToast.value) {
-            return;
-        }
-        activeToast.value.timeout(detail);
+        // this is more for legacy support, as ideally toast.timeout() should be used directly
+        // in this scenario, dismiss all active toasts
+        toasts.value.filter((t) => !t.hidden).forEach((t) => t.timeout(detail));
     };
 });
 </script>
 
 <template>
-    <div
-        v-if="activeToast && activeToast.state !== ToastState.HIDDEN"
-        :class="{
-            pop: !activeToast.hidden,
-            toast: true,
-            alert: activeToast.state === ToastState.FAILED,
-            success: activeToast.state === ToastState.DONE,
-        }"
-        :style="{ opacity: 1 }"
-        data-test="toast"
-        :data-test-is-success="activeToast.state === ToastState.DONE"
-    >
-        {{ activeToast.text }}
-        <a v-if="activeToast.link !== null" :href="activeToast.link.href">{{ activeToast.link.text }}</a>
-    </div>
+    <template v-for="(toast, i) in toasts" :key="i">
+        <div
+            v-if="toast.state !== ToastState.HIDDEN"
+            class="toast"
+            :class="{
+                pop: !toast.hidden,
+                alert: toast.state === ToastState.FAILED,
+                success: toast.state === ToastState.DONE,
+            }"
+            :style="{ opacity: 1 }"
+            data-test="toast"
+            :data-test-is-success="toast.state === ToastState.DONE"
+        >
+            {{ toast.text }}
+            <a v-if="toast.link !== null" :href="toast.link.href">{{ toast.link.text }}</a>
+        </div>
+    </template>
 </template>
 
 <style scoped></style>
