@@ -3,7 +3,7 @@ import { Draggable } from "gsap/Draggable";
 import { ScrollToPlugin } from "gsap/all";
 import { defineStore } from "pinia";
 import type { Column } from "../unitPlannerConfig";
-import type { CurriculumOverviewComponent, Unit, UnitTemplate } from "../unitPlannerTypes";
+import type { CourseBuilderComponent, CurriculumOverviewComponent, Unit, UnitTemplate } from "../unitPlannerTypes";
 
 gsap.registerPlugin(Draggable);
 gsap.registerPlugin(ScrollToPlugin);
@@ -174,6 +174,19 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
         matchedUnit.curriculum.components.push(component);
     }
 
+    /**
+     * Add a newly created Course Builder component to a unit
+     * @param unitId - to find the unit to add the component to
+     * @param component - the component to add
+     */
+    function addCourseBuilderComponent(unitId: number, component: CourseBuilderComponent): void {
+        const matchedUnit = units.value.find((unit) => unit.id === unitId);
+        if (!matchedUnit) {
+            return;
+        }
+        matchedUnit.activities.components.push(component);
+    }
+
     return {
         init,
         unexpandedUnitHeight,
@@ -193,5 +206,6 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
         setUnitContentHeight,
         unitRowDisplayHeights,
         addCurriculumComponent,
+        addCourseBuilderComponent,
     };
 });
