@@ -6,6 +6,16 @@ export enum ToastEvent {
     TIMEOUT = "TOAST__TIMEOUT", //
 }
 
+/**
+ * The different states of a toast
+ */
+export enum ToastState {
+    HIDDEN = "hidden",
+    PENDING = "pending",
+    DONE = "done",
+    FAILED = "failed",
+}
+
 export type ToastLink = {
     text: string;
     href: string;
@@ -31,11 +41,38 @@ export type ToastTimeoutEventDetail = {
 };
 
 /**
+ * A toast instance
+ */
+export type Toast = {
+    text: string;
+    state: ToastState;
+    link: ToastLink | null;
+    fadeDuration: number;
+    hidden: boolean; // I suppose this allows you to resurrect a toast that was timed out
+    currentTimeout: {
+        timeoutId: number;
+        callback?: () => void;
+    } | null;
+    activate: (detail: ToastActivateEventDetail) => Toast;
+    timeout: (detail?: ToastTimeoutEventDetail) => Toast;
+};
+
+/**
  * The type for window.sbProps.toast
  */
-export type SbxToast = {
-    activate: (detail: ToastActivateEventDetail) => void;
-    timeout: (detail: ToastTimeoutEventDetail) => void;
+export type ToastProps = {
+    /**
+     * Create a new toast
+     * @param detail - The details of the toast
+     * @returns The toast instance
+     */
+    activate: (detail: ToastActivateEventDetail) => Toast;
+    /**
+     * Timeout the currently active toast, if one exists
+     * @param detail - The details of the timeout
+     * @returns The toast instance, or null if no toast is active
+     */
+    timeout: (detail?: ToastTimeoutEventDetail) => Toast | null;
 };
 
 /**
