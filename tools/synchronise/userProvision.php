@@ -16,12 +16,12 @@ use Schoolbox\Application\CliTool;
 require_once __DIR__ . '/../../conf/core/require.php';
 
 $app = new class extends CliTool\App {
-
     private const OPT_LONG_PERFORM_UPDATE = 'perform-update';
     private const OPT_LONG_INSTANCE = 'instance';
     private const OPT_LONG_HELP = 'help';
-    private const OPT_SHORT_ROLE = 'r';
+    private const OPT_SHORT_ROLE = 'r:';
 
+    /** @inheritDoc */
     public function getLongOpts(): array
     {
         return [
@@ -29,17 +29,31 @@ $app = new class extends CliTool\App {
         ];
     }
 
+    /** @inheritDoc */
+    public function getShortOpts(): array
+    {
+        return [
+            self::OPT_SHORT_ROLE,
+        ];
+    }
+
+    /**
+     * Ensure tool being run as www-data user
+     * @inheritDoc
+     */
     public function getRequiredProcessUser(): string
     {
-        // Ensure tool being run as www-data user
         return 'www-data';
     }
 
+    /**
+     * @return void
+     */
     public function run(): void
     {
         $perform = $this->getOpt(self::OPT_LONG_PERFORM_UPDATE);
         $instanceId = $this->getOpt(self::OPT_LONG_INSTANCE) ?? INSTANCE_ID;
-        $roleType = $this->getOpt(self::OPT_SHORT_ROLE) ? in_array($this->getOpt(self::OPT_SHORT_ROLE), ['staff', 'student', 'parent']) : null;
+        $roleType = in_array($this->getOpt(self::OPT_SHORT_ROLE), ['staff', 'student', 'parent'])? $this->getOpt(self::OPT_SHORT_ROLE) : null;
 
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo  <<<HELP
