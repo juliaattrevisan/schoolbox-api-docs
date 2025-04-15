@@ -1,12 +1,4 @@
 /**
- * The different events that can be dispatched by the toast
- */
-export enum ToastEvent {
-    ACTIVATE = "TOAST__ACTIVATE", //
-    TIMEOUT = "TOAST__TIMEOUT", //
-}
-
-/**
  * The different states of a toast
  */
 export enum ToastState {
@@ -22,25 +14,6 @@ export type ToastLink = {
 };
 
 /**
- * The details passed with a ACTIVATE event
- */
-export type ToastActivateEventDetail = {
-    text: string;
-    link?: ToastLink;
-};
-
-/**
- * The details passed with a TIMEOUT event
- */
-export type ToastTimeoutEventDetail = {
-    text: string;
-    isSuccess?: boolean;
-    duration?: number;
-    fadeDuration?: number;
-    timeoutCallback?: () => void;
-};
-
-/**
  * A toast instance
  */
 export type Toast = {
@@ -53,51 +26,40 @@ export type Toast = {
         timeoutId: number;
         callback?: () => void;
     } | null;
-    activate: (detail: ToastActivateEventDetail) => Toast;
-    timeout: (detail?: ToastTimeoutEventDetail) => Toast;
+    activate: (text: string, link?: ToastLink) => Toast;
+    timeout: (detail?: ToastTimeoutDetail) => Toast;
 };
 
 /**
- * The type for window.sbProps.toast
+ * The details passed when timing out a toast
  */
-export type ToastProps = {
-    /**
-     * Create a new toast
-     * @param detail - The details of the toast
-     * @returns The toast instance
-     */
-    activate: (detail: ToastActivateEventDetail) => Toast;
-    /**
-     * Timeout the currently active toast, if one exists
-     * @param detail - The details of the timeout
-     * @returns The toast instance, or null if no toast is active
-     */
-    timeout: (detail?: ToastTimeoutEventDetail) => Toast | null;
+export type ToastTimeoutDetail = {
+    text: string;
+    isSuccess?: boolean;
+    duration?: number;
+    fadeDuration?: number;
+    timeoutCallback?: () => void;
 };
+
+// The following two functions (activate and timeout) are wrappers for sbProps
+// so we can continue to import them from sbxToastEvent as per usual...
 
 /**
  * Activate the toast with the given text
  * @param text - The text to display in the toast
  * @param link - An optional link for the toast to be clickable
+ * @returns The toast instance
  */
-export function activate(text: string, link?: ToastLink): void {
-    window.sbProps.toast.activate({ text, link });
-    // document.dispatchEvent(
-    //     new CustomEvent(ToastEvent.ACTIVATE, {
-    //         detail: { text } as ToastActivateEventDetail,
-    //     }),
-    // );
+export function activate(text: string, link?: ToastLink): Toast {
+    return window.sbProps.toastActivate(text, link);
 }
 
 /**
- * Display the timeout toast with the given details
- * @param eventDetail - The details of the timeout event
+ * Timeout the currently active toast, if one exists
+ * Note, it is recommended to use the `timeout` method on the toast instance instead
+ * to avoid accidentally timing out another toast created by another script asynchronously
+ * @param eventDetail - The details of the timeout
  */
-export function timeout(eventDetail: ToastTimeoutEventDetail): void {
-    window.sbProps.toast.timeout(eventDetail);
-    // document.dispatchEvent(
-    //     new CustomEvent(ToastEvent.TIMEOUT, {
-    //         detail: eventDetail,
-    //     }),
-    // );
+export function timeout(eventDetail: ToastTimeoutDetail): void {
+    window.sbProps.toastTimeout(eventDetail);
 }

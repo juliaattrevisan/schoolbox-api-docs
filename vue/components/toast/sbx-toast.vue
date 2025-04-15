@@ -7,23 +7,29 @@
  */
 
 import { ToastState } from "./sbxToastEvent";
-import type { Toast, ToastActivateEventDetail, ToastTimeoutEventDetail } from "./sbxToastEvent";
+import type { Toast, ToastLink, ToastTimeoutDetail } from "./sbxToastEvent";
 
 const DEFAULT_FADE_DURATION = 3000;
 const DEFAULT_DISPLAY_DURATION_SUCCESSFUL = 3000;
 const DEFAULT_DISPLAY_DURATION_UNSUCCESSFUL = 5000;
 
+/**
+ * The currently active toast to display
+ * Note, it's fairly easy to change this to support multiple toasts at some
+ * future point, but for now we only support one toast at a time...
+ */
 const activeToast = window.Vue.ref<Toast | null>(null);
 
 /**
  * Activate a toast
  * @param toast - The toast instance
- * @param detail - The details of the toast
+ * @param text - The text to display in the toast
+ * @param link - An optional link for the toast to be clickable
  * @returns The toast instance
  */
-function activate(toast: Toast, detail: ToastActivateEventDetail): Toast {
-    toast.text = detail.text;
-    toast.link = detail.link ?? null;
+function activate(toast: Toast, text: string, link?: ToastLink): Toast {
+    toast.text = text;
+    toast.link = link ?? null;
     toast.state = ToastState.PENDING;
     toast.hidden = false;
 
@@ -38,8 +44,8 @@ function activate(toast: Toast, detail: ToastActivateEventDetail): Toast {
  * @param _detail - The details of the timeout
  * @returns The toast instance
  */
-function timeout(toast: Toast, _detail?: ToastTimeoutEventDetail): Toast {
-    const detail: ToastTimeoutEventDetail = _detail ?? { text: toast.text };
+function timeout(toast: Toast, _detail?: ToastTimeoutDetail): Toast {
+    const detail: ToastTimeoutDetail = _detail ?? { text: toast.text };
 
     /**
      * If the toast was already told to timeout, clear that timeout
@@ -85,36 +91,35 @@ function timeout(toast: Toast, _detail?: ToastTimeoutEventDetail): Toast {
 /**
  * Create (and activate) a new toast
  * Since we currently only support one toast at a time, this will dismiss any existing toast first
- * @param detail - The details of the toast
+ * @param text - The text to display in the toast
+ * @param link - An optional link for the toast to be clickable
  * @returns The toast object
  */
-function createToast(detail: ToastActivateEventDetail): Toast {
+function createToast(text: string, link?: ToastLink): Toast {
     const toast: Toast = window.Vue.reactive({
-        text: detail.text,
+        text,
         state: ToastState.PENDING,
         link: null,
         fadeDuration: DEFAULT_FADE_DURATION,
         hidden: true,
         currentTimeout: null,
-        activate: (_detail: ToastActivateEventDetail) => activate(toast, _detail),
-        timeout: (_detail?: ToastTimeoutEventDetail) => timeout(toast, _detail),
+        activate: (_text: string, _link?: ToastLink) => activate(toast, _text, _link),
+        timeout: (_detail?: ToastTimeoutDetail) => timeout(toast, _detail),
     });
 
-    return toast.activate(detail);
+    return toast.activate(text, link);
 }
 
 /**
  * Listen for toast events
  */
 window.Vue.onMounted(() => {
-    window.sbProps.toast = {
-        activate: createToast,
-        timeout: (detail?: ToastTimeoutEventDetail): Toast | null => {
-            if (!activeToast.value) {
-                return null;
-            }
-            return activeToast.value.timeout(detail);
-        },
+    window.sbProps.toastActivate = createToast;
+    window.sbProps.toastTimeout = (detail?: ToastTimeoutDetail): void => {
+        if (!activeToast.value) {
+            return;
+        }
+        activeToast.value.timeout(detail);
     };
 });
 </script>
