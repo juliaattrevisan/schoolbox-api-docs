@@ -51,6 +51,8 @@ Long term they will reference the design colour tokens
     font-size: 0.75rem;
     font-weight: 700;
     padding: var(--spacing-xs) var(--spacing-s);
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
 }
 
 .sbx-label--success {
@@ -68,9 +70,5 @@ Long term they will reference the design colour tokens
 .sbx-label--neutral {
     background-color: #dddddd;
     color: #474747;
-}
-sbx-label {
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
 }
 </style>
