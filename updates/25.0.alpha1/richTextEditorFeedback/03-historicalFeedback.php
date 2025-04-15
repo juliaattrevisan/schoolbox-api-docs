@@ -30,7 +30,7 @@ $app = new class extends CliTool\App {
                     `" . $columns['id'] . "` as id,
                     `" . $columns['comment'] . "` as comment
                 FROM `$table`
-                WHERE `comment` IS NOT NULL AND TRIM(`comment`) != ''"
+                WHERE `" . $columns['comment'] . "` IS NOT NULL AND TRIM(`" . $columns['comment'] . "`) != ''"
             );
 
             $updateStatement = $this->getDatabaseInternal()->prepareQuery(
