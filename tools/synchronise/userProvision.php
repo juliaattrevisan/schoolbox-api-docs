@@ -26,6 +26,8 @@ $app = new class extends CliTool\App {
     {
         return [
             self::OPT_LONG_HELP,
+            self::OPT_LONG_PERFORM_UPDATE,
+            self::OPT_LONG_INSTANCE,
         ];
     }
 
@@ -51,17 +53,18 @@ $app = new class extends CliTool\App {
      */
     public function run(): void
     {
-        $perform = $this->getOpt(self::OPT_LONG_PERFORM_UPDATE);
+        $perform = $this->getOpt(self::OPT_LONG_PERFORM_UPDATE) | $this->perform();
         $instanceId = $this->getOpt(self::OPT_LONG_INSTANCE) ?? INSTANCE_ID;
         $roleType = in_array($this->getOpt(self::OPT_SHORT_ROLE), ['staff', 'student', 'parent']) ? $this->getOpt(self::OPT_SHORT_ROLE) : null;
 
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo  <<<HELP
-Usage: userProvision.php [--perform-update] [--instance=instanceId] [-r roleType]
+Usage: userProvision.php [--perform-update] [--instance=instanceId] [-r roleType=staff|student|parent] [--help]
 Options:
-  --perform-update   Perform the update
-  --instance         Instance ID to use (default: INSTANCE_ID)
-  -r, --role         Role type (staff, student, parent)
+  -h, --help            Show this help message
+  -p, --perform-update  Perform the update
+  --instance            Instance ID to use (default: INSTANCE_ID)
+  -r, --role            Role type (staff, student, parent)
 
 HELP;
             exit(0);
