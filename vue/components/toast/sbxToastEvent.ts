@@ -31,15 +31,25 @@ export type ToastTimeoutEventDetail = {
 };
 
 /**
+ * The type for window.sbProps.toast
+ */
+export type SbxToast = {
+    activate: (detail: ToastActivateEventDetail) => void;
+    timeout: (detail: ToastTimeoutEventDetail) => void;
+};
+
+/**
  * Activate the toast with the given text
  * @param text - The text to display in the toast
+ * @param link - An optional link for the toast to be clickable
  */
-export function activate(text: string): void {
-    document.dispatchEvent(
-        new CustomEvent(ToastEvent.ACTIVATE, {
-            detail: { text } as ToastActivateEventDetail,
-        }),
-    );
+export function activate(text: string, link?: ToastLink): void {
+    window.sbProps.toast.activate({ text, link });
+    // document.dispatchEvent(
+    //     new CustomEvent(ToastEvent.ACTIVATE, {
+    //         detail: { text } as ToastActivateEventDetail,
+    //     }),
+    // );
 }
 
 /**
@@ -47,9 +57,10 @@ export function activate(text: string): void {
  * @param eventDetail - The details of the timeout event
  */
 export function timeout(eventDetail: ToastTimeoutEventDetail): void {
-    document.dispatchEvent(
-        new CustomEvent(ToastEvent.TIMEOUT, {
-            detail: eventDetail,
-        }),
-    );
+    window.sbProps.toast.timeout(eventDetail);
+    // document.dispatchEvent(
+    //     new CustomEvent(ToastEvent.TIMEOUT, {
+    //         detail: eventDetail,
+    //     }),
+    // );
 }

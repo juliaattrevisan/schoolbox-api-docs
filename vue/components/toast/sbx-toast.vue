@@ -7,7 +7,6 @@
  */
 
 import type { ToastActivateEventDetail, ToastLink, ToastTimeoutEventDetail } from "./sbxToastEvent";
-import { ToastEvent } from "./sbxToastEvent";
 
 const STATE_HIDDEN = "hidden";
 const STATE_PENDING = "pending";
@@ -95,20 +94,14 @@ function timeout(
  * Listen for toast events
  */
 window.Vue.onMounted(() => {
-    document.addEventListener(ToastEvent.ACTIVATE, (event) => {
-        const eventDetail = (event as CustomEvent).detail as ToastActivateEventDetail;
-        activate(eventDetail.text, eventDetail.link ?? null);
-    });
-    document.addEventListener(ToastEvent.TIMEOUT, (event) => {
-        const eventDetail = (event as CustomEvent).detail as ToastTimeoutEventDetail;
-        timeout(
-            eventDetail.text,
-            eventDetail.isSuccess,
-            eventDetail.duration,
-            eventDetail.fadeDuration,
-            eventDetail.timeoutCallback,
-        );
-    });
+    window.sbProps.toast = {
+        activate: (detail: ToastActivateEventDetail): void => {
+            activate(detail.text, detail.link ?? null);
+        },
+        timeout: (detail: ToastTimeoutEventDetail): void => {
+            timeout(detail.text, detail.isSuccess, detail.duration, detail.fadeDuration, detail.timeoutCallback);
+        },
+    };
 });
 </script>
 
