@@ -53,7 +53,7 @@ $app = new class extends CliTool\App {
      */
     public function run(): void
     {
-        $perform = $this->getOpt(self::OPT_LONG_PERFORM_UPDATE) | $this->perform();
+        $perform = $this->getOpt(self::OPT_LONG_PERFORM_UPDATE) || $this->perform();
         $instanceId = $this->getOpt(self::OPT_LONG_INSTANCE) ?? INSTANCE_ID;
         $roleType = in_array($this->getOpt(self::OPT_SHORT_ROLE), ['staff', 'student', 'parent']) ? $this->getOpt(self::OPT_SHORT_ROLE) : null;
 
