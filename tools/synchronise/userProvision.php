@@ -21,6 +21,11 @@ $app = new class extends CliTool\App {
      * @var string
      */
     private const OPT_LONG_PERFORM_UPDATE = 'perform-update';
+
+    /**
+     * @deprecated
+     * @var string
+     */
     private const OPT_LONG_INSTANCE = 'instance:';
     private const OPT_LONG_HELP = 'help';
     private const OPT_SHORT_ROLE = 'r:';
@@ -68,14 +73,21 @@ $app = new class extends CliTool\App {
             $this->getLogger()->warning('The --perform-update option is deprecated. Use --perform instead.');
         }
 
+        /**
+         * Deprecation message for --instance
+         */
+        if ($this->getOpt(self::OPT_LONG_INSTANCE)) {
+            $this->getLogger()->warning('The --instance option is deprecated. Use INSTANCE_ID environment var instead.');
+        }
+
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo  <<<HELP
-Usage: userProvision.php [-p, --perform] [--instance=instanceId] [-r roleType=staff|student|parent] [--help]
+Usage: userProvision.php [-p, --perform] [-r roleType=staff|student|parent] [--help]
 Options:
   -h, --help        Show this help message
   -p, --perform     Perform the update
   --perform-update  Perform the update (deprecated)
-  --instance        Instance ID to use (default: INSTANCE_ID)
+  --instance        Instance ID to use (default: INSTANCE_ID) (deprecated)
   -r, --role        Role type (staff, student, parent)
 
 HELP;
