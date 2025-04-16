@@ -16,6 +16,10 @@ use Schoolbox\Application\CliTool;
 require_once __DIR__ . '/../../conf/core/require.php';
 
 $app = new class extends CliTool\App {
+    /**
+     * @deprecated
+     * @var string
+     */
     private const OPT_LONG_PERFORM_UPDATE = 'perform-update';
     private const OPT_LONG_INSTANCE = 'instance:';
     private const OPT_LONG_HELP = 'help';
@@ -56,6 +60,13 @@ $app = new class extends CliTool\App {
         $perform = $this->getOpt(self::OPT_LONG_PERFORM_UPDATE) || $this->perform();
         $instanceId = $this->getOpt(self::OPT_LONG_INSTANCE) ?? INSTANCE_ID;
         $roleType = in_array($this->getOpt(self::OPT_SHORT_ROLE), ['staff', 'student', 'parent']) ? $this->getOpt(self::OPT_SHORT_ROLE) : null;
+
+        /**
+         * Deprecation message for --perform-update
+         */
+        if ($this->getOpt(self::OPT_LONG_PERFORM_UPDATE)) {
+            $this->getLogger()->warning('The --perform-update option is deprecated. Use --perform instead.');
+        }
 
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo  <<<HELP
