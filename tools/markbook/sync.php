@@ -38,7 +38,7 @@ $app = new class extends CliTool\App
     /** @inheritDoc */
     public function getShortOpts(): array
     {
-        return ['h'];
+        return [self::OPT_SHORT_HELP];
     }
 
     /** @inheritdoc */
@@ -109,7 +109,7 @@ $app = new class extends CliTool\App
         --parent=xxx         the Schoolbox ID of parent folder to start the traversal, defaults to 0, format --parent=237
         --start=yyyy-mm-dd   Only sync work due after this date, format --start=2016-04-20, defaults to current semester
         --end=yyyy-mm-dd     Only sync work due before this date, format --end=2016-08-15, default to current semester
-        -p --perform:        if set, will actually update anything in the remote system, otherwise just a dry run
+        -p, --perform:       if set, will actually update anything in the remote system, otherwise just a dry run
         --update-only:       if set, will not create any new items in the remote system, only updates existing markbooks
     {$additionalParameters}
     
