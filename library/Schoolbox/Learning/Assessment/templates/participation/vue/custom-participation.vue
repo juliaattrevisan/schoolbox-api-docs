@@ -92,7 +92,7 @@ async function getStudentPastoralCounts(): Promise<void> {
  * @returns A promise that resolves when the operation is complete.
  */
 async function excludeParticipant(participant: Participant): Promise<void> {
-    window.sbProps.toastActivate("Excluding...");
+    const toast = window.sbProps.toastActivate("Excluding...");
     try {
         const response = await fetch(participant._links.exclude, {
             method: "POST",
@@ -112,6 +112,7 @@ async function excludeParticipant(participant: Participant): Promise<void> {
             loadError.value = error.message;
         }
         console.error("Error excluding participant:", error);
+        toast.timeout({ text: "Error excluding student", isSuccess: false });
     }
 }
 
@@ -121,7 +122,7 @@ async function excludeParticipant(participant: Participant): Promise<void> {
  * @returns A promise that resolves when the operation is complete.
  */
 async function includeParticipant(participant: Participant): Promise<void> {
-    window.sbProps.toastActivate("Removing customisation...");
+    const toast = window.sbProps.toastActivate("Removing customisation...");
     try {
         const response = await fetch(participant._links.include, {
             method: "POST",
@@ -141,6 +142,7 @@ async function includeParticipant(participant: Participant): Promise<void> {
             loadError.value = error.message;
         }
         console.error("Error including participant:", error);
+        toast.timeout({ text: "Error excluding student", isSuccess: false });
     }
 }
 
