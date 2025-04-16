@@ -59,12 +59,13 @@ $app = new class extends CliTool\App {
 
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo  <<<HELP
-Usage: userProvision.php [--perform-update] [--instance=instanceId] [-r roleType=staff|student|parent] [--help]
+Usage: userProvision.php [-p, --perform] [--instance=instanceId] [-r roleType=staff|student|parent] [--help]
 Options:
-  -h, --help            Show this help message
-  -p, --perform-update  Perform the update
-  --instance            Instance ID to use (default: INSTANCE_ID)
-  -r, --role            Role type (staff, student, parent)
+  -h, --help        Show this help message
+  -p, --perform     Perform the update
+  --perform-update  Perform the update (deprecated)
+  --instance        Instance ID to use (default: INSTANCE_ID)
+  -r, --role        Role type (staff, student, parent)
 
 HELP;
             exit(0);
