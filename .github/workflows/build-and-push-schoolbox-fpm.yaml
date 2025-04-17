@@ -84,8 +84,8 @@ jobs:
             ENV=prod
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           tags: |
-            alaress/schoolbox-fpm:${{ github.ref_name }}-latest
-            alaress/schoolbox-fpm:${{ github.ref_name }}-${{ github.sha }}
+            alaress/schoolbox-fpm:${{ github.ref_name }}-latest-${{ matrix.build.arch }}
+            alaress/schoolbox-fpm:${{ github.ref_name }}-${{ github.sha }}-${{ matrix.build.arch }}
 
       - name: Build and push schoolbox-fpm deployment image (release)
         if: github.event_name == 'release'
@@ -104,7 +104,7 @@ jobs:
             ENV=prod
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           tags: |
-            alaress/schoolbox-fpm:${{ github.ref_name }}
+            alaress/schoolbox-fpm:${{ github.ref_name }}-${{ matrix.build.arch }}
 
       - name: Upload schoolbox-fpm artifact
         uses: actions/upload-artifact@v4
@@ -112,6 +112,46 @@ jobs:
           name: ${{ inputs.image }}-${{ matrix.build.arch }}
           path: ${{ runner.temp }}/schoolbox-fpm-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
           retention-days: 1
+
+  join-images:
+    needs:
+      - build-and-push-schoolbox-fpm
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Join schoolbox-fpm images (latest)
+        if: github.event_name == 'push'
+        run: |
+          docker manifest create alaress/schoolbox-fpm:${{ github.ref_name }}-latest \
+            --amend alaress/schoolbox-fpm:${{ github.ref_name }}-latest-amd64 \
+            --amend alaress/schoolbox-fpm:${{ github.ref_name }}-latest-arm64 \
+            --amend alaress/schoolbox-fpm:${{ github.ref_name }}-latest
+          docker manifest push --purge alaress/schoolbox-fpm:${{ github.ref_name }}-latest
+
+          docker manifest create alaress/schoolbox-fpm:${{ github.ref_name }}-${{ github.sha }} \
+            --amend alaress/schoolbox-fpm:${{ github.ref_name }}-${{ github.sha }}-amd64 \
+            --amend alaress/schoolbox-fpm:${{ github.ref_name }}-${{ github.sha }}-arm64 \
+            --amend alaress/schoolbox-fpm:${{ github.ref_name }}-${{ github.sha }}
+          docker manifest push --purge alaress/schoolbox-fpm:${{ github.ref_name }}-${{ github.sha }}
+
+      - name: Join schoolbox-fpm images (release)
+        if: github.event_name == 'release'
+        run: |
+          docker manifest create alaress/schoolbox-fpm:${{ github.ref_name }} \
+            --amend alaress/schoolbox-fpm:${{ github.ref_name }}-amd64 \
+            --amend alaress/schoolbox-fpm:${{ github.ref_name }}-arm64 \
+            --amend alaress/schoolbox-fpm:${{ github.ref_name }}
+          docker manifest push --purge alaress/schoolbox-fpm:${{ github.ref_name }}
+
+      # Need artifact for the joined image too, or pull the just built image?
 
   push-schoolbox-fpm-alpine-to-ecr:
     needs:
