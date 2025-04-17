@@ -15,77 +15,156 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
 use Psr\Http\Client\ClientExceptionInterface;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
 
 class Helper
 {
-    private const OPENAI_API_ENDPOINT = 'https://api.openai.com/v1/chat/completions';
-    private const AZURE_API_ENDPOINT = 'https://%s.openai.azure.com/openai/deployments/%s/chat/completions?api-version=2023-12-01-preview';
+    /**
+     * There are apparently two different endpoint flavours that we can chooze
+     *
+     * The CHAT endpoint is for Little Robot Dude, a conversational generator.
+     * The REQUEST endpoint is for everything else, obeys structured output
+     */
+    public const ENDPOINT_TYPE_OPENAI = 'OpenAI';
+    private const ENDPOINT_HOST_OPENAI_CHAT = 'https://api.openai.com/v1/chat/completions';
+    private const ENDPOINT_HOST_OPENAI_REQUEST = 'https://api.openai.com/v1/responses';
 
-    private ErrorMapper $errorMapper;
+    public const ENDPOINT_TYPE_AZURE = 'Azure';
+    private const ENDPOINT_HOST_AZURE_CHAT = 'https://%s.openai.azure.com/openai/deployments/%s/chat/completions?api-version=2023-12-01-preview';
+    private const ENDPOINT_HOST_AZURE_REQUEST = 'https://%s.openai.azure.com/openai/responses?api-version=2025-03-01-preview';
+
+
+    /**
+     * Structured Outputs is only supported in certain models
+     */
+    private const SUPPORTED_STRUCTURED_OUTPUT_MODELS = [
+        self::ENDPOINT_TYPE_OPENAI => [
+            'gpt-3.5-turbo' => false,
+            'gpt-4' => true,
+            'gpt-4o' => true,
+            'gpt-4o-mini' => true,
+            'gpt-4-turbo' => true
+        ],
+        self::ENDPOINT_TYPE_AZURE => [
+            'gpt-3.5-turbo' => false,
+            'gpt-4' => false,
+            'gpt-4o' => true,
+            'gpt-4o-mini' => true,
+            'gpt-4-turbo' => false
+        ],
+    ];
+
+
+    /**
+     * Use the conversational chatgippity variant
+     */
+    private const CHAT = 'chat';
+
+
     /**
      * Controller constructor.
      */
-    public function __construct(private Client $client, private Log\Mapper $logMapper, private IConfigLoader $config)
-    {
-        $this->errorMapper = ErrorMapper::GetInstance();
+    public function __construct(
+        private string $openAiEndpoint,
+        private string $openAiKey,
+        private string $openAiAzureResourceName,
+        private string $openAiAzureDeploymentId,
+        private string $openAiModel,
+        private Client $client,
+        private \Schoolbox\Error\Mapper $errorMapper,
+        private Log\Mapper $logMapper,
+    ) {
     }
 
+
     /**
-     * chat (no async)
+     * request (no streaming, returns full json payload)
      * hits openAI and returns the string response (you need to json decode yourself...)
      *
      * @param User $user // user to log the request against
-     * @param string|null $prompt // if generating a payload, use this prompt
-     * @param string|null $payload // use this payload instead of generating one
-     * @param array|null $responseFormat // null, or array of response format
+     * @param string $payload // use this payload instead of generating one
      * @return string|null
-     * @throws Exception
-     * @throws \JsonException
      * @throws ClientExceptionInterface
+     * @throws Exception
      */
-    public function chat(User $user, ?string $prompt = null, ?string $payload = null, ?array $responseFormat = null): ?string
+    public function request(User $user, string $payload): ?string
     {
-        /**
-         * @var Log\Model $log
+        /* Assert that we're configured correctly
          */
-        $log = $this->logMapper->createModel();
-        $log->setUser($user);
+        if (!$this->openAiKey) {
+            throw new \DomainException('OpenAI API key is unavailable');
+        }
 
-        // either build or use the supplied payload
-        $payload = $payload ?? $this->generatePayload($prompt, $responseFormat);
+        /* Requires a particular minimum set of models to continue.
+         */
+        if (!$this->canUseStructuredOutputs()) {
+            throw new \DomainException('AI endpoint/model does not support Structured Outputs');
+        }
 
+        /* Minimum requirements met: let's send it and see what AI overlords think of our payload
+         */
         try {
             $openAiRequest = new Request('POST', $this->getEndpoint(), array_merge(
                 $this->getAuthorization(),
-                ['Content-Type'  => 'application/json'],
+                ['Content-Type' => 'application/json'],
             ), $payload);
-            $log->setPrompt($payload);
 
             $response = $this->client->sendRequest($openAiRequest);
 
             http_response_code($response->getStatusCode());
 
-            $log->setReturnCode($response->getStatusCode());
+            /* Log some error messages, if applicable
+             */
+            $errorMessage = '';
+
             if ($response->getStatusCode() !== 200) {
-                $log->setErrorMessage($response->getReasonPhrase());
-            } else {
-                $log->setErrorMessage('');
+                $errorMessage = $response->getReasonPhrase();
             }
 
+            /* Log what the user tried to do if we made a vaguely-successful request
+             * and didn't somehow die long the way
+             */
+            $log = $this->logMapper->createModel()
+                ->setUser($user)
+                ->setPrompt($payload)
+                ->setReturnCode($response->getStatusCode())
+                ->setErrorMessage($errorMessage);
+
             $this->logMapper->save($log);
+
+            /* The async method will still continue trying to render other aura stuff,
+             * like the chrome etc. so people left a die(); here to forcibly terminate;
+             * else you end up with a bunch of Warnings about headers already being sent
+             *
+             * You can dodge that using responseAsJson() instead
+             */
             return $response->getBody()->getContents();
         } catch (GuzzleException $e) {
             $this->errorMapper->generateException(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
         }
+
         return null;
     }
+
+
+    /**
+     * Structured Outputs require a particular model
+     *
+     * @return bool
+     */
+    private function canUseStructuredOutputs(): bool
+    {
+        return self::SUPPORTED_STRUCTURED_OUTPUT_MODELS[$this->openAiEndpoint][$this->openAiModel] ?? false;
+    }
+
 
     /**
      * Asynchronously sends a request to the OpenAI API and returns the response to the user.
      * then die()
+     *
+     * This is used by Little Robot Dude in the ckeditor ai assistant plugin thing
+     * Any deviation from this causes it to stop working for one reason or another
      *
      * @param User $user // user to log the request against
      * @param string|null $prompt // if generating a payload, use this prompt
@@ -94,33 +173,50 @@ class Helper
      * @throws \JsonException
      * @throws Exception
      */
-    public function async(User $user, ?string $prompt = null, ?string $payload = null): void
+    public function littleRobotDude(User $user, ?string $prompt = null, ?string $payload = null): void
     {
-        /**
-         * @var Log\Model $log
+        /* Assert that we're configured correctly
          */
-        $log = $this->logMapper->createModel();
-        $log->setUser($user);
+        if (!$this->openAiKey) {
+            throw new \DomainException('OpenAI API key is unavailable');
+        }
 
         // either build or use the supplied payload
-        $payload = $payload ?? $this->generatePayload($prompt);
+        $payload = $payload ?? (new Payload\LittleRobotDude($this->openAiModel))->generate($prompt, stream: true);
 
         try {
-            $openAiRequest = new Request('POST', $this->getEndpoint(), array_merge(
+            $openAiRequest = new Request('POST', $this->getEndpoint(self::CHAT), array_merge(
                 $this->getAuthorization(),
-                ['Content-Type'  => 'application/json'],
+                ['Content-Type' => 'application/json'],
             ), $payload);
-            $log->setPrompt($payload);
+
+            /* Log what the user tried to do if we made a vaguely-successful request
+             * and didn't somehow die long the way
+             */
+            $log = $this->logMapper->createModel()
+                ->setUser($user)
+                ->setPrompt($payload);
 
             $promise = $this->client->sendAsync($openAiRequest, ['stream' => true]);
 
             // Handle the response when it arrives
+            /* The two anonymous functions represent what happens when we succeed
+             * and when we didn't.
+             */
             $promise->then(
                 function ($response) use ($log): void {
-                    http_response_code(200);
-                    $log->setReturnCode(200);
-                    $log->setErrorMessage('');
+                    /* Set up presumed success conditions
+                     */
+                    $returnCode = 200;
 
+                    http_response_code($returnCode);
+
+                    $log->setReturnCode($returnCode)
+                        ->setErrorMessage('');
+
+                    /* Remove preformatted insanity by encoding it all away
+                     * https://stackoverflow.com/questions/23859713/remove-all-unnecessary-whitespaces-from-json-string-in-php
+                     */
                     //header('X-Accel-Buffering: no');
                     header('Content-Type: application/json');
                     header('Content-Encoding: none');
@@ -130,31 +226,38 @@ class Helper
 
                     $stream = $response->getBody();
 
-                    // Read and proxy the data
                     while (!$stream->eof()) {
                         echo $stream->read(1024);
-                        //ob_flush();
-                        //flush();
                     }
                 },
                 function ($reason) use ($log): void {
+                    $returnCode = $reason->getCode();
+
                     /* @var ClientException $reason */
-                    http_response_code($reason->getCode());
+                    http_response_code($returnCode);
+
+                    /* FIXME This probably needs to be in a standardised json error struct
+                     *  The last time we did this was in profile editor
+                     */
                     echo $reason->getMessage();
 
-                    $log->setReturnCode($reason->getCode());
-                    $log->setErrorMessage($reason->getMessage());
+                    /* We died; log the status code and epitaph
+                     */
+                    $log->setReturnCode($returnCode)
+                        ->setErrorMessage($reason->getMessage());
                 }
             );
 
             $promise->wait();
+
+            $this->logMapper->save($log);
+
+            /* Intentionally die
+             */
+            die();
         } catch (GuzzleException $e) {
             $this->errorMapper->generateException(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
         }
-
-        $this->logMapper->save($log);
-
-        die();
     }
 
 
@@ -164,20 +267,49 @@ class Helper
      * Creates an endpoint URL string for the user selected endpoint.  They can choose between OpenAI and Azure.
      *
      */
-    private function getEndpoint(): string
+    private function getEndpoint($type = null): string
     {
-        switch ($this->config->get('openai_endpoint')) {
-            case 'OpenAI':
-                return self::OPENAI_API_ENDPOINT;
-            case 'Azure':
-                if (empty($this->config->get('openai_azure_resource_name')) || empty($this->config->get('openai_azure_deployment_id'))) {
+        switch ($this->openAiEndpoint) {
+            case self::ENDPOINT_TYPE_OPENAI:
+                /* Little Robot Dude
+                 */
+                if (self::CHAT === $type) {
+                    return self::ENDPOINT_HOST_OPENAI_CHAT;
+                }
+
+                /* This is for structured outputs (used in lesson plans)
+                 */
+                return self::ENDPOINT_HOST_OPENAI_REQUEST;
+            case self::ENDPOINT_TYPE_AZURE:
+                if (empty($this->openAiAzureResourceName) || empty($this->openAiAzureDeploymentId)) {
                     throw new \UnexpectedValueException('Azure resource name and deployment ID are required');
                 }
 
+                /* Little Robot Dude
+                 */
+                if (self::CHAT === $type) {
+                    return sprintf(
+                        self::ENDPOINT_HOST_AZURE_CHAT,
+                        $this->openAiAzureResourceName,
+                        $this->openAiAzureDeploymentId,
+                    );
+                }
+
+                /* This is for structured outputs (used in lesson plans)
+                 *
+                 * MAYBE Azure does not support structured outputs at the moment
+                 * https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/responses?tabs=python-secure
+                 *
+                    Not currently supported:
+
+                    Structured outputs
+                    tool_choice
+                    image_url pointing to an internet address
+                    The web search tool is also not supported, and is not part of the 2025-03-01-preview API.
+                 */
                 return sprintf(
-                    self::AZURE_API_ENDPOINT,
-                    $this->config->get('openai_azure_resource_name'),
-                    $this->config->get('openai_azure_deployment_id')
+                    self::ENDPOINT_HOST_AZURE_REQUEST,
+                    $this->openAiAzureResourceName,
                 );
         }
         throw new \UnexpectedValueException('Endpoint must be configured');
@@ -190,51 +322,13 @@ class Helper
      */
     private function getAuthorization(): array
     {
-        switch ($this->config->get('openai_endpoint')) {
-            case 'OpenAI':
-                return ['Authorization' => 'Bearer ' . $this->config->get('openai_key')];
-            case 'Azure':
-                return ['api-key' => $this->config->get('openai_key')];
+        switch ($this->openAiEndpoint) {
+            case self::ENDPOINT_TYPE_OPENAI:
+                return ['Authorization' => 'Bearer ' . $this->openAiKey];
+            case self::ENDPOINT_TYPE_AZURE:
+                return ['api-key' => $this->openAiKey];
         }
 
         throw new \UnexpectedValueException('Endpoint must be configured');
-    }
-
-    /**
-     * Generates the payload for the OpenAI API request.
-     *
-     * @param string $prompt // user prompt to send to the API
-     * @param ?array $responseFormat
-     * @param bool $stream
-     * @return string
-     * @throws \JsonException
-     */
-    private function generatePayload(string $prompt, ?array $responseFormat = null, bool $stream = false): string
-    {
-        $payload = [
-            "messages" => [
-                [
-                    "role" => "system",
-                    "content" => "Your task is to execute the instruction using the provided HTML content. Follow the instruction closely. Your answer must be a properly formatted HTML code. Do not add any additional remarks or notes. Do not act like a chatbot or a real person.",
-                ],
-                [
-                    "role" => "user",
-                    "content" => $prompt
-                ],
-            ],
-            "model" => $this->config->get('openai_model'),
-            "max_tokens" => 2000,
-            "temperature" => 1,
-            "top_p" => 1,
-            "stream" => $stream
-        ];
-
-        // only format if requested
-        if ($responseFormat) {
-            $payload['response_format'] = ["type" => "json_object"];
-            $payload['functions'] = [$responseFormat];
-        }
-
-        return json_encode($payload, JSON_THROW_ON_ERROR);
     }
 }

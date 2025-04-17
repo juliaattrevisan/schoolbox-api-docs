@@ -10,8 +10,6 @@
 
 namespace Schoolbox\Editor\OpenAI\Log;
 
-use Alaress_Date_Format;
-use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
 use Schoolbox\User;
 
@@ -20,53 +18,88 @@ class Model
     use ModelTrait\Id;
     use ModelTrait\CreatedAtDate;
 
-    /**
-     * @var User
-     */
-    private $user;
-
+    private User $user;
     private string $prompt;
-    private int $return_code;
-    private string $error_message;
+    private int $returnCode;
+    private string $errorMessage;
 
+
+    /**
+     * @return User
+     */
     public function getUser(): User
     {
         return $this->user;
     }
 
+
+    /**
+     * @param User $user
+     * @return $this
+     */
     public function setUser(User $user): self
     {
         $this->user = $user;
         return $this;
     }
 
+
+    /**
+     * @return string
+     */
     public function getPrompt(): string
     {
         return $this->prompt;
     }
 
-    public function setPrompt(string $prompt): void
+
+    /**
+     * @param string $prompt
+     * @return $this
+     */
+    public function setPrompt(string $prompt): self
     {
         $this->prompt = $prompt;
+        return $this;
     }
 
+
+    /**
+     * @return int
+     */
     public function getReturnCode(): int
     {
-        return $this->return_code;
+        return $this->returnCode;
     }
 
-    public function setReturnCode(int $return_code): void
+
+    /**
+     * @param int $returnCode
+     * @return $this
+     */
+    public function setReturnCode(int $returnCode): self
     {
-        $this->return_code = $return_code;
+        $this->returnCode = $returnCode;
+        return $this;
     }
 
+
+    /**
+     * @return string
+     */
     public function getErrorMessage(): string
     {
-        return $this->error_message;
+        return $this->errorMessage;
     }
 
-    public function setErrorMessage(string $error_message): void
+
+    /**
+     * @param string $errorMessage
+     * @return $this
+     */
+    public function setErrorMessage(string $errorMessage): self
     {
-        $this->error_message = $error_message;
+        $this->errorMessage = $errorMessage;
+        return $this;
     }
 }

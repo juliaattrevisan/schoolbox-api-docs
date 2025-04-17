@@ -354,6 +354,14 @@ class ConfigMapper extends Mapper
     public const NAME_LEARNOSITY_CONSUMER_KEY = 'learnosity_consumer_key';
     public const NAME_LEARNOSITY_CONSUMER_SECRET = 'learnosity_consumer_secret';
 
+    /* OpenAI
+     */
+    public const NAME_OPENAI_ENDPOINT = 'openai_endpoint';
+    public const NAME_OPENAI_KEY = 'openai_key';
+    public const NAME_OPENAI_RESOURCE_NAME = 'openai_azure_resource_name';
+    public const NAME_OPENAI_DEPLOYMENT_ID = 'openai_azure_deployment_id';
+    public const NAME_OPENAI_MODEL = 'openai_model';
+
 
     public const NAME_DATASET_INSTANCE = 'dataset_instance';
     /**
