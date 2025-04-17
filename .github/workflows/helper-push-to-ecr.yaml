@@ -9,7 +9,7 @@ on:
           The name of the image to push.
 
           Must have had an artifact built for it already, named
-          `{{ inputs.image }}-{{ arch }}`
+          `{{ inputs.image }}`.
         required : true
     secrets:
       AWS_ROLE_TO_ASSUME:
@@ -24,11 +24,6 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        build:
-          - platform: linux
-            arch: amd64
-          - platform: linux
-            arch: arm64
         region:
           - ap-southeast-2
 #          - ap-southeast-1
@@ -40,12 +35,12 @@ jobs:
       - name: Download ${{ inputs.image }} artifact
         uses: actions/download-artifact@v4
         with:
-          name: ${{ inputs.image }}-${{ matrix.build.arch }}
+          name: ${{ inputs.image }}
           path: ${{ runner.temp }}
 
       - name: Load ${{ inputs.image }} image
         run: |
-          docker image load --input ${{ runner.temp }}/${{ inputs.image }}-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
+          docker image load --input ${{ runner.temp }}/${{ inputs.image }}.tar
 
       - name: Configure AWS Credentials
         if: env.AWS_ROLE_TO_ASSUME != ''
@@ -62,4 +57,4 @@ jobs:
       - name: Push ${{ inputs.image }} image
         if: env.AWS_ROLE_TO_ASSUME != ''
         run: |
-          docker push -a ${{ steps.login-ecr.outputs.registry }}/${{ inputs.image }} --platform ${{ matrix.build.platform }}/${{ matrix.build.arch }}
+          docker push -a ${{ steps.login-ecr.outputs.registry }}/${{ inputs.image }} --platform linux/amd64,linux/arm64

@@ -16,16 +16,7 @@ on:
 
 jobs:
   build-and-push-to-dockerhub:
-    strategy:
-      matrix:
-        build:
-          - runs-on: ubuntu-latest
-            platform: linux
-            arch: amd64
-          - runs-on: ubuntu-arm
-            platform: linux
-            arch: arm64
-    runs-on: ${{ matrix.build.runs-on }}
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -47,10 +38,10 @@ jobs:
           cache-to: type=gha
           load: true
           push: true
-          outputs: type=docker,dest=${{ runner.temp }}/php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
+          outputs: type=docker,dest=${{ runner.temp }}/php82-alpine.tar
           build-args: |
             ENV=prod
-          platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
+          platforms: linux/amd64,linux/arm64
           tags: |
             alaress/php82-alpine:latest
 
@@ -62,25 +53,25 @@ jobs:
           cache-to: type=gha
           load: true
           push: true
-          outputs: type=docker,dest=${{ runner.temp }}/php82-fpm-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
+          outputs: type=docker,dest=${{ runner.temp }}/php82-fpm-alpine.tar
           build-args: |
             ENV=prod
-          platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
+          platforms: linux/amd64,linux/arm64
           tags: |
             alaress/php82-fpm-alpine:latest
 
       - name: Upload php82-alpine artifact
         uses: actions/upload-artifact@v4
         with:
-          name: php82-alpine-${{ matrix.build.arch }}
-          path: ${{ runner.temp }}/php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
+          name: php82-alpine
+          path: ${{ runner.temp }}/php82-alpine.tar
           retention-days: 1
 
       - name: Upload php82-fpm-alpine artifact
         uses: actions/upload-artifact@v4
         with:
-          name: php82-fpm-alpine-${{ matrix.build.arch }}
-          path: ${{ runner.temp }}/php82-fpm-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
+          name: php82-fpm-alpine
+          path: ${{ runner.temp }}/php82-fpm-alpine.tar
           retention-days: 1
 
   push-php82-to-ecr:
