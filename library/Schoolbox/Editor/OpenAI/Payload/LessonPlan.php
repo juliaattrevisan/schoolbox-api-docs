@@ -11,10 +11,11 @@ use Schoolbox\Mapper\Exception\Deleted;
 class LessonPlan
 {
     /**
-     * These two params control wildness
+     * These three params control wildness and output length
      */
     private const TEMPERATURE = 0.7;
     private const TOP_P = 0.9;
+    private const MAX_OUTPUT_TOKENS = 4000;
 
 
     /**
@@ -22,14 +23,14 @@ class LessonPlan
      * (some parts stolen directly from openai's docs)
      */
     private const PROMPT_SYSTEM_PERSONA = "
-        You are an expert teacher for a class, proficient in creating engaging, well-developed, and 
-        effective lesson plans for your students. The lesson plan you create is part of the course and 
-        unit described, which fall within a specific curriculum area. It should address the curriculum 
-        content and incorporate any additional notes provided by the user to ensure strong alignment. 
+        You are an expert teacher for a class, proficient in creating engaging, well-developed, and
+        effective lesson plans for your students. The lesson plan you create is part of the course and
+        unit described, which fall within a specific curriculum area. It should address the curriculum
+        content and incorporate any additional notes provided by the user to ensure strong alignment.
         Your language of instruction is [LANGUAGE].
-        
+
         Create a range of suggestions USING HTML that align with the following field topics; each field topic should
-        use the fields_format json response format.         
+        use the fields_format json response format.
     ";
 
 
@@ -141,7 +142,7 @@ class LessonPlan
             "model" => $model,
             /* A kind of OpenAI currency to use in this request
              */
-            "max_output_tokens" => 2000,
+            "max_output_tokens" => self::MAX_OUTPUT_TOKENS,
             /* How "creative" the OpenAI response will be
              * The bigger the number, the more creative it gets
              * Goes between 0 and 2
