@@ -137,6 +137,22 @@ class Controller extends Base
                 return;
             }
 
+            /* The actual output we requested is in this chain of objects, for now assume it'll only ever be one */
+            $newFieldData = json_decode($data['output'][0]['content'][0]['text'], true);
+
+            /* Since we request the fields to be keyed by their title, not ID for AI reasons,
+             * translate it back to IDs for frontend sanity
+             */
+            $fields = [];
+            foreach ($inputs['fields'] as $field) {
+                // maybe the AI didn't return stuff for this field... if so, the frontend will handle that.
+                if (isset($newFieldData[$field['title']])) {
+                    $fields[$field['id']] = $newFieldData[$field['title']];
+                }
+            }
+
+            $this->response = $this->responseAsJson($fields);
+
             return;
         } catch (\DomainException $e) {
             /* Not configured? Not found
