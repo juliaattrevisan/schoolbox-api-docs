@@ -276,7 +276,7 @@ class LessonPlan
 
             /* Make a giant prompt slab for each field
              */
-            $struct['schema']['properties'][$fieldId] = [
+            $struct['schema']['properties'][$fieldTitle] = [
                 'type' => 'string',
                 'description' => sprintf(
                     "FIELD TITLE: %s\nFIELD DESCRIPTION: %s\nTEMPLATE: %s\nVISIBILITY: %s",
@@ -290,7 +290,7 @@ class LessonPlan
             /* I think this forces the $fieldId to spawn in the json payload
              * that openai gives back to us
              */
-            $struct['schema']['required'][] = $fieldId;
+            $struct['schema']['required'][] = $fieldTitle;
         }
 
         return $struct;
