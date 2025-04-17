@@ -177,7 +177,7 @@ class Controller extends Base
                 $returnCode = 500;
 
                 $this->response = $this->responseAsJson([
-                    'output' => $data
+                    'output' => $data["output"]
                 ])->withStatus($returnCode);
 
                 return;
