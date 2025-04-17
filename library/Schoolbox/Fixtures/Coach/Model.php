@@ -68,18 +68,18 @@ class Model implements \JsonSerializable, ISoftDeletable
     }
 
     /**
-     * @return User
+     * @return User|null
      */
-    public function getUser()
+    public function getUser(): ?User
     {
         return $this->user;
     }
 
     /**
-     * @param User $user
-     * @return static
+     * @param User|null $user
+     * @return $this
      */
-    public function setUser($user)
+    public function setUser(?User $user): self
     {
         $this->user = $user;
         return $this;
@@ -99,7 +99,7 @@ class Model implements \JsonSerializable, ISoftDeletable
     {
         if ($this->getId()) {
             return self::PREFIX_EXISTING_TAG . ':' . $this->getId();
-        } elseif ($this->getUser()->getId()) {
+        } elseif ($this->getUser()?->getId()) {
             return self::PREFIX_NEW_FROM_USER . ':' . $this->getUser()->getId();
         } else {
             return self::PREFIX_NEW_FROM_INPUT . ':' . $this->getName();
@@ -113,7 +113,7 @@ class Model implements \JsonSerializable, ISoftDeletable
      */
     public function formatName()
     {
-        if ($this->getUser()->getId()) {
+        if ($this->getUser()?->getId()) {
             // Format similarly to ajax user
             $name = sprintf("%s - %s", $this->getUser()->formatName(), $this->getUser()->getRole()->getName());
             if ($this->getUser()->getExternalId()) {
