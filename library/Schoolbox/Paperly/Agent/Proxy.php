@@ -18,6 +18,8 @@ class Proxy
      */
     public const PAPERLY_PROXY_HMAC_ALGO = 'sha256';
 
+    public const IMAGE_WILDCARD = 'image/';
+
     public function __construct(
         private IConnector $externalDb,
     ) {
@@ -103,9 +105,9 @@ class Proxy
         }
 
         foreach ($data as $row) {
+            $row = array_map(fn($item) => $this->convertImageToBase64($item), $row);
             $results[] = $row;
         }
-
         return $results;
     }
 
@@ -128,5 +130,25 @@ class Proxy
             ),
             $hash
         );
+    }
+
+    /**
+     * Check if the data need to be encoded and return the base64 encoded data back
+     *
+     * @param mixed $stream
+     * @return mixed
+     */
+    private function convertImageToBase64(mixed $stream): mixed
+    {
+        if (!is_string($stream)) {
+            return $stream;
+        }
+        $mimeType = (new \finfo(FILEINFO_MIME_TYPE))->buffer($stream);
+        /* If the data is image stream then encode it
+         */
+        if (str_starts_with($mimeType, self::IMAGE_WILDCARD)) {
+            return base64_encode($stream);
+        }
+        return $stream;
     }
 }
