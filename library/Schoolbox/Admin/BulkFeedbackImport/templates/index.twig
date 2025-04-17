@@ -62,51 +62,23 @@
         <div class="small-12 island">
             <section>
                 <div class="content">
-                    <p>To bulk import feedback (normalised marks and/or comments) to existing {{ locale.dueWork.proper }} items follow these steps:</p>
+                    <p>Before you begin:</p>
 
-                    <ol>
-                        <li>Insert the exact {{ locale.dueWork.proper }} Title as it currently exists on all the {{ locale.class }} pages. The title must be unique for the import to work.</li>
-                        <li>Select the Work Type for the {{ locale.dueWork.proper }} item. The Work Type must be the same one as used on all the {{ locale.dueWork.proper }} pages listed on the CSV.</li>
-                        <li>Select a Feedback Author. This will determine who has given the feedback.</li>
-                        <li>Download and edit the provided template CSV file.</li>
-                        <li>
-                            Add compulsory data to the CSV for:
-                            <ol>
-                                <li><strong>{{ locale.class.proper }} Code(s):</strong> Feedback will only be imported to {{ locale.class.plural }} where the data on the CSV matches that on a homepage within Schoolbox. If a homepage utilises multiple class codes, a match will occur on any of the class codes on the homepage.</li>
-                                <li><strong>Student External ID:</strong> This value will come from the Student Information System, but can be found on the user profile in Schoolbox.</li>
-                            </ol>
-                        </li>
-                        <li>
-                            Add feedback to the CSV for either or both the:
-                            <ol>
-                                <li><strong>Normalised Mark:</strong> This must use a value between 0 and 100. If the mark type is set to 'Total Mark' or 'Letter Grade', Schoolbox will convert the grade on uploading the file. Leave this blank if using the mark type 'None'.</li>
-                                <li><strong>Comment:</strong> This will appear as written feedback and can be left blank if not wanting to add a comment. Comments within the CSV utilising commas, line breaks and quotation marks should be added using the RFC 4180 standard.</li>
-                            </ol>
-                        </li>
-                        <li>Upload the CSV file.</li>
-                        <li>
-                            <p>Select Preview.</p>
-                            <p>You will then be presented with the preview screen containing the outcome of each row of data imported and any errors that exist for review.</p>
+                    <ul>
+                        <li>Use the exact {{ locale.dueWork.proper }} title from class pages.</li>
+                        <li>Match Work Type and Class Codes exactly.</li>
+                        <li>Add feedback using Student External IDs.</li>
+                        <li>Normalised marks must be between 0-100.</li>
+                        <li>Comments must follow formatting rules.</li>
+                        <li>Download and complete the CSV template.</li>
+                        <li>Upload and preview the file.</li>
+                    </ul>
 
-                            <p>Errors may include:</p>
-                            <ul>
-                                <li>Incorrect {{ locale.class.proper }} Codes</li>
-                                <li>Incorrect Student External IDs</li>
-                                <li>{{ locale.dueWork.proper }} Titles that do not exist or are not unique</li>
-                                <li>{{ locale.dueWork.proper }} Titles that do not correspond to the specified Work Type.</li>
-                                <li>Normalised marks that are not a value between 0 and 100. </li>
-                            </ul>
-                            <p>The error logs will not cover:</p>
-                            <ul>
-                                <li>User error of utilising total marks instead of normalised values</li>
-                                <li>Errors in comment formatting</li>
-                                <li>User error in comment content</li>
-                            </ul>
-                        </li>
-                        <li>Correct any errors in the CSV file and re-upload if needed.</li>
-                        <li>When no errors exist, utilise the 'Perform Import' button.</li>
-                    </ol>
-
+                    <p>
+                        <strong>Note:</strong> <em>Errors may occur if class codes or student IDs don't match, or if marks are out of range.</em>
+                        <br>
+                        Read full import instructions <a href="/help/sso/send?returnUrl=/homepage/2725#component502080">here</a>.
+                    </p>
                 </div>
                 <div class="component-action">
                     <section>
