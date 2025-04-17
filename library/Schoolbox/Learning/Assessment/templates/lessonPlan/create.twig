@@ -26,6 +26,7 @@
 {# The <lesson-planner> component renders the following parts of the form:
  # - Title (as a slot)
  # - Lesson Date (as a slot)
+ # - Curriculum Codes (as a slot)
  # - [Generate lesson with AI] button
  # ----
  # - Lesson Plan Fields, and associated regenerate with AI buttons
@@ -37,6 +38,7 @@
         :student-const="{{ lessonPlanMeta.consts.student |json_encode }}"
         :file-browser-category-id="{{ context.baseContext.folder.id ?? 0 }}"
         :fields="{{ lessonPlanMeta.fields |json_encode }}"
+        context-name="{{ context.baseContext is unitSpecification ? context.baseContext.folder.name : context.baseContext.specification.folder.name }}"
         generate-plan-route="{{ routeLookupIfAuthorized('openai.postLessonPlan') }}"
     >
         <template v-slot:title>

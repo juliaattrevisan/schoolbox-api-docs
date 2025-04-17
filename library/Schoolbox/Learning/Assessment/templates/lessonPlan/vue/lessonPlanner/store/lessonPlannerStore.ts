@@ -3,6 +3,9 @@ import { generateLessonPlan, translateFieldForPayload } from "./lessonPlannerUti
 import { LessonPlannerModalStep } from "../lessonPlannerTypes";
 import type { LessonPlanField, LessonPlannerStoreField } from "../lessonPlannerTypes";
 
+const SELECTOR_LESSON_PLANNER_FORM = "#assessmentForm";
+const FORM_KEY_LESSON_TITLE = "title"; // [name="title"]
+
 export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
     // An ordered list of each field of the lesson plan
     const fields = window.Vue.ref<LessonPlannerStoreField[]>([]);
@@ -10,21 +13,26 @@ export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
     // The route to generate the lesson plan with AI, if available
     const generatePlanRoute = window.Vue.ref<string | null>(null);
 
+    // The course name/unit name/folder name/etc that this is being created for, to assist the AI
+    const contextName = window.Vue.ref<string>("");
+
     // Additional context (if any) to be included in the prompt for the AI generation
     const additionalContext = window.Vue.ref<string>("");
 
     /**
      * Initialise the store
      * @param $fields - An ordered list of each field of the lesson plan
+     * @param $contextName - The course name/unit name/folder name/etc that this is being created for, to assist the AI
      * @param $generatePlanRoute - The route to generate the lesson plan with AI, if available
      */
-    function init($fields: LessonPlanField[], $generatePlanRoute: string | null): void {
+    function init($fields: LessonPlanField[], $contextName: string, $generatePlanRoute: string | null): void {
         fields.value = $fields.map((field) => ({
             ...field,
             selected: false,
             editorId: null,
             initialBody: field.lessonPlanTemplateField === undefined ? field.body : "",
         }));
+        contextName.value = $contextName;
         generatePlanRoute.value = $generatePlanRoute;
     }
 
@@ -93,10 +101,20 @@ export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
             throw new Error("No route provided to generate the lesson plan");
         }
 
+        // The lesson title input is outside of Vue, but has the name of "title"
+        const form = document.querySelector(SELECTOR_LESSON_PLANNER_FORM);
+        if (!(form instanceof HTMLFormElement)) {
+            throw new Error(`Unable to find form for selector ${SELECTOR_LESSON_PLANNER_FORM}`);
+        }
+        const formData = new FormData(form);
+        const lessonTitle = formData.get(FORM_KEY_LESSON_TITLE);
+        if (typeof lessonTitle !== "string") {
+            throw new Error("Unexpected type for lesson title form value");
+        }
+
         const response = await generateLessonPlan(generatePlanRoute.value, {
-            // TODO: fill this in with actual values
-            title: "The current title of the lesson plan",
-            context: "The course name/unit name/folder name/etc that this is being created for",
+            title: lessonTitle,
+            context: contextName.value,
             duration: "1 hour", // TODO: There's no field for this yet, so it's just hardcoded to an hour for now
             curriculumNodeIds: [],
             promptRefinement: additionalContext.value,
