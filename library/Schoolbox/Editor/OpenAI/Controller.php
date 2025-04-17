@@ -170,6 +170,19 @@ class Controller extends Base
             /* The actual output we requested is in this chain of objects, for now assume it'll only ever be one */
             $newFieldData = json_decode($data['output'][0]['content'][0]['text'], true);
 
+            /* if this didn't decode correctly (i.e. null) then some weird response came from the AI
+             * send that on... so we can figure out what happened
+             */
+            if ($newFieldData === null) {
+                $returnCode = 500;
+
+                $this->response = $this->responseAsJson([
+                    'output' => $data
+                ])->withStatus($returnCode);
+
+                return;
+            }
+
             /* Since we request the fields to be keyed by their title, not ID for AI reasons,
              * translate it back to IDs for frontend sanity
              */
@@ -179,6 +192,13 @@ class Controller extends Base
                 if (isset($newFieldData[$field['title']])) {
                     $fields[$field['id']] = Scrub::html($newFieldData[$field['title']]);
                 }
+            }
+
+            /* if the AI didn't return anything, then we don't want to send an empty field back
+             * just send whatever on earth the AI sent back to us, it'll be wrong... but it'll be something
+             */
+            if (empty($fields)) {
+                $fields = $newFieldData;
             }
 
             $this->response = $this->responseAsJson($fields);
