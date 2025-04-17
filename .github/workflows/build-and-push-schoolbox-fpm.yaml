@@ -62,9 +62,9 @@ jobs:
           path: www/static/js/bundle/
 
       # Different build-and-push depending on trigger:
-      # push: {{ github.ref_name }}-latest, {{ github.ref_name }}-{{ github.sha }}
+      # push: ${{ github.ref_name }}-latest, ${{ github.ref_name }}-${{ github.sha }}
       #       (ref_name should be master or develop)
-      # release: {{ github.ref_name }}
+      # release: ${{ github.ref_name }}
       # For now this uses a remote image as its build context, later it may use
       # an artifact built in this step?
       - name: Build and push schoolbox-fpm deployment image (latest)
@@ -84,8 +84,8 @@ jobs:
             ENV=prod
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           tags: |
-            alaress/schoolbox-fpm:{{ github.ref_name }}-latest
-            alaress/schoolbox-fpm:{{ github.ref_name }}-{{ github.sha }}
+            alaress/schoolbox-fpm:${{ github.ref_name }}-latest
+            alaress/schoolbox-fpm:${{ github.ref_name }}-${{ github.sha }}
 
       - name: Build and push schoolbox-fpm deployment image (release)
         if: github.event_name == 'release'
@@ -104,7 +104,7 @@ jobs:
             ENV=prod
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           tags: |
-            alaress/schoolbox-fpm:{{ github.ref_name }}
+            alaress/schoolbox-fpm:${{ github.ref_name }}
 
       - name: Upload schoolbox-fpm artifact
         uses: actions/upload-artifact@v4
