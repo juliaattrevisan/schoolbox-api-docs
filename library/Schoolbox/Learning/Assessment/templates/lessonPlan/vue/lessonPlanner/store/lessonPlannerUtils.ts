@@ -138,9 +138,6 @@ export async function generateLessonPlan(endpoint: string, payload: LpGenerateAp
 
         const responseText = await response.text();
 
-        // If we got some form of response, set the initial message to that
-        responseData.message = responseText;
-
         // Safely parse the response as JSON, we don't necessarily know what it will be in advance
         let responseJson: unknown = null;
         try {
