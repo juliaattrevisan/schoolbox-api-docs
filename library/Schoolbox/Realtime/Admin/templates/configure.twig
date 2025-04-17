@@ -28,9 +28,7 @@
             persist: function () {
                 let form = this.closest('form[method=post]');
 
-                document.dispatchEvent(new CustomEvent("TOAST__ACTIVATE", {
-                    detail: { text: "Saving..." }
-                }));
+                const toast = window.sbProps.toastActivate("Saving...");
 
                 // Disable all inputs within the same set while it's saving
                 form.find('input').prop('disabled', true);
@@ -46,11 +44,15 @@
                 });
 
                 $.post(form.attr('action'), formSerialized)
-                    .done(customiserCallback)
+                    .done((data) => {
+                        toast.timeout({ text: "Saved" });
+                        customiserCallback(data);
+                    })
                     .fail(() => {
-                        document.dispatchEvent(new CustomEvent("TOAST__TIMEOUT", {
-                            detail: { text: "Save failed, please contact your support if the problem persists", isSuccess: false }
-                        }));
+                        toast.timeout({
+                            text: "Save failed, please contact your support if the problem persists",
+                            isSuccess: false
+                        });
                     });
 
             },
@@ -212,11 +214,6 @@
     });
 
     function customiserCallback(data) {
-
-        document.dispatchEvent(new CustomEvent("TOAST__TIMEOUT", {
-            detail: { text: "Saved" }
-        }));
-
         $.each(data, function (slug, sources) {
 
             let $ns = $('#configurator').find('[data-namespace=' + slug + ']');
