@@ -13,6 +13,8 @@ export default class ProfilePage {
 
     static readonly DATA_TEST_PROFILE_FLAG = "student-profile-pastoral-flag-{typeId}-{subtypeId}";
 
+    static readonly SELECTOR_PROFILE_TAB = `a[href="#tab-{tabName}"]`;
+
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
@@ -104,7 +106,7 @@ export default class ProfilePage {
     }
 
     /**
-     * Verify if a specified field is visible within the profile section.
+     * Verify if a specified field is visible on profile page
      * @param fieldName - The name of the field to check (e.g., "Role", "Campus", "Class Profile")
      */
     async checkFieldIsVisible(fieldName: string): Promise<void> {
@@ -113,11 +115,29 @@ export default class ProfilePage {
     }
 
     /**
-     * Verify if a specified field is NOT visible within the profile section.
+     * Verify if a specified field is NOT visible on profile page
      * @param fieldName - The name of the field to check (e.g., "Role", "Campus", "Class Profile")
      */
     async checkFieldIsNotVisible(fieldName: string): Promise<void> {
         const fieldLocator = this.page.locator(`dl.profile dt`, { hasText: fieldName });
         await expect(fieldLocator).not.toBeVisible();
+    }
+
+    /**
+     * Verify if a specified tab is visible on profile page
+     * @param tabName - The name of the tab to check (e.g., "Goals", "Achievements", "Classes")
+     */
+    async checkTabIsVisible(tabName: string): Promise<void> {
+        const tabLocator = this.page.locator(ProfilePage.SELECTOR_PROFILE_TAB.replace("{tabName}", tabName));
+        await expect(tabLocator).toBeVisible();
+    }
+
+    /**
+     * Verify if a specified tab is NOT visible on profile page
+     * @param tabName - The name of the tab to check (e.g., "Goals", "Achievements", "Classes")
+     */
+    async checkTabIsNotVisible(tabName: string): Promise<void> {
+        const tabLocator = this.page.locator(ProfilePage.SELECTOR_PROFILE_TAB.replace("{tabName}", tabName));
+        await expect(tabLocator).not.toBeVisible();
     }
 }

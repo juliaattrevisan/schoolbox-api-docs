@@ -58,7 +58,13 @@ const tabSaveError = window.Vue.computed(() => {
                 </div>
             </div>
             <nav>
-                <a ref="editBtn" class="icon-settings" title="Settings" @click="isEditPanelOpen = !isEditPanelOpen" />
+                <a
+                    ref="editBtn"
+                    class="icon-settings"
+                    title="Settings"
+                    :data-test="`${peTabsStore.getTabIdentifier(props.tab.id)}-settings`"
+                    @click="isEditPanelOpen = !isEditPanelOpen"
+                />
             </nav>
         </div>
 

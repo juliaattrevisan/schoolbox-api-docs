@@ -12,7 +12,7 @@ import ProfilePage from "@schoolboxTest/playwright/support/page/profilePage/Prof
  * @param page - The page
  * @param db - The database helper
  */
-async function setupProfileFields(tester: AcceptanceTester, page: Page, db: DatabaseHelper): Promise<void> {
+async function setupProfileEditorPage(tester: AcceptanceTester, page: Page, db: DatabaseHelper): Promise<void> {
     const profileEditor = new ProfileEditor(tester, page);
 
     // Update alt_email for Rebecca White
@@ -58,7 +58,30 @@ async function setupProfileFields(tester: AcceptanceTester, page: Page, db: Data
     await profileEditor.clickFieldCheckbox("student", "campusCollection", "visibility", "parent");
     await profileEditor.clickFieldUpdateButton("student", "campusCollection");
 
-    // Part B: Set up fields on staff profile page
+    // Part B: Set up Tabs on student profile page
+    tester.isGoingTo("Set up tabs on Student profile editor page");
+
+    // Set up the Goals tab to be visible for only for self
+    tester.isGoingTo("Set up the Goals tab to have visible for only for self");
+    await profileEditor.clickTabCog("student", "goals");
+    await profileEditor.clickTabCheckbox("student", "goals", "visibility", "staff");
+    await profileEditor.clickTabCheckbox("student", "goals", "visibility", "parent");
+    await profileEditor.clickTabUpdateButton("student", "goals");
+
+    // Set up Achievements tab to be visible for only for parent
+    tester.isGoingTo("Set up the Achievements tab to have visible for only for parent");
+    await profileEditor.clickTabCog("student", "achievements");
+    await profileEditor.clickTabCheckbox("student", "achievements", "visibility", "self");
+    await profileEditor.clickTabCheckbox("student", "achievements", "visibility", "staff");
+    await profileEditor.clickTabUpdateButton("student", "achievements");
+
+    // Set up Classes tab to be appears on only for secondary
+    tester.isGoingTo("Set up the Classes tab to have appears on only for secondary");
+    await profileEditor.clickTabCog("student", "classes");
+    await profileEditor.clickTabCheckbox("student", "classes", "availability", "2");
+    await profileEditor.clickTabUpdateButton("student", "classes");
+
+    // Part C: Set up fields on staff profile page
     tester.isGoingTo("Set up fields on Staff profile editor page");
     tester.isGoingTo("Click on the staff role type");
     await profileEditor.clickRoleType("staff");
@@ -103,7 +126,7 @@ async function setupProfileFields(tester: AcceptanceTester, page: Page, db: Data
     await profileEditor.clickFieldCheckbox("staff", "email", "availability", "2");
     await profileEditor.clickFieldUpdateButton("staff", "email");
 
-    // Part C: Set up fields on Parent profile page
+    // Part D: Set up fields on Parent profile page
     tester.isGoingTo("Set up fields on Parent profile editor page");
     tester.isGoingTo("Click on the parent role type");
     await profileEditor.clickRoleType("parent");
@@ -148,13 +171,17 @@ test.describe("Profile Editor", () => {
 
     /**
      * Verify fields Availability & Visibility across Profile Pages
-     *    - Jack Coles: Jana Reed, Alison Chan, Jenni Reed
-     *    - Jana Reed: Jack Coles, Eden Reed, Jenni Reed
-     *    - Jenni Reed: Jana Reed, Jack Coles
+     *    - Jack Coles: Own, Jana Reed, Eden Reed, Jenni Reed, Rebecca white
+     *    - Jana Reed: Own, Jack Coles, Eden Reed, Jenni Reed
+     *    - Jenni Reed: Jana Reed, Eden Reed, Jack Coles
+     * Verify Tabss Availability & Visibility across Profile Pages
+     *    - Jack Coles: Jana Reed, Eden Reed
+     *    - Jana Reed: Own, Eden Reed
+     *    - Jenni Reed: Jana Reed, Eden Reed
      */
-    test("Profile Editor fields visibility check", async ({ tester, page, db }) => {
-        // Call setupProfileFields before running visibility checks
-        await setupProfileFields(tester, page, db);
+    test("Profile Editor fields and tabs visibility check", async ({ tester, page, db }) => {
+        // Call setupProfileEditorPage before running visibility checks
+        await setupProfileEditorPage(tester, page, db);
 
         const profilePage = new ProfilePage(tester, page);
         const profileEditor = new ProfileEditor(tester, page);
@@ -187,6 +214,21 @@ test.describe("Profile Editor", () => {
         await profilePage.checkFieldIsVisible("Year Level");
         await profilePage.checkFieldIsNotVisible("Campus");
 
+        // As Jack Coles, verify activity feed, classes, groups and contacts tabs are presented & goals and achievement tabs are not presented on Jana Reed's profile page
+
+        tester.isGoingTo(
+            "As Jack Coles, ensure activity feed, classes, groups and contacts tabs are presented on Jana Reed's profile page",
+        );
+        await profilePage.checkTabIsVisible("activity");
+        await profilePage.checkTabIsVisible("classes");
+        await profilePage.checkTabIsVisible("groups");
+        await profilePage.checkTabIsVisible("contacts");
+        tester.isGoingTo(
+            "As Jack Coles, ensure goals and achievement tabs are not presented on Jana Reed's profile page",
+        );
+        await profilePage.checkTabIsNotVisible("goals");
+        await profilePage.checkTabIsNotVisible("achievements");
+
         // As Jack Coles, Navigating to Eden Reed and verify role, year level  are presented and campus, student id are not presented
         tester.isGoingTo("Navigate to the Eden Reed profile page");
         await profilePage.goto(6);
@@ -197,6 +239,20 @@ test.describe("Profile Editor", () => {
         await profilePage.checkFieldIsVisible("Year Level");
         await profilePage.checkFieldIsNotVisible("Campus");
         await profilePage.checkFieldIsNotVisible("Student ID");
+
+        // As Jack Coles, verify activity feed, groups and contacts tabs are presented & goals, achievement and classes tabs are not presented on Eden Reed's profile page
+        tester.isGoingTo(
+            "As Jack coles, ensure activity feed, groups and contacts tabs are presented on Eden Reed's profile page",
+        );
+        await profilePage.checkTabIsVisible("activity");
+        await profilePage.checkTabIsVisible("groups");
+        await profilePage.checkTabIsVisible("contacts");
+        tester.isGoingTo(
+            "As Jack coles, ensure goals, achievement and classes tabs are not presented on Eden Reed's profile page",
+        );
+        await profilePage.checkTabIsNotVisible("goals");
+        await profilePage.checkTabIsNotVisible("achievements");
+        await profilePage.checkTabIsNotVisible("classes");
 
         // As Jack Coles, Navigating to Rebecca White and verify role is presented and campus, email are not presented
         tester.isGoingTo("Navigate to Rebecca White profile page");
@@ -231,6 +287,21 @@ test.describe("Profile Editor", () => {
         await profilePage.checkFieldIsNotVisible("Campus");
         await profilePage.checkFieldIsNotVisible("Year Level");
 
+        // As Jana Reed, verify activity feed, goals, classes, groups tabs are presented & achievement and contacts tabs are not presented on her own profile page
+
+        tester.isGoingTo(
+            "As Jana Reed, ensure activity feed, goals, classes, groups tabs are presented on her own profile page",
+        );
+        await profilePage.checkTabIsVisible("activity");
+        await profilePage.checkTabIsVisible("goals");
+        await profilePage.checkTabIsVisible("classes");
+        await profilePage.checkTabIsVisible("groups");
+        tester.isGoingTo(
+            "As Jana Reed, ensure achievement and contacts tabs are not presented on her own profile page",
+        );
+        await profilePage.checkTabIsNotVisible("achievements");
+        await profilePage.checkTabIsNotVisible("contacts");
+
         // As Jana Reed , Navigating to Eden Reed profile and verify role is presented and student id, year level and campus  are  not presented
         tester.isGoingTo("Navigate to the Eden Reed profile page");
         await profilePage.goto(6);
@@ -241,6 +312,15 @@ test.describe("Profile Editor", () => {
         await profilePage.checkFieldIsNotVisible("Student ID");
         await profilePage.checkFieldIsNotVisible("Year Level");
         await profilePage.checkFieldIsNotVisible("Campus");
+
+        // As Jana Reed , verify all tabs are not presented on Eden Reed's profile page
+        tester.isGoingTo("As Jana Reed, ensure all tabs are not presented on Eden Reed's profile page");
+        await profilePage.checkTabIsNotVisible("activity");
+        await profilePage.checkTabIsNotVisible("goals");
+        await profilePage.checkTabIsNotVisible("classes");
+        await profilePage.checkTabIsNotVisible("groups");
+        await profilePage.checkTabIsNotVisible("achievements");
+        await profilePage.checkTabIsNotVisible("contacts");
 
         //  As Jana Reed , Navigating to Jack Coles and verify role is presented and campus , email fields are not presented
         tester.isGoingTo("Navigate to the Jack Coles profile page");
@@ -285,6 +365,18 @@ test.describe("Profile Editor", () => {
         await profilePage.checkFieldIsNotVisible("Campus");
         await profilePage.checkFieldIsNotVisible("Year Level");
 
+        // As Jenni Reed, verify activity feed, achievements, classes, groups and contacts tabs are presented & goals tab is not presented on Jana Reed's profile page
+        tester.isGoingTo(
+            "As Jenni Reed, ensure activity feed, achievements, classes, groups and contacts tabs are presented on Jana Reed's profile page",
+        );
+        await profilePage.checkTabIsVisible("activity");
+        await profilePage.checkTabIsVisible("achievements");
+        await profilePage.checkTabIsVisible("classes");
+        await profilePage.checkTabIsVisible("groups");
+        await profilePage.checkTabIsVisible("contacts");
+        tester.isGoingTo("As Jenni Reed, ensure goals tab is not presented on Jana Reed's profile page");
+        await profilePage.checkTabIsNotVisible("goals");
+
         // As Jenni Reed , Navigating to Eden Reed profile and verify role, campus are presented and student id, year level are not presented
         tester.isGoingTo("Navigate to the Eden Reed profile page");
         await profilePage.goto(6);
@@ -295,6 +387,18 @@ test.describe("Profile Editor", () => {
         await profilePage.checkFieldIsNotVisible("Campus");
         await profilePage.checkFieldIsNotVisible("Student ID");
         await profilePage.checkFieldIsNotVisible("Year Level");
+
+        // As Jenni Reed, verify activity feed, achievements, groups and contacts tabs are presented & goals and classes tabs are not presented on Eden Reed's profile page
+        tester.isGoingTo(
+            "As Jenni Reed, ensure activity feed, achievements, groups and contacts tabs are presented on Eden Reed's profile page",
+        );
+        await profilePage.checkTabIsVisible("activity");
+        await profilePage.checkTabIsVisible("achievements");
+        await profilePage.checkTabIsVisible("groups");
+        await profilePage.checkTabIsVisible("contacts");
+        tester.isGoingTo("As Jenni Reed, ensure goals and classes tabs are not presented on Eden Reed's profile page");
+        await profilePage.checkTabIsNotVisible("goals");
+        await profilePage.checkTabIsNotVisible("classes");
 
         // Navigate to the profile editor page to restore fields for student, staff & parent
         await tester.logout();
@@ -321,7 +425,24 @@ test.describe("Profile Editor", () => {
         await profileEditor.clickFieldCheckbox("student", "campusCollection", "visibility", "parent");
         await profileEditor.clickFieldUpdateButton("student", "campusCollection");
 
-        // Part B: Restoring fields on staff profile editor page
+        // Part B: Restoring tabs on Student profile editor page
+        tester.isGoingTo("Restore tabss on Student profile editor page");
+        tester.isGoingTo("Restore the Goals tab");
+        await profileEditor.clickTabCog("student", "goals");
+        await profileEditor.clickTabCheckbox("student", "goals", "visibility", "staff");
+        await profileEditor.clickTabCheckbox("student", "goals", "visibility", "parent");
+        await profileEditor.clickTabUpdateButton("student", "goals");
+        tester.isGoingTo("Restore the Achievements tab");
+        await profileEditor.clickTabCog("student", "achievements");
+        await profileEditor.clickTabCheckbox("student", "achievements", "visibility", "self");
+        await profileEditor.clickTabCheckbox("student", "achievements", "visibility", "staff");
+        await profileEditor.clickTabUpdateButton("student", "achievements");
+        tester.isGoingTo("Restore the Classes tab");
+        await profileEditor.clickTabCog("student", "classes");
+        await profileEditor.clickTabCheckbox("student", "classes", "availability", "2");
+        await profileEditor.clickTabUpdateButton("student", "classes");
+
+        // Part C: Restoring fields on staff profile editor page
         tester.isGoingTo("Restore fields on Staff profile editor page");
         await profileEditor.clickRoleType("staff");
         tester.isGoingTo("Restore the Staff: email field");
@@ -335,7 +456,7 @@ test.describe("Profile Editor", () => {
         await profileEditor.clickFieldCheckbox("staff", "campusCollection", "visibility", "staff");
         await profileEditor.clickFieldUpdateButton("staff", "campusCollection");
 
-        // Part C: Restoring fields on Parent profile Editor page
+        // Part D: Restoring fields on Parent profile Editor page
         tester.isGoingTo("Restore fields on Parent profile editor page");
         await profileEditor.clickRoleType("parent");
         tester.isGoingTo("Restore the Parent: Role field");
