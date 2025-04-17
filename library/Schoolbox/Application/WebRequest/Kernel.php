@@ -76,6 +76,10 @@ class Kernel extends WebKernelAbstract
      */
     protected function configureSentry(): void
     {
+        /* A bit of an antipattern, but ok
+         */
+        parent::configureSentry();;
+
         // Configure Sentry with the current instance, now it's known.
         \Alaress\Sentry\Config::useInstanceWithSessionIdentifier($this->di->get('instance'), $this->di->get('session')->get('identifier'));
     }

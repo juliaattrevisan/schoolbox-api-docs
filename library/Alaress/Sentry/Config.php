@@ -127,18 +127,7 @@ class Config
      */
     public static function useInstanceWithSessionIdentifier(Instance $instance, ?string $sessionIdentifier): void
     {
-        /* TODO How much of this can be refactored into a spoc, idk...
-         *  It shares the guts of the other implementation useInstance()
-         */
         Sentry\configureScope(static function (Sentry\State\Scope $scope) use ($instance, $sessionIdentifier): void {
-            $scope->setTags([
-                'instance_id'      => $instance->getId(),
-                'php_version'      => PHP_VERSION,
-                'site_environment' => $instance->getSiteEnvironment(),
-                'site_version'     => $instance->getVersion(),
-                'site_school_code' => $instance->getSchoolCode(),
-            ]);
-
             /* Logout leads to this possibility
              */
             if (null !== $sessionIdentifier) {
