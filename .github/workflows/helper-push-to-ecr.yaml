@@ -12,7 +12,7 @@ on:
           `{{ inputs.image }}-{{ arch }}`
         required : true
     secrets:
-      AWS_ECR_ROLE:
+      AWS_ROLE_TO_ASSUME:
         description: |
           The AWS role required to call the ECR API.
         required : false
@@ -20,7 +20,7 @@ on:
 jobs:
   push-to-ecr:
     env:
-      AWS_ECR_ROLE: ${{ secrets.AWS_ECR_ROLE }}
+      AWS_ROLE_TO_ASSUME: ${{ secrets.AWS_ROLE_TO_ASSUME }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -48,18 +48,18 @@ jobs:
           docker image load --input ${{ runner.temp }}/${{ inputs.image }}-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
 
       - name: Configure AWS Credentials
-        if: env.AWS_ECR_ROLE != ''
+        if: env.AWS_ROLE_TO_ASSUME != ''
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ env.AWS_ECR_ROLE }}
+          role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
           aws-region: ${{ matrix.region }}
 
       - name: Login to Amazon ECR Private
-        if: env.AWS_ECR_ROLE != ''
+        if: env.AWS_ROLE_TO_ASSUME != ''
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Push ${{ inputs.image }} image
-        if: env.AWS_ECR_ROLE != ''
+        if: env.AWS_ROLE_TO_ASSUME != ''
         run: |
           docker push -a ${{ steps.login-ecr.outputs.registry }}/${{ inputs.image }} --platform ${{ matrix.build.platform }}/${{ matrix.build.arch }}
