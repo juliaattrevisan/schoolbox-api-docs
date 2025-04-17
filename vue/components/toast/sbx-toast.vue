@@ -61,7 +61,7 @@ function timeout(toast: Toast, _detail?: ToastTimeoutDetail): Toast {
     }
 
     toast.text = detail.text ?? toast.text;
-    toast.state = detail.isSuccess ? ToastState.DONE : ToastState.FAILED;
+    toast.state = detail.isSuccess || detail.isSuccess === undefined ? ToastState.DONE : ToastState.FAILED;
     toast.fadeDuration = detail.fadeDuration ?? DEFAULT_FADE_DURATION;
 
     let duration: number;
