@@ -135,13 +135,13 @@ class Proxy
     /**
      * Check if the data need to be encoded and return the base64 encoded data back
      *
-     * @param string|null $stream
-     * @return string
+     * @param mixed $stream
+     * @return mixed
      */
-    private function convertImageToBase64(?string $stream): string
+    private function convertImageToBase64(mixed $stream): mixed
     {
-        if ($stream === null) {
-            return '';
+        if (!is_string($stream)) {
+            return $stream;
         }
         $mimeType = (new \finfo(FILEINFO_MIME_TYPE))->buffer($stream);
         /* If the data is image stream then encode it
