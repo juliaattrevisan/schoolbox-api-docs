@@ -33,6 +33,9 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
@@ -70,7 +73,7 @@ jobs:
             php82-alpine=docker-image://alaress/php82-alpine
             code=${{ github.workspace }}
           push: true
-          outputs: type=docker,dest=${{ runner.temp }}/schoolbox-fpm.tar
+          outputs: type=oci,dest=${{ runner.temp }}/schoolbox-fpm.tar
           build-args: |
             ENV=prod
           platforms: linux/amd64,linux/arm64
@@ -90,7 +93,7 @@ jobs:
             php82-alpine=docker-image://alaress/php82-alpine
             code=${{ github.workspace }}
           push: true
-          outputs: type=docker,dest=${{ runner.temp }}/schoolbox-fpm.tar
+          outputs: type=oci,dest=${{ runner.temp }}/schoolbox-fpm.tar
           build-args: |
             ENV=prod
           platforms: linux/amd64,linux/arm64
