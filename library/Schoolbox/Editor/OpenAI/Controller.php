@@ -138,6 +138,35 @@ class Controller extends Base
                 return;
             }
 
+            /* Did we recieve an incomplete response? i.e. max output tokens reached?
+             * If so, send those details on so we have some idea of why it failed
+             * https://platform.openai.com/docs/api-reference/responses/object#responses/object-status
+             */
+            $status = $data["status"] ?? null;
+            if ($status !== "completed") {
+                $returnCode = 500;
+
+                $title = sprintf(
+                    "Failed to generate a response: %s",
+                    $status ?? "unknown"
+                );
+
+                /* there may be some extra details about why it was incomplete */
+                $incompleteMessage = $data["incomplete_details"]["message"] ?? null;
+                if ($incompleteMessage) {
+                    $title .= sprintf(" (%s)", $incompleteMessage);
+                }
+
+                $problem = (new ApiProblem($title))
+                    ->setStatus($returnCode)
+                    ->asArray();
+
+                $this->response = $this->responseAsJson($problem)
+                    ->withStatus($returnCode);
+
+                return;
+            }
+
             /* The actual output we requested is in this chain of objects, for now assume it'll only ever be one */
             $newFieldData = json_decode($data['output'][0]['content'][0]['text'], true);
 
