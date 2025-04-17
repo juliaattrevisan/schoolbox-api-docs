@@ -152,7 +152,7 @@ class Controller extends Base
                 );
 
                 /* there may be some extra details about why it was incomplete */
-                $incompleteMessage = $data["incomplete_details"]["message"] ?? null;
+                $incompleteMessage = $data["incomplete_details"]["reason"] ?? null;
                 if ($incompleteMessage) {
                     $title .= sprintf(" (%s)", $incompleteMessage);
                 }
