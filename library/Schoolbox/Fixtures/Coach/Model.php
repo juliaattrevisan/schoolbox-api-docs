@@ -68,18 +68,18 @@ class Model implements \JsonSerializable, ISoftDeletable
     }
 
     /**
-     * @return User
+     * @return User|null
      */
-    public function getUser()
+    public function getUser(): ?User
     {
         return $this->user;
     }
 
     /**
-     * @param User $user
-     * @return static
+     * @param User|null $user
+     * @return $this
      */
-    public function setUser($user)
+    public function setUser(?User $user): self
     {
         $this->user = $user;
         return $this;
