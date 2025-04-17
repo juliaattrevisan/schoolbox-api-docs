@@ -16,6 +16,7 @@ use Psr\Http\Client\ClientExceptionInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
+use Scrub;
 
 /**
  * This controller acts as a proxy for OpenAI API.  It just appends the configured API key to the request in
@@ -147,7 +148,7 @@ class Controller extends Base
             foreach ($inputs['fields'] as $field) {
                 // maybe the AI didn't return stuff for this field... if so, the frontend will handle that.
                 if (isset($newFieldData[$field['title']])) {
-                    $fields[$field['id']] = $newFieldData[$field['title']];
+                    $fields[$field['id']] = Scrub::html($newFieldData[$field['title']]);
                 }
             }
 
