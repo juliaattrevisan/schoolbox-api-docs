@@ -37,7 +37,7 @@
         :student-const="{{ lessonPlanMeta.consts.student |json_encode }}"
         :file-browser-category-id="{{ context.baseContext.folder.id ?? 0 }}"
         :fields="{{ lessonPlanMeta.fields |json_encode }}"
-        generate-plan-route="{{ routeLookupIfAuthorized('greenhouse.postLessonPlan') }}"
+        generate-plan-route="{{ routeLookupIfAuthorized('openai.postLessonPlan') }}"
     >
         <template v-slot:title>
             <div class="row">
