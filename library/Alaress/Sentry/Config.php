@@ -127,7 +127,7 @@ class Config
      */
     public static function useInstanceWithSessionIdentifier(Instance $instance, ?string $sessionIdentifier): void
     {
-        Sentry\configureScope(static function (Sentry\State\Scope $scope) use ($instance, $sessionIdentifier): void {
+        Sentry\configureScope(static function (Sentry\State\Scope $scope) use ($sessionIdentifier): void {
             /* Logout leads to this possibility
              */
             if (null !== $sessionIdentifier) {
