@@ -60,6 +60,19 @@
                 {{ dateForm.dateField('Lesson', 'due', assessment.dueAt, '#publishDate', '') }}
             {% endif %}
         </template>
+
+        {# Curriculum Codes
+         # This is the same include used by everything else. The entity type is some textual
+         # representation, randomly hardcoded here
+         # lessonPlanner.js also includes <curriculum-selector> as an available component so this can be used
+         #}
+        <template v-slot:curriculum-codes>
+            {% include '@learningAssessment/fragments/curriculumCodes.twig' with {
+                entityType: locale.lessonPlan.proper,
+                excludeLegend: true,
+                vueSlot: true,
+            } %}
+        </template>
     </lesson-planner>
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/lessonPlanner.js?v={{ config.site_version }}"></script>
@@ -120,14 +133,6 @@
         {% include '@learningAssessment/fragments/assessmentLocation.twig' %}
     {% endif %}
 </fieldset>
-
-{# Curriculum Codes
- # This is the same include used by everything else. The entity type is some textual
- # representation, randomly hardcoded here
- #}
-{% include '@learningAssessment/fragments/curriculumCodes.twig' with {
-    entityType: locale.lessonPlan.proper,
-} %}
 
 {% if assessment.id %}
     {% set action = 'Update' %}

@@ -27,6 +27,7 @@ window.Vue.onMounted(() => {
     <fieldset>
         <slot name="title"></slot>
         <slot name="date"></slot>
+        <slot name="curriculum-codes"></slot>
 
         <button
             v-if="sbProps.hasAIFeatures"
