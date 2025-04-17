@@ -5,7 +5,6 @@
 
 import { defineStore } from "pinia";
 import { watchIgnorable } from "@vueuse/core";
-import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 import { useStore as useSelectorStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/curriculumSelectorStore";
@@ -111,7 +110,7 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
             throw new Error("No Curriculum components exist on the template,");
         }
 
-        activate("Creating curriculum...");
+        const toast = window.sbProps.toastActivate("Creating curriculum...");
         try {
             // First create a new component
             const createFormData = new FormData();
@@ -166,9 +165,9 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
             };
             unitPlannerStore.addCurriculumComponent(unit.id, newComponent);
 
-            timeout({ text: "Curriculum created successfully" });
+            toast.timeout({ text: "Curriculum created successfully" });
         } catch (error) {
-            timeout({ text: error as string, isSuccess: false });
+            toast.timeout({ text: error as string, isSuccess: false });
         }
     }
 

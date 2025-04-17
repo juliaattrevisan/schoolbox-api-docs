@@ -4,7 +4,6 @@
 /* eslint-disable -- Ignore this file for ESLint checks for now (SA-18376) */
 /* eslint-enable vue/no-v-html */
 import RevealModal from "@schoolboxVue/components/reveal-modal";
-import * as toast from "@schoolboxVue/components/toast/sbxToastEvent";
 import { getSearchString } from "@js/util/queryUtils";
 import ExportUrlModal from "./export-url-modal";
 
@@ -70,7 +69,7 @@ export default {
         },
 
         async beginDownload() {
-            toast.activate("Downloading CSV...");
+            const toast = window.sbProps.toastActivate("Downloading CSV...");
             this.isDownloading = true;
             try {
                 const response = await fetch(`${this.exportUrl}&format=csv`, {

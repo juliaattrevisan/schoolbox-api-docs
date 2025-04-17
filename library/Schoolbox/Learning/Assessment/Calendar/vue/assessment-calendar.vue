@@ -14,7 +14,6 @@ import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import ViewEventModal from "@schoolboxVue/components/fullcalendar/view-event-modal.vue";
 import fullCalendarHelper from "@schoolboxVue/components/fullcalendar/mixinFullCalendarHelper";
 import CustomisedCalendarEvent from "@schoolboxVue/components/fullcalendar/customised-calendar-event.vue";
-import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import ViewGroupedEventsModal from "./view-grouped-events-modal.vue";
 
 // Various URLs this calendar can make use of
@@ -257,7 +256,7 @@ export default {
                 successCallback([]);
                 return;
             }
-            activate("Retrieving calendar events...");
+            const toast = window.sbProps.toastActivate("Retrieving calendar events...");
             // AJAX params: the same for all requests
             const ajaxParams = {
                 start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
@@ -271,7 +270,7 @@ export default {
             })
                 .then((response) => response.json())
                 .then((response) => {
-                    timeout({ text: "Events retrieved successfully" });
+                    toast.timeout({ text: "Events retrieved successfully" });
                     // Assign event grouping and resourceIds into every event
                     response = response.map((element) => {
                         element.resourceId = this.buildResourceIdFromEvent(element);
@@ -303,7 +302,7 @@ export default {
                     successCallback(response.filter((v) => "start" in v));
                 })
                 .catch((error) => {
-                    timeout({ text: "Events could not be retrieved", isSuccess: false });
+                    toast.timeout({ text: "Events could not be retrieved", isSuccess: false });
                     console.error(error);
                 });
         },

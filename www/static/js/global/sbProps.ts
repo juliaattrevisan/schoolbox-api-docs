@@ -10,7 +10,6 @@
 
 import { RosettaStone } from "@js/terminology/rosettaStone";
 import { injectScriptsIfNotLoaded } from "@js/util/domUtils";
-import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 
 window.sbProps = {
     ...window.sbProps, // keep any existing properties if they exist
@@ -19,6 +18,4 @@ window.sbProps = {
     MAX_BYTES_MYSQL_TEXT: 65_535, // Maximum bytes storable in a MySQL `text` field.
     l10n: new RosettaStone([]), // A helper object for translating terminology
     injectScriptsIfNotLoaded,
-    toastActivate: activate,
-    toastTimeout: timeout,
 };

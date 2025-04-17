@@ -6,7 +6,6 @@
  */
 
 import { defineStore } from "pinia";
-import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import { UNSET_ID, findById, includeChildren } from "@schoolboxCurriculum/js/nodeUtils";
 
@@ -39,8 +38,8 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
          * To notify the backend of a change in the selected nodes
          */
         async function pushChanges(): Promise<void> {
+            const toast = window.sbProps.toastActivate("Updating...");
             try {
-                activate("Updating...");
                 isProcessing.value = true;
                 const response = await fetch(
                     `/api/curriculum/usage/folder/${folderId}?returnFormat=tree&descendants=0`,
@@ -55,7 +54,7 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
                 if (response.ok) {
                     const newNodes = (await response.json()) as Node[];
                     nodes.value = newNodes;
-                    timeout({ text: "Curriculum updated successfully" });
+                    toast.timeout({ text: "Curriculum updated successfully" });
                     document.dispatchEvent(
                         new CustomEvent(FOLDER_NODES_UPDATED, {
                             detail: {
@@ -68,10 +67,10 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
                     );
                 } else {
                     const responseText = (await response.json()) as { title: string; type: string; status: number };
-                    timeout({ text: responseText.title, isSuccess: false });
+                    toast.timeout({ text: responseText.title, isSuccess: false });
                 }
             } catch (error) {
-                timeout({ text: "There was an unexpected error", isSuccess: false });
+                toast.timeout({ text: "There was an unexpected error", isSuccess: false });
             } finally {
                 isProcessing.value = false;
             }

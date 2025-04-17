@@ -15,7 +15,6 @@ import ExportModal from "@schoolboxVue/components/fullcalendar/resourceBooking/e
 import FilterModal from "@schoolboxVue/components/fullcalendar/resourceBooking/filter-modal";
 import FlatPickr from "@schoolboxVue/components/fullcalendar/flat-pickr";
 import fullCalendarHelper from "@schoolboxVue/components/fullcalendar/mixinFullCalendarHelper";
-import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import { getSearchString } from "@js/util/queryUtils";
 
 // Various URLs that FullCalendar may make use of.
@@ -184,7 +183,7 @@ export default {
          * @param callback  A function to call with the list of events.
          */
         events(fetchInfo, callback) {
-            activate("Retrieving events...");
+            const toast = window.sbProps.toastActivate("Retrieving events...");
             const params = {
                 start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
                 end: Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
@@ -202,11 +201,11 @@ export default {
                             return "start" in v;
                         }),
                     );
-                    timeout({ text: "Events retrieved" });
+                    toast.timeout({ text: "Events retrieved" });
                 })
                 .catch((error) => {
                     console.error(error);
-                    timeout({ text: "Events could not be retrieved", isSuccess: false });
+                    toast.timeout({ text: "Events could not be retrieved", isSuccess: false });
                 });
         },
 

@@ -478,7 +478,7 @@
                             /**
                              * send through the apply default settings request
                              */
-                            window.sbProps.toastActivate("Applying...");
+                            const toast = window.sbProps.toastActivate("Applying...");
                             fetch("{{routeLookup('adminNotifications.postApplyDefaultSettings') }}", {
                                 method: "POST",
                                 body: JSON.stringify({
@@ -489,7 +489,7 @@
                             }).then((response) => {
                                 if (response.ok) {
                                     $("#default-settings-modal").foundation("reveal", "close");
-                                    window.sbProps.toastTimeout({ text: "Settings applied successfully." });
+                                    toast.timeout({ text: "Settings applied successfully." });
                                 } else {
                                     return response.json().then((data) => {
                                         throw new Error(data.message);
@@ -503,7 +503,7 @@
                                 const errorElement = document.getElementById("default-settings-error-message");
                                 errorElement.innerHTML = errorMessage;
                                 errorElement.hidden = false;
-                                window.sbProps.toastTimeout({ text: "Settings not applied.", isSuccess: false });
+                                toast.timeout({ text: "Settings not applied.", isSuccess: false });
                             }).finally(() => {
                                 confirmButton.setAttribute("data-is-processing", "false");
                                 confirmButton.innerHTML = "Yes";

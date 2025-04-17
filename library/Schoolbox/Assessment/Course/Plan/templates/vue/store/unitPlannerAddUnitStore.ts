@@ -3,7 +3,6 @@
  */
 
 import { defineStore } from "pinia";
-import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import { useUnitPlannerStore } from "./unitPlannerStore";
 import type { Unit } from "../unitPlannerTypes";
 
@@ -42,8 +41,8 @@ export const useAddUnitStore = defineStore("unitPlannerAddUnit", () => {
      */
     async function add(): Promise<void> {
         const unitPlannerStore = useUnitPlannerStore();
+        const toast = window.sbProps.toastActivate("Adding...");
         try {
-            activate("Adding...");
             isProcessing.value = true;
             const response = await fetch(`/course/plan/${unitPlannerStore.courseId}/newUnit`, {
                 method: "POST",
@@ -56,14 +55,14 @@ export const useAddUnitStore = defineStore("unitPlannerAddUnit", () => {
             if (response.ok) {
                 const newUnit = (await response.json()) as Unit;
                 unitPlannerStore.units = [...unitPlannerStore.units, newUnit];
-                timeout({ text: "Unit created successfully" });
+                toast.timeout({ text: "Unit created successfully" });
                 cancel();
             } else {
                 const responseText = (await response.json()) as { title: string; type: string; status: number };
-                timeout({ text: responseText.title, isSuccess: false });
+                toast.timeout({ text: responseText.title, isSuccess: false });
             }
         } catch (error) {
-            timeout({ text: "There was an unexpected error", isSuccess: false });
+            toast.timeout({ text: "There was an unexpected error", isSuccess: false });
         } finally {
             isProcessing.value = false;
         }

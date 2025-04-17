@@ -14,7 +14,6 @@ import ViewEventModal from "@schoolboxVue/components/fullcalendar/view-event-mod
 import FlatPickr from "@schoolboxVue/components/fullcalendar/flat-pickr.vue";
 import fullCalendarHelper from "@schoolboxVue/components/fullcalendar/mixinFullCalendarHelper";
 import CustomisedCalendarEvent from "@schoolboxVue/components/fullcalendar/customised-calendar-event.vue";
-import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
 import CreateEventModal from "./create-event-modal.vue";
 import ExportModal from "./export-modal.vue";
@@ -241,7 +240,7 @@ export default {
          * @param callback  A function to call with the list of events.
          */
         events(fetchInfo, callback) {
-            activate("Retrieving calendar events...");
+            const toast = window.sbProps.toastActivate("Retrieving calendar events...");
             const params = {
                 start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
                 end: Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
@@ -259,10 +258,10 @@ export default {
                             return "start" in v;
                         }),
                     );
-                    timeout({ text: "Events retrieved successfully" });
+                    toast.timeout({ text: "Events retrieved successfully" });
                 })
                 .catch((error) => {
-                    timeout({ text: "Events could not be retrieved", isSuccess: false });
+                    toast.timeout({ text: "Events could not be retrieved", isSuccess: false });
                     console.error(error);
                 });
         },
@@ -523,7 +522,7 @@ export default {
             }
 
             // @TODO this needs to consider events in series
-            activate("Moving event...");
+            const toast = window.sbProps.toastActivate("Moving event...");
             fetch(
                 ENDPOINTS.generateUrlFromConst(
                     ENDPOINTS.URL_EVENT_MOVE,
@@ -536,13 +535,13 @@ export default {
             )
                 .then((response) => {
                     if (response.ok) {
-                        timeout({ text: "Event moved successfully" });
+                        toast.timeout({ text: "Event moved successfully" });
                     } else {
-                        timeout({ text: "Event could not be moved", isSuccess: false });
+                        toast.timeout({ text: "Event could not be moved", isSuccess: false });
                     }
                 })
                 .catch((error) => {
-                    timeout({ text: "Event could not be moved", isSuccess: false });
+                    toast.timeout({ text: "Event could not be moved", isSuccess: false });
                     console.error(error);
                 });
         },
@@ -595,7 +594,7 @@ export default {
         async updateSelectedFilters(selectedFilters) {
             // The selected filters in config are read-only and passed by reference.
             // TODO pass it by value into the filter modal, and update in this method
-            activate("Updating events...");
+            const toast = window.sbProps.toastActivate("Updating events...");
             try {
                 await fetch(URL_EVENT_FILTER, {
                     method: "POST",
@@ -603,7 +602,7 @@ export default {
                 });
                 this.calendarApi.refetchEvents();
             } catch (error) {
-                timeout({ text: "Event filters could not be updated", isSuccess: false });
+                toast.timeout({ text: "Event filters could not be updated", isSuccess: false });
                 console.error(error);
             }
         },

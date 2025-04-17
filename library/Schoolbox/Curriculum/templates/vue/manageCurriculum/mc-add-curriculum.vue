@@ -3,7 +3,6 @@
  * To add a new root curriculum node
  */
 
-import * as toast from "@schoolboxVue/components/toast/sbxToastEvent";
 import { getButtonTextDisabledDueToStorageLimitSuffix } from "@js/editor/settings/wordCountSettings";
 import { useAddCurriculumStore } from "./store/mcAddCurriculumStore";
 import { useDescriptionEditor } from "./composable/useDescriptionEditor";
@@ -69,7 +68,7 @@ async function onAddSubsectionSelected(): Promise<void> {
  */
 addCurriculumStore.$onAction(({ name, after, onError }) => {
     if (name === "add") {
-        toast.activate("Adding...");
+        const toast = window.sbProps.toastActivate("Adding...");
         after((result) => {
             toast.timeout({ text: result.message, isSuccess: true });
         });
