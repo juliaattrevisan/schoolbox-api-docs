@@ -193,9 +193,8 @@ class Processor
                     ];
                 } catch (\Schoolbox\Mapper\Exception $e) {
                     $this->log(sprintf(
-                        'Row %s: did not find folder code %s.',
-                        $i,
-                        $folderCode
+                        "Row %s: Can't find Class Code. Make sure it's correct and try again.",
+                        $i
                     ), self::WARNING);
 
                     $errors++;
