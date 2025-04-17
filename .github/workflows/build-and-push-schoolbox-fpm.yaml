@@ -25,16 +25,22 @@ jobs:
     needs:
       - build-composer-artifact
       - build-npm-artifact
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        build:
+          - runs-on: ubuntu-latest
+            platform: linux
+            arch: amd64
+          - runs-on: ubuntu-arm
+            platform: linux
+            arch: arm64
+    runs-on: ${{ matrix.build.runs-on }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -73,10 +79,10 @@ jobs:
             php82-alpine=docker-image://alaress/php82-alpine
             code=${{ github.workspace }}
           push: true
-          outputs: type=oci,dest=${{ runner.temp }}/schoolbox-fpm.tar
+          outputs: type=docker,dest=${{ runner.temp }}/schoolbox-fpm-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
           build-args: |
             ENV=prod
-          platforms: linux/amd64,linux/arm64
+          platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           tags: |
             alaress/schoolbox-fpm:${{ github.ref_name }}-latest
             alaress/schoolbox-fpm:${{ github.ref_name }}-${{ github.sha }}
@@ -93,18 +99,18 @@ jobs:
             php82-alpine=docker-image://alaress/php82-alpine
             code=${{ github.workspace }}
           push: true
-          outputs: type=oci,dest=${{ runner.temp }}/schoolbox-fpm.tar
+          outputs: type=docker,dest=${{ runner.temp }}/schoolbox-fpm-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
           build-args: |
             ENV=prod
-          platforms: linux/amd64,linux/arm64
+          platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           tags: |
             alaress/schoolbox-fpm:${{ github.ref_name }}
 
       - name: Upload schoolbox-fpm artifact
         uses: actions/upload-artifact@v4
         with:
-          name: schoolbox-fpm
-          path: ${{ runner.temp }}/schoolbox-fpm.tar
+          name: ${{ inputs.image }}-${{ matrix.build.arch }}
+          path: ${{ runner.temp }}/schoolbox-fpm-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
           retention-days: 1
 
   push-schoolbox-fpm-alpine-to-ecr:
