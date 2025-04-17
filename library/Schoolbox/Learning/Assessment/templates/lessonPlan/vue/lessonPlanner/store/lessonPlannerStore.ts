@@ -97,6 +97,7 @@ export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
             // TODO: fill this in with actual values
             title: "The current title of the lesson plan",
             context: "The course name/unit name/folder name/etc that this is being created for",
+            duration: "1 hour", // TODO: There's no field for this yet, so it's just hardcoded to an hour for now
             curriculumNodeIds: [],
             promptRefinement: additionalContext.value,
             fields: fields.value.map((f) => translateFieldForPayload(f, f.selected, generateForField.value)),

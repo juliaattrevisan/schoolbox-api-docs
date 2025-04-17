@@ -44,6 +44,10 @@ type LpGenerateApiPayload = {
      */
     context: string;
     /**
+     * A human-readable representation of the duration of this lesson plan, i.e. "1 hour"
+     */
+    duration: string;
+    /**
      * A list of curriculum node IDs that are selected for this lesson plan
      */
     curriculumNodeIds: number[];
