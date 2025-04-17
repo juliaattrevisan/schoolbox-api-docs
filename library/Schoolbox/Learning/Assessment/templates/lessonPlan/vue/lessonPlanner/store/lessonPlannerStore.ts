@@ -1,6 +1,5 @@
 import { defineStore } from "pinia";
 import { generateLessonPlan, translateFieldForPayload } from "./lessonPlannerUtils";
-import type { LpGenerateApiFieldPayload } from "./lessonPlannerUtils";
 import { LessonPlannerModalStep } from "../lessonPlannerTypes";
 import type { LessonPlanField, LessonPlannerStoreField } from "../lessonPlannerTypes";
 
