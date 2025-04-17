@@ -7,9 +7,10 @@
 import { useTemplateRef } from "vue";
 import { onKeyStroke } from "@vueuse/core";
 import { useFocusTrap } from "@vueuse/integrations/useFocusTrap";
+import { vOnClickOutside } from "@vueuse/components";
 
 interface Props {
-    hasBackgroundClick?: boolean; // Whether to close the modal on background click
+    hasBackgroundClick?: boolean; // Whether to close the modal on background click (clicking outside the modal)
 }
 const props = defineProps<Props>();
 
@@ -52,11 +53,10 @@ onKeyStroke("Escape", () => {
 });
 
 /**
- * To close the modal on background click
- * @param event - the click event
+ * To close the modal on background click (clicking outside the modal)
  */
-function onBackgroundClick(event: MouseEvent): void {
-    if (props.hasBackgroundClick && event.target === modalEl.value) {
+function onBackgroundClick(): void {
+    if (props.hasBackgroundClick) {
         close();
     }
 }
@@ -65,8 +65,8 @@ function onBackgroundClick(event: MouseEvent): void {
 <template>
     <teleport to="body">
         <transition>
-            <div v-if="isOpen" ref="modalEl" class="modal" @click="onBackgroundClick">
-                <div class="modal__container">
+            <div v-if="isOpen" ref="modalEl" class="modal">
+                <div v-on-click-outside="onBackgroundClick" class="modal__container">
                     <!-- @slot Reveal modal content goes into this slot -->
                     <slot></slot>
                     <button
