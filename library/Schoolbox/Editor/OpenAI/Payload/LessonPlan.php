@@ -15,7 +15,7 @@ class LessonPlan
      */
     private const TEMPERATURE = 0.7;
     private const TOP_P = 0.9;
-    private const MAX_OUTPUT_TOKENS = 4000;
+    private const MAX_OUTPUT_TOKENS = 20000;
 
 
     /**
