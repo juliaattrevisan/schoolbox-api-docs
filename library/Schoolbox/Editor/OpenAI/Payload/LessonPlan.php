@@ -279,7 +279,7 @@ class LessonPlan
             $struct['schema']['properties'][$fieldTitle] = [
                 'type' => 'string',
                 'description' => sprintf(
-                    "FIELD TITLE: %s\nFIELD DESCRIPTION: %s\nTEMPLATE: %s\nVISIBILITY: %s",
+                    "USE HTML\nFIELD TITLE: %s\nFIELD DESCRIPTION: %s\nTEMPLATE: %s\nVISIBILITY: %s",
                     $fieldTitle,
                     $fieldDescription,
                     $fieldBody,
