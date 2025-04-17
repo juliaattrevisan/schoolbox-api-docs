@@ -120,7 +120,22 @@ class Controller extends Base
 
             $data = json_decode($result, true);
 
-            $this->response = $this->responseAsJson(json_decode($data['output'][0]['content'][0]['text']) ?? null);
+            /* If something went wrong on the openAI side, it'll send us an "error" key
+             * https://platform.openai.com/docs/api-reference/responses/object#responses/object-error
+             * If we get this, send on the human-readable message to the user
+             */
+            if ($data["error"] ?? null) {
+                $returnCode = 500;
+
+                $problem = (new ApiProblem($data["error"]["message"]))
+                    ->setStatus($returnCode)
+                    ->asArray();
+
+                $this->response = $this->responseAsJson($problem)
+                    ->withStatus($returnCode);
+
+                return;
+            }
 
             return;
         } catch (\DomainException $e) {
