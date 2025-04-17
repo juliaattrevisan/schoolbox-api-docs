@@ -150,6 +150,18 @@ export async function generateLessonPlan(endpoint: string, payload: LpGenerateAp
             throw new Error("Invalid response");
         }
 
+        // If we didn't get a 200 response, then handle as per RFC 9457 "API Problem"
+        if (response.status !== 200) {
+            responseData.success = false;
+            if ("title" in responseJson && typeof responseJson.title === "string") {
+                responseData.message = responseJson.title;
+            }
+            if ("detail" in responseJson && typeof responseJson.detail === "string") {
+                responseData.message += `: ${responseJson.detail}`;
+            }
+            return responseData;
+        }
+
         // The final fields to return should be a map of the field IDs to each new body
         const fields: Record<LessonPlanField["id"], string> = {};
 
