@@ -52,7 +52,7 @@ jobs:
             ENV=prod
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           tags: |
-            alaress/php82-alpine:latest
+            alaress/php82-alpine:latest-${{ matrix.build.arch }}
 
       - name: Build and push php82-fpm-alpine to Dockerhub
         uses: docker/build-push-action@v6
@@ -67,7 +67,7 @@ jobs:
             ENV=prod
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           tags: |
-            alaress/php82-fpm-alpine:latest
+            alaress/php82-fpm-alpine:latest-${{ matrix.build.arch }}
 
       - name: Upload php82-alpine artifact
         uses: actions/upload-artifact@v4
@@ -83,9 +83,39 @@ jobs:
           path: ${{ runner.temp }}/php82-fpm-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
           retention-days: 1
 
-  push-php82-to-ecr:
+  join-images:
     needs:
       - build-and-push-to-dockerhub
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Join php82-alpine images
+        run: |
+          docker manifest create alaress/php82-alpine:latest \
+            --amend alaress/php82-alpine:latest-amd64 \
+            --amend alaress/php82-alpine:latest-arm64
+          docker manifest push --purge alaress/php82-alpine:latest
+
+      - name: Join php82-fpm-alpine images
+        run: |
+          docker manifest create alaress/php82-fpm-alpine:latest \
+            --amend alaress/php82-fpm-alpine:latest-amd64 \
+            --amend alaress/php82-fpm-alpine:latest-arm64
+          docker manifest push --purge alaress/php82-fpm-alpine:latest
+
+      # Need artifact for the joined image too, or pull the just built image?
+
+  push-php82-to-ecr:
+    needs:
+      - join-images
     uses: ./.github/workflows/helper-push-to-ecr.yaml
     with:
       image: php82-alpine
@@ -93,7 +123,7 @@ jobs:
 
   push-php82-fpm-to-ecr:
     needs:
-      - build-and-push-to-dockerhub
+      - join-images
     uses: ./.github/workflows/helper-push-to-ecr.yaml
     with:
       image: php82-fpm-alpine
