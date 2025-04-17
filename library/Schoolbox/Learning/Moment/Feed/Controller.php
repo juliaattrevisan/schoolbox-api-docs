@@ -79,7 +79,7 @@ class Controller extends Base
      * @param User $user
      * @since 20.2
      *
-     * @api   GET /learning/evidence/user/{userId}/feed
+     * @api   GET /learning/evidenceFeed/user/{userId}/
      */
     public function getFeedForUser(User $user): void
     {

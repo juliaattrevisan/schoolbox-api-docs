@@ -399,7 +399,7 @@ class Controller extends Base
      */
     public function getAwardedBadges(User $user, string $awardStatus): void
     {
-        $awards = $this->mapper->findRecentForUser($user, $awardStatus, Alaress_Date_Format::now());
+        $awards = $this->mapper->findForUser($user, $awardStatus, Alaress_Date_Format::now());
 
         $stack = [];
 
@@ -445,7 +445,7 @@ class Controller extends Base
 
             /* Init badge count
              *
-             * findRecentForUser() is listed reverse chronologically so the first
+             * findForUser() is listed reverse chronologically so the first
              * in the list is the most recently awarded
              */
             if (!isset($stack['categories'][$categoryId]['awards'][$badgeId])) {
