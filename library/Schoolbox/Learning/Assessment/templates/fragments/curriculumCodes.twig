@@ -2,11 +2,20 @@
  # Curriculum Code Selectize
  #
  # @param bool $courseManagedReadonly
+ # @param ?bool $excludeLegend - Whether the legend should be excluded (defaults to false)
+ # @param ?bool $vueSlot - Whether this is being rendered as a vue slot, (defaults to false)
+ #                         if so, the relevant createApp() must have CurriculumSelector included as an available component
+ #                         Otherwise, this will render it as an independent vue app
  #}
 {% set entityType = entityType ?: 'Folder' %}
+{% set excludeLegend = excludeLegend ?? false %}
+{% set vueSlot = vueSlot ?? false %}
+
 {% if config.curriculum_tagging_enabled %}
-    <fieldset>
-        <legend>Curriculum</legend>
+    {% if not excludeLegend ?? false %}
+        <fieldset>
+            <legend>Curriculum</legend>
+    {% endif %}
         <div class="row">
             <div class="small-12 columns">
                 <label>Curriculum Codes
@@ -15,9 +24,12 @@
                     {% include 'sub/curriculumCodeSelector.twig' with {
                         'codeList': curriculumNodes,
                         'renderButton': true,
+                        'vueSlot': vueSlot,
                         courseManagedReadonly: courseManagedReadonly ?? false
                     } %}
             </div>
         </div>
-    </fieldset>
+    {% if not excludeLegend ?? false %}
+        </fieldset>
+    {% endif %}
 {% endif %}

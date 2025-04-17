@@ -27,17 +27,20 @@ window.Vue.onMounted(() => {
     <fieldset>
         <slot name="title"></slot>
         <slot name="date"></slot>
+        <slot name="curriculum-codes"></slot>
 
-        <button
-            v-if="sbProps.hasAIFeatures"
-            type="button"
-            class="button expand icon-chat"
-            @click="() => lpStore.openModal()"
-        >
-            {{ lpStore.hasLessonContent ? "Regenerate" : "Generate" }}
-            {{ locale.lessonPlan.singular() }}
-            with AI
-        </button>
+        <div class="l-pad-m--top">
+            <button
+                v-if="sbProps.hasAIFeatures"
+                type="button"
+                class="button expand icon-chat"
+                @click="() => lpStore.openModal()"
+            >
+                {{ lpStore.hasLessonContent ? "Regenerate" : "Generate" }}
+                {{ locale.lessonPlan.singular() }}
+                with AI
+            </button>
+        </div>
     </fieldset>
 
     <fieldset v-for="(field, i) in lpStore.fields" :key="field.id">

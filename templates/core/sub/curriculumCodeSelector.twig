@@ -2,16 +2,26 @@
  # Curriculum code selector
  #
  # @param bool courseManagedReadonly
+ # @param ?bool $vueSlot - Whether this is being rendered as a vue slot,
+ #                         if so, the relevant createApp() must have CurriculumSelector included as an available component
+ #                         Otherwise, this will render it as an independent vue app
  #}
 {% if courseManagedReadonly is not defined %}
     {% set courseManagedReadonly = false %}
 {% endif %}
-<div data-cs-container>
+
+{% set vueSlot = vueSlot ?? null %}
+{% if not vueSlot %}
+    <div data-cs-container>
+{% endif %}
     <curriculum-selector
+        {# these props are passed to either the curriculum-selector component, or the slot - which expects the same props #}
         :is-read-only="{{ courseManagedReadonly ? 'true' : 'false' }}"
         :selected-nodes="{{ codeList|json_encode }}"
         data-endpoint="{{ routeLookup('curriculumApi.searchNode') }}"
         :include-children="true"
     />
-</div>
-<script src="{{ CDN_PREFIX }}/js/bundle/curriculumSelector.js?v={{ config.site_version }}"></script>
+{% if not vueSlot %}
+    </div>
+    <script src="{{ CDN_PREFIX }}/js/bundle/curriculumSelector.js?v={{ config.site_version }}"></script>
+{% endif %}
