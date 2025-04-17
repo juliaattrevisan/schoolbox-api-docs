@@ -58,6 +58,11 @@
          # and their causes must be repaired first before schools can continue.
          #}
         <div class="small-12 columns">
+            {% if not outcome.errors %}
+                <div data-alert class="alert-box alert">
+                    <strong>Warning:</strong> This action is permanent and cannot be undone. Please review your changes carefully before proceeding.
+                </div>
+            {% endif %}
             <ul class="flex-list buttons">
                 <li><a href="{{ routeLookupIfAuthorized('adminBulkFeedbackImport.getIndex') }}">Back</a></li>
                 <li>
