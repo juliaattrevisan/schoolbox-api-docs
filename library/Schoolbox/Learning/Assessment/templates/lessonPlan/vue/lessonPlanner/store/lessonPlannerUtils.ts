@@ -54,7 +54,7 @@ type LpGenerateApiPayload = {
     /**
      * The additional context/prompt refinement that the user has provided to assist the AI
      */
-    promptRefinement: string;
+    additionalContext: string;
     /**
      * All of the fields (in order) in the lesson plan,
      * and whether or not they are selected to be generated or not

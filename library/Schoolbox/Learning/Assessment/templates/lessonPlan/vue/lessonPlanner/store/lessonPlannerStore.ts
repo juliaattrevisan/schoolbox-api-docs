@@ -117,7 +117,7 @@ export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
             context: contextName.value,
             duration: "1 hour", // TODO: There's no field for this yet, so it's just hardcoded to an hour for now
             curriculumNodeIds: [],
-            promptRefinement: additionalContext.value,
+            additionalContext: additionalContext.value,
             fields: fields.value.map((f) => translateFieldForPayload(f, f.selected, generateForField.value)),
         });
 
