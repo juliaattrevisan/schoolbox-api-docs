@@ -27,10 +27,25 @@ within a self-contained development environment.
   # this will create a file somewhere in /var/lib/schoolbox: note that path
   cp $backupLocation /usr/share/schoolbox/vagrantcache/schoolbox.sql
   ```
+- optionally, rebuild the base Docker images
+  (these should be in Schoolbox's container repository):
+  ```shell
+  sudo docker build -t alaress/php82-alpine     docker/base-images/php82-alpine/
+  sudo docker build -t alaress/php82-fpm-alpine docker/base-images/php82-fpm-alpine/
+  ```
 - from the base folder, stop and start Docker containers:
   ```shell
+  # stop containers for all docker-compose configurations
   sudo docker compose down
+  sudo docker compose -f docker/deploy.docker-compose.yaml down
+
+  # start default environment:
+  # this has Schoolbox's code folder mounted as a local mount, thus changes made
+  # locally are available immediately within the container.
   sudo docker compose up -d
+
+  # Alternately, start the deployment environment:
+  sudo docker compose -f docker/deploy.docker-compose.yaml up -d
   ```
 - from the CLI container, setup database copied from Vagrant and reload
   notification bindings:

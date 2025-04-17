@@ -6,8 +6,9 @@
 
 # Detect architecture, exit if unsupported
 case $(uname -m) in
-    x86_64)   architecture="amd64" ;;
+    x86_64)  architecture="amd64" ;;
     arm64)   architecture="arm64" ;;
+    aarch64) architecture="arm64" ;;
     *) architecture="unsupported" ;;
 esac
 if [ "unsupported" = "$architecture" ];
