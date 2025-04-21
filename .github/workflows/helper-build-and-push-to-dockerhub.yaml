@@ -91,12 +91,16 @@ jobs:
         with:
           context: ${{ inputs.context }}
           file: ${{ inputs.file || '' }}
+          cache-from: type=gha
+          cache-to: type=gha
+          load: true
           # If both Dockerhub username and token are set: true, otherwise false
           push: ${{ (env.DOCKERHUB_USERNAME && env.DOCKERHUB_TOKEN && true) || false}}
           outputs: type=docker,dest=${{ runner.temp }}/${{ inputs.image }}-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
           build-args: |
             ENV=prod
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
+          # Add arch to end of each tag
           tags: ${{ inputs.tags }}
 
       - name: Upload ${{ inputs.image }} artifact
