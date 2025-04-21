@@ -47,9 +47,10 @@ jobs:
           load: true
           build-args: |
             ENV=prod
-          platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
+            ARCH=${{ matrix.build.arch }}
+#          platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           tags: |
-            php82-alpine
+            php82-alpine-${{ matrix.build.arch }}
 
       # Extract necessary artifacts out of image:
       # /etc/odbc.ini
@@ -62,7 +63,7 @@ jobs:
         if: steps.cache-php82-alpine-artifact.outputs.cache-hit != 'true'
         run: |
           docker image ls
-          image=$(docker image ls -q php82-alpine)
+          image=$(docker image ls -q php82-alpine-${{ matrix.build.arch }})
           docker create --name=temp $image
           mkdir -p \
             ${{ runner.temp }}/artifact/etc/ \
