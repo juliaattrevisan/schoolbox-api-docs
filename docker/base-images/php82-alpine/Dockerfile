@@ -9,8 +9,9 @@
 # ENV: if prod or production, build with prod dependencies only;
 #      otherwise, build with dev dependencies.
 ARG ENV=dev
+ARG ARCH=amd64
 
-FROM shinsenter/php:8.2-alpine
+FROM --platform=linux/${ARCH} shinsenter/php:8.2-alpine
 
 # Install additional extensions
 # (not in https://github.com/shinsenter/php?tab=readme-ov-file#pre-installed-php-extensions)

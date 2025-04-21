@@ -4,16 +4,17 @@
 # ENV: if prod or production, build with prod dependencies only;
 #      otherwise, build with dev dependencies.
 ARG ENV=dev
+ARG ARCH=amd64
 
 
 # Stage 1: base off of alaress/php82-alpine
 # Note: this is a private repository, so need to set an alternate when building
 # from a pull request.
-FROM alaress/php82-alpine AS build
+FROM --platform=linux/${ARCH} alaress/php82-alpine AS build
 
 
 # Stage 2: build final image
-FROM shinsenter/php:8.2-fpm-alpine AS final
+FROM --platform=linux/${ARCH} shinsenter/php:8.2-fpm-alpine AS final
 ARG ENV
 
 ## Install actual dependencies

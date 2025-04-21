@@ -82,7 +82,8 @@ jobs:
           outputs: type=docker,dest=${{ runner.temp }}/schoolbox-fpm-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
           build-args: |
             ENV=prod
-          platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
+            ARCH=${{ matrix.build.arch }}
+#          platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           tags: |
             alaress/schoolbox-fpm:${{ github.ref_name }}-latest-${{ matrix.build.arch }}
             alaress/schoolbox-fpm:${{ github.ref_name }}-${{ github.sha }}-${{ matrix.build.arch }}
@@ -102,7 +103,8 @@ jobs:
           outputs: type=docker,dest=${{ runner.temp }}/schoolbox-fpm-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
           build-args: |
             ENV=prod
-          platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
+            ARCH=${{ matrix.build.arch }}
+#          platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           tags: |
             alaress/schoolbox-fpm:${{ github.ref_name }}-${{ matrix.build.arch }}
 
@@ -132,14 +134,12 @@ jobs:
         run: |
           docker manifest create alaress/schoolbox-fpm:${{ github.ref_name }}-latest \
             --amend alaress/schoolbox-fpm:${{ github.ref_name }}-latest-amd64 \
-            --amend alaress/schoolbox-fpm:${{ github.ref_name }}-latest-arm64 \
-            --amend alaress/schoolbox-fpm:${{ github.ref_name }}-latest
+            --amend alaress/schoolbox-fpm:${{ github.ref_name }}-latest-arm64
           docker manifest push --purge alaress/schoolbox-fpm:${{ github.ref_name }}-latest
 
           docker manifest create alaress/schoolbox-fpm:${{ github.ref_name }}-${{ github.sha }} \
             --amend alaress/schoolbox-fpm:${{ github.ref_name }}-${{ github.sha }}-amd64 \
-            --amend alaress/schoolbox-fpm:${{ github.ref_name }}-${{ github.sha }}-arm64 \
-            --amend alaress/schoolbox-fpm:${{ github.ref_name }}-${{ github.sha }}
+            --amend alaress/schoolbox-fpm:${{ github.ref_name }}-${{ github.sha }}-arm64
           docker manifest push --purge alaress/schoolbox-fpm:${{ github.ref_name }}-${{ github.sha }}
 
       - name: Join schoolbox-fpm images (release)
@@ -147,8 +147,7 @@ jobs:
         run: |
           docker manifest create alaress/schoolbox-fpm:${{ github.ref_name }} \
             --amend alaress/schoolbox-fpm:${{ github.ref_name }}-amd64 \
-            --amend alaress/schoolbox-fpm:${{ github.ref_name }}-arm64 \
-            --amend alaress/schoolbox-fpm:${{ github.ref_name }}
+            --amend alaress/schoolbox-fpm:${{ github.ref_name }}-arm64
           docker manifest push --purge alaress/schoolbox-fpm:${{ github.ref_name }}
 
       # Need artifact for the joined image too, or pull the just built image?
