@@ -74,16 +74,17 @@ jobs:
           load: true
           build-args: |
             ENV=prod
-          platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
+            ARCH=${{ matrix.build.arch }}
+#          platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           tags: |
-            schoolbox-fpm
+            schoolbox-fpm-${{ matrix.build.arch }}
 
       # Smoke test for box:
       # could attempt to run PHPUnit within the box as well?
       - name: Test schoolbox-fpm
         run: |
           docker image ls
-          image=$(docker image ls -q schoolbox-fpm)
+          image=$(docker image ls -q schoolbox-fpm-${{ matrix.build.arch }})
           docker run -i $image ls -al /opt/
           docker run -i $image ls -al /etc/
           docker run -i $image ls -al /usr/local/lib/php/extensions/no-debug-non-zts-20220829/
