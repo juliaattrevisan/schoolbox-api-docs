@@ -56,7 +56,8 @@ jobs:
           outputs: type=docker,dest=${{ runner.temp }}/php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
           build-args: |
             ENV=prod
-          platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
+            ARCH=${{ matrix.build.arch }}
+#          platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           tags: |
             alaress/php82-alpine:latest-${{ matrix.build.arch }}
 
@@ -127,7 +128,8 @@ jobs:
           outputs: type=docker,dest=${{ runner.temp }}/php82-fpm-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
           build-args: |
             ENV=prod
-          platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
+            ARCH=${{ matrix.build.arch }}
+#          platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           tags: |
             alaress/php82-fpm-alpine:latest-${{ matrix.build.arch }}
 
