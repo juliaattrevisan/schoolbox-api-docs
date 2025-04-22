@@ -36,6 +36,7 @@ jobs:
       - base-image-diff
     uses: ./.github/workflows/build-and-push-base-images.yaml
     if: needs.base-image-diff.outputs.count > 0
+    secrets: inherit
 
   # Build artifacts before building image
   build-composer-artifact:
