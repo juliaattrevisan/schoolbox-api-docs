@@ -13,6 +13,10 @@ ARG ARCH=amd64
 
 FROM --platform=linux/${ARCH} shinsenter/php:8.2-alpine
 
+# Ensure ENV is accessible by this build step:
+# otherwise, xDebug will be installed below.
+ARG ENV
+
 # Install additional extensions
 # (not in https://github.com/shinsenter/php?tab=readme-ov-file#pre-installed-php-extensions)
 RUN phpaddmod \
