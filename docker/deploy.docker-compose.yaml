@@ -13,6 +13,8 @@ services:
     restart: no
     build:
       context : ./base-images/php82-alpine
+      args:
+        ENV: prod
 
   schoolbox-php-fpm-deploy:
     container_name: php-fpm
