@@ -14,6 +14,7 @@ use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Instance;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
+use Schoolbox\User;
 use Sentry;
 
 /**
@@ -114,5 +115,25 @@ class Config
             ?->setEnvironment($instance->getType())
             ?->setRelease(Instance::APPLICATION_NAME . '@' . $instance->getVersion())
         ;
+    }
+
+
+    /**
+     * Configure the Sentry hub with the current session identifier.
+     *
+     * @param string|null $sessionIdentifier
+     * @return void
+     */
+    public static function useSessionIdentifier(?string $sessionIdentifier): void
+    {
+        Sentry\configureScope(static function (Sentry\State\Scope $scope) use ($sessionIdentifier): void {
+            /* Logout leads to this possibility
+             */
+            if (null !== $sessionIdentifier) {
+                $scope->setUser([
+                    'id' => $sessionIdentifier,
+                ]);
+            }
+        });
     }
 }

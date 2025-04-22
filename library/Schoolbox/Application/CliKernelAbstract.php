@@ -102,9 +102,6 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
             self::dieGracefullyIfInMaintenanceMode($this->di->get('config'));
         }
 
-        // Configure Sentry with the current instance, now it's known.
-        \Alaress\Sentry\Config::useInstance($this->di->get('instance'));
-
         $this->initRoutes();
         $this->initModules();
     }
