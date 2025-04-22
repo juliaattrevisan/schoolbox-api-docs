@@ -141,7 +141,7 @@ jobs:
       - name: Upload schoolbox-fpm artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ inputs.image }}-${{ matrix.build.arch }}
+          name: schoolbox-fpm-${{ matrix.build.arch }}
           path: ${{ runner.temp }}/schoolbox-fpm-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
           retention-days: 1
 
