@@ -97,6 +97,8 @@ jobs:
           # If both Dockerhub username and token are set: true, otherwise false
           push: ${{ (env.DOCKERHUB_USERNAME && env.DOCKERHUB_TOKEN && true) || false}}
           outputs: type=docker,dest=${{ runner.temp }}/${{ inputs.image }}-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
+          provenance: false
+          sbom: false
           build-args: |
             ENV=prod
             ARCH=${{ matrix.build.arch }}

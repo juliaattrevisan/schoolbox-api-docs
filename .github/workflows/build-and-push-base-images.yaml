@@ -54,6 +54,11 @@ jobs:
           load: true
           push: true
           outputs: type=docker,dest=${{ runner.temp }}/php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
+          # Remove provenance and SBOM for now, as they convert the image build
+          # to a manifest, which prevents the images from being merged into a
+          # manifest later on.
+          provenance: false
+          sbom: false
           build-args: |
             ENV=prod
             ARCH=${{ matrix.build.arch }}
@@ -126,6 +131,8 @@ jobs:
           load: true
           push: true
           outputs: type=docker,dest=${{ runner.temp }}/php82-fpm-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
+          provenance: false
+          sbom: false
           build-args: |
             ENV=prod
             ARCH=${{ matrix.build.arch }}

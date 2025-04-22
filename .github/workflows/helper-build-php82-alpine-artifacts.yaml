@@ -45,6 +45,8 @@ jobs:
           cache-to: type=gha
           push: false
           load: true
+          provenance: false
+          sbom: false
           build-args: |
             ENV=prod
             ARCH=${{ matrix.build.arch }}

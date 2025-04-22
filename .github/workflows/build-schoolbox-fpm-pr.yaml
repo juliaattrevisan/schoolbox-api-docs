@@ -72,6 +72,8 @@ jobs:
             code=${{ github.workspace }}
           push: false
           load: true
+          provenance: false
+          sbom: false
           build-args: |
             ENV=prod
             ARCH=${{ matrix.build.arch }}
