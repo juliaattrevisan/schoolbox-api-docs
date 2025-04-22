@@ -106,14 +106,26 @@ class Controller extends Base
             $queryArgs
         );
 
+        $eventTypes = $this->eventTypeMapper->findAll(['deleted' => true]);
+
         $this->response = $this->responseFromTemplate(
             '@learningAssessmentCalendar/index.twig',
             [
                 'user'        => $this->getUser(),
                 'filterPanel' => $filterPanel,
                 'termDates'   => $this->getAvailableTermDates(),
-                'eventTypes'  => $this->eventTypeMapper->findAll(),
-                'inContext'   =>  $inContext,
+                'eventTypes'  => (
+                    // Convert event type objects into arrays for consumption by Twig, and add extra parameter
+                    // 'isDeleted'.  Extra parameter 'isDeleted' is not needed by FullCalendar, but is needed in
+                    // assessment-calendar.vue.
+                    $eventTypes->map(fn ($eventType) => [
+                        'id' => $eventType->getId(),
+                        'type' => $eventType->getType(),
+                        'color' => $eventType->getColor(),
+                        'isDeleted' => $eventType->isDeleted(),
+                    ])
+                ),
+                'inContext'   => $inContext,
             ],
             'Assessment Calendar',
             $pageTitle
