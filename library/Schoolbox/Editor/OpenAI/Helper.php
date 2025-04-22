@@ -41,10 +41,10 @@ class Helper
     private const SUPPORTED_STRUCTURED_OUTPUT_MODELS = [
         self::ENDPOINT_TYPE_OPENAI => [
             'gpt-3.5-turbo' => false,
-            'gpt-4' => true,
+            'gpt-4' => false,
             'gpt-4o' => true,
             'gpt-4o-mini' => true,
-            'gpt-4-turbo' => true
+            'gpt-4-turbo' => false
         ],
         self::ENDPOINT_TYPE_AZURE => [
             'gpt-3.5-turbo' => false,

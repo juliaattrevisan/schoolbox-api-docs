@@ -18,15 +18,12 @@ const selectedFields = window.Vue.computed(() => {
 
         <label :for="`lp-review-field-${field.id}`">{{ field.title }}</label>
         <p v-if="field.description.length" class="meta lp-field-description">{{ field.description }}</p>
-        <textarea
-            v-if="field.suggestedBody"
-            :id="`lp-review-field-${field.id}`"
-            v-model="field.suggestedBody"
-            rows="2"
-        ></textarea>
+        <!-- eslint-disable-next-line vue/no-v-html -- This is sanitized by the backend already -->
+        <div v-if="field.suggestedBody" :id="`lp-review-field-${field.id}`" v-html="field.suggestedBody" />
         <p v-else>No suggestions available for this section.</p>
     </template>
 
+    <div class="clearfix"></div>
     <div class="l-flex-row l-flex--no-wrap">
         <button class="l-flex__item--1 button" @click="lpStore.modalStep = LessonPlannerModalStep.GENERATE">
             Back

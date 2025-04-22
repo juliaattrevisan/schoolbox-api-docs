@@ -1,22 +1,20 @@
 import { defineStore } from "pinia";
+import { generateLessonPlan, translateFieldForPayload } from "./lessonPlannerUtils";
 import { LessonPlannerModalStep } from "../lessonPlannerTypes";
-import type { LessonPlanField } from "../lessonPlannerTypes";
+import type { LessonPlanField, LessonPlannerStoreField } from "../lessonPlannerTypes";
 
-interface LessonPlanStoreField extends LessonPlanField {
-    selected: boolean; // Whether the field is selected or not
-    editorId: string | null; // The editor ID for the field in the main form, null if not yet created
-    suggestedBody?: string; // The suggested body for the field, if it has been generated
-    /**
-     * Keep track of the initial body of the field, so we can determine whether it has been modified
-     * and to show "Generate Lesson Plan" or "Regenerate Lesson Plan". If modifying an existing lesson plan (i.e. field.lessonPlanTemplateField exists),
-     * assume that the field has been modified if it has any content in it. Otherwise, the initial body is what was provided in the template.
-     */
-    initialBody: string;
-}
+const SELECTOR_LESSON_PLANNER_FORM = "#assessmentForm";
+const FORM_KEY_LESSON_TITLE = "title"; // [name="title"]
 
 export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
     // An ordered list of each field of the lesson plan
-    const fields = window.Vue.ref<LessonPlanStoreField[]>([]);
+    const fields = window.Vue.ref<LessonPlannerStoreField[]>([]);
+
+    // The route to generate the lesson plan with AI, if available
+    const generatePlanRoute = window.Vue.ref<string | null>(null);
+
+    // The course name/unit name/folder name/etc that this is being created for, to assist the AI
+    const contextName = window.Vue.ref<string>("");
 
     // Additional context (if any) to be included in the prompt for the AI generation
     const additionalContext = window.Vue.ref<string>("");
@@ -24,14 +22,18 @@ export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
     /**
      * Initialise the store
      * @param $fields - An ordered list of each field of the lesson plan
+     * @param $contextName - The course name/unit name/folder name/etc that this is being created for, to assist the AI
+     * @param $generatePlanRoute - The route to generate the lesson plan with AI, if available
      */
-    function init($fields: LessonPlanField[]): void {
+    function init($fields: LessonPlanField[], $contextName: string, $generatePlanRoute: string | null): void {
         fields.value = $fields.map((field) => ({
             ...field,
             selected: false,
             editorId: null,
             initialBody: field.lessonPlanTemplateField === undefined ? field.body : "",
         }));
+        contextName.value = $contextName;
+        generatePlanRoute.value = $generatePlanRoute;
     }
 
     /**
@@ -51,7 +53,7 @@ export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
     const modalStep = window.Vue.ref<LessonPlannerModalStep | null>(null);
 
     // When generating/regenerating just one specific field
-    const generateForField = window.Vue.ref<LessonPlanStoreField | null>(null);
+    const generateForField = window.Vue.ref<LessonPlannerStoreField | null>(null);
 
     // Whether the modal is open or not, a ref since <basic-modal> needs it to be a v-model
     const isModalOpen = window.Vue.ref(false);
@@ -72,7 +74,7 @@ export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
      * Open the modal to the initial page
      * @param fieldId - A specific field to generate for, prevents other fields from being selected
      */
-    function openModal(fieldId?: LessonPlanStoreField["id"]): void {
+    function openModal(fieldId?: LessonPlannerStoreField["id"]): void {
         // deselect all fields, but intentionally keep additionalContext so it can be reused on the same page session
         generateForField.value = null;
         fields.value.forEach((field) => {
@@ -95,20 +97,39 @@ export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
         generateError.value = null;
         modalStep.value = LessonPlannerModalStep.GENERATING;
 
-        try {
-            // TODO: Add AI stuffs, for now just simulate a delay
-            await new Promise((resolve) => {
-                setTimeout(resolve, 1000);
-            });
-            // throw new Error("some generally friendly error message");
-        } catch (error) {
-            generateError.value = (error as Error).message;
+        if (generatePlanRoute.value === null) {
+            throw new Error("No route provided to generate the lesson plan");
+        }
+
+        // The lesson title input is outside of Vue, but has the name of "title"
+        const form = document.querySelector(SELECTOR_LESSON_PLANNER_FORM);
+        if (!(form instanceof HTMLFormElement)) {
+            throw new Error(`Unable to find form for selector ${SELECTOR_LESSON_PLANNER_FORM}`);
+        }
+        const formData = new FormData(form);
+        const lessonTitle = formData.get(FORM_KEY_LESSON_TITLE);
+        if (typeof lessonTitle !== "string") {
+            throw new Error("Unexpected type for lesson title form value");
+        }
+
+        const response = await generateLessonPlan(generatePlanRoute.value, {
+            title: lessonTitle,
+            context: contextName.value,
+            duration: "1 hour", // TODO: There's no field for this yet, so it's just hardcoded to an hour for now
+            curriculumNodeIds: [],
+            additionalContext: additionalContext.value,
+            fields: fields.value.map((f) => translateFieldForPayload(f, f.selected, generateForField.value)),
+        });
+
+        if (response.success === false) {
+            generateError.value = response.message;
             modalStep.value = LessonPlannerModalStep.GENERATE;
             return;
         }
 
         fields.value.forEach((field) => {
-            field.suggestedBody = "This is a suggested body that should be generated by the AI";
+            if (!field.selected) return; // Field not selected, skip it
+            field.suggestedBody = response.fields[field.id];
         });
 
         modalStep.value = LessonPlannerModalStep.REVIEW;

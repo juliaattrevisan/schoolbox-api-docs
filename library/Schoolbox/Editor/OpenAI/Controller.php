@@ -16,6 +16,7 @@ use Psr\Http\Client\ClientExceptionInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
+use Scrub;
 
 /**
  * This controller acts as a proxy for OpenAI API.  It just appends the configured API key to the request in
@@ -120,7 +121,87 @@ class Controller extends Base
 
             $data = json_decode($result, true);
 
-            $this->response = $this->responseAsJson(json_decode($data['output'][0]['content'][0]['text']) ?? null);
+            /* If something went wrong on the openAI side, it'll send us an "error" key
+             * https://platform.openai.com/docs/api-reference/responses/object#responses/object-error
+             * If we get this, send on the human-readable message to the user
+             */
+            if ($data["error"] ?? null) {
+                $returnCode = 500;
+
+                $problem = (new ApiProblem($data["error"]["message"]))
+                    ->setStatus($returnCode)
+                    ->asArray();
+
+                $this->response = $this->responseAsJson($problem)
+                    ->withStatus($returnCode);
+
+                return;
+            }
+
+            /* Did we recieve an incomplete response? i.e. max output tokens reached?
+             * If so, send those details on so we have some idea of why it failed
+             * https://platform.openai.com/docs/api-reference/responses/object#responses/object-status
+             */
+            $status = $data["status"] ?? null;
+            if ($status !== "completed") {
+                $returnCode = 500;
+
+                $title = sprintf(
+                    "Failed to generate a response: %s",
+                    $status ?? "unknown"
+                );
+
+                /* there may be some extra details about why it was incomplete */
+                $incompleteMessage = $data["incomplete_details"]["reason"] ?? null;
+                if ($incompleteMessage) {
+                    $title .= sprintf(" (%s)", $incompleteMessage);
+                }
+
+                $problem = (new ApiProblem($title))
+                    ->setStatus($returnCode)
+                    ->asArray();
+
+                $this->response = $this->responseAsJson($problem)
+                    ->withStatus($returnCode);
+
+                return;
+            }
+
+            /* The actual output we requested is in this chain of objects, for now assume it'll only ever be one */
+            $newFieldData = json_decode($data['output'][0]['content'][0]['text'], true);
+
+            /* if this didn't decode correctly (i.e. null) then some weird response came from the AI
+             * send that on... so we can figure out what happened
+             */
+            if ($newFieldData === null) {
+                $returnCode = 500;
+
+                $this->response = $this->responseAsJson([
+                    'output' => $data["output"]
+                ])->withStatus($returnCode);
+
+                return;
+            }
+
+            /* Since we request the fields to be keyed by their title, not ID for AI reasons,
+             * translate it back to IDs for frontend sanity
+             */
+            $fields = [];
+            foreach ($inputs['fields'] as $field) {
+                // maybe the AI didn't return stuff for this field... if so, the frontend will handle that.
+                if (isset($newFieldData[$field['title']])) {
+                    $fields[$field['id']] = Scrub::html($newFieldData[$field['title']]);
+                }
+            }
+
+            /* if the AI didn't return anything, then we don't want to send an empty field back
+             * just send whatever on earth the AI sent back to us, it'll be wrong... but it'll be something
+             */
+            if (empty($fields)) {
+                $fields = $newFieldData;
+            }
+
+            $this->response = $this->responseAsJson($fields);
 
             return;
         } catch (\DomainException $e) {
