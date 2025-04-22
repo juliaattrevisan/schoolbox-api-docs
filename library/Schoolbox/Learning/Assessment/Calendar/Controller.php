@@ -108,25 +108,23 @@ class Controller extends Base
 
         $eventTypes = $this->eventTypeMapper->findAll(['deleted' => true]);
 
-        // Convert event type objects into arrays for consumption by Twig, and add extra parameter 'isDeleted'.
-        // Extra parameter 'isDeleted' is not needed by FullCalendar, but is needed in assessment-calendar.vue.
-        $eventTypeArrays = [];
-        foreach ($eventTypes as $eventType) {
-            $eventTypeArrays[] = [
-                'id' => $eventType->getId(),
-                'type' => $eventType->getType(),
-                'color' => $eventType->getColor(),
-                'isDeleted' => $eventType->isDeleted(),
-            ];
-        }
-
         $this->response = $this->responseFromTemplate(
             '@learningAssessmentCalendar/index.twig',
             [
                 'user'        => $this->getUser(),
                 'filterPanel' => $filterPanel,
                 'termDates'   => $this->getAvailableTermDates(),
-                'eventTypes'  => $eventTypeArrays,
+                'eventTypes'  => (
+                    // Convert event type objects into arrays for consumption by Twig, and add extra parameter
+                    // 'isDeleted'.  Extra parameter 'isDeleted' is not needed by FullCalendar, but is needed in
+                    // assessment-calendar.vue.
+                    $eventTypes->map(fn ($eventType) => [
+                        'id' => $eventType->getId(),
+                        'type' => $eventType->getType(),
+                        'color' => $eventType->getColor(),
+                        'isDeleted' => $eventType->isDeleted(),
+                    ])
+                ),
                 'inContext'   => $inContext,
             ],
             'Assessment Calendar',
