@@ -25,6 +25,7 @@ jobs:
         with:
           sparse-checkout: |
             docker/base-images/
+          fetch-depth: '2'
       - name: Diff base image
         id: diff
         run: |
@@ -49,6 +50,7 @@ jobs:
       - build-and-push-base-images
       - build-composer-artifact
       - build-npm-artifact
+    if: always() && (needs.build-and-push-base-images.result == 'skipped' || needs.build-and-push-base-images.result == 'success')
     strategy:
       matrix:
         build:
