@@ -8,6 +8,7 @@ use Tests\Support\Payload;
 use Codeception\Scenario;
 use SensitiveParameter;
 
+// the csv files are located under Support/Data/SmokeTests - add the new URL in the GetSmokeTestDataList.csv
 class FetchPagesFromCsvCest
 {
     #Need some constants to represent users or logic in the before that sets the users.
