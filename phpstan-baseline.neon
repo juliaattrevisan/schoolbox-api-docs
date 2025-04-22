@@ -6541,12 +6541,6 @@ parameters:
 			path: tools/custom/wgs/pastoral-import.php
 
 		-
-			message: '#^Variable \$addParamsShort might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: tools/markbook/sync.php
-
-		-
 			message: '#^Constant Schoolbox\\Application\\CliTool\\App@anonymous/tools/mq/list\-redis\-routes\.php\:21\:\:TTL_NOT_SET is unused\.$#'
 			identifier: classConstant.unused
 			count: 1
@@ -6563,12 +6557,6 @@ parameters:
 			identifier: foreach.nonIterable
 			count: 1
 			path: tools/mq/reset-ttls.php
-
-		-
-			message: '#^Variable \$d might not be defined\.$#'
-			identifier: variable.undefined
-			count: 2
-			path: tools/notif/syscheck.php
 
 		-
 			message: '#^Variable \$usersAdded in isset\(\) is never defined\.$#'
