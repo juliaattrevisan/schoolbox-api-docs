@@ -141,13 +141,14 @@ jobs:
       - name: Upload schoolbox-fpm artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ inputs.image }}-${{ matrix.build.arch }}
+          name: schoolbox-fpm-${{ matrix.build.arch }}
           path: ${{ runner.temp }}/schoolbox-fpm-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
           retention-days: 1
 
   join-schoolbox-fpm:
     needs:
       - build-and-push-schoolbox-fpm
+    if: always() && needs.build-and-push-schoolbox-fpm.result == 'success'
     runs-on: ubuntu-latest
     steps:
       - name: Set up Docker Buildx
@@ -185,6 +186,7 @@ jobs:
   push-schoolbox-fpm-alpine-to-ecr:
     needs:
       - join-schoolbox-fpm
+    if: always() && needs.join-schoolbox-fpm.result == 'success'
     uses: ./.github/workflows/helper-push-to-ecr.yaml
     with:
       image: schoolbox-fpm
