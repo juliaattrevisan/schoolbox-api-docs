@@ -13,6 +13,29 @@ on:
       - published
 
 jobs:
+  # Build base images before building FPM images,
+  # but only if the build has changed.
+  base-image-diff:
+    runs-on: ubuntu-latest
+    outputs:
+      count: ${{ steps.diff.outputs.count }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          sparse-checkout: |
+            docker/base-images/
+      - name: Diff base image
+        id: diff
+        run: |
+          echo "count=$(git diff ${{ github.sha }}^..${{ github.sha }} --name-only -- docker/base-images/ | wc -l)" >> $GITHUB_OUTPUT
+
+  build-and-push-base-images:
+    needs:
+      - base-image-diff
+    uses: ./.github/workflows/build-and-push-base-images.yaml
+    if: needs.base-image-diff.outputs.count > 0
+
   # Build artifacts before building image
   build-composer-artifact:
     uses: ./.github/workflows/helper-build-composer-artifact.yaml
@@ -23,6 +46,7 @@ jobs:
   # Build schoolbox-fpm image
   build-and-push-schoolbox-fpm:
     needs:
+      - build-and-push-base-images
       - build-composer-artifact
       - build-npm-artifact
     strategy:
@@ -119,7 +143,7 @@ jobs:
           path: ${{ runner.temp }}/schoolbox-fpm-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
           retention-days: 1
 
-  join-images:
+  join-schoolbox-fpm:
     needs:
       - build-and-push-schoolbox-fpm
     runs-on: ubuntu-latest
@@ -158,7 +182,7 @@ jobs:
 
   push-schoolbox-fpm-alpine-to-ecr:
     needs:
-      - build-and-push-schoolbox-fpm
+      - join-schoolbox-fpm
     uses: ./.github/workflows/helper-push-to-ecr.yaml
     with:
       image: schoolbox-fpm

@@ -6,13 +6,14 @@ name: Build and push base images (php82-alpine, php82-fpm-alpine)
 # * manually (workflow_dispatch)?
 # * on a cron?
 on:
-  push:
-    branches:
-#      - master
-      - develop
-    paths:
-      - 'docker/base-images/**'
+#  push:
+#    branches:
+##      - master
+#      - develop
+#    paths:
+#      - 'docker/base-images/**'
   workflow_dispatch:
+  workflow_call:
 
 jobs:
   build-and-push-php82-alpine-to-dockerhub:
