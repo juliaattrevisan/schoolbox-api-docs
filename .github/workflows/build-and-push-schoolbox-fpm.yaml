@@ -119,7 +119,7 @@ jobs:
           path: ${{ runner.temp }}/schoolbox-fpm-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
           retention-days: 1
 
-  join-images:
+  join-schoolbox-fpm:
     needs:
       - build-and-push-schoolbox-fpm
     runs-on: ubuntu-latest
@@ -158,7 +158,7 @@ jobs:
 
   push-schoolbox-fpm-alpine-to-ecr:
     needs:
-      - build-and-push-schoolbox-fpm
+      - join-schoolbox-fpm
     uses: ./.github/workflows/helper-push-to-ecr.yaml
     with:
       image: schoolbox-fpm
