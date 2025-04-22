@@ -25,6 +25,7 @@ jobs:
         with:
           sparse-checkout: |
             docker/base-images/
+          fetch-depth: '2'
       - name: Diff base image
         id: diff
         run: |
