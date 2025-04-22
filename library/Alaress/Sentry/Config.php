@@ -119,13 +119,12 @@ class Config
 
 
     /**
-     * Configure the Sentry hub with details from the instance.
+     * Configure the Sentry hub with the current session identifier.
      *
-     * @param Instance $instance
      * @param string|null $sessionIdentifier
      * @return void
      */
-    public static function useInstanceWithSessionIdentifier(Instance $instance, ?string $sessionIdentifier): void
+    public static function useSessionIdentifier(?string $sessionIdentifier): void
     {
         Sentry\configureScope(static function (Sentry\State\Scope $scope) use ($sessionIdentifier): void {
             /* Logout leads to this possibility
@@ -136,10 +135,5 @@ class Config
                 ]);
             }
         });
-
-        Sentry\SentrySdk::getCurrentHub()->getClient()?->getOptions()
-            ?->setEnvironment($instance->getType())
-            ?->setRelease(Instance::APPLICATION_NAME . '@' . $instance->getVersion())
-        ;
     }
 }
