@@ -8,7 +8,7 @@ or pull request: they should only need to be rebuilt periodically.
 
 It's also not expected that they will ever need to be built or pushed manually:
 the Github action
-[build-and-push-php82.yaml](../../.github/workflows/build-and-push-php82.yaml)
+[build-and-push-base-images.yaml](../../.github/workflows/build-and-push-base-images.yaml)
 ought to be able to build and push automatically.
 
 To build the images:
