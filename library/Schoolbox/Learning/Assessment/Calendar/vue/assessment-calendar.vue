@@ -629,28 +629,13 @@ export default {
         },
 
         /**
-         * After the resource label section on the left of the page has been rendered:
-         * Add a class to any deleted event types so they can be visually distinguished form non-deleted event types.
+         * This is called after the resource label section on the left of the page has been rendered,
+         * once for each label or sub-label (e.g. once for 'Events', and once again for 'Events -> Extra Curricular').
          */
-        resourceLabelDidMount() {
-            const eventTypes = this.config.eventTypes;
-
-            for (const eventType of eventTypes) {
-                if (eventType.isDeleted) {
-                    const elements = document.querySelectorAll(
-                        '[data-resource-id="' + RESOURCE_EVENT_TYPE_PREFIX + eventType.id + '"]',
-                    );
-
-                    for (const element of elements) {
-                        // Events having this event type have the same class are also selected by the above
-                        // call to document.querySelectorAll().  So we need to check the textContent to find the
-                        // element we seek.
-                        if (element.textContent === eventType.type) {
-                            element.classList.add("meta"); // Add 'meta' class to distinguish deleted from non-deleted event types.
-                            element.title = "This event type has been deleted.";
-                        }
-                    }
-                }
+        resourceLabelDidMount({ el, resource }) {
+            if (resource.extendedProps.isDeleted) {
+                el.classList.add("meta"); // Add 'meta' class to distinguish deleted from non-deleted event types.
+                el.title = "This event type has been deleted.";
             }
         },
 
