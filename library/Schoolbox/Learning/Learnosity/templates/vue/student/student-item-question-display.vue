@@ -197,6 +197,12 @@ window.Vue.onMounted(() => {
         if (inputElement) {
             inputElement.removeAttribute("disabled");
         }
+
+        // Remove disabled attribute from the textarea field so field can be selected to view all the text within on smaller screens
+        const textareaElement = response?.querySelector(".lrn_plaintextarea textarea");
+        if (textareaElement) {
+            textareaElement.removeAttribute("disabled");
+        }
     }
 });
 
