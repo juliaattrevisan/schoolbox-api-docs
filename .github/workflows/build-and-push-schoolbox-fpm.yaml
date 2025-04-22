@@ -80,6 +80,8 @@ jobs:
             code=${{ github.workspace }}
           push: true
           outputs: type=docker,dest=${{ runner.temp }}/schoolbox-fpm-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
+          provenance: false
+          sbom: false
           build-args: |
             ENV=prod
             ARCH=${{ matrix.build.arch }}
@@ -101,6 +103,8 @@ jobs:
             code=${{ github.workspace }}
           push: true
           outputs: type=docker,dest=${{ runner.temp }}/schoolbox-fpm-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
+          provenance: false
+          sbom: false
           build-args: |
             ENV=prod
             ARCH=${{ matrix.build.arch }}
