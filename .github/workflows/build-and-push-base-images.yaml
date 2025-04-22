@@ -13,6 +13,7 @@ on:
     paths:
       - 'docker/base-images/**'
   workflow_dispatch:
+  workflow_call:
 
 jobs:
   build-and-push-php82-alpine-to-dockerhub:
