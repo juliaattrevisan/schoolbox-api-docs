@@ -23,6 +23,7 @@ const selectedFields = window.Vue.computed(() => {
         <p v-else>No suggestions available for this section.</p>
     </template>
 
+    <div class="clearfix"></div>
     <div class="l-flex-row l-flex--no-wrap">
         <button class="l-flex__item--1 button" @click="lpStore.modalStep = LessonPlannerModalStep.GENERATE">
             Back
