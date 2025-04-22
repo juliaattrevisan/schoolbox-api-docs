@@ -38,6 +38,7 @@ within a self-contained development environment.
   # stop containers for all docker-compose configurations
   sudo docker compose down
   sudo docker compose -f docker/deploy.docker-compose.yaml down
+  sudo docker compose -f docker/prod.docker-compose.yaml down
 
   # start default environment:
   # this has Schoolbox's code folder mounted as a local mount, thus changes made
@@ -46,6 +47,9 @@ within a self-contained development environment.
 
   # Alternately, start the deployment environment:
   sudo docker compose -f docker/deploy.docker-compose.yaml up -d
+
+  # Also alternately, start the prod environment:
+  sudo docker compose -f docker/prod.docker-compose.yaml up -d
   ```
 - from the CLI container, setup database copied from Vagrant and reload
   notification bindings:
