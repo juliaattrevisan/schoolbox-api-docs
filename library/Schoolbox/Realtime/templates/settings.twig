@@ -33,29 +33,25 @@
                     formdata = $('<form/>').append($input.clone()).serialize(),
                     sourceId = $input.data(dataField) || dataField;
 
-            document.dispatchEvent(new CustomEvent("TOAST__ACTIVATE", {
-                detail: { text: "Saving..." }
-            }));
+            const toast = window.sbProps.toastActivate("Saving...");
             try {
                 $.post(action, formdata)
                     .done(() => {
-                        document.dispatchEvent(new CustomEvent("TOAST__TIMEOUT", {
-                            detail: { text: "Saved" }
-                        }));
+                        toast.timeout({ text: "Saved" });
                     })
                     .fail(() => {
-                        document.dispatchEvent(new CustomEvent("TOAST__TIMEOUT", {
-                            detail: { text: "Save failed, please contact your support if the problem persists", isSuccess: false }
-                        }));
+                        toast.timeout({
+                            text: "Save failed, please contact your support if the problem persists",
+                            isSuccess: false
+                        });
                     })
             } catch (error) {
-                document.dispatchEvent(new CustomEvent("TOAST__TIMEOUT", {
-                    detail: { text: "Save failed, please contact your support if the problem persists", isSuccess: false }
-                }));
+                toast.timeout({
+                    text: "Save failed, please contact your support if the problem persists",
+                    isSuccess: false
+                });
             }
-
         }
-
     });
 </script>
 
