@@ -19,7 +19,13 @@ use Schoolbox\Search\Index;
  */
 abstract class BaseBuilder implements IBuilder
 {
-    protected const QUERY_LEVEL_MAX_STATEMENT_TIME = 0.001;
+    /**
+     * Setting the query-level max_statement_time is necessary to override any global-level max_statement_time that
+     * may have been set.  To apply this to a $query, do the following:
+     * "SET STATEMENT max_statement_time=:queryLevelMaxStatementTime FOR $query"
+     */
+    protected const QUERY_LEVEL_MAX_STATEMENT_TIME = 0;
+
     /**
      * Regular expression for normalising space characters: sequences of space
      * characters are replaced with actual spaces.
