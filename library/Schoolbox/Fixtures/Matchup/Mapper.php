@@ -311,18 +311,22 @@ class Mapper extends BaseMapper
 
                 $matchup->setVenue($venues->getOffset($row['sm.venue_id']));
 
-                /* Hydrate results
-                 */
-                /** @var \Schoolbox\Fixtures\Result\Model $homeTeamResult */
-                $homeTeamResult = $this->hydrateJoin($row, 'result', 'sr1');
-
-                /** @var \Schoolbox\Fixtures\Result\Model $awayTeamResult */
-                $awayTeamResult = $this->hydrateJoin($row, 'result', 'sr2');
-
-                $matchup->setHomeTeamResult($homeTeamResult);
-                $matchup->setAwayTeamResult($awayTeamResult);
-
                 $matches->setOffset($matchup->getId(), $matchup);
+            }
+
+            /* Hydrate results, if not already hydrated
+             */
+            $matchup ??= $matches->getOffset($matchId);
+            if (!$matchup?->getHomeTeamResult()) {
+                /** @var \Schoolbox\Fixtures\Result\Model|null $homeTeamResult */
+                $homeTeamResult = $this->hydrateJoin($row, 'result', 'sr1');
+                $matchup->setHomeTeamResult($homeTeamResult);
+            }
+
+            if (!$matchup?->getAwayTeamResult()) {
+                /** @var \Schoolbox\Fixtures\Result\Model|null $awayTeamResult */
+                $awayTeamResult = $this->hydrateJoin($row, 'result', 'sr2');
+                $matchup->setAwayTeamResult($awayTeamResult);
             }
         }
 
