@@ -2163,7 +2163,7 @@ class Controller extends Base
         );
 
         while ($row = $fileQuery->fetch(\PDO::FETCH_ASSOC)) {
-            $componentName = $row['componentName'] ?? 'NULL';
+            $componentName = $row['component.name'] ?? 'NULL';
             // if component IS empty string, use the system default
             if (trim($componentName) === '') {
                 $componentName = \Schoolbox\Curriculum\Component\CurriculumOverviewController::DEFAULT_COMPONENT_HEADING;
