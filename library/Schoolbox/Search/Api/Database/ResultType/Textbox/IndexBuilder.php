@@ -159,11 +159,11 @@ class IndexBuilder extends BaseBuilder
             }
             [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::UPDATE, $queryString, $params);
         }
-        $query = $this->connector->prepareQuery(
-            // Set max_statement_time at the query level to ensure no timeouts even if global max_statement_time is set.
-            "SET STATEMENT max_statement_time=:maxStatementTime FOR\n$queryString",
-            ['maxStatementTime' => BaseBuilder::QUERY_LEVEL_MAX_STATEMENT_TIME]
-        );
+        // Set max_statement_time at the query level to ensure no timeouts even if global max_statement_time is set.
+        // The query will not work as expected without the CAST, even though a float value is supplied.
+        $queryString = "SET STATEMENT max_statement_time = CAST(:maxStatementTime AS DECIMAL(10,2)) FOR\n$queryString";
+        $params['maxStatementTime'] = BaseBuilder::QUERY_LEVEL_MAX_STATEMENT_TIME;
+        $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding text boxes (with components)...');
         $t0 = microtime(true);
         $query->execute($params);
@@ -224,11 +224,11 @@ class IndexBuilder extends BaseBuilder
             }
             [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::UPDATE, $queryString, $params);
         }
-        $query = $this->connector->prepareQuery(
-            // Set max_statement_time at the query level to ensure no timeouts even if global max_statement_time is set.
-            "SET STATEMENT max_statement_time=:maxStatementTime FOR\n$queryString",
-            ['maxStatementTime' => BaseBuilder::QUERY_LEVEL_MAX_STATEMENT_TIME]
-        );
+        // Set max_statement_time at the query level to ensure no timeouts even if global max_statement_time is set.
+        // The query will not work as expected without the CAST, even though a float value is supplied.
+        $queryString = "SET STATEMENT max_statement_time = CAST(:maxStatementTime AS DECIMAL(10,2)) FOR\n$queryString";
+        $params['maxStatementTime'] = BaseBuilder::QUERY_LEVEL_MAX_STATEMENT_TIME;
+        $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding text boxes (without components)...');
         $t0 = microtime(true);
         $query->execute($params);
