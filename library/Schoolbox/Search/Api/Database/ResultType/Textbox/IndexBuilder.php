@@ -162,7 +162,7 @@ class IndexBuilder extends BaseBuilder
         $query = $this->connector->prepareQuery(
             // Set max_statement_time at the query level to ensure no timeouts even if global max_statement_time is set.
             "SET STATEMENT max_statement_time=:maxStatementTime FOR\n$queryString",
-            [BaseBuilder::QUERY_LEVEL_MAX_STATEMENT_TIME]
+            ['maxStatementTime' => BaseBuilder::QUERY_LEVEL_MAX_STATEMENT_TIME]
         );
         $this->logger->info('Finding text boxes (with components)...');
         $t0 = microtime(true);
@@ -227,7 +227,7 @@ class IndexBuilder extends BaseBuilder
         $query = $this->connector->prepareQuery(
             // Set max_statement_time at the query level to ensure no timeouts even if global max_statement_time is set.
             "SET STATEMENT max_statement_time=:maxStatementTime FOR\n$queryString",
-            [BaseBuilder::QUERY_LEVEL_MAX_STATEMENT_TIME]
+            ['maxStatementTime' => BaseBuilder::QUERY_LEVEL_MAX_STATEMENT_TIME]
         );
         $this->logger->info('Finding text boxes (without components)...');
         $t0 = microtime(true);
