@@ -2472,7 +2472,7 @@ class Controller extends Base
                 $courses[$row['folder_id']]['unit.name'],
                 $courses[$row['folder_id']]['unit.id'],
                 $courses[$row['folder_id']]['unit_specification.id'],
-                $urlBase->withPath(sprintf("/homepage/%s", $courses[$row['folder_id']]['course.id']))->withFragment(sprintf("component%s", $row['componentId'])),
+                $urlBase->withPath(sprintf("/homepage/%s", $courses[$row['folder_id']]['unit.id']))->withFragment(sprintf("component%s", $row['componentId'])),
                 $componentName,
                 $row['componentId'] ?? 'NULL',
                 $row['textboxHeading'] ?? 'NULL',
