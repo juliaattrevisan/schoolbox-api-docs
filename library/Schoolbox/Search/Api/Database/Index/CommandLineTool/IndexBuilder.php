@@ -170,6 +170,7 @@ class IndexBuilder extends App
         $globalMaxStatementTime = $rows[0]['Value'];
         $logger->info("Checking config: global max_statement_time is $globalMaxStatementTime.");
         $logger->info("Note the global max_statement_time will override the session max_statement_time.");
+        $logger->info("Query-level max_statement_time has been used to override the global max_statement_time.");
 
         // Clear indices if required
         if ($this->getOpt(self::OPT_LONG_CLEAR)) {
