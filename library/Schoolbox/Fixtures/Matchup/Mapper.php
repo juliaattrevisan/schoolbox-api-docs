@@ -145,7 +145,11 @@ class Mapper extends BaseMapper
      * Find all the Matchup instances where $user is involved via their current Team,
      * within the date range specified
      *
-     * @param \Schoolbox\User           $user
+     * @param \Schoolbox\User      $user  User to fetch matchups for.
+     * @param \Alaress_Date_Format $start Start of the window in which to find
+     *                                    matchups.
+     * @param \Alaress_Date_Format $end   End of the window in which to find
+     *                                    matchups.
      * @return GenericCollection
      * @throws BaseMapper\DefinitionException
      * @throws Exception
@@ -153,9 +157,10 @@ class Mapper extends BaseMapper
      * @throws \UnexpectedValueException
      */
     public function findInvolvedMatchups(
-        \Schoolbox\User $user
+        \Schoolbox\User $user,
+        \Alaress_Date_Format $start,
+        \Alaress_Date_Format $end,
     ): GenericCollection {
-
         /* Make a pretty significant assumption here:
          *
          * Teams from Clipboard always import as the Home Team
@@ -164,6 +169,14 @@ class Mapper extends BaseMapper
          * team or the Away team, but then you had to know which one of those
          * caused this record to be included in the stack - because you need
          * to link to a team id on the front end via the calendar modal
+         *
+         * Also, a match is within the window if any of:
+         * * window.start or window.finish overlaps [match.start, match.finish]
+         * * match.start or match.finish overlaps [window.start, window.finish]
+         *
+         * This could be simplified to:
+         * NOT (match.finish < window.start OR match.start > window.finish),
+         * but the first version is simpler to understand IMO.
          */
         $query = "
             SELECT
@@ -184,6 +197,12 @@ class Mapper extends BaseMapper
             LEFT JOIN sportsfixtures_result sr1 ON st1.id = sr1.team_id AND sm.id = sr1.match_id
             LEFT JOIN sportsfixtures_result sr2 ON st2.id = sr2.team_id AND sm.id = sr2.match_id
             WHERE (stu1.user_id = :userId OR stu2.user_id = :userId OR sc1.user_id = :userId OR sc2.user_id = :userId)
+            AND (
+                (:start       BETWEEN sm.start_at AND sm.finish_at) OR
+                (:end         BETWEEN sm.start_at AND sm.finish_at) OR
+                (sm.start_at  BETWEEN :start      AND :end)      OR
+                (sm.finish_at BETWEEN :start      AND :end)
+            )
             AND sm.deleted_at IS NULL
             AND st1.deleted_at IS NULL
             AND st2.deleted_at IS NULL
@@ -195,6 +214,8 @@ class Mapper extends BaseMapper
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute([
             'userId' => $user->getId(),
+            'start'  => $start->getDatabase(),
+            'end'    => $end->getDatabase(),
         ]);
 
         /** @var GenericCollection|Matchup[] $matches */
