@@ -124,9 +124,16 @@ class IndexBuilder extends BaseBuilder
             }
             [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::UPDATE, $queryString, $params);
         }
-        $query = $this->connector->prepareQuery($queryString);
+        $query = $this->connector->prepareQuery(
+            // Set max_statement_time at the query level to ensure no timeouts even if global max_statement_time is set.
+            "SET STATEMENT max_statement_time=:maxStatementTime FOR\n$queryString",
+            [BaseBuilder::QUERY_LEVEL_MAX_STATEMENT_TIME]
+        );
         $this->logger->info('Finding assessments...');
+        $t0 = microtime(true);
         $query->execute($params);
+        $t1 = microtime(true);
+        $this->logger->debug('Done.  Time taken: ' . round($t1 - $t0, 4) . ' seconds.');
         $this->logger->info(sprintf('Building search indices for %d assessments', $query->rowCount()));
         foreach ($query as $row) {
             // Somehow this row has no type?

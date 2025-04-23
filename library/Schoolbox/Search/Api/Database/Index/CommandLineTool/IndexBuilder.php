@@ -163,12 +163,13 @@ class IndexBuilder extends App
         // filled, and the search feature will not work as expected.  So here we set max_statement_time to 0 (no limit).
         // https://mariadb.com/kb/en/aborting-statements/
         $dbi->execute('SET SESSION max_statement_time = 0;');
-        $rows = $dbi->executeQuery("SHOW VARIABLES LIKE 'max_statement_time'")->fetchAll();
-        $maxStatementTime = $rows[0]['Value'];
-        $logger->info("Checking config: max_statement_time is $maxStatementTime.");
-
-        // Set this on the server as well: I'm not sure this makes a difference
-        $dbi->executeDirectly('SET MAX_STATEMENT_TIME=0');
+        $rows = $dbi->executeQuery("SHOW SESSION VARIABLES LIKE 'max_statement_time'")->fetchAll();
+        $sessionMaxStatementTime = $rows[0]['Value'];
+        $logger->info("Checking config: session max_statement_time is $sessionMaxStatementTime.");
+        $rows = $dbi->executeQuery("SHOW GLOBAL VARIABLES LIKE 'max_statement_time'")->fetchAll();
+        $globalMaxStatementTime = $rows[0]['Value'];
+        $logger->info("Checking config: global max_statement_time is $globalMaxStatementTime.");
+        $logger->info("Note the global max_statement_time will override the session max_statement_time.");
 
         // Clear indices if required
         if ($this->getOpt(self::OPT_LONG_CLEAR)) {

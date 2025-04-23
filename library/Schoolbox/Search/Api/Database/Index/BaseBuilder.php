@@ -19,6 +19,7 @@ use Schoolbox\Search\Index;
  */
 abstract class BaseBuilder implements IBuilder
 {
+    protected const QUERY_LEVEL_MAX_STATEMENT_TIME = 0.001;
     /**
      * Regular expression for normalising space characters: sequences of space
      * characters are replaced with actual spaces.
