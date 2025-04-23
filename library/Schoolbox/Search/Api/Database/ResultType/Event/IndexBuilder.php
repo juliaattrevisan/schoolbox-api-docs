@@ -76,7 +76,7 @@ class IndexBuilder extends BaseBuilder
         }
         // Set max_statement_time at the query level to ensure no timeouts even if global max_statement_time is set.
         // The query will not work as expected without the CAST, even though a float value is supplied.
-        $queryString = "SET STATEMENT max_statement_time = CAST(:maxStatementTime AS DECIMAL(10,2)) FOR\n$queryString";
+        $queryString = "SET STATEMENT max_statement_time = CAST(:maxStatementTime AS DECIMAL(4,4)) FOR\n$queryString";
         $params['maxStatementTime'] = BaseBuilder::QUERY_LEVEL_MAX_STATEMENT_TIME;
         $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding events...');
