@@ -197,6 +197,8 @@ class Mapper extends BaseMapper
             LEFT JOIN sportsfixtures_result sr1 ON st1.id = sr1.team_id AND sm.id = sr1.match_id
             LEFT JOIN sportsfixtures_result sr2 ON st2.id = sr2.team_id AND sm.id = sr2.match_id
             WHERE (stu1.user_id = :userId OR stu2.user_id = :userId OR sc1.user_id = :userId OR sc2.user_id = :userId)
+            AND sm.start_at IS NOT NULL
+            AND sm.finish_at IS NOT NULL
             AND (
                 (:start       BETWEEN sm.start_at AND sm.finish_at) OR
                 (:end         BETWEEN sm.start_at AND sm.finish_at) OR
