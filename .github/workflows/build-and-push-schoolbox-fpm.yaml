@@ -14,7 +14,7 @@ on:
 
 jobs:
   # Build base images before building FPM images,
-  # but only if the build has changed.
+  # but only if the build has changed, and only if the repo is the base repo.
   base-image-diff:
     runs-on: ubuntu-latest
     outputs:
@@ -22,6 +22,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        # I can't believe that this has to be set as an `if` rule on a step,
+        # instead of in the `on` section.
+        if: github.repository == 'alaress/schoolbox'
         with:
           sparse-checkout: |
             docker/base-images/
