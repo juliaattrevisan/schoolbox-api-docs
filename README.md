@@ -68,7 +68,7 @@ echo "* 192.168.36.0/24" |sudo tee -a /etc/vbox/networks.conf
 ```
 * In your schoolbox directory import your vagrant box and bring it up for the first time
 ```
-  vagrant box add ubuntu-2204-php80 https://s3-ap-southeast-2.amazonaws.com/schoolbox-data/ubuntu-2204-php80.box;
+  vagrant box add ubuntu-2204-php82 https://s3-ap-southeast-2.amazonaws.com/schoolbox-data/ubuntu-2204-php82.box;
   vagrant up;
   vagrant provision;
 ```
