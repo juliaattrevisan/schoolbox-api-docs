@@ -25,6 +25,7 @@ $app = new class extends CliTool\App {
 
 
         foreach ($tables as $table => $columns) {
+            $start = microtime(true);
             $comments = $this->getDatabaseInternal()->executeQuery(
                 "SELECT
                     `" . $columns['id'] . "` as id,
@@ -32,6 +33,11 @@ $app = new class extends CliTool\App {
                 FROM `$table`
                 WHERE `" . $columns['comment'] . "` IS NOT NULL AND TRIM(`" . $columns['comment'] . "`) != ''"
             );
+
+            if ($comments->rowCount() === 0) {
+                $this->getLogger()->info("No comments to process in $table");
+                continue;
+            }
 
             $updateStatement = $this->getDatabaseInternal()->prepareQuery(
                 "UPDATE `$table` SET `" . $columns['comment'] . "` = :comment WHERE `" . $columns['id'] . "` = :id"
@@ -60,6 +66,17 @@ $app = new class extends CliTool\App {
                     "id" => $comment["id"],
                 ]);
             }
+
+            $elapsed = microtime(true) - $start;
+            $this->getLogger()->info(
+                sprintf(
+                    "Processed %d comments in %.2f s (%.4f ms/row) for %s",
+                    $comments->rowCount(),
+                    $elapsed,
+                    $elapsed / $comments->rowCount() * 1000,
+                    $table
+                )
+            );
         }
     }
     public function runAsRoot(): ?bool
