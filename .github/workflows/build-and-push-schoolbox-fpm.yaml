@@ -16,15 +16,15 @@ jobs:
   # Build base images before building FPM images,
   # but only if the build has changed, and only if the repo is the base repo.
   base-image-diff:
+    # I can't believe that this has to be set as an `if` rule on a step,
+    # instead of in the `on` section.
+    if: github.repository == 'alaress/schoolbox'
     runs-on: ubuntu-latest
     outputs:
       count: ${{ steps.diff.outputs.count }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-        # I can't believe that this has to be set as an `if` rule on a step,
-        # instead of in the `on` section.
-        if: github.repository == 'alaress/schoolbox'
         with:
           sparse-checkout: |
             docker/base-images/
@@ -43,9 +43,11 @@ jobs:
 
   # Build artifacts before building image
   build-composer-artifact:
+    if: github.repository == 'alaress/schoolbox'
     uses: ./.github/workflows/helper-build-composer-artifact.yaml
 
   build-npm-artifact:
+    if: github.repository == 'alaress/schoolbox'
     uses: ./.github/workflows/helper-build-npm-artifact.yaml
 
   # Build schoolbox-fpm image
@@ -54,7 +56,7 @@ jobs:
       - build-and-push-base-images
       - build-composer-artifact
       - build-npm-artifact
-    if: always() && (needs.build-and-push-base-images.result == 'skipped' || needs.build-and-push-base-images.result == 'success')
+    if: github.repository == 'alaress/schoolbox' && (needs.build-and-push-base-images.result == 'skipped' || needs.build-and-push-base-images.result == 'success')
     strategy:
       matrix:
         build:
