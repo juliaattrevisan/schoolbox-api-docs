@@ -162,7 +162,7 @@ class IndexBuilder extends App
         // that these queries be allowed to finish, because if they are interrupted, the search_index table will not be
         // filled, and the search feature will not work as expected.  So here we set max_statement_time to 0 (no limit).
         // https://mariadb.com/kb/en/aborting-statements/
-        $dbi->execute('SET SESSION max_statement_time = 0.01;');
+        $dbi->execute('SET SESSION max_statement_time = 0;');
         $rows = $dbi->executeQuery("SELECT @@global.max_statement_time, @@session.max_statement_time")->fetchAll();
         $globalMaxStatementTime = $rows[0]['@@global.max_statement_time'];
         $sessionMaxStatementTime = $rows[0]['@@session.max_statement_time'];
