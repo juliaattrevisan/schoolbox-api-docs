@@ -250,41 +250,7 @@ class Mapper extends BaseMapper
             ",
         ];
 
-        $query = implode(' UNION ', $compositeQuery);
-
-//        $query = "
-//            SELECT
-//                {$this->getColumnString('sm')},
-//                {$this->getJoinColumnString('result', 'sr1')},
-//                {$this->getJoinColumnString('result', 'sr2')},
-//                {$this->getJoinColumnString('venue', 'sv')}
-//            FROM sportsfixtures_match sm
-//            LEFT JOIN {$this->getJoinSql('venue', 'sm', 'sv')}
-//            LEFT JOIN sportsfixtures_team st1 ON sm.home_team_id = st1.id
-//            LEFT JOIN sportsfixtures_team st2 ON sm.away_team_id = st2.id
-//            LEFT JOIN sportsfixtures_team_user stu1 ON st1.id = stu1.team_id
-//            LEFT JOIN sportsfixtures_team_user stu2 ON st2.id = stu2.team_id
-//            LEFT JOIN sportsfixtures_team_coach stc1 ON st1.id = stc1.team_id
-//            LEFT JOIN sportsfixtures_coach sc1 ON stc1.coach_id = sc1.id
-//            LEFT JOIN sportsfixtures_team_coach stc2 ON st2.id = stc2.team_id
-//            LEFT JOIN sportsfixtures_coach sc2 ON stc2.coach_id = sc2.id
-//            LEFT JOIN sportsfixtures_result sr1 ON st1.id = sr1.team_id AND sm.id = sr1.match_id
-//            LEFT JOIN sportsfixtures_result sr2 ON st2.id = sr2.team_id AND sm.id = sr2.match_id
-//            WHERE (stu1.user_id = :userId OR stu2.user_id = :userId OR sc1.user_id = :userId OR sc2.user_id = :userId)
-//            AND (
-//                (:start       BETWEEN sm.start_at AND sm.finish_at) OR
-//                (:end         BETWEEN sm.start_at AND sm.finish_at) OR
-//                (sm.start_at  BETWEEN :start      AND :end)      OR
-//                (sm.finish_at BETWEEN :start      AND :end)
-//            )
-//            AND sm.deleted_at IS NULL
-//            AND st1.deleted_at IS NULL
-//            AND st2.deleted_at IS NULL
-//            AND sc1.deleted_at IS NULL
-//            AND sc2.deleted_at IS NULL
-//            ORDER BY sm.start_at
-//        ";
-
+        $query     = implode(' UNION ', $compositeQuery);
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute([
             'userId' => $user->getId(),
