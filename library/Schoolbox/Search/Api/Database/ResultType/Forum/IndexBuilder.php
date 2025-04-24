@@ -88,9 +88,16 @@ class IndexBuilder extends BaseBuilder
             }
             [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::UPDATE, $queryString, $params);
         }
+        // Set max_statement_time at the query level to ensure no timeouts even if global max_statement_time is set.
+        // The query will not work as expected without the CAST, even though a float value is supplied.
+        $queryString = "SET STATEMENT max_statement_time = CAST(:maxStatementTime AS DECIMAL(4,4)) FOR\n$queryString";
+        $params['maxStatementTime'] = BaseBuilder::QUERY_LEVEL_MAX_STATEMENT_TIME;
         $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding forum posts...');
+        $t0 = microtime(true);
         $query->execute($params);
+        $t1 = microtime(true);
+        $this->logger->debug('Done.  Time taken: ' . round($t1 - $t0, 4) . ' seconds.');
         $this->logger->info(sprintf('Building search indices for %d forum posts', $query->rowCount()));
         foreach ($query as $row) {
             $index = $this->buildIndex(
