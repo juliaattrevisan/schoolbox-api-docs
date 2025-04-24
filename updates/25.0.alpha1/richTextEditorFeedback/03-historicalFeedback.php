@@ -29,9 +29,9 @@ $app = new class extends CliTool\App {
             $comments = $this->getDatabaseInternal()->executeQuery(
                 "SELECT
                     `" . $columns['id'] . "` as id,
-                    `" . $columns['comment'] . "` as comment
+                    `_" . $columns['comment'] . "` as comment
                 FROM `$table`
-                WHERE `" . $columns['comment'] . "` IS NOT NULL AND TRIM(`" . $columns['comment'] . "`) != ''"
+                WHERE `_" . $columns['comment'] . "` IS NOT NULL"
             );
 
             if ($comments->rowCount() === 0) {
