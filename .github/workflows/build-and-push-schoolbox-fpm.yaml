@@ -14,7 +14,7 @@ on:
 
 jobs:
   # Build base images before building FPM images,
-  # but only if the build has changed.
+  # but only if the build has changed, and only if the repo is the base repo.
   base-image-diff:
     runs-on: ubuntu-latest
     outputs:
@@ -22,6 +22,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        # I can't believe that this has to be set as an `if` rule on a step,
+        # instead of in the `on` section.
+        if: github.repository == 'alaress/schoolbox'
         with:
           sparse-checkout: |
             docker/base-images/
@@ -89,9 +92,10 @@ jobs:
           path: www/static/js/bundle/
 
       # Different build-and-push depending on trigger:
-      # push: ${{ github.ref_name }}-latest, ${{ github.ref_name }}-${{ github.sha }}
-      #       (ref_name should be master or develop)
-      # release: ${{ github.ref_name }}
+      # * push:    ${{ github.ref_name }}-latest-${{ matrix.build.arch }}
+      #            (ref_name should be master or develop)
+      # * release: ${{ github.ref_name }}-${{ matrix.build.arch }}
+      #
       # For now this uses a remote image as its build context, later it may use
       # an artifact built in this step?
       - name: Build and push schoolbox-fpm deployment image (latest)
@@ -115,7 +119,6 @@ jobs:
 #          platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           tags: |
             alaress/schoolbox-fpm:${{ github.ref_name }}-latest-${{ matrix.build.arch }}
-            alaress/schoolbox-fpm:${{ github.ref_name }}-${{ github.sha }}-${{ matrix.build.arch }}
 
       - name: Build and push schoolbox-fpm deployment image (release)
         if: github.event_name == 'release'
@@ -168,11 +171,6 @@ jobs:
             --amend alaress/schoolbox-fpm:${{ github.ref_name }}-latest-amd64 \
             --amend alaress/schoolbox-fpm:${{ github.ref_name }}-latest-arm64
           docker manifest push --purge alaress/schoolbox-fpm:${{ github.ref_name }}-latest
-
-          docker manifest create alaress/schoolbox-fpm:${{ github.ref_name }}-${{ github.sha }} \
-            --amend alaress/schoolbox-fpm:${{ github.ref_name }}-${{ github.sha }}-amd64 \
-            --amend alaress/schoolbox-fpm:${{ github.ref_name }}-${{ github.sha }}-arm64
-          docker manifest push --purge alaress/schoolbox-fpm:${{ github.ref_name }}-${{ github.sha }}
 
       - name: Join schoolbox-fpm images (release)
         if: github.event_name == 'release'
