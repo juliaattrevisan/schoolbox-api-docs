@@ -174,6 +174,9 @@ class IndexBuilder extends App
         // So query-level max_statement_time has been set on the queries that were timing out.
         // See BaseBuilder::QUERY_LEVEL_MAX_STATEMENT_TIME.
 
+        // Set this on the server as well: I'm not sure this makes a difference
+        $dbi->executeDirectly('SET MAX_STATEMENT_TIME=0');
+
         // Clear indices if required
         if ($this->getOpt(self::OPT_LONG_CLEAR)) {
             if (empty($types)) {
