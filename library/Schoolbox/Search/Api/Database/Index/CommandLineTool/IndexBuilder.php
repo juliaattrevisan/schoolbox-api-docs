@@ -162,15 +162,17 @@ class IndexBuilder extends App
         // that these queries be allowed to finish, because if they are interrupted, the search_index table will not be
         // filled, and the search feature will not work as expected.  So here we set max_statement_time to 0 (no limit).
         // https://mariadb.com/kb/en/aborting-statements/
-        $dbi->execute('SET SESSION max_statement_time = 0;');
-        $rows = $dbi->executeQuery("SHOW SESSION VARIABLES LIKE 'max_statement_time'")->fetchAll();
-        $sessionMaxStatementTime = $rows[0]['Value'];
-        $logger->info("Checking config: session max_statement_time is $sessionMaxStatementTime.");
-        $rows = $dbi->executeQuery("SHOW GLOBAL VARIABLES LIKE 'max_statement_time'")->fetchAll();
-        $globalMaxStatementTime = $rows[0]['Value'];
-        $logger->info("Checking config: global max_statement_time is $globalMaxStatementTime.");
-        $logger->info("Note the global max_statement_time will override the session max_statement_time.");
-        $logger->info("Query-level max_statement_time has been used to override the global max_statement_time.");
+        $dbi->execute('SET SESSION max_statement_time = 0.01;');
+        $rows = $dbi->executeQuery("SELECT @@global.max_statement_time, @@session.max_statement_time")->fetchAll();
+        $globalMaxStatementTime = $rows[0]['@@global.max_statement_time'];
+        $sessionMaxStatementTime = $rows[0]['@@session.max_statement_time'];
+        $logger->debug("Checking config: global max_statement_time is $globalMaxStatementTime.");
+        $logger->debug("Checking config: session max_statement_time is $sessionMaxStatementTime.");
+        // Errors like 'max_statement_time exceeded' were occurring despite session max_statement_time being set to 0,
+        // and despite the same database connection being used when setting max_statement_time and when running the
+        // queries in the IndexBuilders.  (See creation of $db1 above, and see calls to IndexBuilder constructors).
+        // So query-level max_statement_time has been set on the queries that were timing out.
+        // See BaseBuilder::QUERY_LEVEL_MAX_STATEMENT_TIME.
 
         // Clear indices if required
         if ($this->getOpt(self::OPT_LONG_CLEAR)) {
