@@ -161,6 +161,17 @@ class Mapper extends BaseMapper
         \Alaress_Date_Format $start,
         \Alaress_Date_Format $end,
     ): GenericCollection {
+        /**
+         * Build the set of matchups for `$user`, making a pretty significant
+         * assumption that:
+         *
+         * Teams from Clipboard always import as the Home Team
+         *
+         * There used to be support for a person being in either the Home
+         * team or the Away team, but then you had to know which one of those
+         * caused this record to be included in the stack - because you need
+         * to link to a team id on the front end via the calendar modal
+         */
         $baseSelect = "
             SELECT
                 {$this->getColumnString('sm')},
@@ -170,6 +181,14 @@ class Mapper extends BaseMapper
             FROM sportsfixtures_match sm
             LEFT JOIN {$this->getJoinSql('venue', 'sm', 'sv')}
         ";
+
+        // A match is within the window of $start and $end if any of:
+        // * window.start or window.finish overlaps [match.start, match.finish]
+        // * match.start or match.finish overlaps [window.start, window.finish]
+        //
+        // This could be simplified to:
+        // NOT (match.finish < window.start OR match.start > window.finish),
+        // but the first version is simpler to understand IMO.
         $baseWhere = "
             WHERE sm.deleted_at IS NULL
             AND (
@@ -180,6 +199,12 @@ class Mapper extends BaseMapper
             )
         ";
 
+        // Composite query for fetching the four relation types `$user` may have
+        // to a matchup:
+        // * home team player
+        // * away team player
+        // * home team coach
+        // * away team coach
         $compositeQuery = [
             "
                 $baseSelect,
@@ -227,23 +252,6 @@ class Mapper extends BaseMapper
 
         $query = implode(' UNION ', $compositeQuery);
 
-        /* Make a pretty significant assumption here:
-         *
-         * Teams from Clipboard always import as the Home Team
-         *
-         * There used to be support for a person being in either the Home
-         * team or the Away team, but then you had to know which one of those
-         * caused this record to be included in the stack - because you need
-         * to link to a team id on the front end via the calendar modal
-         *
-         * Also, a match is within the window if any of:
-         * * window.start or window.finish overlaps [match.start, match.finish]
-         * * match.start or match.finish overlaps [window.start, window.finish]
-         *
-         * This could be simplified to:
-         * NOT (match.finish < window.start OR match.start > window.finish),
-         * but the first version is simpler to understand IMO.
-         */
 //        $query = "
 //            SELECT
 //                {$this->getColumnString('sm')},
@@ -310,20 +318,33 @@ class Mapper extends BaseMapper
 
                 $matches->setOffset($matchup->getId(), $matchup);
             }
+        }
 
-            /* Hydrate results, if not already hydrated
-             */
-            $matchup ??= $matches->getOffset($matchId);
-            if (!$matchup?->getHomeTeamResult()) {
-                /** @var \Schoolbox\Fixtures\Result\Model|null $homeTeamResult */
-                $homeTeamResult = $this->hydrateJoin($row, 'result', 'sr1');
-                $matchup->setHomeTeamResult($homeTeamResult);
-            }
+        // Fetch results in a separate query:
+        // There should be only one result per match*team, but use most recent
+        // just in case.
+        $results = $this->getJoinMapper('result')->findByColumn(
+            'match_id',
+            $matches->keys(),
+            ['order' => ['created_at' => self::SORT_ORDER_DESC]],
+        );
+        foreach ($results as $result) {
+            $matchupId = $result->getMatchup()->getId();
+            $matchup   = $matches[$matchupId] ?? null;
+            if (isset($matchup)) {
+                $teamId = $result->getTeam()->getId();
 
-            if (!$matchup?->getAwayTeamResult()) {
-                /** @var \Schoolbox\Fixtures\Result\Model|null $awayTeamResult */
-                $awayTeamResult = $this->hydrateJoin($row, 'result', 'sr2');
-                $matchup->setAwayTeamResult($awayTeamResult);
+                // Don't override results already set
+                if (!$matchup->getHomeTeamResult()) {
+                    if ($teamId === $matchup->getHomeTeam()->getId()) {
+                        $matchup->setHomeTeamResult($result);
+                    }
+                }
+                if (!$matchup->getAwayTeamResult()) {
+                    if ($teamId === $matchup->getAwayTeam()->getId()) {
+                        $matchup->setAwayTeamResult($result);
+                    }
+                }
             }
         }
 
