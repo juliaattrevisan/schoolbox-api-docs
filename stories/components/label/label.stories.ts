@@ -11,7 +11,10 @@ import StorybookSlot from "../../../vue/components/storybook-slot.vue";
  *
  * | Property    | Type     | Description                                                      | Default   | Options                                  |
  * | ----------- | -------- | ---------------------------------------------------------------- | --------- | ---------------------------------------- |
- * | `title`     | `string` | The title of the label                                           | `""`      |                                          |
+ * | `text`      | `string` | The text to display in the label                                | `""`      | |
+ * | `title`     | `string` | The title to display when hovering over the label                | `""`      |
+ * | `icon`      | `string` | The icon to display in the label                                | `""`      | Any icon name from the icon library      |
+ * | `href`      | `string` | The URL to navigate to when the label is clicked                | `""`      |                                          |                                  |
  * | `sentiment` | `string` | The sentiment of the label, which impacts the color of the label | `"neutral"` | `"success"`, `"warning"`, `"alert"`, `"neutral"` |
  * | `backgroundColor` | `string` | To have total control of the background color of the label  | `undefined` | Any color allowed in the CSS spec |
  * | `textColor` | `string` | To have total control of the text color of the label  | `undefined` | Any color allowed in the CSS spec |
@@ -39,7 +42,7 @@ export const Default: Story = {
     render: () => ({
         components: { StorybookSlot },
         template: `
-            <sbx-label title="Label"></sbx-label>
+            <sbx-label text="Label"></sbx-label>
         `,
     }),
 };
@@ -51,7 +54,7 @@ export const Success: Story = {
     render: () => ({
         components: { StorybookSlot },
         template: `
-            <sbx-label title="Success" sentiment="success"></sbx-label>
+            <sbx-label text="Success" sentiment="success"></sbx-label>
         `,
     }),
 };
@@ -63,7 +66,7 @@ export const Warning: Story = {
     render: () => ({
         components: { StorybookSlot },
         template: `
-            <sbx-label title="Warning" sentiment="warning"></sbx-label>
+            <sbx-label text="Warning" sentiment="warning"></sbx-label>
         `,
     }),
 };
@@ -75,7 +78,7 @@ export const Alert: Story = {
     render: () => ({
         components: { StorybookSlot },
         template: `
-            <sbx-label title="Alert" sentiment="alert"></sbx-label>
+            <sbx-label text="Alert" sentiment="alert"></sbx-label>
         `,
     }),
 };
@@ -87,7 +90,7 @@ export const Neutral: Story = {
     render: () => ({
         components: { StorybookSlot },
         template: `
-            <sbx-label title="Neutral" sentiment="neutral"></sbx-label>
+            <sbx-label text="Neutral" sentiment="neutral"></sbx-label>
         `,
     }),
 };
@@ -100,7 +103,71 @@ export const CustomLabelColors: Story = {
     render: () => ({
         components: { StorybookSlot },
         template: `
-            <sbx-label title="Label with custom colors" background-color="teal" text-color="#FFF"></sbx-label>
+            <sbx-label text="Label with custom colors" background-color="teal" text-color="#FFF"></sbx-label>
+        `,
+    }),
+};
+
+/**
+ * We can pass through title and href to the label.
+ * The title will be displayed when hovering over the label.
+ * The href will be used as the link to navigate to when the label is clicked.
+ * This is useful for labels that are used as links to other pages.
+ */
+export const WithHrefAndTitle: Story = {
+    render: () => ({
+        components: { StorybookSlot },
+        template: `
+            <sbx-label text="Link Label" href="#" sentiment="success"></sbx-label>
+        `,
+    }),
+};
+
+/**
+ * We can pass through an icon to the label.
+ * The icon will be displayed on the left of the label text.
+ */
+export const WithIcon: Story = {
+    render: () => ({
+        components: { StorybookSlot },
+        template: `
+            <sbx-label
+                text="Label with Icon"
+                title="Success with icon"
+                icon="approve"
+                sentiment="success"
+            ></sbx-label>
+        `,
+    }),
+};
+
+export const WithHrefAndIcon: Story = {
+    render: () => ({
+        components: { StorybookSlot },
+        template: `
+            <sbx-label
+                text="Clickable with Icon"
+                title="Go to Schoolbox"
+                href="#"
+                icon="alert"
+                sentiment="alert"
+            ></sbx-label>
+        `,
+    }),
+};
+
+export const FullyCustom: Story = {
+    render: () => ({
+        components: { StorybookSlot },
+        template: `
+            <sbx-label
+                text="Fully Custom"
+                title="Styled, icon, and link"
+                icon="info"
+                href="#"
+                background-color="#663399"
+                text-color="#666666"
+            ></sbx-label>
         `,
     }),
 };
