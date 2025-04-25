@@ -48,19 +48,19 @@ const props = withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-    <component
-        :is="props.href ? 'a' : 'span'"
-        :href="props.href"
-        :class="`sbx-label sbx-label--${props.sentiment}`"
-        :style="{
-            backgroundColor: props.backgroundColor || undefined,
-            color: props.textColor || undefined,
-        }"
-        :title="props.title"
-    >
-        <sbx-icon v-if="props.icon" :name="props.icon" class="sbx-label__icon" />
-        {{ props.text }}
-    </component>
+    <a :href="props.href" class="sbx-label-link" :title="props.title">
+        <span
+            :class="`sbx-label sbx-label--${props.sentiment}`"
+            :title="props.title"
+            :style="{
+                backgroundColor: props.backgroundColor || undefined,
+                color: props.textColor || undefined,
+            }"
+        >
+            <sbx-icon v-if="props.icon" :name="props.icon" class="sbx-label__icon" />
+            {{ props.text }}
+        </span>
+    </a>
 </template>
 
 <style scoped>
@@ -76,7 +76,7 @@ Long term they will reference the design colour tokens
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
 }
-a.sbx-label {
+.sbx-label-link {
     text-decoration: none;
 }
 
