@@ -4,7 +4,6 @@
  */
 import { isAbortError, hasErrorMessage } from "@js/util/errorUtils";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
-import PastoralCountBadge from "@schoolboxLibrary/Pastoral/Count/vue/pastoral-count-badge.vue";
 import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
 import type { StudentPastoralCountBadge } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
 import type { Participant } from "../js/types/customParticipationTypes";
@@ -250,11 +249,16 @@ window.Vue.onMounted(() => {
                         </template>
                         <br />
 
-                        <p class="meta inline-container">
-                            <pastoral-count-badge
+                        <p class="l-pad-s--top">
+                            <sbx-label
                                 v-for="studentBadge in studentPastoralCounts[participant.user.id]"
                                 :key="`badge-${studentBadge.typeId}-${studentBadge.subtypeId}`"
-                                :badge="studentBadge"
+                                :title="studentBadge.title"
+                                :text="studentBadge.count.toString()"
+                                :icon="studentBadge.icon"
+                                :background-color="studentBadge.bgColor"
+                                :text-color="studentBadge.fgColor"
+                                :href="studentBadge.destinationUrl"
                             />
                         </p>
                     </td>
