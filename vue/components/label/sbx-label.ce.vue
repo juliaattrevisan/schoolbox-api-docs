@@ -5,7 +5,7 @@
 
 interface Props {
     /**
-     * The title of the label
+     * The title of the label to show the helper text when set
      */
     title: string;
     /**
@@ -20,6 +20,20 @@ interface Props {
      * The text color of the label
      */
     textColor?: string | undefined;
+    /**
+     * The icon of the label
+     */
+    icon?: string | undefined;
+
+    /**
+     * The href of the label
+     */
+    href?: string | undefined;
+
+    /**
+     * The text of the label
+     */
+    text?: string | undefined;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -27,18 +41,26 @@ const props = withDefaults(defineProps<Props>(), {
     sentiment: "neutral",
     backgroundColor: undefined,
     textColor: undefined,
+    icon: undefined,
+    href: undefined,
+    text: undefined,
 });
 </script>
 
 <template>
-    <span
+    <component
+        :is="props.href ? 'a' : 'span'"
+        :href="props.href"
         :class="`sbx-label sbx-label--${props.sentiment}`"
         :style="{
-            backgroundColor: props.backgroundColor ? props.backgroundColor : undefined,
-            color: props.textColor ? props.textColor : undefined,
+            backgroundColor: props.backgroundColor || undefined,
+            color: props.textColor || undefined,
         }"
-        >{{ props.title }}</span
+        :title="props.title"
     >
+        <sbx-icon v-if="props.icon" :name="props.icon" class="sbx-label__icon" />
+        {{ props.text }}
+    </component>
 </template>
 
 <style scoped>
