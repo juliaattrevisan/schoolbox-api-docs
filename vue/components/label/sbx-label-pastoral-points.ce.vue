@@ -32,7 +32,7 @@ const single = window.Vue.computed(() => {
 </script>
 
 <template>
-    <sbx-label :title="`${props.points} ${single ? 'Point' : 'Points'}`" :sentiment="sentiment"> </sbx-label>
+    <sbx-label :text="`${props.points} ${single ? 'Point' : 'Points'}`" :sentiment="sentiment"> </sbx-label>
 </template>
 
 <style scoped></style>
