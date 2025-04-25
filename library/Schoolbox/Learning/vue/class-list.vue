@@ -3,11 +3,9 @@
 /* eslint-disable eslint-comments/no-unlimited-disable -- see below */
 /* eslint-disable -- Ignore this file for ESLint checks for now (SA-18376) */
 /* eslint-enable vue/no-v-html */
-import PastoralCountBadge from "@schoolboxLibrary/Pastoral/Count/vue/pastoral-count-badge";
 
 export default {
     name: "class-list",
-    components: { PastoralCountBadge },
     props: {
         /**
          * The title of the subject for which the class list is shown, including
@@ -663,13 +661,17 @@ export default {
                                 <span class="meta">({{ student.synergy_id }})</span>
                                 <span class="show-for-print"><br />{{ student.email }}</span
                                 ><br />
-
-                                <p class="meta inline-container">
-                                    <pastoral-count-badge
+                                <p class="l-pad-s--top">
+                                    <sbx-label
                                         v-for="studentBadge in studentPastoralCounts[student.id]"
                                         :key="`badge-${studentBadge.typeId}-${studentBadge.subtypeId}`"
-                                        :badge="studentBadge"
-                                    ></pastoral-count-badge>
+                                        :title="studentBadge.title"
+                                        :text="studentBadge.count.toString()"
+                                        :icon="studentBadge.icon"
+                                        :background-color="studentBadge.bgColor"
+                                        :text-color="studentBadge.fgColor"
+                                        :href="studentBadge.destinationUrl"
+                                    />
                                 </p>
 
                                 <p class="meta inline-container">
