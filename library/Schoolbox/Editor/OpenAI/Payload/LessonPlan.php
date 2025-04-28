@@ -169,6 +169,7 @@ class LessonPlan
             ]
         ];
 
+        new \Alaress_Probe($payload);die();
         return json_encode($payload, JSON_THROW_ON_ERROR);
     }
 
@@ -208,6 +209,8 @@ class LessonPlan
             Title: [LESSON PLAN TITLE]
             Course/Unit Context: [CONTEXT]
             Duration: [DURATION]
+            [CURRICULUM CONTENT]
+            [CURRICULUM AREA]
         ";
 
         $userContent = strtr($userContent, [
@@ -228,7 +231,7 @@ class LessonPlan
 
             unset($vals);
 
-            $curriculumContent = "Curriculum Content: " . implode(",\n", $nodes) . "\n\n";
+            $curriculumContent = implode(",\n", $nodes);
 
             /* Yoink out the rest of each node's hierarchy, dedupe it, and then compile it into a csv
              * Note that multiple hierarchies might exist in this cauldron of data
@@ -241,19 +244,28 @@ class LessonPlan
 
             /* Slam it into the prompt, in a particular order I suppose
              */
-            $userContent .= "Curriculum Area: " . implode(', ', $areas) . "\n\n";
-            $userContent .= $curriculumContent;
+            $curriculumAreas = implode(', ', $areas);
+
+            $userContent = strtr($userContent, [
+                '[CURRICULUM CONTENT]' => 'Curriculum Content: ' . $curriculumContent,
+                '[CURRICULUM AREA]' => 'Curriculum Area: ' . $curriculumAreas
+            ]);
+        } else {
+            $userContent = strtr($userContent, [
+                '[CURRICULUM CONTENT]' => '',
+                '[CURRICULUM AREA]' => ''
+            ]);
         }
 
         /* Whatever the user also instructed from the ui
          */
         if ('' !== $additionalContext) {
-            $userContent .= 'Additional Notes: ' . $additionalContext;
+            $userContent .= '    Additional Notes: ' . $additionalContext;
         }
 
         return [
-            'system' => $systemContent,
-            'user' => $userContent
+            'system' => trim($systemContent),
+            'user' => trim($userContent)
         ];
     }
 
