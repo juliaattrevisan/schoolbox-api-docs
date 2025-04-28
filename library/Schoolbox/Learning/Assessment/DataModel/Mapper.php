@@ -562,12 +562,12 @@ class Mapper extends BaseMapper
      *
      * @param array<int>                  $uiIds Unit implementation IDs in which to find assessments.
      * @param AssessmentType::TYPE_*|null $type  If provided: find assessments of this type only.
-     * @return GenericCollection<Model>
+     * @return Collection<Model>
      */
     public function findAllByUnitImplementationIdsForCourseOutline(
         array $uiIds,
         ?string $type = null,
-    ): GenericCollection {
+    ): Collection {
         $modelList = $this->createCollection();
         if (empty($uiIds)) {
             return $modelList;
