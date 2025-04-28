@@ -32,6 +32,14 @@ export default class ProfileEditor {
 
     static readonly DATA_TEST_TAB_UPDATE_BUTTON = "pe-{roleType}-tabs-tab-{tabName}-settings-confirm";
 
+    static readonly DATA_TEST_PORTRAIT_IMAGE_COG = "pe-{roleType}-fields-active-item-portrait-settings";
+
+    static readonly DATA_TEST_PORTRAIT_IMAGE_CHECKBOX =
+        "pe-{roleType}-fields-active-item-portrait-setting-{option}-option-{optionValue}";
+
+    static readonly DATA_TEST_PORTRAIT_IMAGE_UPDATE_BUTTON =
+        "pe-{roleType}-fields-active-item-portrait-settings-confirm";
+
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
@@ -187,6 +195,42 @@ export default class ProfileEditor {
             .getByTestId(
                 ProfileEditor.DATA_TEST_TAB_UPDATE_BUTTON.replace("{roleType}", roleType).replace("{tabName}", tabName),
             )
+            .click();
+        await expect(this.page.getByTestId("toast")).toHaveAttribute("data-test-is-success", "true");
+        await expect(this.page.getByTestId("toast")).not.toBeVisible();
+    }
+
+    /**
+     * Click the cog of a portrait image
+     * @param roleType - The user type: student, staff, parent
+     */
+    async clickPortraitImageCog(roleType: string): Promise<void> {
+        await this.page.getByTestId(ProfileEditor.DATA_TEST_PORTRAIT_IMAGE_COG.replace("{roleType}", roleType)).click();
+    }
+
+    /**
+     * Click the portrait image visibility or availability checkbox
+     * @param roleType - The user type: student, staff, parent
+     * @param option - The option to click: visibility or availability
+     * @param optionValue - The option value to click: student, 1
+     */
+    async clickPortraitImageCheckbox(roleType: string, option: string, optionValue: string): Promise<void> {
+        await this.page
+            .getByTestId(
+                ProfileEditor.DATA_TEST_PORTRAIT_IMAGE_CHECKBOX.replace("{roleType}", roleType)
+                    .replace("{option}", option)
+                    .replace("{optionValue}", optionValue),
+            )
+            .click();
+    }
+
+    /**
+     * Click the update button of a portrait image
+     * @param roleType - The user type: student, staff, parent
+     */
+    async clickPortraitImageUpdateButton(roleType: string): Promise<void> {
+        await this.page
+            .getByTestId(ProfileEditor.DATA_TEST_PORTRAIT_IMAGE_UPDATE_BUTTON.replace("{roleType}", roleType))
             .click();
         await expect(this.page.getByTestId("toast")).toHaveAttribute("data-test-is-success", "true");
         await expect(this.page.getByTestId("toast")).not.toBeVisible();
