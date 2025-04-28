@@ -29,8 +29,6 @@ const props = withDefaults(defineProps<Props>(), {
 const modalStore = useModalStore();
 const modalViewNodesStore = useModalViewNodesStore();
 const isNextSelected = window.Vue.ref(false); // to move to the next modal if a badge usage is selected
-const modalNodeUsageStore = useModalNodeUsageStore();
-const selectedNodeId = window.Vue.ref<number | null>(null); // number|null
 
 /**
  * Pass the single select prop to the store
@@ -39,6 +37,8 @@ window.Vue.onMounted(() => {
     modalStore.isSingleSelect = props.isSingleSelect;
     void modalViewNodesStore.toStartingNodeId(props.startingNodeId);
 });
+
+// #region show badge usage details
 
 /**
  * to show the selected badge that has been selected in a linked usage
@@ -64,6 +64,12 @@ function onOpenPrevious(sequenceIndex: number): void {
     }
 }
 
+// #endregion show badge usage details
+
+// #region show code details
+
+const selectedNodeId = window.Vue.ref<number | null>(null); // number|null
+
 /**
  * a code has been selected in the detail modal
  * @param node - the selected node
@@ -72,6 +78,10 @@ function onCodeSelected(node: Node): void {
     selectedNodeId.value = node.id;
     isNextSelected.value = true;
 }
+
+// #endregion show code details
+
+const modalNodeUsageStore = useModalNodeUsageStore();
 
 /**
  * the modal is closed, also closing the node usage if it's open
