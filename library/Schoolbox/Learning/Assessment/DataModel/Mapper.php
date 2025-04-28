@@ -580,6 +580,7 @@ class Mapper extends BaseMapper
         $query = "
             SELECT
                 {$this->getColumnString()},
+                {$this->getJoinColumnString('work_type', 'wt')},
                 {$this->getJoinColumnString('assessment_course_unit_implementation', 'ui')},
                 {$this->getJoinColumnString('assessment_course_unit_implementation.specification', 'uis')},
                 {$this->getJoinColumnString('assessment_course_unit_implementation.specification.folder', 'uisf')},
@@ -601,6 +602,7 @@ class Mapper extends BaseMapper
             AssessmentType::TYPE_QUIZ           => " INNER JOIN {$this->getJoinSql('quiz', '', 'q', true)}",
             AssessmentType::TYPE_LTI_ASSESSMENT => " INNER JOIN {$this->getJoinSql('ltiAssessment', '', 'l', true)}",
             AssessmentType::TYPE_PROJECT        => " INNER JOIN {$this->getJoinSql('project', '', 'p', true)}",
+            AssessmentType::TYPE_LESSON_PLAN    => " INNER JOIN {$this->getJoinSql('lessonPlan', '', 'lessonPlan', true)}",
             default                             => '',
         };
         $pb = $this->getPredicateBuilder()->in('ui.id', $uiIds);
@@ -611,6 +613,7 @@ class Mapper extends BaseMapper
         foreach ($query as $row) {
             // Hydrate
             $model = $this->hydrate($row);
+            $model->setWorkType($this->hydrateJoin($row, 'work_type', 'wt'));
 
             // Specification
             if ($row['spec.id']) {
