@@ -5,7 +5,7 @@
  */
 
 import { useModalViewNodesStore } from "../store/csModalViewNodesStore";
-import CsModalHeaderBreadcrumb from "./cs-all-modal-header-breadcrumb.vue";
+import CsAllModalHeaderBreadcrumb from "./cs-all-modal-header-breadcrumb.vue";
 
 interface Props {
     isDisabled: boolean; // to disable certain events when editing is taking place
@@ -17,7 +17,7 @@ const modalViewNodesStore = useModalViewNodesStore();
 
 <template>
     <ul name="list" class="breadcrumb" tag="ul">
-        <cs-modal-header-breadcrumb
+        <cs-all-modal-header-breadcrumb
             v-for="(breadcrumb, index) in modalViewNodesStore.breadcrumbs"
             :key="breadcrumb.id"
             :breadcrumb="breadcrumb"

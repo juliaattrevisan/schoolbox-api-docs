@@ -11,9 +11,9 @@ import type { Node } from "@schoolboxCurriculum/types/Node";
 import { useModalStore } from "../store/csModalStore";
 import { useModalViewNodesStore } from "../store/csModalViewNodesStore";
 import { useModalNodeUsageStore } from "../store/csModalNodeUsageStore";
-import CsModalHeader from "./cs-all-modal-header.vue";
-import CsModalNodes from "./cs-modal-nodes.vue";
-import CsModalFooter from "./cs-all-modal-footer.vue";
+import CsAllModalHeader from "./cs-all-modal-header.vue";
+import CsAllModalNodes from "./cs-all-modal-nodes.vue";
+import CsAllModalFooter from "./cs-all-modal-footer.vue";
 
 interface Props {
     isSingleSelect?: boolean; // so can only select a single node
@@ -105,9 +105,9 @@ function onModalClosed(): void {
                     </dd>
                 </dl>
                 <div>
-                    <cs-modal-header />
-                    <cs-modal-nodes />
-                    <cs-modal-footer />
+                    <cs-all-modal-header />
+                    <cs-all-modal-nodes />
+                    <cs-all-modal-footer />
                 </div>
             </div>
         </template>

@@ -13,11 +13,11 @@ import { useModalStore } from "../store/csModalStore";
 import { useModalNodeUsageStore } from "../store/csModalNodeUsageStore";
 import { useModalActiveNodeStore } from "../store/csModalActiveNodeStore";
 import { useModalSearchStore } from "../store/csModalSearchStore";
-import CsModalNodeRadio from "./cs-all-modal-node-radio.vue";
-import CsModalNodeCheckbox from "./cs-all-modal-node-checkbox.vue";
-import CsModalNodeName from "./cs-all-modal-node-name.vue";
-import CsModalNodeUsageSummary from "./cs-all-modal-node-usage-summary.vue";
-import CsModalNodeUsageDetails from "./cs-all-modal-node-usage-details.vue";
+import CsAllModalNodeRadio from "./cs-all-modal-node-radio.vue";
+import CsAllModalNodeCheckbox from "./cs-all-modal-node-checkbox.vue";
+import CsAllModalNodeName from "./cs-all-modal-node-name.vue";
+import CsAllModalNodeUsageSummary from "./cs-all-modal-node-usage-summary.vue";
+import CsAllModalNodeUsageDetails from "./cs-all-modal-node-usage-details.vue";
 
 interface Props {
     node: Node; // to prefill the input
@@ -118,10 +118,10 @@ const isViewing = window.Vue.computed(
 <template>
     <li ref="viewNodeEl">
         <div :class="`buttons-container`" :data-is-inactive="isViewingAnother">
-            <cs-modal-node-radio v-if="modalStore.isSingleSelect" :node="props.node" />
-            <cs-modal-node-checkbox v-else :node="props.node" />
-            <cs-modal-node-name :node="props.node" :depth="props.depth" :title="title" :is-active="isViewing" />
-            <cs-modal-node-usage-summary
+            <cs-all-modal-node-radio v-if="modalStore.isSingleSelect" :node="props.node" />
+            <cs-all-modal-node-checkbox v-else :node="props.node" />
+            <cs-all-modal-node-name :node="props.node" :depth="props.depth" :title="title" :is-active="isViewing" />
+            <cs-all-modal-node-usage-summary
                 v-if="showUsage"
                 :node="props.node"
                 :title="title"
@@ -131,10 +131,10 @@ const isViewing = window.Vue.computed(
             />
         </div>
         <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
-            <cs-modal-node-usage-details v-if="isViewing" :depth="props.depth" />
+            <cs-all-modal-node-usage-details v-if="isViewing" :depth="props.depth" />
         </Transition>
         <ul v-if="showChildren">
-            <cs-modal-node
+            <cs-all-modal-node
                 v-for="$node in props.node.children"
                 :key="$node.id"
                 :node="$node"
