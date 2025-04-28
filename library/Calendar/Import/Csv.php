@@ -30,6 +30,12 @@ use Schoolbox\Resource\Folder;
 class Csv extends Base
 {
     /**
+     * Maximum size allowed by schema.
+     */
+    private const MAX_EVENT_TITLE = 250;
+
+
+    /**
      * Load all events into schoolbox, generate outcome array
      *
      * @param bool $perform should it be a dry-run instead
@@ -175,6 +181,18 @@ class Csv extends Base
                     'status' => 'Not Added',
                     'error'  => 'Event name not provided',
                 );
+
+                continue;
+            }
+
+            /* Event name is too long
+             */
+            if (strlen(trim($name)) > self::MAX_EVENT_TITLE) {
+                $output[] = [
+                    'name'   => $name,
+                    'status' => 'Not Added',
+                    'error'  => 'Event name is too long',
+                ];
 
                 continue;
             }
