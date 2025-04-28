@@ -8,7 +8,7 @@ export type ProfileEditorFieldSettingOption = {
     id: number | string;
     name: string;
     type: string; // currently unused, e.g. "campus" or "role"
-    meta: Record<ProfileEditorRoleType["roleType"], string> | null; // additional explanation about the option, if required
+    meta: Record<ProfileEditorRoleType["roleType"], string> | string | null; // additional explanation about the option, if required
 };
 
 export type ProfileEditorFieldSettingKey = string;

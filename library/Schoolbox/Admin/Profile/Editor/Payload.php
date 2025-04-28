@@ -53,6 +53,9 @@ class Payload
     private const VISIBILITY_NODE = 'visibility';
     private const VISIBILITY_NAME = 'Visible For';
     private const VISIBILITY_TOOLTIP = 'Will appear for profile viewers in the selected role types';
+    private const ADDITIONAL_SETTINGS_NODE = 'additional';
+    private const ADDITIONAL_SETTINGS_NAME = 'Additional Settings';
+    private const ADDITIONAL_SETTINGS_TOOLTIP = null;
 
     /**
      * The labels of the field categories which are used to group the fields in
@@ -141,7 +144,8 @@ class Payload
             'data' => [
                 'fieldSettings' => [
                     self::AVAILABILITY_NODE => $this->getSettingsForAvailabilityNode(),
-                    self::VISIBILITY_NODE => $this->getSettingsForVisibilityNode($roleTypes)
+                    self::VISIBILITY_NODE => $this->getSettingsForVisibilityNode($roleTypes),
+                    self::ADDITIONAL_SETTINGS_NODE => $this->getSettingsForAdditionalSettingsNode(),
                 ],
                 'tabSettings' => [
                     self::AVAILABILITY_NODE => $this->getSettingsForAvailabilityNode(),
@@ -289,7 +293,10 @@ class Payload
                         })->keys(),
                         /* Find the roletypes ("ids") for which this field might be visible
                          */
-                        self::VISIBILITY_NODE => $field->getVisibility()?->indexBy('roleType')->keys()
+                        self::VISIBILITY_NODE => $field->getVisibility()?->indexBy('roleType')->keys(),
+                        /* Find the relevant additional settings for this field
+                         */
+                        self::ADDITIONAL_SETTINGS_NODE => [],
                     ]
                 ];
             }
@@ -368,6 +375,32 @@ class Payload
                 'meta' => $metadata[$roleType] ?? null
             ];
         }
+
+        return $settings;
+    }
+
+    /**
+     * Generate payload data for:
+     *  - $payload['data']['fieldSettings'][self::ADDITIONAL_SETTINGS_NODE]
+     *
+     * @return array
+     */
+    private function getSettingsForAdditionalSettingsNode(): array
+    {
+        /* Field settings (groups of checkboxes) that you can tick
+         */
+        $settings = [
+            'displayAs' => self::ADDITIONAL_SETTINGS_NAME,
+            'tooltip' => self::ADDITIONAL_SETTINGS_TOOLTIP,
+            'options' => [
+                [
+                    'type' => 'boolean',
+                    'id' => 'clickToReveal',
+                    'name' => 'Click to Reveal',
+                    'meta' => 'Hide content by default until the user clicks to reveal it'
+                ],
+            ]
+        ];
 
         return $settings;
     }

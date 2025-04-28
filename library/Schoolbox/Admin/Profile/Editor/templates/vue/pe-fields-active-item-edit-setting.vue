@@ -39,6 +39,7 @@ function getLabelKeyForOption(fieldSettingOption: ProfileEditorFieldSettingOptio
 function getMetaTextForOption(fieldSettingOption: ProfileEditorFieldSettingOption): string | null {
     if (!peStore.selectedRoleType) return null;
     if (!fieldSettingOption.meta) return null;
+    if (typeof fieldSettingOption.meta === "string") return fieldSettingOption.meta;
     return fieldSettingOption.meta[peStore.selectedRoleType.roleType] || null;
 }
 
