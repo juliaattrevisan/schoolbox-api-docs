@@ -14,7 +14,7 @@ export type ProfileEditorFieldSettingOption = {
 export type ProfileEditorFieldSettingKey = string;
 export type ProfileEditorFieldSettingDefinition = {
     displayAs: string;
-    tooltip: string;
+    tooltip: string | null;
     options: ProfileEditorFieldSettingOption[];
 };
 
@@ -85,7 +85,7 @@ export type ProfileEditorTabSettingOption = {
 export type ProfileEditorTabSettingKey = string;
 export type ProfileEditorTabSettingDefinition = {
     displayAs: string;
-    tooltip: string;
+    tooltip: string | null;
     options: ProfileEditorFieldSettingOption[];
 };
 

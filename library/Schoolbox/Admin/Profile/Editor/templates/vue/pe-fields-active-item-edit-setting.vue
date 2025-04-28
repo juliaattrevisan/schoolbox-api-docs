@@ -69,7 +69,14 @@ window.Vue.onMounted(() => {
     <div class="l-flex__item--1-grow">
         <label>
             {{ fieldSettingDefinition.displayAs }}
-            <span data-tooltip class="has-tip tip-top hint" :title="fieldSettingDefinition.tooltip"> ? </span>
+            <span
+                v-if="fieldSettingDefinition.tooltip"
+                data-tooltip
+                class="has-tip tip-top hint"
+                :title="fieldSettingDefinition.tooltip"
+            >
+                ?
+            </span>
         </label>
         <div class="checklist">
             <ul class="option-list">
