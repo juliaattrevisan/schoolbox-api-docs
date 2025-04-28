@@ -19,6 +19,7 @@ const editorId = `final-review-comment-${props.student.elementId}`;
 const comment = useEditor(props.student.attemptResponse.comment ?? "", `#${editorId}`, {
     targetElements: [`#${editorId}`],
     hasTokens: true,
+    maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
     toolbar: EditorToolbar.COMMENT_AI,
 });
 const isSaving = window.Vue.ref(false);
@@ -160,6 +161,7 @@ window.Vue.onUnmounted(async () => {
 
 .save-container {
     grid-template-rows: v-bind(saveContainerHeight);
+    margin-top: -1rem; /* offset the margin so it can butt up against the bottom of the editor */
     transition: grid-template-rows 300ms;
     &__inner-container {
         overflow: hidden;

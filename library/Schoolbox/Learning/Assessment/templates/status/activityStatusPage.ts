@@ -80,6 +80,7 @@ async function createEditorForParticipants(participants: ParticipantRow[]): Prom
                 targetElements: validParticipantRows.map((participantRow) => participantRow.textarea),
                 hasTokens: true,
                 showWordCount: true,
+                maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
                 toolbar: EditorToolbar.COMMENT_AI,
                 mirrorChangeEvents: true, // To keep jquery.dynamic-feedback.js in sync
             },

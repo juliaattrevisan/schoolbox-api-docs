@@ -91,6 +91,7 @@
                         targetElements: [`#${targetId}`],
                         hasTokens: true,
                         showWordCount: true,
+                        maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
                         toolbar: "comment_ai",
                         mirrorChangeEvents: true, // To keep jquery.alaressValidate.js in sync
                     },
