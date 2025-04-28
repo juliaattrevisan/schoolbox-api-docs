@@ -660,34 +660,39 @@ class Mapper extends BaseMapper
         $modelList = $this->augmentListWithLessonPlans($modelList);
         $modelList = $this->augmentListWithProjects($modelList);
 
-//        // Augmentation copied from standard hydrate:
-//        // Due work files and Kami worksheet
-//        $modelList = $this->augmentListWithDueWorkFiles($modelList, $dueWorkIds);
-//        $modelList = $this->augmentListWithDueWorkKamiWorksheetTemplates($modelList, $dueWorkIds);
-//
-//        /* Task files
-//         */
-//        $modelList = $this->augmentListWithTaskFiles($modelList, $taskIds);
-//
-//        /* Augment with Lesson Plan Files and Lesson Plan Fields
-//         */
-//        $modelList = $this->augmentListWithLessonPlanFiles($modelList, $lessonPlanIds);
-//        $modelList = $this->augmentWithLessonPlanFields($modelList, $lessonPlanIds);
-//
-//        // Folder codes for all contexts
-//        $modelList = $this->augmentListWithFolderCodes($modelList);
-//        // Specification assessments
-//        $modelList = $this->augmentListWithSpecifications($modelList);
-//        // Grade groups
-//        $modelList = $this->augmentListWithGradeGroups($modelList);
-//        // Curriculum Nodes
-//        $modelList = $this->augmentListWithCurriculumNodes($modelList);
-//        // Project sub-assessments
-//        if ($this->hydrateProjectSubAssessments) {
-//            $modelList = $this->augmentListWithProjectSubAssessments($modelList, array_keys($projectIds));
-//        }
-//        // Lesson Plan Linked Assessments
-//        $modelList = $this->augmentWithLessonPlanAssessments($modelList, $lessonPlanIds);
+        // Augmentation copied from standard hydrate:
+        // Due work files and Kami worksheet
+        $dueWorkIds = $modelList->map(fn (Model $model) => $model->getDueWork()?->getId(), false)->getAll();
+        $modelList  = $this->augmentListWithDueWorkFiles($modelList, $dueWorkIds);
+        $modelList  = $this->augmentListWithDueWorkKamiWorksheetTemplates($modelList, $dueWorkIds);
+
+        /* Task files
+         */
+        $taskIds   = $modelList->map(fn (Model $model) => $model->getTask()?->getId(), false)->getAll();
+        $modelList = $this->augmentListWithTaskFiles($modelList, $taskIds);
+
+        /* Augment with Lesson Plan Files and Lesson Plan Fields
+         */
+        $lessonPlanIds = $modelList->map(fn (Model $model) => $model->getLessonPlan()?->getId(), false)->getAll();
+        $modelList     = $this->augmentListWithLessonPlanFiles($modelList, $lessonPlanIds);
+        $modelList     = $this->augmentWithLessonPlanFields($modelList, $lessonPlanIds);
+
+        // Folder codes for all contexts
+        $modelList = $this->augmentListWithFolderCodes($modelList);
+        // Specification assessments
+        $modelList = $this->augmentListWithSpecifications($modelList);
+        // Grade groups
+        $modelList = $this->augmentListWithGradeGroups($modelList);
+        // Curriculum Nodes
+        $modelList = $this->augmentListWithCurriculumNodes($modelList);
+
+        // Project sub-assessments
+        $projectIds = $modelList->map(fn (Model $model) => $model->getProject()?->getId(), false)->getAll();
+        if ($this->hydrateProjectSubAssessments) {
+            $modelList = $this->augmentListWithProjectSubAssessments($modelList, array_keys($projectIds));
+        }
+        // Lesson Plan Linked Assessments
+        $modelList = $this->augmentWithLessonPlanAssessments($modelList, $lessonPlanIds);
         return $modelList;
     }
 
