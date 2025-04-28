@@ -14,7 +14,7 @@ import { useModalNodeUsageStore } from "../store/csModalNodeUsageStore";
 import CsModalCurrentNodes from "./current/cs-modal-current-nodes.vue";
 import CsModalAllHeader from "./all/cs-modal-all-header.vue";
 import CsModalAllNodes from "./all/cs-modal-all-nodes.vue";
-import CsModalAllFooter from "./all/cs-modal-all-footer.vue";
+import CsModalAllFooter from "./cs-modal-all-footer.vue";
 
 interface Props {
     isSingleSelect?: boolean; // so can only select a single node
@@ -139,8 +139,8 @@ function onAllSelected(): void {
                 <div v-else>
                     <cs-modal-all-header />
                     <cs-modal-all-nodes />
-                    <cs-modal-all-footer />
                 </div>
+                <cs-modal-all-footer />
             </div>
         </template>
         <template #sequence-2>
