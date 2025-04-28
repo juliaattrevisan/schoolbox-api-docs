@@ -7,6 +7,7 @@ import { watchDebounced } from "@vueuse/core";
 import { timeout } from "@js/util/jsUtils";
 import { EditorToolbar } from "@js/editor/types/editorTypes";
 import { useEditor } from "@schoolboxVue/composables/editor/useEditor";
+import MediaArticle from "@schoolboxVue/components/media-article.vue";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 
 interface Props {
@@ -135,9 +136,16 @@ window.Vue.onUnmounted(async () => {
                 <em>No comment added.</em>
             </p>
         </div>
-        <div v-else-if="props.isReadOnly && props.student.attemptResponse.comment !== ''" class="l-flex-col l-gap-s">
+        <div
+            v-else-if="
+                props.isReadOnly &&
+                props.student.attemptResponse.comment &&
+                props.student.attemptResponse.comment !== ''
+            "
+            class="l-flex-col l-gap-s"
+        >
             <label>Comment</label>
-            <p>{{ props.student.attemptResponse.comment }}</p>
+            <media-article tag="div" :content="props.student.attemptResponse.comment"></media-article>
         </div>
         <template v-else>
             <label :for="editorId">Comment</label>
