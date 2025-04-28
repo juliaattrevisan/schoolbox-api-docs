@@ -161,6 +161,7 @@ window.Vue.onUnmounted(async () => {
 
 .save-container {
     grid-template-rows: v-bind(saveContainerHeight);
+    margin-top: -1rem; /* offset the margin so it can butt up against the bottom of the editor */
     transition: grid-template-rows 300ms;
     &__inner-container {
         overflow: hidden;
