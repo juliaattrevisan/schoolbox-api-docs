@@ -611,7 +611,9 @@ class Mapper extends BaseMapper
             ->isNull('deleted_at')
         ;
         $query = $this->getDatabase()->executeQuery(
-            $query . $typeJoin . ' WHERE ' . $pb->getWhereIntersect(),
+            $query . $typeJoin .
+            ' WHERE ' . $pb->getWhereIntersect() .
+            ' ORDER BY sequence ASC',
             $pb->getParams(),
         );
         foreach ($query as $row) {
