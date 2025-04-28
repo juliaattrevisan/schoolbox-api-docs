@@ -29,6 +29,7 @@ interface Props {
     includeChildren?: boolean; // When a node is selected, also select all its children
     includeDisabled?: boolean; // whether to display disabled nodes
     hasTabs?: boolean; // a split to show only curriculum linked to a parent unit / all curriculum
+    folderId?: number; // the folder id to use when loading current curriculum
 }
 const props = withDefaults(defineProps<Props>(), {
     dataEndpoint: "",
@@ -45,6 +46,7 @@ const props = withDefaults(defineProps<Props>(), {
     includeChildren: false,
     includeDisabled: false,
     hasTabs: false,
+    folderId: undefined,
 });
 
 const store = useStore();
