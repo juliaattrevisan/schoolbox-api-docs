@@ -19,6 +19,7 @@ const editorId = `final-review-comment-${props.student.elementId}`;
 const comment = useEditor(props.student.attemptResponse.comment ?? "", `#${editorId}`, {
     targetElements: [`#${editorId}`],
     hasTokens: true,
+    maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
     toolbar: EditorToolbar.COMMENT_AI,
 });
 const isSaving = window.Vue.ref(false);

@@ -46,6 +46,7 @@
             detail: {
                 targetElements: ["#comment-{{ participant.user.id }}"],
                 showWordCount: true,
+                maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
                 {% if selfAssessment %}
                     toolbar: "comment",
                 {% else %}
