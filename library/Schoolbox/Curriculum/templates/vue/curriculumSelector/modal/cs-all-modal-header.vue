@@ -5,8 +5,8 @@
 
 import { useModalNodeUsageStore } from "../store/csModalNodeUsageStore";
 import { useNodesStore } from "../store/csNodesStore";
-import CsModalHeaderBreadcrumbs from "./cs-modal-header-breadcrumbs.vue";
-import CsModalHeaderSearchInput from "./cs-modal-header-search-input.vue";
+import CsModalHeaderBreadcrumbs from "./cs-all-modal-header-breadcrumbs.vue";
+import CsModalHeaderSearchInput from "./cs-all-modal-header-search-input.vue";
 
 const modalNodeUsageStore = useModalNodeUsageStore();
 const nodesStore = useNodesStore();

@@ -11,9 +11,9 @@ import type { Node } from "@schoolboxCurriculum/types/Node";
 import { useModalStore } from "../store/csModalStore";
 import { useModalViewNodesStore } from "../store/csModalViewNodesStore";
 import { useModalNodeUsageStore } from "../store/csModalNodeUsageStore";
-import CsModalHeader from "./cs-modal-header.vue";
+import CsModalHeader from "./cs-all-modal-header.vue";
 import CsModalNodes from "./cs-modal-nodes.vue";
-import CsModalFooter from "./cs-modal-footer.vue";
+import CsModalFooter from "./cs-all-modal-footer.vue";
 
 interface Props {
     isSingleSelect?: boolean; // so can only select a single node

@@ -5,7 +5,7 @@
  */
 
 import { useModalViewNodesStore } from "../store/csModalViewNodesStore";
-import CsModalHeaderBreadcrumb from "./cs-modal-header-breadcrumb.vue";
+import CsModalHeaderBreadcrumb from "./cs-all-modal-header-breadcrumb.vue";
 
 interface Props {
     isDisabled: boolean; // to disable certain events when editing is taking place

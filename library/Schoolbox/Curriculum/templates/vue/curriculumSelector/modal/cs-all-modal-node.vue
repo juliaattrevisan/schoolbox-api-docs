@@ -13,11 +13,11 @@ import { useModalStore } from "../store/csModalStore";
 import { useModalNodeUsageStore } from "../store/csModalNodeUsageStore";
 import { useModalActiveNodeStore } from "../store/csModalActiveNodeStore";
 import { useModalSearchStore } from "../store/csModalSearchStore";
-import CsModalNodeRadio from "./cs-modal-node-radio.vue";
-import CsModalNodeCheckbox from "./cs-modal-node-checkbox.vue";
-import CsModalNodeName from "./cs-modal-node-name.vue";
-import CsModalNodeUsageSummary from "./cs-modal-node-usage-summary.vue";
-import CsModalNodeUsageDetails from "./cs-modal-node-usage-details.vue";
+import CsModalNodeRadio from "./cs-all-modal-node-radio.vue";
+import CsModalNodeCheckbox from "./cs-all-modal-node-checkbox.vue";
+import CsModalNodeName from "./cs-all-modal-node-name.vue";
+import CsModalNodeUsageSummary from "./cs-all-modal-node-usage-summary.vue";
+import CsModalNodeUsageDetails from "./cs-all-modal-node-usage-details.vue";
 
 interface Props {
     node: Node; // to prefill the input
