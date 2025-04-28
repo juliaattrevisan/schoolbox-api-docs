@@ -226,6 +226,8 @@ class Mapper extends AbstractFolderMapper implements ILocator
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteAssessments']);
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteFields']);
 
+        $this->registerCallback(self::CALLBACK_PRERESTORE, [$this, 'validateFolderCodes']);
+
         $this->registerPersistSearchIndexCallbacks();
     }
 
