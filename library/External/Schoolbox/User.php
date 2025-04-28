@@ -486,6 +486,11 @@ class External_Schoolbox_User implements External_UserInterface
             ";
         }
 
+        // if no restriction return all users
+        if ('' === trim((string)$config->get('staff_dir_position_title_restrict'))) {
+            return $this->internalDatabase->executeQuery($query, $params)->fetchAll();
+        }
+
         $statement = $this->internalDatabase->executeQuery($query, $params);
         /**
          * array map to trim is needed for both these as browsers may be inserting \r\n and it also still needs to remove excessive ` ` or other whitespace
@@ -499,7 +504,7 @@ class External_Schoolbox_User implements External_UserInterface
                 // position title has data and that data is in the blacklist, ignore this human
                 continue;
             }
-            // position title either has no data, or is not in the blacklist use them
+            // position title is not in the blacklist use them
             $staff[] = $row;
         }
         return $staff;
