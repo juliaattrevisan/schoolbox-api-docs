@@ -564,10 +564,13 @@ select.letter-grade-select {
     .rb td,
     .rb th {
         border: solid 1px #8c8c8c !important; //make happen, print needs this... I don't care...
+        min-width: none !important;
+        padding: 0.1rem !important;
+        margin: 0 !important;
     }
     //force text size for rubric when printing
     .rb * {
-        font-size: 10pt !important;
+        font-size: 8pt !important;
     }
 }
 
