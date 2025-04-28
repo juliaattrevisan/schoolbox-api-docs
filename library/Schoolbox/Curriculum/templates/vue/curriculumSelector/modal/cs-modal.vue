@@ -11,6 +11,7 @@ import type { Node } from "@schoolboxCurriculum/types/Node";
 import { useModalStore } from "../store/csModalStore";
 import { useModalViewNodesStore } from "../store/csModalViewNodesStore";
 import { useModalNodeUsageStore } from "../store/csModalNodeUsageStore";
+import CsModalCurrentNodes from "./current/cs-modal-current-nodes.vue";
 import CsModalAllHeader from "./all/cs-modal-all-header.vue";
 import CsModalAllNodes from "./all/cs-modal-all-nodes.vue";
 import CsModalAllFooter from "./all/cs-modal-all-footer.vue";
@@ -130,11 +131,12 @@ function onAllSelected(): void {
                     <dd :class="{ active: currentTab === current }">
                         <a @click="onCurrentSelected">Current Curriculum</a>
                     </dd>
-                    <dd :class="{ active: currentTab === current }">
+                    <dd :class="{ active: currentTab === all }">
                         <a @click="onAllSelected">All Curriculum</a>
                     </dd>
                 </dl>
-                <div>
+                <cs-modal-current-nodes v-if="currentTab === current" />
+                <div v-else>
                     <cs-modal-all-header />
                     <cs-modal-all-nodes />
                     <cs-modal-all-footer />
