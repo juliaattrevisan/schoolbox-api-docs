@@ -92,6 +92,11 @@ function onModalClosed(): void {
         modalNodeUsageStore.cancel();
     }
 }
+
+const current = "CURRENT";
+const all = "ALL";
+
+const currentTab = window.Vue.ref<string>(current); // to track which tab is selected
 </script>
 
 <template>
