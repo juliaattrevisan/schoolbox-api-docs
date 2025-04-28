@@ -3,7 +3,7 @@
  */
 
 import { defineStore } from "pinia";
-import { useNodesStore } from "./csNodesStore";
+import { useNodesStore } from "./csAllNodesStore";
 import { useSelectedNodesStore } from "./csSelectedNodesStore";
 import { useSearchStore } from "./csSearchStore";
 import { useModalStore } from "./csModalStore";

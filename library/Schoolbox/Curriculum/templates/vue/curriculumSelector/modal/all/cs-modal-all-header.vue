@@ -4,7 +4,7 @@
  */
 
 import { useModalNodeUsageStore } from "../../store/csModalNodeUsageStore";
-import { useNodesStore } from "../../store/csNodesStore";
+import { useNodesStore } from "../../store/csAllNodesStore";
 import CsModalAllHeaderBreadcrumbs from "./cs-modal-all-header-breadcrumbs.vue";
 import CsModalAllHeaderSearchInput from "./cs-modal-all-header-search-input.vue";
 
