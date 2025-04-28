@@ -588,12 +588,13 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('assessment_course_unit_implementation.course.folder', 'uicf')},
                 {$this->getJoinColumnString('assessment_specification_implementation', 'spec')}
             FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
+            LEFT  JOIN {$this->getJoinSql('work_type', '', 'wt')}
             INNER JOIN {$this->getJoinSql('assessment_course_unit_implementation', '', 'ui', true)}
             INNER JOIN {$this->getJoinSql('assessment_course_unit_implementation.specification', 'ui', 'uis', true)}
             INNER JOIN {$this->getJoinSql('assessment_course_unit_implementation.specification.folder', 'uis', 'uisf', true)}
             INNER JOIN {$this->getJoinSql('assessment_course_unit_implementation.course', 'ui', 'uic', true)}
             INNER JOIN {$this->getJoinSql('assessment_course_unit_implementation.course.folder', 'uic', 'uicf', true)}
-            LEFT JOIN {$this->getJoinSql('assessment_specification_implementation', '', 'spec', true)}
+            LEFT  JOIN {$this->getJoinSql('assessment_specification_implementation', '', 'spec', true)}
         ";
 
         $typeJoin = match ($type) {
