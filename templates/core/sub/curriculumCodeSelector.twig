@@ -5,6 +5,7 @@
  # @param ?bool $vueSlot - Whether this is being rendered as a vue slot,
  #                         if so, the relevant createApp() must have CurriculumSelector included as an available component
  #                         Otherwise, this will render it as an independent vue app
+ # @param bool $hasTabs - Whether the curriculum code selector should have tabs
  #}
 {% if courseManagedReadonly is not defined %}
     {% set courseManagedReadonly = false %}

@@ -6,6 +6,7 @@
  # @param ?bool $vueSlot - Whether this is being rendered as a vue slot, (defaults to false)
  #                         if so, the relevant createApp() must have CurriculumSelector included as an available component
  #                         Otherwise, this will render it as an independent vue app
+ # @param bool $hasTabs - Whether the curriculum code selector should have tabs
  #}
 {% set entityType = entityType ?: 'Folder' %}
 {% set excludeLegend = excludeLegend ?? false %}
@@ -25,7 +26,8 @@
                         'codeList': curriculumNodes,
                         'renderButton': true,
                         'vueSlot': vueSlot,
-                        courseManagedReadonly: courseManagedReadonly ?? false
+                        courseManagedReadonly: courseManagedReadonly ?? false,
+                        hasTabs: hasTabs ?? false
                     } %}
             </div>
         </div>
