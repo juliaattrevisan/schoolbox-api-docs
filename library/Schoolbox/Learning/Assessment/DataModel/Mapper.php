@@ -23,6 +23,7 @@ use Schoolbox\Assessment\Participant\Plan;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
@@ -549,6 +550,93 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('project_assessment', '', 'pa', true)}
             LEFT JOIN {$this->getJoinSql('assessment_specification_implementation', '', 'spec', true)}
         ";
+    }
+
+
+    /**
+     * Optimised method for finding all assessments for a course outline
+     * component.
+     *
+     * A course outline component always contains assessments from a set of
+     * unit implementation IDs.
+     *
+     * @param array<int>                  $uiIds Unit implementation IDs in which to find assessments.
+     * @param AssessmentType::TYPE_*|null $type  If provided: find assessments of this type only.
+     * @return GenericCollection<Model>
+     */
+    public function findAllByUnitImplementationIdsForCourseOutline(
+        array $uiIds,
+        ?string $type = null,
+    ): GenericCollection {
+        $collection = $this->createCollection();
+        if (empty($uiIds)) {
+            return $collection;
+        }
+
+        // Exclude:
+        // * all assessment types (due work, task, etc.)
+        // * all contexts, except for unit implementation
+        // * spec for implementation assessments
+        $query = "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('assessment_course_unit_implementation', 'ui')},
+                {$this->getJoinColumnString('assessment_course_unit_implementation.specification', 'uis')},
+                {$this->getJoinColumnString('assessment_course_unit_implementation.specification.folder', 'uisf')},
+                {$this->getJoinColumnString('assessment_course_unit_implementation.course', 'uic')},
+                {$this->getJoinColumnString('assessment_course_unit_implementation.course.folder', 'uicf')},
+                {$this->getJoinColumnString('assessment_specification_implementation', 'spec')}
+            FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
+            INNER JOIN {$this->getJoinSql('assessment_course_unit_implementation', '', 'ui', true)}
+            INNER JOIN {$this->getJoinSql('assessment_course_unit_implementation.specification', 'ui', 'uis', true)}
+            INNER JOIN {$this->getJoinSql('assessment_course_unit_implementation.specification.folder', 'uis', 'uisf', true)}
+            INNER JOIN {$this->getJoinSql('assessment_course_unit_implementation.course', 'ui', 'uic', true)}
+            INNER JOIN {$this->getJoinSql('assessment_course_unit_implementation.course.folder', 'uic', 'uicf', true)}
+            LEFT JOIN {$this->getJoinSql('assessment_specification_implementation', '', 'spec', true)}
+        ";
+
+        $typeJoin = match ($type) {
+            AssessmentType::TYPE_TASK           => " INNER JOIN {$this->getJoinSql('task', '', 't', true)}",
+            AssessmentType::TYPE_DUE_WORK       => " INNER JOIN {$this->getJoinSql('duework', '', 'd', true)}",
+            AssessmentType::TYPE_QUIZ           => " INNER JOIN {$this->getJoinSql('quiz', '', 'q', true)}",
+            AssessmentType::TYPE_LTI_ASSESSMENT => " INNER JOIN {$this->getJoinSql('ltiAssessment', '', 'l', true)}",
+            AssessmentType::TYPE_PROJECT        => " INNER JOIN {$this->getJoinSql('project', '', 'p', true)}",
+            default                             => '',
+        };
+        $pb = $this->getPredicateBuilder()->in('ui.id', $uiIds);
+        $query = $this->getDatabase()->executeQuery(
+            $query . $typeJoin . ' WHERE ' . $pb->getWhereIntersect(),
+            $pb->getParams(),
+        );
+        foreach ($query as $row) {
+            // Hydrate
+            $assessment = $this->hydrate($row);
+
+            // Unit impl context
+            /** @var UnitImpl\Model $unitImpl */
+            $unitImpl = $this->hydrateJoin($row, 'assessment_course_unit_implementation', 'ui');
+            /** @var CourseImpl\Model $courseImpl */
+            $courseImpl = $this->hydrateJoin($row, 'assessment_course_unit_implementation.course', 'uic')
+                               ->setFolder(
+                                   $this->hydrateJoin($row, 'assessment_course_unit_implementation.course.folder', 'uicf')
+                               );
+            $unitImpl->setCourse($courseImpl);
+            $courseImpl->getUnits()[$unitImpl->getId()] = $unitImpl;
+            /** @var UnitSpec\Model $unitSpec */
+            $unitSpec = $this->hydrateJoin($row, 'assessment_course_unit_implementation.specification', 'uis')
+                             ->setFolder(
+                                 $this->hydrateJoin($row, 'assessment_course_unit_implementation.specification.folder', 'uisf')
+                             );
+            $unitImpl->setSpecification($unitSpec);
+            $unitSpec->getUnitImplementations()[$unitImpl->getId()] = $unitImpl;
+            $context = $unitImpl;
+
+            $assessment->setAssessmentContext($context);
+
+            // Fetch and hydrate using new augmentList methods
+            $collection->add($assessment);
+        }
+        return $collection;
     }
 
 
