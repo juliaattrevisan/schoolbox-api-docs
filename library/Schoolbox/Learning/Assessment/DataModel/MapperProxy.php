@@ -841,7 +841,7 @@ class MapperProxy
                 // Only option that's respected is type
                 $this->baseMapper->findAllByUnitImplementationIdsForCourseOutline(
                     $unitImplIds,
-                    $options['type'] ?? null,
+                    isset($options['type']) ? (array)$options['type'] : null,
                 ),
             ),
             $student,

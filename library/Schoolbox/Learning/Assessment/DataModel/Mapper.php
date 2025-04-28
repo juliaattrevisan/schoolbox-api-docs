@@ -560,14 +560,13 @@ class Mapper extends BaseMapper
      * A course outline component always contains assessments from a set of
      * unit implementation IDs.
      *
-     * @param array<int>                  $uiIds Unit implementation IDs in which to find assessments.
-     * @param AssessmentType::TYPE_*|null $type  If provided: find assessments of this type only.
+     * @param array<int>                         $uiIds Unit implementation IDs in which to find assessments.
+     * @param array<AssessmentType::TYPE_*>|null $types If provided: find assessments of these types only.
+     *
      * @return Collection<Model>
      */
-    public function findAllByUnitImplementationIdsForCourseOutline(
-        array $uiIds,
-        ?string $type = null,
-    ): Collection {
+    public function findAllByUnitImplementationIdsForCourseOutline(array $uiIds, ?array $types): Collection
+    {
         $modelList = $this->createCollection();
         if (empty($uiIds)) {
             return $modelList;
@@ -597,21 +596,50 @@ class Mapper extends BaseMapper
             LEFT  JOIN {$this->getJoinSql('assessment_specification_implementation', '', 'spec', true)}
         ";
 
-        $typeJoin = match ($type) {
-            AssessmentType::TYPE_TASK           => " INNER JOIN {$this->getJoinSql('task', '', 't', true)}",
-            AssessmentType::TYPE_DUE_WORK       => " INNER JOIN {$this->getJoinSql('duework', '', 'd', true)}",
-            AssessmentType::TYPE_QUIZ           => " INNER JOIN {$this->getJoinSql('quiz', '', 'q', true)}",
-            AssessmentType::TYPE_LTI_ASSESSMENT => " INNER JOIN {$this->getJoinSql('ltiAssessment', '', 'l', true)}",
-            AssessmentType::TYPE_PROJECT        => " INNER JOIN {$this->getJoinSql('project', '', 'p', true)}",
-            AssessmentType::TYPE_LESSON_PLAN    => " INNER JOIN {$this->getJoinSql('lessonPlan', '', 'lessonPlan', true)}",
-            default                             => '',
-        };
         $pb = $this->getPredicateBuilder()
             ->in('ui.id', $uiIds)
-            ->isNull('deleted_at')
-        ;
+            ->isNull('deleted_at');
+
+        // Search on types of assessment
+        $typeJoins = [];
+        if (!empty($types)) {
+            $typesPb = $this->getPredicateBuilder();
+            foreach ($types as $type) {
+                switch ($type) {
+                    case AssessmentType::TYPE_TASK:
+                        $typeJoins[] = " LEFT JOIN {$this->getJoinSql('task', '', 't', true)}";
+                        $typesPb     = $typesPb->notNull('t.id');
+                        break;
+                    case AssessmentType::TYPE_DUE_WORK:
+                        $typeJoins[] = " LEFT JOIN {$this->getJoinSql('duework', '', 'd', true)}";
+                        $typesPb     = $typesPb->notNull('d.id');
+                        break;
+                    case AssessmentType::TYPE_QUIZ:
+                        $typeJoins[] = " LEFT JOIN {$this->getJoinSql('quiz', '', 'q', true)}";
+                        $typesPb     = $typesPb->notNull('q.assess_id');
+                        break;
+                    case AssessmentType::TYPE_LTI_ASSESSMENT:
+                        $typeJoins[] = " LEFT JOIN {$this->getJoinSql('ltiAssessment', '', 'l', true)}";
+                        $typesPb     = $typesPb->notNull('l.id');
+                        break;
+                    case AssessmentType::TYPE_PROJECT:
+                        $typeJoins[] = " LEFT JOIN {$this->getJoinSql('project', '', 'p', true)}";
+                        $typesPb     = $typesPb->notNull('p.id');
+                        break;
+                    case AssessmentType::TYPE_LESSON_PLAN:
+                        $typeJoins[] = " LEFT JOIN {$this->getJoinSql('lessonPlan', '', 'lessonPlan', true)}";
+                        $typesPb     = $typesPb->notNull('lessonPlan.id');
+                        break;
+                    default:
+                        break;
+                }
+            }
+            if (!empty($typeJoins)) {
+                $pb = $pb->any($typesPb);
+            }
+        }
         $query = $this->getDatabase()->executeQuery(
-            $query . $typeJoin .
+            $query . implode(' ', $typeJoins) .
             ' WHERE ' . $pb->getWhereIntersect() .
             ' ORDER BY sequence ASC',
             $pb->getParams(),
