@@ -651,6 +651,7 @@ class Mapper extends BaseMapper
         // Augmentation for this only:
         // * assessment type (due work, task, etc.)
         $modelList = $this->augmentListWithTasks($modelList);
+        $modelList = $this->augmentListWithDueWorks($modelList);
 
 //        // Augmentation copied from standard hydrate:
 //        // Due work files and Kami worksheet
@@ -1119,7 +1120,7 @@ class Mapper extends BaseMapper
      */
     private function augmentListWithTasks(GenericCollection $modelList): GenericCollection
     {
-        if (empty($modelList)) {
+        if (count($modelList) === 0) {
             return $modelList;
         }
 
@@ -1129,7 +1130,7 @@ class Mapper extends BaseMapper
         $mapper = $this->getJoinMapper('task');
         $query  = "
             SELECT {$mapper->getColumnString()}
-            FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($mapper->getTable())}
+            FROM {$mapper->getDatabase()->getQuoter()->quoteIdentifier($mapper->getTable())}
         ";
         $pb     = $mapper->getPredicateBuilder()->in('assessment_id', $modelList->getPropertyValues('id'));
         $result = $mapper->getDatabase()->executeQuery(
@@ -1137,30 +1138,19 @@ class Mapper extends BaseMapper
             $pb->getParams(),
         );
 
-        $subCollection = $mapper->createCollection();
+        $subModelList = $mapper->createCollection();
         foreach ($result as $row) {
             $subModel = $mapper->hydrate($row);
-            $subCollection[$subModel->getAssessmentModel()->getId()] = $subModel;
+            $subModelList[$subModel->getAssessmentModel()->getId()] = $subModel;
         }
 
         foreach ($modelList as $model) {
             $assessmentId = $model->getId();
-            if (isset($subCollection[$assessmentId])) {
-                $model->setSubObject($subCollection[$assessmentId]);
+            if (isset($subModelList[$assessmentId])) {
+                $model->setSubObject($subModelList[$assessmentId]);
             }
         }
 
-
-
-//        $tasks = $this->getJoinMapper('task')
-//            ->findByColumn('assessment_id', $modelList->getPropertyValues('id'))
-//            ->indexByCallback(fn (Task $task) => $task->getAssessmentModel()->getId());
-//        foreach ($modelList as $model) {
-//            $assessmentId = $model->getId();
-//            if (isset($tasks[$assessmentId])) {
-//                $model->setSubObject($tasks[$assessmentId]);
-//            }
-//        }
         return $modelList;
     }
 
@@ -1174,19 +1164,56 @@ class Mapper extends BaseMapper
      */
     private function augmentListWithDueWorks(GenericCollection $modelList): GenericCollection
     {
-        if (empty($modelList)) {
+        if (count($modelList) === 0) {
             return $modelList;
         }
 
-        $tasks = $this->getJoinMapper('task')
-                      ->findByColumn('assessment_id', $modelList->getPropertyValues('id'))
-                      ->indexByCallback(fn (Task $task) => $task->getAssessmentModel()->getId());
+        // Would just use `findByColumn` here, but the joins it includes may
+        // vary too greatly from what's in this mapper.
+        /** @var SubmissionBoxMapper $mapper */
+        $mapper = $this->getJoinMapper('duework');
+        $query  = "
+            SELECT
+                {$mapper->getColumnString()},
+                {$mapper->getJoinColumnString('mark_type', 'mt')},
+                {$mapper->getJoinColumnString('rubric_capability_mark_type_id', 'rmt')},
+                {$mapper->getJoinColumnString('rubric_capability_grade_group_id', 'rcgg')},
+                {$mapper->getJoinColumnString('worksheetTemplate', 'dueworkWorksheetTemplate')},
+                {$mapper->getJoinColumnString('worksheetTemplate.allowedFileExtension', 'dueworkWorksheetTemplateAllowedFileExtension')}
+            FROM {$mapper->getDatabase()->getQuoter()->quoteIdentifier($mapper->getTable())}
+            LEFT JOIN {$mapper->getJoinSql('worksheetTemplate', '', 'dueworkWorksheetTemplate', true)}
+            LEFT JOIN {$mapper->getJoinSql('worksheetTemplate.allowedFileExtension', 'dueworkWorksheetTemplate', 'dueworkWorksheetTemplateAllowedFileExtension', true)}
+            LEFT JOIN {$mapper->getJoinSql('mark_type', '', 'mt')}
+            LEFT JOIN {$mapper->getJoinSql('rubric_capability_mark_type_id', '', 'rmt')}
+            LEFT JOIN {$mapper->getJoinSql('rubric_capability_grade_group_id', '', 'rcgg', true)}
+        ";
+        $pb     = $mapper->getPredicateBuilder()->in('assessment_id', $modelList->getPropertyValues('id'));
+        $result = $mapper->getDatabase()->executeQuery(
+            $query . ' WHERE ' . $pb->getWhereIntersect(),
+            $pb->getParams(),
+        );
+
+        $subModelList = $mapper->createCollection();
+        foreach ($result as $row) {
+            $subModel = $mapper->hydrate($row)
+               ->setMarkType($mapper->hydrateJoin($row, 'mark_type', 'mt'))
+               ->setCapabilityMarkType($mapper->hydrateJoin($row, 'rubric_capability_mark_type_id', 'rmt'))
+               ->setCapabilityGradeGroup($mapper->hydrateJoin($row, 'rubric_capability_grade_group_id', 'rcgg'))
+               ->setWorksheetTemplate(
+                   $mapper->hydrateJoin($row, 'worksheetTemplate', 'dueworkWorksheetTemplate')
+                        ?->setMimeType($mapper->hydrateJoin($row, 'worksheetTemplate.allowedFileExtension', 'dueworkWorksheetTemplateAllowedFileExtension'))
+               );
+
+            $subModelList[$subModel->getAssessmentModel()->getId()] = $subModel;
+        }
+
         foreach ($modelList as $model) {
             $assessmentId = $model->getId();
-            if (isset($tasks[$assessmentId])) {
-                $model->setSubObject($tasks[$assessmentId]);
+            if (isset($subModelList[$assessmentId])) {
+                $model->setSubObject($subModelList[$assessmentId]);
             }
         }
+
         return $modelList;
     }
 
@@ -1205,7 +1232,6 @@ class Mapper extends BaseMapper
 //                {$this->getJoinColumnString('task', 't')},
 //                {$this->getJoinColumnString('duework', 'd')},
 //                {$this->getJoinColumnString('work_type', 'wt')},
-//                {$this->getJoinColumnString('duework', 'd')},
 //                {$this->getJoinColumnString('duework.mark_type', 'mt')},
 //                {$this->getJoinColumnString('duework.rubric_capability_mark_type_id', 'rmt')},
 //                {$this->getJoinColumnString('duework.rubric_capability_grade_group_id', 'rcgg')},
