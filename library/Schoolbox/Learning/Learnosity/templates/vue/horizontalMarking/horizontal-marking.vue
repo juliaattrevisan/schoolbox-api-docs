@@ -78,11 +78,6 @@ window.Vue.onMounted(async () => {
 </template>
 
 <style>
-/* remove the bottom margin so the save status can butt up against the bottom of the editor */
-.ck.ck-editor {
-    margin-bottom: 0 !important;
-}
-
 /* hide the features container */
 .lrn_float_element_container {
     display: none;
