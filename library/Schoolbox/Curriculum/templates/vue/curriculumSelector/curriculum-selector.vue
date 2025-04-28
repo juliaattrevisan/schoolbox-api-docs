@@ -15,20 +15,20 @@ import CsModal from "./modal/cs-modal.vue";
 import SelectedNodeModal from "../selected-node-modal.vue";
 
 interface Props {
-    dataEndpoint: string; // the endpoint to retrieve all the group data from
-    selectedNodes: Node[]; // the nodes already previously selected
-    isReadOnly: boolean; // can only view the currently selected nodes, not edit them
-    includeWithoutCode: boolean; // set to true if curriculum nodes with blank codes need to be selectable
-    formValueName: string; // input name, to allow custom form structure
-    selectedOriginal: Node[]; // an 'original' selection, saved by the user
-    selectedDefault: Node[]; // the default selection relevant to the current user role
-    isSingleSelect: boolean; // so can only select a single node
-    isSelectAll: boolean; // can select any nodes, not just those that have a code
-    canSelectChildren: boolean; // is able to select children of an already selected node
-    inputId: string; // the id of the search input element
-    includeChildren: boolean; // When a node is selected, also select all its children
-    includeDisabled: boolean; // whether to display disabled nodes
-    hasTabs: boolean; // a split to show only curriculum linked to a parent unit / all curriculum
+    dataEndpoint?: string; // the endpoint to retrieve all the group data from
+    selectedNodes?: Node[]; // the nodes already previously selected
+    isReadOnly?: boolean; // can only view the currently selected nodes, not edit them
+    includeWithoutCode?: boolean; // set to true if curriculum nodes with blank codes need to be selectable
+    formValueName?: string; // input name, to allow custom form structure
+    selectedOriginal?: Node[]; // an 'original' selection, saved by the user
+    selectedDefault?: Node[]; // the default selection relevant to the current user role
+    isSingleSelect?: boolean; // so can only select a single node
+    isSelectAll?: boolean; // can select any nodes, not just those that have a code
+    canSelectChildren?: boolean; // is able to select children of an already selected node
+    inputId?: string; // the id of the search input element
+    includeChildren?: boolean; // When a node is selected, also select all its children
+    includeDisabled?: boolean; // whether to display disabled nodes
+    hasTabs?: boolean; // a split to show only curriculum linked to a parent unit / all curriculum
 }
 const props = withDefaults(defineProps<Props>(), {
     dataEndpoint: "",
