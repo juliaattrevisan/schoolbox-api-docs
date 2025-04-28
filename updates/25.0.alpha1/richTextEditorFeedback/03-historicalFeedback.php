@@ -21,6 +21,10 @@ $app = new class extends CliTool\App {
                 'id' => 'attempt_id',
                 'comment' => 'comment',
             ], // i.e. quiz/survey
+            'lti_assessment_score' => [
+                'id' => 'id',
+                'comment' => 'comment',
+            ], // i.e. lti
         ];
 
 
