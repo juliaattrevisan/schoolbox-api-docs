@@ -139,4 +139,3 @@ function onCancelSelected(): void {
         </ul>
     </reveal-modal>
 </template>
-../../student/util/finaliseReviewUtils
