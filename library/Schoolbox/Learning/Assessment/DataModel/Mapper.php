@@ -1132,26 +1132,13 @@ class Mapper extends BaseMapper
         $mapper = $this->getJoinMapper('task');
         return $this->augmentListWithSubObjects(
             $modelList,
-            $this->getJoinMapper('task'),
+            $mapper,
             "
                 SELECT {$mapper->getColumnString()}
                 FROM {$mapper->getDatabase()->getQuoter()->quoteIdentifier($mapper->getTable())}
             ",
-            $this->hydrateTask(...),
+            fn ($row) => $mapper->hydrate($row),
         );
-    }
-
-    /**
-     * Hydrate method for `augmentListWithTasks`.
-     *
-     * @param array $row
-     * @return Task
-     */
-    private function hydrateTask(array $row): Task
-    {
-        /** @var TaskMapper $mapper */
-        $mapper = $this->getJoinMapper('task');
-        return $mapper->hydrate($row);
     }
 
     /**
@@ -1163,59 +1150,55 @@ class Mapper extends BaseMapper
      */
     private function augmentListWithDueWorks(GenericCollection $modelList): GenericCollection
     {
-        if (count($modelList) === 0) {
-            return $modelList;
-        }
-
-        // Would just use `findByColumn` here, but the joins it includes may
-        // vary too greatly from what's in this mapper.
         /** @var SubmissionBoxMapper $mapper */
         $mapper = $this->getJoinMapper('duework');
-        $query  = "
-            SELECT
-                {$mapper->getColumnString()},
-                {$mapper->getJoinColumnString('mark_type', 'mt')},
-                {$mapper->getJoinColumnString('rubric_capability_mark_type_id', 'rmt')},
-                {$mapper->getJoinColumnString('rubric_capability_grade_group_id', 'rcgg')},
-                {$mapper->getJoinColumnString('worksheetTemplate', 'dueworkWorksheetTemplate')},
-                {$mapper->getJoinColumnString('worksheetTemplate.allowedFileExtension', 'dueworkWorksheetTemplateAllowedFileExtension')}
-            FROM {$mapper->getDatabase()->getQuoter()->quoteIdentifier($mapper->getTable())}
-            LEFT JOIN {$mapper->getJoinSql('worksheetTemplate', '', 'dueworkWorksheetTemplate', true)}
-            LEFT JOIN {$mapper->getJoinSql('worksheetTemplate.allowedFileExtension', 'dueworkWorksheetTemplate', 'dueworkWorksheetTemplateAllowedFileExtension', true)}
-            LEFT JOIN {$mapper->getJoinSql('mark_type', '', 'mt')}
-            LEFT JOIN {$mapper->getJoinSql('rubric_capability_mark_type_id', '', 'rmt')}
-            LEFT JOIN {$mapper->getJoinSql('rubric_capability_grade_group_id', '', 'rcgg', true)}
-        ";
-        $pb     = $mapper->getPredicateBuilder()->in('assessment_id', $modelList->getPropertyValues('id'));
-        $result = $mapper->getDatabase()->executeQuery(
-            $query . ' WHERE ' . $pb->getWhereIntersect(),
-            $pb->getParams(),
+        return $this->augmentListWithSubObjects(
+            $modelList,
+            $mapper,
+            "
+                SELECT
+                    {$mapper->getColumnString()},
+                    {$mapper->getJoinColumnString('mark_type', 'mt')},
+                    {$mapper->getJoinColumnString('rubric_capability_mark_type_id', 'rmt')},
+                    {$mapper->getJoinColumnString('rubric_capability_grade_group_id', 'rcgg')},
+                    {$mapper->getJoinColumnString('worksheetTemplate', 'dueworkWorksheetTemplate')},
+                    {$mapper->getJoinColumnString('worksheetTemplate.allowedFileExtension', 'dueworkWorksheetTemplateAllowedFileExtension')}
+                FROM {$mapper->getDatabase()->getQuoter()->quoteIdentifier($mapper->getTable())}
+                LEFT JOIN {$mapper->getJoinSql('worksheetTemplate', '', 'dueworkWorksheetTemplate', true)}
+                LEFT JOIN {$mapper->getJoinSql('worksheetTemplate.allowedFileExtension', 'dueworkWorksheetTemplate', 'dueworkWorksheetTemplateAllowedFileExtension', true)}
+                LEFT JOIN {$mapper->getJoinSql('mark_type', '', 'mt')}
+                LEFT JOIN {$mapper->getJoinSql('rubric_capability_mark_type_id', '', 'rmt')}
+                LEFT JOIN {$mapper->getJoinSql('rubric_capability_grade_group_id', '', 'rcgg', true)}
+            ",
+            $this->hydrateDueWork(...),
         );
-
-        $subModelList = $mapper->createCollection();
-        foreach ($result as $row) {
-            $subModel = $mapper->hydrate($row)
-               ->setMarkType($mapper->hydrateJoin($row, 'mark_type', 'mt'))
-               ->setCapabilityMarkType($mapper->hydrateJoin($row, 'rubric_capability_mark_type_id', 'rmt'))
-               ->setCapabilityGradeGroup($mapper->hydrateJoin($row, 'rubric_capability_grade_group_id', 'rcgg'))
-               ->setWorksheetTemplate(
-                   $mapper->hydrateJoin($row, 'worksheetTemplate', 'dueworkWorksheetTemplate')
-                        ?->setMimeType($mapper->hydrateJoin($row, 'worksheetTemplate.allowedFileExtension', 'dueworkWorksheetTemplateAllowedFileExtension'))
-               );
-
-            $subModelList[$subModel->getAssessmentModel()->getId()] = $subModel;
-        }
-
-        foreach ($modelList as $model) {
-            $assessmentId = $model->getId();
-            if (isset($subModelList[$assessmentId])) {
-                $model->setSubObject($subModelList[$assessmentId]);
-            }
-        }
-
-        return $modelList;
     }
 
+    /**
+     * Hydrate method for `augmentListWithDueWorks`.
+     *
+     * @param array $row
+     * @return SubmissionBox
+     */
+    private function hydrateDueWork(array $row): SubmissionBox
+    {
+        /** @var SubmissionBoxMapper $mapper */
+        $mapper = $this->getJoinMapper('duework');
+        return $mapper->hydrate($row)
+            ->setMarkType($mapper->hydrateJoin($row, 'mark_type', 'mt'))
+            ->setCapabilityMarkType($mapper->hydrateJoin($row, 'rubric_capability_mark_type_id', 'rmt'))
+            ->setCapabilityGradeGroup($mapper->hydrateJoin($row, 'rubric_capability_grade_group_id', 'rcgg'))
+            ->setWorksheetTemplate(
+                $mapper->hydrateJoin($row, 'worksheetTemplate', 'dueworkWorksheetTemplate')
+                    ?->setMimeType(
+                        $mapper->hydrateJoin(
+                            $row,
+                            'worksheetTemplate.allowedFileExtension',
+                            'dueworkWorksheetTemplateAllowedFileExtension',
+                        )
+                    )
+            );
+    }
 
     /**
      * For any assessments in `$modelList`: fetch and add their corresponding
@@ -1226,43 +1209,37 @@ class Mapper extends BaseMapper
      */
     private function augmentListWithQuizzes(GenericCollection $modelList): GenericCollection
     {
-        if (count($modelList) === 0) {
-            return $modelList;
-        }
-
-        // Would just use `findByColumn` here, but the joins it includes may
-        // vary too greatly from what's in this mapper.
         /** @var Quiz\Mapper $mapper */
         $mapper = $this->getJoinMapper('quiz');
-        $query  = "
-            SELECT
-                {$mapper->getColumnString()},
-                {$mapper->getJoinColumnString('mark_type_id', 'qmt')}
-            FROM {$mapper->getDatabase()->getQuoter()->quoteIdentifier($mapper->getTable())}
-            LEFT JOIN {$mapper->getJoinSql('mark_type_id', '', 'qmt')}
-        ";
-        $pb     = $mapper->getPredicateBuilder()->in('assessment_id', $modelList->getPropertyValues('id'));
-        $result = $mapper->getDatabase()->executeQuery(
-            $query . ' WHERE ' . $pb->getWhereIntersect(),
-            $pb->getParams(),
+        return $this->augmentListWithSubObjects(
+            $modelList,
+            $mapper,
+            "
+                SELECT
+                    {$mapper->getColumnString()},
+                    {$mapper->getJoinColumnString('mark_type_id', 'qmt')}
+                FROM {$mapper->getDatabase()->getQuoter()->quoteIdentifier($mapper->getTable())}
+                LEFT JOIN {$mapper->getJoinSql('mark_type_id', '', 'qmt')}
+            ",
+            $this->hydrateQuiz(...),
         );
-
-        $subModelList = $mapper->createCollection();
-        foreach ($result as $row) {
-            $subModel = $mapper->hydrate($row)
-                ->setMarkType($mapper->hydrateJoin($row, 'mark_type_id', 'qmt'));
-            $subModelList[$subModel->getAssessmentModel()->getId()] = $subModel;
-        }
-
-        foreach ($modelList as $model) {
-            $assessmentId = $model->getId();
-            if (isset($subModelList[$assessmentId])) {
-                $model->setSubObject($subModelList[$assessmentId]);
-            }
-        }
-
-        return $modelList;
     }
+
+    /**
+     * Hydrate method for `augmentListWithQuizzes`.
+     *
+     * @param array $row
+     * @return Quiz\Model
+     * @throws Exception
+     */
+    private function hydrateQuiz(array $row): Quiz\Model
+    {
+        /** @var Quiz\Mapper $mapper */
+        $mapper = $this->getJoinMapper('quiz');
+        return $mapper->hydrate($row)
+            ->setMarkType($mapper->hydrateJoin($row, 'mark_type_id', 'qmt'));
+    }
+
 
     /**
      * For any assessments in `$modelList`: fetch and add their corresponding
@@ -1273,44 +1250,35 @@ class Mapper extends BaseMapper
      */
     private function augmentListWithLtiAssessments(GenericCollection $modelList): GenericCollection
     {
-        if (count($modelList) === 0) {
-            return $modelList;
-        }
-
-        // Would just use `findByColumn` here, but the joins it includes may
-        // vary too greatly from what's in this mapper.
         /** @var LtiAssessment\Mapper $mapper */
         $mapper = $this->getJoinMapper('ltiAssessment');
-        $query  = "
-            SELECT
-                {$mapper->getColumnString()},
-                {$mapper->getJoinColumnString('ltiTool', 'ltool')}
-            FROM {$mapper->getDatabase()->getQuoter()->quoteIdentifier($mapper->getTable())}
-            LEFT JOIN {$mapper->getJoinSql('ltiTool', '', 'ltool', true)}
-        ";
-        $pb     = $mapper->getPredicateBuilder()->in('assessment_id', $modelList->getPropertyValues('id'));
-        $result = $mapper->getDatabase()->executeQuery(
-            $query . ' WHERE ' . $pb->getWhereIntersect(),
-            $pb->getParams(),
+        return $this->augmentListWithSubObjects(
+            $modelList,
+            $mapper,
+            "
+                SELECT
+                    {$mapper->getColumnString()},
+                    {$mapper->getJoinColumnString('ltiTool', 'ltool')}
+                FROM {$mapper->getDatabase()->getQuoter()->quoteIdentifier($mapper->getTable())}
+                LEFT JOIN {$mapper->getJoinSql('ltiTool', '', 'ltool', true)}
+            ",
+            $this->hydrateLtiAssessment(...),
         );
-
-        $subModelList = $mapper->createCollection();
-        foreach ($result as $row) {
-            $subModel = $mapper->hydrate($row)
-                               ->setLtiTool($mapper->hydrateJoin($row, 'ltiTool', 'ltool'));
-            $subModelList[$subModel->getAssessmentModel()->getId()] = $subModel;
-        }
-
-        foreach ($modelList as $model) {
-            $assessmentId = $model->getId();
-            if (isset($subModelList[$assessmentId])) {
-                $model->setSubObject($subModelList[$assessmentId]);
-            }
-        }
-
-        return $modelList;
     }
 
+    /**
+     * Hydrate method for `augmentListWithLtiAssessments`.
+     *
+     * @param array $row
+     * @return LtiAssessment\Model
+     */
+    private function hydrateLtiAssessment(array $row): LtiAssessment\Model
+    {
+        /** @var LtiAssessment\Mapper $mapper */
+        $mapper = $this->getJoinMapper('ltiAssessment');
+        return $mapper->hydrate($row)
+            ->setLtiTool($mapper->hydrateJoin($row, 'ltiTool', 'ltool'));
+    }
 
     /**
      * For any assessments in `$modelList`: fetch and add their corresponding
@@ -1321,40 +1289,18 @@ class Mapper extends BaseMapper
      */
     private function augmentListWithLessonPlans(GenericCollection $modelList): GenericCollection
     {
-        if (count($modelList) === 0) {
-            return $modelList;
-        }
-
-        // Would just use `findByColumn` here, but the joins it includes may
-        // vary too greatly from what's in this mapper.
-        /** @var \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper $mapper */
+        /** @var LessonPlan\Mapper $mapper */
         $mapper = $this->getJoinMapper('lessonPlan');
-        $query  = "
-            SELECT {$mapper->getColumnString()}
-            FROM {$mapper->getDatabase()->getQuoter()->quoteIdentifier($mapper->getTable())}
-        ";
-        $pb     = $mapper->getPredicateBuilder()->in('assessment_id', $modelList->getPropertyValues('id'));
-        $result = $mapper->getDatabase()->executeQuery(
-            $query . ' WHERE ' . $pb->getWhereIntersect(),
-            $pb->getParams(),
+        return $this->augmentListWithSubObjects(
+            $modelList,
+            $mapper,
+            "
+                SELECT {$mapper->getColumnString()}
+                FROM {$mapper->getDatabase()->getQuoter()->quoteIdentifier($mapper->getTable())}
+            ",
+            fn ($row) => $mapper->hydrate($row),
         );
-
-        $subModelList = $mapper->createCollection();
-        foreach ($result as $row) {
-            $subModel = $mapper->hydrate($row);
-            $subModelList[$subModel->getAssessmentModel()->getId()] = $subModel;
-        }
-
-        foreach ($modelList as $model) {
-            $assessmentId = $model->getId();
-            if (isset($subModelList[$assessmentId])) {
-                $model->setSubObject($subModelList[$assessmentId]);
-            }
-        }
-
-        return $modelList;
     }
-
 
     /**
      * For any assessments in `$modelList`: fetch and add their corresponding
@@ -1365,45 +1311,27 @@ class Mapper extends BaseMapper
      */
     private function augmentListWithProjects(GenericCollection $modelList): GenericCollection
     {
-        if (count($modelList) === 0) {
-            return $modelList;
-        }
-
-        // Would just use `findByColumn` here, but the joins it includes may
-        // vary too greatly from what's in this mapper.
-        /** @var \Schoolbox\Learning\Assessment\DataModel\Project\Mapper $mapper */
+        /** @var Project\Mapper $mapper */
         $mapper = $this->getJoinMapper('project');
-        $query  = "
-            SELECT {$mapper->getColumnString()}
-            FROM {$mapper->getDatabase()->getQuoter()->quoteIdentifier($mapper->getTable())}
-        ";
-        $pb     = $mapper->getPredicateBuilder()->in('assessment_id', $modelList->getPropertyValues('id'));
-        $result = $mapper->getDatabase()->executeQuery(
-            $query . ' WHERE ' . $pb->getWhereIntersect(),
-            $pb->getParams(),
+        return $this->augmentListWithSubObjects(
+            $modelList,
+            $mapper,
+            "
+                SELECT {$mapper->getColumnString()}
+                FROM {$mapper->getDatabase()->getQuoter()->quoteIdentifier($mapper->getTable())}
+            ",
+            fn ($row) => $mapper->hydrate($row),
         );
-
-        $subModelList = $mapper->createCollection();
-        foreach ($result as $row) {
-            $subModel = $mapper->hydrate($row);
-            $subModelList[$subModel->getAssessmentModel()->getId()] = $subModel;
-        }
-
-        foreach ($modelList as $model) {
-            $assessmentId = $model->getId();
-            if (isset($subModelList[$assessmentId])) {
-                $model->setSubObject($subModelList[$assessmentId]);
-            }
-        }
-
-        return $modelList;
     }
 
     /**
      * For any assessments in `$modelList`: fetch and add their corresponding
      * sub-object (e.g. a due work, task, etc.).
      *
-     * @param GenericCollection<Model> $modelList
+     * @param GenericCollection<Model>              $modelList
+     * @param BaseMapper                            $subMapper
+     * @param string                                $baseQuery
+     * @param callable(array): IAssessableDataModel $hydrator
      * @return GenericCollection<Model>
      */
     private function augmentListWithSubObjects(
@@ -1440,117 +1368,6 @@ class Mapper extends BaseMapper
         }
 
         return $modelList;
-//        $query = "
-//            SELECT
-//                {$this->getColumnString()},
-//                {$this->getJoinColumnString('task', 't')},
-//                {$this->getJoinColumnString('duework', 'd')},
-//                {$this->getJoinColumnString('work_type', 'wt')},
-//                {$this->getJoinColumnString('duework.mark_type', 'mt')},
-//                {$this->getJoinColumnString('duework.rubric_capability_mark_type_id', 'rmt')},
-//                {$this->getJoinColumnString('duework.rubric_capability_grade_group_id', 'rcgg')},
-//                {$this->getJoinColumnString('duework.worksheetTemplate', 'dueworkWorksheetTemplate')},
-//                {$this->getJoinColumnString('duework.worksheetTemplate.allowedFileExtension', 'dueworkWorksheetTemplateAllowedFileExtension')},
-//                {$this->getJoinColumnString('quiz', 'q')},
-//                {$this->getJoinColumnString('quiz.mark_type_id', 'qmt')},
-//                {$this->getJoinColumnString('ltiAssessment', 'l')},
-//                {$this->getJoinColumnString('ltiAssessment.ltiTool', 'ltool')},
-//                {$this->getJoinColumnString('lessonPlan', 'lessonPlan')},
-//                {$this->getJoinColumnString('project', 'p')},
-//                {$this->getJoinColumnString('assessment_folder', 'f')},
-//                {$this->getJoinColumnString('assessment_course_unit_specification', 'us')},
-//                {$this->getJoinColumnString('assessment_course_unit_specification.folder', 'usf')},
-//                {$this->getJoinColumnString('assessment_course_unit_specification.course', 'usc')},
-//                {$this->getJoinColumnString('assessment_course_unit_specification.course.folder', 'uscf')},
-//                {$this->getJoinColumnString('assessment_course_unit_implementation', 'ui')},
-//                {$this->getJoinColumnString('assessment_course_unit_implementation.specification', 'uis')},
-//                {$this->getJoinColumnString('assessment_course_unit_implementation.specification.folder', 'uisf')},
-//                {$this->getJoinColumnString('assessment_course_unit_implementation.course', 'uic')},
-//                {$this->getJoinColumnString('assessment_course_unit_implementation.course.folder', 'uicf')},
-//                {$this->getJoinColumnString('project_assessment', 'pa')},
-//                {$this->getJoinColumnString('assessment_specification_implementation', 'spec')}
-//
-//            FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
-//            -- Allow join onto deleted sub-objects
-//            LEFT JOIN {$this->getJoinSql('task', '', 't', true)}
-//            LEFT JOIN {$this->getJoinSql('duework', '', 'd', true)}
-//            LEFT JOIN {$this->getJoinSql('duework.worksheetTemplate', 'd', 'dueworkWorksheetTemplate', true)}
-//            LEFT JOIN {$this->getJoinSql('duework.worksheetTemplate.allowedFileExtension', 'dueworkWorksheetTemplate', 'dueworkWorksheetTemplateAllowedFileExtension', true)}
-//            LEFT JOIN {$this->getJoinSql('lessonPlan', '', 'lessonPlan', true)}
-//            LEFT JOIN {$this->getJoinSql('work_type', '', 'wt')}
-//            LEFT JOIN {$this->getJoinSql('duework.mark_type', 'd', 'mt')}
-//            LEFT JOIN {$this->getJoinSql('duework.rubric_capability_mark_type_id', 'd', 'rmt')}
-//            LEFT JOIN {$this->getJoinSql('duework.rubric_capability_grade_group_id', 'd', 'rcgg', true)}
-//            LEFT JOIN {$this->getJoinSql('quiz', '', 'q', true)}
-//            LEFT JOIN {$this->getJoinSql('quiz.mark_type_id', 'q', 'qmt')}
-//            LEFT JOIN {$this->getJoinSql('ltiAssessment', '', 'l', true)}
-//            LEFT JOIN {$this->getJoinSql('ltiAssessment.ltiTool', 'l', 'ltool', true)}
-//            LEFT JOIN {$this->getJoinSql('project', '', 'p', true)}
-//            LEFT JOIN {$this->getJoinSql('assessment_folder', '', 'f', true)}
-//            LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification', '', 'us', true)}
-//            LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification.folder', 'us', 'usf', true)}
-//            LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification.course', 'us', 'usc', true)}
-//            LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification.course.folder', 'usc', 'uscf', true)}
-//            LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation', '', 'ui', true)}
-//            LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.specification', 'ui', 'uis', true)}
-//            LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.specification.folder', 'uis', 'uisf', true)}
-//            LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.course', 'ui', 'uic', true)}
-//            LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.course.folder', 'uic', 'uicf', true)}
-//            LEFT JOIN {$this->getJoinSql('project_assessment', '', 'pa', true)}
-//            LEFT JOIN {$this->getJoinSql('assessment_specification_implementation', '', 'spec', true)}
-//        ";
-        $queries = [
-            AssessmentType::TYPE_TASK => "
-                SELECT
-                    {$this->getJoinColumnString('task', 't')}
-                FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
-                INNER JOIN {$this->getJoinSql('task', '', 't', true)}
-            ",
-            AssessmentType::TYPE_DUE_WORK => "
-                SELECT
-                    {$this->getJoinColumnString('duework', 'd')},
-                    {$this->getJoinColumnString('duework.mark_type', 'mt')},
-                    {$this->getJoinColumnString('duework.rubric_capability_mark_type_id', 'rmt')},
-                    {$this->getJoinColumnString('duework.rubric_capability_grade_group_id', 'rcgg')},
-                    {$this->getJoinColumnString('duework.worksheetTemplate', 'dueworkWorksheetTemplate')}
-                    {$this->getJoinColumnString('duework.worksheetTemplate.allowedFileExtension', 'dueworkWorksheetTemplateAllowedFileExtension')}
-                FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
-                INNER JOIN {$this->getJoinSql('duework', '', 'd', true)}
-                LEFT  JOIN {$this->getJoinSql('duework.worksheetTemplate', 'd', 'dueworkWorksheetTemplate', true)}
-                LEFT  JOIN {$this->getJoinSql('duework.worksheetTemplate.allowedFileExtension', 'dueworkWorksheetTemplate', 'dueworkWorksheetTemplateAllowedFileExtension', true)}
-                LEFT  JOIN {$this->getJoinSql('duework.mark_type', 'd', 'mt')}
-                LEFT  JOIN {$this->getJoinSql('duework.rubric_capability_mark_type_id', 'd', 'rmt')}
-                LEFT  JOIN {$this->getJoinSql('duework.rubric_capability_grade_group_id', 'd', 'rcgg', true)}
-            ",
-            AssessmentType::TYPE_QUIZ => "
-                SELECT
-                    {$this->getJoinColumnString('quiz', 'q')},
-                    {$this->getJoinColumnString('quiz.mark_type_id', 'qmt')}
-                FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
-                INNER JOIN {$this->getJoinSql('quiz', '', 'q', true)}
-                LEFT  JOIN {$this->getJoinSql('quiz.mark_type_id', 'q', 'qmt')}
-            ",
-            AssessmentType::TYPE_LTI_ASSESSMENT => "
-                SELECT
-                    {$this->getJoinColumnString('ltiAssessment', 'l')},
-                    {$this->getJoinColumnString('ltiAssessment.ltiTool', 'ltool')}
-                FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
-                INNER JOIN {$this->getJoinSql('ltiAssessment', '', 'l', true)}
-                INNER JOIN {$this->getJoinSql('ltiAssessment.ltiTool', 'l', 'ltool', true)}
-            ",
-            AssessmentType::TYPE_PROJECT => "
-                SELECT
-                    {$this->getJoinColumnString('project', 'p')}
-                FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
-                INNER JOIN {$this->getJoinSql('project', '', 'p', true)}
-            ",
-            AssessmentType::TYPE_LESSON_PLAN => "
-                SELECT
-                    {$this->getJoinColumnString('lessonPlan', 'lessonPlan')}
-                FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
-                INNER JOIN {$this->getJoinSql('lessonPlan', '', 'lessonPlan', true)}
-            ",
-        ];
     }
 
 
