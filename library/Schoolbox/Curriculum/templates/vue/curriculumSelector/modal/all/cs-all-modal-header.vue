@@ -3,8 +3,8 @@
  * The modal header, containing the title, select list and search input
  */
 
-import { useModalNodeUsageStore } from "../store/csModalNodeUsageStore";
-import { useNodesStore } from "../store/csNodesStore";
+import { useModalNodeUsageStore } from "../../store/csModalNodeUsageStore";
+import { useNodesStore } from "../../store/csNodesStore";
 import CsAllModalHeaderBreadcrumbs from "./cs-all-modal-header-breadcrumbs.vue";
 import CsAllModalHeaderSearchInput from "./cs-all-modal-header-search-input.vue";
 

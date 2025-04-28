@@ -3,9 +3,9 @@
  * To cancel or confirm the current node selection
  */
 
-import { useModalStore } from "../store/csModalStore";
-import { useSelectedNodesStore } from "../store/csSelectedNodesStore";
-import { useModalSelectedNodesStore } from "../store/csModalSelectedNodesStore";
+import { useModalStore } from "../../store/csModalStore";
+import { useSelectedNodesStore } from "../../store/csSelectedNodesStore";
+import { useModalSelectedNodesStore } from "../../store/csModalSelectedNodesStore";
 
 const modalStore = useModalStore();
 const selectedNodesStore = useSelectedNodesStore();

@@ -6,9 +6,9 @@
 
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
-import { useModalViewNodesStore } from "../store/csModalViewNodesStore";
-import { useNodesStore } from "../store/csNodesStore";
-import { useModalSearchStore } from "../store/csModalSearchStore";
+import { useModalViewNodesStore } from "../../store/csModalViewNodesStore";
+import { useNodesStore } from "../../store/csNodesStore";
+import { useModalSearchStore } from "../../store/csModalSearchStore";
 import CsAllModalNode from "./cs-all-modal-node.vue";
 
 const modalViewNodesStore = useModalViewNodesStore();

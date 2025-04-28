@@ -4,8 +4,8 @@
  */
 
 import debounce from "lodash/debounce";
-import { useModalSearchStore, DEBOUNCE_AMOUNT } from "../store/csModalSearchStore";
-import { useModalViewNodesStore } from "../store/csModalViewNodesStore";
+import { useModalSearchStore, DEBOUNCE_AMOUNT } from "../../store/csModalSearchStore";
+import { useModalViewNodesStore } from "../../store/csModalViewNodesStore";
 
 interface Props {
     isDisabled: boolean; // to disable certain events when editing is taking place

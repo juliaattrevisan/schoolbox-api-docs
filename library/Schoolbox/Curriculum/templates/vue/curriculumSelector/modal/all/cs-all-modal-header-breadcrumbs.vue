@@ -4,7 +4,7 @@
  * move backwards through the tree
  */
 
-import { useModalViewNodesStore } from "../store/csModalViewNodesStore";
+import { useModalViewNodesStore } from "../../store/csModalViewNodesStore";
 import CsAllModalHeaderBreadcrumb from "./cs-all-modal-header-breadcrumb.vue";
 
 interface Props {

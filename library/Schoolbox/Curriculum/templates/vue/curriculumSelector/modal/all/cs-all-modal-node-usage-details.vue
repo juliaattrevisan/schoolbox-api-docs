@@ -5,9 +5,9 @@
 
 import type { BadgeUsageObject, Usage } from "@schoolboxCurriculum/types/Node";
 import NodeUsageDetails from "@schoolboxCurriculum/vue/usage/node-usage-details.vue";
-import { useModalStore } from "../store/csModalStore";
-import { useModalNodeUsageStore } from "../store/csModalNodeUsageStore";
-import { useModalActiveNodeStore } from "../store/csModalActiveNodeStore";
+import { useModalStore } from "../../store/csModalStore";
+import { useModalNodeUsageStore } from "../../store/csModalNodeUsageStore";
+import { useModalActiveNodeStore } from "../../store/csModalActiveNodeStore";
 
 interface Props {
     depth: number; // to gradually add more marginLeft to indicate node level depth
