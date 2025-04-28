@@ -654,6 +654,8 @@ class Mapper extends BaseMapper
         $modelList = $this->augmentListWithDueWorks($modelList);
         $modelList = $this->augmentListWithQuizzes($modelList);
         $modelList = $this->augmentListWithLtiAssessments($modelList);
+        $modelList = $this->augmentListWithLessonPlans($modelList);
+        $modelList = $this->augmentListWithProjects($modelList);
 
 //        // Augmentation copied from standard hydrate:
 //        // Due work files and Kami worksheet
@@ -1314,6 +1316,93 @@ class Mapper extends BaseMapper
         return $modelList;
     }
 
+
+    /**
+     * For any assessments in `$modelList`: fetch and add their corresponding
+     * lesson plan, if there are any.
+     *
+     * @param GenericCollection<Model> $modelList
+     * @return GenericCollection<Model>
+     */
+    private function augmentListWithLessonPlans(GenericCollection $modelList): GenericCollection
+    {
+        if (count($modelList) === 0) {
+            return $modelList;
+        }
+
+        // Would just use `findByColumn` here, but the joins it includes may
+        // vary too greatly from what's in this mapper.
+        /** @var \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper $mapper */
+        $mapper = $this->getJoinMapper('lessonPlan');
+        $query  = "
+            SELECT {$mapper->getColumnString()}
+            FROM {$mapper->getDatabase()->getQuoter()->quoteIdentifier($mapper->getTable())}
+        ";
+        $pb     = $mapper->getPredicateBuilder()->in('assessment_id', $modelList->getPropertyValues('id'));
+        $result = $mapper->getDatabase()->executeQuery(
+            $query . ' WHERE ' . $pb->getWhereIntersect(),
+            $pb->getParams(),
+        );
+
+        $subModelList = $mapper->createCollection();
+        foreach ($result as $row) {
+            $subModel = $mapper->hydrate($row);
+            $subModelList[$subModel->getAssessmentModel()->getId()] = $subModel;
+        }
+
+        foreach ($modelList as $model) {
+            $assessmentId = $model->getId();
+            if (isset($subModelList[$assessmentId])) {
+                $model->setSubObject($subModelList[$assessmentId]);
+            }
+        }
+
+        return $modelList;
+    }
+
+
+    /**
+     * For any assessments in `$modelList`: fetch and add their corresponding
+     * project, if there are any.
+     *
+     * @param GenericCollection<Model> $modelList
+     * @return GenericCollection<Model>
+     */
+    private function augmentListWithProjects(GenericCollection $modelList): GenericCollection
+    {
+        if (count($modelList) === 0) {
+            return $modelList;
+        }
+
+        // Would just use `findByColumn` here, but the joins it includes may
+        // vary too greatly from what's in this mapper.
+        /** @var \Schoolbox\Learning\Assessment\DataModel\Project\Mapper $mapper */
+        $mapper = $this->getJoinMapper('project');
+        $query  = "
+            SELECT {$mapper->getColumnString()}
+            FROM {$mapper->getDatabase()->getQuoter()->quoteIdentifier($mapper->getTable())}
+        ";
+        $pb     = $mapper->getPredicateBuilder()->in('assessment_id', $modelList->getPropertyValues('id'));
+        $result = $mapper->getDatabase()->executeQuery(
+            $query . ' WHERE ' . $pb->getWhereIntersect(),
+            $pb->getParams(),
+        );
+
+        $subModelList = $mapper->createCollection();
+        foreach ($result as $row) {
+            $subModel = $mapper->hydrate($row);
+            $subModelList[$subModel->getAssessmentModel()->getId()] = $subModel;
+        }
+
+        foreach ($modelList as $model) {
+            $assessmentId = $model->getId();
+            if (isset($subModelList[$assessmentId])) {
+                $model->setSubObject($subModelList[$assessmentId]);
+            }
+        }
+
+        return $modelList;
+    }
 
     /**
      * For any assessments in `$modelList`: fetch and add their corresponding
