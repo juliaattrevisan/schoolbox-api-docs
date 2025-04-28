@@ -696,7 +696,7 @@ class Mapper extends \Schoolbox\Mapper
         ";
         $folderParams = [
             'entity_type'  => Folder::getEntityType(),
-            'entity_value' => $folderId,
+            'entity_value' => (string)$folderId,
             'relationship' => \Schoolbox\Comms\News\Audience\Model::RELATIONSHIP_SELF,
         ];
 
