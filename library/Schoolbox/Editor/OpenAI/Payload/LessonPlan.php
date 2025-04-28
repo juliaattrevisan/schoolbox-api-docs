@@ -83,6 +83,8 @@ class LessonPlan
      *
      * This lets you supply scalar ids, which are resolved to actual instances via mappers
      *
+     * @param string $templateTitle
+     * @param string $lessonPlanTitle
      * @param string $context
      * @param array $fields
      * @param string $duration
@@ -94,6 +96,8 @@ class LessonPlan
      * @throws \JsonException
      */
     public function generate(
+        string $templateTitle,
+        string $lessonPlanTitle,
         string $context,
         array $fields,
         string $duration,
@@ -112,6 +116,8 @@ class LessonPlan
         /* Generate the Systema nd User nodes for the prompt payload
          */
         $prompt = $this->generatePrompt(
+            $templateTitle,
+            $lessonPlanTitle,
             $context,
             $duration,
             $curriculumNames,
@@ -172,6 +178,8 @@ class LessonPlan
      * These could come from a POST array or similar; generateFromInstances() lets you supply
      * actual Lesson Plan and Lesson Plan Template instances, saving you extracting this manually.
      *
+     * @param string $templateTitle
+     * @param string $lessonPlanTitle
      * @param string $context
      * @param string $duration
      * @param array $curriculumNames
@@ -179,6 +187,8 @@ class LessonPlan
      * @return array
      */
     private function generatePrompt(
+        string $templateTitle,
+        string $lessonPlanTitle,
         string $context,
         string $duration,
         array $curriculumNames,
@@ -194,11 +204,15 @@ class LessonPlan
          * provide additional instructions (if meaningful)
          */
         $userContent = "
+            Plan Type: [TEMPLATE TITLE]
+            Title: [LESSON PLAN TITLE]
             Course/Unit Context: [CONTEXT]
             Duration: [DURATION]
         ";
 
         $userContent = strtr($userContent, [
+            '[TEMPLATE TITLE]' => $templateTitle,
+            '[LESSON PLAN TITLE]' => $lessonPlanTitle,
             '[CONTEXT]' => $context,
             '[DURATION]' => $duration,
         ]);

@@ -77,6 +77,8 @@ class Controller extends Base
              * From a POST payload
              */
             $inputs = [
+                'templateTitle' => $this->requestPost->get('templateTitle'),
+                'lessonPlanTitle' => $this->requestPost->get('lessonPlanTitle'),
                 'context' => $this->requestPost->get('context'),
                 'fields' => $this->requestPost->get('fields'),
                 'duration' => $this->requestPost->get('duration'),
@@ -85,6 +87,8 @@ class Controller extends Base
             ];
 
 //            $inputs = [
+//                'templateTitle' => 'MYP Unit Planner',
+//                'lessonPlanTitle' => 'Scott Science',
 //                'context' => 'Year 8 Science',
 //                'fields' => [
 //                    [
@@ -104,6 +108,8 @@ class Controller extends Base
 //            ];
 
             $payload = $payloadGenerator->generate(
+                $inputs['templateTitle'],
+                $inputs['lessonPlanTitle'],
                 $inputs['context'],
                 $inputs['fields'],
                 $inputs['duration'],
