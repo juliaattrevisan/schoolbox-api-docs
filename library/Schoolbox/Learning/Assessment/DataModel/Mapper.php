@@ -1109,6 +1109,183 @@ class Mapper extends BaseMapper
 
 
     /**
+     * For any assessments in `$modelList`: fetch and add their corresponding
+     * task, if there are any.
+     *
+     * @param GenericCollection<Model> $modelList
+     * @return GenericCollection<Model>
+     */
+    private function augmentListWithTasks(GenericCollection $modelList): GenericCollection
+    {
+        if (empty($modelList)) {
+            return $modelList;
+        }
+
+        // Would just use `findByColumn` here, but the joins it includes may
+        // vary too greatly from what's in this mapper.
+        $tasks = $this->getJoinMapper('task')
+            ->findByColumn('assessment_id', $modelList->getPropertyValues('id'))
+            ->indexByCallback(fn (Task $task) => $task->getAssessmentModel()->getId());
+        foreach ($modelList as $model) {
+            $assessmentId = $model->getId();
+            if (isset($tasks[$assessmentId])) {
+                $model->setSubObject($tasks[$assessmentId]);
+            }
+        }
+        return $modelList;
+    }
+
+
+    /**
+     * For any assessments in `$modelList`: fetch and add their corresponding
+     * due work, if there are any.
+     *
+     * @param GenericCollection<Model> $modelList
+     * @return GenericCollection<Model>
+     */
+    private function augmentListWithDueWorks(GenericCollection $modelList): GenericCollection
+    {
+        if (empty($modelList)) {
+            return $modelList;
+        }
+
+        $tasks = $this->getJoinMapper('task')
+                      ->findByColumn('assessment_id', $modelList->getPropertyValues('id'))
+                      ->indexByCallback(fn (Task $task) => $task->getAssessmentModel()->getId());
+        foreach ($modelList as $model) {
+            $assessmentId = $model->getId();
+            if (isset($tasks[$assessmentId])) {
+                $model->setSubObject($tasks[$assessmentId]);
+            }
+        }
+        return $modelList;
+    }
+
+    /**
+     * For any assessments in `$modelList`: fetch and add their corresponding
+     * sub-object (e.g. a due work, task, etc.).
+     *
+     * @param GenericCollection $modelList
+     * @return GenericCollection
+     */
+    private function augmentListWithSubObject(GenericCollection $modelList): GenericCollection
+    {
+//        $query = "
+//            SELECT
+//                {$this->getColumnString()},
+//                {$this->getJoinColumnString('task', 't')},
+//                {$this->getJoinColumnString('duework', 'd')},
+//                {$this->getJoinColumnString('work_type', 'wt')},
+//                {$this->getJoinColumnString('duework', 'd')},
+//                {$this->getJoinColumnString('duework.mark_type', 'mt')},
+//                {$this->getJoinColumnString('duework.rubric_capability_mark_type_id', 'rmt')},
+//                {$this->getJoinColumnString('duework.rubric_capability_grade_group_id', 'rcgg')},
+//                {$this->getJoinColumnString('duework.worksheetTemplate', 'dueworkWorksheetTemplate')},
+//                {$this->getJoinColumnString('duework.worksheetTemplate.allowedFileExtension', 'dueworkWorksheetTemplateAllowedFileExtension')},
+//                {$this->getJoinColumnString('quiz', 'q')},
+//                {$this->getJoinColumnString('quiz.mark_type_id', 'qmt')},
+//                {$this->getJoinColumnString('ltiAssessment', 'l')},
+//                {$this->getJoinColumnString('ltiAssessment.ltiTool', 'ltool')},
+//                {$this->getJoinColumnString('lessonPlan', 'lessonPlan')},
+//                {$this->getJoinColumnString('project', 'p')},
+//                {$this->getJoinColumnString('assessment_folder', 'f')},
+//                {$this->getJoinColumnString('assessment_course_unit_specification', 'us')},
+//                {$this->getJoinColumnString('assessment_course_unit_specification.folder', 'usf')},
+//                {$this->getJoinColumnString('assessment_course_unit_specification.course', 'usc')},
+//                {$this->getJoinColumnString('assessment_course_unit_specification.course.folder', 'uscf')},
+//                {$this->getJoinColumnString('assessment_course_unit_implementation', 'ui')},
+//                {$this->getJoinColumnString('assessment_course_unit_implementation.specification', 'uis')},
+//                {$this->getJoinColumnString('assessment_course_unit_implementation.specification.folder', 'uisf')},
+//                {$this->getJoinColumnString('assessment_course_unit_implementation.course', 'uic')},
+//                {$this->getJoinColumnString('assessment_course_unit_implementation.course.folder', 'uicf')},
+//                {$this->getJoinColumnString('project_assessment', 'pa')},
+//                {$this->getJoinColumnString('assessment_specification_implementation', 'spec')}
+//
+//            FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
+//            -- Allow join onto deleted sub-objects
+//            LEFT JOIN {$this->getJoinSql('task', '', 't', true)}
+//            LEFT JOIN {$this->getJoinSql('duework', '', 'd', true)}
+//            LEFT JOIN {$this->getJoinSql('duework.worksheetTemplate', 'd', 'dueworkWorksheetTemplate', true)}
+//            LEFT JOIN {$this->getJoinSql('duework.worksheetTemplate.allowedFileExtension', 'dueworkWorksheetTemplate', 'dueworkWorksheetTemplateAllowedFileExtension', true)}
+//            LEFT JOIN {$this->getJoinSql('lessonPlan', '', 'lessonPlan', true)}
+//            LEFT JOIN {$this->getJoinSql('work_type', '', 'wt')}
+//            LEFT JOIN {$this->getJoinSql('duework.mark_type', 'd', 'mt')}
+//            LEFT JOIN {$this->getJoinSql('duework.rubric_capability_mark_type_id', 'd', 'rmt')}
+//            LEFT JOIN {$this->getJoinSql('duework.rubric_capability_grade_group_id', 'd', 'rcgg', true)}
+//            LEFT JOIN {$this->getJoinSql('quiz', '', 'q', true)}
+//            LEFT JOIN {$this->getJoinSql('quiz.mark_type_id', 'q', 'qmt')}
+//            LEFT JOIN {$this->getJoinSql('ltiAssessment', '', 'l', true)}
+//            LEFT JOIN {$this->getJoinSql('ltiAssessment.ltiTool', 'l', 'ltool', true)}
+//            LEFT JOIN {$this->getJoinSql('project', '', 'p', true)}
+//            LEFT JOIN {$this->getJoinSql('assessment_folder', '', 'f', true)}
+//            LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification', '', 'us', true)}
+//            LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification.folder', 'us', 'usf', true)}
+//            LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification.course', 'us', 'usc', true)}
+//            LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification.course.folder', 'usc', 'uscf', true)}
+//            LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation', '', 'ui', true)}
+//            LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.specification', 'ui', 'uis', true)}
+//            LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.specification.folder', 'uis', 'uisf', true)}
+//            LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.course', 'ui', 'uic', true)}
+//            LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.course.folder', 'uic', 'uicf', true)}
+//            LEFT JOIN {$this->getJoinSql('project_assessment', '', 'pa', true)}
+//            LEFT JOIN {$this->getJoinSql('assessment_specification_implementation', '', 'spec', true)}
+//        ";
+        $queries = [
+            AssessmentType::TYPE_TASK => "
+                SELECT
+                    {$this->getJoinColumnString('task', 't')}
+                FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
+                INNER JOIN {$this->getJoinSql('task', '', 't', true)}
+            ",
+            AssessmentType::TYPE_DUE_WORK => "
+                SELECT
+                    {$this->getJoinColumnString('duework', 'd')},
+                    {$this->getJoinColumnString('duework.mark_type', 'mt')},
+                    {$this->getJoinColumnString('duework.rubric_capability_mark_type_id', 'rmt')},
+                    {$this->getJoinColumnString('duework.rubric_capability_grade_group_id', 'rcgg')},
+                    {$this->getJoinColumnString('duework.worksheetTemplate', 'dueworkWorksheetTemplate')}
+                    {$this->getJoinColumnString('duework.worksheetTemplate.allowedFileExtension', 'dueworkWorksheetTemplateAllowedFileExtension')}
+                FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
+                INNER JOIN {$this->getJoinSql('duework', '', 'd', true)}
+                LEFT  JOIN {$this->getJoinSql('duework.worksheetTemplate', 'd', 'dueworkWorksheetTemplate', true)}
+                LEFT  JOIN {$this->getJoinSql('duework.worksheetTemplate.allowedFileExtension', 'dueworkWorksheetTemplate', 'dueworkWorksheetTemplateAllowedFileExtension', true)}
+                LEFT  JOIN {$this->getJoinSql('duework.mark_type', 'd', 'mt')}
+                LEFT  JOIN {$this->getJoinSql('duework.rubric_capability_mark_type_id', 'd', 'rmt')}
+                LEFT  JOIN {$this->getJoinSql('duework.rubric_capability_grade_group_id', 'd', 'rcgg', true)}
+            ",
+            AssessmentType::TYPE_QUIZ => "
+                SELECT
+                    {$this->getJoinColumnString('quiz', 'q')},
+                    {$this->getJoinColumnString('quiz.mark_type_id', 'qmt')}
+                FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
+                INNER JOIN {$this->getJoinSql('quiz', '', 'q', true)}
+                LEFT  JOIN {$this->getJoinSql('quiz.mark_type_id', 'q', 'qmt')}
+            ",
+            AssessmentType::TYPE_LTI_ASSESSMENT => "
+                SELECT
+                    {$this->getJoinColumnString('ltiAssessment', 'l')},
+                    {$this->getJoinColumnString('ltiAssessment.ltiTool', 'ltool')}
+                FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
+                INNER JOIN {$this->getJoinSql('ltiAssessment', '', 'l', true)}
+                INNER JOIN {$this->getJoinSql('ltiAssessment.ltiTool', 'l', 'ltool', true)}
+            ",
+            AssessmentType::TYPE_PROJECT => "
+                SELECT
+                    {$this->getJoinColumnString('project', 'p')}
+                FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
+                INNER JOIN {$this->getJoinSql('project', '', 'p', true)}
+            ",
+            AssessmentType::TYPE_LESSON_PLAN => "
+                SELECT
+                    {$this->getJoinColumnString('lessonPlan', 'lessonPlan')}
+                FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
+                INNER JOIN {$this->getJoinSql('lessonPlan', '', 'lessonPlan', true)}
+            ",
+        ];
+    }
+
+
+    /**
      * For any projects found in $modelList, identified by $projectIds, find their sub-assessments
      * and load them into the projects.
      *
