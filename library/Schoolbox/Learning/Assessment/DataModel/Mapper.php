@@ -650,35 +650,36 @@ class Mapper extends BaseMapper
 
         // Augmentation for this only:
         // * assessment type (due work, task, etc.)
+        $modelList = $this->augmentListWithTasks($modelList);
 
-        // Augmentation copied from standard hydrate:
-        // Due work files and Kami worksheet
-        $modelList = $this->augmentListWithDueWorkFiles($modelList, $dueWorkIds);
-        $modelList = $this->augmentListWithDueWorkKamiWorksheetTemplates($modelList, $dueWorkIds);
-
-        /* Task files
-         */
-        $modelList = $this->augmentListWithTaskFiles($modelList, $taskIds);
-
-        /* Augment with Lesson Plan Files and Lesson Plan Fields
-         */
-        $modelList = $this->augmentListWithLessonPlanFiles($modelList, $lessonPlanIds);
-        $modelList = $this->augmentWithLessonPlanFields($modelList, $lessonPlanIds);
-
-        // Folder codes for all contexts
-        $modelList = $this->augmentListWithFolderCodes($modelList);
-        // Specification assessments
-        $modelList = $this->augmentListWithSpecifications($modelList);
-        // Grade groups
-        $modelList = $this->augmentListWithGradeGroups($modelList);
-        // Curriculum Nodes
-        $modelList = $this->augmentListWithCurriculumNodes($modelList);
-        // Project sub-assessments
-        if ($this->hydrateProjectSubAssessments) {
-            $modelList = $this->augmentListWithProjectSubAssessments($modelList, array_keys($projectIds));
-        }
-        // Lesson Plan Linked Assessments
-        $modelList = $this->augmentWithLessonPlanAssessments($modelList, $lessonPlanIds);
+//        // Augmentation copied from standard hydrate:
+//        // Due work files and Kami worksheet
+//        $modelList = $this->augmentListWithDueWorkFiles($modelList, $dueWorkIds);
+//        $modelList = $this->augmentListWithDueWorkKamiWorksheetTemplates($modelList, $dueWorkIds);
+//
+//        /* Task files
+//         */
+//        $modelList = $this->augmentListWithTaskFiles($modelList, $taskIds);
+//
+//        /* Augment with Lesson Plan Files and Lesson Plan Fields
+//         */
+//        $modelList = $this->augmentListWithLessonPlanFiles($modelList, $lessonPlanIds);
+//        $modelList = $this->augmentWithLessonPlanFields($modelList, $lessonPlanIds);
+//
+//        // Folder codes for all contexts
+//        $modelList = $this->augmentListWithFolderCodes($modelList);
+//        // Specification assessments
+//        $modelList = $this->augmentListWithSpecifications($modelList);
+//        // Grade groups
+//        $modelList = $this->augmentListWithGradeGroups($modelList);
+//        // Curriculum Nodes
+//        $modelList = $this->augmentListWithCurriculumNodes($modelList);
+//        // Project sub-assessments
+//        if ($this->hydrateProjectSubAssessments) {
+//            $modelList = $this->augmentListWithProjectSubAssessments($modelList, array_keys($projectIds));
+//        }
+//        // Lesson Plan Linked Assessments
+//        $modelList = $this->augmentWithLessonPlanAssessments($modelList, $lessonPlanIds);
         return $modelList;
     }
 
@@ -1124,15 +1125,42 @@ class Mapper extends BaseMapper
 
         // Would just use `findByColumn` here, but the joins it includes may
         // vary too greatly from what's in this mapper.
-        $tasks = $this->getJoinMapper('task')
-            ->findByColumn('assessment_id', $modelList->getPropertyValues('id'))
-            ->indexByCallback(fn (Task $task) => $task->getAssessmentModel()->getId());
+        /** @var TaskMapper $mapper */
+        $mapper = $this->getJoinMapper('task');
+        $query  = "
+            SELECT {$mapper->getColumnString()}
+            FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($mapper->getTable())}
+        ";
+        $pb     = $mapper->getPredicateBuilder()->in('assessment_id', $modelList->getPropertyValues('id'));
+        $result = $mapper->getDatabase()->executeQuery(
+            $query . ' WHERE ' . $pb->getWhereIntersect(),
+            $pb->getParams(),
+        );
+
+        $subCollection = $mapper->createCollection();
+        foreach ($result as $row) {
+            $subModel = $mapper->hydrate($row);
+            $subCollection[$subModel->getAssessmentModel()->getId()] = $subModel;
+        }
+
         foreach ($modelList as $model) {
             $assessmentId = $model->getId();
-            if (isset($tasks[$assessmentId])) {
-                $model->setSubObject($tasks[$assessmentId]);
+            if (isset($subCollection[$assessmentId])) {
+                $model->setSubObject($subCollection[$assessmentId]);
             }
         }
+
+
+
+//        $tasks = $this->getJoinMapper('task')
+//            ->findByColumn('assessment_id', $modelList->getPropertyValues('id'))
+//            ->indexByCallback(fn (Task $task) => $task->getAssessmentModel()->getId());
+//        foreach ($modelList as $model) {
+//            $assessmentId = $model->getId();
+//            if (isset($tasks[$assessmentId])) {
+//                $model->setSubObject($tasks[$assessmentId]);
+//            }
+//        }
         return $modelList;
     }
 
