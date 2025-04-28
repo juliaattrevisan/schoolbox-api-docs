@@ -606,7 +606,10 @@ class Mapper extends BaseMapper
             AssessmentType::TYPE_LESSON_PLAN    => " INNER JOIN {$this->getJoinSql('lessonPlan', '', 'lessonPlan', true)}",
             default                             => '',
         };
-        $pb = $this->getPredicateBuilder()->in('ui.id', $uiIds);
+        $pb = $this->getPredicateBuilder()
+            ->in('ui.id', $uiIds)
+            ->isNull('deleted_at')
+        ;
         $query = $this->getDatabase()->executeQuery(
             $query . $typeJoin . ' WHERE ' . $pb->getWhereIntersect(),
             $pb->getParams(),
