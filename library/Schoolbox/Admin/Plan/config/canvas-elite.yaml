@@ -132,5 +132,3 @@ components:
     - Schoolbox\Curriculum\Component\CurriculumDetailsController
     - Schoolbox\Curriculum\Component\CurriculumOverviewController
     - Schoolbox\Learning\Assessment\Lti\Component\Homepage\Controller
-    - Schoolbox\Learning\Component\Dashboard\CurrentLessonPlanController
-    - Schoolbox\Learning\Component\Homepage\CurrentLessonPlanController

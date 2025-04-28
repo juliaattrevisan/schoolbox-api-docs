@@ -58,7 +58,7 @@ NAME
     set-plan.php
 
 SYNOPSIS
-    set-plan.php --plan [name of plan .yaml file, without extension]
+    set-plan.php --plan PLAN
     set-plan.php --reset
 
 DESCRIPTION
