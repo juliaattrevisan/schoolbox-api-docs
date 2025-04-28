@@ -169,7 +169,6 @@ class LessonPlan
             ]
         ];
 
-        new \Alaress_Probe($payload);die();
         return json_encode($payload, JSON_THROW_ON_ERROR);
     }
 
