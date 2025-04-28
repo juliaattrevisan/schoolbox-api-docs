@@ -5,8 +5,8 @@
 
 import { useModalNodeUsageStore } from "../../store/csModalNodeUsageStore";
 import { useNodesStore } from "../../store/csNodesStore";
-import CsAllModalHeaderBreadcrumbs from "./cs-all-modal-header-breadcrumbs.vue";
-import CsAllModalHeaderSearchInput from "./cs-all-modal-header-search-input.vue";
+import CsModalAllHeaderBreadcrumbs from "./cs-modal-all-header-breadcrumbs.vue";
+import CsModalAllHeaderSearchInput from "./cs-modal-all-header-search-input.vue";
 
 const modalNodeUsageStore = useModalNodeUsageStore();
 const nodesStore = useNodesStore();
@@ -21,8 +21,8 @@ const isDisabled = window.Vue.computed(() => modalNodeUsageStore.isOpen || nodes
 
 <template>
     <h2>Browse Curriculum</h2>
-    <cs-all-modal-header-breadcrumbs :is-disabled="isDisabled" />
-    <cs-all-modal-header-search-input :is-disabled="isDisabled" />
+    <cs-modal-all-header-breadcrumbs :is-disabled="isDisabled" />
+    <cs-modal-all-header-search-input :is-disabled="isDisabled" />
 </template>
 
 <style scoped></style>

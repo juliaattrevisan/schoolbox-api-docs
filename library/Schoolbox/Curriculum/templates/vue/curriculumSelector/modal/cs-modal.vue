@@ -11,9 +11,9 @@ import type { Node } from "@schoolboxCurriculum/types/Node";
 import { useModalStore } from "../store/csModalStore";
 import { useModalViewNodesStore } from "../store/csModalViewNodesStore";
 import { useModalNodeUsageStore } from "../store/csModalNodeUsageStore";
-import CsAllModalHeader from "./all/cs-all-modal-header.vue";
-import CsAllModalNodes from "./all/cs-all-modal-nodes.vue";
-import CsAllModalFooter from "./all/cs-all-modal-footer.vue";
+import CsModalAllHeader from "./all/cs-modal-all-header.vue";
+import CsModalAllNodes from "./all/cs-modal-all-nodes.vue";
+import CsModalAllFooter from "./all/cs-modal-all-footer.vue";
 
 interface Props {
     isSingleSelect?: boolean; // so can only select a single node
@@ -121,9 +121,9 @@ const currentTab = window.Vue.ref<string>(current); // to track which tab is sel
                     </dd>
                 </dl>
                 <div>
-                    <cs-all-modal-header />
-                    <cs-all-modal-nodes />
-                    <cs-all-modal-footer />
+                    <cs-modal-all-header />
+                    <cs-modal-all-nodes />
+                    <cs-modal-all-footer />
                 </div>
             </div>
         </template>
