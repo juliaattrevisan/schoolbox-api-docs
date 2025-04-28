@@ -7,8 +7,8 @@
  # which should be placed in the meta section of the header
  #}
 
-<li class="separator" data-has-student-view-separator>You are in Teacher View</li>
-<li><a class="icon-view" data-has-student-view="staff">Switch to Student View</a></li>
+<li class="separator" data-has-student-view-separator>You are viewing instructor grades</li>
+<li><a class="icon-view" data-has-student-view="staff">View Student Grades</a></li>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const viewSwitcher = document.querySelector('[data-has-student-view]');
@@ -22,12 +22,12 @@
             * Enable student view of all the marks
             */
         function switchToStudentView() {
-            viewSwitcherSeparator.textContent = 'You are in Student View';
-            viewSwitcherMeta.textContent = 'Student view';
+            viewSwitcherSeparator.textContent = 'You are viewing student grades';
+            viewSwitcherMeta.textContent = 'Viewing student grades';
             viewSwitcherMeta.classList.remove(iconTeacher);
             viewSwitcherMeta.classList.add(iconStaffStudents);
 
-            viewSwitcher.textContent = 'Switch to Teacher View';
+            viewSwitcher.textContent = 'View Instructor Grades';
             viewSwitcher.classList.remove(iconStaffStudents);
             viewSwitcher.classList.add(iconTeacher);
             viewSwitcher.setAttribute('data-has-student-view', 'student');
@@ -41,12 +41,12 @@
             * Enable staff view of all the marks
             */
         function switchToStaffView() {
-            viewSwitcherSeparator.textContent = 'You are in Teacher View';
-            viewSwitcherMeta.textContent = 'Teacher view';
+            viewSwitcherSeparator.textContent = 'You are viewing instructor grades';
+            viewSwitcherMeta.textContent = 'Viewing instructor grades';
             viewSwitcherMeta.classList.remove(iconStaffStudents);
             viewSwitcherMeta.classList.add(iconTeacher);
 
-            viewSwitcher.textContent = 'Switch to Student View';
+            viewSwitcher.textContent = 'View Student Grades';
             viewSwitcher.classList.remove(iconTeacher);
             viewSwitcher.classList.add(iconStaffStudents);
             viewSwitcher.setAttribute('data-has-student-view', 'staff');
