@@ -1117,7 +1117,6 @@ class Mapper extends BaseMapper
         return $modelList;
     }
 
-
     /**
      * For any assessments in `$modelList`: fetch and add their corresponding
      * task, if there are any.
@@ -1127,40 +1126,33 @@ class Mapper extends BaseMapper
      */
     private function augmentListWithTasks(GenericCollection $modelList): GenericCollection
     {
-        if (count($modelList) === 0) {
-            return $modelList;
-        }
-
         // Would just use `findByColumn` here, but the joins it includes may
         // vary too greatly from what's in this mapper.
         /** @var TaskMapper $mapper */
         $mapper = $this->getJoinMapper('task');
-        $query  = "
-            SELECT {$mapper->getColumnString()}
-            FROM {$mapper->getDatabase()->getQuoter()->quoteIdentifier($mapper->getTable())}
-        ";
-        $pb     = $mapper->getPredicateBuilder()->in('assessment_id', $modelList->getPropertyValues('id'));
-        $result = $mapper->getDatabase()->executeQuery(
-            $query . ' WHERE ' . $pb->getWhereIntersect(),
-            $pb->getParams(),
+        return $this->augmentListWithSubObjects(
+            $modelList,
+            $this->getJoinMapper('task'),
+            "
+                SELECT {$mapper->getColumnString()}
+                FROM {$mapper->getDatabase()->getQuoter()->quoteIdentifier($mapper->getTable())}
+            ",
+            $this->hydrateTask(...),
         );
-
-        $subModelList = $mapper->createCollection();
-        foreach ($result as $row) {
-            $subModel = $mapper->hydrate($row);
-            $subModelList[$subModel->getAssessmentModel()->getId()] = $subModel;
-        }
-
-        foreach ($modelList as $model) {
-            $assessmentId = $model->getId();
-            if (isset($subModelList[$assessmentId])) {
-                $model->setSubObject($subModelList[$assessmentId]);
-            }
-        }
-
-        return $modelList;
     }
 
+    /**
+     * Hydrate method for `augmentListWithTasks`.
+     *
+     * @param array $row
+     * @return Task
+     */
+    private function hydrateTask(array $row): Task
+    {
+        /** @var TaskMapper $mapper */
+        $mapper = $this->getJoinMapper('task');
+        return $mapper->hydrate($row);
+    }
 
     /**
      * For any assessments in `$modelList`: fetch and add their corresponding
