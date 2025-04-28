@@ -18,6 +18,7 @@ import CsModalFooter from "./cs-modal-footer.vue";
 interface Props {
     isSingleSelect?: boolean; // so can only select a single node
     startingNodeId?: number; // To open on a specific node, in situations where we wish to restrict further navigation/selection to within a specific node
+    hasTabs?: boolean; // a split to show only curriculum linked to a parent unit / all curriculum
 }
 const props = withDefaults(defineProps<Props>(), {
     isSingleSelect: false,
@@ -94,9 +95,21 @@ function onModalClosed(): void {
         @closed="onModalClosed"
     >
         <template #sequence-1>
-            <cs-modal-header />
-            <cs-modal-nodes />
-            <cs-modal-footer />
+            <div class="l-flex-col l-gap-m">
+                <dl ref="tabsEl" class="tabs">
+                    <dd>
+                        <a>Current Curriculum</a>
+                    </dd>
+                    <dd>
+                        <a>All Curriculum</a>
+                    </dd>
+                </dl>
+                <div>
+                    <cs-modal-header />
+                    <cs-modal-nodes />
+                    <cs-modal-footer />
+                </div>
+            </div>
         </template>
         <template #sequence-2>
             <badge-detail
