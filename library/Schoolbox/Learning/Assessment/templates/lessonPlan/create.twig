@@ -66,6 +66,15 @@
             {% endif %}
         </template>
 
+        <template v-slot:duration>
+            <div class="row">
+                <div class="small-12 columns">
+                    <label class="required" for="duration">Duration</label>
+                    <input id="title" type="text" name="duration" maxlength="255" value="{% if assessment.id %}{{ assessment.duration }}{% endif %}" required />
+                </div>
+            </div>
+        </template>
+
         {# Curriculum Codes
          # This is the same include used by everything else. The entity type is some textual
          # representation, randomly hardcoded here
@@ -87,13 +96,6 @@
  # all the hashes of the files you uploaded via the Mr Matt's Modal
  #}
 <fieldset>
-    <div class="row">
-        <div class="small-12 columns">
-            <label class="required" for="duration">Duration</label>
-            <input id="title" type="text" name="duration" maxlength="255" value="{% if assessment.id %}{{ assessment.duration }}{% endif %}" required />
-        </div>
-    </div>
-
     <div class="row">
         <div class="small-12 columns">
             <label>Attach Files</label>

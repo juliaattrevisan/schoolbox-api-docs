@@ -30,6 +30,7 @@ window.Vue.onMounted(() => {
         <slot name="title"></slot>
         <slot name="date"></slot>
         <slot name="curriculum-codes"></slot>
+        <slot name="duration"></slot>
 
         <div class="l-pad-m--top">
             <button
