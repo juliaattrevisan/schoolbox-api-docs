@@ -23,6 +23,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     isSingleSelect: false,
     startingNodeId: UNSET_ID,
+    hasTabs: false,
 });
 
 const modalStore = useModalStore();
@@ -96,7 +97,7 @@ function onModalClosed(): void {
     >
         <template #sequence-1>
             <div class="l-flex-col l-gap-m">
-                <dl ref="tabsEl" class="tabs">
+                <dl v-if="props.hasTabs" ref="tabsEl" class="tabs">
                     <dd>
                         <a>Current Curriculum</a>
                     </dd>
