@@ -1408,11 +1408,43 @@ class Mapper extends BaseMapper
      * For any assessments in `$modelList`: fetch and add their corresponding
      * sub-object (e.g. a due work, task, etc.).
      *
-     * @param GenericCollection $modelList
-     * @return GenericCollection
+     * @param GenericCollection<Model> $modelList
+     * @return GenericCollection<Model>
      */
-    private function augmentListWithSubObject(GenericCollection $modelList): GenericCollection
-    {
+    private function augmentListWithSubObjects(
+        GenericCollection $modelList,
+        BaseMapper $subMapper,
+        string $baseQuery,
+        callable $hydrator,
+    ): GenericCollection {
+        // No models to augment: exit early
+        if (count($modelList) === 0) {
+            return $modelList;
+        }
+
+        // Would just use `findByColumn` here, but the joins it includes may
+        // vary too greatly from what's in this mapper.
+        // For now: assume that relation field is always `assessment_id`.
+        $pb     = $subMapper->getPredicateBuilder()->in('assessment_id', $modelList->getPropertyValues('id'));
+        $result = $subMapper->getDatabase()->executeQuery(
+            $baseQuery . ' WHERE ' . $pb->getWhereIntersect(),
+            $pb->getParams(),
+        );
+
+        $subModelList = $subMapper->createCollection();
+        foreach ($result as $row) {
+            $subModel = call_user_func($hydrator, $row);
+            $subModelList[$subModel->getAssessmentModel()->getId()] = $subModel;
+        }
+
+        foreach ($modelList as $model) {
+            $assessmentId = $model->getId();
+            if (isset($subModelList[$assessmentId])) {
+                $model->setSubObject($subModelList[$assessmentId]);
+            }
+        }
+
+        return $modelList;
 //        $query = "
 //            SELECT
 //                {$this->getColumnString()},
