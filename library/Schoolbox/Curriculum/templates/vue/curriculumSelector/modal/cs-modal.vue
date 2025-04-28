@@ -97,6 +97,20 @@ const current = "CURRENT";
 const all = "ALL";
 
 const currentTab = window.Vue.ref<string>(current); // to track which tab is selected
+
+/**
+ * when the current curriculum tab is selected
+ */
+function onCurrentSelected(): void {
+    currentTab.value = current;
+}
+
+/**
+ * when the all curriculum tab is selected
+ */
+function onAllSelected(): void {
+    currentTab.value = all;
+}
 </script>
 
 <template>
@@ -113,11 +127,11 @@ const currentTab = window.Vue.ref<string>(current); // to track which tab is sel
         <template #sequence-1>
             <div class="l-flex-col l-gap-m">
                 <dl v-if="props.hasTabs" ref="tabsEl" class="tabs">
-                    <dd>
-                        <a>Current Curriculum</a>
+                    <dd :class="{ active: currentTab === current }">
+                        <a @click="onCurrentSelected">Current Curriculum</a>
                     </dd>
-                    <dd>
-                        <a>All Curriculum</a>
+                    <dd :class="{ active: currentTab === current }">
+                        <a @click="onAllSelected">All Curriculum</a>
                     </dd>
                 </dl>
                 <div>

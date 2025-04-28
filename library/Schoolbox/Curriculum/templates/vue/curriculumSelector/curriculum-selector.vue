@@ -127,6 +127,14 @@ const props = defineProps({
         required: false,
         default: false,
     },
+    /**
+     * a split to show only curriculum linked to a parent unit / all curriculum
+     */
+    hasTabs: {
+        type: Boolean,
+        required: false,
+        default: false,
+    },
 });
 
 const store = useStore();
@@ -176,6 +184,6 @@ function onSelectedNodeModalClosed() {
         />
         <cs-search-results :is-single-select="props.isSingleSelect" />
     </div>
-    <cs-modal v-if="store.hasLoadedOk" :is-single-select="props.isSingleSelect" />
+    <cs-modal v-if="store.hasLoadedOk" :is-single-select="props.isSingleSelect" :has-tabs="props.hasTabs" />
     <selected-node-modal :node="selectedNodesStore.activeNode" @closed="onSelectedNodeModalClosed" />
 </template>

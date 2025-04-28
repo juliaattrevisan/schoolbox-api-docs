@@ -10,6 +10,10 @@
     {% set courseManagedReadonly = false %}
 {% endif %}
 
+{% if hasTabs is not defined %}
+    {% set hasTabs = false %}
+{% endif %}
+
 {% set vueSlot = vueSlot ?? null %}
 {% if not vueSlot %}
     <div data-cs-container>
@@ -20,6 +24,7 @@
         :selected-nodes="{{ codeList|json_encode }}"
         data-endpoint="{{ routeLookup('curriculumApi.searchNode') }}"
         :include-children="true"
+        :has-tabs="{{ hasTabs ? 'true' : 'false' }}"
     />
 {% if not vueSlot %}
     </div>
