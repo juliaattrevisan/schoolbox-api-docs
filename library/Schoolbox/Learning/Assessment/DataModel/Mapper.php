@@ -652,6 +652,7 @@ class Mapper extends BaseMapper
         // * assessment type (due work, task, etc.)
         $modelList = $this->augmentListWithTasks($modelList);
         $modelList = $this->augmentListWithDueWorks($modelList);
+        $modelList = $this->augmentListWithQuizzes($modelList);
 
 //        // Augmentation copied from standard hydrate:
 //        // Due work files and Kami worksheet
@@ -1204,6 +1205,54 @@ class Mapper extends BaseMapper
                         ?->setMimeType($mapper->hydrateJoin($row, 'worksheetTemplate.allowedFileExtension', 'dueworkWorksheetTemplateAllowedFileExtension'))
                );
 
+            $subModelList[$subModel->getAssessmentModel()->getId()] = $subModel;
+        }
+
+        foreach ($modelList as $model) {
+            $assessmentId = $model->getId();
+            if (isset($subModelList[$assessmentId])) {
+                $model->setSubObject($subModelList[$assessmentId]);
+            }
+        }
+
+        return $modelList;
+    }
+
+
+    /**
+     * For any assessments in `$modelList`: fetch and add their corresponding
+     * quiz, if there are any.
+     *
+     * @param GenericCollection<Model> $modelList
+     * @return GenericCollection<Model>
+     */
+    private function augmentListWithQuizzes(GenericCollection $modelList): GenericCollection
+    {
+        if (count($modelList) === 0) {
+            return $modelList;
+        }
+
+        // Would just use `findByColumn` here, but the joins it includes may
+        // vary too greatly from what's in this mapper.
+        /** @var Quiz\Mapper $mapper */
+        $mapper = $this->getJoinMapper('quiz');
+        $query  = "
+            SELECT
+                {$mapper->getColumnString()},
+                {$mapper->getJoinColumnString('mark_type_id', 'qmt')}
+            FROM {$mapper->getDatabase()->getQuoter()->quoteIdentifier($mapper->getTable())}
+            LEFT JOIN {$mapper->getJoinSql('mark_type_id', '', 'qmt')}
+        ";
+        $pb     = $mapper->getPredicateBuilder()->in('assessment_id', $modelList->getPropertyValues('id'));
+        $result = $mapper->getDatabase()->executeQuery(
+            $query . ' WHERE ' . $pb->getWhereIntersect(),
+            $pb->getParams(),
+        );
+
+        $subModelList = $mapper->createCollection();
+        foreach ($result as $row) {
+            $subModel = $mapper->hydrate($row)
+                ->setMarkType($mapper->hydrateJoin($row, 'mark_type_id', 'qmt'));
             $subModelList[$subModel->getAssessmentModel()->getId()] = $subModel;
         }
 
