@@ -8,7 +8,7 @@ import type { Node } from "@schoolboxCurriculum/types/Node";
 const isProcessing = window.Vue.ref(false);
 const nodes = window.Vue.ref<Node[]>([]);
 
-const folderId = 180;
+const folderId = 108;
 
 /**
  * Start loading the curriculum data
@@ -17,7 +17,6 @@ window.Vue.onMounted(async () => {
     try {
         isProcessing.value = true;
         const response = await fetch(`/api/curriculum/usage/folder/${folderId}?returnFormat=tree&descendants=0`, {
-            method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
