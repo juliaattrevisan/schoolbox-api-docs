@@ -30,12 +30,6 @@ use Schoolbox\Resource\Folder;
 class Csv extends Base
 {
     /**
-     * Maximum size allowed by schema.
-     */
-    private const MAX_EVENT_TITLE = 250;
-
-
-    /**
      * Load all events into schoolbox, generate outcome array
      *
      * @param bool $perform should it be a dry-run instead

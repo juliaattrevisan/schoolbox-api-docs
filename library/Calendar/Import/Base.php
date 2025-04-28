@@ -17,6 +17,12 @@ use Schoolbox\User;
 abstract class Base
 {
     /**
+     * Maximum size allowed by schema.
+     */
+    protected const MAX_EVENT_TITLE = 250;
+
+
+    /**
      * The person to whom these imported events are relevant
      *
      * @var User

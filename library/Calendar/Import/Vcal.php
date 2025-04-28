@@ -105,6 +105,18 @@ class Vcal extends Base
                     continue;
                 }
 
+                /* Event name is too long
+                 */
+                if (strlen(trim((string)$currentEvent->SUMMARY)) > self::MAX_EVENT_TITLE) {
+                    $output[] = [
+                        'name'   => \Scrub::text((string)$currentEvent->SUMMARY),
+                        'status' => 'Not Added',
+                        'error'  => 'Event name is too long',
+                    ];
+
+                    continue;
+                }
+
                 /* Skip cancelled event instances
                  * Log them to the user then carry on
                  */
