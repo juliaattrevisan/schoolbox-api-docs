@@ -202,6 +202,10 @@ button {
     margin-bottom: 0;
 }
 
+.search-input {
+    margin-bottom: 1rem;
+}
+
 .input-group[data-is-small-container="true"] {
     flex-direction: column; /*stack the input and button when the container is small */
 }
