@@ -4,7 +4,7 @@ VALUES (
            'pastoral_point_enabled',
            1,
            'Enable Pastoral Points',
-           'If toggled to ON, points can be assigned to pastoral records',
+           'If toggled to \'ON\', points can be assigned to pastoral records.',
            (SELECT id FROM lu_config_field WHERE `field` = 'boolean'),
            '',
            (SELECT id FROM lu_config_type WHERE `type` = 'Pastoral Care'),
