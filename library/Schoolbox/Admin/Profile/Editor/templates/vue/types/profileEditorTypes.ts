@@ -179,8 +179,8 @@ export type ProfileEditorPayload = {
     data: {
         roleTypes: ProfileEditorRoleType[];
         // A map of each field setting key to its definition (display name and options)
-        fieldSettings: Record<ProfileEditorFieldSettingKey, ProfileEditorFieldSettingDefinition>;
+        fieldSettings: Partial<Record<ProfileEditorFieldSettingKey, ProfileEditorFieldSettingDefinition>>;
         // A map of each tab setting key to its definition (display name and options)
-        tabSettings: Record<ProfileEditorFieldSettingKey, ProfileEditorFieldSettingDefinition>;
+        tabSettings: Partial<Record<ProfileEditorFieldSettingKey, ProfileEditorFieldSettingDefinition>>;
     };
 };
