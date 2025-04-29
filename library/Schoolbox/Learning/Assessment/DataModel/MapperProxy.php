@@ -837,7 +837,13 @@ class MapperProxy
     {
         // User's participation cannot be assumed: they cannot be assumed to be in the folder
         return $this->loadParticipantsIntoAssessmentCollection(
-            $this->findAllByUnitImplementationIds($unitImplIds, $options),
+            $this->translateToDomainModelCollection(
+                // Only option that's respected is type
+                $this->baseMapper->findAllByUnitImplementationIdsForCourseOutline(
+                    $unitImplIds,
+                    isset($options['type']) ? (array)$options['type'] : null,
+                ),
+            ),
             $student,
             false,
             false
