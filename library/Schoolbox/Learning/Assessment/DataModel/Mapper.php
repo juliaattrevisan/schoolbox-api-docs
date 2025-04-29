@@ -699,7 +699,7 @@ class Mapper extends BaseMapper
         // Due work files and Kami worksheet
         $dueWorkIds = $modelList->map(fn (Model $model) => $model->getDueWork()?->getId(), false)->getAll();
 //        $modelList  = $this->augmentListWithDueWorkFiles($modelList, $dueWorkIds);
-        $modelList  = $this->augmentListWithDueWorkKamiWorksheetTemplates($modelList, $dueWorkIds);
+//        $modelList  = $this->augmentListWithDueWorkKamiWorksheetTemplates($modelList, $dueWorkIds);
 
 //        /* Task files
 //         */
