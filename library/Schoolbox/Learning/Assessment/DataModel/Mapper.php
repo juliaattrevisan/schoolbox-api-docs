@@ -690,39 +690,44 @@ class Mapper extends BaseMapper
         $modelList = $this->augmentListWithLessonPlans($modelList);
         $modelList = $this->augmentListWithProjects($modelList);
 
-        // Augmentation copied from standard hydrate:
+        // Augmentations for one-to-many fields, copied from standard hydrate.
+        // Turns out only the following are required:
+        // * Kami worksheet (for displaying link to class view)
+        // * Specification (for determining save to course route)
+        // * Project sub-assessments (for displaying in save to course dialog(
+
         // Due work files and Kami worksheet
         $dueWorkIds = $modelList->map(fn (Model $model) => $model->getDueWork()?->getId(), false)->getAll();
-        $modelList  = $this->augmentListWithDueWorkFiles($modelList, $dueWorkIds);
+//        $modelList  = $this->augmentListWithDueWorkFiles($modelList, $dueWorkIds);
         $modelList  = $this->augmentListWithDueWorkKamiWorksheetTemplates($modelList, $dueWorkIds);
 
-        /* Task files
-         */
-        $taskIds   = $modelList->map(fn (Model $model) => $model->getTask()?->getId(), false)->getAll();
-        $modelList = $this->augmentListWithTaskFiles($modelList, $taskIds);
-
-        /* Augment with Lesson Plan Files and Lesson Plan Fields
-         */
-        $lessonPlanIds = $modelList->map(fn (Model $model) => $model->getLessonPlan()?->getId(), false)->getAll();
-        $modelList     = $this->augmentListWithLessonPlanFiles($modelList, $lessonPlanIds);
-        $modelList     = $this->augmentWithLessonPlanFields($modelList, $lessonPlanIds);
-
-        // Folder codes for all contexts
-        $modelList = $this->augmentListWithFolderCodes($modelList);
+//        /* Task files
+//         */
+//        $taskIds   = $modelList->map(fn (Model $model) => $model->getTask()?->getId(), false)->getAll();
+//        $modelList = $this->augmentListWithTaskFiles($modelList, $taskIds);
+//
+//        /* Augment with Lesson Plan Files and Lesson Plan Fields
+//         */
+//        $lessonPlanIds = $modelList->map(fn (Model $model) => $model->getLessonPlan()?->getId(), false)->getAll();
+//        $modelList     = $this->augmentListWithLessonPlanFiles($modelList, $lessonPlanIds);
+//        $modelList     = $this->augmentWithLessonPlanFields($modelList, $lessonPlanIds);
+//
+//        // Folder codes for all contexts
+//        $modelList = $this->augmentListWithFolderCodes($modelList);
         // Specification assessments
         $modelList = $this->augmentListWithSpecifications($modelList);
-        // Grade groups
-        $modelList = $this->augmentListWithGradeGroups($modelList);
-        // Curriculum Nodes
-        $modelList = $this->augmentListWithCurriculumNodes($modelList);
+//        // Grade groups
+//        $modelList = $this->augmentListWithGradeGroups($modelList);
+//        // Curriculum Nodes
+//        $modelList = $this->augmentListWithCurriculumNodes($modelList);
 
         // Project sub-assessments
         $projectIds = $modelList->map(fn (Model $model) => $model->getProject()?->getId(), false)->getAll();
         if ($this->hydrateProjectSubAssessments) {
             $modelList = $this->augmentListWithProjectSubAssessments($modelList, $projectIds);
         }
-        // Lesson Plan Linked Assessments
-        $modelList = $this->augmentWithLessonPlanAssessments($modelList, $lessonPlanIds);
+//        // Lesson Plan Linked Assessments
+//        $modelList = $this->augmentWithLessonPlanAssessments($modelList, $lessonPlanIds);
         return $modelList;
     }
 
