@@ -8,6 +8,7 @@ import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import { useStore } from "./store/curriculumSelectorStore";
 import { useSelectedNodesStore } from "./store/csSelectedNodesStore";
+import { useUnitNodesStore } from "./store/csUnitNodesStore";
 import CsSearchInput from "./cs-search-input.vue";
 import CsSelectedNodes from "./cs-selected-nodes.vue";
 import CsSearchResults from "./cs-search-results.vue";
@@ -80,9 +81,13 @@ function onSelectedNodeModalClosed(): void {
 /**
  * Start loading the curriculum data
  */
-window.Vue.onMounted(() => {
+window.Vue.onMounted(async () => {
     store.init(props);
     initResizeObserver();
+    if (props.hasTabs && props.folderId) {
+        const unitNodesStore = useUnitNodesStore();
+        await unitNodesStore.load(props.folderId);
+    }
 });
 </script>
 
