@@ -422,8 +422,8 @@ class Payload
                 [
                     'type' => 'boolean',
                     'id' => 'clickToReveal',
-                    'name' => 'Click to Reveal',
-                    'meta' => 'Hide content by default until the user clicks to reveal it'
+                    'name' => 'Activate View More',
+                    'meta' => 'Hide content by default until the user clicks to view it'
                 ],
             ]
         ];

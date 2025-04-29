@@ -53,7 +53,7 @@ const isClickToReveal = window.Vue.computed(() => {
     <span
         v-if="isClickToReveal"
         data-tooltip
-        title="The contents of this field is hidden by default until the user clicks to reveal it"
+        title="The contents of this field is hidden by default until the user clicks to view it"
         class="pe-fields-icon icon-view-hollow"
     ></span>
 </template>
