@@ -31,6 +31,8 @@ export default class UnitPlanner {
 
     static readonly DATA_TEST_ACTIVITY_DELETE = "unit-planner-delete-activity-{activityId}";
 
+    static readonly DATA_TEST_SELECT_CURRICULUM_LINK = "unit-planner-select-curriculum-code-{unitId}";
+
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
@@ -206,5 +208,15 @@ export default class UnitPlanner {
         await this.page
             .getByTestId(UnitPlanner.DATA_TEST_ACTIVITY_DELETE.replace("{activityId}", activityId.toString()))
             .isVisible();
+    }
+
+    /**
+     * Click the select curriculum link
+     * @param unitId - The ID of the unit
+     */
+    async clickSelectCurriculumLink(unitId: number): Promise<void> {
+        await this.page
+            .getByTestId(UnitPlanner.DATA_TEST_SELECT_CURRICULUM_LINK.replace("{unitId}", unitId.toString()))
+            .click();
     }
 }

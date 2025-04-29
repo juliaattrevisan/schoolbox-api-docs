@@ -1,6 +1,7 @@
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import UnitPlanner from "@schoolboxTest/playwright/support/page/unitPlanner/UnitPlanner";
 import AssessmentForm from "@schoolboxTest/playwright/support/page/dueWork/AssessmentForm";
+import CurriculumSelector from "@schoolboxTest/playwright/support/page/curriculum/selector/CurriculumSelector";
 
 test.describe("Unit Planner Tests", () => {
     test.describe.configure({ mode: "serial" });
@@ -10,6 +11,7 @@ test.describe("Unit Planner Tests", () => {
     const overviewColumnLabel = "Unit Overview";
     const romeoUnitId = 15; // "Romeo and Juliet"
     const persuasionUnitId = 17; // "Persuasion and the Media"
+    const toKillMockingbirdId = 16; // "To Kill a Mockingbird"
 
     test.beforeEach(async ({ tester, page }) => {
         const teacher = "Jack Coles";
@@ -112,6 +114,15 @@ test.describe("Unit Planner Tests", () => {
         tester.isGoingTo("checking the activity is not presented in the learning activities list in the unit planner");
         await expect(page.getByText("Test Due Activity via unit planner")).not.toBeVisible();
         await expect(page.getByText("Updated via unit planner")).not.toBeVisible();
+    });
+
+    test("Select, modify and remove curriculum codes", async ({ tester, page, db }) => {
+        const curriculumSelector = new CurriculumSelector(page);
+
+        tester.isGoingTo("Confirm the empty state is visible");
+        await expect(page.getByTestId("cc-unit-planner-curriculum-empty-state")).toBeVisible();
+
+        tester.isGoingTo("select curriculum codes for the To Kill a Mockingbird unit");
     });
 
     test.afterAll(async ({ baseTester, db }) => {
