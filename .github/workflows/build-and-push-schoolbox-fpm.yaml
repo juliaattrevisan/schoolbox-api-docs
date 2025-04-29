@@ -10,7 +10,8 @@ on:
       - develop
   release:
     types:
-      - published
+      - prereleased
+      - released
 
 jobs:
   # Build base images before building FPM images,
@@ -109,7 +110,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha
           build-contexts: |
-            php82-alpine=docker-image://alaress/php82-alpine
+            php82-alpine=docker-image://alaress/php82-alpine:latest-${{ github.ref_name }}
             code=${{ github.workspace }}
           push: true
           outputs: type=docker,dest=${{ runner.temp }}/schoolbox-fpm-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
@@ -131,7 +132,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha
           build-contexts: |
-            php82-alpine=docker-image://alaress/php82-alpine
+            php82-alpine=docker-image://alaress/php82-alpine:latest-${{ github.event.release.target_commitish }}
             code=${{ github.workspace }}
           push: true
           outputs: type=docker,dest=${{ runner.temp }}/schoolbox-fpm-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
