@@ -57,7 +57,7 @@ jobs:
       - build-and-push-base-images
       - build-composer-artifact
       - build-npm-artifact
-    if: github.repository == 'alaress/schoolbox' && (needs.build-and-push-base-images.result == 'skipped' || needs.build-and-push-base-images.result == 'success')
+    if: ${{ always() && github.repository == 'alaress/schoolbox' && (needs.build-and-push-base-images.result == 'skipped' || needs.build-and-push-base-images.result == 'success') }}
     strategy:
       matrix:
         build:
