@@ -6,7 +6,6 @@ import { defineStore } from "pinia";
 import type { Node } from "@schoolboxCurriculum/types/Node";
 
 export const useUnitNodesStore = defineStore("csUnitNodesStore", () => {
-    const isProcessing = window.Vue.ref(false);
     const hasLoadError = window.Vue.ref(false);
     const hasLoaded = window.Vue.ref(false); // whether the nodes have been loaded or not
     const nodes = window.Vue.ref<Node[]>([]);
@@ -18,30 +17,29 @@ export const useUnitNodesStore = defineStore("csUnitNodesStore", () => {
      */
     async function load(folderId: number): Promise<void> {
         try {
-            isProcessing.value = true;
-            const response = await fetch(`/api/curriculum/usage/folder/${folderId}?returnFormat=tree&descendants=0`, {
-                headers: {
-                    "Content-Type": "application/json",
+            const response = await fetch(
+                `/api/curriculum/usage/folder/${folderId.toString()}?returnFormat=tree&descendants=0`,
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
                 },
-            });
+            );
             if (response.ok) {
                 nodes.value = (await response.json()) as Node[];
                 if (nodes.value.length > 0) {
                     hasNodes.value = true;
                 }
-            } else {
-                // toast.timeout({ text: responseText.title, isSuccess: false });
             }
         } catch (error) {
-            // toast.timeout({ text: "There was an unexpected error", isSuccess: false });
+            hasLoadError.value = true;
+            console.warn("Error loading unit nodes:", error);
         } finally {
-            isProcessing.value = false;
             hasLoaded.value = true;
         }
     }
 
     return {
-        isProcessing,
         hasLoadError,
         hasLoaded,
         nodes,
