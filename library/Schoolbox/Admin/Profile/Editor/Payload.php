@@ -447,7 +447,7 @@ class Payload
                 /* clickToReveal is only available when the field has both an icon and css
                  * (i.e. when it will be displayed as an alert box)
                  */
-                'clickToReveal' => $field->getCss() && $field->getIcon(),
+                'clickToReveal' => $field->isFlag(),
             ]
         ];
 
