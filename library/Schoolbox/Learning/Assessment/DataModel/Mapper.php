@@ -719,7 +719,7 @@ class Mapper extends BaseMapper
         // Project sub-assessments
         $projectIds = $modelList->map(fn (Model $model) => $model->getProject()?->getId(), false)->getAll();
         if ($this->hydrateProjectSubAssessments) {
-            $modelList = $this->augmentListWithProjectSubAssessments($modelList, array_keys($projectIds));
+            $modelList = $this->augmentListWithProjectSubAssessments($modelList, $projectIds);
         }
         // Lesson Plan Linked Assessments
         $modelList = $this->augmentWithLessonPlanAssessments($modelList, $lessonPlanIds);
