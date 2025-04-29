@@ -49,13 +49,13 @@ class Payload
      * Common nodes and human-readable name equivalents
      * The nodes also map to types in profileEditorTypes.ts
      */
-    private const AVAILABILITY_NODE = 'availability';
+    public const AVAILABILITY_NODE = 'availability';
     private const AVAILABILITY_NAME = 'Appears On';
     private const AVAILABILITY_TOOLTIP = 'Will appear on the selected campuses';
-    private const VISIBILITY_NODE = 'visibility';
+    public const VISIBILITY_NODE = 'visibility';
     private const VISIBILITY_NAME = 'Visible For';
     private const VISIBILITY_TOOLTIP = 'Will appear for profile viewers in the selected role types';
-    private const ADDITIONAL_SETTINGS_NODE = 'additional';
+    public const ADDITIONAL_SETTINGS_NODE = 'additional';
     private const ADDITIONAL_SETTINGS_NAME = 'Additional Settings';
     private const ADDITIONAL_SETTINGS_TOOLTIP = null;
 

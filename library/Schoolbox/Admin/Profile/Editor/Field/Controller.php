@@ -223,7 +223,7 @@ class Controller extends Base
              * Otherwise leave it empty (this is a legitimate use case)
              */
             /** @var int[] $newCampusIds */
-            $newCampusIds = $settings['availability'] ?? [];
+            $newCampusIds = $settings[Payload::AVAILABILITY_NODE] ?? [];
 
             if (\count($newCampusIds)) {
                 $campuses = $this->campusMapper->findByColumn('id', $newCampusIds);
@@ -245,7 +245,7 @@ class Controller extends Base
              * Otherwise leave it empty (this is a legitimate use case)
              */
             /** @var string[] $newRoleTypes */
-            $newRoleTypes = $settings['visibility'] ?? [];
+            $newRoleTypes = $settings[Payload::VISIBILITY_NODE] ?? [];
 
             if (\count($newRoleTypes)) {
                 foreach ($newRoleTypes as $newRoleType) {
@@ -260,7 +260,7 @@ class Controller extends Base
             /* Apply additional settings
              */
             /** @var string[] $additionalSettings */
-            $additionalSettings = $settings['additional'] ?? [];
+            $additionalSettings = $settings[Payload::ADDITIONAL_SETTINGS_NODE] ?? [];
 
             $field->setClickToReveal((int)in_array('clickToReveal', $additionalSettings, true));
             $this->fieldMapper->save($field);
