@@ -528,9 +528,9 @@ class Controller extends Base
             ->refresh($this->assessmentDataSource, $assessment, $student);
 
         // Find the Kami worksheet (if it exists)
-        /** @var DueWork\Response\Model $response */
+        /** @var DueWork\Response\Model|null $response */
         $response = $feedback->getResponse();
-        $kamiModel = $response->getAllFiles()->filter(function (SubmissionFile $file) {
+        $kamiModel = $response?->getAllFiles()->filter(function (SubmissionFile $file) {
             return $file->getIsWorksheet();
         })->first()?->getKami();
         if ($kamiModel) {

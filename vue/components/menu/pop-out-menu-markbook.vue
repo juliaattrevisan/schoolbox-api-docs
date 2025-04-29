@@ -208,8 +208,6 @@ function toggleExclusion(): void {
         const newValue = currentValue === "true" ? "false" : "true";
         element.setAttribute("data-is-excluded", newValue);
     }
-    // close once changed (this is also to avoid a bug where the pop out doesn't close onClickOutside any more)
-    close();
 }
 
 /**
@@ -250,11 +248,14 @@ async function onMenuItemSelected(target: string, action: string | null = null):
             } else {
                 activityItems.value = [];
             }
+            // close once changed (this is also to avoid a bug where the pop out doesn't close onClickOutside any more)
+            close();
         } else {
             hasLoadError.value = true;
         }
     } catch (error) {
         hasLoadError.value = true;
+        console.error(error);
     } finally {
         isLoading.value = false;
         // trigger a markbook reload
