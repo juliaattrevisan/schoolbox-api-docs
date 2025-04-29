@@ -87,7 +87,7 @@ window.Vue.onMounted(async () => {
     store.init(props);
     initResizeObserver();
     // load in the unit nodes, only displaying the tabs if there are any unit nodes
-    if (props.hasTabs && props.folderId) {
+    if (props.hasTabs && props.folderId !== undefined) {
         await unitNodesStore.load(props.folderId);
     }
 });

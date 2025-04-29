@@ -94,24 +94,21 @@ function onModalClosed(): void {
     }
 }
 
+// #region tab switching
+
 const current = "CURRENT";
 const all = "ALL";
-
-const currentTab = window.Vue.ref<string>(current); // to track which tab is selected
-
-/**
- * when the current curriculum tab is selected
- */
-function onCurrentSelected(): void {
-    currentTab.value = current;
-}
+const currentTab = window.Vue.ref<string>(props.hasTabs ? current : all); // to track which tab is selected
 
 /**
- * when the all curriculum tab is selected
+ * switch between the tabs
+ * @param tab - the selected tab
  */
-function onAllSelected(): void {
-    currentTab.value = all;
+function onTabSelected(tab: string): void {
+    currentTab.value = tab;
 }
+
+// #endregion tab switching
 </script>
 
 <template>
@@ -129,10 +126,10 @@ function onAllSelected(): void {
             <div class="l-flex-col l-gap-m">
                 <dl v-if="props.hasTabs" ref="tabsEl" class="tabs">
                     <dd :class="{ active: currentTab === current }">
-                        <a @click="onCurrentSelected">Current Curriculum</a>
+                        <a @click="onTabSelected(current)">Current Curriculum</a>
                     </dd>
                     <dd :class="{ active: currentTab === all }">
-                        <a @click="onAllSelected">All Curriculum</a>
+                        <a @click="onTabSelected(all)">All Curriculum</a>
                     </dd>
                 </dl>
                 <cs-modal-unit-nodes v-if="currentTab === current" />
