@@ -83,13 +83,9 @@ const unitNodesStore = useUnitNodesStore();
 /**
  * Start loading the curriculum data
  */
-window.Vue.onMounted(async () => {
+window.Vue.onMounted(() => {
     store.init(props);
     initResizeObserver();
-    // load in the unit nodes, only displaying the tabs if there are any unit nodes
-    if (props.hasTabs && props.folderId !== undefined) {
-        await unitNodesStore.load(props.folderId);
-    }
 });
 </script>
 
