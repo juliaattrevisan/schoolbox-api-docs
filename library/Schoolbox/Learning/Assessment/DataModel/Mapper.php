@@ -697,7 +697,7 @@ class Mapper extends BaseMapper
         // * Project sub-assessments (for displaying in save to course dialog(
 
         // Due work files and Kami worksheet
-        $dueWorkIds = $modelList->map(fn (Model $model) => $model->getDueWork()?->getId(), false)->getAll();
+//        $dueWorkIds = $modelList->map(fn (Model $model) => $model->getDueWork()?->getId(), false)->getAll();
 //        $modelList  = $this->augmentListWithDueWorkFiles($modelList, $dueWorkIds);
 //        $modelList  = $this->augmentListWithDueWorkKamiWorksheetTemplates($modelList, $dueWorkIds);
 
