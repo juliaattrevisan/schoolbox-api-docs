@@ -93,12 +93,11 @@
             </div>
         </div>
 
-        <div class="small-12 columns">
-            <h2>Create score for {{ participant.user.fullname }}</h2>
-            <form action="{{ routeLookup(
-                'learningAssessment.postCreateResponse',
-                {assessmentId: participant.assessable.id, studentId: participant.user.id })
-            }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" method="post">
+        <form action="{{ routeLookup(
+            'learningAssessment.postCreateResponse',
+            {assessmentId: participant.assessable.id, studentId: participant.user.id })
+        }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" method="post">
+            <div class="small-12 columns">
                 <div class="row">
                     <div class="small-12 columns">
                         <label for="{{ createAttemptIdBase }}-markingUser">
@@ -157,8 +156,14 @@
                     </div>
                 </div>
 
-                <input type="submit" value="Create Score" />
-            </form>
-        </div>
+            </div>
+            <div class="small-12 column no-pad">
+                <div class="component-action">
+                    <section>
+                        <div><button type="submit">Create Score</button></div>
+                    </section>
+                </div>
+            </div>
+        </form>
     </li>
 {% endblock %}
