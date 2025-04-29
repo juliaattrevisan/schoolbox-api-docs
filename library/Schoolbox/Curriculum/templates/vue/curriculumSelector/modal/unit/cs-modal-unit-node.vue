@@ -4,8 +4,8 @@
  */
 
 import type { Node } from "@schoolboxCurriculum/types/Node";
+import { useNodeTitle } from "@schoolboxCurriculum/vue/composables/useNodeTitle";
 import { generateUUID } from "@js/util/jsUtils";
-import { useUnitNodesStore } from "../../store/csUnitNodesStore";
 import { useModalSelectedNodesStore } from "../../store/csModalSelectedNodesStore";
 
 interface Props {
@@ -15,31 +15,12 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const store = useUnitNodesStore();
 const modalSelectedNodesStore = useModalSelectedNodesStore();
+const { title } = useNodeTitle(props.node);
 const extraId = generateUUID(); // to ensure the input/label id is unique
-
-/**
- * To determine whether we need to display further child nodes within this node
- * @returns {boolean}
- */
-const showChildren = window.Vue.computed(() => props.node.children && props.node.children.length > 0);
-
-/**
- * If there's a code available, which means it can be removed from the selected nodes or
- * the code can be selected to open the curriculum details modal
- * @returns {boolean}
- */
-const hasCode = window.Vue.computed(() => props.node.code && props.node.code !== "");
-
-/**
- *
- * @returns {string}
- */
-const fontWeight = window.Vue.computed(() => {
-    if (props.depth === 0) return "bold";
-    return "normal";
-});
+const showChildren = props.node.children && props.node.children.length > 0; // To determine whether we need to display further child nodes within this node
+const hasCode = props.node.code && props.node.code !== ""; // If there's a code, it can be selected
+const fontWeight = props.depth === 0 ? "bold" : "normal"; // so the top most nodes are bold
 
 /**
  * Update the status of the checkbox based on whether it's selected or not
@@ -48,13 +29,6 @@ const fontWeight = window.Vue.computed(() => {
 const isChecked = window.Vue.computed(() => {
     return modalSelectedNodesStore.isSelected(props.node);
 });
-
-/**
- * When the code is selected, switch across to the curriculum details modal
- */
-function onCodeSelected(): void {
-    // store().selectedDetailsNodeId = props.node.id;
-}
 
 /**
  * add or remove based on the current status
@@ -67,30 +41,24 @@ function onChange($isChecked: boolean): void {
 
 <template>
     <li>
-        <div class="node l-flex-row l-flex--justify-space l-flex--center l-flex--no-wrap l-pad-xs--vert">
-            <div class="l-flex-row l-flex--no-wrap l-gap-xs">
-                <div v-if="hasCode" class="checklist">
-                    <input
-                        :id="`checkbox-${props.node.id}__${extraId}`"
-                        type="checkbox"
-                        :value="props.node.id"
-                        :checked="isChecked"
-                        @change="onChange(($event.target as HTMLInputElement).checked)"
-                    />
-                    <label
-                        :for="`checkbox-${props.node.id}__${extraId}`"
-                        :data-test="`cs-modal-unit-node-checkbox-label-${props.node.id}`"
-                    ></label>
-                </div>
-                <a
-                    v-if="hasCode"
-                    class="node__code f-no-margins l-flex__item--0-shrink"
-                    :href="`#${props.node.id}`"
-                    @click.prevent="onCodeSelected"
-                    >[{{ props.node.code }}]
-                </a>
-                <h3 class="node__name f-no-margins">{{ props.node.name }}</h3>
+        <div class="node l-pad-xs--vert">
+            <div v-if="hasCode" class="checklist l-gap-xs">
+                <input
+                    :id="`checkbox-${props.node.id}__${extraId}`"
+                    type="checkbox"
+                    :value="props.node.id"
+                    :checked="isChecked"
+                    @change="onChange(($event.target as HTMLInputElement).checked)"
+                />
+                <label
+                    class="node__name f-no-margins"
+                    :for="`checkbox-${props.node.id}__${extraId}`"
+                    :data-test="`cs-modal-unit-node-checkbox-label-${props.node.id}`"
+                >
+                    {{ title }}
+                </label>
             </div>
+            <h3 v-else class="node__name f-no-margins">{{ title }}</h3>
         </div>
         <template v-if="showChildren">
             <ul>
@@ -110,11 +78,15 @@ function onChange($isChecked: boolean): void {
     border-bottom: 1px solid var(--body-background);
 }
 
-.node__code,
+.checklist {
+    flex: 2rem 0; /* ensure a long name doesn't impact the checkbox width, which may add dodgy scroll bars on it */
+}
+
 .node__name {
     font-size: 1rem;
     font-weight: v-bind(fontWeight);
     max-width: none; /* override the max-width set on .reveal-modal h3 */
+    vertical-align: top; /* so the li bullet sits inline with the first line of a multiline label */
 }
 
 .node__name {
