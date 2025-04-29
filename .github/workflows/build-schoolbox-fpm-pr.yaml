@@ -5,7 +5,8 @@ name: Build schoolbox-fpm (pull request)
 # building the base image and copying its files as artifacts.
 # Commented out for now, as CI doesn't use it yet and it costs us $:
 # will be re-enabled when it's actually in use.
-on: {}
+on:
+  workflow_call:
 #  pull_request:
 
 jobs:
