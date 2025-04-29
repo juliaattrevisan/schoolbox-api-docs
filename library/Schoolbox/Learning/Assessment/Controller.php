@@ -481,12 +481,16 @@ abstract class Controller extends ListController implements IAssessmentControlle
              */
             $lessonPlan = $this->lessonPlanDataModelMapper->findOneByColumn('assessment_id', $assessment->getId());
 
+            /* Customise the selected LPT
+             */
+            $lessonPlanTemplate = $this->lessonPlanTemplateMapper->findById((int)$lessonPlan->getLessonPlanTemplate());
+
             $data['lessonPlanMeta'] = [
                 'newKeyword' => LessonPlan\Decorator\Decorator::NEW_KEYWORD,
                 'consts' => [
                     'student' => \Schoolbox\Role::STUDENT
                 ],
-                'template' => $lessonPlan->getLessonPlanTemplate(),
+                'template' => $lessonPlanTemplate,
                 'fields' => [],
                 'type' => AssessmentType::TYPE_LESSON_PLAN,
                 'mageAsync' => false,
@@ -530,7 +534,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 ->findMimeTypesFromExtensions(
                     array_keys(KamiModel::ALLOWED_FILE_TYPES)
                 );
-
 
             $zone = (new Zone('worksheet'))
                 ->setMulti(false)
