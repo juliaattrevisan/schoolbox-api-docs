@@ -24,6 +24,13 @@ export type ProfileEditorFieldSettingDefinition = {
     options: ProfileEditorFieldSettingOption[];
 };
 
+type ProfileEditorFieldSettings = Record<ProfileEditorFieldSettingKey, ProfileEditorFieldSettingOption["id"][]>;
+
+type ProfileEditorAvailableFieldSettings = Record<
+    ProfileEditorFieldSettingKey,
+    boolean | Record<ProfileEditorFieldSettingOption["id"], boolean>
+>;
+
 // #endregion
 
 // #region FIELD TYPES
@@ -36,12 +43,9 @@ export type ProfileEditorAvailableField = {
     terminology: string | null; // The terminology key for the field, if it exists - maps to l10n
     category: string; // The category to show the field under (these are the tabs at the top of the field palette)
     // The default field settings for the field for when it gets selected
-    defaultFieldSettings: Record<ProfileEditorFieldSettingKey, ProfileEditorFieldSettingOption["id"][]>;
+    defaultFieldSettings: ProfileEditorFieldSettings;
     // Whether each field setting is available (should display) for the field
-    availableFieldSettings: Record<
-        ProfileEditorFieldSettingKey,
-        boolean | Record<ProfileEditorFieldSettingOption["id"], boolean>
-    >;
+    availableFieldSettings: ProfileEditorAvailableFieldSettings;
 };
 
 export type ProfileEditorSelectedField = {
@@ -51,12 +55,9 @@ export type ProfileEditorSelectedField = {
     css: string | null;
     terminology: string | null; // The terminology key for the field, if it exists - maps to l10n
     // A map of each field setting key relevant to the field to an array of the ids of each selected option
-    fieldSettings: Record<ProfileEditorFieldSettingKey, ProfileEditorFieldSettingOption["id"][]>;
+    fieldSettings: ProfileEditorFieldSettings;
     // Whether each field setting is available (should display) for the field
-    availableFieldSettings: Record<
-        ProfileEditorFieldSettingKey,
-        boolean | Record<ProfileEditorFieldSettingOption["id"], boolean>
-    >;
+    availableFieldSettings: ProfileEditorAvailableFieldSettings;
 };
 
 export type ProfileEditorMandatoryField = {
@@ -66,12 +67,9 @@ export type ProfileEditorMandatoryField = {
     css: string | null;
     terminology: string | null; // The terminology key for the field, if it exists - maps to l10n
     // A map of each field setting key relevant to the field to an array of the ids of each selected option
-    fieldSettings: Record<ProfileEditorFieldSettingKey, ProfileEditorFieldSettingOption["id"][]>;
+    fieldSettings: ProfileEditorFieldSettings;
     // Whether each field setting is available (should display) for the field
-    availableFieldSettings: Record<
-        ProfileEditorFieldSettingKey,
-        boolean | Record<ProfileEditorFieldSettingOption["id"], boolean>
-    >;
+    availableFieldSettings: ProfileEditorAvailableFieldSettings;
 };
 
 // An "Active" field is one that is currently shown on the profile page,
