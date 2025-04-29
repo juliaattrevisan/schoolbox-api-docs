@@ -93,7 +93,7 @@
             </div>
         </div>
 
-        <div id="{{ createAttemptIdBase }}" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
+        <div class="small-12 columns">
             <h2>Create score for {{ participant.user.fullname }}</h2>
             <form action="{{ routeLookup(
                 'learningAssessment.postCreateResponse',
@@ -159,7 +159,6 @@
 
                 <input type="submit" value="Create Score" />
             </form>
-            <a class="close-reveal-modal" aria-label="Close">&#215;</a>
         </div>
     </li>
 {% endblock %}
