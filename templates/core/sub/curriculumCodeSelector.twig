@@ -28,7 +28,7 @@
         :include-children="true"
         :has-tabs="{{ hasTabs ? 'true' : 'false' }}"
         :folder-id="{{ context.baseContext.folder.id ?? 0 }}"
-        {% if folderId %}:folder-id="{{ folderId }}"{% endif %}
+        {% if folderId is defined %}:folder-id="{{ folderId }}"{% endif %}
     />
 {% if not vueSlot %}
     </div>
