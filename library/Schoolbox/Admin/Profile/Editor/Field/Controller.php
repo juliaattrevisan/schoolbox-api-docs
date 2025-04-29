@@ -188,6 +188,8 @@ class Controller extends Base
              * and visibility is *presumed* to be roletype strings only (for now)
              * imho it'd be better served seeing a campus node in here and also a
              * roletype node, so you know conclusively what these represent.
+             * An additional node is also present, which contains other settings that
+             * don't fit into the other categoryes, currently this only has 'clickToReveal'
              *
                 [fieldSettings] => Array
                     (
@@ -203,6 +205,11 @@ class Controller extends Base
                                 [1] => student
                                 [2] => staff
                                 [3] => self
+                            )
+
+                        [additional] => Array
+                            (
+                                [0] => clickToReveal
                             )
 
                     )
@@ -249,6 +256,14 @@ class Controller extends Base
                     $this->visibilityMapper->save($relation);
                 }
             }
+
+            /* Apply additional settings
+             */
+            /** @var string[] $additionalSettings */
+            $additionalSettings = $settings['additional'] ?? [];
+
+            $field->setClickToReveal((int)in_array('clickToReveal', $additionalSettings, true));
+            $this->fieldMapper->save($field);
 
             $this->response = $this->responseAsJson(['success' => true]);
         } catch (\Exception $e) {
