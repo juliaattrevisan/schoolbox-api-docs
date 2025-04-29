@@ -11,7 +11,13 @@ export type ProfileEditorFieldSettingOption = {
     meta: Record<ProfileEditorRoleType["roleType"], string> | string | null; // additional explanation about the option, if required
 };
 
-export type ProfileEditorFieldSettingKey = string;
+// The available field setting keys, as per Profile/Editor/Payload.php
+export enum ProfileEditorFieldSettingKey {
+    AVAILABILITY = "availability",
+    VISIBILITY = "visibility",
+    ADDITIONAL_SETTINGS = "additional",
+}
+
 export type ProfileEditorFieldSettingDefinition = {
     displayAs: string;
     tooltip: string | null;
@@ -92,7 +98,13 @@ export type ProfileEditorTabSettingOption = {
     meta: Record<ProfileEditorRoleType["roleType"], string> | null; // additional explanation about the option, if required
 };
 
-export type ProfileEditorTabSettingKey = string;
+// The available tab setting keys, as per Profile/Editor/Payload.php
+export enum ProfileEditorTabSettingKey {
+    AVAILABILITY = "availability",
+    VISIBILITY = "visibility",
+    ADDITIONAL_SETTINGS = "additional",
+}
+
 export type ProfileEditorTabSettingDefinition = {
     displayAs: string;
     tooltip: string | null;

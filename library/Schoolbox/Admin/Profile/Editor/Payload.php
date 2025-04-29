@@ -46,6 +46,7 @@ class Payload
 
     /**
      * Common nodes and human-readable name equivalents
+     * The nodes also map to types in profileEditorTypes.ts
      */
     private const AVAILABILITY_NODE = 'availability';
     private const AVAILABILITY_NAME = 'Appears On';
