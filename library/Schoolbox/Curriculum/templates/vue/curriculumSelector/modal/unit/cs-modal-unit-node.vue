@@ -4,7 +4,9 @@
  */
 
 import type { Node } from "@schoolboxCurriculum/types/Node";
+import { generateUUID } from "@js/util/jsUtils";
 import { useUnitNodesStore } from "../../store/csUnitNodesStore";
+import { useModalSelectedNodesStore } from "../../store/csModalSelectedNodesStore";
 
 interface Props {
     node: Node; // the assigned node to display
@@ -14,6 +16,8 @@ interface Props {
 const props = defineProps<Props>();
 
 const store = useUnitNodesStore();
+const modalSelectedNodesStore = useModalSelectedNodesStore();
+const extraId = generateUUID(); // to ensure the input/label id is unique
 
 /**
  * To determine whether we need to display further child nodes within this node
@@ -38,6 +42,14 @@ const fontWeight = window.Vue.computed(() => {
 });
 
 /**
+ * Update the status of the checkbox based on whether it's selected or not
+ * @returns {boolean} - whether the checkbox is checked or not
+ */
+const isChecked = window.Vue.computed(() => {
+    return modalSelectedNodesStore.isSelected(props.node);
+});
+
+/**
  * When the code is selected, switch across to the curriculum details modal
  */
 function onCodeSelected(): void {
@@ -45,15 +57,31 @@ function onCodeSelected(): void {
 }
 
 /**
- * Add/remove the node from the selected nodes
+ * add or remove based on the current status
+ * @param $isChecked - whether the checkbox is checked or not
  */
-function onNodeSelected(): void {}
+function onChange($isChecked: boolean): void {
+    modalSelectedNodesStore.switchNode(props.node, $isChecked);
+}
 </script>
 
 <template>
     <li>
         <div class="node l-flex-row l-flex--justify-space l-flex--center l-flex--no-wrap l-pad-xs--vert">
             <div class="l-flex-row l-flex--no-wrap l-gap-xs">
+                <div v-if="hasCode" class="checklist">
+                    <input
+                        :id="`checkbox-${props.node.id}__${extraId}`"
+                        type="checkbox"
+                        :value="props.node.id"
+                        :checked="isChecked"
+                        @change="onChange(($event.target as HTMLInputElement).checked)"
+                    />
+                    <label
+                        :for="`checkbox-${props.node.id}__${extraId}`"
+                        :data-test="`cs-modal-unit-node-checkbox-label-${props.node.id}`"
+                    ></label>
+                </div>
                 <a
                     v-if="hasCode"
                     class="node__code f-no-margins l-flex__item--0-shrink"
