@@ -78,14 +78,16 @@ function onSelectedNodeModalClosed(): void {
     selectedNodesStore.setActiveNode(getEmptyNode());
 }
 
+const unitNodesStore = useUnitNodesStore();
+
 /**
  * Start loading the curriculum data
  */
 window.Vue.onMounted(async () => {
     store.init(props);
     initResizeObserver();
+    // load in the unit nodes, only displaying the tabs if there are any unit nodes
     if (props.hasTabs && props.folderId) {
-        const unitNodesStore = useUnitNodesStore();
         await unitNodesStore.load(props.folderId);
     }
 });
@@ -101,6 +103,6 @@ window.Vue.onMounted(async () => {
         />
         <cs-search-results :is-single-select="props.isSingleSelect" />
     </div>
-    <cs-modal v-if="store.hasLoadedOk" :is-single-select="props.isSingleSelect" :has-tabs="props.hasTabs" />
+    <cs-modal v-if="store.hasLoadedOk" :is-single-select="props.isSingleSelect" :has-tabs="unitNodesStore.hasNodes" />
     <selected-node-modal :node="selectedNodesStore.activeNode" @closed="onSelectedNodeModalClosed" />
 </template>

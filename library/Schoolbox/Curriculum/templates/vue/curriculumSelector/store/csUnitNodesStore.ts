@@ -9,6 +9,7 @@ export const useUnitNodesStore = defineStore("csUnitNodesStore", () => {
     const isProcessing = window.Vue.ref(false);
     const hasLoadError = window.Vue.ref(false);
     const nodes = window.Vue.ref<Node[]>([]);
+    const hasNodes = window.Vue.ref(false); // no need to display the tree if there are no nodes
 
     /**
      * load all the nodes linked to a specific unit
@@ -25,6 +26,9 @@ export const useUnitNodesStore = defineStore("csUnitNodesStore", () => {
             });
             if (response.ok) {
                 const newNodes = (await response.json()) as Node[];
+                if (newNodes.length > 0) {
+                    hasNodes.value = true;
+                }
                 nodes.value = newNodes;
                 // toast.timeout({ text: "Curriculum updated successfully" });
             } else {
@@ -42,6 +46,7 @@ export const useUnitNodesStore = defineStore("csUnitNodesStore", () => {
         isProcessing,
         hasLoadError,
         nodes,
+        hasNodes,
         load,
     };
 });
