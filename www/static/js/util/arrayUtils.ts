@@ -36,3 +36,35 @@ export function moveArrayItem(array: unknown[], oldIndex: number, newIndex: numb
 export function isArrayOfNumbers(arr: unknown): arr is number[] {
     return Array.isArray(arr) && arr.every((item) => typeof item === "number");
 }
+
+/**
+ * Get the keys of an object as a union of string literals
+ */
+export type KeysOf<O> = Exclude<
+    O extends readonly unknown[]
+        ? number extends O["length"]
+            ? `${number}`
+            : keyof O & `${number}`
+        : {
+              [K in keyof O]: K extends string ? K : K extends number ? `${K}` : never;
+          }[keyof O],
+    undefined // to avoid Partial<T> returning undefined
+>;
+
+/**
+ * Mimics the result of Object.keys(...), but types the result as a union of string literals
+ * @param o - The object to get the keys of
+ * @returns - The keys of the object as a union of string literals
+ */
+export function keysOf<O extends object>(o: O): KeysOf<O>[] {
+    return Object.keys(o) as KeysOf<O>[];
+}
+
+/**
+ * Mimics the result of Object.fromEntries(...), but correctly types the result as a Record<K, V>
+ * @param entries - An iterable object that contains key-value entries for properties and methods
+ * @returns - The object created from the iterable
+ */
+export function fromEntriesOf<K extends PropertyKey, V>(entries: Iterable<readonly [K, V]>): Record<K, V> {
+    return Object.fromEntries(entries) as Record<K, V>;
+}
