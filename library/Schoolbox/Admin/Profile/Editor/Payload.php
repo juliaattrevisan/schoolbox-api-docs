@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Profile\Editor;
 
 use Schoolbox\Admin\Profile\Editor\Field\Mapper as FieldMapper;
+use Schoolbox\Admin\Profile\Editor\Field\Model as FieldModel;
 use Schoolbox\Admin\Profile\Editor\Tab\Mapper as TabMapper;
 use Schoolbox\Profile\Button\Mapper as ButtonMapper;
 use Schoolbox\CampusMapper;
@@ -259,6 +260,7 @@ class Payload
                     'css' => $field->getCss(),
                     'terminology' => $field->getTerm(),
                     'category' => $field->getIsExternal() ? self::FIELD_CATEGORY_EXTERNAL : self::FIELD_CATEGORY_INTERNAL,
+                    'availableFieldSettings' => $this->getFieldSettingsAvailability($field),
                 ];
             }
 
@@ -305,16 +307,7 @@ class Payload
                             'clickToReveal' => $field->getClickToReveal(),
                         ], static fn($value) => !!$value)),
                     ],
-                    'availableFieldSettings' => [
-                        self::AVAILABILITY_NODE => true,
-                        self::VISIBILITY_NODE => true,
-                        self::ADDITIONAL_SETTINGS_NODE => [
-                            /* clickToReveal is only available when the field has both an icon and css
-                             * (i.e. when it will be displayed as an alert box)
-                             */
-                            'clickToReveal' => $field->getCss() && $field->getIcon(),
-                        ]
-                    ]
+                    'availableFieldSettings' => $this->getFieldSettingsAvailability($field),
                 ];
             }
 
@@ -416,6 +409,29 @@ class Payload
                     'name' => 'Click to Reveal',
                     'meta' => 'Hide content by default until the user clicks to reveal it'
                 ],
+            ]
+        ];
+
+        return $settings;
+    }
+
+    /**
+     * Generate payload data for a specific field's settings availability:
+     *  - $payload['data']['roleTypes'][*]['fields'][*][*]['availableFieldSettings']
+     *
+     * @param FieldModel $field
+     * @return array
+     */
+    private function getFieldSettingsAvailability(FieldModel $field): array
+    {
+        $settings = [
+            self::AVAILABILITY_NODE => true,
+            self::VISIBILITY_NODE => true,
+            self::ADDITIONAL_SETTINGS_NODE => [
+                /* clickToReveal is only available when the field has both an icon and css
+                 * (i.e. when it will be displayed as an alert box)
+                 */
+                'clickToReveal' => $field->getCss() && $field->getIcon(),
             ]
         ];
 

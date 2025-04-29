@@ -35,6 +35,11 @@ export type ProfileEditorAvailableField = {
     css: string | null;
     terminology: string | null; // The terminology key for the field, if it exists - maps to l10n
     category: string; // The category to show the field under (these are the tabs at the top of the field palette)
+    // Whether each field setting is available (should display) for the field
+    availableFieldSettings: Record<
+        ProfileEditorFieldSettingKey,
+        boolean | Record<ProfileEditorFieldSettingOption["id"], boolean>
+    >;
 };
 
 export type ProfileEditorSelectedField = {

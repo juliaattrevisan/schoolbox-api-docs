@@ -328,6 +328,7 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
             css: availableField.css,
             terminology: availableField.terminology,
             fieldSettings: emptyFieldSettings,
+            availableFieldSettings: availableField.availableFieldSettings,
         });
 
         // Timeout so the loading state renders nicely and the user can see the change
