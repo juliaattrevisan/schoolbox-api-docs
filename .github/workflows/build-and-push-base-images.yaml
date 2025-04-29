@@ -65,7 +65,7 @@ jobs:
             ARCH=${{ matrix.build.arch }}
 #          platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           tags: |
-            alaress/php82-alpine:latest-${{ matrix.build.arch }}
+            alaress/php82-alpine:latest-${{ github.ref_name }}-${{ matrix.build.arch }}
 
       - name: Upload php82-alpine artifact
         uses: actions/upload-artifact@v4
@@ -90,10 +90,10 @@ jobs:
 
       - name: Join php82-alpine images
         run: |
-          docker manifest create alaress/php82-alpine:latest \
-            --amend alaress/php82-alpine:latest-amd64 \
-            --amend alaress/php82-alpine:latest-arm64
-          docker manifest push --purge alaress/php82-alpine:latest
+          docker manifest create alaress/php82-alpine:latest-${{ github.ref_name }} \
+            --amend alaress/php82-alpine:latest-${{ github.ref_name }}-amd64 \
+            --amend alaress/php82-alpine:latest-${{ github.ref_name }}-arm64
+          docker manifest push --purge alaress/php82-alpine:latest-${{ github.ref_name }}
 
       # Need artifact for the joined image too, or pull the just built image?
 
@@ -139,7 +139,7 @@ jobs:
             ARCH=${{ matrix.build.arch }}
 #          platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           tags: |
-            alaress/php82-fpm-alpine:latest-${{ matrix.build.arch }}
+            alaress/php82-fpm-alpine:latest-${{ github.ref_name }}-${{ matrix.build.arch }}
 
       - name: Upload php82-fpm-alpine artifact
         uses: actions/upload-artifact@v4
@@ -164,10 +164,10 @@ jobs:
 
       - name: Join php82-fpm-alpine images
         run: |
-          docker manifest create alaress/php82-fpm-alpine:latest \
-            --amend alaress/php82-fpm-alpine:latest-amd64 \
-            --amend alaress/php82-fpm-alpine:latest-arm64
-          docker manifest push --purge alaress/php82-fpm-alpine:latest
+          docker manifest create alaress/php82-fpm-alpine:latest-${{ github.ref_name }} \
+            --amend alaress/php82-fpm-alpine:latest-${{ github.ref_name }}-amd64 \
+            --amend alaress/php82-fpm-alpine:latest-${{ github.ref_name }}-arm64
+          docker manifest push --purge alaress/php82-fpm-alpine:latest-${{ github.ref_name }}
 
   push-php82-to-ecr:
     needs:
