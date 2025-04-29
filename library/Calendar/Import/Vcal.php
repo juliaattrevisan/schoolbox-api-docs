@@ -90,13 +90,41 @@ class Vcal extends Base
 
             /* All the events from the file
              */
-            $now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
+            $now = (new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'))->startOfMonth();
             $later = new \Alaress_Date_Format(strtotime('+1 year', $_SERVER['REQUEST_TIME']), 'U');
 
             /** @var VObject\Component\VCalendar $allEvents */
             $allEvents = VObject\Reader::read(file_get_contents($this->getFile()));
 
-            $allEvents = $allEvents->expand(new \DateTime($now->getDatabaseDate()), new \DateTime($later->getDatabaseDate()));
+            /* Specifically look for events that are in the past, or are too far in the future
+             * (this latter idea is probably less significant in the general usage) since events
+             * in the past will be quietly disregarded by $allEvents->expand(). There's a check
+             * inside the vendor library to ensure events start (or end) within the time range
+             * [$now - $later].
+             */
+            $rangeStart = new \DateTime($now->getDatabaseDate());
+            $rangeEnd = new \DateTime($later->getDatabaseDate());
+
+            foreach ($allEvents->getComponents() as $currentEvent) {
+                /* Skip non-VEvent instances
+                 */
+                if (!$currentEvent instanceof VEvent) {
+                    continue;
+                }
+
+                if (!$currentEvent->isInTimeRange($rangeStart, $rangeEnd)) {
+                    $output[] = [
+                        'name'   => \Scrub::text((string)$currentEvent->SUMMARY),
+                        'status' => 'Not Added',
+                        'error'  => 'Event must start or end between now and one year later',
+                    ];
+                }
+            }
+
+            /* Forcibly expand the date range requirements of every event, silently excluding those
+             * which somehow fall outside this date range.
+             */
+            $allEvents = $allEvents->expand($rangeStart, $rangeEnd);
 
             foreach ($allEvents->getComponents() as $currentEvent) {
                 /* Skip non-VEvent instances
