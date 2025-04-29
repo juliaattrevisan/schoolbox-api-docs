@@ -8,6 +8,7 @@ import { useUnitNodesStore } from "../../store/csUnitNodesStore";
 
 interface Props {
     node: Node; // the assigned node to display
+    depth: number; // the depth of the node in the tree
 }
 
 const props = defineProps<Props>();
@@ -26,6 +27,15 @@ const showChildren = window.Vue.computed(() => props.node.children && props.node
  * @returns {boolean}
  */
 const hasCode = window.Vue.computed(() => props.node.code && props.node.code !== "");
+
+/**
+ *
+ * @returns {string}
+ */
+const fontWeight = window.Vue.computed(() => {
+    if (props.depth === 0) return "bold";
+    return "normal";
+});
 
 /**
  * When the code is selected, switch across to the curriculum details modal
@@ -56,7 +66,12 @@ function onNodeSelected(): void {}
         </div>
         <template v-if="showChildren">
             <ul>
-                <cs-modal-unit-node v-for="viewNode in props.node.children" :key="viewNode.id" :node="viewNode" />
+                <cs-modal-unit-node
+                    v-for="viewNode in props.node.children"
+                    :key="viewNode.id"
+                    :node="viewNode"
+                    :depth="props.depth + 1"
+                />
             </ul>
         </template>
     </li>
@@ -70,7 +85,8 @@ function onNodeSelected(): void {}
 .node__code,
 .node__name {
     font-size: 1rem;
-    max-width: none;
+    font-weight: v-bind(fontWeight);
+    max-width: none; /* override the max-width set on .reveal-modal h3 */
 }
 
 .node__name {
