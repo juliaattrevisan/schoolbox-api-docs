@@ -188,6 +188,8 @@ class Controller extends Base
              * and visibility is *presumed* to be roletype strings only (for now)
              * imho it'd be better served seeing a campus node in here and also a
              * roletype node, so you know conclusively what these represent.
+             * An additional node is also present, which contains other settings that
+             * don't fit into the other categoryes, currently this only has 'clickToReveal'
              *
                 [fieldSettings] => Array
                     (
@@ -205,6 +207,11 @@ class Controller extends Base
                                 [3] => self
                             )
 
+                        [additional] => Array
+                            (
+                                [0] => clickToReveal
+                            )
+
                     )
              */
 
@@ -216,7 +223,7 @@ class Controller extends Base
              * Otherwise leave it empty (this is a legitimate use case)
              */
             /** @var int[] $newCampusIds */
-            $newCampusIds = $settings['availability'] ?? [];
+            $newCampusIds = $settings[Payload::AVAILABILITY_NODE] ?? [];
 
             if (\count($newCampusIds)) {
                 $campuses = $this->campusMapper->findByColumn('id', $newCampusIds);
@@ -238,7 +245,7 @@ class Controller extends Base
              * Otherwise leave it empty (this is a legitimate use case)
              */
             /** @var string[] $newRoleTypes */
-            $newRoleTypes = $settings['visibility'] ?? [];
+            $newRoleTypes = $settings[Payload::VISIBILITY_NODE] ?? [];
 
             if (\count($newRoleTypes)) {
                 foreach ($newRoleTypes as $newRoleType) {
@@ -249,6 +256,14 @@ class Controller extends Base
                     $this->visibilityMapper->save($relation);
                 }
             }
+
+            /* Apply additional settings
+             */
+            /** @var string[] $additionalSettings */
+            $additionalSettings = $settings[Payload::ADDITIONAL_SETTINGS_NODE] ?? [];
+
+            $field->setClickToReveal((int)in_array('clickToReveal', $additionalSettings, true));
+            $this->fieldMapper->save($field);
 
             $this->response = $this->responseAsJson(['success' => true]);
         } catch (\Exception $e) {

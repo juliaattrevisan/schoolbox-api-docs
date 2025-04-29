@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import { cloneDeep } from "lodash";
 import { until } from "@vueuse/core";
 import locale from "@js/terminology/rosettaStone";
+import { keysOf } from "@js/util/arrayUtils";
 import { useProfileEditorStore } from "./profileEditorStore";
 import { fetchProfileEditorEndpoint } from "./profileEditorUtils";
 import type {
@@ -316,9 +317,6 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
         if (availableField === undefined) throw new Error(`Field ${field} not found`);
         if (getActiveFieldType(field) !== null) return;
 
-        // a map of each field setting key to an empty array to start with (all settings are deselected)
-        const emptyFieldSettings = Object.fromEntries(Object.keys(peStore.fieldSettings).map((key) => [key, []]));
-
         // Immediate UI preview
         peStore.selectedRoleType.fields.selected.splice(index, 0, {
             field: availableField.field,
@@ -326,7 +324,8 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
             icon: availableField.icon,
             css: availableField.css,
             terminology: availableField.terminology,
-            fieldSettings: emptyFieldSettings,
+            fieldSettings: cloneDeep(availableField.defaultFieldSettings),
+            availableFieldSettings: availableField.availableFieldSettings,
         });
 
         // Timeout so the loading state renders nicely and the user can see the change
@@ -391,7 +390,7 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
         if (activeField === undefined || savedField === undefined) return false;
 
         // Check if the field settings are different, each setting list *should* be sorted, so we can compare them directly
-        return Object.keys(activeField.fieldSettings).some(
+        return keysOf(activeField.fieldSettings).some(
             (key) => JSON.stringify(activeField.fieldSettings[key]) !== JSON.stringify(savedField.fieldSettings[key]),
         );
     }

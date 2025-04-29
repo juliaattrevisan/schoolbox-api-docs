@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { cloneDeep } from "lodash";
 import { until } from "@vueuse/core";
+import { keysOf } from "@js/util/arrayUtils";
 import { useProfileEditorStore } from "./profileEditorStore";
 import { fetchProfileEditorEndpoint } from "./profileEditorUtils";
 import type {
@@ -227,7 +228,7 @@ export const useProfileEditorTabsStore = defineStore("profileEditorTabsStore", (
         if (activeTab === undefined || savedTab === undefined) return false;
 
         // Check if the tab settings are different, each setting list *should* be sorted, so we can compare them directly
-        return Object.keys(activeTab.tabSettings).some(
+        return keysOf(activeTab.tabSettings).some(
             (key) => JSON.stringify(activeTab.tabSettings[key]) !== JSON.stringify(savedTab.tabSettings[key]),
         );
     }
