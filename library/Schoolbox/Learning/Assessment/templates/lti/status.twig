@@ -87,17 +87,24 @@
                         {% if pActionSummary %}
                             <li><a class="icon-history" href="{{ pActionSummary }}" title="View {{ participant.user.givenName }}'s attempt history">View Attempt History</a></li>
                         {% endif %}
-                        <li><a href="#" data-reveal-id="{{ createAttemptIdBase }}" class="icon-due-work" title="Create score for {{ participant.user.givenName }}">Create Score...</a></li>
+                        <li><a href="#" data-collapser="{{ createAttemptIdBase }}-createScore" class="icon-due-work" title="Create score for {{ participant.user.givenName }}">Create Score...</a></li>
                     {% endapply -%}
                 </ul>
             </div>
         </div>
 
-        <form action="{{ routeLookup(
-            'learningAssessment.postCreateResponse',
-            {assessmentId: participant.assessable.id, studentId: participant.user.id })
-        }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" method="post">
-            <div class="small-12 columns">
+        <form
+            action="{{ routeLookup(
+                'learningAssessment.postCreateResponse',
+                {assessmentId: participant.assessable.id, studentId: participant.user.id })
+            }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}"
+            method="post"
+        >
+            <div
+                class="small-12 columns hide"
+                data-collapse-state="collapsed"
+                data-collapsable="{{ createAttemptIdBase }}-createScore"
+            >
                 <div class="row">
                     <div class="small-12 columns">
                         <label for="{{ createAttemptIdBase }}-markingUser">
@@ -155,9 +162,12 @@
                         <textarea id="{{ createAttemptIdBase }}-comment" name="comment" rows="5"></textarea>
                     </div>
                 </div>
-
             </div>
-            <div class="small-12 column no-pad">
+            <div
+                class="small-12 column no-pad hide"
+                data-collapse-state="collapsed"
+                data-collapsable="{{ createAttemptIdBase }}-createScore"
+            >
                 <div class="component-action">
                     <section>
                         <div><button type="submit">Create Score</button></div>
@@ -166,4 +176,9 @@
             </div>
         </form>
     </li>
+    <script type="text/javascript">
+        $(function () {
+            $('[data-collapser="{{ createAttemptIdBase }}-createScore"]').collapsable();
+        });
+    </script>
 {% endblock %}
