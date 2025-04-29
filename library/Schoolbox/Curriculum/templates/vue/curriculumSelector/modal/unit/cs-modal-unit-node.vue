@@ -6,6 +6,7 @@
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import { useNodeTitle } from "@schoolboxCurriculum/vue/composables/useNodeTitle";
 import { generateUUID } from "@js/util/jsUtils";
+import { useUnitNodesStore } from "../../store/csUnitNodesStore";
 import { useModalSelectedNodesStore } from "../../store/csModalSelectedNodesStore";
 
 interface Props {
@@ -13,17 +14,24 @@ interface Props {
     depth: number; // the depth of the node in the tree
     isExpanded: boolean; // whether the node is expanded or not
 }
-
 const props = defineProps<Props>();
 
+const store = useUnitNodesStore();
 const modalSelectedNodesStore = useModalSelectedNodesStore();
 const { title } = useNodeTitle(props.node);
 const extraId = generateUUID(); // to ensure the input/label id is unique
 const showChildren = props.node.children && props.node.children.length > 0; // To determine whether we need to display further child nodes within this node
 const hasCode = props.node.code && props.node.code !== ""; // If there's a code, it can be selected
 const fontWeight = props.depth === 0 ? "bold" : "normal"; // so the top most nodes are bold
-const showExpandButton = props.depth === 0 && props.node.children && props.node.children.length > 0; // show the expand button when the node has children, and onlyShowGaps is not active
 const isNodeExpanded = window.Vue.ref(props.isExpanded); // to track whether the node is expanded or not
+
+/**
+ * Show the expand button there's multiple top level parents, it's the parent node,
+ * and when the node has children
+ */
+const showExpandButton = window.Vue.computed(() => {
+    return store.hasMultipleParents && props.depth === 0 && props.node.children && props.node.children.length > 0;
+});
 
 /**
  * Expand or collapse the children of the node
@@ -34,7 +42,6 @@ function onExpandSelected(): void {
 
 /**
  * Update the status of the checkbox based on whether it's selected or not
- * @returns {boolean} - whether the checkbox is checked or not
  */
 const isChecked = window.Vue.computed(() => {
     return modalSelectedNodesStore.isSelected(props.node);
@@ -64,7 +71,7 @@ function onChange($isChecked: boolean): void {
                     <sbx-icon v-if="isNodeExpanded" name="up-arrow" />
                     <sbx-icon v-else name="down-arrow" />
                 </button>
-                <div v-if="hasCode" class="checklist l-gap-xs">
+                <div v-if="hasCode" class="checklist l-gap-xs l-pad-xs--vert">
                     <input
                         :id="`checkbox-${props.node.id}__${extraId}`"
                         type="checkbox"
