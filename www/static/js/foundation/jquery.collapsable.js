@@ -25,6 +25,8 @@
             var defaults = {
                 element: element,
                 container: "[data-component]",
+                iconCollapsed: "icon-down-arrow",
+                iconExpanded: "icon-up-arrow",
             };
 
             return $.extend(defaults, options);
@@ -126,7 +128,7 @@
 
         let icon = $('[data-collapser="' + component.attr("data-collapsable") + '"]');
 
-        icon.removeClass("icon-up-arrow").addClass("icon-down-arrow");
+        icon.removeClass(this.config.iconExpanded).addClass(this.config.iconCollapsed);
     };
 
     /**
@@ -135,10 +137,10 @@
      * @param icon
      */
     $.fn.executeIconToggle = function (icon) {
-        if (icon.hasClass("icon-up-arrow")) {
-            icon.removeClass("icon-up-arrow").addClass("icon-down-arrow");
+        if (icon.hasClass(this.config.iconExpanded)) {
+            icon.removeClass(this.config.iconExpanded).addClass(this.config.iconCollapsed);
         } else {
-            icon.removeClass("icon-down-arrow").addClass("icon-up-arrow");
+            icon.removeClass(this.config.iconCollapsed).addClass(this.config.iconExpanded);
         }
     };
 })(jQuery);
