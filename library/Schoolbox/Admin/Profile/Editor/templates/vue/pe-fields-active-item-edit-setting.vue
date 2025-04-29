@@ -83,7 +83,7 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
-    <div class="l-flex__item--1-grow">
+    <div v-if="availableFieldSettingOptions.length" class="l-flex__item--1-grow">
         <label>
             {{ fieldSettingDefinition.displayAs }}
             <span
