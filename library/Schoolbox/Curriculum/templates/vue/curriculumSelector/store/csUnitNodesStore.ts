@@ -10,6 +10,7 @@ export const useUnitNodesStore = defineStore("csUnitNodesStore", () => {
     const hasLoaded = window.Vue.ref(false); // whether the nodes have been loaded or not
     const nodes = window.Vue.ref<Node[]>([]);
     const hasNodes = window.Vue.ref(false); // no need to display the tree if there are no nodes
+    const hasMultipleParents = window.Vue.ref(false); // whether the nodes come from multiple top level curriculum parents
 
     /**
      * load all the nodes linked to a specific unit
@@ -30,6 +31,9 @@ export const useUnitNodesStore = defineStore("csUnitNodesStore", () => {
                 if (nodes.value.length > 0) {
                     hasNodes.value = true;
                 }
+                if (nodes.value.length > 1) {
+                    hasMultipleParents.value = true;
+                }
             }
         } catch (error) {
             hasLoadError.value = true;
@@ -44,6 +48,7 @@ export const useUnitNodesStore = defineStore("csUnitNodesStore", () => {
         hasLoaded,
         nodes,
         hasNodes,
+        hasMultipleParents,
         load,
     };
 });
