@@ -176,9 +176,28 @@
             </div>
         </form>
     </li>
+    <script type="text/javascript" src='{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}'></script>
     <script type="text/javascript">
         $(function () {
-            $('[data-collapser="{{ createAttemptIdBase }}-createScore"]').collapsable();
+            $('[data-collapser="{{ createAttemptIdBase }}-createScore"]')
+                .on('click', () => {
+                    // spawn the editor only after expanding once (for performance reasons with many students)
+                    const editorId = "{{ createAttemptIdBase }}-comment";
+                    if (window.sbProps.editors[editorId]) {
+                        return; // editor already exists, nothing to do
+                    }
+                    document.dispatchEvent(
+                        new CustomEvent("EDITOR__CREATE", {
+                            detail: {
+                                targetElements: [`#${editorId}`],
+                                showWordCount: true,
+                                hasTokens: true,
+                                toolbar: "comment_ai",
+                            },
+                        }),
+                    );
+                })
+                .collapsable();
         });
     </script>
 {% endblock %}
