@@ -70,7 +70,7 @@ class Activity
                 AND   publish_at >= ?
                 AND   publish_at <= NOW()
             ",
-            [$id, $lastcatvisit],
+            [(string)$id, $lastcatvisit],
         );
         $result = $query->fetch();
 
