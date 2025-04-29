@@ -10,6 +10,12 @@ const lpStore = useLessonPlannerStore();
 const allowGeneration = window.Vue.computed(() => {
     return lpStore.fields.some((field) => field.selected);
 });
+
+window.Vue.onMounted(() => {
+    // @ts-expect-error -- To trigger the tooltip next to the field title to show up correctly
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- foundation isn't typed, see above
+    $(document).foundation("tooltip", "reflow");
+});
 </script>
 
 <template>
@@ -22,10 +28,15 @@ const allowGeneration = window.Vue.computed(() => {
                 <input :id="`lp-generate-field-${field.id}`" v-model="field.selected" type="checkbox" />
                 <label :for="`lp-generate-field-${field.id}`" class="checkbox-label">
                     {{ field.title }}
-                    <template v-if="field.description.length">
-                        <br />
-                        <p class="meta lp-field-description">{{ field.description }}</p>
-                    </template>
+                    <span
+                        v-if="field.description.length"
+                        data-tooltip
+                        data-width="800"
+                        class="has-tip hint"
+                        :title="field.description"
+                    >
+                        ?
+                    </span>
                 </label>
             </li>
         </ul>

@@ -53,6 +53,10 @@ window.Vue.onMounted(async () => {
     });
 
     currentField.editorId = `field-body-${props.fieldRef}`;
+
+    // @ts-expect-error -- To trigger the tooltip next to the field title to show up correctly
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- foundation isn't typed, see above
+    $(document).foundation("tooltip", "reflow");
 });
 </script>
 
@@ -62,14 +66,21 @@ window.Vue.onMounted(async () => {
             <div class="lp-item-label">
                 <label>
                     {{ field.title }}
+                    <span
+                        v-if="field.description.length"
+                        data-tooltip
+                        data-width="800"
+                        class="has-tip hint"
+                        :title="field.description.replace(/(\r\n)+/g, '<br>')"
+                    >
+                        ?
+                    </span>
                 </label>
 
                 <p v-if="props.studentConst !== field.visibility" class="meta">
                     <span class="icon-view-hollow"></span>This field is not visible to students
                 </p>
             </div>
-
-            <p v-if="field.description.length" class="meta lp-field-description">{{ field.description }}</p>
 
             <!-- The Lesson Plan Template field which is related to this Lesson Plan Field
               Because of the swamp you need to know both since the same function fulfils
@@ -103,9 +114,5 @@ window.Vue.onMounted(async () => {
 .lp-field-regenerate {
     float: right;
     color: var(--content-ui-foreground);
-}
-
-.lp-field-description {
-    white-space: pre-wrap;
 }
 </style>
