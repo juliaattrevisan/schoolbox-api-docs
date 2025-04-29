@@ -120,8 +120,8 @@ export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
         }
 
         const response = await generateLessonPlan(generatePlanRoute.value, {
-            templateTitle: templateTitle,
-            lessonPlanTitle: lessonPlanTitle,
+            templateTitle,
+            lessonPlanTitle,
             context: contextName.value,
             duration: "1 hour", // TODO: There's no field for this yet, so it's just hardcoded to an hour for now
             curriculumNodeIds: [],
