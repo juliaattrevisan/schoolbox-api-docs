@@ -227,7 +227,11 @@ class Payload
                         /* Find the roletypes ("ids") for which this tab might be visible
                          */
                         self::VISIBILITY_NODE => $tab->getVisibility()?->indexBy('roleType')->keys()
-                    ]
+                    ],
+                    'availableTabSettings' => [
+                        self::AVAILABILITY_NODE => true,
+                        self::VISIBILITY_NODE => true
+                    ],
                 ];
             }
 

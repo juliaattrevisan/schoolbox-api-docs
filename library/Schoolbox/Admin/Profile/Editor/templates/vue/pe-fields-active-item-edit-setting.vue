@@ -54,7 +54,10 @@ const fieldSettingDefinition = window.Vue.computed(() => {
  * The available options for the current field setting
  */
 const availableFieldSettingOptions = window.Vue.computed(() => {
-    return peStore.fieldSettings[props.fieldSettingKey].options.filter((option) => {
+    if (fieldSettingDefinition.value === undefined) {
+        return [];
+    }
+    return fieldSettingDefinition.value.options.filter((option) => {
         const availability = props.field.availableFieldSettings[props.fieldSettingKey];
         if (availability === undefined) {
             return false;
@@ -83,7 +86,7 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
-    <div v-if="availableFieldSettingOptions.length" class="l-flex__item--1-grow">
+    <div v-if="fieldSettingDefinition && availableFieldSettingOptions.length" class="l-flex__item--1-grow">
         <label>
             {{ fieldSettingDefinition.displayAs }}
             <span

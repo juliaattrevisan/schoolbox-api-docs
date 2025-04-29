@@ -95,7 +95,7 @@ export type ProfileEditorTabSettingOption = {
     id: number | string;
     name: string;
     type: string; // currently unused, e.g. "campus" or "role"
-    meta: Record<ProfileEditorRoleType["roleType"], string> | null; // additional explanation about the option, if required
+    meta: Record<ProfileEditorRoleType["roleType"], string> | string | null; // additional explanation about the option, if required
 };
 
 // The available tab setting keys, as per Profile/Editor/Payload.php
@@ -117,6 +117,11 @@ export type ProfileEditorTab = {
     label: string;
     // A map of each tab setting key relevant to the tab to an array of the ids of each selected option
     tabSettings: Record<ProfileEditorTabSettingKey, ProfileEditorTabSettingOption["id"][]>;
+    // Whether each tab setting is available (should display) for the tab
+    availableTabSettings: Record<
+        ProfileEditorTabSettingKey,
+        boolean | Record<ProfileEditorTabSettingOption["id"], boolean>
+    >;
 };
 
 // #endregion
