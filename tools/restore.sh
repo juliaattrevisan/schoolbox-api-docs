@@ -48,6 +48,12 @@ readonly PRESERVED_CONFIG=(
   # Geosnapshot
   "geosnapshot_api_key" "geosnapshot_enabled"
 
+  # Intellischools
+  "intellischool_jwt_private_key" "intellischool_jwt_private_key_signing_algorithm" "intellischool_deployment_id" "intellischool_learner_dashboard_base_url" "intellischool_cohort_dashboard_base_url" "intellischool_deployment_secret"
+
+  # Paperly
+  "paperly_iframe_api_host" "paperly_iframe_api_key" "paperly_agent_ip_whitelist" "paperly_agent_secret" "paperly_agent_external_db_host_override" "paperly_agent_external_db_user_override" "paperly_agent_external_db_password_override" "paperly_agent_external_db_name_override" "paperly_open_in_new_tab"
+
   # Others
   "xml_dir" "file_dir" "api_key" "schooldata_import_frequency" "maintenance_mode"
 );
@@ -261,10 +267,6 @@ truncateTables() {
 
 webCrawlerOff() {
     mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='0' WHERE name='web_crawlers_enabled'";
-}
-
-intellischoolSyncDisable() {
-    mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value = '' WHERE name = 'intellischool_deployment_secret'";
 }
 
 liveCheck() {
@@ -889,7 +891,6 @@ if [ "$destination_site_type" = 'dev' ]; then
 	setdebugstacktrace;
 	truncateTables;
 	webCrawlerOff;
-	intellischoolSyncDisable;
 fi
 if [ "$destination_site_type" = 'stg' ]; then
 	titleprefix='[Staging]';
@@ -899,7 +900,6 @@ if [ "$destination_site_type" = 'stg' ]; then
 	setdebugstacktrace;
 	truncateTables;
 	webCrawlerOff;
-	intellischoolSyncDisable;
 fi
 
 # Truncate storage_transform table if it is a DB only sync
