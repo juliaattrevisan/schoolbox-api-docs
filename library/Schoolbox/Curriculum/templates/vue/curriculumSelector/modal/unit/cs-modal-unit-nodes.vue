@@ -12,7 +12,13 @@ const store = useUnitNodesStore();
 <template>
     <div class="nodes-container">
         <ul v-if="store.hasLoaded" class="nodes l-flex-col">
-            <cs-modal-unit-node v-for="node in store.nodes" :key="node.id" :node="node" :depth="0" />
+            <cs-modal-unit-node
+                v-for="node in store.nodes"
+                :key="node.id"
+                :node="node"
+                :depth="0"
+                :is-expanded="true"
+            />
         </ul>
     </div>
 </template>

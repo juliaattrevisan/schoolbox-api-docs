@@ -11,6 +11,7 @@ import { useModalSelectedNodesStore } from "../../store/csModalSelectedNodesStor
 interface Props {
     node: Node; // the assigned node to display
     depth: number; // the depth of the node in the tree
+    isExpanded: boolean; // whether the node is expanded or not
 }
 
 const props = defineProps<Props>();
@@ -21,6 +22,15 @@ const extraId = generateUUID(); // to ensure the input/label id is unique
 const showChildren = props.node.children && props.node.children.length > 0; // To determine whether we need to display further child nodes within this node
 const hasCode = props.node.code && props.node.code !== ""; // If there's a code, it can be selected
 const fontWeight = props.depth === 0 ? "bold" : "normal"; // so the top most nodes are bold
+const showExpandButton = props.depth === 0 && props.node.children && props.node.children.length > 0; // show the expand button when the node has children, and onlyShowGaps is not active
+const isNodeExpanded = window.Vue.ref(props.isExpanded); // to track whether the node is expanded or not
+
+/**
+ * Expand or collapse the children of the node
+ */
+function onExpandSelected(): void {
+    isNodeExpanded.value = !isNodeExpanded.value; // toggle the expanded state
+}
 
 /**
  * Update the status of the checkbox based on whether it's selected or not
@@ -40,25 +50,38 @@ function onChange($isChecked: boolean): void {
 </script>
 
 <template>
-    <li>
-        <div class="node l-pad-xs--vert">
-            <div v-if="hasCode" class="checklist l-gap-xs">
-                <input
-                    :id="`checkbox-${props.node.id}__${extraId}`"
-                    type="checkbox"
-                    :value="props.node.id"
-                    :checked="isChecked"
-                    @change="onChange(($event.target as HTMLInputElement).checked)"
-                />
-                <label
-                    class="node__name f-no-margins"
-                    :for="`checkbox-${props.node.id}__${extraId}`"
-                    :data-test="`cs-modal-unit-node-checkbox-label-${props.node.id}`"
+    <li v-if="props.isExpanded">
+        <div class="node l-gap-xs l-pad-xs--vert">
+            <div :class="{ 'l-flex l-flex--align-center l-gap-xs f-no-margins': showExpandButton }">
+                <button
+                    v-if="showExpandButton"
+                    class="l-flex l-flex--center l-flex__item--0-shrink f-no-bkg"
+                    :aria-label="isNodeExpanded ? 'Collapse' : 'Expand'"
+                    :title="isNodeExpanded ? 'Collapse' : 'Expand'"
+                    :data-test="`cc-report-table-node-expand-button-${props.node.id}`"
+                    @click="onExpandSelected"
                 >
-                    {{ title }}
-                </label>
+                    <sbx-icon v-if="isNodeExpanded" name="up-arrow" />
+                    <sbx-icon v-else name="down-arrow" />
+                </button>
+                <div v-if="hasCode" class="checklist l-gap-xs">
+                    <input
+                        :id="`checkbox-${props.node.id}__${extraId}`"
+                        type="checkbox"
+                        :value="props.node.id"
+                        :checked="isChecked"
+                        @change="onChange(($event.target as HTMLInputElement).checked)"
+                    />
+                    <label
+                        class="node__name f-no-margins"
+                        :for="`checkbox-${props.node.id}__${extraId}`"
+                        :data-test="`cs-modal-unit-node-checkbox-label-${props.node.id}`"
+                    >
+                        {{ title }}
+                    </label>
+                </div>
+                <h3 v-else class="node__name f-no-margins">{{ title }}</h3>
             </div>
-            <h3 v-else class="node__name f-no-margins">{{ title }}</h3>
         </div>
         <template v-if="showChildren">
             <ul>
@@ -67,6 +90,7 @@ function onChange($isChecked: boolean): void {
                     :key="viewNode.id"
                     :node="viewNode"
                     :depth="props.depth + 1"
+                    :is-expanded="isNodeExpanded"
                 />
             </ul>
         </template>
