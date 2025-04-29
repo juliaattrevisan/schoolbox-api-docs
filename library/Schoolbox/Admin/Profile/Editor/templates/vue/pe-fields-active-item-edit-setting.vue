@@ -51,6 +51,22 @@ const fieldSettingDefinition = window.Vue.computed(() => {
 });
 
 /**
+ * The available options for the current field setting
+ */
+const availableFieldSettingOptions = window.Vue.computed(() => {
+    return peStore.fieldSettings[props.fieldSettingKey].options.filter((option) => {
+        const availability = props.field.availableFieldSettings[props.fieldSettingKey];
+        if (availability === undefined) {
+            return false;
+        }
+        if (typeof availability === "boolean") {
+            return availability;
+        }
+        return availability[option.id];
+    });
+});
+
+/**
  * When a field setting option is changed
  * @param fieldSettingOption - the field setting option
  * @param isChecked - whether the option is checked
@@ -81,7 +97,7 @@ window.Vue.onMounted(() => {
         </label>
         <div class="checklist">
             <ul class="option-list">
-                <li v-for="fieldSettingOption in fieldSettingDefinition.options" :key="fieldSettingOption.id">
+                <li v-for="fieldSettingOption in availableFieldSettingOptions" :key="fieldSettingOption.id">
                     <input
                         :id="getLabelKeyForOption(fieldSettingOption)"
                         type="checkbox"

@@ -39,6 +39,11 @@ export type ProfileEditorSelectedField = {
     terminology: string | null; // The terminology key for the field, if it exists - maps to l10n
     // A map of each field setting key relevant to the field to an array of the ids of each selected option
     fieldSettings: Record<ProfileEditorFieldSettingKey, ProfileEditorFieldSettingOption["id"][]>;
+    // Whether each field setting is available (should display) for the field
+    availableFieldSettings: Record<
+        ProfileEditorFieldSettingKey,
+        boolean | Record<ProfileEditorFieldSettingOption["id"], boolean>
+    >;
 };
 
 export type ProfileEditorMandatoryField = {
@@ -49,6 +54,11 @@ export type ProfileEditorMandatoryField = {
     terminology: string | null; // The terminology key for the field, if it exists - maps to l10n
     // A map of each field setting key relevant to the field to an array of the ids of each selected option
     fieldSettings: Record<ProfileEditorFieldSettingKey, ProfileEditorFieldSettingOption["id"][]>;
+    // Whether each field setting is available (should display) for the field
+    availableFieldSettings: Record<
+        ProfileEditorFieldSettingKey,
+        boolean | Record<ProfileEditorFieldSettingOption["id"], boolean>
+    >;
 };
 
 // An "Active" field is one that is currently shown on the profile page,

@@ -294,9 +294,21 @@ class Payload
                         /* Find the roletypes ("ids") for which this field might be visible
                          */
                         self::VISIBILITY_NODE => $field->getVisibility()?->indexBy('roleType')->keys(),
-                        /* Find the relevant additional settings for this field
+                        /* Find the enabled additional setting keys for this field
                          */
-                        self::ADDITIONAL_SETTINGS_NODE => [],
+                        self::ADDITIONAL_SETTINGS_NODE => array_keys(array_filter([
+                            'clickToReveal' => $field->getClickToReveal(),
+                        ], static fn($value) => !!$value)),
+                    ],
+                    'availableFieldSettings' => [
+                        self::AVAILABILITY_NODE => true,
+                        self::VISIBILITY_NODE => true,
+                        self::ADDITIONAL_SETTINGS_NODE => [
+                            /* clickToReveal is only available when the field has both an icon and css
+                             * (i.e. when it will be displayed as an alert box)
+                             */
+                            'clickToReveal' => $field->getCss() && $field->getIcon(),
+                        ]
                     ]
                 ];
             }
