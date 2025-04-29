@@ -365,7 +365,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
                  */
                 $lessonPlanTemplate = $this->lessonPlanTemplateMapper->findById((int)$templateId);
 
-                $data['lessonPlanMeta']['template'] = $lessonPlanTemplate->getId();
+                $data['lessonPlanMeta']['template'] = $lessonPlanTemplate;
 
                 /* Field list contains the ones from the Lesson Plan Template when creating
                  * When updating, it's actually fields from the Lesson Plan instance itself
