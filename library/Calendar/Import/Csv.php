@@ -179,6 +179,18 @@ class Csv extends Base
                 continue;
             }
 
+            /* Event name is too long
+             */
+            if (strlen(trim($name)) > self::MAX_EVENT_TITLE) {
+                $output[] = [
+                    'name'   => $name,
+                    'status' => 'Not Added',
+                    'error'  => 'Event name is too long',
+                ];
+
+                continue;
+            }
+
             /* Start date is mandatory
              */
             if (!strlen(trim($start_date))) {
