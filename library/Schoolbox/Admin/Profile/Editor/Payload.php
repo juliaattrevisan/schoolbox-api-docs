@@ -253,6 +253,21 @@ class Payload
                     continue;
                 }
 
+                $availableFieldSettings = $this->getFieldSettingsAvailability($field);
+
+                /* The default settings to set for this field when it gets selected
+                 */
+                $defaultFieldSettings = [
+                    self::AVAILABILITY_NODE => [],
+                    self::VISIBILITY_NODE => [],
+                    self::ADDITIONAL_SETTINGS_NODE => []
+                ];
+
+                // click to reveal is ON by default if it's available for the field
+                if ($availableFieldSettings[self::ADDITIONAL_SETTINGS_NODE]['clickToReveal']) {
+                    array_push($defaultFieldSettings[self::ADDITIONAL_SETTINGS_NODE], 'clickToReveal');
+                }
+
                 $roleTypeSettings['fields']['available'][] = [
                     'field' => $field->getField(),
                     'displayAs' => $field->getDisplayAs(),
@@ -260,7 +275,8 @@ class Payload
                     'css' => $field->getCss(),
                     'terminology' => $field->getTerm(),
                     'category' => $field->getIsExternal() ? self::FIELD_CATEGORY_EXTERNAL : self::FIELD_CATEGORY_INTERNAL,
-                    'availableFieldSettings' => $this->getFieldSettingsAvailability($field),
+                    'defaultFieldSettings' => $defaultFieldSettings,
+                    'availableFieldSettings' => $availableFieldSettings,
                 ];
             }
 
