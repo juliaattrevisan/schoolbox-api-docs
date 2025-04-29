@@ -71,7 +71,7 @@ window.Vue.onMounted(async () => {
                         data-tooltip
                         data-width="800"
                         class="has-tip hint"
-                        :title="field.description.replaceAll('\n', '<br>')"
+                        :title="field.description.replaceAll(/(\r\n)+/g, '<br>')"
                     >
                         ?
                     </span>
