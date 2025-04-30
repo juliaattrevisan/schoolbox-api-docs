@@ -341,13 +341,15 @@ HELP;
         if (!\count($templates)) {
             $templates = [];
 
+            $now = \Alaress_Date_Format::now()->getDatabase()
+
             $templates[] = [
                 'id' => null,
                 'title' => $titles['new'],
                 'enabled' => 1,
-                'created_at' => \Alaress_Date_Format::now()->getDatabase(),
+                'created_at' => $now,
                 'created_by' => $superuserId,
-                'updated_at' => \Alaress_Date_Format::now()->getDatabase(),
+                'updated_at' => $now,
                 'updated_by' => $superuserId,
                 'deleted_at' => null,
                 'deleted_by' => null,
