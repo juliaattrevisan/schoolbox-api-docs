@@ -288,6 +288,10 @@ HELP;
                          */
                         $index = (string)$title;
 
+                        /* Precompute visibility
+                         */
+                        $visibility = (int)$updatedField[3] ? Role::STUDENT : Role::STAFF;
+
                         if (isset($fields[$index])) {
                             $struct = $fields[$index];
 
@@ -303,7 +307,7 @@ HELP;
                                     'title' => $updatedField[0],
                                     'description' => $updatedField[1],
                                     'body' => $updatedField[2],
-                                    'visibility' => (int)$updatedField[3] ? Role::STUDENT : Role::STAFF,
+                                    'visibility' => $visibility,
                                     'sequence' => ++$sequence,
                                     'createdAt' => $this->now,
                                     'updatedAt' => $this->now,
@@ -324,7 +328,7 @@ HELP;
                                     'title' => $updatedField[0],
                                     'description' => $updatedField[1],
                                     'body' => $updatedField[2],
-                                    'visibility' => (int)$updatedField[3] ? Role::STUDENT : Role::STAFF,
+                                    'visibility' => $visibility,
                                     'sequence' => ++$sequence,
                                     'createdAt' => $this->now,
                                     'updatedAt' => $this->now,
