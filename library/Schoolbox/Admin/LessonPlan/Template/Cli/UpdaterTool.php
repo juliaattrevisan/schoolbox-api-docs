@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\LessonPlan\Template\Cli;
 
 use Schoolbox\Application\CliTool;
+use Schoolbox\UserMapper;
 
 class UpdaterTool extends CliTool\App
 {
@@ -108,6 +109,10 @@ HELP;
                 WHERE title = :title
             ");
 
+            /* This is alaress admin
+             */
+            $superuserId = $this->findSuperuserId();
+
             /* Each lesson plan template update comes in a csv file. Find all the lesson plan templates that match the
              * title specified in the csv, updating each of them synonymously.
              *
@@ -152,9 +157,9 @@ HELP;
                         'title' => null,
                         'enabled' => 1,
                         'created_at' => \Alaress_Date_Format::now()->getDatabase(),
-                        'created_by' => 1,
+                        'created_by' => $superuserId,
                         'updated_at' => \Alaress_Date_Format::now()->getDatabase(),
-                        'updated_by' => 1,
+                        'updated_by' => $superuserId,
                         'deleted_at' => null,
                         'deleted_by' => null,
                     ];
@@ -231,6 +236,31 @@ HELP;
         $this->getLogger()->debug('Releasing lock');
 
         $lock->release();
+    }
+
+
+    /**
+     * Find the first guy who used the alaress superuser username
+     *
+     * @return int|null
+     */
+    private function findSuperuserId(): ?int
+    {
+        /* This is alaress admin
+         */
+        $superuser = $this->getDatabaseInternal()->executeQuery("SELECT * FROM user WHERE username = :username LIMIT 1", [
+            'username' => UserMapper::USERNAME_ALARESS_ADMIN
+        ])->fetch();
+
+        /* Can't find an alaress admin; we die
+         */
+        if (!$superuser) {
+            $this->getLogger()->warning('Superuser not found; skipping Lesson Plan Template Updates.');
+
+            return null;
+        }
+
+        return $superuser['id'];
     }
 
 
