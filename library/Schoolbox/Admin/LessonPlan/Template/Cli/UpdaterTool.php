@@ -284,12 +284,12 @@ HELP;
                         if (isset($fields[$index])) {
                             $struct = $fields[$index];
 
-                            if ($this->perform()) {
-                                $this->getLogger()->debug(sprintf(
-                                    'Updating existing field "%s"',
-                                    $struct['title']
-                                ));
+                            $this->getLogger()->debug(sprintf(
+                                'Updating existing field "%s"',
+                                $struct['title']
+                            ));
 
+                            if ($this->perform()) {
                                 $this->updateFieldStatement->execute([
                                     'id' => $struct['id'],
                                     'lessonPlanTemplateId' => $template['id'],
@@ -306,6 +306,24 @@ HELP;
                         } else {
                             /* If it doesn't exist, spawn it
                              */
+                            $this->getLogger()->debug(sprintf(
+                                'Creating new field "%s"',
+                                $updatedField[0]
+                            ));
+
+                            if ($this->perform()) {
+                                $this->createFieldStatement->execute([
+                                    'lessonPlanTemplateId' => $template['id'],
+                                    'title' => $updatedField[0],
+                                    'description' => $updatedField[1],
+                                    'body' => $updatedField[2],
+                                    'visibility' => (int)$updatedField[3] ? Role::STUDENT : Role::STAFF,
+                                    'sequence' => ++$sequence,
+                                    'createdAt' => $this->now,
+                                    'updatedAt' => $this->now,
+                                    'deletedAt' => null,
+                                ]);
+                            }
                         }
 //
 //                    /* Delete any field that was untouched by the update process.
