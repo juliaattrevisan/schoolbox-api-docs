@@ -173,6 +173,10 @@ HELP;
                             'id' => $template['id'],
                             'title' => $titles['new']
                         ]);
+
+                        /* We'll need this later: fields are associated with a template
+                         */
+                        $templateId = (int)$template['id'];
                     } else {
                         /* Create a new one, I guess
                          */
@@ -191,10 +195,13 @@ HELP;
                             'deletedAt' => $template['deleted_at'],
                             'deletedBy' => $template['deleted_by']
                         ]);
+
+                        /* We'll need this later: fields are associated with a template
+                         */
+                        $templateId = (int)$this->getDatabaseInternal()->lastInsertId();
                     }
 
-//                    $template['id'] = $newId;
-//
+                    print_r($templateId);
 //                    /* Find all the existing fields for this lesson plan template and store them in a lookup, marking
 //                     * them as deletable for now until we change that via csv processing, thus handling deletions
 //                     */
