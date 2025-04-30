@@ -36,6 +36,23 @@ class UpdaterTool extends CliTool\App
 
 
     /**
+     * Where the csv files live
+     */
+    private const PATH = '/usr/share/schoolbox/tools/assessment/lessonPlanTemplate';
+
+
+    /**
+     * Renamed templates and their corresponding csv files containing Lesson Plan Template Fields
+     */
+    private const SOURCE_FILES = [
+        '5E_Model_Lesson_Plan.csv' => [
+            'old' => '5E Model',
+            'new' => '5E Model Lesson Plan'
+        ],
+    ];
+
+
+    /**
      * @inheritdoc
      */
     public function getLongOpts(): array
@@ -95,76 +112,89 @@ HELP;
              * Schools should be encouraged to rename their customised templates away, if they want to keep their
              * contents, before we invade their lesson plan templates.
              */
-            foreach ($csvs as $csv) {
+            foreach (self::SOURCE_FILES as $file => $titles) {
+                $fp = fopen(sprintf(
+                    '%s/%s',
+                    self::PATH,
+                    $file
+                ), 'r');
+
                 /* Prepare a csv, loading its fields into a local lookup: we might have to use this more than once.
+                 *
+                 * Index the csvs by their title, for lack of any reliable identifier
+                 * This might cause issues if template fields intentionally had the same title, but...that's weird
                  */
-                $updatedFields = fgetcsv($csv);
+                $updatedFields = [];
 
-                /* Find all the templates that match the csv's title
-                 */
-                $templates = $this->getDatabaseInternal()->query('select * from lesson plan templates where title = :title');
-
-                /* If none exist, create one
-                 */
-                if (!count($candidateTemplates)) {
-                    $templates = [];
-
-                    $templates[] = [
-                        'id' => null
-                    ];
+                while ($row = fgetcsv($fp)) {
+                    $updatedFields[$row[0]] = $row;
                 }
 
-                foreach ($templates as $template) {
-                    /* Each template consists of multiple fields, which may or may not match the ones specified in the csv.
-                     * Presume to remove everything *unless* it was referenced in the csv, thus handling deletions.
-                     * This means that if a school created lesson plan template fields, we'll be removing them, forcing
-                     * the template to match our csv spec.
-                     */
-                    $template['name'] = $newValue;
-                    $template->save();
-
-                    $template['id'] = $newId;
-
-                    /* Find all the existing fields for this lesson plan template and store them in a lookup, marking
-                     * them as deletable for now until we change that via csv processing, thus handling deletions
-                     */
-                    $fields = $template->getFields()->indexBy('id');
-
-                    foreach ($fields as &$field) {
-                        $field[$field['title']]['deleted_at'] = true;
-                    }
-
-                    unset($field);
-
-                    /* Iterate through each csv's contents.
-                     *
-                     * If the field matches, update its description and body contents, then unset its delete flag
-                     * because we want to keep this
-                     *
-                     * If it doesn't exist, spawn it
-                     */
-                    foreach ($updatedFields as $updatedField) {
-                        $index = $field[$updatedField['title']];
-
-                        if (isset($fields[$index])) {
-                            $field[$index]['lesson_plan_template_id'] = $template['id'];
-                            $field[$index]['body'] = $newValue;
-                            $field[$index]['description'] = $newValue;
-                            $field[$index]['deleted_at'] = null;
-
-                            $field[$index]->save();
-                        }
-                    }
-
-                    /* Delete any field that was untouched by the update process.
-                     * This field no longer exists according to the csv.
-                     */
-                    foreach ($fields as $field) {
-                        if (null !== $field['deleted_at']) {
-                            $field->delete();
-                        }
-                    }
-                }
+//                /* Find all the templates that match the csv's title
+//                 */
+//                $templates = $this->getDatabaseInternal()->query('select * from lesson plan templates where title = :title');
+//
+//                /* If none exist, create one
+//                 */
+//                if (!count($candidateTemplates)) {
+//                    $templates = [];
+//
+//                    $templates[] = [
+//                        'id' => null
+//                    ];
+//                }
+//
+//                foreach ($templates as $template) {
+//                    /* Each template consists of multiple fields, which may or may not match the ones specified in the csv.
+//                     * Presume to remove everything *unless* it was referenced in the csv, thus handling deletions.
+//                     * This means that if a school created lesson plan template fields, we'll be removing them, forcing
+//                     * the template to match our csv spec.
+//                     */
+//                    $template['name'] = $newValue;
+//                    $template->save();
+//
+//                    $template['id'] = $newId;
+//
+//                    /* Find all the existing fields for this lesson plan template and store them in a lookup, marking
+//                     * them as deletable for now until we change that via csv processing, thus handling deletions
+//                     */
+//                    $fields = $template->getFields()->indexBy('id');
+//
+//                    foreach ($fields as &$field) {
+//                        $field[$field['title']]['deleted_at'] = true;
+//                    }
+//
+//                    unset($field);
+//
+//                    /* Iterate through each csv's contents.
+//                     *
+//                     * If the field matches, update its description and body contents, then unset its delete flag
+//                     * because we want to keep this
+//                     *
+//                     * If it doesn't exist, spawn it
+//                     */
+//                    foreach ($updatedFields as $updatedField) {
+//                        $index = $field[$updatedField['title']];
+//
+//                        if (isset($fields[$index])) {
+//                            $field[$index]['lesson_plan_template_id'] = $template['id'];
+//                            $field[$index]['body'] = $newValue;
+//                            $field[$index]['description'] = $newValue;
+//                            $field[$index]['deleted_at'] = null;
+//
+//                            $field[$index]->save();
+//                        }
+//                    }
+//
+//                    /* Delete any field that was untouched by the update process.
+//                     * This field no longer exists according to the csv.
+//                     */
+//                    foreach ($fields as $field) {
+//                        if (null !== $field['deleted_at']) {
+//                            $field->delete();
+//                        }
+//                    }
+//                }
             }
 
             $this->getLogger()->info('');
