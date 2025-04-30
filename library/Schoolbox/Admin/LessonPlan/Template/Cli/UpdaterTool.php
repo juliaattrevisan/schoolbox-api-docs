@@ -268,6 +268,9 @@ HELP;
                             $fields[$index]['deleted_by'] = null;
 
                             print_r($fields[$index]);
+                        } else {
+                            /* If it doesn't exist, spawn it
+                             */
                         }
 //
 //                    /* Delete any field that was untouched by the update process.
