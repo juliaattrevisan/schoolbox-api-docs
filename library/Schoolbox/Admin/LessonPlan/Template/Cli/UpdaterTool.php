@@ -153,13 +153,6 @@ HELP;
              * contents, before we invade their lesson plan templates.
              */
             foreach (self::SOURCE_FILES as $file => $titles) {
-                /* Prepare a csv, loading its fields into a local lookup: we might have to use this more than once.
-                 *
-                 * Index the csvs by their title, for lack of any reliable identifier
-                 * This might cause issues if template fields intentionally had the same title, but...that's weird
-                 */
-                $updatedFields = $this->indexUpdatedFields($file);
-
                 /* Find all the templates that match the csv's title
                  */
                 $templates = $this->findCandidateTemplates($titles, $superuserId);
@@ -225,17 +218,26 @@ HELP;
 
                     unset($field);
 
-                    print_r($templateId);
-                    print_r($fields);
+                    /* Prepare a csv, loading its fields into a local lookup: we might have to use this more than once.
+                     *
+                     * Index the csvs by their title, for lack of any reliable identifier
+                     * This might cause issues if template fields intentionally had the same title, but...that's weird
+                     */
+                    $updatedFields = $this->indexUpdatedFields($file);
 
-//                    /* Iterate through each csv's contents.
-//                     *
-//                     * If the field matches, update its description and body contents, then unset its delete flag
-//                     * because we want to keep this
-//                     *
-//                     * If it doesn't exist, spawn it
-//                     */
-//                    foreach ($updatedFields as $updatedField) {
+                    /* Iterate through each csv's contents.
+                     *
+                     * If the field matches, update its description and body contents, then unset its delete flag
+                     * because we want to keep this
+                     *
+                     * If it doesn't exist, spawn it
+                     */
+                    foreach ($updatedFields as $updatedField) {
+                        print_r($templateId);
+                        print_r($fields);
+                        print_r($updatedField);
+
+
 //                        $index = $field[$updatedField['title']];
 //
 //                        if (isset($fields[$index])) {
@@ -255,7 +257,7 @@ HELP;
 //                        if (null !== $field['deleted_at']) {
 //                            $field->delete();
 //                        }
-//                    }
+                    }
                 }
             }
 
