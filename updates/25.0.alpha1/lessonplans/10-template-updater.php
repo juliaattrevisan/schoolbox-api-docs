@@ -8,5 +8,5 @@
 
 declare(strict_types=1);
 
-passthru('php ' . __DIR__ .  '/../../../tools/assessment/lessonPlanTemplate/template-updater.php --perform', $resultCode);
+passthru('php ' . __DIR__ .  '/../../../tools/assessment/lessonPlanTemplate/template-updater.php', $resultCode);
 exit($resultCode);
