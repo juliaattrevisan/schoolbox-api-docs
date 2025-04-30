@@ -61,6 +61,7 @@ class UpdaterTool extends CliTool\App
     private \PDOStatement $candidateTemplateStatement;
     private \PDOStatement $renameTemplateStatement;
     private \PDOStatement $createTemplateStatement;
+    private \PDOStatement $templateFieldsStatement;
 
 
     /**
@@ -129,6 +130,14 @@ HELP;
                 INSERT INTO lesson_plan_template
                 (title, enabled, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by)
                 VALUES (:title, :enabled, :createdAt, :createdBy, :updatedAt, :updatedBy, :deletedAt, :deletedBy)
+            ");
+
+            $this->templateFieldsStatement = $this->getDatabaseInternal()->prepare("
+                SELECT *
+                FROM lesson_plan_template_field
+                WHERE lesson_plan_template_id = :templateId
+                AND deleted_at IS NULL
+                ORDER BY sequence
             ");
 
             /* This is alaress admin
@@ -202,10 +211,14 @@ HELP;
                     }
 
                     print_r($templateId);
-//                    /* Find all the existing fields for this lesson plan template and store them in a lookup, marking
-//                     * them as deletable for now until we change that via csv processing, thus handling deletions
-//                     */
-//                    $fields = $template->getFields()->indexBy('id');
+
+                    /* Find all the existing fields for this lesson plan template and store them in a lookup, marking
+                     * them as deletable for now until we change that via csv processing, thus handling deletions
+                     */
+                    $fields = $this->findFields($templateId);;
+
+
+                    print_r($fields);
 //
 //                    foreach ($fields as &$field) {
 //                        $field[$field['title']]['deleted_at'] = true;
@@ -341,7 +354,7 @@ HELP;
         if (!\count($templates)) {
             $templates = [];
 
-            $now = \Alaress_Date_Format::now()->getDatabase()
+            $now = \Alaress_Date_Format::now()->getDatabase();
 
             $templates[] = [
                 'id' => null,
@@ -357,6 +370,31 @@ HELP;
         }
 
         return $templates;
+    }
+
+
+    /**
+     * Find all the existing fields for this lesson plan template and store them in a lookup, marking
+     * them as deletable for now until we change that via csv processing, thus handling deletions
+     *
+     * @param int $templateId
+     * @return array
+     */
+    private function findFields(int $templateId): array
+    {
+        $this->templateFieldsStatement->execute([
+            'templateId' => $templateId,
+        ]);
+
+        $fields = $this->templateFieldsStatement->fetchAll(\PDO::FETCH_ASSOC);
+
+        $stack = [];
+
+        foreach ($fields as $field) {
+            $stack[$field['title']] = $field;
+        }
+
+        return $stack;
     }
 
 
