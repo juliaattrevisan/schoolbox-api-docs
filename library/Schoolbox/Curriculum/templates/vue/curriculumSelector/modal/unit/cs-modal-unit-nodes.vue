@@ -28,13 +28,14 @@ const store = useUnitNodesStore();
     max-height: 650px;
     overflow: auto;
 }
+
 .nodes {
-    /* move the spacing in a bit */
-    margin-inline-start: var(--spacing-s);
-    margin-block-end: 0;
-    padding-inline-start: var(--spacing-s);
+    /* remove the margin/spacing as the first node does not have a bullet */
+    margin-inline-start: 0;
+    padding-inline-start: 0;
 }
-.nodes li ul {
-    margin-inline-start: var(--spacing-xs);
+
+.nodes > li {
+    list-style-type: none; /* remove the bullets on the top level nodes */
 }
 </style>

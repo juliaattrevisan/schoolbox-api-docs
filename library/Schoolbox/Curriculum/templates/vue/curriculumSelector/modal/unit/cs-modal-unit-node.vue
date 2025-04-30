@@ -23,6 +23,7 @@ const extraId = generateUUID(); // to ensure the input/label id is unique
 const showChildren = props.node.children && props.node.children.length > 0; // To determine whether we need to display further child nodes within this node
 const hasCode = props.node.code && props.node.code !== ""; // If there's a code, it can be selected
 const fontWeight = props.depth === 0 ? "bold" : "normal"; // so the top most nodes are bold
+const marginStart = props.depth === 0 ? "var(--spacing-xl)" : "var(--spacing-s)"; // add more margin on the first node directly below the top level node
 const isNodeExpanded = window.Vue.ref(props.isExpanded); // to track whether the node is expanded or not
 
 /**
@@ -106,7 +107,7 @@ function onChange($isChecked: boolean): void {
 
 <style scoped>
 .node:not(:last-child) {
-    border-bottom: 1px solid var(--body-background);
+    border-bottom: 1px solid var(--body-background); /* don't add borders on the last nodes for better readability */
 }
 
 .checklist {
@@ -125,6 +126,6 @@ function onChange($isChecked: boolean): void {
 }
 
 ul li ul {
-    margin-inline-start: var(--spacing-s);
+    margin-inline-start: v-bind(marginStart);
 }
 </style>
