@@ -135,6 +135,7 @@ HELP;
                 SELECT *
                 FROm lesson_plan_template
                 WHERE title = :title
+                AND deleted_at IS NULL
             ");
 
             $this->renameTemplateStatement = $this->getDatabaseInternal()->prepare("
