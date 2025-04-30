@@ -54,6 +54,14 @@ class UpdaterTool extends CliTool\App
 
 
     /**
+     * Some prepared statements
+     *
+     * @var \PDOStatement
+     */
+    private \PDOStatement $candidateTemplateStatement;
+
+
+    /**
      * @inheritdoc
      */
     public function getLongOpts(): array
@@ -103,7 +111,7 @@ HELP;
 
             /* Prepare some oft-used queries
              */
-            $candidateTemplateStatement = $this->getDatabaseInternal()->prepare("
+            $this->candidateTemplateStatement = $this->getDatabaseInternal()->prepare("
                 SELECT *
                 FROm lesson_plan_template
                 WHERE title = :title
@@ -131,29 +139,9 @@ HELP;
 
                 /* Find all the templates that match the csv's title
                  */
-                $candidateTemplateStatement->execute([
-                    'title' => $titles['old']
-                ]);
+                $templates = $this->findCandidateTemplates($titles, $superuserId);
 
-                $templates = $candidateTemplateStatement->fetchAll();
-
-                /* If none exist, create one and shim it in with some default values
-                 */
-                if (!\count($templates)) {
-                    $templates = [];
-
-                    $templates[] = [
-                        'id' => null,
-                        'title' => null,
-                        'enabled' => 1,
-                        'created_at' => \Alaress_Date_Format::now()->getDatabase(),
-                        'created_by' => $superuserId,
-                        'updated_at' => \Alaress_Date_Format::now()->getDatabase(),
-                        'updated_by' => $superuserId,
-                        'deleted_at' => null,
-                        'deleted_by' => null,
-                    ];
-                }
+                print_r($templates);
 
 //                foreach ($templates as $template) {
 //                    /* Each template consists of multiple fields, which may or may not match the ones specified in the csv.
@@ -279,6 +267,46 @@ HELP;
         }
 
         return $updatedFields;
+    }
+
+
+    /**
+     * Find all the lesson plan templates that match $titles['old']
+     * cos we're about to rename those ones
+     *
+     * @param array $titles
+     * @param int $superuserId
+     * @return array
+     */
+    private function findCandidateTemplates(array $titles, int $superuserId): array
+    {
+        /* Find all the templates that match the csv's title
+         */
+        $this->candidateTemplateStatement->execute([
+            'title' => $titles['old']
+        ]);
+
+        $templates = $this->candidateTemplateStatement->fetchAll();
+
+        /* If none exist, create one and shim it in with some default values
+         */
+        if (!\count($templates)) {
+            $templates = [];
+
+            $templates[] = [
+                'id' => null,
+                'title' => null,
+                'enabled' => 1,
+                'created_at' => \Alaress_Date_Format::now()->getDatabase(),
+                'created_by' => $superuserId,
+                'updated_at' => \Alaress_Date_Format::now()->getDatabase(),
+                'updated_by' => $superuserId,
+                'deleted_at' => null,
+                'deleted_by' => null,
+            ];
+        }
+
+        return $templates;
     }
 
 
