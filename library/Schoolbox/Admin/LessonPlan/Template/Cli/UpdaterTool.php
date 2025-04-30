@@ -59,6 +59,8 @@ class UpdaterTool extends CliTool\App
      * @var \PDOStatement
      */
     private \PDOStatement $candidateTemplateStatement;
+    private \PDOStatement $renameTemplateStatement;
+    private \PDOStatement $createTemplateStatement;
 
 
     /**
@@ -117,6 +119,18 @@ HELP;
                 WHERE title = :title
             ");
 
+            $this->renameTemplateStatement = $this->getDatabaseInternal()->prepare("
+                UPDATE lesson_plan_template
+                SET title = :title
+                WHERE id = :id
+            ");
+
+            $this->createTemplateStatement = $this->getDatabaseInternal()->prepare("
+                INSERT INTO lesson_plan_template
+                (title, enabled, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by)
+                VALUES (:title, :enabled, :createdAt, :createdBy, :updatedAt, :updatedBy, :deletedAt, :deletedBy)
+            ");
+
             /* This is alaress admin
              */
             $superuserId = $this->findSuperuserId();
@@ -141,17 +155,44 @@ HELP;
                  */
                 $templates = $this->findCandidateTemplates($titles, $superuserId);
 
-                print_r($templates);
+                foreach ($templates as $template) {
+                    /* Each template consists of multiple fields, which may or may not match the ones specified in the csv.
+                     * Presume to remove everything *unless* it was referenced in the csv, thus handling deletions.
+                     * This means that if a school created lesson plan template fields, we'll be removing them, forcing
+                     * the template to match our csv spec.
+                     */
+                    if ($template['id']) {
+                        $this->getLogger()->info(sprintf(
+                            'Reusing existing lesson plan template "%s" (id: %s) and renaming it to %s',
+                            $titles['old'],
+                            $template['id'],
+                            $titles['new']
+                        ));
 
-//                foreach ($templates as $template) {
-//                    /* Each template consists of multiple fields, which may or may not match the ones specified in the csv.
-//                     * Presume to remove everything *unless* it was referenced in the csv, thus handling deletions.
-//                     * This means that if a school created lesson plan template fields, we'll be removing them, forcing
-//                     * the template to match our csv spec.
-//                     */
-//                    $template['name'] = $newValue;
-//                    $template->save();
-//
+                        $this->renameTemplateStatement->execute([
+                            'id' => $template['id'],
+                            'title' => $titles['new']
+                        ]);
+                    } else {
+                        /* Create a new one, I guess
+                         */
+                        $this->getLogger()->info(sprintf(
+                            'Creating new lesson plan template "%s"',
+                            $titles['new']
+                        ));
+
+                        $this->createTemplateStatement->execute([
+                            'title' => $template['title'],
+                            'enabled' => $template['enabled'],
+                            'createdAt' => $template['created_at'],
+                            'createdBy' => $template['created_by'],
+                            'updatedAt' => $template['updated_at'],
+                            'updatedBy' => $template['updated_by'],
+                            'deletedAt' => $template['deleted_at'],
+                            'deletedBy' => $template['deleted_by']
+                        ]);
+                    }
+
 //                    $template['id'] = $newId;
 //
 //                    /* Find all the existing fields for this lesson plan template and store them in a lookup, marking
@@ -193,7 +234,7 @@ HELP;
 //                            $field->delete();
 //                        }
 //                    }
-//                }
+                }
             }
 
             $this->getLogger()->info('');
@@ -295,7 +336,7 @@ HELP;
 
             $templates[] = [
                 'id' => null,
-                'title' => null,
+                'title' => $titles['new'],
                 'enabled' => 1,
                 'created_at' => \Alaress_Date_Format::now()->getDatabase(),
                 'created_by' => $superuserId,
