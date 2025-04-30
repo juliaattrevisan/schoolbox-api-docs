@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\LessonPlan\Template\Cli;
 
 use Schoolbox\Application\CliTool;
+use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
 class UpdaterTool extends CliTool\App
@@ -62,6 +63,7 @@ class UpdaterTool extends CliTool\App
     private \PDOStatement $renameTemplateStatement;
     private \PDOStatement $createTemplateStatement;
     private \PDOStatement $templateFieldsStatement;
+    private \PDOStatement $createFieldStatement;
 
 
     /**
@@ -152,6 +154,12 @@ HELP;
                 WHERE lesson_plan_template_id = :templateId
                 AND deleted_at IS NULL
                 ORDER BY sequence
+            ");
+
+            $this->createFieldStatement = $this->getDatabaseInternal()->prepare("
+                INSERT INTO lesson_plan_template_field
+                (lesson_plan_template_id, title, body, description, visibility, sequence, created_at, updated_at, deleted_at)
+                VALUES (:lessonPlanTemplateId, :title, :body, :description, :visiblity, :sequence, :createdAt, :updatedAt, :deletedAt)
             ");
 
             /* This is alaress admin
@@ -260,12 +268,10 @@ HELP;
                             $fields[$index]['title'] = $updatedField[0];
                             $fields[$index]['description'] = $updatedField[1];
                             $fields[$index]['body'] = $updatedField[2];
+                            $fields[$index]['visibility'] = (int)$updatedField[3] ? Role::STUDENT : Role::STAFF;
                             $fields[$index]['created_at'] = $this->now;
-                            $fields[$index]['created_by'] = $this->superuserId;
                             $fields[$index]['updated_at'] = $this->now;
-                            $fields[$index]['updated_by'] = $this->superuserId;
                             $fields[$index]['deleted_at'] = null;
-                            $fields[$index]['deleted_by'] = null;
 
                             print_r($fields[$index]);
                         } else {
