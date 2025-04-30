@@ -302,12 +302,12 @@ class Mapper extends BaseMapper
 
                 // Don't override results already set
                 if (!$matchup->getHomeTeamResult()) {
-                    if ($teamId === $matchup->getHomeTeam()->getId()) {
+                    if ($teamId === $matchup->getHomeTeam()?->getId()) {
                         $matchup->setHomeTeamResult($result);
                     }
                 }
                 if (!$matchup->getAwayTeamResult()) {
-                    if ($teamId === $matchup->getAwayTeam()->getId()) {
+                    if ($teamId === $matchup->getAwayTeam()?->getId()) {
                         $matchup->setAwayTeamResult($result);
                     }
                 }
