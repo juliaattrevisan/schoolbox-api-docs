@@ -124,12 +124,13 @@ function onTabSelected(tab: string): void {
     >
         <template #sequence-1>
             <div class="l-flex-col l-gap-m">
+                <h2 class="f-no-margins">Browse Curriculum</h2>
                 <dl v-if="props.hasTabs" ref="tabsEl" class="tabs">
                     <dd :class="{ active: currentTab === current }">
-                        <a @click="onTabSelected(current)">Current Curriculum</a>
+                        <a @click="onTabSelected(current)">Current</a>
                     </dd>
                     <dd :class="{ active: currentTab === all }">
-                        <a @click="onTabSelected(all)">All Curriculum</a>
+                        <a @click="onTabSelected(all)">All</a>
                     </dd>
                 </dl>
                 <cs-modal-unit-nodes v-if="currentTab === current" />
