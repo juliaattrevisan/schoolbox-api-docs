@@ -122,22 +122,12 @@ HELP;
              * contents, before we invade their lesson plan templates.
              */
             foreach (self::SOURCE_FILES as $file => $titles) {
-                $fp = fopen(sprintf(
-                    '%s/%s',
-                    self::PATH,
-                    $file
-                ), 'r');
-
                 /* Prepare a csv, loading its fields into a local lookup: we might have to use this more than once.
                  *
                  * Index the csvs by their title, for lack of any reliable identifier
                  * This might cause issues if template fields intentionally had the same title, but...that's weird
                  */
-                $updatedFields = [];
-
-                while ($row = fgetcsv($fp)) {
-                    $updatedFields[$row[0]] = $row;
-                }
+                $updatedFields = $this->indexUpdatedFields($file);
 
                 /* Find all the templates that match the csv's title
                  */
@@ -261,6 +251,34 @@ HELP;
         }
 
         return $superuser['id'];
+    }
+
+
+    /**
+     * Index updated fields by their titles, for quick lookup
+     * @param string $file
+     * @return array
+     */
+    private function indexUpdatedFields(string $file): array
+    {
+        $fp = fopen(sprintf(
+            '%s/%s',
+            self::PATH,
+            $file
+        ), 'r');
+
+        /* Prepare a csv, loading its fields into a local lookup: we might have to use this more than once.
+         *
+         * Index the csvs by their title, for lack of any reliable identifier
+         * This might cause issues if template fields intentionally had the same title, but...that's weird
+         */
+        $updatedFields = [];
+
+        while ($row = fgetcsv($fp)) {
+            $updatedFields[$row[0]] = $row;
+        }
+
+        return $updatedFields;
     }
 
 
