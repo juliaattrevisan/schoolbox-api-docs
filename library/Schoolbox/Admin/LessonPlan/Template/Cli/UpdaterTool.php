@@ -102,7 +102,11 @@ HELP;
 
             /* Prepare some oft-used queries
              */
-
+            $candidateTemplateStatement = $this->getDatabaseInternal()->prepare("
+                SELECT *
+                FROm lesson_plan_template
+                WHERE title = :title
+            ");
 
             /* Each lesson plan template update comes in a csv file. Find all the lesson plan templates that match the
              * title specified in the csv, updating each of them synonymously.
@@ -130,10 +134,14 @@ HELP;
                     $updatedFields[$row[0]] = $row;
                 }
 
-//                /* Find all the templates that match the csv's title
-//                 */
-//                $templates = $this->getDatabaseInternal()->query('select * from lesson plan templates where title = :title');
-//
+                /* Find all the templates that match the csv's title
+                 */
+                $candidateTemplateStatement->execute([
+                    'title' => $titles['old']
+                ]);
+
+                $templates = $candidateTemplateStatement->fetchAll();
+
 //                /* If none exist, create one
 //                 */
 //                if (!count($candidateTemplates)) {
