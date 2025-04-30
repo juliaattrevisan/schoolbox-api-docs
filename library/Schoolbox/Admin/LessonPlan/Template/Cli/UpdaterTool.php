@@ -64,6 +64,7 @@ class UpdaterTool extends CliTool\App
     private \PDOStatement $createTemplateStatement;
     private \PDOStatement $templateFieldsStatement;
     private \PDOStatement $createFieldStatement;
+    private \PDOStatement $updateFieldStatement;
 
 
     /**
@@ -159,8 +160,23 @@ HELP;
             $this->createFieldStatement = $this->getDatabaseInternal()->prepare("
                 INSERT INTO lesson_plan_template_field
                 (lesson_plan_template_id, title, body, description, visibility, sequence, created_at, updated_at, deleted_at)
-                VALUES (:lessonPlanTemplateId, :title, :body, :description, :visiblity, :sequence, :createdAt, :updatedAt, :deletedAt)
+                VALUES (:lessonPlanTemplateId, :title, :body, :description, :visibility, :sequence, :createdAt, :updatedAt, :deletedAt)
             ");
+
+            $this->updateFieldStatement = $this->getDatabaseInternal()->prepare("
+                UPDATE lesson_plan_template_field
+                SET lesson_plan_template_id = :lessonPlanTemplateId,
+                    title = :title,
+                    body = :body,
+                    description = :description,
+                    visibility = :visibility,
+                    sequence = :sequence,
+                    created_at = :createdAt,
+                    updated_at = :updatedAt,
+                    deleted_at = :deletedAt
+                WHERE id = :id
+            ");
+
 
             /* This is alaress admin
              */
@@ -268,17 +284,25 @@ HELP;
                         if (isset($fields[$index])) {
                             $struct = $fields[$index];
 
-                            $struct['lesson_plan_template_id'] = $template['id'];
-                            $struct['title'] = $updatedField[0];
-                            $struct['description'] = $updatedField[1];
-                            $struct['body'] = $updatedField[2];
-                            $struct['visibility'] = (int)$updatedField[3] ? Role::STUDENT : Role::STAFF;
-                            $struct['sequence'] = ++$sequence;
-                            $struct['created_at'] = $this->now;
-                            $struct['updated_at'] = $this->now;
-                            $struct['deleted_at'] = null;
+                            if ($this->perform()) {
+                                $this->getLogger()->debug(sprintf(
+                                    'Updating existing field "%s"',
+                                    $struct['title']
+                                ));
 
-                            print_r($struct);
+                                $this->updateFieldStatement->execute([
+                                    'id' => $struct['id'],
+                                    'lessonPlanTemplateId' => $template['id'],
+                                    'title' => $updatedField[0],
+                                    'description' => $updatedField[1],
+                                    'body' => $updatedField[2],
+                                    'visibility' => (int)$updatedField[3] ? Role::STUDENT : Role::STAFF,
+                                    'sequence' => ++$sequence,
+                                    'createdAt' => $this->now,
+                                    'updatedAt' => $this->now,
+                                    'deletedAt' => null,
+                                ]);
+                            }
                         } else {
                             /* If it doesn't exist, spawn it
                              */
