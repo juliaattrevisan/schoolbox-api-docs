@@ -65,6 +65,7 @@ class UpdaterTool extends CliTool\App
     private \PDOStatement $templateFieldsStatement;
     private \PDOStatement $createFieldStatement;
     private \PDOStatement $updateFieldStatement;
+    private \PDOStatement $deleteFieldStatement;
 
 
     /**
@@ -178,6 +179,11 @@ HELP;
                 WHERE id = :id
             ");
 
+            $this->deleteFieldStatement = $this->getDatabaseInternal()->prepare("
+                UPDATE lesson_plan_template_field
+                SET deleted_at = :deletedAt
+                WHERE id = :id
+            ");
 
             /* This is alaress admin
              */
@@ -326,14 +332,26 @@ HELP;
                                 ]);
                             }
                         }
-//
-//                    /* Delete any field that was untouched by the update process.
-//                     * This field no longer exists according to the csv.
-//                     */
-//                    foreach ($fields as $field) {
-//                        if (null !== $field['deleted_at']) {
-//                            $field->delete();
-//                        }
+                    }
+
+                    /* Delete any field that was untouched by the update process.
+                     * This field no longer exists according to the csv.
+                     */
+                    foreach ($fields as $field) {
+                        if ($field['deleted_at']) {
+                            $this->getLogger()->debug(sprintf(
+                                'Removing extraneous field "%s" (id: %s)',
+                                $field['title'],
+                                $field['id']
+                            ));
+
+                            if ($this->perform()) {
+                                $this->deleteFieldStatement->execute([
+                                    'id' => $field['id'],
+                                    'deletedAt' => $this->now,
+                                ]);
+                            }
+                        }
                     }
                 }
             }
