@@ -265,6 +265,7 @@ HELP;
                             $fields[$index]['updated_at'] = $this->now;
                             $fields[$index]['updated_by'] = $this->superuserId;
                             $fields[$index]['deleted_at'] = null;
+                            $fields[$index]['deleted_by'] = null;
 
                             print_r($fields[$index]);
                         }
