@@ -142,16 +142,24 @@ HELP;
 
                 $templates = $candidateTemplateStatement->fetchAll();
 
-//                /* If none exist, create one
-//                 */
-//                if (!count($candidateTemplates)) {
-//                    $templates = [];
-//
-//                    $templates[] = [
-//                        'id' => null
-//                    ];
-//                }
-//
+                /* If none exist, create one and shim it in with some default values
+                 */
+                if (!\count($templates)) {
+                    $templates = [];
+
+                    $templates[] = [
+                        'id' => null,
+                        'title' => null,
+                        'enabled' => 1,
+                        'created_at' => \Alaress_Date_Format::now()->getDatabase(),
+                        'created_by' => 1,
+                        'updated_at' => \Alaress_Date_Format::now()->getDatabase(),
+                        'updated_by' => 1,
+                        'deleted_at' => null,
+                        'deleted_by' => null,
+                    ];
+                }
+
 //                foreach ($templates as $template) {
 //                    /* Each template consists of multiple fields, which may or may not match the ones specified in the csv.
 //                     * Presume to remove everything *unless* it was referenced in the csv, thus handling deletions.
