@@ -51,6 +51,9 @@ class UpdaterTool extends CliTool\App
             'old' => '5E Model',
             'new' => '5E Model Lesson Plan'
         ],
+
+        /* TODO Add more here
+         */
     ];
 
 
