@@ -178,10 +178,12 @@ HELP;
                             $titles['new']
                         ));
 
-                        $this->renameTemplateStatement->execute([
-                            'id' => $template['id'],
-                            'title' => $titles['new']
-                        ]);
+                        if ($this->perform()) {
+                            $this->renameTemplateStatement->execute([
+                                'id' => $template['id'],
+                                'title' => $titles['new']
+                            ]);
+                        }
 
                         /* We'll need this later: fields are associated with a template
                          */
@@ -194,30 +196,30 @@ HELP;
                             $titles['new']
                         ));
 
-                        $this->createTemplateStatement->execute([
-                            'title' => $template['title'],
-                            'enabled' => $template['enabled'],
-                            'createdAt' => $template['created_at'],
-                            'createdBy' => $template['created_by'],
-                            'updatedAt' => $template['updated_at'],
-                            'updatedBy' => $template['updated_by'],
-                            'deletedAt' => $template['deleted_at'],
-                            'deletedBy' => $template['deleted_by']
-                        ]);
+                        if ($this->perform()) {
+                            $this->createTemplateStatement->execute([
+                                'title' => $template['title'],
+                                'enabled' => $template['enabled'],
+                                'createdAt' => $template['created_at'],
+                                'createdBy' => $template['created_by'],
+                                'updatedAt' => $template['updated_at'],
+                                'updatedBy' => $template['updated_by'],
+                                'deletedAt' => $template['deleted_at'],
+                                'deletedBy' => $template['deleted_by']
+                            ]);
+                        }
 
                         /* We'll need this later: fields are associated with a template
                          */
                         $templateId = (int)$this->getDatabaseInternal()->lastInsertId();
                     }
 
-                    print_r($templateId);
-
                     /* Find all the existing fields for this lesson plan template and store them in a lookup, marking
                      * them as deletable for now until we change that via csv processing, thus handling deletions
                      */
-                    $fields = $this->findFields($templateId);;
+                    $fields = $this->findFields($templateId);
 
-
+                    print_r($templateId);
                     print_r($fields);
 //
 //                    foreach ($fields as &$field) {
