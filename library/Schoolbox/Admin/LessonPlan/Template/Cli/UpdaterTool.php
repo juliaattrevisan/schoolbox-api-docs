@@ -258,22 +258,27 @@ HELP;
                      *
                      * If it doesn't exist, spawn it
                      */
+                    $sequence = 0;
+
                     foreach ($updatedFields as $title => $updatedField) {
                         /* Apparently...this is required...for some reason
                          */
                         $index = (string)$title;
 
                         if (isset($fields[$index])) {
-                            $fields[$index]['lesson_plan_template_id'] = $template['id'];
-                            $fields[$index]['title'] = $updatedField[0];
-                            $fields[$index]['description'] = $updatedField[1];
-                            $fields[$index]['body'] = $updatedField[2];
-                            $fields[$index]['visibility'] = (int)$updatedField[3] ? Role::STUDENT : Role::STAFF;
-                            $fields[$index]['created_at'] = $this->now;
-                            $fields[$index]['updated_at'] = $this->now;
-                            $fields[$index]['deleted_at'] = null;
+                            $struct = $fields[$index];
 
-                            print_r($fields[$index]);
+                            $struct['lesson_plan_template_id'] = $template['id'];
+                            $struct['title'] = $updatedField[0];
+                            $struct['description'] = $updatedField[1];
+                            $struct['body'] = $updatedField[2];
+                            $struct['visibility'] = (int)$updatedField[3] ? Role::STUDENT : Role::STAFF;
+                            $struct['sequence'] = ++$sequence;
+                            $struct['created_at'] = $this->now;
+                            $struct['updated_at'] = $this->now;
+                            $struct['deleted_at'] = null;
+
+                            print_r($struct);
                         } else {
                             /* If it doesn't exist, spawn it
                              */
