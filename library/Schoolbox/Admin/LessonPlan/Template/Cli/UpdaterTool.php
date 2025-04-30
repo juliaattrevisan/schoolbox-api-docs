@@ -219,15 +219,15 @@ HELP;
                      */
                     $fields = $this->findFields($templateId);
 
+                    foreach ($fields as &$field) {
+                        $field['deleted_at'] = true;
+                    }
+
+                    unset($field);
+
                     print_r($templateId);
                     print_r($fields);
-//
-//                    foreach ($fields as &$field) {
-//                        $field[$field['title']]['deleted_at'] = true;
-//                    }
-//
-//                    unset($field);
-//
+
 //                    /* Iterate through each csv's contents.
 //                     *
 //                     * If the field matches, update its description and body contents, then unset its delete flag
