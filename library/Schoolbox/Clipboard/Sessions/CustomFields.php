@@ -29,6 +29,13 @@ class CustomFields
         $output = [];
 
         foreach (['sessions', 'fixtures'] as $key) {
+            /* One or more of these keys didn't have a set of data in the custom fields
+             * Skip it
+             */
+            if (!array_key_exists($key, $temp)) {
+                continue;
+            }
+
             $nodes = $this->sorter($temp[$key]);
 
             foreach ($nodes as $current => $previous) {
