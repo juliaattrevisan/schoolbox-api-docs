@@ -65,6 +65,20 @@ class UpdaterTool extends CliTool\App
 
 
     /**
+     * Everything updated at this time
+     */
+    private string $now;
+
+
+    /**
+     * Corresponds to alaress admin username
+     *
+     * @var int
+     */
+    private int $superuserId;
+
+
+    /**
      * @inheritdoc
      */
     public function getLongOpts(): array
@@ -142,7 +156,11 @@ HELP;
 
             /* This is alaress admin
              */
-            $superuserId = $this->findSuperuserId();
+            $this->superuserId = $this->findSuperuserId();
+
+            /* I guess everything updated at this time
+             */
+            $this->now = \Alaress_Date_Format::now()->getDatabaseDate();
 
             /* Each lesson plan template update comes in a csv file. Find all the lesson plan templates that match the
              * title specified in the csv, updating each of them synonymously.
@@ -155,7 +173,7 @@ HELP;
             foreach (self::SOURCE_FILES as $file => $titles) {
                 /* Find all the templates that match the csv's title
                  */
-                $templates = $this->findCandidateTemplates($titles, $superuserId);
+                $templates = $this->findCandidateTemplates($titles);
 
                 foreach ($templates as $template) {
                     /* Each template consists of multiple fields, which may or may not match the ones specified in the csv.
@@ -232,23 +250,24 @@ HELP;
                      *
                      * If it doesn't exist, spawn it
                      */
-                    foreach ($updatedFields as $updatedField) {
-                        print_r($templateId);
-                        print_r($fields);
-                        print_r($updatedField);
+                    foreach ($updatedFields as $title => $updatedField) {
+                        /* Apparently...this is required...for some reason
+                         */
+                        $index = (string)$title;
 
+                        if (isset($fields[$index])) {
+                            $fields[$index]['lesson_plan_template_id'] = $template['id'];
+                            $fields[$index]['title'] = $updatedField[0];
+                            $fields[$index]['description'] = $updatedField[1];
+                            $fields[$index]['body'] = $updatedField[2];
+                            $fields[$index]['created_at'] = $this->now;
+                            $fields[$index]['created_by'] = $this->superuserId;
+                            $fields[$index]['updated_at'] = $this->now;
+                            $fields[$index]['updated_by'] = $this->superuserId;
+                            $fields[$index]['deleted_at'] = null;
 
-//                        $index = $field[$updatedField['title']];
-//
-//                        if (isset($fields[$index])) {
-//                            $field[$index]['lesson_plan_template_id'] = $template['id'];
-//                            $field[$index]['body'] = $newValue;
-//                            $field[$index]['description'] = $newValue;
-//                            $field[$index]['deleted_at'] = null;
-//
-//                            $field[$index]->save();
-//                        }
-//                    }
+                            print_r($fields[$index]);
+                        }
 //
 //                    /* Delete any field that was untouched by the update process.
 //                     * This field no longer exists according to the csv.
@@ -340,10 +359,9 @@ HELP;
      * cos we're about to rename those ones
      *
      * @param array $titles
-     * @param int $superuserId
      * @return array
      */
-    private function findCandidateTemplates(array $titles, int $superuserId): array
+    private function findCandidateTemplates(array $titles): array
     {
         /* Find all the templates that match the csv's title
          */
@@ -358,16 +376,14 @@ HELP;
         if (!\count($templates)) {
             $templates = [];
 
-            $now = \Alaress_Date_Format::now()->getDatabase();
-
             $templates[] = [
                 'id' => null,
                 'title' => $titles['new'],
                 'enabled' => 1,
-                'created_at' => $now,
-                'created_by' => $superuserId,
-                'updated_at' => $now,
-                'updated_by' => $superuserId,
+                'created_at' => $this->now,
+                'created_by' => $this->superuserId,
+                'updated_at' => $this->now,
+                'updated_by' => $this->superuserId,
                 'deleted_at' => null,
                 'deleted_by' => null,
             ];
