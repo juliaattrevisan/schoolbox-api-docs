@@ -160,7 +160,7 @@ HELP;
 
             /* I guess everything updated at this time
              */
-            $this->now = \Alaress_Date_Format::now()->getDatabaseDate();
+            $this->now = \Alaress_Date_Format::now()->getDatabase();
 
             /* Each lesson plan template update comes in a csv file. Find all the lesson plan templates that match the
              * title specified in the csv, updating each of them synonymously.
