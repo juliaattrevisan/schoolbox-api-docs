@@ -57,6 +57,10 @@ class UpdaterTool extends CliTool\App
             'old' => 'ELC Learning Plans',  // This was lost in the spreadsheet, but this was its original name
             'new' => 'ELC Learning Plan',   // Everything else is singular so...I guess this is too?
         ],
+        'Generic_Primary_Lesson_Plan.csv' => [
+            'old' => 'Generic Primary',
+            'new' => 'Generic Primary Lesson Plan',
+        ],
         /* TODO Add more here
          */
     ];
