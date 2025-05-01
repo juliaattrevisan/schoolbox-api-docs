@@ -51,7 +51,7 @@ test.describe("Curriculum Coverage Report Tests", () => {
             "Within Select Curriculum: Choose Year 12 French, Years 9 and 10 French, Year 9 History and English ",
         );
         await searchSelect.selectButton("curriculum"); // Open the select courses modal
-        await curriculumSelector.browseTree([302, 304, 1, 135]);
+        await curriculumSelector.selectNodes([302, 304, 1, 135]);
         await curriculumSelector.saveModal(); // Select Select, closing the modal
 
         // link for reference: https://vagrant.dev.schoolbox.cloud/curriculum/reports/coverage?courseId=6%2C2%2C14&nodeId=302%2C304%2C1%2C135

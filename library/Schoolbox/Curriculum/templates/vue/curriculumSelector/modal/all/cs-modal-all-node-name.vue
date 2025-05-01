@@ -118,6 +118,7 @@ function onNameSelected(): void {
             :text="props.title"
             :query="modalSearchStore.query"
             :is-searching="modalSearchStore.isActive"
+            :data-test="`cs-modal-all-node-name-${props.node.id}`"
             @click="onNameSelected"
         />
         <show-matches

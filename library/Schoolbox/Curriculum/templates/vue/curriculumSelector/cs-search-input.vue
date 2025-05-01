@@ -189,6 +189,7 @@ const isActive = window.Vue.computed(() => {
             type="button"
             class="button icon-curriculum"
             title="Browse and select from the Curriculum"
+            data-test="cs-search-input-browse-button"
             @click.prevent="onBrowseSelected"
         >
             Browse
