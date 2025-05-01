@@ -254,13 +254,13 @@ HELP;
                                 'Updating existing field "%s" (id: %s) in template id %s',
                                 $struct['title'],
                                 $struct['id'],
-                                $template['id']
+                                $templateId
                             ));
 
                             if ($this->perform()) {
                                 $this->updateFieldStatement->execute([
                                     'id' => $struct['id'],
-                                    'lessonPlanTemplateId' => $template['id'],
+                                    'lessonPlanTemplateId' => $templateId,
                                     'title' => $updatedField[0],
                                     'description' => $updatedField[1],
                                     'body' => $updatedField[2],
@@ -282,7 +282,7 @@ HELP;
 
                             if ($this->perform()) {
                                 $this->createFieldStatement->execute([
-                                    'lessonPlanTemplateId' => $template['id'],
+                                    'lessonPlanTemplateId' => $templateId,
                                     'title' => $updatedField[0],
                                     'description' => $updatedField[1],
                                     'body' => $updatedField[2],
