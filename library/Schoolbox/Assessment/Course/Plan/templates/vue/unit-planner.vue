@@ -163,7 +163,7 @@ window.Vue.onUnmounted(() => {
         <div class="small-12 island">
             <dl ref="tabsEl" class="tabs no-print">
                 <dd v-for="tab in tabs" :key="tab.id" :class="{ active: selectedTab.id === tab.id }">
-                    <a @click="selectedTab = tab">{{ tab.label }}</a>
+                    <a :data-test="`unit-planner-tabs-${tab.label}`" @click="selectedTab = tab">{{ tab.label }}</a>
                 </dd>
             </dl>
             <div

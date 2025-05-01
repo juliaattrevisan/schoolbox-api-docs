@@ -123,11 +123,38 @@ test.describe("Unit Planner Tests", () => {
 
         tester.isGoingTo("select curriculum codes for the To Kill a Mockingbird unit");
         await unitPlanner.clickSelectCurriculumLink(toKillMockingbirdId); // Open the select courses modal
-        await curriculumSelector.browseTreeUnitPlanner([135, 136, 138, 143]);
-        await curriculumSelector.checkNode(146); // Select the first node
+        await curriculumSelector.browseTreeUnitPlanner([247, 248, 250, 251]);
+        await curriculumSelector.checkNode(257); // Select the first node
         await curriculumSelector.saveModal(); // Select Select, closing the modal
 
         tester.isGoingTo("check the selected curriculum codes are visible");
+        await expect(page.locator(`a[href="#257"]`)).toBeVisible();
+        await expect(page.locator("div.unit-planner")).toContainText("[ACHHK078]");
+        await expect(page.locator("div.unit-planner")).toContainText("Year 4 History");
+        await expect(page.locator("div.unit-planner")).toContainText("First Contacts");
+
+        tester.isGoingTo("check the curriculum codes are visible in the curriculum overview tab");
+        await unitPlanner.clickUnitPlannerTabs("Curriculum Overview");
+        await expect(page.locator(`a[href="#257"]`)).toBeVisible();
+        await expect(page.locator("div.unit-planner")).toContainText("[ACHHK078]");
+        await expect(page.locator("div.unit-planner")).toContainText("Year 4 History");
+        await expect(page.locator("div.unit-planner")).toContainText("First Contacts");
+
+        tester.isGoingTo("delete the node and ensure it is not visible");
+        await unitPlanner.clickUnitPlannerTabs("All");
+        await unitPlanner.clickRemoveNodeIcon(257);
+        await unitPlanner.clickConfirmDeleteNodeButton(89);
+        await expect(page.locator(`a[href="#257"]`)).not.toBeVisible();
+        await expect(page.locator("div.unit-planner")).not.toContainText("[ACHHK078]");
+        await expect(page.locator("div.unit-planner")).not.toContainText("Year 4 History");
+        await expect(page.locator("div.unit-planner")).not.toContainText("First Contacts");
+
+        tester.isGoingTo("check the curriculum codes are not visible in the curriculum overview tab");
+        await unitPlanner.clickUnitPlannerTabs("Curriculum Overview");
+        await expect(page.locator(`a[href="#257"]`)).not.toBeVisible();
+        await expect(page.locator("div.unit-planner")).not.toContainText("[ACHHK078]");
+        await expect(page.locator("div.unit-planner")).not.toContainText("Year 4 History");
+        await expect(page.locator("div.unit-planner")).not.toContainText("First Contacts");
     });
 
     test.afterAll(async ({ baseTester, db }) => {
