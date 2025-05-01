@@ -26,6 +26,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\UserMapper;
+use Schoolbox\User;
 
 class Controller extends Base
 {
@@ -119,6 +120,18 @@ class Controller extends Base
         $userspb = $this->userMapper->getPredicateBuilder();
 
         $deletedUsers = $this->userMapper->findByPredicates($userspb->betweenDates('deleted_at', $start, $end), ['deleted' => true,'order' => ['deleted_at' => 'DESC']]);
+
+        // Grab a lightweight cache of all the active usernames
+        $activeUsernamesQuery = "
+            SELECT username
+            FROM user
+            WHERE deleted_at IS NULL";
+        $activeUsernamesQuery = $this->userMapper->getDatabase()->executeQuery($activeUsernamesQuery)->fetchColumnArray('username');
+
+        // Filter users where the username is already being used
+        $deletedUsers = $deletedUsers->filter(function (User $node) use ($activeUsernamesQuery) {
+            return !in_array($node->getUsername(), $activeUsernamesQuery, true);
+        });
 
         // Courses
         // spec
