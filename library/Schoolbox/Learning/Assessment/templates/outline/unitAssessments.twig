@@ -140,7 +140,7 @@
                                 <li><a class="icon-task" href="{{ viewGradeRoute }}" >View and {{ locale.grades }} submissions</a></li>
                                 {% endif %}
                             {% endif %}
-                            {% if assessment is dueWork and assessment.enableWorksheet and kamiWorksheetRoute %}
+                            {% if assessment is dueWork and assessment.enableWorksheet and assessment.kamiWorksheetTemplate and kamiWorksheetRoute %}
                                 <li>
                                     <a id="kamiWorksheet" class="icon-surveys" href="{{ kamiWorksheetRoute }}">Class View</a>
                                 </li>
