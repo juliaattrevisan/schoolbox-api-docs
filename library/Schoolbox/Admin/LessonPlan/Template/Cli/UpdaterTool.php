@@ -39,6 +39,8 @@ class UpdaterTool extends CliTool\App
 
     /**
      * Where the csv files live
+     *
+     * TODO Probably can't assume this folder path
      */
     private const PATH = '/usr/share/schoolbox/tools/assessment/lessonPlanTemplate';
 
