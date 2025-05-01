@@ -85,6 +85,10 @@ class UpdaterTool extends CliTool\App
             'old' => 'PYP Lesson Plan',
             'new' => 'PYP Lesson Plan',
         ],
+        'Simplified_Lesson_Plan.csv' => [
+            'old' => 'Simplified Lesson Plan',
+            'new' => 'Simplified Lesson Plan',
+        ],
         /* TODO Add more here
          */
     ];
