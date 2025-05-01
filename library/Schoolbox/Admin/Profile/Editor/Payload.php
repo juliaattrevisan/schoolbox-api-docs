@@ -423,7 +423,7 @@ class Payload
                     'type' => 'boolean',
                     'id' => 'clickToReveal',
                     'name' => 'Activate View More',
-                    'meta' => 'Hide content by default until the user clicks to view it'
+                    'meta' => 'Only show content after the user chooses to view it.'
                 ],
             ]
         ];
