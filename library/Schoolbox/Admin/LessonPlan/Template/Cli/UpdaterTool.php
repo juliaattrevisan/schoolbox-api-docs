@@ -89,12 +89,16 @@ class UpdaterTool extends CliTool\App
             'old' => 'Simplified Lesson Plan',
             'new' => 'Simplified Lesson Plan',
         ],
+        // This is a completely new lesson plan template we've never seen before.
         'Detailed_Weekly_Plan.csv' => [
-            'old' => 'Detailed Weekly Plan',  // This is a completely new lesson plan template we've never seen before.
+            'old' => 'Detailed Weekly Plan',
             'new' => 'Detailed Weekly Plan',
         ],
-        /* TODO Add more here
-         */
+        // This is a completely new lesson plan template we've never seen before.
+        'Weekly_Plan.csv' => [
+            'old' => 'Weekly Plan',
+            'new' => 'Weekly Plan',
+        ],
     ];
 
 
