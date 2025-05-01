@@ -3,7 +3,6 @@ import UnitPlanner from "@schoolboxTest/playwright/support/page/unitPlanner/Unit
 import AssessmentForm from "@schoolboxTest/playwright/support/page/dueWork/AssessmentForm";
 import CurriculumSelector from "@schoolboxTest/playwright/support/page/curriculum/selector/CurriculumSelector";
 import SearchSelect from "@schoolboxTest/playwright/support/components/SearchSelect";
-import { ex } from "@fullcalendar/core/internal-common";
 
 test.describe("Unit Planner Tests", () => {
     test.describe.configure({ mode: "serial" });
@@ -119,9 +118,8 @@ test.describe("Unit Planner Tests", () => {
         await expect(page.getByText("Updated via unit planner")).not.toBeVisible();
     });
 
-    test("Select, modify and remove curriculum codes", async ({ tester, page, db }) => {
+    test("Select, modify and remove curriculum codes", async ({ tester, page }) => {
         const curriculumSelector = new CurriculumSelector(page);
-        const searchSelect = new SearchSelect(page);
 
         tester.isGoingTo("select curriculum codes for the To Kill a Mockingbird unit");
         await unitPlanner.clickSelectCurriculumLink(toKillMockingbirdId); // Open the select courses modal
