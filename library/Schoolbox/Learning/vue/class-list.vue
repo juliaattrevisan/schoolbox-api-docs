@@ -3,11 +3,9 @@
 /* eslint-disable eslint-comments/no-unlimited-disable -- see below */
 /* eslint-disable -- Ignore this file for ESLint checks for now (SA-18376) */
 /* eslint-enable vue/no-v-html */
-import PastoralCountBadge from "@schoolboxLibrary/Pastoral/Count/vue/pastoral-count-badge";
 
 export default {
     name: "class-list",
-    components: { PastoralCountBadge },
     props: {
         /**
          * The title of the subject for which the class list is shown, including
@@ -611,14 +609,14 @@ export default {
                                 <input type="checkbox" id="select-all" v-model="allSelected" />
                                 <label for="select-all" class="checkbox-label"></label>
                             </th>
-                            <th width="84"></th>
+                            <td></td>
                             <th>Name</th>
                             <th class="show-for-large-up">{{ yearLevelLabel }}</th>
                             <th class="show-for-large-up" v-if="showTutorGroupColumn">Tutor Group</th>
                             <th class="show-for-medium-up" v-if="showCoreGroupColumn">Core Group</th>
                             <th class="show-for-medium-up" v-if="showHouseColumn">{{ houseLabel }}</th>
                             <th class="show-for-medium-up">Last Visited</th>
-                            <th></th>
+                            <td></td>
                         </tr>
                     </thead>
                     <tbody>
@@ -661,16 +659,20 @@ export default {
                                 </template>
 
                                 <span class="meta">({{ student.synergy_id }})</span>
-                                <span class="show-for-print"><br />{{ student.email }}</span
-                                ><br />
-
-                                <p class="meta inline-container">
-                                    <pastoral-count-badge
+                                <span class="show-for-print"><br />{{ student.email }}</span>
+                                <br />
+                                <div class="l-flex l-gap-xs l-pad-s--vert">
+                                    <sbx-label
                                         v-for="studentBadge in studentPastoralCounts[student.id]"
                                         :key="`badge-${studentBadge.typeId}-${studentBadge.subtypeId}`"
-                                        :badge="studentBadge"
-                                    ></pastoral-count-badge>
-                                </p>
+                                        :title="studentBadge.title"
+                                        :text="studentBadge.count.toString()"
+                                        :icon="studentBadge.icon"
+                                        :background-color="studentBadge.bgColor"
+                                        :text-color="studentBadge.fgColor"
+                                        :href="studentBadge.destinationUrl"
+                                    />
+                                </div>
 
                                 <p class="meta inline-container">
                                     <slot name="student-meta" v-bind:student="student">

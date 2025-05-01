@@ -18,7 +18,7 @@
                     <dt class="small-4 medium-3 columns">{{ locale.severity.proper }}:</dt>
                     <dd class="small-8 medium-9 columns">
                         {% if severityColor %}
-                            <sbx-label title="{{ record.severity.name }}" background-color="{{ record.severity.color }}" text-color="{{ severityColor }}"></sbx-label>
+                            <sbx-label text="{{ record.severity.name }}" background-color="{{ record.severity.color }}" text-color="{{ severityColor }}"></sbx-label>
                         {% else %}
                             {{ record.severity.name }}
                         {% endif %}

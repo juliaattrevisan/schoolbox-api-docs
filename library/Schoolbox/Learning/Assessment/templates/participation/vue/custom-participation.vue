@@ -4,7 +4,6 @@
  */
 import { isAbortError, hasErrorMessage } from "@js/util/errorUtils";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
-import PastoralCountBadge from "@schoolboxLibrary/Pastoral/Count/vue/pastoral-count-badge.vue";
 import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
 import type { StudentPastoralCountBadge } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
 import type { Participant } from "../js/types/customParticipationTypes";
@@ -226,8 +225,20 @@ window.Vue.onMounted(() => {
                         />
                     </td>
                     <td>
-                        <template v-if="participant.user.id">
-                            <a :href="`/search/user/${participant.user.id}`">
+                        <div class="l-flex-col l-gap-s">
+                            <template v-if="participant.user.id">
+                                <a :href="`/search/user/${participant.user.id}`">
+                                    {{ participant.user.lastname + ", " + participant.user.firstname }}
+                                    {{
+                                        participant.user.preferredName &&
+                                        participant.user.preferredName !== participant.user.firstname
+                                            ? "‘" + participant.user.preferredName + "’"
+                                            : ""
+                                    }}
+                                    {{ participant.user.pronoun }}
+                                </a>
+                            </template>
+                            <template v-else>
                                 {{ participant.user.lastname + ", " + participant.user.firstname }}
                                 {{
                                     participant.user.preferredName &&
@@ -236,27 +247,20 @@ window.Vue.onMounted(() => {
                                         : ""
                                 }}
                                 {{ participant.user.pronoun }}
-                            </a>
-                        </template>
-                        <template v-else>
-                            {{ participant.user.lastname + ", " + participant.user.firstname }}
-                            {{
-                                participant.user.preferredName &&
-                                participant.user.preferredName !== participant.user.firstname
-                                    ? "‘" + participant.user.preferredName + "’"
-                                    : ""
-                            }}
-                            {{ participant.user.pronoun }}
-                        </template>
-                        <br />
-
-                        <p class="meta inline-container">
-                            <pastoral-count-badge
-                                v-for="studentBadge in studentPastoralCounts[participant.user.id]"
-                                :key="`badge-${studentBadge.typeId}-${studentBadge.subtypeId}`"
-                                :badge="studentBadge"
-                            />
-                        </p>
+                            </template>
+                            <div class="l-flex l-gap-xs">
+                                <sbx-label
+                                    v-for="studentBadge in studentPastoralCounts[participant.user.id]"
+                                    :key="`badge-${studentBadge.typeId}-${studentBadge.subtypeId}`"
+                                    :title="studentBadge.title"
+                                    :text="studentBadge.count.toString()"
+                                    :icon="studentBadge.icon"
+                                    :background-color="studentBadge.bgColor"
+                                    :text-color="studentBadge.fgColor"
+                                    :href="studentBadge.destinationUrl"
+                                />
+                            </div>
+                        </div>
                     </td>
                     <td>
                         <span v-if="participant.excludedAt !== null">Excluded</span>
