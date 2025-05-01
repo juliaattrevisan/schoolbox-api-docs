@@ -10,7 +10,7 @@ const store = useUnitNodesStore();
 </script>
 
 <template>
-    <div class="nodes-container">
+    <div class="nodes-container" data-test="cs-modal-unit-nodes-container">
         <ul v-if="store.hasLoaded" class="nodes l-flex-col">
             <cs-modal-unit-node
                 v-for="node in store.nodes"
