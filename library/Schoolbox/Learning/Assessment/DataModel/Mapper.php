@@ -693,8 +693,10 @@ class Mapper extends BaseMapper
         // Augmentations for one-to-many fields, copied from standard hydrate.
         // Turns out only the following are required:
         // * Kami worksheet (for displaying link to class view)
+        // * Folder codes (for determining if student is a participant, when
+        //   filtering activity list)
         // * Specification (for determining save to course route)
-        // * Project sub-assessments (for displaying in save to course dialog(
+        // * Project sub-assessments (for displaying in save to course dialog)
 
         // Due work files and Kami worksheet
 //        $dueWorkIds = $modelList->map(fn (Model $model) => $model->getDueWork()?->getId(), false)->getAll();
@@ -711,9 +713,9 @@ class Mapper extends BaseMapper
 //        $lessonPlanIds = $modelList->map(fn (Model $model) => $model->getLessonPlan()?->getId(), false)->getAll();
 //        $modelList     = $this->augmentListWithLessonPlanFiles($modelList, $lessonPlanIds);
 //        $modelList     = $this->augmentWithLessonPlanFields($modelList, $lessonPlanIds);
-//
-//        // Folder codes for all contexts
-//        $modelList = $this->augmentListWithFolderCodes($modelList);
+
+        // Folder codes for all contexts
+        $modelList = $this->augmentListWithFolderCodes($modelList);
         // Specification assessments
         $modelList = $this->augmentListWithSpecifications($modelList);
 //        // Grade groups
