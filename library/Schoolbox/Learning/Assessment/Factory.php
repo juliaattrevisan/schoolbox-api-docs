@@ -352,7 +352,7 @@ class Factory
         $this->setLessonPlanTemplateId((int)($post['lessonPlanTemplateId'] ?? null));
         $this->setLessonPlanFields($post['field'] ?? []);
         $this->setLessonPlanVisibility('on' === ($post['lessonPlanVisibility'] ?? null) ? \Schoolbox\Role::STUDENT : \Schoolbox\Role::STAFF);
-        $this->setDuration((string)($post['duration'] ?? null));
+        $this->setLessonPlanDuration((string)($post['duration'] ?? null));
 
         // Ensure custom fields is an array if it's set
         $customFields = $post['customFields'] ?? null;
@@ -541,7 +541,7 @@ class Factory
                 $this->getLessonPlanFields(),
                 $this->getLessonPlanVisibility(),
                 $this->getAttachedFiles(),
-                $this->getDuration(),
+                $this->getLessonPlanDuration(),
             );
         } else {
             throw new DomainException('Please select an assessment type');
@@ -928,7 +928,7 @@ class Factory
     /**
      * @return string|null
      */
-    public function getDuration(): ?string
+    public function getLessonPlanDuration(): ?string
     {
         return $this->duration;
     }
@@ -938,7 +938,7 @@ class Factory
      * @param string|null $duration
      * @return $this
      */
-    public function setDuration(?string $duration): self
+    public function setLessonPlanDuration(?string $duration): self
     {
         $this->duration = $duration;
         return $this;

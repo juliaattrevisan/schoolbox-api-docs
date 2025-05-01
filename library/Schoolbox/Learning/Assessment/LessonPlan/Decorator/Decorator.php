@@ -50,7 +50,7 @@ class Decorator implements DecoratorInterface
         private array $lessonPlanFields,
         private string $lessonPlanVisibility,
         private array $attachedFiles,
-        private string $duration
+        private string $lessonPlanDuration
     ) {
     }
 
@@ -76,7 +76,7 @@ class Decorator implements DecoratorInterface
          */
         $assessment->setVisibility($this->lessonPlanVisibility);
 
-        $assessment->setDuration($this->duration);
+        $assessment->setLessonPlanDuration($this->lessonPlanDuration);
 
         /* Hydrate all the template's fields too
          * We need to remember where a Lesson Plan Field came from,

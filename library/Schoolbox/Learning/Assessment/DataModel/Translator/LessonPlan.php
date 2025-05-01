@@ -98,7 +98,7 @@ class LessonPlan implements IAssessmentTypeTranslator
 
         /* Duration, for the LLM
          */
-        $dataModel->setDuration($domainObject->getDuration());
+        $dataModel->setLessonPlanDuration($domainObject->getLessonPlanDuration());
 
         /* Lesson Plans don't have any marking-related stuff
          * Andy's Filters and the Andy Markbook requires it for all assessment types
@@ -189,7 +189,7 @@ class LessonPlan implements IAssessmentTypeTranslator
 
         /* Duration, for the LLM
          */
-        $domainObject->setDuration($dataModel->getDuration());
+        $domainObject->setLessonPlanDuration($dataModel->getLessonPlanDuration());
 
         /* Lesson Plans don't have any marking-related stuff
          * Andy's Filters and the Andy Markbook requires it for all assessment types

@@ -585,7 +585,7 @@ class Model extends AbstractAssessment
     /**
      * @return string|null
      */
-    public function getDuration(): ?string
+    public function getLessonPlanDuration(): ?string
     {
         return $this->duration;
     }
@@ -595,7 +595,7 @@ class Model extends AbstractAssessment
      * @param string|null $duration
      * @return $this
      */
-    public function setDuration(?string $duration): self
+    public function setLessonPlanDuration(?string $duration): self
     {
         $this->duration = $duration;
         return $this;
