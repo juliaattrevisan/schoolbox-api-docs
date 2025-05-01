@@ -3,6 +3,7 @@ import UnitPlanner from "@schoolboxTest/playwright/support/page/unitPlanner/Unit
 import AssessmentForm from "@schoolboxTest/playwright/support/page/dueWork/AssessmentForm";
 import CurriculumSelector from "@schoolboxTest/playwright/support/page/curriculum/selector/CurriculumSelector";
 import SearchSelect from "@schoolboxTest/playwright/support/components/SearchSelect";
+import { ex } from "@fullcalendar/core/internal-common";
 
 test.describe("Unit Planner Tests", () => {
     test.describe.configure({ mode: "serial" });
@@ -13,6 +14,7 @@ test.describe("Unit Planner Tests", () => {
     const romeoUnitId = 15; // "Romeo and Juliet"
     const persuasionUnitId = 17; // "Persuasion and the Media"
     const toKillMockingbirdId = 16; // "To Kill a Mockingbird"
+    const folderId = 89; // "To Kill a Mockingbird" folder ID
 
     test.beforeEach(async ({ tester, page }) => {
         const teacher = "Jack Coles";
@@ -140,10 +142,21 @@ test.describe("Unit Planner Tests", () => {
         await expect(page.locator("div.unit-planner")).toContainText("Year 4 History");
         await expect(page.locator("div.unit-planner")).toContainText("First Contacts");
 
-        tester.isGoingTo("delete the node and ensure it is not visible");
+        tester.isGoingTo("check the curriculum codes are visible in the unit page");
+        await unitPlanner.clickUnitLink(toKillMockingbirdId);
+        await expect(
+            page.locator(
+                `div[class="component-container Schoolbox_Curriculum_Component_CurriculumOverviewController"]`,
+            ),
+        ).toBeVisible();
+        await expect(page.locator("ul.nodes.l-flex-col")).toContainText("[ACHHK078]");
+        await expect(page.locator("ul.nodes.l-flex-col")).toContainText("Year 4 History");
+
+        tester.isGoingTo("delete the node via unit planner and ensure it is not visible");
+        await unitPlanner.goto(6);
         await unitPlanner.clickUnitPlannerTabs("All");
         await unitPlanner.clickRemoveNodeIcon(257);
-        await unitPlanner.clickConfirmDeleteNodeButton(89);
+        await unitPlanner.clickConfirmDeleteNodeButton(folderId);
         await expect(page.locator(`a[href="#257"]`)).not.toBeVisible();
         await expect(page.locator("div.unit-planner")).not.toContainText("[ACHHK078]");
         await expect(page.locator("div.unit-planner")).not.toContainText("Year 4 History");
@@ -155,6 +168,16 @@ test.describe("Unit Planner Tests", () => {
         await expect(page.locator("div.unit-planner")).not.toContainText("[ACHHK078]");
         await expect(page.locator("div.unit-planner")).not.toContainText("Year 4 History");
         await expect(page.locator("div.unit-planner")).not.toContainText("First Contacts");
+
+        tester.isGoingTo("check the curriculum codes are not visible in the unit page");
+        await unitPlanner.clickUnitLink(toKillMockingbirdId);
+        await expect(
+            page.locator(
+                `div[class="component-container Schoolbox_Curriculum_Component_CurriculumOverviewController"]`,
+            ),
+        ).toBeVisible();
+        await expect(page.locator("ul.nodes.l-flex-col")).not.toBeVisible();
+        await expect(page.locator("div.empty-state")).toBeVisible();
     });
 
     test.afterAll(async ({ baseTester, db }) => {
