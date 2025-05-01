@@ -19,6 +19,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplMappe
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplMapper;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Code\Mapper as FolderCodeMapper;
 use Schoolbox\UserMapper;
 use Twig\Error\LoaderError;
 
@@ -68,6 +69,7 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->getMapperFactory()->get(FolderMapper::class),
+            $this->getMapperFactory()->get(FolderCodeMapper::class),
             $this->getMapperFactory()->get(AssessmentMapper::class),
             $this->getMapperFactory()->get(UserMapper::class),
             $this->getMapperFactory()->get(FileMapper::class),

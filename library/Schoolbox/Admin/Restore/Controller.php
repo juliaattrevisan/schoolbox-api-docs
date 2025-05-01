@@ -18,6 +18,8 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\RecursiveUndeleter;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Code\Mapper as FolderCodeMapper;
+use Schoolbox\Resource\Folder\Code\Model as FolderCode;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
@@ -47,30 +49,6 @@ class Controller extends Base
     public const RESTORE_WINDOW = '120';
 
     /**
-     * Controller constructor.
-     *
-     * @param FolderMapper                $folderMapper
-     * @param Assessment\DataModel\Mapper $assessmentMapper
-     * @param UserMapper $userMapper
-     * @param FileMapper $fileMapper
-     * @param CourseSpec\Mapper $courseSpecMapper
-     * @param UnitSpec\Mapper $unitSpecMapper
-     * @param CourseImpl\Mapper $courseImplMapper
-     * @param UnitImpl\Mapper $unitImplMapper
-     */
-    public function __construct(
-        private FolderMapper $folderMapper,
-        private Assessment\DataModel\Mapper $assessmentMapper,
-        private UserMapper $userMapper,
-        private FileMapper $fileMapper,
-        private CourseSpec\Mapper $courseSpecMapper,
-        private UnitSpec\Mapper $unitSpecMapper,
-        private CourseImpl\Mapper $courseImplMapper,
-        private UnitImpl\Mapper $unitImplMapper,
-    ) {
-    }
-
-    /**
      * Main Restore page
      *
      * find all the deleted things
@@ -95,9 +73,29 @@ class Controller extends Base
 
         $deletedFolders = $this->folderMapper->findByPredicates($folderpb->betweenDates('deleted_at', $start, $end), ['deleted' => true,'order' => ['deleted_at' => 'DESC']]);
 
-        // Filter folders where the parent is deleted, these cannot be restored
-        $deletedFolders = $deletedFolders->filter(function (Folder $node) {
-            return !$node->getParent()->isDeleted();
+        // fetch folder codes to pair with the deleted folders (codes will be deleted at the same time)
+        $folderCodepb = $this->folderCodeMapper->getPredicateBuilder();
+        $deletedFolderCodes = $this->folderCodeMapper->findByPredicates($folderCodepb->betweenDates('deleted_at', $start, $end), ['deleted' => true,'order' => ['deleted_at' => 'DESC']]);
+
+        // Light weight cache of all the active folder codes
+        $activeFolderCodesQuery = "
+            SELECT code
+            FROM folder_code
+            WHERE deleted_at IS NULL";
+        $activeFolderCodes = $this->folderCodeMapper->getDatabase()->executeQuery($activeFolderCodesQuery)->fetchColumnArray('code');
+
+
+        $deletedFolders = $deletedFolders->filter(function (Folder $folderNode) use ($activeFolderCodes, $deletedFolderCodes) {
+            // get the codes for this folder
+            $folderCodes = $deletedFolderCodes->filter(function (FolderCode $folderCodesNode) use ($folderNode) {
+                return $folderCodesNode->getFolder()->getId() === $folderNode->getId();
+            });
+            return
+                // if the folder codes are already in use, we can't restore it
+                count(array_intersect($folderCodes->getPropertyValues('code'), $activeFolderCodes)) === 0
+                &&
+                // Filter folders where the parent is deleted, these cannot be restored
+                !$folderNode->getParent()->isDeleted();
         });
 
         // Assessments
@@ -181,6 +179,32 @@ class Controller extends Base
             'deletedUnitImpl'    => $deletedUnitImpl,
             'restoreRange'       => $startRange,
         ]);
+    }
+
+    /**
+     * Controller constructor.
+     *
+     * @param FolderMapper                  $folderMapper
+     * @param FolderCodeMapper              $folderCodeMapper
+     * @param Assessment\DataModel\Mapper   $assessmentMapper
+     * @param UserMapper                    $userMapper
+     * @param FileMapper                    $fileMapper
+     * @param CourseSpec\Mapper             $courseSpecMapper
+     * @param UnitSpec\Mapper               $unitSpecMapper
+     * @param CourseImpl\Mapper             $courseImplMapper
+     * @param UnitImpl\Mapper               $unitImplMapper
+     */
+    public function __construct(
+        private FolderMapper $folderMapper,
+        private FolderCodeMapper $folderCodeMapper,
+        private Assessment\DataModel\Mapper $assessmentMapper,
+        private UserMapper $userMapper,
+        private FileMapper $fileMapper,
+        private CourseSpec\Mapper $courseSpecMapper,
+        private UnitSpec\Mapper $unitSpecMapper,
+        private CourseImpl\Mapper $courseImplMapper,
+        private UnitImpl\Mapper $unitImplMapper,
+    ) {
     }
 
     /**
