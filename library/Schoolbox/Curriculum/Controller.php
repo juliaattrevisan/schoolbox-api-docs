@@ -13,6 +13,7 @@ namespace Schoolbox\Curriculum;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Curriculum\Node\Model;
+use Scrub;
 
 class Controller extends Base
 {
@@ -293,12 +294,11 @@ class Controller extends Base
     {
         $node = $this->nodeMapper->loadDescendants($item, 'parent', 'children');
 
-        $filename = sprintf(
-            "CurriculumExport-%s-%s-%s.csv",
-            $item->getName(),
-            $this->getConfigLoader()->get(ConfigMapper::NAME_SITE_SCHOOL_CODE),
+        $filename = Scrub::filename(sprintf(
+            "CurriculumExport--%s--%s.csv",
+            substr($item->getName(), 0, 50),
             \Alaress_Date_Format::now()->toIso8601String()
-        );
+        ));
 
         $fp = fopen('php://temp', 'w');
 
