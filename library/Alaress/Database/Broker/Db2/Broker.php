@@ -22,9 +22,9 @@ use PDO;
 class Broker extends Base
 {
     /**
-     * Name of the driver to use: must exist in `/etc/odbcinst.ini`.
+     * Name of the driver to use.
      */
-    private const ODBC_DRIVER = 'IBM i Access ODBC Driver';
+    private const ODBC_DRIVER = '{IBM DB2 ODBC DRIVER}';
 
     /**
      * @inheritdoc
@@ -32,7 +32,7 @@ class Broker extends Base
     public static function isAvailable()
     {
         // DB2 now uses ODBC: can only assume that the driver actually exists.
-        return in_array('odbc', PDO::getAvailableDrivers(), true);
+        return in_array('ibm', PDO::getAvailableDrivers(), true);
     }
 
     /**
@@ -79,7 +79,7 @@ class Broker extends Base
         }
 
         return sprintf(
-            "odbc:DRIVER=%s;DATABASE=%s;SYSTEM=%s;%sPROTOCOL=TCPIP;UID=%s;PWD=%s;",
+            "ibm:DRIVER=%s;DATABASE=%s;HOSTNAME=%s;%sPROTOCOL=TCPIP;UID=%s;PWD=%s;",
             self::ODBC_DRIVER,
             $this->connector->getDatabase(),
             $this->connector->getHostname(),
