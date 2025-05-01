@@ -45,7 +45,10 @@ class UpdaterTool extends CliTool\App
             'old' => '5E Model',
             'new' => '5E Model Lesson Plan'
         ],
-
+        'DP_Lesson_Plan.csv' => [
+            'old' => 'DP Lesson PLan',  // YES I KNOW. This has a capital L in "Plan". It's like that in demo data.
+            'new' => 'DP Lesson Plan'   // YES I KNOW. This seems to retain the same name as it originally had.
+        ],
         /* TODO Add more here
          */
     ];
