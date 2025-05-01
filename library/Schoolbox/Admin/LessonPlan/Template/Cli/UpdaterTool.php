@@ -49,6 +49,10 @@ class UpdaterTool extends CliTool\App
             'old' => 'DP Lesson PLan',  // YES I KNOW. This has a capital L in "Plan". It's like that in demo data.
             'new' => 'DP Lesson Plan'   // YES I KNOW. This seems to retain the same name as it originally had.
         ],
+        'Daily_Plan.csv' => [
+            'old' => 'Daily Planner',   // I presume Daily Plan became Daily Planner in the original spreadsheet
+            'new' => 'Daily Plan',      // I presume this meant to have a capital P in Plan
+        ]
         /* TODO Add more here
          */
     ];
