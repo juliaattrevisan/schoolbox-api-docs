@@ -52,7 +52,11 @@ class UpdaterTool extends CliTool\App
         'Daily_Plan.csv' => [
             'old' => 'Daily Planner',   // I presume Daily Plan became Daily Planner in the original spreadsheet
             'new' => 'Daily Plan',      // I presume this meant to have a capital P in Plan
-        ]
+        ],
+        'ELC_Learning_Plan.csv' => [
+            'old' => 'ELC Learning Plans',  // This was lost in the spreadsheet, but this was its original name
+            'new' => 'ELC Learning Plan',   // Everything else is singular so...I guess this is too?
+        ],
         /* TODO Add more here
          */
     ];
