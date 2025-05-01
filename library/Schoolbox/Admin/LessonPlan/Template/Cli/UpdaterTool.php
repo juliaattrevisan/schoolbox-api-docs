@@ -73,6 +73,10 @@ class UpdaterTool extends CliTool\App
             'old' => 'Hook/Teach/Task',
             'new' => 'Hook/Teach/Task Lesson Plan',
         ],
+        'IGCSE_Lesson_Plan.csv' => [
+            'old' => 'IGCSE Lesson Plan',
+            'new' => 'IGCSE Lesson Plan',
+        ]
         /* TODO Add more here
          */
     ];
