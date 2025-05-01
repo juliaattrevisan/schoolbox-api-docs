@@ -21,6 +21,8 @@ export default class CurriculumSelector {
 
     static readonly DATA_TEST_MODAL_UNIT_NODE_CHECKBOX_LABEL = "cs-modal-unit-node-checkbox-label-";
 
+    static readonly DATA_TEST_MODAL_NODE_VIEW_LABEL = "cs-modal-view-node-checkbox-label-";
+
     static readonly DATA_TEST_MODAL_SAVE_BUTTON = "cs-modal-footer-save-button";
 
     static readonly DATA_TEST_SELECTED_NODES_CONTAINER = "cs-selected-nodes-container";
@@ -92,6 +94,14 @@ export default class CurriculumSelector {
                 .getByTestId(`${CurriculumSelector.DATA_TEST_MODAL_UNIT_NODE_CHECKBOX_LABEL}${id.toString()}`)
                 .click();
         }
+    }
+
+    /**
+     * Tick a node in curriculum browser modal
+     * @param id - The node ids to navigate to
+     */
+    async checkNode(id: number): Promise<void> {
+        await this.page.getByTestId(`${CurriculumSelector.DATA_TEST_MODAL_NODE_CHECKBOX_LABEL}${id}`).click();
     }
 
     /**

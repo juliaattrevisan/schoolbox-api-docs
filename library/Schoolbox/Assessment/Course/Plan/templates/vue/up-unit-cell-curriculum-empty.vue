@@ -75,7 +75,9 @@ async function onMapSelected(): Promise<void> {
 <template>
     <i class="icon-curriculum"></i>
     <p v-if="props.unit.curriculum._routes.createComponent && props.unit.curriculum._routes.modifyCurriculum">
-        <a @click.prevent="onMapSelected">Select the curriculum codes</a>
+        <a :data-test="`unit-planner-select-curriculum-code-${props.unit.id}`" @click.prevent="onMapSelected"
+            >Select the curriculum codes</a
+        >
         that you intend to cover in this area of the curriculum
     </p>
     <p v-else>No curriculum codes have been added to this unit.</p>

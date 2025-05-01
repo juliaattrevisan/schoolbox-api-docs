@@ -330,7 +330,7 @@ const isFirstUnit = window.Vue.computed(() => {
                     </button>
                 </div>
             </div>
-            <div v-else class="content-overlay empty-state no-print" data-test="unit-planner-curriculum-empty-state">
+            <div v-else class="content-overlay empty-state no-print">
                 <up-unit-cell-textbox-empty
                     v-if="props.column.type === ColumnType.OVERVIEW"
                     :unit="props.unit"
