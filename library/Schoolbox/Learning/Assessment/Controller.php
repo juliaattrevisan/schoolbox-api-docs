@@ -361,9 +361,9 @@ abstract class Controller extends ListController implements IAssessmentControlle
                     }
                 }
             } else {
-                /* Customise the selected LPT
+                /* Customise the selected LPT - even it was deleted after this lesson plan was made
                  */
-                $lessonPlanTemplate = $this->lessonPlanTemplateMapper->findById((int)$templateId);
+                $lessonPlanTemplate = $this->lessonPlanTemplateMapper->findOneByColumn('id', (int)$templateId, ['deleted' => true]);
 
                 $data['lessonPlanMeta']['template'] = $lessonPlanTemplate;
 
@@ -481,9 +481,9 @@ abstract class Controller extends ListController implements IAssessmentControlle
              */
             $lessonPlan = $this->lessonPlanDataModelMapper->findOneByColumn('assessment_id', $assessment->getId());
 
-            /* Customise the selected LPT
+            /* Customise the selected LPT - even it was deleted after this lesson plan was made
              */
-            $lessonPlanTemplate = $this->lessonPlanTemplateMapper->findById((int)$lessonPlan->getLessonPlanTemplate());
+            $lessonPlanTemplate = $this->lessonPlanTemplateMapper->findOneByColumn('id', (int)$lessonPlan->getLessonPlanTemplate(), ['deleted' => true]);
 
             $data['lessonPlanMeta'] = [
                 'newKeyword' => LessonPlan\Decorator\Decorator::NEW_KEYWORD,
