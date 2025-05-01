@@ -38,14 +38,6 @@ class UpdaterTool extends CliTool\App
 
 
     /**
-     * Where the csv files live
-     *
-     * TODO Probably can't assume this folder path
-     */
-    private const PATH = '/usr/share/schoolbox/tools/assessment/lessonPlanTemplate';
-
-
-    /**
      * Renamed templates and their corresponding csv files containing Lesson Plan Template Fields
      */
     private const SOURCE_FILES = [
@@ -445,7 +437,7 @@ HELP;
     {
         $fp = fopen(sprintf(
             '%s/%s',
-            self::PATH,
+            __DIR__,
             $file
         ), 'r');
 
