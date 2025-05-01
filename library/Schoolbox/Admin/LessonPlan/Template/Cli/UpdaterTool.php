@@ -80,7 +80,11 @@ class UpdaterTool extends CliTool\App
         'Inquiry_Lesson_Plan.csv' => [
             'old' => 'Inquiry Lesson',
             'new' => 'Inquiry Lesson Plan',
-        ]
+        ],
+        'PYP_Lesson_Plan.csv' => [
+            'old' => 'PYP Lesson Plan',
+            'new' => 'PYP Lesson Plan',
+        ],
         /* TODO Add more here
          */
     ];
