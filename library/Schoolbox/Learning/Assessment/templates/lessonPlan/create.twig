@@ -67,7 +67,7 @@
         </template>
 
         <template v-slot:duration>
-            <div class="row">
+            <div class="row l-pad-m--top">
                 <div class="small-12 columns">
                     <label class="required" for="duration">Duration</label>
                     <input id="title" type="text" name="duration" maxlength="255" value="{% if assessment.id %}{{ assessment.duration }}{% endif %}" required />

@@ -32,18 +32,16 @@ window.Vue.onMounted(() => {
         <slot name="curriculum-codes"></slot>
         <slot name="duration"></slot>
 
-        <div class="l-pad-m--top">
-            <button
-                v-if="sbProps.hasAIFeatures"
-                type="button"
-                class="button expand icon-chat"
-                @click="() => lpStore.openModal()"
-            >
-                {{ lpStore.hasLessonContent ? "Regenerate" : "Generate" }}
-                {{ locale.lessonPlan.singular() }}
-                with AI
-            </button>
-        </div>
+        <button
+            v-if="sbProps.hasAIFeatures"
+            type="button"
+            class="button expand icon-chat"
+            @click="() => lpStore.openModal()"
+        >
+            {{ lpStore.hasLessonContent ? "Regenerate" : "Generate" }}
+            {{ locale.lessonPlan.singular() }}
+            with AI
+        </button>
     </fieldset>
 
     <fieldset v-for="(field, i) in lpStore.fields" :key="field.id">
