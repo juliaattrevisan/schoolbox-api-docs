@@ -245,5 +245,28 @@ test.describe("Unit Planner Tests", () => {
             { deleted_at: "2022-01-15 11:22:34" },
             { "title like": "Updated via unit planner" },
         );
+
+        baseTester.isGoingTo("remove the curriculum overview component from unit page");
+
+        const curriculumOverviewComponentId = (await db.grabFromDatabase("component_instance", "id", {
+            module: "homepage",
+            identifier: folderId,
+            position: "top",
+            sequence: 0,
+        })) as number | null;
+
+        if (curriculumOverviewComponentId === null) {
+            baseTester.isGoingTo("skip deletion as the curriculum overview component instance was not found");
+            return;
+        }
+
+        baseTester.isGoingTo(`delete the component instance with ID ${curriculumOverviewComponentId}`);
+        await db.dontHaveInDatabase("component_config_instance", {
+            component_instance_id: curriculumOverviewComponentId,
+        });
+
+        await db.dontHaveInDatabase("component_instance", {
+            id: curriculumOverviewComponentId,
+        });
     });
 });
