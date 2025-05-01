@@ -155,11 +155,15 @@ HELP;
              * contents, before we invade their lesson plan templates.
              */
             foreach (self::SOURCE_FILES as $file => $titles) {
+                $this->refreshLock($lock);
+
                 /* Find all the templates that match the csv's title
                  */
                 $templates = $this->findCandidateTemplates($titles);
 
                 foreach ($templates as $template) {
+                    $this->refreshLock($lock);
+
                     /* Each template consists of multiple fields, which may or may not match the ones specified in the csv.
                      * Presume to remove everything *unless* it was referenced in the csv, thus handling deletions.
                      * This means that if a school created lesson plan template fields, we'll be removing them, forcing
@@ -237,6 +241,8 @@ HELP;
                     $sequence = 0;
 
                     foreach ($updatedFields as $title => $updatedField) {
+                        $this->refreshLock($lock);
+
                         /* Apparently...this is required...for some reason
                          */
                         $index = (string)$title;
@@ -295,6 +301,8 @@ HELP;
                      * This field no longer exists according to the csv.
                      */
                     foreach ($fields as $field) {
+                        $this->refreshLock($lock);
+
                         if ($field['deleted_at']) {
                             $this->getLogger()->debug(sprintf(
                                 'Removing extraneous field "%s" (id: %s)',
