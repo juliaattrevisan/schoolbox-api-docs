@@ -609,14 +609,14 @@ export default {
                                 <input type="checkbox" id="select-all" v-model="allSelected" />
                                 <label for="select-all" class="checkbox-label"></label>
                             </th>
-                            <th width="84"></th>
+                            <td></td>
                             <th>Name</th>
                             <th class="show-for-large-up">{{ yearLevelLabel }}</th>
                             <th class="show-for-large-up" v-if="showTutorGroupColumn">Tutor Group</th>
                             <th class="show-for-medium-up" v-if="showCoreGroupColumn">Core Group</th>
                             <th class="show-for-medium-up" v-if="showHouseColumn">{{ houseLabel }}</th>
                             <th class="show-for-medium-up">Last Visited</th>
-                            <th></th>
+                            <td></td>
                         </tr>
                     </thead>
                     <tbody>
@@ -659,9 +659,9 @@ export default {
                                 </template>
 
                                 <span class="meta">({{ student.synergy_id }})</span>
-                                <span class="show-for-print"><br />{{ student.email }}</span
-                                ><br />
-                                <p class="l-pad-s--top">
+                                <span class="show-for-print"><br />{{ student.email }}</span>
+                                <br />
+                                <div class="l-flex l-gap-xs l-pad-s--vert">
                                     <sbx-label
                                         v-for="studentBadge in studentPastoralCounts[student.id]"
                                         :key="`badge-${studentBadge.typeId}-${studentBadge.subtypeId}`"
@@ -672,7 +672,7 @@ export default {
                                         :text-color="studentBadge.fgColor"
                                         :href="studentBadge.destinationUrl"
                                     />
-                                </p>
+                                </div>
 
                                 <p class="meta inline-container">
                                     <slot name="student-meta" v-bind:student="student">

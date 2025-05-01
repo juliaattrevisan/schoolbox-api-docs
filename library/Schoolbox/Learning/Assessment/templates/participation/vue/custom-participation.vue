@@ -225,8 +225,20 @@ window.Vue.onMounted(() => {
                         />
                     </td>
                     <td>
-                        <template v-if="participant.user.id">
-                            <a :href="`/search/user/${participant.user.id}`">
+                        <div class="l-flex-col l-gap-s">
+                            <template v-if="participant.user.id">
+                                <a :href="`/search/user/${participant.user.id}`">
+                                    {{ participant.user.lastname + ", " + participant.user.firstname }}
+                                    {{
+                                        participant.user.preferredName &&
+                                        participant.user.preferredName !== participant.user.firstname
+                                            ? "‘" + participant.user.preferredName + "’"
+                                            : ""
+                                    }}
+                                    {{ participant.user.pronoun }}
+                                </a>
+                            </template>
+                            <template v-else>
                                 {{ participant.user.lastname + ", " + participant.user.firstname }}
                                 {{
                                     participant.user.preferredName &&
@@ -235,32 +247,20 @@ window.Vue.onMounted(() => {
                                         : ""
                                 }}
                                 {{ participant.user.pronoun }}
-                            </a>
-                        </template>
-                        <template v-else>
-                            {{ participant.user.lastname + ", " + participant.user.firstname }}
-                            {{
-                                participant.user.preferredName &&
-                                participant.user.preferredName !== participant.user.firstname
-                                    ? "‘" + participant.user.preferredName + "’"
-                                    : ""
-                            }}
-                            {{ participant.user.pronoun }}
-                        </template>
-                        <br />
-
-                        <p class="l-pad-s--top">
-                            <sbx-label
-                                v-for="studentBadge in studentPastoralCounts[participant.user.id]"
-                                :key="`badge-${studentBadge.typeId}-${studentBadge.subtypeId}`"
-                                :title="studentBadge.title"
-                                :text="studentBadge.count.toString()"
-                                :icon="studentBadge.icon"
-                                :background-color="studentBadge.bgColor"
-                                :text-color="studentBadge.fgColor"
-                                :href="studentBadge.destinationUrl"
-                            />
-                        </p>
+                            </template>
+                            <div class="l-flex l-gap-xs">
+                                <sbx-label
+                                    v-for="studentBadge in studentPastoralCounts[participant.user.id]"
+                                    :key="`badge-${studentBadge.typeId}-${studentBadge.subtypeId}`"
+                                    :title="studentBadge.title"
+                                    :text="studentBadge.count.toString()"
+                                    :icon="studentBadge.icon"
+                                    :background-color="studentBadge.bgColor"
+                                    :text-color="studentBadge.fgColor"
+                                    :href="studentBadge.destinationUrl"
+                                />
+                            </div>
+                        </div>
                     </td>
                     <td>
                         <span v-if="participant.excludedAt !== null">Excluded</span>

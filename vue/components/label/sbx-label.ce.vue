@@ -91,6 +91,7 @@ Long term they will reference the design colour tokens
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
 }
+
 .sbx-label-link {
     text-decoration: none;
 }
@@ -111,6 +112,7 @@ Long term they will reference the design colour tokens
     background-color: #dddddd;
     color: #474747;
 }
+
 .sbx-label__icon {
     align-items: center;
     display: inline-flex;
