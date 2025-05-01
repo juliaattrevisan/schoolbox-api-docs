@@ -2,7 +2,6 @@ import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import UnitPlanner from "@schoolboxTest/playwright/support/page/unitPlanner/UnitPlanner";
 import AssessmentForm from "@schoolboxTest/playwright/support/page/dueWork/AssessmentForm";
 import CurriculumSelector from "@schoolboxTest/playwright/support/page/curriculum/selector/CurriculumSelector";
-import SearchSelect from "@schoolboxTest/playwright/support/components/SearchSelect";
 
 test.describe("Unit Planner Tests", () => {
     test.describe.configure({ mode: "serial" });
