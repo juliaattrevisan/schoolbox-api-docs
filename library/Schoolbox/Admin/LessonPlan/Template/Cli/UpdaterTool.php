@@ -61,6 +61,10 @@ class UpdaterTool extends CliTool\App
             'old' => 'Generic Primary',
             'new' => 'Generic Primary Lesson Plan',
         ],
+        'Generic_Secondary_Lesson_Plan.csv' => [
+            'old' => 'Generic Secondary',
+            'new' => 'Generic Secondary Lesson Plan',
+        ],
         /* TODO Add more here
          */
     ];
