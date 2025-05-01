@@ -36,9 +36,13 @@ export type LpGenerateApiFieldPayload = {
 
 type LpGenerateApiPayload = {
     /**
+     * The title of the Lesson Plan Template that spawned this Lesson Plan
+     */
+    templateTitle: string;
+    /**
      * The current title of the lesson plan
      */
-    title: string;
+    lessonPlanTitle: string;
     /**
      * The course name/unit name/folder name/etc that this is being created for
      */

@@ -361,11 +361,11 @@ abstract class Controller extends ListController implements IAssessmentControlle
                     }
                 }
             } else {
-                /* Customise the selected LPT
+                /* Customise the selected LPT - even it was deleted after this lesson plan was made
                  */
-                $lessonPlanTemplate = $this->lessonPlanTemplateMapper->findById((int)$templateId);
+                $lessonPlanTemplate = $this->lessonPlanTemplateMapper->findOneByColumn('id', (int)$templateId, ['deleted' => true]);
 
-                $data['lessonPlanMeta']['template'] = $lessonPlanTemplate->getId();
+                $data['lessonPlanMeta']['template'] = $lessonPlanTemplate;
 
                 /* Field list contains the ones from the Lesson Plan Template when creating
                  * When updating, it's actually fields from the Lesson Plan instance itself
@@ -481,12 +481,16 @@ abstract class Controller extends ListController implements IAssessmentControlle
              */
             $lessonPlan = $this->lessonPlanDataModelMapper->findOneByColumn('assessment_id', $assessment->getId());
 
+            /* Customise the selected LPT - even it was deleted after this lesson plan was made
+             */
+            $lessonPlanTemplate = $this->lessonPlanTemplateMapper->findOneByColumn('id', (int)$lessonPlan->getLessonPlanTemplate(), ['deleted' => true]);
+
             $data['lessonPlanMeta'] = [
                 'newKeyword' => LessonPlan\Decorator\Decorator::NEW_KEYWORD,
                 'consts' => [
                     'student' => \Schoolbox\Role::STUDENT
                 ],
-                'template' => $lessonPlan->getLessonPlanTemplate(),
+                'template' => $lessonPlanTemplate,
                 'fields' => [],
                 'type' => AssessmentType::TYPE_LESSON_PLAN,
                 'mageAsync' => false,
@@ -530,7 +534,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 ->findMimeTypesFromExtensions(
                     array_keys(KamiModel::ALLOWED_FILE_TYPES)
                 );
-
 
             $zone = (new Zone('worksheet'))
                 ->setMulti(false)

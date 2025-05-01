@@ -23,11 +23,17 @@ class LessonPlan
      * (some parts stolen directly from openai's docs)
      */
     private const PROMPT_SYSTEM_PERSONA = "
-        You are an expert teacher for a class, proficient in creating engaging, well-developed, and
-        effective lesson plans for your students. The lesson plan you create is part of the course and
-        unit described, which fall within a specific curriculum area. It should address the curriculum
-        content and incorporate any additional notes provided by the user to ensure strong alignment.
-        Your language of instruction is [LANGUAGE].
+        You are an expert teacher, proficient in creating engaging, well-developed, and effective learning and teaching
+        plans for your students. You will receive a plan type that is part of a specific course and unit within a defined
+        curriculum area. Your task is to develop a plan that addresses the provided curriculum content and incorporates
+        any additional notes to ensure strong alignment. Your language of instruction is [LANGUAGE]. 
+        
+        If any field is missing or left blank, follow these guidelines:
+            * Course/Unit Context: If missing, infer a general context using the curriculum content and plan type.
+            * Curriculum Content: If missing, infer appropriate content based on the plan type, course/unit context, title, and any additional notes.
+            * Curriculum Area: If missing, use the plan type, course/unit context, title, and additional notes to determine the relevant subject area.
+            * Duration: If not provided, exclude any time-specific content or scheduling details from the plan.
+            * Additional Notes: If missing, proceed without them and ensure the plan aligns closely with the plan type, curriculum content, title, course/unit context, and curriculum area.
 
         Create a range of suggestions USING HTML that align with the following field topics; each field topic should
         use the fields_format json response format.
@@ -77,6 +83,8 @@ class LessonPlan
      *
      * This lets you supply scalar ids, which are resolved to actual instances via mappers
      *
+     * @param string $templateTitle
+     * @param string $lessonPlanTitle
      * @param string $context
      * @param array $fields
      * @param string $duration
@@ -88,6 +96,8 @@ class LessonPlan
      * @throws \JsonException
      */
     public function generate(
+        string $templateTitle,
+        string $lessonPlanTitle,
         string $context,
         array $fields,
         string $duration,
@@ -106,6 +116,8 @@ class LessonPlan
         /* Generate the Systema nd User nodes for the prompt payload
          */
         $prompt = $this->generatePrompt(
+            $templateTitle,
+            $lessonPlanTitle,
             $context,
             $duration,
             $curriculumNames,
@@ -166,6 +178,8 @@ class LessonPlan
      * These could come from a POST array or similar; generateFromInstances() lets you supply
      * actual Lesson Plan and Lesson Plan Template instances, saving you extracting this manually.
      *
+     * @param string $templateTitle
+     * @param string $lessonPlanTitle
      * @param string $context
      * @param string $duration
      * @param array $curriculumNames
@@ -173,6 +187,8 @@ class LessonPlan
      * @return array
      */
     private function generatePrompt(
+        string $templateTitle,
+        string $lessonPlanTitle,
         string $context,
         string $duration,
         array $curriculumNames,
@@ -188,11 +204,17 @@ class LessonPlan
          * provide additional instructions (if meaningful)
          */
         $userContent = "
+            Plan Type: [TEMPLATE TITLE]
+            Title: [LESSON PLAN TITLE]
             Course/Unit Context: [CONTEXT]
             Duration: [DURATION]
+            [CURRICULUM CONTENT]
+            [CURRICULUM AREA]
         ";
 
         $userContent = strtr($userContent, [
+            '[TEMPLATE TITLE]' => $templateTitle,
+            '[LESSON PLAN TITLE]' => $lessonPlanTitle,
             '[CONTEXT]' => $context,
             '[DURATION]' => $duration,
         ]);
@@ -208,7 +230,7 @@ class LessonPlan
 
             unset($vals);
 
-            $curriculumContent = "Curriculum Content: " . implode(",\n", $nodes) . "\n\n";
+            $curriculumContent = implode(",\n", $nodes);
 
             /* Yoink out the rest of each node's hierarchy, dedupe it, and then compile it into a csv
              * Note that multiple hierarchies might exist in this cauldron of data
@@ -221,19 +243,28 @@ class LessonPlan
 
             /* Slam it into the prompt, in a particular order I suppose
              */
-            $userContent .= "Curriculum Area: " . implode(', ', $areas) . "\n\n";
-            $userContent .= $curriculumContent;
+            $curriculumAreas = implode(', ', $areas);
+
+            $userContent = strtr($userContent, [
+                '[CURRICULUM CONTENT]' => 'Curriculum Content: ' . $curriculumContent,
+                '[CURRICULUM AREA]' => 'Curriculum Area: ' . $curriculumAreas
+            ]);
+        } else {
+            $userContent = strtr($userContent, [
+                '[CURRICULUM CONTENT]' => '',
+                '[CURRICULUM AREA]' => ''
+            ]);
         }
 
         /* Whatever the user also instructed from the ui
          */
         if ('' !== $additionalContext) {
-            $userContent .= 'Additional Notes: ' . $additionalContext;
+            $userContent .= '    Additional Notes: ' . $additionalContext;
         }
 
         return [
-            'system' => $systemContent,
-            'user' => $userContent
+            'system' => trim($systemContent),
+            'user' => trim($userContent)
         ];
     }
 
