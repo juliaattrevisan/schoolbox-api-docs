@@ -106,10 +106,9 @@ class UpdaterTool extends CliTool\App
 
 Lesson Plan Template Updater
 
-Updates lesson plan templates' titles, field descriptions and field bodies for the
-schoolbox-created default data in admin. This matches based on titles, spawning new
-templates and/or fields as required, deleting any that didn't match the spec contained
-in the various csvs. 
+Updates lesson plan templates' titles, field descriptions and field bodies for the schoolbox-created
+default data in admin. This matches based on titles, spawning new templates and/or fields as required,
+deleting any that didn't match the spec contained in the various csvs. 
 
 Usage: php template-updater.php -vvv --perform
 
@@ -135,58 +134,7 @@ HELP;
 
             /* Prepare some oft-used queries
              */
-            $this->candidateTemplateStatement = $this->getDatabaseInternal()->prepare("
-                SELECT *
-                FROm lesson_plan_template
-                WHERE title = :title
-                AND deleted_at IS NULL
-            ");
-
-            $this->renameTemplateStatement = $this->getDatabaseInternal()->prepare("
-                UPDATE lesson_plan_template
-                SET title = :title
-                WHERE id = :id
-            ");
-
-            $this->createTemplateStatement = $this->getDatabaseInternal()->prepare("
-                INSERT INTO lesson_plan_template
-                (title, enabled, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by)
-                VALUES (:title, :enabled, :createdAt, :createdBy, :updatedAt, :updatedBy, :deletedAt, :deletedBy)
-            ");
-
-            $this->templateFieldsStatement = $this->getDatabaseInternal()->prepare("
-                SELECT *
-                FROM lesson_plan_template_field
-                WHERE lesson_plan_template_id = :templateId
-                AND deleted_at IS NULL
-                ORDER BY sequence
-            ");
-
-            $this->createFieldStatement = $this->getDatabaseInternal()->prepare("
-                INSERT INTO lesson_plan_template_field
-                (lesson_plan_template_id, title, body, description, visibility, sequence, created_at, updated_at, deleted_at)
-                VALUES (:lessonPlanTemplateId, :title, :body, :description, :visibility, :sequence, :createdAt, :updatedAt, :deletedAt)
-            ");
-
-            $this->updateFieldStatement = $this->getDatabaseInternal()->prepare("
-                UPDATE lesson_plan_template_field
-                SET lesson_plan_template_id = :lessonPlanTemplateId,
-                    title = :title,
-                    body = :body,
-                    description = :description,
-                    visibility = :visibility,
-                    sequence = :sequence,
-                    created_at = :createdAt,
-                    updated_at = :updatedAt,
-                    deleted_at = :deletedAt
-                WHERE id = :id
-            ");
-
-            $this->deleteFieldStatement = $this->getDatabaseInternal()->prepare("
-                UPDATE lesson_plan_template_field
-                SET deleted_at = :deletedAt
-                WHERE id = :id
-            ");
+            $this->prepare();
 
             /* This is alaress admin
              */
@@ -377,10 +325,72 @@ HELP;
         }
 
         /* Announce lock release
-          */
+         */
         $this->getLogger()->debug('Releasing lock');
 
         $lock->release();
+    }
+
+
+    /**
+     * Set up prepared statements etc.
+     *
+     * @return void
+     */
+    private function prepare(): void
+    {
+        $this->candidateTemplateStatement = $this->getDatabaseInternal()->prepare("
+            SELECT *
+            FROm lesson_plan_template
+            WHERE title = :title
+            AND deleted_at IS NULL
+        ");
+
+        $this->renameTemplateStatement = $this->getDatabaseInternal()->prepare("
+            UPDATE lesson_plan_template
+            SET title = :title
+            WHERE id = :id
+        ");
+
+        $this->createTemplateStatement = $this->getDatabaseInternal()->prepare("
+            INSERT INTO lesson_plan_template
+            (title, enabled, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by)
+            VALUES (:title, :enabled, :createdAt, :createdBy, :updatedAt, :updatedBy, :deletedAt, :deletedBy)
+        ");
+
+        $this->templateFieldsStatement = $this->getDatabaseInternal()->prepare("
+            SELECT *
+            FROM lesson_plan_template_field
+            WHERE lesson_plan_template_id = :templateId
+            AND deleted_at IS NULL
+            ORDER BY sequence
+        ");
+
+        $this->createFieldStatement = $this->getDatabaseInternal()->prepare("
+            INSERT INTO lesson_plan_template_field
+            (lesson_plan_template_id, title, body, description, visibility, sequence, created_at, updated_at, deleted_at)
+            VALUES (:lessonPlanTemplateId, :title, :body, :description, :visibility, :sequence, :createdAt, :updatedAt, :deletedAt)
+        ");
+
+        $this->updateFieldStatement = $this->getDatabaseInternal()->prepare("
+            UPDATE lesson_plan_template_field
+            SET lesson_plan_template_id = :lessonPlanTemplateId,
+                title = :title,
+                body = :body,
+                description = :description,
+                visibility = :visibility,
+                sequence = :sequence,
+                created_at = :createdAt,
+                updated_at = :updatedAt,
+                deleted_at = :deletedAt
+            WHERE id = :id
+        ");
+
+        $this->deleteFieldStatement = $this->getDatabaseInternal()->prepare("
+            UPDATE lesson_plan_template_field
+            SET deleted_at = :deletedAt
+            WHERE id = :id
+        ");
     }
 
 
