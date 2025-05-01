@@ -254,9 +254,15 @@ HELP;
                         if (isset($fields[$index])) {
                             $struct = $fields[$index];
 
+                            /* Keep this, because we're reusing it
+                             */
+                            $fields[$index]['deleted_at'] = null;
+
                             $this->getLogger()->debug(sprintf(
-                                'Updating existing field "%s"',
-                                $struct['title']
+                                'Updating existing field "%s" (id: %s) in template id %s',
+                                $struct['title'],
+                                $struct['id'],
+                                $template['id']
                             ));
 
                             if ($this->perform()) {
@@ -277,8 +283,9 @@ HELP;
                             /* If it doesn't exist, spawn it
                              */
                             $this->getLogger()->debug(sprintf(
-                                'Creating new field "%s"',
-                                $updatedField[0]
+                                'Creating new field "%s" in template id %s',
+                                $updatedField[0],
+                                $template['id']
                             ));
 
                             if ($this->perform()) {
