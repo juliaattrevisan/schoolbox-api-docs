@@ -70,4 +70,21 @@ export default class CurriculumSelector {
     async expectSelectedToContain(text: string): Promise<void> {
         await expect(this.page.getByTestId(CurriculumSelector.DATA_TEST_SELECTED_NODES_CONTAINER)).toContainText(text);
     }
+
+    /**
+     * Expect the selected nodes to not contain the text
+     * @param text - The text to not expect
+     */
+    async expectSelectedNotToContain(text: string): Promise<void> {
+        await expect(this.page.getByTestId(CurriculumSelector.DATA_TEST_SELECTED_NODES_CONTAINER)).not.toContainText(
+            text,
+        );
+    }
+
+    /**
+     * Expect the selected nodes to be empty (so not be visible at all)
+     */
+    async expectSelectedToBeEmpty(): Promise<void> {
+        await expect(this.page.getByTestId(CurriculumSelector.DATA_TEST_SELECTED_NODES_CONTAINER)).not.toBeVisible();
+    }
 }
