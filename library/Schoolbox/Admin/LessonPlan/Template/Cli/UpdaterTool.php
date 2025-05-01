@@ -69,6 +69,10 @@ class UpdaterTool extends CliTool\App
             'old' => 'Gradual Release Model',
             'new' => 'Gradual Release Model Lesson Plan',
         ],
+        'Hook_Teach_Task_Lesson_Plan.csv' => [
+            'old' => 'Hook/Teach/Task',
+            'new' => 'Hook/Teach/Task Lesson Plan',
+        ],
         /* TODO Add more here
          */
     ];
