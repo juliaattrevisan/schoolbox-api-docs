@@ -8,6 +8,7 @@ import { useNodeTitle } from "@schoolboxCurriculum/vue/composables/useNodeTitle"
 import { generateUUID } from "@js/util/jsUtils";
 import { useUnitNodesStore } from "../../store/csUnitNodesStore";
 import { useModalSelectedNodesStore } from "../../store/csModalSelectedNodesStore";
+import csModalUnitChildNode from "./cs-modal-unit-child-node.vue";
 
 interface Props {
     node: Node; // the assigned node to display
