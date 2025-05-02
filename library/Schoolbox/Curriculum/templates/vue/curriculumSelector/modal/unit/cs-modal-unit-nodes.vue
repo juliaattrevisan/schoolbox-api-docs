@@ -4,7 +4,7 @@
  */
 
 import { useUnitNodesStore } from "../../store/csUnitNodesStore";
-import CsModalUnitNode from "./cs-modal-unit-node.vue";
+import CsModalUnitParentNode from "./cs-modal-unit-parent-node.vue";
 
 const store = useUnitNodesStore();
 </script>
@@ -12,7 +12,7 @@ const store = useUnitNodesStore();
 <template>
     <div class="nodes-container" data-test="cs-modal-unit-nodes-container">
         <ul v-if="store.hasLoaded" class="nodes l-flex-col">
-            <cs-modal-unit-node
+            <cs-modal-unit-parent-node
                 v-for="node in store.nodes"
                 :key="node.id"
                 :node="node"
