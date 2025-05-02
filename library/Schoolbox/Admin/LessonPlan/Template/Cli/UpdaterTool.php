@@ -38,66 +38,121 @@ class UpdaterTool extends CliTool\App
 
 
     /**
+     * Some plans only get changed/created in one set, but not the other
+     */
+    private const DATASET_INITIAL = 'initial';
+    private const DATASET_DEMO = 'demo';
+
+
+    /**
      * Renamed templates and their corresponding csv files containing Lesson Plan Template Fields
      */
     private const SOURCE_FILES = [
         '5E_Model_Lesson_Plan.csv' => [
             'old' => '5E Model',
-            'new' => '5E Model Lesson Plan'
+            'new' => '5E Model Lesson Plan',
+            'datasets' => [
+                self::DATASET_INITIAL,
+                self::DATASET_DEMO,
+            ],
         ],
         'DP_Lesson_Plan.csv' => [
             'old' => 'DP Lesson PLan',  // YES I KNOW. This has a capital L in "Plan". It's like that in demo data.
-            'new' => 'DP Lesson Plan'   // YES I KNOW. This seems to retain the same name as it originally had.
+            'new' => 'DP Lesson Plan',   // YES I KNOW. This seems to retain the same name as it originally had.
+            'datasets' => [
+                self::DATASET_DEMO,
+            ],
         ],
-        'Daily_Plan.csv' => [
-            'old' => 'Daily Planner',   // I presume Daily Plan became Daily Planner in the original spreadsheet
-            'new' => 'Daily Plan',      // I presume this meant to have a capital P in Plan
-        ],
+// This USED to exist...not sure if it is supposed to anymore?
+//        'Daily_Plan.csv' => [
+//            'old' => 'Daily Planner',   // I presume Daily Plan became Daily Planner in the original spreadsheet
+//            'new' => 'Daily Plan',      // I presume this meant to have a capital P in Plan
+//            'datasets' => [],
+//        ],
         'ELC_Learning_Plan.csv' => [
             'old' => 'ELC Learning Plans',  // This was lost in the spreadsheet, but this was its original name
             'new' => 'ELC Learning Plan',   // Everything else is singular so...I guess this is too?
+            'datasets' => [
+                self::DATASET_DEMO,
+            ],
         ],
         'Generic_Primary_Lesson_Plan.csv' => [
             'old' => 'Generic Primary',
             'new' => 'Generic Primary Lesson Plan',
+            'datasets' => [
+                self::DATASET_INITIAL,
+                self::DATASET_DEMO,
+            ],
         ],
         'Generic_Secondary_Lesson_Plan.csv' => [
             'old' => 'Generic Secondary',
             'new' => 'Generic Secondary Lesson Plan',
+            'datasets' => [
+                self::DATASET_INITIAL,
+                self::DATASET_DEMO,
+            ],
         ],
         'Gradual_Release_Model_Lesson_Plan.csv' => [
             'old' => 'Gradual Release Model',
             'new' => 'Gradual Release Model Lesson Plan',
+            'datasets' => [
+                self::DATASET_INITIAL,
+                self::DATASET_DEMO,
+            ],
         ],
         'Hook_Teach_Task_Lesson_Plan.csv' => [
             'old' => 'Hook/Teach/Task',
             'new' => 'Hook/Teach/Task Lesson Plan',
+            'datasets' => [
+                self::DATASET_INITIAL,
+                self::DATASET_DEMO,
+            ],
         ],
         'IGCSE_Lesson_Plan.csv' => [
             'old' => 'IGCSE Lesson Plan',
             'new' => 'IGCSE Lesson Plan',
+            'datasets' => [
+                self::DATASET_DEMO,
+            ],
         ],
         'Inquiry_Lesson_Plan.csv' => [
             'old' => 'Inquiry Lesson',
             'new' => 'Inquiry Lesson Plan',
+            'datasets' => [
+                self::DATASET_INITIAL,
+                self::DATASET_DEMO,
+            ],
         ],
         'PYP_Lesson_Plan.csv' => [
             'old' => 'PYP Lesson Plan',
             'new' => 'PYP Lesson Plan',
+            'datasets' => [
+                self::DATASET_DEMO,
+            ],
         ],
         'Simplified_Lesson_Plan.csv' => [
             'old' => 'Simplified Lesson Plan',
             'new' => 'Simplified Lesson Plan',
+            'datasets' => [
+                self::DATASET_DEMO,
+            ],
         ],
         // This is a completely new lesson plan template we've never seen before.
         'Detailed_Weekly_Plan.csv' => [
             'old' => 'Detailed Weekly Plan',
             'new' => 'Detailed Weekly Plan',
+            'datasets' => [
+                self::DATASET_DEMO,
+            ],
         ],
         // This is a completely new lesson plan template we've never seen before.
         'Weekly_Plan.csv' => [
             'old' => 'Weekly Plan',
             'new' => 'Weekly Plan',
+            'datasets' => [
+                self::DATASET_INITIAL,
+                self::DATASET_DEMO,
+            ],
         ],
     ];
 
