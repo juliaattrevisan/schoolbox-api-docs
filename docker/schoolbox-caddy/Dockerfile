@@ -42,5 +42,4 @@ WORKDIR /usr/share/schoolbox
 # Command:
 # should be caddy instead of php-fpm,
 # but keep php-fpm running in background and logging to stdout as well
-RUN php-fpm -D
-CMD caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
+CMD php-fpm -D & caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
