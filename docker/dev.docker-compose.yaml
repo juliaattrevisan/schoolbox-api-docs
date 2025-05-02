@@ -12,6 +12,7 @@ services:
     restart: always
     build:
       context: ./schoolbox-caddy
+      dockerfile: dev-image.Dockerfile
     volumes:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage

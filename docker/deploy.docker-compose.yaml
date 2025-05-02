@@ -12,6 +12,7 @@ services:
     restart: always
     build:
       context: ./schoolbox-caddy
+      dockerfile: deploy-image.Dockerfile
       additional_contexts:
         - code=../
     volumes:
