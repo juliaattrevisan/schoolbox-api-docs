@@ -496,29 +496,29 @@ test.describe("Profile Editor", () => {
 
         // 1: Set up Portrait Image on student profile page
         tester.isGoingTo("Set up Portrait Image on Student profile editor page");
-        await profileEditor.clickPortraitImageCog("student");
-        await profileEditor.clickPortraitImageCheckbox("student", "availability", "2");
-        await profileEditor.clickPortraitImageUpdateButton("student");
+        await profileEditor.clickFieldCog("student", "portrait");
+        await profileEditor.clickFieldCheckbox("student", "portrait", "availability", "2");
+        await profileEditor.clickFieldUpdateButton("student", "portrait");
 
         // 2: Set up Portrait Image on staff profile page
         tester.isGoingTo("Set up Portrait Image on Staff profile editor page");
         await profileEditor.clickRoleType("staff");
-        await profileEditor.clickPortraitImageCog("staff");
-        await profileEditor.clickPortraitImageCheckbox("staff", "visibility", "student");
-        await profileEditor.clickPortraitImageCheckbox("staff", "visibility", "staff");
-        await profileEditor.clickPortraitImageCheckbox("staff", "visibility", "parent");
-        await profileEditor.clickPortraitImageCheckbox("staff", "availability", "2");
-        await profileEditor.clickPortraitImageUpdateButton("staff");
+        await profileEditor.clickFieldCog("staff", "portrait");
+        await profileEditor.clickFieldCheckbox("staff", "portrait", "visibility", "student");
+        await profileEditor.clickFieldCheckbox("staff", "portrait", "visibility", "staff");
+        await profileEditor.clickFieldCheckbox("staff", "portrait", "visibility", "parent");
+        await profileEditor.clickFieldCheckbox("staff", "portrait", "availability", "2");
+        await profileEditor.clickFieldUpdateButton("staff", "portrait");
 
         // 3: Set up Portrait Image on Parent profile page
         tester.isGoingTo("Set up Portrait Image on Parent profile editor page");
         await profileEditor.clickRoleType("parent");
-        await profileEditor.clickPortraitImageCog("parent");
-        await profileEditor.clickPortraitImageCheckbox("parent", "visibility", "self");
-        await profileEditor.clickPortraitImageCheckbox("parent", "visibility", "student");
-        await profileEditor.clickPortraitImageCheckbox("parent", "visibility", "staff");
-        await profileEditor.clickPortraitImageCheckbox("parent", "visibility", "parent");
-        await profileEditor.clickPortraitImageUpdateButton("parent");
+        await profileEditor.clickFieldCog("parent", "portrait");
+        await profileEditor.clickFieldCheckbox("parent", "portrait", "visibility", "self");
+        await profileEditor.clickFieldCheckbox("parent", "portrait", "visibility", "student");
+        await profileEditor.clickFieldCheckbox("parent", "portrait", "visibility", "staff");
+        await profileEditor.clickFieldCheckbox("parent", "portrait", "visibility", "parent");
+        await profileEditor.clickFieldUpdateButton("parent", "portrait");
 
         // Impersonate Jack Coles
         await tester.impersonate(teacher);
@@ -576,29 +576,29 @@ test.describe("Profile Editor", () => {
 
         // 1: Restoring Portrait Image on student profile page
         tester.isGoingTo("Restore Portrait Image on Student profile editor page");
-        await profileEditor.clickPortraitImageCog("student");
-        await profileEditor.clickPortraitImageCheckbox("student", "availability", "2");
-        await profileEditor.clickPortraitImageUpdateButton("student");
+        await profileEditor.clickFieldCog("student", "portrait");
+        await profileEditor.clickFieldCheckbox("student", "portrait", "availability", "2");
+        await profileEditor.clickFieldUpdateButton("student", "portrait");
 
         // 2: Restoring Portrait Image on staff profile page
         tester.isGoingTo("Restore Portrait Image on Staff profile editor page");
         await profileEditor.clickRoleType("staff");
-        await profileEditor.clickPortraitImageCog("staff");
-        await profileEditor.clickPortraitImageCheckbox("staff", "visibility", "student");
-        await profileEditor.clickPortraitImageCheckbox("staff", "visibility", "staff");
-        await profileEditor.clickPortraitImageCheckbox("staff", "visibility", "parent");
-        await profileEditor.clickPortraitImageCheckbox("staff", "availability", "2");
-        await profileEditor.clickPortraitImageUpdateButton("staff");
+        await profileEditor.clickFieldCog("staff", "portrait");
+        await profileEditor.clickFieldCheckbox("staff", "portrait", "visibility", "student");
+        await profileEditor.clickFieldCheckbox("staff", "portrait", "visibility", "staff");
+        await profileEditor.clickFieldCheckbox("staff", "portrait", "visibility", "parent");
+        await profileEditor.clickFieldCheckbox("staff", "portrait", "availability", "2");
+        await profileEditor.clickFieldUpdateButton("staff", "portrait");
 
         // 3: Restoring Portrait Image on parent profile page
         tester.isGoingTo("Restore Portrait Image on Parent profile editor page");
         await profileEditor.clickRoleType("parent");
-        await profileEditor.clickPortraitImageCog("parent");
-        await profileEditor.clickPortraitImageCheckbox("parent", "visibility", "self");
-        await profileEditor.clickPortraitImageCheckbox("parent", "visibility", "student");
-        await profileEditor.clickPortraitImageCheckbox("parent", "visibility", "staff");
-        await profileEditor.clickPortraitImageCheckbox("parent", "visibility", "parent");
-        await profileEditor.clickPortraitImageUpdateButton("parent");
+        await profileEditor.clickFieldCog("parent", "portrait");
+        await profileEditor.clickFieldCheckbox("parent", "portrait", "visibility", "self");
+        await profileEditor.clickFieldCheckbox("parent", "portrait", "visibility", "student");
+        await profileEditor.clickFieldCheckbox("parent", "portrait", "visibility", "staff");
+        await profileEditor.clickFieldCheckbox("parent", "portrait", "visibility", "parent");
+        await profileEditor.clickFieldUpdateButton("parent", "portrait");
     });
 
     /**
