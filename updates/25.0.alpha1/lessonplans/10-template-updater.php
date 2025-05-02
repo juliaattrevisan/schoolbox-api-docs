@@ -8,5 +8,5 @@
 
 declare(strict_types=1);
 
-passthru('php ' . __DIR__ .  '/../../../tools/assessment/lessonPlanTemplate/template-updater.php --dataset=initial', $resultCode);
+passthru('php ' . __DIR__ .  '/../../../tools/assessment/lessonPlanTemplate/template-updater.php --dataset=initial --perform', $resultCode);
 exit($resultCode);
