@@ -38,6 +38,12 @@ class UpdaterTool extends CliTool\App
 
 
     /**
+     * Choose which datasets' templates
+     */
+    private const OPT_LONG_DATASET = 'dataset:';
+
+
+    /**
      * Some plans only get changed/created in one set, but not the other
      */
     private const DATASET_INITIAL = 'initial';
@@ -192,6 +198,7 @@ class UpdaterTool extends CliTool\App
     {
         return [
             self::OPT_LONG_HELP,
+            self::OPT_LONG_DATASET,
         ];
     }
 
@@ -210,8 +217,10 @@ Updates lesson plan templates' titles, field descriptions and field bodies for t
 default data in admin. This matches based on titles, spawning new templates and/or fields as required,
 deleting any that didn't match the spec contained in the various csvs. 
 
-Usage: php template-updater.php -vvv --perform
+Usage: php template-updater.php --dataset=[initial,demo] -vvv --perform
 
+Ex.    php template-updater.php --dataset=initial -vvv --perform
+Ex.    php template-updater.php --dataset=demo -vvv --perform
 
 HELP;
             return;
@@ -244,6 +253,17 @@ HELP;
              */
             $this->now = \Alaress_Date_Format::now()->getDatabase();
 
+            /* Check that this matches the dataset you chose to import
+             */
+            $dataset = trim((string)$this->getOpt(self::OPT_LONG_DATASET));
+
+            /* This is mandatory
+             */
+            if ('' === $dataset) {
+                $this->getLogger()->warning('Choose a dataset to update. See --help for more options.');
+                return;
+            }
+
             /* Each lesson plan template update comes in a csv file. Find all the lesson plan templates that match the
              * title specified in the csv, updating each of them synonymously.
              *
@@ -254,6 +274,18 @@ HELP;
              */
             foreach (self::SOURCE_FILES as $file => $titles) {
                 $this->refreshLock($lock);
+
+                /* Check that this matches the dataset you chose to import
+                 */
+                if (!\in_array($dataset, $titles['datasets'], true)) {
+                    $this->getLogger()->debug(sprintf(
+                        'Template "%s" not in the chosen dataset %s: skipping',
+                        $titles['new'],
+                        $dataset
+                    ));
+
+                    continue;
+                }
 
                 /* Find all the templates that match the csv's title
                  */
