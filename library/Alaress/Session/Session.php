@@ -304,4 +304,9 @@ class Session extends BaseSession
     {
         $this->getSegment($namespace)->set($key, $value);
     }
+
+    public function getCookie($name)
+    {
+        return $this->cookies[$name] ?? null;
+    }
 }

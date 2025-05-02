@@ -1490,4 +1490,42 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     {
         return $this->pronoun;
     }
+
+    /**
+     * Check if the celebration confetti required
+     *
+     * @return bool
+     */
+    public function isBirthday(): bool
+    {
+        $externalId = $this->getExternalId();
+        if ('' === (string)$externalId) {
+            return false;
+        }
+
+        /* Unfortunately, Only students get to celebrate their birthday =(
+         */
+        if (!$this->getRole()->isStudent()) {
+            return false;
+        }
+
+        $studentExternal = (new \External_User())->getStudent($externalId);
+
+        $dobTimestamp = $studentExternal['StudentBirthDate'] ?? false;
+
+        /* No birthday found in the system, no confetti
+         */
+        if (false === $dobTimestamp) {
+            return false;
+        }
+        $dob = \Alaress_Date_Format::newFromTimestamp($dobTimestamp);
+
+        /* Not the time for celebrations yet.
+         */
+        if (!$dob->isBirthday()) {
+            return false;
+        }
+
+        return true;
+    }
 }
