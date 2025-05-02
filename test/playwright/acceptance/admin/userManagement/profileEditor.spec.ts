@@ -524,48 +524,48 @@ test.describe("Profile Editor", () => {
         await tester.impersonate(teacher);
 
         tester.isGoingTo("As Jack Coles, ensure profile page the image is presented on own profile page");
-        await profilePage.goto("22");
+        await profilePage.goto(22);
         await profilePage.checkImagePresence("22");
         tester.isGoingTo("As Jack Coles, ensure profile page the image is presented on Jana Reed's profile page");
-        await profilePage.goto("25");
+        await profilePage.goto(25);
         await profilePage.checkImagePresence("25");
         tester.isGoingTo("As Jack Coles, ensure profile page the image is not presented on Eden Reed's profile page");
-        await profilePage.goto("6");
+        await profilePage.goto(6);
         await profilePage.checkImagePresence("0");
         tester.isGoingTo(
             "As Jack Coles, ensure profile page the image is not presented on rebecca White's profile page",
         );
-        await profilePage.goto("24");
+        await profilePage.goto(24);
         await profilePage.checkImagePresence("0");
         tester.isGoingTo("As Jack Coles, ensure profile page the image is not presented on Jenni Reed's profile page");
-        await profilePage.goto("27");
+        await profilePage.goto(27);
         await profilePage.checkImagePresence("0");
 
         // Impersonate as Jana Reed
         await tester.impersonate(student);
         tester.isGoingTo("As Jana Reed, ensure profile page the image is presented on her own profile page");
-        await profilePage.goto("25");
+        await profilePage.goto(25);
         await profilePage.checkImagePresence("25");
         tester.isGoingTo("As Jana Reed, ensure profile page the image is not presented on Jack coles's profile page");
-        await profilePage.goto("22");
+        await profilePage.goto(22);
         await profilePage.checkImagePresence("0");
         tester.isGoingTo("As Jana Reed, ensure profile page the image is not presented on Eden Reed's profile page");
-        await profilePage.goto("6");
+        await profilePage.goto(6);
         await profilePage.checkImagePresence("0");
         tester.isGoingTo("As Jana Reed, ensure profile page the image is not presented on Jenni Reed's profile page");
-        await profilePage.goto("27");
+        await profilePage.goto(27);
         await profilePage.checkImagePresence("0");
 
         // Impersonate Jenni Reed
         await tester.impersonate(parent);
         tester.isGoingTo("As Jenni Reed, ensure profile page the image is presented on her Jana Reed's profile page");
-        await profilePage.goto("25");
+        await profilePage.goto(25);
         await profilePage.checkImagePresence("25");
         tester.isGoingTo("As Jenni Reed, ensure profile page the image is not presented on own profile page");
-        await profilePage.goto("22");
+        await profilePage.goto(22);
         await profilePage.checkImagePresence("0");
         tester.isGoingTo("As Jenni Reed, ensure profile page the image is not presented on Eden Reed's profile page");
-        await profilePage.goto("6");
+        await profilePage.goto(6);
         await profilePage.checkImagePresence("0");
 
         // Navigate to the profile editor page to restore fields for student, staff & parent
