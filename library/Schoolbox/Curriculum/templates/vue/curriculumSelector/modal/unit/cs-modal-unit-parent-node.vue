@@ -23,8 +23,6 @@ const { title } = useNodeTitle(props.node);
 const extraId = generateUUID(); // to ensure the input/label id is unique
 const showChildren = props.node.children && props.node.children.length > 0; // To determine whether we need to display further child nodes within this node
 const hasCode = props.node.code && props.node.code !== ""; // If there's a code, it can be selected
-const fontWeight = props.depth === 0 ? "bold" : "normal"; // so the top most nodes are bold
-const marginStart = props.depth === 0 ? "var(--spacing-xl)" : "var(--spacing-s)"; // add more margin on the first node directly below the top level node
 const isNodeExpanded = window.Vue.ref(props.isExpanded); // to track whether the node is expanded or not
 
 /**
@@ -32,7 +30,7 @@ const isNodeExpanded = window.Vue.ref(props.isExpanded); // to track whether the
  * and when the node has children
  */
 const showExpandButton = window.Vue.computed(() => {
-    return store.hasMultipleParents && props.depth === 0 && props.node.children && props.node.children.length > 0;
+    return store.hasMultipleParents && props.node.children && props.node.children.length > 0;
 });
 
 /**
@@ -89,7 +87,7 @@ function onChange($isChecked: boolean): void {
                         {{ title }}
                     </label>
                 </div>
-                <h3 v-else class="node__name f-no-margins">{{ title }}</h3>
+                <h3 v-else class="node__name f-no-margins" @click="onExpandSelected">{{ title }}</h3>
             </div>
         </div>
         <template v-if="showChildren">
@@ -117,7 +115,7 @@ function onChange($isChecked: boolean): void {
 
 .node__name {
     font-size: 1rem;
-    font-weight: v-bind(fontWeight);
+    font-weight: bold;
     max-width: none; /* override the max-width set on .reveal-modal h3 */
     vertical-align: top; /* so the li bullet sits inline with the first line of a multiline label */
 }
@@ -127,6 +125,6 @@ function onChange($isChecked: boolean): void {
 }
 
 ul li ul {
-    margin-inline-start: v-bind(marginStart);
+    margin-inline-start: var(--spacing-xl);
 }
 </style>
