@@ -4,3 +4,43 @@
 
 include:
   - base.docker-compose.yaml
+
+services:
+  # Caddy+PHP-FPM container
+  schoolbox-caddy:
+    container_name: schoolbox-caddy
+    restart: always
+    build:
+      context: ./schoolbox-caddy
+    volumes:
+      - code:/usr/share/schoolbox
+      - storage:/var/lib/schoolbox/docker/storage
+      - schoolbox-caddy-config:/etc/caddy
+      - schoolbox-config:/etc/schoolbox
+    ports:
+      - '80:80'
+      - '443:443'
+    # Make this host available across the network as docker.dev.schoolbox.cloud
+    networks:
+      default:
+        aliases:
+          - docker.dev.schoolbox.cloud
+    # After building: create data dirs, and make mount writable by www-data
+    # Cannot currently use create-data-dirs.sh, as /bin/bash isn't available,
+    # and /bin/sh doesn't support {} expansion
+    post_start:
+      - command: mkdir -p /var/lib/schoolbox/docker/cache/portrait
+      - command: mkdir -p /var/lib/schoolbox/docker/cache/stream
+      - command: mkdir -p /var/lib/schoolbox/docker/cache/zip
+      - command: mkdir -p /var/lib/schoolbox/docker/files
+      - command: mkdir -p /var/lib/schoolbox/docker/purifier
+      - command: mkdir -p /var/lib/schoolbox/docker/twig
+      - command: chown -R www-data:www-data /var/lib/schoolbox/docker/
+
+volumes:
+  schoolbox-caddy-config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./schoolbox-caddy/config

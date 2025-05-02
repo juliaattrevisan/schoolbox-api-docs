@@ -1,39 +1,31 @@
 # docker-compose.yaml for testing of deployments.
-# Its PHP-FPM container contains Schoolbox's code within its image, thus it has
-# no live access to the code on the local file system.
-# Changes made to Schoolbox's code on the local file system will not propagate
-# to this file's PHP-FPM container.
+# Its Caddy container contains Schoolbox's code within its image, thus changes
+# made to the local file system will not propagate to the Caddy container.
 
 include:
   - base.docker-compose.yaml
 
 services:
-  # This box is used only as an artifact context for schoolbox-php-fpm-deploy.
-  php82-alpine:
-    restart: no
-    build:
-      context : ./base-images/php82-alpine
-      args:
-        ENV: prod
-
-  schoolbox-php-fpm-deploy:
-    container_name: php-fpm
+  # Caddy+PHP-FPM container
+  schoolbox-caddy:
+    container_name: schoolbox-caddy
     restart: always
-    depends_on:
-      - php82-alpine
-      - mariadb
-      - rabbitmq
-      - redis-cache
-      - redis-storage
     build:
-      context: ../
-      dockerfile: ./docker/php-fpm/deploy-image.Dockerfile
+      context: ./schoolbox-caddy
       additional_contexts:
-        - php82-alpine=service:php82-alpine
         - code=../
     volumes:
       - storage:/var/lib/schoolbox/docker/storage
+      - schoolbox-caddy-config:/etc/caddy
       - schoolbox-config:/etc/schoolbox
+    ports:
+      - '80:80'
+      - '443:443'
+    # Make this host available across the network as docker.dev.schoolbox.cloud
+    networks:
+      default:
+        aliases:
+          - docker.dev.schoolbox.cloud
     # After building: create data dirs, and make mount writable by www-data
     # Cannot currently use create-data-dirs.sh, as /bin/bash isn't available,
     # and /bin/sh doesn't support {} expansion
@@ -45,3 +37,11 @@ services:
       - command: mkdir -p /var/lib/schoolbox/docker/purifier
       - command: mkdir -p /var/lib/schoolbox/docker/twig
       - command: chown -R www-data:www-data /var/lib/schoolbox/docker/
+
+volumes:
+  schoolbox-caddy-config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./schoolbox-caddy/config
