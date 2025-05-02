@@ -42,4 +42,25 @@ WORKDIR /usr/share/schoolbox
 # Command:
 # should be caddy instead of php-fpm,
 # but keep php-fpm running in background and logging to stdout as well
-CMD php-fpm -D & caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
+#CMD php-fpm -D & caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
+
+# Copy s6 processes from https://github.com/shinsenter/php/blob/main/src/php/with-nginx/nginx-config.dockerfile,
+# and adapt for Caddy
+RUN <<'EOF'
+# create s6 services
+if has-cmd s6-service; then
+    s6-service php-fpm longrun '#!/usr/bin/env sh
+cd "$(app-path)"
+exec php-fpm -y /usr/local/etc/php-fpm.d/zz-generated-settings.conf --nodaemonize --allow-to-run-as-root -d clear_env=no'
+
+    s6-service caddy depends php-fpm
+    s6-service caddy longrun '#!/usr/bin/env sh
+export APP_PATH="$(app-path)"
+export APP_ROOT="$(app-root)"
+
+cd $APP_PATH
+exec caddy run --config /etc/caddy/Caddyfile --adapter caddyfile"
+'
+fi
+
+EOF
