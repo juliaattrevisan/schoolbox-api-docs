@@ -3,15 +3,17 @@
 # A PHP-FPM container must be defined in whichever compose.yaml includes this.
 
 services:
-  # Web server
-  caddy:
-    container_name: caddy
+  # Nginx+PHP server
+  schoolbox-nginx:
+    container_name: schoolbox-nginx
     restart: always
     build:
-      context: ./caddy
+      context: ./schoolbox-nginx
     volumes:
       - code:/usr/share/schoolbox
-      - caddy-config:/etc/caddy
+      - storage:/var/lib/schoolbox/docker/storage
+      - nginx-config:/etc/nginx
+      - schoolbox-config:/etc/schoolbox
     ports:
       - '80:80'
       - '443:443'
@@ -20,6 +22,35 @@ services:
       default:
         aliases:
           - docker.dev.schoolbox.cloud
+    # After building: create data dirs, and make mount writable by www-data
+    # Cannot currently use create-data-dirs.sh, as /bin/bash isn't available,
+    # and /bin/sh doesn't support {} expansion
+    post_start:
+      - command: mkdir -p /var/lib/schoolbox/docker/cache/portrait
+      - command: mkdir -p /var/lib/schoolbox/docker/cache/stream
+      - command: mkdir -p /var/lib/schoolbox/docker/cache/zip
+      - command: mkdir -p /var/lib/schoolbox/docker/files
+      - command: mkdir -p /var/lib/schoolbox/docker/purifier
+      - command: mkdir -p /var/lib/schoolbox/docker/twig
+      - command: chown -R www-data:www-data /var/lib/schoolbox/docker/
+
+#  # Web server
+#  caddy:
+#    container_name: caddy
+#    restart: always
+#    build:
+#      context: ./caddy
+#    volumes:
+#      - code:/usr/share/schoolbox
+#      - caddy-config:/etc/caddy
+#    ports:
+#      - '80:80'
+#      - '443:443'
+#    # Make this host available across the network as docker.dev.schoolbox.cloud
+#    networks:
+#      default:
+#        aliases:
+#          - docker.dev.schoolbox.cloud
 
   # Image intended for running command-line processes:
   # * command-line tools
