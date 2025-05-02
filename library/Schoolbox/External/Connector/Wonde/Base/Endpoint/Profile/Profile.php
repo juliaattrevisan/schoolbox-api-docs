@@ -122,6 +122,8 @@ class Profile implements IStrategy
                     'identifiers',
                     'medical_conditions',
                     'permissions',
+                    'registration',
+                    'registration.employees',
                     'sen_needs',
                     'year',
                     'campus'
@@ -235,7 +237,6 @@ class Profile implements IStrategy
                 $photoRedacted  = (bool)$student['permissions']['data']['photograph_student'];
                 $studiesCode    = trim((string)$student['education_details']['data']['learner_number']);
                 $title          = '';
-                $tutorGroup     = '';
 
                 /* There's a Username in the identifiers object, but it's not always set
                  * I guess we take a punt about meaningful values, though there's this other
@@ -294,7 +295,7 @@ class Profile implements IStrategy
 
                 /* Fish out a staff member via their user code
                  */
-                $tutor = $this->findTutor();
+                $tutor = $this->findTutor($student['registration'] ?? []);
 
                 /* Find out a staff member via their user code
                  */
@@ -385,7 +386,7 @@ class Profile implements IStrategy
                     ->setMobile($mobile)
                     ->setPhotoRedacted($photoRedacted)
                     ->setStudiesCode($studiesCode)
-                    ->setTutorGroup($tutorGroup)
+                    ->setTutorGroup($tutor['group'])
                     ->setTutorTeacherId($tutor['id'])
                     ->setTutorTeacherName($tutor['name'])
                     ->setYearLevel($yearLevel)
@@ -661,18 +662,45 @@ class Profile implements IStrategy
 
 
     /**
-     * Find a tutor from their id
+     * Find the first tutor and tutor group for a student
      *
+     * @param array $studentTutor
      * @return array
      */
-    private function findTutor(): array
+    private function findTutor(array $studentTutor): array
     {
-        /* TODO Fill in these tutor vars
-         */
-        return [
+        $tutor = [
             'id' => null,
-            'name' => null
+            'name' => null,
+            'group' => ''
         ];
+
+        /* Check to make sure our registration type is actually 'REGISTRATION' which is Wonde's definition
+         * of a tutor
+         */
+        if (
+            'REGISTRATION' === ($studentTutor['data']['type'] ?? '') &&
+            count($studentTutor['data']['employees']['data'] ?? [])
+        ) {
+            $tutor = [
+                'id' => $studentTutor['data']['employees']['data'][0]['mis_id'],
+                /**
+                 * chose 'title' as it was equivalent of our 'title'
+                 * chose 'forename' as it was equivalent of our 'preferred_name' rather than 'legal_forename'
+                 * chose 'surname' as it was equivalent of our 'lastname' rather than 'legal_surname'
+                 */
+                'name' => trim(
+                    sprintf(
+                        "%s %s %s",
+                        $studentTutor['data']['employees']['data'][0]['title'] ?? '',
+                        $studentTutor['data']['employees']['data'][0]['forename'] ?? '',
+                        $studentTutor['data']['employees']['data'][0]['surname'] ?? ''
+                    )
+                ),
+                'group' => $studentTutor['data']['name'] ?? ''
+            ];
+        }
+        return $tutor;
     }
 
 
