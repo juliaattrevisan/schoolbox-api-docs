@@ -67,6 +67,7 @@ ul {
     min-height: $height;
     overflow-x: hidden; /*prevent any horizontal animations from showing a scrollbar */
     overflow-y: auto;
+    position: relative;
 }
 
 .empty-state-flex-centered {

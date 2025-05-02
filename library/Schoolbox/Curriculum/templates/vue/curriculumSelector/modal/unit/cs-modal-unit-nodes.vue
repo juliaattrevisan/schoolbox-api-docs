@@ -27,6 +27,7 @@ const store = useUnitNodesStore();
 .nodes-container {
     max-height: 650px;
     overflow: auto;
+    position: relative;
 }
 
 .nodes {
