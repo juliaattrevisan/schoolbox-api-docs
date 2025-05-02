@@ -279,7 +279,7 @@ HELP;
                  */
                 if (!\in_array($dataset, $titles['datasets'], true)) {
                     $this->getLogger()->debug(sprintf(
-                        'Template "%s" not in the chosen dataset %s: skipping',
+                        'Template "%s" not in the chosen dataset "%s": skipping',
                         $titles['new'],
                         $dataset
                     ));
