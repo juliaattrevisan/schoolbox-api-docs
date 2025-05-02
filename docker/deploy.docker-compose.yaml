@@ -1,23 +1,23 @@
 # docker-compose.yaml for testing of deployments.
-# Its Caddy container contains Schoolbox's code within its image, thus changes
-# made to the local file system will not propagate to the Caddy container.
+# Its nginx container contains Schoolbox's code within its image, thus changes
+# made to the local file system will not propagate to the nginx container.
 
 include:
   - base.docker-compose.yaml
 
 services:
-  # Caddy+PHP-FPM container
-  schoolbox-caddy:
-    container_name: schoolbox-caddy
+  # nginx+PHP-FPM container
+  schoolbox-nginx:
+    container_name: schoolbox-nginx
     restart: always
     build:
-      context: ./schoolbox-caddy
+      context: ./schoolbox-nginx
       dockerfile: deploy-image.Dockerfile
       additional_contexts:
         - code=../
     volumes:
       - storage:/var/lib/schoolbox/docker/storage
-      - schoolbox-caddy-config:/etc/caddy
+      - schoolbox-nginx-config:/etc/nginx/custom.d
       - schoolbox-config:/etc/schoolbox
     ports:
       - '80:80'
@@ -40,9 +40,9 @@ services:
       - command: chown -R www-data:www-data /var/lib/schoolbox/docker/
 
 volumes:
-  schoolbox-caddy-config:
+  schoolbox-nginx-config:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ./schoolbox-caddy/config
+      device: ./schoolbox-nginx/config

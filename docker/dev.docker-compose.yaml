@@ -1,22 +1,22 @@
 # docker-compose.yaml for local development.
-# Its Caddy container mounts Schoolbox's code folder as a local mount,
+# Its nginx container mounts Schoolbox's code folder as a local mount,
 # so that changes made locally are made available immediately.
 
 include:
   - base.docker-compose.yaml
 
 services:
-  # Caddy+PHP-FPM container
-  schoolbox-caddy:
-    container_name: schoolbox-caddy
+  # nginx+PHP-FPM container
+  schoolbox-nginx:
+    container_name: schoolbox-nginx
     restart: always
     build:
-      context: ./schoolbox-caddy
+      context: ./schoolbox-nginx
       dockerfile: dev-image.Dockerfile
     volumes:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
-      - schoolbox-caddy-config:/etc/caddy
+      - schoolbox-nginx-config:/etc/nginx/custom.d
       - schoolbox-config:/etc/schoolbox
     ports:
       - '80:80'
@@ -39,9 +39,9 @@ services:
       - command: chown -R www-data:www-data /var/lib/schoolbox/docker/
 
 volumes:
-  schoolbox-caddy-config:
+  schoolbox-nginx-config:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ./schoolbox-caddy/config
+      device: ./schoolbox-nginx/config
