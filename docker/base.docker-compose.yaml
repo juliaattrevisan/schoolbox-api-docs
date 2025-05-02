@@ -3,16 +3,16 @@
 # A PHP-FPM container must be defined in whichever compose.yaml includes this.
 
 services:
-  # Nginx+PHP server
-  schoolbox-nginx:
-    container_name: schoolbox-nginx
+  # Caddy+PHP-FPM server
+  schoolbox-caddy:
+    container_name: schoolbox-caddy
     restart: always
     build:
-      context: ./schoolbox-nginx
+      context: ./schoolbox-caddy
     volumes:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
-      - nginx-config:/etc/nginx
+      - schoolbox-caddy-config:/etc/caddy
       - schoolbox-config:/etc/schoolbox
     ports:
       - '80:80'
@@ -176,7 +176,7 @@ services:
     container_name: schoolbox-taskd
     depends_on:
       - redis-storage
-      - caddy
+      - schoolbox-caddy
     build:
       context: ./schoolbox-taskd
     environment:
@@ -241,6 +241,13 @@ volumes:
       type: none
       o: bind
       device: ./caddy/config
+
+  schoolbox-caddy-config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./schoolbox-caddy/config
 
   # Want to overlay files in this folder over what's already in
   # /usr/local/etc/php/conf.d/, but don't yet know how
