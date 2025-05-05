@@ -10,7 +10,9 @@
             <h2>Settings go here</h2>
         </div>
 
-        {% include '@adminImportIndex/schoolData/dsn/moduleConfig.twig' with configContext only %}
+        <div id="settingsContainer" style="display:none">
+            {% include '@settings/moduleConfig.twig' with configContext only %}
+        </div>
 
         <script>
             $(function() {
@@ -23,12 +25,12 @@
                 let azureResourceName = $('#openai_azure_resource_name-field').parent('div');
                 let azureDeploymentId = $('#openai_azure_deployment_id-field').parent('div');
 
-                init(provider, key, model, azureResourceName, azureDeploymentId);
-
                 provider.on('change', function(event) {
                     event.preventDefault();
                     init(provider, key, model, azureResourceName, azureDeploymentId)
-                })
+                });
+
+                init(provider, key, model, azureResourceName, azureDeploymentId);
 
                 /**
                  *  Hide everything if you haven't chozen a provider yet
@@ -36,7 +38,7 @@
                 function init(provider, key, model, azureResourceName, azureDeploymentId)
                 {
                     if ('' === provider.val()) {
-                        key.parent('div').hide();
+                        key.hide();
                         model.hide();
                         azureResourceName.hide();
                         azureDeploymentId.hide();
@@ -51,6 +53,8 @@
                         azureResourceName.show();
                         azureDeploymentId.show();
                     }
+
+                    $('#settingsContainer').show();
                 }
             });
         </script>
