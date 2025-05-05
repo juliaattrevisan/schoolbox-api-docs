@@ -16,7 +16,7 @@ beforeEach(() => {
 });
 
 test("should not display when there is no codes", () => {
-    expect(wrapper.find("[data-test-nodes-container]").exists()).toBe(false);
+    expect(wrapper.find("[data-test='cs-selected-nodes-container']").exists()).toBe(false);
 });
 
 test("should display when there is codes", async () => {

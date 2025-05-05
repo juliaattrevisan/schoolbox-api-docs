@@ -57,7 +57,7 @@ window.Vue.watch(
 </script>
 
 <template>
-    <div v-if="selectedNodesStore.hasNodes" class="selected-nodes-container" data-test-nodes-container>
+    <div v-if="selectedNodesStore.hasNodes" class="selected-nodes-container" data-test="cs-selected-nodes-container">
         <cs-selected-node v-for="node in selectedNodesStore.nodes" :key="node.id" :node="node" data-test-node />
     </div>
     <div v-else-if="selectedNodesStore.hasNoNodes && store.isReadOnly" class="selected-nodes-container">

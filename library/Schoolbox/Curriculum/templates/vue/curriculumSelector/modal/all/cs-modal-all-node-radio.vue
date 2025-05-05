@@ -6,7 +6,7 @@
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import { getEmptyNode, UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 import { generateUUID } from "@js/util/jsUtils";
-import { useModalSelectedNodesStore } from "../store/csModalSelectedNodesStore";
+import { useModalSelectedNodesStore } from "../../store/csModalSelectedNodesStore";
 
 const modalSelectedNodesStore = useModalSelectedNodesStore();
 const extraId = generateUUID(); // to ensure the input/label id is unique

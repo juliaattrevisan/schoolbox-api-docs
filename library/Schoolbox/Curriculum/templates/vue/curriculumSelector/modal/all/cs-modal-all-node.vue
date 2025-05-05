@@ -8,16 +8,16 @@ import { gsap } from "gsap/all";
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import { getEmptyNode, UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
-import { useModalViewNodesStore, DIRECTION } from "../store/csModalViewNodesStore";
-import { useModalStore } from "../store/csModalStore";
-import { useModalNodeUsageStore } from "../store/csModalNodeUsageStore";
-import { useModalActiveNodeStore } from "../store/csModalActiveNodeStore";
-import { useModalSearchStore } from "../store/csModalSearchStore";
-import CsModalNodeRadio from "./cs-modal-node-radio.vue";
-import CsModalNodeCheckbox from "./cs-modal-node-checkbox.vue";
-import CsModalNodeName from "./cs-modal-node-name.vue";
-import CsModalNodeUsageSummary from "./cs-modal-node-usage-summary.vue";
-import CsModalNodeUsageDetails from "./cs-modal-node-usage-details.vue";
+import { useModalViewNodesStore, DIRECTION } from "../../store/csModalViewNodesStore";
+import { useModalStore } from "../../store/csModalStore";
+import { useModalNodeUsageStore } from "../../store/csModalNodeUsageStore";
+import { useModalActiveNodeStore } from "../../store/csModalActiveNodeStore";
+import { useModalSearchStore } from "../../store/csModalSearchStore";
+import CsModalAllNodeRadio from "./cs-modal-all-node-radio.vue";
+import CsModalAllNodeCheckbox from "./cs-modal-all-node-checkbox.vue";
+import CsModalAllNodeName from "./cs-modal-all-node-name.vue";
+import CsModalAllNodeUsageSummary from "./cs-modal-all-node-usage-summary.vue";
+import CsModalAllNodeUsageDetails from "./cs-modal-all-node-usage-details.vue";
 
 interface Props {
     node: Node; // to prefill the input
@@ -118,10 +118,10 @@ const isViewing = window.Vue.computed(
 <template>
     <li ref="viewNodeEl">
         <div :class="`buttons-container`" :data-is-inactive="isViewingAnother">
-            <cs-modal-node-radio v-if="modalStore.isSingleSelect" :node="props.node" />
-            <cs-modal-node-checkbox v-else :node="props.node" />
-            <cs-modal-node-name :node="props.node" :depth="props.depth" :title="title" :is-active="isViewing" />
-            <cs-modal-node-usage-summary
+            <cs-modal-all-node-radio v-if="modalStore.isSingleSelect" :node="props.node" />
+            <cs-modal-all-node-checkbox v-else :node="props.node" />
+            <cs-modal-all-node-name :node="props.node" :depth="props.depth" :title="title" :is-active="isViewing" />
+            <cs-modal-all-node-usage-summary
                 v-if="showUsage"
                 :node="props.node"
                 :title="title"
@@ -131,10 +131,10 @@ const isViewing = window.Vue.computed(
             />
         </div>
         <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
-            <cs-modal-node-usage-details v-if="isViewing" :depth="props.depth" />
+            <cs-modal-all-node-usage-details v-if="isViewing" :depth="props.depth" />
         </Transition>
         <ul v-if="showChildren">
-            <cs-modal-node
+            <cs-modal-all-node
                 v-for="$node in props.node.children"
                 :key="$node.id"
                 :node="$node"

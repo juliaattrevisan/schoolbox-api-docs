@@ -6,8 +6,8 @@
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import { getEmptyNode, UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 import { generateUUID } from "@js/util/jsUtils";
-import { useStore } from "../store/curriculumSelectorStore";
-import { useModalSelectedNodesStore } from "../store/csModalSelectedNodesStore";
+import { useStore } from "../../store/curriculumSelectorStore";
+import { useModalSelectedNodesStore } from "../../store/csModalSelectedNodesStore";
 
 const store = useStore();
 const modalSelectedNodesStore = useModalSelectedNodesStore();

@@ -6,7 +6,7 @@
 
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import NodeUsageSummary from "@schoolboxCurriculum/vue/usage/node-usage-summary.vue";
-import { useModalNodeUsageStore } from "../store/csModalNodeUsageStore";
+import { useModalNodeUsageStore } from "../../store/csModalNodeUsageStore";
 
 interface Props {
     node: Node; // the assigned node to display

@@ -7,7 +7,7 @@ import type { Node } from "@schoolboxCurriculum/types/Node";
 import { findById, includeChildren, noChildrenOfNode } from "@schoolboxCurriculum/js/nodeUtils";
 /* eslint-disable-next-line import/no-cycle -- Disable dependency cycle warning temporarily [SA-18397] */
 import { useStore } from "./curriculumSelectorStore";
-import { useNodesStore } from "./csNodesStore";
+import { useNodesStore } from "./csAllNodesStore";
 import { useSelectedNodesStore } from "./csSelectedNodesStore";
 
 export const useModalSelectedNodesStore = defineStore(`csModalSelectedNodes`, () => {

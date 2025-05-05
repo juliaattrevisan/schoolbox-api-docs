@@ -3,7 +3,8 @@
  */
 
 import { defineStore } from "pinia";
-import { useNodesStore } from "./csNodesStore";
+import { useNodesStore } from "./csAllNodesStore";
+import { useUnitNodesStore } from "./csUnitNodesStore";
 import { useSelectedNodesStore } from "./csSelectedNodesStore";
 import { useSearchStore } from "./csSearchStore";
 import { useModalStore } from "./csModalStore";
@@ -25,16 +26,26 @@ export const useStore = defineStore(`curriculumSelector`, {
         includeWithoutCode: false, // set to true if curriculum nodes with blank codes need to be selectable
         includeChildren: false, // When a node is selected, also select all its children
         includeDisabled: false, // whether to display disabled nodes
+        hasTabs: false, // whether to display tabs
+        folderId: undefined, // the folderId to load the unit nodes from
     }),
 
     getters: {
         /**
-         * When load is complete and was a success
+         * When all loading is complete and was a success
          *
          * @returns { Boolean }
          */
         hasLoadedOk() {
-            return !this.isLoading && !this.hasLoadError;
+            if (!this.hasTabs) {
+                return !this.isLoading && !this.hasLoadError;
+            }
+            return (
+                !this.isLoading &&
+                !this.hasLoadError &&
+                useUnitNodesStore().hasLoaded &&
+                !useUnitNodesStore().hasLoadError
+            );
         },
 
         /**
@@ -62,10 +73,16 @@ export const useStore = defineStore(`curriculumSelector`, {
             this.includeWithoutCode = props.includeWithoutCode;
             this.includeChildren = props.includeChildren;
             this.includeDisabled = props.includeDisabled;
+            this.hasTabs = props.hasTabs;
+            this.folderId = props.folderId;
             if (!this.isReadOnly && props.dataEndpoint !== "") {
                 //only load when we need to
                 apiEndpoint = props.dataEndpoint;
                 useNodesStore().load();
+            }
+            // load in the unit nodes, only displaying the tabs if there are any unit nodes
+            if (props.hasTabs && props.folderId !== undefined) {
+                useUnitNodesStore().load(props.folderId);
             }
             if (props.selectedNodes?.length > 0) {
                 //add in any nodes that have been selected previously

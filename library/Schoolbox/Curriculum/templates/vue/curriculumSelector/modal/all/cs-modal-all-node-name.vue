@@ -7,10 +7,10 @@
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import { getEmptyNode, allChildrenDisabled } from "@schoolboxCurriculum/js/nodeUtils";
 import ShowMatches from "@schoolboxVue/components/search/show-matches.vue";
-import { useStore } from "../store/curriculumSelectorStore";
-import { useNodesStore } from "../store/csNodesStore";
-import { useModalViewNodesStore } from "../store/csModalViewNodesStore";
-import { useModalSearchStore } from "../store/csModalSearchStore";
+import { useStore } from "../../store/curriculumSelectorStore";
+import { useNodesStore } from "../../store/csAllNodesStore";
+import { useModalViewNodesStore } from "../../store/csModalViewNodesStore";
+import { useModalSearchStore } from "../../store/csModalSearchStore";
 
 interface Props {
     node: Node; // the assigned node to display
@@ -118,6 +118,7 @@ function onNameSelected(): void {
             :text="props.title"
             :query="modalSearchStore.query"
             :is-searching="modalSearchStore.isActive"
+            :data-test="`cs-modal-all-node-name-${props.node.id}`"
             @click="onNameSelected"
         />
         <show-matches

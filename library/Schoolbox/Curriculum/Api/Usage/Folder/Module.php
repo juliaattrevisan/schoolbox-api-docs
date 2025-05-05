@@ -52,6 +52,8 @@ class Module extends BaseModule
 
         // Route for updating folder's nodes all at once
         $this->register(self::METHOD_POST, '/folder/{folderId:\\d+}', 'postFolderUsage', $permission, $preload);
+        // Route for getting folder's nodes all at once
+        $this->register(self::METHOD_GET, '/folder/{folderId:\\d+}', 'getFolderUsage', $permission, $preload);
     }
 
     /**

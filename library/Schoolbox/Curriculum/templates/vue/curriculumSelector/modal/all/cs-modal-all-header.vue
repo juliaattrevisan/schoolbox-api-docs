@@ -3,10 +3,10 @@
  * The modal header, containing the title, select list and search input
  */
 
-import { useModalNodeUsageStore } from "../store/csModalNodeUsageStore";
-import { useNodesStore } from "../store/csNodesStore";
-import CsModalHeaderBreadcrumbs from "./cs-modal-header-breadcrumbs.vue";
-import CsModalHeaderSearchInput from "./cs-modal-header-search-input.vue";
+import { useModalNodeUsageStore } from "../../store/csModalNodeUsageStore";
+import { useNodesStore } from "../../store/csAllNodesStore";
+import CsModalAllHeaderBreadcrumbs from "./cs-modal-all-header-breadcrumbs.vue";
+import CsModalAllHeaderSearchInput from "./cs-modal-all-header-search-input.vue";
 
 const modalNodeUsageStore = useModalNodeUsageStore();
 const nodesStore = useNodesStore();
@@ -20,9 +20,8 @@ const isDisabled = window.Vue.computed(() => modalNodeUsageStore.isOpen || nodes
 </script>
 
 <template>
-    <h2>Browse Curriculum</h2>
-    <cs-modal-header-breadcrumbs :is-disabled="isDisabled" />
-    <cs-modal-header-search-input :is-disabled="isDisabled" />
+    <cs-modal-all-header-breadcrumbs :is-disabled="isDisabled" />
+    <cs-modal-all-header-search-input :is-disabled="isDisabled" />
 </template>
 
 <style scoped></style>

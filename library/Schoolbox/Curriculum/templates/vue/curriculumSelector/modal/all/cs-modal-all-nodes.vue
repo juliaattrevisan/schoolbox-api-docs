@@ -6,10 +6,10 @@
 
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
-import { useModalViewNodesStore } from "../store/csModalViewNodesStore";
-import { useNodesStore } from "../store/csNodesStore";
-import { useModalSearchStore } from "../store/csModalSearchStore";
-import CsModalNode from "./cs-modal-node.vue";
+import { useModalViewNodesStore } from "../../store/csModalViewNodesStore";
+import { useNodesStore } from "../../store/csAllNodesStore";
+import { useModalSearchStore } from "../../store/csModalSearchStore";
+import CsAllModalNode from "./cs-modal-all-node.vue";
 
 const modalViewNodesStore = useModalViewNodesStore();
 const modalSearchStore = useModalSearchStore();
@@ -53,7 +53,7 @@ window.Vue.watch(
         <button title="Clear the current search" @click.prevent="onClearSearchSelected">Clear search</button>
     </div>
     <ul v-else ref="nodesContainerEl">
-        <cs-modal-node v-for="node in modalViewNodesStore.nodes" :key="node.id" :node="node" :depth="depth" />
+        <cs-all-modal-node v-for="node in modalViewNodesStore.nodes" :key="node.id" :node="node" :depth="depth" />
     </ul>
 </template>
 
@@ -67,6 +67,7 @@ ul {
     min-height: $height;
     overflow-x: hidden; /*prevent any horizontal animations from showing a scrollbar */
     overflow-y: auto;
+    position: relative;
 }
 
 .empty-state-flex-centered {

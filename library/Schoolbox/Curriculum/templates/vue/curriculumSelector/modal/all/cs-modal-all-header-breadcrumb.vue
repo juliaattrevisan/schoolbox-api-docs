@@ -6,7 +6,7 @@
 
 import { shortenLength } from "@js/util/stringUtils";
 import type { Breadcrumb } from "@schoolboxCurriculum/types/Breadcrumb";
-import { useModalViewNodesStore } from "../store/csModalViewNodesStore";
+import { useModalViewNodesStore } from "../../store/csModalViewNodesStore";
 
 interface Props {
     breadcrumb: Breadcrumb; // the relevant breadcrumb
