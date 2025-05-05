@@ -56,6 +56,10 @@ class Controller extends ConfigController
             'pageCurrent' => $this->routeGenerator->generate('adminOpenAi.getIndex'),
             'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex')),
             'configContext' => $configContext,
+            'models' => [
+                'openai' => \Schoolbox\Editor\OpenAI\Helper::ENDPOINT_TYPE_OPENAI,
+                'azure' => \Schoolbox\Editor\OpenAI\Helper::ENDPOINT_TYPE_AZURE,
+            ]
         ], 'AI Services');
     }
 
