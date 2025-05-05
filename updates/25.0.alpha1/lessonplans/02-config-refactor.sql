@@ -14,3 +14,10 @@ WHERE `name` IN (
     'openai_model'
 )
 LIMIT 5;
+
+-- For some random reason this sequence is wrong
+
+UPDATE config
+SET sequence = 5
+WHERE `name` = 'openai_azure_deployment_id'
+LIMIT 1;
