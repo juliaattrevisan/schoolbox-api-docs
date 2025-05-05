@@ -28,7 +28,7 @@ readonly PRESERVED_CONFIG=(
   "redis_ephemeral_url" "redis_url" "taskd_redis_url"
 
   # External DB Config
-  "external_db_host" "external_db_user" "external_db_passwd" "external_db_db" "external_portal"
+  "external_db_host" "external_db_user" "external_db_passwd" "external_db_db" "external_portal" "external_db_encryption"
 
   # SAML Config
   "saml_sso_url" "saml_idp_metadata_url" "saml_enabled" "saml_slo_enabled" "saml_slo_url" "saml_logout_url" "saml_private_cert" "saml_public_cert" "saml_idp_certificate" "saml_entityid" "saml_sp_entityid"
