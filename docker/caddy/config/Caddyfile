@@ -14,6 +14,39 @@ docker.dev.schoolbox.cloud:443 {
         output stdout
     }
 
+    # What's this?
+    #import headers
+
+    # Handle allowed and disallowed methods
+    @allowed-methods method GET HEAD POST PUT DELETE PATCH OPTIONS
+    @disallowed-methods not {
+        method GET HEAD POST PUT DELETE PATCH OPTIONS
+    }
+    error @disallowed-methods "Method {method} Not Allowed" 405
+
+    # Handle requests for fail images before nginx
+    handle_path /static/images/core/fail-whale.png {
+        rewrite * /images/core/fail-whale.png
+        reverse_proxy https://schoolbox-static.cloud {
+            header_up host {http.reverse_proxy.upstream.hostport}
+        }
+    }
+    handle_path /static/images/core/icons/fail-whale-16x16.png {
+        rewrite * /images/core/icons/fail-whale-16x16.png
+        reverse_proxy https://schoolbox-static.cloud {
+            header_up host {http.reverse_proxy.upstream.hostport}
+        }
+    }
+
+    # Handle requests for websockets and Etherpad
+    handle_path /websocket {
+        reverse_proxy schoolbox-socketd:9081
+    }
+    handle_path /pad* {
+        reverse_proxy schoolbox-etherpad:9001
+    }
+
+    # All other requests just get forwarded to nginx
     reverse_proxy http://schoolbox-nginx {
     }
 
