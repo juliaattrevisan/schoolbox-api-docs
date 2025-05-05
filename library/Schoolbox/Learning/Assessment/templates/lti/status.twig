@@ -87,18 +87,24 @@
                         {% if pActionSummary %}
                             <li><a class="icon-history" href="{{ pActionSummary }}" title="View {{ participant.user.givenName }}'s attempt history">View Attempt History</a></li>
                         {% endif %}
-                        <li><a href="#" data-reveal-id="{{ createAttemptIdBase }}" class="icon-due-work" title="Create score for {{ participant.user.givenName }}">Create Score...</a></li>
+                        <li><a href="#" data-collapser="{{ createAttemptIdBase }}-createScore" class="icon-due-work" title="Create score for {{ participant.user.givenName }}">Create Score</a></li>
                     {% endapply -%}
                 </ul>
             </div>
         </div>
 
-        <div id="{{ createAttemptIdBase }}" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
-            <h2>Create score for {{ participant.user.fullname }}</h2>
-            <form action="{{ routeLookup(
+        <form
+            action="{{ routeLookup(
                 'learningAssessment.postCreateResponse',
                 {assessmentId: participant.assessable.id, studentId: participant.user.id })
-            }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" method="post">
+            }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}"
+            method="post"
+        >
+            <div
+                class="small-12 columns hide"
+                data-collapse-state="collapsed"
+                data-collapsable="{{ createAttemptIdBase }}-createScore"
+            >
                 <div class="row">
                     <div class="small-12 columns">
                         <label for="{{ createAttemptIdBase }}-markingUser">
@@ -156,10 +162,46 @@
                         <textarea id="{{ createAttemptIdBase }}-comment" name="comment" rows="5"></textarea>
                     </div>
                 </div>
-
-                <input type="submit" value="Create Score" />
-            </form>
-            <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-        </div>
+            </div>
+            <div
+                class="small-12 column no-pad hide"
+                data-collapse-state="collapsed"
+                data-collapsable="{{ createAttemptIdBase }}-createScore"
+            >
+                <div class="component-action">
+                    <section>
+                        <div><button type="submit">Create Score</button></div>
+                    </section>
+                </div>
+            </div>
+        </form>
     </li>
+    <script type="text/javascript" src='{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}'></script>
+    <script type="text/javascript">
+        $(function () {
+            $('[data-collapser="{{ createAttemptIdBase }}-createScore"]')
+                .on('click', () => {
+                    // spawn the editor only after expanding once (for performance reasons with many students)
+                    const editorId = "{{ createAttemptIdBase }}-comment";
+                    if (window.sbProps.editors[editorId]) {
+                        return; // editor already exists, nothing to do
+                    }
+                    document.dispatchEvent(
+                        new CustomEvent("EDITOR__CREATE", {
+                            detail: {
+                                targetElements: [`#${editorId}`],
+                                showWordCount: true,
+                                hasTokens: true,
+                                toolbar: "comment_ai",
+                            },
+                        }),
+                    );
+                })
+                .collapsable({
+                    // we don't want to use the changing icon here, so force it to be the same
+                    iconCollapsed: "icon-due-work",
+                    iconExpanded: "icon-due-work",
+                });
+        });
+    </script>
 {% endblock %}

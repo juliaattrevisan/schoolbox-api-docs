@@ -39,6 +39,7 @@ use Schoolbox\LTI\Provider as LtiTool;
 use Schoolbox\LTI\ResourceLink\LaunchFactory;
 use Schoolbox\LTI\User\Codec as UserCodec;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\TokenReplacer;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -290,6 +291,10 @@ class Controller extends Assessment\Controller
      */
     public function postCreateResponse(IAssessable $assessment, User $student): void
     {
+        // Replace any tokens in the comment with the relevant details
+        $comment = (new TokenReplacer\Student(new TokenReplacer\Simple()))
+            ->replace(trim((string)$this->requestPost->get('comment')), $student);
+
         $scoreModel = $this->ltiAssessmentScoreMapper->createModel()
             ->setStudent($student)
             ->setIsResponse($this->requestPost->getBool('isResponse', false))
@@ -300,7 +305,7 @@ class Controller extends Assessment\Controller
             ->setScoreMaximum(
                 filter_var($this->requestPost->get('scoreMaximum'), FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE)
             )
-            ->setComment($this->requestPost->get('comment'))
+            ->setComment($comment)
             ->setSubmittedAt(Alaress_Date_Format::now());
 
         // Set activity/grading progress dependent on if response/feedback
