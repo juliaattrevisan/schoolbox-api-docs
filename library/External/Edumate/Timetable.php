@@ -121,6 +121,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             WHERE TIMETABLE_ID = :campus
             AND START_DATE <= :startDate
             AND END_DATE >= :endDate
+            ORDER BY START_DATE ASC, END_DATE ASC
             FETCH FIRST 1 ROW ONLY
         ');
 
