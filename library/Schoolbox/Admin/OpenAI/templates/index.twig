@@ -1,1 +1,47 @@
-test
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+<div class="admin-container row">
+
+    {{ renderAdminNavigation(pageCurrent) }}
+
+    <div class="admin-content">
+        <div class="small-12 columns">
+            <h2>Settings go here</h2>
+        </div>
+
+        <div class="small-12 columns">
+            <table>
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>CKEditor AI</th>
+                        <th>Lesson Plans AI</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>gpt-4</td>
+                        <td>Yes</td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td>gpt-4o</td>
+                        <td>Yes</td>
+                        <td>Yes</td>
+                    </tr>
+                    <tr>
+                        <td>gpt-4o-mini</td>
+                        <td>Yes</td>
+                        <td>Yes</td>
+                    </tr>
+                    <tr>
+                        <td>gpt-4-turbo</td>
+                        <td>Yes</td>
+                        <td>No</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

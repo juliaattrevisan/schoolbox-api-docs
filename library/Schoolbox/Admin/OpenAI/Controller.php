@@ -15,6 +15,7 @@ use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Controller\ConfigController;
 use Aura\Router\Exception\RouteNotFound;
+use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception;
 
@@ -33,7 +34,10 @@ class Controller extends ConfigController
      */
     public function getIndex(): void
     {
-        $this->response = $this->responseFromTemplate('@adminOpenAi/index.twig', [], 'AI Services');
+        $this->response = $this->responseFromTemplate('@adminOpenAi/index.twig', [
+            'pageCurrent' => $this->routeGenerator->generate('adminOpenAi.getIndex'),
+            'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex')),
+        ], 'AI Services');
     }
 
 
