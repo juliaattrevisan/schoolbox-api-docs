@@ -6,10 +6,6 @@
     {{ renderAdminNavigation(pageCurrent) }}
 
     <div class="admin-content">
-        <div class="small-12 columns">
-            <h2>Settings go here</h2>
-        </div>
-
         <div id="settingsContainer" style="display:none">
             {% include '@settings/moduleConfig.twig' with configContext only %}
         </div>
