@@ -8,6 +8,12 @@ const lpStore = useLessonPlannerStore();
 const selectedFields = window.Vue.computed(() => {
     return lpStore.fields.filter((field) => field.selected);
 });
+
+window.Vue.onMounted(() => {
+    // @ts-expect-error -- To trigger the tooltip next to the field title to show up correctly
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- foundation isn't typed, see above
+    $(document).foundation("tooltip", "reflow");
+});
 </script>
 
 <template>
