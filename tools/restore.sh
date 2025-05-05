@@ -54,6 +54,12 @@ readonly PRESERVED_CONFIG=(
   # Paperly
   "paperly_iframe_api_host" "paperly_iframe_api_key" "paperly_agent_ip_whitelist" "paperly_agent_secret" "paperly_agent_external_db_host_override" "paperly_agent_external_db_user_override" "paperly_agent_external_db_password_override" "paperly_agent_external_db_name_override" "paperly_open_in_new_tab"
 
+  # Cloudwork
+  "cloudwork_oauth_identity_provider" "cloudwork_oauth_client_id" "cloudwork_oauth_client_secret" "cloudwork_oauth_identifying_claims"
+
+  # Other OAuth
+  "oauth_issuer" "oauth_enable_sso" "oauth_response_type" "oauth_scopes"
+
   # Others
   "xml_dir" "file_dir" "api_key" "schooldata_import_frequency" "maintenance_mode"
 );
