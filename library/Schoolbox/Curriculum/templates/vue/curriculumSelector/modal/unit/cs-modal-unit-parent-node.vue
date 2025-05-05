@@ -114,6 +114,7 @@ function onChange($isChecked: boolean): void {
 }
 
 .node__name {
+    color: var(--header-font-color);
     font-size: 1rem;
     font-weight: bold;
     max-width: none; /* override the max-width set on .reveal-modal h3 */
