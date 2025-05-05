@@ -361,6 +361,7 @@ class LessonPlan
             $fieldTitle = trim((string)$field['title']);
             $fieldDescription = trim((string)$field['description']);
             $fieldBody = trim((string)$field['body']);
+            $fieldTemplate = trim((string)$field['template']);
 
             /* Add a visibility statement
              */
@@ -370,17 +371,27 @@ class LessonPlan
                 $fieldVisibility = 'This field is visible to staff.';
             }
 
+            $description = sprintf(
+                "USE HTML\nFIELD TITLE: %s\nFIELD DESCRIPTION: %s\nVISIBILITY: %s",
+                $fieldTitle,
+                $fieldDescription,
+                $fieldVisibility
+            );
+
+            /* If the body/template is present, tack it on the end
+             */
+            if ('' !== $fieldBody) {
+                $description .= sprintf("\nCURRENT VALUE: %s", $fieldBody);
+            }
+            if ('' !== $fieldTemplate) {
+                $description .= sprintf("\nTEMPLATE: %s", $fieldTemplate);
+            }
+
             /* Make a giant prompt slab for each field
              */
             $struct['schema']['properties'][$fieldTitle] = [
                 'type' => 'string',
-                'description' => sprintf(
-                    "USE HTML\nFIELD TITLE: %s\nFIELD DESCRIPTION: %s\nTEMPLATE: %s\nVISIBILITY: %s",
-                    $fieldTitle,
-                    $fieldDescription,
-                    $fieldBody,
-                    $fieldVisibility
-                ),
+                'description' => $description,
             ];
 
             /* I think this forces the $fieldId to spawn in the json payload
