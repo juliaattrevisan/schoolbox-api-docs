@@ -18,14 +18,14 @@ services:
       - storage:/var/lib/schoolbox/docker/storage
       - schoolbox-nginx-config:/etc/nginx/sites-enabled
       - schoolbox-config:/etc/schoolbox
-    ports:
-      - '80:80'
-      - '443:443'
-    # Make this host available across the network as docker.dev.schoolbox.cloud
-    networks:
-      default:
-        aliases:
-          - docker.dev.schoolbox.cloud
+#    ports:
+#      - '80:80'
+#      - '443:443'
+#    # Make this host available across the network as docker.dev.schoolbox.cloud
+#    networks:
+#      default:
+#        aliases:
+#          - docker.dev.schoolbox.cloud
     # After building: create data dirs, and make mount writable by www-data
     # Cannot currently use create-data-dirs.sh, as /bin/bash isn't available,
     # and /bin/sh doesn't support {} expansion

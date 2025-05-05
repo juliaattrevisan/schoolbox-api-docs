@@ -1,8 +1,26 @@
 # Base docker-compose.yaml for local running of a containerised Schoolbox
 # environment.
-# A Caddy container must be defined in whichever compose.yaml includes this.
+# An nginx container must be defined in whichever compose.yaml includes this.
 
 services:
+  # Web server
+  caddy:
+    container_name: caddy
+    restart: always
+    build:
+      context: ./caddy
+    volumes:
+      - code:/usr/share/schoolbox
+      - caddy-config:/etc/caddy
+    ports:
+      - '80:80'
+      - '443:443'
+    # Make this host available across the network as docker.dev.schoolbox.cloud
+    networks:
+      default:
+        aliases:
+          - docker.dev.schoolbox.cloud
+
   # Image intended for running command-line processes:
   # * command-line tools
   # * updates
@@ -185,13 +203,13 @@ volumes:
       type: none
       o: bind
       device: ./schoolbox/config
-#
-#  schoolbox-caddy-config:
-#    driver: local
-#    driver_opts:
-#      type: none
-#      o: bind
-#      device: ./schoolbox-caddy/config
+
+  caddy-config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./caddy/config
 
   # Want to overlay files in this folder over what's already in
   # /usr/local/etc/php/conf.d/, but don't yet know how
