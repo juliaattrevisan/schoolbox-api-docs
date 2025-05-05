@@ -12,6 +12,49 @@
 
         {% include '@adminImportIndex/schoolData/dsn/moduleConfig.twig' with configContext only %}
 
+        <script>
+            $(function() {
+                const PROVIDER_OPENAI = 'OpenAI';
+                const PROVIDER_AZURE = 'Azure';
+
+                let provider = $('#openai_endpoint-field');
+                let key = $('#openai_key-field');
+                let model = $('#openai_model-field');
+                let azureResourceName = $('#openai_azure_resource_name-field');
+                let azureDeploymentId = $('#openai_azure_deployment_id-field');
+
+                init(provider, key, model, azureResourceName, azureDeploymentId);
+
+                provider.on('change', function(event) {
+                    event.preventDefault();
+                    init(provider, key, model, azureResourceName, azureDeploymentId)
+                })
+
+                /**
+                 *  Hide everything if you haven't chozen a provider yet
+                 */
+                function init(provider, key, model, azureResourceName, azureDeploymentId)
+                {
+                    if ('' === provider.val()) {
+                        key.parent('div').hide();
+                        model.parent('div').hide();
+                        azureResourceName.parent('div').hide();
+                        azureDeploymentId.parent('div').hide();
+                    } else if (PROVIDER_OPENAI === provider.val()) {
+                        key.parent('div').show();
+                        model.parent('div').show();
+                        azureResourceName.parent('div').hide();
+                        azureDeploymentId.parent('div').hide();
+                    } else if (PROVIDER_AZURE === provider.val()) {
+                        key.parent('div').show();
+                        model.parent('div').hide();
+                        azureResourceName.parent('div').show();
+                        azureDeploymentId.parent('div').show();
+                    }
+                }
+            });
+        </script>
+
         <div class="small-12 columns">
             <table>
                 <thead>
