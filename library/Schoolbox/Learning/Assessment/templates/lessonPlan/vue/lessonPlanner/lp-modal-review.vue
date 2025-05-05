@@ -16,8 +16,18 @@ const selectedFields = window.Vue.computed(() => {
     <template v-for="(field, i) in selectedFields" :key="field.id">
         <hr v-if="i > 0" />
 
-        <label :for="`lp-review-field-${field.id}`">{{ field.title }}</label>
-        <p v-if="field.description.length" class="meta lp-field-description">{{ field.description }}</p>
+        <label :for="`lp-review-field-${field.id}`">
+            {{ field.title }}
+            <span
+                v-if="field.description.length"
+                data-tooltip
+                data-width="800"
+                class="has-tip hint"
+                :title="field.description"
+            >
+                ?
+            </span>
+        </label>
         <!-- eslint-disable-next-line vue/no-v-html -- This is sanitized by the backend already -->
         <div v-if="field.suggestedBody" :id="`lp-review-field-${field.id}`" v-html="field.suggestedBody" />
         <p v-else>No suggestions available for this section.</p>
