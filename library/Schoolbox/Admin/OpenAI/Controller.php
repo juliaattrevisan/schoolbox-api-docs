@@ -32,9 +32,9 @@ class Controller extends ConfigController
      */
     public function __construct(
         private ConfigMapper $configMapper,
-        private FieldStrategyFactory $fieldStrategyFactory,
-        protected Rebuilder $rebuilder,
-        protected CacheInterface $oidcCache,
+        FieldStrategyFactory $fieldStrategyFactory,
+        Rebuilder $rebuilder,
+        CacheInterface $oidcCache,
     ) {
         parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder, $oidcCache);
     }
