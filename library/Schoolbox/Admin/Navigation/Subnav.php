@@ -688,6 +688,15 @@ class Subnav
                     ],
                 ]
             ],
+            /* OpenAI needs its own page because Azure has a special usage of th config fields
+             * Also, we provide some more information here than just input fields
+             */
+            '/adminv2/ai-services' => [
+                'name' => 'AI Services',
+                'visible' => true,
+                'searchable' => true,
+                'children' => []
+            ],
             '/adminv2/schoolDataImport' => [
                 'name'       => 'School Data Import',
                 'visible'    => (
