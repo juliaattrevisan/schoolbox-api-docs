@@ -21,15 +21,16 @@
                 let azureResourceName = $('#openai_azure_resource_name-field').parent('div');
                 let azureDeploymentId = $('#openai_azure_deployment_id-field').parent('div');
 
+
                 provider.on('change', function(event) {
                     event.preventDefault();
-                    init(provider, key, model, azureResourceName, azureDeploymentId)
+                    init(provider, key, model, azureResourceName, azureDeploymentId);
                 });
 
                 init(provider, key, model, azureResourceName, azureDeploymentId);
 
                 /**
-                 *  Hide everything if you haven't chozen a provider yet
+                 *  Hide everything if you haven't chosen a provider yet
                  */
                 function init(provider, key, model, azureResourceName, azureDeploymentId)
                 {
