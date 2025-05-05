@@ -11,7 +11,7 @@ const modalEl = window.Vue.ref<InstanceType<typeof RevealModal> | null>(null);
 const isModalActive = window.Vue.ref(false); /*  */
 
 interface Props {
-    user?: Number
+    user?: Number;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -27,7 +27,7 @@ function onNotificationSelected(): void {
     modalEl.value.open();
     const utc = new Date();
     // Set the expiration to the end of the day, so it will only check it once a day
-    utc.setUTCHours(23,59,59,999);
+    utc.setUTCHours(23, 59, 59, 999);
     // update the local storage to prevent the modal from showing again
     document.cookie = `birthdayCelebrated_${props.user}=1; expires=${utc.toUTCString()}; path=/`;
 }
