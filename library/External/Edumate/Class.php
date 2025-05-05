@@ -26,15 +26,15 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
         $stmt = $this->getConnection()->prepareQuery("
             SELECT
                 FIRSTNAME,
-                '' AS preferredname,
+                '' AS PREFERREDNAME,
                 SURNAME AS LASTNAME,
                 SCHOOLBOX_STUDENTCLASS.STUDENT_NUMBER AS SYNERGY_ID,
                 YEAR_LEVEL AS YEARLEVEL,
                 HOUSE,
-                '' AS StudentMedicalAlert,
-                '' AS StudentSpecialNeedsFlag,
-                '' AS EnglishSecondFlag,
-                '' AS StudentTutorDescription
+                '' AS STUDENTMEDICALALERT,
+                '' AS STUDENTSPECIALNEEDSFLAG,
+                '' AS ENGLISHSECONDFLAG,
+                '' AS STUDENTTUTORDESCRIPTION
             FROM  SCHOOLBOX_STUDENTCLASS
             LEFT JOIN SCHOOLBOX_STUDENTS ON SCHOOLBOX_STUDENTCLASS.STUDENT_NUMBER = SCHOOLBOX_STUDENTS.STUDENT_NUMBER
             WHERE SCHOOLBOX_STUDENTCLASS.CLASS_CODE IN (" . implode(',', $codes) . ")
