@@ -450,6 +450,16 @@
                             </p>
                             <input type="text" id="report-filename" name="filename" maxlength="255" value="{{ report.filename }}" />
                         </div>
+
+                        <div class="small-12 columns">
+                            <label for="report-footer">Footer</label>
+                            <p class="meta">
+                                To display a footer on each page of the report. You may use the following tokens that
+                                will be substituted with the students details on creation: [title], [firstname],
+                                [surname], [preferredname], [year] and [govstudentnumber].
+                            </p>
+                            <input type="text" id="report-footer" name="footer" maxlength="255" value="{{ report.footer }}" />
+                        </div>
                     </fieldset>
 
                     <fieldset class="content">

@@ -236,6 +236,7 @@ class Controller extends ConfigController
         }
         $report = $this->reportMapper->createModel();
         $report->setFileName(Model::DEFAULT_FILENAME);
+        $report->setFooter(Model::DEFAULT_FOOTER);
         $this->response = $this->responseFromTemplate(
             '@adminSummativeReport/create.twig',
             [
@@ -422,7 +423,8 @@ class Controller extends ConfigController
             ->setIntroduction($postData['introduction'])
             ->setOptions(json_encode($options, JSON_THROW_ON_ERROR))
             ->setUpdatedBy($this->getUser())
-            ->setFileName($report->sanitiseFilename(trim((string)$postData['filename'])));
+            ->setFileName($report->sanitiseFilename(trim((string)$postData['filename'])))
+            ->setFooter($report->sanitiseFooter(trim((string)$postData['footer'])));
 
         /* If any Logo was provided, remember it
          * Otherwise clear it
