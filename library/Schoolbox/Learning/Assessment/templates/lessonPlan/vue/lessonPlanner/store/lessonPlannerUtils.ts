@@ -93,12 +93,13 @@ export function translateFieldForPayload(
 
     /**
      * When (re)generating a single field on the create or modify page,
-     * - For all fields, this should be the CURRENT body to use as additional context
+     * - If this is the field being generated, this is left BLANK (i.e. the AI should generate a new body from scratch)
+     * - Otherwise, from all other fields, this should be the CURRENT body to use as additional context
      */
     if (generateForField) {
-        // if (field.id === generateForField.id) {
-        //     return { ...baseFieldData, body: null, template: null };
-        // }
+        if (field.id === generateForField.id) {
+            return { ...baseFieldData, body: null, template: null };
+        }
         return { ...baseFieldData, body: field.body, template: null };
     }
 

@@ -54,7 +54,6 @@ class LessonPlan
         content across the plan as contextual guidance to ensure the regenerated field is pedagogically sound,
         consistent with the plan flow, and aligned to the curriculum.
 
-        Your response should replace the 'Current Value' with an improved version that better fits the plan.
         Regenerate only the requested field. Do not alter or repeat any of the other fields.
         Your language of instruction is [LANGUAGE].
 
