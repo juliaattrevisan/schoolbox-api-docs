@@ -20,6 +20,7 @@ use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Admin\Settings\ModuleConfig;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Mapper\Exception;
 
 class Controller extends ConfigController
@@ -31,7 +32,7 @@ class Controller extends ConfigController
      * @param CacheInterface $oidcCache
      */
     public function __construct(
-        private ConfigMapper $configMapper,
+        ConfigMapper $configMapper,
         FieldStrategyFactory $fieldStrategyFactory,
         Rebuilder $rebuilder,
         CacheInterface $oidcCache,
@@ -57,8 +58,8 @@ class Controller extends ConfigController
             'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex')),
             'configContext' => $configContext,
             'models' => [
-                'openai' => \Schoolbox\Editor\OpenAI\Helper::ENDPOINT_TYPE_OPENAI,
-                'azure' => \Schoolbox\Editor\OpenAI\Helper::ENDPOINT_TYPE_AZURE,
+                'openai' => Helper::ENDPOINT_TYPE_OPENAI,
+                'azure' => Helper::ENDPOINT_TYPE_AZURE,
             ]
         ], 'AI Services');
     }
@@ -93,6 +94,6 @@ class Controller extends ConfigController
      */
     private function buildConfigPredicate(): Builder
     {
-        return $this->configMapper->getPredicateBuilder()->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_OPENAI);
+        return $this->getConfigMapper()->getPredicateBuilder()->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_OPENAI);
     }
 }
