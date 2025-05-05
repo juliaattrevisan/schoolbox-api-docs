@@ -115,7 +115,7 @@
 }
 .lrn_widget .lrn_response.lrn_cloze .lrn_combobox select.lrn-cloze-select:hover,
 .lrn_widget .lrn_response.lrn_cloze .lrn_combobox select.lrn-cloze-select:focus {
-    background-color: var(--form-bg-hover-color);
+    background-color: var(--form-bg-hover-color) !important;
     border-color: hsla(
         var(--form-border-color-h),
         var(--form-border-color-s),
