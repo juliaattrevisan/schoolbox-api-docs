@@ -39,6 +39,7 @@ class User implements IDataGenerator
         $initialUser  = $this->session->get(ImpersonationCheck::SESSION_KEY_INITIAL_USER);
         $previousUser = $this->session->get(ImpersonationCheck::SESSION_KEY_PREVIOUS_USER);
         $this->session->set('no_header', $this->session->get('no_header') ?: isset($_GET['no_header']));
+        $birthdaySession = $this->session->getCookie('birthdayCelebrated_' . $this->currentUser->getId());
 
         return [
             'current'           => $this->currentUser,
@@ -47,7 +48,7 @@ class User implements IDataGenerator
             'impersonated'      => (new ImpersonationCheck())->isImpersonated($this->currentUser, $previousUser),
             'communityLogin'    => $this->session->get('communityLogin'),
             'no_header'         => $this->session->get('no_header'),  //Hides top nav header if user session var set
-            'celebrateBirthday' => !$this->session->getCookie('birthdayCelebrated') && $this->currentUser->isBirthday(),
+            'celebrateBirthday' => !isset($birthdaySession) && $this->currentUser->isBirthday(),
         ];
     }
 }

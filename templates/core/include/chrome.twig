@@ -448,7 +448,7 @@
 <!-- temporary conditionals to show the birthday surprise for Jana Reed -->
 {% if user.celebrateBirthday %}
 <div id="birthday-surprise-container">
-    <birthday-surprise />
+    <birthday-surprise user="{{ user.current.id }}"/>
 </div>
     <script src="{{ CDN_PREFIX }}/js/bundle/birthdaySurprise.js?v={{ config.site_version }}"></script>
 {% endif %}
