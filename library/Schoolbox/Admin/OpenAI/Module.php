@@ -14,6 +14,9 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
+use Schoolbox\Admin\Settings\FieldStrategyFactory;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 
 class Module extends BaseModule
 {
@@ -38,6 +41,7 @@ class Module extends BaseModule
         );
 
         $this->register('GET', '', 'getIndex', $perms);
+        $this->register('POST', '', 'postOpenAIOptions', $perms);
     }
 
 
@@ -46,7 +50,12 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
-        return new Controller();
+        return new Controller(
+            $this->getMapperFactory()->get(ConfigMapper::class),
+            new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),
+            $this->injector->get('moduleCache.rebuilder'),
+            $this->injector->get('oidc.cache'),
+        );
     }
 
 

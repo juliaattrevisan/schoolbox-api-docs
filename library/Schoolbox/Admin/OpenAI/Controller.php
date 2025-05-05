@@ -12,19 +12,31 @@ namespace Schoolbox\Admin\OpenAI;
 
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\InvalidColumnException;
-use Alaress\Web\Controller\Base;
+use Alaress\Module\Cache\Rebuilder;
 use Alaress\Web\Controller\ConfigController;
 use Aura\Router\Exception\RouteNotFound;
+use Psr\SimpleCache\CacheInterface;
 use Schoolbox\Admin\Navigation\Subnav;
+use Schoolbox\Admin\Settings\FieldStrategyFactory;
+use Schoolbox\Admin\Settings\ModuleConfig;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception;
 
 class Controller extends ConfigController
 {
     /**
-     * Controller constructor.
+     * @param ConfigMapper $configMapper
+     * @param FieldStrategyFactory $fieldStrategyFactory
+     * @param Rebuilder $rebuilder
+     * @param CacheInterface $oidcCache
      */
-    public function __construct() {
+    public function __construct(
+        private ConfigMapper $configMapper,
+        private FieldStrategyFactory $fieldStrategyFactory,
+        protected Rebuilder $rebuilder,
+        protected CacheInterface $oidcCache,
+    ) {
+        parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder, $oidcCache);
     }
 
 
@@ -34,9 +46,16 @@ class Controller extends ConfigController
      */
     public function getIndex(): void
     {
+        $configContext = $this->buildConfigContext(
+            $this->buildConfigPredicate(),
+            $this->routeGenerator->generate('adminOpenAi.postOpenAIOptions'),
+            [ModuleConfig::CONTEXT_USE_BOTTOM_DRAWER => false],
+        );
+
         $this->response = $this->responseFromTemplate('@adminOpenAi/index.twig', [
             'pageCurrent' => $this->routeGenerator->generate('adminOpenAi.getIndex'),
             'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex')),
+            'configContext' => $configContext,
         ], 'AI Services');
     }
 
@@ -70,6 +89,6 @@ class Controller extends ConfigController
      */
     private function buildConfigPredicate(): Builder
     {
-        return $this->getConfigMapper()->getPredicateBuilder()->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_OPENAI);
+        return $this->configMapper->getPredicateBuilder()->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_OPENAI);
     }
 }
