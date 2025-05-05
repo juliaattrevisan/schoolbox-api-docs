@@ -41,7 +41,7 @@ class Module extends BaseModule
         );
 
         $this->register('GET', '', 'getIndex', $perms);
-        $this->register('POST', '', 'postOpenAIOptions', $perms);
+        $this->register('POST', '', 'postOpenAiOptions', $perms);
     }
 
 

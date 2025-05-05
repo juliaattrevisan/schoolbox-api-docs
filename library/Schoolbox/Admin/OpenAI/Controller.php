@@ -48,7 +48,7 @@ class Controller extends ConfigController
     {
         $configContext = $this->buildConfigContext(
             $this->buildConfigPredicate(),
-            $this->routeGenerator->generate('adminOpenAi.postOpenAIOptions'),
+            $this->routeGenerator->generate('adminOpenAi.postOpenAiOptions'),
             [ModuleConfig::CONTEXT_USE_BOTTOM_DRAWER => false],
         );
 
@@ -77,7 +77,7 @@ class Controller extends ConfigController
 
         /* Go back to the place from whence you came
          */
-        $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex'));
+        $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminOpenAi.getIndex'));
     }
 
     /**
