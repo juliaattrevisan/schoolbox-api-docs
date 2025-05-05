@@ -21,7 +21,7 @@ function onNotificationSelected(): void {
     // Set the expiration to the end of the day, so it will only check it once a day
     utc.setUTCHours(23,59,59,999);
     // update the local storage to prevent the modal from showing again
-    document.cookie = "birthdayCelebrated=1; expires=" + utc.toUTCString() +"; path=/";
+    document.cookie = `birthdayCelebrated=1; expires=${utc.toUTCString()}; path=/`;
 }
 </script>
 
