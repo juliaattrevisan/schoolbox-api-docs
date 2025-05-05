@@ -49,7 +49,8 @@ class Decorator implements DecoratorInterface
         private int $lessonPlanTemplateId,
         private array $lessonPlanFields,
         private string $lessonPlanVisibility,
-        private array $attachedFiles
+        private array $attachedFiles,
+        private string $lessonPlanDuration
     ) {
     }
 
@@ -74,6 +75,8 @@ class Decorator implements DecoratorInterface
         /* Decide whether students can see this Lesson Plan
          */
         $assessment->setVisibility($this->lessonPlanVisibility);
+
+        $assessment->setLessonPlanDuration($this->lessonPlanDuration);
 
         /* Hydrate all the template's fields too
          * We need to remember where a Lesson Plan Field came from,

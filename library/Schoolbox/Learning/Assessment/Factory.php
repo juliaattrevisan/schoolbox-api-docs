@@ -155,6 +155,17 @@ class Factory
     /** @var Error\Mapper */
     private Error\Mapper $errorMapper;
 
+
+    /**
+     * Used in Lesson Plans' AI generation to decide how much data
+     * the LLM should generate. Unfortunately shares a similar name,
+     * but not concept, with other duration fields here
+     *
+     * @var string|null
+     */
+    private ?string $duration = null;
+
+
     /**
      * Factory constructor.
      * @param User             $creator
@@ -341,6 +352,7 @@ class Factory
         $this->setLessonPlanTemplateId((int)($post['lessonPlanTemplateId'] ?? null));
         $this->setLessonPlanFields($post['field'] ?? []);
         $this->setLessonPlanVisibility('on' === ($post['lessonPlanVisibility'] ?? null) ? \Schoolbox\Role::STUDENT : \Schoolbox\Role::STAFF);
+        $this->setLessonPlanDuration((string)($post['duration'] ?? null));
 
         // Ensure custom fields is an array if it's set
         $customFields = $post['customFields'] ?? null;
@@ -528,7 +540,8 @@ class Factory
                 $this->getLessonPlanTemplateId(),
                 $this->getLessonPlanFields(),
                 $this->getLessonPlanVisibility(),
-                $this->getAttachedFiles()
+                $this->getAttachedFiles(),
+                $this->getLessonPlanDuration(),
             );
         } else {
             throw new DomainException('Please select an assessment type');
@@ -908,6 +921,26 @@ class Factory
     protected function setCurriculumNodes($curriculumNodes)
     {
         $this->curriculumNodes = $curriculumNodes;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getLessonPlanDuration(): ?string
+    {
+        return $this->duration;
+    }
+
+
+    /**
+     * @param string|null $duration
+     * @return $this
+     */
+    public function setLessonPlanDuration(?string $duration): self
+    {
+        $this->duration = $duration;
         return $this;
     }
 }

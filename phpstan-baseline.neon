@@ -6581,3 +6581,27 @@ parameters:
 			identifier: method.notFound
 			count: 1
 			path: library/Schoolbox/Admin/BulkFeedbackImport/Processor.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getLessonPlanDuration\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/LessonPlan.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:setLessonPlanDuration\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/LessonPlan.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getLessonPlanDuration\(\).$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/LessonPlan.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:setLessonPlanDuration\(\).$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/LessonPlan.php
