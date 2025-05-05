@@ -11,7 +11,7 @@ const modalEl = window.Vue.ref<InstanceType<typeof RevealModal> | null>(null);
 const isModalActive = window.Vue.ref(false); /*  */
 
 interface Props {
-    user?: Number;
+    user?: number;
 }
 
 const props = withDefaults(defineProps<Props>(), {
