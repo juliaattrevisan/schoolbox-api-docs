@@ -143,6 +143,49 @@ class LessonPlan
 
 
     /**
+     * Generate details for a given field for the prompt.
+     * Used for the user persona as well as the structured output contents
+     *
+     * @param array $field
+     * @return string
+     */
+    private function generateFieldDetails(array $field): string
+    {
+        $fieldId = (string)$field['id'];
+        $fieldTitle = trim((string)$field['title']);
+        $fieldDescription = trim((string)$field['description']);
+        $fieldBody = trim((string)$field['body']);
+        $fieldTemplate = trim((string)$field['template']);
+
+        /* Add a visibility statement
+         */
+        if (trim((string)$field['visibility']) === \Schoolbox\Role::STUDENT) {
+            $fieldVisibility = 'This field is visible to students and staff.';
+        } else {
+            $fieldVisibility = 'This field is visible to staff.';
+        }
+
+        $details = sprintf(
+            "FIELD TITLE: %s\nFIELD DESCRIPTION: %s\nVISIBILITY: %s",
+            $fieldTitle,
+            $fieldDescription,
+            $fieldVisibility
+        );
+
+        /* If the body/template is present, tack it on the end
+         */
+        if ('' !== $fieldBody) {
+            $details .= sprintf("\nCURRENT VALUE: %s", $fieldBody);
+        }
+        if ('' !== $fieldTemplate) {
+            $details .= sprintf("\nTEMPLATE: %s", $fieldTemplate);
+        }
+
+        return $details;
+    }
+
+
+    /**
      * Derive prompt attributes from an existing Lesson Plan and Lesson Plan Template.
      *
      * This lets you supply scalar ids, which are resolved to actual instances via mappers
@@ -292,24 +335,27 @@ class LessonPlan
         ]);
 
         if (null !== $generateForField) {
-            $otherFieldsInfo = "";
+            $otherFieldsInfo = "Other Fields:";
 
             foreach ($fields as $field) {
                 if ($field['id'] === $generateForField) {
                     continue;
                 }
 
-                $otherFieldsInfo .= sprintf(
-                    "\n * %s: %s",
-                    $field['title'],
-                    $field['body']
-                );
+                $fieldDetails = $this->generateFieldDetails($field);
+                $otherFieldsInfo .= sprintf("\n * %s", $fieldDetails);
             }
 
             $userContent = strtr($userContent, [
                 '[CURRENT FIELD TITLE]' => $fields[$generateForField]['title'],
                 '[CURRENT FIELD BODY]' => $fields[$generateForField]['body'],
                 '[OTHER FIELDS]' => $otherFieldsInfo
+            ]);
+        } else {
+            $userContent = strtr($userContent, [
+                '[CURRENT FIELD TITLE]' => '',
+                '[CURRENT FIELD BODY]' => '',
+                '[OTHER FIELDS]' => ''
             ]);
         }
 
@@ -381,41 +427,15 @@ class LessonPlan
                 continue;
             }
 
-            $fieldId = (string)$field['id'];
             $fieldTitle = trim((string)$field['title']);
-            $fieldDescription = trim((string)$field['description']);
-            $fieldBody = trim((string)$field['body']);
-            $fieldTemplate = trim((string)$field['template']);
+            $details = $this->generateFieldDetails($field);
 
-            /* Add a visibility statement
-             */
-            if (trim((string)$field['visibility']) === \Schoolbox\Role::STUDENT) {
-                $fieldVisibility = 'This field is visible to students and staff.';
-            } else {
-                $fieldVisibility = 'This field is visible to staff.';
-            }
-
-            $description = sprintf(
-                "USE HTML\nFIELD TITLE: %s\nFIELD DESCRIPTION: %s\nVISIBILITY: %s",
-                $fieldTitle,
-                $fieldDescription,
-                $fieldVisibility
-            );
-
-            /* If the body/template is present, tack it on the end
-             */
-            if ('' !== $fieldBody) {
-                $description .= sprintf("\nCURRENT VALUE: %s", $fieldBody);
-            }
-            if ('' !== $fieldTemplate) {
-                $description .= sprintf("\nTEMPLATE: %s", $fieldTemplate);
-            }
 
             /* Make a giant prompt slab for each field
              */
             $struct['schema']['properties'][$fieldTitle] = [
                 'type' => 'string',
-                'description' => $description,
+                'description' => sprintf("USE HTML\n%s", $details),
             ];
 
             /* I think this forces the $fieldId to spawn in the json payload
