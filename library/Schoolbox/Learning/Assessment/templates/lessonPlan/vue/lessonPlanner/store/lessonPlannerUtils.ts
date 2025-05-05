@@ -61,6 +61,10 @@ type LpGenerateApiPayload = {
      */
     additionalContext: string;
     /**
+     * Are we regenerating for a single field (ID) or the entire lesson plan (null)?
+     */
+    generateForField: LessonPlanField["id"] | null;
+    /**
      * All of the fields (in order) in the lesson plan,
      * and whether or not they are selected to be generated or not
      */

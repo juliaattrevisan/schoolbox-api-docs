@@ -154,6 +154,7 @@ class LessonPlan
      * @param string $duration
      * @param array $curriculumNodeIds
      * @param string $additionalContext
+     * @param ?string $generateForField
      * @return string
      * @throws Deleted
      * @throws Exception
@@ -166,7 +167,8 @@ class LessonPlan
         array $fields,
         string $duration,
         array $curriculumNodeIds,
-        string $additionalContext = ''
+        string $additionalContext = '',
+        ?string $generateForField = null
     ): string {
         /* Details about how to use each field
          */
@@ -185,7 +187,9 @@ class LessonPlan
             $context,
             $duration,
             $curriculumNames,
-            $additionalContext
+            $fields,
+            $generateForField,
+            $additionalContext,
         );
 
         /* OpenAI uses the model name from our ui.
@@ -247,6 +251,8 @@ class LessonPlan
      * @param string $context
      * @param string $duration
      * @param array $curriculumNames
+     * @param array $fields
+     * @param string|null $generateForField
      * @param string $additionalContext
      * @return array
      */
@@ -256,32 +262,56 @@ class LessonPlan
         string $context,
         string $duration,
         array $curriculumNames,
+        array $fields,
+        ?string $generateForField = null,
         string $additionalContext = ''
     ): array {
+        /* Use the right base prompt depending on if we're regenerating a single field
+         * or multiple fields at once
+         */
+        if (null !== $generateForField) {
+            $systemContent = self::PROMPT_SYSTEM_PERSONA_SINGLE;
+            $userContent = self::PROMPT_USER_PERSONA_SINGLE;
+        } else {
+            $systemContent = self::PROMPT_SYSTEM_PERSONA_MULTIPLE;
+            $userContent = self::PROMPT_USER_PERSONA_MULTIPLE;
+        }
+
         /* Conduct replacements
          */
-        $systemContent = strtr(self::PROMPT_SYSTEM_PERSONA, [
+        $systemContent = strtr($systemContent, [
             '[LANGUAGE]' => $this->language
         ]);
-
-        /* Something that shapes what the ai would make;
-         * provide additional instructions (if meaningful)
-         */
-        $userContent = "
-            Plan Type: [TEMPLATE TITLE]
-            Title: [LESSON PLAN TITLE]
-            Course/Unit Context: [CONTEXT]
-            Duration: [DURATION]
-            [CURRICULUM CONTENT]
-            [CURRICULUM AREA]
-        ";
 
         $userContent = strtr($userContent, [
             '[TEMPLATE TITLE]' => $templateTitle,
             '[LESSON PLAN TITLE]' => $lessonPlanTitle,
             '[CONTEXT]' => $context,
             '[DURATION]' => $duration,
+            '[ADDITIONAL NOTES]' => '' !== $additionalContext ? 'Additional Notes: ' . $additionalContext : '',
         ]);
+
+        if (null !== $generateForField) {
+            $otherFieldsInfo = "";
+
+            foreach ($fields as $field) {
+                if ($field['id'] === $generateForField) {
+                    continue;
+                }
+
+                $otherFieldsInfo .= sprintf(
+                    "\n * %s: %s",
+                    $field['title'],
+                    $field['body']
+                );
+            }
+
+            $userContent = strtr($userContent, [
+                '[CURRENT FIELD TITLE]' => $fields[$generateForField]['title'],
+                '[CURRENT FIELD BODY]' => $fields[$generateForField]['body'],
+                '[OTHER FIELDS]' => $otherFieldsInfo
+            ]);
+        }
 
         if (\count($curriculumNames)) {
             /* Yoink out the node's name
@@ -318,12 +348,6 @@ class LessonPlan
                 '[CURRICULUM CONTENT]' => '',
                 '[CURRICULUM AREA]' => ''
             ]);
-        }
-
-        /* Whatever the user also instructed from the ui
-         */
-        if ('' !== $additionalContext) {
-            $userContent .= '    Additional Notes: ' . $additionalContext;
         }
 
         return [
