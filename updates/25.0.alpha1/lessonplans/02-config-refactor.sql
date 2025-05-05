@@ -5,7 +5,8 @@ alter table config
     modify module enum ('settings', 'comms', 'custom', 'oauth', 'schoolData', 'lti', 'report-export', 'feature-tours', 'openai') default 'settings' null;
 
 UPDATE config
-SET module = 'openai'
+SET module = 'openai',
+type_id = null
 WHERE `name` IN (
     'openai_azure_deployment_id',
     'openai_azure_resource_name',
