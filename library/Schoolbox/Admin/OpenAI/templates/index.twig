@@ -18,10 +18,10 @@
                 const PROVIDER_AZURE = 'Azure';
 
                 let provider = $('#openai_endpoint-field');
-                let key = $('#openai_key-field');
-                let model = $('#openai_model-field');
-                let azureResourceName = $('#openai_azure_resource_name-field');
-                let azureDeploymentId = $('#openai_azure_deployment_id-field');
+                let key = $('#openai_key-field').parent('div');
+                let model = $('#openai_model-field').parent('div');
+                let azureResourceName = $('#openai_azure_resource_name-field').parent('div');
+                let azureDeploymentId = $('#openai_azure_deployment_id-field').parent('div');
 
                 init(provider, key, model, azureResourceName, azureDeploymentId);
 
@@ -37,19 +37,19 @@
                 {
                     if ('' === provider.val()) {
                         key.parent('div').hide();
-                        model.parent('div').hide();
-                        azureResourceName.parent('div').hide();
-                        azureDeploymentId.parent('div').hide();
+                        model.hide();
+                        azureResourceName.hide();
+                        azureDeploymentId.hide();
                     } else if (PROVIDER_OPENAI === provider.val()) {
-                        key.parent('div').show();
-                        model.parent('div').show();
-                        azureResourceName.parent('div').hide();
-                        azureDeploymentId.parent('div').hide();
+                        key.show();
+                        model.show();
+                        azureResourceName.hide();
+                        azureDeploymentId.hide();
                     } else if (PROVIDER_AZURE === provider.val()) {
-                        key.parent('div').show();
-                        model.parent('div').hide();
-                        azureResourceName.parent('div').show();
-                        azureDeploymentId.parent('div').show();
+                        key.show();
+                        model.hide();
+                        azureResourceName.show();
+                        azureDeploymentId.show();
                     }
                 }
             });
