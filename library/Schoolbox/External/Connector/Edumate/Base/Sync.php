@@ -42,7 +42,7 @@ class Sync extends Base implements ISync
         ';
 
         return new Iterator\Student(
-            $this->databaseExternal->getQueryIterator($query)
+            new ResultIterator($this->databaseExternal->getQueryIterator($query)),
         );
     }
 
@@ -80,7 +80,7 @@ class Sync extends Base implements ISync
         ';
 
         return new Iterator\Guardian(
-            $this->databaseExternal->getQueryIterator($query)
+            new ResultIterator($this->databaseExternal->getQueryIterator($query)),
         );
     }
 
@@ -116,7 +116,7 @@ class Sync extends Base implements ISync
         ';
 
         return new Iterator\Staff(
-            $this->databaseExternal->getQueryIterator($query)
+            new ResultIterator($this->databaseExternal->getQueryIterator($query)),
         );
     }
 }
