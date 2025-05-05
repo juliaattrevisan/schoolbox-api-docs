@@ -17,7 +17,7 @@ services:
         - code=../
     volumes:
       - storage:/var/lib/schoolbox/docker/storage
-      - schoolbox-nginx-config:/etc/nginx/conf.d
+      - schoolbox-nginx-config:/etc/nginx/sites-enabled
       - schoolbox-config:/etc/schoolbox
     ports:
       - '80:80'
