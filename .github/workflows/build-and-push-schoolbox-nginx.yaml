@@ -14,9 +14,9 @@ on:
       - released
 
 jobs:
-  # Build base images before building nginx images,
+  # Build php82-alpine image before building nginx images,
   # but only if the build has changed, and only if the repo is the base repo.
-  base-image-diff:
+  php82-alpine-diff:
     # I can't believe that this has to be set as an `if` rule on a step,
     # instead of in the `on` section.
     if: github.repository == 'alaress/schoolbox'
@@ -28,18 +28,18 @@ jobs:
         uses: actions/checkout@v3
         with:
           sparse-checkout: |
-            docker/base-images/
+            docker/base-images/php82-alpine/
           fetch-depth: '2'
       - name: Diff base image
         id: diff
         run: |
-          echo "count=$(git diff ${{ github.sha }}^..${{ github.sha }} --name-only -- docker/base-images/ | wc -l)" >> $GITHUB_OUTPUT
+          echo "count=$(git diff ${{ github.sha }}^..${{ github.sha }} --name-only -- docker/base-images/php82-alpine/ | wc -l)" >> $GITHUB_OUTPUT
 
-  build-and-push-base-images:
+  build-and-push-php82-alpine:
     needs:
-      - base-image-diff
-    uses: ./.github/workflows/build-and-push-base-images.yaml
-    if: needs.base-image-diff.outputs.count > 0
+      - php82-alpine-diff
+    uses: ./.github/workflows/build-and-push-php82-alpine.yaml
+    if: needs.php82-alpine-diff.outputs.count > 0
     secrets: inherit
 
   # Build artifacts before building image
@@ -54,10 +54,10 @@ jobs:
   # Build schoolbox-nginx image
   build-and-push-schoolbox-nginx:
     needs:
-      - build-and-push-base-images
+      - build-and-push-php82-alpine
       - build-composer-artifact
       - build-npm-artifact
-    if: ${{ always() && github.repository == 'alaress/schoolbox' && (needs.build-and-push-base-images.result == 'skipped' || needs.build-and-push-base-images.result == 'success') }}
+    if: ${{ always() && github.repository == 'alaress/schoolbox' && (needs.build-and-push-php82-alpine.result == 'skipped' || needs.build-and-push-php82-alpine.result == 'success') }}
     strategy:
       matrix:
         build:
