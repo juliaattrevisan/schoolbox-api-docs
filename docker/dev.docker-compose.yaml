@@ -15,9 +15,10 @@ services:
         ENV: dev
     restart: no
 
-  # nginx+PHP-FPM container
-  schoolbox-nginx:
-    container_name: schoolbox-nginx
+  # Load-balanced nginx+PHP-FPM containers:
+  # regrettably copy-pasted for now
+  schoolbox-nginx-1:
+    container_name: schoolbox-nginx-1
     depends_on:
       - php82-alpine
     environment:
@@ -27,7 +28,7 @@ services:
       context: ./schoolbox-nginx
       dockerfile: dev-image.Dockerfile
       args:
-        SERVER_NAME: schoolbox-nginx.docker.localhost
+        SERVER_NAME: schoolbox-nginx-1.docker.localhost
     volumes:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
@@ -35,6 +36,31 @@ services:
     # After building: create data dirs, and make mount writable by www-data
     # Cannot currently use create-data-dirs.sh, as /bin/bash isn't available,
     # and /bin/sh doesn't support {} expansion
+    post_start:
+      - command: mkdir -p /var/lib/schoolbox/docker/cache/portrait
+      - command: mkdir -p /var/lib/schoolbox/docker/cache/stream
+      - command: mkdir -p /var/lib/schoolbox/docker/cache/zip
+      - command: mkdir -p /var/lib/schoolbox/docker/files
+      - command: mkdir -p /var/lib/schoolbox/docker/purifier
+      - command: mkdir -p /var/lib/schoolbox/docker/twig
+      - command: chown -R www-data:www-data /var/lib/schoolbox/docker/
+
+  schoolbox-nginx-2:
+    container_name: schoolbox-nginx-2
+    depends_on:
+      - php82-alpine
+    environment:
+      DEBUG: "1"
+    restart: always
+    build:
+      context: ./schoolbox-nginx
+      dockerfile: dev-image.Dockerfile
+      args:
+        SERVER_NAME: schoolbox-nginx-2.docker.localhost
+    volumes:
+      - code:/usr/share/schoolbox
+      - storage:/var/lib/schoolbox/docker/storage
+      - schoolbox-config:/etc/schoolbox
     post_start:
       - command: mkdir -p /var/lib/schoolbox/docker/cache/portrait
       - command: mkdir -p /var/lib/schoolbox/docker/cache/stream
