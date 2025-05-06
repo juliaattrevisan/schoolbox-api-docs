@@ -470,10 +470,10 @@ Admin,"System Settings 3rd Party Services",Superuser,https://vagrant.dev.schoolb
 Admin,"System Settings 3rd Party Services",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/setting/3rd Party Services,401
 Admin,"System Settings 3rd Party Services",Student,https://vagrant.dev.schoolbox.cloud/adminv2/setting/3rd Party Services,401
 Admin,"System Settings 3rd Party Services",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/setting/3rd Party Services,401
-Admin,"System Settings AI Services",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/setting/AI,200
-Admin,"System Settings AI Services",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/setting/AI,401
-Admin,"System Settings AI Services",Student,https://vagrant.dev.schoolbox.cloud/adminv2/setting/AI,401
-Admin,"System Settings AI Services",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/setting/AI,401
+Admin,"System Settings AI Services",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/ai-services,200
+Admin,"System Settings AI Services",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/ai-services,401
+Admin,"System Settings AI Services",Student,https://vagrant.dev.schoolbox.cloud/adminv2/ai-services,401
+Admin,"System Settings AI Services",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/ai-services,401
 Admin,"System Settings Debugging",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Debugging,200
 Admin,"System Settings Debugging",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Debugging,401
 Admin,"System Settings Debugging",Student,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Debugging,401
