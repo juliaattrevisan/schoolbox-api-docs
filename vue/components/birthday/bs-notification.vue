@@ -94,10 +94,10 @@ window.Vue.onMounted(async () => {
 
 <style lang="scss" scoped>
 .birthday-button {
-    right: 0;
     margin: 0; // to remove the default button margin
     padding: 0; // to remove the default button padding
     position: absolute; // to overlay the notification bar
+    right: 0;
     top: 0;
     z-index: var(--sbx-depth-pop-over);
 }
