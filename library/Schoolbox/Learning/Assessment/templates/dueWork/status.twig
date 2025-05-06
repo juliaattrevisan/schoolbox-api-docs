@@ -142,7 +142,7 @@
                                 <li><a class="icon-task" href="{{ pActionResponses }}" title="View submission for {{ participant.user.givenName }}" data-inline-grader data-test="assessment-status-feedback-viewSubmission-{{ participant.user.id }}">View {% if fbUrl %}and {{ locale.grades }} {% endif %}submission</a></li>
                             {% endif %}
                             {% if pActionSummary %}
-                                <li><a class="icon-history" href="{{ pActionSummary }}" title="View {{ participant.user.givenName }}'s history">{{ responseHistory }}</a></li>
+                                <li><a class="icon-history" href="{{ pActionSummary }}" title="View {{ participant.user.givenName }}'s history" data-test="assessment-status-feedback-responseHistory-{{ participant.user.id }}">{{ responseHistory }}</a></li>
                             {% endif %}
                             {% if pActionSobo %}
                                 <li><a class="icon-due-work" href="{{ pActionSobo }}" title="Submit on behalf of {{ participant.user.givenName }}">Submit on behalf of {{ participant.user.givenName }}</a></li>

@@ -261,7 +261,7 @@ Usage:
                                                 </ul>
                                                 {# Use the display mark type here to align with what the student actually gave themselves #}
                                                 {% if selfAssessmentFeedback.humanReadableMark|length %}
-                                                    <div class="grade {{ urgency.marks(selfAssessmentFeedback.normalisedMark) }}-bg">
+                                                    <div class="grade {{ urgency.marks(selfAssessmentFeedback.normalisedMark) }}-bg" data-test="assessment-feedback-self-assessment-mark">
                                                         <span>{{ selfAssessmentFeedback.humanReadableMark }}</span>
                                                     </div>
                                                 {% endif %}

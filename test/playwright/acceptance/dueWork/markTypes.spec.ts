@@ -10,8 +10,9 @@ import FeedbackForm from "@schoolboxTest/playwright/support/page/dueWork/Feedbac
 test.describe("Due Work - Mark type tests", () => {
     test.describe.configure({ mode: "serial" });
 
-    const teacher = "Mr Jack Coles";
-    const student = "Ms Jana Reed";
+    const instructor = "Mr Jack Coles";
+    const learner = "Ms Jana Reed";
+    const learnerId = 25;
 
     const unitName = `Test Unit ${Date.now()}`;
     let newUnitSpecId: number | null = null;
@@ -137,7 +138,7 @@ test.describe("Due Work - Mark type tests", () => {
         const feedbackForm = new FeedbackForm(tester, page);
         const submitForm = new SubmitForm(tester, page);
 
-        await tester.impersonateViaUserProfilePage(student);
+        await tester.impersonateViaUserProfilePage(learner);
 
         /**
          * @param activityName - The name of the activity to find
@@ -207,6 +208,96 @@ test.describe("Due Work - Mark type tests", () => {
 
             await feedbackForm.setComment("test", participantId);
             await submitForm.submit();
+        });
+    });
+
+    /**
+     * (Step 3) - Mark the submissions as Jack Coles
+     */
+    test("Mark submissions", async ({ tester, page }) => {
+        if (newUnitId === null) throw new Error("newUnitId is null");
+
+        const homepage = new Homepage(page);
+        const feedbackForm = new FeedbackForm(tester, page);
+        const submitForm = new SubmitForm(tester, page);
+        const statusPage = new StatusPage(tester, page);
+
+        await tester.impersonateViaUserProfilePage(instructor);
+
+        /**
+         * @param activityName - The name of the activity to find
+         */
+        async function viewStatusForActivity(activityName: string): Promise<void> {
+            if (classLink === null) throw new Error("classLink is null");
+
+            // Find the course outline and the unit we created inside it
+            tester.isGoingTo("find the unit in the course outline");
+            await page.goto(classLink);
+            const courseOutline = homepage.locateComponentByName("Course Outline");
+            const courseOutlineUnit = courseOutline.locator(`li[data-unit="${newUnitId}"]`);
+
+            const activities = courseOutlineUnit.locator("li[data-unit-assessment]");
+            await expect(activities).toHaveCount(3);
+
+            tester.isGoingTo("click to view the status of the activity");
+            const activity = activities.filter({ hasText: activityName });
+            const activityId = await activity.getAttribute("data-unit-assessment");
+            const courseOutlineId = await courseOutline.getAttribute("id");
+            await activity.getByTestId(`sbx-pop-out-${courseOutlineId}-options-task${activityId}-button`).click();
+
+            await activity.locator("[data-dropdown-content] a.icon-progress").click();
+        }
+
+        await test.step("Mark the first due work (via status page)", async () => {
+            await viewStatusForActivity(dueWorkName1);
+
+            // Find the participant row
+            const participantRow = page.locator(`li[data-participant][data-participant-name="${learner}"]`);
+
+            // Input mark type should be used (percentage)
+            const gradeInput = participantRow.locator(StatusPage.SELECTOR_MARK);
+            await expect(gradeInput).toHaveAttribute("placeholder", "Percentage mark");
+
+            await statusPage.gradeSubmission(learnerId, 75, "test");
+        });
+
+        await test.step("Mark the second due work (via inline grader)", async () => {
+            await viewStatusForActivity(dueWorkName2);
+
+            await statusPage.clickParticipantJellyTot(learnerId);
+            await statusPage.clickViewAndGradeSubmission(learnerId);
+
+            await feedbackForm.selectRubricIndicatorByValue(452, "1");
+            await feedbackForm.selectRubricIndicatorByValue(446, "1");
+
+            // Input mark type should be used (total mark)
+            await feedbackForm.expectRubricFinalSummaryMark("2 / 4 (3 / 4 given in Self-assessment)");
+            await feedbackForm.expectRubricSum("2 / 4");
+            await feedbackForm.expectGrade("2 / 4", learnerId);
+
+            // Display mark type should be used for the self assessment mark (percentage)
+            await feedbackForm.expectSelfAssessmentMark("75 %");
+
+            await feedbackForm.setComment("test", learnerId);
+            await submitForm.submit();
+        });
+
+        await test.step("Mark the third due work (via inline grader)", async () => {
+            await viewStatusForActivity(dueWorkName3);
+
+            await statusPage.clickParticipantJellyTot(learnerId);
+            await statusPage.clickViewAndGradeSubmission(learnerId);
+
+            await feedbackForm.selectRubricIndicatorByValue(452, "1");
+            await feedbackForm.selectRubricIndicatorByValue(446, "1");
+
+            // Input mark type should be used (percentage)
+            await feedbackForm.expectRubricFinalSummaryMark("50 % ( given in Self-assessment)"); // NOTE: The self-assessment mark here is a bug, it should be blank. See SA-19963
+            await feedbackForm.expectRubricSum("50 %");
+            await feedbackForm.expectGrade("50 %", learnerId);
+
+            // Displey mark type should be used for the self assessment mark (none)
+            await feedbackForm.expectNoSelfAssessmentMark();
         });
     });
 });

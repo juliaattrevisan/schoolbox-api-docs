@@ -21,7 +21,9 @@ export default class FeedbackForm {
 
     static readonly DATA_TEST_ASSESSMENT_RESPONSE_INFO_SAVED_AS_DRAFT = "assessment-response-info-saved-as-draft";
 
-    static readonly SELECTOR_RUBRIC_FINAL_SUMMARY = "[data-final-summary]";
+    static readonly DATA_TEST_ASSESSMENT_SELF_ASSESSMENT_MARK = "assessment-feedback-self-assessment-mark";
+
+    static readonly SELECTOR_RUBRIC_FINAL_SUMMARY = ".rb-final-summary";
 
     static readonly SELECTOR_RUBRIC_SUM = "[data-rubric-sum]";
 
@@ -171,6 +173,23 @@ export default class FeedbackForm {
     async expectNoRubricSum(): Promise<void> {
         const rubricSum = this.page.locator(FeedbackForm.SELECTOR_RUBRIC_SUM);
         await expect(rubricSum).not.toBeVisible();
+    }
+
+    /**
+     * Ensure the value of the self-assessment mark matches the expected value
+     * @param value - The expected value
+     */
+    async expectSelfAssessmentMark(value: string): Promise<void> {
+        const selfAssessmentMark = this.page.getByTestId(FeedbackForm.DATA_TEST_ASSESSMENT_SELF_ASSESSMENT_MARK);
+        await expect(selfAssessmentMark).toHaveText(value);
+    }
+
+    /**
+     * Expect that no self-assessment mark is present
+     */
+    async expectNoSelfAssessmentMark(): Promise<void> {
+        const selfAssessmentMark = this.page.getByTestId(FeedbackForm.DATA_TEST_ASSESSMENT_SELF_ASSESSMENT_MARK);
+        await expect(selfAssessmentMark).not.toBeVisible();
     }
 
     /**

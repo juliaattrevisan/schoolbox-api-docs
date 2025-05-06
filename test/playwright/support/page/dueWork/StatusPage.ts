@@ -19,6 +19,12 @@ export default class StatusPage {
 
     static readonly DATA_TEST_JELLY_TOT = "sbx-pop-out-header-options-button";
 
+    static readonly DATA_TEST_PARTICIPANT_JELLY_TOT = "sbx-pop-out-feedback-options-"; // Append "-[participantId]-button"
+
+    static readonly DATA_TEST_PARTICIPANT_JELLY_TOT_VIEW_AND_GRADE = "assessment-status-feedback-viewSubmission-"; // Append "-[participantId]"
+
+    static readonly DATA_TEST_PARTICIPANT_JELLY_TOT_RESPONSE_HISTORY = "assessment-status-feedback-responseHistory-"; // Append "-[participantId]"
+
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
@@ -82,6 +88,34 @@ export default class StatusPage {
         await expect(this.page.locator(`#header-options a.icon-${option}`)).toBeVisible();
         await this.page.locator(`#header-options a.icon-${option}`).click();
         await this.tester.common.waitForPageLoad();
+    }
+
+    /**
+     * click the jelly tot for a participant
+     * @param participantId - The ID of the participant
+     */
+    async clickParticipantJellyTot(participantId: number): Promise<void> {
+        await this.page.getByTestId(`${StatusPage.DATA_TEST_PARTICIPANT_JELLY_TOT}${participantId}-button`).click();
+    }
+
+    /**
+     * Click "View and grade submission" for a participant in the jelly tot
+     * @param participantId - The ID of the participant
+     */
+    async clickViewAndGradeSubmission(participantId: number): Promise<void> {
+        await this.page
+            .getByTestId(`${StatusPage.DATA_TEST_PARTICIPANT_JELLY_TOT_VIEW_AND_GRADE}${participantId}`)
+            .click();
+    }
+
+    /**
+     * Click "Submission history" for a participant in the jelly tot
+     * @param participantId - The ID of the participant
+     */
+    async clickSubmissionHistory(participantId: number): Promise<void> {
+        await this.page
+            .getByTestId(`${StatusPage.DATA_TEST_PARTICIPANT_JELLY_TOT_RESPONSE_HISTORY}${participantId}`)
+            .click();
     }
 
     /**
