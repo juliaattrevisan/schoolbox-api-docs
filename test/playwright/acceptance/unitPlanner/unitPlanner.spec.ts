@@ -1,3 +1,9 @@
+/**
+ * Test some of the key functionality of the unit planner page
+ * 1. Provision sales.tar.gz data
+ * 2. Execute npx playwright test unitPlanner.spec.ts
+ */
+
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import UnitPlanner from "@schoolboxTest/playwright/support/page/unitPlanner/UnitPlanner";
 import AssessmentForm from "@schoolboxTest/playwright/support/page/dueWork/AssessmentForm";
