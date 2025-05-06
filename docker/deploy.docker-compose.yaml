@@ -6,18 +6,20 @@ include:
   - base.docker-compose.yaml
 
 services:
-  # nginx+PHP-FPM container
-  schoolbox-nginx:
-    container_name: schoolbox-nginx
+  # Load-balanced nginx+PHP-FPM containers:
+  # regrettably copy-pasted for now
+  schoolbox-fpm-nginx-1:
+    container_name: schoolbox-fpm-nginx-1
     restart: always
     build:
-      context: ./schoolbox-nginx
+      context: ./schoolbox-fpm-nginx
       dockerfile: deploy-image.Dockerfile
       additional_contexts:
         - code=../
+      args:
+        SERVER_NAME: schoolbox-fpm-nginx-1.docker.localhost
     volumes:
       - storage:/var/lib/schoolbox/docker/storage
-      - schoolbox-nginx-config:/etc/nginx/sites-enabled
       - schoolbox-config:/etc/schoolbox
     # After building: create data dirs, and make mount writable by www-data
     # Cannot currently use create-data-dirs.sh, as /bin/bash isn't available,
@@ -31,10 +33,27 @@ services:
       - command: mkdir -p /var/lib/schoolbox/docker/twig
       - command: chown -R www-data:www-data /var/lib/schoolbox/docker/
 
-volumes:
-  schoolbox-nginx-config:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./schoolbox-nginx/config
+  schoolbox-fpm-nginx-2:
+    container_name: schoolbox-fpm-nginx-2
+    restart: always
+    build:
+      context: ./schoolbox-fpm-nginx
+      dockerfile: deploy-image.Dockerfile
+      additional_contexts:
+        - code=../
+      args:
+        SERVER_NAME: schoolbox-fpm-nginx-2.docker.localhost
+    volumes:
+      - storage:/var/lib/schoolbox/docker/storage
+      - schoolbox-config:/etc/schoolbox
+    # After building: create data dirs, and make mount writable by www-data
+    # Cannot currently use create-data-dirs.sh, as /bin/bash isn't available,
+    # and /bin/sh doesn't support {} expansion
+    post_start:
+      - command: mkdir -p /var/lib/schoolbox/docker/cache/portrait
+      - command: mkdir -p /var/lib/schoolbox/docker/cache/stream
+      - command: mkdir -p /var/lib/schoolbox/docker/cache/zip
+      - command: mkdir -p /var/lib/schoolbox/docker/files
+      - command: mkdir -p /var/lib/schoolbox/docker/purifier
+      - command: mkdir -p /var/lib/schoolbox/docker/twig
+      - command: chown -R www-data:www-data /var/lib/schoolbox/docker/

@@ -50,5 +50,5 @@ https://docker.dev.schoolbox.cloud {
     # I'm guessing they're handled in the nginx container?
 
     # All other requests just get forwarded to nginx
-    reverse_proxy http://schoolbox-nginx-1 http://schoolbox-nginx-2
+    reverse_proxy http://schoolbox-fpm-nginx-1 http://schoolbox-fpm-nginx-2
 }

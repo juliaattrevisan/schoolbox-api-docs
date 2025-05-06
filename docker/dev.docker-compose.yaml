@@ -17,18 +17,18 @@ services:
 
   # Load-balanced nginx+PHP-FPM containers:
   # regrettably copy-pasted for now
-  schoolbox-nginx-1:
-    container_name: schoolbox-nginx-1
+  schoolbox-fpm-nginx-1:
+    container_name: schoolbox-fpm-nginx-1
     depends_on:
       - php82-alpine
     environment:
       DEBUG: "1"
     restart: always
     build:
-      context: ./schoolbox-nginx
+      context: ./schoolbox-fpm-nginx
       dockerfile: dev-image.Dockerfile
       args:
-        SERVER_NAME: schoolbox-nginx-1.docker.localhost
+        SERVER_NAME: schoolbox-fpm-nginx-1.docker.localhost
     volumes:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
@@ -45,18 +45,18 @@ services:
       - command: mkdir -p /var/lib/schoolbox/docker/twig
       - command: chown -R www-data:www-data /var/lib/schoolbox/docker/
 
-  schoolbox-nginx-2:
-    container_name: schoolbox-nginx-2
+  schoolbox-fpm-nginx-2:
+    container_name: schoolbox-fpm-nginx-2
     depends_on:
       - php82-alpine
     environment:
       DEBUG: "1"
     restart: always
     build:
-      context: ./schoolbox-nginx
+      context: ./schoolbox-fpm-nginx
       dockerfile: dev-image.Dockerfile
       args:
-        SERVER_NAME: schoolbox-nginx-2.docker.localhost
+        SERVER_NAME: schoolbox-fpm-nginx-2.docker.localhost
     volumes:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
