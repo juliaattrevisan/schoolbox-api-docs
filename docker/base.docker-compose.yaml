@@ -3,15 +3,16 @@
 # An nginx container must be defined in whichever compose.yaml includes this.
 
 services:
-  # Frontend web server, mimicking a load balancer and SSL termination endpoint:
-  # forwards requests to schoolbox-nginx container.
+  # Frontend web server, mimicking a load balancer and SSL termination endpoint.
+  # In the dev environment, forwards requests to one of these containers:
+  # * schoolbox-fpm-nginx-1
+  # * schoolbox-fpm-nginx-2
   caddy:
     container_name: caddy
     restart: always
     build:
       context: ./caddy
     volumes:
-#      - code:/usr/share/schoolbox
       - caddy-config:/etc/caddy
     ports:
       - '80:80'
