@@ -1,6 +1,13 @@
+/**
+ * Test some of the key functionality of the unit planner page
+ * 1. Provision sales.tar.gz data
+ * 2. Execute npx playwright test unitPlanner.spec.ts
+ */
+
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import UnitPlanner from "@schoolboxTest/playwright/support/page/unitPlanner/UnitPlanner";
 import AssessmentForm from "@schoolboxTest/playwright/support/page/dueWork/AssessmentForm";
+import CurriculumSelector from "@schoolboxTest/playwright/support/page/curriculum/selector/CurriculumSelector";
 
 test.describe("Unit Planner Tests", () => {
     test.describe.configure({ mode: "serial" });
@@ -10,6 +17,8 @@ test.describe("Unit Planner Tests", () => {
     const overviewColumnLabel = "Unit Overview";
     const romeoUnitId = 15; // "Romeo and Juliet"
     const persuasionUnitId = 17; // "Persuasion and the Media"
+    const toKillMockingbirdId = 16; // "To Kill a Mockingbird"
+    const folderId = 89; // "To Kill a Mockingbird" folder ID
 
     test.beforeEach(async ({ tester, page }) => {
         const teacher = "Jack Coles";
@@ -114,6 +123,66 @@ test.describe("Unit Planner Tests", () => {
         await expect(page.getByText("Updated via unit planner")).not.toBeVisible();
     });
 
+    test("Select, modify and remove curriculum codes", async ({ tester, page }) => {
+        const curriculumSelector = new CurriculumSelector(page);
+
+        tester.isGoingTo("select curriculum codes for the To Kill a Mockingbird unit");
+        await unitPlanner.clickSelectCurriculumLink(toKillMockingbirdId); // Open the select courses modal
+        await curriculumSelector.browseToNode([247, 248, 250, 251]);
+        await curriculumSelector.selectNodes([257]); // Select the first node
+        await curriculumSelector.saveModal(); // Select Select, closing the modal
+
+        tester.isGoingTo("check the selected curriculum codes are visible");
+        await expect(page.locator(`a[href="#257"]`)).toBeVisible();
+        await expect(page.locator("div.unit-planner")).toContainText("[ACHHK078]");
+        await expect(page.locator("div.unit-planner")).toContainText("Year 4 History");
+        await expect(page.locator("div.unit-planner")).toContainText("First Contacts");
+
+        tester.isGoingTo("check the curriculum codes are visible in the curriculum overview tab");
+        await unitPlanner.clickUnitPlannerTabs("Curriculum Overview");
+        await expect(page.locator(`a[href="#257"]`)).toBeVisible();
+        await expect(page.locator("div.unit-planner")).toContainText("[ACHHK078]");
+        await expect(page.locator("div.unit-planner")).toContainText("Year 4 History");
+        await expect(page.locator("div.unit-planner")).toContainText("First Contacts");
+
+        tester.isGoingTo("check the curriculum codes are visible in the unit page");
+        await unitPlanner.clickUnitLink(toKillMockingbirdId);
+        await expect(
+            page.locator(
+                `div[class="component-container Schoolbox_Curriculum_Component_CurriculumOverviewController"]`,
+            ),
+        ).toBeVisible();
+        await expect(page.locator("ul.nodes.l-flex-col")).toContainText("[ACHHK078]");
+        await expect(page.locator("ul.nodes.l-flex-col")).toContainText("Year 4 History");
+
+        tester.isGoingTo("delete the node via unit planner and ensure it is not visible");
+        await unitPlanner.goto(6);
+        await unitPlanner.clickUnitPlannerTabs("All");
+        await unitPlanner.clickRemoveNodeIcon(257);
+        await unitPlanner.clickConfirmDeleteNodeButton(folderId);
+        await expect(page.locator(`a[href="#257"]`)).not.toBeVisible();
+        await expect(page.locator("div.unit-planner")).not.toContainText("[ACHHK078]");
+        await expect(page.locator("div.unit-planner")).not.toContainText("Year 4 History");
+        await expect(page.locator("div.unit-planner")).not.toContainText("First Contacts");
+
+        tester.isGoingTo("check the curriculum codes are not visible in the curriculum overview tab");
+        await unitPlanner.clickUnitPlannerTabs("Curriculum Overview");
+        await expect(page.locator(`a[href="#257"]`)).not.toBeVisible();
+        await expect(page.locator("div.unit-planner")).not.toContainText("[ACHHK078]");
+        await expect(page.locator("div.unit-planner")).not.toContainText("Year 4 History");
+        await expect(page.locator("div.unit-planner")).not.toContainText("First Contacts");
+
+        tester.isGoingTo("check the curriculum codes are not visible in the unit page");
+        await unitPlanner.clickUnitLink(toKillMockingbirdId);
+        await expect(
+            page.locator(
+                `div[class="component-container Schoolbox_Curriculum_Component_CurriculumOverviewController"]`,
+            ),
+        ).toBeVisible();
+        await expect(page.locator("ul.nodes.l-flex-col")).not.toBeVisible();
+        await expect(page.locator("div.empty-state")).toBeVisible();
+    });
+
     test.afterAll(async ({ baseTester, db }) => {
         baseTester.isGoingTo("find the textbox that was created in this test so it can be deleted");
 
@@ -179,5 +248,28 @@ test.describe("Unit Planner Tests", () => {
             { deleted_at: "2022-01-15 11:22:34" },
             { "title like": "Updated via unit planner" },
         );
+
+        baseTester.isGoingTo("remove the curriculum overview component from unit page");
+
+        const curriculumOverviewComponentId = (await db.grabFromDatabase("component_instance", "id", {
+            module: "homepage",
+            identifier: folderId,
+            position: "top",
+            sequence: 0,
+        })) as number | null;
+
+        if (curriculumOverviewComponentId === null) {
+            baseTester.isGoingTo("skip deletion as the curriculum overview component instance was not found");
+            return;
+        }
+
+        baseTester.isGoingTo(`delete the component instance with ID ${curriculumOverviewComponentId}`);
+        await db.dontHaveInDatabase("component_config_instance", {
+            component_instance_id: curriculumOverviewComponentId,
+        });
+
+        await db.dontHaveInDatabase("component_instance", {
+            id: curriculumOverviewComponentId,
+        });
     });
 });

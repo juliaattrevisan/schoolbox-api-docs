@@ -31,6 +31,14 @@ export default class UnitPlanner {
 
     static readonly DATA_TEST_ACTIVITY_DELETE = "unit-planner-delete-activity-{activityId}";
 
+    static readonly DATA_TEST_SELECT_CURRICULUM_LINK = "unit-planner-select-curriculum-code-{unitId}";
+
+    static readonly DATA_TEST_REMOVE_CURRICULUM_ICON = "fn-list-node-remove-{nodeId}";
+
+    static readonly DATA_TEST_MODAL_CONFIRM_DELETE_NODE = "fn-delete-node-confirm-{folderId}";
+
+    static readonly DATA_TEST_UNIT_PLANNER_TABS = "unit-planner-tabs-{tabName}";
+
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
@@ -206,5 +214,45 @@ export default class UnitPlanner {
         await this.page
             .getByTestId(UnitPlanner.DATA_TEST_ACTIVITY_DELETE.replace("{activityId}", activityId.toString()))
             .isVisible();
+    }
+
+    /**
+     * Click the select curriculum link
+     * @param unitId - The ID of the unit
+     */
+    async clickSelectCurriculumLink(unitId: number): Promise<void> {
+        await this.page
+            .getByTestId(UnitPlanner.DATA_TEST_SELECT_CURRICULUM_LINK.replace("{unitId}", unitId.toString()))
+            .click();
+    }
+
+    /**
+     * Click the remove curriculum icon
+     * @param nodeId - The ID of the node
+     */
+    async clickRemoveNodeIcon(nodeId: number): Promise<void> {
+        await this.page
+            .getByTestId(UnitPlanner.DATA_TEST_REMOVE_CURRICULUM_ICON.replace("{nodeId}", nodeId.toString()))
+            .click();
+    }
+
+    /**
+     * Click the confirm delete node button
+     */
+
+    async clickConfirmDeleteNodeButton(folderId: number): Promise<void> {
+        await this.page
+            .getByTestId(UnitPlanner.DATA_TEST_MODAL_CONFIRM_DELETE_NODE.replace("{folderId}", folderId.toString()))
+            .click();
+        await expect(this.page.getByTestId("toast")).toHaveAttribute("data-test-is-success", "true");
+    }
+
+    /**
+     * Click the confirm delete node button
+     * @param folderId - The ID of the folder
+     */
+
+    async clickUnitPlannerTabs(tabName: string): Promise<void> {
+        await this.page.getByTestId(UnitPlanner.DATA_TEST_UNIT_PLANNER_TABS.replace("{tabName}", tabName)).click();
     }
 }

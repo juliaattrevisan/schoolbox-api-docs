@@ -91,6 +91,7 @@ function onRemoveSelected(): void {
                 class="node__remove f-no-icon-button icon-close l-flex-row l-flex--center l-flex__item--0-shrink"
                 :aria-label="`Remove [${props.node.code}] ${props.node.name}`"
                 :title="`Remove [${props.node.code}] ${props.node.name}`"
+                :data-test="`fn-list-node-remove-${props.node.id}`"
                 @click.prevent="onRemoveSelected"
             ></button>
         </div>
