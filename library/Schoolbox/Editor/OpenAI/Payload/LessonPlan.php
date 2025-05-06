@@ -335,9 +335,11 @@ class LessonPlan
 
         if (null !== $generateForField) {
             $otherFieldsInfo = "Other Fields:";
+            $currentField = null;
 
             foreach ($fields as $field) {
                 if ($field['id'] === $generateForField) {
+                    $currentField = $field; // since $fields is not indexed by id
                     continue;
                 }
 
@@ -346,8 +348,8 @@ class LessonPlan
             }
 
             $userContent = strtr($userContent, [
-                '[CURRENT FIELD TITLE]' => $fields[$generateForField]['title'],
-                '[CURRENT FIELD BODY]' => $fields[$generateForField]['body'],
+                '[CURRENT FIELD TITLE]' => $currentField['title'],
+                '[CURRENT FIELD BODY]' => $currentField['body'],
                 '[OTHER FIELDS]' => $otherFieldsInfo
             ]);
         } else {
