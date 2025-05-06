@@ -128,7 +128,7 @@ class Inspector extends CliTool\App
 
         /* Lesson Plan Template Updater
          */
-        \Schoolbox\Admin\LessonPlan\Template\Cli\UpdaterTool::LOCK_NAME => 'Lesson Plan Template: Updater',
+        \Schoolbox\Admin\LessonPlan\Template\Cli\LimitedUpdaterTool::LOCK_NAME => 'Lesson Plan Template: Updater',
     ];
 
 
