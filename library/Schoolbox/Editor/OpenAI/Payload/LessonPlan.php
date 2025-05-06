@@ -77,7 +77,7 @@ class LessonPlan
         Plan Type: [TEMPLATE TITLE]
         Title: [LESSON PLAN TITLE]
         Course/Unit Context: [CONTEXT]
-        Duration: [DURATION]
+        [DURATION]
         [CURRICULUM CONTENT]
         [CURRICULUM AREA]
         [ADDITIONAL NOTES]
@@ -93,7 +93,7 @@ class LessonPlan
         Plan Type: [TEMPLATE TITLE]
         Title: [LESSON PLAN TITLE]
         Course/Unit Context: [CONTEXT]
-        Duration: [DURATION]
+        [DURATION]
         [CURRICULUM CONTENT]
         [CURRICULUM AREA]
         [ADDITIONAL NOTES]
@@ -328,7 +328,7 @@ class LessonPlan
             '[TEMPLATE TITLE]' => $templateTitle,
             '[LESSON PLAN TITLE]' => $lessonPlanTitle,
             '[CONTEXT]' => $context,
-            '[DURATION]' => $duration,
+            '[DURATION]' => '' !== $duration ? 'Duration: ' . $duration : '',
             '[ADDITIONAL NOTES]' => '' !== $additionalContext ? 'Additional Notes: ' . $additionalContext : '',
         ]);
 

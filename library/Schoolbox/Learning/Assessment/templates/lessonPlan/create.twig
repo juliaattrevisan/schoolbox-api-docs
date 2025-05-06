@@ -46,7 +46,7 @@
         <template v-slot:title>
             <div class="row">
                 <div class="small-12 columns">
-                    <label class="required" for="title">Title</label>
+                    <label for="title" class="required">Title</label>
                     <input id="title" type="text" name="title" maxlength="255" value="{% if assessment.id %}{{ assessment.title }}{% endif %}" required />
                 </div>
             </div>
@@ -69,8 +69,8 @@
         <template v-slot:duration>
             <div class="row l-pad-m--top">
                 <div class="small-12 columns">
-                    <label class="required" for="duration">Duration</label>
-                    <input id="title" type="text" name="duration" maxlength="255" value="{% if assessment.id %}{{ assessment.lessonPlanDuration }}{% endif %}" required />
+                    <label  for="duration">Duration</label>
+                    <input id="duration" type="text" name="duration" maxlength="255" value="{% if assessment.id %}{{ assessment.lessonPlanDuration }}{% endif %}" />
                 </div>
             </div>
         </template>

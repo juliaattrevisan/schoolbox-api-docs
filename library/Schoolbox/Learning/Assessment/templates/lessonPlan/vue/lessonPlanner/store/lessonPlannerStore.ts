@@ -6,6 +6,7 @@ import type { LessonPlanField, LessonPlannerStoreField } from "../lessonPlannerT
 const SELECTOR_LESSON_PLANNER_FORM = "#assessmentForm";
 const FORM_KEY_LESSON_TITLE = "title"; // [name="title"]
 const FORM_KEY_TEMPLATE_TITLE = "templateTitle"; // [name="templateTitle"]
+const FORM_KEY_DURATION = "duration"; // [name="duration"]
 
 export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
     // An ordered list of each field of the lesson plan
@@ -119,11 +120,16 @@ export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
             throw new Error("Unexpected type for lesson plan template title form value");
         }
 
+        const duration = formData.get(FORM_KEY_DURATION);
+        if (typeof duration !== "string") {
+            throw new Error("Unexpected type for lesson plan template duration form value");
+        }
+
         const response = await generateLessonPlan(generatePlanRoute.value, {
             templateTitle,
             lessonPlanTitle,
             context: contextName.value,
-            duration: "1 hour", // TODO: There's no field for this yet, so it's just hardcoded to an hour for now
+            duration,
             curriculumNodeIds: [],
             additionalContext: additionalContext.value,
             generateForField: generateForField.value?.id ?? null,
