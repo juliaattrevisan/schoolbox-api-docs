@@ -337,7 +337,7 @@ class LessonPlan
             $currentField = null;
 
             foreach ($fields as $field) {
-                if ($field['id'] === $generateForField) {
+                if ((string)$field['id'] === (string)$generateForField) {
                     $currentField = $field; // since $fields is not indexed by id
                     continue;
                 }
