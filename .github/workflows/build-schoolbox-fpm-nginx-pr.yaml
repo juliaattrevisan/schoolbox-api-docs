@@ -67,7 +67,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: docker/schoolbox-fpm-nginx
-          file: deploy-image.Dockerfile
+          file: docker/schoolbox-fpm-nginx/deploy-image.Dockerfile
           cache-from: type=gha
           cache-to: type=gha
           build-contexts: |
