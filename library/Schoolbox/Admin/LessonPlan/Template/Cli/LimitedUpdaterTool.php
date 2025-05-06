@@ -245,6 +245,7 @@ HELP;
 
     /**
      * Index updated fields by their titles, for quick lookup
+     *
      * @param string $file
      * @return array
      */
@@ -294,8 +295,7 @@ HELP;
 
 
     /**
-     * Find all the existing fields for this lesson plan template and store them in a lookup, marking
-     * them as deletable for now until we change that via csv processing, thus handling deletions
+     * Find all the existing fields for this lesson plan template and store them in a lookup
      *
      * @param int $templateId
      * @return array
