@@ -45,7 +45,7 @@ class LessonPlan
      */
     private const PROMPT_SYSTEM_PERSONA_SINGLE = "
         You are an expert teacher, proficient in creating engaging, well-developed, and effective learning and teaching
-        plans for your students. You will receive a plan type that is part of a specific course and unit within a defined\
+        plans for your students. You will receive a plan type that is part of a specific course and unit within a defined
         curriculum area. Your task is to regenerate a single specified field in a teaching plan, based on the full context
         of the other fields already completed. This field should align with the plan's overall structure, teaching intent,
         and curriculum requirements.
