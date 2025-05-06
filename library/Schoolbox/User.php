@@ -1499,7 +1499,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     public function isBirthday(): bool
     {
         /* Unfortunately, Only students get to celebrate their birthday =(
- */
+         */
         if (!$this->getRole()->isStudent()) {
             return false;
         }
