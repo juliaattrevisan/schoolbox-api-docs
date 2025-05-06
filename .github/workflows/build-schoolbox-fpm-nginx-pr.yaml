@@ -66,8 +66,8 @@ jobs:
       - name: Build schoolbox-fpm-nginx pull request image
         uses: docker/build-push-action@v6
         with:
-          context: .
-          file: docker/schoolbox-fpm-nginx/deploy-image.Dockerfile
+          context: docker/schoolbox-fpm-nginx
+          file: deploy-image.Dockerfile
           cache-from: type=gha
           cache-to: type=gha
           build-contexts: |

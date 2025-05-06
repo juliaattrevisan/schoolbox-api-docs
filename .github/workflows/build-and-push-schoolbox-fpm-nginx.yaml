@@ -105,8 +105,8 @@ jobs:
         if: github.event_name == 'push'
         uses: docker/build-push-action@v6
         with:
-          context: .
-          file: docker/schoolbox-fpm-nginx/deploy-image.Dockerfile
+          context: docker/schoolbox-fpm-nginx
+          file: deploy-image.Dockerfile
           cache-from: type=gha
           cache-to: type=gha
           build-contexts: |
@@ -127,8 +127,8 @@ jobs:
         if: github.event_name == 'release'
         uses: docker/build-push-action@v6
         with:
-          context: .
-          file: docker/schoolbox-fpm-nginx/deploy-image.Dockerfile
+          context: docker/schoolbox-fpm-nginx
+          file: deploy-image.Dockerfile
           cache-from: type=gha
           cache-to: type=gha
           build-contexts: |
