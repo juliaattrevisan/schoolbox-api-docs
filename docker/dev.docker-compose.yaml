@@ -6,9 +6,19 @@ include:
   - base.docker-compose.yaml
 
 services:
+  # Base image
+  php82-alpine:
+    image: php82-alpine
+    build:
+      context: ./base-images/php82-alpine
+      args:
+        ENV: dev
+
   # nginx+PHP-FPM container
   schoolbox-nginx:
     container_name: schoolbox-nginx
+    depends_on:
+      - php82-alpine
     environment:
       DEBUG: "1"
     restart: always

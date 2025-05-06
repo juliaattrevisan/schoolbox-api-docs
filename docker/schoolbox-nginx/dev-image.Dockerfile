@@ -7,13 +7,8 @@ ARG ENV=dev
 ARG ARCH=amd64
 
 
-# Stage 1: base off of alaress/php82-alpine
-# Note: this is a private repository, so need to set an alternate when building
-# from a pull request.
-# Also note: need to rebuild this for dev and prod dependencies?
-# (Current tags: latest-master, latest-develop: add :dev and :prod to tag)
-# How to get master or develop to here though?
-FROM --platform=linux/${ARCH} alaress/php82-alpine AS build
+# Stage 1: base off of just-built image php82-alpine
+FROM --platform=linux/${ARCH} php82-alpine AS build
 
 
 # Stage 2: build final image
