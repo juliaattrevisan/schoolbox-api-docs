@@ -47,8 +47,7 @@ docker.dev.schoolbox.cloud:443 {
     }
 
     # All other requests just get forwarded to nginx
-    reverse_proxy http://schoolbox-nginx {
-    }
+    reverse_proxy http://schoolbox-nginx
 
 #    root * /usr/share/schoolbox/www
 #    # What's this?
