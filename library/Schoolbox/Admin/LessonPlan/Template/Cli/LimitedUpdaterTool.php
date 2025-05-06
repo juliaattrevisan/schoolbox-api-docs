@@ -38,127 +38,26 @@ class LimitedUpdaterTool extends CliTool\App
 
 
     /**
-     * Choose which datasets' templates
-     */
-    private const OPT_LONG_DATASET = 'dataset:';
-
-
-    /**
-     * Some plans only get changed/created in one set, but not the other
-     */
-    private const DATASET_INITIAL = 'initial';
-    private const DATASET_DEMO = 'demo';
-
-
-    /**
      * Renamed templates and their corresponding csv files containing Lesson Plan Template Fields
      */
     private const SOURCE_FILES = [
         '5E_Model_Lesson_Plan.csv' => [
-            'old' => '5E Model',
-            'new' => '5E Model Lesson Plan',
-            'datasets' => [
-                self::DATASET_INITIAL,
-                self::DATASET_DEMO,
-            ],
-        ],
-        'DP_Lesson_Plan.csv' => [
-            'old' => 'DP Lesson PLan',  // YES I KNOW. This has a capital L in "Plan". It's like that in demo data.
-            'new' => 'DP Lesson Plan',   // YES I KNOW. This seems to retain the same name as it originally had.
-            'datasets' => [
-                self::DATASET_DEMO,
-            ],
-        ],
-// This USED to exist...not sure if it is supposed to anymore?
-//        'Daily_Plan.csv' => [
-//            'old' => 'Daily Planner',   // I presume Daily Plan became Daily Planner in the original spreadsheet
-//            'new' => 'Daily Plan',      // I presume this meant to have a capital P in Plan
-//            'datasets' => [],
-//        ],
-        'ELC_Learning_Plan.csv' => [
-            'old' => 'ELC Learning Plans',  // This was lost in the spreadsheet, but this was its original name
-            'new' => 'ELC Learning Plan',   // Everything else is singular so...I guess this is too?
-            'datasets' => [
-                self::DATASET_DEMO,
-            ],
+            'title' => '5E Model',
         ],
         'Generic_Primary_Lesson_Plan.csv' => [
-            'old' => 'Generic Primary',
-            'new' => 'Generic Primary Lesson Plan',
-            'datasets' => [
-                self::DATASET_INITIAL,
-                self::DATASET_DEMO,
-            ],
+            'title' => 'Generic Primary',
         ],
         'Generic_Secondary_Lesson_Plan.csv' => [
-            'old' => 'Generic Secondary',
-            'new' => 'Generic Secondary Lesson Plan',
-            'datasets' => [
-                self::DATASET_INITIAL,
-                self::DATASET_DEMO,
-            ],
+            'title' => 'Generic Secondary',
         ],
         'Gradual_Release_Model_Lesson_Plan.csv' => [
-            'old' => 'Gradual Release Model',
-            'new' => 'Gradual Release Model Lesson Plan',
-            'datasets' => [
-                self::DATASET_INITIAL,
-                self::DATASET_DEMO,
-            ],
+            'title' => 'Gradual Release Model',
         ],
         'Hook_Teach_Task_Lesson_Plan.csv' => [
-            'old' => 'Hook/Teach/Task',
-            'new' => 'Hook/Teach/Task Lesson Plan',
-            'datasets' => [
-                self::DATASET_INITIAL,
-                self::DATASET_DEMO,
-            ],
-        ],
-        'IGCSE_Lesson_Plan.csv' => [
-            'old' => 'IGCSE Lesson Plan',
-            'new' => 'IGCSE Lesson Plan',
-            'datasets' => [
-                self::DATASET_DEMO,
-            ],
+            'title' => 'Hook/Teach/Task',
         ],
         'Inquiry_Lesson_Plan.csv' => [
-            'old' => 'Inquiry Lesson',
-            'new' => 'Inquiry Lesson Plan',
-            'datasets' => [
-                self::DATASET_INITIAL,
-                self::DATASET_DEMO,
-            ],
-        ],
-        'PYP_Lesson_Plan.csv' => [
-            'old' => 'PYP Lesson Plan',
-            'new' => 'PYP Lesson Plan',
-            'datasets' => [
-                self::DATASET_DEMO,
-            ],
-        ],
-        'Simplified_Lesson_Plan.csv' => [
-            'old' => 'Simplified Lesson Plan',
-            'new' => 'Simplified Lesson Plan',
-            'datasets' => [
-                self::DATASET_DEMO,
-            ],
-        ],
-        // This is a completely new lesson plan template we've never seen before.
-        'Detailed_Weekly_Plan.csv' => [
-            'old' => 'Detailed Weekly Plan',
-            'new' => 'Detailed Weekly Plan',
-            'datasets' => [
-                self::DATASET_DEMO,
-            ],
-        ],
-        // This is a completely new lesson plan template we've never seen before.
-        'Weekly_Plan.csv' => [
-            'old' => 'Weekly Plan',
-            'new' => 'Weekly Plan',
-            'datasets' => [
-                self::DATASET_INITIAL,
-                self::DATASET_DEMO,
-            ],
+            'title' => 'Inquiry Lesson',
         ],
     ];
 
@@ -186,7 +85,6 @@ class LimitedUpdaterTool extends CliTool\App
     {
         return [
             self::OPT_LONG_HELP,
-            self::OPT_LONG_DATASET,
         ];
     }
 
@@ -208,10 +106,10 @@ It only changes Field Descriptions if both the template title and field title ma
 
 It won't create new templates or new fields. It won't delete existing templates or fields. 
 
-Usage: php template-updater.php --dataset=[initial,demo] -vvv --perform
+Usage: php template-updater.php -vvv --perform
 
-Ex.    php template-updater.php --dataset=initial -vvv --perform
-Ex.    php template-updater.php --dataset=demo -vvv --perform
+Ex.    php template-updater.php -vvv --perform
+Ex.    php template-updater.php -vvv --perform
 
 HELP;
             return;
@@ -240,17 +138,6 @@ HELP;
              */
             $this->now = \Alaress_Date_Format::now()->getDatabase();
 
-            /* Check that this matches the dataset you chose to import
-             */
-            $dataset = trim((string)$this->getOpt(self::OPT_LONG_DATASET));
-
-            /* This is mandatory
-             */
-            if ('' === $dataset) {
-                $this->getLogger()->warning('Choose a dataset to update. See --help for more options.');
-                return;
-            }
-
             /* Each lesson plan template update comes in a csv file. Find all the lesson plan templates that match the
              * title specified in the csv, updating each of them synonymously.
              *
@@ -261,18 +148,6 @@ HELP;
              */
             foreach (self::SOURCE_FILES as $file => $titles) {
                 $this->refreshLock($lock);
-
-                /* Check that this matches the dataset you chose to import
-                 */
-                if (!\in_array($dataset, $titles['datasets'], true)) {
-                    $this->getLogger()->debug(sprintf(
-                        'Template "%s" not in the chosen dataset "%s": skipping',
-                        $titles['new'],
-                        $dataset
-                    ));
-
-                    continue;
-                }
 
                 /* Find all the templates that match the csv's title
                  */
@@ -415,7 +290,7 @@ HELP;
 
 
     /**
-     * Find all the lesson plan templates that match $titles['old']
+     * Find all the lesson plan templates that match $titles['title']
      * cos we're about to rename those ones
      *
      * @param array $titles
@@ -426,7 +301,7 @@ HELP;
         /* Find all the templates that match the csv's title
          */
         $this->candidateTemplateStatement->execute([
-            'title' => $titles['old']
+            'title' => $titles['title']
         ]);
 
         /* We no longer create new templates if they didn't already exist.
