@@ -128,8 +128,8 @@ test.describe("Unit Planner Tests", () => {
 
         tester.isGoingTo("select curriculum codes for the To Kill a Mockingbird unit");
         await unitPlanner.clickSelectCurriculumLink(toKillMockingbirdId); // Open the select courses modal
-        await curriculumSelector.browseTreeUnitPlanner([247, 248, 250, 251]);
-        await curriculumSelector.checkNode(257); // Select the first node
+        await curriculumSelector.browseToNode([247, 248, 250, 251]);
+        await curriculumSelector.selectNodes([257]); // Select the first node
         await curriculumSelector.saveModal(); // Select Select, closing the modal
 
         tester.isGoingTo("check the selected curriculum codes are visible");

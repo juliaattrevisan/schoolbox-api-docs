@@ -97,14 +97,6 @@ export default class CurriculumSelector {
     }
 
     /**
-     * Tick a node in curriculum browser modal
-     * @param id - The node ids to navigate to
-     */
-    async checkNode(id: number): Promise<void> {
-        await this.page.getByTestId(`${CurriculumSelector.DATA_TEST_MODAL_NODE_CHECKBOX_LABEL}${id}`).click();
-    }
-
-    /**
      * Select Save, closing the modal
      */
     async saveModal(): Promise<void> {
