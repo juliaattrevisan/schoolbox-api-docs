@@ -61,12 +61,6 @@ class LimitedUpdaterTool extends CliTool\App
 
 
     /**
-     * Everything updated at this time
-     */
-    private string $now;
-
-
-    /**
      * @inheritdoc
      */
     public function getLongOpts(): array
@@ -119,10 +113,6 @@ HELP;
             /* Prepare some oft-used queries
              */
             $this->prepare();
-
-            /* I guess everything updated at this time
-             */
-            $this->now = \Alaress_Date_Format::now()->getDatabase();
 
             /* Each lesson plan template update comes in a csv file. Find all the lesson plan templates that match the
              * title specified in the csv, updating each of them synonymously.
@@ -178,10 +168,7 @@ HELP;
                             if ($this->perform()) {
                                 $this->updateFieldStatement->execute([
                                     'id' => $struct['id'],
-                                    'lessonPlanTemplateId' => $templateId,
                                     'description' => $updatedField[1],
-                                    'createdAt' => $this->now,
-                                    'updatedAt' => $this->now,
                                 ]);
                             }
                         }
@@ -234,10 +221,7 @@ HELP;
 
         $this->updateFieldStatement = $this->getDatabaseInternal()->prepare("
             UPDATE lesson_plan_template_field
-            SET lesson_plan_template_id = :lessonPlanTemplateId,
-                description = :description,
-                created_at = :createdAt,
-                updated_at = :updatedAt
+            SET description = :description
             WHERE id = :id
         ");
     }
