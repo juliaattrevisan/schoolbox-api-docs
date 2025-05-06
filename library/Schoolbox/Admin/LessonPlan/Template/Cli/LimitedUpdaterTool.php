@@ -41,24 +41,12 @@ class LimitedUpdaterTool extends CliTool\App
      * Renamed templates and their corresponding csv files containing Lesson Plan Template Fields
      */
     private const SOURCE_FILES = [
-        '5E_Model_Lesson_Plan.csv' => [
-            'title' => '5E Model',
-        ],
-        'Generic_Primary_Lesson_Plan.csv' => [
-            'title' => 'Generic Primary',
-        ],
-        'Generic_Secondary_Lesson_Plan.csv' => [
-            'title' => 'Generic Secondary',
-        ],
-        'Gradual_Release_Model_Lesson_Plan.csv' => [
-            'title' => 'Gradual Release Model',
-        ],
-        'Hook_Teach_Task_Lesson_Plan.csv' => [
-            'title' => 'Hook/Teach/Task',
-        ],
-        'Inquiry_Lesson_Plan.csv' => [
-            'title' => 'Inquiry Lesson',
-        ],
+        '5E_Model_Lesson_Plan.csv' => '5E Model',
+        'Generic_Primary_Lesson_Plan.csv' => 'Generic Primary',
+        'Generic_Secondary_Lesson_Plan.csv' => 'Generic Secondary',
+        'Gradual_Release_Model_Lesson_Plan.csv' => 'Gradual Release Model',
+        'Hook_Teach_Task_Lesson_Plan.csv' => 'Hook/Teach/Task',
+        'Inquiry_Lesson_Plan.csv' => 'Inquiry Lesson',
     ];
 
 
@@ -108,8 +96,6 @@ It won't create new templates or new fields. It won't delete existing templates 
 
 Usage: php template-updater.php -vvv --perform
 
-Ex.    php template-updater.php -vvv --perform
-Ex.    php template-updater.php -vvv --perform
 
 HELP;
             return;
@@ -146,12 +132,12 @@ HELP;
              * Schools should be encouraged to rename their customised templates away, if they want to keep their
              * contents, before we invade their lesson plan templates.
              */
-            foreach (self::SOURCE_FILES as $file => $titles) {
+            foreach (self::SOURCE_FILES as $file => $title) {
                 $this->refreshLock($lock);
 
                 /* Find all the templates that match the csv's title
                  */
-                $templates = $this->findCandidateTemplates($titles);
+                $templates = $this->findCandidateTemplates($title);
 
                 foreach ($templates as $template) {
                     $this->refreshLock($lock);
@@ -172,12 +158,12 @@ HELP;
                      */
                     $updatedFields = $this->indexUpdatedFields($file);
 
-                    foreach ($updatedFields as $title => $updatedField) {
+                    foreach ($updatedFields as $fieldTitle => $updatedField) {
                         $this->refreshLock($lock);
 
                         /* Apparently...this is required...for some reason
                          */
-                        $index = (string)$title;
+                        $index = (string)$fieldTitle;
 
                         /* We only update fields that exist: we never delete them, nor do we spawn new fields;
                          * also, we only update field descriptions. Their titles, bodies etc. all remain the same.
@@ -290,18 +276,18 @@ HELP;
 
 
     /**
-     * Find all the lesson plan templates that match $titles['title']
+     * Find all the lesson plan templates that match $title
      * cos we're about to rename those ones
      *
-     * @param array $titles
+     * @param string $title
      * @return array
      */
-    private function findCandidateTemplates(array $titles): array
+    private function findCandidateTemplates(string $title): array
     {
         /* Find all the templates that match the csv's title
          */
         $this->candidateTemplateStatement->execute([
-            'title' => $titles['title']
+            'title' => $title
         ]);
 
         /* We no longer create new templates if they didn't already exist.
