@@ -48,6 +48,8 @@ export default class AssessmentForm {
 
     static readonly DATA_TEST_USE_RUBRIC = "assessment-form-use-rubric";
 
+    static readonly DATA_TEST_RUBRIC_SPAWN_LEVEL = "rubric-spawn-level";
+
     static readonly SELECTOR_PARTICIPATION_BUTTON_SAVE = "participation-plan-form-button-save";
 
     static readonly SELECTOR_PARTICIPATION_LEGEND = "participation-plan-legend";
@@ -354,6 +356,13 @@ export default class AssessmentForm {
         const useRubricInputId = await this.page.getByTestId(AssessmentForm.DATA_TEST_USE_RUBRIC).getAttribute("id");
         const useRubricLabel = this.page.locator(`.switch label[for="${useRubricInputId}"]`);
         await useRubricLabel.click();
+    }
+
+    /**
+     * Adds a new rubric indicator level
+     */
+    async addRubricLevel(): Promise<void> {
+        await this.page.getByTestId(AssessmentForm.DATA_TEST_RUBRIC_SPAWN_LEVEL).click();
     }
 
     /**

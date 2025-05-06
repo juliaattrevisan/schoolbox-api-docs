@@ -1,10 +1,17 @@
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import AssessmentForm from "@schoolboxTest/playwright/support/page/dueWork/AssessmentForm";
 import Homepage from "@schoolboxTest/playwright/support/page/homepage/Homepage";
+import AssessmentPage from "@schoolboxTest/playwright/support/page/dueWork/AssessmentPage";
+import SubmitForm from "@schoolboxTest/playwright/support/page/dueWork/SubmitForm";
+import StatusPage from "@schoolboxTest/playwright/support/page/dueWork/StatusPage";
 import CourseModify from "@schoolboxTest/playwright/support/page/courses/CourseModify";
+import FeedbackForm from "@schoolboxTest/playwright/support/page/dueWork/FeedbackForm";
 
 test.describe("Due Work - Mark type tests", () => {
     test.describe.configure({ mode: "serial" });
+
+    const teacher = "Mr Jack Coles";
+    const student = "Ms Jana Reed";
 
     const unitName = `Test Unit ${Date.now()}`;
     let newUnitSpecId: number | null = null;
@@ -57,12 +64,13 @@ test.describe("Due Work - Mark type tests", () => {
         await assessmentForm.setMarkType(AssessmentForm.MARK_TYPE_PERCENTAGE);
         await assessmentForm.setInstructorMarkType(AssessmentForm.MARK_TYPE_TOTAL_MARK);
         await assessmentForm.toggleUseRubric();
+        await assessmentForm.addRubricLevel();
         await assessmentForm.toggleRubricIndicator(0, 426);
         await assessmentForm.fillRubricCriterionPoints(0, 426, 0, "1");
-        await assessmentForm.fillRubricCriterionPoints(0, 426, 0, "2");
+        await assessmentForm.fillRubricCriterionPoints(0, 426, 1, "2");
         await assessmentForm.toggleRubricIndicator(0, 420);
         await assessmentForm.fillRubricCriterionPoints(0, 420, 0, "1");
-        await assessmentForm.fillRubricCriterionPoints(0, 420, 0, "2");
+        await assessmentForm.fillRubricCriterionPoints(0, 420, 1, "2");
         await assessmentForm.create();
 
         // Now back on the course modify page, import the unit into the homepage
@@ -96,7 +104,7 @@ test.describe("Due Work - Mark type tests", () => {
         const homepage = new Homepage(page);
         const courseOutline = homepage.locateComponentByName("Course Outline");
         const courseOutlineId = await courseOutline.getAttribute("id");
-        const courseOutlineUnit = courseOutline.locator(`li[data-unit]`).filter({ hasText: unitName });
+        const courseOutlineUnit = courseOutline.locator("li[data-unit]").filter({ hasText: unitName });
         newUnitId = Number(await courseOutlineUnit.getAttribute("data-unit"));
         await courseOutlineUnit.getByTestId(`sbx-pop-out-${courseOutlineId}-unit-options${newUnitId}-button`).click();
         await courseOutlineUnit.locator("[data-dropdown-content] [data-add-button].icon-due-work").click();
@@ -106,15 +114,99 @@ test.describe("Due Work - Mark type tests", () => {
         await assessmentForm.setTitle(dueWorkName3);
         await assessmentForm.setWorkType(AssessmentForm.WORKTYPE_ASSESSMENT_TASK);
         await assessmentForm.setSelfReflection(AssessmentForm.SELF_REFLECTION_FULL);
-        await assessmentForm.setMarkType(AssessmentForm.MARK_TYPE_PERCENTAGE);
-        await assessmentForm.setInstructorMarkType(AssessmentForm.MARK_TYPE_NONE);
+        await assessmentForm.setMarkType(AssessmentForm.MARK_TYPE_NONE);
+        await assessmentForm.setInstructorMarkType(AssessmentForm.MARK_TYPE_PERCENTAGE);
         await assessmentForm.toggleUseRubric();
         await assessmentForm.toggleRubricIndicator(0, 452);
         await assessmentForm.fillRubricCriterionPoints(0, 452, 0, "1");
-        await assessmentForm.fillRubricCriterionPoints(0, 452, 0, "2");
+        await assessmentForm.fillRubricCriterionPoints(0, 452, 1, "2");
         await assessmentForm.toggleRubricIndicator(0, 446);
         await assessmentForm.fillRubricCriterionPoints(0, 446, 0, "1");
-        await assessmentForm.fillRubricCriterionPoints(0, 446, 0, "2");
+        await assessmentForm.fillRubricCriterionPoints(0, 446, 1, "2");
         await assessmentForm.create();
+    });
+
+    /**
+     * (Step 2) - Create submissions as Jana Reed for each assessment
+     */
+    test("Create submissions", async ({ tester, page }) => {
+        if (newUnitId === null) throw new Error("newUnitId is null");
+
+        const homepage = new Homepage(page);
+        const assessmentPage = new AssessmentPage(tester, page);
+        const feedbackForm = new FeedbackForm(tester, page);
+        const submitForm = new SubmitForm(tester, page);
+
+        await tester.impersonateViaUserProfilePage(student);
+
+        /**
+         * @param activityName - The name of the activity to find
+         * @returns The participant ID
+         */
+        async function createSelfAssessmentForActivity(activityName: string): Promise<number> {
+            if (classLink === null) throw new Error("classLink is null");
+
+            // Find the course outline and the unit we created inside it
+            tester.isGoingTo("find the unit in the course outline");
+            await page.goto(classLink);
+            const courseOutline = homepage.locateComponentByName("Course Outline");
+            const courseOutlineUnit = courseOutline.locator(`li[data-unit="${newUnitId}"]`);
+
+            const activities = courseOutlineUnit.locator("li[data-unit-assessment]");
+            await expect(activities).toHaveCount(3);
+
+            const activity = activities.filter({ hasText: activityName });
+            await activity.locator("a").first().click();
+
+            await assessmentPage.clickSelfAcknowledge();
+            await assessmentPage.clickSelfAcknowledgeProceed();
+
+            const participantId = await page.locator("[data-feedback-form]").getAttribute("data-feedback-form");
+            if (participantId === null) {
+                expect(participantId).not.toBeNull();
+                throw new Error("participantId is null");
+            }
+
+            return Number(participantId);
+        }
+
+        await test.step("Create a submission for the first due work", async () => {
+            const participantId = await createSelfAssessmentForActivity(dueWorkName1);
+
+            // Display mark type should be used (letter grade)
+            await feedbackForm.setGradeDropdown("B+", participantId);
+            await feedbackForm.setComment("test", participantId);
+            await submitForm.submit();
+        });
+
+        await test.step("Create a submission for the second due work", async () => {
+            const participantId = await createSelfAssessmentForActivity(dueWorkName2);
+
+            await feedbackForm.selectRubricIndicatorByValue(452, "1");
+            await feedbackForm.selectRubricIndicatorByValue(446, "2");
+
+            // Display mark type should be used (percentage)
+            await feedbackForm.expectRubricFinalSummaryMark("75 %");
+            await feedbackForm.expectRubricSum("75 %");
+            await feedbackForm.expectGrade("75 %", participantId);
+
+            await feedbackForm.setComment("test", participantId);
+            await submitForm.submit();
+        });
+
+        await test.step("Create a submission for the third due work", async () => {
+            const participantId = await createSelfAssessmentForActivity(dueWorkName3);
+
+            await feedbackForm.selectRubricIndicatorByValue(452, "1");
+            await feedbackForm.selectRubricIndicatorByValue(446, "2");
+
+            // Display mark type should be used (none)
+            await feedbackForm.expectNoRubricFinalSummary();
+            await feedbackForm.expectNoRubricSum();
+            await feedbackForm.expectNoGradeSelector(participantId);
+
+            await feedbackForm.setComment("test", participantId);
+            await submitForm.submit();
+        });
     });
 });

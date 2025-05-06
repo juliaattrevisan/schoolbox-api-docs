@@ -21,7 +21,7 @@ so if there are bullet points in the textbox they count as 3 characters, and wil
                     levelIndex: loop.index0
                 } -%}
             {%- endfor %}
-            <th><a href="#" data-spawn="level">&plus; {{ locale.translate('rubricLevel', false, true) }}</a></th>
+            <th><a href="#" data-test="rubric-spawn-level" data-spawn="level">&plus; {{ locale.translate('rubricLevel', false, true) }}</a></th>
         </tr>
         </thead>
         <tbody>

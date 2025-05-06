@@ -18,6 +18,8 @@ export default class AssessmentPage {
 
     static readonly DATA_TEST_ASSESSMENT_SUMMARY_CREATE_BUTTON = "assessment-summary-create-button";
 
+    static readonly DATA_TEST_ASSESSMENT_SUMMARY_SELF_ACKNOWLEDGE_BUTTON = "assessment-summary-self-acknowledge-button";
+
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
@@ -71,5 +73,22 @@ export default class AssessmentPage {
      */
     async clickCreateSubmission(): Promise<void> {
         await this.page.getByTestId(AssessmentPage.DATA_TEST_ASSESSMENT_SUMMARY_CREATE_BUTTON).click();
+    }
+
+    /**
+     * Click the self-acknowledge button (i.e. "I have submitted my work in person")
+     */
+    async clickSelfAcknowledge(): Promise<void> {
+        await this.page.getByTestId(AssessmentPage.DATA_TEST_ASSESSMENT_SUMMARY_SELF_ACKNOWLEDGE_BUTTON).click();
+    }
+
+    /**
+     * Click the "Proceed" button in the modal after being prompted for "Have you submitted your work?"
+     * via the self-acknowledge button on the assessment summary page
+     */
+    async clickSelfAcknowledgeProceed(): Promise<void> {
+        await this.tester.common.waitForModalToBeOpen();
+        await this.tester.common.clickConfirmButton();
+        await this.tester.common.waitForModalToBeClosed();
     }
 }
