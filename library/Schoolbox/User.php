@@ -1498,14 +1498,20 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
      */
     public function isBirthday(): bool
     {
-        $externalId = $this->getExternalId();
-        if ('' === (string)$externalId) {
+        /* Unfortunately, Only students get to celebrate their birthday =(
+ */
+        if (!$this->getRole()->isStudent()) {
             return false;
         }
 
-        /* Unfortunately, Only students get to celebrate their birthday =(
+        /* The celebration is not enabled for this year level =(
          */
-        if (!$this->getRole()->isStudent()) {
+        if (!$this->getYear()?->getBirthdayCelebrationEnabled()) {
+            return false;
+        }
+
+        $externalId = $this->getExternalId();
+        if ('' === (string)$externalId) {
             return false;
         }
 
