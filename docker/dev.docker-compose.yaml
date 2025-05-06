@@ -9,6 +9,8 @@ services:
   # nginx+PHP-FPM container
   schoolbox-nginx:
     container_name: schoolbox-nginx
+    environment:
+      DEBUG: "1"
     restart: always
     build:
       context: ./schoolbox-nginx
