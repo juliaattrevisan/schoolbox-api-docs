@@ -254,15 +254,6 @@ volumes:
       o: bind
       device: ./caddy/config
 
-  # Want to overlay files in this folder over what's already in
-  # /usr/local/etc/php/conf.d/, but don't yet know how
-  php-fpm-config:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./php-fpm/config
-
   redis-storage-config:
     driver: local
     driver_opts:
