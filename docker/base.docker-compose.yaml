@@ -188,7 +188,6 @@ services:
     depends_on:
       redis-storage:
         condition: service_healthy
-#      - schoolbox-caddy
     build:
       context: ./schoolbox-taskd
     environment:
