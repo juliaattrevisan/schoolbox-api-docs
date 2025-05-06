@@ -383,7 +383,13 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
             $allOptions = unserialize($answer['answer']);
 
             foreach ($allOptions as $currentOption) {
-                if ($currentOption->value == $value) {
+                /* Skip the answer if the value does not exist
+                 * TODO: Will need to fix the import/export to fix the issue completely
+                 */
+                if (!isset($currentOption->value)) {
+                    continue;
+                }
+                if ($currentOption->value == $value && isset($currentOption->description)) {
                     return $currentOption->description;
                 }
             }
