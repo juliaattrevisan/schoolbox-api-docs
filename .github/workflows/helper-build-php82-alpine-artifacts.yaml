@@ -4,7 +4,6 @@ on:
   workflow_call:
 
 jobs:
-  # Build schoolbox-fpm image
   build-php82-alpine-artifacts:
     strategy:
       matrix:
