@@ -21,6 +21,7 @@ services:
     # After building: create data dirs, and make mount writable by www-data
     # Cannot currently use create-data-dirs.sh, as /bin/bash isn't available,
     # and /bin/sh doesn't support {} expansion
+    # Also: set server_name and trigger nginx restart
     post_start:
       - command: mkdir -p /var/lib/schoolbox/docker/cache/portrait
       - command: mkdir -p /var/lib/schoolbox/docker/cache/stream
