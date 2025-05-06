@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test";
-import type { Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 
 export default class Homepage {
     private page: Page;
@@ -70,6 +70,8 @@ export default class Homepage {
 
     static readonly DATA_TEST_ASSESSMENT_COMPONENT_TOT_MENU_DELETE = "component-assessment-actions-delete-";
 
+    static readonly DATA_TEST_HOMEPAGE_COMPONENT_TITLEBAR_NAME = "homepage-component-titlebar-name";
+
     constructor(page: Page) {
         this.page = page;
     }
@@ -120,6 +122,20 @@ export default class Homepage {
      */
     public static locateComponent(layout: string, position: number): string {
         return `${layout} ${Homepage.ELEMENT_COMPONENT}:nth-child(${position})`;
+    }
+
+    /**
+     * Create a locator for a component by its name
+     * @param componentName - The name of the component
+     * @returns - the Locator for the component (or components)
+     */
+    public locateComponentByName(componentName: string): Locator {
+        const titleBar = this.page
+            .getByTestId(Homepage.DATA_TEST_HOMEPAGE_COMPONENT_TITLEBAR_NAME)
+            .filter({ hasText: componentName });
+
+        const components = this.page.locator("[data-component]");
+        return components.filter({ has: titleBar });
     }
 
     /**

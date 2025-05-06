@@ -182,7 +182,7 @@ test.describe("Lesson Plan Activity", () => {
         tester.isGoingTo("click the arrow down for Romeo and Juliet unit");
         await courseModify.clickUnitArrow(15);
         tester.isGoingTo("click New Lesson PLan button to create a lesson plan");
-        await courseModify.clickNewLessonPlanButton("lesson-plan");
+        await courseModify.clickNewActivityButton("lesson-plan");
         await page.waitForLoadState("domcontentloaded");
         const lessonPlanTemplateId = (await db.grabFromDatabase("lesson_plan_template", "id", {
             deleted_at: null,

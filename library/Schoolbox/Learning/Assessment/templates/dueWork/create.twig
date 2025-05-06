@@ -219,7 +219,7 @@
 
     {% if selfAssessmentEnabled %}
         <label>{{ locale.selfReflection.proper }} <span data-tooltip class="hint has-tip tip-top"  title="Enabling '{{ locale.selfReflection.proper }}' allows students to reflect on their work with a comment, and rubric if provided. Also enabling '{{ locale.selfAssessment.proper }}' gives students the ability to provide themselves a grade.">?</span>
-            <select name="self_reviewable" {% if courseManaged.isReadonly %}readonly{% endif %}>
+            <select name="self_reviewable" {% if courseManaged.isReadonly %}readonly{% endif %} data-test="assessment-form-select-selfReflection">
                 {% for selfReviewType in selfReviewTypes %}
                     <option value="{{ selfReviewType.value }}"
                         {% if assessment.selfReviewability == selfReviewType.value %}

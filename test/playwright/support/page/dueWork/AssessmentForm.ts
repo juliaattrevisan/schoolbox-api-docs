@@ -20,6 +20,8 @@ export default class AssessmentForm {
 
     static readonly SELECTOR_WORKTYPE = "assessment-form-select-workType";
 
+    static readonly DATA_TEST_SELF_REFLECTION = "assessment-form-select-selfReflection";
+
     static readonly SELECTOR_WEIGHT = "assessment-form-input-weight";
 
     static readonly SELECTOR_VISIBILITY = "assessment-form-select-visibility";
@@ -43,6 +45,8 @@ export default class AssessmentForm {
     static readonly DATA_TEST_SUBMISSION_TYPE_CONTAINER = "assessment-form-submission-type-container";
 
     static readonly DATA_TEST_SUBMISSION_TYPE_LABEL = "assessment-form-submission-type"; // Append "-[submissionType]"
+
+    static readonly DATA_TEST_USE_RUBRIC = "assessment-form-use-rubric";
 
     static readonly SELECTOR_PARTICIPATION_BUTTON_SAVE = "participation-plan-form-button-save";
 
@@ -78,13 +82,20 @@ export default class AssessmentForm {
     static readonly WORKTYPE_NONE = 7;
 
     // Mark type constants
-    static readonly MARK_TYPE_NONE = 0;
+    static readonly MARK_TYPE_NONE = 6;
 
     static readonly MARK_TYPE_PERCENTAGE = 1;
 
     static readonly MARK_TYPE_TOTAL_MARK = 3;
 
     static readonly MARK_TYPE_LETTER_GRADE = 2;
+
+    // Self reflection constants
+    static readonly SELF_REFLECTION_NONE = "none";
+
+    static readonly SELF_REFLECTION_REFLECT_ONLY = "reflect-only";
+
+    static readonly SELF_REFLECTION_FULL = "full";
 
     // Visibility constants
     // NOTE: The PHP implementation referenced Schoolbox\Assessment\Component\SubmissionBox
@@ -130,7 +141,12 @@ export default class AssessmentForm {
      */
     async create(): Promise<void> {
         await this.page.getByTestId(AssessmentForm.SELECTOR_BUTTON_CREATE).click();
-        await expect(this.page.getByTestId(AssessmentForm.SELECTOR_HOMEPAGE_TABS)).toHaveCount(1);
+
+        const homepageTabs = this.page.getByTestId(AssessmentForm.SELECTOR_HOMEPAGE_TABS);
+        const courseModifyPage = this.page.locator("h1").filter({ hasText: "Modify Course" });
+
+        // either of the above should be visible
+        await expect(homepageTabs.or(courseModifyPage)).toHaveCount(1);
     }
 
     /**
@@ -180,6 +196,20 @@ export default class AssessmentForm {
      */
     async setWeight(weight: number): Promise<void> {
         await this.page.getByTestId(AssessmentForm.SELECTOR_WEIGHT).fill(weight.toString());
+    }
+
+    /**
+     * Sets work type
+     * @param option - The self-reflection option to set
+     */
+    async setSelfReflection(
+        option:
+            | typeof AssessmentForm.SELF_REFLECTION_NONE
+            | typeof AssessmentForm.SELF_REFLECTION_REFLECT_ONLY
+            | typeof AssessmentForm.SELF_REFLECTION_FULL,
+    ): Promise<void> {
+        const selfReflectionSelectEl = this.page.getByTestId(AssessmentForm.DATA_TEST_SELF_REFLECTION);
+        await selfReflectionSelectEl.selectOption({ value: option });
     }
 
     /**
@@ -315,5 +345,43 @@ export default class AssessmentForm {
     async worksheetAttachment(db: DatabaseHelper, filePath: string): Promise<void> {
         const attachZone = this.page.locator(AssessmentForm.SELECTOR_WORKSHEET_ATTACHMENT_ZONE);
         await this.tester.dragAndDropFile(db, attachZone, filePath);
+    }
+
+    /**
+     * Toggles the use rubric option
+     */
+    async toggleUseRubric(): Promise<void> {
+        const useRubricInputId = await this.page.getByTestId(AssessmentForm.DATA_TEST_USE_RUBRIC).getAttribute("id");
+        const useRubricLabel = this.page.locator(`.switch label[for="${useRubricInputId}"]`);
+        await useRubricLabel.click();
+    }
+
+    /**
+     * Toggle a given rubric indicator
+     * @param capabilityId - The capability ID
+     * @param indicatorId - The indicator ID
+     */
+    async toggleRubricIndicator(capabilityId: number, indicatorId: number): Promise<void> {
+        const rubricIndicator = this.page.locator(`label[for="rb[${capabilityId}][criterion][${indicatorId}][on]"]`);
+        await rubricIndicator.click();
+    }
+
+    /**
+     * Fill in points for a given criterion
+     * @param capabilityId - The capability ID
+     * @param indicatorId - The indicator ID
+     * @param criterionId - The criterion ID
+     * @param value - The value to set
+     */
+    async fillRubricCriterionPoints(
+        capabilityId: number,
+        indicatorId: number,
+        criterionId: number,
+        value: string | number,
+    ): Promise<void> {
+        const pointsInput = this.page.locator(
+            `input[name="rb[${capabilityId}][descriptor][${indicatorId}][${criterionId}][points]"]`,
+        );
+        await pointsInput.fill(value.toString());
     }
 }
