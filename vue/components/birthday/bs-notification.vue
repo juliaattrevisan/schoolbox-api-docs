@@ -14,14 +14,18 @@ const emit = defineEmits<{
 const notificationEl = window.Vue.ref<HTMLDivElement | null>(null);
 const canvasEl = window.Vue.ref<HTMLCanvasElement | null>(null);
 const duration = window.Vue.ref(1.5);
+const canDisplay = window.Vue.ref(false); // to check if the birthday notification can be displayed
 
 /**
- * Append the birthday notification to the notifications list
+ * Append the birthday notification to the notifications list or the header search button
+ * if the notifications module is off
  */
-function appendToNotifications(): void {
-    const toggle = document.querySelector("#notifications") as HTMLAnchorElement;
-    if (toggle) {
-        toggle.appendChild(notificationEl.value as HTMLDivElement);
+async function appendToNotifications(): Promise<void> {
+    const container = document.querySelector("#notifications") || document.querySelector("#header-search-input");
+    if (container) {
+        canDisplay.value = true; // show the birthday notification
+        await window.Vue.nextTick(); // wait for the DOM to update
+        container.appendChild(notificationEl.value as HTMLDivElement);
     }
 }
 
@@ -61,15 +65,17 @@ function onSelected(): void {
  * Append the birthday notification to the
  * notifications list and start animating
  */
-window.Vue.onMounted(() => {
-    appendToNotifications();
-    animateStars();
-    animateBell();
+window.Vue.onMounted(async () => {
+    await appendToNotifications();
+    if (canDisplay.value) {
+        animateStars();
+        animateBell();
+    }
 });
 </script>
 
 <template>
-    <button ref="notificationEl" class="birthday-button" @click.prevent="onSelected">
+    <button v-if="canDisplay" ref="notificationEl" class="birthday-button" @click.prevent="onSelected">
         <div class="birthday-container">
             <div class="birthday-container__background">
                 <canvas ref="canvasEl" width="72" height="72"></canvas>
@@ -88,10 +94,12 @@ window.Vue.onMounted(() => {
 
 <style lang="scss" scoped>
 .birthday-button {
+    right: 0;
     margin: 0; // to remove the default button margin
     padding: 0; // to remove the default button padding
     position: absolute; // to overlay the notification bar
     top: 0;
+    z-index: var(--sbx-depth-pop-over);
 }
 
 .birthday-container {
