@@ -7,15 +7,14 @@ ARG ENV=dev
 ARG ARCH=amd64
 
 
-# Stage 1: base off of alaress/php82-alpine
-# Note: this is a private repository, so need to set an alternate when building
-# from a pull request.
-FROM --platform=linux/${ARCH} alaress/php82-alpine AS build
+# Stage 1: base off of just-built image php82-alpine
+FROM --platform=linux/${ARCH} php82-alpine AS build
 
 
 # Stage 2: build final image
 FROM --platform=linux/${ARCH} shinsenter/php:8.2-fpm-nginx-alpine AS final
 ARG ENV
+ARG SERVER_NAME
 
 ## Install actual dependencies
 RUN apk add libzip icu-libs libldap \
@@ -34,6 +33,16 @@ COPY --from=build /opt/mssql-tools18 /opt/mssql-tools18
 COPY --from=build /usr/local/lib/php/extensions/no-debug-non-zts-20220829 /usr/local/lib/php/extensions/no-debug-non-zts-20220829
 COPY --from=build /usr/local/etc/php/conf.d/ /usr/local/etc/php/conf.d/
 
+# Write config
+RUN rm /etc/nginx/sites-enabled/*.conf
+COPY config/schoolbox.conf /etc/nginx/sites-enabled/schoolbox.conf
+RUN mkdir -p /etc/nginx/sites-enabled/schoolbox.d/ && \
+    echo "server_name ${SERVER_NAME};" > /etc/nginx/sites-enabled/schoolbox.d/server_name.conf
+
+EXPOSE 80 443
+
+WORKDIR /usr/share/schoolbox
+
 # Only current difference between deploy and dev builds is to copy all Schoolbox
 # code from code context to image.
 COPY --from=code ./conf      /usr/share/schoolbox/conf
@@ -46,7 +55,3 @@ COPY --from=code ./tools     /usr/share/schoolbox/tools
 COPY --from=code ./updates   /usr/share/schoolbox/updates
 COPY --from=code ./vendor    /usr/share/schoolbox/vendor
 COPY --from=code ./www       /usr/share/schoolbox/www
-
-EXPOSE 80 443
-
-WORKDIR /usr/share/schoolbox

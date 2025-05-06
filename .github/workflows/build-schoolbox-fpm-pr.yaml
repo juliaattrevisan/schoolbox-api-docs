@@ -1,6 +1,6 @@
-name: Build schoolbox-fpm (pull request)
+name: Build schoolbox-nginx (pull request)
 
-# Build a new schoolbox-fpm image for this pull request, for CI.
+# Build a new schoolbox-nginx image for this pull request, for CI.
 # Works around the fact that PRs can't use base images in repositories, by
 # building the base image and copying its files as artifacts.
 # Commented out for now, as CI doesn't use it yet and it costs us $:
@@ -20,8 +20,8 @@ jobs:
   build-php82-alpine-artifacts:
     uses: ./.github/workflows/helper-build-php82-alpine-artifacts.yaml
 
-  # Build schoolbox-fpm image
-  build-schoolbox-fpm:
+  # Build schoolbox-nginx image
+  build-schoolbox-nginx:
     needs:
       - build-composer-artifact
       - build-npm-artifact
@@ -63,11 +63,11 @@ jobs:
           path: ${{ runner.temp }}/artifact
 
       # Build
-      - name: Build schoolbox-fpm pull request image
+      - name: Build schoolbox-nginx pull request image
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: docker/php-fpm/deploy-image.Dockerfile
+          file: docker/schoolbox-nginx/deploy-image.Dockerfile
           cache-from: type=gha
           cache-to: type=gha
           build-contexts: |
@@ -80,16 +80,17 @@ jobs:
           build-args: |
             ENV=prod
             ARCH=${{ matrix.build.arch }}
+            SERVER_NAME=
 #          platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           tags: |
-            schoolbox-fpm-${{ matrix.build.arch }}
+            schoolbox-nginx-${{ matrix.build.arch }}
 
       # Smoke test for box:
       # could attempt to run PHPUnit within the box as well?
-      - name: Test schoolbox-fpm
+      - name: Test schoolbox-nginx
         run: |
           docker image ls
-          image=$(docker image ls -q schoolbox-fpm-${{ matrix.build.arch }})
+          image=$(docker image ls -q schoolbox-nginx-${{ matrix.build.arch }})
           docker run -i $image ls -al /opt/
           docker run -i $image ls -al /etc/
           docker run -i $image ls -al /usr/local/lib/php/extensions/no-debug-non-zts-20220829/
