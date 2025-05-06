@@ -22,12 +22,12 @@ class LessonPlan
      * This seems mostly the same across most usages, other than specifying that context
      * (some parts stolen directly from openai's docs)
      */
-    private const PROMPT_SYSTEM_PERSONA = "
+    private const PROMPT_SYSTEM_PERSONA_MULTIPLE = "
         You are an expert teacher, proficient in creating engaging, well-developed, and effective learning and teaching
         plans for your students. You will receive a plan type that is part of a specific course and unit within a defined
         curriculum area. Your task is to develop a plan that addresses the provided curriculum content and incorporates
-        any additional notes to ensure strong alignment. Your language of instruction is [LANGUAGE]. 
-        
+        any additional notes to ensure strong alignment. Your language of instruction is [LANGUAGE].
+
         If any field is missing or left blank, follow these guidelines:
             * Course/Unit Context: If missing, infer a general context using the curriculum content and plan type.
             * Curriculum Content: If missing, infer appropriate content based on the plan type, course/unit context, title, and any additional notes.
@@ -37,6 +37,68 @@ class LessonPlan
 
         Create a range of suggestions USING HTML that align with the following field topics; each field topic should
         use the fields_format json response format.
+    ";
+
+
+    /**
+     * This is the same as above, but for regenerating a single field only
+     */
+    private const PROMPT_SYSTEM_PERSONA_SINGLE = "
+        You are an expert teacher, proficient in creating engaging, well-developed, and effective learning and teaching
+        plans for your students. You will receive a plan type that is part of a specific course and unit within a defined
+        curriculum area. Your task is to regenerate a single specified field in a teaching plan, based on the full context
+        of the other fields already completed. This field should align with the plan's overall structure, teaching intent,
+        and curriculum requirements.
+
+        You will receive all fields of the current plan, including the one that is being regenerated. Use the existing
+        content across the plan as contextual guidance to ensure the regenerated field is pedagogically sound,
+        consistent with the plan flow, and aligned to the curriculum.
+
+        Regenerate only the requested field. Do not alter or repeat any of the other fields.
+        Your language of instruction is [LANGUAGE].
+
+        If any field is missing or left blank, follow these guidelines:
+            * Course/Unit Context: If missing, infer a general context using the curriculum content, plan type and context from existing fields.
+            * Curriculum Content: If missing, infer appropriate content based on the plan type, course/unit context, title, any additional notes and context from existing fields.
+            * Curriculum Area: If missing, use the plan type, course/unit context, title, additional notes and context from existing fields to determine the relevant subject area.
+            * Duration: If not provided, exclude any time-specific content or scheduling details from the plan.
+            * Additional Notes: If missing, proceed without them and ensure the plan aligns closely with the plan type, curriculum content, title, course/unit context,curriculum area and content from existing fields.
+
+        Create a range of suggestions USING HTML that align with the following field topics; each field topic should
+        use the fields_format json response format.
+    ";
+
+
+    /**
+     * Something that shapes what the ai would make;
+     * provide additional instructions (if meaningful)
+     */
+    private const PROMPT_USER_PERSONA_MULTIPLE = "
+        Plan Type: [TEMPLATE TITLE]
+        Title: [LESSON PLAN TITLE]
+        Course/Unit Context: [CONTEXT]
+        Duration: [DURATION]
+        [CURRICULUM CONTENT]
+        [CURRICULUM AREA]
+        [ADDITIONAL NOTES]
+    ";
+
+
+    /**
+     * This is the same as above, but for regenerating a single field only
+     */
+    private const PROMPT_USER_PERSONA_SINGLE = "
+        Field to Regenerate: [CURRENT FIELD TITLE]
+
+        Plan Type: [TEMPLATE TITLE]
+        Title: [LESSON PLAN TITLE]
+        Course/Unit Context: [CONTEXT]
+        Duration: [DURATION]
+        [CURRICULUM CONTENT]
+        [CURRICULUM AREA]
+        [ADDITIONAL NOTES]
+
+        [OTHER FIELDS]
     ";
 
 
@@ -79,6 +141,49 @@ class LessonPlan
 
 
     /**
+     * Generate details for a given field for the prompt.
+     * Used for the user persona as well as the structured output contents
+     *
+     * @param array $field
+     * @return string
+     */
+    private function generateFieldDetails(array $field): string
+    {
+        $fieldId = (string)$field['id'];
+        $fieldTitle = trim((string)$field['title']);
+        $fieldDescription = trim((string)$field['description']);
+        $fieldBody = trim((string)$field['body']);
+        $fieldTemplate = trim((string)$field['template']);
+
+        /* Add a visibility statement
+         */
+        if (trim((string)$field['visibility']) === \Schoolbox\Role::STUDENT) {
+            $fieldVisibility = 'This field is visible to students and staff.';
+        } else {
+            $fieldVisibility = 'This field is visible to staff.';
+        }
+
+        $details = sprintf(
+            "FIELD TITLE: %s\nFIELD DESCRIPTION: %s\nVISIBILITY: %s",
+            $fieldTitle,
+            $fieldDescription,
+            $fieldVisibility
+        );
+
+        /* If the body/template is present, tack it on the end
+         */
+        if ('' !== $fieldBody) {
+            $details .= sprintf("\nCURRENT VALUE: %s", $fieldBody);
+        }
+        if ('' !== $fieldTemplate) {
+            $details .= sprintf("\nTEMPLATE: %s", $fieldTemplate);
+        }
+
+        return $details;
+    }
+
+
+    /**
      * Derive prompt attributes from an existing Lesson Plan and Lesson Plan Template.
      *
      * This lets you supply scalar ids, which are resolved to actual instances via mappers
@@ -90,6 +195,7 @@ class LessonPlan
      * @param string $duration
      * @param array $curriculumNodeIds
      * @param string $additionalContext
+     * @param ?string $generateForField
      * @return string
      * @throws Deleted
      * @throws Exception
@@ -102,7 +208,8 @@ class LessonPlan
         array $fields,
         string $duration,
         array $curriculumNodeIds,
-        string $additionalContext = ''
+        string $additionalContext = '',
+        ?string $generateForField = null
     ): string {
         /* Details about how to use each field
          */
@@ -121,7 +228,9 @@ class LessonPlan
             $context,
             $duration,
             $curriculumNames,
-            $additionalContext
+            $fields,
+            $generateForField,
+            $additionalContext,
         );
 
         /* OpenAI uses the model name from our ui.
@@ -183,6 +292,8 @@ class LessonPlan
      * @param string $context
      * @param string $duration
      * @param array $curriculumNames
+     * @param array $fields
+     * @param string|null $generateForField
      * @param string $additionalContext
      * @return array
      */
@@ -192,32 +303,59 @@ class LessonPlan
         string $context,
         string $duration,
         array $curriculumNames,
+        array $fields,
+        ?string $generateForField = null,
         string $additionalContext = ''
     ): array {
+        /* Use the right base prompt depending on if we're regenerating a single field
+         * or multiple fields at once
+         */
+        if (null !== $generateForField) {
+            $systemContent = self::PROMPT_SYSTEM_PERSONA_SINGLE;
+            $userContent = self::PROMPT_USER_PERSONA_SINGLE;
+        } else {
+            $systemContent = self::PROMPT_SYSTEM_PERSONA_MULTIPLE;
+            $userContent = self::PROMPT_USER_PERSONA_MULTIPLE;
+        }
+
         /* Conduct replacements
          */
-        $systemContent = strtr(self::PROMPT_SYSTEM_PERSONA, [
+        $systemContent = strtr($systemContent, [
             '[LANGUAGE]' => $this->language
         ]);
-
-        /* Something that shapes what the ai would make;
-         * provide additional instructions (if meaningful)
-         */
-        $userContent = "
-            Plan Type: [TEMPLATE TITLE]
-            Title: [LESSON PLAN TITLE]
-            Course/Unit Context: [CONTEXT]
-            Duration: [DURATION]
-            [CURRICULUM CONTENT]
-            [CURRICULUM AREA]
-        ";
 
         $userContent = strtr($userContent, [
             '[TEMPLATE TITLE]' => $templateTitle,
             '[LESSON PLAN TITLE]' => $lessonPlanTitle,
             '[CONTEXT]' => $context,
             '[DURATION]' => $duration,
+            '[ADDITIONAL NOTES]' => '' !== $additionalContext ? 'Additional Notes: ' . $additionalContext : '',
         ]);
+
+        if (null !== $generateForField) {
+            $otherFieldsInfo = "Other Fields:";
+            $currentField = null;
+
+            foreach ($fields as $field) {
+                if ((string)$field['id'] === (string)$generateForField) {
+                    $currentField = $field; // since $fields is not indexed by id
+                    continue;
+                }
+
+                $fieldDetails = $this->generateFieldDetails($field);
+                $otherFieldsInfo .= sprintf("\n * %s", $fieldDetails);
+            }
+
+            $userContent = strtr($userContent, [
+                '[CURRENT FIELD TITLE]' => $currentField['title'],
+                '[OTHER FIELDS]' => $otherFieldsInfo
+            ]);
+        } else {
+            $userContent = strtr($userContent, [
+                '[CURRENT FIELD TITLE]' => '',
+                '[OTHER FIELDS]' => ''
+            ]);
+        }
 
         if (\count($curriculumNames)) {
             /* Yoink out the node's name
@@ -256,12 +394,6 @@ class LessonPlan
             ]);
         }
 
-        /* Whatever the user also instructed from the ui
-         */
-        if ('' !== $additionalContext) {
-            $userContent .= '    Additional Notes: ' . $additionalContext;
-        }
-
         return [
             'system' => trim($systemContent),
             'user' => trim($userContent)
@@ -293,30 +425,15 @@ class LessonPlan
                 continue;
             }
 
-            $fieldId = (string)$field['id'];
             $fieldTitle = trim((string)$field['title']);
-            $fieldDescription = trim((string)$field['description']);
-            $fieldBody = trim((string)$field['body']);
+            $details = $this->generateFieldDetails($field);
 
-            /* Add a visibility statement
-             */
-            if (trim((string)$field['visibility']) === \Schoolbox\Role::STUDENT) {
-                $fieldVisibility = 'This field is visible to students and staff.';
-            } else {
-                $fieldVisibility = 'This field is visible to staff.';
-            }
 
             /* Make a giant prompt slab for each field
              */
             $struct['schema']['properties'][$fieldTitle] = [
                 'type' => 'string',
-                'description' => sprintf(
-                    "USE HTML\nFIELD TITLE: %s\nFIELD DESCRIPTION: %s\nTEMPLATE: %s\nVISIBILITY: %s",
-                    $fieldTitle,
-                    $fieldDescription,
-                    $fieldBody,
-                    $fieldVisibility
-                ),
+                'description' => sprintf("USE HTML\n%s", $details),
             ];
 
             /* I think this forces the $fieldId to spawn in the json payload

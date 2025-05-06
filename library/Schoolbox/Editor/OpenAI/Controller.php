@@ -83,7 +83,8 @@ class Controller extends Base
                 'fields' => $this->requestPost->get('fields'),
                 'duration' => $this->requestPost->get('duration'),
                 'curriculumNodeIds' => $this->requestPost->get('curriculumNodeIds'),
-                'additionalContext' => $this->requestPost->get('additionalContext') ?? ''
+                'additionalContext' => $this->requestPost->get('additionalContext') ?? '',
+                'generateForField' => $this->requestPost->get('generateForField') ?? null,
             ];
 
 //            $inputs = [
@@ -114,7 +115,8 @@ class Controller extends Base
                 $inputs['fields'],
                 $inputs['duration'],
                 $inputs['curriculumNodeIds'],
-                $inputs['additionalContext']
+                $inputs['additionalContext'],
+                $inputs['generateForField'],
             );
 
             /* Send it and decode the result (if any: sometimes it returns null)

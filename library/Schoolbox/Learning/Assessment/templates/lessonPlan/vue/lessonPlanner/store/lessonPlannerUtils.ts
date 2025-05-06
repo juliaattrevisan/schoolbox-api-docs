@@ -27,6 +27,7 @@ export type LpGenerateApiFieldPayload = {
      * See translateFieldForPayload for details
      */
     body: LessonPlanField["body"] | null;
+    template: LessonPlanField["body"] | null;
     /**
      * Whether this field is to be regenerated (true) or only used as additional context (false)
      * This can be used to influence how the body above is represented in the AI prompt
@@ -59,6 +60,10 @@ type LpGenerateApiPayload = {
      * The additional context/prompt refinement that the user has provided to assist the AI
      */
     additionalContext: string;
+    /**
+     * Are we regenerating for a single field (ID) or the entire lesson plan (null)?
+     */
+    generateForField: LessonPlanField["id"] | null;
     /**
      * All of the fields (in order) in the lesson plan,
      * and whether or not they are selected to be generated or not
@@ -93,9 +98,9 @@ export function translateFieldForPayload(
      */
     if (generateForField) {
         if (field.id === generateForField.id) {
-            return { ...baseFieldData, body: null };
+            return { ...baseFieldData, body: null, template: null };
         }
-        return { ...baseFieldData, body: field.body };
+        return { ...baseFieldData, body: field.body, template: null };
     }
 
     /**
@@ -108,10 +113,10 @@ export function translateFieldForPayload(
      *     on this page we don't have the original template content to provide, so the AI can't use it as context
      */
     if (field.lessonPlanTemplateField === undefined) {
-        return { ...baseFieldData, body: field.initialBody };
+        return { ...baseFieldData, body: null, template: field.initialBody };
     }
 
-    return { ...baseFieldData, body: null };
+    return { ...baseFieldData, body: null, template: null };
 }
 
 /**
