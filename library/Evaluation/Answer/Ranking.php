@@ -389,7 +389,7 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
                 if (!isset($currentOption->value)) {
                     continue;
                 }
-                if ($currentOption->value == $value) {
+                if ($currentOption->value == $value && isset($currentOption->description)) {
                     return $currentOption->description;
                 }
             }
