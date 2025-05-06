@@ -373,6 +373,9 @@ class Controller extends ConfigController
             case 'schoolData':
                 return '/adminv2/import/schoolDataImport';
 
+            case 'openai':
+                return '/adminv2/ai-services';
+
             default:
                 return "/adminv2/$module"; // E.g. /adminv2/lti
         }
