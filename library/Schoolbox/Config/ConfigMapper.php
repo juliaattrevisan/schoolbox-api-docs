@@ -46,6 +46,7 @@ class ConfigMapper extends Mapper
     public const MODULE_LTI        = 'lti';
     public const MODULE_REPORT_EXPORT = 'summative-report';
     public const MODULE_FEATURE_TOURS = 'feature-tours';
+    public const MODULE_OPENAI = 'openai';
 
     // Field enum (kinda)
     public const FIELD_INPUT         =  1;
@@ -501,7 +502,8 @@ class ConfigMapper extends Mapper
                 self::MODULE_SCHOOLDATA,
                 self::MODULE_LTI,
                 self::MODULE_REPORT_EXPORT,
-                self::MODULE_FEATURE_TOURS
+                self::MODULE_FEATURE_TOURS,
+                self::MODULE_OPENAI,
             ]
         );
         $this->joins(self::COL_TYPE, Type\Mapper::class, 'id', self::TYPE_MODEL, null, 'type', 'type');

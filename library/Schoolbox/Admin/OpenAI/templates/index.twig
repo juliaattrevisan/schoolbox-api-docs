@@ -1,0 +1,94 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+<div class="admin-container row">
+
+    {{ renderAdminNavigation(pageCurrent) }}
+
+    <div class="admin-content">
+        <div id="settingsContainer" style="display:none">
+            {% include '@settings/moduleConfig.twig' with configContext only %}
+        </div>
+
+        <script>
+            $(function() {
+                const PROVIDER_OPENAI = '{{ models.openai }}';
+                const PROVIDER_AZURE = '{{ models.azure }}';
+
+                let provider = $('#openai_endpoint-field');
+                let key = $('#openai_key-field').parent('div');
+                let model = $('#openai_model-field').parent('div');
+                let azureResourceName = $('#openai_azure_resource_name-field').parent('div');
+                let azureDeploymentId = $('#openai_azure_deployment_id-field').parent('div');
+
+                provider.on('change', function(event) {
+                    event.preventDefault();
+                    init(provider, key, model, azureResourceName, azureDeploymentId);
+                });
+
+                init(provider, key, model, azureResourceName, azureDeploymentId);
+
+                /**
+                 *  Hide everything if you haven't chosen a provider yet
+                 */
+                function init(provider, key, model, azureResourceName, azureDeploymentId)
+                {
+                    if ('' === provider.val()) {
+                        key.hide();
+                        model.hide();
+                        azureResourceName.hide();
+                        azureDeploymentId.hide();
+                    } else if (PROVIDER_OPENAI === provider.val()) {
+                        key.show();
+                        model.show();
+                        azureResourceName.hide();
+                        azureDeploymentId.hide();
+                    } else if (PROVIDER_AZURE === provider.val()) {
+                        key.show();
+                        model.hide();
+                        azureResourceName.show();
+                        azureDeploymentId.show();
+                    }
+
+                    $('#settingsContainer').show();
+                }
+            });
+        </script>
+
+        <div class="small-12 columns">
+            <h2 class="subheader">Feature Compatibility</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>CKEditor AI</th>
+                        <th>Lesson Plans AI</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>gpt-4</td>
+                        <td>Yes</td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td>gpt-4o</td>
+                        <td>Yes</td>
+                        <td>Yes</td>
+                    </tr>
+                    <tr>
+                        <td>gpt-4o-mini</td>
+                        <td>Yes</td>
+                        <td>Yes</td>
+                    </tr>
+                    <tr>
+                        <td>gpt-4-turbo</td>
+                        <td>Yes</td>
+                        <td>No</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

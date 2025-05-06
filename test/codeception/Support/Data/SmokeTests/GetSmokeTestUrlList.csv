@@ -44,7 +44,7 @@ Admin,Configure notification delivery,https://vagrant.dev.schoolbox.cloud/adminv
 Admin,Configure student notifications,https://vagrant.dev.schoolbox.cloud/adminv2/notifications/configure/student
 Admin,Configure push providers,https://vagrant.dev.schoolbox.cloud/adminv2/notifications/apps
 Admin,System Settings 3rd Party Services,https://vagrant.dev.schoolbox.cloud/adminv2/setting/3rd Party Services
-Admin,System Settings AI Services,https://vagrant.dev.schoolbox.cloud/adminv2/setting/AI
+Admin,System Settings AI Services,https://vagrant.dev.schoolbox.cloud/adminv2/ai-services
 Admin,System Settings Debugging,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Debugging
 Admin,System Settings Email,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Email
 Admin,System Settings External DB,https://vagrant.dev.schoolbox.cloud/adminv2/setting/External%20DB

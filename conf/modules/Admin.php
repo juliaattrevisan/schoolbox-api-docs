@@ -147,5 +147,9 @@ class Admin extends ModuleLoader
         /* Bulk Feedback Import
          */
         $this->loadModule($di, \Schoolbox\Admin\BulkFeedbackImport\Module::class, '/adminv2/bulk-feedback-import');
+
+        /* OpenAI
+         */
+        $this->loadModule($di, \Schoolbox\Admin\OpenAI\Module::class, '/adminv2/ai-services');
     }
 }

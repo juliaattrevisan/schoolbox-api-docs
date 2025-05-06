@@ -736,10 +736,15 @@ class Subnav
                         'visible'     => count($enabledConfigs[ConfigMapper::TYPE_3RD] ?? []) > 0,
                         'description' => 'Enable and configure API connectivity between your platform and many other integrated services.',
                     ],
-                    '/adminv2/setting/AI' => [
-                        'name'        => 'AI Services',
-                        'visible'     => count($enabledConfigs[ConfigMapper::TYPE_3RD] ?? []) > 0,
+                    /* OpenAI needs its own page because Azure has a special usage of th config fields
+                     * Also, we provide some more information here than just input fields
+                     */
+                    '/adminv2/ai-services' => [
+                        'name' => 'AI Services',
+                        'visible' => true,
                         'description' => 'Enable and configure OpenAI integration to enable AI services to be made available to users.',
+                        'searchable' => true,
+                        'children' => []
                     ],
                     '/adminv2/setting/Debugging' => [
                         'name'        => 'Debugging',
