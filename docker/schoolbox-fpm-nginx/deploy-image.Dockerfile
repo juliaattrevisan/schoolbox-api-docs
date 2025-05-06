@@ -35,7 +35,7 @@ COPY --from=build /usr/local/etc/php/conf.d/ /usr/local/etc/php/conf.d/
 
 # Write config
 RUN rm /etc/nginx/sites-enabled/*.conf
-COPY config/schoolbox.conf /etc/nginx/sites-enabled/schoolbox.conf
+COPY ./config/schoolbox.conf /etc/nginx/sites-enabled/schoolbox.conf
 RUN mkdir -p /etc/nginx/sites-enabled/schoolbox.d/ && \
     echo "server_name ${SERVER_NAME};" > /etc/nginx/sites-enabled/schoolbox.d/server_name.conf
 
