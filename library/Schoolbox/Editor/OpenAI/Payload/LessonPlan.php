@@ -89,7 +89,6 @@ class LessonPlan
      */
     private const PROMPT_USER_PERSONA_SINGLE = "
         Field to Regenerate: [CURRENT FIELD TITLE]
-        Current Value: [CURRENT FIELD BODY]
 
         Plan Type: [TEMPLATE TITLE]
         Title: [LESSON PLAN TITLE]
@@ -349,13 +348,11 @@ class LessonPlan
 
             $userContent = strtr($userContent, [
                 '[CURRENT FIELD TITLE]' => $currentField['title'],
-                '[CURRENT FIELD BODY]' => $currentField['body'],
                 '[OTHER FIELDS]' => $otherFieldsInfo
             ]);
         } else {
             $userContent = strtr($userContent, [
                 '[CURRENT FIELD TITLE]' => '',
-                '[CURRENT FIELD BODY]' => '',
                 '[OTHER FIELDS]' => ''
             ]);
         }
