@@ -389,9 +389,10 @@ HELP;
                             $fields[$index]['deleted_at'] = null;
 
                             $this->getLogger()->debug(sprintf(
-                                'Updating existing field "%s" (id: %s) in template id %s',
+                                'Updating existing field "%s" (id: %s) in template "%s" (id: %s)',
                                 $struct['title'],
                                 $struct['id'],
+                                $template['title'],
                                 $templateId
                             ));
 
