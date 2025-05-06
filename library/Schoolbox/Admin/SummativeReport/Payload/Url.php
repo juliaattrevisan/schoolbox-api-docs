@@ -231,6 +231,37 @@ class Url
                         continue;
                     }
 
+                    /* Need this to fetch the Govt. Student Number and slap it onto summative reports
+                     * Your connector might not supply this, so could be entirely null for all we know
+                     */
+                    $govtStudentNumber = null;
+
+                    if ('' !== trim((string)$student->getExternalId())) {
+                        $externalUser = (new \External_User())->getStudent($student->getExternalId());
+                        $govtStudentNumber = $externalUser['StudentGovernmentStudentNumber'] ?? null;
+                    }
+
+                    $footer = $tokenReplacer->replace(
+                        $report->getFooter(),
+                        [
+                            '[firstname]'        => \Scrub::text($student->getFirstname() ?: 'unknown'),
+                            '[surname]'          => \Scrub::text($student->getLastname() ?: 'unknown'),
+                            '[externalId]'       => \Scrub::text($student->getExternalId() ?: 'unknown'),
+                            '[year]'             => \Scrub::text($student->getYear()?->getName() ?: 'unknown'),
+                            //yes getGivenName returns the firstname if the preferred name is not set. but it says it can also return null... I don't trust this. so null coalesce
+                            '[preferredname]'    => \Scrub::text($student->getGivenName() ?: 'unknown'),
+                            '[fullname]'         => \Scrub::text($student->getFullName() ?: 'unknown'),
+                            '[title]'            => \Scrub::text($student->getTitle() ?: 'unknown'),
+                            '[they]'             => \Scrub::text($student->getPronoun()?->getSubjective() ?: Model::SUBJECTIVE_DEFAULT),
+                            '[They]'             => \Scrub::text(ucfirst($student->getPronoun()?->getSubjective() ?: Model::SUBJECTIVE_DEFAULT)),
+                            '[them]'             => \Scrub::text($student->getPronoun()?->getObjective() ?: Model::OBJECTIVE_DEFAULT),
+                            '[Them]'             => \Scrub::text(ucfirst($student->getPronoun()?->getObjective() ?: Model::OBJECTIVE_DEFAULT)),
+                            '[theirs]'           => \Scrub::text($student->getPronoun()?->getPossessive() ?: Model::POSSESSIVE_DEFAULT),
+                            '[Theirs]'           => \Scrub::text(ucfirst($student->getPronoun()?->getPossessive() ?: Model::POSSESSIVE_DEFAULT)),
+                            '[govstudentnumber]' => \Scrub::text($govtStudentNumber ?: 'unknown'),
+                        ]
+                    );
+
                     /* Assemble paths/hierarchy in the zip
                      *
                      * The zip file contains the student's externalId as a folder
@@ -240,6 +271,7 @@ class Url
                     $reportConfig = [
                         'filename' => sprintf("%s.pdf", $filename),
                         'url' => (string)$urlBase->withPath($reportPath),
+                        'footer' => $footer,
                     ];
 
                     $reportConfigs[] = $reportConfig;
