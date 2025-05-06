@@ -373,20 +373,16 @@ HELP;
                     foreach ($updatedFields as $title => $updatedField) {
                         $this->refreshLock($lock);
 
-                        /* Apparently...this is required...for some reason
-                         */
-                        $index = (string)$title;
-
                         /* Precompute visibility
                          */
                         $visibility = (int)$updatedField[3] ? Role::STUDENT : Role::STAFF;
 
-                        if (isset($fields[$index])) {
-                            $struct = $fields[$index];
+                        if (isset($fields[$title])) {
+                            $struct = $fields[$title];
 
                             /* Keep this, because we're reusing it
                              */
-                            $fields[$index]['deleted_at'] = null;
+                            $fields[$title]['deleted_at'] = null;
 
                             $this->getLogger()->debug(sprintf(
                                 'Updating existing field "%s" (id: %s) in template "%s" (id: %s)',

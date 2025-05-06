@@ -161,15 +161,11 @@ HELP;
                     foreach ($updatedFields as $fieldTitle => $updatedField) {
                         $this->refreshLock($lock);
 
-                        /* Apparently...this is required...for some reason
-                         */
-                        $index = (string)$fieldTitle;
-
                         /* We only update fields that exist: we never delete them, nor do we spawn new fields;
                          * also, we only update field descriptions. Their titles, bodies etc. all remain the same.
                          */
-                        if (isset($fields[$index])) {
-                            $struct = $fields[$index];
+                        if (isset($fields[$fieldTitle])) {
+                            $struct = $fields[$fieldTitle];
 
                             $this->getLogger()->debug(sprintf(
                                 'Updating existing field "%s" (id: %s) in template "%s" (id: %s)',
