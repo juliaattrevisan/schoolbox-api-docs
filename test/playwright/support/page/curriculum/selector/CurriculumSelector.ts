@@ -21,8 +21,6 @@ export default class CurriculumSelector {
 
     static readonly DATA_TEST_MODAL_UNIT_NODE_CHECKBOX_LABEL = "cs-modal-unit-node-checkbox-label-";
 
-    static readonly DATA_TEST_MODAL_NODE_VIEW_LABEL = "cs-modal-view-node-checkbox-label-";
-
     static readonly DATA_TEST_MODAL_SAVE_BUTTON = "cs-modal-footer-save-button";
 
     static readonly DATA_TEST_SELECTED_NODES_CONTAINER = "cs-selected-nodes-container";

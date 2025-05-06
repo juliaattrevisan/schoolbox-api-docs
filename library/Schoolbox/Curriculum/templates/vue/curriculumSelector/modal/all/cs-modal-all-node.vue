@@ -117,11 +117,7 @@ const isViewing = window.Vue.computed(
 
 <template>
     <li ref="viewNodeEl">
-        <div
-            :class="`buttons-container`"
-            :data-is-inactive="isViewingAnother"
-            :data-test="`cs-modal-view-node-checkbox-label-${props.node.id}`"
-        >
+        <div :class="`buttons-container`" :data-is-inactive="isViewingAnother">
             <cs-modal-all-node-radio v-if="modalStore.isSingleSelect" :node="props.node" />
             <cs-modal-all-node-checkbox v-else :node="props.node" />
             <cs-modal-all-node-name :node="props.node" :depth="props.depth" :title="title" :is-active="isViewing" />
