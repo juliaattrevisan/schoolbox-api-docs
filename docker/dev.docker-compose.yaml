@@ -26,10 +26,11 @@ services:
     build:
       context: ./schoolbox-nginx
       dockerfile: dev-image.Dockerfile
+      args:
+        SERVER_NAME: schoolbox-nginx.docker.localhost
     volumes:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
-      - schoolbox-nginx-config:/etc/nginx/sites-enabled
       - schoolbox-config:/etc/schoolbox
     # After building: create data dirs, and make mount writable by www-data
     # Cannot currently use create-data-dirs.sh, as /bin/bash isn't available,
