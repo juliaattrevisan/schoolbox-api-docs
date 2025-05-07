@@ -86,12 +86,21 @@ class Controller extends Base
             WHERE deleted_at IS NULL";
         $activeFolderCodes = $this->folderCodeMapper->getDatabase()->executeQuery($activeFolderCodesQuery)->fetchColumnArray('code');
 
-
+        /**
+         * filter out folders that have:
+         * * folder codes that are in use
+         * * parent folders that are deleted
+         *
+         * this is a single filter, to try and reduce complexity
+         */
         $deletedFolders = $deletedFolders->filter(function (Folder $folderNode) use ($activeFolderCodes, $deletedFolderCodes) {
+
             // get the codes for this folder
             $folderCodes = $deletedFolderCodes->filter(function (FolderCode $folderCodesNode) use ($folderNode) {
                 return $folderCodesNode->getFolder()->getId() === $folderNode->getId();
             });
+
+            // complete the filter checks, all MUST be true
             return
                 // if the folder codes are already in use, we can't restore it
                 count(array_intersect($folderCodes->getPropertyValues('code'), $activeFolderCodes)) === 0
