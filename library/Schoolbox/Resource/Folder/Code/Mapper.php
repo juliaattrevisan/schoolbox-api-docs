@@ -134,7 +134,7 @@ class Mapper extends \Schoolbox\Mapper
      * @return true
      * @throws \Exception
      */
-    public function validateCodes(Model $model)
+    protected function validateCodes(Model $model)
     {
         if ($model->getCode() === null) {
             return true;
