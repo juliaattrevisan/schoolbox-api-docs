@@ -244,21 +244,15 @@ class Url
                     $footer = $tokenReplacer->replace(
                         $report->getFooter(),
                         [
-                            '[firstname]'        => \Scrub::text($student->getFirstname() ?: 'unknown'),
-                            '[surname]'          => \Scrub::text($student->getLastname() ?: 'unknown'),
-                            '[externalId]'       => \Scrub::text($student->getExternalId() ?: 'unknown'),
-                            '[year]'             => \Scrub::text($student->getYear()?->getName() ?: 'unknown'),
+                            '[firstname]'        => \Scrub::text($student->getFirstname() ?: ''),
+                            '[surname]'          => \Scrub::text($student->getLastname() ?: ''),
+                            '[externalId]'       => \Scrub::text($student->getExternalId() ?: ''),
+                            '[year]'             => \Scrub::text($student->getYear()?->getName() ?: ''),
                             //yes getGivenName returns the firstname if the preferred name is not set. but it says it can also return null... I don't trust this. so null coalesce
-                            '[preferredname]'    => \Scrub::text($student->getGivenName() ?: 'unknown'),
-                            '[fullname]'         => \Scrub::text($student->getFullName() ?: 'unknown'),
-                            '[title]'            => \Scrub::text($student->getTitle() ?: 'unknown'),
-                            '[they]'             => \Scrub::text($student->getPronoun()?->getSubjective() ?: Model::SUBJECTIVE_DEFAULT),
-                            '[They]'             => \Scrub::text(ucfirst($student->getPronoun()?->getSubjective() ?: Model::SUBJECTIVE_DEFAULT)),
-                            '[them]'             => \Scrub::text($student->getPronoun()?->getObjective() ?: Model::OBJECTIVE_DEFAULT),
-                            '[Them]'             => \Scrub::text(ucfirst($student->getPronoun()?->getObjective() ?: Model::OBJECTIVE_DEFAULT)),
-                            '[theirs]'           => \Scrub::text($student->getPronoun()?->getPossessive() ?: Model::POSSESSIVE_DEFAULT),
-                            '[Theirs]'           => \Scrub::text(ucfirst($student->getPronoun()?->getPossessive() ?: Model::POSSESSIVE_DEFAULT)),
-                            '[govstudentnumber]' => \Scrub::text($govtStudentNumber ?: 'unknown'),
+                            '[preferredname]'    => \Scrub::text($student->getGivenName() ?: ''),
+                            '[fullname]'         => \Scrub::text($student->getFullName() ?: ''),
+                            '[title]'            => \Scrub::text($student->getTitle() ?: ''),
+                            '[govstudentnumber]' => \Scrub::text($govtStudentNumber ?: ''),
                         ]
                     );
 
