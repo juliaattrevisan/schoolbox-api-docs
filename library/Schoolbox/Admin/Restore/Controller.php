@@ -100,6 +100,9 @@ class Controller extends Base
                 return $folderCodesNode->getFolder()->getId() === $folderNode->getId();
             });
 
+            // deleted codes, need us to set the code so we can display it
+            $folderNode->setCodes($folderCodes);
+
             // complete the filter checks, all MUST be true
             return
                 // if the folder codes are already in use, we can't restore it
