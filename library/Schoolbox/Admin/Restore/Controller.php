@@ -371,9 +371,10 @@ class Controller extends Base
     {
         // if the parent is not in the cache, fetch it
         if (!isset($this->folderParent[$id])) {
-            try{
+            try {
                 $this->folderParent[$id] = $this->folderMapper->findById($id);
             } catch (Mapper\Exception\Deleted $e) {
+                // we still need the deleted parent...
                 $this->folderParent[$id] = $e->getDeletedObject();
             }
         }
