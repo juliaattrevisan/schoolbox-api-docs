@@ -219,7 +219,6 @@ test.describe("Due Work - Mark type tests", () => {
 
         const homepage = new Homepage(page);
         const feedbackForm = new FeedbackForm(tester, page);
-        const submitForm = new SubmitForm(tester, page);
         const statusPage = new StatusPage(tester, page);
 
         await tester.impersonateViaUserProfilePage(instructor);
@@ -279,7 +278,7 @@ test.describe("Due Work - Mark type tests", () => {
             await feedbackForm.expectSelfAssessmentMark("75 %");
 
             await feedbackForm.setComment("test", learnerId);
-            await submitForm.submit();
+            await feedbackForm.publish();
         });
 
         await test.step("Mark the third due work (via inline grader)", async () => {
@@ -298,6 +297,107 @@ test.describe("Due Work - Mark type tests", () => {
 
             // Displey mark type should be used for the self assessment mark (none)
             await feedbackForm.expectNoSelfAssessmentMark();
+
+            await feedbackForm.setComment("test", learnerId);
+            await feedbackForm.publish();
+        });
+    });
+
+    /**
+     * (Step 4) - Submission history
+     */
+    test("Submission history", async ({ tester, page }) => {
+        if (classLink === null) throw new Error("classLink is null");
+        if (newUnitId === null) throw new Error("newUnitId is null");
+
+        const homepage = new Homepage(page);
+        const statusPage = new StatusPage(tester, page);
+
+        await tester.impersonateViaUserProfilePage(instructor);
+
+        /**
+         * @param activityName - The name of the activity to find
+         */
+        async function viewStatusForActivity(activityName: string): Promise<void> {
+            if (classLink === null) throw new Error("classLink is null");
+
+            // Find the course outline and the unit we created inside it
+            tester.isGoingTo("find the unit in the course outline");
+            await page.goto(classLink);
+            const courseOutline = homepage.locateComponentByName("Course Outline");
+            const courseOutlineUnit = courseOutline.locator(`li[data-unit="${newUnitId}"]`);
+
+            const activities = courseOutlineUnit.locator("li[data-unit-assessment]");
+            await expect(activities).toHaveCount(3);
+
+            tester.isGoingTo("click to view the status of the activity");
+            const activity = activities.filter({ hasText: activityName });
+            const activityId = await activity.getAttribute("data-unit-assessment");
+            const courseOutlineId = await courseOutline.getAttribute("id");
+            await activity.getByTestId(`sbx-pop-out-${courseOutlineId}-options-task${activityId}-button`).click();
+
+            await activity.locator("[data-dropdown-content] a.icon-progress").click();
+        }
+
+        await test.step("Check submission history for the first due work", async () => {
+            await viewStatusForActivity(dueWorkName1);
+
+            await statusPage.clickParticipantJellyTot(learnerId);
+            await statusPage.clickSubmissionHistory(learnerId);
+
+            // Display mark type should be used (letter grade)
+            const summary = page.getByTestId("assessment-feedback-summary");
+            const mainMark = summary.getByTestId("assessment-feedback-mark");
+
+            await expect(mainMark).toHaveText("B+");
+
+            // we submitted this via the status page, so there'll be two independent submission history items
+            const submissionHistory = page.getByTestId("assessment-submission-history");
+            await expect(submissionHistory).toHaveCount(2);
+
+            const submissionHistory1Mark = submissionHistory.first().getByTestId("assessment-feedback-mark");
+            const submissionHistory2Mark = submissionHistory.last().getByTestId("assessment-feedback-mark");
+
+            await expect(submissionHistory1Mark).toHaveText("B+"); // The final mark
+            await expect(submissionHistory2Mark).toHaveText("B+"); // The self-assessment mark
+        });
+
+        await test.step("Check submission history for the second due work", async () => {
+            await viewStatusForActivity(dueWorkName2);
+
+            await statusPage.clickParticipantJellyTot(learnerId);
+            await statusPage.clickSubmissionHistory(learnerId);
+
+            // Display mark type should be used (percentage)
+            const summary = page.getByTestId("assessment-feedback-summary");
+            const mainMark = summary.getByTestId("assessment-feedback-mark");
+
+            await expect(mainMark).toHaveText("50 %");
+
+            const submissionHistory = page.getByTestId("assessment-submission-history");
+            const submissionHistoryMarks = submissionHistory.getByTestId("assessment-feedback-mark");
+
+            await expect(submissionHistoryMarks).toHaveCount(2);
+            await expect(submissionHistoryMarks.first()).toHaveText("75 %"); // The self-assessment mark
+            await expect(submissionHistoryMarks.last()).toHaveText("50 %"); // The final mark
+        });
+
+        await test.step("Check submission history for the third due work", async () => {
+            await viewStatusForActivity(dueWorkName3);
+
+            await statusPage.clickParticipantJellyTot(learnerId);
+            await statusPage.clickSubmissionHistory(learnerId);
+
+            // Display mark type should be used (none)
+            const summary = page.getByTestId("assessment-feedback-summary");
+            const mainMark = summary.getByTestId("assessment-feedback-mark");
+
+            await expect(mainMark).not.toBeVisible();
+
+            const submissionHistory = page.getByTestId("assessment-submission-history");
+            const submissionHistoryMarks = submissionHistory.getByTestId("assessment-feedback-mark");
+
+            await expect(submissionHistoryMarks).toHaveCount(0);
         });
     });
 });
