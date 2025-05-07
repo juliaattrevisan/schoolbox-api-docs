@@ -48,6 +48,8 @@ class Controller extends Base
      */
     public const RESTORE_WINDOW = '120';
 
+    private array $folderParent = [];
+
     /**
      * Main Restore page
      *
@@ -95,8 +97,12 @@ class Controller extends Base
                 count(array_intersect($folderCodes->getPropertyValues('code'), $activeFolderCodes)) === 0
                 &&
                 // Filter folders where the parent is deleted, these cannot be restored
-                !$folderNode->getParent()->isDeleted();
+                // due to hydration issues, we need to fetch the parent
+                !$this->getParent($folderNode->getParent()->getId())->isDeleted();
         });
+
+        // we don't need the folder caches any more, clear them to help with memory
+        unset($this->folderParent, $activeFolderCodes, $deletedFolderCodes);
 
         // Assessments
         $assessmentpb = $this->assessmentMapper->getPredicateBuilder();
@@ -339,5 +345,27 @@ class Controller extends Base
 
         $db->commit();
         $this->response = $this->responseAsJson(['success' => true]);
+    }
+
+    /**
+     * Due to folders are hydrated, they may not get the parent's deleted check correct, lets do that here...
+     * whilst caching records
+     *
+     * @param int $id
+     * @return \Schoolbox\ISoftDeletable|Folder
+     * @throws Mapper\Exception
+     */
+    private function getParent(int $id)
+    {
+        // if the parent is not in the cache, fetch it
+        if (!isset($this->folderParent[$id])) {
+            try{
+                $this->folderParent[$id] = $this->folderMapper->findById($id);
+            } catch (Mapper\Exception\Deleted $e) {
+                $this->folderParent[$id] = $e->getDeletedObject();
+            }
+        }
+        // return the hydrated parent
+        return $this->folderParent[$id];
     }
 }
