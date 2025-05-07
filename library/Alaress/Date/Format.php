@@ -1778,6 +1778,15 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
         return $this->getUsingFormat('Hi') == '2359';
     }
 
+    /**
+     * Is today the birthday?
+     *
+     * @return bool
+     */
+    public function isBirthday(): bool
+    {
+        return $this->getDateTimeObject()->isBirthday();
+    }
 
     /**
      * Takes the input date, converts it to UTC first,

@@ -10,6 +10,14 @@ import BsCard from "./bs-card.vue";
 const modalEl = window.Vue.ref<InstanceType<typeof RevealModal> | null>(null);
 const isModalActive = window.Vue.ref(false); /*  */
 
+interface Props {
+    userId?: number;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    userId: 0,
+});
+
 /**
  * To display the birthday modal
  */
@@ -17,7 +25,11 @@ function onNotificationSelected(): void {
     isModalActive.value = true;
     if (modalEl.value === null) return; // no modal yet
     modalEl.value.open();
+    const utc = new Date();
+    // Set the expiration to the end of the day, so it will only check it once a day
+    utc.setUTCHours(23, 59, 59, 999);
     // update the local storage to prevent the modal from showing again
+    document.cookie = `birthdayCelebrated_${props.userId}=1; expires=${utc.toUTCString()}; path=/`;
 }
 </script>
 

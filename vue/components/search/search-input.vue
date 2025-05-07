@@ -117,7 +117,7 @@ function onMouseOut(event: MouseEvent): void {
 </script>
 
 <template>
-    <div class="c-search-input">
+    <div id="header-search-input" class="c-search-input">
         <input
             id="search-field"
             ref="inputElement"
@@ -154,7 +154,7 @@ function onMouseOut(event: MouseEvent): void {
 <style lang="scss">
 .c-search-input {
     display: grid;
-    grid-template-columns: 1fr 5rem;
+    grid-template-columns: 1fr 4.5rem;
 
     input[type="text"].c-search-input__field {
         border: 2px solid var(--form-border-color);

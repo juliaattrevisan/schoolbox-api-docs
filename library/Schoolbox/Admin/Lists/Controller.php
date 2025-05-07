@@ -1522,6 +1522,15 @@ class Controller extends Base
                 ];
         }
 
+        $return['year-levels']['fields']['birthdayCelebrationEnabled'] = [
+            'caption'    => 'Birthday Celebration Enabled',
+            'tooltip'    => 'If toggled \'ON\', displays a celebration on the users\' Birthday.',
+            'checkbox'   => true,
+            'mandatory'  => true,
+            'default'    => false,
+            'popOutList' => 'displayOptions',
+        ];
+
         $return['evidence-tag'] = [
             'title'             => 'Learning Moments',
             'mapper'            => LearningMomentEvidenceTag::class,
