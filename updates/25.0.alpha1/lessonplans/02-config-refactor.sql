@@ -26,6 +26,9 @@ LIMIT 1;
 -- gippity 3.5 is no longer allowed
 
 UPDATE config
-SET options='gpt-4:gpt-4o:gpt-4o-mini:gpt-4-turbo'
+SET options='gpt-4o:gpt-4o-mini:gpt-4.1:gpt-4.1-mini'
 WHERE `name` = 'openai_model'
 LIMIT 1;
+
+
+UPDATE config SET value = 'gpt-4.1-mini' WHERE `name` = 'openai_model' AND value IN('gpt-3.5-turbo', 'gpt-4', 'gpt-4-turbo') LIMIT 1;
