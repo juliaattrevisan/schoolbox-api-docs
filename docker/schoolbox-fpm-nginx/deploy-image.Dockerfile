@@ -36,8 +36,15 @@ COPY --from=build /usr/local/etc/php/conf.d/ /usr/local/etc/php/conf.d/
 # Write config
 RUN rm /etc/nginx/sites-enabled/*.conf
 COPY ./config/schoolbox.conf /etc/nginx/sites-enabled/schoolbox.conf
-RUN mkdir -p /etc/nginx/sites-enabled/schoolbox.d/ && \
-    echo "server_name ${SERVER_NAME};" > /etc/nginx/sites-enabled/schoolbox.d/server_name.conf
+
+# Write server_name only if there is one: otherwise write nothing
+RUN <<EOF
+mkdir -p /etc/nginx/sites-enabled/schoolbox.d/
+if [[ "${SERVER_NAME}" = "" ]]
+    then echo ""
+    else echo "server_name ${SERVER_NAME};"
+fi > /etc/nginx/sites-enabled/schoolbox.d/server_name.conf
+EOF
 
 EXPOSE 80 443
 
