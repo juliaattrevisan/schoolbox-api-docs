@@ -31,4 +31,4 @@ WHERE `name` = 'openai_model'
 LIMIT 1;
 
 
-UPDATE config SET value = 'gpt-4.1-mini' WHERE value IN('gpt-3.5-turbo', 'gpt-4', 'gpt-4-turbo');
+UPDATE config SET value = 'gpt-4.1-mini' WHERE `name` = 'openai_model' AND value IN('gpt-3.5-turbo', 'gpt-4', 'gpt-4-turbo') LIMIT 1;
