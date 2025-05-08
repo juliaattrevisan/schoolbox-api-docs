@@ -140,4 +140,13 @@ export default class ProfilePage {
         const tabLocator = this.page.locator(ProfilePage.SELECTOR_PROFILE_TAB.replace("{tabName}", tabName));
         await expect(tabLocator).not.toBeVisible();
     }
+
+    /**
+     * Verify if a specified image is presented on profile page
+     * @param userId - The user id to check (e.g., "0", "22")
+     */
+    async checkImagePresence(userId: string | number): Promise<void> {
+        const imageSrc = await this.page.locator("img.full-width").getAttribute("src");
+        expect(imageSrc).toContain(`id=${userId}`);
+    }
 }
