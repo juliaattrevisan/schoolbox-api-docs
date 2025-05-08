@@ -100,72 +100,119 @@ import { includeChildren, getOnlyEnabled } from "../nodeUtils";
 describe("getOnlyEnabled()", () => {
     test("check top level nodes", () => {
         const nodes = [
-            { id: 1, name: "Node 1", children: null, enabled: true },
-            { id: 2, name: "Node 2", children: null, enabled: false },
-            { id: 3, name: "Node 3", children: null, enabled: true },
+            { id: 1, name: "Node 1", enabled: true, children: null },
+            { id: 2, name: "Node 2", enabled: false, children: null },
+            { id: 3, name: "Node 3", enabled: true, children: null },
         ];
         const onlyEnabledNodes = getOnlyEnabled(nodes);
         expect(onlyEnabledNodes).toHaveLength(2);
     });
     test("removes children not enabled", () => {
         const nodes = [
-            { id: 1, name: "Node 1", children: null, enabled: true },
+            { id: 1, name: "Node 1", enabled: true, children: null },
             {
                 id: 2,
                 name: "Node 2",
-                code: "C2",
                 enabled: true,
                 children: [
-                    { id: 4, name: "Node Child 2.1", code: "C2.1", children: null, enabled: true },
-                    { id: 5, name: "Node Child 2.2", code: "C2.2", children: null, enabled: false },
+                    { id: 4, name: "Node Child 2.1", code: "C2.1", enabled: true, children: null },
+                    { id: 5, name: "Node Child 2.2", code: "C2.2", enabled: false, children: null },
                 ],
             },
-            { id: 3, name: "Node 3", enabled: true },
+            { id: 3, name: "Node 3", enabled: true, children: null },
         ];
         const onlyEnabledNodes = getOnlyEnabled(nodes);
         expect(onlyEnabledNodes[1].children).toHaveLength(1);
     });
     test("removes deeper children not enabled", () => {
         const nodes = [
-            { id: 1, name: "Node 1", children: null, enabled: true },
+            { id: 1, name: "Node 1", enabled: true, children: null },
             {
                 id: 2,
                 name: "Node 2",
-                code: "C2",
                 enabled: true,
                 children: [
-                    { id: 4, name: "Node Child 2.1", code: "C2.1", enabled: true },
+                    { id: 4, name: "Node Child 2.1", code: "C2.1", enabled: true, children: null },
                     {
                         id: 5,
                         name: "Node Child 2.2",
                         code: "C2.2",
                         enabled: true,
                         children: [
-                            { id: 7, name: "Node Child 2.2.1", code: "C2.2.1", children: null, enabled: false },
-                            { id: 8, name: "Node Child 2.2.2", code: "C2.2.2", children: null, enabled: true },
+                            {
+                                id: 7,
+                                name: "Node Child 2.2.1",
+                                code: "C2.2.1",
+                                enabled: false,
+                                children: null,
+                            },
+                            {
+                                id: 8,
+                                name: "Node Child 2.2.2",
+                                code: "C2.2.2",
+                                enabled: true,
+                                children: null,
+                            },
                         ],
                     },
                 ],
             },
-            { id: 3, name: "Node 3", children: null, enabled: true },
+            { id: 3, name: "Node 3", enabled: true, children: null },
         ];
         const onlyEnabledNodes = getOnlyEnabled(nodes);
         expect(onlyEnabledNodes[1].children[1].children).toHaveLength(1);
     });
     test("remove nodes if no children with codes are enabled", () => {
         const nodes = [
-            { id: 1, name: "Node 1", children: null, enabled: true },
+            { id: 1, name: "Node 1", enabled: true, children: null },
             {
                 id: 2,
                 name: "Node 2",
                 code: "C2",
                 enabled: true,
                 children: [
-                    { id: 4, name: "Node Child 2.1", code: "C2.1", children: null, enabled: false },
-                    { id: 5, name: "Node Child 2.2", code: "C2.2", children: null, enabled: false },
+                    { id: 4, name: "Node Child 2.1", code: "C2.1", enabled: false, children: null },
+                    { id: 5, name: "Node Child 2.2", code: "C2.2", enabled: false, children: null },
                 ],
             },
-            { id: 3, name: "Node 3", children: null, enabled: true },
+            { id: 3, name: "Node 3", enabled: true, children: null },
+        ];
+        const onlyEnabledNodes = getOnlyEnabled(nodes);
+        expect(onlyEnabledNodes).toHaveLength(2);
+    });
+    test("remove deeper nodes if no children with codes are enabled", () => {
+        const nodes = [
+            { id: 1, name: "Node 1", enabled: true, children: null },
+            {
+                id: 2,
+                name: "Node 2",
+                enabled: true,
+                children: [
+                    { id: 4, name: "Node Child 2.1", enabled: false, children: null },
+                    {
+                        id: 5,
+                        name: "Node Child 2.2",
+                        enabled: true,
+                        children: [
+                            {
+                                id: 7,
+                                name: "Node Child 2.2.1",
+                                code: "C2.2.1",
+                                enabled: false,
+                                children: null,
+                            },
+                            {
+                                id: 8,
+                                name: "Node Child 2.2.2",
+                                code: "C2.2.2",
+                                enabled: false,
+                                children: null,
+                            },
+                        ],
+                    },
+                ],
+            },
+            { id: 3, name: "Node 3", enabled: true, children: null },
         ];
         const onlyEnabledNodes = getOnlyEnabled(nodes);
         expect(onlyEnabledNodes).toHaveLength(2);
