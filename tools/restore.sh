@@ -28,7 +28,7 @@ readonly PRESERVED_CONFIG=(
   "redis_ephemeral_url" "redis_url" "taskd_redis_url"
 
   # External DB Config
-  "external_db_host" "external_db_user" "external_db_passwd" "external_db_db" "external_portal"
+  "external_db_host" "external_db_user" "external_db_passwd" "external_db_db" "external_portal" "external_db_encryption"
 
   # SAML Config
   "saml_sso_url" "saml_idp_metadata_url" "saml_enabled" "saml_slo_enabled" "saml_slo_url" "saml_logout_url" "saml_private_cert" "saml_public_cert" "saml_idp_certificate" "saml_entityid" "saml_sp_entityid"
@@ -53,6 +53,12 @@ readonly PRESERVED_CONFIG=(
 
   # Paperly
   "paperly_iframe_api_host" "paperly_iframe_api_key" "paperly_agent_ip_whitelist" "paperly_agent_secret" "paperly_agent_external_db_host_override" "paperly_agent_external_db_user_override" "paperly_agent_external_db_password_override" "paperly_agent_external_db_name_override" "paperly_open_in_new_tab"
+
+  # Cloudwork
+  "cloudwork_oauth_identity_provider" "cloudwork_oauth_client_id" "cloudwork_oauth_client_secret" "cloudwork_oauth_identifying_claims"
+
+  # Other OAuth
+  "oauth_issuer" "oauth_enable_sso" "oauth_response_type" "oauth_scopes"
 
   # Others
   "xml_dir" "file_dir" "api_key" "schooldata_import_frequency" "maintenance_mode"
