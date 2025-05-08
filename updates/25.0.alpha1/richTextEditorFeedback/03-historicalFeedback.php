@@ -35,7 +35,9 @@ $app = new class extends CliTool\App {
                     `" . $columns['id'] . "` as id,
                     `_" . $columns['comment'] . "` as comment
                 FROM `$table`
-                WHERE `_" . $columns['comment'] . "` IS NOT NULL"
+                WHERE
+                    `_" . $columns['comment'] . "` IS NOT NULL AND
+                    `_" . $columns['comment'] . "` != ''"
             );
 
             if ($comments->rowCount() === 0) {
