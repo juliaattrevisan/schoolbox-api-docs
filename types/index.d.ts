@@ -86,6 +86,10 @@ declare global {
          */
         alaressDateTimePicker(): JQuery;
         collapsable(): JQuery;
+        /**
+         * From jquery-validation
+         */
+        valid(): boolean;
     }
 
     // Fix types when importing .vue files and using with window.Vue.createApp

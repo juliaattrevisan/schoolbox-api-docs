@@ -77,6 +77,17 @@ export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
      * @param fieldId - A specific field to generate for, prevents other fields from being selected
      */
     function openModal(fieldId?: LessonPlannerStoreField["id"]): void {
+        // is the form valid?
+        const form = document.querySelector(SELECTOR_LESSON_PLANNER_FORM);
+        if (!(form instanceof HTMLFormElement)) {
+            throw new Error(`Unable to find form for selector ${SELECTOR_LESSON_PLANNER_FORM}`);
+        }
+
+        if (!$(form).valid()) {
+            form.querySelector("input.error")?.scrollIntoView({ block: "center" });
+            return; // form is invalid, don't open the modal
+        }
+
         // deselect all fields, but intentionally keep additionalContext so it can be reused on the same page session
         generateForField.value = null;
         fields.value.forEach((field) => {
