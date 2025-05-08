@@ -97,6 +97,7 @@ function start_container () {
   docker run -d \
     --network host \
     --name "$LOCAL_CONTAINER_NAME" \
+    --volume $MOUNT_DIR_TASKD:/app \
     "${extra_args[@]}" \
     alaress/taskd:$IMAGE_TAG
 }
