@@ -30,7 +30,6 @@ export const useUnitNodesStore = defineStore("csUnitNodesStore", () => {
             if (response.ok) {
                 nodes.value = (await response.json()) as Node[];
                 nodes.value = getOnlyEnabled(nodes.value);
-                console.warn("Loaded nodes:", nodes.value);
                 if (nodes.value.length > 0) {
                     hasNodes.value = true;
                 }
