@@ -145,7 +145,7 @@ export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
             lessonPlanTitle,
             context: contextName.value,
             duration,
-            curriculumNodeIds: selectedNodesStore.nodesIds as number[],
+            curriculumNodeIds: selectedNodesStore.nodesIds,
             additionalContext: additionalContext.value,
             generateForField: generateForField.value?.id ?? null,
             fields: fields.value.map((f) => translateFieldForPayload(f, f.selected, generateForField.value)),
