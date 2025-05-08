@@ -15,6 +15,8 @@ export default class ProfilePage {
 
     static readonly SELECTOR_PROFILE_TAB = `a[href="#tab-{tabName}"]`;
 
+    static readonly DATA_TEST_PROFILE_BUTTONS = "profile-buttons";
+
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
@@ -34,7 +36,8 @@ export default class ProfilePage {
      * @param buttonName - The button name
      */
     async clickButton(buttonName: string): Promise<void> {
-        await this.page.click(`a.icon-${buttonName}`);
+        const buttons = this.page.getByTestId(ProfilePage.DATA_TEST_PROFILE_BUTTONS);
+        await buttons.locator("a").filter({ hasText: buttonName }).click();
     }
 
     /**

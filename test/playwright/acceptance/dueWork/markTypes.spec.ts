@@ -7,6 +7,8 @@ import StatusPage from "@schoolboxTest/playwright/support/page/dueWork/StatusPag
 import CourseModify from "@schoolboxTest/playwright/support/page/courses/CourseModify";
 import FeedbackForm from "@schoolboxTest/playwright/support/page/dueWork/FeedbackForm";
 import MarkbookPage from "@schoolboxTest/playwright/support/page/markbook/MarkbookPage";
+import ProfilePage from "@schoolboxTest/playwright/support/page/profilePage/ProfilePage";
+import GradesPage from "@schoolboxTest/playwright/support/page/grades/GradesPage";
 
 test.describe("Due Work - Mark type tests", () => {
     test.describe.configure({ mode: "serial" });
@@ -474,5 +476,64 @@ test.describe("Due Work - Mark type tests", () => {
             await markbook.validateDisplayMark(learnerId, assessmentId2, "50 %");
             await markbook.validateDisplayMark(learnerId, assessmentId3, "–");
         });
+    });
+
+    /**
+     * (Step 7) - Grades Page (as an instructor)
+     */
+    test("Grades Page (as an instructor)", async ({ tester, page }) => {
+        const profilePage = new ProfilePage(tester, page);
+        const gradesPage = new GradesPage(tester, page);
+
+        await tester.impersonateViaUserProfilePage(instructor);
+
+        tester.isGoingTo("navigate to the grades page for Jana Reed");
+        await tester.searchForUser(learner);
+        await profilePage.clickButton("Grade");
+
+        tester.isGoingTo("click the row for the relevant homepage (9A English)");
+        await gradesPage.clickSubject("9A English");
+
+        await gradesPage.expectGradesVisibility("instructor");
+
+        await test.step("Input Mark Type (initial load)", async () => {
+            await gradesPage.expectAssessmentMark(dueWorkName1, "75 %");
+            await gradesPage.expectAssessmentMark(dueWorkName2, "2 / 4");
+            await gradesPage.expectAssessmentMark(dueWorkName3, "50 %");
+        });
+
+        await test.step("Display Mark Type", async () => {
+            await gradesPage.viewStudentGrades();
+            await gradesPage.expectAssessmentMark(dueWorkName1, "B+");
+            await gradesPage.expectAssessmentMark(dueWorkName2, "50 %");
+            await gradesPage.expectAssessmentMark(dueWorkName3, null);
+        });
+
+        // Then re-check input mark type via the button
+        await test.step("Input Mark Type", async () => {
+            await gradesPage.viewInstructorGrades();
+            await gradesPage.expectAssessmentMark(dueWorkName1, "75 %");
+            await gradesPage.expectAssessmentMark(dueWorkName2, "2 / 4");
+            await gradesPage.expectAssessmentMark(dueWorkName3, "50 %");
+        });
+    });
+
+    /**
+     * (Step 8) - Grades Page (as a student)
+     */
+    test("Grades Page (as a student)", async ({ tester, page }) => {
+        const gradesPage = new GradesPage(tester, page);
+
+        await tester.impersonateViaUserProfilePage(learner);
+
+        tester.isGoingTo("navigate to the grades page for the current user");
+        await page.locator(".top-menu a").filter({ hasText: "Grades" }).click();
+
+        tester.isGoingTo("click the row for the relevant homepage (9A English)");
+        await gradesPage.clickSubject("9A English");
+
+        await gradesPage.expectAssessmentMark(dueWorkName1, "B+");
+        await gradesPage.expectAssessmentMark(dueWorkName2, "50 %");
+        await gradesPage.expectAssessmentMark(dueWorkName3, null);
     });
 });

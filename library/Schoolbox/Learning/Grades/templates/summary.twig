@@ -79,8 +79,8 @@
     <div class="small-12 island">
         <section>
             {% for folder in folders %}
-                <ul class="activity-list group">
-                    <li class="subject-group">
+                <ul class="activity-list group" data-test="grades-subject">
+                    <li class="subject-group" data-test="grades-subject-heading">
                         {% if term.id is not null %}
                             {# The supplied term matches a row in the schoolbox.term database table, so we can link to the getGradesForSubject() page for this term/subject. #}
                             <a href="{{ routeLookup('learningGrades.getGradesForSubject', {viewee: student, userId: student.id, term: term, termCode: term.code, subject: folder, subjectId: folder.id}) }}"
