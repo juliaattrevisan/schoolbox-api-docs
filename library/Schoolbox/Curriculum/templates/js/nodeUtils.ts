@@ -218,6 +218,31 @@ export function allChildrenDisabled(node: Node): boolean {
 }
 
 /**
+ * Get only enabled nodes
+ * @param nodes - the nodes to check
+ * @returns - all included, enabled children
+ */
+export function getOnlyEnabled(nodes: Node[]): Node[] {
+    if (nodes.length === 0) {
+        return [];
+    }
+    const enabledNodes = nodes.filter((node) => node.enabled); // only include enabled nodes and those with enabled children
+    enabledNodes.forEach((enabledNode) => {
+        if (enabledNode.children) {
+            enabledNode.children = getOnlyEnabled(enabledNode.children); // only include enabled children
+        }
+    });
+    // loop through the enabled nodes and if all children are disabled, remove from enabledNodes
+    enabledNodes.forEach((enabledNode) => {
+        if (enabledNode.children && allChildrenDisabled(enabledNode)) {
+            // if all children are disabled, remove the node from the enabled nodes
+            enabledNodes.splice(enabledNodes.indexOf(enabledNode), 1);
+        }
+    });
+    return enabledNodes;
+}
+
+/**
  * Recursively loop through the parents adding in a breadcrumb for each
  * @param node - the Node to traverse for breadcrumbs
  * @param currentBreadcrumbs - the current breadcrumbs
