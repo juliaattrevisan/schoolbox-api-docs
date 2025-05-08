@@ -84,6 +84,7 @@ export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
         }
 
         if (!$(form).valid()) {
+            form.querySelector("input.error")?.scrollIntoView({ block: "center" });
             return; // form is invalid, don't open the modal
         }
 
