@@ -93,12 +93,16 @@ export function translateFieldForPayload(
 
     /**
      * When (re)generating a single field on the create or modify page,
-     * - If this is the field being generated, this is left BLANK (i.e. the AI should generate a new body from scratch)
+     * - If this is the field being generated,
+     *     - If the field has been generated previously, this is left BLANK (i.e. the AI should generate a new body from scratch)
+     *     - If the field is being generated for the first time, the original template content is provided (CREATE page only)
      * - Otherwise, from all other fields, this should be the CURRENT body to use as additional context
      */
     if (generateForField) {
         if (field.id === generateForField.id) {
-            return { ...baseFieldData, body: null, template: null };
+            const fieldWasGenerated = field.body.trim() !== field.initialBody.trim() && field.body.trim().length > 0;
+            const includeTemplate = !fieldWasGenerated && field.lessonPlanTemplateField === undefined;
+            return { ...baseFieldData, body: null, template: includeTemplate ? field.initialBody : null };
         }
         return { ...baseFieldData, body: field.body, template: null };
     }
