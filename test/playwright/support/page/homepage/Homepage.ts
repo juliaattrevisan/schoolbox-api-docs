@@ -297,4 +297,11 @@ export default class Homepage {
             .getByTestId(`${Homepage.DATA_TEST_ASSESSMENT_COMPONENT_TOT_MENU_DELETE}${assessmentId}`)
             .click();
     }
+
+    /**
+     * Open the link menu for the homepage
+     */
+    async openLinkMenu(): Promise<void> {
+        await this.page.getByTestId(Homepage.DATA_TEST_LINK_MENU_BUTTON).click();
+    }
 }

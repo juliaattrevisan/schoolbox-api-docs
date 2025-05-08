@@ -6,6 +6,7 @@ import SubmitForm from "@schoolboxTest/playwright/support/page/dueWork/SubmitFor
 import StatusPage from "@schoolboxTest/playwright/support/page/dueWork/StatusPage";
 import CourseModify from "@schoolboxTest/playwright/support/page/courses/CourseModify";
 import FeedbackForm from "@schoolboxTest/playwright/support/page/dueWork/FeedbackForm";
+import MarkbookPage from "@schoolboxTest/playwright/support/page/markbook/MarkbookPage";
 
 test.describe("Due Work - Mark type tests", () => {
     test.describe.configure({ mode: "serial" });
@@ -398,6 +399,80 @@ test.describe("Due Work - Mark type tests", () => {
             const submissionHistoryMarks = submissionHistory.getByTestId("assessment-feedback-mark");
 
             await expect(submissionHistoryMarks).toHaveCount(0);
+        });
+    });
+
+    /**
+     * (Step 5) - Course Markbook (via course outline component)
+     */
+    test("Course Markbook", async ({ tester, page }) => {
+        if (classLink === null) throw new Error("classLink is null");
+
+        const homepage = new Homepage(page);
+        const markbook = new MarkbookPage(page);
+
+        await tester.impersonateViaUserProfilePage(instructor);
+
+        tester.isGoingTo("navigate to the course markbook page");
+        await page.goto(classLink);
+        const courseOutline = homepage.locateComponentByName("Course Outline");
+        const courseOutlineId = await courseOutline.getAttribute("id");
+        const courseOutlineUnit = courseOutline.locator("li[data-unit]").filter({ hasText: unitName });
+        newUnitId = Number(await courseOutlineUnit.getAttribute("data-unit"));
+        await courseOutlineUnit.getByTestId(`sbx-pop-out-${courseOutlineId}-unit-options${newUnitId}-button`).click();
+        await courseOutlineUnit.locator("[data-dropdown-content] a.icon-curriculum").click();
+
+        const assessmentId1 = await markbook.getAssessmentId(dueWorkName1);
+        const assessmentId2 = await markbook.getAssessmentId(dueWorkName2);
+        const assessmentId3 = await markbook.getAssessmentId(dueWorkName3);
+
+        await test.step("Input Mark Type", async () => {
+            await markbook.showInputMarks();
+            await markbook.validateInputMark(learnerId, assessmentId1, "75 %");
+            await markbook.validateInputMark(learnerId, assessmentId2, "2 / 4");
+            await markbook.validateInputMark(learnerId, assessmentId3, "50 %");
+        });
+
+        await test.step("Display Mark Type", async () => {
+            await markbook.showDisplayMarks();
+            await markbook.validateDisplayMark(learnerId, assessmentId1, "B+");
+            await markbook.validateDisplayMark(learnerId, assessmentId2, "50 %");
+            await markbook.validateDisplayMark(learnerId, assessmentId3, "–");
+        });
+    });
+
+    /**
+     * (Step 6) - Class Markbook
+     */
+    test("Class Markbook", async ({ tester, page }) => {
+        if (classLink === null) throw new Error("classLink is null");
+
+        const homepage = new Homepage(page);
+        const markbook = new MarkbookPage(page);
+
+        await tester.impersonateViaUserProfilePage(instructor);
+
+        tester.isGoingTo("navigate to the class markbook page");
+        await page.goto(classLink);
+        await homepage.openLinkMenu();
+        await page.locator("[data-dropdown-content] a.icon-curriculum").filter({ hasText: "Class Markbook" }).click();
+
+        const assessmentId1 = await markbook.getAssessmentId(dueWorkName1);
+        const assessmentId2 = await markbook.getAssessmentId(dueWorkName2);
+        const assessmentId3 = await markbook.getAssessmentId(dueWorkName3);
+
+        await test.step("Input Mark Type", async () => {
+            await markbook.showInputMarks();
+            await markbook.validateInputMark(learnerId, assessmentId1, "75 %");
+            await markbook.validateInputMark(learnerId, assessmentId2, "2 / 4");
+            await markbook.validateInputMark(learnerId, assessmentId3, "50 %");
+        });
+
+        await test.step("Display Mark Type", async () => {
+            await markbook.showDisplayMarks();
+            await markbook.validateDisplayMark(learnerId, assessmentId1, "B+");
+            await markbook.validateDisplayMark(learnerId, assessmentId2, "50 %");
+            await markbook.validateDisplayMark(learnerId, assessmentId3, "–");
         });
     });
 });
