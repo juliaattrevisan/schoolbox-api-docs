@@ -91,7 +91,10 @@ function start_container () {
     echo "[SB][$(date +%Y-%m-%d\ %X)] Restarting task daemon container with default configuration";
   fi
 
-  docker run -d --rm \
+  # Start the container, but don't delete it after it is shut down:
+  # this is so it can be reloaded without rebuilding to apply code changes.
+  # (Also, the code is mounted as a volume)
+  docker run -d \
     --network host \
     --name "$LOCAL_CONTAINER_NAME" \
     "${extra_args[@]}" \
