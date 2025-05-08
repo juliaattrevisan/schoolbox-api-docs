@@ -215,6 +215,7 @@ export function allChildrenDisabled(node: Node): boolean {
         return true;
     }
     return false;
+    // return node.children.every((child) => !child.enabled || (child.children && child.children.length === 0));
 }
 
 /**
@@ -222,24 +223,32 @@ export function allChildrenDisabled(node: Node): boolean {
  * @param nodes - the nodes to check
  * @returns - all included, enabled children
  */
-export function getOnlyEnabled(nodes: Node[]): Node[] {
-    if (nodes.length === 0) {
+export function getOnlyEnabled(nodes: Node[] | null): Node[] {
+    if (nodes === null) {
         return [];
     }
-    const enabledNodes = nodes.filter((node) => node.enabled); // only include enabled nodes and those with enabled children
-    enabledNodes.forEach((enabledNode) => {
-        if (enabledNode.children) {
-            enabledNode.children = getOnlyEnabled(enabledNode.children); // only include enabled children
-        }
-    });
-    // loop through the enabled nodes and if all children are disabled, remove from enabledNodes
-    enabledNodes.forEach((enabledNode) => {
-        if (enabledNode.children && allChildrenDisabled(enabledNode)) {
-            // if all children are disabled, remove the node from the enabled nodes
-            enabledNodes.splice(enabledNodes.indexOf(enabledNode), 1);
-        }
-    });
-    return enabledNodes;
+    return (
+        nodes
+            .filter((node) => node.enabled) // Filter to only nodes that are enabled
+            .map((node) => {
+                const hadChildren = Array.isArray(node.children) && node.children.length > 0;
+                const filteredChildren = hadChildren ? getOnlyEnabled(node.children) : null; // Recursively filter children (if any)
+                const newNode = {
+                    ...node,
+                    // Normalize children: if filteredChildren exists and has elements, use it; otherwise set children to null
+                    children: filteredChildren && filteredChildren.length > 0 ? filteredChildren : null,
+                };
+                return { node: newNode, hadChildren }; // Return a wrapper object that includes whether the node had children
+            })
+            // Filter out nodes that originally had children but now have none as no children are enabled
+            .filter(({ node, hadChildren }) => {
+                // Keep node if it didn't have children originally (e.g., it's a leaf),
+                // OR if it has children remaining after filtering
+                return !hadChildren || (node.children && node.children.length > 0);
+            })
+            // Extract just the cleaned node (discard the wrapper object including hadChildren)
+            .map(({ node }) => node)
+    );
 }
 
 /**
