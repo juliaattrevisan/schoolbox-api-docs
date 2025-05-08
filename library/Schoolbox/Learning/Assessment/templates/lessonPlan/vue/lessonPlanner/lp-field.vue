@@ -54,9 +54,12 @@ window.Vue.onMounted(async () => {
 
     currentField.editorId = `field-body-${props.fieldRef}`;
 
-    // @ts-expect-error -- To trigger the tooltip next to the field title to show up correctly
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- foundation isn't typed, see above
-    $(document).foundation("tooltip", "reflow");
+    // a setTimeout is needed here otherwise foundation throws a fit...
+    setTimeout(() => {
+        // @ts-expect-error -- To trigger the tooltip next to the field title to show up correctly
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- foundation isn't typed, see above
+        $(document).foundation("tooltip", "reflow");
+    }, 0);
 });
 </script>
 
