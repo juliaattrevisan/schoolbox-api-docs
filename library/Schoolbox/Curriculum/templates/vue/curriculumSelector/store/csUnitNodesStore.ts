@@ -3,6 +3,7 @@
  */
 
 import { defineStore } from "pinia";
+import { getOnlyEnabled } from "@schoolboxCurriculum/js/nodeUtils";
 import type { Node } from "@schoolboxCurriculum/types/Node";
 
 export const useUnitNodesStore = defineStore("csUnitNodesStore", () => {
@@ -28,6 +29,8 @@ export const useUnitNodesStore = defineStore("csUnitNodesStore", () => {
             );
             if (response.ok) {
                 nodes.value = (await response.json()) as Node[];
+                nodes.value = getOnlyEnabled(nodes.value);
+                console.warn("Loaded nodes:", nodes.value);
                 if (nodes.value.length > 0) {
                     hasNodes.value = true;
                 }
