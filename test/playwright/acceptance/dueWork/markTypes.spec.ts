@@ -9,6 +9,7 @@ import FeedbackForm from "@schoolboxTest/playwright/support/page/dueWork/Feedbac
 import MarkbookPage from "@schoolboxTest/playwright/support/page/markbook/MarkbookPage";
 import ProfilePage from "@schoolboxTest/playwright/support/page/profilePage/ProfilePage";
 import GradesPage from "@schoolboxTest/playwright/support/page/grades/GradesPage";
+import ActivityFeed from "@schoolboxTest/playwright/support/page/profilePage/ActivityFeed";
 
 test.describe("Due Work - Mark type tests", () => {
     test.describe.configure({ mode: "serial" });
@@ -553,5 +554,15 @@ test.describe("Due Work - Mark type tests", () => {
         await activityFeed.expectActivityFeedItemMark(dueWorkName1, "B+");
         await activityFeed.expectActivityFeedItemMark(dueWorkName2, "50 %");
         await activityFeed.expectActivityFeedItemMark(dueWorkName3, null);
+    });
+
+    test.afterAll(async ({ db }) => {
+        // Soft-delete data to not interfere with other tests
+        await db.updateInDatabase("folder", { deleted_at: "2022-01-15 11:12:34" }, { "name LIKE": "Test Unit %" });
+        await db.updateInDatabase(
+            "assessment",
+            { deleted_at: "2022-01-15 11:12:34" },
+            { "title LIKE": "Test Due Work %" },
+        );
     });
 });
