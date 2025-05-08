@@ -559,7 +559,22 @@ test.describe("Due Work - Mark type tests", () => {
 
     test.afterAll(async ({ db }) => {
         // Soft-delete data to not interfere with other tests
-        await db.updateInDatabase("folder", { deleted_at: "2022-01-15 11:12:34" }, { "name LIKE": "Test Unit %" });
+        const folderIds = await db.grabColumnFromDatabase("folder", "id", { "name LIKE": "Test Unit %" });
+        const courseUnitSpecIds = await db.grabColumnFromDatabase("course_unit_specification", "id", {
+            folder_id: folderIds,
+        });
+
+        await db.updateInDatabase("folder", { deleted_at: "2022-01-15 11:12:34" }, { id: folderIds });
+        await db.updateInDatabase(
+            "course_unit_specification",
+            { deleted_at: "2022-01-15 11:12:34" },
+            { folder_id: folderIds },
+        );
+        await db.updateInDatabase(
+            "course_unit_implementation",
+            { deleted_at: "2022-01-15 11:12:34" },
+            { course_unit_specification_id: courseUnitSpecIds },
+        );
         await db.updateInDatabase(
             "assessment",
             { deleted_at: "2022-01-15 11:12:34" },

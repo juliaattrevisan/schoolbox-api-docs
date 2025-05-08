@@ -2,7 +2,7 @@ import type { Pool, RowDataPacket, ResultSetHeader } from "mysql2/promise";
 import { createPool } from "mysql2/promise";
 
 export interface DataPairs {
-    [key: string]: string | number | boolean | null;
+    [key: string]: string | number | boolean | unknown[] | null;
 }
 
 export default class DatabaseHelper {
@@ -49,6 +49,9 @@ export default class DatabaseHelper {
                 if (value === "NOT NULL") {
                     return `${key} IS NOT NULL`;
                 }
+                if (Array.isArray(value)) {
+                    return `${key} IN (${value.map(() => "?").join(", ")})`;
+                }
                 // If key has a space, don't include = sign as we assume it's a custom assignment such as "column LIKE"
                 if (key.includes(" ")) return `${key} ?`;
                 return `${key} = ?`;
@@ -56,8 +59,19 @@ export default class DatabaseHelper {
             .join(" AND ");
         const whereClause = criteriaKeys.length > 0 ? `WHERE ${whereBinding}` : "";
 
-        // Remove NULL and NOT NULL values from the criteria values, as we override them in the where clause
-        const valuesBinding = criteriaValues.filter((value) => value !== null && value !== "NOT NULL");
+        const valuesBinding: unknown[] = [];
+        criteriaValues.forEach((value) => {
+            // Remove NULL and NOT NULL values from the criteria values, as we override them in the where clause
+            if (value === null || value === "NOT NULL") return;
+
+            // If the value is an array push each value into the valuesBinding array
+            if (Array.isArray(value)) {
+                valuesBinding.push(...value);
+                return;
+            }
+
+            valuesBinding.push(value);
+        });
 
         const [results] = await this.pool.execute<RowDataPacket[]>(
             `SELECT ${columns} FROM ${table} ${whereClause}`,
@@ -114,6 +128,9 @@ export default class DatabaseHelper {
                 if (value === "NOT NULL") {
                     return `${key} IS NOT NULL`;
                 }
+                if (Array.isArray(value)) {
+                    return `${key} IN (${value.map(() => "?").join(", ")})`;
+                }
                 // If key has a space, don't include = sign as we assume it's a custom assignment such as "column LIKE"
                 if (key.includes(" ")) return `${key} ?`;
                 return `${key} = ?`;
@@ -121,8 +138,19 @@ export default class DatabaseHelper {
             .join(" AND ");
         const whereClause = criteriaKeys.length > 0 ? `WHERE ${whereBinding}` : "";
 
-        // Remove NULL and NOT NULL values from the criteria values, as we override them in the where clause
-        const valuesBinding = criteriaValues.filter((value) => value !== null && value !== "NOT NULL");
+        const valuesBinding: unknown[] = [];
+        criteriaValues.forEach((value) => {
+            // Remove NULL and NOT NULL values from the criteria values, as we override them in the where clause
+            if (value === null || value === "NOT NULL") return;
+
+            // If the value is an array push each value into the valuesBinding array
+            if (Array.isArray(value)) {
+                valuesBinding.push(...value);
+                return;
+            }
+
+            valuesBinding.push(value);
+        });
 
         await this.pool.execute(`DELETE FROM ${table} ${whereClause}`, valuesBinding);
     }
@@ -144,14 +172,29 @@ export default class DatabaseHelper {
             if (value === "NOT NULL") {
                 return `${key} IS NOT NULL`;
             }
+            if (Array.isArray(value)) {
+                return `${key} IN (${value.map(() => "?").join(", ")})`;
+            }
             // If key has a space, don't include = sign as we assume it's a custom assignment such as "column LIKE"
             if (key.includes(" ")) return `${key} ?`;
             return `${key} = ?`;
         });
-        const values = [
-            ...Object.values(data),
-            ...Object.values(criteria).filter((value) => value !== null && value !== "NOT NULL"),
-        ];
+
+        const criteriaValuesBinding: unknown[] = [];
+        Object.values(criteria).forEach((value) => {
+            // Remove NULL and NOT NULL values from the criteria values, as we override them in the where clause
+            if (value === null || value === "NOT NULL") return;
+
+            // If the value is an array push each value into the valuesBinding array
+            if (Array.isArray(value)) {
+                criteriaValuesBinding.push(...value);
+                return;
+            }
+
+            criteriaValuesBinding.push(value);
+        });
+
+        const values = [...Object.values(data), ...criteriaValuesBinding];
         // only add WHERE clause if there are criteria
         const whereQuery = criteriaKeys.length > 0 ? ` WHERE ${criteriaKeys.join(" AND ")}` : "";
         // execute the update query
