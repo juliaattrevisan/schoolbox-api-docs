@@ -144,6 +144,7 @@ class RecursiveUndeleterCli extends CliTool\App
                         $recursiveUndeleter->restoreSoftDeletedModels($modelsByMapperClass);
                     } catch (Throwable $e) {
                         $this->logger->critical("Unable to restore models, rolling back.", ['exception' => $e]);
+                        $this->logger->error($e->getMessage());
                         $this->logger->error($e->getTraceAsString());
                         $this->database->rollBack();
                         exit(1);

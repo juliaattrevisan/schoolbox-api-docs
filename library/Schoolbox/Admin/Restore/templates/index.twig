@@ -115,7 +115,7 @@
                         <tbody>
                         {% for folder in deletedFolders %}
                         <tr>
-                            <td>{{ folder.nameWithCodes }}</td>
+                            <td>{{ folder.title }}{% if folder.codes is not empty %} ({% for code in folder.codes %}{{ code.code }}{% if not loop.last %},{% endif %}{% endfor %}){% endif %}</td>
                             <td>{{ folder.deletedAt.long }}</td>
                             <td><a data-restore data-restore-id="{{ folder.id }}" data-restore-href="{{ routeLookup('restore.restoreFolder') }}" data-restore-type="Folder" href="#" class="icon-upload" title="Restore"></a></td>
                         </tr>

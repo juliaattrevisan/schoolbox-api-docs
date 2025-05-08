@@ -184,6 +184,7 @@ class UserMapper extends Mapper
             }
         );
 
+        $this->registerCallback(self::CALLBACK_PRERESTORE, [$this, 'verifyUniqueUsername']);
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'addUsernameToCache']);
 
         // Persist search index changes on changing of a user.

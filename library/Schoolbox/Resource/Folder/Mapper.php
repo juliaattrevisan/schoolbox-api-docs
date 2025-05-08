@@ -226,6 +226,9 @@ class Mapper extends AbstractFolderMapper implements ILocator
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteAssessments']);
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteFields']);
 
+        $this->registerCallback(self::CALLBACK_PRERESTORE, [$this, 'validateFolderCodes']);
+        $this->registerCallback(self::CALLBACK_PRERESTORE, [$this, 'validateActiveParent']);
+
         $this->registerPersistSearchIndexCallbacks();
     }
 
@@ -2453,6 +2456,32 @@ class Mapper extends AbstractFolderMapper implements ILocator
     {
         if (null === $model->getSequence()) {
             $model->setSequence(0);
+        }
+
+        return true;
+    }
+
+    /**
+     * Ensure business logic, and prevent folder being restored that have deleted parents
+     * The UI won't show folders like this, but the cli tool (tools/recursiveUndeleter.php) was allowing it
+     * Not anymore...
+     *
+     * @param Model $model
+     * @return bool
+     * @throws MapperException
+     * @throws MapperException\Deleted
+     */
+    protected function validateActiveParent(Model $model): bool
+    {
+        // No need to check for active parent if the folder is root
+        if ($model->getParent()?->getId() === Model::ROOT_ID) {
+            return true;
+        }
+
+        // fetch hydrated parent
+        $parent = $this->findById($model->getParent()->getId());
+        if ($parent->isDeleted()) {
+            throw new UnexpectedValueException('Parent folder must NOT be deleted.');
         }
 
         return true;
