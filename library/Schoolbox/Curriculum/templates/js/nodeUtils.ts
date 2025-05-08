@@ -215,7 +215,6 @@ export function allChildrenDisabled(node: Node): boolean {
         return true;
     }
     return false;
-    // return node.children.every((child) => !child.enabled || (child.children && child.children.length === 0));
 }
 
 /**
