@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csSelectedNodesStore";
 import { generateLessonPlan, translateFieldForPayload } from "./lessonPlannerUtils";
 import { LessonPlannerModalStep } from "../lessonPlannerTypes";
 import type { LessonPlanField, LessonPlannerStoreField } from "../lessonPlannerTypes";
@@ -9,6 +10,9 @@ const FORM_KEY_TEMPLATE_TITLE = "templateTitle"; // [name="templateTitle"]
 const FORM_KEY_DURATION = "duration"; // [name="duration"]
 
 export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
+    // The selected curriculum nodes store, used to get the curriculum node IDs
+    const selectedNodesStore = useSelectedNodesStore();
+
     // An ordered list of each field of the lesson plan
     const fields = window.Vue.ref<LessonPlannerStoreField[]>([]);
 
@@ -141,7 +145,7 @@ export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
             lessonPlanTitle,
             context: contextName.value,
             duration,
-            curriculumNodeIds: [],
+            curriculumNodeIds: selectedNodesStore.nodesIds,
             additionalContext: additionalContext.value,
             generateForField: generateForField.value?.id ?? null,
             fields: fields.value.map((f) => translateFieldForPayload(f, f.selected, generateForField.value)),
