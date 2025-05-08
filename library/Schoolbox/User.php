@@ -1429,14 +1429,14 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
         if (!$this->getRole()->isStaff()) {
             return false;
         }
+        // superuser can always work with badges
+        if ($this->isSuperuser()) {
+            return true;
+        }
         foreach ($this->getAccessList() as $access) {
             if ($access->getService() === UserAccess::SERVICE_BADGE && $access->getAccessLevel() >= UserAccess::ACCESS_WRITE) {
                 return true;
             }
-        }
-        // super can always work with badges
-        if ($this->isSuperuser()) {
-            return true;
         }
         return $this->getRole()->getCreateBadges();
     }
