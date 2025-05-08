@@ -60,16 +60,19 @@ function validate_args(){
   fi
 }
 
-# stop existing locally-built container (identified via image tag + container name)
+# stop existing locally-built container (identified via image tag + container name):
+# also, remove the local container so it can be restarted
 function stop_container () {
   echo "[SB][$(date +%Y-%m-%d\ %X)] Stopping locally-built task daemon container";
-  taskd_container_ids="$(docker ps -f ancestor=alaress/taskd:$IMAGE_TAG -q)"
+  taskd_container_ids="$(docker ps -af ancestor=alaress/taskd:$IMAGE_TAG -q)"
   if [[ -n $taskd_container_ids ]]; then
     echo -e "$taskd_container_ids" | xargs docker stop
+    echo -e "$taskd_container_ids" | xargs docker container remove
   fi
-  taskd_container_ids="$(docker ps -f name="$LOCAL_CONTAINER_NAME" -q)"
+  taskd_container_ids="$(docker ps -af name="$LOCAL_CONTAINER_NAME" -q)"
   if [[ -n $taskd_container_ids ]]; then
     echo -e "$taskd_container_ids" | xargs docker stop
+    echo -e "$taskd_container_ids" | xargs docker container remove
   fi
 }
 
