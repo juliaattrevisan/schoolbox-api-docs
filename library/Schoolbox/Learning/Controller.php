@@ -374,7 +374,7 @@ class Controller extends Base
                     && $this->getUser()->getRole()->getAccessEvidence(),
                 'badgesEnabled'          =>
                     $this->getConfigLoader()->get(ConfigMapper::NAME_BADGES_ENABLED)
-                    && $this->getUser()->getRole()->getCreateBadges(),
+                    && $this->getUser()->isStaffWithBadgeAccess(),
                 'emailGroups'            => $this->getClassListsEmailGroups(),
                 'folder'                 => $folder,
                 'returnUrlName'          => Assessment\Redirect::RETURN_URL,

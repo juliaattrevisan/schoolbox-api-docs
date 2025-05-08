@@ -1417,6 +1417,31 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     }
 
     /**
+     * Checks Staff Access to badges:
+     * Badge Moderator Write+
+     * Superuser
+     * Role with Create Badges
+     *
+     * @return bool
+     */
+    public function isStaffWithBadgeAccess(): bool
+    {
+        if (!$this->getRole()->isStaff()) {
+            return false;
+        }
+        foreach ($this->getAccessList() as $access) {
+            if ($access->getService() === UserAccess::SERVICE_BADGE && $access->getAccessLevel() >= UserAccess::ACCESS_WRITE) {
+                return true;
+            }
+        }
+        // super can always work with badges
+        if ($this->isSuperuser()) {
+            return true;
+        }
+        return $this->getRole()->getCreateBadges();
+    }
+
+    /**
      * Note this function deliberately does not check whether the user is a staff member.
      *
      * @param int $servicePermission - One of UserAccess::SERVICE_NEWS, UserAccess::SERVICE_CALENDAR, etc.
