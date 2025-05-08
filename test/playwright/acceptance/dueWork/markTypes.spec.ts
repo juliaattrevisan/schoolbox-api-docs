@@ -536,4 +536,22 @@ test.describe("Due Work - Mark type tests", () => {
         await gradesPage.expectAssessmentMark(dueWorkName2, "50 %");
         await gradesPage.expectAssessmentMark(dueWorkName3, null);
     });
+
+    /**
+     * (Step 9) - Profile Page / Activity Feed
+     */
+    test("Profile Page / Activity Feed", async ({ tester, page }) => {
+        const profilePage = new ProfilePage(tester, page);
+        const activityFeed = new ActivityFeed(tester, page);
+
+        await tester.impersonateViaUserProfilePage(learner);
+
+        tester.isGoingTo("navigate to the profile page");
+        await profilePage.goto(learnerId);
+
+        tester.isGoingTo("check that the 3 assessments in the activity feed use the display mark type");
+        await activityFeed.expectActivityFeedItemMark(dueWorkName1, "B+");
+        await activityFeed.expectActivityFeedItemMark(dueWorkName2, "50 %");
+        await activityFeed.expectActivityFeedItemMark(dueWorkName3, null);
+    });
 });
