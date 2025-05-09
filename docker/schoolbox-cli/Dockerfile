@@ -1,8 +1,15 @@
-# Using ubuntu rather than alpine, as that's what anyone who would be using
-# a command-line tool would be familiar with.
-# Alternately: use either a PHP image or Schoolbox's pre-built images.
-FROM schoolbox/jammy-php82-codeception
+ARG ARCH=amd64
 
-## Stay in the background
-#ENTRYPOINT ["tail"]
-#CMD ["-f","/dev/null"]
+FROM --platform=linux/${ARCH} php82-ubuntu
+
+# Install Intellischool CLI client, as per instructions on
+# https://docs.intellischool.co/guides/cli-quickstart#install-debian-ubuntu:
+# since keys are publicly accessible on that page, I'm not counting them as
+# private information.
+RUN \
+  echo "deb https://cli.intellischool.net/channels/stable/apt/ /" > /etc/apt/sources.list.d/intelliscl.list && \
+  apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 88C06AD00AA2BB47 && \
+  rm /etc/apt/trusted.gpg.d/intellischool.gpg 2> /dev/null || echo > /dev/null && \
+  apt-key export 0AA2BB47 | gpg --dearmour -o /etc/apt/trusted.gpg.d/intellischool.gpg && \
+  apt-get update && \
+  apt-get install -y intelliscl
