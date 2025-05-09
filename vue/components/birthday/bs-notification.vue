@@ -17,11 +17,10 @@ const duration = window.Vue.ref(1.5);
 const canDisplay = window.Vue.ref(false); // to check if the birthday notification can be displayed
 
 /**
- * Append the birthday notification to the notifications list or the header search button
- * if the notifications module is off
+ * Append the birthday notification to the header search button
  */
 async function appendToNotifications(): Promise<void> {
-    const container = document.querySelector("#notifications") || document.querySelector("#header-search-input");
+    const container = document.querySelector("#header-search-input");
     if (container) {
         canDisplay.value = true; // show the birthday notification
         await window.Vue.nextTick(); // wait for the DOM to update
