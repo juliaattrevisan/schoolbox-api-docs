@@ -231,9 +231,17 @@ class Helper
 
                     $stream = $response->getBody();
 
+                    // store a section of the response (end of the stream)
+                    $output = '';
+
                     while (!$stream->eof()) {
-                        echo $stream->read(1024);
+                        $output = $stream->read(1024);
+                        echo $output;
                     }
+
+                    //store the last of the output and the model (if it exists
+                    $log->setResponse($output);
+                    $log->setModel($this->extractModel($output));
                 },
                 function ($reason) use ($log): void {
                     $returnCode = $reason->getCode();
@@ -335,5 +343,21 @@ class Helper
         }
 
         throw new \UnexpectedValueException('Endpoint must be configured');
+    }
+
+    private function extractModel($payload)
+    {
+        $payload = explode("\n", $payload);
+
+        foreach ($payload as $line) {
+            if (str_starts_with($line, 'data:')) {
+                $json = json_decode(substr($line, 5), true);
+                if (isset($json['model'])) {
+                    return $json['model'];
+                }
+            }
+        }
+
+        return null;
     }
 }
