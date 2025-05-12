@@ -370,11 +370,11 @@ class Helper
                 if (isset($json['model'])) {
                     $stats['model'] = $json['model'];
                 }
-                if (isset($json['input_tokens'])) {
-                    $stats['input_tokens'] = $json['input_tokens'];
+                if (isset($json['usage']['prompt_tokens'])) {
+                    $stats['input_tokens'] = $json['usage']['prompt_tokens'];
                 }
-                if (isset($json['output_tokens'])) {
-                    $stats['output_tokens'] = $json['output_tokens'];
+                if (isset($json['usage']['completion_tokens'])) {
+                    $stats['output_tokens'] = $json['usage']['completion_tokens'];
                 }
             }
         }
