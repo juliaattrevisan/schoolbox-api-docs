@@ -133,6 +133,7 @@ class Helper
             $log = $this->logMapper->createModel()
                 ->setUser($user)
                 ->setPrompt($payload)
+                ->setModel($this->openAiModel)
                 ->setReturnCode($response->getStatusCode())
                 ->setErrorMessage($errorMessage);
 
@@ -200,7 +201,8 @@ class Helper
              */
             $log = $this->logMapper->createModel()
                 ->setUser($user)
-                ->setPrompt($payload);
+                ->setPrompt($payload)
+                ->setModel($this->openAiModel);
 
             $promise = $this->client->sendAsync($openAiRequest, ['stream' => true]);
 
