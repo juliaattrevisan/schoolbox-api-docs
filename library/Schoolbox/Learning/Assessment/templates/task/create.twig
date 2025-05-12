@@ -112,7 +112,8 @@
 {# ----------------------------------------------------------- #}
 {% include '@learningAssessment/fragments/curriculumCodes.twig' with {
     entityType: 'Task',
-    courseManagedReadonly: courseManaged.isReadonly
+    courseManagedReadonly: courseManaged.isReadonly,
+    hasTabs: true,
 } %}
 
 {# ----------------------------------------------------------- #}
