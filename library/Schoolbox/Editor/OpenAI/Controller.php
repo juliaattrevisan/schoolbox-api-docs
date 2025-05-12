@@ -125,7 +125,8 @@ class Controller extends Base
              *
              * https://community.openai.com/t/json-returning-with-json/584818/6
              */
-            $result = $helper->request($this->getUser(), $payload);
+            /** @var \Schoolbox\Editor\OpenAI\Log\Model $log */
+            [$result, $log] = $helper->request($this->getUser(), $payload);
 
             $data = json_decode($result, true);
 
@@ -135,6 +136,10 @@ class Controller extends Base
              */
             if ($data["error"] ?? null) {
                 $returnCode = 500;
+
+                $log->setReturnCode($returnCode);
+                $log->setErrorMessage($data["error"]["message"]);
+                $this->logMapper->save($log);
 
                 $problem = (new ApiProblem($data["error"]["message"]))
                     ->setStatus($returnCode)
@@ -165,6 +170,10 @@ class Controller extends Base
                     $title .= sprintf(" (%s)", $incompleteMessage);
                 }
 
+                $log->setReturnCode($returnCode);
+                $log->setErrorMessage($incompleteMessage);
+                $this->logMapper->save($log);
+
                 $problem = (new ApiProblem($title))
                     ->setStatus($returnCode)
                     ->asArray();
@@ -174,6 +183,14 @@ class Controller extends Base
 
                 return;
             }
+
+            /** store the response, and the ai usage */
+            $log->setReturnCode(200);
+            $log->setResponse($result);
+            $log->setModel($data['model'] ?? null);
+            $log->setInputTokens($data['usage']['input_tokens'] ?? null);
+            $log->setOutputTokens($data['usage']['input_tokens'] ?? null);
+            $this->logMapper->save($log);
 
             /* The actual output we requested is in this chain of objects, for now assume it'll only ever be one */
             $newFieldData = json_decode($data['output'][0]['content'][0]['text'], true);

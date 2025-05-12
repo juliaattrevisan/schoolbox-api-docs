@@ -89,11 +89,11 @@ class Helper
      *
      * @param User $user // user to log the request against
      * @param string $payload // use this payload instead of generating one
-     * @return string|null
+     * @return array(string|null, Log\Model)
      * @throws ClientExceptionInterface
      * @throws Exception
      */
-    public function request(User $user, string $payload): ?string
+    public function request(User $user, string $payload): array
     {
         /* Assert that we're configured correctly
          */
@@ -144,12 +144,12 @@ class Helper
              *
              * You can dodge that using responseAsJson() instead
              */
-            return $response->getBody()->getContents();
+            return [$response->getBody()->getContents(), $log];
         } catch (GuzzleException $e) {
             $this->errorMapper->generateException(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
         }
 
-        return null;
+        return [null, $log];
     }
 
 
@@ -345,6 +345,13 @@ class Helper
         throw new \UnexpectedValueException('Endpoint must be configured');
     }
 
+    /**
+     * Little Robot Dude:
+     * Extracts the model from the OpenAI API response payload.
+     *
+     * @param string $payload The response payload from the OpenAI API.
+     * @return string|null The extracted model or null if not found.
+     */
     private function extractModel($payload)
     {
         $payload = explode("\n", $payload);
