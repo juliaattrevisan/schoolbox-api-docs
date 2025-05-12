@@ -325,7 +325,14 @@
                             <li><a href="{{ config.feedback_url }}">{{ config.feedback_text }}</a></li>
                         {% endif %}
                         {% if hasTour %}
-                            <li>What's New</li>
+                            <script>
+                                $(function() {
+                                    $('#whats-new').on('click', function(event) {
+                                        $('body').trigger('tourReady');
+                                    });
+                                });
+                            </script>
+                            <li><a href='#' id="whats-new">What's New</a></li>
                         {% endif %}
                     </ul>
                 </div>
