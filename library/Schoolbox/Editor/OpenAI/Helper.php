@@ -237,13 +237,17 @@ class Helper
                     $output = '';
 
                     while (!$stream->eof()) {
-                        $output = $stream->read(1024);
-                        echo $output;
+                        $tmp = $stream->read(1024);
+                        echo $tmp;
+                        $output .= $tmp;
                     }
 
                     //store the last of the output and the model (if it exists
                     $log->setResponse($output);
-                    $log->setModel($this->extractModel($output));
+                    $aiStats = $this->extractStats($output);
+                    $log->setModel($aiStats['model']);
+                    $log->setInputTokens($aiStats['input_tokens']);
+                    $log->setOutputTokens($aiStats['output_tokens']);
                 },
                 function ($reason) use ($log): void {
                     $returnCode = $reason->getCode();
@@ -259,7 +263,8 @@ class Helper
                     /* We died; log the status code and epitaph
                      */
                     $log->setReturnCode($returnCode)
-                        ->setErrorMessage($reason->getMessage());
+                        ->setErrorMessage($reason->getMessage())
+                        ->setResponse($reason->getResponse()->getBody()->getContents());
                 }
             );
 
@@ -352,21 +357,32 @@ class Helper
      * Extracts the model from the OpenAI API response payload.
      *
      * @param string $payload The response payload from the OpenAI API.
-     * @return string|null The extracted model or null if not found.
+     * @return array {model: string|null, input_tokens: int|null, output_tokens: int|null}
      */
-    private function extractModel($payload)
+    private function extractStats($payload): array
     {
         $payload = explode("\n", $payload);
 
+        $stats = [
+            'model' => null,
+            'input_tokens' => null,
+            'output_tokens' => null,
+        ];
         foreach ($payload as $line) {
             if (str_starts_with($line, 'data:')) {
                 $json = json_decode(substr($line, 5), true);
                 if (isset($json['model'])) {
-                    return $json['model'];
+                    $stats['model'] = $json['model'];
+                }
+                if (isset($json['input_tokens'])) {
+                    $stats['input_tokens'] = $json['input_tokens'];
+                }
+                if (isset($json['output_tokens'])) {
+                    $stats['output_tokens'] = $json['output_tokens'];
                 }
             }
         }
 
-        return null;
+        return $stats;
     }
 }
