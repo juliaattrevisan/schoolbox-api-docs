@@ -223,9 +223,11 @@ class FetchPagesFromCsvCest
      * take too long, as would modifying the permissions code to consistently return the same code.  So instead, tests
      * expecting a particular code were modified to allow a set of acceptable substitute codes.
      *
+     * @param IntegrationTester $i
+     * @param array<int> $expectedCodes
      * @throws \Exception
      */
-    private function seeResponseCodeIsOneOf($i, array $expectedCodes): void
+    private function seeResponseCodeIsOneOf(IntegrationTester $i, array $expectedCodes): void
     {
         foreach ($expectedCodes as $expectedCode) {
             if ($this->responseCodeIs($i, $expectedCode)) {
@@ -236,7 +238,12 @@ class FetchPagesFromCsvCest
         throw new \Exception('HTTP Response code is not one of: ' . implode(', ', $expectedCodes) . '.');
     }
 
-    private function responseCodeIs($i, $expectedCode): bool
+    /**
+     * @param IntegrationTester $i
+     * @param int               $expectedCode
+     * @return bool
+     */
+    private function responseCodeIs(IntegrationTester $i, int $expectedCode): bool
     {
         try {
             $i->seeResponseCodeIs($expectedCode);
