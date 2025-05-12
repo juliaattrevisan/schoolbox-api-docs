@@ -61,7 +61,7 @@ class Cleanup implements IStrategy
          */
         $cacheDir = $this->zipDir . '/' . BatchPhotoDownloader::ISAMS_CACHE_DIR;
 
-        /* Make subfolders
+        /* Clean subfolders
          */
         $extractionPaths = [
             Role::STUDENT => sprintf(
@@ -74,6 +74,9 @@ class Cleanup implements IStrategy
                 $cacheDir,
                 Role::STAFF
             ),
+            /* Clean original zips we downloaded
+             */
+            'cachedir' => $cacheDir,
         ];
 
         foreach ($extractionPaths as $type => $path) {
@@ -85,12 +88,14 @@ class Cleanup implements IStrategy
                 if ($file !== '.' && $file !== '..' && $file !== '') {
                     $source = "{$path}/{$file}";
 
-                    $this->log->debug(sprintf(
-                        'Unlinking zip remnants: %s',
-                        $source
-                    ));
+                    if (!is_dir($source)) {
+                        $this->log->debug(sprintf(
+                            'Unlinking zip remnants: %s',
+                            $source
+                        ));
 
-                    unlink($source);
+                        unlink($source);
+                    }
                 }
             }
         }
