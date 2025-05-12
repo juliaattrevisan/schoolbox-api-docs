@@ -38,8 +38,7 @@
      # note that tour is an array containing a data node, like $tour['data'] => ...
      # and 'data' might be an empty node, which usually means there's nothing here.
      #}
-    {% set hasTour = tour.data is defined and tour.data|length and not user.impersonated %}
-    {% if hasTour %}
+    {% if tour.data is defined and tour.data|length and not user.impersonated %}
     {% autoescape 'js' %}
     <script>
         window.tourData = {{ tour.data|json_encode|raw }};
@@ -324,14 +323,19 @@
                         {% if config.feedback_url and config.feedback_text %}
                             <li><a href="{{ config.feedback_url }}">{{ config.feedback_text }}</a></li>
                         {% endif %}
-                        {% if hasTour %}
-                            <script>
-                                $(function() {
-                                    $('#whats-new').on('click', function(event) {
-                                        $('body').trigger('tourReady');
+                        {# Check if there's a tour here that you can actually (re-)experience, regardless of your dismissal status #}
+                        {% if tourPersistent.data is defined and tourPersistent.data|length and not user.impersonated %}
+                            {% autoescape 'js' %}
+                                <script>
+                                    window.tourPersistentData = {{ tourPersistent.data|json_encode|raw }};
+
+                                    $(function() {
+                                        $('#whats-new').on('click', function(event) {
+                                            tourInit(window.tourPersistentData);
+                                        });
                                     });
-                                });
-                            </script>
+                                </script>
+                            {% endautoescape %}
                             <li><a href='#' id="whats-new">What's New</a></li>
                         {% endif %}
                     </ul>

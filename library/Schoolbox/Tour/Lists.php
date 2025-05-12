@@ -51,7 +51,7 @@ class Lists
      * @return array
      * @throws \Schoolbox\Mapper\DefinitionException
      */
-    public function getTours(User $user, $url): array
+    public function getTours(User $user, $url, bool $persistent): array
     {
         // Store the tours we are going to serve in an array
 
@@ -61,7 +61,7 @@ class Lists
 
         // Grab all tours for the logged in user/url
 
-        $tours = $this->tourMapper->findByUserForUrl($user, $url);
+        $tours = $this->tourMapper->findByUserForUrl($user, $url, $persistent);
 
         // Iterate through them and add the required information into the array
 

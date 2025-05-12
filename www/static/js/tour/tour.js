@@ -22,9 +22,7 @@ $(function () {
         },
     };
 
-    tourInit(window.tourData);
-
-    function tourInit(tourData) {
+    window.tourInit = function(tourData) {
         if (typeof tourData !== "undefined" && tourData.length > 0 && window.innerWidth >= 1024) {
             // Function to initiate a joyride
 
@@ -248,4 +246,6 @@ $(function () {
             }
         }
     }
+
+    window.tourInit(window.tourData);
 });

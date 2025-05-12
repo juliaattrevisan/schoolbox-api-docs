@@ -929,7 +929,8 @@ abstract class Kernel
                             new UnreadRetriever($redisStorage),
                             INSTANCE_ID
                         ),
-                        'tour' => new Output\DataGenerator\Tour($config, $session->getAuthUser(), $tourList, $_SERVER),
+                        'tour' => new Output\DataGenerator\Tour($config, $session->getAuthUser(), $tourList, $_SERVER, false),
+                        'tourPersistent' => new Output\DataGenerator\Tour($config, $session->getAuthUser(), $tourList, $_SERVER, true),
                         'user' => new Output\DataGenerator\User($session->getAuthUser(), $session),
                         'topMenu' => new Output\DataGenerator\TopMenu(
                             $session->getAuthUser(),
