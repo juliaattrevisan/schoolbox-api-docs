@@ -173,22 +173,18 @@ class Helper
      * Any deviation from this causes it to stop working for one reason or another
      *
      * @param User $user // user to log the request against
-     * @param string|null $prompt // if generating a payload, use this prompt
-     * @param string|null $payload // use this payload instead of generating one
+     * @param string $payload // the fully build payload to send to AI
      * @return void
      * @throws \JsonException
      * @throws Exception
      */
-    public function littleRobotDude(User $user, ?string $prompt = null, ?string $payload = null): void
+    public function littleRobotDude(User $user, string $payload): void
     {
         /* Assert that we're configured correctly
          */
         if (!$this->openAiKey) {
             throw new \DomainException('OpenAI API key is unavailable');
         }
-
-        // either build or use the supplied payload
-        $payload = $payload ?? (new Payload\LittleRobotDude($this->openAiModel))->generate($prompt, stream: true);
 
         try {
             $openAiRequest = new Request('POST', $this->getEndpoint(self::CHAT), array_merge(
