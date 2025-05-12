@@ -74,7 +74,6 @@ class BatchPhotoDownloader implements IPhotoDownloader
      * @param string $host
      * @param array $credentials
      * @param string $zipDir
-     * @throws \DomainException
      */
     public function __construct(string $host, #[SensitiveParameter] array $credentials, string $zipDir)
     {
