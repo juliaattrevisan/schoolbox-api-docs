@@ -90,13 +90,6 @@ class RestPhotoDownloader implements IPhotoDownloader
         // unused for RestApi
     }
 
-//    /**
-//     * @inheritDoc
-//     */
-//    public function cleanup(): void
-//    {
-//        // unused for RestApi
-//    }
 
     /**
      * @inheritDoc

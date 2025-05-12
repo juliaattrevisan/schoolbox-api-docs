@@ -230,26 +230,6 @@ class BatchPhotoDownloader implements IPhotoDownloader
         return null;
     }
 
-//
-//    /**
-//     * Removes all the photo-related files from the isams cache dir
-//     *
-//     * @return void
-//     */
-//    public function cleanup(): void
-//    {
-//        foreach ($this->extractionPaths as $type => $path) {
-//            $dirhandle = opendir($path);
-//
-//            while ($file = readdir($dirhandle)) {
-//                if ($file !== '.' && $file !== '..') {
-//                    $source = "{$path}/{$file}";
-//                    echo "Unlinking {$source}";
-//                    unlink($source);
-//                }
-//            }
-//        }
-//    }
 
     /**
      * @inheritDoc
