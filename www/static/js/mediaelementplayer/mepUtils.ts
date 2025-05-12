@@ -34,7 +34,8 @@ export function getConfigForVideo(overrideValueByKey?: object): {
          */
         stretching: "none",
 
-        // point to the SVG sprite file that contains the icons used in the player.
+        // point to the correct icon sprite location
+        // refer to https://github.com/mediaelement/mediaelement/blob/master/docs/api.md#configuration
         iconSprite: `${window.cdnPrefix}/images/resources/mejs-controls.svg`,
 
         /**
