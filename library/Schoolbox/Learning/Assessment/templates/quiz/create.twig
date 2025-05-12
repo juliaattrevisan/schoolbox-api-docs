@@ -208,7 +208,10 @@
 {# ----------------------------------------------------------- #}
 {# Curriculum #}
 {# ----------------------------------------------------------- #}
-{% include '@learningAssessment/fragments/curriculumCodes.twig' with {entityType: 'Quiz'} %}
+{% include '@learningAssessment/fragments/curriculumCodes.twig' with {
+    entityType: 'Quiz',
+    hasTabs: true,
+} %}
 
 {# ----------------------------------------------------------- #}
 {# Submit #}
