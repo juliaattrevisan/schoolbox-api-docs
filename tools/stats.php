@@ -324,6 +324,13 @@ $app = new class extends CliTool\App {
             //AI Usage
             'openai_success'    => 'SELECT COUNT(*) FROM openai_log WHERE return_code = 200',
             'openai_error'      => 'SELECT COUNT(*) FROM openai_log WHERE return_code != 200',
+            'openai_input_tokens' => 'SELECT SUM(input_tokens) FROM openai_log WHERE return_code = 200',
+            'openai_output_tokens' => 'SELECT SUM(output_tokens) FROM openai_log WHERE return_code = 200',
+            'openai_tokens' => 'SELECT SUM(output_tokens) + SUM(input_tokens) FROM openai_log WHERE return_code = 200',
+            'openai_model_gpt4o' => "SELECT count(*) FROM openai_log WHERE (model like 'gpt-4o%' or model like 'gpt4o%') and model not like '%mini%'",
+            'openai_model_gpt4o-mini' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-4o-mini%' or model like 'gpt4o%-mini'",
+            'openai_model_gpt41' => "SELECT count(*) FROM openai_log WHERE (model like 'gpt-4.1%' or model like 'gpt4.1%') and model not like '%mini%'",
+            'openai_model_gpt41-mini' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-4.1-mini%' or model like 'gpt4.1-mini%'",
 
             //Packages
             'package_installed' => 'SELECT COUNT(*) FROM package WHERE installed = 1',
