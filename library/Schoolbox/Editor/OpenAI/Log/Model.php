@@ -20,6 +20,10 @@ class Model
 
     private User $user;
     private string $prompt;
+    private ?int $inputTokens = null;
+    private ?int $outputTokens = null;
+    private ?string $model = null;
+    private ?string $response = null;
     private int $returnCode;
     private string $errorMessage;
 
@@ -100,6 +104,78 @@ class Model
     public function setErrorMessage(string $errorMessage): self
     {
         $this->errorMessage = $errorMessage;
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getInputTokens(): ?int
+    {
+        return $this->inputTokens;
+    }
+
+    /**
+     * @param int|null $inputTokens
+     * @return $this
+     */
+    public function setInputTokens(?int $inputTokens): self
+    {
+        $this->inputTokens = $inputTokens;
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getOutputTokens(): ?int
+    {
+        return $this->outputTokens;
+    }
+
+    /**
+     * @param int|null $outputTokens
+     * @return $this
+     */
+    public function setOutputTokens(?int $outputTokens): self
+    {
+        $this->outputTokens = $outputTokens;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getModel(): ?string
+    {
+        return $this->model;
+    }
+
+    /**
+     * @param string|null $model
+     * @return $this
+     */
+    public function setModel(?string $model): self
+    {
+        $this->model = $model;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getResponse(): ?string
+    {
+        return $this->response;
+    }
+
+    /**
+     * @param string|null $response
+     * @return $this
+     */
+    public function setResponse(?string $response): self
+    {
+        $this->response = $response;
         return $this;
     }
 }
