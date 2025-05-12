@@ -13,6 +13,7 @@ namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Profile\Images;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
+use Schoolbox\Role;
 use SensitiveParameter;
 
 class Cleanup implements IStrategy
@@ -60,20 +61,37 @@ class Cleanup implements IStrategy
          */
         $cacheDir = $this->zipDir . '/' . BatchPhotoDownloader::ISAMS_CACHE_DIR;
 
-        $dirhandle = opendir($cacheDir);
+        /* Make subfolders
+         */
+        $extractionPaths = [
+            Role::STUDENT => sprintf(
+                '%s/%s',
+                $cacheDir,
+                Role::STUDENT
+            ),
+            Role::STAFF => sprintf(
+                '%s/%s',
+                $cacheDir,
+                Role::STAFF
+            ),
+        ];
 
-        while ($file = readdir($dirhandle)) {
-            /* There might not actually be any profile pictures here
-             */
-            if ($file !== '.' && $file !== '..' && $file !== '') {
-                $source = "{$cacheDir}/{$file}";
+        foreach ($extractionPaths as $type => $path) {
+            $dirhandle = opendir($path);
 
-                $this->log->debug(sprintf(
-                    'Unlinking zip remnants: %s',
-                    $source
-                ));
+            while ($file = readdir($dirhandle)) {
+                /* There might not actually be any profile pictures here
+                 */
+                if ($file !== '.' && $file !== '..' && $file !== '') {
+                    $source = "{$path}/{$file}";
 
-                unlink($source);
+                    $this->log->debug(sprintf(
+                        'Unlinking zip remnants: %s',
+                        $source
+                    ));
+
+                    unlink($source);
+                }
             }
         }
     }

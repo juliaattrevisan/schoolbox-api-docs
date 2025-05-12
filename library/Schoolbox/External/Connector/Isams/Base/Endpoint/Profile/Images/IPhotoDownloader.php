@@ -49,12 +49,12 @@ interface IPhotoDownloader
     public function getPhoto(string $personId, string $roleType = Role::STUDENT, ?string $externalId = null): ?string;
 
 
-    /**
-     * Removes all the photo-related files from the isams cache dir
-     *
-     * @return void
-     */
-    public function cleanup(): void;
+//    /**
+//     * Removes all the photo-related files from the isams cache dir
+//     *
+//     * @return void
+//     */
+//    public function cleanup(): void;
 
 
     /**
