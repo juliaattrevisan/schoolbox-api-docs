@@ -27,6 +27,9 @@ class Model
     private int $returnCode;
     private string $errorMessage;
 
+    // TEXT max length, to trim the prompt, rather than die.
+    private const PROMPT_MAX_LENGTH = 65535;
+
     // MEDIUM TEXT max length, to trim the response, rather than die.
     private const RESPONSE_MAX_LENGTH = 16777215;
 
@@ -66,6 +69,10 @@ class Model
      */
     public function setPrompt(string $prompt): self
     {
+        // Limit the prompt length to prevent database errors
+        if ($prompt && strlen($prompt) > self::PROMPT_MAX_LENGTH) {
+            $prompt = substr($prompt, 0, self::PROMPT_MAX_LENGTH);
+        }
         $this->prompt = $prompt;
         return $this;
     }
