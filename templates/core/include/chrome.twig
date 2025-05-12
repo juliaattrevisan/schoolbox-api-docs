@@ -34,7 +34,12 @@
     {% include 'include/skin.twig' with { config: config } only %}
     <link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/vendors/fullcalendar/datepicker.css?v={{ config.site_version }}" />
 
-    {% if tour.data is defined and not user.impersonated %}
+    {# Decide if the current url has a feature tour/What's New
+     # note that tour is an array containing a data node, like $tour['data'] => ...
+     # and 'data' might be an empty node, which usually means there's nothing here.
+     #}
+    {% set hasTour = tour.data is defined and tour.data|length and not user.impersonated %}
+    {% if hasTour %}
     {% autoescape 'js' %}
     <script>
         window.tourData = {{ tour.data|json_encode|raw }};
@@ -318,6 +323,9 @@
                             {{ config.site_version }}</li>
                         {% if config.feedback_url and config.feedback_text %}
                             <li><a href="{{ config.feedback_url }}">{{ config.feedback_text }}</a></li>
+                        {% endif %}
+                        {% if hasTour %}
+                            <li>What's New</li>
                         {% endif %}
                     </ul>
                 </div>
