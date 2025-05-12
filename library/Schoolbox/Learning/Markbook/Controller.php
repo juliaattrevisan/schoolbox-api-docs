@@ -417,11 +417,22 @@ class Controller extends Base
      */
     private function isAssessmentMarkable(User $user, IAssessable $assessment, GenericCollection $terms): bool
     {
+        /* Note that this will contain Extraordinary Terms whose dates could
+         * be encompassed by another Extraordinary Term (ie. those extraordinary
+         * terms have overlapping dates)
+         *
+         * There used to be an exit-early here for an archived term, under the
+         * presumption that Academic Periods could never overlap. That's true,
+         * for ordinary terms, but not for Extraordinary Terms.
+         *
+         * This means we have to inspect the full set of $terms to potentially find
+         * one that matches, considering that overlapping dates are possible.
+         */
         foreach ($terms as $term) {
-            if ($term->contains($assessment->getDueAt())) {
-                if ($term->getArchived()) {
-                    return false;
-                }
+            /* Only care about terms that contain the assessment's due date
+             * and that the term is not archived
+             */
+            if ($term->contains($assessment->getDueAt()) && !$term->getArchived()) {
                 // Rely on access cache to catch repeated calls to same folder.
                 return $this->access->isInstructor($user, $assessment->getContext()->getFolder());
             }
