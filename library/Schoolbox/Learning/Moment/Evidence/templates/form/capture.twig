@@ -24,7 +24,9 @@
                             let preview = document.getElementById(previewId);
                             preview.classList.remove('hide');
                             preview.src = reader.result;
-                            player = new MediaElementPlayer(previewId);
+                            player = new MediaElementPlayer(previewId, {
+                                iconSprite: `${window.cdnPrefix}/images/resources/mejs-controls.svg`,
+                            });
                             player.load();
                         });
                         reader.readAsDataURL(file);
