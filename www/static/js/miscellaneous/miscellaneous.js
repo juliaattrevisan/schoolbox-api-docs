@@ -225,6 +225,17 @@ $(function () {
     // Set a data-test-ready="true" attribute as a flag for playwright tests
     // to ensure that we've successfully added the listener to the profile drop (and other parts of this script have finished)
     profileDrop.attr("data-test-ready", "true");
+
+    // point to the correct icon sprite location
+    // refer to https://github.com/mediaelement/mediaelement/blob/master/docs/api.md#configuration
+    const originalMediaElementPlayer = $.fn.mediaelementplayer;
+    $.fn.mediaelementplayer = function (options) {
+        const defaultOptions = {
+            iconSprite: `${window.cdnPrefix}/images/resources/mejs-controls.svg`,
+        };
+        const mergedOptions = $.extend(true, {}, defaultOptions, options);
+        return originalMediaElementPlayer.call(this, mergedOptions);
+    };
 });
 
 /**
