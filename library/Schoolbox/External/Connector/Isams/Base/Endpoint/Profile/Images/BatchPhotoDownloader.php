@@ -221,7 +221,7 @@ class BatchPhotoDownloader implements IPhotoDownloader
      */
     public function getPhoto(string $personId, string $roleType = Role::STUDENT, ?string $externalId = null): ?string
     {
-        $path = "{$this->cacheDir}/{$personId}.png";
+        $path = "{$this->cacheDir}/{$roleType}/{$personId}.png";
 
         if (file_exists($path)) {
             return file_get_contents($path);
