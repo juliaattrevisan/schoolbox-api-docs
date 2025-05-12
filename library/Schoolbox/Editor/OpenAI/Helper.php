@@ -89,7 +89,7 @@ class Helper
      *
      * @param User $user // user to log the request against
      * @param string $payload // use this payload instead of generating one
-     * @return array(string|null, Log\Model)
+     * @return array{string|null, Log\Model|null}
      * @throws ClientExceptionInterface
      * @throws Exception
      */
@@ -150,7 +150,7 @@ class Helper
             $this->errorMapper->generateException(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
         }
 
-        return [null, $log];
+        return [null, null];
     }
 
 
