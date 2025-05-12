@@ -189,7 +189,7 @@ class Controller extends Base
             $log->setResponse($result);
             $log->setModel($data['model'] ?? null);
             $log->setInputTokens($data['usage']['input_tokens'] ?? null);
-            $log->setOutputTokens($data['usage']['input_tokens'] ?? null);
+            $log->setOutputTokens($data['usage']['output_tokens'] ?? null);
             $this->logMapper->save($log);
 
             /* The actual output we requested is in this chain of objects, for now assume it'll only ever be one */
