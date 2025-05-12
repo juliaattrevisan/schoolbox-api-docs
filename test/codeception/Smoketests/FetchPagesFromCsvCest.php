@@ -218,6 +218,11 @@ class FetchPagesFromCsvCest
     }
 
     /**
+     * This function was added because as a result of changes made during the Granular Permissions epic, some tests
+     * expecting 401 started returning 403.  To update the expected code for each affected test (in the CSV file) would
+     * take too long, as would modifying the permissions code to consistently return the same code.  So instead, tests
+     * expecting a particular code were modified to allow a set of acceptable substitute codes.
+     *
      * @throws \Exception
      */
     private function seeResponseCodeIsOneOf($i, array $expectedCodes): void
