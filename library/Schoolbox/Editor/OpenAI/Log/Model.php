@@ -27,6 +27,9 @@ class Model
     private int $returnCode;
     private string $errorMessage;
 
+    // MEDIUM TEXT max length, to trim the response, rather than die.
+    private const RESPONSE_MAX_LENGTH = 16777215;
+
 
     /**
      * @return User
@@ -175,6 +178,10 @@ class Model
      */
     public function setResponse(?string $response): self
     {
+        // Limit the response length to prevent database errors
+        if ($response && strlen($response) > self::RESPONSE_MAX_LENGTH) {
+            $response = substr($response, 0, self::RESPONSE_MAX_LENGTH);
+        }
         $this->response = $response;
         return $this;
     }
