@@ -22,6 +22,16 @@
     %}
 
     {# ----------------------------------------------------------- #}
+    {# Curriculum #}
+    {# ----------------------------------------------------------- #}
+    {% include '@learningAssessment/fragments/curriculumCodes.twig' with {
+        entityType: 'Task',
+        courseManagedReadonly: courseManaged.isReadonly,
+        excludeLegend: true,
+        hasTabs: true,
+    } %}
+
+    {# ----------------------------------------------------------- #}
     {# Description #}
     {# ----------------------------------------------------------- #}
     <label for="assessment-description">
@@ -106,15 +116,6 @@
 {% if context.baseContext is not unitSpecification and custom_assessment_participation %}
     {% include '@learningAssessment/fragments/participation.twig' %}
 {% endif %}
-
-{# ----------------------------------------------------------- #}
-{# Curriculum #}
-{# ----------------------------------------------------------- #}
-{% include '@learningAssessment/fragments/curriculumCodes.twig' with {
-    entityType: 'Task',
-    courseManagedReadonly: courseManaged.isReadonly,
-    hasTabs: true,
-} %}
 
 {# ----------------------------------------------------------- #}
 {# Submit #}
