@@ -18,8 +18,7 @@ const store = useUnitPlannerCurriculumStore();
 /**
  * Initiate the curriculum store
  */
-window.Vue.onMounted(async () => {
-    await window.Vue.nextTick();
+window.Vue.onMounted(() => {
     store.init(props.folderId);
 });
 
