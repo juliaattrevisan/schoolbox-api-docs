@@ -73,6 +73,7 @@ class Rescore
         foreach ($assessment->getAllParticipants() as $participant) {
             $hasChanges = false;
 
+            /** @var \Schoolbox\Learning\Assessment\DueWork\Feedback\Model $authoritativeFeedback */
             $authoritativeFeedback = $participant->getAuthoritativeFeedback(true);
 
             if ($authoritativeFeedback) {
