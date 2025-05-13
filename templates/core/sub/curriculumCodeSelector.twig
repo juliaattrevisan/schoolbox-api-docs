@@ -27,7 +27,6 @@
         data-endpoint="{{ routeLookup('curriculumApi.searchNode') }}"
         :include-children="true"
         :has-tabs="{{ hasTabs ? 'true' : 'false' }}"
-        :folder-id="{{ context.baseContext.folder.id ?? 0 }}"
         {% if folderId is defined %}:folder-id="{{ folderId }}"{% endif %}
     />
 {% if not vueSlot %}
