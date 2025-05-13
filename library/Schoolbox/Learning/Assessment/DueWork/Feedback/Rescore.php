@@ -58,13 +58,27 @@ class Rescore
             $authoritativeFeedback = $participant->getAuthoritativeFeedback(true);
 
             if ($authoritativeFeedback) {
-                /* Recalibrate normalised mark from the human readable mark, as if you'd done that on the ui
-                 * This prevents you having a normalised mark that would otherwise have been unattainable,
-                 * such as a value between the lower and upper bounds of Letter Grades.
+                /* Apparently this is how you detect a Submission State: an exception is thrown
+                 * trying to interpret it as one of the Mark Schemes. No wonder it was classified
+                 * as the $errors var. Wild!
+                 *
+                 * Shanked from Learning/Assessment/DueWork/Feedback/Factory.php::210
                  */
-                $newStudentMark = $assessment->getMarkScheme()->getHumanReadableMark($authoritativeFeedback->getNormalisedMark());
-                $newInstructorMark = $assessment->getInstructorMarkScheme()->getHumanReadableMark($authoritativeFeedback->getNormalisedMark());
-                $newNormalisedMark = $assessment->getInstructorMarkScheme()->getNormalisedMark($newInstructorMark);
+                try {
+                    /* Recalibrate normalised mark from the human readable mark, as if you'd done that on the ui
+                     * This prevents you having a normalised mark that would otherwise have been unattainable,
+                     * such as a value between the lower and upper bounds of Letter Grades.
+                     */
+                    $newStudentMark = $assessment->getMarkScheme()->getHumanReadableMark($authoritativeFeedback->getNormalisedMark());
+                    $newInstructorMark = $assessment->getInstructorMarkScheme()->getHumanReadableMark($authoritativeFeedback->getNormalisedMark());
+                    $newNormalisedMark = $assessment->getInstructorMarkScheme()->getNormalisedMark($newInstructorMark);
+                } catch (\InvalidArgumentException $e) {
+                    /* Leave unchanged
+                     */
+                    $newStudentMark = $authoritativeFeedback->getHumanReadableMark();
+                    $newInstructorMark = $authoritativeFeedback->getHumanReadableInstructorMark();
+                    $newNormalisedMark = $authoritativeFeedback->getNormalisedMark();
+                }
 
                 $changes[] = [
                     'user' => $participant->getUser(),
