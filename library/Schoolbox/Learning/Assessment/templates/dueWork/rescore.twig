@@ -3,6 +3,10 @@
  # Updates published authoritative feedbacks to use the currently-selected mark types
  # for both instructor-given marks and student marks.
  #
+ # @param array $breadcrumbs       A breadcrumb set
+ # @param IAssessable $assessment  An assessment instance
+ # @param bool $perform            Whether you're in perform mode not (changes ui buttons)
+ # @param array $changes           An array of strutcs containing old and new values and a user instanec
  #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 
@@ -12,7 +16,7 @@
 <div class="row">
     <div class="list-item">
         <div class="small-12 columns">
-            <h1>Rescore feedback for {{ assessment.title }}</h1>
+            <h1>Rescore feedback for {{ assessment.title }} {% if not perform %}(Preview){% endif %}</h1>
         </div>
     </div>
 </div>

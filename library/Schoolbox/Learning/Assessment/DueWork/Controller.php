@@ -2215,7 +2215,7 @@ class Controller extends Assessment\Controller
                         'assessmentId' => $assessment->getId()
                     ])
                 ])->add([
-                    'Rescore',
+                    'Rescore Preview',
                     ''
                 ]),
                 'assessment' => $assessment,
