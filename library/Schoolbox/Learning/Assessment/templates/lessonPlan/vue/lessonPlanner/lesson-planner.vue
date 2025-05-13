@@ -35,16 +35,20 @@ window.Vue.onMounted(() => {
         <!-- Hidden field outside of the modal to ensure the form gets it -->
         <input type="hidden" name="duration" :value="lpStore.lessonPlanDuration" />
 
-        <button
-            v-if="sbProps.hasAIFeatures"
-            type="button"
-            class="button expand icon-chat"
-            @click="() => lpStore.openModal()"
-        >
-            {{ lpStore.hasLessonContent ? "Regenerate" : "Generate" }}
-            {{ locale.lessonPlan.singular() }}
-            with AI
-        </button>
+        <div class="row l-pad-m--top">
+            <div class="small-12 columns">
+                <button
+                    v-if="sbProps.hasAIFeatures"
+                    type="button"
+                    class="button expand icon-chat"
+                    @click="() => lpStore.openModal()"
+                >
+                    {{ lpStore.hasLessonContent ? "Regenerate" : "Generate" }}
+                    {{ locale.lessonPlan.singular() }}
+                    with AI
+                </button>
+            </div>
+        </div>
     </fieldset>
 
     <fieldset v-for="(field, i) in lpStore.fields" :key="field.id">
