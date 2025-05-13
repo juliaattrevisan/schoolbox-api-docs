@@ -271,10 +271,6 @@ class Model implements ISoftDeletable
      */
     public function sanitiseFooter(string $footer): string
     {
-        //if blank or empty use default value
-        if ('' === trim($footer)) {
-            $footer = self::DEFAULT_FOOTER;
-        }
         return $footer;
     }
 }
