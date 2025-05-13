@@ -456,3 +456,11 @@ p.sb-ck-code-block {
     // editor.css is loaded in after our file, so we need to use !important...
     border: 1px solid css-darken($form-border-color, 15%) !important;
 }
+
+/**
+ * Sometimes we put editors in a <label>,
+ * to ensure the cursor still behaves correctly, we enforce it here
+ */
+.ck.ck-editor__main {
+    cursor: text;
+}
