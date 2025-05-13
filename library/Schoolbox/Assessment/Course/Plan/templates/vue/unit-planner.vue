@@ -233,7 +233,7 @@ window.Vue.onUnmounted(() => {
         </div>
     </div>
     <activities-list-delete-modal />
-    <up-curriculum />
+    <up-curriculum :folder-id="props.folderId" />
 </template>
 
 <style scoped lang="scss">

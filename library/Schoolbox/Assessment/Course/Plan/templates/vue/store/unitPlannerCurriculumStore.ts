@@ -26,14 +26,17 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
 
     /**
      * Initialises the curriculum selector modal store, which loads the initial curriculum data
+     * @param folderId - the folderId to target
      */
-    function init(): void {
+    function init(folderId: number): void {
         selectorStore.init({
             isReadOnly: false,
             formValueName: "", // not required in this context
             dataEndpoint: "/api/curriculum",
             selectedNodes: [], // so the modal displays the latest selected nodes
             includeChildren: true, // include all children in selections
+            hasTabs: true, // show the tabs for curriculum selector
+            folderId, // the folderId to target
         });
     }
 
