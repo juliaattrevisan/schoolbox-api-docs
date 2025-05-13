@@ -33,7 +33,7 @@ window.Vue.onMounted(() => {
         <slot name="curriculum-codes"></slot>
 
         <!-- Hidden field outside of the modal to ensure the form gets it -->
-        <input type="hidden" name="duration" :value="lpStore.lessonPlanDuration" />
+        <input v-model="lpStore.lessonPlanDuration" type="hidden" name="duration" />
 
         <div class="row l-pad-m--top">
             <div class="small-12 columns">

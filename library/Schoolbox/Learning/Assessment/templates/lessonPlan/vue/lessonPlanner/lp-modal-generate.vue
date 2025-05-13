@@ -47,7 +47,7 @@ window.Vue.onMounted(() => {
 
     <label for="lp-duration">{{ locale.lessonPlan.proper() }} Duration</label>
     <p class="meta">This field is to set a timeframe for lesson plan creation by AI</p>
-    <input id="lp-duration" type="text" maxlength="255" :value="lpStore.lessonPlanDuration" />
+    <input id="lp-duration" v-model.trim="lpStore.lessonPlanDuration" type="text" maxlength="255" />
 
     <label for="lp-generate-additional-context">Additional Context</label>
     <p class="meta">
