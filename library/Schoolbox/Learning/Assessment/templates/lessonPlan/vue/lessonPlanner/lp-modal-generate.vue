@@ -46,6 +46,7 @@ window.Vue.onMounted(() => {
     </template>
 
     <label for="lp-duration">Duration</label>
+    <p class="meta">This field is to set a timeframe for lesson plan creation by AI</p>
     <input id="lp-duration" type="text" maxlength="255" :value="lpStore.lessonPlanDuration" />
 
     <label for="lp-generate-additional-context">Additional Context</label>
