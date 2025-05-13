@@ -62,7 +62,6 @@ tar xzf "$initialdir"/npm-artifact/*-npm.tar.gz;
 
 # Re-run NPM publish to ensure the latest versions of files are used,
 # as the above build is from a different branch if this is run on a PR
-tools/pkg-build-npm.sh
 tools/pkg-build-css-js.sh --production
 
 ## Install playwright for the test
