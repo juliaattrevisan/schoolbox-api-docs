@@ -138,6 +138,7 @@ class Controller extends Base
                 $returnCode = 500;
 
                 $log->setReturnCode($returnCode);
+                $log->setResponse($result);
                 $log->setErrorMessage($data["error"]["message"]);
                 $this->logMapper->save($log);
 
@@ -171,6 +172,7 @@ class Controller extends Base
                 }
 
                 $log->setReturnCode($returnCode);
+                $log->setResponse($result);
                 $log->setErrorMessage($incompleteMessage);
                 $this->logMapper->save($log);
 

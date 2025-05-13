@@ -133,7 +133,6 @@ class Helper
             $log = $this->logMapper->createModel()
                 ->setUser($user)
                 ->setPrompt($payload)
-                ->setModel($this->openAiModel)
                 ->setReturnCode($response->getStatusCode())
                 ->setErrorMessage($errorMessage);
 
