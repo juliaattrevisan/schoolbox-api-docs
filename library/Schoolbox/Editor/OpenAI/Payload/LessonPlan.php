@@ -141,6 +141,41 @@ class LessonPlan
 
 
     /**
+     * Get the key of a field for the structured output part of the prompt
+     * To enhance the behaviour of the AI, we desire to have the field title itself within each key,
+     * however to ensure multiple fields of the same title can be used, we also append the field id if necessary
+     *
+     * @param array $fields All fields that are to be generated
+     * @param int|string $fieldId The ID of the field to retrieve the key for
+     * @return string
+     */
+    public function getPayloadFieldKey(array $fields, int|string $fieldId): string
+    {
+        $fieldCounts = [];
+        foreach ($fields as $field) {
+            $fieldTitle = trim((string)$field['title']);
+
+            if (!isset($fieldCounts[$fieldTitle])) {
+                $fieldCounts[$fieldTitle] = 0;
+            }
+
+            $fieldCounts[$fieldTitle]++;
+
+            if ($field['id'] === $fieldId) {
+                $fieldKey = $fieldTitle;
+                // only append the number if we actually need to
+                if ($fieldCounts[$fieldTitle] > 1) {
+                    $fieldKey .= ' ' . $fieldCounts[$fieldTitle];
+                }
+                return $fieldKey;
+            }
+        }
+
+        throw new \InvalidArgumentException('Field ID not found in fields array');
+    }
+
+
+    /**
      * Generate details for a given field for the prompt.
      * Used for the user persona as well as the structured output contents
      *
@@ -425,13 +460,13 @@ class LessonPlan
                 continue;
             }
 
-            $fieldTitle = trim((string)$field['title']);
+            $fieldKey = $this->getPayloadFieldKey($fields, $field['id']);
             $details = $this->generateFieldDetails($field);
 
 
             /* Make a giant prompt slab for each field
              */
-            $struct['schema']['properties'][$fieldTitle] = [
+            $struct['schema']['properties'][$fieldKey] = [
                 'type' => 'string',
                 'description' => sprintf("USE HTML\n%s", $details),
             ];
@@ -439,7 +474,7 @@ class LessonPlan
             /* I think this forces the $fieldId to spawn in the json payload
              * that openai gives back to us
              */
-            $struct['schema']['required'][] = $fieldTitle;
+            $struct['schema']['required'][] = $fieldKey;
         }
 
         return $struct;

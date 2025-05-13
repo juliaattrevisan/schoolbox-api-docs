@@ -197,8 +197,9 @@ class Controller extends Base
             $fields = [];
             foreach ($inputs['fields'] as $field) {
                 // maybe the AI didn't return stuff for this field... if so, the frontend will handle that.
-                if (isset($newFieldData[$field['title']])) {
-                    $fields[$field['id']] = Scrub::html($newFieldData[$field['title']]);
+                $fieldKey = $payloadGenerator->getPayloadFieldKey($inputs['fields'], $field['id']);
+                if (isset($newFieldData[$fieldKey])) {
+                    $fields[$field['id']] = Scrub::html($newFieldData[$fieldKey]);
                 }
             }
 
