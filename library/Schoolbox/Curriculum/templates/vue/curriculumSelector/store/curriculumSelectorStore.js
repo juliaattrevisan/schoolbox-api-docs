@@ -37,7 +37,7 @@ export const useStore = defineStore(`curriculumSelector`, {
          * @returns { Boolean }
          */
         hasLoadedOk() {
-            if (!this.hasTabs) {
+            if (!this.hasTabs || this.folderId === undefined) {
                 return !this.isLoading && !this.hasLoadError;
             }
             return (
