@@ -2203,35 +2203,7 @@ class Controller extends Assessment\Controller
      */
     public function getRescore(IAssessable $assessment): void
     {
-        $changes = [];
-
-        foreach ($assessment->getAllParticipants() as $participant) {
-            $authoritativeFeedback = $participant->getAuthoritativeFeedback(true);
-
-            if ($authoritativeFeedback) {
-                /* Recalibrate normalised mark from the human readable mark, as if you'd done that on the ui
-                 * This prevents you having a normalised mark that would otherwise have been unattainable,
-                 * such as a value between the lower and upper bounds of Letter Grades.
-                 */
-                $newStudentMark = $assessment->getMarkScheme()->getHumanReadableMark($authoritativeFeedback->getNormalisedMark());
-                $newInstructorMark = $assessment->getInstructorMarkScheme()->getHumanReadableMark($authoritativeFeedback->getNormalisedMark());
-                $newNormalisedMark = $assessment->getInstructorMarkScheme()->getNormalisedMark($newInstructorMark);
-
-                $changes[] = [
-                    'user' => $participant->getUser(),
-                    'old' => [
-                        'normalised' => $authoritativeFeedback->getNormalisedMark(),
-                        'student' => $authoritativeFeedback->getHumanReadableMark(),
-                        'instructor' => $authoritativeFeedback->getHumanReadableInstructorMark(),
-                    ] ,
-                    'new' => [
-                        'normalised' => $newNormalisedMark,
-                        'student' => $newStudentMark,
-                        'instructor' => $newInstructorMark
-                    ]
-                ];
-            }
-        }
+        $changes = (new Assessment\DueWork\Feedback\Rescore())->generate($assessment);
 
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/dueWork/rescore.twig',
