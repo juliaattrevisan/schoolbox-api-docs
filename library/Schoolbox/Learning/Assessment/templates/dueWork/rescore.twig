@@ -29,10 +29,8 @@
                 <thead>
                     <tr>
                         <th>Student</th>
-                        <th>Previous normalised mark</th>
                         <th>Previous input mark</th>
                         <th>Previous display mark</th>
-                        <th>New normalised mark</th>
                         <th>New input mark</th>
                         <th>New display mark</th>
                     </tr>
@@ -47,12 +45,10 @@
                                     <a href="/search/user/{{ change.user.id }}">{{ change.user.fullname }}</a>
                                 {% endif %}
                             </td>
-                            <td>{{ change.old.normalised|number_format(2) }}</td>
-                            <td>{{ change.old.student }}</td>
-                            <td>{{ change.old.instructor }}</td>
-                            <td>{{ change.new.normalised|number_format(2) }}</td>
-                            <td>{{ change.new.student }}</td>
-                            <td>{{ change.new.instructor }}</td>
+                            <td title="Normalised mark: {{ change.old.normalised|number_format(2) }}">{{ change.old.student }}</td>
+                            <td title="Normalised mark: {{ change.old.normalised|number_format(2) }}">{{ change.old.instructor }}</td>
+                            <td title="Normalised mark: {{ change.new.normalised|number_format(2) }}">{{ change.new.student }}</td>
+                            <td title="Normalised mark: {{ change.new.normalised|number_format(2) }}">{{ change.new.instructor }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
