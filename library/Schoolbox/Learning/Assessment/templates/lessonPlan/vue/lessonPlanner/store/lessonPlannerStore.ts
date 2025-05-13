@@ -19,6 +19,9 @@ export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
     // The route to generate the lesson plan with AI, if available
     const generatePlanRoute = window.Vue.ref<string | null>(null);
 
+    // The duration of the lesson plan, only available in the AI menu
+    const lessonPlanDuration = window.Vue.ref<string>("");
+
     // The course name/unit name/folder name/etc that this is being created for, to assist the AI
     const contextName = window.Vue.ref<string>("");
 
@@ -29,9 +32,15 @@ export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
      * Initialise the store
      * @param $fields - An ordered list of each field of the lesson plan
      * @param $contextName - The course name/unit name/folder name/etc that this is being created for, to assist the AI
+     * @param $lessonPlanDuration - The duration of the lesson plan, only available in the AI menu
      * @param $generatePlanRoute - The route to generate the lesson plan with AI, if available
      */
-    function init($fields: LessonPlanField[], $contextName: string, $generatePlanRoute: string | null): void {
+    function init(
+        $fields: LessonPlanField[],
+        $contextName: string,
+        $lessonPlanDuration: string,
+        $generatePlanRoute: string | null,
+    ): void {
         fields.value = $fields.map((field) => ({
             ...field,
             selected: false,
@@ -39,6 +48,7 @@ export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
             initialBody: field.lessonPlanTemplateField === undefined ? field.body : "",
         }));
         contextName.value = $contextName;
+        lessonPlanDuration.value = $lessonPlanDuration;
         generatePlanRoute.value = $generatePlanRoute;
     }
 
@@ -190,6 +200,7 @@ export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
         init,
         hasLessonContent,
         fields,
+        lessonPlanDuration,
         additionalContext,
         modalStep,
         generateForField,

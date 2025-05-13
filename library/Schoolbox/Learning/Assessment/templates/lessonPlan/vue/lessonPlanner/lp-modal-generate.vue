@@ -45,6 +45,9 @@ window.Vue.onMounted(() => {
         <h2>{{ lpStore.generateForField.title }}</h2>
     </template>
 
+    <label for="lp-duration">Duration</label>
+    <input id="lp-duration" type="text" maxlength="255" :value="lpStore.lessonPlanDuration" />
+
     <label for="lp-generate-additional-context">Additional Context</label>
     <p class="meta">
         Provide any specific instructions, lesson context, or ideas to guide the AI in generating a tailored

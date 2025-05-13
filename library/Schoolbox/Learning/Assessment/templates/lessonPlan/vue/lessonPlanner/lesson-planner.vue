@@ -13,6 +13,7 @@ interface Props {
     studentConst: string; // The const for student visibility
     fileBrowserCategoryId: number;
     fields: LessonPlanField[];
+    lessonPlanDuration: string; // The duration of the lesson plan, only available in the AI menu
     contextName: string; // The course name/unit name/folder name/etc that this is being created for, to assist the AI
     generatePlanRoute: string | null; // The route to generate the lesson plan with AI, if available
 }
@@ -21,7 +22,7 @@ const props = defineProps<Props>();
 const lpStore = useLessonPlannerStore();
 
 window.Vue.onMounted(() => {
-    lpStore.init(props.fields, props.contextName, props.generatePlanRoute);
+    lpStore.init(props.fields, props.contextName, props.lessonPlanDuration, props.generatePlanRoute);
 });
 </script>
 
@@ -30,7 +31,9 @@ window.Vue.onMounted(() => {
         <slot name="title"></slot>
         <slot name="date"></slot>
         <slot name="curriculum-codes"></slot>
-        <slot name="duration"></slot>
+
+        <!-- Hidden field outside of the modal to ensure the form gets it -->
+        <input type="hidden" name="duration" :value="lpStore.lessonPlanDuration" />
 
         <button
             v-if="sbProps.hasAIFeatures"
