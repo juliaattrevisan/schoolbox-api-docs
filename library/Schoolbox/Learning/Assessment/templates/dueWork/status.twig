@@ -62,6 +62,7 @@
         <li class="separator">Bulk Actions</li>
         <li><a class="icon-approve" data-mass="submit" data-reveal-id="manage-submissions">Manage submissions</a></li>
         <li><a class="icon-approve" data-mass="publish" data-reveal-id="mass-publish">Publish grades & feedback</a></li>
+        <li><a class="icon-eye" href="{{ routeLookupIfAuthorized('learningAssessment.getRescore', {assessment: assessment, assessmentId: assessment.id}) }}">Rescore</a></li>
     {% endif %}
 {% endblock %}
 

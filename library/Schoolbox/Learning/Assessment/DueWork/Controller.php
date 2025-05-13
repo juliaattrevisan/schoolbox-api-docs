@@ -2194,10 +2194,12 @@ class Controller extends Assessment\Controller
      * Update each published authoritative feedback's human-readable marks to a new mark type.
      * This applies to human-readable marks for both the display grade and the instructor-given grade.
      *
+     * This is a preview screen to see waht the feedbacks would become.
+     *
      * @param IAssessable $assessment
      * @return void
      */
-    public function postRescore(IAssessable $assessment): void
+    public function getRescore(IAssessable $assessment): void
     {
         foreach ($assessment->getAllParticipants() as $participant) {
             $authoritativeFeedback = $participant->getAuthoritativeFeedback(true);
