@@ -24,6 +24,8 @@ class Rescore
      *
      * @param IAssessable $assessment
      * @return array
+     * @throws Deleted
+     * @throws Exception
      */
     public function preview(IAssessable $assessment): array
     {
@@ -37,8 +39,11 @@ class Rescore
      *
      * @param IAssessable $assessment
      * @return array
+     * @throws Deleted
+     * @throws Exception
      */
-    public function perform(IAssessable $assessment): array {
+    public function perform(IAssessable $assessment): array
+    {
         return $this->generate($assessment, true);
     }
 
