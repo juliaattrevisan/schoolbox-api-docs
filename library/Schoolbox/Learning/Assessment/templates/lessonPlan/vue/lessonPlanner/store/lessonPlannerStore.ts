@@ -92,13 +92,12 @@ export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
             return; // form is invalid, don't open the modal
         }
 
-        // deselect all fields, but intentionally keep additionalContext so it can be reused on the same page session
+        // intentionally keep additionalContext so it can be reused on the same page session
+        // select all fields by default, or if a fieldId is provided, only select that field
         generateForField.value = null;
         fields.value.forEach((field) => {
             field.selected = false;
-
-            // If a fieldId is provided, only select that field
-            if (field.id === fieldId) {
+            if (fieldId === field.id) {
                 field.selected = true;
                 generateForField.value = field;
             }
