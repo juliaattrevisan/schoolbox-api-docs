@@ -83,16 +83,6 @@ class Rescore
                     $newStudentMark = $assessment->getMarkScheme()->getHumanReadableMark($authoritativeFeedback->getNormalisedMark());
                     $newInstructorMark = $assessment->getInstructorMarkScheme()->getHumanReadableMark($authoritativeFeedback->getNormalisedMark());
                     $newNormalisedMark = $assessment->getInstructorMarkScheme()->getNormalisedMark($newInstructorMark);
-
-                    /* Mutate changes
-                     */
-                    if ($perform) {
-                        $authoritativeFeedback->setNormalisedMark($newNormalisedMark)
-                            ->setHumanReadableMark($newStudentMark)
-                            ->setHumanReadableInstructorMark($newInstructorMark);
-
-                        $this->feedbackDataSource->save($authoritativeFeedback);
-                    }
                 }
 
                 $changes[] = [
@@ -108,6 +98,16 @@ class Rescore
                         'instructor' => $newInstructorMark
                     ]
                 ];
+
+                /* Mutate changes
+                 */
+                if ($perform) {
+                    $authoritativeFeedback->setNormalisedMark($newNormalisedMark)
+                        ->setHumanReadableMark($newStudentMark)
+                        ->setHumanReadableInstructorMark($newInstructorMark);
+
+                    $this->feedbackDataSource->save($authoritativeFeedback);
+                }
             }
         }
 
