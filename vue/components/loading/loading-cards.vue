@@ -24,8 +24,10 @@ const props = withDefaults(defineProps<Props>(), {
                     </div>
                 </div>
                 <div class="l-flex-col l-flex--justify-center l-flex__item--1 l-gap-m">
-                    <h3></h3>
-                    <span></span>
+                    <slot>
+                        <h3></h3>
+                        <span></span>
+                    </slot>
                 </div>
             </div>
         </div>

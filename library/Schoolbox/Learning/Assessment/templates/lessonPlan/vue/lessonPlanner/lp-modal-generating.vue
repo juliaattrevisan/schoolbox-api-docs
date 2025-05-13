@@ -20,7 +20,12 @@ const selectedFields = window.Vue.computed(() => {
         <hr v-if="i > 0" />
         <label>{{ field.title }}</label>
 
-        <loading-cards :rows="1" :show-image="false"></loading-cards>
+        <loading-cards :rows="1" :show-image="false">
+            <h3></h3>
+            <p></p>
+            <p></p>
+            <p></p>
+        </loading-cards>
     </template>
 </template>
 
