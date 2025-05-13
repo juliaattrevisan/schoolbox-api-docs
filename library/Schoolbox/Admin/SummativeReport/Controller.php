@@ -85,7 +85,7 @@ class Controller extends ConfigController
      * theme or layout for their reports will require customisation of almost
      * everything inside the templates folder
      */
-//    private const FOOTER_HTML = '/templates/footer.html';
+    private const FOOTER_HTML = '/templates/footer.html';
     private const FOOTER_TWIG = '@adminSummativeReport/footer.twig';
 
 
@@ -740,7 +740,7 @@ class Controller extends ConfigController
                     'from'    => call_user_func($userSerializer, $this->getUser()),
                     'to'      => call_user_func($userSerializer, $this->getUser()),
                 ])
-//                ->setPdfFooter(file_get_contents(__DIR__ . self::FOOTER_HTML))
+                ->setPdfFooter(file_get_contents(__DIR__ . self::FOOTER_HTML))
                 ->setOutfile($outfile)
                 ->build();
 
