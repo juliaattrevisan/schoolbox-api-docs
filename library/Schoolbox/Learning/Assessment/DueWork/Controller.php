@@ -2194,10 +2194,12 @@ class Controller extends Assessment\Controller
      * Update each published authoritative feedback's human-readable marks to a new mark type.
      * This applies to human-readable marks for both the display grade and the instructor-given grade.
      *
-     * This is a preview screen to see waht the feedbacks would become.
+     * This is a preview screen to see what the feedbacks would become.
      *
      * @param IAssessable $assessment
      * @return void
+     * @throws RouteNotFound
+     * @throws \Twig\Error\Error
      */
     public function getRescore(IAssessable $assessment): void
     {

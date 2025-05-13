@@ -19,31 +19,41 @@
 
 <div class="row">
     <div class="small-12 island">
-        <table>
-            <thead>
-                <tr>
-                    <th>Student</th>
-                    <th>Previous normalised mark</th>
-                    <th>Previous input mark</th>
-                    <th>Previous display mark</th>
-                    <th>New normalised mark</th>
-                    <th>New input mark</th>
-                    <th>New display mark</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for change in changes %}
+        <form method="post" action="">
+            <table>
+                <thead>
                     <tr>
-                        <td>{{ change.user.fullname }}</td>
-                        <td>{{ change.old.normalised }}</td>
-                        <td>{{ change.old.student }}</td>
-                        <td>{{ change.old.instructor }}</td>
-                        <td>{{ change.new.normalised }}</td>
-                        <td>{{ change.new.student }}</td>
-                        <td>{{ change.new.instructor }}</td>
+                        <th>Student</th>
+                        <th>Previous normalised mark</th>
+                        <th>Previous input mark</th>
+                        <th>Previous display mark</th>
+                        <th>New normalised mark</th>
+                        <th>New input mark</th>
+                        <th>New display mark</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for change in changes %}
+                        <tr>
+                            <td>
+                                {% if change.user.deleted %}
+                                    {{ change.user.fullname }}
+                                {% else %}
+                                    <a href="/search/user/{{ change.user.id }}">{{ change.user.fullname }}</a>
+                                {% endif %}
+                            </td>
+                            <td>{{ change.old.normalised }}</td>
+                            <td>{{ change.old.student }}</td>
+                            <td>{{ change.old.instructor }}</td>
+                            <td>{{ change.new.normalised }}</td>
+                            <td>{{ change.new.student }}</td>
+                            <td>{{ change.new.instructor }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <input type="submit" value="Update" />
+        </form>
     </div>
 </div>
