@@ -2203,7 +2203,7 @@ class Controller extends Assessment\Controller
      */
     public function getRescore(IAssessable $assessment): void
     {
-        $changes = (new Assessment\DueWork\Feedback\Rescore($this->feedbackDataSource))->preview($assessment);
+        $changes = (new Assessment\DueWork\Feedback\Rescore($this->feedbackDataSource, $this->stateMapper))->preview($assessment);
 
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/dueWork/rescore.twig',
@@ -2237,7 +2237,7 @@ class Controller extends Assessment\Controller
      */
     public function postRescore(IAssessable $assessment): void
     {
-        $changes = (new Assessment\DueWork\Feedback\Rescore($this->feedbackDataSource))->perform($assessment);
+        $changes = (new Assessment\DueWork\Feedback\Rescore($this->feedbackDataSource, $this->stateMapper))->perform($assessment);
 
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/dueWork/rescore.twig',

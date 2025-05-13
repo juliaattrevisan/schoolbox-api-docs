@@ -4,13 +4,17 @@ namespace Schoolbox\Learning\Assessment\DueWork\Feedback;
 
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\DueWork\StateMapper;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception\Deleted;
 
 class Rescore
 {
     /**
      * @param IFeedbackDataSource $feedbackDataSource
+     * @param StateMapper $stateMapper
      */
-    public function __construct(private IFeedbackDataSource $feedbackDataSource)
+    public function __construct(private IFeedbackDataSource $feedbackDataSource, private StateMapper $stateMapper)
     {
     }
 
@@ -49,22 +53,29 @@ class Rescore
      * @param IAssessable $assessment
      * @param bool $perform
      * @return array
+     * @throws Exception
+     * @throws Deleted
      */
     private function generate(IAssessable $assessment, bool $perform = false): array
     {
         $changes = [];
 
+        /* Submission States with a normalised grade might get recomputed: instead, use the stateMapper
+         * to try and preserve them.
+         */
+        $submissionStates = $this->stateMapper->findAll()->indexBy('displayAs');
+
         foreach ($assessment->getAllParticipants() as $participant) {
             $authoritativeFeedback = $participant->getAuthoritativeFeedback(true);
 
             if ($authoritativeFeedback) {
-                /* Apparently this is how you detect a Submission State: an exception is thrown
-                 * trying to interpret it as one of the Mark Schemes. No wonder it was classified
-                 * as the $errors var. Wild!
-                 *
-                 * Shanked from Learning/Assessment/DueWork/Feedback/Factory.php::210
+                /* If it's a Submission State, just leave everything as it was: preserve the status quo
                  */
-                try {
+                if (null !== $submissionStates->getOffset($authoritativeFeedback->getHumanReadableMark())) {
+                    $newStudentMark = $authoritativeFeedback->getHumanReadableMark();
+                    $newInstructorMark = $authoritativeFeedback->getHumanReadableInstructorMark();
+                    $newNormalisedMark = $authoritativeFeedback->getNormalisedMark();
+                } else {
                     /* Recalibrate normalised mark from the human readable mark, as if you'd done that on the ui
                      * This prevents you having a normalised mark that would otherwise have been unattainable,
                      * such as a value between the lower and upper bounds of Letter Grades.
@@ -72,12 +83,16 @@ class Rescore
                     $newStudentMark = $assessment->getMarkScheme()->getHumanReadableMark($authoritativeFeedback->getNormalisedMark());
                     $newInstructorMark = $assessment->getInstructorMarkScheme()->getHumanReadableMark($authoritativeFeedback->getNormalisedMark());
                     $newNormalisedMark = $assessment->getInstructorMarkScheme()->getNormalisedMark($newInstructorMark);
-                } catch (\InvalidArgumentException $e) {
-                    /* Leave unchanged
+
+                    /* Mutate changes
                      */
-                    $newStudentMark = $authoritativeFeedback->getHumanReadableMark();
-                    $newInstructorMark = $authoritativeFeedback->getHumanReadableInstructorMark();
-                    $newNormalisedMark = $authoritativeFeedback->getNormalisedMark();
+                    if ($perform) {
+                        $authoritativeFeedback->setNormalisedMark($newNormalisedMark)
+                            ->setHumanReadableMark($newStudentMark)
+                            ->setHumanReadableInstructorMark($newInstructorMark);
+
+                        $this->feedbackDataSource->save($authoritativeFeedback);
+                    }
                 }
 
                 $changes[] = [
@@ -93,17 +108,6 @@ class Rescore
                         'instructor' => $newInstructorMark
                     ]
                 ];
-
-                /* Mutate changes
-                 */
-                if ($perform) {
-                    $authoritativeFeedback->setNormalisedMark($newNormalisedMark)
-                        ->setHumanReadableMark($newStudentMark)
-                        ->setHumanReadableInstructorMark($newInstructorMark);
-
-                    $this->feedbackDataSource->save($authoritativeFeedback);
-
-                }
             }
         }
 
