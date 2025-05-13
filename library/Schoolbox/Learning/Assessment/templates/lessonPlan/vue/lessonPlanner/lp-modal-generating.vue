@@ -18,7 +18,6 @@ const selectedFields = window.Vue.computed(() => {
 
     <template v-for="(field, i) in selectedFields" :key="field.id">
         <hr v-if="i > 0" />
-        <label>{{ field.title }}</label>
 
         <loading-cards :rows="1" :show-image="false">
             <h3></h3>
