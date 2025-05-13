@@ -143,8 +143,7 @@ class Helper
             return [$response->getBody()->getContents(), $log];
         } catch (GuzzleException $e) {
             $log->setReturnCode($e->getCode())
-                ->setErrorMessage($e->getMessage())
-                ->setResponse($e->getResponse()?->getBody()->getContents());
+                ->setErrorMessage($e->getMessage());
             $this->logMapper->save($log);
             $this->errorMapper->generateException(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
         }
