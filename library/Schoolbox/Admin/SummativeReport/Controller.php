@@ -428,7 +428,7 @@ class Controller extends ConfigController
             ->setOptions(json_encode($options, JSON_THROW_ON_ERROR))
             ->setUpdatedBy($this->getUser())
             ->setFileName($report->sanitiseFilename(trim((string)$postData['filename'])))
-            ->setFooter($report->sanitiseFooter(trim((string)$postData['footer'])));
+            ->setFooter(trim((string)$postData['footer']));
 
         /* If any Logo was provided, remember it
          * Otherwise clear it

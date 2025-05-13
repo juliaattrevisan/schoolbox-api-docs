@@ -262,15 +262,4 @@ class Model implements ISoftDeletable
         $this->footer = $footer;
         return $this;
     }
-
-    /**
-     * if empty it will use the default `self::DEFAULT_FOOTER`
-     *
-     * @param string $footer
-     * @return string
-     */
-    public function sanitiseFooter(string $footer): string
-    {
-        return $footer;
-    }
 }
