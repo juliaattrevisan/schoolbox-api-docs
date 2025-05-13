@@ -13,9 +13,10 @@
             >?</span>`
         )
 
-        // As we are adding a new tooltip, we need to trigger foundation to find the new one (more info in pixel.html).
-        setTimeout(function() {
-            $(document).foundation('tooltip', 'reflow');
-        }, 500);
     })();
+
+    // As we are adding a new tooltip, we need to trigger foundation to find the new one (more info in pixel.html).
+    document.addEventListener("DOMContentLoaded", () => {
+        $(document).foundation('tooltip', 'reflow');
+    })
 </script>
