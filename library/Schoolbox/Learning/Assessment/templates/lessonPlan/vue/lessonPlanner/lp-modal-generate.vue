@@ -45,7 +45,7 @@ window.Vue.onMounted(() => {
         <h2>{{ lpStore.generateForField.title }}</h2>
     </template>
 
-    <label for="lp-duration">Duration</label>
+    <label for="lp-duration">{{ locale.lessonPlan.proper() }} Duration</label>
     <p class="meta">This field is to set a timeframe for lesson plan creation by AI</p>
     <input id="lp-duration" type="text" maxlength="255" :value="lpStore.lessonPlanDuration" />
 
