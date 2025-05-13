@@ -169,7 +169,8 @@ class Module extends BaseModule
                 new \External_User(),
                 $this->getMapperFactory()->get(UserMapper::class)
             ),
-            $this->getMapperFactory()->get(ImplementationMapper::class)
+            $this->getMapperFactory()->get(ImplementationMapper::class),
+            $this->injector->get('templateEngine'),
         );
     }
 
