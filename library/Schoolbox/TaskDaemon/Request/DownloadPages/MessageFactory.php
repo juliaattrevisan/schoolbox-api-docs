@@ -30,7 +30,7 @@ class MessageFactory extends BaseMessageFactory
     /**
      * Content to download.
      *
-     * @var array<array{filename: string, urls?: string[], source?: string}>
+     * @var array<array{filename: string, footer?: string, urls?: string[], source?: string}>
      */
     private array $content = [];
 
@@ -108,10 +108,10 @@ class MessageFactory extends BaseMessageFactory
      *                         converted to PDF and then merged.
      * @return self
      */
-    public function addPdfContent(string $filename, string ...$urls): self
+    public function addPdfContent(string $filename, ?string $footer = null, string ...$urls,): self
     {
         $clone = clone $this;
-        $clone->content[] = ['filename' => $filename, 'urls' => $urls];
+        $clone->content[] = ['filename' => $filename, 'urls' => $urls, 'footer' => $footer];
         return $clone;
     }
 
