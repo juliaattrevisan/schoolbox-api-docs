@@ -2201,8 +2201,42 @@ class Controller extends Assessment\Controller
      */
     public function getRescore(IAssessable $assessment): void
     {
+        $changes = [];
+
         foreach ($assessment->getAllParticipants() as $participant) {
             $authoritativeFeedback = $participant->getAuthoritativeFeedback(true);
+
+            if ($authoritativeFeedback) {
+                $changes[] = [
+                    'user' => $participant->getUser(),
+                    'old' => [
+                        'student' => $authoritativeFeedback->getHumanReadableMark(),
+                        'instructor' => $authoritativeFeedback->getHumanReadableInstructorMark(),
+                    ] ,
+                    'new' => [
+                        'student' => $assessment->getMarkScheme()->getHumanReadableMark($authoritativeFeedback->getNormalisedMark()),
+                        'instructor' => $assessment->getInstructorMarkScheme()->getHumanReadableMark($authoritativeFeedback->getNormalisedMark()),
+                    ]
+                ];
+            }
         }
+
+        $this->response = $this->responseFromTemplate(
+            '@learningAssessment/dueWork/rescore.twig',
+            [
+                'breadcrumbs' => $this->bakery->produceFromAssessment($assessment, $this->getUser())->add([
+                    $assessment->getTitle(),
+                    $this->getRouteIfAuthorized('learningAssessment.getStatus', [
+                        'assessment' => $assessment,
+                        'assessmentId' => $assessment->getId()
+                    ])
+                ])->add([
+                    'Rescore',
+                    ''
+                ]),
+                'assessment' => $assessment,
+                'changes' => $changes
+            ]
+        );
     }
 }

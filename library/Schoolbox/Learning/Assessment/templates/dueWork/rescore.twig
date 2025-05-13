@@ -1,0 +1,45 @@
+{##
+ # Rescore Feedbacks
+ # Updates published authoritative feedbacks to use the currently-selected mark types
+ # for both instructor-given marks and student marks.
+ #
+ #}
+{% import 'sub/breadcrumbs.twig' as bread %}
+
+{# Build breadcrumbs #}
+{{ bread.crumbsArray(breadcrumbs) }}
+
+<div class="row">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>Rescore feedback for {{ assessment.title }}</h1>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <table>
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Previous instructor mark</th>
+                    <th>Previous student-visible mark</th>
+                    <th>New instructor mark</th>
+                    <th>New student-visible mark</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for change in changes %}
+                    <tr>
+                        <td>{{ change.user.fullname }}</td>
+                        <td>{{ change.old.student }}</td>
+                        <td>{{ change.old.instructor }}</td>
+                        <td>{{ change.new.student }}</td>
+                        <td>{{ change.new.instructor }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
