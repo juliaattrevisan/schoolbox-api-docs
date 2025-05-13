@@ -66,6 +66,8 @@ class Rescore
         $submissionStates = $this->stateMapper->findAll()->indexBy('displayAs');
 
         foreach ($assessment->getAllParticipants() as $participant) {
+            $hasChanges = false;
+
             $authoritativeFeedback = $participant->getAuthoritativeFeedback(true);
 
             if ($authoritativeFeedback) {
@@ -83,6 +85,8 @@ class Rescore
                     $newStudentMark = $assessment->getMarkScheme()->getHumanReadableMark($authoritativeFeedback->getNormalisedMark());
                     $newInstructorMark = $assessment->getInstructorMarkScheme()->getHumanReadableMark($authoritativeFeedback->getNormalisedMark());
                     $newNormalisedMark = $assessment->getInstructorMarkScheme()->getNormalisedMark($newInstructorMark);
+
+                    $hasChanges = true;
                 }
 
                 $changes[] = [
@@ -101,7 +105,7 @@ class Rescore
 
                 /* Mutate changes
                  */
-                if ($perform) {
+                if ($perform && $hasChanges) {
                     $authoritativeFeedback->setNormalisedMark($newNormalisedMark)
                         ->setHumanReadableMark($newStudentMark)
                         ->setHumanReadableInstructorMark($newInstructorMark);
