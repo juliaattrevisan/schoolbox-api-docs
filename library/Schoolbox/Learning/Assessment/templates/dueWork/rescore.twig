@@ -21,6 +21,7 @@
     </div>
 </div>
 
+{% if changes|length %}
 <div class="row">
     <div class="small-12 island">
         <form method="post" action="{{ routeLookupIfAuthorized('learningAssessment.postRescore', {assessment: assessment, assessmentId: assessment.id}) }}">
@@ -65,3 +66,13 @@
         </form>
     </div>
 </div>
+{% else %}
+    <div class="row">
+        <div class="small-12 columns">
+            <div class="empty-state">
+                <i class="icon-progress"></i>
+                <p>There aren't any published feedbacks yet.</p>
+            </div>
+        </div>
+    </div>
+{% endif %}

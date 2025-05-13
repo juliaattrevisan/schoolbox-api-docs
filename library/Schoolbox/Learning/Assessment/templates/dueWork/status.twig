@@ -62,7 +62,11 @@
         <li class="separator">Bulk Actions</li>
         <li><a class="icon-approve" data-mass="submit" data-reveal-id="manage-submissions">Manage submissions</a></li>
         <li><a class="icon-approve" data-mass="publish" data-reveal-id="mass-publish">Publish grades & feedback</a></li>
-        <li><a class="icon-eye" href="{{ routeLookupIfAuthorized('learningAssessment.getRescore', {assessment: assessment, assessmentId: assessment.id}) }}">Rescore</a></li>
+
+        {% set rescoreRoute = routeLookupIfAuthorized('learningAssessment.getRescore', {assessment: assessment, assessmentId: assessment.id}) %}
+        {% if rescoreRoute %}
+            <li><a class="icon-due-work" href="{{ rescoreRoute }}">Rescore feedback</a></li>
+        {% endif %}
     {% endif %}
 {% endblock %}
 
