@@ -60,6 +60,7 @@ use Schoolbox\User\Translator\Author\ModelToArray;
 use Schoolbox\UserBulkMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\YearLevel\Mapper as YearLevelMapper;
+use Twig\Environment;
 use Twig\Error\Error;
 
 /**
@@ -84,7 +85,8 @@ class Controller extends ConfigController
      * theme or layout for their reports will require customisation of almost
      * everything inside the templates folder
      */
-    private const FOOTER_HTML = '/templates/footer.html';
+//    private const FOOTER_HTML = '/templates/footer.html';
+    private const FOOTER_TWIG = '@adminSummativeReport/footer.twig';
 
 
     /**
@@ -143,6 +145,7 @@ class Controller extends ConfigController
      * @param CacheInterface $oidcCache
      * @param \Schoolbox\External\User $externalUser
      * @param ImplementationMapper $implementationMapper
+     * @param Environment $twig
      */
     public function __construct(
         private \Schoolbox\Error\Mapper $errorMapper,
@@ -164,7 +167,8 @@ class Controller extends ConfigController
         Rebuilder $rebuilder,
         CacheInterface $oidcCache,
         private \Schoolbox\External\User $externalUser,
-        private ImplementationMapper $implementationMapper
+        private ImplementationMapper $implementationMapper,
+        private Environment $twig,
     ) {
         parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder, $oidcCache);
     }
@@ -692,7 +696,16 @@ class Controller extends ConfigController
              * Not sure what this does/did...?
              */
             foreach ($reports as $current) {
-                $messageFactory = $messageFactory->addPdfContent($current['filename'], $current['url']);
+                $messageFactory = $messageFactory->addPdfContent(
+                    $current['filename'],
+                    /* Having individualised footer
+                     */
+                    $this->twig->render(
+                        self::FOOTER_TWIG,
+                        ['customFooter' => $current['footer']]
+                    ),
+                    $current['url']
+                );
             }
 
             /* This is the filename for the zip that contains everything
@@ -727,7 +740,7 @@ class Controller extends ConfigController
                     'from'    => call_user_func($userSerializer, $this->getUser()),
                     'to'      => call_user_func($userSerializer, $this->getUser()),
                 ])
-                ->setPdfFooter(file_get_contents(__DIR__ . self::FOOTER_HTML))
+//                ->setPdfFooter(file_get_contents(__DIR__ . self::FOOTER_HTML))
                 ->setOutfile($outfile)
                 ->build();
 
