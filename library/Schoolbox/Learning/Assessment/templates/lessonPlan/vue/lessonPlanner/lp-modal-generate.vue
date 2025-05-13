@@ -11,6 +11,29 @@ const allowGeneration = window.Vue.computed(() => {
     return lpStore.fields.some((field) => field.selected);
 });
 
+const selectAll = window.Vue.ref(true);
+
+/**
+ * When the select all checkbox is clicked, change all fields to match the checkbox
+ * This is only applied on a user action, not if selectAll is changed by other means (i.e. the watcher)
+ */
+async function onSelectAllClick(): Promise<void> {
+    await new Promise((res) => {
+        setTimeout(res, 0); // wait for the click to be processed
+    });
+    lpStore.fields.forEach((field) => {
+        field.selected = selectAll.value;
+    });
+}
+
+window.Vue.watch(
+    () => lpStore.fields.every((field) => field.selected),
+    (newValue) => {
+        selectAll.value = newValue;
+    },
+    { immediate: true },
+);
+
 window.Vue.onMounted(() => {
     // @ts-expect-error -- To trigger the tooltip next to the field title to show up correctly
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- foundation isn't typed, see above
@@ -24,6 +47,10 @@ window.Vue.onMounted(() => {
             Select the sections of your {{ locale.lessonPlan.singular() }} which you want AI to help with:
         </label>
         <ul id="lp-generate-fields" class="option-list">
+            <li v-if="lpStore.fields.length > 1">
+                <input id="lp-generate-select-all" v-model="selectAll" type="checkbox" />
+                <label for="lp-generate-select-all" class="checkbox-label" @click="onSelectAllClick">Select All</label>
+            </li>
             <li v-for="field in lpStore.fields" :key="field.id">
                 <input :id="`lp-generate-field-${field.id}`" v-model="field.selected" type="checkbox" />
                 <label :for="`lp-generate-field-${field.id}`" class="checkbox-label">
