@@ -2,10 +2,43 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Feedback;
 
+use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
 
 class Rescore
 {
+    /**
+     * @param IFeedbackDataSource $feedbackDataSource
+     */
+    public function __construct(private IFeedbackDataSource $feedbackDataSource)
+    {
+    }
+
+
+    /**
+     * Don't make any database changes; used for a preview screen
+     *
+     * @param IAssessable $assessment
+     * @return array
+     */
+    public function preview(IAssessable $assessment): array
+    {
+        return $this->generate($assessment);
+    }
+
+
+    /**
+     * Persist updates in the db and return a list of changed records;
+     * used for a confirmation screen
+     *
+     * @param IAssessable $assessment
+     * @return array
+     */
+    public function perform(IAssessable $assessment): array {
+        return $this->generate($assessment, true);
+    }
+
+
     /**
      * Takes a fully hydrated $assessment via findByIdForReview()) and recalculates
      * normalised and human readable marks using $assessment's current settings for
@@ -14,9 +47,10 @@ class Rescore
      * This is used to change the feedbacks' mark type after they've been marked.
      *
      * @param IAssessable $assessment
+     * @param bool $perform
      * @return array
      */
-    public function generate(IAssessable $assessment): array
+    private function generate(IAssessable $assessment, bool $perform = false): array
     {
         $changes = [];
 
@@ -45,6 +79,17 @@ class Rescore
                         'instructor' => $newInstructorMark
                     ]
                 ];
+
+                /* Mutate changes
+                 */
+                if ($perform) {
+                    $authoritativeFeedback->setNormalisedMark($newNormalisedMark)
+                        ->setHumanReadableMark($newStudentMark)
+                        ->setHumanReadableInstructorMark($newInstructorMark);
+
+                    $this->feedbackDataSource->save($authoritativeFeedback);
+
+                }
             }
         }
 

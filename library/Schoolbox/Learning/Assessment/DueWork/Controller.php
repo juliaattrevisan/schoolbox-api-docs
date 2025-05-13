@@ -2203,7 +2203,7 @@ class Controller extends Assessment\Controller
      */
     public function getRescore(IAssessable $assessment): void
     {
-        $changes = (new Assessment\DueWork\Feedback\Rescore())->generate($assessment);
+        $changes = (new Assessment\DueWork\Feedback\Rescore($this->feedbackDataSource))->preview($assessment);
 
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/dueWork/rescore.twig',
@@ -2219,7 +2219,42 @@ class Controller extends Assessment\Controller
                     ''
                 ]),
                 'assessment' => $assessment,
-                'changes' => $changes
+                'changes' => $changes,
+                'perform' => false
+            ]
+        );
+    }
+
+
+    /**
+     * Update each published authoritative feedback's human-readable marks to a new mark type.
+     * This applies to human-readable marks for both the display grade and the instructor-given grade.
+     *
+     * @param IAssessable $assessment
+     * @return void
+     * @throws RouteNotFound
+     * @throws \Twig\Error\Error
+     */
+    public function postRescore(IAssessable $assessment): void
+    {
+        $changes = (new Assessment\DueWork\Feedback\Rescore($this->feedbackDataSource))->perform($assessment);
+
+        $this->response = $this->responseFromTemplate(
+            '@learningAssessment/dueWork/rescore.twig',
+            [
+                'breadcrumbs' => $this->bakery->produceFromAssessment($assessment, $this->getUser())->add([
+                    $assessment->getTitle(),
+                    $this->getRouteIfAuthorized('learningAssessment.getStatus', [
+                        'assessment' => $assessment,
+                        'assessmentId' => $assessment->getId()
+                    ])
+                ])->add([
+                    'Rescore',
+                    ''
+                ]),
+                'assessment' => $assessment,
+                'changes' => $changes,
+                'perform' => true
             ]
         );
     }

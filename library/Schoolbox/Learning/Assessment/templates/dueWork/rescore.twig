@@ -19,7 +19,7 @@
 
 <div class="row">
     <div class="small-12 island">
-        <form method="post" action="">
+        <form method="post" action="{{ routeLookupIfAuthorized('learningAssessment.postRescore', {assessment: assessment, assessmentId: assessment.id}) }}">
             <table>
                 <thead>
                     <tr>
@@ -53,7 +53,11 @@
                 </tbody>
             </table>
 
-            <input type="submit" value="Update" />
+            {% if perform %}
+                <a class='button full-width' href="{{ routeLookupIfAuthorized('learningAssessment.getStatus', {assessment: assessment, assessmentId: assessment.id }) }}">Back</a>
+            {% else %}
+                <input type="submit" value="Update" />
+            {% endif %}
         </form>
     </div>
 </div>
