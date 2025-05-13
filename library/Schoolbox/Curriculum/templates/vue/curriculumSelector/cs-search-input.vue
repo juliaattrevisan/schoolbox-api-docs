@@ -197,10 +197,14 @@ const isActive = window.Vue.computed(() => {
     </div>
 </template>
 
-<style scoped>
-input,
-button {
-    margin-bottom: 0;
+<style scoped lang="scss">
+// remove the default margins when the cs-search-results are visible so the results butt up against the search input
+// ^foundation-fixes^ - inputs shouldn't have margins, they should always be controlled by a parent element
+.curriculum-selector:has(.search-results-container li) {
+    .search-input,
+    .button {
+        margin-bottom: 0;
+    }
 }
 
 .input-group[data-is-small-container="true"] {
