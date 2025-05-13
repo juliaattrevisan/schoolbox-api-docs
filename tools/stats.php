@@ -331,6 +331,12 @@ $app = new class extends CliTool\App {
             'openai_model_gpt4o-mini' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-4o-mini%' or model like 'gpt4o%-mini'",
             'openai_model_gpt41' => "SELECT count(*) FROM openai_log WHERE (model like 'gpt-4.1%' or model like 'gpt4.1%') and model not like '%mini%'",
             'openai_model_gpt41-mini' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-4.1-mini%' or model like 'gpt4.1-mini%'",
+            'openai_model_unknown' => "
+                SELECT count(*) FROM openai_log WHERE
+                not ((model like 'gpt-4o%' or model like 'gpt4o%') and model not like '%mini%') and not
+                (model like 'gpt-4o-mini%' or model like 'gpt4o%-mini') and not
+                ((model like 'gpt-4.1%' or model like 'gpt4.1%') and model not like '%mini%') and not
+                (model like 'gpt-4.1-mini%' or model like 'gpt4.1-mini%')",
 
             //Packages
             'package_installed' => 'SELECT COUNT(*) FROM package WHERE installed = 1',
