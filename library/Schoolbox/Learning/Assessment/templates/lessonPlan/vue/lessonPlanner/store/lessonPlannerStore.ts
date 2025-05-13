@@ -96,8 +96,9 @@ export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
         // select all fields by default, or if a fieldId is provided, only select that field
         generateForField.value = null;
         fields.value.forEach((field) => {
-            field.selected = false;
-            if (fieldId === field.id) {
+            if (fieldId === undefined) {
+                field.selected = true;
+            } else if (fieldId === field.id) {
                 field.selected = true;
                 generateForField.value = field;
             }
