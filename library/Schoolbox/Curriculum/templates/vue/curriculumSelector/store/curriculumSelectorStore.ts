@@ -9,110 +9,137 @@ import { useSelectedNodesStore } from "./csSelectedNodesStore";
 import { useSearchStore } from "./csSearchStore";
 import { useModalStore } from "./csModalStore";
 import { useModalViewNodesStore } from "./csModalViewNodesStore";
+import type { Node } from "@schoolboxCurriculum/types/Node";
 
 export let apiEndpoint = "";
 
-export const useStore = defineStore(`curriculumSelector`, {
-    state: () => ({
-        isLoading: true, //to display loading note
-        hasLoadError: false, //to display loading error
-        isProcessing: false, //to notify that an action is taking place, like updating a member access
-        isReadOnly: true, //can only view the currently selected codes, not edit them
-        containerWidth: 0, //currently so can tweak the styling when the selector is small
-        selectedOriginal: [], //an 'original' selection, saved by the user
-        selectedDefault: [], //the default selection relevant to the current user role
-        isSelectAll: false, // to select any nodes, not just those that have a code
-        canSelectChildren: true, // is able to select children of an already selected node
-        includeWithoutCode: false, // set to true if curriculum nodes with blank codes need to be selectable
-        includeChildren: false, // When a node is selected, also select all its children
-        includeDisabled: false, // whether to display disabled nodes
-        hasTabs: false, // whether to display tabs
-        folderId: undefined, // the folderId to load the unit nodes from
-    }),
+interface Props {
+    isReadOnly: boolean;
+    formValueName: string;
+    dataEndpoint: string;
+    selectedNodes: Node[];
+    includeChildren: boolean;
+    hasTabs: boolean;
+    folderId: number | undefined;
+    isSelectAll: boolean;
+    canSelectChildren: boolean;
+    includeWithoutCode: boolean;
+    includeDisabled: boolean;
+}
 
-    getters: {
-        /**
-         * When all loading is complete and was a success
-         *
-         * @returns { Boolean }
-         */
-        hasLoadedOk() {
-            if (!this.hasTabs || this.folderId === undefined) {
-                return !this.isLoading && !this.hasLoadError;
-            }
-            return (
-                !this.isLoading &&
-                !this.hasLoadError &&
-                useUnitNodesStore().hasLoaded &&
-                !useUnitNodesStore().hasLoadError
-            );
-        },
+export const useStore = defineStore(`curriculumSelector`, () => {
+    const isLoading = window.Vue.ref(true); // to display loading note
+    const hasLoadError = window.Vue.ref(false); // to display loading error
+    const isProcessing = window.Vue.ref(false); // to notify that an action is taking place, like updating a member access
+    const isReadOnly = window.Vue.ref(true); // can only view the currently selected codes, not edit them
+    const formValueName = window.Vue.ref(""); // the name of the form value to update
+    const containerWidth = window.Vue.ref(0); // currently so can tweak the styling when the selector is small
+    const selectedOriginal = window.Vue.ref([]); // an 'original' selection, saved by the user
+    const selectedDefault = window.Vue.ref([]); // the default selection relevant to the current user role
+    const isSelectAll = window.Vue.ref(false); // to select any nodes, not just those that have a code
+    const canSelectChildren = window.Vue.ref(true); // is able to select children of an already selected node
+    const includeWithoutCode = window.Vue.ref(false); // set to true if curriculum nodes with blank codes need to be selectable
+    const includeChildren = window.Vue.ref(false); // When a node is selected, also select all its children
+    const includeDisabled = window.Vue.ref(false); // whether to display disabled nodes
+    const hasTabs = window.Vue.ref(false); // whether to display tabs
+    const folderId = window.Vue.ref<number | undefined>(undefined); // the folderId to load the unit nodes from
 
-        /**
-         * To tweak the design of the selector when small
-         *
-         * @returns { Boolean }
-         */
-        isSmallContainer() {
-            return this.containerWidth < 500;
-        },
-    },
+    /**
+     * When all loading is complete and was a success
+     */
+    const hasLoadedOk = window.Vue.computed(() => {
+        if (!hasTabs.value || folderId.value === undefined) {
+            return !isLoading.value && !hasLoadError.value;
+        }
+        return (
+            !isLoading.value &&
+            !hasLoadError.value &&
+            useUnitNodesStore().hasLoaded &&
+            !useUnitNodesStore().hasLoadError
+        );
+    });
 
-    actions: {
-        /**
-         * set up the passed properties and start loading the node data
-         *
-         * @param { object }
-         */
-        init(props) {
-            this.checkForStorybook();
-            this.isReadOnly = props.isReadOnly;
-            this.formValueName = props.formValueName;
-            this.isSelectAll = props.isSelectAll;
-            this.canSelectChildren = props.canSelectChildren;
-            this.includeWithoutCode = props.includeWithoutCode;
-            this.includeChildren = props.includeChildren;
-            this.includeDisabled = props.includeDisabled;
-            this.hasTabs = props.hasTabs;
-            this.folderId = props.folderId;
-            if (!this.isReadOnly && props.dataEndpoint !== "") {
-                //only load when we need to
-                apiEndpoint = props.dataEndpoint;
-                useNodesStore().load();
-            }
-            // load in the unit nodes, only displaying the tabs if there are any unit nodes
-            if (props.hasTabs && props.folderId !== undefined) {
-                useUnitNodesStore().load(props.folderId);
-            }
-            if (props.selectedNodes?.length > 0) {
-                //add in any nodes that have been selected previously
-                const selectedNodesStore = useSelectedNodesStore();
-                props.selectedNodes.forEach((node) => selectedNodesStore.add(node));
-            }
-        },
+    /**
+     * To tweak the design of the selector when small
+     */
+    const isSmallContainer = window.Vue.computed(() => {
+        return containerWidth.value < 500;
+    });
 
-        /**
-         * When switching between stories, we need to reset the data models
-         * as they persist between the stories otherwise
-         */
-        checkForStorybook() {
-            if (typeof STORYBOOK_ENV !== "undefined") {
-                useSelectedNodesStore().$reset();
-                useSearchStore().$reset();
-                useModalStore().$reset();
-                useModalViewNodesStore().$reset();
-                this.$reset();
-            }
-        },
+    /**
+     * When switching between stories, we need to reset the data models
+     * as they persist between the stories otherwise
+     */
+    function checkForStorybook(): void {
+        if (typeof STORYBOOK_ENV !== "undefined") {
+            useSelectedNodesStore().$reset();
+            useSearchStore().$reset();
+            useModalStore().$reset();
+            useModalViewNodesStore().$reset();
+            $reset();
+        }
+    }
 
-        /**
-         * to track the width of the container the curriculum selector is in,
-         * so we can update the design when appropriate
-         *
-         * @param { number }
-         */
-        updateContainerWidth(width) {
-            this.containerWidth = width;
-        },
-    },
+    /**
+     * set up the passed properties and start loading the node data
+     * @param props - the properties to set
+     */
+    function init(props: Props): void {
+        checkForStorybook();
+        isReadOnly.value = props.isReadOnly;
+        formValueName.value = props.formValueName;
+        isSelectAll.value = props.isSelectAll;
+        canSelectChildren.value = props.canSelectChildren;
+        includeWithoutCode.value = props.includeWithoutCode;
+        includeChildren.value = props.includeChildren;
+        includeDisabled.value = props.includeDisabled;
+        hasTabs.value = props.hasTabs;
+        folderId.value = props.folderId;
+        if (!isReadOnly.value && props.dataEndpoint !== "") {
+            // only load when we need to
+            apiEndpoint = props.dataEndpoint;
+            void useNodesStore().load();
+        }
+        // load in the unit nodes, only displaying the tabs if there are any unit nodes
+        if (props.hasTabs && props.folderId !== undefined) {
+            void useUnitNodesStore().load(props.folderId);
+        }
+        if (props.selectedNodes?.length > 0) {
+            // add in any nodes that have been selected previously
+            const selectedNodesStore = useSelectedNodesStore();
+            props.selectedNodes.forEach((node) => selectedNodesStore.add(node));
+        }
+    }
+
+    /**
+     * to track the width of the container the curriculum selector is in,
+     * so we can update the design when appropriate
+     * @param width - the width of the container
+     */
+    function updateContainerWidth(width: number): void {
+        containerWidth.value = width;
+    }
+
+    return {
+        isLoading,
+        hasLoadError,
+        isProcessing,
+        isReadOnly,
+        formValueName,
+        containerWidth,
+        selectedOriginal,
+        selectedDefault,
+        isSelectAll,
+        canSelectChildren,
+        includeWithoutCode,
+        includeChildren,
+        includeDisabled,
+        hasTabs,
+        folderId,
+        hasLoadedOk,
+        isSmallContainer,
+        checkForStorybook,
+        init,
+        updateContainerWidth,
+    };
 });
