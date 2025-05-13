@@ -67,6 +67,16 @@
         {% endif %}
     </div>
 
+    {# ----------------------------------------------------------- #}
+    {# Curriculum #}
+    {# ----------------------------------------------------------- #}
+    {% include '@learningAssessment/fragments/curriculumCodes.twig' with {
+        entityType: locale.dueWork.proper,
+        courseManagedReadonly: courseManaged.isReadonly,
+        excludeLegend: true,
+        hasTabs: true,
+    } %}
+
     <label for="assessment-description">Description</label>
     <textarea name="description" id="assessment-description" data-test="assessment-form-input-description">{{ assessment.description }}</textarea>
 
@@ -285,14 +295,6 @@
 {% if context.baseContext is not unitSpecification and custom_assessment_participation %}
     {% include '@learningAssessment/fragments/participation.twig' %}
 {% endif %}
-
-{# ----------------------------------------------------------- #}
-{# Curriculum #}
-{# ----------------------------------------------------------- #}
-{% include '@learningAssessment/fragments/curriculumCodes.twig' with {
-    entityType: locale.dueWork.proper,
-    courseManagedReadonly: courseManaged.isReadonly
-} %}
 
 {# ----------------------------------------------------------- #}
 {# Submit #}

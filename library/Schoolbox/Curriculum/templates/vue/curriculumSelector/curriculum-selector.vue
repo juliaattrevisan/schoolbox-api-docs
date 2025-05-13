@@ -90,7 +90,7 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
-    <div ref="curriculumSelectorEl">
+    <div ref="curriculumSelectorEl" class="curriculum-selector">
         <cs-selected-nodes />
         <cs-search-input
             :curriculum-selector-el="curriculumSelectorEl"
