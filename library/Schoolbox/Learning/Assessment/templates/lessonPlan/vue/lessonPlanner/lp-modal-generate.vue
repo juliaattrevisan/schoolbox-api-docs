@@ -47,15 +47,15 @@ window.Vue.onMounted(() => {
 
     <label for="lp-duration">{{ locale.lessonPlan.proper() }} Duration</label>
     <p class="meta">
-        Provide a timeframe for how long the lesson is expected to run. This helps the AI tailor the
-        {{ locale.lessonPlan.singular() }} to fit your intended lesson duration.
+        Provide a timeframe for how long the {{ locale.lessonPlan.singular() }} is expected to run. This helps the AI
+        tailor the {{ locale.lessonPlan.singular() }} to fit your intended {{ locale.lessonPlan.singular() }} duration.
     </p>
     <input id="lp-duration" v-model.trim="lpStore.lessonPlanDuration" type="text" maxlength="255" />
 
     <label for="lp-generate-additional-context">Additional Context</label>
     <p class="meta">
-        Provide any specific instructions, lesson context, or ideas to guide the AI in generating a tailored
-        {{ locale.lessonPlan.singular() }}.
+        Provide any specific instructions, {{ locale.lessonPlan.singular() }} context, or ideas to guide the AI in
+        generating a tailored {{ locale.lessonPlan.singular() }}.
     </p>
     <textarea id="lp-generate-additional-context" v-model="lpStore.additionalContext" rows="5"></textarea>
 
