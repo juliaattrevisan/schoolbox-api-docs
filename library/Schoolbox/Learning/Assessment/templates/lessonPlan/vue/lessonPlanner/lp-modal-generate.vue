@@ -47,8 +47,8 @@ window.Vue.onMounted(() => {
 
     <label for="lp-duration">{{ locale.lessonPlan.proper() }} Duration</label>
     <p class="meta">
-        Provide a timeframe for how long the lesson is expected to run. This helps the AI tailor the plan to fit your
-        intended lesson duration.
+        Provide a timeframe for how long the lesson is expected to run. This helps the AI tailor the
+        {{ locale.lessonPlan.singular() }} to fit your intended lesson duration.
     </p>
     <input id="lp-duration" v-model.trim="lpStore.lessonPlanDuration" type="text" maxlength="255" />
 
