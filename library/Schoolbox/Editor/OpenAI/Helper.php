@@ -106,6 +106,14 @@ class Helper
         if (!$this->canUseStructuredOutputs()) {
             throw new \DomainException('AI endpoint/model does not support Structured Outputs');
         }
+        /* Log what the user tried to do if we made a vaguely-successful request
+             * and didn't somehow die long the way
+             */
+        $log = $this->logMapper->createModel()
+            ->setUser($user)
+            ->setPrompt($payload);
+
+        $this->logMapper->save($log);
 
         /* Minimum requirements met: let's send it and see what AI overlords think of our payload
          */
@@ -119,24 +127,12 @@ class Helper
 
             http_response_code($response->getStatusCode());
 
-            /* Log some error messages, if applicable
-             */
-            $errorMessage = '';
-
             if ($response->getStatusCode() !== 200) {
-                $errorMessage = $response->getReasonPhrase();
+                // store error in log
+                $log->setReturnCode($response->getStatusCode())
+                    ->setErrorMessage($response->getReasonPhrase());
+                $this->logMapper->save($log);
             }
-
-            /* Log what the user tried to do if we made a vaguely-successful request
-             * and didn't somehow die long the way
-             */
-            $log = $this->logMapper->createModel()
-                ->setUser($user)
-                ->setPrompt($payload)
-                ->setReturnCode($response->getStatusCode())
-                ->setErrorMessage($errorMessage);
-
-            $this->logMapper->save($log);
 
             /* The async method will still continue trying to render other aura stuff,
              * like the chrome etc. so people left a die(); here to forcibly terminate;
@@ -146,6 +142,10 @@ class Helper
              */
             return [$response->getBody()->getContents(), $log];
         } catch (GuzzleException $e) {
+            $log->setReturnCode($e->getCode())
+                ->setErrorMessage($e->getMessage())
+                ->setResponse($e->getResponse()?->getBody()->getContents());
+            $this->logMapper->save($log);
             $this->errorMapper->generateException(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
         }
 

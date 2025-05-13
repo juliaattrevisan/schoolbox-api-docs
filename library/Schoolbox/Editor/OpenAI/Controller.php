@@ -137,10 +137,12 @@ class Controller extends Base
             if ($data["error"] ?? null) {
                 $returnCode = 500;
 
-                $log->setReturnCode($returnCode);
-                $log->setResponse($result);
-                $log->setErrorMessage($data["error"]["message"]);
-                $this->logMapper->save($log);
+                if ($log) {
+                    $log->setReturnCode($returnCode);
+                    $log->setResponse($result);
+                    $log->setErrorMessage($data["error"]["message"]);
+                    $this->logMapper->save($log);
+                }
 
                 $problem = (new ApiProblem($data["error"]["message"]))
                     ->setStatus($returnCode)
@@ -171,10 +173,12 @@ class Controller extends Base
                     $title .= sprintf(" (%s)", $incompleteMessage);
                 }
 
-                $log->setReturnCode($returnCode);
-                $log->setResponse($result);
-                $log->setErrorMessage($incompleteMessage);
-                $this->logMapper->save($log);
+                if ($log) {
+                    $log->setReturnCode($returnCode);
+                    $log->setResponse($result);
+                    $log->setErrorMessage($incompleteMessage);
+                    $this->logMapper->save($log);
+                }
 
                 $problem = (new ApiProblem($title))
                     ->setStatus($returnCode)

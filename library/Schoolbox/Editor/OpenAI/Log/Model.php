@@ -24,8 +24,8 @@ class Model
     private ?int $outputTokens = null;
     private ?string $model = null;
     private ?string $response = null;
-    private int $returnCode;
-    private string $errorMessage;
+    private ?int $returnCode = null;
+    private ?string $errorMessage = null;
 
     // TEXT max length, to trim the prompt, rather than die.
     private const PROMPT_MAX_LENGTH = 65535;
@@ -79,19 +79,19 @@ class Model
 
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getReturnCode(): int
+    public function getReturnCode(): ?int
     {
         return $this->returnCode;
     }
 
 
     /**
-     * @param int $returnCode
+     * @param int|null $returnCode
      * @return $this
      */
-    public function setReturnCode(int $returnCode): self
+    public function setReturnCode(?int $returnCode): self
     {
         $this->returnCode = $returnCode;
         return $this;
@@ -99,19 +99,19 @@ class Model
 
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getErrorMessage(): string
+    public function getErrorMessage(): ?string
     {
         return $this->errorMessage;
     }
 
 
     /**
-     * @param string $errorMessage
+     * @param string|null $errorMessage
      * @return $this
      */
-    public function setErrorMessage(string $errorMessage): self
+    public function setErrorMessage(?string $errorMessage): self
     {
         $this->errorMessage = $errorMessage;
         return $this;
