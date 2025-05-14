@@ -1435,7 +1435,7 @@ const computedSize = window.Vue.computed(() => {
                 ></path>
             </svg>
             <svg
-                v-else-if="props.name === 'showcase'"
+                v-else-if="['showcase', 'achievement', 'trophy'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
