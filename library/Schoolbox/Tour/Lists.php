@@ -19,29 +19,14 @@ use Schoolbox\User;
  */
 class Lists
 {
-
-    /**
-     * @var Mapper
-     */
-    private $tourMapper;
-
-
-    /**
-     * @var Step\Mapper;
-     */
-    private $stepMapper;
-
-
     /**
      * Lists constructor.
      *
      * @param Mapper      $tourMapper
      * @param Step\Mapper $stepMapper
      */
-    public function __construct(Mapper $tourMapper, Step\Mapper $stepMapper)
+    public function __construct(private Mapper $tourMapper, private Step\Mapper $stepMapper)
     {
-        $this->tourMapper = $tourMapper;
-        $this->stepMapper = $stepMapper;
     }
 
 
