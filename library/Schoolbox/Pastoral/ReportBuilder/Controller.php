@@ -419,6 +419,8 @@ class Controller extends Base
      */
     public function dataManipulator(PastoralRecord $record): array
     {
+        $points = trim((string)$record->getPoints());
+
         return [
             'Pastoral ID'  => $record->getId(),
             'Student Name' => $record->getStudent()->getFullName(),
@@ -431,7 +433,7 @@ class Controller extends Base
             'Sub-Type'     => $record->getSubType() ? $record->getSubType()->getName() : '',
             'Occurred On'  => $record->getOccurredOn()?->getDatabaseDate(),
             'Tags'         => implode(',', $record->getTags()->getPropertyValues('name')),
-            'Points'       => $record->getPoints() ?: '',
+            'Points'       => '' !== $points ? $points : '',
             'Severity'     => $record->getSeverity() ? $record->getSeverity()->getName() : '',
             'Body'         => $record->getBodyPublic(),
             'Created Date' => $record->getCreatedAt()->getDatabase(),
