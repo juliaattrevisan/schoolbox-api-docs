@@ -6,6 +6,7 @@ import { useLessonPlannerStore } from "./store/lessonPlannerStore";
 import { LessonPlannerModalStep, type LessonPlanField } from "./lessonPlannerTypes";
 import LpField from "./lp-field.vue";
 import LpModalGenerate from "./lp-modal-generate.vue";
+import LpModalGenerating from "./lp-modal-generating.vue";
 import LpModalReview from "./lp-modal-review.vue";
 
 interface Props {
@@ -64,7 +65,7 @@ window.Vue.onMounted(() => {
     <basic-modal v-if="sbProps.hasAIFeatures" v-model:is-open="lpStore.isModalOpen">
         <section>
             <lp-modal-generate v-if="lpStore.modalStep === LessonPlannerModalStep.GENERATE" />
-            <div v-else-if="lpStore.modalStep === LessonPlannerModalStep.GENERATING" class="loader"></div>
+            <lp-modal-generating v-else-if="lpStore.modalStep === LessonPlannerModalStep.GENERATING" />
             <lp-modal-review v-else-if="lpStore.modalStep === LessonPlannerModalStep.REVIEW" />
         </section>
     </basic-modal>
