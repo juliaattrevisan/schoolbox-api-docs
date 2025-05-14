@@ -497,9 +497,9 @@ class Controller extends ConfigController
      * This function was copied from vendor/symfony/http-foundation/File/UploadedFile->getMaxFilesize(), then modified
      * to use the Alaress stringToBytes() function.
      *
-     * @return int|float The maximum size of an uploaded file in bytes (returns float if size > PHP_INT_MAX)
+     * @return int The maximum size of an uploaded file in bytes.
      */
-    private static function getMaxUploadFileSizeInBytes(): int|float
+    private static function getMaxUploadFileSizeInBytes(): int
     {
         $sizePostMax = Alaress_Byte_Format::stringToBytes(\ini_get('post_max_size'));
         $sizeUploadMax = Alaress_Byte_Format::stringToBytes(\ini_get('upload_max_filesize'));
