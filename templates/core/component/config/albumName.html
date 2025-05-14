@@ -16,7 +16,12 @@
     })();
 
     // As we are adding a new tooltip, we need to trigger foundation to find the new one (more info in pixel.html).
-    document.addEventListener("DOMContentLoaded", () => {
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", () => {
+            $(document).foundation('tooltip', 'reflow');
+        });
+    } else {
+        // Document is already loaded, so we can trigger the tooltip reflow immediately
         $(document).foundation('tooltip', 'reflow');
-    })
+    }
 </script>
