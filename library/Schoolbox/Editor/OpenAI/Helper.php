@@ -247,11 +247,11 @@ class Helper
                     }
 
                     //store the last of the output and the model (if it exists
-                    $log->setResponse($output);
                     $aiStats = $this->extractStats($output);
-                    $log->setModel($aiStats['model']);
-                    $log->setInputTokens($aiStats['input_tokens']);
-                    $log->setOutputTokens($aiStats['output_tokens']);
+                    $log->setResponse($output)
+                        ->setModel($aiStats['model'])
+                        ->setInputTokens($aiStats['input_tokens'])
+                        ->setOutputTokens($aiStats['output_tokens']);
                 },
                 function ($reason) use ($log): void {
                     $returnCode = $reason->getCode();

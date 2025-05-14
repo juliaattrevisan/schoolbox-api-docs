@@ -138,9 +138,9 @@ class Controller extends Base
                 $returnCode = 500;
 
                 if ($log) {
-                    $log->setReturnCode($returnCode);
-                    $log->setResponse($result);
-                    $log->setErrorMessage($data["error"]["message"]);
+                    $log->setReturnCode($returnCode)
+                        ->setResponse($result)
+                        ->setErrorMessage($data["error"]["message"]);
                     $this->logMapper->save($log);
                 }
 
@@ -174,9 +174,9 @@ class Controller extends Base
                 }
 
                 if ($log) {
-                    $log->setReturnCode($returnCode);
-                    $log->setResponse($result);
-                    $log->setErrorMessage($incompleteMessage);
+                    $log->setReturnCode($returnCode)
+                        ->setResponse($result)
+                        ->setErrorMessage($incompleteMessage);
                     $this->logMapper->save($log);
                 }
 
@@ -191,11 +191,11 @@ class Controller extends Base
             }
 
             /** store the response, and the ai usage */
-            $log->setReturnCode(200);
-            $log->setResponse($result);
-            $log->setModel($data['model'] ?? null);
-            $log->setInputTokens($data['usage']['input_tokens'] ?? null);
-            $log->setOutputTokens($data['usage']['output_tokens'] ?? null);
+            $log->setReturnCode(200)
+                ->setResponse($result)
+                ->setModel($data['model'] ?? null)
+                ->setInputTokens($data['usage']['input_tokens'] ?? null)
+                ->setOutputTokens($data['usage']['output_tokens'] ?? null);
             $this->logMapper->save($log);
 
             /* The actual output we requested is in this chain of objects, for now assume it'll only ever be one */
