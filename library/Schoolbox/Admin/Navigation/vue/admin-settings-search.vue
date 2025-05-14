@@ -28,7 +28,7 @@ export default window.Vue.defineComponent({
             isLoaded: false,
             hasLoadError: false,
             query: "",
-            minQueryLength: 3,
+            minQueryLength: 2,
             resultsShownLimit: 6,
             activeIndex: 0, // to track which index is selected
         };
