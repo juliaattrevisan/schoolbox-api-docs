@@ -3,15 +3,13 @@
  */
 
 import { defineStore } from "pinia";
+import type { Node } from "@schoolboxCurriculum/types/Node";
+/* eslint-disable-next-line import/no-cycle -- Same as [SA-18428] */
 import { useNodesStore } from "./csAllNodesStore";
 import { useUnitNodesStore } from "./csUnitNodesStore";
+/* eslint-disable-next-line import/no-cycle -- Same as [SA-18428] */
 import { useSelectedNodesStore } from "./csSelectedNodesStore";
-import { useSearchStore } from "./csSearchStore";
-import { useModalStore } from "./csModalStore";
-import { useModalViewNodesStore } from "./csModalViewNodesStore";
-import type { Node } from "@schoolboxCurriculum/types/Node";
-
-export let apiEndpoint = "";
+import { useSharedStore } from "./csSharedStore";
 
 interface Props {
     isReadOnly: boolean;
@@ -67,25 +65,11 @@ export const useStore = defineStore(`curriculumSelector`, () => {
     });
 
     /**
-     * When switching between stories, we need to reset the data models
-     * as they persist between the stories otherwise
-     */
-    function checkForStorybook(): void {
-        if (typeof STORYBOOK_ENV !== "undefined") {
-            useSelectedNodesStore().$reset();
-            useSearchStore().$reset();
-            useModalStore().$reset();
-            useModalViewNodesStore().$reset();
-            $reset();
-        }
-    }
-
-    /**
      * set up the passed properties and start loading the node data
      * @param props - the properties to set
      */
     function init(props: Props): void {
-        checkForStorybook();
+        useSharedStore().init({ apiEndpoint: props.dataEndpoint });
         isReadOnly.value = props.isReadOnly;
         formValueName.value = props.formValueName;
         isSelectAll.value = props.isSelectAll;
@@ -97,7 +81,6 @@ export const useStore = defineStore(`curriculumSelector`, () => {
         folderId.value = props.folderId;
         if (!isReadOnly.value && props.dataEndpoint !== "") {
             // only load when we need to
-            apiEndpoint = props.dataEndpoint;
             void useNodesStore().load();
         }
         // load in the unit nodes, only displaying the tabs if there are any unit nodes
@@ -138,7 +121,6 @@ export const useStore = defineStore(`curriculumSelector`, () => {
         folderId,
         hasLoadedOk,
         isSmallContainer,
-        checkForStorybook,
         init,
         updateContainerWidth,
     };
