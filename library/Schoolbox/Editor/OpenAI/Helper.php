@@ -184,6 +184,16 @@ class Helper
             throw new \DomainException('OpenAI API key is unavailable');
         }
 
+        // capture tokens for logging
+        try {
+            $payload = json_decode($payload, true, 512, JSON_THROW_ON_ERROR);
+            $payload['stream_options'] = ['include_usage' => true];
+            $payload = json_encode($payload, JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
+            // noop
+            // continue with the little robot dude payload, and see what AI responds with...
+        }
+
         try {
             $openAiRequest = new Request('POST', $this->getEndpoint(self::CHAT), array_merge(
                 $this->getAuthorization(),
