@@ -27,7 +27,7 @@ class Tour implements IDataGenerator
      * @param null|User $currentUser
      * @param TourLists $tourList
      * @param array $serverVars
-     * @param bool $persistent
+     * @param ?string $version
      */
     public function __construct(
         private IConfigLoader $config,
