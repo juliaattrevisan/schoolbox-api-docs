@@ -65,7 +65,7 @@
 
         {% set rescoreRoute = routeLookupIfAuthorized('learningAssessment.getRescore', {assessment: assessment, assessmentId: assessment.id}) %}
         {% if rescoreRoute %}
-            <li><a class="icon-due-work" href="{{ rescoreRoute }}">Rescore feedback</a></li>
+            <li><a class="icon-due-work" href="{{ rescoreRoute }}">Rescore {{ locale.grades.plural }}</a></li>
         {% endif %}
     {% endif %}
 {% endblock %}
