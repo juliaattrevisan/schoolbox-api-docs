@@ -2995,12 +2995,6 @@ parameters:
 			path: library/Schoolbox/External/Connector/Edumate/Base/Sync.php
 
 		-
-			message: '#^Method Schoolbox\\External\\Connector\\Isams\\Base\\Endpoint\\Profile\\Images\\BatchPhotoDownloader\:\:__construct\(\) has DomainException in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/External/Connector/Isams/Base/Endpoint/Profile/Images/BatchPhotoDownloader.php
-
-		-
 			message: '#^Strict comparison using \!\=\= between non\-falsy\-string and '''' will always evaluate to true\.$#'
 			identifier: notIdentical.alwaysTrue
 			count: 1
