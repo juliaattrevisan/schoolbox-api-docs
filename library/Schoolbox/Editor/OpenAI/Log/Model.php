@@ -70,8 +70,8 @@ class Model
     public function setPrompt(string $prompt): self
     {
         // Limit the prompt length to prevent database errors
-        if ($prompt && strlen($prompt) > self::PROMPT_MAX_LENGTH) {
-            $prompt = substr($prompt, 0, self::PROMPT_MAX_LENGTH);
+        if ($prompt && mb_strlen($prompt) > self::PROMPT_MAX_LENGTH) {
+            $prompt = mb_substr($prompt, 0, self::PROMPT_MAX_LENGTH);
         }
         $this->prompt = $prompt;
         return $this;
@@ -186,8 +186,8 @@ class Model
     public function setResponse(?string $response): self
     {
         // Limit the response length to prevent database errors
-        if ($response && strlen($response) > self::RESPONSE_MAX_LENGTH) {
-            $response = substr($response, 0, self::RESPONSE_MAX_LENGTH);
+        if ($response && mb_strlen($response) > self::RESPONSE_MAX_LENGTH) {
+            $response = mb_substr($response, 0, self::RESPONSE_MAX_LENGTH);
         }
         $this->response = $response;
         return $this;
