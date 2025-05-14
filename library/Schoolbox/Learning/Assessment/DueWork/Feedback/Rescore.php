@@ -73,50 +73,68 @@ class Rescore
         foreach ($assessment->getAllParticipants() as $participant) {
             $hasChanges = false;
 
+            /* Process authoritative published feedback and any existing drafts
+             */
+            $feedbacks = [];
+
+            $publishedFeedback = $participant->findMostRecentInstructorGivenPublishedFeedback();
+            $draftFeedback = $participant->findMostRecentInstructorGivenFeedback();
+
+            /* These two feedbacks might actually be the same, so uniquify this list
+             */
+            if ($publishedFeedback) {
+                $feedbacks[$publishedFeedback->getId()] = $publishedFeedback;
+            }
+
+            if ($draftFeedback) {
+                $feedbacks[$draftFeedback->getId()] = $draftFeedback;
+            }
+
             /** @var \Schoolbox\Learning\Assessment\DueWork\Feedback\Model $authoritativeFeedback */
-            $authoritativeFeedback = $participant->getAuthoritativeFeedback(true);
-
-            if ($authoritativeFeedback) {
-                /* If it's a Submission State, just leave everything as it was: preserve the status quo
-                 */
-                if (null !== $submissionStates->getOffset($authoritativeFeedback->getHumanReadableMark())) {
-                    $newStudentMark = $authoritativeFeedback->getHumanReadableMark();
-                    $newInstructorMark = $authoritativeFeedback->getHumanReadableInstructorMark();
-                    $newNormalisedMark = $authoritativeFeedback->getNormalisedMark();
-                } else {
-                    /* Recalibrate normalised mark from the human readable mark, as if you'd done that on the ui
-                     * This prevents you having a normalised mark that would otherwise have been unattainable,
-                     * such as a value between the lower and upper bounds of Letter Grades.
+            foreach ($feedbacks as $authoritativeFeedback) {
+                if ($authoritativeFeedback) {
+                    /* If it's a Submission State, just leave everything as it was: preserve the status quo
                      */
-                    $newStudentMark = $assessment->getMarkScheme()->getHumanReadableMark($authoritativeFeedback->getNormalisedMark());
-                    $newInstructorMark = $assessment->getInstructorMarkScheme()->getHumanReadableMark($authoritativeFeedback->getNormalisedMark());
-                    $newNormalisedMark = $assessment->getInstructorMarkScheme()->getNormalisedMark($newInstructorMark);
+                    if (null !== $submissionStates->getOffset($authoritativeFeedback->getHumanReadableMark())) {
+                        $newStudentMark = $authoritativeFeedback->getHumanReadableMark();
+                        $newInstructorMark = $authoritativeFeedback->getHumanReadableInstructorMark();
+                        $newNormalisedMark = $authoritativeFeedback->getNormalisedMark();
+                    } else {
+                        /* Recalibrate normalised mark from the human readable mark, as if you'd done that on the ui
+                         * This prevents you having a normalised mark that would otherwise have been unattainable,
+                         * such as a value between the lower and upper bounds of Letter Grades.
+                         */
+                        $newStudentMark = $assessment->getMarkScheme()->getHumanReadableMark($authoritativeFeedback->getNormalisedMark());
+                        $newInstructorMark = $assessment->getInstructorMarkScheme()->getHumanReadableMark($authoritativeFeedback->getNormalisedMark());
+                        $newNormalisedMark = $assessment->getInstructorMarkScheme()->getNormalisedMark($newInstructorMark);
 
-                    $hasChanges = true;
-                }
+                        $hasChanges = true;
+                    }
 
-                $changes[] = [
-                    'user' => $participant->getUser(),
-                    'old' => [
-                        'normalised' => $authoritativeFeedback->getNormalisedMark(),
-                        'student' => $authoritativeFeedback->getHumanReadableMark(),
-                        'instructor' => $authoritativeFeedback->getHumanReadableInstructorMark(),
-                    ] ,
-                    'new' => [
-                        'normalised' => $newNormalisedMark,
-                        'student' => $newStudentMark,
-                        'instructor' => $newInstructorMark
-                    ]
-                ];
+                    $changes[] = [
+                        'user' => $participant->getUser(),
+                        'published' => $authoritativeFeedback->isPublished(),
+                        'old' => [
+                            'normalised' => $authoritativeFeedback->getNormalisedMark(),
+                            'student' => $authoritativeFeedback->getHumanReadableMark(),
+                            'instructor' => $authoritativeFeedback->getHumanReadableInstructorMark(),
+                        ] ,
+                        'new' => [
+                            'normalised' => $newNormalisedMark,
+                            'student' => $newStudentMark,
+                            'instructor' => $newInstructorMark
+                        ]
+                    ];
 
-                /* Mutate changes
-                 */
-                if ($perform && $hasChanges) {
-                    $authoritativeFeedback->setNormalisedMark($newNormalisedMark)
-                        ->setHumanReadableMark($newStudentMark)
-                        ->setHumanReadableInstructorMark($newInstructorMark);
+                    /* Mutate changes
+                     */
+                    if ($perform && $hasChanges) {
+                        $authoritativeFeedback->setNormalisedMark($newNormalisedMark)
+                            ->setHumanReadableMark($newStudentMark)
+                            ->setHumanReadableInstructorMark($newInstructorMark);
 
-                    $this->feedbackDataSource->save($authoritativeFeedback);
+                        $this->feedbackDataSource->save($authoritativeFeedback);
+                    }
                 }
             }
         }
