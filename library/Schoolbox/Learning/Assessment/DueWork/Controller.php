@@ -2188,4 +2188,74 @@ class Controller extends Assessment\Controller
             ]
         );
     }
+
+
+    /**
+     * Update each published authoritative feedback's human-readable marks to a new mark type.
+     * This applies to human-readable marks for both the display grade and the instructor-given grade.
+     *
+     * This is a preview screen to see what the feedbacks would become.
+     *
+     * @param IAssessable $assessment
+     * @return void
+     * @throws RouteNotFound
+     * @throws \Twig\Error\Error
+     */
+    public function getRescore(IAssessable $assessment): void
+    {
+        $changes = (new Assessment\DueWork\Feedback\Rescore($this->feedbackDataSource, $this->stateMapper))->preview($assessment);
+
+        $this->response = $this->responseFromTemplate(
+            '@learningAssessment/dueWork/rescore.twig',
+            [
+                'breadcrumbs' => $this->bakery->produceFromAssessment($assessment, $this->getUser())->add([
+                    $assessment->getTitle(),
+                    $this->getRouteIfAuthorized('learningAssessment.getStatus', [
+                        'assessment' => $assessment,
+                        'assessmentId' => $assessment->getId()
+                    ])
+                ])->add([
+                    'Rescore Preview',
+                    ''
+                ]),
+                'assessment' => $assessment,
+                'changes' => $changes,
+                'perform' => false
+            ]
+        );
+    }
+
+
+    /**
+     * Update each published authoritative feedback's human-readable marks to a new mark type.
+     * This applies to human-readable marks for both the display grade and the instructor-given grade.
+     *
+     * @param IAssessable $assessment
+     * @return void
+     * @throws RouteNotFound
+     * @throws \Twig\Error\Error
+     */
+    public function postRescore(IAssessable $assessment): void
+    {
+        $changes = (new Assessment\DueWork\Feedback\Rescore($this->feedbackDataSource, $this->stateMapper))->perform($assessment);
+
+        $this->response = $this->responseFromTemplate(
+            '@learningAssessment/dueWork/rescore.twig',
+            [
+                'breadcrumbs' => $this->bakery->produceFromAssessment($assessment, $this->getUser())->add([
+                    $assessment->getTitle(),
+                    $this->getRouteIfAuthorized('learningAssessment.getStatus', [
+                        'assessment' => $assessment,
+                        'assessmentId' => $assessment->getId()
+                    ])
+                ])->add([
+                    'Rescore',
+                    ''
+                ]),
+                'assessment' => $assessment,
+                'changes' => $changes,
+                'perform' => true
+            ]
+        );
+    }
 }

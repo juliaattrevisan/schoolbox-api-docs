@@ -6605,3 +6605,10 @@ parameters:
 			identifier: method.notFound
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/LessonPlan.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getInstructorMarkScheme\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Rescore.php
+
