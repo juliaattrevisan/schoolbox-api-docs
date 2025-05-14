@@ -824,7 +824,7 @@ export default {
                                             </p>
                                         </div>
                                         <div
-                                            v-if="evidence.object.normalisedMark"
+                                            v-if="evidence.object.mark"
                                             :class="`grade ${gradient(evidence.object.normalisedMark)}`"
                                         >
                                             <span>{{ evidence.object.mark }}</span>
