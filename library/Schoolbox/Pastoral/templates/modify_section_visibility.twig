@@ -99,7 +99,7 @@
                         $(this).attr('for', $(this).attr('for') + '-locked');
                     })
                     $('.component-action').addClass('hide');
-                    $('.icon-delete').addClass('hide');
+                    $('table#table-permission .icon-delete').addClass('hide');
                 } else {
                     $(permList).find('input[type=radio]').each(function () {
                         $(this).removeAttr('readonly');
@@ -111,7 +111,7 @@
                         $(this).attr('for', $(this).attr('for').replace(/-locked/g, ''));
                     })
                     $('.component-action').removeClass('hide');
-                    $('.icon-delete').removeClass('hide');
+                    $('table#table-permission .icon-delete').removeClass('hide');
                 }
             });
         }
