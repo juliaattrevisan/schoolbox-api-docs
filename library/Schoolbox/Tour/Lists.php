@@ -48,10 +48,10 @@ class Lists
     /**
      * @param User $user
      * @param string $url
+     * @param string|null $version
      * @return array
-     * @throws \Schoolbox\Mapper\DefinitionException
      */
-    public function getTours(User $user, $url, bool $persistent): array
+    public function getTours(User $user, $url, ?string $version): array
     {
         // Store the tours we are going to serve in an array
 
@@ -61,7 +61,14 @@ class Lists
 
         // Grab all tours for the logged in user/url
 
-        $tours = $this->tourMapper->findByUserForUrl($user, $url, $persistent);
+        if (null === $version) {
+            $tours = $this->tourMapper->findByUserForUrl(user: $user, url: $url, version: $version);
+        } else {
+            /* Persistent version-specific tour in the footer
+             */
+            $tours = $this->tourMapper->findByUserForUrl(user: $user, url: $url, version: $version, repeat: true);
+        }
+
 
         // Iterate through them and add the required information into the array
 

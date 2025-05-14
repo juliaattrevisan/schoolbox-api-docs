@@ -34,7 +34,7 @@ class Tour implements IDataGenerator
         private ?User $currentUser,
         private TourLists $tourList,
         private array $serverVars,
-        private bool $persistent
+        private ?string $version,
     ) {
     }
 
@@ -49,7 +49,7 @@ class Tour implements IDataGenerator
             // parse_url fails when REQUEST_URI contains a colon. Don't tour when failed to parse_url.
             $request    = parse_url($this->serverVars['REQUEST_URI']);
             if ($request && array_key_exists('path', $request)) {
-                $tour['data'] = $this->tourList->getTours($this->currentUser, $request['path'], $this->persistent);
+                $tour['data'] = $this->tourList->getTours($this->currentUser, $request['path'], $this->version);
             }
         }
         return $tour;

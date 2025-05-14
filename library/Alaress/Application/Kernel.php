@@ -922,6 +922,11 @@ abstract class Kernel
                     /** @var Predis\ClientInterface $redisStorage */
                     $redisStorage = $di->get('redis.storage');
 
+                    /* Find the main version number for this instance
+                     */
+                    preg_match('/(\d+\.\d+)\.(.*)/', $config->get('site_version'), $matches);
+                    $version = $matches[1];
+
                     $dataGenerators = [
                         'ws' => new Output\DataGenerator\Websocket(
                             $config,
@@ -929,8 +934,8 @@ abstract class Kernel
                             new UnreadRetriever($redisStorage),
                             INSTANCE_ID
                         ),
-                        'tour' => new Output\DataGenerator\Tour($config, $session->getAuthUser(), $tourList, $_SERVER, false),
-                        'tourPersistent' => new Output\DataGenerator\Tour($config, $session->getAuthUser(), $tourList, $_SERVER, true),
+                        'tour' => new Output\DataGenerator\Tour($config, $session->getAuthUser(), $tourList, $_SERVER, null),
+                        'tourPersistent' => new Output\DataGenerator\Tour($config, $session->getAuthUser(), $tourList, $_SERVER, $version),
                         'user' => new Output\DataGenerator\User($session->getAuthUser(), $session),
                         'topMenu' => new Output\DataGenerator\TopMenu(
                             $session->getAuthUser(),
