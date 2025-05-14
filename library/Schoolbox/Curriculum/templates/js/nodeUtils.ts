@@ -218,6 +218,36 @@ export function allChildrenDisabled(node: Node): boolean {
 }
 
 /**
+ * Get only enabled nodes
+ * @param nodes - the nodes to check
+ * @returns - all included, enabled children
+ */
+export function getOnlyEnabled(nodes: Node[] | null): Node[] {
+    if (nodes === null) {
+        return [];
+    }
+    // First filter to only top level nodes that are enabled
+    const parentEnabledNodes = nodes.filter((node) => node.enabled);
+    // Then do the same for each of the children, also adding hadChildren to later filter out empty parents
+    const withHadChildren = parentEnabledNodes.map((node) => {
+        const hadChildren = Array.isArray(node.children) && node.children.length > 0;
+        const filteredChildren = hadChildren ? getOnlyEnabled(node.children) : null; // Recursively filter children (if any)
+        const newNode = {
+            ...node,
+            // Normalize children: if filteredChildren exists and has elements, use it; otherwise set children to null
+            children: filteredChildren && filteredChildren.length > 0 ? filteredChildren : null,
+        };
+        return { node: newNode, hadChildren }; // Return a wrapper object that includes whether the node had children
+    });
+    // Filter out empty parents that originally had children but now have none as no children are enabled
+    const noEmptyParents = withHadChildren.filter(({ node, hadChildren }) => {
+        return !hadChildren || (node.children && node.children.length > 0);
+    });
+    // Then extract just the cleaned node (discard the wrapper object including hadChildren)
+    return noEmptyParents.map(({ node }) => node);
+}
+
+/**
  * Recursively loop through the parents adding in a breadcrumb for each
  * @param node - the Node to traverse for breadcrumbs
  * @param currentBreadcrumbs - the current breadcrumbs
