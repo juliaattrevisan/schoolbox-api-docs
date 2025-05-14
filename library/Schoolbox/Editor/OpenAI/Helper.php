@@ -363,7 +363,7 @@ class Helper
      * @param string $payload The response payload from the OpenAI API.
      * @return array {model: string|null, input_tokens: int|null, output_tokens: int|null}
      */
-    private function extractStats($payload): array
+    private function extractStats(string $payload): array
     {
         $payload = explode("\n", $payload);
 
@@ -374,7 +374,11 @@ class Helper
         ];
         foreach ($payload as $line) {
             if (str_starts_with($line, 'data:')) {
-                $json = json_decode(substr($line, 5), true);
+                try {
+                    $json = json_decode(substr($line, 5), true, 512, JSON_THROW_ON_ERROR);
+                } catch (\JsonException $e) {
+                    continue;
+                }
                 if (isset($json['model'])) {
                     $stats['model'] = $json['model'];
                 }
