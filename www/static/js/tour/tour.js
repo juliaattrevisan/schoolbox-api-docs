@@ -22,7 +22,7 @@ $(function () {
         },
     };
 
-    window.tourInit = function(tourData) {
+    window.tourInit = function (tourData) {
         if (typeof tourData !== "undefined" && tourData.length > 0 && window.innerWidth >= 1024) {
             // Function to initiate a joyride
 
@@ -125,12 +125,20 @@ $(function () {
                         }
 
                         // If the user has moved forward, and the previous step had any custom JS events attached on close - trigger those now
-                        if (stepPrev !== undefined && stepPrev.jsEvents !== null && tourCurrent._direction === "forward") {
+                        if (
+                            stepPrev !== undefined &&
+                            stepPrev.jsEvents !== null &&
+                            tourCurrent._direction === "forward"
+                        ) {
                             runStepEvents(stepPrev.jsEvents, "close");
                         }
 
                         // If the user has moved back, and the previous step had any custom JS events attached on close - trigger those now
-                        if (stepNext !== undefined && stepNext.jsEvents !== null && tourCurrent._direction === "backward") {
+                        if (
+                            stepNext !== undefined &&
+                            stepNext.jsEvents !== null &&
+                            tourCurrent._direction === "backward"
+                        ) {
                             runStepEvents(stepNext.jsEvents, "close");
                         }
                     });
@@ -220,9 +228,8 @@ $(function () {
             // Trigger 'tourReady' on body tag
             $("body").trigger("tourReady");
         }
-    }
+    };
     // Only show tours windows larger than medium (has sidebar showing)
-
 
     /**
      * Run events for a step
