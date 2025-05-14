@@ -21,43 +21,21 @@ use function array_key_exists;
 class Tour implements IDataGenerator
 {
     /**
-     * @var IConfigLoader
-     */
-    private $config;
-
-
-    /**
-     * @var null|User
-     */
-    private $currentUser;
-
-
-    /**
-     * @var TourLists
-     */
-    private $tourList;
-
-
-    /**
-     * @var array
-     */
-    private $serverVars;
-
-
-    /**
      * Constructor
      *
      * @param IConfigLoader $config
-     * @param null|User     $currentUser
-     * @param TourLists        $tourList
-     * @param array         $serverVars
+     * @param null|User $currentUser
+     * @param TourLists $tourList
+     * @param array $serverVars
+     * @param ?string $version
      */
-    public function __construct(IConfigLoader $config, ?User $currentUser, TourLists $tourList, array $serverVars)
-    {
-        $this->config      = $config;
-        $this->currentUser = $currentUser;
-        $this->tourList    = $tourList;
-        $this->serverVars  = $serverVars;
+    public function __construct(
+        private IConfigLoader $config,
+        private ?User $currentUser,
+        private TourLists $tourList,
+        private array $serverVars,
+        private ?string $version,
+    ) {
     }
 
 
@@ -71,7 +49,7 @@ class Tour implements IDataGenerator
             // parse_url fails when REQUEST_URI contains a colon. Don't tour when failed to parse_url.
             $request    = parse_url($this->serverVars['REQUEST_URI']);
             if ($request && array_key_exists('path', $request)) {
-                $tour['data'] = $this->tourList->getTours($this->currentUser, $request['path']);
+                $tour['data'] = $this->tourList->getTours($this->currentUser, $request['path'], $this->version);
             }
         }
         return $tour;

@@ -6265,12 +6265,6 @@ parameters:
 			path: library/Schoolbox/Tile/Controller.php
 
 		-
-			message: '#^PHPDoc tag @var has invalid value \(Step\\Mapper;\)\: Unexpected token ";", expected TOKEN_HORIZONTAL_WS at offset 27 on line 2$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: library/Schoolbox/Tour/Lists.php
-
-		-
 			message: '#^Method Schoolbox\\User\:\:getAccessList\(\) should return iterable\<Schoolbox\\Permission\\Access\\UserAccess\>&Schoolbox\\GenericCollection but returns iterable\<Schoolbox\\Permission\\Access\\UserAccess\>&Schoolbox\\Collection\.$#'
 			identifier: return.type
 			count: 1
