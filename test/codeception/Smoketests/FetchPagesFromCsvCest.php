@@ -237,7 +237,10 @@ class FetchPagesFromCsvCest
             }
         }
 
-        throw new \Exception('HTTP Response code is not one of: ' . implode(', ', $expectedCodes) . '.');
+        throw new \Exception(
+            'HTTP Response code ' . $i->grabResponseCode() .
+            ' is not one of: {' . implode(', ', $expectedCodes) . '}.'
+        );
     }
 
     /**

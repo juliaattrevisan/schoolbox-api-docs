@@ -100,7 +100,7 @@ class Integration extends REST
      */
     public function grabResponseCode(): string
     {
-        return $this->connectionModule->_getResponseStatusCode();
+        return (string)$this->connectionModule->_getResponseStatusCode();
     }
 
     /**
