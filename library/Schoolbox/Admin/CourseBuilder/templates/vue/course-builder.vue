@@ -91,18 +91,9 @@ window.Vue.onMounted(() => {
                             <label class="small-12 medium-3 column required">Unit Page Template</label>
                         </div>
                     </header>
-                  <sortable-wrapper
-                      tag="ul"
-                      class="information-list sortable-card ui-sortable pe-fields-selected"
-                      :list="store.courseTemplates"
-                      :item-key="(item) => item.id"
-                      :options="sortableOptions"
-                      @end="onResequenceField"
-                  >
-                    <template #item="item">
+
                       <course-builder-rows :available-templates="props.availableTemplates" />
-                    </template>
-                  </sortable-wrapper>
+
 
                     <div class="component-action">
                         <section>

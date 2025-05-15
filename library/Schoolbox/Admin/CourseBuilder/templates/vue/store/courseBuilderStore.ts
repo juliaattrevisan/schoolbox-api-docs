@@ -155,6 +155,19 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
         }
     }
 
+    /**
+     * Resequence a field to a new index
+     * @param oldIndex - The original index of the field
+     * @param newIndex - The new index of the field
+     */
+    async function resequenceField(oldIndex: number, newIndex: number): Promise<void> {
+        // Update UI immediately
+        const [movedField] = courseTemplates.splice(oldIndex, 1);
+        courseTemplates.splice(newIndex, 0, movedField);
+
+        await queueAction({ type: "RESEQUENCE_FIELDS", fields: [movedField.field] });
+    }
+
     return {
         init,
         courseTemplates,
@@ -166,5 +179,6 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
         updateCourseTemplate,
         deleteCourseTemplate,
         saveChanges,
+        resequenceField
     };
 });

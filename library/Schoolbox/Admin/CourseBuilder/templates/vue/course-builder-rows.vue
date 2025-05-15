@@ -2,6 +2,8 @@
 import { slideDown, slideUp } from "@js/util/animateUtils";
 import { useCourseBuilderStore } from "./store/courseBuilderStore";
 import type { PageTemplate, CourseTemplate } from "./courseBuilderTypes";
+import SortableWrapper from "@schoolboxVue/components/sortable-wrapper.vue";
+import {slideDownOnEnter, slideUpOnLeave} from "@schoolboxVue/transitions/transitions";
 
 interface Props {
     availableTemplates: PageTemplate[];
@@ -10,6 +12,34 @@ interface Props {
 const props = defineProps<Props>();
 
 const store = useCourseBuilderStore();
+
+const sortableOptions = window.Vue.computed(() => ({
+  // Link the selected fields sortable to the available fields sortable so that we can drag between them
+  group: {
+    name: `fields-courseBuilder-frameworks`,
+    pull: false, // can't drag out of the selected fields
+    put: false, // can't drag into the selected fields
+  },
+  // We use this to force the html5 drag and drop logic to be ignored and use the fallback so we can style it
+  forceFallback: true,
+  // The class to apply to the clone when dragging
+  fallbackClass: "dragged-item",
+  // How long the animation should take when items shift
+  animation: 200,
+  // The handle to use to drag the field around
+  handle: "[data-pe-field-drag-handle]",
+}));
+
+/**
+ * When the user resequences the fields
+ * @param event The event that triggered the resequence
+ */
+async function onResequenceField(event: Sortable.SortableEvent): Promise<void> {
+  if (event.oldIndex === event.newIndex) return;
+  if (event.oldIndex === undefined || event.newIndex === undefined) return;
+
+  await store.resequenceField(event.oldIndex, event.newIndex);
+}
 
 /**
  * How the element animates on
@@ -57,14 +87,18 @@ const existingCourseTemplateCount = window.Vue.computed(() => {
 </script>
 
 <template>
-    <transition-group
-        tag="ul"
-        class="information-list sortable ui-sortable"
-        data-list
-        @enter="onRowEnter"
-        @leave="onRowLeave"
-    >
-        <li v-for="courseTemplate in store.courseTemplates" :key="courseTemplate.id" class="list-item-container">
+      <sortable-wrapper
+          tag="ul"
+          class="information-list sortable-card ui-sortable"
+          :list="store.courseTemplates"
+          :item-key="(item) => item.id"
+          :options="sortableOptions"
+          @end="onResequenceField"
+          :transition-enter="onRowEnter"
+          :transition-leave="onRowLeave"
+      >
+        <template #item="courseTemplate">
+        <li class="list-item-container">
           <div class="grip compact" data-pe-field-drag-handle />
             <div class="actions-small-1">
                 <div class="list-item">
@@ -137,7 +171,8 @@ const existingCourseTemplateCount = window.Vue.computed(() => {
                 </nav>
             </div>
         </li>
-    </transition-group>
+        </template>
+      </sortable-wrapper>
 </template>
 
 <style scoped>
