@@ -103,12 +103,17 @@ class Rescore
                         /* Recalibrate normalised mark from the human readable mark, as if you'd done that on the ui
                          * This prevents you having a normalised mark that would otherwise have been unattainable,
                          * such as a value between the lower and upper bounds of Letter Grades.
+                         *
+                         * Note that feedbacks might simply be requests to resubmit: in this case, there'll be a null
+                         * normalised mark and no data to change or re-evaluate.
                          */
-                        $newStudentMark = $assessment->getMarkScheme()->getHumanReadableMark($authoritativeFeedback->getNormalisedMark());
-                        $newInstructorMark = $assessment->getInstructorMarkScheme()->getHumanReadableMark($authoritativeFeedback->getNormalisedMark());
-                        $newNormalisedMark = $assessment->getInstructorMarkScheme()->getNormalisedMark($newInstructorMark);
+                        if (null !== $authoritativeFeedback->getNormalisedMark()) {
+                            $newStudentMark = $assessment->getMarkScheme()->getHumanReadableMark($authoritativeFeedback->getNormalisedMark());
+                            $newInstructorMark = $assessment->getInstructorMarkScheme()->getHumanReadableMark($authoritativeFeedback->getNormalisedMark());
+                            $newNormalisedMark = $assessment->getInstructorMarkScheme()->getNormalisedMark($newInstructorMark);
 
-                        $hasChanges = true;
+                            $hasChanges = true;
+                        }
                     }
 
                     $changes[] = [
