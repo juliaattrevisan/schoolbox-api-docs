@@ -18,7 +18,7 @@ interface Props {
     selectedNodes: Node[];
     includeChildren?: boolean;
     hasTabs: boolean;
-    folderId: number | undefined;
+    parentFolderId: number | undefined;
     isSelectAll?: boolean;
     canSelectChildren?: boolean;
     includeWithoutCode?: boolean;
@@ -40,13 +40,13 @@ export const useStore = defineStore(`curriculumSelector`, () => {
     const includeChildren = window.Vue.ref(false); // When a node is selected, also select all its children
     const includeDisabled = window.Vue.ref(false); // whether to display disabled nodes
     const hasTabs = window.Vue.ref(false); // whether to display tabs
-    const folderId = window.Vue.ref<number | undefined>(undefined); // the folderId to load the unit nodes from
+    const parentFolderId = window.Vue.ref<number | undefined>(undefined); // the parentFolderId to load the course/unit nodes from
 
     /**
      * When all loading is complete and was a success
      */
     const hasLoadedOk = window.Vue.computed(() => {
-        if (!hasTabs.value || folderId.value === undefined) {
+        if (!hasTabs.value || parentFolderId.value === undefined) {
             return !isLoading.value && !hasLoadError.value;
         }
         return (
@@ -78,14 +78,14 @@ export const useStore = defineStore(`curriculumSelector`, () => {
         includeChildren.value = props.includeChildren ? props.includeChildren : false;
         includeDisabled.value = props.includeDisabled ? props.includeDisabled : false;
         hasTabs.value = props.hasTabs;
-        folderId.value = props.folderId;
+        parentFolderId.value = props.parentFolderId;
         if (!isReadOnly.value && props.dataEndpoint !== "") {
             // only load when we need to
             void useNodesStore().load();
         }
         // load in the current nodes, only displaying the tabs if there are any to display
-        if (props.hasTabs && props.folderId !== undefined) {
-            void useCurrentNodesStore().load(props.folderId);
+        if (props.hasTabs && props.parentFolderId !== undefined) {
+            void useCurrentNodesStore().load(props.parentFolderId);
         }
         if (props.selectedNodes?.length > 0) {
             // add in any nodes that have been selected previously
@@ -118,7 +118,7 @@ export const useStore = defineStore(`curriculumSelector`, () => {
         includeChildren,
         includeDisabled,
         hasTabs,
-        folderId,
+        parentFolderId,
         hasLoadedOk,
         isSmallContainer,
         init,

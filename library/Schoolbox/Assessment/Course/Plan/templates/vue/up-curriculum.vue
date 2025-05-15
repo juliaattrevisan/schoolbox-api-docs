@@ -9,7 +9,7 @@ import CurriculumDetailsModal from "@schoolboxCurriculum/vue/curriculumDetailsMo
 import { useUnitPlannerCurriculumStore } from "./store/unitPlannerCurriculumStore";
 
 interface Props {
-    folderId: number; // the folder id to use when loading current curriculum
+    parentFolderId: number; // the parent folder id to use when loading current curriculum
 }
 const props = defineProps<Props>();
 
@@ -19,7 +19,7 @@ const store = useUnitPlannerCurriculumStore();
  * Initiate the curriculum store
  */
 window.Vue.onMounted(() => {
-    store.init(props.folderId);
+    store.init(props.parentFolderId);
 });
 
 /**

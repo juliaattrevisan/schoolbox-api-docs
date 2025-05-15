@@ -15,12 +15,12 @@ export const useCurrentNodesStore = defineStore("csUnitNodesStore", () => {
 
     /**
      * load all the nodes linked to a specific unit
-     * @param folderId - the id of the folder (unit) to load
+     * @param parentFolderId - the id of the parent folder (course/unit) to load
      */
-    async function load(folderId: number): Promise<void> {
+    async function load(parentFolderId: number): Promise<void> {
         try {
             const response = await fetch(
-                `/api/curriculum/usage/folder/${folderId.toString()}?returnFormat=tree&descendants=0`,
+                `/api/curriculum/usage/folder/${parentFolderId.toString()}?returnFormat=tree&descendants=0`,
                 {
                     headers: {
                         "Content-Type": "application/json",

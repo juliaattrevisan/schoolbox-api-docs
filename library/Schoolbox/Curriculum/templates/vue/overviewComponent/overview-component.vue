@@ -63,7 +63,7 @@ window.Vue.onMounted(() => {
             selectedNodes: props.selectedNodes, // so the modal displays the latest selected nodes
             includeChildren: true, // include all children in selections
             hasTabs: false, // no tabs in this context
-            folderId: undefined, // not required in this context
+            parentFolderId: undefined, // not required in this context
         });
     });
 });
