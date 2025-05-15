@@ -83,6 +83,7 @@ export const useCurrentNodesStore = defineStore("csUnitNodesStore", () => {
     return {
         hasLoadError,
         hasLoaded,
+        parentFolderId,
         nodes,
         filteredNodes,
         hasNodes,

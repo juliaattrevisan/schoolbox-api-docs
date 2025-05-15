@@ -40,15 +40,14 @@ export const useStore = defineStore(`curriculumSelector`, () => {
     const includeWithoutCode = window.Vue.ref(false); // set to true if curriculum nodes with blank codes need to be selectable
     const includeChildren = window.Vue.ref(false); // When a node is selected, also select all its children
     const includeDisabled = window.Vue.ref(false); // whether to display disabled nodes
-    const hasTabs = window.Vue.ref(false); // whether to display tabs
-    const parentFolderId = window.Vue.ref<number | undefined>(undefined); // the parentFolderId to load the course/unit nodes from
+    const sharedStore = useSharedStore(); // the store to load the shared data from
     const currentNodesStore = useCurrentNodesStore(); // the store to load the current nodes from
 
     /**
      * When all loading is complete and was a success
      */
     const hasLoadedOk = window.Vue.computed(() => {
-        if (!hasTabs.value || parentFolderId.value === undefined) {
+        if (!sharedStore.hasTabs || currentNodesStore.parentFolderId === undefined) {
             return !isLoading.value && !hasLoadError.value;
         }
         return (
@@ -68,7 +67,7 @@ export const useStore = defineStore(`curriculumSelector`, () => {
      * @param props - the properties to set
      */
     function init(props: InitProps): void {
-        useSharedStore().init({ apiEndpoint: props.dataEndpoint });
+        useSharedStore().init({ apiEndpoint: props.dataEndpoint, hasTabs: props.hasTabs });
         isReadOnly.value = props.isReadOnly;
         formValueName.value = props.formValueName;
         isSelectAll.value = props.isSelectAll ? props.isSelectAll : false;
@@ -76,8 +75,6 @@ export const useStore = defineStore(`curriculumSelector`, () => {
         includeWithoutCode.value = props.includeWithoutCode ? props.includeWithoutCode : false;
         includeChildren.value = props.includeChildren ? props.includeChildren : false;
         includeDisabled.value = props.includeDisabled ? props.includeDisabled : false;
-        hasTabs.value = props.hasTabs;
-        parentFolderId.value = props.parentFolderId;
         if (!isReadOnly.value && props.dataEndpoint !== "") {
             // only load when we need to
             void useNodesStore().load();
@@ -120,8 +117,6 @@ export const useStore = defineStore(`curriculumSelector`, () => {
         includeWithoutCode,
         includeChildren,
         includeDisabled,
-        hasTabs,
-        parentFolderId,
         hasLoadedOk,
         isSmallContainer,
         currentNodesStore,
