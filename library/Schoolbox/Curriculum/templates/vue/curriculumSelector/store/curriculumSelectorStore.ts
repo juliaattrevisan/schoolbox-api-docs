@@ -30,7 +30,6 @@ export const useStore = defineStore(`curriculumSelector`, () => {
     const isLoading = window.Vue.ref(true); // to display loading note
     const hasLoadError = window.Vue.ref(false); // to display loading error
     const isProcessing = window.Vue.ref(false); // to notify that an action is taking place, like updating a member access
-    const isReadOnly = window.Vue.ref(true); // can only view the currently selected codes, not edit them
     const formValueName = window.Vue.ref(""); // the name of the form value to update
     const containerWidth = window.Vue.ref(0); // currently so can tweak the styling when the selector is small
     const selectedOriginal = window.Vue.ref([]); // an 'original' selection, saved by the user
@@ -67,15 +66,18 @@ export const useStore = defineStore(`curriculumSelector`, () => {
      * @param props - the properties to set
      */
     function init(props: InitProps): void {
-        useSharedStore().init({ apiEndpoint: props.dataEndpoint, hasTabs: props.hasTabs });
-        isReadOnly.value = props.isReadOnly;
+        useSharedStore().init({
+            apiEndpoint: props.dataEndpoint,
+            isReadOnly: props.isReadOnly,
+            hasTabs: props.hasTabs,
+        });
         formValueName.value = props.formValueName;
         isSelectAll.value = props.isSelectAll ? props.isSelectAll : false;
         canSelectChildren.value = props.canSelectChildren ? props.canSelectChildren : true;
         includeWithoutCode.value = props.includeWithoutCode ? props.includeWithoutCode : false;
         includeChildren.value = props.includeChildren ? props.includeChildren : false;
         includeDisabled.value = props.includeDisabled ? props.includeDisabled : false;
-        if (!isReadOnly.value && props.dataEndpoint !== "") {
+        if (!props.isReadOnly && props.dataEndpoint !== "") {
             // only load when we need to
             void useNodesStore().load();
         }
@@ -107,7 +109,6 @@ export const useStore = defineStore(`curriculumSelector`, () => {
         isLoading,
         hasLoadError,
         isProcessing,
-        isReadOnly,
         formValueName,
         containerWidth,
         selectedOriginal,

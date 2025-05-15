@@ -9,11 +9,13 @@
 
 import debounce from "lodash/debounce";
 import { useStore } from "./store/curriculumSelectorStore";
+import { useSharedStore } from "./store/csSharedStore";
 import { useSelectedNodesStore } from "./store/csSelectedNodesStore";
 import { useModalStore } from "./store/csModalStore";
 import { useSearchStore, DEBOUNCE_AMOUNT } from "./store/csSearchStore";
 
 const store = useStore();
+const sharedStore = useSharedStore();
 const selectedNodesStore = useSelectedNodesStore();
 const modalStore = useModalStore();
 const searchStore = useSearchStore();
@@ -161,7 +163,7 @@ function onBrowseSelected() {
  * @returns {boolean} - whether the search input is active
  */
 const isActive = window.Vue.computed(() => {
-    if (store.isReadOnly) {
+    if (sharedStore.isReadOnly) {
         return false;
     }
     if (props.isSingleSelect && selectedNodesStore.hasNodes) {
