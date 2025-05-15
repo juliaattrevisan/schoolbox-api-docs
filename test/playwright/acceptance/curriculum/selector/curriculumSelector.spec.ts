@@ -20,6 +20,7 @@ test.describe("Curriculum Selector Tests", () => {
 
         tester.isGoingTo("Choose ACELA1552 and ACELA1551 from the modal");
         await curriculumSelector.clickBrowse();
+        await curriculumSelector.clickAllTab();
         await curriculumSelector.browseToNode([135, 136, 138, 143]);
         await curriculumSelector.selectNodes([146, 144]);
         await curriculumSelector.saveModal();
@@ -39,6 +40,7 @@ test.describe("Curriculum Selector Tests", () => {
 
         tester.isGoingTo("Choose ACELA1552 and ACELA1551 from the modal");
         await curriculumSelector.clickBrowse();
+        await curriculumSelector.clickAllTab();
         await curriculumSelector.browseToNode([135, 136, 138, 143]);
         await curriculumSelector.selectNodes([146]);
         await curriculumSelector.saveModal();
@@ -78,6 +80,7 @@ test.describe("Curriculum Selector Tests", () => {
 
         tester.isGoingTo("Choose ACELA1556 from the modal");
         await curriculumSelector.clickBrowse();
+        await curriculumSelector.clickCurrentTab();
         await curriculumSelector.selectUnitNodes([153]);
         await curriculumSelector.saveModal();
 
