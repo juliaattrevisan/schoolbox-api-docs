@@ -1746,7 +1746,7 @@ function alertInvalidIconName(): false {
                     d="M16 5.333l4.944-4.55 1.325 6.587 6.675-0.775-2.8 6.108 5.855 3.296-5.855 3.296 2.8 6.108-6.675-0.775-1.325 6.587-4.944-4.55-4.944 4.55-1.325-6.587-6.675 0.775 2.8-6.108-5.855-3.296 5.855-3.296-2.8-6.108 6.675 0.775 1.325-6.587z"
                 ></path>
             </svg>
-            <template v-else-if="alertInvalidIconName"></template>
+            <template v-else-if="alertInvalidIconName()"></template>
         </slot>
     </span>
 </template>
