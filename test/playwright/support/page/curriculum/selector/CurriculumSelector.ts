@@ -45,7 +45,7 @@ export default class CurriculumSelector {
      * @returns - The modal tabs
      */
     getModalTabs(): Locator {
-        return this.page.locator(CurriculumSelector.DATA_TEST_MODAL_TABS);
+        return this.page.getByTestId(CurriculumSelector.DATA_TEST_MODAL_TABS);
     }
 
     /**
