@@ -28,14 +28,19 @@
                 }
             });
         }
-
-        // As we are adding a new tooltip, we need to trigger foundation to find the new one
-        // The following error occurs within Foundation if the setTimeout is not used:
-        //  jquery.js:1745 Uncaught Error: Syntax error, unrecognized expression: [data-"Times New Roman"-tooltip]
-        //  to prevent foundation from throwing this error, we need to wait a moment before triggering the tooltip reflow
-        //  note: if this error is still thrown for some reason, it is okay to ignore. The tooltip will still work.
-        setTimeout(function() {
-            $(document).foundation('tooltip', 'reflow');
-        }, 500);
     })();
+
+    // As we are adding a new tooltip, we need to trigger foundation to find the new one
+    // The following error occurs within Foundation if the setTimeout is not used:
+    //  jquery.js:1745 Uncaught Error: Syntax error, unrecognized expression: [data-"Times New Roman"-tooltip]
+    //  to prevent foundation from throwing this error, we need to wait a moment before triggering the tooltip reflow
+    //  note: if this error is still thrown for some reason, it is okay to ignore. The tooltip will still work.
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", () => {
+            $(document).foundation('tooltip', 'reflow');
+        });
+    } else {
+        // Document is already loaded, so we can trigger the tooltip reflow immediately
+        $(document).foundation('tooltip', 'reflow');
+    }
 </script>
