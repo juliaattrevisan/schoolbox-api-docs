@@ -11,7 +11,7 @@ import { useCurrentNodesStore } from "./csCurrentNodesStore";
 import { useSelectedNodesStore } from "./csSelectedNodesStore";
 import { useSharedStore } from "./csSharedStore";
 
-interface Props {
+interface InitProps {
     isReadOnly: boolean;
     formValueName: string;
     dataEndpoint: string;
@@ -23,6 +23,7 @@ interface Props {
     canSelectChildren?: boolean;
     includeWithoutCode?: boolean;
     includeDisabled?: boolean;
+    filter?: Node | null;
 }
 
 export const useStore = defineStore(`curriculumSelector`, () => {
@@ -66,7 +67,7 @@ export const useStore = defineStore(`curriculumSelector`, () => {
      * set up the passed properties and start loading the node data
      * @param props - the properties to set
      */
-    function init(props: Props): void {
+    function init(props: InitProps): void {
         useSharedStore().init({ apiEndpoint: props.dataEndpoint });
         isReadOnly.value = props.isReadOnly;
         formValueName.value = props.formValueName;
@@ -83,7 +84,11 @@ export const useStore = defineStore(`curriculumSelector`, () => {
         }
         // load in the current nodes, only displaying the tabs if there are any to display
         if (props.hasTabs && props.parentFolderId !== undefined) {
-            void useCurrentNodesStore().load(props.parentFolderId);
+            currentNodesStore.init({
+                filter: props.filter ? props.filter : null,
+                parentFolderId: props.parentFolderId,
+            });
+            void currentNodesStore.load();
         }
         if (props.selectedNodes?.length > 0) {
             // add in any nodes that have been selected previously

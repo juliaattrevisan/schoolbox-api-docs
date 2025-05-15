@@ -3,24 +3,63 @@
  */
 
 import { defineStore } from "pinia";
-import { getOnlyEnabled } from "@schoolboxCurriculum/js/nodeUtils";
+import { getOnlyEnabled, findById } from "@schoolboxCurriculum/js/nodeUtils";
 import type { Node } from "@schoolboxCurriculum/types/Node";
+
+interface InitProps {
+    filter: Node | null;
+    parentFolderId?: number;
+}
 
 export const useCurrentNodesStore = defineStore("csUnitNodesStore", () => {
     const hasLoadError = window.Vue.ref(false);
     const hasLoaded = window.Vue.ref(false); // whether the nodes have been loaded or not
+    const parentFolderId = window.Vue.ref<number | undefined>(undefined); // the parentFolderId to load the course/unit nodes from
     const nodes = window.Vue.ref<Node[]>([]);
     const hasNodes = window.Vue.ref(false); // no need to display the tree if there are no nodes
     const hasMultipleParents = window.Vue.ref(false); // whether the nodes come from multiple top level curriculum parents
+    const filter = window.Vue.ref<Node | null>({} as Node | null); // to only display nodes that are children of this node
 
     /**
-     * load all the nodes linked to a specific unit
-     * @param parentFolderId - the id of the parent folder (course/unit) to load
+     * We need to filter the nodes to only display the children of the filter node,
+     * first checking if the node is a child of the existing node trees
+     * and if so only returning the children of the filter node
+     * @returns {Node[]} - the nodes that are children of the filter node
      */
-    async function load(parentFolderId: number): Promise<void> {
+    const filteredNodes = window.Vue.computed(() => {
+        // Nothing selected? Just show all nodes
+        if (filter.value === null) {
+            return nodes.value;
+        }
+        const filterNode = findById(nodes.value, filter.value.id);
+        if (filterNode === undefined) {
+            // if the filter node isn't within the list of nodes, we'll just return an empty node, highlighting that the filter node doesn't currently contain any selected nodes
+            return [];
+        }
+        if (filterNode.children === null) {
+            // if the filter node has no children, we'll just return the filter node, as it's the only node to display
+            return [filterNode];
+        }
+        // when the filter is set and has children, it's assumed the component heading will be the name of the filter node, so there's no need to display the filter node itself, as we'd just be doubling up on the name
+        return [filterNode];
+    });
+
+    /**
+     * Pass through the required props to the store
+     * @param props - the props to pass through
+     */
+    function init(props: InitProps): void {
+        filter.value = props.filter;
+        parentFolderId.value = props.parentFolderId;
+    }
+
+    /**
+     * load all the nodes linked to a specific course/unit
+     */
+    async function load(): Promise<void> {
         try {
             const response = await fetch(
-                `/api/curriculum/usage/folder/${parentFolderId.toString()}?returnFormat=tree&descendants=0`,
+                `/api/curriculum/usage/folder/${(parentFolderId.value as number).toString()}?returnFormat=tree&descendants=0`,
                 {
                     headers: {
                         "Content-Type": "application/json",
@@ -30,10 +69,10 @@ export const useCurrentNodesStore = defineStore("csUnitNodesStore", () => {
             if (response.ok) {
                 nodes.value = (await response.json()) as Node[];
                 nodes.value = getOnlyEnabled(nodes.value);
-                if (nodes.value.length > 0) {
+                if (filteredNodes.value.length > 0) {
                     hasNodes.value = true;
                 }
-                if (nodes.value.length > 1) {
+                if (filteredNodes.value.length > 1) {
                     hasMultipleParents.value = true;
                 }
             }
@@ -49,8 +88,10 @@ export const useCurrentNodesStore = defineStore("csUnitNodesStore", () => {
         hasLoadError,
         hasLoaded,
         nodes,
+        filteredNodes,
         hasNodes,
         hasMultipleParents,
+        init,
         load,
     };
 });

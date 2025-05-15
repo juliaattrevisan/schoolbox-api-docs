@@ -13,7 +13,7 @@ const store = useCurrentNodesStore();
     <div class="nodes-container" data-test="cs-modal-current-nodes-container">
         <ul v-if="store.hasLoaded" class="nodes l-flex-col">
             <cs-modal-current-parent-node
-                v-for="node in store.nodes"
+                v-for="node in store.filteredNodes"
                 :key="node.id"
                 :node="node"
                 :depth="0"

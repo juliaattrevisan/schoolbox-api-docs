@@ -65,6 +65,7 @@ window.Vue.onMounted(() => {
             includeChildren: true, // include all children in selections
             hasTabs: true, // to show the tabs in the modal when the curriculum selector is opened
             parentFolderId: props.parentFolderId, // The parent folder id to use when loading the current curriculum tab
+            filter: props.filter, // to only display nodes that are children of this node
         });
     });
 });
