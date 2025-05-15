@@ -65,6 +65,7 @@ const existingCourseTemplateCount = window.Vue.computed(() => {
         @leave="onRowLeave"
     >
         <li v-for="courseTemplate in store.courseTemplates" :key="courseTemplate.id" class="list-item-container">
+          <div class="grip compact" data-pe-field-drag-handle />
             <div class="actions-small-1">
                 <div class="list-item">
                     <div class="small-12 medium-1 column">
