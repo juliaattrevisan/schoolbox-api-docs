@@ -34,7 +34,7 @@ function onAddNewRow(): void {
         name: "",
         courseTemplate: firstValidTemplate,
         unitTemplate: firstValidTemplate,
-        sequence: store.courseTemplates.length,
+        sequence: store.courseTemplates.length, // default this to the end of the list (may need to actually set the sequence at some point)
     });
 }
 
