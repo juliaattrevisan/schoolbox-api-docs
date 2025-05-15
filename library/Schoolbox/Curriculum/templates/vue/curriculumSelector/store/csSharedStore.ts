@@ -1,5 +1,5 @@
 /**
- * Handles the load of the curriculum data
+ * Handles any shared state between the curriculumSelector stores
  */
 
 import { defineStore } from "pinia";
@@ -12,7 +12,7 @@ export const useSharedStore = defineStore(`csSharedStore`, () => {
     const apiEndpoint = window.Vue.ref(""); // the endpoint to load the curriculum data from
 
     /**
-     * set up the passed properties and start loading the node data
+     * Initialises the shared store with the given properties
      * @param props - the properties to set
      */
     function init(props: Props): void {
