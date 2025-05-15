@@ -93,6 +93,12 @@ class Mapper extends \Schoolbox\Mapper
         return $templates;
     }
 
+    /** @inheritDoc */
+    protected function getDefaultOrderByParams(): array
+    {
+        return ['sequence' => 'ASC'];
+    }
+
     /**
      * Validates templates selected are real
      *
