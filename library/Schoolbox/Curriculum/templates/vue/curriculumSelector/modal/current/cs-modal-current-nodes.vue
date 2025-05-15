@@ -10,7 +10,7 @@ const store = useCurrentNodesStore();
 </script>
 
 <template>
-    <div class="nodes-container" data-test="cs-modal-unit-nodes-container">
+    <div class="nodes-container" data-test="cs-modal-current-nodes-container">
         <ul v-if="store.hasLoaded" class="nodes l-flex-col">
             <cs-modal-current-parent-node
                 v-for="node in store.nodes"

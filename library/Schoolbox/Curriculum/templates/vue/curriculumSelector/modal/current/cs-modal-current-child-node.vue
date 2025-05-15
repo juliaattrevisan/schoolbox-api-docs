@@ -51,7 +51,7 @@ function onChange($isChecked: boolean): void {
                 <label
                     class="node__name f-no-margins"
                     :for="`checkbox-${props.node.id}__${extraId}`"
-                    :data-test="`cs-modal-unit-node-checkbox-label-${props.node.id}`"
+                    :data-test="`cs-modal-current-node-checkbox-label-${props.node.id}`"
                 >
                     {{ title }}
                 </label>

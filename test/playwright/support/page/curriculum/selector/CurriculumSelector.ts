@@ -17,9 +17,9 @@ export default class CurriculumSelector {
 
     static readonly DATA_TEST_MODAL_NODE_CHECKBOX_LABEL = "cs-modal-node-checkbox-label-";
 
-    static readonly DATA_TEST_MODAL_UNIT_NODES_CONTAINER = "cs-modal-unit-nodes-container";
+    static readonly DATA_TEST_MODAL_CURRENT_NODES_CONTAINER = "cs-modal-current-nodes-container";
 
-    static readonly DATA_TEST_MODAL_UNIT_NODE_CHECKBOX_LABEL = "cs-modal-unit-node-checkbox-label-";
+    static readonly DATA_TEST_MODAL_CURRENT_NODE_CHECKBOX_LABEL = "cs-modal-current-node-checkbox-label-";
 
     static readonly DATA_TEST_MODAL_SAVE_BUTTON = "cs-modal-footer-save-button";
 
@@ -75,7 +75,7 @@ export default class CurriculumSelector {
      * @param text - The text to not expect
      */
     async expectUnitModalToContainText(text: string): Promise<void> {
-        await expect(this.page.getByTestId(CurriculumSelector.DATA_TEST_MODAL_UNIT_NODES_CONTAINER)).toContainText(
+        await expect(this.page.getByTestId(CurriculumSelector.DATA_TEST_MODAL_CURRENT_NODES_CONTAINER)).toContainText(
             text,
         );
     }
@@ -89,7 +89,7 @@ export default class CurriculumSelector {
         for (const id of ids) {
             // eslint-disable-next-line no-await-in-loop -- need to click each item sequentially
             await this.page
-                .getByTestId(`${CurriculumSelector.DATA_TEST_MODAL_UNIT_NODE_CHECKBOX_LABEL}${id.toString()}`)
+                .getByTestId(`${CurriculumSelector.DATA_TEST_MODAL_CURRENT_NODE_CHECKBOX_LABEL}${id.toString()}`)
                 .click();
         }
     }
