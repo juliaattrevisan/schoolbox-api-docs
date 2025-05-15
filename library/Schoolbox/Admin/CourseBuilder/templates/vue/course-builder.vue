@@ -34,6 +34,7 @@ function onAddNewRow(): void {
         name: "",
         courseTemplate: firstValidTemplate,
         unitTemplate: firstValidTemplate,
+        sequence: store.courseTemplates.length,
     });
 }
 
