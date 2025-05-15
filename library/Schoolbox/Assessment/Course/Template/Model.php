@@ -12,8 +12,9 @@ namespace Schoolbox\Assessment\Course\Template;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
 use Schoolbox\Resource\HomepageTemplate;
+use Schoolbox\Sequential;
 
-class Model implements ISoftDeletable
+class Model implements ISoftDeletable, Sequential
 {
     use ModelTrait\Id;
     use ModelTrait\DeletedAtDate;
