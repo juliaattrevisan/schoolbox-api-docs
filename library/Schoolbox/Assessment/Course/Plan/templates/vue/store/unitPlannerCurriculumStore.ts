@@ -38,7 +38,7 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
             selectedNodes: [], // so the modal displays the latest selected nodes
             includeChildren: true, // include all children in selections
             hasTabs: true, // show the tabs for curriculum selector
-            parentFolderId: folderId, // the folderId to target, which represents tht parent folder id for each unit curriculum
+            parentFolderId: folderId, // the folderId to target, which represents the parent folder id for each unit curriculum
         });
     }
 
@@ -57,7 +57,7 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
 
     /**
      * To open the curriculum selector modal, targeting the relevant folderNodesStore
-     * @param folderId - the folderId to target
+     * @param folderId - the unit folderId to target
      * @param componentId - the componentId to target
      */
     function openCurriculumSelectorModal(folderId: number, componentId: number): void {
