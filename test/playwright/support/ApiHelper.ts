@@ -81,4 +81,16 @@ export default class ApiHelper {
         const token = await this.getUserToken();
         return { headers: { Authorization: `Bearer ${token}` } };
     }
+
+    /**
+     * Delete a folder
+     * @param folderId - ID of the folder to delete
+     */
+    async deleteFolder(folderId: string | number): Promise<void> {
+        this.baseTester.isGoingTo(`delete the folder with ID ${folderId}`);
+        const resp = await this.request.delete(`/resource/folder/${folderId}`, await this.getAuthHeader());
+        if (!resp.ok()) {
+            throw new Error(`Failed to delete folder: ${resp.status()} ${resp.statusText()}`);
+        }
+    }
 }
