@@ -67,8 +67,8 @@
                             <label for="defaultExpiry">Default Expiry</label>
                             {% set currentDefaultExpiry  = (subtype ? subtype.defaultExpiry : type.defaultExpiry) %}
                             <p class="meta">
-                                Set the default expiry period for this record type. The selected Default Expiry will be
-                                automatically applied upon selection of this type when creating a pastoral care record.
+                               Set the default expiry duration for this pastoral care record type. Selecting an option below will automatically calculate and apply the expiry based on the record's creation date.
+                               Once expired, records will then be archived.
                             </p>
                             <div class="row">
                                 <div class="small-12 columns">
