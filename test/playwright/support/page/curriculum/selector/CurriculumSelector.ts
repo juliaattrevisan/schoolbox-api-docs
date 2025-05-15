@@ -13,6 +13,10 @@ export default class CurriculumSelector {
 
     static readonly DATA_TEST_MODAL_TABS = "cs-modal-tabs";
 
+    static readonly DATA_TEST_MODAL_CURRENT_TAB_BUTTON = "cs-modal-current-tab-button";
+
+    static readonly DATA_TEST_MODAL_ALL_TAB_BUTTON = "cs-modal-all-tab-button";
+
     static readonly DATA_TEST_MODAL_NODE_NAME = "cs-modal-all-node-name-";
 
     static readonly DATA_TEST_MODAL_NODE_CHECKBOX_LABEL = "cs-modal-node-checkbox-label-";
@@ -42,6 +46,20 @@ export default class CurriculumSelector {
      */
     getModalTabs(): Locator {
         return this.page.locator(CurriculumSelector.DATA_TEST_MODAL_TABS);
+    }
+
+    /**
+     * Clicks the Current tab
+     */
+    async clickCurrentTab(): Promise<void> {
+        await this.page.getByTestId(CurriculumSelector.DATA_TEST_MODAL_CURRENT_TAB_BUTTON).click();
+    }
+
+    /**
+     * Clicks the All tab
+     */
+    async clickAllTab(): Promise<void> {
+        await this.page.getByTestId(CurriculumSelector.DATA_TEST_MODAL_ALL_TAB_BUTTON).click();
     }
 
     /**
