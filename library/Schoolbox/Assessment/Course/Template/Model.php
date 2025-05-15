@@ -17,6 +17,7 @@ class Model implements ISoftDeletable
 {
     use ModelTrait\Id;
     use ModelTrait\DeletedAtDate;
+    use ModelTrait\HasSequence;
 
     private string $name;
 
