@@ -188,4 +188,25 @@ export default class DatabaseHelper {
     async closePool(): Promise<void> {
         await this.pool.end();
     }
+
+    /**
+     * Create a backup of a table
+     * @param table - Table name
+     */
+    async backupTable(table: string): Promise<void> {
+        const backupTableName = `${table}_backup`;
+        await this.pool.execute(`RENAME TABLE ${table} TO ${backupTableName}`);
+        await this.pool.execute(`CREATE TABLE ${table} LIKE ${backupTableName}`);
+        await this.pool.execute(`INSERT INTO ${table} SELECT * FROM ${backupTableName}`);
+    }
+
+    /**
+     * Restore a table from a backup
+     * @param table - Table name
+     */
+    async restoreTable(table: string): Promise<void> {
+        const backupTableName = `${table}_backup`;
+        await this.pool.execute(`DROP TABLE IF EXISTS ${table}`);
+        await this.pool.execute(`RENAME TABLE ${backupTableName} TO ${table}`);
+    }
 }

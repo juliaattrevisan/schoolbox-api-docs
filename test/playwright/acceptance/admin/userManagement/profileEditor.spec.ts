@@ -155,6 +155,25 @@ async function setupProfileEditorPage(tester: AcceptanceTester, page: Page, db: 
 }
 
 /**
+ * As a lot of data is changing in this test (but reversable),
+ * the following tables will be backed up at the start and then restored at the end
+ * of the test, as to ensure no other test is effected by what happens in here
+ */
+const TABLES_TO_RESTORE = [
+    "profile_button",
+    "profile_button_campus_availability",
+    "profile_button_campus_visibility",
+    "profile_button_role_availability",
+    "profile_button_role_visibility",
+    "profile_field",
+    "profile_field_campus_availability",
+    "profile_field_roletype_visibility",
+    "profile_tab",
+    "profile_tab_campus_availability",
+    "profile_tab_roletype_visibility",
+];
+
+/**
  * This test checks the profile editor
  * Steps:
  * 1. Provision sales.tar.gz data
@@ -162,6 +181,12 @@ async function setupProfileEditorPage(tester: AcceptanceTester, page: Page, db: 
  */
 test.describe("Profile Editor", () => {
     test.describe.configure({ mode: "serial" });
+
+    // Make a backup of the tables that will be restored at the end of the test
+    test.beforeAll(async ({ baseTester, db }) => {
+        baseTester.isGoingTo("back up tables to restore at the end of the test");
+        await Promise.all(TABLES_TO_RESTORE.map((table) => db.backupTable(table)));
+    });
 
     // Run before each test to ensure login and homepage navigation
     test.beforeEach(async ({ tester }) => {
@@ -676,10 +701,8 @@ test.describe("Profile Editor", () => {
         baseTester.isGoingTo("reset alt_email for Rebecca White");
         await db.updateInDatabase("user", { alt_email: null }, { id: 24 });
 
-        baseTester.isGoingTo("Remove Role field from Staff tab");
-        await db.updateInDatabase("profile_field", { enabled: 0 }, { roletype: "staff", field: "role" });
-
-        baseTester.isGoingTo("Remove Campus field from Parent tab");
-        await db.updateInDatabase("profile_field", { enabled: 0 }, { roletype: "parent", field: "campusCollection" });
+        // Restore the backed up tables
+        baseTester.isGoingTo("restore the backed up tables");
+        await Promise.all(TABLES_TO_RESTORE.map((table) => db.restoreTable(table)));
     });
 });
