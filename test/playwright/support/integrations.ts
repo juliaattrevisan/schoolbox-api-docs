@@ -9,9 +9,11 @@ import { test as base } from "@playwright/test";
 import BaseTester from "@schoolboxTest/playwright/support/BaseTester";
 import AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import DatabaseHelper from "@schoolboxTest/playwright/support/DatabaseHelper";
+import ApiHelper from "@schoolboxTest/playwright/support/ApiHelper";
 
 type Integrations = {
     db: DatabaseHelper;
+    api: ApiHelper;
     tester: AcceptanceTester;
     baseTester: BaseTester;
 };
@@ -25,6 +27,10 @@ export const test = base.extend<Integrations>({
         } finally {
             await db.closePool();
         }
+    },
+    api: async ({ request, baseTester }, use) => {
+        const api = new ApiHelper(request, baseTester);
+        await use(api);
     },
     tester: ({ page }, use) => {
         const tester = new AcceptanceTester(page);
