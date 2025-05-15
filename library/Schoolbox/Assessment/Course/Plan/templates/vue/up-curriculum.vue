@@ -35,7 +35,7 @@ function onDetailsModalClosed(): void {
     <cs-modal
         v-if="store.selectorStore?.hasLoadedOk"
         :starting-node-id="store.startingNodeId"
-        :has-tabs="store.selectorStore.hasTabs"
+        :has-tabs="store.unitNodesStore.hasNodes"
     />
     <curriculum-details-modal :selected-node-id="store.selectedDetailsNodeId" @closed="onDetailsModalClosed" />
 </template>
