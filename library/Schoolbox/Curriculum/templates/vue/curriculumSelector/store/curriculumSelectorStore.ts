@@ -16,13 +16,13 @@ interface Props {
     formValueName: string;
     dataEndpoint: string;
     selectedNodes: Node[];
-    includeChildren: boolean;
+    includeChildren?: boolean;
     hasTabs: boolean;
     folderId: number | undefined;
-    isSelectAll: boolean;
-    canSelectChildren: boolean;
-    includeWithoutCode: boolean;
-    includeDisabled: boolean;
+    isSelectAll?: boolean;
+    canSelectChildren?: boolean;
+    includeWithoutCode?: boolean;
+    includeDisabled?: boolean;
 }
 
 export const useStore = defineStore(`curriculumSelector`, () => {
@@ -72,11 +72,11 @@ export const useStore = defineStore(`curriculumSelector`, () => {
         useSharedStore().init({ apiEndpoint: props.dataEndpoint });
         isReadOnly.value = props.isReadOnly;
         formValueName.value = props.formValueName;
-        isSelectAll.value = props.isSelectAll;
-        canSelectChildren.value = props.canSelectChildren;
-        includeWithoutCode.value = props.includeWithoutCode;
-        includeChildren.value = props.includeChildren;
-        includeDisabled.value = props.includeDisabled;
+        isSelectAll.value = props.isSelectAll ? props.isSelectAll : false;
+        canSelectChildren.value = props.canSelectChildren ? props.canSelectChildren : true;
+        includeWithoutCode.value = props.includeWithoutCode ? props.includeWithoutCode : false;
+        includeChildren.value = props.includeChildren ? props.includeChildren : false;
+        includeDisabled.value = props.includeDisabled ? props.includeDisabled : false;
         hasTabs.value = props.hasTabs;
         folderId.value = props.folderId;
         if (!isReadOnly.value && props.dataEndpoint !== "") {
