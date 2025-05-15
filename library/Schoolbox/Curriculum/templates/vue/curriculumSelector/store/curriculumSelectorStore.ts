@@ -41,6 +41,7 @@ export const useStore = defineStore(`curriculumSelector`, () => {
     const includeDisabled = window.Vue.ref(false); // whether to display disabled nodes
     const hasTabs = window.Vue.ref(false); // whether to display tabs
     const parentFolderId = window.Vue.ref<number | undefined>(undefined); // the parentFolderId to load the course/unit nodes from
+    const currentNodesStore = useCurrentNodesStore(); // the store to load the current nodes from
 
     /**
      * When all loading is complete and was a success
@@ -50,10 +51,7 @@ export const useStore = defineStore(`curriculumSelector`, () => {
             return !isLoading.value && !hasLoadError.value;
         }
         return (
-            !isLoading.value &&
-            !hasLoadError.value &&
-            useCurrentNodesStore().hasLoaded &&
-            !useCurrentNodesStore().hasLoadError
+            !isLoading.value && !hasLoadError.value && currentNodesStore.hasLoaded && !currentNodesStore.hasLoadError
         );
     });
 
@@ -121,6 +119,7 @@ export const useStore = defineStore(`curriculumSelector`, () => {
         parentFolderId,
         hasLoadedOk,
         isSmallContainer,
+        currentNodesStore,
         init,
         updateContainerWidth,
     };

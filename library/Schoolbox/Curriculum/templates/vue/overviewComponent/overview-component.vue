@@ -107,6 +107,10 @@ function onModalClosed(): void {
         @modify-selected="onModifySelected"
     />
     <fn-delete-node :folder-id="props.folderId" :component-instance-id="props.componentInstanceId" />
-    <cs-modal v-if="selectorStore.hasLoadedOk" :starting-node-id="props.filter?.id" />
+    <cs-modal
+        v-if="selectorStore.hasLoadedOk"
+        :starting-node-id="props.filter?.id"
+        :has-tabs="selectorStore.currentNodesStore.hasNodes"
+    />
     <curriculum-details-modal :selected-node-id="store().selectedDetailsNodeId" @closed="onModalClosed" />
 </template>
