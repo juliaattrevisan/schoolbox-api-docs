@@ -427,7 +427,12 @@ abstract class Mapper implements IMapper
         $this->setMonitor(self::$perfmon ?: new LiveMonitor());
 
         // Need to add session data so that notifiers can do their thing
-        $this->setSessionData($_SESSION ?? []);
+        // pass $_SESSION by reference so all the mappers keep in-sync with the real $_SESSION
+        $sessionData = &$_SESSION;
+        if (null == $sessionData) {
+            $sessionData = [];
+        }
+        $this->setSessionData($sessionData);
         $this->mapping();
 
         $this->monitor->cacheIndices($this);
@@ -721,9 +726,9 @@ abstract class Mapper implements IMapper
     /**
      * @param array $sessionData
      */
-    public function setSessionData($sessionData)
+    public function setSessionData(&$sessionData)
     {
-        $this->sessionData = $sessionData;
+        $this->sessionData = &$sessionData;
     }
 
     /**
