@@ -110,17 +110,17 @@ class ValidUploadableFileTest extends TestCase
 
         yield 'file has no mimetype' => [
             $standardFile,
-            '/^this file has no detectable type/i',
+            '/^this file is not a permitted file type/i',
         ];
         yield 'file mimetype is not enabled' => [
             (clone $standardFile)
                 ->setMimetype((clone $standardMimetype)->setEnable(false)),
-            '/^this file is not a valid file type/i',
+            '/^this file is not a permitted file type/i',
         ];
         yield 'file mimetype is deleted' => [
             (clone $standardFile)
                 ->setMimetype((clone $standardMimetype)->setDeleted(true)),
-            '/^this file is not a valid file type/i',
+            '/^this file is not a permitted file type/i',
         ];
         yield 'file over size limit, no expiry' => [
             (clone $standardFile)
