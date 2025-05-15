@@ -9,7 +9,7 @@ import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 import { useStore as useSelectorStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/curriculumSelectorStore";
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csSelectedNodesStore";
-import { useUnitNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csUnitNodesStore";
+import { useUnitNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csCurrentNodesStore";
 import { useStore as useFolderNodesStore } from "@schoolboxCurriculum/vue/folderNodes/store/folderNodesStore";
 import { useModalStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csModalStore";
 import { useUnitPlannerStore } from "./unitPlannerStore";

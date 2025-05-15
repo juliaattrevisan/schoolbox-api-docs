@@ -3,7 +3,7 @@
  * To only show the nodes that are currently assigned to the unit
  */
 
-import { useUnitNodesStore } from "../../store/csUnitNodesStore";
+import { useUnitNodesStore } from "../../store/csCurrentNodesStore";
 import CsModalUnitParentNode from "./cs-modal-unit-parent-node.vue";
 
 const store = useUnitNodesStore();

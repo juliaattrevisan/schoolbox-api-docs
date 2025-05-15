@@ -8,7 +8,7 @@ import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import { useStore } from "./store/curriculumSelectorStore";
 import { useSelectedNodesStore } from "./store/csSelectedNodesStore";
-import { useUnitNodesStore } from "./store/csUnitNodesStore";
+import { useUnitNodesStore } from "./store/csCurrentNodesStore";
 import CsSearchInput from "./cs-search-input.vue";
 import CsSelectedNodes from "./cs-selected-nodes.vue";
 import CsSearchResults from "./cs-search-results.vue";

@@ -6,7 +6,7 @@ import { defineStore } from "pinia";
 import type { Node } from "@schoolboxCurriculum/types/Node";
 /* eslint-disable-next-line import/no-cycle -- Same as [SA-18428] */
 import { useNodesStore } from "./csAllNodesStore";
-import { useUnitNodesStore } from "./csUnitNodesStore";
+import { useUnitNodesStore } from "./csCurrentNodesStore";
 /* eslint-disable-next-line import/no-cycle -- Same as [SA-18428] */
 import { useSelectedNodesStore } from "./csSelectedNodesStore";
 import { useSharedStore } from "./csSharedStore";

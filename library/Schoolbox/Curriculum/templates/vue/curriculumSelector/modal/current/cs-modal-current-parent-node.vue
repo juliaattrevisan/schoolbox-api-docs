@@ -6,7 +6,7 @@
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import { useNodeTitle } from "@schoolboxCurriculum/vue/composables/useNodeTitle";
 import { generateUUID } from "@js/util/jsUtils";
-import { useUnitNodesStore } from "../../store/csUnitNodesStore";
+import { useUnitNodesStore } from "../../store/csCurrentNodesStore";
 import { useModalSelectedNodesStore } from "../../store/csModalSelectedNodesStore";
 import csModalUnitChildNode from "./cs-modal-unit-child-node.vue";
 
