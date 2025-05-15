@@ -5,10 +5,11 @@
 import { defineStore } from "pinia";
 import { getOnlyEnabled, findById } from "@schoolboxCurriculum/js/nodeUtils";
 import type { Node } from "@schoolboxCurriculum/types/Node";
+import { useSharedStore } from "./csSharedStore";
 
 interface InitProps {
-    filter: Node | null;
-    parentFolderId?: number;
+    filter: Node | null; // to only display nodes that are children of this node
+    parentFolderId?: number; // the parentFolderId to load the course/unit nodes from
 }
 
 export const useCurrentNodesStore = defineStore("csUnitNodesStore", () => {
@@ -36,11 +37,6 @@ export const useCurrentNodesStore = defineStore("csUnitNodesStore", () => {
             // if the filter node isn't within the list of nodes, we'll just return an empty node, highlighting that the filter node doesn't currently contain any selected nodes
             return [];
         }
-        if (filterNode.children === null) {
-            // if the filter node has no children, we'll just return the filter node, as it's the only node to display
-            return [filterNode];
-        }
-        // when the filter is set and has children, it's assumed the component heading will be the name of the filter node, so there's no need to display the filter node itself, as we'd just be doubling up on the name
         return [filterNode];
     });
 
@@ -59,7 +55,7 @@ export const useCurrentNodesStore = defineStore("csUnitNodesStore", () => {
     async function load(): Promise<void> {
         try {
             const response = await fetch(
-                `/api/curriculum/usage/folder/${(parentFolderId.value as number).toString()}?returnFormat=tree&descendants=0`,
+                `${useSharedStore().apiEndpoint}/usage/folder/${(parentFolderId.value as number).toString()}?returnFormat=tree&descendants=0`,
                 {
                     headers: {
                         "Content-Type": "application/json",
