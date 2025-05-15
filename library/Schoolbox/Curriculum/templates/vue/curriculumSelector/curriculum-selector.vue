@@ -8,7 +8,7 @@ import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import { useStore } from "./store/curriculumSelectorStore";
 import { useSelectedNodesStore } from "./store/csSelectedNodesStore";
-import { useUnitNodesStore } from "./store/csCurrentNodesStore";
+import { useCurrentNodesStore } from "./store/csCurrentNodesStore";
 import CsSearchInput from "./cs-search-input.vue";
 import CsSelectedNodes from "./cs-selected-nodes.vue";
 import CsSearchResults from "./cs-search-results.vue";
@@ -78,7 +78,7 @@ function onSelectedNodeModalClosed(): void {
     selectedNodesStore.setActiveNode(getEmptyNode());
 }
 
-const unitNodesStore = useUnitNodesStore();
+const currentNodesStore = useCurrentNodesStore();
 
 /**
  * Start loading the curriculum data
@@ -99,6 +99,10 @@ window.Vue.onMounted(() => {
         />
         <cs-search-results :is-single-select="props.isSingleSelect" />
     </div>
-    <cs-modal v-if="store.hasLoadedOk" :is-single-select="props.isSingleSelect" :has-tabs="unitNodesStore.hasNodes" />
+    <cs-modal
+        v-if="store.hasLoadedOk"
+        :is-single-select="props.isSingleSelect"
+        :has-tabs="currentNodesStore.hasNodes"
+    />
     <selected-node-modal :node="selectedNodesStore.activeNode" @closed="onSelectedNodeModalClosed" />
 </template>

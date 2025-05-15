@@ -60,7 +60,7 @@ function onChange($isChecked: boolean): void {
         </div>
         <template v-if="showChildren">
             <ul>
-                <cs-modal-unit-child-node
+                <cs-modal-current-child-node
                     v-for="viewNode in props.node.children"
                     :key="viewNode.id"
                     :node="viewNode"

@@ -1,18 +1,18 @@
 <script setup lang="ts">
 /**
- * To only show the nodes that are currently assigned to the unit
+ * To only show the nodes that are currently assigned to the current unit/course
  */
 
-import { useUnitNodesStore } from "../../store/csCurrentNodesStore";
-import CsModalUnitParentNode from "./cs-modal-unit-parent-node.vue";
+import { useCurrentNodesStore } from "../../store/csCurrentNodesStore";
+import CsModalCurrentParentNode from "./cs-modal-current-parent-node.vue";
 
-const store = useUnitNodesStore();
+const store = useCurrentNodesStore();
 </script>
 
 <template>
     <div class="nodes-container" data-test="cs-modal-unit-nodes-container">
         <ul v-if="store.hasLoaded" class="nodes l-flex-col">
-            <cs-modal-unit-parent-node
+            <cs-modal-current-parent-node
                 v-for="node in store.nodes"
                 :key="node.id"
                 :node="node"

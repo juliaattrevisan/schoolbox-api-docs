@@ -6,7 +6,7 @@ import { defineStore } from "pinia";
 import type { Node } from "@schoolboxCurriculum/types/Node";
 /* eslint-disable-next-line import/no-cycle -- Same as [SA-18428] */
 import { useNodesStore } from "./csAllNodesStore";
-import { useUnitNodesStore } from "./csCurrentNodesStore";
+import { useCurrentNodesStore } from "./csCurrentNodesStore";
 /* eslint-disable-next-line import/no-cycle -- Same as [SA-18428] */
 import { useSelectedNodesStore } from "./csSelectedNodesStore";
 import { useSharedStore } from "./csSharedStore";
@@ -52,8 +52,8 @@ export const useStore = defineStore(`curriculumSelector`, () => {
         return (
             !isLoading.value &&
             !hasLoadError.value &&
-            useUnitNodesStore().hasLoaded &&
-            !useUnitNodesStore().hasLoadError
+            useCurrentNodesStore().hasLoaded &&
+            !useCurrentNodesStore().hasLoadError
         );
     });
 
@@ -83,9 +83,9 @@ export const useStore = defineStore(`curriculumSelector`, () => {
             // only load when we need to
             void useNodesStore().load();
         }
-        // load in the unit nodes, only displaying the tabs if there are any unit nodes
+        // load in the current nodes, only displaying the tabs if there are any to display
         if (props.hasTabs && props.folderId !== undefined) {
-            void useUnitNodesStore().load(props.folderId);
+            void useCurrentNodesStore().load(props.folderId);
         }
         if (props.selectedNodes?.length > 0) {
             // add in any nodes that have been selected previously

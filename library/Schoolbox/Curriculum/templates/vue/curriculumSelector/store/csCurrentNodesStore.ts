@@ -6,7 +6,7 @@ import { defineStore } from "pinia";
 import { getOnlyEnabled } from "@schoolboxCurriculum/js/nodeUtils";
 import type { Node } from "@schoolboxCurriculum/types/Node";
 
-export const useUnitNodesStore = defineStore("csUnitNodesStore", () => {
+export const useCurrentNodesStore = defineStore("csUnitNodesStore", () => {
     const hasLoadError = window.Vue.ref(false);
     const hasLoaded = window.Vue.ref(false); // whether the nodes have been loaded or not
     const nodes = window.Vue.ref<Node[]>([]);

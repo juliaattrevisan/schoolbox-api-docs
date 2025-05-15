@@ -6,9 +6,9 @@
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import { useNodeTitle } from "@schoolboxCurriculum/vue/composables/useNodeTitle";
 import { generateUUID } from "@js/util/jsUtils";
-import { useUnitNodesStore } from "../../store/csCurrentNodesStore";
+import { useCurrentNodesStore } from "../../store/csCurrentNodesStore";
 import { useModalSelectedNodesStore } from "../../store/csModalSelectedNodesStore";
-import csModalUnitChildNode from "./cs-modal-unit-child-node.vue";
+import csModalCurrentChildNode from "./cs-modal-current-child-node.vue";
 
 interface Props {
     node: Node; // the assigned node to display
@@ -17,7 +17,7 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const store = useUnitNodesStore();
+const store = useCurrentNodesStore();
 const modalSelectedNodesStore = useModalSelectedNodesStore();
 const { title } = useNodeTitle(props.node);
 const extraId = generateUUID(); // to ensure the input/label id is unique
@@ -92,7 +92,7 @@ function onChange($isChecked: boolean): void {
         </div>
         <template v-if="showChildren">
             <ul>
-                <cs-modal-unit-child-node
+                <cs-modal-current-child-node
                     v-for="viewNode in props.node.children"
                     :key="viewNode.id"
                     :node="viewNode"
