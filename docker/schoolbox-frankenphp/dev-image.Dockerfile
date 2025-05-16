@@ -35,8 +35,7 @@ COPY --from=build /usr/local/lib/php/extensions/no-debug-zts-20220829 /usr/local
 COPY --from=build /usr/local/etc/php/conf.d/ /usr/local/etc/php/conf.d/
 
 # Write config
-#RUN rm /etc/nginx/sites-enabled/*.conf
-#COPY ./config/schoolbox.conf /etc/nginx/sites-enabled/schoolbox.conf
+COPY ./config/Caddyfile /etc/caddy/Caddyfile
 
 EXPOSE 80 443
 

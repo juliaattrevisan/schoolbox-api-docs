@@ -70,37 +70,7 @@ docker.dev.schoolbox.cloud:443 {
     handle_path /pad* {
         reverse_proxy schoolbox-etherpad:9001
     }
-    @images path_regexp (portrait|videothumb|cms/(image|myimage)|images/(fail|icon|logo)|(socialstream|storage)/image)\.php$
-    handle @images {
-        log_skip *
-        php_fastcgi php-fpm:9000 {
-            try_files index.php
-        }
-    }
 
-    handle_path /awstats-icon* {
-        root * /usr/share/awstats/icon
-        file_server
-    }
-    handle_path /awstats* {
-        php_fastcgi php-fpm:9000 {
-            try_files private/auth.php
-            env X-Original-URI {http.request.orig_uri}
-
-            @good status 200
-            handle_response @good {
-                root * /var/awstats
-                @root expression {http.request.orig_uri.path} == "/awstats/"
-                rewrite @root awstats.awstats.conf.html
-                rewrite {http.request.orig_uri.path}
-                uri strip_prefix /awstats
-                file_server
-            }
-            handle_response {
-                respond {rp.status_text} {rp.status_code}
-            }
-        }
-    }
     handle_path /debugbar* {
         root * /usr/share/schoolbox/vendor/maximebf/debugbar/src/DebugBar/Resources
     }
@@ -116,40 +86,7 @@ docker.dev.schoolbox.cloud:443 {
     log_skip /service-worker.js
     log_skip /manifest
     encode  zstd  gzip
-    php_fastcgi php-fpm:9000 {
+    php_server {
         try_files index.php
-    }
-    file_server
-}
-
-docker.dev.schoolbox.cloud:1081 {
-    #tls /etc/nginx/certs/schoolbox-vagrantx-fullchain.crt /etc/nginx/certs/schoolbox-vagrantx-private.key
-    tls internal
-    root * /usr/share/schoolbox/www
-    php_fastcgi php-fpm:9000 {
-        try_files private/auth.php
-
-        @good status 200
-        handle_response @good {
-            rewrite {http.request.orig_uri}
-            reverse_proxy php-fpm:1080
-        }
-        handle_response {
-            respond {rp.status_text} {rp.status_code}
-        }
-    }
-}
-
-docker-dav.dev.schoolbox.cloud {
-    #tls /etc/nginx/certs/schoolbox-vagrantx-fullchain.crt /etc/nginx/certs/schoolbox-vagrantx-private.key
-    tls internal
-    root * /usr/share/schoolbox/dav
-    #import headers
-    php_fastcgi php-fpm:9000
-    handle_errors 404 {
-        rewrite * /index.php?page=common/404
-    }
-    handle_errors {
-        respond "{err.status_code} {err.status_text}"
     }
 }
