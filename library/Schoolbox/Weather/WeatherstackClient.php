@@ -35,13 +35,14 @@ class WeatherstackClient
     /**
      * Constructor
      *
-     * @param string $apiKey
-     * @param string $apiUrl
-     * @param Cache  $cache
+     * @param string|null $apiKey
+     * @param string|null $apiUrl
+     * @param Cache $cache
+     * @param int $cacheTimeout
      */
     public function __construct(
-        #[SensitiveParameter] private string $apiKey,
-        private string $apiUrl,
+        #[SensitiveParameter] private ?string $apiKey,
+        private ?string $apiUrl,
         private Cache $cache,
         private int $cacheTimeout,
     ) {
@@ -58,15 +59,25 @@ class WeatherstackClient
      */
     public function getForecast(int $forecastLimit, string $location): array
     {
+        $default = ['weatherAvailable' => false];
+
+        /* Weatherstack might not always be configured.
+         */
+        if ('' === trim((string)$this->apiKey) || '' === trim((string)$this->apiUrl)) {
+            return $default;
+        }
+
         try {
             $requestUrl = "forecast?query={$location}&forecast_days={$forecastLimit}&units=m&hourly=1&access_key={$this->apiKey}";
             $response   = $this->makeRequest($requestUrl);
             $twigData   = $this->parseWeatherData($response);
+
+            return $twigData;
         } catch (\Exception $e) {
-            return ['weatherAvailable' => false];
+            // noop
         }
 
-        return $twigData;
+        return $default;
     }
 
 
@@ -81,14 +92,24 @@ class WeatherstackClient
      */
     public function getForecastByDate(Alaress_Date_Format $date, $latitude, $longitude)
     {
+        $default = [];
+
+        /* Weatherstack might not always be configured.
+         */
+        if ('' === trim((string)$this->apiKey) || '' === trim((string)$this->apiUrl)) {
+            return $default;
+        }
+
         try {
             $requestUrl = "forecast?date={$date->getDatabaseDate()}&query={$latitude},{$longitude}&units=m&hourly=1&access_key={$this->apiKey}";
             $response   = $this->makeRequest($requestUrl);
 
             return $response['forecast'][$date->getDatabaseDate()] ?? [];
         } catch (\Exception $e) {
-            return [];
+            // noop
         }
+
+        return $default;
     }
 
 
