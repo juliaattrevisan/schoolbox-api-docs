@@ -5,8 +5,8 @@
 services:
   # Frontend web server, mimicking a load balancer and SSL termination endpoint.
   # In the dev environment, forwards requests to one of these containers:
-  # * schoolbox-fpm-nginx-1
-  # * schoolbox-fpm-nginx-2
+  # * schoolbox-frankenphp-1
+  # * schoolbox-frankenphp-2
   caddy:
     container_name: caddy
     restart: always

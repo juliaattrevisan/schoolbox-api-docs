@@ -1,5 +1,5 @@
 # docker-compose.yaml for local development.
-# Its nginx container mounts Schoolbox's code folder as a local mount,
+# Its FrankenPHP container mounts Schoolbox's code folder as a local mount,
 # so that changes made locally are made available immediately.
 
 include:
@@ -7,15 +7,6 @@ include:
 
 services:
   # Base image: only needs to be built, not started
-  php82-alpine:
-    image: php82-alpine
-    build:
-      context: ./base-images/php82-alpine
-      args:
-        ENV: dev
-    restart: no
-
-
   php82-frankenphp:
     image: php82-frankenphp
     build:
@@ -24,8 +15,7 @@ services:
         ENV: dev
     restart: no
 
-
-  # Load-balanced frankenphp containers:
+  # Load-balanced FrankenPHP containers:
   # regrettably copy-pasted for now
   schoolbox-frankenphp-1:
     container_name: schoolbox-frankenphp-1
