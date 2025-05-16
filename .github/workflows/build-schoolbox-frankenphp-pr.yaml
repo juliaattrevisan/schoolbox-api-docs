@@ -1,6 +1,6 @@
-name: Build schoolbox-fpm-nginx (pull request)
+name: Build schoolbox-frankenphp (pull request)
 
-# Build a new schoolbox-fpm-nginx image for this pull request, for CI.
+# Build a new schoolbox-frankenphp image for this pull request, for CI.
 # Works around the fact that PRs can't use base images in repositories, by
 # building the base image and copying its files as artifacts.
 # Commented out for now, as CI doesn't use it yet and it costs us $:
@@ -17,15 +17,11 @@ jobs:
   build-npm-artifact:
     uses: ./.github/workflows/helper-build-npm-artifact.yaml
 
-  build-php82-frankenphp-artifacts:
-    uses: ./.github/workflows/helper-build-php82-frankenphp-artifacts.yaml
-
-  # Build schoolbox-fpm-nginx image
-  build-schoolbox-fpm-nginx:
+  # Build schoolbox-frankenphp image
+  build-schoolbox-frankenphp:
     needs:
       - build-composer-artifact
       - build-npm-artifact
-      - build-php82-frankenphp-artifacts
     strategy:
       matrix:
         build:
@@ -62,16 +58,33 @@ jobs:
           name: php82-frankenphp-${{ matrix.build.platform }}-${{ matrix.build.arch }}
           path: ${{ runner.temp }}/artifact
 
-      # Build
-      - name: Build schoolbox-fpm-nginx pull request image
+      - name: Build php82-frankenphp image
         uses: docker/build-push-action@v6
         with:
-          context: docker/schoolbox-fpm-nginx
-          file: docker/schoolbox-fpm-nginx/deploy-image.Dockerfile
+          context: docker/base-images/php82-frankenphp/
           cache-from: type=gha
           cache-to: type=gha
+          push: false
+          load: true
+          provenance: false
+          sbom: false
+          build-args: |
+            ENV=prod
+            ARCH=${{ matrix.build.arch }}
+          tags: |
+            php82-frankenphp-${{ matrix.build.arch }}
+          outputs: type=docker,dest=${{ runner.temp }}/php82-frankenphp-${{ matrix.build.arch }}.tar
+
+      - name: Build schoolbox-frankenphp pull request image
+        uses: docker/build-push-action@v6
+        with:
+          context: docker/schoolbox-frankenphp
+          file: docker/schoolbox-frankenphp/deploy-image.Dockerfile
+          cache-from: type=gha
+          cache-to: type=gha
+          # May need to include just-built php82-frankenphp image in the context
           build-contexts: |
-            php82-frankenphp=${{ runner.temp }}/artifact
+            php82-frankenphp=${{ runner.temp }}/php82-frankenphp-${{ matrix.build.arch }}.tar
             code=${{ github.workspace }}
           push: false
           load: true
@@ -80,17 +93,15 @@ jobs:
           build-args: |
             ENV=prod
             ARCH=${{ matrix.build.arch }}
-            SERVER_NAME=
-#          platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           tags: |
-            schoolbox-fpm-nginx-${{ matrix.build.arch }}
+            schoolbox-frankenphp-${{ matrix.build.arch }}
 
       # Smoke test for box:
       # could attempt to run PHPUnit within the box as well?
-      - name: Test schoolbox-fpm-nginx
+      - name: Test schoolbox-frankenphp
         run: |
           docker image ls
-          image=$(docker image ls -q schoolbox-fpm-nginx-${{ matrix.build.arch }})
+          image=$(docker image ls -q schoolbox-frankenphp-${{ matrix.build.arch }})
           docker run -i $image ls -al /opt/
           docker run -i $image ls -al /etc/
           docker run -i $image ls -al /etc/nginx/sites-enabled/
