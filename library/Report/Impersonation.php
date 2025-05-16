@@ -48,7 +48,7 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
     private $filterable = array(
         'impersonator' => 'username, real name or partial',
         'impersonated' => 'username, real name or partial',
-        'originating_IP' => 'x.x.x.x',
+        'originating_ip' => 'x.x.x.x',
         'after'        => 'eg. 2012-01-06, yesterday',
         'before'       => 'eg. July 1, 3 days ago'
     );
@@ -187,9 +187,9 @@ class Report_Impersonation extends Report_Abstract implements Report_IReport
                         $sqlFilter[] = "user_assume_log.created_at <= :before";
                         $params['before'] = $date;
                     }
-                } elseif ($key == 'originating_IP') {
-                    $sqlFilter[] = "ip LIKE :originating_IP";
-                    $params['originating_IP'] = '%' . $this->db->getQuoter()->escapeForLike($value) . '%';
+                } elseif ($key == 'originating_ip') {
+                    $sqlFilter[] = "ip LIKE :originating_ip";
+                    $params['originating_ip'] = '%' . $this->db->getQuoter()->escapeForLike($value) . '%';
                 } else {
                     $sqlFilter[] = $this->db->getQuoter()->quoteIdentifier($key) . " LIKE :$key";
                     $params[$key] = '%' . $this->db->getQuoter()->escapeForLike($value) . '%';
