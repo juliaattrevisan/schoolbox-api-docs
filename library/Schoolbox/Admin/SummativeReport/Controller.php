@@ -78,16 +78,18 @@ class Controller extends ConfigController
      */
     public const SUMMATIVE_REPORT_STATUS_KEY = 'summativeReport_%s';
 
-
     /**
-     * This file contains an html fragment that represents the footer
-     * for all the generated summative reports. Schools wanting a custom
-     * theme or layout for their reports will require customisation of almost
-     * everything inside the templates folder
+     * This file contains the footer for the summative reports, as well as
+     * customisable section that allows the school to add custom footer which
+     * are individualised per summative report
      */
-    private const FOOTER_HTML = '/templates/footer.html';
     private const FOOTER_TWIG = '@adminSummativeReport/footer.twig';
 
+    /**
+     * This file contains the default CSS styling for the footer for all the
+     * generated summative reports
+     */
+    private const FOOTER_CSS = '/templates/footer.css';
 
     /**
      * Default title of the report; used if the title field was 0-length
@@ -740,7 +742,7 @@ class Controller extends ConfigController
                     'from'    => call_user_func($userSerializer, $this->getUser()),
                     'to'      => call_user_func($userSerializer, $this->getUser()),
                 ])
-                ->setPdfFooter(file_get_contents(__DIR__ . self::FOOTER_HTML))
+                ->setPdfFooterStylesheet(file_get_contents(__DIR__ . self::FOOTER_CSS))
                 ->setOutfile($outfile)
                 ->build();
 
