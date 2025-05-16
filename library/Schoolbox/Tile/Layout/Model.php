@@ -45,6 +45,13 @@ class Model implements ISoftDeletable, \JsonSerializable
      */
     public const MAX_PADDING_PERCENTAGE = 50;
 
+    /**
+     * These set the minimum and maximum integer values for aspectRatioX and aspectRatioY,
+     * where aspectRatio = aspectRatioX/aspectRatioY.
+     */
+    public const MIN_ASPECT_RATIO_X_OR_Y = 1;
+    public const MAX_ASPECT_RATIO_X_OR_Y = 99;
+
 
     /**
      * The primary key of this grid.

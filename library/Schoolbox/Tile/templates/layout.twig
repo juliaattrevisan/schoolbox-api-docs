@@ -30,14 +30,14 @@
             aspect_ratio_x: {
                 required: true,
                 digits: true,
-                min: 1,
-                max: 100
+                min: {{ minAspectRatioXorY }},
+                max: {{ maxAspectRatioXorY }}
             },
             aspect_ratio_y: {
                 required: true,
                 digits: true,
-                min: 1,
-                max: 100
+                min: {{ minAspectRatioXorY }},
+                max: {{ maxAspectRatioXorY }}
             },
             column_padding: {
                 required: true,
