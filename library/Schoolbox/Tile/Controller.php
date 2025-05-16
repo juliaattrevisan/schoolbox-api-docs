@@ -113,7 +113,8 @@ class Controller extends Base
             $columnPadding = 0;
         }
 
-        if ($this->requestPost['aspect_ratio_x'] < Layout\Model::MIN_ASPECT_RATIO_X_OR_Y ||
+        if (
+            $this->requestPost['aspect_ratio_x'] < Layout\Model::MIN_ASPECT_RATIO_X_OR_Y ||
             $this->requestPost['aspect_ratio_y'] > Layout\Model::MAX_ASPECT_RATIO_X_OR_Y ||
             $this->requestPost['aspect_ratio_x'] < Layout\Model::MIN_ASPECT_RATIO_X_OR_Y ||
             $this->requestPost['aspect_ratio_y'] > Layout\Model::MAX_ASPECT_RATIO_X_OR_Y
