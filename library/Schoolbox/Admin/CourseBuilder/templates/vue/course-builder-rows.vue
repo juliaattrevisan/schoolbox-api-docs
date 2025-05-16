@@ -98,36 +98,36 @@ const existingCourseTemplateCount = window.Vue.computed(() => {
           :transition-enter="onRowEnter"
           :transition-leave="onRowLeave"
       >
-        <template #item="courseTemplate: { courseTemplate: courseTemplate, isDragging }">
+        <template #item="{element, index}">
         <li class="list-item-container">
           <div class="grip compact" data-pe-field-drag-handle />
             <div class="actions-small-1">
                 <div class="list-item">
                     <div class="small-12 medium-1 column">
                         <strong class="hide-for-medium-up">Template ID:</strong>
-                        {{ courseTemplate.id }}
+                        {{ element.id }}
                     </div>
                     <div class="small-12 medium-5 column">
                         <strong class="hide-for-medium-up">Template Name:</strong>
                         <input
-                            v-model="courseTemplate.name"
+                            v-model="element.name"
                             maxlength="50"
                             required
-                            @input="clearNameValidationError(courseTemplate)"
+                            @input="clearNameValidationError(element)"
                         />
-                        <label v-if="courseTemplate.nameHasValidationError" class="error">
+                        <label v-if="element.nameHasValidationError" class="error">
                             This field is required.
                         </label>
                     </div>
                     <div class="small-12 medium-3 column">
                         <strong class="hide-for-medium-up">Course Page Template:</strong>
                         <div class="select-wrapper">
-                            <select v-model="courseTemplate.courseTemplate" required>
+                            <select v-model="element.courseTemplate" required>
                                 <template v-for="availableTemplate in props.availableTemplates">
                                     <option
                                         v-if="
                                             !availableTemplate.deleted ||
-                                            courseTemplate.courseTemplate?.id === availableTemplate.id
+                                            element.courseTemplate?.id === availableTemplate.id
                                         "
                                         :key="availableTemplate.id"
                                         :value="availableTemplate"
@@ -143,12 +143,12 @@ const existingCourseTemplateCount = window.Vue.computed(() => {
                     <div class="small-12 medium-3 column">
                         <strong class="hide-for-medium-up">Unit Page Template:</strong>
                         <div class="select-wrapper">
-                            <select v-model="courseTemplate.unitTemplate" required>
+                            <select v-model="element.unitTemplate" required>
                                 <template v-for="availableTemplate in props.availableTemplates">
                                     <option
                                         v-if="
                                             !availableTemplate.deleted ||
-                                            courseTemplate.unitTemplate?.id === availableTemplate.id
+                                            element.unitTemplate?.id === availableTemplate.id
                                         "
                                         :key="availableTemplate.id"
                                         :value="availableTemplate"
@@ -165,9 +165,9 @@ const existingCourseTemplateCount = window.Vue.computed(() => {
                 <nav>
                     <a
                         class="delete-row-button icon-delete"
-                        :class="{ disabled: existingCourseTemplateCount === 1 && courseTemplate.id >= 0 }"
+                        :class="{ disabled: existingCourseTemplateCount === 1 && element.id >= 0 }"
                         title="Delete Template"
-                        @click.prevent="onDeleteClicked(courseTemplate)"
+                        @click.prevent="onDeleteClicked(element)"
                     ></a>
                 </nav>
             </div>
