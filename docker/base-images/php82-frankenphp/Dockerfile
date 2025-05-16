@@ -46,15 +46,15 @@ RUN install-php-extensions \
     fileinfo \
     libxml
 
-# Install XDebug on non-production
+# Install XDebug on non-production, also copy base config
 RUN <<EOF
 case "$ENV" in
-  prod)
-    ;;
-  production)
+  prod production)
+    ln -s /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
     ;;
   *)
     install-php-extensions xdebug
+    ln -s /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini
     ;;
 esac
 EOF
