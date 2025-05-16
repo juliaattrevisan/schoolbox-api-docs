@@ -163,12 +163,13 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
      * @param oldIndex - The original index of the field
      * @param newIndex - The new index of the field
      */
-    function resequenceField(oldIndex: number, newIndex: number): void {
+    async function resequenceField(oldIndex: number, newIndex: number): Promise<void> {
         // Update UI immediately
         const [movedField] = courseTemplates.value.splice(oldIndex, 1);
         courseTemplates.value.splice(newIndex, 0, movedField);
 
-       // sequence will be updated on saveChanges
+        // sequence will be updated on saveChanges
+        await window.Vue.nextTick();
     }
 
     return {
