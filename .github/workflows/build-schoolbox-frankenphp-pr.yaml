@@ -67,7 +67,7 @@ jobs:
             ARCH=${{ matrix.build.arch }}
           tags: |
             php82-frankenphp-${{ matrix.build.arch }}
-          outputs: type=docker,dest=${{ runner.temp }}/php82-frankenphp-${{ matrix.build.arch }}.tar
+          outputs: type=docker,dest=${{ runner.temp }}/php82-frankenphp-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
 
       - name: Build schoolbox-frankenphp pull request image
         uses: docker/build-push-action@v6
@@ -78,7 +78,7 @@ jobs:
           cache-to: type=gha
           # May need to include just-built php82-frankenphp image in the context
           build-contexts: |
-            php82-frankenphp=${{ runner.temp }}/php82-frankenphp-${{ matrix.build.arch }}.tar
+            php82-frankenphp=docker-image://php82-frankenphp-${{ matrix.build.arch }}
             code=${{ github.workspace }}
           push: false
           load: true
