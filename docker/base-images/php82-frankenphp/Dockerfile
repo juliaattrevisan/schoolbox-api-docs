@@ -46,8 +46,18 @@ RUN install-php-extensions \
     fileinfo \
     libxml
 
-# Fix this so that xdebug is actually installed
-RUN if [[ ! " prod production " =~ " $ENV " ]] ; then install-php-extensions xdebug ; fi
+# Install XDebug on non-production
+RUN <<EOF
+case "$ENV" in
+  prod)
+    ;;
+  production)
+    ;;
+  *)
+    install-php-extensions xdebug
+    ;;
+esac
+EOF
 
 # Install ODBC driver
 COPY ./bin/install-odbc-driver.sh /opt/bin/install-odbc-driver.sh
