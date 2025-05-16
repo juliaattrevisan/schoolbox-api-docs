@@ -51,6 +51,7 @@ use Twig\Error\Error;
 use UnexpectedValueException;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
 
 /**
@@ -778,6 +779,13 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         $contextType = AssessmentContextType::objectToString($context) . 's';
 
+        //$assessment->getBaseContext() instanceof UnitSpecification
+        if ($assessment->isImplementation()) {
+            $parentFolderId = $assessment->getBaseContext()->getSpecification()->getFolder()->getId();
+        } else {
+            $parentFolderId = $assessment->getBaseContext()->getFolder()->getId();
+        }
+
         /* The usual info everything requires
          */
         $data = [
@@ -796,7 +804,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
              * so we don't need a different method than the existing getAllMarkTypes
              */
             'capabilityMarkTypes'      => $this->getAllMarkTypes($assessment),
-            'capabilityGradingSchemes' => $this->getAllGradeSchemes()
+            'capabilityGradingSchemes' => $this->getAllGradeSchemes(),
+            'parentFolderId'           => $parentFolderId,
         ];
 
         $data = array_merge($data, $this->getAssessmentTwigData($assessment));
