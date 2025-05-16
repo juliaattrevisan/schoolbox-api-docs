@@ -5,7 +5,7 @@ http://docker.dev.schoolbox.cloud {
     redir https://{host}{uri} 308
 }
 
-# Forward all traffic to schoolbox-nginx (terminating SSL)
+# Forward all traffic to schoolbox-frankenphp (terminating SSL)
 # Maybe static assets will be served by another container, but that can be
 # figured out later.
 https://docker.dev.schoolbox.cloud {
@@ -24,7 +24,7 @@ https://docker.dev.schoolbox.cloud {
     }
     error @disallowed-methods "Method {method} Not Allowed" 405
 
-    # Handle requests for fail images before nginx
+    # Handle requests for fail images before frankenphp
     handle_path /static/images/core/fail-whale.png {
         rewrite * /images/core/fail-whale.png
         reverse_proxy https://schoolbox-static.cloud {
@@ -47,7 +47,8 @@ https://docker.dev.schoolbox.cloud {
     }
 
     # TODO determine how to handle DAV requests:
-    # I'm guessing they're handled in the nginx container?
+    # I'm guessing they're handled in the frankenphp container,
+    # if DAV is handled at all?
 
     # All other requests just get forwarded to frankenphp
     reverse_proxy http://schoolbox-frankenphp-1 http://schoolbox-frankenphp-2

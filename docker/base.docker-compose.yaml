@@ -1,6 +1,5 @@
 # Base docker-compose.yaml for local running of a containerised Schoolbox
 # environment.
-# An nginx container must be defined in whichever compose.yaml includes this.
 
 services:
   # Frontend web server, mimicking a load balancer and SSL termination endpoint.

@@ -5,9 +5,7 @@ include:
   - base.docker-compose.yaml
 
 services:
-
-
-  # Load-balanced nginx+PHP-FPM containers:
+  # Load-balanced FrankenPHP containers:
   # regrettably copy-pasted for now
   schoolbox-frankenphp-1:
     container_name: schoolbox-frankenphp-1
@@ -24,7 +22,6 @@ services:
     # After building: create data dirs, and make mount writable by www-data
     # Cannot currently use create-data-dirs.sh, as /bin/bash isn't available,
     # and /bin/sh doesn't support {} expansion
-    # Also: set server_name and trigger nginx reload if possible?
     post_start:
       - command: mkdir -p /var/lib/schoolbox/docker/cache/portrait
       - command: mkdir -p /var/lib/schoolbox/docker/cache/stream
