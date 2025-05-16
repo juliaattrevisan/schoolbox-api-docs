@@ -114,7 +114,10 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
         try {
             // Ensure all course template names are not empty, otherwise set .hasNameValidationError on the courseTemplate
             let allTemplatesHaveNames = true;
-            courseTemplates.value.forEach((ct) => {
+            courseTemplates.value.forEach((ct, index) => {
+                // resequence before sending to backend...
+                ct.sequence = index;
+
                 if (!ct.name) {
                     ct.nameHasValidationError = true;
                     allTemplatesHaveNames = false;
@@ -164,6 +167,8 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
         // Update UI immediately
         const [movedField] = courseTemplates.value.splice(oldIndex, 1);
         courseTemplates.value.splice(newIndex, 0, movedField);
+
+       // sequence will be updated on saveChanges
     }
 
     return {
