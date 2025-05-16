@@ -9,15 +9,15 @@ services:
 
   # Load-balanced nginx+PHP-FPM containers:
   # regrettably copy-pasted for now
-  schoolbox-fpm-nginx-1:
-    container_name: schoolbox-fpm-nginx-1
+  schoolbox-frankenphp-1:
+    container_name: schoolbox-frankenphp-1
     restart: always
     depends_on:
       - mariadb
       - rabbitmq
       - redis-cache
       - redis-storage
-    image: alaress/schoolbox-fpm-nginx:develop-latest
+    image: alaress/schoolbox-frankenphp:develop-latest
     volumes:
       - storage:/var/lib/schoolbox/docker/storage
       - schoolbox-config:/etc/schoolbox
@@ -33,18 +33,16 @@ services:
       - command: mkdir -p /var/lib/schoolbox/docker/purifier
       - command: mkdir -p /var/lib/schoolbox/docker/twig
       - command: chown -R www-data:www-data /var/lib/schoolbox/docker/
-      - command: echo "server_name schoolbox-fpm-nginx-1" > /etc/nginx/sites-enabled/schoolbox.d/server_name.conf
-      - command: nginx -s reload
 
-  schoolbox-fpm-nginx-2:
-    container_name: schoolbox-fpm-nginx-2
+  schoolbox-frankenphp-2:
+    container_name: schoolbox-frankenphp-2
     restart: always
     depends_on:
       - mariadb
       - rabbitmq
       - redis-cache
       - redis-storage
-    image: alaress/schoolbox-fpm-nginx:develop-latest
+    image: alaress/schoolbox-frankenphp:develop-latest
     volumes:
       - storage:/var/lib/schoolbox/docker/storage
       - schoolbox-config:/etc/schoolbox
@@ -56,5 +54,3 @@ services:
       - command: mkdir -p /var/lib/schoolbox/docker/purifier
       - command: mkdir -p /var/lib/schoolbox/docker/twig
       - command: chown -R www-data:www-data /var/lib/schoolbox/docker/
-      - command: echo "server_name schoolbox-fpm-nginx-2" > /etc/nginx/sites-enabled/schoolbox.d/server_name.conf
-      - command: nginx -s reload
