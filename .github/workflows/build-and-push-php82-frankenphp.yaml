@@ -1,6 +1,6 @@
-name: Build and push php82-alpine
+name: Build and push php82-frankenphp
 
-# Build new php82-alpine images:
+# Build new php82-frankenphp images:
 # * whenever docker/base-images/** changes?
 #   (develop only for now: master and develop will use the same base images)
 # * manually (workflow_dispatch)?
@@ -16,12 +16,12 @@ on:
   workflow_call:
 
 jobs:
-  build-and-push-php82-alpine-to-dockerhub:
+  build-and-push-php82-frankenphp-to-dockerhub:
     # TODO use helper workflow (need to add arch to every tag first)
 #    uses: ./.github/workflows/helper-build-and-push-to-dockerhub.yaml
 #    with:
-#      image: php82-alpine
-#      context: docker/base-images/php82-alpine
+#      image: php82-frankenphp
+#      context: docker/base-images/php82-frankenphp
 #    secrets: inherit
     strategy:
       matrix:
@@ -46,15 +46,15 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push php82-alpine to Dockerhub
+      - name: Build and push php82-frankenphp to Dockerhub
         uses: docker/build-push-action@v6
         with:
-          context: docker/base-images/php82-alpine
+          context: docker/base-images/php82-frankenphp
           cache-from: type=gha
           cache-to: type=gha
           load: true
           push: true
-          outputs: type=docker,dest=${{ runner.temp }}/php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
+          outputs: type=docker,dest=${{ runner.temp }}/php82-frankenphp-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
           # Remove provenance and SBOM for now, as they convert the image build
           # to a manifest, which prevents the images from being merged into a
           # manifest later on.
@@ -65,18 +65,18 @@ jobs:
             ARCH=${{ matrix.build.arch }}
 #          platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           tags: |
-            alaress/php82-alpine:latest-${{ github.ref_name }}-${{ matrix.build.arch }}
+            alaress/php82-frankenphp:latest-${{ github.ref_name }}-${{ matrix.build.arch }}
 
-      - name: Upload php82-alpine artifact
+      - name: Upload php82-frankenphp artifact
         uses: actions/upload-artifact@v4
         with:
-          name: php82-alpine-${{ matrix.build.arch }}
-          path: ${{ runner.temp }}/php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
+          name: php82-frankenphp-${{ matrix.build.arch }}
+          path: ${{ runner.temp }}/php82-frankenphp-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
           retention-days: 1
 
-  join-php82-alpine:
+  join-php82-frankenphp:
     needs:
-      - build-and-push-php82-alpine-to-dockerhub
+      - build-and-push-php82-frankenphp-to-dockerhub
     runs-on: ubuntu-latest
     steps:
       - name: Set up Docker Buildx
@@ -88,19 +88,19 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Join php82-alpine images
+      - name: Join php82-frankenphp images
         run: |
-          docker manifest create alaress/php82-alpine:latest-${{ github.ref_name }} \
-            --amend alaress/php82-alpine:latest-${{ github.ref_name }}-amd64 \
-            --amend alaress/php82-alpine:latest-${{ github.ref_name }}-arm64
-          docker manifest push --purge alaress/php82-alpine:latest-${{ github.ref_name }}
+          docker manifest create alaress/php82-frankenphp:latest-${{ github.ref_name }} \
+            --amend alaress/php82-frankenphp:latest-${{ github.ref_name }}-amd64 \
+            --amend alaress/php82-frankenphp:latest-${{ github.ref_name }}-arm64
+          docker manifest push --purge alaress/php82-frankenphp:latest-${{ github.ref_name }}
 
       # Need artifact for the joined image too, or pull the just built image?
 
   push-php82-to-ecr:
     needs:
-      - join-php82-alpine
+      - join-php82-frankenphp
     uses: ./.github/workflows/helper-push-to-ecr.yaml
     with:
-      image: php82-alpine
+      image: php82-frankenphp
     secrets: inherit
