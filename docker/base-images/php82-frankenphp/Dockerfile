@@ -14,6 +14,8 @@ ARG ARCH=amd64
 # Currently alpine can drop-in replace bookworm:
 # just replace "bookworm" with "alpine" in the `FROM` line below.
 # Image size: alpine 355MB, bookworm 653MB.
+# Attempting to `apt install` required packages and only copy compiled
+# extensions actually bloats the bookworm image to 743MB.
 FROM --platform=linux/${ARCH} dunglas/frankenphp:1.5-php8.2-bookworm
 
 # Ensure ENV is accessible by this build step:
