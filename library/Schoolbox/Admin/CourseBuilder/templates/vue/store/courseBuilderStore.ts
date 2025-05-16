@@ -162,8 +162,8 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
      */
     async function resequenceField(oldIndex: number, newIndex: number): Promise<void> {
         // Update UI immediately
-        const [movedField] = courseTemplates.splice(oldIndex, 1);
-        courseTemplates.splice(newIndex, 0, movedField);
+        const [movedField] = courseTemplates.value.splice(oldIndex, 1);
+        courseTemplates.value.splice(newIndex, 0, movedField);
     }
 
     return {

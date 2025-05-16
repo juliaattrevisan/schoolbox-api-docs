@@ -85,8 +85,9 @@ window.Vue.onMounted(() => {
                 <div class="list-container">
                     <header class="list-header actions-small-1">
                         <div class="list-item">
+                            <label class="small-12 medium-1 column">&nbsp;</label>
                             <label class="small-12 medium-1 column">ID</label>
-                            <label class="small-12 medium-5 column required">Framework Name</label>
+                            <label class="small-12 medium-4 column required">Framework Name</label>
                             <label class="small-12 medium-3 column required">Course Page Template</label>
                             <label class="small-12 medium-3 column required">Unit Page Template</label>
                         </div>

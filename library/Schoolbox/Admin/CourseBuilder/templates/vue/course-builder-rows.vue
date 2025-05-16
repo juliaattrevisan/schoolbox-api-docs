@@ -100,14 +100,16 @@ const existingCourseTemplateCount = window.Vue.computed(() => {
       >
         <template #item="{element, index}">
         <li class="list-item-container">
-          <div class="grip compact" data-pe-field-drag-handle />
             <div class="actions-small-1">
                 <div class="list-item">
+                    <div class="small-12 medium-1 column">
+                      <div class="grip compact" data-pe-field-drag-handle />
+                    </div>
                     <div class="small-12 medium-1 column">
                         <strong class="hide-for-medium-up">Template ID:</strong>
                         {{ element.id }}
                     </div>
-                    <div class="small-12 medium-5 column">
+                    <div class="small-12 medium-4 column">
                         <strong class="hide-for-medium-up">Template Name:</strong>
                         <input
                             v-model="element.name"
