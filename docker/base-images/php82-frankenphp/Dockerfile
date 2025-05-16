@@ -59,9 +59,5 @@ case "$ENV" in
 esac
 EOF
 
-# Install ODBC driver
-COPY ./bin/install-odbc-driver.sh /opt/bin/install-odbc-driver.sh
-RUN /opt/bin/install-odbc-driver.sh
-
 # Copy configuration files
 COPY ./config/* /usr/local/etc/php/conf.d/
