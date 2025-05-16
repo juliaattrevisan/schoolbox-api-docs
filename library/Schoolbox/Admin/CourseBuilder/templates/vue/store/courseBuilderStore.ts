@@ -183,6 +183,6 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
         updateCourseTemplate,
         deleteCourseTemplate,
         saveChanges,
-        resequenceField
+        resequenceField,
     };
 });

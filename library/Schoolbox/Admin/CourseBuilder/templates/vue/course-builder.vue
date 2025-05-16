@@ -72,8 +72,7 @@ window.Vue.onMounted(() => {
                         </div>
                     </header>
 
-                      <course-builder-rows :available-templates="props.availableTemplates" />
-
+                    <course-builder-rows :available-templates="props.availableTemplates" />
 
                     <div class="component-action">
                         <section>
