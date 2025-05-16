@@ -17,15 +17,15 @@ jobs:
   build-npm-artifact:
     uses: ./.github/workflows/helper-build-npm-artifact.yaml
 
-  build-php82-alpine-artifacts:
-    uses: ./.github/workflows/helper-build-php82-alpine-artifacts.yaml
+  build-php82-frankenphp-artifacts:
+    uses: ./.github/workflows/helper-build-php82-frankenphp-artifacts.yaml
 
   # Build schoolbox-fpm-nginx image
   build-schoolbox-fpm-nginx:
     needs:
       - build-composer-artifact
       - build-npm-artifact
-      - build-php82-alpine-artifacts
+      - build-php82-frankenphp-artifacts
     strategy:
       matrix:
         build:
@@ -56,10 +56,10 @@ jobs:
           name: schoolbox-npm
           path: www/static/js/bundle/
 
-      - name: Download php82-alpine artifact
+      - name: Download php82-frankenphp artifact
         uses: actions/download-artifact@v4
         with:
-          name: php82-alpine-${{ matrix.build.platform }}-${{ matrix.build.arch }}
+          name: php82-frankenphp-${{ matrix.build.platform }}-${{ matrix.build.arch }}
           path: ${{ runner.temp }}/artifact
 
       # Build
@@ -71,7 +71,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha
           build-contexts: |
-            php82-alpine=${{ runner.temp }}/artifact
+            php82-frankenphp=${{ runner.temp }}/artifact
             code=${{ github.workspace }}
           push: false
           load: true
