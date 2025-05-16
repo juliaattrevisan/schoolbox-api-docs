@@ -49,6 +49,6 @@ https://docker.dev.schoolbox.cloud {
     # TODO determine how to handle DAV requests:
     # I'm guessing they're handled in the nginx container?
 
-    # All other requests just get forwarded to nginx
-    reverse_proxy http://schoolbox-fpm-nginx-1 http://schoolbox-fpm-nginx-2
+    # All other requests just get forwarded to frankenphp
+    reverse_proxy http://schoolbox-frankenphp-1 http://schoolbox-frankenphp-2
 }
