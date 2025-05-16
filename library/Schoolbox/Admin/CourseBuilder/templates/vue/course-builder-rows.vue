@@ -3,6 +3,7 @@ import { slideDown, slideUp } from "@js/util/animateUtils";
 import { useCourseBuilderStore } from "./store/courseBuilderStore";
 import type { PageTemplate, CourseTemplate } from "./courseBuilderTypes";
 import SortableWrapper from "@schoolboxVue/components/sortable-wrapper.vue";
+import type Sortable from "sortablejs";
 import {slideDownOnEnter, slideUpOnLeave} from "@schoolboxVue/transitions/transitions";
 
 interface Props {
@@ -97,7 +98,7 @@ const existingCourseTemplateCount = window.Vue.computed(() => {
           :transition-enter="onRowEnter"
           :transition-leave="onRowLeave"
       >
-        <template #item="courseTemplate">
+        <template #item="courseTemplate: { courseTemplate: courseTemplate, isDragging }">
         <li class="list-item-container">
           <div class="grip compact" data-pe-field-drag-handle />
             <div class="actions-small-1">
@@ -126,7 +127,7 @@ const existingCourseTemplateCount = window.Vue.computed(() => {
                                     <option
                                         v-if="
                                             !availableTemplate.deleted ||
-                                            courseTemplate.courseTemplate.id === availableTemplate.id
+                                            courseTemplate.courseTemplate?.id === availableTemplate.id
                                         "
                                         :key="availableTemplate.id"
                                         :value="availableTemplate"
@@ -147,7 +148,7 @@ const existingCourseTemplateCount = window.Vue.computed(() => {
                                     <option
                                         v-if="
                                             !availableTemplate.deleted ||
-                                            courseTemplate.unitTemplate.id === availableTemplate.id
+                                            courseTemplate.unitTemplate?.id === availableTemplate.id
                                         "
                                         :key="availableTemplate.id"
                                         :value="availableTemplate"

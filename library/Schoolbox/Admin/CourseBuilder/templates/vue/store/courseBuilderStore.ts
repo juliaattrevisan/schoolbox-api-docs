@@ -164,8 +164,6 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
         // Update UI immediately
         const [movedField] = courseTemplates.splice(oldIndex, 1);
         courseTemplates.splice(newIndex, 0, movedField);
-
-        await queueAction({ type: "RESEQUENCE_FIELDS", fields: [movedField.field] });
     }
 
     return {
