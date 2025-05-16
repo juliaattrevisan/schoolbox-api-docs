@@ -25,12 +25,12 @@
         {% set paddingPercentage = (layout.columnPadding / 100) %}
         {% set tilePadding       = baseColumnWidth * paddingPercentage %}
         {% set tileWidth         = baseColumnWidth - tilePadding %}
-        width: {{ tileWidth }}%;
-        margin: {{ tilePadding / 2 }}%;
+        width: {{ tileWidth|round(2) }}%;
+        margin: {{ (tilePadding / 2)|round(2) }}%;
         {% set paddingBottom = tileWidth * aspectRatio ~ "%" %}
     {% endif %}
 
-    padding-bottom: {{ paddingBottom }};
+    padding-bottom: {{ paddingBottom|round(2) }};
 }
 </style>
 
