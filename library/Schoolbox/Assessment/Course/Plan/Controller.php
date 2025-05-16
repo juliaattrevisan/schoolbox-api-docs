@@ -897,7 +897,9 @@ class Controller extends Base
                 try {
                     $instanceConfig['curriculumTreeFilter']['value'] =
                         $this->nodeMapper->findOneByColumnList(['id' => $instanceConfig['curriculumTreeFilter']['value']]);
-                } catch (Deleted $e) {
+                } catch (Exception $e) {
+                    // Node not found or deleted?
+                    // Just act as if nothing were selected.
                     $instanceConfig['curriculumTreeFilter']['value'] = null;
                 }
             }
@@ -1019,8 +1021,9 @@ class Controller extends Base
             } else {
                 try {
                     $curricFilter = $this->nodeMapper->findOneByColumnList(['id' => $curricFilter]);
-                } catch (Deleted $e) {
-                    $curricFilter = null;
+                } catch (Exception $e) {
+                    // Node not found or deleted?
+                    // Just act as if nothing were selected.
                 }
             }
             $curriculumTemplate[] = [
