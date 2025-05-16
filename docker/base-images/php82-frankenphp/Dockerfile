@@ -21,14 +21,32 @@ ARG ENV
 # (not in https://github.com/shinsenter/php?tab=readme-ov-file#pre-installed-php-extensions)
 RUN install-php-extensions \
     imagick \
+    pdo_mysql \
     pdo_sqlsrv \
     excimer \
     curl \
     ldap \
     dom \
     sockets \
-    imap
+    imap \
+    redis \
+    readline \
+    zip \
+    pcntl \
+    posix \
+    openssl \
+    json \
+    simplexml \
+    mbstring \
+    intl \
+    xmlreader \
+    dom \
+    exif \
+    zlib \
+    fileinfo \
+    libxml
 
+# Fix this so that xdebug is actually installed
 RUN if [[ ! " prod production " =~ " $ENV " ]] ; then install-php-extensions xdebug ; fi
 
 # Install ODBC driver
