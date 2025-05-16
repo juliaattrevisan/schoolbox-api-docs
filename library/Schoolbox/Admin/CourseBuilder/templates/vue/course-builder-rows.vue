@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { slideDown, slideUp } from "@js/util/animateUtils";
-import { useCourseBuilderStore } from "./store/courseBuilderStore";
-import type { PageTemplate, CourseTemplate } from "./courseBuilderTypes";
 import SortableWrapper from "@schoolboxVue/components/sortable-wrapper.vue";
 import type Sortable from "sortablejs";
-import {slideDownOnEnter, slideUpOnLeave} from "@schoolboxVue/transitions/transitions";
+import { useCourseBuilderStore } from "./store/courseBuilderStore";
+import type { PageTemplate, CourseTemplate } from "./courseBuilderTypes";
 
 interface Props {
     availableTemplates: PageTemplate[];
@@ -94,11 +93,11 @@ const existingCourseTemplateCount = window.Vue.computed(() => {
           :list="store.courseTemplates"
           :item-key="(item) => item.id"
           :options="sortableOptions"
-          @end="onResequenceField"
           :transition-enter="onRowEnter"
           :transition-leave="onRowLeave"
+          @end="onResequenceField"
       >
-        <template #item="{element, index}">
+        <template #item="{element}">
         <li class="list-item-container">
             <div class="actions-small-1">
                 <div class="list-item">

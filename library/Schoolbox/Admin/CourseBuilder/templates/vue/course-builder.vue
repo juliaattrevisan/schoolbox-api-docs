@@ -5,9 +5,6 @@ import CourseBuilderRows from "./course-builder-rows.vue";
 import CourseBuilderAccessCourse from "./course-builder-access-course.vue";
 import CourseBuilderAccessUnit from "./course-builder-access-unit.vue";
 import CourseBuilderDeleteModal from "./course-builder-delete-modal.vue";
-import {slideDownOnEnter, slideUpOnLeave} from "@schoolboxVue/transitions/transitions";
-import SortableWrapper from "@schoolboxVue/components/sortable-wrapper.vue";
-import PeFieldsSelectedItem from "@schoolboxLibrary/Admin/Profile/Editor/templates/vue/pe-fields-selected-item.vue";
 
 interface Props {
     courseTemplates: CourseTemplate[];
@@ -24,24 +21,6 @@ const props = defineProps<Props>();
 const store = useCourseBuilderStore();
 
 const newRowAmount = window.Vue.ref(0);
-
-const sortableOptions = window.Vue.computed(() => ({
-  // Link the selected fields sortable to the available fields sortable so that we can drag between them
-  group: {
-    name: `fields-courseBuilder-frameworks`,
-    pull: false, // can't drag out of the selected fields
-    put: true, // can drag into the selected fields
-  },
-  // We use this to force the html5 drag and drop logic to be ignored and use the fallback so we can style it
-  forceFallback: true,
-  // The class to apply to the clone when dragging
-  fallbackClass: "dragged-item",
-  // How long the animation should take when items shift
-  animation: 200,
-  // The handle to use to drag the field around
-  handle: "[data-pe-field-drag-handle]",
-}));
-
 
 /**
  * Add a new row to the list
