@@ -779,10 +779,11 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         $contextType = AssessmentContextType::objectToString($context) . 's';
 
-        //$assessment->getBaseContext() instanceof UnitSpecification
-        if ($assessment->isImplementation()) {
-            $parentFolderId = $assessment->getBaseContext()->getSpecification()->getFolder()->getId();
-        } else {
+        if ($assessment->isImplementation()) { // check if the assessment's on a class page
+            /** @var UnitImplementation\Model $unitImpl */
+            $unitImpl = $assessment->getBaseContext();
+            $parentFolderId = $unitImpl->getSpecification()->getFolder()->getId();
+        } else { // otherwise it's on a unit page
             $parentFolderId = $assessment->getBaseContext()->getFolder()->getId();
         }
 
