@@ -49,7 +49,7 @@ RUN install-php-extensions \
 # Install XDebug on non-production, also copy base config
 RUN <<EOF
 case "$ENV" in
-  prod production)
+  prod | production)
     ln -s /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
     ;;
   *)
