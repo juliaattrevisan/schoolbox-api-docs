@@ -49,7 +49,8 @@ RUN install-php-extensions \
     exif \
     zlib \
     fileinfo \
-    libxml
+    libxml \
+    opcache
 
 # Install XDebug on non-production, also copy base config
 RUN <<EOF
