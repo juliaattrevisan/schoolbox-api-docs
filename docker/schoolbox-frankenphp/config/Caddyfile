@@ -1,3 +1,7 @@
+{
+    frankenphp
+}
+
 :80 {
     log {
         output stdout
