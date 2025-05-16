@@ -29,7 +29,7 @@ ARG SERVER_NAME
 COPY --from=build /etc/odbc.ini      /etc/odbc.ini
 COPY --from=build /etc/odbcinst.ini  /etc/odbcinst.ini
 COPY --from=build /opt/microsoft     /opt/microsoft
-COPY --from=build /opt/mssql-tools18 /opt/mssql-tools18
+#COPY --from=build /opt/mssql-tools18 /opt/mssql-tools18
 ## TODO use `php -r "echo ini_get('extension_dir')`
 COPY --from=build /usr/local/lib/php/extensions/no-debug-zts-20220829 /usr/local/lib/php/extensions/no-debug-zts-20220829
 COPY --from=build /usr/local/etc/php/conf.d/ /usr/local/etc/php/conf.d/
