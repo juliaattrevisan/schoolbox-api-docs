@@ -77,10 +77,8 @@ jobs:
         run: |
           docker image ls
           image=$(docker image ls -q schoolbox-frankenphp-${{ matrix.build.arch }})
-          docker run -i $image ls -al /opt/
           docker run -i $image ls -al /etc/
-          docker run -i $image ls -al /etc/nginx/sites-enabled/
-          docker run -i $image ls -al /etc/nginx/sites-enabled/schoolbox.d/
+          docker run -i $image ls -al /etc/caddy
           docker run -i $image ls -al /usr/local/lib/php/extensions/no-debug-non-zts-20220829/
           docker run -i $image ls -al /usr/local/etc/php/conf.d/
           docker run -i $image ls -al /usr/share/schoolbox/
