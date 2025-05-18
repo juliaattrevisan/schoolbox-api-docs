@@ -66,4 +66,5 @@ esac
 EOF
 
 # Copy configuration files
-COPY ./config/* /usr/local/etc/php/conf.d/
+COPY ./config/php/* /usr/local/etc/php/conf.d/
+COPY ./config/imagemagick/* /etc/ImageMagick-6/
