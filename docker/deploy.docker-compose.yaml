@@ -28,6 +28,8 @@ services:
       dockerfile: deploy-image.Dockerfile
       args:
         SERVER_NAME: schoolbox-frankenphp-1.docker.localhost
+      additional_contexts:
+        - code=../
     volumes:
       - storage:/var/lib/schoolbox/docker/storage
       - schoolbox-config:/etc/schoolbox
@@ -53,6 +55,8 @@ services:
       dockerfile: deploy-image.Dockerfile
       args:
         SERVER_NAME: schoolbox-frankenphp-2.docker.localhost
+      additional_contexts:
+        - code=../
     volumes:
       - storage:/var/lib/schoolbox/docker/storage
       - schoolbox-config:/etc/schoolbox
