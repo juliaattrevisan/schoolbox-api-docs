@@ -59,7 +59,7 @@ class Model implements ISoftDeletable
      * default filename, to be kept in a common place.
      */
     public const DEFAULT_FILENAME = "[externalId]/Semester Report - [firstname] [surname]";
-    public const DEFAULT_FOOTER = "[title] - [firstname] [surname]";
+    public const DEFAULT_FOOTER = "[reportTitle] - [firstname] [surname]";
 
     private ?string $title = null;
     private ?string $introduction = null;
