@@ -14,34 +14,6 @@ on:
       - released
 
 jobs:
-  # Build base image before building schoolbox images,
-  # but only if the build has changed, and only if the repo is the base repo.
-  php82-frankenphp-diff:
-    # I can't believe that this has to be set as an `if` rule on a step,
-    # instead of in the `on` section.
-    if: github.repository == 'alaress/schoolbox'
-    runs-on: ubuntu-latest
-    outputs:
-      count: ${{ steps.diff.outputs.count }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          sparse-checkout: |
-            docker/base-images/php82-frankenphp/
-          fetch-depth: '2'
-      - name: Diff base image
-        id: diff
-        run: |
-          echo "count=$(git diff ${{ github.sha }}^..${{ github.sha }} --name-only -- docker/base-images/php82-frankenphp/ | wc -l)" >> $GITHUB_OUTPUT
-
-  build-and-push-php82-frankenphp:
-    needs:
-      - php82-frankenphp-diff
-    uses: ./.github/workflows/build-and-push-php82-frankenphp.yaml
-    if: needs.php82-frankenphp-diff.outputs.count > 0
-    secrets: inherit
-
   # Build artifacts before building image
   build-composer-artifact:
     if: github.repository == 'alaress/schoolbox'
@@ -54,7 +26,6 @@ jobs:
   # Build schoolbox-frankenphp image
   build-and-push-schoolbox-frankenphp:
     needs:
-      - build-and-push-php82-frankenphp
       - build-composer-artifact
       - build-npm-artifact
     if: ${{ always() && github.repository == 'alaress/schoolbox' && (needs.build-and-push-php82-frankenphp.result == 'skipped' || needs.build-and-push-php82-frankenphp.result == 'success') }}
@@ -110,7 +81,6 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha
           build-contexts: |
-            php82-frankenphp=docker-image://alaress/php82-frankenphp:latest-${{ github.ref_name }}
             code=${{ github.workspace }}
           push: true
           outputs: type=docker,dest=${{ runner.temp }}/schoolbox-frankenphp-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
@@ -132,7 +102,6 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha
           build-contexts: |
-            php82-frankenphp=docker-image://alaress/php82-frankenphp:latest-${{ github.event.release.target_commitish }}
             code=${{ github.workspace }}
           push: true
           outputs: type=docker,dest=${{ runner.temp }}/schoolbox-frankenphp-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
