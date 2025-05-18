@@ -253,6 +253,7 @@ class Url
                             '[fullname]'         => \Scrub::text($student->getFullName() ?: ''),
                             '[title]'            => \Scrub::text($student->getTitle() ?: ''),
                             '[govstudentnumber]' => \Scrub::text($govtStudentNumber ?: ''),
+                            '[reportTitle]'      => \Scrub::text($report->getTitle() ?: ''),
                         ]
                     );
 
