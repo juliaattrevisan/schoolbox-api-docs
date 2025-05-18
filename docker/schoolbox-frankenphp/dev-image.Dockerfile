@@ -6,9 +6,64 @@
 ARG ENV=dev
 ARG ARCH=amd64
 
+# Currently alpine can drop-in replace bookworm:
+# just replace "bookworm" with "alpine" in the `FROM` line below.
+# Image size: alpine 355MB, bookworm 653MB.
+# Attempting to `apt install` required packages and only copy compiled
+# extensions actually bloats the bookworm image to 743MB.
+FROM --platform=linux/${ARCH} dunglas/frankenphp:1.5-php8.2-bookworm
 
-# Stage 1: base off of just-built image php82-frankenphp
-FROM --platform=linux/${ARCH} php82-frankenphp
+# Ensure ENV is accessible by this build step:
+# otherwise, xDebug will be installed below.
+ARG ENV
+
+# Install additional extensions
+# (not in https://github.com/shinsenter/php?tab=readme-ov-file#pre-installed-php-extensions)
+RUN install-php-extensions \
+    imagick \
+    pdo_mysql \
+    pdo_sqlsrv \
+    excimer \
+    curl \
+    ldap \
+    dom \
+    sockets \
+    imap \
+    redis \
+    readline \
+    zip \
+    pcntl \
+    posix \
+    openssl \
+    json \
+    simplexml \
+    mbstring \
+    intl \
+    xmlreader \
+    dom \
+    exif \
+    zlib \
+    fileinfo \
+    libxml \
+    opcache
+
+# Install XDebug on non-production, also copy base config
+RUN <<EOF
+case "$ENV" in
+  prod | production)
+    ln -s /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
+    ;;
+  *)
+    install-php-extensions xdebug
+    ln -s /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini
+    ;;
+esac
+EOF
+
+# Copy configuration files
+COPY ./config/php/* /usr/local/etc/php/conf.d/
+COPY ./config/imagemagick/* /etc/ImageMagick-6/
+COPY ./config/caddy/* /etc/caddy/*
 
 
 # Stage 2: build final image
@@ -35,7 +90,6 @@ FROM --platform=linux/${ARCH} php82-frankenphp
 #COPY --from=build /usr/local/etc/php/conf.d/ /usr/local/etc/php/conf.d/
 
 # Write config
-COPY ./config/Caddyfile /etc/caddy/Caddyfile
 
 EXPOSE 80 443
 
