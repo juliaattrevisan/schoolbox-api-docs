@@ -12,7 +12,7 @@ test.describe("Curriculum Selector Tests", () => {
         await tester.loginAsAdmin();
     });
 
-    test("Curriculum can be selected", async ({ tester, page }) => {
+    test("Curriculum can be selected in the 'All' tab", async ({ tester, page }) => {
         const curriculumSelector = new CurriculumSelector(page);
 
         tester.isGoingTo("Modify the To Kill a Mockingbird unit");
@@ -20,6 +20,7 @@ test.describe("Curriculum Selector Tests", () => {
 
         tester.isGoingTo("Choose ACELA1552 and ACELA1551 from the modal");
         await curriculumSelector.clickBrowse();
+        await curriculumSelector.clickAllTab();
         await curriculumSelector.browseToNode([135, 136, 138, 143]);
         await curriculumSelector.selectNodes([146, 144]);
         await curriculumSelector.saveModal();
@@ -31,7 +32,7 @@ test.describe("Curriculum Selector Tests", () => {
         await curriculumSelector.expectSelectedToContain("ELBE1173"); // the child node of ACELA1551
     });
 
-    test("Curriculum can be unselected", async ({ tester, page }) => {
+    test("Curriculum can be unselected in the 'All' tab", async ({ tester, page }) => {
         const curriculumSelector = new CurriculumSelector(page);
 
         tester.isGoingTo("Modify the To Kill a Mockingbird unit");
@@ -39,6 +40,7 @@ test.describe("Curriculum Selector Tests", () => {
 
         tester.isGoingTo("Choose ACELA1552 and ACELA1551 from the modal");
         await curriculumSelector.clickBrowse();
+        await curriculumSelector.clickAllTab();
         await curriculumSelector.browseToNode([135, 136, 138, 143]);
         await curriculumSelector.selectNodes([146]);
         await curriculumSelector.saveModal();
@@ -66,6 +68,20 @@ test.describe("Curriculum Selector Tests", () => {
 
         tester.isGoingTo("Open the modal and check for Text structure and organisation");
         await curriculumSelector.clickBrowse();
+        await expect(curriculumSelector.getModalTabs()).toBeVisible();
+        await curriculumSelector.expectUnitModalToContainText("Text structure and organisation");
+        await curriculumSelector.expectUnitModalToContainText("Expressing and developing ideas");
+    });
+
+    test("Tabs visible on unit page with curriculum already assigned to course", async ({ tester, page }) => {
+        const curriculumSelector = new CurriculumSelector(page);
+
+        tester.isGoingTo("Add a new lesson plan to Romeo and Juliet");
+        await page.goto("/resource/folder/89/modify");
+
+        tester.isGoingTo("Open the modal and check for Text structure and organisation");
+        await curriculumSelector.clickBrowse();
+        await expect(curriculumSelector.getModalTabs()).toBeVisible();
         await curriculumSelector.expectUnitModalToContainText("Text structure and organisation");
         await curriculumSelector.expectUnitModalToContainText("Expressing and developing ideas");
     });
@@ -78,6 +94,7 @@ test.describe("Curriculum Selector Tests", () => {
 
         tester.isGoingTo("Choose ACELA1556 from the modal");
         await curriculumSelector.clickBrowse();
+        await curriculumSelector.clickCurrentTab();
         await curriculumSelector.selectUnitNodes([153]);
         await curriculumSelector.saveModal();
 
@@ -93,6 +110,7 @@ test.describe("Curriculum Selector Tests", () => {
         await page.goto("learning/unitspecs/16/assessments/new?lpt=2&type=lessonPlan&returnUrl=L2NvdXJzZS9wbGFuLzY=");
 
         tester.isGoingTo("Open the modal and check for Current/All Tabs");
+        await curriculumSelector.clickBrowse();
         await expect(curriculumSelector.getModalTabs()).not.toBeVisible();
     });
 });

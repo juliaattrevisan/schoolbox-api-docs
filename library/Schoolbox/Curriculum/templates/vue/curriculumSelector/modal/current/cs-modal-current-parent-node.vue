@@ -6,7 +6,9 @@
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import { useNodeTitle } from "@schoolboxCurriculum/vue/composables/useNodeTitle";
 import { generateUUID } from "@js/util/jsUtils";
+import { useCurrentNodesStore } from "../../store/csCurrentNodesStore";
 import { useModalSelectedNodesStore } from "../../store/csModalSelectedNodesStore";
+import csModalCurrentChildNode from "./cs-modal-current-child-node.vue";
 
 interface Props {
     node: Node; // the assigned node to display
@@ -15,11 +17,28 @@ interface Props {
 }
 const props = defineProps<Props>();
 
+const store = useCurrentNodesStore();
 const modalSelectedNodesStore = useModalSelectedNodesStore();
 const { title } = useNodeTitle(props.node);
 const extraId = generateUUID(); // to ensure the input/label id is unique
 const showChildren = props.node.children && props.node.children.length > 0; // To determine whether we need to display further child nodes within this node
 const hasCode = props.node.code && props.node.code !== ""; // If there's a code, it can be selected
+const isNodeExpanded = window.Vue.ref(props.isExpanded); // to track whether the node is expanded or not
+
+/**
+ * Show the expand button there's multiple top level parents, it's the parent node,
+ * and when the node has children
+ */
+const showExpandButton = window.Vue.computed(() => {
+    return store.hasMultipleParents && props.node.children && props.node.children.length > 0;
+});
+
+/**
+ * Expand or collapse the children of the node
+ */
+function onExpandSelected(): void {
+    isNodeExpanded.value = !isNodeExpanded.value; // toggle the expanded state
+}
 
 /**
  * Update the status of the checkbox based on whether it's selected or not
@@ -40,32 +59,45 @@ function onChange($isChecked: boolean): void {
 <template>
     <li v-if="props.isExpanded">
         <div class="node l-gap-xs l-pad-xs--vert">
-            <div v-if="hasCode" class="checklist l-gap-xs l-pad-xs--vert">
-                <input
-                    :id="`checkbox-${props.node.id}__${extraId}`"
-                    type="checkbox"
-                    :value="props.node.id"
-                    :checked="isChecked"
-                    @change="onChange(($event.target as HTMLInputElement).checked)"
-                />
-                <label
-                    class="node__name f-no-margins"
-                    :for="`checkbox-${props.node.id}__${extraId}`"
-                    :data-test="`cs-modal-unit-node-checkbox-label-${props.node.id}`"
+            <div :class="{ 'l-flex l-flex--align-center l-gap-xs f-no-margins': showExpandButton }">
+                <button
+                    v-if="showExpandButton"
+                    class="l-flex l-flex--center l-flex__item--0-shrink f-no-bkg"
+                    :aria-label="isNodeExpanded ? 'Collapse' : 'Expand'"
+                    :title="isNodeExpanded ? 'Collapse' : 'Expand'"
+                    :data-test="`cc-report-table-node-expand-button-${props.node.id}`"
+                    @click="onExpandSelected"
                 >
-                    {{ title }}
-                </label>
+                    <sbx-icon v-if="isNodeExpanded" name="up-arrow" />
+                    <sbx-icon v-else name="down-arrow" />
+                </button>
+                <div v-if="hasCode" class="checklist l-gap-xs l-pad-xs--vert">
+                    <input
+                        :id="`checkbox-${props.node.id}__${extraId}`"
+                        type="checkbox"
+                        :value="props.node.id"
+                        :checked="isChecked"
+                        @change="onChange(($event.target as HTMLInputElement).checked)"
+                    />
+                    <label
+                        class="node__name f-no-margins"
+                        :for="`checkbox-${props.node.id}__${extraId}`"
+                        :data-test="`cs-modal-current-node-checkbox-label-${props.node.id}`"
+                    >
+                        {{ title }}
+                    </label>
+                </div>
+                <h3 v-else class="node__name f-no-margins" @click="onExpandSelected">{{ title }}</h3>
             </div>
-            <h3 v-else class="node__name f-no-margins">{{ title }}</h3>
         </div>
         <template v-if="showChildren">
             <ul>
-                <cs-modal-unit-child-node
+                <cs-modal-current-child-node
                     v-for="viewNode in props.node.children"
                     :key="viewNode.id"
                     :node="viewNode"
                     :depth="props.depth + 1"
-                    :is-expanded="props.isExpanded"
+                    :is-expanded="isNodeExpanded"
                 />
             </ul>
         </template>
@@ -84,7 +116,7 @@ function onChange($isChecked: boolean): void {
 .node__name {
     color: var(--header-font-color);
     font-size: 1rem;
-    font-weight: normal;
+    font-weight: bold;
     max-width: none; /* override the max-width set on .reveal-modal h3 */
     vertical-align: top; /* so the li bullet sits inline with the first line of a multiline label */
 }
@@ -94,6 +126,6 @@ function onChange($isChecked: boolean): void {
 }
 
 ul li ul {
-    margin-inline-start: var(--spacing-s);
+    margin-inline-start: var(--spacing-xl);
 }
 </style>

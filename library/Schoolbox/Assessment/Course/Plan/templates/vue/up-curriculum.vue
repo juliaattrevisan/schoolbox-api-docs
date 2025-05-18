@@ -8,13 +8,18 @@ import CsModal from "@schoolboxCurriculum/vue/curriculumSelector/modal/cs-modal.
 import CurriculumDetailsModal from "@schoolboxCurriculum/vue/curriculumDetailsModal/curriculum-details-modal.vue";
 import { useUnitPlannerCurriculumStore } from "./store/unitPlannerCurriculumStore";
 
+interface Props {
+    parentFolderId: number; // the parent folder id to use when loading the current curriculum tab
+}
+const props = defineProps<Props>();
+
 const store = useUnitPlannerCurriculumStore();
 
 /**
  * Initiate the curriculum store
  */
 window.Vue.onMounted(() => {
-    store.init();
+    store.init(props.parentFolderId);
 });
 
 /**
@@ -27,7 +32,11 @@ function onDetailsModalClosed(): void {
 </script>
 
 <template>
-    <cs-modal v-if="store.selectorStore?.hasLoadedOk" :starting-node-id="store.startingNodeId" />
+    <cs-modal
+        v-if="store.selectorStore?.hasLoadedOk"
+        :starting-node-id="store.startingNodeId"
+        :has-tabs="store.currentNodesStore.hasNodes"
+    />
     <curriculum-details-modal :selected-node-id="store.selectedDetailsNodeId" @closed="onDetailsModalClosed" />
 </template>
 

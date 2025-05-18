@@ -11,7 +11,7 @@ import type { Node } from "@schoolboxCurriculum/types/Node";
 import { useModalStore } from "../store/csModalStore";
 import { useModalViewNodesStore } from "../store/csModalViewNodesStore";
 import { useModalNodeUsageStore } from "../store/csModalNodeUsageStore";
-import CsModalUnitNodes from "./unit/cs-modal-unit-nodes.vue";
+import CsModalCurrentNodes from "./current/cs-modal-current-nodes.vue";
 import CsModalAllHeader from "./all/cs-modal-all-header.vue";
 import CsModalAllNodes from "./all/cs-modal-all-nodes.vue";
 import CsModalFooter from "./cs-modal-footer.vue";
@@ -127,13 +127,13 @@ function onTabSelected(tab: string): void {
                 <h2 class="f-no-margins">Browse Curriculum</h2>
                 <dl v-if="props.hasTabs" ref="tabsEl" class="tabs" data-test="cs-modal-tabs">
                     <dd :class="{ active: currentTab === current }">
-                        <a @click="onTabSelected(current)">Current</a>
+                        <a data-test="cs-modal-current-tab-button" @click="onTabSelected(current)">Current</a>
                     </dd>
                     <dd :class="{ active: currentTab === all }">
-                        <a @click="onTabSelected(all)">All</a>
+                        <a data-test="cs-modal-all-tab-button" @click="onTabSelected(all)">All</a>
                     </dd>
                 </dl>
-                <cs-modal-unit-nodes v-if="currentTab === current" />
+                <cs-modal-current-nodes v-if="currentTab === current" />
                 <div v-else>
                     <cs-modal-all-header />
                     <cs-modal-all-nodes />

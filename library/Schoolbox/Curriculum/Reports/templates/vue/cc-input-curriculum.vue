@@ -46,6 +46,8 @@ store.init({
     canSelectChildren: false,
     includeChildren: false,
     includeDisabled: true,
+    hasTabs: false,
+    parentFolderId: undefined,
 });
 const selectedStore = useSelectedNodesStore();
 props.preselected.forEach((preselected) => selectedStore.add(preselected));

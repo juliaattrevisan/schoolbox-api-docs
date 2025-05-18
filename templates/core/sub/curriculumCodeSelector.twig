@@ -6,7 +6,7 @@
  #                         if so, the relevant createApp() must have CurriculumSelector included as an available component
  #                         Otherwise, this will render it as an independent vue app
  # @param bool $hasTabs - Whether the curriculum code selector should have tabs
- # @param int $folderId - The folder ID to use for the current curriculum selector tab
+ # @param int $parentFolderId - The folder ID to use for the current curriculum selector tab
  #}
 {% if courseManagedReadonly is not defined %}
     {% set courseManagedReadonly = false %}
@@ -27,8 +27,7 @@
         data-endpoint="{{ routeLookup('curriculumApi.searchNode') }}"
         :include-children="true"
         :has-tabs="{{ hasTabs ? 'true' : 'false' }}"
-        :folder-id="{{ context.baseContext.folder.id ?? 0 }}"
-        {% if folderId is defined %}:folder-id="{{ folderId }}"{% endif %}
+        {% if parentFolderId is defined %}:parent-folder-id="{{ parentFolderId }}"{% endif %}
     />
 {% if not vueSlot %}
     </div>
