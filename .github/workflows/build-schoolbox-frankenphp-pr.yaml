@@ -52,23 +52,6 @@ jobs:
           name: schoolbox-npm
           path: www/static/js/bundle/
 
-      - name: Build php82-frankenphp base image
-        uses: docker/build-push-action@v6
-        with:
-          context: docker/base-images/php82-frankenphp/
-          cache-from: type=gha
-          cache-to: type=gha
-          push: false
-          load: true
-          provenance: false
-          sbom: false
-          build-args: |
-            ENV=prod
-            ARCH=${{ matrix.build.arch }}
-          tags: |
-            php82-frankenphp-${{ matrix.build.arch }}
-          outputs: type=docker,dest=${{ runner.temp }}/php82-frankenphp-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
-
       - name: Build schoolbox-frankenphp pull request image
         uses: docker/build-push-action@v6
         with:
@@ -76,9 +59,7 @@ jobs:
           file: docker/schoolbox-frankenphp/deploy-image.Dockerfile
           cache-from: type=gha
           cache-to: type=gha
-          # May need to include just-built php82-frankenphp image in the context
           build-contexts: |
-            php82-frankenphp=docker-image://php82-frankenphp-${{ matrix.build.arch }}
             code=${{ github.workspace }}
           push: false
           load: true
