@@ -29,7 +29,13 @@ class External_Edumate_Connection
                 unset($record[$upper]);
             }
         }
-        return $record;
+
+        /* $fieldNames is the expected struct to return
+         * $record may be an incomplete subset of $fieldNames
+         */
+        $indexed = array_fill_keys($fieldNames, null);
+
+        return array_merge($indexed, $record);
     }
 
     // Getters & Setters
