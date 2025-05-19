@@ -514,19 +514,17 @@ class Controller extends AbstractController
     {
         try {
             $attempt = $this->quizAttemptMapper->findById($this->requestPost['attemptId']);
-//            $this->quizAttemptMapper->delete($attempt);
+            $this->quizAttemptMapper->delete($attempt);
 
             /* Invalidate project result cache if this quiz is in a project
              * (This is what I have to do here...you've gotta be kidding me)
              */
-//            $assessment = $this->assessmentMapperProxy->findById($attempt->getQuiz()->getAssessmentModel()->getId());
-
-            // TODO: Check if $attempt->user should still be a participant in $attempt->quiz->assessmentModel.
+            $assessment = $this->assessmentMapperProxy->findById($attempt->getQuiz()->getAssessmentModel()->getId());
 
             $attempt->getUser();
             $attempt->getQuiz()->getAssessmentModel()->getId()
 
-//            (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))->refresh($this->assessmentMapperProxy, $assessment, $attempt->getUser());
+            (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))->refresh($this->assessmentMapperProxy, $assessment, $attempt->getUser());
         } catch (MapperException $e) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_ATTEMPT_NOT_FOUND);
         }
