@@ -15,19 +15,12 @@ use Schoolbox\Weather\WeatherstackClient;
 
 class Weather
 {
-
-    /**
-     * @var Matchup
-     */
-    private $matchup;
-
     /**
      * Forecast length. If the match occurs beyond this many days
      * into the future, don't bother trying to find weather data
-     *
-     * @var int
      */
-    private $forecastLength = 7;
+    private const FORECAST_LENGTH = 7;
+
 
     /**
      * The icon to display
@@ -36,12 +29,14 @@ class Weather
      */
     private $icon = '';
 
+
     /**
      * The weather condition to display
      *
      * @var string
      */
     private $condition = '';
+
 
     /**
      * Temperature to display
@@ -50,6 +45,7 @@ class Weather
      */
     private $temp = '';
 
+
     /**
      * Did we find any data?
      *
@@ -57,12 +53,6 @@ class Weather
      */
     private $hasResults = false;
 
-    /**
-     * The weather API
-     *
-     * @var WeatherstackClient
-     */
-    private $api;
 
     /**
      * Weather constructor.
@@ -70,17 +60,15 @@ class Weather
      * @param Matchup            $matchup
      * @param WeatherstackClient $api
      */
-    public function __construct(Matchup $matchup, WeatherstackClient $api)
+    public function __construct(private Matchup $matchup, private WeatherstackClient $api)
     {
-        $this->matchup = $matchup;
-        $this->api = $api;
     }
+
 
     /**
      * Load the forecast
-     *
      */
-    public function loadForecast(): void
+    public function loadForecast(): self
     {
         $forecast = $this->findWeather($this->matchup);
 
@@ -89,6 +77,8 @@ class Weather
             $this->condition = $forecast['hourly'][4]['weather_descriptions'][0];
             $this->temp      = $forecast['avgtemp'];
         }
+
+        return $this;
     }
 
     /**
@@ -112,7 +102,7 @@ class Weather
              *     (imported from clipboard, since their venues don't have lat/long coords)
              */
             if (
-                $matchDayDiff < $this->forecastLength &&
+                $matchDayDiff < self::FORECAST_LENGTH &&
                 null !== $matchup->getVenue() &&
                 '' !== trim((string)$matchup->getVenue()->getLatitude()) &&
                 '' !== trim((string)$matchup->getVenue()->getLongitude())
