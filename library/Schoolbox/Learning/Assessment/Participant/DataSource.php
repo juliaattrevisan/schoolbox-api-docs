@@ -18,7 +18,6 @@ use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\Participant as ParticipantObject;
 use Schoolbox\Learning\Assessment\Plan as PlanObject;
 use Schoolbox\Assessment\Participant;
-use Schoolbox\Learning\Assessment\Plan;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
 use Schoolbox\Mapper\DefinitionException;
