@@ -63,7 +63,7 @@ EOF
 # Copy configuration files
 COPY ./config/php/* /usr/local/etc/php/conf.d/
 COPY ./config/imagemagick/* /etc/ImageMagick-6/
-COPY ./config/caddy/* /etc/caddy/*
+COPY ./config/caddy/* /etc/caddy/
 
 
 # Stage 2: build final image
