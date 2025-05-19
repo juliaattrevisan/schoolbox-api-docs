@@ -15,7 +15,7 @@ use Alaress\Web\Controller\Base;
 use Component_Config;
 use Component_ConfigMapper;
 use Component_Instance;
-use PHPUnit\Event\InvalidArgumentException;
+use InvalidArgumentException;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\Exception as MapperException;
