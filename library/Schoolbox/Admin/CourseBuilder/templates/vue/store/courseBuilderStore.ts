@@ -114,7 +114,10 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
         try {
             // Ensure all course template names are not empty, otherwise set .hasNameValidationError on the courseTemplate
             let allTemplatesHaveNames = true;
-            courseTemplates.value.forEach((ct) => {
+            courseTemplates.value.forEach((ct, index) => {
+                // resequence before sending to backend...
+                ct.sequence = index;
+
                 if (!ct.name) {
                     ct.nameHasValidationError = true;
                     allTemplatesHaveNames = false;
@@ -155,6 +158,20 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
         }
     }
 
+    /**
+     * Resequence a field to a new index
+     * @param oldIndex - The original index of the field
+     * @param newIndex - The new index of the field
+     */
+    async function resequenceField(oldIndex: number, newIndex: number): Promise<void> {
+        // Update UI immediately
+        const [movedField] = courseTemplates.value.splice(oldIndex, 1);
+        courseTemplates.value.splice(newIndex, 0, movedField);
+
+        // sequence will be updated on saveChanges
+        await window.Vue.nextTick();
+    }
+
     return {
         init,
         courseTemplates,
@@ -166,5 +183,6 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
         updateCourseTemplate,
         deleteCourseTemplate,
         saveChanges,
+        resequenceField,
     };
 });
