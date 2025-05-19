@@ -34,6 +34,10 @@ export function getConfigForVideo(overrideValueByKey?: object): {
          */
         stretching: "none",
 
+        // point to the correct icon sprite location
+        // refer to https://github.com/mediaelement/mediaelement/blob/master/docs/api.md#configuration
+        iconSprite: `${window.cdnPrefix}/images/resources/mejs-controls.svg`,
+
         /**
          * @param media - the <mediaelementwrapper> DOM node (contains the <video> node)
          * @param node - the <video> DOM node
