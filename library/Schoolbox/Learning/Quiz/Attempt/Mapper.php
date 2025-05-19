@@ -24,6 +24,7 @@ use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
@@ -102,11 +103,15 @@ class Mapper extends BaseMapper
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'canParticipate']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'insertParticipation']);
 
+        $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'removeParticipationIfNoInteractionsRemain']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'removeParticipationIfNoInteractionsRemain']);
+
         // Markbook sync
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'syncToExternalMarkbook']);
 //        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'syncToExternalMarkbook']);
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'syncToExternalMarkbook']);
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreAnswers']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'insertParticipation']);
     }
 
 
@@ -146,6 +151,20 @@ class Mapper extends BaseMapper
         }
         $assessment = $this->getQuizMapper()->findById($object->getQuiz()->getId())->getAssessmentModel();
         return $this->interactionChecker->insertParticipationOnFirstInteraction($object->getUser(), $assessment);
+    }
+
+
+    /**
+     * @param Model $object
+     * @return bool
+     * @throws Deleted
+     * @throws Exception
+     * @throws NotFound
+     */
+    private function removeParticipationIfNoInteractionsRemain(Model $object): bool
+    {
+        $assessment = $this->getQuizMapper()->findById($object->getQuiz()->getId())->getAssessmentModel();
+        return $this->interactionChecker->removeParticipationIfNoInteractionsRemain($object->getUser(), $assessment);
     }
 
 

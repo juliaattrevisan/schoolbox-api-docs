@@ -204,6 +204,17 @@ class InteractionIntegrityChecker
 
 
     /**
+     * @param User             $student
+     * @param Assessment\Model $assessment
+     * @return bool
+     */
+    public function removeParticipationIfNoInteractionsRemain(User $student, Assessment\Model $assessment): bool
+    {
+        return true;
+    }
+
+
+    /**
      * Load this assessment's plans and participants
      *
      * @param Assessment\Model $assessment
