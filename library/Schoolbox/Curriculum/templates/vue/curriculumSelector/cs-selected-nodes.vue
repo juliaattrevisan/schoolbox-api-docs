@@ -8,10 +8,12 @@
  */
 
 import { useStore } from "./store/curriculumSelectorStore";
+import { useSharedStore } from "./store/csSharedStore";
 import { useSelectedNodesStore } from "./store/csSelectedNodesStore";
 import CsSelectedNode from "./cs-selected-node.vue";
 
 const store = useStore();
+const sharedStore = useSharedStore();
 const selectedNodesStore = useSelectedNodesStore();
 const selectEl = window.Vue.ref(null);
 
@@ -60,7 +62,7 @@ window.Vue.watch(
     <div v-if="selectedNodesStore.hasNodes" class="selected-nodes-container" data-test="cs-selected-nodes-container">
         <cs-selected-node v-for="node in selectedNodesStore.nodes" :key="node.id" :node="node" data-test-node />
     </div>
-    <div v-else-if="selectedNodesStore.hasNoNodes && store.isReadOnly" class="selected-nodes-container">
+    <div v-else-if="selectedNodesStore.hasNoNodes && sharedStore.isReadOnly" class="selected-nodes-container">
         <aside class="meta no-codes-note">No Curriculum Codes have been selected</aside>
     </div>
     <input :id="store.formValueName" :name="store.formValueName" type="hidden" tabindex="-1" :value="ids" />

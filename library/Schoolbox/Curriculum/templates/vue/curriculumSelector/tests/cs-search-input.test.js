@@ -1,7 +1,9 @@
+import { nextTick } from "vue";
 import { mount } from "@vue/test-utils";
 import CsSearchInput from "../cs-search-input";
 import { createTestingPinia } from "@pinia/testing";
 import { useStore } from "../store/curriculumSelectorStore";
+import { useSharedStore } from "../store/csSharedStore";
 
 let wrapper; //so we don't need to pass it into every test
 
@@ -25,13 +27,19 @@ describe("search input", () => {
 
     test("should be disabled if there is a load error", async () => {
         const store = useStore();
-        await store.$patch({ isReadOnly: false, isLoading: false, hasLoadError: true });
+        await store.$patch({ isLoading: false, hasLoadError: true });
+        const sharedStore = useSharedStore();
+        sharedStore.$patch({ isReadOnly: false });
+        await nextTick(); //need to ensure the DOM has updated first prior to checking
         expect(wrapper.find("input").attributes().readonly).toBeDefined();
     });
 
     test("should display when load is successful", async () => {
         const store = useStore();
-        await store.$patch({ isReadOnly: false, isLoading: false });
+        await store.$patch({ isLoading: false });
+        const sharedStore = useSharedStore();
+        sharedStore.$patch({ isReadOnly: false });
+        await nextTick(); //need to ensure the DOM has updated first prior to checking
         expect(wrapper.find("input").attributes().readonly).toBeUndefined();
     });
 });
@@ -43,13 +51,19 @@ describe("browse button", () => {
 
     test("should not display if there is a load error", async () => {
         const store = useStore();
-        await store.$patch({ isReadOnly: false, isLoading: false, hasLoadError: true });
+        await store.$patch({ isLoading: false, hasLoadError: true });
+        const sharedStore = useSharedStore();
+        sharedStore.$patch({ isReadOnly: false });
+        await nextTick(); //need to ensure the DOM has updated first prior to checking
         expect(wrapper.find("button").exists()).toBe(false);
     });
 
     test("should display when load is successful", async () => {
         const store = useStore();
-        await store.$patch({ isReadOnly: false, isLoading: false });
+        await store.$patch({ isLoading: false });
+        const sharedStore = useSharedStore();
+        sharedStore.$patch({ isReadOnly: false });
+        await nextTick(); //need to ensure the DOM has updated first prior to checking
         expect(wrapper.find("button").exists()).toBe(true);
     });
 });

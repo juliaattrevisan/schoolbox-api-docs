@@ -30,7 +30,6 @@ export const useStore = defineStore(`curriculumSelector`, () => {
     const isLoading = window.Vue.ref(true); // to display loading note
     const hasLoadError = window.Vue.ref(false); // to display loading error
     const isProcessing = window.Vue.ref(false); // to notify that an action is taking place, like updating a member access
-    const isReadOnly = window.Vue.ref(true); // can only view the currently selected codes, not edit them
     const formValueName = window.Vue.ref(""); // the name of the form value to update
     const containerWidth = window.Vue.ref(0); // currently so can tweak the styling when the selector is small
     const selectedOriginal = window.Vue.ref([]); // an 'original' selection, saved by the user
@@ -40,15 +39,14 @@ export const useStore = defineStore(`curriculumSelector`, () => {
     const includeWithoutCode = window.Vue.ref(false); // set to true if curriculum nodes with blank codes need to be selectable
     const includeChildren = window.Vue.ref(false); // When a node is selected, also select all its children
     const includeDisabled = window.Vue.ref(false); // whether to display disabled nodes
-    const hasTabs = window.Vue.ref(false); // whether to display tabs
-    const parentFolderId = window.Vue.ref<number | undefined>(undefined); // the parentFolderId to load the course/unit nodes from
+    const sharedStore = useSharedStore(); // the store to load the shared data from
     const currentNodesStore = useCurrentNodesStore(); // the store to load the current nodes from
 
     /**
      * When all loading is complete and was a success
      */
     const hasLoadedOk = window.Vue.computed(() => {
-        if (!hasTabs.value || parentFolderId.value === undefined) {
+        if (!sharedStore.hasTabs || currentNodesStore.parentFolderId === undefined) {
             return !isLoading.value && !hasLoadError.value;
         }
         return (
@@ -68,17 +66,18 @@ export const useStore = defineStore(`curriculumSelector`, () => {
      * @param props - the properties to set
      */
     function init(props: InitProps): void {
-        useSharedStore().init({ apiEndpoint: props.dataEndpoint });
-        isReadOnly.value = props.isReadOnly;
+        useSharedStore().init({
+            apiEndpoint: props.dataEndpoint,
+            isReadOnly: props.isReadOnly,
+            hasTabs: props.hasTabs,
+        });
         formValueName.value = props.formValueName;
         isSelectAll.value = props.isSelectAll ? props.isSelectAll : false;
         canSelectChildren.value = props.canSelectChildren ? props.canSelectChildren : true;
         includeWithoutCode.value = props.includeWithoutCode ? props.includeWithoutCode : false;
         includeChildren.value = props.includeChildren ? props.includeChildren : false;
         includeDisabled.value = props.includeDisabled ? props.includeDisabled : false;
-        hasTabs.value = props.hasTabs;
-        parentFolderId.value = props.parentFolderId;
-        if (!isReadOnly.value && props.dataEndpoint !== "") {
+        if (!props.isReadOnly && props.dataEndpoint !== "") {
             // only load when we need to
             void useNodesStore().load();
         }
@@ -110,7 +109,6 @@ export const useStore = defineStore(`curriculumSelector`, () => {
         isLoading,
         hasLoadError,
         isProcessing,
-        isReadOnly,
         formValueName,
         containerWidth,
         selectedOriginal,
@@ -120,8 +118,6 @@ export const useStore = defineStore(`curriculumSelector`, () => {
         includeWithoutCode,
         includeChildren,
         includeDisabled,
-        hasTabs,
-        parentFolderId,
         hasLoadedOk,
         isSmallContainer,
         currentNodesStore,

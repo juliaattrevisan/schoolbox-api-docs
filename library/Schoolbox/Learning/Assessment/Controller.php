@@ -51,6 +51,8 @@ use Twig\Error\Error;
 use UnexpectedValueException;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
 use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
 
 /**
@@ -778,6 +780,20 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         $contextType = AssessmentContextType::objectToString($context) . 's';
 
+        /**
+         * Get the parent folder id to use in the curriculum browser,
+         * so it can display curriculum assigned to the unit when available
+         */
+        if ($assessment->isImplementation() && $assessment->getBaseContext() instanceof UnitImplementation\Model) { // check if the assessment's on a class page and linked to a unit
+            /** @var UnitImplementation\Model $unitImpl */
+            $unitImpl = $assessment->getBaseContext();
+            $parentFolderId = $unitImpl->getSpecification()->getFolder()->getId();
+        } else if ($assessment->getBaseContext() instanceof UnitSpecification) { // otherwise it's on a unit page
+            $parentFolderId = $assessment->getBaseContext()->getFolder()->getId();
+        } else { // or it can't be linked to a unit (for example created from the Due work component on a class page)
+            $parentFolderId = null;
+        }
+
         /* The usual info everything requires
          */
         $data = [
@@ -796,7 +812,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
              * so we don't need a different method than the existing getAllMarkTypes
              */
             'capabilityMarkTypes'      => $this->getAllMarkTypes($assessment),
-            'capabilityGradingSchemes' => $this->getAllGradeSchemes()
+            'capabilityGradingSchemes' => $this->getAllGradeSchemes(),
+            'parentFolderId'           => $parentFolderId,
         ];
 
         $data = array_merge($data, $this->getAssessmentTwigData($assessment));
