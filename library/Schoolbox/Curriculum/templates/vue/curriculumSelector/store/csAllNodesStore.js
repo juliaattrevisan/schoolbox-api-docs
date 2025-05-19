@@ -168,6 +168,10 @@ export const useNodesStore = defineStore(`csNodes`, {
          * @param { Node } node - the Node to load all children of
          */
         async loadAllChildren(node) {
+            // if the node is disabled, we don't want to load it
+            if (node.enabled === false) {
+                return;
+            }
             const breadcrumbs = getBreadcrumbs(node, []);
             breadcrumbs.push({ id: node.id, name: node.name }); // add in the actual node as the last
             const modalViewNodesStore = useModalViewNodesStore();
