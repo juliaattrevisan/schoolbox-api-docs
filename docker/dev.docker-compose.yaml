@@ -6,21 +6,10 @@ include:
   - base.docker-compose.yaml
 
 services:
-  # Base image: only needs to be built, not started
-  php82-frankenphp:
-    image: php82-frankenphp
-    build:
-      context: ./base-images/php82-frankenphp
-      args:
-        ENV: dev
-    restart: no
-
   # Load-balanced FrankenPHP containers:
   # regrettably copy-pasted for now
   schoolbox-frankenphp-1:
     container_name: schoolbox-frankenphp-1
-    depends_on:
-      - php82-frankenphp
     environment:
       DEBUG: "1"
     restart: always
@@ -47,8 +36,6 @@ services:
 
   schoolbox-frankenphp-2:
     container_name: schoolbox-frankenphp-2
-    depends_on:
-      - php82-frankenphp
     environment:
       DEBUG: "1"
     restart: always
