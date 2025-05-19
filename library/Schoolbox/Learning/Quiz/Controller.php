@@ -521,9 +521,6 @@ class Controller extends AbstractController
              */
             $assessment = $this->assessmentMapperProxy->findById($attempt->getQuiz()->getAssessmentModel()->getId());
 
-            $attempt->getUser();
-            $attempt->getQuiz()->getAssessmentModel()->getId()
-
             (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))->refresh($this->assessmentMapperProxy, $assessment, $attempt->getUser());
         } catch (MapperException $e) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_ATTEMPT_NOT_FOUND);
