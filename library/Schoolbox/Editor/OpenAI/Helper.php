@@ -14,6 +14,7 @@ use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
 use Psr\Http\Client\ClientExceptionInterface;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
@@ -89,7 +90,7 @@ class Helper
      *
      * @param User $user // user to log the request against
      * @param string $payload // use this payload instead of generating one
-     * @return array{string|null, Log\Model|null}
+     * @return array
      * @throws ClientExceptionInterface
      * @throws Exception
      */
@@ -113,8 +114,6 @@ class Helper
             ->setUser($user)
             ->setPrompt($payload);
 
-        $this->logMapper->save($log);
-
         /* Minimum requirements met: let's send it and see what AI overlords think of our payload
          */
         try {
@@ -126,29 +125,80 @@ class Helper
             $response = $this->client->sendRequest($openAiRequest);
 
             http_response_code($response->getStatusCode());
-
-            if ($response->getStatusCode() !== 200) {
-                // store error in log
-                $log->setReturnCode($response->getStatusCode())
-                    ->setErrorMessage($response->getReasonPhrase());
-                $this->logMapper->save($log);
-            }
-
-            /* The async method will still continue trying to render other aura stuff,
-             * like the chrome etc. so people left a die(); here to forcibly terminate;
-             * else you end up with a bunch of Warnings about headers already being sent
-             *
-             * You can dodge that using responseAsJson() instead
-             */
-            return [$response->getBody()->getContents(), $log];
+//
+//            if ($response->getStatusCode() !== 200) {
+//                // store error in log
+//                $log->setReturnCode($response->getStatusCode())
+//                    ->setErrorMessage($response->getReasonPhrase());
+//                $this->logMapper->save($log);
+//            }
         } catch (GuzzleException $e) {
             $log->setReturnCode($e->getCode())
                 ->setErrorMessage($e->getMessage());
             $this->logMapper->save($log);
-            $this->errorMapper->generateException(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
         }
 
-        return [null, null];
+        $result = $response->getBody()->getContents();
+        $log->setResponse($result);
+        $data = json_decode($result, true);
+
+        /* If something went wrong on the openAI side, it'll send us an "error" key
+             * https://platform.openai.com/docs/api-reference/responses/object#responses/object-error
+             * If we get this, send on the human-readable message to the user
+             */
+        if ($data["error"] ?? null) {
+            $returnCode = 500;
+
+            $log->setReturnCode($returnCode)
+                ->setErrorMessage($data["error"]["message"]);
+            $this->logMapper->save($log);
+
+            new SchoolboxException(
+                $data["error"]["message"],
+                $returnCode
+            );
+        }
+
+        /* Did we recieve an incomplete response? i.e. max output tokens reached?
+         * If so, send those details on so we have some idea of why it failed
+         * https://platform.openai.com/docs/api-reference/responses/object#responses/object-status
+         */
+        $status = $data["status"] ?? null;
+        if ($status !== "completed") {
+            $returnCode = 500;
+
+            $title = sprintf(
+                "Failed to generate a response: %s",
+                $status ?? "unknown"
+            );
+
+            /* there may be some extra details about why it was incomplete */
+            $incompleteMessage = $data["incomplete_details"]["reason"] ?? null;
+            if ($incompleteMessage) {
+                $title .= sprintf(" (%s)", $incompleteMessage);
+            }
+
+            $log->setReturnCode($returnCode)
+                ->setErrorMessage($incompleteMessage);
+            $this->logMapper->save($log);
+
+            new SchoolboxException(
+                $title,
+                $returnCode
+            );
+        }
+
+        // well we didn't die, so let's assume we got a good response
+
+        /** store the response, and the ai usage */
+        $log->setReturnCode(200)
+            ->setModel($data['model'] ?? null)
+            ->setInputTokens($data['usage']['input_tokens'] ?? null)
+            ->setOutputTokens($data['usage']['output_tokens'] ?? null);
+        $this->logMapper->save($log);
+
+        return $data;
     }
 
 

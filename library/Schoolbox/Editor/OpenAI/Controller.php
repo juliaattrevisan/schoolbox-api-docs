@@ -10,9 +10,9 @@ namespace Schoolbox\Editor\OpenAI;
 
 use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
-use DebugBar\DebugBarException;
 use GuzzleHttp\Client;
 use Psr\Http\Client\ClientExceptionInterface;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
@@ -119,85 +119,24 @@ class Controller extends Base
                 $inputs['generateForField'],
             );
 
-            /* Send it and decode the result (if any: sometimes it returns null)
-             * and dodge around all its weird encoding business with a double-decode,
-             * and ditching all its training markdown (lol) that it loves to use
-             *
-             * https://community.openai.com/t/json-returning-with-json/584818/6
-             */
-            /** @var \Schoolbox\Editor\OpenAI\Log\Model $log */
-            [$result, $log] = $helper->request($this->getUser(), $payload);
-
-            $data = json_decode($result, true);
-
-            /* If something went wrong on the openAI side, it'll send us an "error" key
-             * https://platform.openai.com/docs/api-reference/responses/object#responses/object-error
-             * If we get this, send on the human-readable message to the user
-             */
-            if ($data["error"] ?? null) {
-                $returnCode = 500;
-
-                if ($log) {
-                    $log->setReturnCode($returnCode)
-                        ->setResponse($result)
-                        ->setErrorMessage($data["error"]["message"]);
-                    $this->logMapper->save($log);
-                }
-
-                $problem = (new ApiProblem($data["error"]["message"]))
-                    ->setStatus($returnCode)
+            try {
+                /* Send it and decode the result (if any: sometimes it returns null)
+                 * and dodge around all its weird encoding business with a double-decode,
+                 * and ditching all its training markdown (lol) that it loves to use
+                 *
+                 * https://community.openai.com/t/json-returning-with-json/584818/6
+                 */
+                $data = $helper->request($this->getUser(), $payload);
+            } catch (SchoolboxException $e) {
+                $problem = (new ApiProblem($e->getMessage()))
+                    ->setStatus($e->getCode())
                     ->asArray();
 
                 $this->response = $this->responseAsJson($problem)
-                    ->withStatus($returnCode);
+                    ->withStatus($e->getCode());
 
                 return;
             }
-
-            /* Did we recieve an incomplete response? i.e. max output tokens reached?
-             * If so, send those details on so we have some idea of why it failed
-             * https://platform.openai.com/docs/api-reference/responses/object#responses/object-status
-             */
-            $status = $data["status"] ?? null;
-            if ($status !== "completed") {
-                $returnCode = 500;
-
-                $title = sprintf(
-                    "Failed to generate a response: %s",
-                    $status ?? "unknown"
-                );
-
-                /* there may be some extra details about why it was incomplete */
-                $incompleteMessage = $data["incomplete_details"]["reason"] ?? null;
-                if ($incompleteMessage) {
-                    $title .= sprintf(" (%s)", $incompleteMessage);
-                }
-
-                if ($log) {
-                    $log->setReturnCode($returnCode)
-                        ->setResponse($result)
-                        ->setErrorMessage($incompleteMessage);
-                    $this->logMapper->save($log);
-                }
-
-                $problem = (new ApiProblem($title))
-                    ->setStatus($returnCode)
-                    ->asArray();
-
-                $this->response = $this->responseAsJson($problem)
-                    ->withStatus($returnCode);
-
-                return;
-            }
-
-            /** store the response, and the ai usage */
-            $log->setReturnCode(200)
-                ->setResponse($result)
-                ->setModel($data['model'] ?? null)
-                ->setInputTokens($data['usage']['input_tokens'] ?? null)
-                ->setOutputTokens($data['usage']['output_tokens'] ?? null);
-            $this->logMapper->save($log);
-
             /* The actual output we requested is in this chain of objects, for now assume it'll only ever be one */
             $newFieldData = json_decode($data['output'][0]['content'][0]['text'], true);
 
