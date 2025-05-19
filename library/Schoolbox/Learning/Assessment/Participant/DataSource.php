@@ -194,7 +194,9 @@ class DataSource
      * * any students in the context's folder's class
      * * any read-level members of the context's folder's group
      * * anyone who has submitted a Response for this assessment
+     *   (so long as the Response has not subsequently been deleted (TODO))
      * * anyone who has been given Feedback for this assessment
+     *   (so long as the Feedback has not subsequently been deleted (TODO))
      *
      * This method sets the participants into each $assessment
      *
