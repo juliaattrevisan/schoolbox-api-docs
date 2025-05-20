@@ -248,17 +248,17 @@ test.describe("Quiz Tests: create, modify, delete quiz, submit and vertical revi
         ).toBeVisible();
     });
 
-    test.afterAll(async ({ baseTester, db }) => {
+    test.afterAll(async ({ baseTester, db, api }) => {
         baseTester.isGoingTo("update delete_at for the quiz assessment so it does not impact the news tests");
         await db.updateInDatabase(
             "assessment",
             { deleted_at: "2022-01-15 11:22:34" },
             { "title like": "Quiz Automation Test%", deleted_at: null },
         );
-        await db.updateInDatabase(
-            "folder",
-            { deleted_at: "2020-01-15 11:22:34" },
-            { "name like": "Test Class Homepage Quiz" },
-        );
+
+        const folderIds = (await db.grabColumnFromDatabase("folder", "id", {
+            "name LIKE": "Test Class Homepage Quiz",
+        })) as number[];
+        await Promise.all(folderIds.map((f) => api.deleteFolder(f)));
     });
 });

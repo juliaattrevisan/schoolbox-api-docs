@@ -557,14 +557,15 @@ test.describe("Due Work - Mark type tests", () => {
         // await activityFeed.expectActivityFeedItemMark(dueWorkName3, null);
     });
 
-    test.afterAll(async ({ db }) => {
+    test.afterAll(async ({ db, api }) => {
         // Soft-delete data to not interfere with other tests
-        const folderIds = await db.grabColumnFromDatabase("folder", "id", { "name LIKE": "Test Unit %" });
-        const courseUnitSpecIds = await db.grabColumnFromDatabase("course_unit_specification", "id", {
+        const folderIds = (await db.grabColumnFromDatabase("folder", "id", { "name LIKE": "Test Unit %" })) as number[];
+        const courseUnitSpecIds = (await db.grabColumnFromDatabase("course_unit_specification", "id", {
             folder_id: folderIds,
-        });
+        })) as number[];
 
-        await db.updateInDatabase("folder", { deleted_at: "2022-01-15 11:12:34" }, { id: folderIds });
+        await Promise.all(folderIds.map((folderId) => api.deleteFolder(folderId)));
+
         await db.updateInDatabase(
             "course_unit_specification",
             { deleted_at: "2022-01-15 11:12:34" },

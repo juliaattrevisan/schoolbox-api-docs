@@ -131,12 +131,12 @@ test.describe("Participation Plan Tests", () => {
     /**
      * Soft deleting data to not impact the tests
      */
-    test.afterAll(async ({ db }) => {
-        await db.updateInDatabase(
-            "folder",
-            { deleted_at: "2022-01-15 11:22:34" },
-            { "name like": "Participation and Learning Plan Homepage" },
-        );
+    test.afterAll(async ({ db, api }) => {
+        const folderIds = (await db.grabColumnFromDatabase("folder", "id", {
+            "name LIKE": "Participation and Learning Plan Homepage%",
+        })) as number[];
+        await Promise.all(folderIds.map((folderId) => api.deleteFolder(folderId)));
+
         await db.updateInDatabase(
             "assessment",
             { deleted_at: "2022-01-15 11:22:34" },

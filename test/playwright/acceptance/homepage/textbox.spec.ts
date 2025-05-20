@@ -19,14 +19,6 @@ test.describe("Textbox Tests", () => {
     });
 
     /**
-     * Soft deleting the homepage with certain name to not impact the test
-     */
-    test.beforeAll(async ({ baseTester, db }) => {
-        baseTester.isGoingTo("update delete_at for the textbox (folder table) so it does not impact the news tests");
-        await db.updateInDatabase("folder", { deleted_at: "2022-01-15 11:22:34" }, { name: "Test TextBox Homepage%" });
-    });
-
-    /**
      * create a homepage
      */
 
@@ -229,11 +221,16 @@ test.describe("Textbox Tests", () => {
     /**
      * Soft deleting data to not impact the tests
      */
-    test.afterAll(async ({ baseTester, db }) => {
+    test.afterAll(async ({ baseTester, db, api }) => {
         baseTester.isGoingTo(
             "update delete_at for the data created in this test so it does impact next suite of tests",
         );
-        await db.updateInDatabase("folder", { deleted_at: "2022-01-15 11:22:34" }, { name: "Test TextBox Homepage" });
+
+        const folderIds = (await db.grabColumnFromDatabase("folder", "id", {
+            "name LIKE": "Test TextBox Homepage",
+        })) as number[];
+        await Promise.all(folderIds.map((folderId) => api.deleteFolder(folderId)));
+
         await db.updateInDatabase("textBox", { deleted_at: "2022-01-15 11:22:34" }, { heading: "Test Text Box Title" });
         await db.updateInDatabase("textBox", { deleted_at: "2022-01-15 11:22:34" }, { heading: "Second Text Box" });
         await db.updateInDatabase("textBox", { deleted_at: "2022-01-15 11:22:34" }, { heading: "Third Text Box" });

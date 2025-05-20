@@ -289,11 +289,16 @@ test.describe("Homepage Initial Tests", () => {
      * Soft deleting data to not impact the other tests
      */
 
-    test.afterAll(async ({ baseTester, db }) => {
+    test.afterAll(async ({ baseTester, db, api }) => {
         baseTester.isGoingTo(
             "update delete_at for the data created in this test so it does impact next suite of tests",
         );
-        await db.updateInDatabase("folder", { deleted_at: "2020-01-15 11:22:34" }, { "name like": "Test Homepage" });
+
+        const folderIds = (await db.grabColumnFromDatabase("folder", "id", {
+            "name LIKE": "Test Homepage",
+        })) as number[];
+        await Promise.all(folderIds.map((folderId) => api.deleteFolder(folderId)));
+
         await db.updateInDatabase("blog", { deleted_at: "2020-01-15 11:22:34" }, { "heading like": "Test Blog Title" });
         await db.updateInDatabase(
             "textBox",

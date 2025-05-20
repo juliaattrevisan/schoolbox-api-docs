@@ -306,18 +306,19 @@ test.describe("Group Permission Tests", () => {
     /**
      * Soft-delete data is about to start so it does not get impacted by other tests already executed
      */
-    test.afterAll(async ({ baseTester, db }) => {
+    test.afterAll(async ({ baseTester, db, api }) => {
         baseTester.isGoingTo(
             "update delete_at for the data created in this test so it does impact next suite of tests",
         );
-        await db.updateInDatabase("folder", { deleted_at: "2022-01-15 11:22:34" }, { "name LIKE": "Group Free%" });
-        await db.updateInDatabase("folder", { deleted_at: "2022-01-15 11:22:34" }, { "name LIKE": "Group Moderated%" });
-        await db.updateInDatabase(
-            "folder",
-            { deleted_at: "2022-01-15 11:22:34" },
+
+        const folderIds = (await db.grabColumnFromDatabase("folder", "id", [
+            { "name LIKE": "Group Free%" },
+            { "name LIKE": "Group Moderated%" },
             { "name LIKE": "Group Restricted%" },
-        );
-        await db.updateInDatabase("folder", { deleted_at: "2022-01-15 11:22:34" }, { "name LIKE": "Group Root%" });
-        await db.updateInDatabase("folder", { deleted_at: "2022-01-15 11:22:34" }, { "name LIKE": "Group 1" });
+            { "name LIKE": "Group Root%" },
+            { "name LIKE": "Group 1" },
+        ])) as number[];
+
+        await Promise.all(folderIds.map((folderId) => api.deleteFolder(folderId)));
     });
 });
