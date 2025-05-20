@@ -84,7 +84,7 @@ class SingleAssessmentScoreRepository implements ScoreRepositoryInterface
          * Also convert any \n to <br> tags, as we want to keep the line breaks
          * Then, surround it in an actual <p> tag so that it can be rendered as if ckeditor made it
          */
-        $comment = nl2br(\Scrub::text($score->getComment()));
+        $comment = nl2br(\Scrub::linkifyText(\Scrub::text($score->getComment())));
         $comment = "<p>$comment</p>";
 
         // The easy stuff
