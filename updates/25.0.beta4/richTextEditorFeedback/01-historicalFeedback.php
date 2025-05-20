@@ -54,13 +54,15 @@ $app = new class extends CliTool\App {
                  * Start by converting any html entities to their unicode equivalents,
                  * as we still want "Jana, make sure you place a <p> tag around the text" to show up correctly
                  * and not be rendered as an actual <p> tag
-                 * Also convert any \n to <br> tags, as we want to keep the line breaks
+                 * Scrub::linkifyText replaces any links and some markdown with html, like it used to in some areas
                  */
-                $newComment = nl2br(Scrub::text($comment['comment']));
+                $newComment = Scrub::linkifyText(Scrub::text($comment['comment']));
 
-                /**
-                 * Then, surround it in an actual <p> tag so that it can be rendered as if ckeditor made it
+                /** For some reason linkifyText adds a new line at the end, so remove that
+                 *  Then convert any remaining \n to <br> tags, as we want to keep the line breaks
+                 *  and finally, surround it in an actual <p> tag so that it can be rendered as if ckeditor made it
                  */
+                $newComment = nl2br(rtrim($newComment, "\n"));
                 $newComment = "<p>$newComment</p>";
 
                 /**

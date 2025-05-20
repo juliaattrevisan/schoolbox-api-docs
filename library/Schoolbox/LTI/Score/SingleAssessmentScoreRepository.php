@@ -80,11 +80,14 @@ class SingleAssessmentScoreRepository implements ScoreRepositoryInterface
          * Converts any html entities to their unicode equivalents, as we still want
          * "Jana, make sure you place a <p> tag around the text" to show up correctly
          * and not be rendered as an actual <p> tag.
-         *
-         * Also convert any \n to <br> tags, as we want to keep the line breaks
-         * Then, surround it in an actual <p> tag so that it can be rendered as if ckeditor made it
          */
-        $comment = nl2br(\Scrub::text($score->getComment()));
+        $comment = \Scrub::linkifyText(\Scrub::text($score->getComment()));
+
+        /** For some reason linkifyText adds a new line at the end, so remove that
+         *  Then convert any remaining \n to <br> tags, as we want to keep the line breaks
+         *  and finally, surround it in an actual <p> tag so that it can be rendered as if ckeditor made it
+         */
+        $comment = nl2br(rtrim($comment, "\n"));
         $comment = "<p>$comment</p>";
 
         // The easy stuff
