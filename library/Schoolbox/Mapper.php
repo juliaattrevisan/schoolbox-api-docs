@@ -266,13 +266,13 @@ abstract class Mapper implements IMapper
     protected $config_loader;
 
     /**
-     * Session data.
+     * An override for the session data
      *
      * TODO decouple the dependency between mappers and session
      *
-     * @var array
+     * @var array|null
      */
-    protected $sessionData = [];
+    protected array|null $sessionDataOverride = null;
 
     /**
      * A cache of the results of `SELECT` statements which this mapper executes.
@@ -426,13 +426,6 @@ abstract class Mapper implements IMapper
         $this->setColumnFactory(self::$columnFactory ?: new ColumnFactory());
         $this->setMonitor(self::$perfmon ?: new LiveMonitor());
 
-        // Need to add session data so that notifiers can do their thing
-        // pass $_SESSION by reference so all the mappers keep in-sync with the real $_SESSION
-        $sessionData = &$_SESSION;
-        if (null == $sessionData) {
-            $sessionData = [];
-        }
-        $this->setSessionData($sessionData);
         $this->mapping();
 
         $this->monitor->cacheIndices($this);
@@ -724,19 +717,34 @@ abstract class Mapper implements IMapper
     }
 
     /**
-     * @param array $sessionData
+     * @param array|null $sessionDataOverride
      */
-    public function setSessionData(&$sessionData)
+    public function setSessionDataOverride(array|null $sessionDataOverride): void
     {
-        $this->sessionData = &$sessionData;
+        $this->sessionDataOverride = $sessionDataOverride;
     }
 
     /**
+     * @return array|null
+     */
+    public function getSessionDataOverride(): array|null
+    {
+        return $this->sessionDataOverride;
+    }
+
+
+    /**
+     * Returns the current data from $_SESSION, unless overridden by sessionDataOverride
+     *
      * @return array
      */
-    public function getSessionData()
+    public function getSessionData(): array
     {
-        return $this->sessionData;
+        if ($this->sessionDataOverride) {
+            return $this->sessionDataOverride;
+        }
+
+        return $_SESSION ?? [];
     }
 
 
@@ -747,7 +755,7 @@ abstract class Mapper implements IMapper
      */
     public function getSessionUser(): ?User
     {
-        return $this->sessionData['user'] ?? null;
+        return $this->getSessionData()['user'] ?? null;
     }
 
 
