@@ -18,8 +18,6 @@ services:
 
   # Load-balanced FrankenPHP containers
   schoolbox-frankenphp:
-    depends_on:
-      - php82-frankenphp
     restart: always
     build:
       context: ./schoolbox-frankenphp
