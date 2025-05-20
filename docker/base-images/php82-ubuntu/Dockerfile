@@ -37,7 +37,6 @@ RUN \
     php8.2-bcmath \
     php8.2-common \
     php8.2-curl \
-    php8.2-dev \
     php8.2-excimer \
     php8.2-gd \
     php8.2-intl \
@@ -56,8 +55,9 @@ RUN \
 COPY ./opt/bin/install-odbc-driver.sh /opt/bin/install-odbc-driver.sh
 RUN /opt/bin/install-odbc-driver.sh
 
-# Install pdo_sqlsrv
+# Install pdo_sqlsrv and dev packages required for pecl installs
 RUN <<EOF
+apt-get install -y php8.2-dev unixodbc-dev
 pecl install pdo_sqlsrv
 echo "extension=pdo_sqlsrv.so" > /etc/php/8.2/mods-available/pdo_sqlsrv.ini
 phpenmod pdo_sqlsrv
@@ -81,6 +81,7 @@ EOF
 
 # Cleanup
 RUN \
+  apt-get remove -y php8.2-dev unixodbc-dev && \
   apt-get autoremove -y && \
   apt-get clean -y
 
