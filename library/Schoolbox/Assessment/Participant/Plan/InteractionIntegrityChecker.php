@@ -233,7 +233,8 @@ class InteractionIntegrityChecker
      *
      * @param User             $student
      * @param Assessment\Model $assessment
-     * @return bool - True if participation was removed.
+     * @return bool - Return true on success - whether or not a participation was removed.
+     *                This is the expected behaviour for callbacks registered with Schoolbox\Mapper.
      * @throws \Exception
      */
     public function removeParticipationIfNoInteractionsRemain(User $student, Assessment\Model $assessment): bool
@@ -244,7 +245,7 @@ class InteractionIntegrityChecker
 
         if (!$plan->isDynamic()) {
             // Plan is custom, so participation should only be removed explicitly by a teacher.
-            return false;
+            return true;
         }
 
         $contextFolder = $assessment->getContextFolder();
@@ -255,7 +256,7 @@ class InteractionIntegrityChecker
         // Checking rule (1)...
         if (in_array($student->getExternalId(), $studentExternalIdsInClassList)) {
             // The student is in the class list, so remains a participant.
-            return false;
+            return true;
         }
 
         // Checking rule (2)...
@@ -268,7 +269,7 @@ class InteractionIntegrityChecker
             $groupMemberUserIds = $userAccessList->keys();
             if (in_array($student->getId(), $groupMemberUserIds)) {
                 // The student is in the assessment's context's folder's group, so remains a participant.
-                return false;
+                return true;
             }
         }
 
@@ -284,11 +285,13 @@ class InteractionIntegrityChecker
             // Checking rule (3)...
             if (count($attempts) > 0) {
                 // The student has submitted a (non-deleted) response for this assessment.
-                return false;
+                return true;
             }
 
             // Checking rule (4)...
         } elseif ($assessment->getDueWork() instanceof DueWorkModel) {
+            $dueWork = $assessment->getDueWork();
+
             // Handle assessments other than quizzes.
 
             // Checking rule (3)...
