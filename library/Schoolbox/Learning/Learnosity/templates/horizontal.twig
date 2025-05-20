@@ -30,7 +30,7 @@
 
 <div id="horizontal-marking-container">
     <horizontal-marking
-        :title="'{{ assessment.title }}'"
+        title="{{ assessment.title }}"
         :items="{{ itemReferences|json_encode }}"
         :students="{{ students|json_encode }}"
         :item-responses="{{ itemResponses|json_encode }}"
