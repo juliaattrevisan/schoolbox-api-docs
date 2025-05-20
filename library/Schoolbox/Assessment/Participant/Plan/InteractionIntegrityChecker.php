@@ -52,11 +52,6 @@ class InteractionIntegrityChecker
      */
     private $quizAttemptMapper;
 
-    /**
-     * @var QuizMapper
-     */
-    private $quizMapper;
-
 
     /**
      * @param Mapper             $planMapper
@@ -68,7 +63,6 @@ class InteractionIntegrityChecker
         $this->participantMapper = $participantMapper;
         $this->userAccessMapper  = new UserAccessMapper(); // TODO: Pass to constructor?
         $this->quizAttemptMapper = new QuizAttemptMapper(); // TODO: Pass to constructor?
-        $this->quizMapper        = new QuizMapper(); // TODO: Pass to constructor?
     }
 
 
