@@ -87,7 +87,7 @@ class SingleAssessmentScoreRepository implements ScoreRepositoryInterface
          *  Then convert any remaining \n to <br> tags, as we want to keep the line breaks
          *  and finally, surround it in an actual <p> tag so that it can be rendered as if ckeditor made it
          */
-        $comment = rtrim($comment, "\n");
+        $comment = nl2br(rtrim($comment, "\n"));
         $comment = "<p>$comment</p>";
 
         // The easy stuff
