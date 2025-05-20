@@ -29,8 +29,7 @@ RUN \
 
 # Install PHP dependencies, as well as likely requirements, as per
 # https://schoolbox.atlassian.net/wiki/spaces/DEV/pages/2584313884/Services+within+Schoolbox#Execution-of-shell-commands
-# Consider though that only the CLI box may require the command-line tools:
-# Git, mariadb, ffmpeg, imagemagick
+# Command-line tools will only be installed in the CLI box, though.
 RUN \
   apt-get install -y \
     php8.2-apcu \
@@ -51,12 +50,18 @@ RUN \
     php8.2-xml \
     php8.2-zip \
     php8.2-imagick \
-    php8.2-redis \
-    git \
-    mariadb-client \
-    ffmpeg \
-    unixodbc-dev \
-    imagemagick
+    php8.2-redis
+
+# Install ODBC driver
+COPY ./opt/bin/install-odbc-driver.sh /opt/bin/install-odbc-driver.sh
+RUN /opt/bin/install-odbc-driver.sh
+
+# Install pdo_sqlsrv
+RUN <<EOF
+pecl install pdo_sqlsrv
+echo "extension=pdo_sqlsrv.so" > /etc/php/8.2/mods-available/pdo_sqlsrv.ini
+phpenmod pdo_sqlsrv
+EOF
 
 # Install XDebug on non-production:
 # for some reason, `apt-get install php8.2-xdebug` doesn't install it
@@ -77,21 +82,7 @@ EOF
 # Cleanup
 RUN \
   apt-get autoremove -y && \
-  apt-get clean -y && \
-  rm -rf /var/lib/apt/lists/* && \
-  update-alternatives --set php /usr/bin/php8.2
-
-# Install ODBC driver
-COPY ./opt/bin/install-odbc-driver.sh /opt/bin/install-odbc-driver.sh
-RUN /opt/bin/install-odbc-driver.sh
-
-
-# Install pdo_sqlsrv
-RUN <<EOF
-pecl install pdo_sqlsrv
-echo "extension=pdo_sqlsrv.so" > /etc/php/8.2/mods-available/pdo_sqlsrv.ini
-phpenmod pdo_sqlsrv
-EOF
+  apt-get clean -y
 
 # Copy configuration files
 COPY ./config/* /etc/php/8.2/cli/conf.d/
