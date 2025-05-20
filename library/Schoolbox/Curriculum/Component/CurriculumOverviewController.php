@@ -91,7 +91,9 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
 
             // Then find all the nodes and filter out disabled nodes that aren't directly mapped to this folder
             // This is because we still want to show disabled nodes if they are still directly mapped to aid in transitioning curriculum
-            $curriculumNodes = $nodeMapper->findByColumnList(['id' => $nodeIds]);
+            $curriculumNodes = $nodeMapper->findByColumnList(['id' => $nodeIds])->filter(
+                fn ($node) => $node->getEnabled() || in_array($node->getId(), $directNodeIds)
+            );
 
             // Then, sort the entire list of nodes into a tree structure.
             Node\Mapper::sortNodes($curriculumNodes, 0);
