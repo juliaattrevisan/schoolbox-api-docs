@@ -194,7 +194,7 @@ class Controller extends ConfigController
             $valueSerializer = $this->getFieldStrategyFactory()->makeValueSerializer($existingConfig->getFieldId());
             $newValue        = $valueSerializer->serializeValue($value, $existingConfig);
 
-            if ($name === 'max_file_size') {
+            if ($name === ConfigMapper::NAME_MAX_FILE_SIZE) {
                 $maxMaxFileSize = $this::getMaxUploadFileSizeInBytes();
 
                 if ($newValue > $maxMaxFileSize) {
