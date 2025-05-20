@@ -10,9 +10,16 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Participant\Plan;
 
+use External_Class;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkModel;
+use Schoolbox\Learning\Assessment\Quiz\Model as QuizModel;
+use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Assessment\Participant;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
 use PDOException;
 use Schoolbox\Mapper as SchoolboxMapper;
@@ -35,6 +42,21 @@ class InteractionIntegrityChecker
      */
     private $participantMapper;
 
+    /**
+     * @var UserAccessMapper
+     */
+    private $userAccessMapper;
+
+    /**
+     * @var QuizAttemptMapper
+     */
+    private $quizAttemptMapper;
+
+    /**
+     * @var QuizMapper
+     */
+    private $quizMapper;
+
 
     /**
      * @param Mapper             $planMapper
@@ -44,6 +66,9 @@ class InteractionIntegrityChecker
     {
         $this->planMapper        = $planMapper;
         $this->participantMapper = $participantMapper;
+        $this->userAccessMapper  = new UserAccessMapper(); // TODO: Pass to constructor?
+        $this->quizAttemptMapper = new QuizAttemptMapper(); // TODO: Pass to constructor?
+        $this->quizMapper        = new QuizMapper(); // TODO: Pass to constructor?
     }
 
 
@@ -204,12 +229,80 @@ class InteractionIntegrityChecker
 
 
     /**
+     * Remove the participant if $student is no longer a participant in $assessment according to the following rules
+     * (copied from the docblock of Assessment\Participant\DataSource->findForAssessmentCollection()):
+     *
+     * A student is a participant in $assessment if:
+     *  * (1) the student is in the $assessment's context's folder's class list OR
+     *  * (2) the student is a read-level member of the $assessment's context's folder's group OR
+     *  * (3) the student has submitted a (non-deleted) Response for this assessment OR
+     *  * (4) the student has been given (non-deleted) Feedback for this assessment
+     *
      * @param User             $student
      * @param Assessment\Model $assessment
-     * @return bool
+     * @return bool - True if participation was removed.
+     * @throws \Exception
      */
     public function removeParticipationIfNoInteractionsRemain(User $student, Assessment\Model $assessment): bool
     {
+        $this->loadPlansAndParticipants($assessment);
+        $participant = $this->findParticipation($student, $assessment);
+        $plan = $participant->getPlan();
+
+        $contextFolder = $assessment->getContextFolder();
+        $externalClassHandler = new External_Class();
+        $studentsInClassList = $externalClassHandler->getStudents($contextFolder->getCodeString());
+        $studentExternalIdsInClassList = array_map(fn ($student) => $student['synergy_id'], $studentsInClassList);
+
+        // Checking rule (1)...
+        if (in_array($student->getExternalId(), $studentExternalIdsInClassList)) {
+            // The student is in the class list, so remains a participant.
+            return false;
+        }
+
+        // Checking rule (2)...
+        // Code below copied from Group\Manage\Controller->getData().
+        if ($contextFolder->getGroup()) {
+            // The lowest access level is read-level, so all users in $userAccessList have read-level access.
+            $userAccessList = $this->userAccessMapper->findForFolder($contextFolder)
+                ->indexByCallback(fn (UserAccess $userAccess) => $userAccess->getUser()->getId());
+
+            $groupMemberUserIds = $userAccessList->keys();
+            if (in_array($student->getId(), $groupMemberUserIds)) {
+                // The student is in the assessment's context's folder's group, so remains a participant.
+                return false;
+            }
+        }
+
+        if ($plan->isDynamic()) {
+        }
+
+        if ($assessment->getQuiz() instanceof QuizModel) {
+            $quiz = $assessment->getQuiz();
+            $attempts = $this->quizAttemptMapper->findByColumnList(
+                [
+                    'assess_id' => $quiz->getId(),
+                    'user_id' => $student->getId()
+                ]
+            );
+
+            // Checking rule (3)...
+            if (count($attempts) > 0) {
+                // The student has submitted a (non-deleted) response for this assessment.
+                return false;
+            }
+
+            // Checking rule (4)...
+        } elseif ($assessment->getDueDate() instanceof DueWorkModel) {
+            // Handle assessments other than quizzes.
+
+            // Checking rule (3)...
+
+            // Checking rule (4)...
+        }
+
+        // There are no reasons for this student to remain a participant of the assessment, so remove participation.
+        $this->participantMapper->delete($participant);
         return true;
     }
 
