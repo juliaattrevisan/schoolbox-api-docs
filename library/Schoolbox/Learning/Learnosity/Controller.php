@@ -1417,7 +1417,7 @@ class Controller extends Base
             'assessment' => $assessment,
             'breadcrumbs' => $breadcrumbs,
             'reportPayloads' => json_encode($reportPayloads, JSON_THROW_ON_ERROR),
-            'itemReferences' => $itemReferences,
+            'itemReferences' => $itemReferences ?? [],
             'students' => $students,
             'itemResponses' => $itemResponses,
             'attemptResponses' => $attemptResponses,
