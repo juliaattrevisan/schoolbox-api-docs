@@ -50,7 +50,7 @@ class Model implements ISoftDeletable, \JsonSerializable
      * where aspectRatio = aspectRatioX/aspectRatioY.
      */
     public const MIN_ASPECT_RATIO_X_OR_Y = 1;
-    public const MAX_ASPECT_RATIO_X_OR_Y = 99;
+    public const MAX_ASPECT_RATIO_X_OR_Y = 100;
 
 
     /**
