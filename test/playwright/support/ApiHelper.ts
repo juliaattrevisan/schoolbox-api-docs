@@ -1,10 +1,6 @@
 import type { APIRequestContext } from "@playwright/test";
 import type BaseTester from "./BaseTester";
 
-export interface DataPairs {
-    [key: string]: string | number | boolean | unknown[] | null;
-}
-
 export default class ApiHelper {
     public request: APIRequestContext;
 
