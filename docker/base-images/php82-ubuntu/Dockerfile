@@ -67,9 +67,7 @@ EOF
 # for some reason, `apt-get install php8.2-xdebug` doesn't install it
 RUN <<EOF
 case "$ENV" in
-  prod)
-    ;;
-  production)
+  prod | production)
     ;;
   *)
     pecl install xdebug
