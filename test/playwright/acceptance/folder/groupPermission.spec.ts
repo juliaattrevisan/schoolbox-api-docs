@@ -303,22 +303,14 @@ test.describe("Group Permission Tests", () => {
         await tester.logout();
     });
 
-    /**
-     * Soft-delete data is about to start so it does not get impacted by other tests already executed
-     */
-    test.afterAll(async ({ baseTester, db, api }) => {
-        baseTester.isGoingTo(
-            "update delete_at for the data created in this test so it does impact next suite of tests",
-        );
-
-        const folderIds = (await db.grabColumnFromDatabase("folder", "id", [
-            { "name LIKE": "Group Free%" },
-            { "name LIKE": "Group Moderated%" },
-            { "name LIKE": "Group Restricted%" },
-            { "name LIKE": "Group Root%" },
-            { "name LIKE": "Group 1" },
-        ])) as number[];
-
-        await Promise.all(folderIds.map((folderId) => api.deleteFolder(folderId)));
+    test.afterAll(async ({ db, api }) => {
+        // Soft-delete data to not interfere with other tests
+        await api.deleteFoldersByName(db, [
+            "Group Free%",
+            "Group Moderated%",
+            "Group Restricted%",
+            "Group Root%",
+            "Group 1",
+        ]);
     });
 });

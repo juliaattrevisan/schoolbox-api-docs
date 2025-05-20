@@ -132,10 +132,7 @@ test.describe("Participation Plan Tests", () => {
      * Soft deleting data to not impact the tests
      */
     test.afterAll(async ({ db, api }) => {
-        const folderIds = (await db.grabColumnFromDatabase("folder", "id", {
-            "name LIKE": "Participation and Learning Plan Homepage%",
-        })) as number[];
-        await Promise.all(folderIds.map((folderId) => api.deleteFolder(folderId)));
+        await api.deleteFoldersByName(db, "Participation and Learning Plan Homepage%");
 
         await db.updateInDatabase(
             "assessment",

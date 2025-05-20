@@ -559,12 +559,10 @@ test.describe("Due Work - Mark type tests", () => {
 
     test.afterAll(async ({ db, api }) => {
         // Soft-delete data to not interfere with other tests
-        const folderIds = (await db.grabColumnFromDatabase("folder", "id", { "name LIKE": "Test Unit %" })) as number[];
+        const folderIds = await api.deleteFoldersByName(db, "Test Unit %");
         const courseUnitSpecIds = (await db.grabColumnFromDatabase("course_unit_specification", "id", {
             folder_id: folderIds,
         })) as number[];
-
-        await Promise.all(folderIds.map((folderId) => api.deleteFolder(folderId)));
 
         await db.updateInDatabase(
             "course_unit_specification",

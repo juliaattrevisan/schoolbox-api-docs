@@ -226,10 +226,7 @@ test.describe("Textbox Tests", () => {
             "update delete_at for the data created in this test so it does impact next suite of tests",
         );
 
-        const folderIds = (await db.grabColumnFromDatabase("folder", "id", {
-            "name LIKE": "Test TextBox Homepage",
-        })) as number[];
-        await Promise.all(folderIds.map((folderId) => api.deleteFolder(folderId)));
+        await api.deleteFoldersByName(db, "Test TextBox Homepage");
 
         await db.updateInDatabase("textBox", { deleted_at: "2022-01-15 11:22:34" }, { heading: "Test Text Box Title" });
         await db.updateInDatabase("textBox", { deleted_at: "2022-01-15 11:22:34" }, { heading: "Second Text Box" });

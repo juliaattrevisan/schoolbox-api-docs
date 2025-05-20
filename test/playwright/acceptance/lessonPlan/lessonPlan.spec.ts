@@ -266,9 +266,6 @@ test.describe("Lesson Plan Activity", () => {
             { "title like": "Lesson Plan Automation Test%" },
         );
 
-        const folderIds = (await db.grabColumnFromDatabase("folder", "id", {
-            "name LIKE": "Test Class Homepage Lesson Plan%",
-        })) as number[];
-        await Promise.all(folderIds.map((folderId) => api.deleteFolder(folderId)));
+        await api.deleteFoldersByName(db, "Test Class Homepage Lesson Plan%");
     });
 });

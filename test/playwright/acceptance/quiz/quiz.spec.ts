@@ -256,9 +256,6 @@ test.describe("Quiz Tests: create, modify, delete quiz, submit and vertical revi
             { "title like": "Quiz Automation Test%", deleted_at: null },
         );
 
-        const folderIds = (await db.grabColumnFromDatabase("folder", "id", {
-            "name LIKE": "Test Class Homepage Quiz",
-        })) as number[];
-        await Promise.all(folderIds.map((f) => api.deleteFolder(f)));
+        await api.deleteFoldersByName(db, "Test Class Homepage Quiz%");
     });
 });

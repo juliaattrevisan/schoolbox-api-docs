@@ -403,17 +403,8 @@ test.describe("Initial Due Work functionality tests", () => {
         await tester.logout();
     });
 
-    test.afterAll(async ({ baseTester, db, api }) => {
+    test.afterAll(async ({ db, api }) => {
         // Soft-delete data to not interfere with other tests
-        baseTester.isGoingTo(
-            "update delete_at for the data created in this test so it does not impact next suite of tests",
-        );
-
-        const folderIds = (await db.grabColumnFromDatabase("folder", "id", [
-            { "name LIKE": "Test Class Homepage%" },
-            { "name LIKE": "Test Due Work%" },
-        ])) as number[];
-
-        await Promise.all(folderIds.map((folderId) => api.deleteFolder(folderId)));
+        await api.deleteFoldersByName(db, ["Test Class Homepage%", "Test Due Work%"]);
     });
 });

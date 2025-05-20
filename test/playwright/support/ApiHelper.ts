@@ -1,5 +1,6 @@
 import type { APIRequestContext } from "@playwright/test";
 import type BaseTester from "./BaseTester";
+import type DatabaseHelper from "./DatabaseHelper";
 
 export default class ApiHelper {
     public request: APIRequestContext;
@@ -83,10 +84,30 @@ export default class ApiHelper {
      * @param folderId - ID of the folder to delete
      */
     async deleteFolder(folderId: string | number): Promise<void> {
-        this.baseTester.isGoingTo(`delete the folder with ID ${folderId}`);
+        this.baseTester.isGoingTo(`soft delete the folder with ID ${folderId}`);
         const resp = await this.request.delete(`/resource/folder/${folderId}`, await this.getAuthHeader());
         if (!resp.ok()) {
             throw new Error(`Failed to delete folder: ${resp.status()} ${resp.statusText()}`);
         }
+    }
+
+    /**
+     * Delete all folders by name
+     * @param db - DatabaseHelper instance
+     * @param names - A name, or list of names to delete folders by - Uses SQL LIKE (so % for wildcards)
+     * @returns The IDs of the deleted folders
+     */
+    async deleteFoldersByName(db: DatabaseHelper, names: string | string[]): Promise<number[]> {
+        const nameList = Array.isArray(names) ? names : [names];
+
+        const folderIds = (await db.grabColumnFromDatabase(
+            "folder",
+            "id",
+            nameList.map((name) => ({ "name LIKE": name })),
+        )) as number[];
+
+        await Promise.all(folderIds.map((folderId) => this.deleteFolder(folderId)));
+
+        return folderIds;
     }
 }
