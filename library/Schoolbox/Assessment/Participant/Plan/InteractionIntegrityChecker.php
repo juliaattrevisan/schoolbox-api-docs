@@ -61,7 +61,7 @@ class InteractionIntegrityChecker
         $this->planMapper        = $planMapper;
         $this->participantMapper = $participantMapper;
         $this->userAccessMapper  = new UserAccessMapper(); // TODO: Pass to constructor?
-        $this->quizAttemptMapper = new QuizAttemptMapper(); // TODO: Pass to constructor?
+        $this->quizAttemptMapper = new QuizAttemptMapper(); // TODO: Pass to constructor to avoid causing an infinite loop.
     }
 
 
@@ -300,7 +300,7 @@ class InteractionIntegrityChecker
         }
 
         // There are no reasons for this student to remain a participant of the assessment, so remove participation.
-//        $this->participantMapper->delete($participant);
+        $this->participantMapper->delete($participant);
         return true;
     }
 
