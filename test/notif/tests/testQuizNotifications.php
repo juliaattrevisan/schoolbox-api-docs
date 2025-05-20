@@ -302,8 +302,7 @@ class QuizNotifications extends AbstractNotificationTestCase
                 $this->log->notice("Raising visibility of quiz $quizId to $newVis", [ 'char' => '>' ]);
                 $quiz->setMarkVisibility($newVis);
 
-                $sessionData = ['user' => $quiz->getUser()];
-                $qm->setSessionData($sessionData);
+                $qm->setSessionData([ 'user' => $quiz->getUser() ]);
                 $qm->save($quiz);
             }
         }
@@ -360,9 +359,8 @@ class QuizNotifications extends AbstractNotificationTestCase
         $meta = json_decode($quiz->getDescription(), true);
 
         // 3. spawn an assess_attempt record
-        $sessionData = ['user' => $as];
         $aMap = Quiz\Attempt\Mapper::getInstance();
-        $aMap->setSessionData($sessionData);
+        $aMap->setSessionData(['user' => $as]);
 
         $this->log->debug("Starting attempt");
         /** @var Quiz\Attempt\Model $attempt */
@@ -406,9 +404,8 @@ class QuizNotifications extends AbstractNotificationTestCase
 
         $attempt->setReviewed(Alaress_Date_Format::now());
 
-        $sessionData = ['user' => $as];
         $aMap = Quiz\Attempt\Mapper::getInstance();
-        $aMap->setSessionData($sessionData);
+        $aMap->setSessionData([ 'user' => $as ]);
 
         $aMap->save($attempt);
     }
@@ -478,9 +475,8 @@ class QuizNotifications extends AbstractNotificationTestCase
         $quiz->setUser($as);
 
         // ensure the mapper thinks this is the effector
-        $sessionData = ['user' => $as];
         $oam = Quiz\Mapper::getInstance();
-        $oam->setSessionData($sessionData);
+        $oam->setSessionData([ 'user' => $as ]);
         $oam->save($quiz);
 
         // FUN FACT: THESE HAVEN'T BEEN MAPPERED

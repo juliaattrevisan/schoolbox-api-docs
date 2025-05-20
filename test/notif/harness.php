@@ -48,11 +48,10 @@ $kernel->run(function ($di, $loop, $log, $opts) {
     $redis = Alaress\Redis::getStorageClientInstance();
 
     // mappers
-    $sessionData = ['user' => $zsmith];
     $workMap = Component\SubmissionBoxMapper::getInstance();
-    $workMap->setSessionData($sessionData);
+    $workMap->setSessionData(['user' => $zsmith]);
     $rtnMap  = Component\SubmissionBox\ReturnedWorkMapper::getInstance();
-    $rtnMap->setSessionData($sessionData);
+    $rtnMap->setSessionData(['user' => $zsmith]);
 
     // "jerry springer show"
     $work = $workMap->findById(54);

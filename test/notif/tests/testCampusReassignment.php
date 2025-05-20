@@ -217,8 +217,8 @@ class CampusReassignment extends AbstractNotificationTestCase
         $article->setId(null)
                 ->setExpiresAt(Alaress_Date_Format::now()->addYears(100));
 
-        $sessionData = ['user' => $article->getAuthor()];
-        $am->setSessionData($sessionData);
+
+        $am->setSessionData([ 'user' => $article->getAuthor() ]);
         $am->create($article);
     }
 

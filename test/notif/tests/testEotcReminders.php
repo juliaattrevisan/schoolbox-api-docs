@@ -103,8 +103,9 @@ class EotcReminders extends AbstractNotificationTestCase
      */
     protected function configureMapper(Mapper $mapper, $id = self::JACKIE_BENSON)
     {
-        $sessionData = ['user' => $this->getUser($id)];
-        $mapper->setSessionData($sessionData);
+        $mapper->setSessionData([
+            'user' => $this->getUser($id)
+        ]);
     }
 
 
