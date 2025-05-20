@@ -1792,7 +1792,7 @@ abstract class Kernel
                     return new SimpleCacheBridge(
                         new ItemPool(
                             $di->get('redis.cache'),
-                            new Base64(),
+                            new \Alaress\Codec\StringValue\Base64(),
                             new KeyGenerator('httpClient', INSTANCE_ID),
                         )
                     );
