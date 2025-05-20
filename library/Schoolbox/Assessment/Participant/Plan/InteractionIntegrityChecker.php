@@ -288,7 +288,7 @@ class InteractionIntegrityChecker
             }
 
             // Checking rule (4)...
-        } elseif ($assessment->getDueDate() instanceof DueWorkModel) {
+        } elseif ($assessment->getDueWork() instanceof DueWorkModel) {
             // Handle assessments other than quizzes.
 
             // Checking rule (3)...
