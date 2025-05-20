@@ -47,10 +47,10 @@
                                 {% endif %}
                             </td>
                             <td>{% if change.published %}Published{% else %}Draft{% endif %}</td>
-                            <td title="Normalised mark: {{ change.old.normalised|number_format(2) }}">{{ change.old.student }}</td>
                             <td title="Normalised mark: {{ change.old.normalised|number_format(2) }}">{{ change.old.instructor }}</td>
-                            <td title="Normalised mark: {{ change.new.normalised|number_format(2) }}">{{ change.new.student }}</td>
+                            <td title="Normalised mark: {{ change.old.normalised|number_format(2) }}">{{ change.old.student }}</td>
                             <td title="Normalised mark: {{ change.new.normalised|number_format(2) }}">{{ change.new.instructor }}</td>
+                            <td title="Normalised mark: {{ change.new.normalised|number_format(2) }}">{{ change.new.student }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
