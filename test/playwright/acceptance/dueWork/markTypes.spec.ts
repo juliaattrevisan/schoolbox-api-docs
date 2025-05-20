@@ -295,7 +295,7 @@ test.describe("Due Work - Mark type tests", () => {
             await feedbackForm.selectRubricIndicatorByValue(446, "1");
 
             // Input mark type should be used (percentage)
-            await feedbackForm.expectRubricFinalSummaryMark("50 % ( given in Self-assessment)"); // NOTE: The self-assessment mark here is a bug, it should be blank. See SA-19963
+            await feedbackForm.expectRubricFinalSummaryMark("50 %");
             await feedbackForm.expectRubricSum("50 %");
             await feedbackForm.expectGrade("50 %", learnerId);
 
@@ -553,8 +553,7 @@ test.describe("Due Work - Mark type tests", () => {
         tester.isGoingTo("check that the 3 assessments in the activity feed use the display mark type");
         await activityFeed.expectActivityFeedItemMark(dueWorkName1, "B+");
         await activityFeed.expectActivityFeedItemMark(dueWorkName2, "50 %");
-        // TEMPORARILY DISABLED - There's a bug here, so re-enable this in SA-19964
-        // await activityFeed.expectActivityFeedItemMark(dueWorkName3, null);
+        await activityFeed.expectActivityFeedItemMark(dueWorkName3, null);
     });
 
     test.afterAll(async ({ db, api }) => {
