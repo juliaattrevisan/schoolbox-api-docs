@@ -29,6 +29,8 @@ RUN \
 
 # Install PHP dependencies, as well as likely requirements, as per
 # https://schoolbox.atlassian.net/wiki/spaces/DEV/pages/2584313884/Services+within+Schoolbox#Execution-of-shell-commands
+# Consider though that only the CLI box may require the command-line tools:
+# Git, mariadb, ffmpeg, imagemagick
 RUN \
   apt-get install -y \
     php8.2-apcu \
