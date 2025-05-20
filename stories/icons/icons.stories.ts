@@ -830,6 +830,18 @@ export const Default: Story = {
             </div>
             <div class="box-icon-wrapper">
                 <div class="box-icon">
+                    <sbx-icon name="achievement"></sbx-icon>
+                </div>
+                <p>achievement</p>
+            </div>
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <sbx-icon name="trophy"></sbx-icon>
+                </div>
+                <p>trophy</p>
+            </div>
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
                     <sbx-icon name="shuffle"></sbx-icon>
                 </div>
                 <p>shuffle</p>
