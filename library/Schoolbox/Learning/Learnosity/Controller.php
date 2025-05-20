@@ -1173,11 +1173,21 @@ class Controller extends Base
             $key = self::REPORT_HORIZONTAL_MARKING_PREFIX . $attempt->getUser()->getId();
 
             if (!isset($users[$key]) && $attempt->isFinished()) {
+                /* The user who made the attempt might no longer be a participant in the assessment:
+                 * their user account might have been deleted...which means it never hydrates and thus
+                 * omitted from the participant stack.
+                 */
+                try {
+                    $participantUser = $assessment->getParticipant($attempt->getUser());
+                } catch (\UnexpectedValueException $e) {
+                    continue;
+                }
+
                 $sessions[$attempt->getUser()->getId()] = $attempt->getLearnosityReference();
 
                 /* Find this attempt's MapperProxy equivalent from something we already obtained
                 */
-                $feedback = $assessment->getParticipant($attempt->getUser())
+                $feedback = $participantUser
                     ->getAllFeedbacks()
                     ->filter(static function ($model) use ($attempt) {
                         return $model->getResponse()->getLearnosityReference() === $attempt->getLearnosityReference();
