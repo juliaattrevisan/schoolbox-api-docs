@@ -122,6 +122,14 @@ class Cache
         // Return cached result if there
         $result = $this->internalCache->get($key);
         if (isset($result)) {
+            // If somehow this isn't a string: cast it to one
+            if (!is_string($result)) {
+                trigger_error(
+                    'Internal cache returned a non-string value: casting to string and returning',
+                    E_USER_WARNING,
+                );
+                return (string)$result;
+            }
             return $result;
         }
 
@@ -158,6 +166,15 @@ class Cache
             $this->internalCache->delete($lockKey);
         }
         $responseBody = $response->getBody()->getContents();
+
+        // If somehow response isn't a string: cast it to one
+        if (!is_string($responseBody)) {
+            trigger_error(
+                'HTTP client returned a non-string value: casting to string',
+                E_USER_WARNING,
+            );
+            $responseBody = (string)$result;
+        }
         $this->internalCache->set($key, $responseBody, $ttl ?? $this->defaultLifetime);
         return $responseBody;
     }
