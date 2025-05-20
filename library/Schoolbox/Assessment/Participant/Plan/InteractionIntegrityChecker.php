@@ -249,6 +249,11 @@ class InteractionIntegrityChecker
         $participant = $this->findParticipation($student, $assessment);
         $plan = $participant->getPlan();
 
+        if (!$plan->isDynamic()) {
+            // Plan is custom, so participation should only be removed explicitly by a teacher.
+            return false;
+        }
+
         $contextFolder = $assessment->getContextFolder();
         $externalClassHandler = new External_Class();
         $studentsInClassList = $externalClassHandler->getStudents($contextFolder->getCodeString());
@@ -272,9 +277,6 @@ class InteractionIntegrityChecker
                 // The student is in the assessment's context's folder's group, so remains a participant.
                 return false;
             }
-        }
-
-        if ($plan->isDynamic()) {
         }
 
         if ($assessment->getQuiz() instanceof QuizModel) {
