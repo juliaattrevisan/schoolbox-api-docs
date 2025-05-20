@@ -134,14 +134,14 @@ test.describe("Unit Planner Tests", () => {
         await curriculumSelector.saveModal(); // Select Select, closing the modal
 
         tester.isGoingTo("check the selected curriculum codes are visible");
-        await expect(page.locator(`a[href="#257"]`)).toBeVisible();
+        await expect(page.locator(`a[href="#257"]`)).toBeVisible(); // the curriculum code link
         await expect(page.locator("div.unit-planner")).toContainText("[ACHHK078]");
         await expect(page.locator("div.unit-planner")).toContainText("Year 4 History");
         await expect(page.locator("div.unit-planner")).toContainText("First Contacts");
 
         tester.isGoingTo("check the curriculum codes are visible in the curriculum overview tab");
         await unitPlanner.clickUnitPlannerTabs("Curriculum Overview");
-        await expect(page.locator(`a[href="#257"]`)).toBeVisible();
+        await expect(page.locator(`a[href="#257"]`)).toBeVisible(); // the curriculum code link
         await expect(page.locator("div.unit-planner")).toContainText("[ACHHK078]");
         await expect(page.locator("div.unit-planner")).toContainText("Year 4 History");
         await expect(page.locator("div.unit-planner")).toContainText("First Contacts");
@@ -153,22 +153,22 @@ test.describe("Unit Planner Tests", () => {
                 `div[class="component-container Schoolbox_Curriculum_Component_CurriculumOverviewController"]`,
             ),
         ).toBeVisible();
-        await expect(page.locator("ul.nodes.l-flex-col")).toContainText("[ACHHK078]");
-        await expect(page.locator("ul.nodes.l-flex-col")).toContainText("Year 4 History");
+        await expect(page.getByTestId("fn-list-container")).toContainText("[ACHHK078]");
+        await expect(page.getByTestId("fn-list-container")).toContainText("Year 4 History");
 
         tester.isGoingTo("delete the node via unit planner and ensure it is not visible");
         await unitPlanner.goto(6);
         await unitPlanner.clickUnitPlannerTabs("All");
         await unitPlanner.clickRemoveNodeIcon(257);
         await unitPlanner.clickConfirmDeleteNodeButton(folderId);
-        await expect(page.locator(`a[href="#257"]`)).not.toBeVisible();
+        await expect(page.locator(`a[href="#257"]`)).not.toBeVisible(); // the curriculum code link
         await expect(page.locator("div.unit-planner")).not.toContainText("[ACHHK078]");
         await expect(page.locator("div.unit-planner")).not.toContainText("Year 4 History");
         await expect(page.locator("div.unit-planner")).not.toContainText("First Contacts");
 
         tester.isGoingTo("check the curriculum codes are not visible in the curriculum overview tab");
         await unitPlanner.clickUnitPlannerTabs("Curriculum Overview");
-        await expect(page.locator(`a[href="#257"]`)).not.toBeVisible();
+        await expect(page.locator(`a[href="#257"]`)).not.toBeVisible(); // the curriculum code link
         await expect(page.locator("div.unit-planner")).not.toContainText("[ACHHK078]");
         await expect(page.locator("div.unit-planner")).not.toContainText("Year 4 History");
         await expect(page.locator("div.unit-planner")).not.toContainText("First Contacts");
@@ -180,7 +180,7 @@ test.describe("Unit Planner Tests", () => {
                 `div[class="component-container Schoolbox_Curriculum_Component_CurriculumOverviewController"]`,
             ),
         ).toBeVisible();
-        await expect(page.locator("ul.nodes.l-flex-col")).not.toBeVisible();
+        await expect(page.getByTestId("fn-list-container")).not.toBeVisible();
         await expect(page.locator("div.empty-state")).toBeVisible();
     });
 
