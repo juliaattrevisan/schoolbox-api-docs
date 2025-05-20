@@ -304,7 +304,7 @@ class InteractionIntegrityChecker
         }
 
         // There are no reasons for this student to remain a participant of the assessment, so remove participation.
-        $this->participantMapper->delete($participant);
+//        $this->participantMapper->delete($participant);
         return true;
     }
 
