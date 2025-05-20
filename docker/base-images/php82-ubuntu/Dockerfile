@@ -53,7 +53,8 @@ RUN \
     git \
     mariadb-client \
     ffmpeg \
-    unixodbc-dev
+    unixodbc-dev \
+    imagemagick
 
 # Install XDebug on non-production:
 # for some reason, `apt-get install php8.2-xdebug` doesn't install it
@@ -81,6 +82,7 @@ RUN \
 # Install ODBC driver
 COPY ./opt/bin/install-odbc-driver.sh /opt/bin/install-odbc-driver.sh
 RUN /opt/bin/install-odbc-driver.sh
+
 
 # Install pdo_sqlsrv
 RUN <<EOF
