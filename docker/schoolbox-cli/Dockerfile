@@ -9,6 +9,8 @@ FROM --platform=linux/${ARCH} php82-ubuntu
 # Also, install tools required by cron tasks and CLI:
 # git, mariadb client, ffmpeg, imagemagick
 RUN \
+  apt-get update && \
+  apt-get install -y gnupg && \
   echo "deb https://cli.intellischool.net/channels/stable/apt/ /" > /etc/apt/sources.list.d/intelliscl.list && \
   apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 88C06AD00AA2BB47 && \
   rm /etc/apt/trusted.gpg.d/intellischool.gpg 2> /dev/null || echo > /dev/null && \
@@ -20,5 +22,6 @@ RUN \
     mariadb-client \
     ffmpeg \
     imagemagick && \
+  apt-get remove -y gnupg && \
   apt-get autoremove -y && \
   apt-get clean -y
