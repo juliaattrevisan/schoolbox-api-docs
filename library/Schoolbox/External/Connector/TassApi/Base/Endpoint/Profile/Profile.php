@@ -956,7 +956,7 @@ class Profile implements IStrategy
                 'teacher_photo' => $teacherPhoto,
                 'position' => $position,
                 'work_phone' => '',
-                'campuses' => $employee['campuses'],
+                'campuses' => $employee['campuses'] ?? null,
             ];
         }
 
