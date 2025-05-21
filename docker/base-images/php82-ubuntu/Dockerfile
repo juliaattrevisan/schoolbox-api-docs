@@ -80,3 +80,7 @@ COPY ./config/* /etc/php/8.2/cli/conf.d/
 # schoolbox-instance-registry and schoolbox-read-instances:
 # copy from puppet-alaress as-is for now
 COPY ./usr/local/bin/* /usr/local/bin/
+
+# Cheat by linking /usr/local/bin/php to /usr/bin/php:
+# all of our scripts have shebang lines referencing that.
+RUN ln -s /usr/local/bin/php /usr/bin/php
