@@ -21,15 +21,6 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
 ARG ENV
 ENV DEBIAN_FRONTEND noninteractive
 
-# Setup ondrej/php repo
-RUN \
-  apt-get update && \
-  apt-get install -y language-pack-en-base software-properties-common && \
-  export LC_ALL=en_US.UTF-8 && \
-  export LANG=en_US.UTF-8 && \
-  add-apt-repository -y ppa:ondrej/php && \
-  apt-get update
-
 # Install PHP dependencies, as well as likely requirements, as per
 # https://schoolbox.atlassian.net/wiki/spaces/DEV/pages/2584313884/Services+within+Schoolbox#Execution-of-shell-commands
 # Command-line tools will only be installed in the CLI box, though.
