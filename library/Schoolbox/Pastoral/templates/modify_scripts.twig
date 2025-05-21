@@ -3,6 +3,7 @@
 <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/select-all/attacher.select-all.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/chained/jquery.chained.min.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/form/jquery.alaressValidate.js?v={{ config.site_version }}"></script>
 {% autoescape('js') %}
 <script type="text/javascript">
     $(function () {
@@ -190,11 +191,6 @@
 
         $.validator.format("You must select at least one student before you can proceed"));
 
-        $.validator.addMethod("dateDDMMYYYY", function(value, element) {
-            return this.optional(element) || /^\d{2}\/\d{2}\/\d{4}$/.test(value);
-        }, "Please enter a valid date");
-
-
         form.alaressValidate({
             ignore: ':disabled',
             rules: {
@@ -210,10 +206,10 @@
                     },
                 },
                  occurredOn: {
-                    dateDDMMYYYY: true,
+                     numericalDateFormat: true,
                 },
                 expiresAt: {
-                    dateDDMMYYYY: true,
+                     numericalDateFormat: true,
 
                 },
                 points: {
