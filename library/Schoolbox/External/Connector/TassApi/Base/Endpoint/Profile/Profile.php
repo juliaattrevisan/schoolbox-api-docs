@@ -898,7 +898,7 @@ class Profile implements IStrategy
             if ('' !== (string)$teacher['employee_code']) {
                 /* Appending campus data to the teaching staff
                  */
-                $teacher['campuses'] = $employeeSetDedupe[$teacher['employee_code']]['campuses'] ?? [];
+                $teacher['campuses'] = $employeeSetDedupe[$teacher['employee_code']]['campuses'] ?? null;
                 unset($employeeSetDedupe[$teacher['employee_code']]);
 
                 $this->log->debug(sprintf(
