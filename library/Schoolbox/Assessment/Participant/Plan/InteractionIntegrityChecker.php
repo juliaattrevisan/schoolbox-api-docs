@@ -13,9 +13,6 @@ namespace Schoolbox\Assessment\Participant\Plan;
 use External_Class;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkModel;
-use Schoolbox\Learning\Assessment\Quiz\Model as QuizModel;
-use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Assessment\Participant;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -46,11 +43,6 @@ class InteractionIntegrityChecker
      */
     private $userAccessMapper;
 
-    /**
-     * @var QuizAttemptMapper
-     */
-    private $quizAttemptMapper;
-
 
     /**
      * @param Mapper             $planMapper
@@ -61,7 +53,6 @@ class InteractionIntegrityChecker
         $this->planMapper        = $planMapper;
         $this->participantMapper = $participantMapper;
         $this->userAccessMapper  = new UserAccessMapper(); // TODO: Pass to constructor?
-        $this->quizAttemptMapper = new QuizAttemptMapper(); // TODO: Pass to constructor to avoid causing an infinite loop.
     }
 
 
@@ -273,33 +264,9 @@ class InteractionIntegrityChecker
             }
         }
 
-        if ($assessment->getQuiz() instanceof QuizModel) {
-            $quiz = $assessment->getQuiz();
-            $attempts = $this->quizAttemptMapper->findByColumnList(
-                [
-                    'assess_id' => $quiz->getId(),
-                    'user_id' => $student->getId()
-                ]
-            );
-
-            // Checking rule (3)...
-            if (count($attempts) > 0) {
-                // The student has submitted a (non-deleted) response for this assessment.
-                return true;
-            }
-
-            // Checking rule (4)...
-        } elseif ($assessment->getDueWork() instanceof DueWorkModel) {
-            $dueWork = $assessment->getDueWork();
-
-            // Handle assessments other than quizzes.
-
-            // Checking rule (3)...
-
-            // Checking rule (4)...
-        }
-
-        // There are no reasons for this student to remain a participant of the assessment, so remove participation.
+        // Rules (3) and (4) should have been checked in the calling function (in an assessment type's mapper).
+        // Since all the rules have been checked, there are no reasons for this student to remain a participant of
+        // the assessment.
         $this->participantMapper->delete($participant);
         return true;
     }
