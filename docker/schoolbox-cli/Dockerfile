@@ -25,3 +25,5 @@ RUN \
   apt-get remove -y gnupg && \
   apt-get autoremove -y && \
   apt-get clean -y
+
+WORKDIR /usr/share/schoolbox
