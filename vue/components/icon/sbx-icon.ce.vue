@@ -1753,9 +1753,12 @@ function alertInvalidIconName(): false {
 
 <style lang="scss" scoped>
 .sbx-icon {
+    align-items: center;
     color: v-bind(color);
     height: v-bind(computedSize);
     vertical-align: middle; // Ensure the icon is vertically centered when used inline with text
+    display: flex;
+    justify-content: center;
     width: v-bind(computedSize);
     &__svg {
         fill: currentColor;
