@@ -123,7 +123,7 @@ class Sync extends Base implements ISync
                       sups.department          AS staff_department,
                       ''                       AS staff_year_level,
                       ''                       AS staff_year_level_description,
-                      ''                       AS staff_house
+                      sups.house_name          AS staff_house
             FROM      {$userProfileTable} sup
             JOIN      {$staffProfileTable} sups ON sup.id = sups.sis_user_profile_id
             ORDER BY  sup.external_id ASC
