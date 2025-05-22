@@ -30,6 +30,7 @@ class CompletionMapper extends Mapper
      */
     private $interactionChecker;
 
+
     public function __construct()
     {
         parent::__construct();
