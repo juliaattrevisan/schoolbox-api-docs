@@ -13,7 +13,7 @@ test.describe("Curriculum Selector Tests", () => {
     });
 
     test("Curriculum can be selected in the 'All' tab", async ({ tester, page }) => {
-        const curriculumSelector = new CurriculumSelector(page);
+        const curriculumSelector = new CurriculumSelector(tester, page);
 
         tester.isGoingTo("Modify the To Kill a Mockingbird unit");
         await page.goto("/resource/folder/89/modify");
@@ -33,7 +33,7 @@ test.describe("Curriculum Selector Tests", () => {
     });
 
     test("Curriculum can be unselected in the 'All' tab", async ({ tester, page }) => {
-        const curriculumSelector = new CurriculumSelector(page);
+        const curriculumSelector = new CurriculumSelector(tester, page);
 
         tester.isGoingTo("Modify the To Kill a Mockingbird unit");
         await page.goto("/resource/folder/89/modify");
@@ -50,6 +50,7 @@ test.describe("Curriculum Selector Tests", () => {
         await curriculumSelector.expectSelectedToContain("ELBE1174"); // the child node of ACELA1552
 
         tester.isGoingTo("Remove ACELA1552 from the selected curriculum");
+        await curriculumSelector.clickBrowse();
         await curriculumSelector.selectNodes([146]);
         await curriculumSelector.saveModal();
 
@@ -61,7 +62,7 @@ test.describe("Curriculum Selector Tests", () => {
         tester,
         page,
     }) => {
-        const curriculumSelector = new CurriculumSelector(page);
+        const curriculumSelector = new CurriculumSelector(tester, page);
 
         tester.isGoingTo("Add a new lesson plan to Romeo and Juliet");
         await page.goto("/learning/unitspecs/15/assessments/new?lpt=2&type=lessonPlan&returnUrl=L2NvdXJzZS9wbGFuLzY=");
@@ -74,7 +75,7 @@ test.describe("Curriculum Selector Tests", () => {
     });
 
     test("Tabs visible on unit page with curriculum already assigned to course", async ({ tester, page }) => {
-        const curriculumSelector = new CurriculumSelector(page);
+        const curriculumSelector = new CurriculumSelector(tester, page);
 
         tester.isGoingTo("Add a new lesson plan to Romeo and Juliet");
         await page.goto("/resource/folder/89/modify");
@@ -87,7 +88,7 @@ test.describe("Curriculum Selector Tests", () => {
     });
 
     test("Can select nodes within the 'Current' tab", async ({ tester, page }) => {
-        const curriculumSelector = new CurriculumSelector(page);
+        const curriculumSelector = new CurriculumSelector(tester, page);
 
         tester.isGoingTo("Add a new lesson plan to Romeo and Juliet");
         await page.goto("/learning/unitspecs/15/assessments/new?lpt=2&type=lessonPlan&returnUrl=L2NvdXJzZS9wbGFuLzY=");
@@ -104,7 +105,7 @@ test.describe("Curriculum Selector Tests", () => {
     });
 
     test("Tabs not visible on lesson plan page with no unit curriculum assigned", async ({ tester, page }) => {
-        const curriculumSelector = new CurriculumSelector(page);
+        const curriculumSelector = new CurriculumSelector(tester, page);
 
         tester.isGoingTo("Add a new lesson plan to To Kill a Mockingbird");
         await page.goto("learning/unitspecs/16/assessments/new?lpt=2&type=lessonPlan&returnUrl=L2NvdXJzZS9wbGFuLzY=");
