@@ -16,10 +16,26 @@ FROM --platform=linux/${ARCH} php:8.2-cli-bookworm
 # Use install-php-extensions script, and install extensions with that
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
-# Ensure ENV is accessible by this build step:
-# otherwise, xDebug will be installed below.
-ARG ENV
-ENV DEBIAN_FRONTEND noninteractive
+# Copy configuration files
+RUN <<EOF
+case "$ENV" in
+  prod | production)
+    ln -s /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
+    ;;
+  *)
+    ln -s /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini
+    ;;
+esac
+EOF
+COPY ./config/php/* /usr/local/etc/php/conf.d/
+
+# schoolbox-instance-registry and schoolbox-read-instances:
+# copy from puppet-alaress as-is for now
+COPY ./usr/local/bin/* /usr/local/bin/
+
+# Cheat by linking /usr/local/bin/php to /usr/bin/php:
+# all of our scripts have shebang lines referencing that.
+RUN ln -s /usr/local/bin/php /usr/bin/php
 
 # Install PHP dependencies, as well as likely requirements, as per
 # https://schoolbox.atlassian.net/wiki/spaces/DEV/pages/2584313884/Services+within+Schoolbox#Execution-of-shell-commands
@@ -52,26 +68,13 @@ RUN install-php-extensions \
     libxml \
     opcache
 
-# Install XDebug on non-production, also copy base config
+# Install XDebug on non-production images
 RUN <<EOF
 case "$ENV" in
   prod | production)
-    ln -s /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
     ;;
   *)
     install-php-extensions xdebug
-    ln -s /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini
     ;;
 esac
 EOF
-
-# Copy configuration files
-COPY ./config/php/* /usr/local/etc/php/conf.d/
-
-# schoolbox-instance-registry and schoolbox-read-instances:
-# copy from puppet-alaress as-is for now
-COPY ./usr/local/bin/* /usr/local/bin/
-
-# Cheat by linking /usr/local/bin/php to /usr/bin/php:
-# all of our scripts have shebang lines referencing that.
-RUN ln -s /usr/local/bin/php /usr/bin/php
