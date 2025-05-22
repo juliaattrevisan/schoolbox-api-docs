@@ -44,6 +44,11 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
      */
     private $interactionChecker;
 
+    /**
+     * @var StudentSubmissionMapper
+     */
+    private $submissionMapper;
+
 
     public function __construct()
     {
@@ -52,6 +57,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
             Participant\Plan\Mapper::getInstance(),
             Participant\Mapper::getInstance()
         );
+        $this->submissionMapper = new StudentSubmissionMapper();
     }
 
 
@@ -89,6 +95,8 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
 
         // SoftDelete/Restore weak entities
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteReturnedWorkFiles']);
+        $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'removeParticipationIfNecessary']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'removeParticipationIfNecessary']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'persistFiles']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'canParticipate']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateNormMark']);
@@ -100,6 +108,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
 //        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'syncToExternalMarkbook']);
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'syncToExternalMarkbook']);
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreReturnedWorkFiles']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'insertParticipation']);
     }
 
     /**
@@ -159,6 +168,48 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
         return true;
     }
 
+
+    /**
+     * Remove the participant if $student should no longer be a participant in $assessment.
+     *
+     * @param ReturnedWork $object
+     * @return bool - Return true on success - whether or not a participation was removed.
+     *                This is the expected behaviour for callbacks registered with Schoolbox\Mapper.
+     */
+    public function removeParticipationIfNecessary(ReturnedWork $object): bool
+    {
+        $student = $object->getOwner();
+        $submissionBox = $object->getSubmissionBox();
+
+        // If any (non-deleted) response or feedback exists, the student should remain a participant.
+        // In this case:
+        //  * the response is stored in the student_submission table
+        //  * the feedback is stored in the submission_return table.
+
+        $submissionCountByBoxId = $this->submissionMapper->findCountsForSubmissionBoxes(
+            [$submissionBox->getId()],
+            $student->getId()
+        );
+        $submissionCountForThisBox = $submissionCountByBoxId[$submissionBox->getId()];
+        if ($submissionCountForThisBox > 0) {
+            // A response was found, so the student should remain a participant.
+            return true;
+        }
+
+        $feedbackCountByBoxId = $this->findCountsForSubmissionBoxes([$submissionBox->getId()], $student->getId());
+        $feedbackCountForThisBox = $feedbackCountByBoxId[$submissionBox->getId()];
+        if ($feedbackCountForThisBox > 0) {
+            // A feedback was found, so the student should remain a participant.
+            return true;
+        }
+
+        return $this->interactionChecker->removeParticipationIfNoInteractionsRemain(
+            $student,
+            $object->getSubmissionBox()->getAssessmentModel()
+        );
+    }
+
+
     /**
      * If a resubmission is requested and create an extension for the user
      *
@@ -175,6 +226,8 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
         }
         return true;
     }
+
+
     /**
      * Soft deletes all Files for the specified Return
      *

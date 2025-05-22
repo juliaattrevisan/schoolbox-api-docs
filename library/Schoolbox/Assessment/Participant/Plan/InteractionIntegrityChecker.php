@@ -278,7 +278,7 @@ class InteractionIntegrityChecker
         // Note rules (3) and (4) should have been checked in the calling function (in an assessment type's mapper).
 
         // Since all the rules have been checked, there are no reasons for this student to remain a participant.
-        $this->participantMapper->delete($participant);
+//        $this->participantMapper->delete($participant);
         return true;
     }
 

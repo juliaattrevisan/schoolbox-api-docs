@@ -103,8 +103,8 @@ class Mapper extends BaseMapper
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'canParticipate']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'insertParticipation']);
 
-        $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'removeParticipationIfNoInteractionsRemain']);
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'removeParticipationIfNoInteractionsRemain']);
+        $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'removeParticipationIfNecessary']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'removeParticipationIfNecessary']);
 
         // Markbook sync
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'syncToExternalMarkbook']);
@@ -155,20 +155,20 @@ class Mapper extends BaseMapper
 
 
     /**
-     * Remove the participant if $student is no longer a participant in $assessment.
+     * Remove the participant if $student should no longer be a participant in $assessment.
      *
      * @param Model $object
      * @return bool - Return true on success - whether or not a participation was removed.
      *                This is the expected behaviour for callbacks registered with Schoolbox\Mapper.
      */
-    public function removeParticipationIfNoInteractionsRemain(Model $object): bool
+    public function removeParticipationIfNecessary(Model $object): bool
     {
         $student = $object->getUser();
         $quiz = $object->getQuiz();
 
         if ($this->getAttemptCountForStudent($quiz->getId(), $student->getId()) > 0) {
-            // If any (non-deleted) attempt or feedback exists, the student should remain a participant.
-            // Note for quizzes, both the attempt and the feedback are stored in the assess_attempt table.
+            // If any (non-deleted) response or feedback exists, the student should remain a participant.
+            // The response and feedback for quizzes are both stored in the assess_attempt table.
             return true;
         }
 
