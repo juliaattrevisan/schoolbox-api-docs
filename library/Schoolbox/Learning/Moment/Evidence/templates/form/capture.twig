@@ -25,7 +25,10 @@
                             preview.classList.remove('hide');
                             preview.src = reader.result;
                             player = new MediaElementPlayer(previewId, {
-                                iconSprite: `${window.cdnPrefix}/images/resources/mejs-controls.svg`,
+                                // Override the default iconSprite reference and leave blank to avoid load error
+                                // CSS is used to display the icons instead
+                                // refer to https://github.com/mediaelement/mediaelement/blob/master/docs/api.md#configuration
+                                iconSprite: ``,
                             });
                             player.load();
                         });
