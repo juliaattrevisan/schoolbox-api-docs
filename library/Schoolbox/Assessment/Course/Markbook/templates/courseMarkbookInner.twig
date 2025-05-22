@@ -268,7 +268,6 @@
                                         title="Incomplete"
                                         data-progress-tick-status="incomplete"></div>
                                 {% else %}
-                                    {% set participationRoute = routeLookup('learningAssessment.getSummary', {assessmentId: aImpl.id, studentId: student.id}) %}
                                     {% set comment            = studentComments[courseImpl.id][student.id][assessment.id] ?? '' %}
                                     {% set marks              = studentMarks[courseImpl.id][assessment.id][student.id] ?? null %}
                                     {% set publishedMark      = marks.published ?? null %}
@@ -283,8 +282,7 @@
                                         <span data-learner-mark style="display: none">{{ decorator.label(participant, true, false) }}</span>
                                     </span>
                                     {% if marks.draft is defined %}
-                                        <a
-                                            href="{{ participationRoute }}"
+                                        <span
                                             data-draft-mark
                                             style="display: none"
                                             data-tooltip="right"
@@ -294,7 +292,7 @@
                                         >
                                             <span data-instructor-mark>{{ decorator.label(participant, false, true) }}</span>
                                             <span data-learner-mark style="display: none">{{ decorator.label(participant, false, false) }}</span>
-                                        </a>
+                                        </span>
                                     {% endif %}
                                     {% if participant.hasSubmittedResponse or participant.resubmissionRequired or participant.hasPublishedFeedback or draftMark %}
                                         <span class="legend-indicator indicator-{{ decorator.indicator(participant, draftMark) }}" title="{{ decorator.notchTitle(participant, draftMark) }}"></span>
