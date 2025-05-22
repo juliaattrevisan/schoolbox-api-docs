@@ -25,6 +25,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\ExternalMarkbook\Adapter as MarkbookAdapter;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
 
@@ -176,8 +177,16 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
     public function removeParticipationIfNecessary(ReturnedWork $object): bool
     {
         $student = $object->getOwner();
-        $submissionBox = $object->getSubmissionBox();
         $submissionBoxMapper = $this->getSubmissionBoxMapper();
+
+        // The SubmissionBox obtained by $object->getSubmissionBox() will not be hydrated (but it will have an ID).
+        // Get a hydrated SubmissionBox.
+        try {
+            $submissionBox = $submissionBoxMapper->findById($object->getSubmissionBox()->getId());
+        } catch (MapperException) {
+            // Can't get a $submissionBox - assume the student should still be a participant.
+            return true;
+        }
 
         // If any (non-deleted) response or feedback exists, the student should remain a participant.
         // In this case:
@@ -206,7 +215,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
 
         return $this->interactionChecker->removeParticipationIfNoInteractionsRemain(
             $student,
-            $object->getSubmissionBox()->getAssessmentModel()
+            $submissionBox->getAssessmentModel()
         );
     }
 
