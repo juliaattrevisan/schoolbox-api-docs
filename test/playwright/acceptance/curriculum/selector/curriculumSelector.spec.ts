@@ -50,6 +50,7 @@ test.describe("Curriculum Selector Tests", () => {
         await curriculumSelector.expectSelectedToContain("ELBE1174"); // the child node of ACELA1552
 
         tester.isGoingTo("Remove ACELA1552 from the selected curriculum");
+        await curriculumSelector.clickBrowse();
         await curriculumSelector.selectNodes([146]);
         await curriculumSelector.saveModal();
 
