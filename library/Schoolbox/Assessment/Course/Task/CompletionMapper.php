@@ -150,7 +150,8 @@ class CompletionMapper extends Mapper
             return true;
         }
 
-        return $this->interactionChecker->removeParticipationIfNoInteractionsRemain($student, $assessment);
+        $this->interactionChecker->removeParticipationIfNoInteractionsRemain($student, $assessment);
+        return true;
     }
 
 

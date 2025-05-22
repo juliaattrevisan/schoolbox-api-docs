@@ -186,7 +186,8 @@ class Mapper extends BaseMapper
             return true;
         }
 
-        return $this->interactionChecker->removeParticipationIfNoInteractionsRemain($student, $assessment);
+        $this->interactionChecker->removeParticipationIfNoInteractionsRemain($student, $assessment);
+        return true;
     }
 
 

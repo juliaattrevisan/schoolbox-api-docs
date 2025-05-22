@@ -225,24 +225,22 @@ class InteractionIntegrityChecker
      *
      * @param User             $student
      * @param Assessment\Model $assessment
-     * @return bool - Return true on success - whether or not a participation was removed.
-     *                This is the expected behaviour for callbacks registered with Schoolbox\Mapper.
      */
-    public function removeParticipationIfNoInteractionsRemain(User $student, Assessment\Model $assessment): bool
+    public function removeParticipationIfNoInteractionsRemain(User $student, Assessment\Model $assessment): void
     {
         $this->loadPlansAndParticipants($assessment);
         $participant = $this->findParticipation($student, $assessment);
 
         if ($participant === null) {
             // The student is no longer a participant, so nothing to do here.
-            return true;
+            return;
         }
 
         $plan = $participant->getPlan();
 
         if (!$plan->isDynamic()) {
             // Plan is custom, so participation should only be removed explicitly by a teacher.
-            return true;
+            return;
         }
 
         // The below line works, but $assessment->getContextFolder() returns null.  Why?
@@ -254,7 +252,7 @@ class InteractionIntegrityChecker
         // Checking rule (1)...
         if (in_array($student->getExternalId(), $studentExternalIdsInClassList)) {
             // The student is in the class list, so remains a participant.
-            return true;
+            return;
         }
 
         // Checking rule (2)...
@@ -267,7 +265,7 @@ class InteractionIntegrityChecker
             $groupMemberUserIds = $userAccessList->keys();
             if (in_array($student->getId(), $groupMemberUserIds)) {
                 // The student is in the assessment's context's folder's group, so remains a participant.
-                return true;
+                return;
             }
         }
 
@@ -279,7 +277,6 @@ class InteractionIntegrityChecker
         } catch (Exception) {
             // Couldn't delete participation, probably because it has already been deleted.
         }
-        return true;
     }
 
 
