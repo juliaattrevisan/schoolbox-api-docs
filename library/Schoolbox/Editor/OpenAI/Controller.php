@@ -212,7 +212,7 @@ class Controller extends Base
                 $this->client,
                 $this->errorMapper,
                 $this->logMapper,
-            ))->littleRobotDude($this->getUser(), $this->request->getBody()->getContents());
+            ))->aiAssistantChat($this->getUser(), $this->request->getBody()->getContents());
         } catch (\DomainException $e) {
             /* Not configured? Not found
              */

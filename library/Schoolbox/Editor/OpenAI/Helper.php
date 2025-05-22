@@ -214,7 +214,7 @@ class Helper
 
 
     /**
-     * Asynchronously sends a request to the OpenAI API and returns the response to the user.
+     * Asynchronously sends a request to the OpenAI API Chat and returns the response to the user.
      * then die()
      *
      * This is used by Little Robot Dude in the ckeditor ai assistant plugin thing
@@ -226,7 +226,7 @@ class Helper
      * @throws \JsonException
      * @throws Exception
      */
-    public function littleRobotDude(User $user, string $payload): void
+    public function aiAssistantChat(User $user, string $payload): void
     {
         /* Assert that we're configured correctly
          */
