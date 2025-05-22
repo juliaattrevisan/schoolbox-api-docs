@@ -1,6 +1,6 @@
 ARG ARCH=amd64
 
-FROM --platform=linux/${ARCH} php82-ubuntu
+FROM --platform=linux/${ARCH} php82-bookworm
 
 # Install Intellischool CLI client, as per instructions on
 # https://docs.intellischool.co/guides/cli-quickstart#install-debian-ubuntu:
