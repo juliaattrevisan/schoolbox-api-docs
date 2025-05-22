@@ -438,6 +438,10 @@ class Helper
                 if (isset($json['usage']['completion_tokens'])) {
                     $stats['output_tokens'] = $json['usage']['completion_tokens'];
                 }
+                if ($stats['model'] && $stats['input_tokens'] && $stats['output_tokens']) {
+                    // found all the things, exit early
+                    return $stats;
+                }
             }
         }
 
