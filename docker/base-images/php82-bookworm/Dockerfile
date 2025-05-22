@@ -68,6 +68,9 @@ RUN install-php-extensions \
     libxml \
     opcache
 
+# Copy non-broken Imagemagick config, only after installing Imagemagick
+COPY ./config/imagemagick/* /etc/ImageMagick-6/
+
 # Install XDebug on non-production images
 RUN <<EOF
 case "$ENV" in
