@@ -66,7 +66,7 @@ esac
 EOF
 
 # Copy configuration files
-COPY ./config/* /etc/php/8.2/cli/conf.d/
+COPY ./config/php/* /usr/local/etc/php/conf.d/
 
 # schoolbox-instance-registry and schoolbox-read-instances:
 # copy from puppet-alaress as-is for now
