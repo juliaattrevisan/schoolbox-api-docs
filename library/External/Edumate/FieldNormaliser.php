@@ -1,0 +1,87 @@
+<?php
+
+namespace External\Edumate;
+
+/**
+ * A $student record consists of multiple (key, value) tuples
+ * where the keys are in all uppercase, like this:
+ *
+    [FIRSTNAME] => Paul
+    [PREFERREDNAME] =>
+    [LASTNAME] => Muad'dib
+    [SYNERGY_ID] => 12345
+    [YEARLEVEL] => 07
+    [HOUSE] => Atreides
+    [STUDENTMEDICALALERT] =>
+    [STUDENTSPECIALNEEDSFLAG] =>
+    [ENGLISHSECONDFLAG] =>
+    [STUDENTTUTORDESCRIPTION] =>
+
+ * This is totally inconsistent with the rest of the world, because db2
+ * works in a special way. To make it consistent with the rest of the world
+ * we need to change the case back to camelcase manually.
+ */
+
+class FieldNormaliser
+{
+    /* These are case-sensitive fields from literally everywhere
+     */
+    private const CASE_SENSITIVE_FIELDS = [
+        'StudentID',
+        'StudentGiven1',
+        'StudentSurname',
+        'StudentBirthDate',
+        'StudentHouseDescription',
+        'StudentYearLevel',
+        'TeacherFormID',
+        'StudentTutor',
+        'StudentTutorDescription',
+        'StudentHeadOfHouse',
+        'StudentForm',
+        'StudentFormStaffName',
+        'StudentEmergencyName',
+        'StudentEmergencyPhone',
+        'StudentMobilePhone',
+        'EnglishSecondFlag',
+        'ParentsSeparatedFlag',
+        'StudentMedicalAlert',
+        'StudentSpecialNeedsFlag',
+        'StudentContactID',
+        'StudentContactTitle',
+        'StudentContactPreferred',
+        'StudentContactSurname',
+        'StudentContactDefaultEmail',
+        'StudentContactPhoneActual',
+        'StudentContactSilentPhoneFlag',
+        'StudentContactMobilePhone',
+        'StudentContactOccupPhone',
+        'StudentContactSpouseID',
+        'StudentContactSpouseTitle',
+        'StudentContactSpousePreferred',
+        'StudentContactSpouseSurname',
+        'StudentContactSpouseMobilePhone',
+        'StudentContactSpouseOccupPhone',
+        'StudentContactSpouseDefaultEmail',
+        'StudentContactType',
+    ];
+
+
+    /**
+     * Convert uppercase array keys to camelcase array keys from a known list
+     *
+     * @param array $record
+     * @return array
+     */
+    public function normalise(array $record): array
+    {
+        foreach (self::CASE_SENSITIVE_FIELDS as $field) {
+            $upper = strtoupper($field);
+            if (array_key_exists($upper, $record)) {
+                $record[$field] = $record[$upper];
+                unset($record[$upper]);
+            }
+        }
+
+        return $record;
+    }
+}

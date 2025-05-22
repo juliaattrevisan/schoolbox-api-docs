@@ -46,8 +46,11 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
 
         // manipulate
         $students = [];
+
+        $normaliser = new External\Edumate\FieldNormaliser();
+
         while ($student = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $students[$student['SYNERGY_ID']] = array_change_key_case($student, CASE_LOWER);
+            $students[$student['SYNERGY_ID']] = $normaliser->normalise($student);
         }
         return array_values($students);
     }
