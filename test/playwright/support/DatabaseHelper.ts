@@ -50,6 +50,10 @@ export default class DatabaseHelper {
             const criteriaKeys = Object.keys(pair);
             const criteriaValues = Object.values(pair);
 
+            if (criteriaKeys.length === 0) {
+                return;
+            }
+
             const clause = criteriaKeys
                 .map((key) => {
                     const value = pair[key];
