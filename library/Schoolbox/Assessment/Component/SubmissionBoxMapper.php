@@ -23,8 +23,6 @@ use Schoolbox\Learning\Assessment\DataModel\ExternalMarkbook\Adapter as Markbook
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Storage;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\User;
 
 /**
  * Class SubmissionBoxMapper
