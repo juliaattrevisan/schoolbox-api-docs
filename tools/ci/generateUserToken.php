@@ -40,6 +40,11 @@ $app = new class extends CliTool\App
         ];
     }
 
+    /** @inheritDoc */
+    public function runAsRoot(): ?bool
+    {
+        return null;
+    }
 
     /**
      * Run the cli tool
