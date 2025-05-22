@@ -5,8 +5,11 @@
 
 import type { Page, Locator } from "@playwright/test";
 import { expect } from "@playwright/test";
+import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 
 export default class CurriculumSelector {
+    private tester: AcceptanceTester;
+
     private page: Page;
 
     static readonly DATA_TEST_BROWSE_BUTTON = "cs-search-input-browse-button";
@@ -29,7 +32,8 @@ export default class CurriculumSelector {
 
     static readonly DATA_TEST_SELECTED_NODES_CONTAINER = "cs-selected-nodes-container";
 
-    constructor(page: Page) {
+    constructor(tester: AcceptanceTester, page: Page) {
+        this.tester = tester;
         this.page = page;
     }
 
@@ -135,6 +139,7 @@ export default class CurriculumSelector {
     async saveModal($context?: Locator): Promise<void> {
         const context = $context || this.page;
         await context.getByTestId(CurriculumSelector.DATA_TEST_MODAL_SAVE_BUTTON).click();
+        await this.tester.common.waitForModalToBeClosed();
     }
 
     /**

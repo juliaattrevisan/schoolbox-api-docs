@@ -22,7 +22,7 @@ test.describe("Curriculum Coverage Report Tests", () => {
         const coverageReport = new CurriculumCoverageReport(page);
         const searchSelect = new SearchSelect(page);
         const searchSelectModal = new SearchSelectModal(page);
-        const curriculumSelector = new CurriculumSelector(page);
+        const curriculumSelector = new CurriculumSelector(tester, page);
         const common = new Common(page);
 
         tester.isGoingTo("Visit the curriculum coverage report page");

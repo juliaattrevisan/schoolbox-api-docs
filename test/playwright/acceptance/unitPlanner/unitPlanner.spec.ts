@@ -124,7 +124,7 @@ test.describe("Unit Planner Tests", () => {
     });
 
     test("Select, modify and remove curriculum codes", async ({ tester, page }) => {
-        const curriculumSelector = new CurriculumSelector(page);
+        const curriculumSelector = new CurriculumSelector(tester, page);
 
         tester.isGoingTo("select curriculum codes for the To Kill a Mockingbird unit");
         await unitPlanner.clickSelectCurriculumLink(toKillMockingbirdId); // Open the select courses modal
