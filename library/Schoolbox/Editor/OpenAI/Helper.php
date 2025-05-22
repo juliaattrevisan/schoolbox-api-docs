@@ -125,6 +125,11 @@ class Helper
             $response = $this->client->sendRequest($openAiRequest);
 
             http_response_code($response->getStatusCode());
+
+            $result = $response->getBody()->getContents();
+            $log->setResponse($result);
+            $data = json_decode($result, true, 512, JSON_THROW_ON_ERROR);
+
 //
 //            if ($response->getStatusCode() !== 200) {
 //                // store error in log
@@ -132,16 +137,12 @@ class Helper
 //                    ->setErrorMessage($response->getReasonPhrase());
 //                $this->logMapper->save($log);
 //            }
-        } catch (GuzzleException $e) {
+        } catch (GuzzleException | \JsonException $e) {
             $log->setReturnCode($e->getCode())
                 ->setErrorMessage($e->getMessage());
             $this->logMapper->save($log);
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
         }
-
-        $result = $response->getBody()->getContents();
-        $log->setResponse($result);
-        $data = json_decode($result, true);
 
         /* If something went wrong on the openAI side, it'll send us an "error" key
          * https://platform.openai.com/docs/api-reference/responses/object#responses/object-error
