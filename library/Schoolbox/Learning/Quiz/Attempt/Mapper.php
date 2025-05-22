@@ -155,16 +155,27 @@ class Mapper extends BaseMapper
 
 
     /**
+     * Remove the participant if $student is no longer a participant in $assessment.
+     *
      * @param Model $object
-     * @return bool
-     * @throws Deleted
-     * @throws Exception
-     * @throws NotFound
+     * @return bool - Return true on success - whether or not a participation was removed.
+     *                This is the expected behaviour for callbacks registered with Schoolbox\Mapper.
      */
-    private function removeParticipationIfNoInteractionsRemain(Model $object): bool
+    public function removeParticipationIfNoInteractionsRemain(Model $object): bool
     {
-        $assessment = $this->getQuizMapper()->findById($object->getQuiz()->getId())->getAssessmentModel();
-        return $this->interactionChecker->removeParticipationIfNoInteractionsRemain($object->getUser(), $assessment);
+        $student = $object->getUser();
+        $quiz = $object->getQuiz();
+
+        if ($this->getAttemptCountForStudent($quiz->getId(), $student->getId()) > 0) {
+            // If any (non-deleted) attempt or feedback exists, the student should remain a participant.
+            // Note for quizzes, both the attempt and the feedback are stored in the assess_attempt table.
+            return true;
+        }
+
+        return $this->interactionChecker->removeParticipationIfNoInteractionsRemain(
+            $student,
+            $quiz->getAssessmentModel()
+        );
     }
 
 
