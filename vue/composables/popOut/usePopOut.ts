@@ -193,7 +193,13 @@ export function usePopOut(
      * while also trying to keep it in the viewport
      */
     async function onButtonSelected(): Promise<void> {
-        if (content.value === null) throw new Error("Unable to open content - content element not found");
+        if (content.value === null) {
+            /**
+             * The user clicked the button before onMounted was called, this could happen if the page is slow to load
+             * At least attempt to find the content, if we're successful then all is good - otherwise it would've died anyway
+             */
+            await getContent();
+        }
         if (isOpen.value) {
             close();
             return;
