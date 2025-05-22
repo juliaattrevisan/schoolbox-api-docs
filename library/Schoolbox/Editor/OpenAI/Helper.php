@@ -144,9 +144,9 @@ class Helper
         $data = json_decode($result, true);
 
         /* If something went wrong on the openAI side, it'll send us an "error" key
-             * https://platform.openai.com/docs/api-reference/responses/object#responses/object-error
-             * If we get this, send on the human-readable message to the user
-             */
+         * https://platform.openai.com/docs/api-reference/responses/object#responses/object-error
+         * If we get this, send on the human-readable message to the user
+         */
         if ($data["error"] ?? null) {
             $returnCode = 500;
 
