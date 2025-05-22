@@ -14,6 +14,7 @@ use External_Class;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Assessment\Participant;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
@@ -226,7 +227,6 @@ class InteractionIntegrityChecker
      * @param Assessment\Model $assessment
      * @return bool - Return true on success - whether or not a participation was removed.
      *                This is the expected behaviour for callbacks registered with Schoolbox\Mapper.
-     * @throws \Exception
      */
     public function removeParticipationIfNoInteractionsRemain(User $student, Assessment\Model $assessment): bool
     {
@@ -239,30 +239,35 @@ class InteractionIntegrityChecker
             return true;
         }
 
-        $contextFolder = $assessment->getContextFolder();
-        $externalClassHandler = new External_Class();
-        $studentsInClassList = $externalClassHandler->getStudents($contextFolder->getCodeString());
-        $studentExternalIdsInClassList = array_map(fn ($student) => $student['synergy_id'], $studentsInClassList);
-
-        // Checking rule (1)...
-        if (in_array($student->getExternalId(), $studentExternalIdsInClassList)) {
-            // The student is in the class list, so remains a participant.
-            return true;
-        }
-
-        // Checking rule (2)...
-        // Code below copied from Group\Manage\Controller->getData().
-        if ($contextFolder->getGroup()) {
-            // The lowest access level is read-level, so all users in $userAccessList have read-level access.
-            $userAccessList = $this->userAccessMapper->findForFolder($contextFolder)
-                ->indexByCallback(fn (UserAccess $userAccess) => $userAccess->getUser()->getId());
-
-            $groupMemberUserIds = $userAccessList->keys();
-            if (in_array($student->getId(), $groupMemberUserIds)) {
-                // The student is in the assessment's context's folder's group, so remains a participant.
-                return true;
-            }
-        }
+// TODO: Figure out how to get assessment context, then uncomment below code.
+//        if ($assessment->getContextFolder() === null) {
+//            // Get assessment context somehow.  Possibly using mv_assessment_relation table.
+//        }
+//
+//        $contextFolder = $assessment->getContextFolder();
+//        $externalClassHandler = new External_Class();
+//        $studentsInClassList = $externalClassHandler->getStudents($contextFolder->getCodeString());
+//        $studentExternalIdsInClassList = array_map(fn ($student) => $student['synergy_id'], $studentsInClassList);
+//
+//        // Checking rule (1)...
+//        if (in_array($student->getExternalId(), $studentExternalIdsInClassList)) {
+//            // The student is in the class list, so remains a participant.
+//            return true;
+//        }
+//
+//        // Checking rule (2)...
+//        // Code below copied from Group\Manage\Controller->getData().
+//        if ($contextFolder->getGroup()) {
+//            // The lowest access level is read-level, so all users in $userAccessList have read-level access.
+//            $userAccessList = $this->userAccessMapper->findForFolder($contextFolder)
+//                ->indexByCallback(fn (UserAccess $userAccess) => $userAccess->getUser()->getId());
+//
+//            $groupMemberUserIds = $userAccessList->keys();
+//            if (in_array($student->getId(), $groupMemberUserIds)) {
+//                // The student is in the assessment's context's folder's group, so remains a participant.
+//                return true;
+//            }
+//        }
 
         // Note rules (3) and (4) should have been checked in the calling function (in an assessment type's mapper).
 
@@ -278,7 +283,6 @@ class InteractionIntegrityChecker
      * @param Assessment\Model $assessment
      * @throws SchoolboxMapper\DefinitionException
      * @throws InvalidArgumentException If assessment is not sufficiently hydrated
-     * @throws SchoolboxMapper\Exception
      */
     private function loadPlansAndParticipants(Assessment\Model $assessment): void
     {
