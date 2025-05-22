@@ -120,7 +120,7 @@ test.describe("Curriculum Selector Tests", () => {
         tester.isGoingTo("Visit Manage Rubric Capabilities for Year 9 English");
         await page.goto("/rubric/manager/87");
 
-        tester.isGoingTo("Open the modal and check for Text structure and organisation");
+        tester.isGoingTo("Open the modal and check for codes assigned to the course");
         await curriculumSelector.clickBrowse(page.getByTestId("curriculum-selector-1"));
         const modalContext = page.getByTestId("cs-modal-1");
         await expect(curriculumSelector.getModalTabs(modalContext)).toBeVisible();
@@ -138,12 +138,26 @@ test.describe("Curriculum Selector Tests", () => {
         tester.isGoingTo("Visit Manage Rubric Capabilities for Romeo and Juliet");
         await page.goto("/rubric/manager/88");
 
-        tester.isGoingTo("Open the modal and check for Text structure and organisation");
+        tester.isGoingTo("Open the modal and check for codes assigned to the unit");
         await curriculumSelector.clickBrowse(page.getByTestId("curriculum-selector-1"));
         const modalContext = page.getByTestId("cs-modal-1");
         await expect(curriculumSelector.getModalTabs(modalContext)).toBeVisible();
         await curriculumSelector.expectUnitModalToContainText("ACELA1556", modalContext);
         await curriculumSelector.expectUnitModalToContainText("ELBE1178", modalContext);
         await curriculumSelector.expectUnitModalToContainText("ACELA1560", modalContext);
+    });
+
+    test("Tabs not visible on unit manage rubric capabilities page with no curriculum already assigned to unit", async ({
+        tester,
+        page,
+    }) => {
+        const curriculumSelector = new CurriculumSelector(page);
+
+        tester.isGoingTo("Visit Manage Rubric Capabilities for To Kill a Mockingbird");
+        await page.goto("/rubric/manager/89");
+
+        tester.isGoingTo("Open the modal and check for Current/All Tabs");
+        await curriculumSelector.clickBrowse(page.getByTestId("curriculum-selector-1"));
+        await expect(curriculumSelector.getModalTabs()).not.toBeVisible();
     });
 });
