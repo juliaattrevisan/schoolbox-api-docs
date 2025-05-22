@@ -80,6 +80,24 @@
     };
 
     /**
+     * Date format validation method - works with a datepicker
+     * and uses the dateDisplayFormats.dayjs format from System Settings › Localisation
+     * to validate the date.
+     */
+    $.validator.addMethod(
+        "numericalDateFormat",
+        function (value, element) {
+            const expectedFormat = window.dateDisplayFormats.dayjs; // format from System Settings › Localisation
+            const date = dayjs(value, expectedFormat, true);
+            return this.optional(element) || date.isValid();
+        },
+        function (params, element) {
+            // Using a function so the error message reflects any runtime format changes
+            return `Please enter a date in the format: ${window.dateDisplayFormats.dayjs}`;
+        },
+    );
+
+    /**
      * Custom email validation method: allow any non-ASCII character
      */
     $.validator.methods.email = function (value, element) {
@@ -458,7 +476,6 @@
         },
         "Descriptor values must be an ascending or descending sequence",
     );
-
     /**
      * Default error placement method.
      *
