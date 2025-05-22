@@ -56,6 +56,13 @@ class CompletionMapper extends Mapper
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'canParticipate']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'insertParticipation']);
+
+        // Note regarding absence of post-delete callback for removing participation
+        // -------------------------------------------------------------------------
+        // No post-delete callback is required here (unlike other types of assessment e.g. 'due work' and 'quiz',
+        // because the UI provides no way for a user to delete the task_completion record that is added when a task is
+        // marked as completed.  All the user can do to reverse the act of marking a task as completed, is change the
+        // status of the task_completion row to 'incomplete'.
     }
 
 
