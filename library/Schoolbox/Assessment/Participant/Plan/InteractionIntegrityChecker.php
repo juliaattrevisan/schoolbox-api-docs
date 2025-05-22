@@ -227,7 +227,6 @@ class InteractionIntegrityChecker
      * @param Assessment\Model $assessment
      * @return bool - Return true on success - whether or not a participation was removed.
      *                This is the expected behaviour for callbacks registered with Schoolbox\Mapper.
-     * @throws Exception
      */
     public function removeParticipationIfNoInteractionsRemain(User $student, Assessment\Model $assessment): bool
     {
@@ -275,7 +274,11 @@ class InteractionIntegrityChecker
         // Note rules (3) and (4) should have been checked in the calling function (in an assessment type's mapper).
 
         // Since all the rules have been checked, there are no reasons for this student to remain a participant.
-        $this->participantMapper->delete($participant);
+        try {
+            $this->participantMapper->delete($participant);
+        } catch (Exception) {
+            // Couldn't delete participation, probably because it has already been deleted.
+        }
         return true;
     }
 
