@@ -76,9 +76,19 @@ class FieldNormaliser
     {
         foreach (self::CASE_SENSITIVE_FIELDS as $field) {
             $upper = strtoupper($field);
+            $lower = strtolower($field);
+
+            /* Accommodate db2 nastiness due to lowercased expectations in Edumate/Class.php
+             * that we've built upon for a long time
+             */
             if (array_key_exists($upper, $record)) {
                 $record[$field] = $record[$upper];
                 unset($record[$upper]);
+            }
+
+            if (array_key_exists($lower, $record)) {
+                $record[$field] = $record[$lower];
+                unset($record[$lower]);
             }
         }
 
