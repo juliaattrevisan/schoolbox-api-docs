@@ -9,6 +9,8 @@ export default class ApiHelper {
 
     private token: string | null = null;
 
+    private isFetchingToken: boolean = false;
+
     private static readonly USER_ID: number = 1; // alaress admin
 
     /**
@@ -33,9 +35,23 @@ export default class ApiHelper {
         effectorId: number = ApiHelper.USER_ID,
         expiry?: number,
     ): Promise<string> {
+        // Wait for isFetchingToken to be false before proceeding
+        await new Promise<void>((resolve) => {
+            const interval = setInterval(() => {
+                if (this.isFetchingToken) {
+                    return;
+                }
+
+                clearInterval(interval);
+                resolve();
+            }, 100);
+        });
+
         if (this.token) {
             return this.token; // Return the existing token if available
         }
+
+        this.isFetchingToken = true; // Avoid multiple calls to getUserToken in parallel
 
         this.baseTester.isGoingTo(`generate a JWT token for user ${userId} with effector ${effectorId}`);
 
@@ -68,6 +84,7 @@ export default class ApiHelper {
         }
 
         this.token = respBody.token; // Save it for later use
+        this.isFetchingToken = false; // Allow other calls to proceed
         return respBody.token;
     }
 
