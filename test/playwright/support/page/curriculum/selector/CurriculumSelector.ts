@@ -35,54 +35,66 @@ export default class CurriculumSelector {
 
     /**
      * Clicks the browse button to open the modal
+     * @param $context - The context to use when there are multiple curriculum selectors on the page
      */
-    async clickBrowse(): Promise<void> {
-        await this.page.getByTestId(CurriculumSelector.DATA_TEST_BROWSE_BUTTON).click();
+    async clickBrowse($context?: Locator): Promise<void> {
+        const context = $context || this.page;
+        await context.getByTestId(CurriculumSelector.DATA_TEST_BROWSE_BUTTON).click();
     }
 
     /**
      * Return the modal tabs
+     * @param $context - The context to use when there are multiple curriculum selectors on the page
      * @returns - The modal tabs
      */
-    getModalTabs(): Locator {
-        return this.page.getByTestId(CurriculumSelector.DATA_TEST_MODAL_TABS);
+    getModalTabs($context?: Locator): Locator {
+        const context = $context || this.page;
+        return context.getByTestId(CurriculumSelector.DATA_TEST_MODAL_TABS);
     }
 
     /**
      * Clicks the Current tab
+     * @param $context - The context to use when there are multiple curriculum selectors on the page
      */
-    async clickCurrentTab(): Promise<void> {
-        await this.page.getByTestId(CurriculumSelector.DATA_TEST_MODAL_CURRENT_TAB_BUTTON).click();
+    async clickCurrentTab($context?: Locator): Promise<void> {
+        const context = $context || this.page;
+        await context.getByTestId(CurriculumSelector.DATA_TEST_MODAL_CURRENT_TAB_BUTTON).click();
     }
 
     /**
      * Clicks the All tab
+     * @param $context - The context to use when there are multiple curriculum selectors on the page
      */
-    async clickAllTab(): Promise<void> {
-        await this.page.getByTestId(CurriculumSelector.DATA_TEST_MODAL_ALL_TAB_BUTTON).click();
+    async clickAllTab($context?: Locator): Promise<void> {
+        const context = $context || this.page;
+        await context.getByTestId(CurriculumSelector.DATA_TEST_MODAL_ALL_TAB_BUTTON).click();
     }
 
     /**
      * Browse the node tree
      * @param ids - The node ids to select
+     * @param $context - The context to use when there are multiple curriculum selectors on the page
      */
-    async browseToNode(ids: number[]): Promise<void> {
+    async browseToNode(ids: number[], $context?: Locator): Promise<void> {
+        const context = $context || this.page;
         // eslint-disable-next-line no-restricted-syntax -- need to loop through each sequentially, rather than in parallel with Promise.all
         for (const id of ids) {
             // eslint-disable-next-line no-await-in-loop -- need to click each item sequentially
-            await this.page.getByTestId(`${CurriculumSelector.DATA_TEST_MODAL_NODE_NAME}${id.toString()}`).click();
+            await context.getByTestId(`${CurriculumSelector.DATA_TEST_MODAL_NODE_NAME}${id.toString()}`).click();
         }
     }
 
     /**
      * Select the nodes in the modal
      * @param ids - The node ids to select
+     * @param $context - The context to use when there are multiple curriculum selectors on the page
      */
-    async selectNodes(ids: number[]): Promise<void> {
+    async selectNodes(ids: number[], $context?: Locator): Promise<void> {
+        const context = $context || this.page;
         // eslint-disable-next-line no-restricted-syntax -- need to loop through each sequentially, rather than in parallel with Promise.all
         for (const id of ids) {
             // eslint-disable-next-line no-await-in-loop -- need to click each item sequentially
-            await this.page
+            await context
                 .getByTestId(`${CurriculumSelector.DATA_TEST_MODAL_NODE_CHECKBOX_LABEL}${id.toString()}`)
                 .click();
         }
@@ -91,9 +103,11 @@ export default class CurriculumSelector {
     /**
      * Expect the unit modal container to contain the text
      * @param text - The text to not expect
+     * @param $context - The context to use when there are multiple curriculum selectors on the page
      */
-    async expectUnitModalToContainText(text: string): Promise<void> {
-        await expect(this.page.getByTestId(CurriculumSelector.DATA_TEST_MODAL_CURRENT_NODES_CONTAINER)).toContainText(
+    async expectUnitModalToContainText(text: string, $context?: Locator): Promise<void> {
+        const context = $context || this.page;
+        await expect(context.getByTestId(CurriculumSelector.DATA_TEST_MODAL_CURRENT_NODES_CONTAINER)).toContainText(
             text,
         );
     }
@@ -101,12 +115,14 @@ export default class CurriculumSelector {
     /**
      * Select the nodes in the modal within the 'Current' tab
      * @param ids - The node ids to select
+     * @param $context - The context to use when there are multiple curriculum selectors on the page
      */
-    async selectUnitNodes(ids: number[]): Promise<void> {
+    async selectUnitNodes(ids: number[], $context?: Locator): Promise<void> {
+        const context = $context || this.page;
         // eslint-disable-next-line no-restricted-syntax -- need to loop through each sequentially, rather than in parallel with Promise.all
         for (const id of ids) {
             // eslint-disable-next-line no-await-in-loop -- need to click each item sequentially
-            await this.page
+            await context
                 .getByTestId(`${CurriculumSelector.DATA_TEST_MODAL_CURRENT_NODE_CHECKBOX_LABEL}${id.toString()}`)
                 .click();
         }
@@ -114,33 +130,41 @@ export default class CurriculumSelector {
 
     /**
      * Select Save, closing the modal
+     * @param $context - The context to use when there are multiple curriculum selectors on the page
      */
-    async saveModal(): Promise<void> {
-        await this.page.getByTestId(CurriculumSelector.DATA_TEST_MODAL_SAVE_BUTTON).click();
+    async saveModal($context?: Locator): Promise<void> {
+        const context = $context || this.page;
+        await context.getByTestId(CurriculumSelector.DATA_TEST_MODAL_SAVE_BUTTON).click();
     }
 
     /**
      * Expect the selected nodes to contain the text
      * @param text - The text to expect
+     * @param $context - The context to use when there are multiple curriculum selectors on the page
      */
-    async expectSelectedToContain(text: string): Promise<void> {
-        await expect(this.page.getByTestId(CurriculumSelector.DATA_TEST_SELECTED_NODES_CONTAINER)).toContainText(text);
+    async expectSelectedToContain(text: string, $context?: Locator): Promise<void> {
+        const context = $context || this.page;
+        await expect(context.getByTestId(CurriculumSelector.DATA_TEST_SELECTED_NODES_CONTAINER)).toContainText(text);
     }
 
     /**
      * Expect the selected nodes to not contain the text
      * @param text - The text to not expect
+     * @param $context - The context to use when there are multiple curriculum selectors on the page
      */
-    async expectSelectedNotToContain(text: string): Promise<void> {
-        await expect(this.page.getByTestId(CurriculumSelector.DATA_TEST_SELECTED_NODES_CONTAINER)).not.toContainText(
+    async expectSelectedNotToContain(text: string, $context?: Locator): Promise<void> {
+        const context = $context || this.page;
+        await expect(context.getByTestId(CurriculumSelector.DATA_TEST_SELECTED_NODES_CONTAINER)).not.toContainText(
             text,
         );
     }
 
     /**
      * Expect the selected nodes to be empty (so not be visible at all)
+     * @param $context - The context to use when there are multiple curriculum selectors on the page
      */
-    async expectSelectedToBeEmpty(): Promise<void> {
-        await expect(this.page.getByTestId(CurriculumSelector.DATA_TEST_SELECTED_NODES_CONTAINER)).not.toBeVisible();
+    async expectSelectedToBeEmpty($context?: Locator): Promise<void> {
+        const context = $context || this.page;
+        await expect(context.getByTestId(CurriculumSelector.DATA_TEST_SELECTED_NODES_CONTAINER)).not.toBeVisible();
     }
 }

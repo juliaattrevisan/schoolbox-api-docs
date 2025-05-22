@@ -53,6 +53,7 @@ const props = withDefaults(defineProps<Props>(), {
 const store = useStore();
 const selectedNodesStore = useSelectedNodesStore();
 const curriculumSelectorEl = useTemplateRef<HTMLDivElement | null>("curriculumSelectorEl");
+const testId = window.Vue.ref<number>(0); // to add a id to target in tests when there are multiple selectors on the page
 
 /**
  * to track the width of the container the curriculum selector is in,
@@ -86,11 +87,12 @@ const currentNodesStore = useCurrentNodesStore();
 window.Vue.onMounted(() => {
     store.init(props);
     initResizeObserver();
+    testId.value = document.querySelectorAll("[data-test^=curriculum-selector-]").length; // will increment for each selector on the page
 });
 </script>
 
 <template>
-    <div ref="curriculumSelectorEl" class="curriculum-selector">
+    <div ref="curriculumSelectorEl" class="curriculum-selector" :data-test="`curriculum-selector-${testId}`">
         <cs-selected-nodes />
         <cs-search-input
             :curriculum-selector-el="curriculumSelectorEl"
@@ -103,6 +105,7 @@ window.Vue.onMounted(() => {
         v-if="store.hasLoadedOk"
         :is-single-select="props.isSingleSelect"
         :has-tabs="currentNodesStore.hasNodes"
+        :test-id="testId"
     />
     <selected-node-modal :node="selectedNodesStore.activeNode" @closed="onSelectedNodeModalClosed" />
 </template>

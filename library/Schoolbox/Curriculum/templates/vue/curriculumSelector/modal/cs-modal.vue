@@ -20,11 +20,13 @@ interface Props {
     isSingleSelect?: boolean; // so can only select a single node
     startingNodeId?: number; // To open on a specific node, in situations where we wish to restrict further navigation/selection to within a specific node
     hasTabs?: boolean; // a split to show only curriculum linked to a parent unit / all curriculum
+    testId?: number; // to add a modal id to target in tests when there are multiple modals on the page
 }
 const props = withDefaults(defineProps<Props>(), {
     isSingleSelect: false,
     startingNodeId: UNSET_ID,
     hasTabs: false,
+    testId: 0,
 });
 
 const modalStore = useModalStore();
@@ -123,7 +125,7 @@ function onTabSelected(tab: string): void {
         @closed="onModalClosed"
     >
         <template #sequence-1>
-            <div class="l-flex-col l-gap-m">
+            <div class="l-flex-col l-gap-m" :data-test="`cs-modal-${props.testId}`">
                 <h2 class="f-no-margins">Browse Curriculum</h2>
                 <dl v-if="props.hasTabs" ref="tabsEl" class="tabs" data-test="cs-modal-tabs">
                     <dd :class="{ active: currentTab === current }">

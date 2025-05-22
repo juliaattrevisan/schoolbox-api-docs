@@ -110,4 +110,21 @@ test.describe("Curriculum Selector Tests", () => {
         await curriculumSelector.expectUnitModalToContainText("Text structure and organisation");
         await curriculumSelector.expectUnitModalToContainText("Expressing and developing ideas");
     });
+
+    test("Tabs visible on course manage rubric capabilities page with curriculum already assigned to course", async ({
+        tester,
+        page,
+    }) => {
+        const curriculumSelector = new CurriculumSelector(page);
+
+        tester.isGoingTo("Visit Manage Rubric Capabilities for Year 9 English");
+        await page.goto("/rubric/manager/87");
+
+        tester.isGoingTo("Open the modal and check for Text structure and organisation");
+        await curriculumSelector.clickBrowse(page.getByTestId("curriculum-selector-1"));
+        const modalContext = page.getByTestId("cs-modal-1");
+        await expect(curriculumSelector.getModalTabs(modalContext)).toBeVisible();
+        await curriculumSelector.expectUnitModalToContainText("Text structure and organisation", modalContext);
+        await curriculumSelector.expectUnitModalToContainText("ACELA1556", modalContext);
+    });
 });
