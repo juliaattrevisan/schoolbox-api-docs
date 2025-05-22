@@ -20,8 +20,18 @@ class Model
 
     private User $user;
     private string $prompt;
-    private int $returnCode;
-    private string $errorMessage;
+    private ?int $inputTokens = null;
+    private ?int $outputTokens = null;
+    private ?string $model = null;
+    private ?string $response = null;
+    private ?int $returnCode = null;
+    private ?string $errorMessage = null;
+
+    // TEXT max length, to trim the prompt, rather than die.
+    private const PROMPT_MAX_LENGTH = 65535;
+
+    // MEDIUM TEXT max length, to trim the response, rather than die.
+    private const RESPONSE_MAX_LENGTH = 16777215;
 
 
     /**
@@ -59,25 +69,29 @@ class Model
      */
     public function setPrompt(string $prompt): self
     {
+        // Limit the prompt length to prevent database errors
+        if ($prompt && mb_strlen($prompt) > self::PROMPT_MAX_LENGTH) {
+            $prompt = mb_substr($prompt, 0, self::PROMPT_MAX_LENGTH);
+        }
         $this->prompt = $prompt;
         return $this;
     }
 
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getReturnCode(): int
+    public function getReturnCode(): ?int
     {
         return $this->returnCode;
     }
 
 
     /**
-     * @param int $returnCode
+     * @param int|null $returnCode
      * @return $this
      */
-    public function setReturnCode(int $returnCode): self
+    public function setReturnCode(?int $returnCode): self
     {
         $this->returnCode = $returnCode;
         return $this;
@@ -85,21 +99,97 @@ class Model
 
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getErrorMessage(): string
+    public function getErrorMessage(): ?string
     {
         return $this->errorMessage;
     }
 
 
     /**
-     * @param string $errorMessage
+     * @param string|null $errorMessage
      * @return $this
      */
-    public function setErrorMessage(string $errorMessage): self
+    public function setErrorMessage(?string $errorMessage): self
     {
         $this->errorMessage = $errorMessage;
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getInputTokens(): ?int
+    {
+        return $this->inputTokens;
+    }
+
+    /**
+     * @param int|null $inputTokens
+     * @return $this
+     */
+    public function setInputTokens(?int $inputTokens): self
+    {
+        $this->inputTokens = $inputTokens;
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getOutputTokens(): ?int
+    {
+        return $this->outputTokens;
+    }
+
+    /**
+     * @param int|null $outputTokens
+     * @return $this
+     */
+    public function setOutputTokens(?int $outputTokens): self
+    {
+        $this->outputTokens = $outputTokens;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getModel(): ?string
+    {
+        return $this->model;
+    }
+
+    /**
+     * @param string|null $model
+     * @return $this
+     */
+    public function setModel(?string $model): self
+    {
+        $this->model = $model;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getResponse(): ?string
+    {
+        return $this->response;
+    }
+
+    /**
+     * @param string|null $response
+     * @return $this
+     */
+    public function setResponse(?string $response): self
+    {
+        // Limit the response length to prevent database errors
+        if ($response && mb_strlen($response) > self::RESPONSE_MAX_LENGTH) {
+            $response = mb_substr($response, 0, self::RESPONSE_MAX_LENGTH);
+        }
+        $this->response = $response;
         return $this;
     }
 }
