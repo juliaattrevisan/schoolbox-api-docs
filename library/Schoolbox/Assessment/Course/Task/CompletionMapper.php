@@ -24,7 +24,6 @@ use Schoolbox\Assessment\Participant;
  */
 class CompletionMapper extends Mapper
 {
-
     /**
      * @var Participant\Plan\InteractionIntegrityChecker
      */
