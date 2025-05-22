@@ -898,7 +898,7 @@ class Profile implements IStrategy
             if ('' !== (string)$teacher['employee_code']) {
                 /* Appending campus data to the teaching staff
                  */
-                $teacher['campuses'] = $employeeSetDedupe[$teacher['employee_code']]['campuses'] ?? null;
+                $teacher['campuses'] = $employeeSetDedupe[$teacher['employee_code']]['campuses'] ?? [];
                 unset($employeeSetDedupe[$teacher['employee_code']]);
 
                 $this->log->debug(sprintf(
@@ -956,7 +956,9 @@ class Profile implements IStrategy
                 'teacher_photo' => $teacherPhoto,
                 'position' => $position,
                 'work_phone' => '',
-                'campuses' => $employee['campuses'] ?? null,
+                /* It is possible for the employee to not have the campuses key defined so we need to fallback to empty
+                 */
+                'campuses' => $employee['campuses'] ?? [],
             ];
         }
 
