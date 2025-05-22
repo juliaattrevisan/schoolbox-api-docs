@@ -696,8 +696,7 @@ class SubmissionBoxMapper extends BaseMapper
         int $userId,
         bool $includeUnsubmitted = true,
         bool $includeDeleted = false
-    ): array
-    {
+    ): array {
         // Retrieve count of submission IDs from a list of IDs for a user
         if (empty($boxIds)) {
             return array();
@@ -708,7 +707,7 @@ class SubmissionBoxMapper extends BaseMapper
             WHERE ss.owner = :user_id
             AND ss.box_id IN {$this->getArrayPlaceholders($boxIds, 'sb')}
             " . ($includeUnsubmitted ? '' : "AND ss.submitted_at IS NOT NULL") . "
-            " . ($includeDeleted? '' : "AND ss.deleted_at IS NULL") . "
+            " . ($includeDeleted ? '' : "AND ss.deleted_at IS NULL") . "
             GROUP BY ss.box_id
         ";
         $statement = $this->database->prepare($query);
