@@ -154,7 +154,7 @@ class Helper
                 ->setErrorMessage($data["error"]["message"]);
             $this->logMapper->save($log);
 
-            new SchoolboxException(
+            throw new SchoolboxException(
                 $data["error"]["message"],
                 $returnCode
             );
@@ -183,7 +183,7 @@ class Helper
                 ->setErrorMessage($incompleteMessage);
             $this->logMapper->save($log);
 
-            new SchoolboxException(
+            throw new SchoolboxException(
                 $title,
                 $returnCode
             );
@@ -330,7 +330,7 @@ class Helper
              */
             die();
         } catch (GuzzleException $e) {
-            $this->errorMapper->generateException(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
         }
     }
 
