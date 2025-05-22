@@ -5,10 +5,13 @@
 
         > a:not([data-plugin]) > img {
             margin: 0 1rem 0 0;
-            width: 12.5rem;
 
-            @media #{$medium-down} {
-                width: 6rem;
+            &:not(.thumbnail) {
+                width: 12.5rem;
+
+                @media #{$medium-down} {
+                    width: 6rem;
+                }
             }
         }
         .thumbnail {
