@@ -137,11 +137,24 @@ class Helper
 //                    ->setErrorMessage($response->getReasonPhrase());
 //                $this->logMapper->save($log);
 //            }
-        } catch (GuzzleException | \JsonException $e) {
+        } catch (GuzzleException $e) {
             $log->setReturnCode($e->getCode())
                 ->setErrorMessage($e->getMessage());
             $this->logMapper->save($log);
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
+            throw new SchoolboxException(
+                "Error requesting data from the AI service",
+                500,
+                $e
+            );
+        } catch (\JsonException $e) {
+            $log->setReturnCode($e->getCode())
+                ->setErrorMessage(sprintf("JsonError: %s", $e->getMessage()));
+            $this->logMapper->save($log);
+            throw new SchoolboxException(
+                "Error decoding response from the AI service",
+                500,
+                $e
+            );
         }
 
         /* If something went wrong on the openAI side, it'll send us an "error" key
