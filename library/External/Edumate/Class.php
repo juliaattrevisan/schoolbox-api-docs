@@ -46,9 +46,25 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
 
         // manipulate
         $students = [];
+
+        $normaliser = new External\Edumate\FieldNormaliser();
+
         while ($student = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $students[$student['SYNERGY_ID']] = array_change_key_case($student, CASE_LOWER);
+            /* Other places expect fields to be in lowercase from this method,
+             * building upon this db2 case nastiness. Start with lowercasing
+             * everything first
+             */
+            $normalisedStudent = array_change_key_case($student, CASE_LOWER);
+
+            /* Then camelCase a known whitelist
+             */
+            $normalisedStudent = $normaliser->normalise($normalisedStudent);
+
+            /* Pile it into the stack
+             */
+            $students[$student['SYNERGY_ID']] = $normalisedStudent;
         }
+
         return array_values($students);
     }
 
