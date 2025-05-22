@@ -63,10 +63,13 @@ class SubmissionMapper extends BaseMapper
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [ $this, 'persistFiles' ]);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [ $this, 'softDeleteSubmissionFiles']);
+        $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'removeParticipationIfNecessary']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'removeParticipationIfNecessary']);
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'canParticipate']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'insertParticipation']);
-        $this->registerCallback(self::CALLBACK_POSTRESTORE, [ $this, 'restoreSubmissionFiles']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreSubmissionFiles']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'insertParticipation']);
     }
 
 
@@ -106,6 +109,52 @@ class SubmissionMapper extends BaseMapper
         }
         $assessment = $this->getSubmissionBoxMapper()->findById($object->getSubmissionBox()->getId())->getAssessmentModel();
         return $this->interactionChecker->insertParticipationOnFirstInteraction($object->getOwner(), $assessment);
+    }
+
+
+    /**
+     * Remove the participant if $student should no longer be a participant in $assessment.
+     * @see ReturnedWorkMapper->removeParticipationIfNecessary() (similar function).
+     *
+     * @param Submission $object
+     * @return bool - Return true on success - whether or not a participation was removed.
+     *                This is the expected behaviour for callbacks registered with Schoolbox\Mapper.
+     */
+    public function removeParticipationIfNecessary(Submission $object): bool
+    {
+        $student = $object->getOwner();
+        $submissionBox = $object->getSubmissionBox();
+        $submissionBoxMapper = $this->getSubmissionBoxMapper();
+
+        // If any (non-deleted) response or feedback exists, the student should remain a participant.
+        // In this case:
+        //  * the response is stored in the student_submission table
+        //  * the feedback is stored in the submission_return table.
+
+        $submissionCountByBoxId = $submissionBoxMapper->findSubmissionCountsForSubmissionBoxes(
+            [$submissionBox->getId()],
+            $student->getId()
+        );
+        $submissionCountForThisBox = $submissionCountByBoxId[$submissionBox->getId()] ?? 0;
+        if ($submissionCountForThisBox > 0) {
+            // A response was found, so the student should remain a participant.
+            return true;
+        }
+
+        $feedbackCountByBoxId = $submissionBoxMapper->findReturnedWorkCountsForSubmissionBoxes(
+            [$submissionBox->getId()],
+            $student->getId()
+        );
+        $feedbackCountForThisBox = $feedbackCountByBoxId[$submissionBox->getId()] ?? 0;
+        if ($feedbackCountForThisBox > 0) {
+            // A feedback was found, so the student should remain a participant.
+            return true;
+        }
+
+        return $this->interactionChecker->removeParticipationIfNoInteractionsRemain(
+            $student,
+            $object->getSubmissionBox()->getAssessmentModel()
+        );
     }
 
 
@@ -333,40 +382,6 @@ class SubmissionMapper extends BaseMapper
         ]);
     }
 
-    /**
-     * Retrieves the number of submissions that have been made on each box in a
-     * list.
-     *
-     * @param array $box_ids
-     * @param int   $user_id
-     *
-     * @return array The submission box ID as the key, the count as the value.
-     */
-    public function findCountsForSubmissionBoxes($box_ids, $user_id)
-    {
-        // Retrieve count of submission IDs from a list of IDs for a user
-        if (empty($box_ids)) {
-            return array();
-        }
-        $query = "
-            SELECT ss.box_id, COUNT(DISTINCT submitted_at) as submission_count
-            FROM {$this->getTable()} ss
-            WHERE ss.owner = :user_id
-            AND ss.box_id IN {$this->getArrayPlaceholders($box_ids, 'sb')}
-            AND ss.submitted_at IS NOT NULL
-            GROUP BY ss.box_id
-        ";
-        $statement = $this->database->prepare($query);
-        $params = $this->getArrayParameters($box_ids, 'sb');
-        $params['user_id'] = $user_id;
-        $statement->execute($params);
-
-        $return = array();
-        foreach ($statement as $row) {
-            $return[$row['box_id']] = $row['submission_count'];
-        }
-        return $return;
-    }
 
     /**
      * @return BaseMapper|SubmissionBoxMapper

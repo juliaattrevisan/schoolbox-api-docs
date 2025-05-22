@@ -646,6 +646,84 @@ class SubmissionBoxMapper extends BaseMapper
         return true;
     }
 
+
+    /**
+     * Retrieves the number of returns that have been made on each box in a list.
+     *
+     * @param array $boxIds
+     * @param int   $userId
+     *
+     * @return array The submission box ID as the key, the count as the value.
+     */
+    public function findReturnedWorkCountsForSubmissionBoxes(array $boxIds, int $userId): array
+    {
+        // Retrieve count of submission IDs from a list of IDs for a user
+        if (empty($boxIds)) {
+            return [];
+        }
+        $query = "
+			SELECT sr.box_id, COUNT(*) as submission_count
+			FROM submission_return sr
+			WHERE sr.owner = :user_id
+			AND sr.box_id IN {$this->getArrayPlaceholders($boxIds, 'sb')}
+			AND sr.deleted_at IS NULL
+			GROUP BY sr.box_id
+		";
+        $statement         = $this->database->prepare($query);
+        $params            = $this->getArrayParameters($boxIds, 'sb');
+        $params['user_id'] = $userId;
+        $statement->execute($params);
+
+        $return = [];
+        foreach ($statement as $row) {
+            $return[$row['box_id']] = $row['submission_count'];
+        }
+        return $return;
+    }
+
+
+    /**
+     * Retrieves the number of submissions that have been made on each box in a list.
+     *
+     * @param array $boxIds
+     * @param int   $userId
+     * @param bool  $includeUnsubmitted
+     *
+     * @return array The submission box ID as the key, the count as the value.
+     */
+    public function findSubmissionCountsForSubmissionBoxes(
+        array $boxIds,
+        int $userId,
+        bool $includeUnsubmitted = true,
+        bool $includeDeleted = false
+    ): array
+    {
+        // Retrieve count of submission IDs from a list of IDs for a user
+        if (empty($boxIds)) {
+            return array();
+        }
+        $query = "
+            SELECT ss.box_id, COUNT(DISTINCT submitted_at) as submission_count
+            FROM student_submission ss
+            WHERE ss.owner = :user_id
+            AND ss.box_id IN {$this->getArrayPlaceholders($boxIds, 'sb')}
+            " . ($includeUnsubmitted ? '' : "AND ss.submitted_at IS NOT NULL") . "
+            " . ($includeDeleted? '' : "AND ss.deleted_at IS NULL") . "
+            GROUP BY ss.box_id
+        ";
+        $statement = $this->database->prepare($query);
+        $params = $this->getArrayParameters($boxIds, 'sb');
+        $params['user_id'] = $userId;
+        $statement->execute($params);
+
+        $return = array();
+        foreach ($statement as $row) {
+            $return[$row['box_id']] = $row['submission_count'];
+        }
+        return $return;
+    }
+
+
     /**
      * Any notifications related to assessments must be deferred until all
      * its plans and constituent participation records are saved.

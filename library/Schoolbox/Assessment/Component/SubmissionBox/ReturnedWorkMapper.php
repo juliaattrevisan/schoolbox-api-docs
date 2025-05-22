@@ -44,11 +44,6 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
      */
     private $interactionChecker;
 
-    /**
-     * @var StudentSubmissionMapper
-     */
-    private $submissionMapper;
-
 
     public function __construct()
     {
@@ -57,7 +52,6 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
             Participant\Plan\Mapper::getInstance(),
             Participant\Mapper::getInstance()
         );
-        $this->submissionMapper = new StudentSubmissionMapper();
     }
 
 
@@ -111,6 +105,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'insertParticipation']);
     }
 
+
     /**
      * @param ReturnedWork $object
      * @return bool
@@ -126,6 +121,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
         }
         return true;
     }
+
 
     /**
      * @param ReturnedWork      $object
@@ -171,6 +167,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
 
     /**
      * Remove the participant if $student should no longer be a participant in $assessment.
+     * @see SubmissionMapper->removeParticipationIfNecessary() (similar function).
      *
      * @param ReturnedWork $object
      * @return bool - Return true on success - whether or not a participation was removed.
@@ -180,24 +177,28 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
     {
         $student = $object->getOwner();
         $submissionBox = $object->getSubmissionBox();
+        $submissionBoxMapper = $this->getSubmissionBoxMapper();
 
         // If any (non-deleted) response or feedback exists, the student should remain a participant.
         // In this case:
         //  * the response is stored in the student_submission table
         //  * the feedback is stored in the submission_return table.
 
-        $submissionCountByBoxId = $this->submissionMapper->findCountsForSubmissionBoxes(
+        $submissionCountByBoxId = $submissionBoxMapper->findReturnedWorkCountsForSubmissionBoxes(
             [$submissionBox->getId()],
             $student->getId()
         );
-        $submissionCountForThisBox = $submissionCountByBoxId[$submissionBox->getId()];
+        $submissionCountForThisBox = $submissionCountByBoxId[$submissionBox->getId()] ?? 0;
         if ($submissionCountForThisBox > 0) {
             // A response was found, so the student should remain a participant.
             return true;
         }
 
-        $feedbackCountByBoxId = $this->findCountsForSubmissionBoxes([$submissionBox->getId()], $student->getId());
-        $feedbackCountForThisBox = $feedbackCountByBoxId[$submissionBox->getId()];
+        $feedbackCountByBoxId = $submissionBoxMapper->findSubmissionCountsForSubmissionBoxes(
+            [$submissionBox->getId()],
+            $student->getId()
+        );
+        $feedbackCountForThisBox = $feedbackCountByBoxId[$submissionBox->getId()] ?? 0;
         if ($feedbackCountForThisBox > 0) {
             // A feedback was found, so the student should remain a participant.
             return true;
@@ -294,6 +295,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
         ";
     }
 
+
     /**
      * @param PDOStatement $statement
      * @return GenericCollection|ReturnedWork[]
@@ -336,40 +338,6 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
         return $collection;
     }
 
-
-    /**
-     * Retrieves the number of returns that have been made on each box in a
-     * list.
-     *
-     * @param array $box_ids
-     * @param int   $user_id
-     *
-     * @return array The submission box ID as the key, the count as the value.
-     */
-    public function findCountsForSubmissionBoxes($box_ids, $user_id)
-    {
-        // Retrieve count of submission IDs from a list of IDs for a user
-        if (empty($box_ids)) {
-            return [];
-        }
-        $query             = "
-			SELECT sr.box_id, COUNT(*) as submission_count
-			FROM {$this->getTable()} sr
-			WHERE sr.owner = :user_id
-			AND sr.box_id IN {$this->getArrayPlaceholders($box_ids, 'sb')}
-			GROUP BY sr.box_id
-		";
-        $statement         = $this->database->prepare($query);
-        $params            = $this->getArrayParameters($box_ids, 'sb');
-        $params['user_id'] = $user_id;
-        $statement->execute($params);
-
-        $return = [];
-        foreach ($statement as $row) {
-            $return[$row['box_id']] = $row['submission_count'];
-        }
-        return $return;
-    }
 
     /**
      * Post-save callback for returned work models.
