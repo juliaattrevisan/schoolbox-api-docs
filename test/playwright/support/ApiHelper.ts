@@ -120,7 +120,7 @@ export default class ApiHelper {
         const folderIds = (await db.grabColumnFromDatabase(
             "folder",
             "id",
-            nameList.map((name) => ({ "name LIKE": name })),
+            nameList.map((name) => ({ "name LIKE": name, deleted_at: null })),
         )) as number[];
 
         await Promise.all(folderIds.map((folderId) => this.deleteFolder(folderId)));
