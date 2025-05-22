@@ -11,6 +11,7 @@ namespace Schoolbox\LTI\Assessment\Score;
 
 use PDOStatement;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\LTI\Assessment\Mapper as LTIAssessmentMapper;
 use Schoolbox\LTI\Assessment\Model as LTIAssessment;
 use Schoolbox\Mapper as BaseMapper;
@@ -32,6 +33,11 @@ class Mapper extends BaseMapper
     private Participant\Plan\InteractionIntegrityChecker $interactionChecker;
 
     /**
+     * @var AssessmentMapper
+     */
+    private $assessmentMapper;
+
+    /**
      * @inheritDoc
      */
     public function __construct()
@@ -41,6 +47,7 @@ class Mapper extends BaseMapper
             Participant\Plan\Mapper::getInstance(),
             Participant\Mapper::getInstance()
         );
+        $this->assessmentMapper = new AssessmentMapper();
     }
 
     /**
@@ -103,6 +110,9 @@ class Mapper extends BaseMapper
         $this->uses('is_feedback', self::TYPE_BOOLEAN);
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'insertParticipation']);
+        $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'removeParticipationIfNecessary']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'removeParticipationIfNecessary']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'insertParticipation']);
     }
 
     /**
@@ -182,5 +192,63 @@ class Mapper extends BaseMapper
             $this->interactionChecker->insertParticipationOnFirstInteraction($object->getStudent(), $assessment);
         }
         return true;
+    }
+
+    /**
+     * Remove the participant if $student should no longer be a participant in $assessment.
+     *
+     * @param Model $object
+     * @return bool - Return true on success - whether or not a participation was removed.
+     *                This is the expected behaviour for callbacks registered with Schoolbox\Mapper.
+     */
+    public function removeParticipationIfNecessary(Model $object): bool
+    {
+        $student = $object->getStudent();
+        $ltiAssessment = $object->getLtiAssessment();
+
+        if ($this->getScoreCountForStudent($ltiAssessment->getId(), $student->getId()) > 0) {
+            // If any (non-deleted) response or feedback exists, the student should remain a participant.
+            // The response and feedback for LTI assessments are both stored in the lti_assessment_score table.
+            return true;
+        }
+
+        // Get a hydrated $assessment to ensure its context properties are set.
+        try {
+            $assessment = $this->assessmentMapper->findById($ltiAssessment->getAssessmentModel()->getId());
+        } catch (BaseMapper\Exception) {
+            // Can't find assessment - just assume the student should remain a participant.
+            return true;
+        }
+
+        $this->interactionChecker->removeParticipationIfNoInteractionsRemain($student, $assessment);
+        return true;
+    }
+
+    /**
+     * Gets number of attempts this student has made on this assessment. Doesn't
+     * include deleted assessments.
+     *
+     * @param int $ltiAssessmentId LTI assessment to check.
+     * @param int $studentId The student to check.
+     *
+     * @return int
+     */
+    public function getScoreCountForStudent(int $ltiAssessmentId, int $studentId): int
+    {
+        $query = "
+            SELECT COUNT(*) AS scores
+            FROM {$this->getTable()} AS ltias
+            WHERE ltias.lti_assessment_id = :lti_assessment_id
+            AND ltias.student_id = :student_id
+            AND ltias.deleted_at IS NULL
+        ";
+        $statement = $this->database->prepare($query);
+        $statement->bindValue('lti_assessment_id', $ltiAssessmentId, \PDO::PARAM_INT);
+        $statement->bindValue('student_id', $studentId, \PDO::PARAM_INT);
+        $statement->execute();
+        if ($row = $statement->fetch()) {
+            return intval($row['scores']);
+        }
+        return 0;
     }
 }
