@@ -19,6 +19,7 @@ use Alaress\Sentry\Tracing\Tracer;
 use Cache\Bridge\SimpleCache\SimpleCacheBridge;
 use enshrined\svgSanitize\Sanitizer as BaseSvgSanitizer;
 use GuzzleHttp;
+use Http\Discovery\Psr17Factory;
 use League\Flysystem\Filesystem;
 use Proxy\Server as ProxyServer;
 use Psr\Log\NullLogger;
@@ -112,6 +113,18 @@ class Kernel extends WebKernelAbstract
         // Enable mappers to be injectable, but instantiated only when required
         $mapperFactory = new MapperFactory($di);
         $di->set('mapperFactory', $mapperFactory);
+
+        /* Stolen from superclass lol
+         */
+        // PSR-17 compliant request factory: implements all of the interfaces
+        // defined in that PSR.
+        // TODO consider hand-building instead of relying upon discovery?
+        //      The reason I'm using discovery is because the discovery class
+        //      provides a convenient createServerRequestFromGlobals method.
+        $di->set(
+            'httpFactory',
+            $di->lazyNew(Psr17Factory::class)
+        );
 
         // User token generator
         $di->set(
