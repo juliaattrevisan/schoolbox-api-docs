@@ -17,6 +17,7 @@ use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\ExternalMarkbook\Adapter as MarkbookAdapter;
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Learnosity\Helper;
 use Schoolbox\Learning\Quiz\Attempt\Answer\Mapper as QuizAnswerMapper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
@@ -24,7 +25,6 @@ use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
-use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
@@ -44,6 +44,11 @@ class Mapper extends BaseMapper
      */
     private $interactionChecker;
 
+    /**
+     * @var AssessmentMapper
+     */
+    private $assessmentMapper;
+
 
     public function __construct()
     {
@@ -52,6 +57,7 @@ class Mapper extends BaseMapper
             Participant\Plan\Mapper::getInstance(),
             Participant\Mapper::getInstance()
         );
+        $this->assessmentMapper = new AssessmentMapper();
     }
 
     /**
@@ -172,10 +178,15 @@ class Mapper extends BaseMapper
             return true;
         }
 
-        return $this->interactionChecker->removeParticipationIfNoInteractionsRemain(
-            $student,
-            $quiz->getAssessmentModel()
-        );
+        // Get a hydrated $assessment to ensure its context properties are set.
+        try {
+            $assessment = $this->assessmentMapper->findById($quiz->getAssessmentModel()->getId());
+        } catch (Exception) {
+            // Can't find assessment - just assume the student should remain a participant.
+            return true;
+        }
+
+        return $this->interactionChecker->removeParticipationIfNoInteractionsRemain($student, $assessment);
     }
 
 

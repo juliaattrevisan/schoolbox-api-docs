@@ -245,40 +245,36 @@ class InteractionIntegrityChecker
             return true;
         }
 
-// TODO: Figure out how to get assessment context, then uncomment below code.
-//        if ($assessment->getContextFolder() === null) {
-//            // Get assessment context somehow.  Possibly using mv_assessment_relation table.
-//        }
-//
-//        $contextFolder = $assessment->getContextFolder();
-//        $externalClassHandler = new External_Class();
-//        $studentsInClassList = $externalClassHandler->getStudents($contextFolder->getCodeString());
-//        $studentExternalIdsInClassList = array_map(fn ($student) => $student['synergy_id'], $studentsInClassList);
-//
-//        // Checking rule (1)...
-//        if (in_array($student->getExternalId(), $studentExternalIdsInClassList)) {
-//            // The student is in the class list, so remains a participant.
-//            return true;
-//        }
-//
-//        // Checking rule (2)...
-//        // Code below copied from Group\Manage\Controller->getData().
-//        if ($contextFolder->getGroup()) {
-//            // The lowest access level is read-level, so all users in $userAccessList have read-level access.
-//            $userAccessList = $this->userAccessMapper->findForFolder($contextFolder)
-//                ->indexByCallback(fn (UserAccess $userAccess) => $userAccess->getUser()->getId());
-//
-//            $groupMemberUserIds = $userAccessList->keys();
-//            if (in_array($student->getId(), $groupMemberUserIds)) {
-//                // The student is in the assessment's context's folder's group, so remains a participant.
-//                return true;
-//            }
-//        }
+        // The below line works, but $assessment->getContextFolder() returns null.  Why?
+        $contextFolder = $assessment->getAssessmentContext()->getFolder();
+        $externalClassHandler = new External_Class();
+        $studentsInClassList = $externalClassHandler->getStudents($contextFolder->getCodeString());
+        $studentExternalIdsInClassList = array_map(fn ($student) => $student['synergy_id'], $studentsInClassList);
+
+        // Checking rule (1)...
+        if (in_array($student->getExternalId(), $studentExternalIdsInClassList)) {
+            // The student is in the class list, so remains a participant.
+            return true;
+        }
+
+        // Checking rule (2)...
+        // Code below copied from Group\Manage\Controller->getData().
+        if ($contextFolder->getGroup()) {
+            // The lowest access level is read-level, so all users in $userAccessList have read-level access.
+            $userAccessList = $this->userAccessMapper->findForFolder($contextFolder)
+                ->indexByCallback(fn (UserAccess $userAccess) => $userAccess->getUser()->getId());
+
+            $groupMemberUserIds = $userAccessList->keys();
+            if (in_array($student->getId(), $groupMemberUserIds)) {
+                // The student is in the assessment's context's folder's group, so remains a participant.
+                return true;
+            }
+        }
 
         // Note rules (3) and (4) should have been checked in the calling function (in an assessment type's mapper).
 
         // Since all the rules have been checked, there are no reasons for this student to remain a participant.
-//        $this->participantMapper->delete($participant);
+        $this->participantMapper->delete($participant);
         return true;
     }
 

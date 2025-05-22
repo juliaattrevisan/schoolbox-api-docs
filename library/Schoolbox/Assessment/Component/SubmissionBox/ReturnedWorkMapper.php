@@ -24,6 +24,7 @@ use Schoolbox\Assessment\Participant;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\ExternalMarkbook\Adapter as MarkbookAdapter;
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
@@ -45,6 +46,11 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
      */
     private $interactionChecker;
 
+    /**
+     * @var AssessmentMapper
+     */
+    private $assessmentMapper;
+
 
     public function __construct()
     {
@@ -53,6 +59,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
             Participant\Plan\Mapper::getInstance(),
             Participant\Mapper::getInstance()
         );
+        $this->assessmentMapper = new AssessmentMapper();
     }
 
 
@@ -213,10 +220,15 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
             return true;
         }
 
-        return $this->interactionChecker->removeParticipationIfNoInteractionsRemain(
-            $student,
-            $submissionBox->getAssessmentModel()
-        );
+        // Get a hydrated $assessment to ensure its context properties are set.
+        try {
+            $assessment = $this->assessmentMapper->findById($submissionBox->getAssessmentModel()->getId());
+        } catch (MapperException) {
+            // Can't find assessment - just assume the student should remain a participant.
+            return true;
+        }
+
+        return $this->interactionChecker->removeParticipationIfNoInteractionsRemain($student, $assessment);
     }
 
 

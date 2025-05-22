@@ -13,6 +13,7 @@ use PDOStatement;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper as SubmissionFileMapper;
@@ -33,6 +34,11 @@ class SubmissionMapper extends BaseMapper
      */
     private $interactionChecker;
 
+    /**
+     * @var AssessmentMapper
+     */
+    private $assessmentMapper;
+
 
     public function __construct()
     {
@@ -41,7 +47,9 @@ class SubmissionMapper extends BaseMapper
             Participant\Plan\Mapper::getInstance(),
             Participant\Mapper::getInstance()
         );
+        $this->assessmentMapper = new AssessmentMapper();
     }
+
 
     /**
      * @return void
@@ -159,10 +167,15 @@ class SubmissionMapper extends BaseMapper
             return true;
         }
 
-        return $this->interactionChecker->removeParticipationIfNoInteractionsRemain(
-            $student,
-            $submissionBox->getAssessmentModel()
-        );
+        // Get a hydrated $assessment to ensure its context properties are set.
+        try {
+            $assessment = $this->assessmentMapper->findById($submissionBox->getAssessmentModel()->getId());
+        } catch (MapperException) {
+            // Can't find assessment - just assume the student should remain a participant.
+            return true;
+        }
+
+        return $this->interactionChecker->removeParticipationIfNoInteractionsRemain($student, $assessment);
     }
 
 
