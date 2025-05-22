@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Settings;
 
 use Alaress\Redis;
+use Alaress_Byte_Format;
 use Alaress\Web\Controller\ConfigController;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Admin\Navigation\Subnav;
@@ -193,6 +194,14 @@ class Controller extends ConfigController
             $valueSerializer = $this->getFieldStrategyFactory()->makeValueSerializer($existingConfig->getFieldId());
             $newValue        = $valueSerializer->serializeValue($value, $existingConfig);
 
+            if ($name === ConfigMapper::NAME_MAX_FILE_SIZE) {
+                $maxMaxFileSize = $this::getMaxUploadFileSizeInBytes();
+
+                if ($newValue > $maxMaxFileSize) {
+                    $newValue = $maxMaxFileSize;
+                }
+            }
+
             if ($newValue !== $existingConfig->getValue()) {
                 if (\in_array($name, ConfigMapper::SETTINGS_AFFECTING_ROUTED, true)) {
                     $reloadRouteDaemon = true;
@@ -209,7 +218,7 @@ class Controller extends ConfigController
                 if (\in_array($name, ConfigMapper::SETTINGS_AFFECTING_OAUTH, true)) {
                     $clearOidcCache = true;
                 }
-                $existingConfig->setValue(trim($newValue));
+                $existingConfig->setValue(trim((string)$newValue));
                 $this->getConfigMapper()->save($existingConfig);
             }
         }
@@ -481,5 +490,20 @@ class Controller extends ConfigController
             'Skin Config' => 'Design',
             default => '',
         };
+    }
+
+    /**
+     * Returns the maximum size of an uploaded file as configured in php.ini.
+     * This function was copied from vendor/symfony/http-foundation/File/UploadedFile->getMaxFilesize(), then modified
+     * to use the Alaress stringToBytes() function.
+     *
+     * @return int The maximum size of an uploaded file in bytes.
+     */
+    private static function getMaxUploadFileSizeInBytes(): int
+    {
+        $sizePostMax = Alaress_Byte_Format::stringToBytes(\ini_get('post_max_size'));
+        $sizeUploadMax = Alaress_Byte_Format::stringToBytes(\ini_get('upload_max_filesize'));
+
+        return min($sizePostMax ?: \PHP_INT_MAX, $sizeUploadMax ?: \PHP_INT_MAX);
     }
 }
