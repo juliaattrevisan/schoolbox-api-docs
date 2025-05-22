@@ -108,8 +108,8 @@ class Helper
             throw new \DomainException('AI endpoint/model does not support Structured Outputs');
         }
         /* Log what the user tried to do if we made a vaguely-successful request
-             * and didn't somehow die long the way
-             */
+         * and didn't somehow die long the way
+         */
         $log = $this->logMapper->createModel()
             ->setUser($user)
             ->setPrompt($payload);
