@@ -200,7 +200,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
         //  * the response is stored in the student_submission table
         //  * the feedback is stored in the submission_return table.
 
-        $submissionCountByBoxId = $submissionBoxMapper->findReturnedWorkCountsForSubmissionBoxes(
+        $submissionCountByBoxId = $submissionBoxMapper->findSubmissionCountsForSubmissionBoxes(
             [$submissionBox->getId()],
             $student->getId()
         );
@@ -210,7 +210,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
             return true;
         }
 
-        $feedbackCountByBoxId = $submissionBoxMapper->findSubmissionCountsForSubmissionBoxes(
+        $feedbackCountByBoxId = $submissionBoxMapper->findReturnedWorkCountsForSubmissionBoxes(
             [$submissionBox->getId()],
             $student->getId()
         );
