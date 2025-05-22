@@ -956,7 +956,9 @@ class Profile implements IStrategy
                 'teacher_photo' => $teacherPhoto,
                 'position' => $position,
                 'work_phone' => '',
-                'campuses' => $employee['campuses'],
+                /* It is possible for the employee to not have the campuses key defined so we need to fallback to empty
+                 */
+                'campuses' => $employee['campuses'] ?? [],
             ];
         }
 
