@@ -20,6 +20,11 @@ namespace External\Edumate;
  * This is totally inconsistent with the rest of the world, because db2
  * works in a special way. To make it consistent with the rest of the world
  * we need to change the case back to camelcase manually.
+ *
+ * In Edumate/Class.php we give out specifically-lowercased array keys and have
+ * been doing so for a long time, causing other features to rely on it being in
+ * lowercase rather than camelcased, adding to this db2 nastyness. I standardised
+ * both as best I could.
  */
 
 class FieldNormaliser
