@@ -232,6 +232,12 @@ class InteractionIntegrityChecker
     {
         $this->loadPlansAndParticipants($assessment);
         $participant = $this->findParticipation($student, $assessment);
+
+        if ($participant === null) {
+            // The student is no longer a participant, so nothing to do here.
+            return true;
+        }
+
         $plan = $participant->getPlan();
 
         if (!$plan->isDynamic()) {
