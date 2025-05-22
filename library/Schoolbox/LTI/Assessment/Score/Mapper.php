@@ -32,10 +32,7 @@ class Mapper extends BaseMapper
      */
     private Participant\Plan\InteractionIntegrityChecker $interactionChecker;
 
-    /**
-     * @var AssessmentMapper
-     */
-    private $assessmentMapper;
+    private AssessmentMapper $assessmentMapper;
 
     /**
      * @inheritDoc
@@ -47,7 +44,7 @@ class Mapper extends BaseMapper
             Participant\Plan\Mapper::getInstance(),
             Participant\Mapper::getInstance()
         );
-        $this->assessmentMapper = new AssessmentMapper();
+        $this->assessmentMapper = AssessmentMapper::getInstance();
     }
 
     /**

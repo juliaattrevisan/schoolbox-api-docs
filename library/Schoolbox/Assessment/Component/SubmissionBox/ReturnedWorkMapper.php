@@ -46,10 +46,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
      */
     private $interactionChecker;
 
-    /**
-     * @var AssessmentMapper
-     */
-    private $assessmentMapper;
+    private AssessmentMapper $assessmentMapper;
 
 
     public function __construct()
@@ -59,7 +56,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
             Participant\Plan\Mapper::getInstance(),
             Participant\Mapper::getInstance()
         );
-        $this->assessmentMapper = new AssessmentMapper();
+        $this->assessmentMapper = AssessmentMapper::getInstance();
     }
 
 

@@ -39,10 +39,7 @@ class InteractionIntegrityChecker
      */
     private $participantMapper;
 
-    /**
-     * @var UserAccessMapper
-     */
-    private $userAccessMapper;
+    private UserAccessMapper $userAccessMapper;
 
 
     /**

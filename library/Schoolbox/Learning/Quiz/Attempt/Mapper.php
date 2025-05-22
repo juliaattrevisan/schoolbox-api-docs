@@ -44,10 +44,7 @@ class Mapper extends BaseMapper
      */
     private $interactionChecker;
 
-    /**
-     * @var AssessmentMapper
-     */
-    private $assessmentMapper;
+    private AssessmentMapper $assessmentMapper;
 
 
     public function __construct()
@@ -57,7 +54,7 @@ class Mapper extends BaseMapper
             Participant\Plan\Mapper::getInstance(),
             Participant\Mapper::getInstance()
         );
-        $this->assessmentMapper = new AssessmentMapper();
+        $this->assessmentMapper = AssessmentMapper::getInstance();
     }
 
     /**
