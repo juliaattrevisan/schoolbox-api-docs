@@ -188,20 +188,6 @@ export function usePopOut(
     }
 
     /**
-     * When the button is clicked, close the content if it's open,
-     * otherwise open it using @floating-ui/dom to position it relative to the trigger
-     * while also trying to keep it in the viewport
-     */
-    async function onButtonSelected(): Promise<void> {
-        if (content.value === null) throw new Error("Unable to open content - content element not found");
-        if (isOpen.value) {
-            close();
-            return;
-        }
-        await open();
-    }
-
-    /**
      * Move the content to a different parent, if requested, and keep track of the initial parent.
      *
      * For scenarios where the location of the content element is not ideal and could lead to issues such as being
@@ -284,6 +270,26 @@ export function usePopOut(
                 ignore: isCloseOnContentClick ? [] : [content],
             });
         }
+    }
+
+    /**
+     * When the button is clicked, close the content if it's open,
+     * otherwise open it using @floating-ui/dom to position it relative to the trigger
+     * while also trying to keep it in the viewport
+     */
+    async function onButtonSelected(): Promise<void> {
+        if (content.value === null) {
+            /**
+             * The user clicked the button before onMounted was called, this could happen if the page is slow to load
+             * At least attempt to find the content, if we're successful then all is good - otherwise it would've died anyway
+             */
+            await getContent();
+        }
+        if (isOpen.value) {
+            close();
+            return;
+        }
+        await open();
     }
 
     /**
