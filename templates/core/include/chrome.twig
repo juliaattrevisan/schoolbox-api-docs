@@ -333,10 +333,24 @@
                                         $('#whats-new').on('click', function(event) {
                                             tourInit(window.tourPersistentData);
                                         });
+
+                                        /* Enable only on viewports bigger than small due to SA-5396
+                                         */
+                                        const container = document.querySelector('body');
+
+                                        let resizeObserver = new ResizeObserver(() => {
+                                            if (window.innerWidth >= 1024) {
+                                                $('#whats-new').show();
+                                            } else {
+                                                $('#whats-new').hide();
+                                            }
+                                        });
+
+                                        resizeObserver.observe(container);
                                     });
                                 </script>
                             {% endautoescape %}
-                            <li><a href='#' id="whats-new">What's New</a></li>
+                            <li><a href='#' id="whats-new" style="display:none">What's New</a></li>
                         {% endif %}
                     </ul>
                 </div>
