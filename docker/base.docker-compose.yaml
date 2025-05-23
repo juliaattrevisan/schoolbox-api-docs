@@ -1,16 +1,17 @@
 # Base docker-compose.yaml for local running of a containerised Schoolbox
 # environment.
-# A PHP-FPM container must be defined in whichever compose.yaml includes this.
 
 services:
-  # Web server
+  # Frontend web server, mimicking a load balancer and SSL termination endpoint.
+  # In the dev environment, forwards requests to one of these containers:
+  # * schoolbox-frankenphp-1
+  # * schoolbox-frankenphp-2
   caddy:
     container_name: caddy
     restart: always
     build:
       context: ./caddy
     volumes:
-      - code:/usr/share/schoolbox
       - caddy-config:/etc/caddy
     ports:
       - '80:80'
@@ -53,6 +54,12 @@ services:
   mariadb:
     container_name: mariadb
     image: mariadb:11.4
+    healthcheck:
+      test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
+      start_period: 30s
+      interval: 3s
+      timeout: 3s
+      retries: 5
     volumes:
       - mariadb-data:/var/lib/mysql
     environment:
@@ -61,6 +68,12 @@ services:
   redis-storage:
     container_name: redis-storage
     image: redis:7.4
+    healthcheck:
+      test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
+      start_period: 30s
+      interval: 3s
+      timeout: 3s
+      retries: 5
     volumes:
       - redis-storage-config:/usr/local/etc/redis
       - redis-storage-data:/data
@@ -68,6 +81,12 @@ services:
   redis-cache:
     container_name: redis-cache
     image: redis:7.4
+    healthcheck:
+      test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
+      start_period: 30s
+      interval: 3s
+      timeout: 3s
+      retries: 5
     volumes:
       - redis-cache-config:/usr/local/etc/redis
       - redis-cache-data:/data
@@ -76,6 +95,12 @@ services:
     container_name: rabbitmq
     build:
       context: ./rabbitmq
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
+      start_period: 30s
+      interval: 3s
+      timeout: 3s
+      retries: 5
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq
 
@@ -84,10 +109,14 @@ services:
   schoolbox-digestd:
     container_name: schoolbox-digestd
     depends_on:
-      - mariadb
-      - rabbitmq
-      - redis-cache
-      - redis-storage
+      mariadb:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis-cache:
+        condition: service_healthy
+      redis-storage:
+        condition: service_healthy
     build:
       context: ./schoolbox-digestd
     env_file: ./default.env
@@ -99,10 +128,14 @@ services:
   schoolbox-scheduled:
     container_name: schoolbox-scheduled
     depends_on:
-      - mariadb
-      - rabbitmq
-      - redis-cache
-      - redis-storage
+      mariadb:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis-cache:
+        condition: service_healthy
+      redis-storage:
+        condition: service_healthy
     build:
       context: ./schoolbox-scheduled
     env_file: ./default.env
@@ -114,10 +147,14 @@ services:
   schoolbox-mobiled:
     container_name: schoolbox-mobiled
     depends_on:
-      - mariadb
-      - rabbitmq
-      - redis-cache
-      - redis-storage
+      mariadb:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis-cache:
+        condition: service_healthy
+      redis-storage:
+        condition: service_healthy
     build:
       context: ./schoolbox-mobiled
     env_file: ./default.env
@@ -129,10 +166,14 @@ services:
   schoolbox-socketd:
     container_name: schoolbox-socketd
     depends_on:
-      - mariadb
-      - rabbitmq
-      - redis-cache
-      - redis-storage
+      mariadb:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis-cache:
+        condition: service_healthy
+      redis-storage:
+        condition: service_healthy
     build:
       context: ./schoolbox-socketd
     env_file: ./default.env
@@ -144,8 +185,8 @@ services:
   schoolbox-taskd:
     container_name: schoolbox-taskd
     depends_on:
-      - redis-storage
-      - caddy
+      redis-storage:
+        condition: service_healthy
     build:
       context: ./schoolbox-taskd
     environment:
@@ -158,7 +199,8 @@ services:
   schoolbox-etherpad:
     container_name: schoolbox-etherpad
     depends_on:
-      - redis-storage
+      redis-storage:
+        condition: service_healthy
     image: schoolbox/epl:latest
     env_file: ./schoolbox-etherpad/default.env
 
@@ -210,15 +252,6 @@ volumes:
       type: none
       o: bind
       device: ./caddy/config
-
-  # Want to overlay files in this folder over what's already in
-  # /usr/local/etc/php/conf.d/, but don't yet know how
-  php-fpm-config:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./php-fpm/config
 
   redis-storage-config:
     driver: local

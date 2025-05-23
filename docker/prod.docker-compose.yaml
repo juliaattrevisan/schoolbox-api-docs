@@ -1,34 +1,27 @@
 # docker-compose.yaml for testing of the production image, which has been built
-# by Github Actions and pushed to Dockerhub. As with the deploy docker-compose:
-# Its PHP-FPM container contains Schoolbox's code within its image, thus it has
-# no live access to the code on the local file system.
-# Changes made to Schoolbox's code on the local file system will not propagate
-# to this file's PHP-FPM container.
+# by Github Actions and pushed to Dockerhub.
 
 include:
   - base.docker-compose.yaml
 
 services:
-  schoolbox-php-fpm-deploy:
-    container_name: php-fpm
+  # Load-balanced FrankenPHP containers:
+  schoolbox-frankenphp:
     restart: always
     depends_on:
       - mariadb
       - rabbitmq
       - redis-cache
       - redis-storage
-    image: alaress/schoolbox-fpm:develop-latest
+    image: alaress/schoolbox-frankenphp:develop-latest
     volumes:
       - storage:/var/lib/schoolbox/docker/storage
       - schoolbox-config:/etc/schoolbox
+    scale: 2
+    deploy:
+      mode: replicated
+      replicas: 2
     # After building: create data dirs, and make mount writable by www-data
-    # Cannot currently use create-data-dirs.sh, as /bin/bash isn't available,
-    # and /bin/sh doesn't support {} expansion
     post_start:
-      - command: mkdir -p /var/lib/schoolbox/docker/cache/portrait
-      - command: mkdir -p /var/lib/schoolbox/docker/cache/stream
-      - command: mkdir -p /var/lib/schoolbox/docker/cache/zip
-      - command: mkdir -p /var/lib/schoolbox/docker/files
-      - command: mkdir -p /var/lib/schoolbox/docker/purifier
-      - command: mkdir -p /var/lib/schoolbox/docker/twig
-      - command: chown -R www-data:www-data /var/lib/schoolbox/docker/
+      - command: /usr/share/schoolbox/tools/create-data-dirs.sh /var/lib/schoolbox/docker/
+      - command: /usr/share/schoolbox/tools/set-data-dir-perms.sh /var/lib/schoolbox/docker/ www-data

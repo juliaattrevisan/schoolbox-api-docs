@@ -1,6 +1,6 @@
-name: Build and push schoolbox-fpm (push, release)
+name: Build and push schoolbox-frankenphp (push, release)
 
-# Build a new schoolbox-fpm image:
+# Build a new schoolbox-frankenphp image:
 # * when master or develop changes (tags: master, develop, commit hash)
 # * when a release is created (tags: release name (github.ref_name))
 on:
@@ -14,34 +14,6 @@ on:
       - released
 
 jobs:
-  # Build base images before building FPM images,
-  # but only if the build has changed, and only if the repo is the base repo.
-  base-image-diff:
-    # I can't believe that this has to be set as an `if` rule on a step,
-    # instead of in the `on` section.
-    if: github.repository == 'alaress/schoolbox'
-    runs-on: ubuntu-latest
-    outputs:
-      count: ${{ steps.diff.outputs.count }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          sparse-checkout: |
-            docker/base-images/
-          fetch-depth: '2'
-      - name: Diff base image
-        id: diff
-        run: |
-          echo "count=$(git diff ${{ github.sha }}^..${{ github.sha }} --name-only -- docker/base-images/ | wc -l)" >> $GITHUB_OUTPUT
-
-  build-and-push-base-images:
-    needs:
-      - base-image-diff
-    uses: ./.github/workflows/build-and-push-base-images.yaml
-    if: needs.base-image-diff.outputs.count > 0
-    secrets: inherit
-
   # Build artifacts before building image
   build-composer-artifact:
     if: github.repository == 'alaress/schoolbox'
@@ -51,13 +23,12 @@ jobs:
     if: github.repository == 'alaress/schoolbox'
     uses: ./.github/workflows/helper-build-npm-artifact.yaml
 
-  # Build schoolbox-fpm image
-  build-and-push-schoolbox-fpm:
+  # Build schoolbox-frankenphp image
+  build-and-push-schoolbox-frankenphp:
     needs:
-      - build-and-push-base-images
       - build-composer-artifact
       - build-npm-artifact
-    if: ${{ always() && github.repository == 'alaress/schoolbox' && (needs.build-and-push-base-images.result == 'skipped' || needs.build-and-push-base-images.result == 'success') }}
+    if: ${{ always() && github.repository == 'alaress/schoolbox' && (needs.build-and-push-php82-frankenphp.result == 'skipped' || needs.build-and-push-php82-frankenphp.result == 'success') }}
     strategy:
       matrix:
         build:
@@ -101,19 +72,18 @@ jobs:
       #
       # For now this uses a remote image as its build context, later it may use
       # an artifact built in this step?
-      - name: Build and push schoolbox-fpm deployment image (latest)
+      - name: Build and push schoolbox-frankenphp deployment image (latest)
         if: github.event_name == 'push'
         uses: docker/build-push-action@v6
         with:
-          context: .
-          file: docker/php-fpm/deploy-image.Dockerfile
+          context: docker/schoolbox-frankenphp
+          file: docker/schoolbox-frankenphp/deploy-image.Dockerfile
           cache-from: type=gha
           cache-to: type=gha
           build-contexts: |
-            php82-alpine=docker-image://alaress/php82-alpine:latest-${{ github.ref_name }}
             code=${{ github.workspace }}
           push: true
-          outputs: type=docker,dest=${{ runner.temp }}/schoolbox-fpm-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
+          outputs: type=docker,dest=${{ runner.temp }}/schoolbox-frankenphp-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
           provenance: false
           sbom: false
           build-args: |
@@ -121,21 +91,20 @@ jobs:
             ARCH=${{ matrix.build.arch }}
 #          platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           tags: |
-            alaress/schoolbox-fpm:${{ github.ref_name }}-latest-${{ matrix.build.arch }}
+            alaress/schoolbox-frankenphp:${{ github.ref_name }}-latest-${{ matrix.build.arch }}
 
-      - name: Build and push schoolbox-fpm deployment image (release)
+      - name: Build and push schoolbox-frankenphp deployment image (release)
         if: github.event_name == 'release'
         uses: docker/build-push-action@v6
         with:
-          context: .
-          file: docker/php-fpm/deploy-image.Dockerfile
+          context: docker/schoolbox-frankenphp
+          file: docker/schoolbox-frankenphp/deploy-image.Dockerfile
           cache-from: type=gha
           cache-to: type=gha
           build-contexts: |
-            php82-alpine=docker-image://alaress/php82-alpine:latest-${{ github.event.release.target_commitish }}
             code=${{ github.workspace }}
           push: true
-          outputs: type=docker,dest=${{ runner.temp }}/schoolbox-fpm-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
+          outputs: type=docker,dest=${{ runner.temp }}/schoolbox-frankenphp-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
           provenance: false
           sbom: false
           build-args: |
@@ -143,19 +112,19 @@ jobs:
             ARCH=${{ matrix.build.arch }}
 #          platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           tags: |
-            alaress/schoolbox-fpm:${{ github.ref_name }}-${{ matrix.build.arch }}
+            alaress/schoolbox-frankenphp:${{ github.ref_name }}-${{ matrix.build.arch }}
 
-      - name: Upload schoolbox-fpm artifact
+      - name: Upload schoolbox-frankenphp artifact
         uses: actions/upload-artifact@v4
         with:
-          name: schoolbox-fpm-${{ matrix.build.arch }}
-          path: ${{ runner.temp }}/schoolbox-fpm-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
+          name: schoolbox-frankenphp-${{ matrix.build.arch }}
+          path: ${{ runner.temp }}/schoolbox-frankenphp-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
           retention-days: 1
 
-  join-schoolbox-fpm:
+  join-schoolbox-frankenphp:
     needs:
-      - build-and-push-schoolbox-fpm
-    if: always() && needs.build-and-push-schoolbox-fpm.result == 'success'
+      - build-and-push-schoolbox-frankenphp
+    if: always() && needs.build-and-push-schoolbox-frankenphp.result == 'success'
     runs-on: ubuntu-latest
     steps:
       - name: Set up Docker Buildx
@@ -167,29 +136,29 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Join schoolbox-fpm images (latest)
+      - name: Join schoolbox-frankenphp images (latest)
         if: github.event_name == 'push'
         run: |
-          docker manifest create alaress/schoolbox-fpm:${{ github.ref_name }}-latest \
-            --amend alaress/schoolbox-fpm:${{ github.ref_name }}-latest-amd64 \
-            --amend alaress/schoolbox-fpm:${{ github.ref_name }}-latest-arm64
-          docker manifest push --purge alaress/schoolbox-fpm:${{ github.ref_name }}-latest
+          docker manifest create alaress/schoolbox-frankenphp:${{ github.ref_name }}-latest \
+            --amend alaress/schoolbox-frankenphp:${{ github.ref_name }}-latest-amd64 \
+            --amend alaress/schoolbox-frankenphp:${{ github.ref_name }}-latest-arm64
+          docker manifest push --purge alaress/schoolbox-frankenphp:${{ github.ref_name }}-latest
 
-      - name: Join schoolbox-fpm images (release)
+      - name: Join schoolbox-frankenphp images (release)
         if: github.event_name == 'release'
         run: |
-          docker manifest create alaress/schoolbox-fpm:${{ github.ref_name }} \
-            --amend alaress/schoolbox-fpm:${{ github.ref_name }}-amd64 \
-            --amend alaress/schoolbox-fpm:${{ github.ref_name }}-arm64
-          docker manifest push --purge alaress/schoolbox-fpm:${{ github.ref_name }}
+          docker manifest create alaress/schoolbox-frankenphp:${{ github.ref_name }} \
+            --amend alaress/schoolbox-frankenphp:${{ github.ref_name }}-amd64 \
+            --amend alaress/schoolbox-frankenphp:${{ github.ref_name }}-arm64
+          docker manifest push --purge alaress/schoolbox-frankenphp:${{ github.ref_name }}
 
       # Need artifact for the joined image too, or pull the just built image?
 
-  push-schoolbox-fpm-alpine-to-ecr:
+  push-schoolbox-frankenphp-to-ecr:
     needs:
-      - join-schoolbox-fpm
-    if: always() && needs.join-schoolbox-fpm.result == 'success'
+      - join-schoolbox-frankenphp
+    if: always() && needs.join-schoolbox-frankenphp.result == 'success'
     uses: ./.github/workflows/helper-push-to-ecr.yaml
     with:
-      image: schoolbox-fpm
+      image: schoolbox-frankenphp
     secrets: inherit
