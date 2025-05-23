@@ -103,6 +103,12 @@ class Mapper extends BaseMapper
         $this->uses('is_feedback', self::TYPE_BOOLEAN);
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'insertParticipation']);
+
+        // Note regarding absence of post-delete callback for removing participation
+        // -------------------------------------------------------------------------
+        // No post-delete callback is required here (unlike other types of assessment e.g. 'due work' and 'quiz'),
+        // because the UI provides no way for a user to delete the lti_assessment_score record that is added when an LTI
+        // task is given a score.
     }
 
     /**
