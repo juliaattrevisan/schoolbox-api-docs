@@ -23,13 +23,6 @@ services:
       - storage:/var/lib/schoolbox/docker/storage
       - schoolbox-config:/etc/schoolbox
     # After building: create data dirs, and make mount writable by www-data
-    # Cannot currently use create-data-dirs.sh, as /bin/bash isn't available,
-    # and /bin/sh doesn't support {} expansion
     post_start:
-      - command: mkdir -p /var/lib/schoolbox/docker/cache/portrait
-      - command: mkdir -p /var/lib/schoolbox/docker/cache/stream
-      - command: mkdir -p /var/lib/schoolbox/docker/cache/zip
-      - command: mkdir -p /var/lib/schoolbox/docker/files
-      - command: mkdir -p /var/lib/schoolbox/docker/purifier
-      - command: mkdir -p /var/lib/schoolbox/docker/twig
-      - command: chown -R www-data:www-data /var/lib/schoolbox/docker/
+      - command: /usr/share/schoolbox/tools/create-data-dirs.sh /var/lib/schoolbox/docker/
+      - command: /usr/share/schoolbox/tools/set-data-dir-perms.sh /var/lib/schoolbox/docker/ www-data
