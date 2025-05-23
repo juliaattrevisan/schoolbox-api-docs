@@ -6,9 +6,7 @@ include:
 
 services:
   # Load-balanced FrankenPHP containers:
-  # regrettably copy-pasted for now
-  schoolbox-frankenphp-1:
-    container_name: schoolbox-frankenphp-1
+  schoolbox-frankenphp:
     restart: always
     depends_on:
       - mariadb
@@ -19,30 +17,13 @@ services:
     volumes:
       - storage:/var/lib/schoolbox/docker/storage
       - schoolbox-config:/etc/schoolbox
+    scale: 2
+    deploy:
+      mode: replicated
+      replicas: 2
     # After building: create data dirs, and make mount writable by www-data
     # Cannot currently use create-data-dirs.sh, as /bin/bash isn't available,
     # and /bin/sh doesn't support {} expansion
-    post_start:
-      - command: mkdir -p /var/lib/schoolbox/docker/cache/portrait
-      - command: mkdir -p /var/lib/schoolbox/docker/cache/stream
-      - command: mkdir -p /var/lib/schoolbox/docker/cache/zip
-      - command: mkdir -p /var/lib/schoolbox/docker/files
-      - command: mkdir -p /var/lib/schoolbox/docker/purifier
-      - command: mkdir -p /var/lib/schoolbox/docker/twig
-      - command: chown -R www-data:www-data /var/lib/schoolbox/docker/
-
-  schoolbox-frankenphp-2:
-    container_name: schoolbox-frankenphp-2
-    restart: always
-    depends_on:
-      - mariadb
-      - rabbitmq
-      - redis-cache
-      - redis-storage
-    image: alaress/schoolbox-frankenphp:develop-latest
-    volumes:
-      - storage:/var/lib/schoolbox/docker/storage
-      - schoolbox-config:/etc/schoolbox
     post_start:
       - command: mkdir -p /var/lib/schoolbox/docker/cache/portrait
       - command: mkdir -p /var/lib/schoolbox/docker/cache/stream

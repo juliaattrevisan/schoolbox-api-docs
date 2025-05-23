@@ -51,5 +51,5 @@ https://docker.dev.schoolbox.cloud {
     # if DAV is handled at all?
 
     # All other requests just get forwarded to frankenphp
-    reverse_proxy http://schoolbox-frankenphp-1 http://schoolbox-frankenphp-2
+    reverse_proxy http://schoolbox-frankenphp
 }
