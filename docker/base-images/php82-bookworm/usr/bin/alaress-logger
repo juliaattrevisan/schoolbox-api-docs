@@ -1,0 +1,108 @@
+#!/bin/bash
+# Bash logger. Corresponds to SB TTY formatter at Alaress\Lumberjack\CliFormatter.
+# Usage example:
+#   log="./schoolbox-logger.sh"
+#   $log $level1 $message1
+#   $log $level2 $message2 [$date_format]
+#   ...
+#
+# @copyright   2020 Schoolbox Pty Ltd
+# @link        https://schoolbox.com.au
+
+# Scripts that use this library should copy the next block for easy of use
+readonly L_DEBUG=100;
+readonly L_INFO=200;
+readonly L_NOTICE=250;
+readonly L_WARNING=300;
+readonly L_ERROR=400;
+readonly L_CRITICAL=500;
+readonly L_ALERT=550;
+readonly L_EMERGENCY=600;
+
+# https://misc.flogisoft.com/bash/tip_colors_and_formatting
+readonly COLOUR_FG_CYAN='\e[36m'
+readonly COLOUR_FG_LIGHT_RED='\e[91m'
+readonly COLOUR_FG_RED='\e[31m'
+readonly COLOUR_FG_WHITE='\e[97m'
+readonly COLOUR_FG_BLACK='\e[30m'
+readonly COLOUR_FG_BROWN='\e[38;5;130m'
+readonly COLOUR_BG_YELLOW='\e[43m'
+readonly COLOUR_BG_RED='\e[41m'
+readonly COLOUR_BG_MAGENTA='\e[45m'
+readonly COLOUR_END='\e[0m'
+
+# Consistently log a message
+function main(){
+  if [[ $# -lt 2 ]] || [[ $# -gt 3 ]]; then
+    echo -e "${COLOUR_FG_LIGHT_RED}You must pass 2-3 args, found: $#${COLOUR_END}" 1>&2
+    exit 1;
+  fi
+
+  local colour_fg;
+  local colour_bg;
+  local char_prefix;
+  local date;
+  if [[ $# -eq 3 ]]; then
+    date=$(date +"$3")
+  else
+    date=$(date +%Y-%m-%d\ %H:%M:%S.%3N);
+  fi
+
+  case $1 in
+    $L_DEBUG)
+      colour_fg=$COLOUR_FG_CYAN
+      colour_bg=''
+      char_prefix='d'
+      ;;
+    $L_INFO)
+      colour_fg=''
+      colour_bg=''
+      char_prefix=' '
+      ;;
+    $L_NOTICE)
+      colour_fg=$COLOUR_FG_BROWN
+      colour_bg=''
+      char_prefix=' '
+      ;;
+    $L_WARNING)
+      colour_fg=$COLOUR_FG_BLACK
+      colour_bg=$COLOUR_BG_YELLOW
+      char_prefix='*'
+      ;;
+    $L_ERROR)
+      colour_fg=$COLOUR_FG_RED
+      colour_bg=''
+      char_prefix='*'
+      ;;
+    $L_CRITICAL)
+      colour_fg=$COLOUR_FG_LIGHT_RED
+      colour_bg=''
+      char_prefix='!'
+      ;;
+    $L_ALERT)
+      colour_fg=$COLOUR_FG_WHITE
+      colour_bg=$COLOUR_BG_RED
+      char_prefix='!'
+      ;;
+    $L_EMERGENCY)
+      colour_fg=$COLOUR_FG_WHITE
+      colour_bg=$COLOUR_BG_MAGENTA
+      char_prefix='!'
+      ;;
+    *)
+      echo -e "${COLOUR_FG_LIGHT_RED}Unrecognised log level: '$1'${COLOUR_END}" 1>&2
+      exit 1;
+      ;;
+  esac
+
+  case $1 in
+    $L_DEBUG|$L_INFO|$L_NOTICE|$L_WARNING)
+      echo -e "${colour_fg}${colour_bg}[$char_prefix][$date] ${2}${COLOUR_END}"
+      ;;
+    $L_ERROR|$L_CRITICAL|$L_ALERT|$L_EMERGENCY)
+      echo -e "${colour_fg}${colour_bg}[$char_prefix][$date] ${2}${COLOUR_END}" 1>&2
+      ;;
+  esac
+}
+
+main "$@"

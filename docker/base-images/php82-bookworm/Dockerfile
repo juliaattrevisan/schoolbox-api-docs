@@ -29,8 +29,8 @@ esac
 EOF
 COPY ./config/php/* /usr/local/etc/php/conf.d/
 
-# schoolbox-instance-registry and schoolbox-read-instances:
-# copy from puppet-alaress as-is for now
+# Copy scripts from puppet-alaress as-is for now
+COPY ./usr/bin/* /usr/bin/
 COPY ./usr/local/bin/* /usr/local/bin/
 
 # Cheat by linking /usr/local/bin/php to /usr/bin/php:
