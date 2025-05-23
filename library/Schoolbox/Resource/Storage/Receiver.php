@@ -16,6 +16,7 @@ use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Resource\Storage\Sanitizer\ISanitizer;
 use Schoolbox\User;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 
 /**
  * Receiver for accepting files into the storage system.
@@ -120,7 +121,13 @@ class Receiver implements IReceiver
         }
         if ($requireSafety) {
             $validator = new ValidUploadableFile(Alaress_Date_Format::now());
-            $validator->isSatisfiedBy($storage);
+            try {
+                $validator->isSatisfiedBy($storage);
+            } catch (FileException $e) {
+                /* Throwing the FileException out with more user-friendly message
+                 */
+                throw new SchoolboxException($e->getMessage(), $e->getCode());
+            }
         } elseif (!$storage->getMimetype() instanceof Mimetype) {
             // For superusers only, we allow an unknown mimetype
             $storage->setMimetype($this->mimetypeMapper->getUnknownMime());
