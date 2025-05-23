@@ -14,18 +14,6 @@
         method GET HEAD POST PUT DELETE PATCH OPTIONS
     }
     error @disallowed-methods "Method {method} Not Allowed" 405
-    handle_path /static/images/core/fail-whale.png {
-        rewrite * /images/core/fail-whale.png
-        reverse_proxy https://schoolbox-static.cloud {
-            header_up host {http.reverse_proxy.upstream.hostport}
-        }
-    }
-    handle_path /static/images/core/icons/fail-whale-16x16.png {
-        rewrite * /images/core/icons/fail-whale-16x16.png
-        reverse_proxy https://schoolbox-static.cloud {
-            header_up host {http.reverse_proxy.upstream.hostport}
-        }
-    }
     handle_path /favicon.ico {
         rewrite * /images/logo.php?logo=skin_logo_square&size=favicon
     }
