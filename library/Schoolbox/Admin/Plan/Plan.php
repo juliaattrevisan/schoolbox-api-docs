@@ -96,9 +96,9 @@ HELP
         // Setting the plan for a single instance
         $plan = $this->getOpt(self::OPT_LONG_PLAN);
 
-        $plan = $this->mapOldPlanNameToNewIfNecessary($plan);
+        if ($plan !== null) {
+            $plan = $this->mapOldPlanNameToNewIfNecessary($plan);
 
-        if ($plan) {
             $planConfig = $this->extractPlanConfig((string)$plan);
 
             // Plan not found? That's an error
