@@ -59,7 +59,6 @@ class CompletionMapper extends Mapper
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'preSave']);
-        $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'removeParticipationIfNecessary']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'removeParticipationIfNecessary']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'canParticipate']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'insertParticipation']);

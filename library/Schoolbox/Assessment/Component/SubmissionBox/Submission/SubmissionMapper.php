@@ -66,9 +66,8 @@ class SubmissionMapper extends BaseMapper
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
         $this->joinsReverseMulti('student_submission_id', SubmissionFileMapper::class, 'files', 'files');
 
-        $this->registerCallback(self::CALLBACK_POSTSAVE, [ $this, 'persistFiles' ]);
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [ $this, 'softDeleteSubmissionFiles']);
-        $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'removeParticipationIfNecessary']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'persistFiles']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteSubmissionFiles']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'removeParticipationIfNecessary']);
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'canParticipate']);

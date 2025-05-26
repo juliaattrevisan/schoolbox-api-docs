@@ -107,7 +107,6 @@ class Mapper extends BaseMapper
         $this->uses('is_feedback', self::TYPE_BOOLEAN);
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'insertParticipation']);
-        $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'removeParticipationIfNecessary']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'removeParticipationIfNecessary']);
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'insertParticipation']);
     }

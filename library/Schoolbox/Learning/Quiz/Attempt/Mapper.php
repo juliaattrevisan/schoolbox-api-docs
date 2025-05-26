@@ -102,11 +102,8 @@ class Mapper extends BaseMapper
         $this->uses('learnosity_poll_count', self::TYPE_INTEGER);
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteAnswers']);
-
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'canParticipate']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'insertParticipation']);
-
-        $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'removeParticipationIfNecessary']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'removeParticipationIfNecessary']);
 
         // Markbook sync

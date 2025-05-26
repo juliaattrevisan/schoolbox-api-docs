@@ -94,7 +94,6 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
 
         // SoftDelete/Restore weak entities
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteReturnedWorkFiles']);
-        $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'removeParticipationIfNecessary']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'removeParticipationIfNecessary']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'persistFiles']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'canParticipate']);
