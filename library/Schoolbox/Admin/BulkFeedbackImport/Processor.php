@@ -107,6 +107,7 @@ class Processor
      * @param UserMapper $userMapper
      * @param Mapper $folderMapper
      * @param RosettaStone $rosettaStone
+     * @param string $dateLocal
      * @param string $assessmentTitle
      * @param \Schoolbox\Learning\Assessment\WorkType\Model $workType
      * @param \Alaress_Date_Format $publishAt
@@ -117,10 +118,10 @@ class Processor
         private FilesystemProxy $filesystemProxy,
         private \Schoolbox\UserMapper $userMapper,
         private \Schoolbox\Resource\Folder\Mapper $folderMapper,
-        protected RosettaStone $rosettaStone,
+        private RosettaStone $rosettaStone,
+        private string $dateLocal,
         private string $assessmentTitle,
         private \Schoolbox\Learning\Assessment\WorkType\Model $workType,
-        private \Alaress_Date_Format $publishAt,
         private bool $perform
     ) {
         /* We're going to reuse this a lot
@@ -181,6 +182,21 @@ class Processor
             if ('' === $datetime) {
                 $this->log(sprintf(
                     "Row %s: Can't find Publish Date. Make sure it's correct and try again.",
+                    $i
+                ), self::WARNING);
+
+                $errors++;
+
+                continue;
+            }
+
+            /* Check the format of the date: try both database and local short
+             */
+            try {
+                $datetime = (new \Alaress_Date_Format($datetime, $this->dateLocal))->getDatabase();
+            } catch (\Carbon\Exceptions\InvalidFormatException $e) {
+                $this->log(sprintf(
+                    "Row %s: Invalid date format. Make sure it's correct and try again.",
                     $i
                 ), self::WARNING);
 

@@ -114,9 +114,9 @@ class Controller extends Base
             $this->userMapper,
             $this->folderMapper,
             $this->rosettaStone,
+            trim((string)$this->getConfigLoader()->get('date_local')),
             $settings['assessmentTitle'],
             $settings['worktype'],
-            $settings['publishAt'],
             false,
         ))->parseFeedbacks($settings['sourceFile'], $settings['feedbackAuthor']);
 
@@ -163,9 +163,9 @@ class Controller extends Base
             $this->userMapper,
             $this->folderMapper,
             $this->rosettaStone,
+            trim((string)$this->getConfigLoader()->get('date_local')),
             $settings['assessmentTitle'],
             $settings['worktype'],
-            $settings['publishAt'],
             true,
         ))->parseFeedbacks($settings['sourceFile'], $settings['feedbackAuthor']);
 
