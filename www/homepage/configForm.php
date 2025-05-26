@@ -54,7 +54,7 @@ if (is_numeric($_REQUEST['cid'])) {
                 if ($componentID) {
                     try {
                         /** @var Component_Instance $inst */
-                        $inst = $componentInstanceMapper->findById($componentID);
+                        $inst = $componentInstanceMapper->findByInstanceId($componentID, $folder->getId());
                         $inst->setSequence($sequence + 1); // because we prefer to not have 0s in the database///
                         $inst->setPosition($position);
                         $instanceList[] = $inst;
