@@ -1519,10 +1519,17 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     /**
      * Check if the celebration confetti required
      *
+     * @param string|null $birthdateTimestamp
      * @return bool
      */
-    public function isBirthday(): bool
+    public function isBirthday(?string $birthdateTimestamp): bool
     {
+        /* No birthday found in the system or if empty, no confetti
+         */
+        if ('' === (string)$birthdateTimestamp) {
+            return false;
+        }
+
         /* Unfortunately, Only students get to celebrate their birthday =(
          */
         if (!$this->getRole()->isStudent()) {
@@ -1534,22 +1541,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
         if (!$this->getYear()?->getBirthdayCelebrationEnabled()) {
             return false;
         }
-
-        $externalId = $this->getExternalId();
-        if ('' === (string)$externalId) {
-            return false;
-        }
-
-        $studentExternal = (new \External_User())->getStudent($externalId);
-
-        $dobTimestamp = $studentExternal['StudentBirthDate'] ?? false;
-
-        /* No birthday found in the system, no confetti
-         */
-        if (false === $dobTimestamp) {
-            return false;
-        }
-        $dob = \Alaress_Date_Format::newFromTimestamp($dobTimestamp);
+        $dob = \Alaress_Date_Format::newFromTimestamp($birthdateTimestamp);
 
         /* Not the time for celebrations yet.
          */

@@ -564,8 +564,11 @@ class Session
                     }
                 }
             }
+            /* Student birthday check session
+             */
             if ($user->getRole()->isStudent()) {
-                $_SESSION['isBirthdayCelebration'] = $user->isBirthday();
+                $externalStudent = $synUser->getStudent($synergyId);
+                $_SESSION['isBirthdayCelebration'] = $user->isBirthday($externalStudent['StudentBirthDate']);
             }
         }
     }
