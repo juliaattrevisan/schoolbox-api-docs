@@ -53,7 +53,7 @@ export const useFiltersStore = defineStore("ccFilters", () => {
 
     const onlyShowGaps = window.Vue.ref<boolean>(false); // whether to only show nodes that contain 0 usage counts
 
-    const showDisabled = window.Vue.ref<boolean>(true); // whether to show those nodes that are disabled
+    const showDisabled = window.Vue.ref<boolean>(false); // whether to show those nodes that are disabled
 
     // to pass through to the csv export, to know which usages to include
     const queryParams = window.Vue.computed(() => {
