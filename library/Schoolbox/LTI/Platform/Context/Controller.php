@@ -162,6 +162,10 @@ class Controller extends BaseController
         if (!is_array($componentCustomClaims)) {
             $componentCustomClaims = [];
         }
+
+        /* If the custom claims are empty, set it to null so not to send to the LTI tool
+         * this claim is optional (well should be) so we can safely remove it
+         */
         if (empty($componentCustomClaims)) {
             $componentCustomClaims = null;
         }
