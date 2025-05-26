@@ -71,6 +71,12 @@ class Profile implements IStrategy
 
 
     /**
+     * A special node containing details about Tutors
+     */
+    private const TUTOR_NODE = 'REGISTRATION';
+
+
+    /**
      * Profile constructor.
      *
      * @param ValidStrats                     $validStrats
@@ -678,8 +684,9 @@ class Profile implements IStrategy
         /* Check to make sure our registration type is actually 'REGISTRATION' which is Wonde's definition
          * of a tutor
          */
-        if ('REGISTRATION' === ($studentTutor['type'] ?? '') && count($studentTutor['employees']['data'] ?? [])) {
+        if (self::TUTOR_NODE === ($studentTutor['type'] ?? '') && count($studentTutor['employees']['data'] ?? [])) {
             /* Assume the first guy in the stack
+             * Note: might die if this becomes a key-value lookup instead of a stack
              */
             $firstTutor = $studentTutor['employees']['data'][0];
 
