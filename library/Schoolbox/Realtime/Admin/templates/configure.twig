@@ -356,17 +356,16 @@
                                             not be delayed.
                                         </li>
                                         <li>
-                                            This affects only the sending of instant notifications sent to a device,
+                                            This affects only the sending of notifications sent to a device,
                                             either via a web app or a <a href="{{ routeLookup('adminNotifications.getApps') }}">delivery provider</a>:
                                             it does not affect digest, side panel or email notifications.
                                         </li>
                                         <li>
-                                            Priority news notifications are still sent as soon as they are able to be.
+                                            Priority news functionality is unaffected by this setting.
                                         </li>
                                         <li>
-                                            If this setting is changed, any notifications which were already delayed due
-                                            to this setting will still be sent at the previous blackout end time, rather
-                                            than the new time.
+                                            If this setting is changed, any notifications which were already delayed due to this setting will still
+                                            be sent at the end of the previous pause period, rather than the new time.
                                         </li>
                                     </ul>
                                 </section>
