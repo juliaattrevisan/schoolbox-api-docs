@@ -295,7 +295,7 @@ class Profile implements IStrategy
 
                 /* Fish out a staff member via their user code
                  */
-                $tutor = $this->findTutor($student['registration'] ?? []);
+                $tutor = $this->findTutor($student['registration']['data'] ?? []);
 
                 /* Find out a staff member via their user code
                  */
@@ -679,11 +679,11 @@ class Profile implements IStrategy
          * of a tutor
          */
         if (
-            'REGISTRATION' === ($studentTutor['data']['type'] ?? '') &&
-            count($studentTutor['data']['employees']['data'] ?? [])
+            'REGISTRATION' === ($studentTutor['type'] ?? '') &&
+            count($studentTutor['employees']['data'] ?? [])
         ) {
             $tutor = [
-                'id' => $studentTutor['data']['employees']['data'][0]['mis_id'],
+                'id' => $studentTutor['employees']['data'][0]['mis_id'],
                 /**
                  * chose 'title' as it was equivalent of our 'title'
                  * chose 'forename' as it was equivalent of our 'preferred_name' rather than 'legal_forename'
@@ -692,12 +692,12 @@ class Profile implements IStrategy
                 'name' => trim(
                     sprintf(
                         "%s %s %s",
-                        $studentTutor['data']['employees']['data'][0]['title'] ?? '',
-                        $studentTutor['data']['employees']['data'][0]['forename'] ?? '',
-                        $studentTutor['data']['employees']['data'][0]['surname'] ?? ''
+                        $studentTutor['employees']['data'][0]['title'] ?? '',
+                        $studentTutor['employees']['data'][0]['forename'] ?? '',
+                        $studentTutor['employees']['data'][0]['surname'] ?? ''
                     )
                 ),
-                'group' => $studentTutor['data']['name'] ?? ''
+                'group' => $studentTutor['name'] ?? ''
             ];
         }
         return $tutor;
