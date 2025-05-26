@@ -159,14 +159,9 @@ class Processor
             'Class Code',
             'Student External ID',
             'Normalised Mark',
-            'Comment'
+            'Comment',
+            'Publish Date'
         ]);
-
-        /* Compute publish date just once
-         * and also make it the same as created_at and updated_at to better keep track
-         * of things after an import has occurred
-         */
-        $datetime = $this->publishAt->getDatabase();
 
         /* Maintain a row counter
          */
@@ -176,6 +171,23 @@ class Processor
             /* Remember the row number
              */
             $i++;
+
+            /* Compute publish date from csv
+             * and also make it the same as created_at and updated_at to better keep track
+             * of things after an import has occurred
+             */
+            $datetime = trim((string)$row['Publish Date']);
+
+            if ('' === $datetime) {
+                $this->log(sprintf(
+                    "Row %s: Can't find Publish Date. Make sure it's correct and try again.",
+                    $i
+                ), self::WARNING);
+
+                $errors++;
+
+                continue;
+            }
 
             /* Process feedbacks
              */
