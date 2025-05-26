@@ -720,9 +720,9 @@ class Profile implements IStrategy
                     ]),
                 )),
                 'group' => $fmv->find([
-                    $firstTutor['name'],
-                    $firstTutor['code'],
-                    $firstTutor['description'],
+                    $studentTutor['name'],
+                    $studentTutor['code'],
+                    $studentTutor['description'],
                 ]),
             ];
         }
