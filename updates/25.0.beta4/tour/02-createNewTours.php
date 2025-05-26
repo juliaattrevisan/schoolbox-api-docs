@@ -39,12 +39,24 @@ $app = new class extends CliTool\App
          */
         passthru("{$cmd}/250-core.yaml", $returnVar);
 
+        /* Some plans have both Pastoral and LMS Enhancements
+         * We didn't really add support for multiple tours commencing from the same initiation point
+         * so we've added a special tour that services both, in addition to the individual tours for
+         * pastoral care and lms enhancements
+         */
+        $lmsPastoraLPlans = [
+            'Learning Enhanced',
+            'Canvas Elite'
+        ];
+
+        if (in_array($currentPlan, $lmsPastoraLPlans)) {
+            passthru("{$cmd}/250-lms-and-pastoral-care.yaml", $returnVar);
+        }
+
         /* Pastoral Enhancements are only available for some plans
          */
         $pastoralCarePlans = [
             'Community Elite',
-            'Learning Enhanced',
-            'Canvas Elite'
         ];
 
         if (in_array($currentPlan, $pastoralCarePlans)) {
@@ -55,9 +67,7 @@ $app = new class extends CliTool\App
          */
         $lmsPlans = [
             'Learning Essentials',
-            'Learning Enhanced',
             'Canvas Enhanced',
-            'Canvas Elite'
         ];
 
         if (in_array($currentPlan, $lmsPlans)) {
