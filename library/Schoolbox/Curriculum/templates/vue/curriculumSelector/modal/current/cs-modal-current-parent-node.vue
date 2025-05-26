@@ -26,7 +26,7 @@ const hasCode = props.node.code && props.node.code !== ""; // If there's a code,
 const isNodeExpanded = window.Vue.ref(!store.hasMultipleParents); // will not be expanded if there are multiple parents, to avoid potential long scrolls in the modal
 
 /**
- * Show the expand button there's multiple top level parents, it's the parent node,
+ * Show the expand button if there's multiple top level parents, it's the parent node,
  * and when the node has children
  */
 const showExpandButton = window.Vue.computed(() => {
@@ -37,6 +37,9 @@ const showExpandButton = window.Vue.computed(() => {
  * Expand or collapse the children of the node
  */
 function onExpandSelected(): void {
+    if (!showExpandButton.value) {
+        return; // do nothing if the expand button is not shown
+    }
     isNodeExpanded.value = !isNodeExpanded.value; // toggle the expanded state
 }
 
