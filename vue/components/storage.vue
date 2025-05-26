@@ -43,7 +43,12 @@ export default {
                     // The component is visible, ready to init the player
                     switch (this.storage.type) {
                         case "audio":
-                            this.player = new this.MediaElementPlayer(this.$el);
+                            this.player = new this.MediaElementPlayer(this.$el, {
+                                // Override the default iconSprite reference and leave blank to avoid load error
+                                // CSS is used to display the icons instead
+                                // refer to https://github.com/mediaelement/mediaelement/blob/master/docs/api.md#configuration
+                                iconSprite: ``,
+                            });
                             break;
 
                         case "video":
