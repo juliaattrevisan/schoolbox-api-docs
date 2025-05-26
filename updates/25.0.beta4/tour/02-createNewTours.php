@@ -26,7 +26,7 @@ $app = new class extends CliTool\App
         /* Passthru for running a tool during an upgrade
          */
         $cmd = sprintf(
-            'php %s /../../../tools/tour/install.php --perform %s',
+            'php %s/../../../tools/tour/install.php --perform %s',
             __DIR__,
             __DIR__,
         );
