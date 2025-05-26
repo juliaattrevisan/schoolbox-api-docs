@@ -689,6 +689,10 @@ class Profile implements IStrategy
                 return $tutor;
             }
 
+            /* Used to compress optionality in preferred and legal names
+             */
+            $fmv = new FirstMeaningfulValue();
+
             $tutor = [
                 'id' => $firstTutor['mis_id'],
                 /**
@@ -698,11 +702,21 @@ class Profile implements IStrategy
                  */
                 'name' => trim(sprintf(
                     "%s %s %s",
-                    $firstTutor['title'] ?? '',
-                    $firstTutor['forename'] ?? '',
-                    $firstTutor['surname'] ?? ''
+                    trim((string)($firstTutor['title'] ?? '')),
+                    $fmv->find([
+                        $firstTutor['forename'],
+                        $firstTutor['legal_forename']
+                    ]),
+                    $fmv->find([
+                        $firstTutor['surname'],
+                        $firstTutor['legal_surname']
+                    ]),
                 )),
-                'group' => $firstTutor['name'] ?? ''
+                'group' => $fmv->find([
+                    $firstTutor['name'],
+                    $firstTutor['code'],
+                    $firstTutor['description'],
+                ]),
             ];
         }
 
