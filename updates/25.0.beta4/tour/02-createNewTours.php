@@ -46,10 +46,13 @@ $app = new class extends CliTool\App
          */
         $lmsPastoraLPlans = [
             'Learning Enhanced',
-            'Canvas Elite'
+            'Learning-Enhanced',
+            'Canvas Elite',
+            'Canvas-Elite'
         ];
 
         if (in_array($currentPlan, $lmsPastoraLPlans)) {
+            $this->getLogger()->debug("Creating joint tour for {$currentPlan} via {$cmd}/250-lms-and-pastoral-care.yaml");
             passthru("{$cmd}/250-lms-and-pastoral-care.yaml", $returnVar);
         }
 
@@ -57,9 +60,11 @@ $app = new class extends CliTool\App
          */
         $pastoralCarePlans = [
             'Community Elite',
+            'Community-Elite',
         ];
 
         if (in_array($currentPlan, $pastoralCarePlans)) {
+            $this->getLogger()->debug("Creating pastoral care tour for {$currentPlan} via {$cmd}/250-pastoral-care.yaml");
             passthru("{$cmd}/250-pastoral-care.yaml", $returnVar);
         }
 
@@ -67,10 +72,13 @@ $app = new class extends CliTool\App
          */
         $lmsPlans = [
             'Learning Essentials',
+            'Learning-Essentials',
             'Canvas Enhanced',
+            'Canvas-Enhanced',
         ];
 
         if (in_array($currentPlan, $lmsPlans)) {
+            $this->getLogger()->debug("Creating lms tour for {$currentPlan} via {$cmd}/250-pastoral-care.yaml");
             passthru("{$cmd}/250-lms.yaml", $returnVar);
         }
     }
