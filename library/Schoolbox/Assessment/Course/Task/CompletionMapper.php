@@ -30,6 +30,12 @@ class CompletionMapper extends Mapper
      */
     private $interactionChecker;
 
+    /**
+     * @var AssessmentMapper
+     */
+    private $assessmentMapper;
+
+
     public function __construct()
     {
         parent::__construct();
@@ -53,15 +59,11 @@ class CompletionMapper extends Mapper
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'preSave']);
+        $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'removeParticipationIfNecessary']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'removeParticipationIfNecessary']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'canParticipate']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'insertParticipation']);
-
-        // Note regarding absence of post-delete callback for removing participation
-        // -------------------------------------------------------------------------
-        // No post-delete callback is required here (unlike other types of assessment e.g. 'due work' and 'quiz'),
-        // because the UI provides no way for a user to delete the task_completion record that is added when a task is
-        // marked as completed.  All the user can do to reverse the act of marking a task as completed, is change the
-        // status of the task_completion row to 'incomplete'.
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'insertParticipation']);
     }
 
 
@@ -111,6 +113,44 @@ class CompletionMapper extends Mapper
         }
         $assessment = $this->getTaskMapper()->findById($object->getTask()->getId())->getAssessmentModel();
         return $this->interactionChecker->insertParticipationOnFirstInteraction($object->getStudent(), $assessment);
+    }
+
+
+    /**
+     * Remove the participant if $student should no longer be a participant in $assessment.
+     *
+     * @param Completion $object
+     * @return bool - Return true on success - whether or not a participation was removed.
+     *                This is the expected behaviour for callbacks registered with Schoolbox\Mapper.
+     */
+    public function removeParticipationIfNecessary(Completion $object): bool
+    {
+        $student = $object->getStudent();
+        $task = $object->getTask();
+
+        try {
+            $latestTaskCompletion = $this->findLatestForTaskAndStudent($task->getId(), $student->getId());
+        } catch (Mapper\Exception) {
+            // Could not find latest task completion, probably because none exists.
+            $latestTaskCompletion = null;
+        }
+
+        if ($latestTaskCompletion !== null) {
+            // If any (non-deleted) response or feedback exists, the student should remain a participant.
+            // For tasks the response is the task_completion record.  Tasks have no feedback.
+            return true;
+        }
+
+        // Get a hydrated $assessment to ensure its context properties are set.
+        try {
+            $assessment = $this->assessmentMapper->findById($task->getAssessmentModel()->getId());
+        } catch (Mapper\Exception) {
+            // Can't find assessment - just assume the student should remain a participant.
+            return true;
+        }
+
+        $this->interactionChecker->removeParticipationIfNoInteractionsRemain($student, $assessment);
+        return true;
     }
 
 
@@ -297,7 +337,7 @@ class CompletionMapper extends Mapper
     }
 
     /**
-     * Pre-save method for saving an task completion object - saves the
+     * Pre-save method for saving a task completion object - saves the
      * marking user if this is a new object.
      *
      * @param Completion $object
