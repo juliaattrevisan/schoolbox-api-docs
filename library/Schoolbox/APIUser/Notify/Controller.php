@@ -52,6 +52,8 @@ class Controller extends Base
         }
         try {
             $bob  = new NotificationInstanceBuilder();
+            // Note that setting href to # has the effect of automarking the
+            // notification as read: see SA-17727
             $bob->setTitle($data['message'] ?? '')
                 ->setAllowSelfSend(true)
                 ->setSeverity(Logger::INFO)

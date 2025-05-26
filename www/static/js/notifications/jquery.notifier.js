@@ -391,8 +391,15 @@
                 const href = document.location.pathname;
                 document.querySelectorAll("[data-msgitem-href]").forEach((element) => {
                     if (!settings.autoReadNotif) {
+                        // Is this a link to the base anchor?
+                        // If so, then this should be considered an alert which always displays?
+                        let href = element.getAttribute("href");
+                        if (href === '#') {
+                            return;
+                        }
+
                         // no page found yet, keep looping
-                        let elmHref = new URL(element.getAttribute("href"), window.location.href);
+                        let elmHref = new URL(href, window.location.href);
                         if (elmHref.pathname === href) {
                             // get parent where we could mark as read
                             let message = element.closest("[data-msgitem]");
