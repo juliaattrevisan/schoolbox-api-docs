@@ -23,7 +23,7 @@ const { title } = useNodeTitle(props.node);
 const extraId = generateUUID(); // to ensure the input/label id is unique
 const showChildren = props.node.children && props.node.children.length > 0; // To determine whether we need to display further child nodes within this node
 const hasCode = props.node.code && props.node.code !== ""; // If there's a code, it can be selected
-const isNodeExpanded = window.Vue.ref(props.isExpanded); // to track whether the node is expanded or not
+const isNodeExpanded = window.Vue.ref(!store.hasMultipleParents); // will not be expanded if there are multiple parents, to avoid potential long scrolls in the modal
 
 /**
  * Show the expand button there's multiple top level parents, it's the parent node,
