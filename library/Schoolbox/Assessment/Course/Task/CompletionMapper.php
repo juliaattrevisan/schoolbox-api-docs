@@ -13,6 +13,7 @@ namespace Schoolbox\Assessment\Course\Task;
 use PDOStatement;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
 use Schoolbox\User;
@@ -36,6 +37,7 @@ class CompletionMapper extends Mapper
             Participant\Plan\Mapper::getInstance(),
             Participant\Mapper::getInstance()
         );
+        $this->assessmentMapper = new AssessmentMapper();
     }
 
     protected function mapping()
@@ -51,7 +53,6 @@ class CompletionMapper extends Mapper
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'preSave']);
-
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'canParticipate']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'insertParticipation']);
 
