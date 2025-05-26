@@ -30,6 +30,8 @@ services:
   # Basically, anything which we haven't yet figured out how to migrate into its
   # own container will go here for now.
   schoolbox-cli:
+    depends_on:
+      - php82-bookworm
     container_name: schoolbox-cli
     restart: always
     build:
@@ -96,7 +98,7 @@ services:
     build:
       context: ./rabbitmq
     healthcheck:
-      test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
+      test: [ "CMD", "rabbitmq-diagnostics", "check_port_connectivity" ]
       start_period: 30s
       interval: 3s
       timeout: 3s
@@ -117,6 +119,8 @@ services:
         condition: service_healthy
       redis-storage:
         condition: service_healthy
+      php82-bookworm:
+        condition: service_started
     build:
       context: ./schoolbox-digestd
     env_file: ./default.env
@@ -136,6 +140,8 @@ services:
         condition: service_healthy
       redis-storage:
         condition: service_healthy
+      php82-bookworm:
+        condition: service_started
     build:
       context: ./schoolbox-scheduled
     env_file: ./default.env
@@ -155,6 +161,8 @@ services:
         condition: service_healthy
       redis-storage:
         condition: service_healthy
+      php82-bookworm:
+        condition: service_started
     build:
       context: ./schoolbox-mobiled
     env_file: ./default.env
@@ -174,6 +182,8 @@ services:
         condition: service_healthy
       redis-storage:
         condition: service_healthy
+      php82-bookworm:
+        condition: service_started
     build:
       context: ./schoolbox-socketd
     env_file: ./default.env

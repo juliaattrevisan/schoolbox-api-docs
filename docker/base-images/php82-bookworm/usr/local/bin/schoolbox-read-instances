@@ -1,0 +1,233 @@
+#!/bin/bash
+# @copyright   Copyright 2021, Schoolbox Pty Ltd
+# @link        https://schoolbox.com.au/
+#
+# Reads Schoolbox instances.ini
+# Usage:
+#   schoolbox-read-instances --option [OPTION] [--ini INI_FILE]
+# Eg:
+#   schoolbox-read-instances --option SQL_passwd --ini /tmp/instances.ini
+
+# Global const
+readonly INI_FILE_DEFAULT='/etc/schoolbox/instances.ini'
+readonly ARG_INI_FILE='ini'
+readonly ARG_OPTION='option'
+readonly ARG_HELP_LONG='help'
+readonly ARG_HELP_SHORT='h'
+readonly VALID_OPTIONS=("INSTANCE_ID instance-list hostnames SQL_host SQL_user SQL_passwd SQL_db")
+readonly COLOUR_RED='\e[91m'
+readonly COLOUR_LIGHT_GREEN='\e[92m'
+readonly COLOUR_END='\e[0m'
+
+# Global vars
+# Map of options and their value in the ini file
+declare -A optionKeys;
+optionKeys[SQL_host]=db_host
+optionKeys[SQL_user]=db_user
+optionKeys[SQL_passwd]=db_pass
+optionKeys[SQL_db]=db_schema
+
+# Map of options to env var names. These env vars may be provided prior to the instances.ini file being deployed. Eg during instance installation.
+declare -A sql_env_vars
+sql_env_vars[SQL_host]=SQL_HOST
+sql_env_vars[SQL_user]=SQL_USER
+sql_env_vars[SQL_passwd]=SQL_PASS
+sql_env_vars[SQL_db]=SQL_SCHEMA
+
+declare ini_file="$INI_FILE_DEFAULT";
+declare option;
+
+
+print_help(){
+  local file
+  file=$(basename "$0")
+  echo -e "DESCRIPTION"
+  echo -e "  Read schoolbox instance data from ini file."
+  echo -e "  You can fetch instance-list without an INSTANCE_ID environment variable."
+  echo -e "  For all other invocations, you must specify an INSTANCE_ID environment variable."
+  echo -e "  If specified, env vars [SQL_HOST, SQL_USER, SQL_PASS, SQL_SCHEMA] will take precedent over values in ini file."
+  echo -e "  This is useful if you know this script will be called indirectly by another script"
+  echo -e "  eg if ${COLOUR_LIGHT_GREEN}xxx.sh${COLOUR_END} calls ${COLOUR_LIGHT_GREEN}$file${COLOUR_END}, then the following will work:"
+  echo -e "    ${COLOUR_LIGHT_GREEN}SQL_HOST=localhost SQL_USER=john SQL_PASS=abc SQL_SCHEMA=john_db ./xxx.sh${COLOUR_END}"
+  echo -e ""
+  echo -e "USAGE"
+  echo -e "  ${COLOUR_LIGHT_GREEN}[INSTANCE_ID=<instance_id>] $file [--$ARG_INI_FILE <ini_file>] --$ARG_OPTION <option>${COLOUR_END}"
+  echo -e ""
+  echo -e "OPTIONS"
+  echo -e "  ${COLOUR_LIGHT_GREEN}--$ARG_OPTION <option>${COLOUR_END}  Required. Value must be one of [${VALID_OPTIONS[*]}]"
+  echo -e "  ${COLOUR_LIGHT_GREEN}--$ARG_INI_FILE${COLOUR_END}              Optional. Path to ini file. Defaults to $INI_FILE_DEFAULT"
+  echo -e "  ${COLOUR_LIGHT_GREEN}-$ARG_HELP_SHORT,--$ARG_HELP_LONG${COLOUR_END}          Optional. Print this help message and exit"
+  echo -e ""
+  echo -e "EXAMPLES"
+  echo -e "  # To read instance list from custom ini file"
+  echo -e "  ${COLOUR_LIGHT_GREEN}$file --ini /some/other/file.ini --$ARG_OPTION instance-list${COLOUR_END}"
+  echo -e ""
+  echo -e "  # Check that instance abc123 exists in ini file"
+  echo -e "  ${COLOUR_LIGHT_GREEN}INSTANCE_ID=abc123 $file --$ARG_OPTION INSTANCE_ID${COLOUR_END}"
+  echo -e ""
+  echo -e "  # To read hostnames for specific instance from default ini file"
+  echo -e "  ${COLOUR_LIGHT_GREEN}INSTANCE_ID=abc123 $file --$ARG_OPTION hostnames${COLOUR_END}"
+}
+
+
+parse_args(){
+  local errors=0
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+      --"$ARG_INI_FILE")
+        ini_file=$(readlink -f "$2"); shift; shift;
+        ;;
+      --"$ARG_OPTION")
+        option="$2"; shift; shift;
+        ;;
+      -"$ARG_HELP_SHORT"|--"$ARG_HELP_LONG")
+        print_help
+        exit
+        ;;
+      *)    # unknown option
+        echo -e "${COLOUR_RED}Unrecognised option: '$1'${COLOUR_END}" >&2
+        errors='1'
+        shift # past argument
+        ;;
+    esac
+  done
+  if [[ $errors == '1' ]]; then
+    exit 1
+  fi
+}
+
+
+validate_args(){
+  if [[ ! -f $ini_file ]]; then
+    echo -e "${COLOUR_RED}File not found: '$ini_file'${COLOUR_END}" >&2
+    exit 1;
+  fi
+
+  # Check user specified a valid option to fetch
+  regex=" ${option} "
+  if [[ ! " ${VALID_OPTIONS[*]} " =~ $regex ]]; then
+    echo -e "${COLOUR_RED}Invalid --$ARG_OPTION arg. '$option'${COLOUR_END}" >&2
+    echo "Must be one of [${VALID_OPTIONS[*]}] " >&2
+    exit 1
+  fi
+}
+
+
+check_requested_instance_list(){
+  if [[ $option == "instance-list" ]]; then
+    grep -Eo "^\[.+\]" "$ini_file" | sed -E 's/\[//g' | sed -E 's/\]//g'
+    exit
+  fi
+}
+
+
+check_instance_id(){
+  if [[ -z $INSTANCE_ID ]]; then
+    echo -e "${COLOUR_RED}You must provide an INSTANCE_ID env var${COLOUR_END}" >&2
+    exit 1
+  fi
+}
+
+
+# Check if requesting a SQL cred and it was provided explicitly via ENV var
+check_sql_env_var_override(){
+  # Is desired option not a SQL credential?
+  if [[ ! -v "sql_env_vars[$option]" ]]; then
+    return
+  fi
+  # We could either:
+  # - Check if env var is defined (regardless if value is empty), or
+  # - Check env var is defined and has non-empty value
+  # We adopt the latter so that empty value doesn't mask a non-empty value in INI file
+  local env_var_name=${sql_env_vars[$option]}
+  local env_var_value="${!env_var_name}"
+  if [[ -n $env_var_value ]]; then
+    echo $env_var_value | xargs
+    exit 0
+  fi
+}
+
+
+output_hostnames(){
+  section=$1
+  echo -e "$section" | grep -F "hostnames[]" | grep -Eo "'.+'$" | sed "s/'//g"
+  exit
+}
+
+
+output_sql_cred(){
+  section=$1
+  ini_var_name=${optionKeys[$option]}
+  # Is option defined in INI file?
+  if ! echo -e "$section" | grep -qE "^$ini_var_name\s*=" ; then
+    # Instance section found, but no config defined for option. Should never get here.
+    echo -e "${COLOUR_RED}Instance '$INSTANCE_ID' has section, but no config defined for option '$option($ini_var_name)'${COLOUR_END}" >&2
+    echo -e "$section"  >&2
+    exit 1
+  fi
+
+  # Parse the requested config
+  line=$(echo -e "$section" | grep "$ini_var_name\s")
+  readarray -d = -t my_array <<< "$line"
+  value="${my_array[1]}"
+  echo "$value" | xargs
+  exit
+}
+
+parse_option_for_instance(){
+  # parse the section for the specified instance
+  section='';
+  is_match=0
+  instance_id_found='0'
+  while read -r line || [[ -n $line ]]; do
+    # If not a comment and not empty
+    if ! [[ $line =~ \s*\;.+ ]] && [[ -n $line ]]; then
+      # If we've reached the instance's section
+      if [[ $line =~ \[$INSTANCE_ID\] ]]; then
+        section="$line"
+        instance_id_found=1
+        is_match=1
+      # Have we previously matched the [$instance_id] and are therefore in the instance's section?
+      elif [[ $is_match == 1 ]]; then
+        # Have we reached the next section?
+        if [[ $line =~ \[.+\] ]]; then
+          is_match=0
+        else
+          section="$section\n$line"
+        fi
+      fi
+    fi
+  done < "$ini_file"
+
+  # Was instance not found in ini file?
+  if [[ $instance_id_found == 0 ]]; then
+    echo -e "${COLOUR_RED}Instance id '$INSTANCE_ID' not found in ini file '$ini_file'${COLOUR_END}" >&2
+    exit 1
+  fi
+
+  # Was user just validating instance_id exists in file?
+  if [[ $option == 'INSTANCE_ID' ]]; then
+    echo "$INSTANCE_ID"
+    exit
+  fi
+
+  # Did user request hostnames?
+  if [[ $option == 'hostnames' ]]; then
+    output_hostnames "$section"
+  fi
+
+  output_sql_cred "$section"
+}
+
+
+main(){
+  parse_args "$@"
+  validate_args
+  check_requested_instance_list
+  # All other options require an INSTANCE_ID
+  check_instance_id
+  check_sql_env_var_override
+  parse_option_for_instance
+}
+
+main "$@"

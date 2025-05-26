@@ -6,6 +6,15 @@ include:
   - base.docker-compose.yaml
 
 services:
+  # Base image: only needs to be built, not started
+  php82-bookworm:
+    image: php82-bookworm
+    build:
+      context: ./base-images/php82-bookworm
+      args:
+        ENV: dev
+    restart: no
+
   # Load-balanced FrankenPHP containers
   schoolbox-frankenphp:
     environment:
