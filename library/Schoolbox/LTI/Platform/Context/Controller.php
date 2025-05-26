@@ -162,6 +162,9 @@ class Controller extends BaseController
         if (!is_array($componentCustomClaims)) {
             $componentCustomClaims = [];
         }
+        if (empty($componentCustomClaims)) {
+            $componentCustomClaims = null;
+        }
 
         // Build the launch request for the resource link
         $repository       = $this->registrations->find($tool->getDeploymentId());
