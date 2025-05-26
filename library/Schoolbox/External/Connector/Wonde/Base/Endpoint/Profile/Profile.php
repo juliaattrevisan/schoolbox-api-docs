@@ -670,10 +670,10 @@ class Profile implements IStrategy
     /**
      * Find the first tutor and tutor group for a student
      *
-     * @param array $studentTutor
+     * @param array $registrationData
      * @return array
      */
-    private function findTutor(array $studentTutor): array
+    private function findTutor(array $registrationData): array
     {
         $tutor = [
             'id' => null,
@@ -684,11 +684,11 @@ class Profile implements IStrategy
         /* Check to make sure our registration type is actually 'REGISTRATION' which is Wonde's definition
          * of a tutor
          */
-        if (self::TUTOR_NODE === ($studentTutor['type'] ?? '') && count($studentTutor['employees']['data'] ?? [])) {
+        if (self::TUTOR_NODE === ($registrationData['type'] ?? '') && count($registrationData['employees']['data'] ?? [])) {
             /* Assume the first guy in the stack
              * Note: might die if this becomes a key-value lookup instead of a stack
              */
-            $firstTutor = $studentTutor['employees']['data'][0];
+            $firstTutor = $registrationData['employees']['data'][0];
 
             /* No guy? No trabajo
              */
@@ -720,9 +720,9 @@ class Profile implements IStrategy
                     ]),
                 )),
                 'group' => $fmv->find([
-                    $studentTutor['name'],
-                    $studentTutor['code'],
-                    $studentTutor['description'],
+                    $registrationData['name'],
+                    $registrationData['code'],
+                    $registrationData['description'],
                 ]),
             ];
         }
