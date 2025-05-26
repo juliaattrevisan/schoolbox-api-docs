@@ -678,28 +678,34 @@ class Profile implements IStrategy
         /* Check to make sure our registration type is actually 'REGISTRATION' which is Wonde's definition
          * of a tutor
          */
-        if (
-            'REGISTRATION' === ($studentTutor['type'] ?? '') &&
-            count($studentTutor['employees']['data'] ?? [])
-        ) {
+        if ('REGISTRATION' === ($studentTutor['type'] ?? '') && count($studentTutor['employees']['data'] ?? [])) {
+            /* Assume the first guy in the stack
+             */
+            $firstTutor = $studentTutor['employees']['data'][0];
+
+            /* No guy? No trabajo
+             */
+            if (null === $firstTutor) {
+                return $tutor;
+            }
+
             $tutor = [
-                'id' => $studentTutor['employees']['data'][0]['mis_id'],
+                'id' => $firstTutor['mis_id'],
                 /**
                  * chose 'title' as it was equivalent of our 'title'
                  * chose 'forename' as it was equivalent of our 'preferred_name' rather than 'legal_forename'
                  * chose 'surname' as it was equivalent of our 'lastname' rather than 'legal_surname'
                  */
-                'name' => trim(
-                    sprintf(
-                        "%s %s %s",
-                        $studentTutor['employees']['data'][0]['title'] ?? '',
-                        $studentTutor['employees']['data'][0]['forename'] ?? '',
-                        $studentTutor['employees']['data'][0]['surname'] ?? ''
-                    )
-                ),
-                'group' => $studentTutor['name'] ?? ''
+                'name' => trim(sprintf(
+                    "%s %s %s",
+                    $firstTutor['title'] ?? '',
+                    $firstTutor['forename'] ?? '',
+                    $firstTutor['surname'] ?? ''
+                )),
+                'group' => $firstTutor['name'] ?? ''
             ];
         }
+
         return $tutor;
     }
 
