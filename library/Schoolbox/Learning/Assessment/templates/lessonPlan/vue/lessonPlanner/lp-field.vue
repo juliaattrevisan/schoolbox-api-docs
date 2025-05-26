@@ -104,7 +104,7 @@ window.Vue.onMounted(async () => {
             </textarea>
             <a
                 v-if="sbProps.hasAIFeatures"
-                class="icon-chat lp-field-regenerate"
+                class="icon-ai lp-field-regenerate"
                 @click="() => lpStore.openModal(props.fieldId)"
             >
                 {{ fieldWasGenerated ? "Regenerate" : "Generate" }} with AI

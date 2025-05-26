@@ -41,7 +41,7 @@ window.Vue.onMounted(() => {
                 <button
                     v-if="sbProps.hasAIFeatures"
                     type="button"
-                    class="button expand icon-chat"
+                    class="button expand icon-ai"
                     @click="() => lpStore.openModal()"
                 >
                     {{ lpStore.hasLessonContent ? "Regenerate" : "Generate" }}
