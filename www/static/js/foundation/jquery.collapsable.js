@@ -2,6 +2,9 @@
  * Make homepage components collapsable
  */
 (function () {
+    const DEFAULT_ICON_COLLAPSED = "icon-down-arrow";
+    const DEFAULT_ICON_EXPANDED = "icon-up-arrow";
+
     /**
      * Compute dimensions dynamically
      *
@@ -25,8 +28,8 @@
             var defaults = {
                 element: element,
                 container: "[data-component]",
-                iconCollapsed: "icon-down-arrow",
-                iconExpanded: "icon-up-arrow",
+                iconCollapsed: DEFAULT_ICON_COLLAPSED,
+                iconExpanded: DEFAULT_ICON_EXPANDED,
             };
 
             return $.extend(defaults, options);
@@ -128,7 +131,11 @@
 
         let icon = $('[data-collapser="' + component.attr("data-collapsable") + '"]');
 
-        icon.removeClass(this.config.iconExpanded).addClass(this.config.iconCollapsed);
+        // some places that aren't collapsable sometimes decide to call this, so fall back to the default icon if so
+        const iconCollapsed = this.config?.iconCollapsed ?? DEFAULT_ICON_COLLAPSED;
+        const iconExpanded = this.config?.iconExpanded ?? DEFAULT_ICON_EXPANDED;
+
+        icon.removeClass(iconExpanded).addClass(iconCollapsed);
     };
 
     /**
@@ -137,10 +144,14 @@
      * @param icon
      */
     $.fn.executeIconToggle = function (icon) {
-        if (icon.hasClass(this.config.iconExpanded)) {
-            icon.removeClass(this.config.iconExpanded).addClass(this.config.iconCollapsed);
+        // some places that aren't collapsable sometimes decide to call this, so fall back to the default icon if so
+        const iconCollapsed = this.config?.iconCollapsed ?? DEFAULT_ICON_COLLAPSED;
+        const iconExpanded = this.config?.iconExpanded ?? DEFAULT_ICON_EXPANDED;
+
+        if (icon.hasClass(iconExpanded)) {
+            icon.removeClass(iconExpanded).addClass(iconCollapsed);
         } else {
-            icon.removeClass(this.config.iconCollapsed).addClass(this.config.iconExpanded);
+            icon.removeClass(iconCollapsed).addClass(iconExpanded);
         }
     };
 })(jQuery);

@@ -23,26 +23,26 @@ class Sync extends Base implements ISync
     {
         $query = '
             SELECT
-            STUDENT_NUMBER AS "student_id",
-            USERNAME       AS "network_login",
-            NULL           AS "student_title",
-            FIRSTNAME      AS "student_given_name",
-            FIRSTNAME      AS "student_preferred",
-            SURNAME        AS "student_surname",
-            NULL           AS "student_home_email",
-            EMAIL_ADDRESS  AS "student_default_email",
-            NULL           AS "student_work_email",
-            YEAR_LEVEL     AS "student_year_level",
-            FORM_NAME      AS "student_form_description",
-            HOUSE          AS "student_house",
-            NULL           AS "student_boarder",
-            NULL           AS "student_boarding_house",
-            NULL           AS "student_campus"
+            STUDENT_NUMBER AS STUDENT_ID,
+            USERNAME       AS NETWORK_LOGIN,
+            NULL           AS STUDENT_TITLE,
+            FIRSTNAME      AS STUDENT_GIVEN_NAME,
+            FIRSTNAME      AS STUDENT_PREFERRED,
+            SURNAME        AS STUDENT_SURNAME,
+            NULL           AS STUDENT_HOME_EMAIL,
+            EMAIL_ADDRESS  AS STUDENT_DEFAULT_EMAIL,
+            NULL           AS STUDENT_WORK_EMAIL,
+            YEAR_LEVEL     AS STUDENT_YEAR_LEVEL,
+            FORM_NAME      AS STUDENT_FORM_DESCRIPTION,
+            HOUSE          AS STUDENT_HOUSE,
+            NULL           AS STUDENT_BOARDER,
+            NULL           AS STUDENT_BOARDING_HOUSE,
+            NULL           AS STUDENT_CAMPUS
             FROM SCHOOLBOX_STUDENTS
         ';
 
         return new Iterator\Student(
-            $this->databaseExternal->getQueryIterator($query)
+            new ResultIterator($this->databaseExternal->getQueryIterator($query)),
         );
     }
 
@@ -53,23 +53,23 @@ class Sync extends Base implements ISync
     {
         $query = '
             SELECT
-                P.USERNAME               AS "student_contact_network_login",
-                P.CARER_NUMBER           AS "student_contact_id",
-                NULL                     AS "student_contact_title",
-                P.FIRST_NAME             AS "student_contact_given_name",
-                P.PREFERRED_NAME         AS "student_contact_preferred",
-                P.SURNAME                AS "student_contact_surname",
-                NULL                     AS "student_contact_home_email",
-                P.EMAIL                  AS "student_contact_default_email",
-                NULL                     AS "student_contact_work_email",
-                S.STUDENT_NUMBER         AS "student_id",
-                S.YEAR_LEVEL             AS "student_year_level",
-                S.FORM_NAME              AS "student_form_description",
-                NULL                     AS "student_campus",
-                S.HOUSE                  AS "student_house",
-                NULL                     AS "student_gender",
-                S.FIRSTNAME              AS "student_preferred",
-                S.SURNAME                AS "student_surname"
+                P.USERNAME               AS STUDENT_CONTACT_NETWORK_LOGIN,
+                P.CARER_NUMBER           AS STUDENT_CONTACT_ID,
+                NULL                     AS STUDENT_CONTACT_TITLE,
+                P.FIRST_NAME             AS STUDENT_CONTACT_GIVEN_NAME,
+                P.PREFERRED_NAME         AS STUDENT_CONTACT_PREFERRED,
+                P.SURNAME                AS STUDENT_CONTACT_SURNAME,
+                NULL                     AS STUDENT_CONTACT_HOME_EMAIL,
+                P.EMAIL                  AS STUDENT_CONTACT_DEFAULT_EMAIL,
+                NULL                     AS STUDENT_CONTACT_WORK_EMAIL,
+                S.STUDENT_NUMBER         AS STUDENT_ID,
+                S.YEAR_LEVEL             AS STUDENT_YEAR_LEVEL,
+                S.FORM_NAME              AS STUDENT_FORM_DESCRIPTION,
+                NULL                     AS STUDENT_CAMPUS,
+                S.HOUSE                  AS STUDENT_HOUSE,
+                NULL                     AS STUDENT_GENDER,
+                S.FIRSTNAME              AS STUDENT_PREFERRED,
+                S.SURNAME                AS STUDENT_SURNAME
             FROM SCHOOLBOX_PARENTS AS P
             INNER JOIN SCHOOLBOX_PARENT_STUDENT
                 AS PS ON P.CARER_NUMBER = PS.CARER_NUMBER
@@ -80,7 +80,7 @@ class Sync extends Base implements ISync
         ';
 
         return new Iterator\Guardian(
-            $this->databaseExternal->getQueryIterator($query)
+            new ResultIterator($this->databaseExternal->getQueryIterator($query)),
         );
     }
 
@@ -91,32 +91,32 @@ class Sync extends Base implements ISync
     {
         $query = '
             SELECT
-                STAFF_NUMBER  AS "staff_id",
-                USERNAME      AS "network_login",
-                1             AS "active_flag",
-                SALUTATION    AS "staff_title",
-                FIRSTNAME     AS "staff_given_name",
-                FIRSTNAME     AS "staff_preferred_name",
-                SURNAME       AS "staff_surname",
-                NULL          AS "default_email_code",
-                NULL          AS "home_email",
-                EMAIL_ADDRESS AS "default_email",
-                NULL          AS "work_email",
-                CAMPUS        AS "staff_campus",
-                NULL          AS "staff_category_type",
-                NULL          AS "staff_category",
-                NULL          AS "staff_house",
-                NULL          AS "staff_department",
-                NULL          AS "staff_year_level",
-                NULL          AS "staff_year_level_description",
-                NULL          AS staff_position_code,
-                NULL          AS staff_position
+                STAFF_NUMBER  AS STAFF_ID,
+                USERNAME      AS NETWORK_LOGIN,
+                1             AS ACTIVE_FLAG,
+                SALUTATION    AS STAFF_TITLE,
+                FIRSTNAME     AS STAFF_GIVEN_NAME,
+                FIRSTNAME     AS STAFF_PREFERRED_NAME,
+                SURNAME       AS STAFF_SURNAME,
+                NULL          AS DEFAULT_EMAIL_CODE,
+                NULL          AS HOME_EMAIL,
+                EMAIL_ADDRESS AS DEFAULT_EMAIL,
+                NULL          AS WORK_EMAIL,
+                CAMPUS        AS STAFF_CAMPUS,
+                NULL          AS STAFF_CATEGORY_TYPE,
+                NULL          AS STAFF_CATEGORY,
+                NULL          AS STAFF_HOUSE,
+                NULL          AS STAFF_DEPARTMENT,
+                NULL          AS STAFF_YEAR_LEVEL,
+                NULL          AS STAFF_YEAR_LEVEL_DESCRIPTION,
+                NULL          AS STAFF_POSITION_CODE,
+                NULL          AS STAFF_POSITION
             FROM SCHOOLBOX_STAFF
             WHERE USERNAME IS NOT NULL
         ';
 
         return new Iterator\Staff(
-            $this->databaseExternal->getQueryIterator($query)
+            new ResultIterator($this->databaseExternal->getQueryIterator($query)),
         );
     }
 }

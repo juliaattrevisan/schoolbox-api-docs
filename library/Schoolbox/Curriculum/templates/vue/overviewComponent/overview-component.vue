@@ -29,6 +29,7 @@ interface Props {
     isSuperUser: boolean; // Whether the user is a super user
     hasTagging: boolean; // Whether curriculum tagging is enabled
     localeUnit: string; // the localised term for a Unit
+    parentFolderId?: number; // The parent folder id to use when loading the current curriculum tab
 }
 const props = defineProps<Props>();
 
@@ -62,6 +63,9 @@ window.Vue.onMounted(() => {
             dataEndpoint: props.dataEndpoint,
             selectedNodes: props.selectedNodes, // so the modal displays the latest selected nodes
             includeChildren: true, // include all children in selections
+            hasTabs: true, // to show the tabs in the modal when the curriculum selector is opened
+            parentFolderId: props.parentFolderId, // The parent folder id to use when loading the current curriculum tab
+            filter: props.filter, // to only display nodes that are children of this node
         });
     });
 });
@@ -104,6 +108,10 @@ function onModalClosed(): void {
         @modify-selected="onModifySelected"
     />
     <fn-delete-node :folder-id="props.folderId" :component-instance-id="props.componentInstanceId" />
-    <cs-modal v-if="selectorStore.hasLoadedOk" :starting-node-id="props.filter?.id" />
+    <cs-modal
+        v-if="selectorStore.hasLoadedOk"
+        :starting-node-id="props.filter?.id"
+        :has-tabs="selectorStore.currentNodesStore.hasNodes"
+    />
     <curriculum-details-modal :selected-node-id="store().selectedDetailsNodeId" @closed="onModalClosed" />
 </template>

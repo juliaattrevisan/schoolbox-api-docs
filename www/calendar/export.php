@@ -628,7 +628,7 @@ try {
                 //build vcal source
                 $subApi = buildApiClass(
                     Calendar_Api_EventType_Event_Vcal_Default::class,
-                    [ $user, $viewer ],
+                    [ $user, $viewer, $kernel->getDependencyInjector()->get('redis.cache'), $kernel->getDependencyInjector()->get('httpClient.cache') ],
                     true,
                     $sentry
                 );

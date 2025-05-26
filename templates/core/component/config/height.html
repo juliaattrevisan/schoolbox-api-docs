@@ -11,12 +11,7 @@
                 class="hint has-tip tip-top"
                 data-tooltip title="To customise the display height of the component. Only whole numbers are allowed."
             >?</span>`
-        )
-
-        // As we are adding a new tooltip, we need to trigger foundation to find the new one
-        setTimeout(function() {
-            $(document).foundation('tooltip', 'reflow');
-        }, 500);
+        );
 
         // Add an event listener to the height input to restrict the input to whole numbers only
         currentHeightInput.addEventListener("input", (event) => {
@@ -24,4 +19,14 @@
             event.target.value = value.replace(/[^0-9]/g, ""); // Remove non-numeric characters
         });
     })();
+
+    // As we are adding a new tooltip, we need to trigger foundation to find the new one (more info in pixel.html).
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", () => {
+            $(document).foundation('tooltip', 'reflow');
+        });
+    } else {
+        // Document is already loaded, so we can trigger the tooltip reflow immediately
+        $(document).foundation('tooltip', 'reflow');
+    }
 </script>

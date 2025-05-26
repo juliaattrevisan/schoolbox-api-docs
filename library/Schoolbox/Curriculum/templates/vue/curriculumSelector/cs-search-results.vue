@@ -80,9 +80,17 @@ window.Vue.watch(
 
 <style lang="scss" scoped>
 .search-results-container {
-    height: 0; //will animate the results within with the window.Vue.watch() above
+    height: 0; // will animate the results within with the window.Vue.watch() above
     position: relative;
     overflow: hidden;
+}
+
+// as the margin has been removed from the search input when the results are visible, add a margin to the bottom of the results
+// ^foundation-fixes^ - inputs shouldn't have margins, they should always be controlled by a parent element
+.curriculum-selector:has(.search-results-container li) {
+    .search-results-container {
+        margin-bottom: 1rem;
+    }
 }
 
 .search-results {

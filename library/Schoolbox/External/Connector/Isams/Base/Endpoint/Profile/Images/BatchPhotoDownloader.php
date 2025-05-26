@@ -63,12 +63,17 @@ class BatchPhotoDownloader implements IPhotoDownloader
 
 
     /**
+     * @var array
+     */
+    private array $extractionPaths;
+
+
+    /**
      * Constructor.
      *
      * @param string $host
      * @param array $credentials
      * @param string $zipDir
-     * @throws \DomainException
      */
     public function __construct(string $host, #[SensitiveParameter] array $credentials, string $zipDir)
     {
@@ -79,6 +84,21 @@ class BatchPhotoDownloader implements IPhotoDownloader
         $this->key = $credentials['modules'][DSN::MODULE_BATCHXML]['key'];
 
         $this->cacheDir = $zipDir . '/' . self::ISAMS_CACHE_DIR;
+
+        /* Make subfolders
+         */
+        $this->extractionPaths = [
+            Role::STUDENT => sprintf(
+                '%s/%s',
+                $this->cacheDir,
+                Role::STUDENT
+            ),
+            Role::STAFF => sprintf(
+                '%s/%s',
+                $this->cacheDir,
+                Role::STAFF
+            ),
+        ];
     }
 
 
@@ -90,7 +110,7 @@ class BatchPhotoDownloader implements IPhotoDownloader
      */
     public function downloadStudentPhotos(): void
     {
-        $this->download('photos.ashx', $this->key);
+        $this->download('photos.ashx', $this->key, Role::STUDENT);
     }
 
 
@@ -102,7 +122,7 @@ class BatchPhotoDownloader implements IPhotoDownloader
      */
     public function downloadStaffPhotos(): void
     {
-        $this->download('staffphotos.ashx', $this->key);
+        $this->download('staffphotos.ashx', $this->key, Role::STAFF);
     }
 
 
@@ -111,10 +131,10 @@ class BatchPhotoDownloader implements IPhotoDownloader
      *
      * @param string $path
      * @param string $key
+     * @param string $type
      * @return void
-     * @throws \RuntimeException
      */
-    private function download(string $path, string $key): void
+    private function download(string $path, string $key, string $type): void
     {
         /* Forcibly create isams subdir
          */
@@ -123,6 +143,14 @@ class BatchPhotoDownloader implements IPhotoDownloader
                 $message = sprintf('Directory "%s" was not created', $concurrentDirectory);
 
                 throw new \RuntimeException($message);
+            }
+
+            foreach ($this->extractionPaths as $extractionPath) {
+                if (!mkdir($extractionPath) && !is_dir($extractionPath)) {
+                    $message = sprintf('Directory "%s" was not created', $extractionPath);
+
+                    throw new \RuntimeException($message);
+                }
             }
         }
 
@@ -148,7 +176,7 @@ class BatchPhotoDownloader implements IPhotoDownloader
 
         fclose($filepointer);
 
-        $this->extract($filename);
+        $this->extract($filename, $type);
     }
 
 
@@ -156,16 +184,23 @@ class BatchPhotoDownloader implements IPhotoDownloader
      * Extract to zip dir for now I suppose
      *
      * @param string $filename
+     * @param string $type
      * @return void
      */
-    private function extract(string $filename): void
+    private function extract(string $filename, string $type): void
     {
         $zipArchive = new ZipArchive();
 
         $result = $zipArchive->open($filename);
 
         if (true === $result) {
-            $zipArchive->extractTo($this->cacheDir);
+            /* Student and Staff zips might contain files with the same filename, OR, as we found,
+             * the staff's PersonId happens to match a student's PersonId, causing them to have
+             * the same picture. We split the downloads into subdirectories to deconflict them.
+             */
+            $extractionPath = $this->extractionPaths[$type];
+
+            $zipArchive->extractTo($extractionPath);
             $zipArchive->close();
         }
     }
@@ -185,7 +220,7 @@ class BatchPhotoDownloader implements IPhotoDownloader
      */
     public function getPhoto(string $personId, string $roleType = Role::STUDENT, ?string $externalId = null): ?string
     {
-        $path = "{$this->cacheDir}/{$personId}.png";
+        $path = "{$this->cacheDir}/{$roleType}/{$personId}.png";
 
         if (file_exists($path)) {
             return file_get_contents($path);
@@ -194,24 +229,6 @@ class BatchPhotoDownloader implements IPhotoDownloader
         return null;
     }
 
-
-    /**
-     * Removes all the photo-related files from the isams cache dir
-     *
-     * @return void
-     */
-    public function cleanup(): void
-    {
-        $dirhandle = opendir($this->cacheDir);
-
-        while ($file = readdir($dirhandle)) {
-            if ($file !== '.' && $file !== '..') {
-                $source = "{$this->cacheDir}/{$file}";
-
-                unlink($source);
-            }
-        }
-    }
 
     /**
      * @inheritDoc

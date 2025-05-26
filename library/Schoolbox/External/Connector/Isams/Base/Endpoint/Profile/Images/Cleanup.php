@@ -13,6 +13,7 @@ namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Profile\Images;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
+use Schoolbox\Role;
 use SensitiveParameter;
 
 class Cleanup implements IStrategy
@@ -60,20 +61,42 @@ class Cleanup implements IStrategy
          */
         $cacheDir = $this->zipDir . '/' . BatchPhotoDownloader::ISAMS_CACHE_DIR;
 
-        $dirhandle = opendir($cacheDir);
-
-        while ($file = readdir($dirhandle)) {
-            /* There might not actually be any profile pictures here
+        /* Clean subfolders
+         */
+        $extractionPaths = [
+            Role::STUDENT => sprintf(
+                '%s/%s',
+                $cacheDir,
+                Role::STUDENT
+            ),
+            Role::STAFF => sprintf(
+                '%s/%s',
+                $cacheDir,
+                Role::STAFF
+            ),
+            /* Clean original zips we downloaded
              */
-            if ($file !== '.' && $file !== '..' && $file !== '') {
-                $source = "{$cacheDir}/{$file}";
+            'cachedir' => $cacheDir,
+        ];
 
-                $this->log->debug(sprintf(
-                    'Unlinking zip remnants: %s',
-                    $source
-                ));
+        foreach ($extractionPaths as $type => $path) {
+            $dirhandle = opendir($path);
 
-                unlink($source);
+            while ($file = readdir($dirhandle)) {
+                /* There might not actually be any profile pictures here
+                 */
+                if ($file !== '.' && $file !== '..' && $file !== '') {
+                    $source = "{$path}/{$file}";
+
+                    if (!is_dir($source)) {
+                        $this->log->debug(sprintf(
+                            'Unlinking zip remnants: %s',
+                            $source
+                        ));
+
+                        unlink($source);
+                    }
+                }
             }
         }
     }

@@ -375,7 +375,11 @@ class Mapper extends AbstractFolderMapper implements ILocator
 
                 /** @var CourseSpecification\Model $courseSpecification */
                 $courseSpecification = CourseSpecification\Mapper::getInstance()->createModel();
-                ;
+
+                // grab the first course framework / template
+                $courseFrameworkMapper = \Schoolbox\Assessment\Course\Template\Mapper::getInstance();
+                $framework = $courseFrameworkMapper->findAll()->first();
+                $courseSpecification->setTemplate($framework);
                 $courseSpecification->setFolder($parent);
                 CourseSpecification\Mapper::getInstance()->save($courseSpecification);
 

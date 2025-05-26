@@ -48,7 +48,7 @@ class User implements IDataGenerator
             'impersonated'      => (new ImpersonationCheck())->isImpersonated($this->currentUser, $previousUser),
             'communityLogin'    => $this->session->get('communityLogin'),
             'no_header'         => $this->session->get('no_header'),  //Hides top nav header if user session var set
-            'celebrateBirthday' => !isset($birthdaySession) && $this->currentUser->isBirthday(),
+            'celebrateBirthday' => !isset($birthdaySession) && ($this->session->get('isBirthdayCelebration') ?? false),
         ];
     }
 }

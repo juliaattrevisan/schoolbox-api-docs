@@ -300,8 +300,8 @@ class Controller extends AbstractController
          */
         /** @var WeatherstackClient $weatherClient */
         $weatherClient = $this->getDi()->get('weatherClient');
-        $forecast      = new MatchupWeather($matchup, $weatherClient);
-        $forecast->loadForecast();
+
+        $forecast = (new MatchupWeather($matchup, $weatherClient))->loadForecast();
 
         /* Determine whether you've got write access or not
          * when viewing this page

@@ -4,7 +4,8 @@
 
 import { defineStore } from "pinia";
 import { UNSET_ID, findById, getBreadcrumbs } from "@schoolboxCurriculum/js/nodeUtils";
-import { useStore, apiEndpoint } from "./curriculumSelectorStore";
+import { useStore } from "./curriculumSelectorStore";
+import { useSharedStore } from "./csSharedStore";
 import { useModalViewNodesStore } from "./csModalViewNodesStore";
 import { useModalSelectedNodesStore } from "./csModalSelectedNodesStore";
 import {
@@ -92,7 +93,7 @@ export const useNodesStore = defineStore(`csNodes`, {
             const store = useStore();
             try {
                 const response = await fetch(
-                    `${apiEndpoint}/?topLevelOnly=1${store.includeDisabled ? "" : "&enabled=1"}&descendants=1&limit=50`,
+                    `${useSharedStore().apiEndpoint}/?topLevelOnly=1${store.includeDisabled ? "" : "&enabled=1"}&descendants=1&limit=50`,
                 );
                 if (response.ok) {
                     const topLevelNodes = await response.json();
@@ -126,7 +127,7 @@ export const useNodesStore = defineStore(`csNodes`, {
         async loadId(id) {
             try {
                 this.isLoading = true;
-                const response = await fetch(`${apiEndpoint}/${id}?ancestors=99`); // just use 99 as hopefully there's no tree that deep...
+                const response = await fetch(`${useSharedStore().apiEndpoint}/${id}?ancestors=99`); // just use 99 as hopefully there's no tree that deep...
                 if (response.ok) {
                     const nodeWithParents = await response.json();
                     await this.loadAllChildren(nodeWithParents);
@@ -167,6 +168,10 @@ export const useNodesStore = defineStore(`csNodes`, {
          * @param { Node } node - the Node to load all children of
          */
         async loadAllChildren(node) {
+            // if the node is disabled, we don't want to load it
+            if (node.enabled === false) {
+                return;
+            }
             const breadcrumbs = getBreadcrumbs(node, []);
             breadcrumbs.push({ id: node.id, name: node.name }); // add in the actual node as the last
             const modalViewNodesStore = useModalViewNodesStore();
@@ -207,7 +212,9 @@ export const useNodesStore = defineStore(`csNodes`, {
             try {
                 this.isLoading = true;
                 const descendants = useStore().includeChildren ? 10 : 2; // if we're including children, load in all descendants, otherwise we just load in the next level to show the structure
-                const response = await fetch(`${apiEndpoint}/${id}?descendants=${descendants}&limit=50`);
+                const response = await fetch(
+                    `${useSharedStore().apiEndpoint}/${id}?descendants=${descendants}&limit=50`,
+                );
                 if (response.ok) {
                     const newNode = await response.json();
                     newNode.children?.forEach((node) => useModalSelectedNodesStore().checkIfSelected(node));

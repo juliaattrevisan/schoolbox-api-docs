@@ -34,7 +34,11 @@
     {% include 'include/skin.twig' with { config: config } only %}
     <link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/vendors/fullcalendar/datepicker.css?v={{ config.site_version }}" />
 
-    {% if tour.data is defined and not user.impersonated %}
+    {# Decide if the current url has a feature tour/What's New
+     # note that tour is an array containing a data node, like $tour['data'] => ...
+     # and 'data' might be an empty node, which usually means there's nothing here.
+     #}
+    {% if tour.data is defined and tour.data|length and not user.impersonated %}
     {% autoescape 'js' %}
     <script>
         window.tourData = {{ tour.data|json_encode|raw }};
@@ -318,6 +322,35 @@
                             {{ config.site_version }}</li>
                         {% if config.feedback_url and config.feedback_text %}
                             <li><a href="{{ config.feedback_url }}">{{ config.feedback_text }}</a></li>
+                        {% endif %}
+                        {# Check if there's a tour here that you can actually (re-)experience, regardless of your dismissal status #}
+                        {% if tourPersistent.data is defined and tourPersistent.data|length and not user.impersonated %}
+                            {% autoescape 'js' %}
+                                <script>
+                                    window.tourPersistentData = {{ tourPersistent.data|json_encode|raw }};
+
+                                    $(function() {
+                                        $('#whats-new').on('click', function(event) {
+                                            tourInit(window.tourPersistentData);
+                                        });
+
+                                        /* Enable only on viewports bigger than small due to SA-5396
+                                         */
+                                        const container = document.querySelector('body');
+
+                                        let resizeObserver = new ResizeObserver(() => {
+                                            if (window.innerWidth >= 1024) {
+                                                $('#whats-new').show();
+                                            } else {
+                                                $('#whats-new').hide();
+                                            }
+                                        });
+
+                                        resizeObserver.observe(container);
+                                    });
+                                </script>
+                            {% endautoescape %}
+                            <li><a href='#' id="whats-new" style="display:none">What's New</a></li>
                         {% endif %}
                     </ul>
                 </div>

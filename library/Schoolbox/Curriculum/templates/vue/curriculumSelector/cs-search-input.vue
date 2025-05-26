@@ -9,11 +9,13 @@
 
 import debounce from "lodash/debounce";
 import { useStore } from "./store/curriculumSelectorStore";
+import { useSharedStore } from "./store/csSharedStore";
 import { useSelectedNodesStore } from "./store/csSelectedNodesStore";
 import { useModalStore } from "./store/csModalStore";
 import { useSearchStore, DEBOUNCE_AMOUNT } from "./store/csSearchStore";
 
 const store = useStore();
+const sharedStore = useSharedStore();
 const selectedNodesStore = useSelectedNodesStore();
 const modalStore = useModalStore();
 const searchStore = useSearchStore();
@@ -161,7 +163,7 @@ function onBrowseSelected() {
  * @returns {boolean} - whether the search input is active
  */
 const isActive = window.Vue.computed(() => {
-    if (store.isReadOnly) {
+    if (sharedStore.isReadOnly) {
         return false;
     }
     if (props.isSingleSelect && selectedNodesStore.hasNodes) {
@@ -197,10 +199,14 @@ const isActive = window.Vue.computed(() => {
     </div>
 </template>
 
-<style scoped>
-input,
-button {
-    margin-bottom: 0;
+<style scoped lang="scss">
+// remove the default margins when the cs-search-results are visible so the results butt up against the search input
+// ^foundation-fixes^ - inputs shouldn't have margins, they should always be controlled by a parent element
+.curriculum-selector:has(.search-results-container li) {
+    .search-input,
+    .button {
+        margin-bottom: 0;
+    }
 }
 
 .input-group[data-is-small-container="true"] {

@@ -36,6 +36,10 @@ class Mapper extends BaseMapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
         $this->uses('prompt', self::TYPE_STRING);
+        $this->uses('input_tokens', self::TYPE_INTEGER);
+        $this->uses('output_tokens', self::TYPE_INTEGER);
+        $this->uses('model', self::TYPE_STRING);
+        $this->uses('response', self::TYPE_STRING);
         $this->uses('return_code', self::TYPE_INTEGER);
         $this->uses('error_message', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);

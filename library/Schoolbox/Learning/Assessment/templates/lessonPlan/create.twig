@@ -41,6 +41,7 @@
         :file-browser-category-id="{{ context.baseContext.folder.id ?? 0 }}"
         :fields="{{ lessonPlanMeta.fields |json_encode }}"
         context-name="{{ context.baseContext is unitSpecification ? context.baseContext.folder.name : context.baseContext.specification.folder.name }}"
+        lesson-plan-duration="{% if assessment.id %}{{ assessment.lessonPlanDuration }}{% endif %}"
         generate-plan-route="{{ routeLookupIfAuthorized('openai.postLessonPlan') }}"
     >
         <template v-slot:title>
@@ -66,15 +67,6 @@
             {% endif %}
         </template>
 
-        <template v-slot:duration>
-            <div class="row l-pad-m--top">
-                <div class="small-12 columns">
-                    <label  for="duration">Duration</label>
-                    <input id="duration" type="text" name="duration" maxlength="255" value="{% if assessment.id %}{{ assessment.lessonPlanDuration }}{% endif %}" />
-                </div>
-            </div>
-        </template>
-
         {# Curriculum Codes
          # This is the same include used by everything else. The entity type is some textual
          # representation, randomly hardcoded here
@@ -86,7 +78,7 @@
                 excludeLegend: true,
                 vueSlot: true,
                 hasTabs: true,
-                folderId: context.baseContext.folder.id
+                parentFolderId: parentFolderId ?? null
             } %}
         </template>
     </lesson-planner>

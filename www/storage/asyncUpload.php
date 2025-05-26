@@ -34,7 +34,7 @@ $prefixGenerator = $kernel->get('cdnPrefixGenerator');
 
 $result = array(
     'success' => false,
-    'error'   => 500,
+    'error'   => 400,
     'message' => 'Unknown Error',
     'hash'    => '',
 );

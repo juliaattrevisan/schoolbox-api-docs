@@ -15,14 +15,16 @@
     {% for event in currentEvents %}
         {% if hasMultipleEvents %}<li>{% endif %}
         <span {% if event.periodCancelled %}class="strike" title="This period has been cancelled"{% endif %}>
+            {% if event.location != '' %}
             {{ event.location }}
             -
+            {% endif %}
             {{ event.title }}
             {% set hasShownStaff = false %}
             {% for staffId, staffName in event.staff %}
                 {# Only show "with" if it's a different user (i.e. don't show a teacher is with themselves) #}
                 {% if staffId != user.id %}
-                    {% set staffProfileRoute = routeLookupIfAuthorized('searchUser.getProfile', {userId: staffId, user: user.id}) %}
+                    {% set staffProfileRoute = routeLookupIfAuthorized('searchUser.getProfile', {userId: user.id, user: user}) %}
                     {% if hasShownStaff %}/{% else %}with{% endif %}
                     {% if staffProfileRoute %}
                         <a href="{{ staffProfileRoute }}">{{ staffName }}</a>

@@ -34,6 +34,11 @@ export function getConfigForVideo(overrideValueByKey?: object): {
          */
         stretching: "none",
 
+        // Override the default iconSprite reference and leave blank to avoid load error
+        // CSS is used to display the icons instead
+        // refer to https://github.com/mediaelement/mediaelement/blob/master/docs/api.md#configuration
+        iconSprite: ``,
+
         /**
          * @param media - the <mediaelementwrapper> DOM node (contains the <video> node)
          * @param node - the <video> DOM node

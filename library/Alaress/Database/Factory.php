@@ -52,6 +52,6 @@ class Factory
      */
     public function createDb2()
     {
-        return new Connector(new Db2Broker(), new Transactor(new Strategy\Savepoint()), new Db2Quoter());
+        return new Connector(new Db2Broker(), new Transactor(new Strategy\Nested()), new Db2Quoter());
     }
 }

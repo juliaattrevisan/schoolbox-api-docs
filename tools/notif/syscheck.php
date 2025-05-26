@@ -25,6 +25,12 @@ $app = new class extends CliTool\App {
     private const OPT_LONG_HELP = 'help';
 
     /** @inheritdoc */
+    public function runAsRoot(): ?bool
+    {
+        return null;
+    }
+
+    /** @inheritdoc */
     public function getLongOpts(): array
     {
         return [

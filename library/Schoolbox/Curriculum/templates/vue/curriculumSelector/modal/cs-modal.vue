@@ -11,7 +11,7 @@ import type { Node } from "@schoolboxCurriculum/types/Node";
 import { useModalStore } from "../store/csModalStore";
 import { useModalViewNodesStore } from "../store/csModalViewNodesStore";
 import { useModalNodeUsageStore } from "../store/csModalNodeUsageStore";
-import CsModalUnitNodes from "./unit/cs-modal-unit-nodes.vue";
+import CsModalCurrentNodes from "./current/cs-modal-current-nodes.vue";
 import CsModalAllHeader from "./all/cs-modal-all-header.vue";
 import CsModalAllNodes from "./all/cs-modal-all-nodes.vue";
 import CsModalFooter from "./cs-modal-footer.vue";
@@ -20,11 +20,13 @@ interface Props {
     isSingleSelect?: boolean; // so can only select a single node
     startingNodeId?: number; // To open on a specific node, in situations where we wish to restrict further navigation/selection to within a specific node
     hasTabs?: boolean; // a split to show only curriculum linked to a parent unit / all curriculum
+    testId?: number; // to add a modal id to target in tests when there are multiple modals on the page
 }
 const props = withDefaults(defineProps<Props>(), {
     isSingleSelect: false,
     startingNodeId: UNSET_ID,
     hasTabs: false,
+    testId: 0,
 });
 
 const modalStore = useModalStore();
@@ -123,17 +125,17 @@ function onTabSelected(tab: string): void {
         @closed="onModalClosed"
     >
         <template #sequence-1>
-            <div class="l-flex-col l-gap-m">
+            <div class="l-flex-col l-gap-m" :data-test="`cs-modal-${props.testId}`">
                 <h2 class="f-no-margins">Browse Curriculum</h2>
                 <dl v-if="props.hasTabs" ref="tabsEl" class="tabs" data-test="cs-modal-tabs">
                     <dd :class="{ active: currentTab === current }">
-                        <a @click="onTabSelected(current)">Current</a>
+                        <a data-test="cs-modal-current-tab-button" @click="onTabSelected(current)">Current</a>
                     </dd>
                     <dd :class="{ active: currentTab === all }">
-                        <a @click="onTabSelected(all)">All</a>
+                        <a data-test="cs-modal-all-tab-button" @click="onTabSelected(all)">All</a>
                     </dd>
                 </dl>
-                <cs-modal-unit-nodes v-if="currentTab === current" />
+                <cs-modal-current-nodes v-if="currentTab === current" />
                 <div v-else>
                     <cs-modal-all-header />
                     <cs-modal-all-nodes />

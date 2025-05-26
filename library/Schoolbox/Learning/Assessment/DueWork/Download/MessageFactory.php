@@ -160,6 +160,7 @@ class MessageFactory
             // Add this participant's submission history
             $messageFactory = $messageFactory->addPdfContent(
                 $this->generateParticipantSubmissionHistoryFileName($participant),
+                null,
                 $this->generateParticipantSubmissionHistoryUrl($participant),
             );
         }

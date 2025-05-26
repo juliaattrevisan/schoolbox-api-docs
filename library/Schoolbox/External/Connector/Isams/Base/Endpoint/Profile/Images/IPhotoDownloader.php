@@ -50,14 +50,6 @@ interface IPhotoDownloader
 
 
     /**
-     * Removes all the photo-related files from the isams cache dir
-     *
-     * @return void
-     */
-    public function cleanup(): void;
-
-
-    /**
      * Get the latest photo ID for the user from the rest API
      *
      * @param string $roleType

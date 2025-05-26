@@ -3,6 +3,7 @@
  # * group:                    If null, this is an input for a new group
  # * allowModifyUsed:          If true, the group name is never readonly even if it's in use.
  # * curriculumTaggingEnabled: Are curriculum code inputs shown?
+ # * parentFolderId:          The folder ID to use for the current curriculum selector tab
  #}
 
 {% set readonly  = not allowModifyUsed and group is not null and group.usage|length > 0 %}
@@ -47,6 +48,8 @@ so if there are bullet points in the textbox they count as 3 characters, and wil
                     data-endpoint="{{ routeLookup('curriculumApi.searchNode') }}"
                     :include-children="true"
                     {% if group %}form-value-name="crits[{{ group.id }}][curriculumCode][]"{% endif %}
+                    :has-tabs="true"
+                    {% if parentFolderId is defined and parentFolderId is not null %}:parent-folder-id="{{ parentFolderId }}"{% endif %}
                 />
             </div>
         {% endif %}

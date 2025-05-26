@@ -162,13 +162,13 @@ class Mapper extends BaseMapper
     /**
      * Find all tours relevant to a particular user and the supplied URL
      *
-     * @param User   $user The user for whom we are retrieving the tours
-     * @param string $url  The URL to be used to filter the returned tours
+     * @param User $user The user for whom we are retrieving the tours
+     * @param string $url The URL to be used to filter the returned tours
+     * @param string|null $version Filter to a particular tour(s)
      * @param boolean $repeat Determines whether we should retrieve tours that have already started
      * @return GenericCollection
-     * @throws BaseMapper\DefinitionException
      */
-    public function findByUserForUrl(User $user, string $url, bool $repeat = false): GenericCollection
+    public function findByUserForUrl(User $user, string $url, ?string $version, bool $repeat = false): GenericCollection
     {
         $userQuery = $this->getUserFilterQuery($user);
 
@@ -177,19 +177,27 @@ class Mapper extends BaseMapper
 
         $sql = "
             {$this->getSelectString()}
-            WHERE       {$userQuery['query']} AND
-                        :url REGEXP `t`.`url_regex` AND
-                        `{$this->getTable()}`.`active` = 1
+            WHERE {$userQuery['query']} AND
+            :url REGEXP `t`.`url_regex` AND
+            `{$this->getTable()}`.`active` = 1
         ";
+
+        /* Match a particular version number
+         */
+        if (null !== $version) {
+            $sql .= "
+                AND tour.title LIKE '{$version}%'
+            ";
+        }
 
         if (!$repeat) {
             $userQuery['bindings']['user_id'] = $user->getId();
 
-            $sql = $sql . "AND
-                            tour.uuid NOT IN (
-                            SELECT tour_uuid
-                            FROM tour_status
-                            WHERE user_id = :user_id)";
+            $sql .= "
+                AND tour.uuid NOT IN (
+                    SELECT tour_uuid
+                    FROM tour_status
+                    WHERE user_id = :user_id)";
         }
 
         $sql .= ' ORDER BY updated_at';

@@ -141,15 +141,23 @@ class Factory
                     }
                     // Timetable event
                     if ($event instanceof \Calendar\Event\Type\Timetable\Event) {
+                        /* This is a special case for teachers with deleted user accounts.
+                         */
+                        $staff = [];
+
+                        if (-1 !== $event->getAuthorId() && '' !== trim((string)$event->getAuthorName())) {
+                            $staff = [
+                                $event->getAuthorId() => $event->getAuthorName()
+                            ];
+                        }
+
                         return [
                             'title' => $event->getTitle(),
                             'periodName' => $event->getPeriodName(),
                             'periodCancelled' => $event->getPeriodCancelled(),
                             'location' => $event->getLocation(),
                             // these events only support 1 teacher
-                            'staff' => [
-                                $event->getAuthorId() => $event->getAuthorName(),
-                            ],
+                            'staff' => $staff,
                             'startTime' => $event->getStartTime(),
                             'endTime' => $event->getEndTime(),
                         ];

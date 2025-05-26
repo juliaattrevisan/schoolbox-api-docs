@@ -564,6 +564,9 @@ class Session
                     }
                 }
             }
+            if ($user->getRole()->isStudent()) {
+                $_SESSION['isBirthdayCelebration'] = $user->isBirthday();
+            }
         }
     }
 

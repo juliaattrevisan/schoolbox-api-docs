@@ -162,6 +162,7 @@ class Controller extends Base
             }
             $template->setCourseTemplate($courseTemplate);
             $template->setUnitTemplate($unitTemplate);
+            $template->setSequence($templateGroup['sequence']);
             $templates->add($template);
         }
         try {

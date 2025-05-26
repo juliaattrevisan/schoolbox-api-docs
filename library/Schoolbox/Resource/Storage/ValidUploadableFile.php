@@ -64,7 +64,7 @@ class ValidUploadableFile extends BaseSpecification
         // Assert: Mime set
         if (!$fileMime instanceof Mimetype) {
             throw new FileException(
-                "This file has no detectable type. $errorSuffix",
+                "This file is not a permitted file type. $errorSuffix",
                 FileException::CODE_MIMETYPE_NOT_FOUND
             );
         }
@@ -72,7 +72,7 @@ class ValidUploadableFile extends BaseSpecification
         // Assert: Mime type allowed
         if (!$fileMime->isEnabled() || $fileMime->isDeleted()) {
             throw new FileException(
-                "This file is not a valid file type. $errorSuffix",
+                "This file is not a permitted file type. $errorSuffix",
                 FileException::CODE_MIMETYPE_NOT_ALLOWED
             );
         }

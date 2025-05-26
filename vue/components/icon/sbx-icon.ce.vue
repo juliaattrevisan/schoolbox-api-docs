@@ -42,6 +42,15 @@ const sizeMap: Record<string, string> = {
 const computedSize = window.Vue.computed(() => {
     return sizeMap[props.size as string] || (props.size as string) || sizeMap.m;
 });
+
+/**
+ * Alert (in the console) that an icon name is invalid (to assist with debugging)
+ * @returns false, for template usage
+ */
+function alertInvalidIconName(): false {
+    console.error(`Invalid icon name: ${props.name}`);
+    return false;
+}
 </script>
 
 <template>
@@ -1435,7 +1444,7 @@ const computedSize = window.Vue.computed(() => {
                 ></path>
             </svg>
             <svg
-                v-else-if="props.name === 'showcase'"
+                v-else-if="['showcase', 'achievement', 'trophy'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -1737,15 +1746,19 @@ const computedSize = window.Vue.computed(() => {
                     d="M16 5.333l4.944-4.55 1.325 6.587 6.675-0.775-2.8 6.108 5.855 3.296-5.855 3.296 2.8 6.108-6.675-0.775-1.325 6.587-4.944-4.55-4.944 4.55-1.325-6.587-6.675 0.775 2.8-6.108-5.855-3.296 5.855-3.296-2.8-6.108 6.675 0.775 1.325-6.587z"
                 ></path>
             </svg>
+            <template v-else-if="alertInvalidIconName()"></template>
         </slot>
     </span>
 </template>
 
 <style lang="scss" scoped>
 .sbx-icon {
+    align-items: center;
     color: v-bind(color);
     height: v-bind(computedSize);
     vertical-align: middle; // Ensure the icon is vertically centered when used inline with text
+    display: flex;
+    justify-content: center;
     width: v-bind(computedSize);
     &__svg {
         fill: currentColor;

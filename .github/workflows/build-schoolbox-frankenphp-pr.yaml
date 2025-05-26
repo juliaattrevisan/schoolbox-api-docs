@@ -1,0 +1,86 @@
+name: Build schoolbox-frankenphp (pull request)
+
+# Build a new schoolbox-frankenphp image for this pull request, for CI.
+# Works around the fact that PRs can't use base images in repositories, by
+# building the base image and copying its files as artifacts.
+# Commented out for now, as CI doesn't use it yet and it costs us $:
+# will be re-enabled when it's actually in use.
+on:
+  workflow_call:
+#  pull_request:
+
+jobs:
+  # Build artifacts before building image
+  build-composer-artifact:
+    uses: ./.github/workflows/helper-build-composer-artifact.yaml
+
+  build-npm-artifact:
+    uses: ./.github/workflows/helper-build-npm-artifact.yaml
+
+  # Build schoolbox-frankenphp image
+  build-schoolbox-frankenphp:
+    needs:
+      - build-composer-artifact
+      - build-npm-artifact
+    strategy:
+      matrix:
+        build:
+          - runs-on: ubuntu-latest
+            platform: linux
+            arch: amd64
+          - runs-on: ubuntu-arm
+            platform: linux
+            arch: arm64
+    runs-on: ${{ matrix.build.runs-on }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Extract artifacts
+      - name: Download composer artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: schoolbox-composer
+          path: vendor/
+
+      - name: Download npm artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: schoolbox-npm
+          path: www/static/js/bundle/
+
+      - name: Build schoolbox-frankenphp pull request image
+        uses: docker/build-push-action@v6
+        with:
+          context: docker/schoolbox-frankenphp
+          file: docker/schoolbox-frankenphp/deploy-image.Dockerfile
+          cache-from: type=gha
+          cache-to: type=gha
+          build-contexts: |
+            code=${{ github.workspace }}
+          push: false
+          load: true
+          provenance: false
+          sbom: false
+          build-args: |
+            ENV=prod
+            ARCH=${{ matrix.build.arch }}
+          tags: |
+            schoolbox-frankenphp-${{ matrix.build.arch }}
+
+      # Smoke test for box:
+      # could attempt to run PHPUnit within the box as well?
+      - name: Test schoolbox-frankenphp
+        run: |
+          docker image ls
+          image=$(docker image ls -q schoolbox-frankenphp-${{ matrix.build.arch }})
+          docker run -i $image ls -al /etc/
+          docker run -i $image ls -al /etc/caddy
+          docker run -i $image ls -al /usr/local/lib/php/extensions/no-debug-zts-20220829/
+          docker run -i $image ls -al /usr/local/etc/php/conf.d/
+          docker run -i $image ls -al /usr/share/schoolbox/
+          docker run -i $image ls -al /usr/share/schoolbox/vendor/
+          docker run -i $image ls -al /usr/share/schoolbox/www/static/js/bundle/

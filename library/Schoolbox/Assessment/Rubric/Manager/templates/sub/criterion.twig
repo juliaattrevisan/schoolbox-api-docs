@@ -4,6 +4,7 @@
  # * criterion:                If null, this is an input for a new criterion
  # * allowModifyUsed:          If true, the criterion name is never readonly even if it's in use.
  # * curriculumTaggingEnabled: Are curriculum code inputs shown?
+ # * parentFolderId:           The folder ID to use for the current curriculum selector tab
  #}
 
 {% set showNames = group and criterion %}
@@ -53,6 +54,8 @@ so if there are bullet points in the textbox they count as 3 characters, and wil
                     data-endpoint="{{ routeLookup('curriculumApi.searchNode') }}"
                     :include-children="true"
                     {% if showNames %}form-value-name="crits[{{ group.id }}][items][{{ criterion.id }}][curriculumCode][]"{% endif %}
+                    :has-tabs="true"
+                    {% if parentFolderId is defined and parentFolderId is not null %}:parent-folder-id="{{ parentFolderId }}"{% endif %}
                 />
             </div>
         {% endif %}

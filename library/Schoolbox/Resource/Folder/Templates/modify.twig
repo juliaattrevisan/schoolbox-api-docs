@@ -494,7 +494,9 @@
                                     include 'sub/curriculumCodeSelector.twig' with
                                     {
                                         'codeList' : curriculumCodes ?? [],
-                                        'renderButton' : true
+                                        'renderButton' : true,
+                                        hasTabs: parent.getId ? true : false,
+                                        parentFolderId: parent.getId ?? null,
                                     }
                                 %}
                         </div>

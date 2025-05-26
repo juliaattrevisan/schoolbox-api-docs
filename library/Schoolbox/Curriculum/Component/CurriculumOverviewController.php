@@ -142,6 +142,7 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
                 'curriculumTreeFilter' => $this->curriculumTreeFilter,
                 'curriculumTagging' => $this->curriculumTagging,
                 'readonly' => !$this->hasContextWriteAccess(),
+                'parentFolderId' => $this->getContext()->getParent()->getId(),
             ]
         );
     }

@@ -1,0 +1,76 @@
+{##
+ # Rescore Feedbacks
+ # Updates published authoritative feedbacks to use the currently-selected mark types
+ # for both instructor-given marks and student marks.
+ #
+ # @param array $breadcrumbs       A breadcrumb set
+ # @param IAssessable $assessment  An assessment instance
+ # @param bool $perform            Whether you're in perform mode not (changes ui buttons)
+ # @param array $changes           An array of strutcs containing old and new values and a user instanec
+ #}
+{% import 'sub/breadcrumbs.twig' as bread %}
+
+{# Build breadcrumbs #}
+{{ bread.crumbsArray(breadcrumbs) }}
+
+<div class="row">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>Rescore feedback for {{ assessment.title }} {% if not perform %}(Preview){% endif %}</h1>
+        </div>
+    </div>
+</div>
+
+{% if changes|length %}
+<div class="row">
+    <div class="small-12 island">
+        <form method="post" action="{{ routeLookupIfAuthorized('learningAssessment.postRescore', {assessment: assessment, assessmentId: assessment.id}) }}">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Status</th>
+                        <th>Previous input mark</th>
+                        <th>Previous display mark</th>
+                        <th>New input mark</th>
+                        <th>New display mark</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for change in changes %}
+                        <tr>
+                            <td>
+                                {% if change.user.deleted %}
+                                    {{ change.user.fullname }}
+                                {% else %}
+                                    <a href="/search/user/{{ change.user.id }}">{{ change.user.fullname }}</a>
+                                {% endif %}
+                            </td>
+                            <td>{% if change.published %}Published{% else %}Draft{% endif %}</td>
+                            <td title="Normalised mark: {{ change.old.normalised|number_format(2) }}">{{ change.old.instructor }}</td>
+                            <td title="Normalised mark: {{ change.old.normalised|number_format(2) }}">{{ change.old.student }}</td>
+                            <td title="Normalised mark: {{ change.new.normalised|number_format(2) }}">{{ change.new.instructor }}</td>
+                            <td title="Normalised mark: {{ change.new.normalised|number_format(2) }}">{{ change.new.student }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            {% if perform %}
+                <a class='button full-width' href="{{ routeLookupIfAuthorized('learningAssessment.getStatus', {assessment: assessment, assessmentId: assessment.id }) }}">Back</a>
+            {% else %}
+                <input type="submit" value="Update" />
+            {% endif %}
+        </form>
+    </div>
+</div>
+{% else %}
+    <div class="row">
+        <div class="small-12 columns">
+            <div class="empty-state">
+                <i class="icon-progress"></i>
+                <p>There aren't any {{ locale.grades.plural }} yet.</p>
+            </div>
+        </div>
+    </div>
+{% endif %}

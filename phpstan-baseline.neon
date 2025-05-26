@@ -2995,12 +2995,6 @@ parameters:
 			path: library/Schoolbox/External/Connector/Edumate/Base/Sync.php
 
 		-
-			message: '#^Method Schoolbox\\External\\Connector\\Isams\\Base\\Endpoint\\Profile\\Images\\BatchPhotoDownloader\:\:__construct\(\) has DomainException in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/External/Connector/Isams/Base/Endpoint/Profile/Images/BatchPhotoDownloader.php
-
-		-
 			message: '#^Strict comparison using \!\=\= between non\-falsy\-string and '''' will always evaluate to true\.$#'
 			identifier: notIdentical.alwaysTrue
 			count: 1
@@ -6271,12 +6265,6 @@ parameters:
 			path: library/Schoolbox/Tile/Controller.php
 
 		-
-			message: '#^PHPDoc tag @var has invalid value \(Step\\Mapper;\)\: Unexpected token ";", expected TOKEN_HORIZONTAL_WS at offset 27 on line 2$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: library/Schoolbox/Tour/Lists.php
-
-		-
 			message: '#^Method Schoolbox\\User\:\:getAccessList\(\) should return iterable\<Schoolbox\\Permission\\Access\\UserAccess\>&Schoolbox\\GenericCollection but returns iterable\<Schoolbox\\Permission\\Access\\UserAccess\>&Schoolbox\\Collection\.$#'
 			identifier: return.type
 			count: 1
@@ -6605,3 +6593,10 @@ parameters:
 			identifier: method.notFound
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/LessonPlan.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getInstructorMarkScheme\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Rescore.php
+

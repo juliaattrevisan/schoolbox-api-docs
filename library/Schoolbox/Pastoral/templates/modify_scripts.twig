@@ -3,6 +3,7 @@
 <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/select-all/attacher.select-all.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/chained/jquery.chained.min.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/form/jquery.alaressValidate.js?v={{ config.site_version }}"></script>
 {% autoescape('js') %}
 <script type="text/javascript">
     $(function () {
@@ -186,8 +187,9 @@
 
         $.validator.addMethod("duplicateIdSelected", function () {
             return $('#duplicateIds').val() !== '';
-        }, $.validator.format("You must select at least one student before you can proceed"));
+        },
 
+        $.validator.format("You must select at least one student before you can proceed"));
 
         form.alaressValidate({
             ignore: ':disabled',
@@ -202,6 +204,13 @@
                             return document.getElementById("report-zone").querySelector("[data-dz-previews]").children.length === 0;
                         },
                     },
+                },
+                 occurredOn: {
+                     numericalDateFormat: true,
+                },
+                expiresAt: {
+                     numericalDateFormat: true,
+
                 },
                 points: {
                     number: true,

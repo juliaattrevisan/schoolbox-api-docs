@@ -60,16 +60,19 @@ function validate_args(){
   fi
 }
 
-# stop existing locally-built container (identified via image tag + container name)
+# stop existing locally-built container (identified via image tag + container name):
+# also, remove the local container so it can be restarted
 function stop_container () {
   echo "[SB][$(date +%Y-%m-%d\ %X)] Stopping locally-built task daemon container";
-  taskd_container_ids="$(docker ps -f ancestor=alaress/taskd:$IMAGE_TAG -q)"
+  taskd_container_ids="$(docker ps -af ancestor=alaress/taskd:$IMAGE_TAG -q)"
   if [[ -n $taskd_container_ids ]]; then
     echo -e "$taskd_container_ids" | xargs docker stop
+    echo -e "$taskd_container_ids" | xargs docker container remove
   fi
-  taskd_container_ids="$(docker ps -f name="$LOCAL_CONTAINER_NAME" -q)"
+  taskd_container_ids="$(docker ps -af name="$LOCAL_CONTAINER_NAME" -q)"
   if [[ -n $taskd_container_ids ]]; then
     echo -e "$taskd_container_ids" | xargs docker stop
+    echo -e "$taskd_container_ids" | xargs docker container remove
   fi
 }
 
@@ -91,9 +94,13 @@ function start_container () {
     echo "[SB][$(date +%Y-%m-%d\ %X)] Restarting task daemon container with default configuration";
   fi
 
-  docker run -d --rm \
+  # Start the container, but don't delete it after it is shut down:
+  # this is so it can be reloaded without rebuilding to apply code changes.
+  # (Also, the code is mounted as a volume)
+  docker run -d \
     --network host \
     --name "$LOCAL_CONTAINER_NAME" \
+    --volume $MOUNT_DIR_TASKD:/app \
     "${extra_args[@]}" \
     alaress/taskd:$IMAGE_TAG
 }

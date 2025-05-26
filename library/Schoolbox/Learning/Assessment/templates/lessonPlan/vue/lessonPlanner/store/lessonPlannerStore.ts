@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csSelectedNodesStore";
 import { generateLessonPlan, translateFieldForPayload } from "./lessonPlannerUtils";
 import { LessonPlannerModalStep } from "../lessonPlannerTypes";
 import type { LessonPlanField, LessonPlannerStoreField } from "../lessonPlannerTypes";
@@ -9,11 +10,17 @@ const FORM_KEY_TEMPLATE_TITLE = "templateTitle"; // [name="templateTitle"]
 const FORM_KEY_DURATION = "duration"; // [name="duration"]
 
 export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
+    // The selected curriculum nodes store, used to get the curriculum node IDs
+    const selectedNodesStore = useSelectedNodesStore();
+
     // An ordered list of each field of the lesson plan
     const fields = window.Vue.ref<LessonPlannerStoreField[]>([]);
 
     // The route to generate the lesson plan with AI, if available
     const generatePlanRoute = window.Vue.ref<string | null>(null);
+
+    // The duration of the lesson plan, only available in the AI menu
+    const lessonPlanDuration = window.Vue.ref<string>("");
 
     // The course name/unit name/folder name/etc that this is being created for, to assist the AI
     const contextName = window.Vue.ref<string>("");
@@ -25,9 +32,15 @@ export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
      * Initialise the store
      * @param $fields - An ordered list of each field of the lesson plan
      * @param $contextName - The course name/unit name/folder name/etc that this is being created for, to assist the AI
+     * @param $lessonPlanDuration - The duration of the lesson plan, only available in the AI menu
      * @param $generatePlanRoute - The route to generate the lesson plan with AI, if available
      */
-    function init($fields: LessonPlanField[], $contextName: string, $generatePlanRoute: string | null): void {
+    function init(
+        $fields: LessonPlanField[],
+        $contextName: string,
+        $lessonPlanDuration: string,
+        $generatePlanRoute: string | null,
+    ): void {
         fields.value = $fields.map((field) => ({
             ...field,
             selected: false,
@@ -35,6 +48,7 @@ export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
             initialBody: field.lessonPlanTemplateField === undefined ? field.body : "",
         }));
         contextName.value = $contextName;
+        lessonPlanDuration.value = $lessonPlanDuration;
         generatePlanRoute.value = $generatePlanRoute;
     }
 
@@ -88,16 +102,12 @@ export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
             return; // form is invalid, don't open the modal
         }
 
-        // deselect all fields, but intentionally keep additionalContext so it can be reused on the same page session
+        // intentionally keep additionalContext so it can be reused on the same page session
+        // select all fields by default, or if a fieldId is provided, only select that field
         generateForField.value = null;
         fields.value.forEach((field) => {
-            field.selected = false;
-
-            // If a fieldId is provided, only select that field
-            if (field.id === fieldId) {
-                field.selected = true;
-                generateForField.value = field;
-            }
+            field.selected = fieldId === undefined ? true : fieldId === field.id;
+            generateForField.value = fieldId === field.id ? field : generateForField.value;
         });
 
         modalStep.value = LessonPlannerModalStep.GENERATE;
@@ -141,7 +151,7 @@ export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
             lessonPlanTitle,
             context: contextName.value,
             duration,
-            curriculumNodeIds: [],
+            curriculumNodeIds: selectedNodesStore.nodesIds,
             additionalContext: additionalContext.value,
             generateForField: generateForField.value?.id ?? null,
             fields: fields.value.map((f) => translateFieldForPayload(f, f.selected, generateForField.value)),
@@ -186,6 +196,7 @@ export const useLessonPlannerStore = defineStore("lessonPlannerStore", () => {
         init,
         hasLessonContent,
         fields,
+        lessonPlanDuration,
         additionalContext,
         modalStep,
         generateForField,
