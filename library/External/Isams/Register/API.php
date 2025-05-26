@@ -11,7 +11,9 @@ namespace External\Isams\Register;
 
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\RequestOptions;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Url\Uri;
 use SensitiveParameter;
 
@@ -149,6 +151,13 @@ class API
                 sleep($napTime);
 
                 continue;
+            } catch (ClientException $e) {
+                $response = $e->getResponse();
+                if ($response->getStatusCode() === 400) {
+                    if (str_contains($response->getBody()->getContents(), 'invalid_client')) {
+                        throw new SchoolboxException('iSAMS REST API credentials are invalid', 400, $e);
+                    }
+                }
             }
         }
 
