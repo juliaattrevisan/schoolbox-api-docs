@@ -13,7 +13,6 @@ use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\RequestOptions;
-use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Url\Uri;
 use SensitiveParameter;
 
@@ -63,8 +62,7 @@ class API
      * @param array       $options
      * @param string|null $token
      * @return mixed
-     * @throws GuzzleException
-     * @throws \JsonException
+     * @throws ApiException
      */
     public function request(string $path, string $method, array $options = [], #[SensitiveParameter] ?string $token = null): mixed
     {
@@ -155,9 +153,21 @@ class API
                 $response = $e->getResponse();
                 if ($response->getStatusCode() === 400) {
                     if (str_contains($response->getBody()->getContents(), 'invalid_client')) {
-                        throw new SchoolboxException('iSAMS REST API credentials are invalid', 400, $e);
+                        throw new ApiException('iSAMS REST API credentials are invalid', 400, $e);
                     }
                 }
+            } catch (\JsonException $e) {
+                // If we can't decode the response, then throw an exception
+                throw new ApiException(sprintf(
+                    'iSAMS REST API returned an invalid JSON response: %s',
+                    $e->getMessage()
+                ), 500, $e);
+            } catch (GuzzleException $e) {
+                // If we can't connect to the API, then throw an exception
+                throw new ApiException(sprintf(
+                    'iSAMS REST API request failed: %s',
+                    $e->getMessage()
+                ), 500, $e);
             }
         }
 
