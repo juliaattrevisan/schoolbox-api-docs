@@ -80,7 +80,7 @@ if (is_numeric($_REQUEST['cid'])) {
         // locate the instance, locate its config instances, then blast them away
         try {
             /** @var Component_Instance $instance */
-            $instance = $componentInstanceMapper->findById($_POST['delete']);
+            $instance = $componentInstanceMapper->findByInstanceId($_POST['delete'], $folder->getId());
             $configs  = $componentConfigInstanceMapper->findByColumn('component_instance_id', $instance->getId());
             foreach ($configs as $c) {
                 $componentConfigInstanceMapper->delete($c);
