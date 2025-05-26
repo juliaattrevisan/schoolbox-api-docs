@@ -71,6 +71,12 @@ class Profile implements IStrategy
 
 
     /**
+     * A special node containing details about Tutors
+     */
+    private const TUTOR_NODE = 'REGISTRATION';
+
+
+    /**
      * Profile constructor.
      *
      * @param ValidStrats                     $validStrats
@@ -122,6 +128,8 @@ class Profile implements IStrategy
                     'identifiers',
                     'medical_conditions',
                     'permissions',
+                    'registration',
+                    'registration.employees',
                     'sen_needs',
                     'year',
                     'campus'
@@ -235,7 +243,6 @@ class Profile implements IStrategy
                 $photoRedacted  = (bool)$student['permissions']['data']['photograph_student'];
                 $studiesCode    = trim((string)$student['education_details']['data']['learner_number']);
                 $title          = '';
-                $tutorGroup     = '';
 
                 /* There's a Username in the identifiers object, but it's not always set
                  * I guess we take a punt about meaningful values, though there's this other
@@ -294,7 +301,7 @@ class Profile implements IStrategy
 
                 /* Fish out a staff member via their user code
                  */
-                $tutor = $this->findTutor();
+                $tutor = $this->findTutor($student['registration']['data'] ?? []);
 
                 /* Find out a staff member via their user code
                  */
@@ -385,7 +392,7 @@ class Profile implements IStrategy
                     ->setMobile($mobile)
                     ->setPhotoRedacted($photoRedacted)
                     ->setStudiesCode($studiesCode)
-                    ->setTutorGroup($tutorGroup)
+                    ->setTutorGroup($tutor['group'])
                     ->setTutorTeacherId($tutor['id'])
                     ->setTutorTeacherName($tutor['name'])
                     ->setYearLevel($yearLevel)
@@ -661,18 +668,66 @@ class Profile implements IStrategy
 
 
     /**
-     * Find a tutor from their id
+     * Find the first tutor and tutor group for a student
      *
+     * @param array $registrationData
      * @return array
      */
-    private function findTutor(): array
+    private function findTutor(array $registrationData): array
     {
-        /* TODO Fill in these tutor vars
-         */
-        return [
+        $tutor = [
             'id' => null,
-            'name' => null
+            'name' => null,
+            'group' => ''
         ];
+
+        /* Check to make sure our registration type is actually 'REGISTRATION' which is Wonde's definition
+         * of a tutor
+         */
+        if (self::TUTOR_NODE === ($registrationData['type'] ?? '') && count($registrationData['employees']['data'] ?? [])) {
+            /* Assume the first guy in the stack
+             * Note: might die if this becomes a key-value lookup instead of a stack
+             */
+            $firstTutor = $registrationData['employees']['data'][0];
+
+            /* No guy? No trabajo
+             */
+            if (null === $firstTutor) {
+                return $tutor;
+            }
+
+            /* Used to compress optionality in preferred and legal names
+             */
+            $fmv = new FirstMeaningfulValue();
+
+            $tutor = [
+                'id' => $firstTutor['mis_id'],
+                /**
+                 * chose 'title' as it was equivalent of our 'title'
+                 * chose 'forename' as it was equivalent of our 'preferred_name' rather than 'legal_forename'
+                 * chose 'surname' as it was equivalent of our 'lastname' rather than 'legal_surname'
+                 */
+                'name' => trim(sprintf(
+                    "%s %s %s",
+                    trim((string)($firstTutor['title'] ?? '')),
+                    $fmv->find([
+                        $firstTutor['forename'],
+                        $firstTutor['legal_forename']
+                    ]),
+                    $fmv->find([
+                        $firstTutor['surname'],
+                        $firstTutor['legal_surname']
+                    ]),
+                )),
+                'group' => $fmv->find([
+                    $registrationData['name'],
+                    $registrationData['code'],
+                    $registrationData['description'],
+                ]),
+            ];
+        }
+
+        return $tutor;
     }
 
 
