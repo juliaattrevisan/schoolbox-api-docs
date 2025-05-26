@@ -35,7 +35,7 @@ export const useViewNodesStore = defineStore("mcViewNodes", () => {
     const idList = window.Vue.ref<number[]>([]); // ids of the selected nodes
     const currentDepth = window.Vue.ref(0); // track how far down the tree we are
     const currentDirection = window.Vue.ref(DIRECTION.FORWARDS); // which direction we are currently travelling in the tree
-    const showDisabled = window.Vue.ref(true); // whether only enabled nodes should appear
+    const showDisabled = window.Vue.ref(false); // whether disabled nodes are shown in the tree
     const isBrowserAction = window.Vue.ref(false); // whether the current action is a browser action (backward or forward press)
 
     /**
