@@ -40,8 +40,6 @@ try {
 $authenticator = new Eportfolio_Authenticator($_SESSION['user'], $page->getOwner(), $page->getPageId());
 
 if ($authenticator->canModify()) {
-    $componentInstanceMapper = Component_InstanceMapper::getInstance();
-
     /* Add a list item
      */
     if ($action == 'addItem') {
