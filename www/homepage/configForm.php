@@ -55,6 +55,9 @@ if (is_numeric($_REQUEST['cid'])) {
                     try {
                         /** @var Component_Instance $inst */
                         $inst = $componentInstanceMapper->findByInstanceId($componentID, $folder->getId());
+                        if (null === $inst) {
+                            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+                        }
                         $inst->setSequence($sequence + 1); // because we prefer to not have 0s in the database///
                         $inst->setPosition($position);
                         $instanceList[] = $inst;
@@ -81,6 +84,9 @@ if (is_numeric($_REQUEST['cid'])) {
         try {
             /** @var Component_Instance $instance */
             $instance = $componentInstanceMapper->findByInstanceId($_POST['delete'], $folder->getId());
+            if (null === $instance) {
+                throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            }
             $configs  = $componentConfigInstanceMapper->findByColumn('component_instance_id', $instance->getId());
             foreach ($configs as $c) {
                 $componentConfigInstanceMapper->delete($c);
