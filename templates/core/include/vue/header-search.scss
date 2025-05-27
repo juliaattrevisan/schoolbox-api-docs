@@ -6,7 +6,7 @@
     position: absolute;
     top: 0;
     width: 4.5rem;
-    z-index: calc(var(--sbx-depth-menu) -1); // -1 to avoid overlap with the side menus, which should sit on top
+    z-index: calc(var(--sbx-depth-menu) - 1); // -1 to avoid overlap with the side menus, which should sit on top
     ::placeholder {
         color: transparent;
         font-weight: normal;
