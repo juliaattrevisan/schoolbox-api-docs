@@ -377,7 +377,7 @@ export default {
                 this.selectedBadges.map(async (badge) => {
                     /* Construct each payload for each badge uniquely
                      */
-                    const payload = this.awardToSelfOnly ? null : { users: this.users };
+                    const payload = this.awardToSelfOnly ? {} : { users: this.users };
 
                     const resp = await fetch(badge._links[this.postAwardRouteLookup], {
                         method: "POST",
