@@ -196,8 +196,7 @@ class Processor
                  */
                 try {
                     $datetime = sprintf('%s %s', (new \Alaress_Date_Format($datetime, $this->dateLocal))->getDatabaseDate(), self::PUBLISH_TIME);
-                }
-                catch (\Carbon\Exceptions\InvalidFormatException $e) {
+                } catch (\Carbon\Exceptions\InvalidFormatException $e) {
                     $this->log(sprintf("Row %s: Invalid date format. Make sure it's correct and try again.", $i), self::WARNING);
 
                     $errors++;
