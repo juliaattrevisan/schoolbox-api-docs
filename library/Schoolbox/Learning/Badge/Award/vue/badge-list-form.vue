@@ -374,18 +374,23 @@ export default {
             this.isProcessing = true;
 
             Promise.all(
-                this.selectedBadges.map((badge) => {
+                this.selectedBadges.map(async (badge) => {
                     /* Construct each payload for each badge uniquely
                      */
                     const payload = this.awardToSelfOnly ? null : { users: this.users };
 
-                    fetch(badge._links[this.postAwardRouteLookup], {
+                    const resp = await fetch(badge._links[this.postAwardRouteLookup], {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
                         },
                         body: JSON.stringify(payload),
                     });
+
+                    if (!resp.ok) {
+                        console.error(`Failed to award badge`, await resp.text());
+                        throw new Error(`Failed to award badge`);
+                    }
                 }),
             )
                 .then(() => {
