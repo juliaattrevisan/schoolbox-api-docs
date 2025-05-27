@@ -13,6 +13,7 @@ tour:
         type: modal
         content: "<video id='feature_tour_video'
                    controls
+                   loop
                    data-videocomponent
                    preload='none'
                    poster='{CDN_PREFIX}/images/tour/25.0/2_lesson_plan_generator.jpg'
@@ -34,6 +35,7 @@ tour:
         type: modal
         content: "<video id='feature_tour_video'
                    controls
+                   loop
                    data-videocomponent
                    preload='none'
                    poster='{CDN_PREFIX}/images/tour/25.0/3_pastoral_care.jpg'

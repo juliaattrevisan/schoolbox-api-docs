@@ -13,6 +13,7 @@ tour:
         type: modal
         content: "<video id='feature_tour_video'
                    controls
+                   loop
                    data-videocomponent
                    preload='none'
                    poster='{CDN_PREFIX}/images/tour/25.0/1_notification_pause.jpg'
