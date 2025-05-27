@@ -11,7 +11,6 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
-use Schoolbox\Config\ConfigMapper;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
@@ -21,7 +20,7 @@ require_once __DIR__ . '/../../../conf/core/require.php';
 $app = new class extends CliTool\App
 {
     /**
-     * A string prefix used to segregate imported content from other stuf
+     * A string prefix used to segregate imported content from other stuffs
      * in the temp folder
      */
     private const ASSET_IDENTIFIER = '250_feature_tour';
@@ -67,6 +66,23 @@ $app = new class extends CliTool\App
         foreach (self::ASSETS as $asset) {
             $this->receive($asset, $expiryAt);
         }
+
+        /* Initiate video transcodes immediately...this might capture more stuffs than just
+         * the assets we uploaded (such as when schools upload their own content) but that
+         * will be inevitably processed synonymously
+         */
+        $cmd = sprintf(
+            'php %s/../../../tools/video/processor.php',
+            __DIR__,
+        );
+
+        /* Render EVERYTHING
+         */
+        $this->getLogger()->debug('Executing video processor...');
+
+        passthru($cmd, $returnVar);
+
+        $this->getLogger()->debug('Done.');
     }
 
 
