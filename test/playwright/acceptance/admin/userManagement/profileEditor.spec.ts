@@ -424,76 +424,6 @@ test.describe("Profile Editor", () => {
         tester.isGoingTo("As Jenni Reed, ensure goals and classes tabs are not presented on Eden Reed's profile page");
         await profilePage.checkTabIsNotVisible("goals");
         await profilePage.checkTabIsNotVisible("classes");
-
-        // Navigate to the profile editor page to restore fields for student, staff & parent
-        await tester.logout();
-        await tester.loginAsAdmin();
-        tester.isGoingTo("Navigate to the profile editor page to restore fields");
-        await profileEditor.goto();
-
-        // A) Restoring student profile editor page
-
-        // 1: Restoring fields on Student profile editor page
-        tester.isGoingTo("Restore fields on Student profile editor page");
-        tester.isGoingTo("Restore the Student ID field");
-        await profileEditor.clickFieldCog("student", "externalId");
-        await profileEditor.clickFieldCheckbox("student", "externalId", "visibility", "student");
-        await profileEditor.clickFieldCheckbox("student", "externalId", "availability", "2");
-        await profileEditor.clickFieldUpdateButton("student", "externalId");
-        tester.isGoingTo("Restore the Student: Year Level field");
-        await profileEditor.clickFieldCog("student", "yearLevel");
-        await profileEditor.clickFieldCheckbox("student", "yearLevel", "visibility", "self");
-        await profileEditor.clickFieldCheckbox("student", "yearLevel", "visibility", "parent");
-        await profileEditor.clickFieldUpdateButton("student", "yearLevel");
-        tester.isGoingTo("Restore the Student: Campus field");
-        await profileEditor.clickFieldCog("student", "campusCollection");
-        await profileEditor.clickFieldCheckbox("student", "campusCollection", "visibility", "self");
-        await profileEditor.clickFieldCheckbox("student", "campusCollection", "visibility", "staff");
-        await profileEditor.clickFieldCheckbox("student", "campusCollection", "visibility", "parent");
-        await profileEditor.clickFieldUpdateButton("student", "campusCollection");
-
-        // 2: Restoring tabs on Student profile editor page
-        tester.isGoingTo("Restore tabss on Student profile editor page");
-        tester.isGoingTo("Restore the Goals tab");
-        await profileEditor.clickTabCog("student", "goals");
-        await profileEditor.clickTabCheckbox("student", "goals", "visibility", "staff");
-        await profileEditor.clickTabCheckbox("student", "goals", "visibility", "parent");
-        await profileEditor.clickTabUpdateButton("student", "goals");
-        tester.isGoingTo("Restore the Achievements tab");
-        await profileEditor.clickTabCog("student", "achievements");
-        await profileEditor.clickTabCheckbox("student", "achievements", "visibility", "self");
-        await profileEditor.clickTabCheckbox("student", "achievements", "visibility", "staff");
-        await profileEditor.clickTabUpdateButton("student", "achievements");
-        tester.isGoingTo("Restore the Classes tab");
-        await profileEditor.clickTabCog("student", "classes");
-        await profileEditor.clickTabCheckbox("student", "classes", "availability", "2");
-        await profileEditor.clickTabUpdateButton("student", "classes");
-
-        // B) Restoring staff profile editor page
-        await profileEditor.clickRoleType("staff");
-
-        // Restoring fields on Staff profile editor page
-        tester.isGoingTo("Restore fields on Staff profile editor page");
-        tester.isGoingTo("Restore the Staff: email field");
-        await profileEditor.clickFieldCog("staff", "email");
-        await profileEditor.clickFieldCheckbox("staff", "email", "visibility", "staff");
-        await profileEditor.clickFieldCheckbox("staff", "email", "availability", "2");
-        await profileEditor.clickFieldUpdateButton("staff", "email");
-        tester.isGoingTo("Restore the Staff: Campus field");
-        await profileEditor.clickFieldCog("staff", "campusCollection");
-        await profileEditor.clickFieldCheckbox("staff", "campusCollection", "visibility", "self");
-        await profileEditor.clickFieldCheckbox("staff", "campusCollection", "visibility", "staff");
-        await profileEditor.clickFieldUpdateButton("staff", "campusCollection");
-
-        // C): Restoring Parent profile Editor page
-        await profileEditor.clickRoleType("parent");
-
-        // Restoring fields on Parent profile editor page
-        tester.isGoingTo("Restore fields on Parent profile editor page");
-        tester.isGoingTo("Restore the Parent: Role field");
-        await profileEditor.clickFieldCog("parent", "role");
-        await profileEditor.clickFieldCheckbox("parent", "role", "visibility", "student");
-        await profileEditor.clickFieldUpdateButton("parent", "role");
     });
 
     /**
@@ -592,38 +522,6 @@ test.describe("Profile Editor", () => {
         tester.isGoingTo("As Jenni Reed, ensure profile page the image is not presented on Eden Reed's profile page");
         await profilePage.goto(6);
         await profilePage.checkImagePresence("0");
-
-        // Navigate to the profile editor page to restore fields for student, staff & parent
-        await tester.logout();
-        await tester.loginAsAdmin();
-        tester.isGoingTo("Navigate to the profile editor page to restore portrait image");
-        await profileEditor.goto();
-
-        // 1: Restoring Portrait Image on student profile page
-        tester.isGoingTo("Restore Portrait Image on Student profile editor page");
-        await profileEditor.clickFieldCog("student", "portrait");
-        await profileEditor.clickFieldCheckbox("student", "portrait", "availability", "2");
-        await profileEditor.clickFieldUpdateButton("student", "portrait");
-
-        // 2: Restoring Portrait Image on staff profile page
-        tester.isGoingTo("Restore Portrait Image on Staff profile editor page");
-        await profileEditor.clickRoleType("staff");
-        await profileEditor.clickFieldCog("staff", "portrait");
-        await profileEditor.clickFieldCheckbox("staff", "portrait", "visibility", "student");
-        await profileEditor.clickFieldCheckbox("staff", "portrait", "visibility", "staff");
-        await profileEditor.clickFieldCheckbox("staff", "portrait", "visibility", "parent");
-        await profileEditor.clickFieldCheckbox("staff", "portrait", "availability", "2");
-        await profileEditor.clickFieldUpdateButton("staff", "portrait");
-
-        // 3: Restoring Portrait Image on parent profile page
-        tester.isGoingTo("Restore Portrait Image on Parent profile editor page");
-        await profileEditor.clickRoleType("parent");
-        await profileEditor.clickFieldCog("parent", "portrait");
-        await profileEditor.clickFieldCheckbox("parent", "portrait", "visibility", "self");
-        await profileEditor.clickFieldCheckbox("parent", "portrait", "visibility", "student");
-        await profileEditor.clickFieldCheckbox("parent", "portrait", "visibility", "staff");
-        await profileEditor.clickFieldCheckbox("parent", "portrait", "visibility", "parent");
-        await profileEditor.clickFieldUpdateButton("parent", "portrait");
     });
 
     /**
