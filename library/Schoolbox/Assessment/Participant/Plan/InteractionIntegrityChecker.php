@@ -10,12 +10,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Participant\Plan;
 
-use External_Class;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Assessment\Participant;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
 use PDOException;
