@@ -61,28 +61,9 @@ $app = new class extends CliTool\App
          */
         $expiryAt = \Alaress_Date_Format::now()->addMonths(self::EXPIRY);
 
-        /* Apparently this is the secret recipe
-         */
         foreach (self::ASSETS as $asset) {
             $this->receive($asset, $expiryAt);
         }
-
-        /* Initiate video transcodes immediately...this might capture more stuffs than just
-         * the assets we uploaded (such as when schools upload their own content) but that
-         * will be inevitably processed synonymously
-         */
-        $cmd = sprintf(
-            'php %s/../../../tools/video/processor.php',
-            __DIR__,
-        );
-
-        /* Render EVERYTHING
-         */
-        $this->getLogger()->debug('Executing video processor...');
-
-        passthru($cmd, $returnVar);
-
-        $this->getLogger()->debug('Done.');
     }
 
 
@@ -96,6 +77,8 @@ $app = new class extends CliTool\App
      */
     private function receive(string $asset, \Alaress_Date_Format $expiryAt)
     {
+        /* Apparently this is the secret recipe
+         */
         $tmp = tempnam(sys_get_temp_dir(), self::ASSET_IDENTIFIER);
         file_put_contents($tmp, file_get_contents($asset));
 
