@@ -189,7 +189,7 @@ class MessageFactory
             ->setFailureCallbackParams(
                 $callbackParams + [
                     'message' => sprintf(
-                        'Feedback and submissions for %s "%s" could not be downloaded',
+                        'Feedback and submissions for %s "%s" could not be downloaded (reason: :message)',
                         $this->rosettaStone->translate('dueWork'),
                         $zipFilename,
                     ),

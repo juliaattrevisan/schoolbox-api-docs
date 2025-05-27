@@ -20,6 +20,7 @@ use Predis\ClientInterface;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\MessageList\Listed;
 use Schoolbox\Realtime\MessageList\Unread;
+use Schoolbox\Realtime\Notification\Parameter\SimpleParam;
 use Schoolbox\User;
 
 class Controller extends Base
@@ -51,7 +52,7 @@ class Controller extends Base
             return; //exit early the message field is not set...
         }
         try {
-            $bob  = new NotificationInstanceBuilder();
+            $bob  = new NotificationInstanceBuilder(validate: false);
             // Note that setting href to # has the effect of automarking the
             // notification as read: see SA-17727
             $bob->setTitle($data['message'] ?? '')
@@ -62,6 +63,14 @@ class Controller extends Base
                 ->setIcon('/images/icon.php?size=192&icon=' . NSMapper::NS_MESSAGE)
                 ->addTopic(sprintf('%s.user.%d', Instance::DELIVERY_INSTANT, $user->getId()))
                 ->putMeta('title', 'Message from ' . ($data['from']['fullName'] ?? 'Unknown User'));
+
+            // Attempt to add params passed back from taskd?
+            // Also add params to message, and subject to template application?
+            foreach ($data['messageParams'] ?? [] as $key => $value) {
+                if (isset($value)) {
+                    $bob->setParam($key, new SimpleParam($value));
+                }
+            }
 
             $composite = new Composite(
                 new Listed($this->redisStorage, INSTANCE_ID, $user->getId()),
