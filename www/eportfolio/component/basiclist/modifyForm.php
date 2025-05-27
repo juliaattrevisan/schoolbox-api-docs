@@ -82,7 +82,7 @@ if ($authenticator->canModify()) {
         $listItem = $basicListMapper->findById($listItemId);
 
         /* Make sure the component that is being modified is on the page we are modifying */
-        $instance = $componentInstanceMapper->findByInstanceId($listItem->getGomponentInstanceId(), $page->getPageId());
+        $instance = $componentInstanceMapper->findByInstanceId($listItem->getComponentInstanceId(), $page->getPageId());
         if (null === $instance) {
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
