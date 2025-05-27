@@ -116,7 +116,6 @@ class Processor
      * @param string $dateLocal
      * @param string $assessmentTitle
      * @param \Schoolbox\Learning\Assessment\WorkType\Model $workType
-     * @param \Alaress_Date_Format $publishAt
      * @param bool $perform
      */
     public function __construct(
