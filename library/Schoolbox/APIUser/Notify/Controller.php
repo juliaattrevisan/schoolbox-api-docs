@@ -12,6 +12,7 @@ namespace Schoolbox\APIUser\Notify;
 
 use Alaress\Async\Notification\Instance\Builder as NotificationInstanceBuilder;
 use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Async\Notification\Parameter;
 use Alaress\Async\Queue\Composite;
 use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
@@ -20,7 +21,6 @@ use Predis\ClientInterface;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\MessageList\Listed;
 use Schoolbox\Realtime\MessageList\Unread;
-use Schoolbox\Realtime\Notification\Parameter\SimpleParam;
 use Schoolbox\User;
 
 class Controller extends Base
@@ -52,9 +52,12 @@ class Controller extends Base
             return; //exit early the message field is not set...
         }
         try {
-            $bob  = new NotificationInstanceBuilder(validate: false);
+            $bob = new NotificationInstanceBuilder(validate: false);
+
             // Note that setting href to # has the effect of automarking the
-            // notification as read: see SA-17727
+            // notification as read: see SA-17727.
+            // SA-19820 specifically works around this if the href is an empty
+            // anchor.
             $bob->setTitle($data['message'] ?? '')
                 ->setAllowSelfSend(true)
                 ->setSeverity(Logger::INFO)
@@ -64,11 +67,16 @@ class Controller extends Base
                 ->addTopic(sprintf('%s.user.%d', Instance::DELIVERY_INSTANT, $user->getId()))
                 ->putMeta('title', 'Message from ' . ($data['from']['fullName'] ?? 'Unknown User'));
 
-            // Attempt to add params passed back from taskd?
-            // Also add params to message, and subject to template application?
+            // Attach any messageParams as well
             foreach ($data['messageParams'] ?? [] as $key => $value) {
                 if (isset($value)) {
-                    $bob->setParam($key, new SimpleParam($value));
+                    $bob->setParam(
+                        $key,
+                        new Parameter\Param(
+                            $value,
+                            stacking: Parameter\ParameterInterface::STACKING_REPLACE_NO_DECORATION,
+                        ),
+                    );
                 }
             }
 
