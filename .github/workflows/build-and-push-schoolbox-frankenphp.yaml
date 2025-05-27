@@ -32,10 +32,10 @@ jobs:
     strategy:
       matrix:
         build:
-          - runs-on: ubuntu-latest
+          - runs-on: onprem-k3s
             platform: linux
             arch: amd64
-          - runs-on: ubuntu-arm
+          - runs-on: onprem-k3s-arm
             platform: linux
             arch: arm64
     runs-on: ${{ matrix.build.runs-on }}
@@ -125,7 +125,7 @@ jobs:
     needs:
       - build-and-push-schoolbox-frankenphp
     if: always() && needs.build-and-push-schoolbox-frankenphp.result == 'success'
-    runs-on: ubuntu-latest
+    runs-on: onprem-k3s
     steps:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3

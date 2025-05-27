@@ -52,10 +52,10 @@ jobs:
     strategy:
       matrix:
         build:
-        - runs-on: ubuntu-latest
+        - runs-on: onprem-k3s
           platform: linux
           arch: amd64
-        - runs-on: ubuntu-arm
+        - runs-on: onprem-k3s-arm
           platform: linux
           arch: arm64
     runs-on: ${{ matrix.build.runs-on }}

@@ -12,7 +12,7 @@ jobs:
     #Branch must contain -sb in the branch name
     if: ${{ contains(github.ref_name, '-sb') }}
     # Operating System
-    runs-on: ubuntu-latest
+    runs-on: onprem-k3s
     # Job steps
     steps:
       - uses: actions/checkout@v1

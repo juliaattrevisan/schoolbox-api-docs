@@ -21,7 +21,7 @@ jobs:
   push-to-ecr:
     env:
       AWS_ROLE_TO_ASSUME: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-    runs-on: ubuntu-latest
+    runs-on: onprem-k3s
     strategy:
       matrix:
         build:
