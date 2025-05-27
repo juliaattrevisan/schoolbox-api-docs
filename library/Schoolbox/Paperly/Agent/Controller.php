@@ -154,7 +154,8 @@ class Controller extends Base
                 ];
             }
             $this->response = $this->responseAsJson(
-                $response
+                $response,
+                true
             );
         } catch (AlaressDatabaseException $e) {
             //Catching external database exception and return useful message in json
