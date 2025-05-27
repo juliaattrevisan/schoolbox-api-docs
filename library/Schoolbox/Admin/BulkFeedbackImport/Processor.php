@@ -32,6 +32,12 @@ class Processor
 
 
     /**
+     * Assume a default time of 1:11pm
+     */
+    private const PUBLISH_TIME = '13:11:11';
+
+
+    /**
      * Used to find a relationship between a folder and a particular
      * assessment by its (assessment title, worktype) combo
      */
@@ -168,6 +174,10 @@ class Processor
          */
         $i = 0;
 
+        /* The current datetime is used for publish_at if it was omitted
+         */
+        $now = \Alaress_Date_Format::now();
+
         foreach ($reader as $row) {
             /* Remember the row number
              */
@@ -180,29 +190,20 @@ class Processor
             $datetime = trim((string)$row['Publish Date']);
 
             if ('' === $datetime) {
-                $this->log(sprintf(
-                    "Row %s: Can't find Publish Date. Make sure it's correct and try again.",
-                    $i
-                ), self::WARNING);
+                $datetime = $now->getDatabase();
+            } else {
+                /* Check the format of the date: try both database and local short
+                 */
+                try {
+                    $datetime = sprintf('%s %s', (new \Alaress_Date_Format($datetime, $this->dateLocal))->getDatabaseDate(), self::PUBLISH_TIME);
+                }
+                catch (\Carbon\Exceptions\InvalidFormatException $e) {
+                    $this->log(sprintf("Row %s: Invalid date format. Make sure it's correct and try again.", $i), self::WARNING);
 
-                $errors++;
+                    $errors++;
 
-                continue;
-            }
-
-            /* Check the format of the date: try both database and local short
-             */
-            try {
-                $datetime = (new \Alaress_Date_Format($datetime, $this->dateLocal))->getDatabase();
-            } catch (\Carbon\Exceptions\InvalidFormatException $e) {
-                $this->log(sprintf(
-                    "Row %s: Invalid date format. Make sure it's correct and try again.",
-                    $i
-                ), self::WARNING);
-
-                $errors++;
-
-                continue;
+                    continue;
+                }
             }
 
             /* Process feedbacks
