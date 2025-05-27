@@ -478,8 +478,8 @@
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/pwa.js?v={{ config.site_version }}"></script>
 <script src="{{ CDN_PREFIX }}/js/bundle/headerSearch.js?v={{ config.site_version }}"></script>
-<!-- when enabled, show a birthday celebration on a students birthday -->
 {% if user.celebrateBirthday %}
+<!-- when enabled, show a birthday celebration on a students birthday -->
 <div id="birthday-surprise-container">
     <birthday-surprise :user-id="{{ user.current.id }}"/>
 </div>
