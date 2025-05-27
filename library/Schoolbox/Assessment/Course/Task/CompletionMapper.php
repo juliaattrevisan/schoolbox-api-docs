@@ -131,6 +131,10 @@ class CompletionMapper extends Mapper
             $latestTaskCompletion = null;
         }
 
+        if ($latestTaskCompletion->isDeleted()) {
+            $latestTaskCompletion = null;
+        }
+
         // If no task completion exists, the student's participation can be removed.
         if ($latestTaskCompletion === null) {
             // Get a hydrated $assessment to ensure its context properties are set.
