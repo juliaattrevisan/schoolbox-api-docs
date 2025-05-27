@@ -74,7 +74,7 @@ if ($authenticator->canModify()) {
         $listItem = \Component\Eportfolio\FileListMapper::getInstance()->findById($listItemId);
 
         /* Make sure the list item that is being modified is on the page we are modifying */
-        if ($listItem->getPageId() !== $pageId) {
+        if ($listItem->getPageId() != $pageId) {
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
 
