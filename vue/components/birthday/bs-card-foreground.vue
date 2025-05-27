@@ -214,6 +214,7 @@ window.Vue.onMounted(() => {
  */
 window.Vue.onBeforeUnmount(() => {
     cakeTimeline.kill();
+    if (afterCakeTimeline === undefined) return; // no after cake timeline to kill as hasn't started yet
     afterCakeTimeline.kill();
 });
 </script>
