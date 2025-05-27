@@ -120,6 +120,7 @@ class Controller extends Base
                 $prefixGenerator,
             ))->build(),
             (new DueWorkFeedbackTranslatorFactory(
+                $this->getConfigLoader(),
                 $this->routeGenerator,
                 $this->authorizer,
                 $this->getUser(),

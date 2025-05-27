@@ -34,10 +34,6 @@ export default {
             type: String,
             required: true,
         },
-        configGradeGradientEnabled: {
-            type: Boolean,
-            required: true,
-        },
         showLearningMoments: {
             // whether to show learning moments within the feed
             type: Boolean,
@@ -292,9 +288,16 @@ export default {
             return dayjs(date).format(format);
         },
 
+        /**
+         * Retrieve the class to use for the gradient background based on the grade
+         * @param {null|number|"none"} data
+         * @returns {string}
+         */
         gradient(data) {
-            let gradientLevel = this.configGradeGradientEnabled ? (parseInt(data) / 10).toFixed() : "none";
-            return `gradient-${gradientLevel}-bg`;
+            if (data === null) {
+                return "";
+            }
+            return `gradient-${data}-bg`;
         },
 
         /**
@@ -825,7 +828,7 @@ export default {
                                         </div>
                                         <div
                                             v-if="evidence.object.mark"
-                                            :class="`grade ${gradient(evidence.object.normalisedMark)}`"
+                                            :class="`grade ${gradient(evidence.object.gradientMark)}`"
                                         >
                                             <span>{{ evidence.object.mark }}</span>
                                         </div>

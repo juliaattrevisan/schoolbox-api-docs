@@ -17,6 +17,7 @@ use Schoolbox\Learning\Assessment\DueWork\Feedback\Translator\ModelToArray;
 use Schoolbox\Learning\Assessment\Translator\AssessmentForFeed;
 use Schoolbox\Learning\Assessment\Translator\Links;
 use Schoolbox\User;
+use Schoolbox\Config\Loader as ConfigLoader;
 
 /**
  * Factory for building a standard translator
@@ -24,6 +25,7 @@ use Schoolbox\User;
 class Factory
 {
     public function __construct(
+        private ConfigLoader $configLoader,
         private Generator $routeGenerator,
         private Authorizer $authorizer,
         private User $user
@@ -33,6 +35,7 @@ class Factory
     public function build(): ModelToArray
     {
         return new ModelToArray(
+            $this->configLoader,
             new AssessmentForFeed(),
             new User\Translator\Author\ModelToArray(),
             new Links(
