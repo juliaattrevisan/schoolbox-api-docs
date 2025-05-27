@@ -155,7 +155,7 @@ class Mapper extends BaseMapper
 
 
     /**
-     * Remove the participant if $student should no longer be a participant in $assessment.
+     * Remove the student's participant row if $student should no longer be a participant in $assessment.
      *
      * @param Model $object
      * @return bool - Return true on success - whether or not a participation was removed.
@@ -166,21 +166,20 @@ class Mapper extends BaseMapper
         $student = $object->getUser();
         $quiz = $object->getQuiz();
 
-        if ($this->getAttemptCountForStudent($quiz->getId(), $student->getId()) > 0) {
-            // If any (non-deleted) response or feedback exists, the student should remain a participant.
-            // The response and feedback for quizzes are both stored in the assess_attempt table.
-            return true;
+        // If no attempts exist for the student, the student's participation can be removed.
+        // Note the response and feedback for quizzes are both stored in the assess_attempt table.
+        if ($this->getAttemptCountForStudent($quiz->getId(), $student->getId()) === 0) {
+            // Get a hydrated $assessment to ensure its context properties are set.
+            try {
+                $assessment = $this->assessmentMapper->findById($quiz->getAssessmentModel()->getId());
+            } catch (Exception) {
+                // Can't find assessment - just assume the student should remain a participant.
+                return true;
+            }
+
+            $this->interactionChecker->removeParticipationFromDynamicPlan($student, $assessment);
         }
 
-        // Get a hydrated $assessment to ensure its context properties are set.
-        try {
-            $assessment = $this->assessmentMapper->findById($quiz->getAssessmentModel()->getId());
-        } catch (Exception) {
-            // Can't find assessment - just assume the student should remain a participant.
-            return true;
-        }
-
-        $this->interactionChecker->removeParticipationIfNoInteractionsRemain($student, $assessment);
         return true;
     }
 

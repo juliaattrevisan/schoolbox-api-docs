@@ -116,7 +116,7 @@ class CompletionMapper extends Mapper
 
 
     /**
-     * Remove the participant if $student should no longer be a participant in $assessment.
+     * Remove the student's participant row if $student should no longer be a participant in $assessment.
      *
      * @param Completion $object
      * @return bool - Return true on success - whether or not a participation was removed.
@@ -134,21 +134,19 @@ class CompletionMapper extends Mapper
             $latestTaskCompletion = null;
         }
 
-        if ($latestTaskCompletion !== null) {
-            // If any (non-deleted) response or feedback exists, the student should remain a participant.
-            // For tasks the response is the task_completion record.  Tasks have no feedback.
-            return true;
+        // If no task completion exists, the student's participation can be removed.
+        if ($latestTaskCompletion === null) {
+            // Get a hydrated $assessment to ensure its context properties are set.
+            try {
+                $assessment = $this->assessmentMapper->findById($task->getAssessmentModel()->getId());
+            } catch (Mapper\Exception) {
+                // Can't find assessment - just assume the student should remain a participant.
+                return true;
+            }
+
+            $this->interactionChecker->removeParticipationFromDynamicPlan($student, $assessment);
         }
 
-        // Get a hydrated $assessment to ensure its context properties are set.
-        try {
-            $assessment = $this->assessmentMapper->findById($task->getAssessmentModel()->getId());
-        } catch (Mapper\Exception) {
-            // Can't find assessment - just assume the student should remain a participant.
-            return true;
-        }
-
-        $this->interactionChecker->removeParticipationIfNoInteractionsRemain($student, $assessment);
         return true;
     }
 

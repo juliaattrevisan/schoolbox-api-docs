@@ -170,7 +170,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
 
 
     /**
-     * Remove the participant if $student should no longer be a participant in $assessment.
+     * Remove the student's participant row if the student should no longer be a participant in $assessment.
      * @see SubmissionMapper->removeParticipationIfNecessary() (similar function).
      *
      * @param ReturnedWork $object
@@ -191,40 +191,34 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
             return true;
         }
 
-        // If any (non-deleted) response or feedback exists, the student should remain a participant.
+        // Get response and feedback counts for this student on this assessment.
         // In this case:
         //  * the response is stored in the student_submission table
         //  * the feedback is stored in the submission_return table.
-
         $submissionCountByBoxId = $submissionBoxMapper->findSubmissionCountsForSubmissionBoxes(
             [$submissionBox->getId()],
             $student->getId()
         );
-        $submissionCountForThisBox = $submissionCountByBoxId[$submissionBox->getId()] ?? 0;
-        if ($submissionCountForThisBox > 0) {
-            // A response was found, so the student should remain a participant.
-            return true;
-        }
-
         $feedbackCountByBoxId = $submissionBoxMapper->findReturnedWorkCountsForSubmissionBoxes(
             [$submissionBox->getId()],
             $student->getId()
         );
+        $submissionCountForThisBox = $submissionCountByBoxId[$submissionBox->getId()] ?? 0;
         $feedbackCountForThisBox = $feedbackCountByBoxId[$submissionBox->getId()] ?? 0;
-        if ($feedbackCountForThisBox > 0) {
-            // A feedback was found, so the student should remain a participant.
-            return true;
+
+        // If no (non-deleted) response or feedback exists, the student's participation can be removed.
+        if ($submissionCountForThisBox == 0 && $feedbackCountForThisBox == 0) {
+            // Get a hydrated $assessment to ensure its context properties are set.
+            try {
+                $assessment = $this->assessmentMapper->findById($submissionBox->getAssessmentModel()->getId());
+            } catch (MapperException) {
+                // Can't find assessment - just assume the student should remain a participant.
+                return true;
+            }
+
+            $this->interactionChecker->removeParticipationFromDynamicPlan($student, $assessment);
         }
 
-        // Get a hydrated $assessment to ensure its context properties are set.
-        try {
-            $assessment = $this->assessmentMapper->findById($submissionBox->getAssessmentModel()->getId());
-        } catch (MapperException) {
-            // Can't find assessment - just assume the student should remain a participant.
-            return true;
-        }
-
-        $this->interactionChecker->removeParticipationIfNoInteractionsRemain($student, $assessment);
         return true;
     }
 

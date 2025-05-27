@@ -171,7 +171,7 @@ class InteractionIntegrityChecker
 
 
     /**
-     * Post-save callback to check whether a user does not yet have a participation record, and inserts one in they dynamic plan.
+     * Post-save callback to check whether a user has a participation row, and if not inserts one in the dynamic plan.
      *
      * @param User             $student
      * @param Assessment\Model $assessment
@@ -211,19 +211,25 @@ class InteractionIntegrityChecker
 
 
     /**
-     * Remove the participant if $student is no longer a participant in $assessment according to the following rules
-     * (copied from the docblock of Assessment\Participant\DataSource->findForAssessmentCollection()):
+     * Remove $student's participant row if the linked plan is dynamic.
      *
-     * A student is a participant in $assessment if:
-     *  * (1) the student is in the $assessment's context's folder's class list OR
-     *  * (2) the student is a read-level member of the $assessment's context's folder's group OR
-     *  * (3) the student has submitted a (non-deleted) Response for this assessment OR
-     *  * (4) the student has been given (non-deleted) Feedback for this assessment
+     * A participant row for a student is added in two situations:
+     *  - when a teacher creates a participation plan for that student
+     *    (note plans created this way have is_dynamic=0)
+     *  - when a student who does not already have a participant row, first interacts with an assessment
+     *    (see $this->insertParticipationOnFirstInteraction() above, in which the participant row is added to the
+     *     assessment's dynamic plan)
+     *
+     * A participant row in a dynamic plan should be removed when all interactions by that student have been deleted.
+     *
+     * The types of interactions for different types of assessment vary, so the deletion of those interactions should
+     * be done in the relevant mapper class for the assessment type.  If no interactions remain after an interaction
+     * has been deleted in one of those mappers, this function should be called.
      *
      * @param User             $student
      * @param Assessment\Model $assessment
      */
-    public function removeParticipationIfNoInteractionsRemain(User $student, Assessment\Model $assessment): void
+    public function removeParticipationFromDynamicPlan(User $student, Assessment\Model $assessment): void
     {
         $this->loadPlansAndParticipants($assessment);
         $participant = $this->findParticipation($student, $assessment);
@@ -233,46 +239,12 @@ class InteractionIntegrityChecker
             return;
         }
 
-        $plan = $participant->getPlan();
-
-        if (!$plan->isDynamic()) {
-            // Plan is custom, so participation should only be removed explicitly by a teacher.
-            return;
-        }
-
-        // The below line works, but $assessment->getContextFolder() returns null.  Why?
-        $contextFolder = $assessment->getAssessmentContext()->getFolder();
-        $externalClassHandler = new External_Class();
-        $studentsInClassList = $externalClassHandler->getStudents($contextFolder->getCodeString());
-        $studentExternalIdsInClassList = array_map(fn ($student) => $student['synergy_id'], $studentsInClassList);
-
-        // Checking rule (1)...
-        if (in_array($student->getExternalId(), $studentExternalIdsInClassList)) {
-            // The student is in the class list, so remains a participant.
-            return;
-        }
-
-        // Checking rule (2)...
-        // Code below copied from Group\Manage\Controller->getData().
-        if ($contextFolder->getGroup()) {
-            // The lowest access level is read-level, so all users in $userAccessList have read-level access.
-            $userAccessList = $this->userAccessMapper->findForFolder($contextFolder)
-                ->indexByCallback(fn (UserAccess $userAccess) => $userAccess->getUser()->getId());
-
-            $groupMemberUserIds = $userAccessList->keys();
-            if (in_array($student->getId(), $groupMemberUserIds)) {
-                // The student is in the assessment's context's folder's group, so remains a participant.
-                return;
+        if ($participant->getPlan()->isDynamic()) {
+            try {
+                $this->participantMapper->delete($participant);
+            } catch (Exception) {
+                // Couldn't delete participation, probably because it has already been deleted by another process.
             }
-        }
-
-        // Note rules (3) and (4) should have been checked in the calling function (in an assessment type's mapper).
-
-        // Since all the rules have been checked, there are no reasons for this student to remain a participant.
-        try {
-            $this->participantMapper->delete($participant);
-        } catch (Exception) {
-            // Couldn't delete participation, probably because it has already been deleted.
         }
     }
 

@@ -191,7 +191,7 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Remove the participant if $student should no longer be a participant in $assessment.
+     * Remove the student's participant row if $student should no longer be a participant in $assessment.
      *
      * @param Model $object
      * @return bool - Return true on success - whether or not a participation was removed.
@@ -202,21 +202,20 @@ class Mapper extends BaseMapper
         $student = $object->getStudent();
         $ltiAssessment = $object->getLtiAssessment();
 
-        if ($this->getScoreCountForStudent($ltiAssessment->getId(), $student->getId()) > 0) {
-            // If any (non-deleted) response or feedback exists, the student should remain a participant.
-            // The response and feedback for LTI assessments are both stored in the lti_assessment_score table.
-            return true;
+        // If no score exists for the student, the student's participation can be removed.
+        // Note the response and feedback for LTI assessments are both stored in the lti_assessment_score table.
+        if ($this->getScoreCountForStudent($ltiAssessment->getId(), $student->getId()) === 0) {
+            // Get a hydrated $assessment to ensure its context properties are set.
+            try {
+                $assessment = $this->assessmentMapper->findById($ltiAssessment->getAssessmentModel()->getId());
+            } catch (BaseMapper\Exception) {
+                // Can't find assessment - just assume the student should remain a participant.
+                return true;
+            }
+
+            $this->interactionChecker->removeParticipationFromDynamicPlan($student, $assessment);
         }
 
-        // Get a hydrated $assessment to ensure its context properties are set.
-        try {
-            $assessment = $this->assessmentMapper->findById($ltiAssessment->getAssessmentModel()->getId());
-        } catch (BaseMapper\Exception) {
-            // Can't find assessment - just assume the student should remain a participant.
-            return true;
-        }
-
-        $this->interactionChecker->removeParticipationIfNoInteractionsRemain($student, $assessment);
         return true;
     }
 
