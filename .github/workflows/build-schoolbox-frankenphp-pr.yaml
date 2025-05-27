@@ -7,7 +7,7 @@ name: Build schoolbox-frankenphp (pull request)
 # will be re-enabled when it's actually in use.
 on:
   workflow_call:
-#  pull_request:
+  pull_request:
 
 jobs:
   # Build artifacts before building image
