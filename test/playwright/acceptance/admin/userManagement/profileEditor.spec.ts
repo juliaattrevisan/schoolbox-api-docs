@@ -209,7 +209,6 @@ test.describe("Profile Editor", () => {
         await setupProfileEditorPage(tester, page, db);
 
         const profilePage = new ProfilePage(tester, page);
-        const profileEditor = new ProfileEditor(tester, page);
 
         const teacher = Common.USER_JACKCOLES;
         const student = Common.USER_JANAREED;
