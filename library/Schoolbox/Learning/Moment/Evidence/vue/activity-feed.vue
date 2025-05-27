@@ -290,12 +290,12 @@ export default {
 
         /**
          * Retrieve the class to use for the gradient background based on the grade
-         * @param {null|number|"none"} data
+         * @param {null|string} data - The grade gradient value, if it exists - may be the string "none" for no gradient
          * @returns {string}
          */
         gradient(data) {
             if (data === null) {
-                return "";
+                return ""; // No mark exists
             }
             return `gradient-${data}-bg`;
         },
