@@ -14,7 +14,6 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Assessment\Participant;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
 use PDOException;
 use Schoolbox\Mapper as SchoolboxMapper;
