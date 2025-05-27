@@ -19,7 +19,7 @@ ARG ENV
 
 # Install additional extensions
 # (not in https://github.com/shinsenter/php?tab=readme-ov-file#pre-installed-php-extensions)
-RUN IPE_DEBUG=1 install-php-extensions \
+RUN install-php-extensions \
     imagick \
     pdo_mysql \
     pdo_sqlsrv \
