@@ -6,6 +6,8 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\Error\Mapper as ErrorMapper;
+
 require_once __DIR__ . '/../../../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
@@ -37,9 +39,17 @@ try {
 $authenticator = new Eportfolio_Authenticator($_SESSION['user'], $page->getOwner(), $page->getPageId());
 
 if ($authenticator->canModify()) {
+    $componentInstanceMapper = Component_InstanceMapper::getInstance();
+
     /* Add a list item
      */
     if ($action == 'addItem') {
+        /* Make sure the component that is being modified is on the page we are modifying */
+        $instance = $componentInstanceMapper->findByInstanceId($componentInstanceId, $page->getPageId());
+        if (null === $instance) {
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
         $title = $_POST['title'];
         $content = $_POST['content'];
 
@@ -73,6 +83,13 @@ if ($authenticator->canModify()) {
         }
 
         $listItem = \Component\Eportfolio\LinkListMapper::getInstance()->findById($listItemId);
+
+        /* Make sure the component that is being modified is on the page we are modifying */
+        $instance = $componentInstanceMapper->findByInstanceId($listItem->getComponentInstanceId(), $page->getPageId());
+        if (null === $instance) {
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
         $listItem->setTitle($title);
         $listItem->setContent($url->getUrl());
 
@@ -82,6 +99,13 @@ if ($authenticator->canModify()) {
         $listItemId = $_GET['listItemId'];
 
         $listItem = \Component\Eportfolio\LinkListMapper::getInstance()->findById($listItemId);
+
+        /* Make sure the component that is being modified is on the page we are modifying */
+        $instance = $componentInstanceMapper->findByInstanceId($listItem->getComponentInstanceId(), $page->getPageId());
+        if (null === $instance) {
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
         \Component\Eportfolio\LinkListMapper::getInstance()->delete($listItem);
     }
 

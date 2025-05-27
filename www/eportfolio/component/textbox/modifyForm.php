@@ -6,6 +6,8 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\Error\Mapper as ErrorMapper;
+
 require_once __DIR__ . '/../../../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
@@ -38,6 +40,14 @@ $authenticator = new Eportfolio_Authenticator($_SESSION['user'], $page->getOwner
 
 if ($authenticator->canModify()) {
     $content = $_POST['content'];
+
+    $componentInstanceMapper = Component_InstanceMapper::getInstance();
+
+    /* Make sure the component that is being modified is on the page we are modifying */
+    $instance = $componentInstanceMapper->findByInstanceId($componentInstanceId, $page->getPageId());
+    if (null === $instance) {
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+    }
 
     $textboxCollection = \Component\Eportfolio\TextboxMapper::getInstance()->findByColumn('component_instance_id', $componentInstanceId);
 
