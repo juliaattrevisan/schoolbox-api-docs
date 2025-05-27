@@ -30,10 +30,7 @@ class CompletionMapper extends Mapper
      */
     private $interactionChecker;
 
-    /**
-     * @var AssessmentMapper
-     */
-    private $assessmentMapper;
+    private AssessmentMapper $assessmentMapper;
 
 
     public function __construct()
@@ -43,7 +40,7 @@ class CompletionMapper extends Mapper
             Participant\Plan\Mapper::getInstance(),
             Participant\Mapper::getInstance()
         );
-        $this->assessmentMapper = new AssessmentMapper();
+        $this->assessmentMapper = AssessmentMapper::getInstance();
     }
 
     protected function mapping()
