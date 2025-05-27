@@ -8,7 +8,7 @@ import BsNotification from "./bs-notification.vue";
 import BsCard from "./bs-card.vue";
 
 const modalEl = window.Vue.ref<InstanceType<typeof RevealModal> | null>(null);
-const isModalActive = window.Vue.ref(false); /*  */
+const isModalActive = window.Vue.ref(false); // to remove the content inside the modal when the user closes it
 
 interface Props {
     userId?: number;
