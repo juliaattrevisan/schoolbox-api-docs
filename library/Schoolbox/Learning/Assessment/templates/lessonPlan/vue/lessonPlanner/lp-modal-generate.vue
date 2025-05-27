@@ -74,15 +74,19 @@ window.Vue.onMounted(() => {
 
     <label for="lp-duration">{{ locale.lessonPlan.proper() }} Duration</label>
     <p class="meta">
-        Provide a timeframe for how long the {{ locale.lessonPlan.singular() }} is expected to run. This helps the AI
-        tailor the {{ locale.lessonPlan.singular() }} to fit your intended {{ locale.lessonPlan.singular() }} duration.
+        <strong>Tips for using Duration:</strong><br />
+        Specify the total time (e.g. "60 minutes").<br />
+        To plan for multiple sessions, indicate the number and length (e.g. "4 x 50-minute lessons").<br />
+        For the AI to accurately incorporate <strong>duration</strong> into your plan, ensure your template has fields
+        that specify its structure or timing.<br />
     </p>
     <input id="lp-duration" v-model.trim="lpStore.lessonPlanDuration" type="text" maxlength="255" />
 
     <label for="lp-generate-additional-context">Additional Context</label>
     <p class="meta">
-        Provide any specific instructions, {{ locale.lessonPlan.singular() }} context, or ideas to guide the AI in
-        generating a tailored {{ locale.lessonPlan.singular() }}.
+        Provide additional details to help the AI create a high-quality, personalized plan. This might include
+        information such as <strong>specific learning objectives</strong>, students' <strong>prior knowledge</strong>,
+        <strong>available resources</strong>, <strong>differentiation needs</strong>, or <strong>activity preferences</strong>.
     </p>
     <textarea id="lp-generate-additional-context" v-model="lpStore.additionalContext" rows="5"></textarea>
 
