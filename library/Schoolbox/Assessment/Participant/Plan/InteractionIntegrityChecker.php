@@ -37,8 +37,6 @@ class InteractionIntegrityChecker
      */
     private $participantMapper;
 
-    private UserAccessMapper $userAccessMapper;
-
 
     /**
      * @param Mapper             $planMapper
@@ -48,7 +46,6 @@ class InteractionIntegrityChecker
     {
         $this->planMapper        = $planMapper;
         $this->participantMapper = $participantMapper;
-        $this->userAccessMapper  = new UserAccessMapper(); // TODO: Pass to constructor?
     }
 
 
