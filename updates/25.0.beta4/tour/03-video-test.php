@@ -26,18 +26,39 @@ $app = new class extends CliTool\App
          */
         $expiryAt = \Alaress_Date_Format::now()->addYears(1);
 
-        /* This never did anything
+        /* A mapper
          */
-        $public = true;
+        $storageMapper = \Schoolbox\Resource\Storage\Mapper::getInstance();
 
         /* Apparently this is the secret recipe
          */
-        $tmp = tempnam(sys_get_temp_dir(), '250_feature_tour');
-        file_put_contents($tmp, file_get_contents('lms.mp4'));
+        $assetPrefix = '250_feature_tour';
 
-        $storage = \Schoolbox\Resource\Storage\Mapper::getInstance()->accept('lms.mp4', $tmp, $public, $expiryAt);
+        /* Video assets to cram into storage
+         */
+        $assets = [
+            'lms.mp4'
+        ];
 
-        print_r($storage);
+        foreach ($assets as $asset) {
+            $tmp = tempnam(sys_get_temp_dir(), $assetPrefix);
+            file_put_contents($tmp, file_get_contents($asset));
+
+            $this->getLogger()->debug(sprintf(
+                'Accepting asset %s at location %s',
+                $asset,
+                $tmp
+            ));
+
+            /* This is deprecated in favour of something else, but not sure what
+             */
+            $storage = $storageMapper->accept($asset, $tmp, true, $expiryAt);
+
+            $this->getLogger()->debug(sprintf(
+                '    Received with hash %s',
+                $storage->getHash()
+            ));
+        }
     }
 
     public function runAsRoot(): ?bool
