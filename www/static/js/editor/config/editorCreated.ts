@@ -21,6 +21,18 @@ function addToGlobalScope(editor: SbxEditor, sourceElement: SbxEditorElement): v
 }
 
 /**
+ * CKEditor doesn't automatically check the readonly attribute on the source element,
+ * so we do it here instead.
+ * @param editor - the CKEditor instance
+ * @param sourceElement - the sourceElement the CKEditor will replace
+ */
+function checkReadonly(editor: SbxEditor, sourceElement: SbxEditorElement): void {
+    if (sourceElement instanceof HTMLTextAreaElement && sourceElement.readOnly) {
+        editor.enableReadOnlyMode("readonly");
+    }
+}
+
+/**
  * Mirror editor change events back to the source element if enabled in the config
  * Sometimes the editor is used in a form which pays attention to the base <textarea> element for autosave/etc
  * in this case, we need to dispatch the change event from the editor back to the source element
@@ -28,7 +40,7 @@ function addToGlobalScope(editor: SbxEditor, sourceElement: SbxEditorElement): v
  * @param config - the CKEditor config object
  */
 function mirrorEditorChanges(editor: SbxEditor, config: SbxEditorConfig): void {
-    if (config.mirrorChangeEvents) {
+    if (config.mirrorChangeEvents && !editor.isReadOnly) {
         editor.model.document.on("change", () => {
             if (!(editor.sourceElement instanceof HTMLTextAreaElement)) return;
             editor.sourceElement.value = editor.getData();
@@ -124,6 +136,7 @@ function configureIframelyListener(editor: SbxEditor): void {
  */
 export function modifyEditor(sourceElement: SbxEditorElement, editor: SbxEditor, config: SbxEditorConfig): void {
     addToGlobalScope(editor, sourceElement);
+    checkReadonly(editor, sourceElement);
     mirrorEditorChanges(editor, config);
     insertWordCount(sourceElement, editor, config);
     disableAutoMedia(editor, config);
