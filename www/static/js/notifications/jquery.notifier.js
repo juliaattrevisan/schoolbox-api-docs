@@ -394,7 +394,7 @@
                         // Is this a link to the base anchor?
                         // If so, then this should be considered an alert which always displays?
                         let elementHref = element.getAttribute("href");
-                        if (elementHref === '#') {
+                        if (elementHref === "#") {
                             return;
                         }
 
