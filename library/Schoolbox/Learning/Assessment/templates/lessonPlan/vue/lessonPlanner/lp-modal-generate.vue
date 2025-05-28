@@ -86,7 +86,8 @@ window.Vue.onMounted(() => {
     <p class="meta">
         Provide additional details to help the AI create a high-quality, personalized plan. This might include
         information such as <strong>specific learning objectives</strong>, students' <strong>prior knowledge</strong>,
-        <strong>available resources</strong>, <strong>differentiation needs</strong>, or <strong>activity preferences</strong>.
+        <strong>available resources</strong>, <strong>differentiation needs</strong>, or
+        <strong>activity preferences</strong>.
     </p>
     <textarea id="lp-generate-additional-context" v-model="lpStore.additionalContext" rows="5"></textarea>
 
