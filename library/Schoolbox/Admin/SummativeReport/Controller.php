@@ -751,9 +751,12 @@ class Controller extends ConfigController
                 ->setFailureCallbackParams(
                     $callbackParams + [
                         'message' => sprintf(
-                            'Your summative report %s could not be downloaded',
+                            'Your summative report %s could not be downloaded (reason: :message)',
                             $report->getTitle(),
                         ),
+                        'messageParams' => [
+                            'message' => '{{response.message}}',
+                        ],
                     ]
                 )
                 ->setPdfFooterStylesheet(file_get_contents(__DIR__ . self::FOOTER_CSS))
