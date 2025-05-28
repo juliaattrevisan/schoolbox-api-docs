@@ -30,17 +30,16 @@ $app = new class extends CliTool\App {
 
         foreach ($tables as $table => $columns) {
             $start = microtime(true);
-            $comments = $this->getDatabaseInternal()->executeQuery(
+            $commentIds = $this->getDatabaseInternal()->executeQuery(
                 "SELECT
-                    `" . $columns['id'] . "` as id,
-                    `_" . $columns['comment'] . "` as comment
+                    `" . $columns['id'] . "` as id
                 FROM `$table`
                 WHERE
-                    `_" . $columns['comment'] . "` IS NOT NULL AND
-                    `_" . $columns['comment'] . "` != ''"
+                `_" . $columns['comment'] . "` IS NOT NULL AND
+                `_" . $columns['comment'] . "` != ''"
             );
 
-            if ($comments->rowCount() === 0) {
+            if ($commentIds->rowCount() === 0) {
                 $this->getLogger()->info("No comments to process in $table");
                 continue;
             }
@@ -49,7 +48,24 @@ $app = new class extends CliTool\App {
                 "UPDATE `$table` SET `" . $columns['comment'] . "` = :comment WHERE `" . $columns['id'] . "` = :id"
             );
 
-            foreach ($comments as $comment) {
+            // fetch the comments as we need them, save fetching all the data in sql memory
+            $commentStatement = $this->getDatabaseInternal()->prepareQuery(
+                "SELECT
+                    `" . $columns['id'] . "` as id,
+                    `_" . $columns['comment'] . "` as comment
+                FROM `$table`
+                WHERE `" . $columns['id'] . "` = :id"
+            );
+
+            foreach ($commentIds as $commentId) {
+                /**
+                 * Fetch the comment from the database
+                 */
+                $commentStatement->execute([
+                    "id" => $commentId['id'],
+                ]);
+                $comment = $commentStatement->fetch();
+
                 /**
                  * Start by converting any html entities to their unicode equivalents,
                  * as we still want "Jana, make sure you place a <p> tag around the text" to show up correctly
@@ -79,9 +95,9 @@ $app = new class extends CliTool\App {
             $this->getLogger()->info(
                 sprintf(
                     "Processed %d comments in %.2f s (%.4f ms/row) for %s",
-                    $comments->rowCount(),
+                    $commentIds->rowCount(),
                     $elapsed,
-                    $elapsed / $comments->rowCount() * 1000,
+                    $elapsed / $commentIds->rowCount() * 1000,
                     $table
                 )
             );
