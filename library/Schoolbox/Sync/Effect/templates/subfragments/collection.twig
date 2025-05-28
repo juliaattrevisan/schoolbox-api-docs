@@ -11,7 +11,7 @@
             value: [
                 {% if preselected is defined and preselected is iterable %}
                     {% for current in preselected %}
-                {% if (current in entireDataset|keys) and  entireDataset[current] %}
+                        {% if (current in entireDataset|keys) and  entireDataset[current] != '' %} {# The !='' check is necessary because '0' is valid. #}
                             {% autoescape 'js' %}{"id":{{ current }},"name":"{{ entireDataset[current] }}"}{% endautoescape %}
                         {% endif %}
                         {% if not loop.last %},{% endif %}
