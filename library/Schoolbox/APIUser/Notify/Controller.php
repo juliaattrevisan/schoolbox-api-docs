@@ -67,7 +67,12 @@ class Controller extends Base
                 ->addTopic(sprintf('%s.user.%d', Instance::DELIVERY_INSTANT, $user->getId()))
                 ->putMeta('title', 'Message from ' . ($data['from']['fullName'] ?? 'Unknown User'));
 
-            // Attach any messageParams as well
+            // Attach any messageParams as well.
+            // Using a `\Schoolbox\Realtime\Notification\Parameter\SimpleParam` causes the unserialization in
+            // `\Schoolbox\Realtime\Subscription\Redis\UnreadRetriever::getUnread` to fail, as for whatever reason the
+            // class is not yet defined.
+            // This should be fixed (as in theory at least it should raise errors elsewhere), but for whatever reason it
+            // doesn't that I have seen.
             foreach ($data['messageParams'] ?? [] as $key => $value) {
                 if (isset($value)) {
                     $bob->setParam(
