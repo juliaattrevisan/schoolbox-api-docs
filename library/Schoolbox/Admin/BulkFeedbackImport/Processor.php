@@ -32,6 +32,12 @@ class Processor
 
 
     /**
+     * Assume a default time of 1:11pm
+     */
+    private const PUBLISH_TIME = '13:11:11';
+
+
+    /**
      * Used to find a relationship between a folder and a particular
      * assessment by its (assessment title, worktype) combo
      */
@@ -107,9 +113,9 @@ class Processor
      * @param UserMapper $userMapper
      * @param Mapper $folderMapper
      * @param RosettaStone $rosettaStone
+     * @param string $dateLocal
      * @param string $assessmentTitle
      * @param \Schoolbox\Learning\Assessment\WorkType\Model $workType
-     * @param \Alaress_Date_Format $publishAt
      * @param bool $perform
      */
     public function __construct(
@@ -117,10 +123,10 @@ class Processor
         private FilesystemProxy $filesystemProxy,
         private \Schoolbox\UserMapper $userMapper,
         private \Schoolbox\Resource\Folder\Mapper $folderMapper,
-        protected RosettaStone $rosettaStone,
+        private RosettaStone $rosettaStone,
+        private string $dateLocal,
         private string $assessmentTitle,
         private \Schoolbox\Learning\Assessment\WorkType\Model $workType,
-        private \Alaress_Date_Format $publishAt,
         private bool $perform
     ) {
         /* We're going to reuse this a lot
@@ -159,23 +165,44 @@ class Processor
             'Class Code',
             'Student External ID',
             'Normalised Mark',
-            'Comment'
+            'Comment',
+            'Publish Date'
         ]);
-
-        /* Compute publish date just once
-         * and also make it the same as created_at and updated_at to better keep track
-         * of things after an import has occurred
-         */
-        $datetime = $this->publishAt->getDatabase();
 
         /* Maintain a row counter
          */
         $i = 0;
 
+        /* The current datetime is used for publish_at if it was omitted
+         */
+        $now = \Alaress_Date_Format::now();
+
         foreach ($reader as $row) {
             /* Remember the row number
              */
             $i++;
+
+            /* Compute publish date from csv
+             * and also make it the same as created_at and updated_at to better keep track
+             * of things after an import has occurred
+             */
+            $datetime = trim((string)$row['Publish Date']);
+
+            if ('' === $datetime) {
+                $datetime = $now->getDatabase();
+            } else {
+                /* Check the format of the date: try both database and local short
+                 */
+                try {
+                    $datetime = sprintf('%s %s', (new \Alaress_Date_Format($datetime, $this->dateLocal))->getDatabaseDate(), self::PUBLISH_TIME);
+                } catch (\Carbon\Exceptions\InvalidFormatException $e) {
+                    $this->log(sprintf("Row %s: Invalid date format. Make sure it's correct and try again.", $i), self::WARNING);
+
+                    $errors++;
+
+                    continue;
+                }
+            }
 
             /* Process feedbacks
              */
