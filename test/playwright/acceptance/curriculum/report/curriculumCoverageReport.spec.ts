@@ -11,6 +11,7 @@ import SearchSelectModal from "@schoolboxTest/playwright/support/components/Sear
 import CurriculumSelector from "@schoolboxTest/playwright/support/page/curriculum/selector/CurriculumSelector";
 import ManageCurriculum from "@schoolboxTest/playwright/support/page/curriculum/manage/ManageCurriculum";
 import DisableNodes from "@schoolboxTest/playwright/support/page/curriculum/manage/action/DisableNodes";
+import SearchNodes from "@schoolboxTest/playwright/support/page/curriculum/manage/action/SearchNodes";
 import Common from "@schoolboxTest/playwright/support/page/Common";
 
 test.describe("Curriculum Coverage Report Tests", () => {
@@ -134,6 +135,7 @@ test.describe("Curriculum Coverage Report Tests", () => {
     test("Check Show disabled outcomes toggle", async ({ tester, page }) => {
         const manageCurriculum = new ManageCurriculum(page, tester);
         const disableNodes = new DisableNodes(page, tester);
+        const searchNodes = new SearchNodes(page, tester);
         const coverageReport = new CurriculumCoverageReport(page);
 
         await manageCurriculum.goto();
@@ -158,24 +160,27 @@ test.describe("Curriculum Coverage Report Tests", () => {
         tester.isGoingTo("Visit the curriculum coverage report page with disabled nodes preloaded");
         await coverageReport.gotoDisabledTest();
 
-        tester.isGoingTo("Confirm the disabled node is visible");
-        await expect(coverageReport.getTable()).toContainText("Year 4 History");
+        tester.isGoingTo("Confirm the disabled node is not visible by default");
+        await expect(coverageReport.getTable()).not.toContainText("Year 4 History");
 
         tester.isGoingTo("Select the Show disabled outcomes toggle");
         await coverageReport.clickShowDisabledToggle();
 
-        tester.isGoingTo("Confirm the disabled node is no longer visible");
-        await expect(coverageReport.getTable()).not.toContainText("Year 4 History");
+        tester.isGoingTo("Confirm the disabled node is visible");
+        await expect(coverageReport.getTable()).toContainText("Year 4 History");
 
         tester.isGoingTo("Select the Show disabled outcomes toggle again");
         await coverageReport.clickShowDisabledToggle();
 
-        tester.isGoingTo("Confirm the disabled node is visible");
-        await expect(coverageReport.getTable()).toContainText("Year 4 History");
+        tester.isGoingTo("Confirm the disabled node is hidden again");
+        await expect(coverageReport.getTable()).not.toContainText("Year 4 History");
 
         await manageCurriculum.goto();
 
         tester.isGoingTo("enable Year 4 History");
+
+        tester.isGoingTo("Select the show disabled nodes toggle");
+        await searchNodes.checkShowDisabledNodes();
 
         tester.isGoingTo("Check Year 4");
         await manageCurriculum.checkNode("Year 4 History");
@@ -196,6 +201,7 @@ test.describe("Curriculum Coverage Report Tests", () => {
     test("Check hidden disabled children nodes don't impact total counts", async ({ tester, page, db }) => {
         const manageCurriculum = new ManageCurriculum(page, tester);
         const disableNodes = new DisableNodes(page, tester);
+        const searchNodes = new SearchNodes(page, tester);
         const coverageReport = new CurriculumCoverageReport(page);
 
         await manageCurriculum.gotoNode(250);
@@ -220,16 +226,19 @@ test.describe("Curriculum Coverage Report Tests", () => {
         tester.isGoingTo("Visit the curriculum coverage report page with disabled nodes preloaded");
         await coverageReport.gotoDisabledTest();
 
-        tester.isGoingTo("Check Year 4 History > Year 4 has total usage of 1");
-        await expect(coverageReport.getYear4TotalUsageTableCell()).toHaveText("1");
+        tester.isGoingTo("Check Year 4 History > Year 4 has total usage of 0");
+        await expect(coverageReport.getYear4TotalUsageTableCell()).toHaveText("");
 
         tester.isGoingTo("Select the Show disabled outcomes toggle");
         await coverageReport.clickShowDisabledToggle();
 
-        tester.isGoingTo("Check Year 4 History > Year 4 now has total usage of 0");
-        await expect(coverageReport.getYear4TotalUsageTableCell()).toHaveText("");
+        tester.isGoingTo("Check Year 4 History > Year 4 now has total usage of 1");
+        await expect(coverageReport.getYear4TotalUsageTableCell()).toHaveText("1");
 
         await manageCurriculum.gotoNode(250);
+
+        tester.isGoingTo("Select the show disabled nodes toggle");
+        await searchNodes.checkShowDisabledNodes();
 
         tester.isGoingTo("Check First Contacts");
         await manageCurriculum.checkNode("First Contacts");
@@ -249,7 +258,7 @@ test.describe("Curriculum Coverage Report Tests", () => {
         await db.dontHaveInDatabase("curriculum_node_for_category", { curriculum_node_id: 253, category_id: 65 });
     });
 
-    test("Check wether the course and unit are presented or not according to the folder permissions", async ({
+    test("Check whether the course and unit are presented or not according to the folder permissions", async ({
         tester,
         page,
         db,
@@ -306,6 +315,10 @@ test.describe("Curriculum Coverage Report Tests", () => {
     });
 
     test.afterAll(async ({ baseTester, db }) => {
+        // Clean up the database to ensure no data is left behind
+        await db.updateInDatabase("curriculum_node", { enabled: 1 });
+        await db.dontHaveInDatabase("curriculum_node_for_category", { curriculum_node_id: 253, category_id: 65 });
+
         // Soft-delete data to not interfere with other tests
         baseTester.isGoingTo("update the folder permissions so it does not impact next suite of tests");
 

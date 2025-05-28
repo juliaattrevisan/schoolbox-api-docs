@@ -22,6 +22,7 @@ beforeEach(async () => {
         nodes: {
             id: 0,
             name: "My Node",
+            enabled: true,
             _usageCounts: {
                 course: 0,
                 unit: 0,
@@ -32,6 +33,7 @@ beforeEach(async () => {
                 {
                     id: 1,
                     name: "My Second Node",
+                    enabled: true,
                     _usageCounts: {
                         course: 0,
                         unit: 0,
@@ -42,6 +44,7 @@ beforeEach(async () => {
                         {
                             id: 2,
                             name: "My Third Node",
+                            enabled: true,
                             _usageCounts: {
                                 course: 0,
                                 unit: 0,
@@ -84,6 +87,7 @@ test("should show nodes in search results when search is active", async () => {
                 id: 1,
                 code: "C1",
                 name: "Node 1",
+                enabled: true,
                 description: "",
                 _usageCounts: { course: 0, unit: 0, assessment: 0, badge: 0 },
             },
@@ -91,6 +95,7 @@ test("should show nodes in search results when search is active", async () => {
                 id: 2,
                 code: "C2",
                 name: "Node 2",
+                enabled: true,
                 description: "",
                 _usageCounts: { course: 0, unit: 0, assessment: 0, badge: 0 },
             },
@@ -98,6 +103,7 @@ test("should show nodes in search results when search is active", async () => {
                 id: 3,
                 code: "C2",
                 name: "Node 3",
+                enabled: true,
                 description: "",
                 _usageCounts: { course: 0, unit: 0, assessment: 0, badge: 0 },
             },

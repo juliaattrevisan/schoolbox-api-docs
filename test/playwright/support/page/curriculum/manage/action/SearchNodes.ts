@@ -40,4 +40,11 @@ export default class SearchNodes {
     async uncheckShowDisabledNodes(): Promise<void> {
         await this.page.getByTestId(SearchNodes.DATA_TEST_TOGGLE_SHOW_DISABLED_NODES).uncheck();
     }
+
+    /**
+     * show disabled nodes
+     */
+    async checkShowDisabledNodes(): Promise<void> {
+        await this.page.getByTestId(SearchNodes.DATA_TEST_TOGGLE_SHOW_DISABLED_NODES).check();
+    }
 }
