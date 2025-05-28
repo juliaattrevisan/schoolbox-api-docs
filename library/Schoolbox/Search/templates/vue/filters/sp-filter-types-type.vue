@@ -40,15 +40,26 @@ const subTypeHeight = window.Vue.computed(() => {
 });
 
 /**
+ * Sometimes we need to ignore the change event on selectedTypes
+ * to avoid a loop occuring when the parent type is deselected by a sub type change
+ */
+const ignoreTypesChange = window.Vue.ref(false);
+
+/**
  * To add/remove the sub types when the parent type is selected/deselected
  * And to also add the parent type when all the sub types are selected
  */
 window.Vue.watch(
     () => filterTypesStore.selectedTypes,
-    (newSelectedTypes, oldSelectedTypes) => {
+    async (newSelectedTypes, oldSelectedTypes) => {
         if (!props.type.subTypes) {
             return;
         }
+
+        if (ignoreTypesChange.value) {
+            return;
+        }
+
         // if the parent type has just been added, add all the sub types
         if (newSelectedTypes.includes(props.type.value) && !oldSelectedTypes.includes(props.type.value)) {
             filterTypesStore.addSubTypes(props.type);
@@ -70,6 +81,17 @@ window.Vue.watch(
             props.type.subTypes.every((subType) => !newSelectedTypes.includes(subType.value))
         ) {
             filterTypesStore.removeType(props.type);
+            return;
+        }
+        // if the parent is selected, and some of the sub types are selected, deselect the parent
+        if (
+            newSelectedTypes.includes(props.type.value) &&
+            props.type.subTypes.some((subType) => newSelectedTypes.includes(subType.value))
+        ) {
+            ignoreTypesChange.value = true; // to prevent the other sub types from being removed
+            filterTypesStore.removeType(props.type);
+            await window.Vue.nextTick();
+            ignoreTypesChange.value = false;
         }
     },
 );
