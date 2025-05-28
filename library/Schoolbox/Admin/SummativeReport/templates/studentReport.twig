@@ -662,16 +662,17 @@
                             } only %}
                     {% endfor %}
                 </div>
-            {% endif %}
 
-            {# Victorian Curriculum Progression: Class #}
-            {% if reportOptions.class.active and (vicProgression.class[folder.id] ?? false) %}
-                {% include '@adminSummativeReport/VictorianProgression.twig' with {
-                    identifier: 'curriculumProgression-class-' ~ folder.id,
-                    payload: vicProgression.class[folder.id],
-                    annotate: vicProgression.annotate,
-                    title: vicProgression.class.title ?? null
-                } only %}
+                {# Victorian Curriculum Progression: Class #}
+
+                {% if reportOptions.class.active and (vicProgression.class[folder.id] ?? false) %}
+                    {% include '@adminSummativeReport/VictorianProgression.twig' with {
+                        identifier: 'curriculumProgression-class-' ~ folder.id,
+                        payload: vicProgression.class[folder.id],
+                        annotate: vicProgression.annotate,
+                        title: vicProgression.class.title ?? null
+                    } only %}
+                {% endif %}
             {% endif %}
         {% endfor %}
     {% endif %}
