@@ -5,9 +5,7 @@
 
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import { useNodeTitle } from "@schoolboxCurriculum/vue/composables/useNodeTitle";
-import { generateUUID } from "@js/util/jsUtils";
 import { useCurrentNodesStore } from "../../store/csCurrentNodesStore";
-import { useModalSelectedNodesStore } from "../../store/csModalSelectedNodesStore";
 import csModalCurrentChildNode from "./cs-modal-current-child-node.vue";
 
 interface Props {
