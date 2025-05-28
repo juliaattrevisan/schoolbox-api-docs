@@ -388,19 +388,19 @@
                  * originally this matched the exact notif href, but some of those have specific tabs, or references  / anchors,
                  * that are not navigated to when using the interface. so we need to match on path instead.
                  */
-                const href = document.location.pathname;
+                const documentPathname = document.location.pathname;
                 document.querySelectorAll("[data-msgitem-href]").forEach((element) => {
                     if (!settings.autoReadNotif) {
                         // Is this a link to the base anchor?
                         // If so, then this should be considered an alert which always displays?
-                        let href = element.getAttribute("href");
-                        if (href === '#') {
+                        let elementHref = element.getAttribute("href");
+                        if (elementHref === '#') {
                             return;
                         }
 
                         // no page found yet, keep looping
-                        let elmHref = new URL(href, window.location.href);
-                        if (elmHref.pathname === href) {
+                        let elementUrl = new URL(elementHref, window.location.href);
+                        if (elementUrl.pathname === documentPathname) {
                             // get parent where we could mark as read
                             let message = element.closest("[data-msgitem]");
                             // if this is unread, mark as read, and exit
