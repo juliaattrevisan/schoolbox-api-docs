@@ -85,7 +85,7 @@ test.describe("Homepage Initial Tests", () => {
         const createFolder = new CreateFolder(tester, page);
         const folderName = "Test Homepage";
         const resources = new Resources(page);
-        const homepage = new Homepage(page);
+        const homepage = new Homepage(tester, page);
         tester.isGoingTo("navigate to the Test Homepage via resources browser");
         await createFolder.gotoResources();
         await expect(page.locator(`a.jstree-anchor:has-text("${folderName}")`)).toBeVisible();
@@ -118,7 +118,7 @@ test.describe("Homepage Initial Tests", () => {
         const createFolder = new CreateFolder(tester, page);
         const folderName = "Test Homepage";
         const resources = new Resources(page);
-        const homepage = new Homepage(page);
+        const homepage = new Homepage(tester, page);
         const textbox = new TextboxForm(tester, page);
         tester.isGoingTo("Navigate to the Test Homepage via resources browser");
         await createFolder.gotoResources();
@@ -215,7 +215,7 @@ test.describe("Homepage Initial Tests", () => {
         const createFolder = new CreateFolder(tester, page);
         const folderName = "Test Homepage";
         const resources = new Resources(page);
-        const homepage = new Homepage(page);
+        const homepage = new Homepage(tester, page);
         tester.isGoingTo("Navigate to the Test Homepage via resources browser");
         await createFolder.gotoResources();
         await expect(page.locator(`a.jstree-anchor:has-text("${folderName}")`)).toBeVisible();

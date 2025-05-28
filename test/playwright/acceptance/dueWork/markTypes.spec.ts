@@ -106,7 +106,7 @@ test.describe("Due Work - Mark type tests", () => {
 
         // Find the course outline and the unit we created inside it
         tester.isGoingTo("find the course outline and add a new due work to the unit");
-        const homepage = new Homepage(page);
+        const homepage = new Homepage(tester, page);
         const courseOutline = homepage.locateComponentByName("Course Outline");
         const courseOutlineId = await courseOutline.getAttribute("id");
         const courseOutlineUnit = courseOutline.locator("li[data-unit]").filter({ hasText: unitName });
@@ -135,62 +135,41 @@ test.describe("Due Work - Mark type tests", () => {
      * (Step 2) - Create submissions as Jana Reed for each assessment
      */
     test("Create submissions", async ({ tester, page }) => {
-        if (newUnitId === null) throw new Error("newUnitId is null");
-
-        const homepage = new Homepage(page);
+        const homepage = new Homepage(tester, page);
         const assessmentPage = new AssessmentPage(tester, page);
         const feedbackForm = new FeedbackForm(tester, page);
         const submitForm = new SubmitForm(tester, page);
 
         await tester.impersonateViaUserProfilePage(learner);
 
-        /**
-         * @param activityName - The name of the activity to find
-         * @returns The participant ID
-         */
-        async function createSelfAssessmentForActivity(activityName: string): Promise<number> {
+        await test.step("Create a submission for the first due work", async () => {
             if (classLink === null) throw new Error("classLink is null");
-
-            // Find the course outline and the unit we created inside it
-            tester.isGoingTo("find the unit in the course outline");
+            if (newUnitId === null) throw new Error("newUnitId is null");
             await page.goto(classLink);
-            const courseOutline = homepage.locateComponentByName("Course Outline");
-            const courseOutlineUnit = courseOutline.locator(`li[data-unit="${newUnitId}"]`);
-
-            const activities = courseOutlineUnit.locator("li[data-unit-assessment]");
-            await expect(activities).toHaveCount(3);
-
-            const activity = activities.filter({ hasText: activityName });
-            await activity.locator("a").first().click();
-
+            await homepage.viewUnitActivitySummary(newUnitId, dueWorkName1);
             await assessmentPage.clickSelfAcknowledge();
             await assessmentPage.clickSelfAcknowledgeProceed();
 
-            const participantId = await page.locator("[data-feedback-form]").getAttribute("data-feedback-form");
-            if (participantId === null) {
-                expect(participantId).not.toBeNull();
-                throw new Error("participantId is null");
-            }
-
-            return Number(participantId);
-        }
-
-        await test.step("Create a submission for the first due work", async () => {
-            const participantId = await createSelfAssessmentForActivity(dueWorkName1);
-
             // Display mark type should be used (letter grade)
+            const participantId = await feedbackForm.getParticipantId();
             await feedbackForm.setGradeDropdown("B+", participantId);
             await feedbackForm.setComment("test", participantId);
             await submitForm.submit();
         });
 
         await test.step("Create a submission for the second due work", async () => {
-            const participantId = await createSelfAssessmentForActivity(dueWorkName2);
+            if (classLink === null) throw new Error("classLink is null");
+            if (newUnitId === null) throw new Error("newUnitId is null");
+            await page.goto(classLink);
+            await homepage.viewUnitActivitySummary(newUnitId, dueWorkName2);
+            await assessmentPage.clickSelfAcknowledge();
+            await assessmentPage.clickSelfAcknowledgeProceed();
 
             await feedbackForm.selectRubricIndicatorByValue(452, "1");
             await feedbackForm.selectRubricIndicatorByValue(446, "2");
 
             // Display mark type should be used (percentage)
+            const participantId = await feedbackForm.getParticipantId();
             await feedbackForm.expectRubricFinalSummaryMark("75 %");
             await feedbackForm.expectRubricSum("75 %");
             await feedbackForm.expectGrade("75 %", participantId);
@@ -200,12 +179,18 @@ test.describe("Due Work - Mark type tests", () => {
         });
 
         await test.step("Create a submission for the third due work", async () => {
-            const participantId = await createSelfAssessmentForActivity(dueWorkName3);
+            if (classLink === null) throw new Error("classLink is null");
+            if (newUnitId === null) throw new Error("newUnitId is null");
+            await page.goto(classLink);
+            await homepage.viewUnitActivitySummary(newUnitId, dueWorkName3);
+            await assessmentPage.clickSelfAcknowledge();
+            await assessmentPage.clickSelfAcknowledgeProceed();
 
             await feedbackForm.selectRubricIndicatorByValue(452, "1");
             await feedbackForm.selectRubricIndicatorByValue(446, "2");
 
             // Display mark type should be used (none)
+            const participantId = await feedbackForm.getParticipantId();
             await feedbackForm.expectNoRubricFinalSummary();
             await feedbackForm.expectNoRubricSum();
             await feedbackForm.expectNoGradeSelector(participantId);
@@ -219,40 +204,17 @@ test.describe("Due Work - Mark type tests", () => {
      * (Step 3) - Mark the submissions as Jack Coles
      */
     test("Mark submissions", async ({ tester, page }) => {
-        if (newUnitId === null) throw new Error("newUnitId is null");
-
-        const homepage = new Homepage(page);
+        const homepage = new Homepage(tester, page);
         const feedbackForm = new FeedbackForm(tester, page);
         const statusPage = new StatusPage(tester, page);
 
         await tester.impersonateViaUserProfilePage(instructor);
 
-        /**
-         * @param activityName - The name of the activity to find
-         */
-        async function viewStatusForActivity(activityName: string): Promise<void> {
-            if (classLink === null) throw new Error("classLink is null");
-
-            // Find the course outline and the unit we created inside it
-            tester.isGoingTo("find the unit in the course outline");
-            await page.goto(classLink);
-            const courseOutline = homepage.locateComponentByName("Course Outline");
-            const courseOutlineUnit = courseOutline.locator(`li[data-unit="${newUnitId}"]`);
-
-            const activities = courseOutlineUnit.locator("li[data-unit-assessment]");
-            await expect(activities).toHaveCount(3);
-
-            tester.isGoingTo("click to view the status of the activity");
-            const activity = activities.filter({ hasText: activityName });
-            const activityId = await activity.getAttribute("data-unit-assessment");
-            const courseOutlineId = await courseOutline.getAttribute("id");
-            await activity.getByTestId(`sbx-pop-out-${courseOutlineId}-options-task${activityId}-button`).click();
-
-            await activity.locator("[data-dropdown-content] a.icon-progress").click();
-        }
-
         await test.step("Mark the first due work (via status page)", async () => {
-            await viewStatusForActivity(dueWorkName1);
+            if (classLink === null) throw new Error("classLink is null");
+            if (newUnitId === null) throw new Error("newUnitId is null");
+            await page.goto(classLink);
+            await homepage.viewUnitActivityStatus(newUnitId, dueWorkName1);
 
             // Find the participant row
             const participantRow = page.locator(`li[data-participant][data-participant-name="${learner}"]`);
@@ -265,7 +227,10 @@ test.describe("Due Work - Mark type tests", () => {
         });
 
         await test.step("Mark the second due work (via inline grader)", async () => {
-            await viewStatusForActivity(dueWorkName2);
+            if (classLink === null) throw new Error("classLink is null");
+            if (newUnitId === null) throw new Error("newUnitId is null");
+            await page.goto(classLink);
+            await homepage.viewUnitActivityStatus(newUnitId, dueWorkName2);
 
             await statusPage.clickParticipantJellyTot(learnerId);
             await statusPage.clickViewAndGradeSubmission(learnerId);
@@ -286,7 +251,10 @@ test.describe("Due Work - Mark type tests", () => {
         });
 
         await test.step("Mark the third due work (via inline grader)", async () => {
-            await viewStatusForActivity(dueWorkName3);
+            if (classLink === null) throw new Error("classLink is null");
+            if (newUnitId === null) throw new Error("newUnitId is null");
+            await page.goto(classLink);
+            await homepage.viewUnitActivityStatus(newUnitId, dueWorkName3);
 
             await statusPage.clickParticipantJellyTot(learnerId);
             await statusPage.clickViewAndGradeSubmission(learnerId);
@@ -314,37 +282,16 @@ test.describe("Due Work - Mark type tests", () => {
         if (classLink === null) throw new Error("classLink is null");
         if (newUnitId === null) throw new Error("newUnitId is null");
 
-        const homepage = new Homepage(page);
+        const homepage = new Homepage(tester, page);
         const statusPage = new StatusPage(tester, page);
 
         await tester.impersonateViaUserProfilePage(instructor);
 
-        /**
-         * @param activityName - The name of the activity to find
-         */
-        async function viewStatusForActivity(activityName: string): Promise<void> {
-            if (classLink === null) throw new Error("classLink is null");
-
-            // Find the course outline and the unit we created inside it
-            tester.isGoingTo("find the unit in the course outline");
-            await page.goto(classLink);
-            const courseOutline = homepage.locateComponentByName("Course Outline");
-            const courseOutlineUnit = courseOutline.locator(`li[data-unit="${newUnitId}"]`);
-
-            const activities = courseOutlineUnit.locator("li[data-unit-assessment]");
-            await expect(activities).toHaveCount(3);
-
-            tester.isGoingTo("click to view the status of the activity");
-            const activity = activities.filter({ hasText: activityName });
-            const activityId = await activity.getAttribute("data-unit-assessment");
-            const courseOutlineId = await courseOutline.getAttribute("id");
-            await activity.getByTestId(`sbx-pop-out-${courseOutlineId}-options-task${activityId}-button`).click();
-
-            await activity.locator("[data-dropdown-content] a.icon-progress").click();
-        }
-
         await test.step("Check submission history for the first due work", async () => {
-            await viewStatusForActivity(dueWorkName1);
+            if (classLink === null) throw new Error("classLink is null");
+            if (newUnitId === null) throw new Error("newUnitId is null");
+            await page.goto(classLink);
+            await homepage.viewUnitActivityStatus(newUnitId, dueWorkName1);
 
             await statusPage.clickParticipantJellyTot(learnerId);
             await statusPage.clickSubmissionHistory(learnerId);
@@ -367,7 +314,10 @@ test.describe("Due Work - Mark type tests", () => {
         });
 
         await test.step("Check submission history for the second due work", async () => {
-            await viewStatusForActivity(dueWorkName2);
+            if (classLink === null) throw new Error("classLink is null");
+            if (newUnitId === null) throw new Error("newUnitId is null");
+            await page.goto(classLink);
+            await homepage.viewUnitActivityStatus(newUnitId, dueWorkName2);
 
             await statusPage.clickParticipantJellyTot(learnerId);
             await statusPage.clickSubmissionHistory(learnerId);
@@ -387,7 +337,10 @@ test.describe("Due Work - Mark type tests", () => {
         });
 
         await test.step("Check submission history for the third due work", async () => {
-            await viewStatusForActivity(dueWorkName3);
+            if (classLink === null) throw new Error("classLink is null");
+            if (newUnitId === null) throw new Error("newUnitId is null");
+            await page.goto(classLink);
+            await homepage.viewUnitActivityStatus(newUnitId, dueWorkName3);
 
             await statusPage.clickParticipantJellyTot(learnerId);
             await statusPage.clickSubmissionHistory(learnerId);
@@ -411,7 +364,7 @@ test.describe("Due Work - Mark type tests", () => {
     test("Course Markbook", async ({ tester, page }) => {
         if (classLink === null) throw new Error("classLink is null");
 
-        const homepage = new Homepage(page);
+        const homepage = new Homepage(tester, page);
         const markbook = new MarkbookPage(page);
 
         await tester.impersonateViaUserProfilePage(instructor);
@@ -450,7 +403,7 @@ test.describe("Due Work - Mark type tests", () => {
     test("Class Markbook", async ({ tester, page }) => {
         if (classLink === null) throw new Error("classLink is null");
 
-        const homepage = new Homepage(page);
+        const homepage = new Homepage(tester, page);
         const markbook = new MarkbookPage(page);
 
         await tester.impersonateViaUserProfilePage(instructor);

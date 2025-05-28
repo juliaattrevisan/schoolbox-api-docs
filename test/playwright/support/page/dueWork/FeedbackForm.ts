@@ -202,4 +202,16 @@ export default class FeedbackForm {
         await this.page.getByTestId(FeedbackForm.DATA_TEST_ASSESSMENT_FEEDBACK_PUBLISH_BUTTON).click();
         await this.page.waitForTimeout(1000); // Wait for the feedback to be published
     }
+
+    /**
+     * @returns The participant ID for the current feedback form
+     */
+    async getParticipantId(): Promise<number> {
+        const participantId = await this.page.locator("[data-feedback-form]").getAttribute("data-feedback-form");
+        if (participantId === null) {
+            expect(participantId).not.toBeNull();
+            throw new Error("participantId is null");
+        }
+        return Number(participantId);
+    }
 }

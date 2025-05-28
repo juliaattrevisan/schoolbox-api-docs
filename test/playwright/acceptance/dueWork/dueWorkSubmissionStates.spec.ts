@@ -33,7 +33,7 @@ async function createClassPage(
     const resources = new Resources(page);
     const assessmentForm = new AssessmentForm(tester, page);
     const manageGroup = new ManageGroup(page);
-    const homepage = new Homepage(page);
+    const homepage = new Homepage(tester, page);
     const filename = path.join(__dirname, "../../support/file/baboon.png");
 
     const homepageTemplateOption = "Blank";
@@ -163,7 +163,7 @@ test.describe("Submission States functionality tests", () => {
         })) as number;
 
         const folderId = (await db.grabFromDatabase("folder", "id", { deleted_at: null, name: folderName })) as string;
-        const homepage = new Homepage(page);
+        const homepage = new Homepage(tester, page);
         const assessmentPage = new AssessmentPage(tester, page);
 
         await tester.impersonate(student);
@@ -216,7 +216,7 @@ test.describe("Submission States functionality tests", () => {
         })) as number;
 
         const folderId = (await db.grabFromDatabase("folder", "id", { deleted_at: null, name: folderName })) as string;
-        const homepage = new Homepage(page);
+        const homepage = new Homepage(tester, page);
         const statusPage = new StatusPage(tester, page);
 
         tester.isGoingTo("as tecaher: checking class view visibility via due work component on homepage");

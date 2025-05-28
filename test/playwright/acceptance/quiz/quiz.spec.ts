@@ -96,7 +96,7 @@ test.describe("Quiz Tests: create, modify, delete quiz, submit and vertical revi
 
     test("Create a quiz", async ({ tester, page, db }) => {
         const resources = new Resources(page);
-        const homepage = new Homepage(page);
+        const homepage = new Homepage(tester, page);
         const assessmentForm = new AssessmentForm(tester, page);
         const quiz = new QuizSettingPage(tester, page);
         // const quizContent = new QuizContentsPage(tester, page);
@@ -139,7 +139,7 @@ test.describe("Quiz Tests: create, modify, delete quiz, submit and vertical revi
     });
 
     test("Modify a quiz settings", async ({ tester, page }) => {
-        const homepage = new Homepage(page);
+        const homepage = new Homepage(tester, page);
         const assessmentForm = new AssessmentForm(tester, page);
         const quiz = new QuizSettingPage(tester, page);
 
@@ -229,7 +229,7 @@ test.describe("Quiz Tests: create, modify, delete quiz, submit and vertical revi
     // });
 
     test("Delete a quiz", async ({ tester, page }) => {
-        const homepage = new Homepage(page);
+        const homepage = new Homepage(tester, page);
         const common = new Common(page);
 
         if (folderId === null || quizId === null) {

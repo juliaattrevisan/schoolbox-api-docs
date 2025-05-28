@@ -59,7 +59,7 @@ test.describe("Textbox Tests", () => {
         const createFolder = new CreateFolder(tester, page);
         const resources = new Resources(page);
         const manageAll = new ManageAllTextbox(tester, page);
-        const homepage = new Homepage(page);
+        const homepage = new Homepage(tester, page);
         const textbox = new TextboxForm(tester, page);
         const folderName = "Test TextBox Homepage";
         const heading = "Test Text Box Title";
@@ -124,7 +124,7 @@ test.describe("Textbox Tests", () => {
         const folderName = "Test TextBox Homepage";
         const manageAll = new ManageAllTextbox(tester, page);
         const searchPage = new SearchPage(page);
-        const homepage = new Homepage(page);
+        const homepage = new Homepage(tester, page);
         const textbox = new TextboxForm(tester, page);
 
         tester.isGoingTo("As Jack Coles search for a  textbox and ensure it is presented in the search results grid");

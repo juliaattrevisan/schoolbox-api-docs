@@ -26,7 +26,7 @@ test.describe("Participation Plan Tests", () => {
     });
 
     test("Participation Plan", async ({ tester, page, db }) => {
-        const addComponent = new Homepage(page);
+        const addComponent = new Homepage(tester, page);
         const dueworkForm = new AssessmentForm(tester, page);
         const statusPage = new StatusPage(tester, page);
         const folder = new Folder(tester, page);
