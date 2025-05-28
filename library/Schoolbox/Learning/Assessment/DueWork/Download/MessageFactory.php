@@ -193,6 +193,9 @@ class MessageFactory
                         $this->rosettaStone->translate('dueWork'),
                         $zipFilename,
                     ),
+                    'messageParams' => [
+                        'message' => '{{response.message}}',
+                    ],
                 ]
             )
             ->setOutfile($zipFilename)
