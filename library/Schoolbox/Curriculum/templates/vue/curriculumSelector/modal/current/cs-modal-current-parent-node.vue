@@ -34,9 +34,6 @@ const showExpandButton = window.Vue.computed(() => {
  * Expand or collapse the children of the node
  */
 function onExpandSelected(): void {
-    if (!showExpandButton.value) {
-        return; // do nothing if the expand button is not shown
-    }
     isNodeExpanded.value = !isNodeExpanded.value; // toggle the expanded state
 }
 </script>
@@ -56,7 +53,14 @@ function onExpandSelected(): void {
                     <sbx-icon v-if="isNodeExpanded" name="up-arrow" />
                     <sbx-icon v-else name="down-arrow" />
                 </button>
-                <h3 class="node__name f-no-margins" @click="onExpandSelected">{{ title }}</h3>
+                <button
+                    v-if="showExpandButton"
+                    class="node__name node__name--button f-no-margins"
+                    @click="onExpandSelected"
+                >
+                    {{ title }}
+                </button>
+                <h3 v-else class="node__name node__name--title f-no-margins">{{ title }}</h3>
             </div>
         </div>
         <template v-if="showChildren">
@@ -73,7 +77,7 @@ function onExpandSelected(): void {
     </li>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 .node:not(:last-child) {
     border-bottom: 1px solid var(--body-background); /* don't add borders on the last nodes for better readability */
 }
@@ -83,14 +87,21 @@ function onExpandSelected(): void {
 }
 
 .node__name {
-    color: var(--header-font-color);
     font-size: 1rem;
     font-weight: bold;
     max-width: none; /* override the max-width set on .reveal-modal h3 */
     vertical-align: top; /* so the li bullet sits inline with the first line of a multiline label */
 }
 
-.node__name {
+.node__name--button {
+    background: none;
+    &:hover {
+        background: none;
+    }
+}
+
+.node__name--title {
+    color: var(--header-font-color);
     padding-inline-end: var(--spacing-s); /* to avoid the text sitting right on the component edge */
 }
 
