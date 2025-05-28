@@ -478,12 +478,12 @@
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/pwa.js?v={{ config.site_version }}"></script>
 <script src="{{ CDN_PREFIX }}/js/bundle/headerSearch.js?v={{ config.site_version }}"></script>
-<!-- temporary conditionals to show the birthday surprise for Jana Reed -->
 {% if user.celebrateBirthday %}
+<!-- when enabled, show a birthday celebration on a students birthday -->
 <div id="birthday-surprise-container">
     <birthday-surprise :user-id="{{ user.current.id }}"/>
 </div>
-    <script src="{{ CDN_PREFIX }}/js/bundle/birthdaySurprise.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/birthdaySurprise.js?v={{ config.site_version }}"></script>
 {% endif %}
 </body>
 </html>

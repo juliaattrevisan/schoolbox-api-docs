@@ -20,7 +20,17 @@ const canDisplay = window.Vue.ref(false); // to check if the birthday notificati
  * Append the birthday notification to the header search button
  */
 async function appendToNotifications(): Promise<void> {
-    const container = document.querySelector("#header-search-input");
+    /**
+     * As the bs-notification button sits above the header search input,
+     * the focus/hover on the header search input interferes with the button selection,
+     * meaning it has to be selected twice on some devices.
+     * As such the header search input is just removed until the button is selected.
+     */
+    const searchField = document.querySelector("#header-search-input") as HTMLInputElement;
+    if (searchField) {
+        searchField.style.setProperty("display", "none");
+    }
+    const container = document.querySelector("#search");
     if (container) {
         canDisplay.value = true; // show the birthday notification
         await window.Vue.nextTick(); // wait for the DOM to update
@@ -57,6 +67,11 @@ function animateBell(): void {
 function onSelected(): void {
     destroy(canvasEl.value as HTMLCanvasElement); // destroy the canvas so it doesn't keep animating
     notificationEl.value?.remove(); // remove once it's pressed so the usual notifications can be shown
+    // also add in the header search input again
+    const searchField = document.querySelector("#header-search-input") as HTMLInputElement;
+    if (searchField) {
+        searchField.style.setProperty("display", "grid");
+    }
     emit("selected");
 }
 
@@ -98,7 +113,6 @@ window.Vue.onMounted(async () => {
     position: absolute; // to overlay the notification bar
     right: 0;
     top: 0;
-    z-index: var(--sbx-depth-pop-over);
 }
 
 .birthday-container {
