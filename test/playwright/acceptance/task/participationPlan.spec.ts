@@ -26,7 +26,7 @@ test.describe("Participation Plan Tests", () => {
     });
 
     test("Participation Plan", async ({ tester, page, db }) => {
-        const addComponent = new Homepage(page);
+        const addComponent = new Homepage(tester, page);
         const dueworkForm = new AssessmentForm(tester, page);
         const statusPage = new StatusPage(tester, page);
         const folder = new Folder(tester, page);
@@ -131,12 +131,9 @@ test.describe("Participation Plan Tests", () => {
     /**
      * Soft deleting data to not impact the tests
      */
-    test.afterAll(async ({ db }) => {
-        await db.updateInDatabase(
-            "folder",
-            { deleted_at: "2022-01-15 11:22:34" },
-            { "name like": "Participation and Learning Plan Homepage" },
-        );
+    test.afterAll(async ({ db, api }) => {
+        await api.deleteFoldersByName(db, "Participation and Learning Plan Homepage%");
+
         await db.updateInDatabase(
             "assessment",
             { deleted_at: "2022-01-15 11:22:34" },

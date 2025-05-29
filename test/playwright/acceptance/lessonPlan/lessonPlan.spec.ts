@@ -125,40 +125,6 @@ test.describe("Lesson Plan Activity", () => {
     });
 
     /**
-     * Soft deleting data to not impact the tests
-     */
-
-    test.beforeAll(async ({ baseTester, db }) => {
-        baseTester.isGoingTo("update delete_at for the folder and lesson plan table so it does not impact the tests");
-        await db.updateInDatabase(
-            "lesson_plan_template_field",
-            { deleted_at: "2022-01-15 11:22:34" },
-            { "title like": "Automation Field%" },
-        );
-        await db.updateInDatabase(
-            "lesson_plan_template",
-            { deleted_at: "2022-01-15 11:22:34" },
-            { "title like": "Automation Template%" },
-        );
-        await db.updateInDatabase(
-            "lesson_plan_field",
-            { deleted_at: "2022-01-15 11:22:34" },
-            { "title like": "Automation Field%" },
-        );
-        await db.updateInDatabase("lesson_plan", { deleted_at: "2022-01-15 11:22:34" }, { created_by: "1" });
-        await db.updateInDatabase(
-            "assessment",
-            { deleted_at: "2022-01-15 11:22:34" },
-            { "title like": "Lesson Plan Automation Test%" },
-        );
-        await db.updateInDatabase(
-            "folder",
-            { deleted_at: "2022-01-15 11:22:34" },
-            { "name like": "Test Class Homepage Lesson Plan%" },
-        );
-    });
-
-    /**
      * create a lesson plan template with a field visible to student and a field that is not visible to students
      * create  lesson plan using the lesson plan template above
      */
@@ -182,7 +148,7 @@ test.describe("Lesson Plan Activity", () => {
         tester.isGoingTo("click the arrow down for Romeo and Juliet unit");
         await courseModify.clickUnitArrow(15);
         tester.isGoingTo("click New Lesson PLan button to create a lesson plan");
-        await courseModify.clickNewLessonPlanButton("lesson-plan");
+        await courseModify.clickNewActivityButton("lesson-plan");
         await page.waitForLoadState("domcontentloaded");
         const lessonPlanTemplateId = (await db.grabFromDatabase("lesson_plan_template", "id", {
             deleted_at: null,
@@ -276,8 +242,7 @@ test.describe("Lesson Plan Activity", () => {
     /**
      * Soft deleting data to not impact the tests
      */
-
-    test.afterAll(async ({ baseTester, db }) => {
+    test.afterAll(async ({ baseTester, db, api }) => {
         baseTester.isGoingTo("update delete_at for the folder and lesson plan table so it does not impact the tests");
         await db.updateInDatabase(
             "lesson_plan_template_field",
@@ -300,10 +265,7 @@ test.describe("Lesson Plan Activity", () => {
             { deleted_at: "2022-01-15 11:22:34" },
             { "title like": "Lesson Plan Automation Test%" },
         );
-        await db.updateInDatabase(
-            "folder",
-            { deleted_at: "2022-01-15 11:22:34" },
-            { "name like": "Test Class Homepage Lesson Plan%" },
-        );
+
+        await api.deleteFoldersByName(db, "Test Class Homepage Lesson Plan%");
     });
 });

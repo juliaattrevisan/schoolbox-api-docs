@@ -303,21 +303,14 @@ test.describe("Group Permission Tests", () => {
         await tester.logout();
     });
 
-    /**
-     * Soft-delete data is about to start so it does not get impacted by other tests already executed
-     */
-    test.afterAll(async ({ baseTester, db }) => {
-        baseTester.isGoingTo(
-            "update delete_at for the data created in this test so it does impact next suite of tests",
-        );
-        await db.updateInDatabase("folder", { deleted_at: "2022-01-15 11:22:34" }, { "name LIKE": "Group Free%" });
-        await db.updateInDatabase("folder", { deleted_at: "2022-01-15 11:22:34" }, { "name LIKE": "Group Moderated%" });
-        await db.updateInDatabase(
-            "folder",
-            { deleted_at: "2022-01-15 11:22:34" },
-            { "name LIKE": "Group Restricted%" },
-        );
-        await db.updateInDatabase("folder", { deleted_at: "2022-01-15 11:22:34" }, { "name LIKE": "Group Root%" });
-        await db.updateInDatabase("folder", { deleted_at: "2022-01-15 11:22:34" }, { "name LIKE": "Group 1" });
+    test.afterAll(async ({ db, api }) => {
+        // Soft-delete data to not interfere with other tests
+        await api.deleteFoldersByName(db, [
+            "Group Free%",
+            "Group Moderated%",
+            "Group Restricted%",
+            "Group Root%",
+            "Group 1",
+        ]);
     });
 });

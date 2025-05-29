@@ -28,7 +28,7 @@ test.describe("Participant Tests", () => {
         const teacher = Common.USER_JACKCOLES;
         const teacherId = Common.USER_ID_JACKCOLES;
 
-        const addComponent = new Homepage(page);
+        const addComponent = new Homepage(tester, page);
         const dueworkForm = new AssessmentForm(tester, page);
         const submitForm = new SubmitForm(tester, page);
         const markbookPage = new MarkbookPage(page);
@@ -142,7 +142,7 @@ test.describe("Participant Tests", () => {
             return;
         }
 
-        const addComponent = new Homepage(page);
+        const addComponent = new Homepage(tester, page);
 
         // remove the duework component from the homepage to avoid issues in the next test
         tester.isGoingTo("remove the duework component from the homepage");

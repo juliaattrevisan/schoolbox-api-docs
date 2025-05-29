@@ -33,7 +33,7 @@ async function createClassPage(
     const resources = new Resources(page);
     const assessmentForm = new AssessmentForm(tester, page);
     const manageGroup = new ManageGroup(page);
-    const homepage = new Homepage(page);
+    const homepage = new Homepage(tester, page);
     const filename = path.join(__dirname, "../../support/file/baboon.png");
 
     const homepageTemplateOption = "Blank";
@@ -163,7 +163,7 @@ test.describe("Submission States functionality tests", () => {
         })) as number;
 
         const folderId = (await db.grabFromDatabase("folder", "id", { deleted_at: null, name: folderName })) as string;
-        const homepage = new Homepage(page);
+        const homepage = new Homepage(tester, page);
         const assessmentPage = new AssessmentPage(tester, page);
 
         await tester.impersonate(student);
@@ -216,7 +216,7 @@ test.describe("Submission States functionality tests", () => {
         })) as number;
 
         const folderId = (await db.grabFromDatabase("folder", "id", { deleted_at: null, name: folderName })) as string;
-        const homepage = new Homepage(page);
+        const homepage = new Homepage(tester, page);
         const statusPage = new StatusPage(tester, page);
 
         tester.isGoingTo("as tecaher: checking class view visibility via due work component on homepage");
@@ -232,21 +232,8 @@ test.describe("Submission States functionality tests", () => {
         await expect(page.locator("#kamiWorksheet")).toBeVisible();
     });
 
-    test.afterAll(async ({ baseTester, db }) => {
+    test.afterAll(async ({ db, api }) => {
         // Soft-delete data to not interfere with other tests
-        baseTester.isGoingTo(
-            "update delete_at for the data created in this test so it does not impact next suite of tests",
-        );
-
-        await db.updateInDatabase(
-            "folder",
-            { deleted_at: "2022-01-15 11:12:34" },
-            { "name LIKE": "Test Class Homepage%" },
-        );
-        await db.updateInDatabase(
-            "assessment",
-            { deleted_at: "2022-01-15 11:12:34" },
-            { "title LIKE": "Test Due Work%" },
-        );
+        await api.deleteFoldersByName(db, ["Test Due Work%", "Test Class Homepage%"]);
     });
 });

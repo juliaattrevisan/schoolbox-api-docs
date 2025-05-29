@@ -386,7 +386,7 @@ test.describe("Create and Verify News Article Test", () => {
         const form = new Form(tester, page);
         const index = new Index(tester, page);
         const item = new Item(tester, page);
-        const homepage = new Homepage(page);
+        const homepage = new Homepage(tester, page);
 
         tester.isGoingTo("Create a folder page to create articles for that audience");
         await createNewsFolder(tester, page, db);

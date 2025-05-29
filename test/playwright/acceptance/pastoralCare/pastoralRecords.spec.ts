@@ -63,7 +63,7 @@ test.describe("Pastoral Records", () => {
         tester.isGoingTo("navigate to the student profile page");
         await profilePage.goto(studentId);
         tester.isGoingTo("click the pastoral care button");
-        await profilePage.clickButton("pastoral");
+        await profilePage.clickButton("Pastoral Care");
         tester.isGoingTo("click create pastoral record and create a pastoral record");
         await pastoralProfile.clickCreatePastoralRecord();
         await createPastoralRecord.typeTitle(pastoralTitle);
@@ -180,7 +180,7 @@ test.describe("Pastoral Records", () => {
         tester.isGoingTo("navigate to the student profile page");
         await profilePage.goto(studentId);
         tester.isGoingTo("click the pastoral care button");
-        await profilePage.clickButton("pastoral");
+        await profilePage.clickButton("Pastoral Care");
         tester.isGoingTo("click create pastoral record and create a pastoral record  visible to parents and students");
         await pastoralProfile.clickCreatePastoralRecord();
         await createPastoralRecord.typeTitle(pastoralTitle);

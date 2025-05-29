@@ -1,7 +1,10 @@
 import { expect } from "@playwright/test";
-import type { Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
+import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 
 export default class Homepage {
+    private tester: AcceptanceTester;
+
     private page: Page;
 
     static readonly URL = "/homepage/{id}";
@@ -70,7 +73,10 @@ export default class Homepage {
 
     static readonly DATA_TEST_ASSESSMENT_COMPONENT_TOT_MENU_DELETE = "component-assessment-actions-delete-";
 
-    constructor(page: Page) {
+    static readonly DATA_TEST_HOMEPAGE_COMPONENT_TITLEBAR_NAME = "homepage-component-titlebar-name";
+
+    constructor(tester: AcceptanceTester, page: Page) {
+        this.tester = tester;
         this.page = page;
     }
 
@@ -120,6 +126,20 @@ export default class Homepage {
      */
     public static locateComponent(layout: string, position: number): string {
         return `${layout} ${Homepage.ELEMENT_COMPONENT}:nth-child(${position})`;
+    }
+
+    /**
+     * Create a locator for a component by its name
+     * @param componentName - The name of the component
+     * @returns - the Locator for the component (or components)
+     */
+    public locateComponentByName(componentName: string): Locator {
+        const titleBar = this.page
+            .getByTestId(Homepage.DATA_TEST_HOMEPAGE_COMPONENT_TITLEBAR_NAME)
+            .filter({ hasText: componentName });
+
+        const components = this.page.locator("[data-component]");
+        return components.filter({ has: titleBar });
     }
 
     /**
@@ -280,5 +300,12 @@ export default class Homepage {
         await this.page
             .getByTestId(`${Homepage.DATA_TEST_ASSESSMENT_COMPONENT_TOT_MENU_DELETE}${assessmentId}`)
             .click();
+    }
+
+    /**
+     * Open the link menu for the homepage
+     */
+    async openLinkMenu(): Promise<void> {
+        await this.page.getByTestId(Homepage.DATA_TEST_LINK_MENU_BUTTON).click();
     }
 }

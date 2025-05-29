@@ -8,19 +8,6 @@ import CourseList from "@schoolboxTest/playwright/support/page/courses/CourseLis
 import ImportCourseIntoClass from "@schoolboxTest/playwright/support/page/courses/ImportCourseIntoClass";
 
 test.describe("Course import tests", () => {
-    /**
-     * Deleting data is about to start so it does not get impacted by other tests already executed
-     */
-    test.beforeAll(async ({ baseTester, db }) => {
-        baseTester.isGoingTo("update delete_at so data does not impact the tests");
-        await db.updateInDatabase(
-            "folder",
-            { deleted_at: "2022-01-15 11:22:34" },
-            { "name LIKE": "Automation Course Import Folder%" },
-        );
-        await db.updateInDatabase("folder_code", { deleted_at: "2022-01-15 11:22:34" }, { "code LIKE": "test%" });
-    });
-
     test.beforeEach(async ({ tester }) => {
         await tester.loginAsAdmin();
     });
@@ -174,17 +161,8 @@ test.describe("Course import tests", () => {
         await tester.logout();
     });
 
-    test.afterAll(async ({ baseTester, db }) => {
+    test.afterAll(async ({ db, api }) => {
         // Soft-delete data to not interfere with other tests
-        baseTester.isGoingTo(
-            "update delete_at for the data created in this test so it does not impact next suite of tests",
-        );
-
-        await db.updateInDatabase(
-            "folder",
-            { deleted_at: "2022-01-15 11:12:34" },
-            { "name LIKE": "Automation Course Import Folder%" },
-        );
-        await db.updateInDatabase("folder_code", { deleted_at: "2022-01-15 11:12:34" }, { "code LIKE": "test%" });
+        await api.deleteFoldersByName(db, "Automation Course Import Folder%");
     });
 });

@@ -19,14 +19,6 @@ test.describe("Textbox Tests", () => {
     });
 
     /**
-     * Soft deleting the homepage with certain name to not impact the test
-     */
-    test.beforeAll(async ({ baseTester, db }) => {
-        baseTester.isGoingTo("update delete_at for the textbox (folder table) so it does not impact the news tests");
-        await db.updateInDatabase("folder", { deleted_at: "2022-01-15 11:22:34" }, { name: "Test TextBox Homepage%" });
-    });
-
-    /**
      * create a homepage
      */
 
@@ -67,7 +59,7 @@ test.describe("Textbox Tests", () => {
         const createFolder = new CreateFolder(tester, page);
         const resources = new Resources(page);
         const manageAll = new ManageAllTextbox(tester, page);
-        const homepage = new Homepage(page);
+        const homepage = new Homepage(tester, page);
         const textbox = new TextboxForm(tester, page);
         const folderName = "Test TextBox Homepage";
         const heading = "Test Text Box Title";
@@ -132,7 +124,7 @@ test.describe("Textbox Tests", () => {
         const folderName = "Test TextBox Homepage";
         const manageAll = new ManageAllTextbox(tester, page);
         const searchPage = new SearchPage(page);
-        const homepage = new Homepage(page);
+        const homepage = new Homepage(tester, page);
         const textbox = new TextboxForm(tester, page);
 
         tester.isGoingTo("As Jack Coles search for a  textbox and ensure it is presented in the search results grid");
@@ -229,11 +221,13 @@ test.describe("Textbox Tests", () => {
     /**
      * Soft deleting data to not impact the tests
      */
-    test.afterAll(async ({ baseTester, db }) => {
+    test.afterAll(async ({ baseTester, db, api }) => {
         baseTester.isGoingTo(
             "update delete_at for the data created in this test so it does impact next suite of tests",
         );
-        await db.updateInDatabase("folder", { deleted_at: "2022-01-15 11:22:34" }, { name: "Test TextBox Homepage" });
+
+        await api.deleteFoldersByName(db, "Test TextBox Homepage");
+
         await db.updateInDatabase("textBox", { deleted_at: "2022-01-15 11:22:34" }, { heading: "Test Text Box Title" });
         await db.updateInDatabase("textBox", { deleted_at: "2022-01-15 11:22:34" }, { heading: "Second Text Box" });
         await db.updateInDatabase("textBox", { deleted_at: "2022-01-15 11:22:34" }, { heading: "Third Text Box" });

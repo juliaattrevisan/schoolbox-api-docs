@@ -45,7 +45,7 @@
         </div>
         <div class="checklist">
             <input type="checkbox" id="show-display-marks">
-            <label for="show-display-marks">
+            <label for="show-display-marks" data-test="markbook-show-display-marks">
                 Show Display Marks
                 <span class="hint has-tip tip-top" data-tooltip title="Shows marks in the same format that students see">?</span>
             </label>
@@ -80,7 +80,7 @@
                     </th>
                 {% endif %}
                 {% for assessment in collapsedAssessments %}
-                        <th><div><span>
+                        <th data-test="markbook-assessment" data-assessment="{{ assessment.id }}"><div><span>
                             {% if assessment.isSpecification %}
                                 {% set participationRoute = routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: USER.id}) %}
                                 {% if participationRoute %}
@@ -232,6 +232,7 @@
                             {% if aImpl %}
                             <td
                                 class="column-{{ assessment.id }} {% if not participant or participant.isExcluded %} excluded {% endif %} student-grade-cell"
+                                data-test="markbook-cell-{{ assessment.id }}-{{ student.id }}"
                                 data-assessment="{{ assessment.id }}"
                                 {% if canAccessPopOut and (assessment is dueWork or assessment is quiz or assessment is lti ) %}
                                 data-pop-out-menu

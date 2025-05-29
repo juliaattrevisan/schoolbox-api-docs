@@ -57,7 +57,14 @@
     {% endif %}
 
     {% set found = false %}
-    <select class="letter-grade-select" data-mark-input name="mark" tabindex="{{ tabIndex }}" title="Select a {{ locale.grades.proper }}">
+    <select
+        class="letter-grade-select"
+        data-test="assessment-feedback-mark-select-{{ participant.user.id }}"
+        data-mark-input
+        name="mark"
+        tabindex="{{ tabIndex }}"
+        title="Select a {{ locale.grades.proper }}"
+    >
 
         {# If humanReadableMark is null, there isn't an existing mark; this is a new draft
          # Select No Grade. Otherwise we need to find out whether the humanReadableMark exists

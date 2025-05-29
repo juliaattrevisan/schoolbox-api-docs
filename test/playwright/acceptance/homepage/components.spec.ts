@@ -10,7 +10,7 @@ test.describe("Homepage Components Tests", () => {
     });
 
     test("Homepage Components", async ({ tester, page }) => {
-        const homepage = new Homepage(page);
+        const homepage = new Homepage(tester, page);
         await homepage.goto(83);
 
         tester.isGoingTo("click the add component icon");

@@ -85,7 +85,7 @@ test.describe("Homepage Initial Tests", () => {
         const createFolder = new CreateFolder(tester, page);
         const folderName = "Test Homepage";
         const resources = new Resources(page);
-        const homepage = new Homepage(page);
+        const homepage = new Homepage(tester, page);
         tester.isGoingTo("navigate to the Test Homepage via resources browser");
         await createFolder.gotoResources();
         await expect(page.locator(`a.jstree-anchor:has-text("${folderName}")`)).toBeVisible();
@@ -118,7 +118,7 @@ test.describe("Homepage Initial Tests", () => {
         const createFolder = new CreateFolder(tester, page);
         const folderName = "Test Homepage";
         const resources = new Resources(page);
-        const homepage = new Homepage(page);
+        const homepage = new Homepage(tester, page);
         const textbox = new TextboxForm(tester, page);
         tester.isGoingTo("Navigate to the Test Homepage via resources browser");
         await createFolder.gotoResources();
@@ -215,7 +215,7 @@ test.describe("Homepage Initial Tests", () => {
         const createFolder = new CreateFolder(tester, page);
         const folderName = "Test Homepage";
         const resources = new Resources(page);
-        const homepage = new Homepage(page);
+        const homepage = new Homepage(tester, page);
         tester.isGoingTo("Navigate to the Test Homepage via resources browser");
         await createFolder.gotoResources();
         await expect(page.locator(`a.jstree-anchor:has-text("${folderName}")`)).toBeVisible();
@@ -288,12 +288,13 @@ test.describe("Homepage Initial Tests", () => {
     /**
      * Soft deleting data to not impact the other tests
      */
-
-    test.afterAll(async ({ baseTester, db }) => {
+    test.afterAll(async ({ baseTester, db, api }) => {
         baseTester.isGoingTo(
             "update delete_at for the data created in this test so it does impact next suite of tests",
         );
-        await db.updateInDatabase("folder", { deleted_at: "2020-01-15 11:22:34" }, { "name like": "Test Homepage" });
+
+        await api.deleteFoldersByName(db, "Test Homepage");
+
         await db.updateInDatabase("blog", { deleted_at: "2020-01-15 11:22:34" }, { "heading like": "Test Blog Title" });
         await db.updateInDatabase(
             "textBox",
