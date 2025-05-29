@@ -245,8 +245,7 @@
     {% set markTypeTotalMark = 3 %}
     {% set markTypeNone = 6 %}
 
-    {% include '@learningAssessment/fragments/markType.twig' with {
-        context: 'instructor',
+    {% include '@learningAssessment/fragments/dualMarkTypes.twig' with {
         assessment: assessment,
         allMarkTypes: allMarkTypes,
         allGradeSchemes: allGradeSchemes,
@@ -254,24 +253,6 @@
         selectedMarkType: assessment.instructorMarkType.id ?? null,
         selectedGradeGroup: assessment.instructorGradeGroup.id ?? null,
         defaultGradeGroup: defaultGradeGroup,
-        renderMaxMark: true,
-        markTypeLabel: 'Input Mark Type',
-        markTypeTooltip: 'Select the mark type that the teacher will input',
-        courseManagedReadonly: courseManaged.isReadonly
-    } %}
-
-    {% include '@learningAssessment/fragments/markType.twig' with {
-        context: '',
-        assessment: assessment,
-        allMarkTypes: allMarkTypes,
-        allGradeSchemes: allGradeSchemes,
-        selectedMaxMark: assessment.maxMark ?? null,
-        selectedMarkType: assessment.markType.id ?? null,
-        selectedGradeGroup: assessment.gradeGroup.id ?? null,
-        defaultGradeGroup: defaultGradeGroup,
-        renderMaxMark: true,
-        markTypeLabel: 'Display Mark Type',
-        markTypeTooltip: 'Select the mark type that will be displayed to students and parents',
         courseManagedReadonly: courseManaged.isReadonly
     } %}
 
