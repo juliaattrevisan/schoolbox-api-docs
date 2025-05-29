@@ -1657,12 +1657,6 @@ parameters:
 			path: library/External/Isams/Class.php
 
 		-
-			message: '#^PHPDoc tag @throws with type JsonException\|Psr\\SimpleCache\\InvalidArgumentException is not subtype of Throwable$#'
-			identifier: throws.notThrowable
-			count: 1
-			path: library/External/Isams/Register/CacheHelper.php
-
-		-
 			message: '#^PHPDoc tag @throws with type JsonException\|Psr\\Http\\Client\\ClientExceptionInterface\|Psr\\SimpleCache\\InvalidArgumentException\|Schoolbox\\Mapper\\Exception\|Twig\\Error\\Error is not subtype of Throwable$#'
 			identifier: throws.notThrowable
 			count: 2

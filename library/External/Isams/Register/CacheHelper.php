@@ -325,7 +325,7 @@ class CacheHelper
      * @throws InvalidArgumentException if key set or OIDC discovery couldn't be
      *                                  written to or read from cache
      * @see                      self::getMetadataFields
-     *
+     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
     public function getDataSource(string $dataSourceUrl): mixed
     {
