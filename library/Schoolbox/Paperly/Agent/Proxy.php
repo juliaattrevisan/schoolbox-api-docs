@@ -12,7 +12,7 @@ class Proxy
 {
     /* Max number of results allowed
      */
-    private const MAX_RESULTS = 100;
+    private const MAX_RESULTS = 10000;
 
     /* HMAC algorithm for hashing the request
      */
