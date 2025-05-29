@@ -195,7 +195,10 @@ HELP;
                     ($assessmentId === '' ? 'not linked to any assessment' : "for assessment $assessmentId") . '.'
                 );
             }
-            $logger->debug('kami_document.id values: ' . implode(',', $kamiDocumentIds));
+            $logger->debug(
+                'kami_document.id values for which corrupted data type 1 was fixed: ' .
+                implode(',', $kamiDocumentIds)
+            );
         }
     }
 
@@ -254,7 +257,10 @@ HELP;
         while ($row = $statement1->fetch()) {
             $kamiDocumentIds[] = $row['kamiDocumentId'];
         }
-        $logger->debug('kami_document.id values: ' . implode(',', $kamiDocumentIds));
+        $logger->debug(
+            'kami_document.id values for which corrupted data type 2 was fixed: ' .
+            implode(',', $kamiDocumentIds)
+        );
     }
 };
 
