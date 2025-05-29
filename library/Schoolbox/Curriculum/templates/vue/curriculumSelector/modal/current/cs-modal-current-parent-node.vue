@@ -11,7 +11,6 @@ import csModalCurrentChildNode from "./cs-modal-current-child-node.vue";
 interface Props {
     node: Node; // the assigned node to display
     depth: number; // the depth of the node in the tree
-    isExpanded: boolean; // whether the node is expanded or not
 }
 const props = defineProps<Props>();
 
@@ -37,7 +36,7 @@ function onExpandSelected(): void {
 </script>
 
 <template>
-    <li v-if="props.isExpanded">
+    <li>
         <div class="node l-gap-xs l-pad-xs--vert">
             <div :class="{ 'l-flex l-flex--align-center l-gap-xs f-no-margins': showExpandButton }">
                 <button
