@@ -12,7 +12,6 @@ interface Props {
     allParticipants: Participant[];
     getStudentsPastoralCountsUrl: string;
 }
-
 const props = defineProps<Props>();
 
 const allParticipants = window.Vue.ref<Participant[]>(props.allParticipants);
@@ -50,6 +49,9 @@ const studentPastoralCounts = window.Vue.ref<Record<string, StudentPastoralCount
  * Fetch the pastoral counts for the students
  */
 async function getStudentPastoralCounts(): Promise<void> {
+    if (props.getStudentsPastoralCountsUrl === "") {
+        return;
+    }
     const url = props.getStudentsPastoralCountsUrl.replace(
         "{studentIds}",
         allParticipants.value.map((participant) => participant.user.id).join(","),
@@ -85,6 +87,7 @@ async function getStudentPastoralCounts(): Promise<void> {
         console.error(error);
     }
 }
+
 /**
  * Excludes a participant.
  * @param participant - The participant to exclude.
@@ -174,6 +177,9 @@ async function includeSelected(): Promise<void> {
     selectedList.value = [];
 }
 
+/**
+ * Load the student pastoral counts when the component is mounted.
+ */
 window.Vue.onMounted(() => {
     void getStudentPastoralCounts();
 });
@@ -192,7 +198,7 @@ window.Vue.onMounted(() => {
         <table>
             <thead>
                 <tr>
-                    <th v-if="showCheckboxes" width="40">
+                    <th v-if="showCheckboxes" width="40" data-test="custom-participation-select-all">
                         <input
                             id="select-all"
                             v-model="allSelected"
@@ -208,7 +214,11 @@ window.Vue.onMounted(() => {
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="participant in allParticipants" :key="participant.id">
+                <tr
+                    v-for="participant in allParticipants"
+                    :key="participant.id"
+                    :data-test="`custom-participation-row-${participant.user.id}`"
+                >
                     <td v-if="showCheckboxes">
                         <input
                             :id="`id-${participant.user.id}`"
