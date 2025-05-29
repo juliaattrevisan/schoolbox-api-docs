@@ -55,16 +55,13 @@ class ModelToArray
         }
         $this->linkDecorator->decorate([], $model->getReviewer());
 
-        /* The gradientMark can be any of three values:
+        /* The gradientMark can be:
          * - null: No mark was given
          * - string: The gradient value to use, if the config is enabled and a mark exists
-         * - "none": The grade gradient config is not enabled and a mark exists
          */
         $gradientMark = null;
-        if (is_numeric($model->getNormalisedMark())) {
-            $gradientMark = $this->configLoader->get(ConfigMapper::NAME_GRADE_GRADIENT_ENABLED)
-                ? (string)((int)($model->getNormalisedMark() / 10)) /* (int) to make it 0-10, then api docs say this is a string, sooo double cast lol */
-                : "none";
+        if (is_numeric($model->getNormalisedMark()) && $this->configLoader->get(ConfigMapper::NAME_GRADE_GRADIENT_ENABLED)) {
+            $gradientMark = (string)floor($model->getNormalisedMark() / 10);
         }
 
         return [
