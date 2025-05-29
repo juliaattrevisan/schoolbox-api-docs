@@ -7,10 +7,14 @@ import { getOnlyEnabled, findById } from "@schoolboxCurriculum/js/nodeUtils";
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import { useSharedStore } from "./csSharedStore";
 
-interface InitProps {
+type InitProps = {
     filter: Node | null; // to only display nodes that are children of this node
     parentFolderId?: number; // the parentFolderId to load the course/unit nodes from
-}
+};
+
+type ExpandedState = Pick<Node, "id"> & {
+    isExpanded: boolean;
+};
 
 export const useCurrentNodesStore = defineStore("csUnitNodesStore", () => {
     const hasLoadError = window.Vue.ref(false);
@@ -20,6 +24,7 @@ export const useCurrentNodesStore = defineStore("csUnitNodesStore", () => {
     const hasNodes = window.Vue.ref(false); // no need to display the tree if there are no nodes
     const hasMultipleParents = window.Vue.ref(false); // whether the nodes come from multiple top level curriculum parents
     const filter = window.Vue.ref<Node | null>({} as Node | null); // to only display nodes that are children of this node
+    const expandedStates = window.Vue.ref<ExpandedState[]>([]); // Keep track of whether a node is expanded or not, for when the user switches between the 'Current' and 'All' tabs
 
     /**
      * We need to filter the nodes to only display the children of the filter node,
@@ -80,6 +85,32 @@ export const useCurrentNodesStore = defineStore("csUnitNodesStore", () => {
         }
     }
 
+    /**
+     * To retrieve the new or previous expanded state of the node
+     * @param nodeId - the id of the node to check if it is expanded
+     * @returns - whether the node is expanded or not
+     */
+    function getIsExpanded(nodeId: number): boolean {
+        const expandedNode = expandedStates.value.find((node) => node.id === nodeId);
+        // if it's undefined, we add the node to the expandedStates array and expand if the store only has one parent
+        if (expandedNode === undefined) {
+            expandedStates.value.push({ id: nodeId, isExpanded: !hasMultipleParents.value });
+        }
+        return expandedNode ? expandedNode.isExpanded : !hasMultipleParents.value;
+    }
+
+    /**
+     * Keep track of whether a node is expanded or not, for when the user switches between the 'Current' and 'All' tabs
+     * @param nodeId - the id of the node to check if it is expanded
+     * @param $isExpanded - whether the node is expanded or not
+     */
+    function setIsExpanded(nodeId: number, $isExpanded: boolean): void {
+        const index = expandedStates.value.findIndex((node) => node.id === nodeId);
+        if (index !== -1) {
+            expandedStates.value[index].isExpanded = $isExpanded;
+        }
+    }
+
     return {
         hasLoadError,
         hasLoaded,
@@ -90,5 +121,7 @@ export const useCurrentNodesStore = defineStore("csUnitNodesStore", () => {
         hasMultipleParents,
         init,
         load,
+        getIsExpanded,
+        setIsExpanded,
     };
 });

@@ -17,7 +17,7 @@ const props = defineProps<Props>();
 const store = useCurrentNodesStore();
 const { title } = useNodeTitle(props.node);
 const showChildren = props.node.children && props.node.children.length > 0; // To determine whether we need to display further child nodes within this node
-const isNodeExpanded = window.Vue.ref(!store.hasMultipleParents); // will not be expanded if there are multiple parents, to avoid potential long scrolls in the modal
+const isExpanded = window.Vue.ref(store.getIsExpanded(props.node.id)); // will not be expanded if there are multiple parents, to avoid potential long scrolls in the modal
 
 /**
  * Show the expand button if there's multiple top level parents, it's the parent node,
@@ -31,7 +31,8 @@ const showExpandButton = window.Vue.computed(() => {
  * Expand or collapse the children of the node
  */
 function onExpandSelected(): void {
-    isNodeExpanded.value = !isNodeExpanded.value; // toggle the expanded state
+    isExpanded.value = !isExpanded.value; // toggle the expanded state
+    store.setIsExpanded(props.node.id, isExpanded.value); // update the store with the new expanded state
 }
 </script>
 
@@ -42,12 +43,12 @@ function onExpandSelected(): void {
                 <button
                     v-if="showExpandButton"
                     class="l-flex l-flex--center l-flex__item--0-shrink f-no-bkg"
-                    :aria-label="isNodeExpanded ? 'Collapse' : 'Expand'"
-                    :title="isNodeExpanded ? 'Collapse' : 'Expand'"
+                    :aria-label="isExpanded ? 'Collapse' : 'Expand'"
+                    :title="isExpanded ? 'Collapse' : 'Expand'"
                     :data-test="`cc-report-table-node-expand-button-${props.node.id}`"
                     @click="onExpandSelected"
                 >
-                    <sbx-icon v-if="isNodeExpanded" name="up-arrow" />
+                    <sbx-icon v-if="isExpanded" name="up-arrow" />
                     <sbx-icon v-else name="down-arrow" />
                 </button>
                 <button
@@ -67,7 +68,7 @@ function onExpandSelected(): void {
                     :key="viewNode.id"
                     :node="viewNode"
                     :depth="props.depth + 1"
-                    :is-expanded="isNodeExpanded"
+                    :is-expanded="isExpanded"
                 />
             </ul>
         </template>
