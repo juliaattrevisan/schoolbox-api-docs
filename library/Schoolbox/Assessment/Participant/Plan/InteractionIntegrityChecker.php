@@ -13,6 +13,7 @@ namespace Schoolbox\Assessment\Participant\Plan;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Assessment\Participant;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
 use PDOException;
 use Schoolbox\Mapper as SchoolboxMapper;
@@ -164,7 +165,7 @@ class InteractionIntegrityChecker
 
 
     /**
-     * Post-save callback to check whether a user does not yet have a participation record, and inserts one in they dynamic plan.
+     * Post-save callback to check whether a user has a participation row, and if not inserts one in the dynamic plan.
      *
      * @param User             $student
      * @param Assessment\Model $assessment
@@ -204,12 +205,50 @@ class InteractionIntegrityChecker
 
 
     /**
+     * Remove $student's participant row if the linked plan is dynamic.
+     *
+     * A participant row for a student is added in two situations:
+     *  - when a teacher creates a participation plan for that student
+     *    (note plans created this way have is_dynamic=0)
+     *  - when a student who does not already have a participant row, first interacts with an assessment
+     *    (see $this->insertParticipationOnFirstInteraction() above, in which the participant row is added to the
+     *     assessment's dynamic plan)
+     *
+     * A participant row in a dynamic plan should be removed when all interactions by that student have been deleted.
+     *
+     * The types of interactions for different types of assessment vary, so the deletion of those interactions should
+     * be done in the relevant mapper class for the assessment type.  If no interactions remain after an interaction
+     * has been deleted in one of those mappers, this function should be called.
+     *
+     * @param User             $student
+     * @param Assessment\Model $assessment
+     */
+    public function removeParticipationFromDynamicPlan(User $student, Assessment\Model $assessment): void
+    {
+        $this->loadPlansAndParticipants($assessment);
+        $participant = $this->findParticipation($student, $assessment);
+
+        if ($participant === null) {
+            // The student is no longer a participant, so nothing to do here.
+            return;
+        }
+
+        if ($participant->getPlan()->isDynamic()) {
+            try {
+                $this->participantMapper->delete($participant);
+            } catch (Exception) {
+                // Couldn't delete participation, probably because it has already been deleted by another process.
+            }
+        }
+    }
+
+
+    /**
      * Load this assessment's plans and participants
      *
      * @param Assessment\Model $assessment
      * @throws SchoolboxMapper\DefinitionException
      * @throws InvalidArgumentException If assessment is not sufficiently hydrated
-     * @throws SchoolboxMapper\Exception
      */
     private function loadPlansAndParticipants(Assessment\Model $assessment): void
     {

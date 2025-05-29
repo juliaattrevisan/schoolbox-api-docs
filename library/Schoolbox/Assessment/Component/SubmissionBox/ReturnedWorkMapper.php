@@ -25,6 +25,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\ExternalMarkbook\Adapter as MarkbookAdapter;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
 
@@ -89,6 +90,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
 
         // SoftDelete/Restore weak entities
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteReturnedWorkFiles']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'removeParticipationIfNecessary']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'persistFiles']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'canParticipate']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateNormMark']);
@@ -100,7 +102,9 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
 //        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'syncToExternalMarkbook']);
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'syncToExternalMarkbook']);
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreReturnedWorkFiles']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'insertParticipation']);
     }
+
 
     /**
      * @param ReturnedWork $object
@@ -117,6 +121,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
         }
         return true;
     }
+
 
     /**
      * @param ReturnedWork      $object
@@ -159,6 +164,57 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
         return true;
     }
 
+
+    /**
+     * Remove the student's participant row if the student should no longer be a participant in $assessment.
+     * @see SubmissionMapper->removeParticipationIfNecessary() (similar function).
+     *
+     * @param ReturnedWork $object
+     * @return bool - Return true on success - whether or not a participation was removed.
+     *                This is the expected behaviour for callbacks registered with Schoolbox\Mapper.
+     */
+    public function removeParticipationIfNecessary(ReturnedWork $object): bool
+    {
+        $student = $object->getOwner();
+        $submissionBox = $object->getSubmissionBox();
+        $submissionBoxMapper = $this->getSubmissionBoxMapper();
+
+        // Get response and feedback counts for this student on this assessment.
+        // In this case:
+        //  * the response is stored in the student_submission table
+        //  * the feedback is stored in the submission_return table.
+        $submissionCountByBoxId = $submissionBoxMapper->findSubmissionCountsForSubmissionBoxes(
+            [$submissionBox->getId()],
+            $student->getId()
+        );
+        $feedbackCountByBoxId = $submissionBoxMapper->findReturnedWorkCountsForSubmissionBoxes(
+            [$submissionBox->getId()],
+            $student->getId()
+        );
+        $submissionCountForThisBox = $submissionCountByBoxId[$submissionBox->getId()] ?? 0;
+        $feedbackCountForThisBox = $feedbackCountByBoxId[$submissionBox->getId()] ?? 0;
+
+        // If no (non-deleted) response or feedback exists, the student's participation can be removed.
+        if ($submissionCountForThisBox == 0 && $feedbackCountForThisBox == 0) {
+            // The SubmissionBox obtained by $object->getSubmissionBox() will not be hydrated (but it will have an id).
+            // Get a hydrated SubmissionBox so $submissionBox->getAssessmentModel() will return an object with an id.
+            try {
+                $submissionBox = $submissionBoxMapper->findById($object->getSubmissionBox()->getId());
+            } catch (MapperException) {
+                // Can't get a $submissionBox - assume the student should still be a participant.
+                return true;
+            }
+
+            $this->interactionChecker->removeParticipationFromDynamicPlan(
+                $student,
+                $submissionBox->getAssessmentModel()
+            );
+        }
+
+        return true;
+    }
+
+
     /**
      * If a resubmission is requested and create an extension for the user
      *
@@ -175,6 +231,8 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
         }
         return true;
     }
+
+
     /**
      * Soft deletes all Files for the specified Return
      *
@@ -241,6 +299,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
         ";
     }
 
+
     /**
      * @param PDOStatement $statement
      * @return GenericCollection|ReturnedWork[]
@@ -283,40 +342,6 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
         return $collection;
     }
 
-
-    /**
-     * Retrieves the number of returns that have been made on each box in a
-     * list.
-     *
-     * @param array $box_ids
-     * @param int   $user_id
-     *
-     * @return array The submission box ID as the key, the count as the value.
-     */
-    public function findCountsForSubmissionBoxes($box_ids, $user_id)
-    {
-        // Retrieve count of submission IDs from a list of IDs for a user
-        if (empty($box_ids)) {
-            return [];
-        }
-        $query             = "
-			SELECT sr.box_id, COUNT(*) as submission_count
-			FROM {$this->getTable()} sr
-			WHERE sr.owner = :user_id
-			AND sr.box_id IN {$this->getArrayPlaceholders($box_ids, 'sb')}
-			GROUP BY sr.box_id
-		";
-        $statement         = $this->database->prepare($query);
-        $params            = $this->getArrayParameters($box_ids, 'sb');
-        $params['user_id'] = $user_id;
-        $statement->execute($params);
-
-        $return = [];
-        foreach ($statement as $row) {
-            $return[$row['box_id']] = $row['submission_count'];
-        }
-        return $return;
-    }
 
     /**
      * Post-save callback for returned work models.

@@ -24,7 +24,6 @@ use Schoolbox\Assessment\Participant;
  */
 class CompletionMapper extends Mapper
 {
-
     /**
      * @var Participant\Plan\InteractionIntegrityChecker
      */
@@ -53,9 +52,10 @@ class CompletionMapper extends Mapper
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'preSave']);
-
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'removeParticipationIfNecessary']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'canParticipate']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'insertParticipation']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'insertParticipation']);
     }
 
 
@@ -105,6 +105,38 @@ class CompletionMapper extends Mapper
         }
         $assessment = $this->getTaskMapper()->findById($object->getTask()->getId())->getAssessmentModel();
         return $this->interactionChecker->insertParticipationOnFirstInteraction($object->getStudent(), $assessment);
+    }
+
+
+    /**
+     * Remove the student's participant row if $student should no longer be a participant in $assessment.
+     *
+     * @param Completion $object
+     * @return bool - Return true on success - whether or not a participation was removed.
+     *                This is the expected behaviour for callbacks registered with Schoolbox\Mapper.
+     */
+    public function removeParticipationIfNecessary(Completion $object): bool
+    {
+        $student = $object->getStudent();
+        $task = $object->getTask();
+
+        try {
+            $latestTaskCompletion = $this->findLatestForTaskAndStudent($task->getId(), $student->getId());
+        } catch (Mapper\Exception) {
+            // Could not find latest task completion, probably because none exists.
+            $latestTaskCompletion = null;
+        }
+
+        if ($latestTaskCompletion->isDeleted()) {
+            $latestTaskCompletion = null;
+        }
+
+        // If no task completion exists, the student's participation can be removed.
+        if ($latestTaskCompletion === null) {
+            $this->interactionChecker->removeParticipationFromDynamicPlan($student, $task->getAssessmentModel());
+        }
+
+        return true;
     }
 
 
@@ -291,7 +323,7 @@ class CompletionMapper extends Mapper
     }
 
     /**
-     * Pre-save method for saving an task completion object - saves the
+     * Pre-save method for saving a task completion object - saves the
      * marking user if this is a new object.
      *
      * @param Completion $object
