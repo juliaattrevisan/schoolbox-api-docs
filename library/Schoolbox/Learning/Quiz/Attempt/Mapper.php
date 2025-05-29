@@ -17,7 +17,6 @@ use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\ExternalMarkbook\Adapter as MarkbookAdapter;
-use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Learnosity\Helper;
 use Schoolbox\Learning\Quiz\Attempt\Answer\Mapper as QuizAnswerMapper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
@@ -44,8 +43,6 @@ class Mapper extends BaseMapper
      */
     private $interactionChecker;
 
-    private AssessmentMapper $assessmentMapper;
-
 
     public function __construct()
     {
@@ -54,7 +51,6 @@ class Mapper extends BaseMapper
             Participant\Plan\Mapper::getInstance(),
             Participant\Mapper::getInstance()
         );
-        $this->assessmentMapper = AssessmentMapper::getInstance();
     }
 
     /**
@@ -169,15 +165,7 @@ class Mapper extends BaseMapper
         // If no attempts exist for the student, the student's participation can be removed.
         // Note the response and feedback for quizzes are both stored in the assess_attempt table.
         if ($this->getAttemptCountForStudent($quiz->getId(), $student->getId()) === 0) {
-            // Get a hydrated $assessment to ensure its context properties are set.
-            try {
-                $assessment = $this->assessmentMapper->findById($quiz->getAssessmentModel()->getId());
-            } catch (Exception) {
-                // Can't find assessment - just assume the student should remain a participant.
-                return true;
-            }
-
-            $this->interactionChecker->removeParticipationFromDynamicPlan($student, $assessment);
+            $this->interactionChecker->removeParticipationFromDynamicPlan($student, $quiz->getAssessmentModel());
         }
 
         return true;

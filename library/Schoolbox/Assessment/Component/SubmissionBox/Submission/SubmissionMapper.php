@@ -13,7 +13,6 @@ use PDOStatement;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Collection;
-use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper as SubmissionFileMapper;
@@ -34,8 +33,6 @@ class SubmissionMapper extends BaseMapper
      */
     private $interactionChecker;
 
-    private AssessmentMapper $assessmentMapper;
-
 
     public function __construct()
     {
@@ -44,7 +41,6 @@ class SubmissionMapper extends BaseMapper
             Participant\Plan\Mapper::getInstance(),
             Participant\Mapper::getInstance()
         );
-        $this->assessmentMapper = AssessmentMapper::getInstance();
     }
 
 
@@ -127,16 +123,8 @@ class SubmissionMapper extends BaseMapper
     public function removeParticipationIfNecessary(Submission $object): bool
     {
         $student = $object->getOwner();
+        $submissionBox = $object->getSubmissionBox();
         $submissionBoxMapper = $this->getSubmissionBoxMapper();
-
-        // The SubmissionBox obtained by $object->getSubmissionBox() will not be hydrated (but it will have an ID).
-        // Get a hydrated SubmissionBox.
-        try {
-            $submissionBox = $submissionBoxMapper->findById($object->getSubmissionBox()->getId());
-        } catch (MapperException) {
-            // Can't get a $submissionBox - assume the student should still be a participant.
-            return true;
-        }
 
         // Get response and feedback counts for this student on this assessment.
         // In this case:
@@ -155,15 +143,19 @@ class SubmissionMapper extends BaseMapper
 
         // If no (non-deleted) response or feedback exists, the student's participation can be removed.
         if ($submissionCountForThisBox == 0 && $feedbackCountForThisBox == 0) {
-            // Get a hydrated $assessment to ensure its context properties are set.
+            // The SubmissionBox obtained by $object->getSubmissionBox() will not be hydrated (but it will have an id).
+            // Get a hydrated SubmissionBox so $submissionBox->getAssessmentModel() will return an object with an id.
             try {
-                $assessment = $this->assessmentMapper->findById($submissionBox->getAssessmentModel()->getId());
+                $submissionBox = $submissionBoxMapper->findById($object->getSubmissionBox()->getId());
             } catch (MapperException) {
-                // Can't find assessment - just assume the student should remain a participant.
+                // Can't get a $submissionBox - assume the student should still be a participant.
                 return true;
             }
 
-            $this->interactionChecker->removeParticipationFromDynamicPlan($student, $assessment);
+            $this->interactionChecker->removeParticipationFromDynamicPlan(
+                $student,
+                $submissionBox->getAssessmentModel()
+            );
         }
 
         return true;

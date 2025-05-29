@@ -11,7 +11,6 @@ namespace Schoolbox\LTI\Assessment\Score;
 
 use PDOStatement;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\LTI\Assessment\Mapper as LTIAssessmentMapper;
 use Schoolbox\LTI\Assessment\Model as LTIAssessment;
 use Schoolbox\Mapper as BaseMapper;
@@ -32,8 +31,6 @@ class Mapper extends BaseMapper
      */
     private Participant\Plan\InteractionIntegrityChecker $interactionChecker;
 
-    private AssessmentMapper $assessmentMapper;
-
     /**
      * @inheritDoc
      */
@@ -44,7 +41,6 @@ class Mapper extends BaseMapper
             Participant\Plan\Mapper::getInstance(),
             Participant\Mapper::getInstance()
         );
-        $this->assessmentMapper = AssessmentMapper::getInstance();
     }
 
     /**
@@ -205,15 +201,10 @@ class Mapper extends BaseMapper
         // If no score exists for the student, the student's participation can be removed.
         // Note the response and feedback for LTI assessments are both stored in the lti_assessment_score table.
         if ($this->getScoreCountForStudent($ltiAssessment->getId(), $student->getId()) === 0) {
-            // Get a hydrated $assessment to ensure its context properties are set.
-            try {
-                $assessment = $this->assessmentMapper->findById($ltiAssessment->getAssessmentModel()->getId());
-            } catch (BaseMapper\Exception) {
-                // Can't find assessment - just assume the student should remain a participant.
-                return true;
-            }
-
-            $this->interactionChecker->removeParticipationFromDynamicPlan($student, $assessment);
+            $this->interactionChecker->removeParticipationFromDynamicPlan(
+                $student,
+                $ltiAssessment->getAssessmentModel()
+            );
         }
 
         return true;

@@ -13,7 +13,6 @@ namespace Schoolbox\Assessment\Course\Task;
 use PDOStatement;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
-use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
 use Schoolbox\User;
@@ -30,8 +29,6 @@ class CompletionMapper extends Mapper
      */
     private $interactionChecker;
 
-    private AssessmentMapper $assessmentMapper;
-
 
     public function __construct()
     {
@@ -40,7 +37,6 @@ class CompletionMapper extends Mapper
             Participant\Plan\Mapper::getInstance(),
             Participant\Mapper::getInstance()
         );
-        $this->assessmentMapper = AssessmentMapper::getInstance();
     }
 
     protected function mapping()
@@ -137,15 +133,7 @@ class CompletionMapper extends Mapper
 
         // If no task completion exists, the student's participation can be removed.
         if ($latestTaskCompletion === null) {
-            // Get a hydrated $assessment to ensure its context properties are set.
-            try {
-                $assessment = $this->assessmentMapper->findById($task->getAssessmentModel()->getId());
-            } catch (Mapper\Exception) {
-                // Can't find assessment - just assume the student should remain a participant.
-                return true;
-            }
-
-            $this->interactionChecker->removeParticipationFromDynamicPlan($student, $assessment);
+            $this->interactionChecker->removeParticipationFromDynamicPlan($student, $task->getAssessmentModel());
         }
 
         return true;
