@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
+use Schoolbox\Version\Version;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
@@ -33,6 +34,10 @@ $app = new class extends CliTool\App {
 
         // Set absurdly high max iterations
         $maxIterations = 1_000_000_000;
+
+        // Sleep for up to this long (microseconds) between iterations,
+        // just so that the update is staggered a little on cloud.
+        $maxSleepMicroseconds = 250_000;
 
         foreach ($tables as $table => $columns) {
             $start = microtime(true);
@@ -86,6 +91,9 @@ $app = new class extends CliTool\App {
             ");
 
             $runningCount = 0;
+
+            $instanceInfo = new Version($this->getConfig());
+            $isCloud      = $instanceInfo->isCloudHosted();
 
             // Failsafe for infinite loop
             $iteration = 0;
@@ -142,6 +150,13 @@ $app = new class extends CliTool\App {
                         "comment" => $newComment,
                         "id" => $comment["id"],
                     ]);
+                }
+
+                // Go to sleep for a little bit, on cloud only
+                if ($isCloud) {
+                    $sleep = random_int(0, $maxSleepMicroseconds);
+                    $this->getLogger()->info(sprintf("Waiting %0.2fs for next process", $sleep / 1_000_000));
+                    usleep($sleep);
                 }
             }
 
