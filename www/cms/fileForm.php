@@ -39,7 +39,10 @@ if (is_string($_POST['description'] ?? null) && isset($_POST['category'])) {
     try {
         // if we're editing an existing file, ensure the file exists
         if ($modifyExisting) {
-            $file = FileMapper::getInstance()->findById($_POST['fileID'] ?? null);
+            $file = FileMapper::getInstance()->findOneByColumnList([
+                "id" => $_POST['fileID'] ?? null,
+                "category" => $_POST['category'],
+            ]);
         } else {
             $file = FileMapper::getInstance()->createModel();
         }
