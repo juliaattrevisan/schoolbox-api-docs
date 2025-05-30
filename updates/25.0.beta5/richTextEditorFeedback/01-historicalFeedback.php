@@ -27,6 +27,8 @@ $app = new class extends CliTool\App {
             ], // i.e. lti
         ];
 
+        // Arbitrary chunk size:
+        // only fetch this number of comment rows per loop
         $chunkSize = 1000;
 
         foreach ($tables as $table => $columns) {
@@ -56,7 +58,7 @@ $app = new class extends CliTool\App {
 
             // Create a chunk fetch query:
             // only processes rows whose new comment isn't yet set
-            $commentIds = $this->getDatabaseInternal()->executeQuery("
+            $commentIdsStatement = $this->getDatabaseInternal()->executeQuery("
                 SELECT `{$columns['id']}` as id
                 FROM `$table`
                 WHERE `_{$columns['comment']}` IS NOT NULL
@@ -66,6 +68,7 @@ $app = new class extends CliTool\App {
                 LIMIT $chunkSize OFFSET 0
             ");
 
+            // prepared statement for updating comments
             $updateStatement = $this->getDatabaseInternal()->prepareQuery("
                 UPDATE `$table`
                 SET `{$columns['comment']}` = :comment
@@ -79,47 +82,69 @@ $app = new class extends CliTool\App {
                 WHERE `{$columns['id']}` = :id
             ");
 
-            foreach ($commentIds as $commentId) {
-                /**
-                 * Fetch the comment from the database
-                 */
-                $commentStatement->execute([
-                    "id" => $commentId['id'],
-                ]);
-                $comment = $commentStatement->fetch();
+            $runningCount = 0;
+            while (true) {
+                $commentIdsStatement->execute();
+                $commentChunkCount = $commentIdsStatement->rowCount();
+                if ($commentChunkCount === 0) {
+                    $this->getLogger()->info(sprintf('No more %s comments to process', $table));
+                    break;
+                }
 
-                /**
-                 * Start by converting any html entities to their unicode equivalents,
-                 * as we still want "Jana, make sure you place a <p> tag around the text" to show up correctly
-                 * and not be rendered as an actual <p> tag
-                 * Scrub::linkifyText replaces any links and some markdown with html, like it used to in some areas
-                 */
-                $newComment = Scrub::linkifyText(Scrub::text($comment['comment']));
+                $runningCount += $commentChunkCount;
+                $this->getLogger()->info(
+                    sprintf(
+                        'Processing %d %s comments (approx. %d remaining)',
+                        $commentChunkCount,
+                        $table,
+                        $commentCount - $runningCount,
+                    )
+                );
+                $commentIds = $commentIdsStatement->fetchAll();
+                $commentIdsStatement->close();
 
-                /** For some reason linkifyText adds a new line at the end, so remove that
-                 *  Then convert any remaining \n to <br> tags, as we want to keep the line breaks
-                 *  and finally, surround it in an actual <p> tag so that it can be rendered as if ckeditor made it
-                 */
-                $newComment = nl2br(rtrim($newComment, "\n"));
-                $newComment = "<p>$newComment</p>";
+                foreach ($commentIds as $commentId) {
+                    /**
+                     * Fetch the comment from the database
+                     */
+                    $commentStatement->execute([
+                        "id" => $commentId['id'],
+                    ]);
+                    $comment = $commentStatement->fetch();
 
-                /**
-                 * this is probably mighty unperformant... if it takes too long to run then we could
-                 * consider doing only more recent comments, or do it in batches with a cron I guess
-                 */
-                $updateStatement->execute([
-                    "comment" => $newComment,
-                    "id" => $comment["id"],
-                ]);
+                    /**
+                     * Start by converting any html entities to their unicode equivalents,
+                     * as we still want "Jana, make sure you place a <p> tag around the text" to show up correctly
+                     * and not be rendered as an actual <p> tag
+                     * Scrub::linkifyText replaces any links and some markdown with html, like it used to in some areas
+                     */
+                    $newComment = Scrub::linkifyText(Scrub::text($comment['comment']));
+
+                    /** For some reason linkifyText adds a new line at the end, so remove that
+                     *  Then convert any remaining \n to <br> tags, as we want to keep the line breaks
+                     *  and finally, surround it in an actual <p> tag so that it can be rendered as if ckeditor made it
+                     */
+                    $newComment = nl2br(rtrim($newComment, "\n"));
+                    $newComment = "<p>$newComment</p>";
+
+                    /**
+                     * this is probably mighty unperformant... if it takes too long to run then we could
+                     * consider doing only more recent comments, or do it in batches with a cron I guess
+                     */
+                    $updateStatement->execute([
+                        "comment" => $newComment,
+                        "id" => $comment["id"],
+                    ]);
+                }
             }
 
             $elapsed = microtime(true) - $start;
             $this->getLogger()->info(
                 sprintf(
                     "Processed %d comments in %.2f s (%.4f ms/row) for %s",
-                    $commentIds->rowCount(),
+                    $commentCount,
                     $elapsed,
-                    $elapsed / $commentIds->rowCount() * 1000,
+                    $elapsed / $commentCount * 1000,
                     $table
                 )
             );
