@@ -1,4 +1,6 @@
 (function () {
+    const configEntries = {};
+
     /**
      * markTypeGradingScheme
      *
@@ -10,7 +12,8 @@
     $.fn.markTypeGradingScheme = function (options) {
         options = options || {};
 
-        let config = init(options, $(this));
+        const config = init(options, $(this));
+        configEntries[config.context] = config;
 
         /* Set up event listeners
          */
@@ -36,6 +39,25 @@
          */
         config.gradingSchemeSelect.change(populateScaleModal);
 
+        /* Handle sync mode
+         */
+        if (config.sync) {
+            const syncSwitch = document.querySelector(config.sync.switchSelector);
+            syncSwitch.addEventListener("change", () => {
+                // If this is set to sync with another field, hide the dropdown if the switch is off
+                if (config.sync.syncWith !== null) {
+                    config.markTypeDropdown[0].closest(".row").style.display = syncSwitch.checked ? "block" : "none";
+                }
+
+                syncEntriesIfNeeded();
+            });
+
+            // Whenever any field value changes, sync the entries if we need to
+            config.markTypeDropdown.on("change", syncEntriesIfNeeded);
+            config.maxMarkInput.on("input", syncEntriesIfNeeded);
+            config.gradingSchemeSelect.on("change", syncEntriesIfNeeded);
+        }
+
         /**
          * Init
          *
@@ -47,6 +69,7 @@
             let defaults = {
                 element: element,
                 context: "",
+                sync: null,
 
                 /* These const correspond to backend consts
                  */
@@ -58,7 +81,7 @@
              */
             let context = "";
 
-            if (options.context.length) {
+            if (options.context && options.context.length) {
                 context = options.context;
             }
 
@@ -77,6 +100,10 @@
                 /* A container for the Total Mark elements
                  */
                 maxMarkDiv: $('[data-max-mark="' + context + '"]'),
+
+                /* The maximum mark input field
+                 */
+                maxMarkInput: $("#" + context + "maxMark"),
 
                 /* A container for the Grading Scheme elements
                  */
@@ -141,6 +168,38 @@
 
             // Populate the modal body with the scheme table
             config.gradingSchemeBody.html(schemeTemplate);
+        }
+
+        /**
+         * Sync the current values of all fields that are in sync mode with their source
+         * if the switch is unchecked (i.e. only if the source field is in control)
+         */
+        function syncEntriesIfNeeded() {
+            // If this was triggered by a change in a target entry, ignore it (otherwise we'll get an infinite loop)
+            if (config.sync === null || config.sync.syncWith !== null) {
+                return;
+            }
+
+            const sourceConfig = configEntries[config.sync.syncWith ?? config.context];
+            if (document.querySelector(sourceConfig.sync.switchSelector).checked) {
+                return; // the switch is enabled, so the fields shouldn't be sync'd
+            }
+
+            // Find all target entries that should sync with this source entry
+            const targetEntries = Object.values(configEntries).filter(
+                (entry) => entry.sync && entry.sync.syncWith === sourceConfig.context,
+            );
+
+            // Apply the source values to all target entries
+            targetEntries.forEach((targetConfig) => {
+                targetConfig.markTypeDropdown.val(sourceConfig.markTypeDropdown.val());
+                targetConfig.maxMarkInput.val(sourceConfig.maxMarkInput.val());
+                targetConfig.gradingSchemeSelect.val(sourceConfig.gradingSchemeSelect.val());
+
+                targetConfig.markTypeDropdown.trigger("change");
+                targetConfig.maxMarkInput.trigger("input");
+                targetConfig.gradingSchemeSelect.trigger("change");
+            });
         }
     };
 })(jQuery);
