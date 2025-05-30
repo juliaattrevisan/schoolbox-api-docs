@@ -220,6 +220,11 @@ if (is_string($_POST['description'] ?? null) && isset($_POST['category'])) {
     try {
         $file = FileMapper::getInstance()->findById($_POST['move']);
 
+        // can you move this file?
+        if ($groupHandler->getPermission($file->getFolder()->getId()) < UserAccess::ACCESS_WRITE) {
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
+        }
+
         if (0 == $_POST['categoryID']) {
             $result = "Cannot attach files to root";
         } elseif ($groupHandler->getPermission($file->getFolder()->getId()) < UserAccess::ACCESS_WRITE) {
