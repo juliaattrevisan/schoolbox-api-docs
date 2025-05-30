@@ -568,7 +568,7 @@ class Session
              */
             if ($user->getRole()->isStudent()) {
                 $externalStudent = $synUser->getStudent($synergyId);
-                $_SESSION['isBirthdayCelebration'] = $user->isBirthday($externalStudent['StudentBirthDate']);
+                $_SESSION['isBirthdayCelebration'] = $user->isBirthday($externalStudent['StudentBirthDate'] ?? null);
             }
         }
     }
