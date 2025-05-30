@@ -31,6 +31,9 @@ $app = new class extends CliTool\App {
         // only fetch this number of comment rows per loop
         $chunkSize = 1000;
 
+        // Set absurdly high max iterations
+        $maxIterations = 1_000_000_000;
+
         foreach ($tables as $table => $columns) {
             $start = microtime(true);
 
@@ -83,7 +86,11 @@ $app = new class extends CliTool\App {
             ");
 
             $runningCount = 0;
-            while (true) {
+
+            // Failsafe for infinite loop
+            $iteration = 0;
+            while ($iteration < $maxIterations) {
+                $iteration++;
                 $commentIdsStatement->execute();
                 $commentChunkCount = $commentIdsStatement->rowCount();
                 if ($commentChunkCount === 0) {
