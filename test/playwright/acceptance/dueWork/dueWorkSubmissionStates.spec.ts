@@ -91,7 +91,7 @@ async function createClassPage(
     await assessmentForm.setTitle("Test Due Work1");
     await assessmentForm.setDescription("We need more fish.");
     await assessmentForm.setWorkType(AssessmentForm.WORKTYPE_ASSESSMENT_TASK);
-    await assessmentForm.setMarkType(AssessmentForm.MARK_TYPE_PERCENTAGE);
+    await assessmentForm.setInstructorMarkType(AssessmentForm.MARK_TYPE_PERCENTAGE);
     await assessmentForm.setAcceptSubmission(AssessmentForm.ACCEPT_SUBMISSION_SINGLE);
     await assessmentForm.setWeight(5);
     await assessmentForm.checkSubmissionAllowed(AssessmentForm.INTERACTIVE_WORKSHEET);

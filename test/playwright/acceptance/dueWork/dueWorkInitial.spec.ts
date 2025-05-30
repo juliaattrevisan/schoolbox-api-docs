@@ -141,7 +141,6 @@ test.describe("Initial Due Work functionality tests", () => {
         await assessmentForm.setTitle("Test Due Work");
         await assessmentForm.setDescription("We need more fish.");
         await assessmentForm.setWorkType(AssessmentForm.WORKTYPE_ASSESSMENT_TASK);
-        await assessmentForm.setMarkType(AssessmentForm.MARK_TYPE_PERCENTAGE);
         await assessmentForm.setInstructorMarkType(AssessmentForm.MARK_TYPE_PERCENTAGE);
         await assessmentForm.setAcceptSubmission(AssessmentForm.ACCEPT_SUBMISSION_SINGLE);
         await assessmentForm.setWeight(5);

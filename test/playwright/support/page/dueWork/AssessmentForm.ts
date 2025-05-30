@@ -38,6 +38,8 @@ export default class AssessmentForm {
 
     static readonly DATA_TEST_INSTRUCTOR_MARK_TYPE = "assessment-form-select-instructor-markType";
 
+    static readonly DATA_TEST_DUAL_MARK_TYPES = "assessment-form-checkbox-dualMarkTypes";
+
     static readonly SELECTOR_BUTTON_CREATE = "assessment-form-button-submit-Create";
 
     static readonly SELECTOR_BUTTON_UPDATE = "assessment-form-button-submit-Update";
@@ -175,7 +177,7 @@ export default class AssessmentForm {
     }
 
     /**
-     * Sets mark type
+     * Sets display mark type
      * @param markType - The mark type to set
      */
     async setMarkType(markType: number): Promise<void> {
@@ -190,6 +192,24 @@ export default class AssessmentForm {
     async setInstructorMarkType(markType: number): Promise<void> {
         const markTypeSelectEl = this.page.getByTestId(AssessmentForm.DATA_TEST_INSTRUCTOR_MARK_TYPE);
         await markTypeSelectEl.selectOption({ value: markType.toString() });
+    }
+
+    /**
+     * Enable the "Use dual mark types" option (and expect that it's not currently checked)
+     */
+    async enableDualMarkTypes(): Promise<void> {
+        const dualMarkTypesSwitch = this.page.getByTestId(AssessmentForm.DATA_TEST_DUAL_MARK_TYPES);
+        await expect(dualMarkTypesSwitch).not.toBeChecked();
+        await dualMarkTypesSwitch.click();
+    }
+
+    /**
+     * Disable the "Use dual mark types" option (and expect that it's currently checked)
+     */
+    async disableDualMarkTypes(): Promise<void> {
+        const dualMarkTypesSwitch = this.page.getByTestId(AssessmentForm.DATA_TEST_DUAL_MARK_TYPES);
+        await expect(dualMarkTypesSwitch).toBeChecked();
+        await dualMarkTypesSwitch.click();
     }
 
     /**

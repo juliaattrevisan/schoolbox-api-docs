@@ -42,7 +42,6 @@ test.describe("Feedback Tests", () => {
         await dueworkForm.setTitle(dueworkTitle1);
         await dueworkForm.setPublishDate(Common.getTodayAtMidnight());
         await dueworkForm.setOpenDate(Common.getTodayAtMidnight());
-        await dueworkForm.setMarkType(AssessmentForm.MARK_TYPE_PERCENTAGE);
         await dueworkForm.setInstructorMarkType(AssessmentForm.MARK_TYPE_PERCENTAGE);
         await dueworkForm.create();
 
@@ -123,7 +122,6 @@ test.describe("Feedback Tests", () => {
         await dueworkForm.setTitle(dueworkTitle2);
         await dueworkForm.setPublishDate(Common.getTodayAtMidnight());
         await dueworkForm.setOpenDate(Common.getTodayAtMidnight());
-        await dueworkForm.setMarkType(AssessmentForm.MARK_TYPE_PERCENTAGE);
         await dueworkForm.setInstructorMarkType(AssessmentForm.MARK_TYPE_PERCENTAGE);
         await dueworkForm.create();
 
