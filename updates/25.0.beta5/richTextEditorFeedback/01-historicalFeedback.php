@@ -27,35 +27,57 @@ $app = new class extends CliTool\App {
             ], // i.e. lti
         ];
 
+        $chunkSize = 1000;
 
         foreach ($tables as $table => $columns) {
             $start = microtime(true);
-            $commentIds = $this->getDatabaseInternal()->executeQuery(
-                "SELECT
-                    `" . $columns['id'] . "` as id
-                FROM `$table`
-                WHERE
-                `_" . $columns['comment'] . "` IS NOT NULL AND
-                `_" . $columns['comment'] . "` != ''"
-            );
 
-            if ($commentIds->rowCount() === 0) {
+            // First output a count (can remove if too slow)
+            $commentCountQuery = $this->getDatabaseInternal()->executeQuery("
+                SELECT COUNT(*)
+                FROM `$table`
+                WHERE `_{$columns['comment']}` IS NOT NULL
+                AND   `_{$columns['comment']}` != ''
+                AND   `{$columns['comment']}`  IS NULL
+            ");
+            $commentCount = $commentCountQuery->fetchColumn();
+            if ($commentCount === 0) {
                 $this->getLogger()->info("No comments to process in $table");
                 continue;
             }
-
-            $updateStatement = $this->getDatabaseInternal()->prepareQuery(
-                "UPDATE `$table` SET `" . $columns['comment'] . "` = :comment WHERE `" . $columns['id'] . "` = :id"
+            $this->getLogger()->info(
+                sprintf(
+                    "Found %d comments for %s",
+                    $commentCount,
+                    $table,
+                )
             );
+            $commentCountQuery->close();
+
+            // Create a chunk fetch query:
+            // only processes rows whose new comment isn't yet set
+            $commentIds = $this->getDatabaseInternal()->executeQuery("
+                SELECT `{$columns['id']}` as id
+                FROM `$table`
+                WHERE `_{$columns['comment']}` IS NOT NULL
+                AND   `_{$columns['comment']}` != ''
+                AND   `{$columns['comment']}`  IS NULL
+                ORDER BY `{$columns['id']}` DESC
+                LIMIT $chunkSize OFFSET 0
+            ");
+
+            $updateStatement = $this->getDatabaseInternal()->prepareQuery("
+                UPDATE `$table`
+                SET `{$columns['comment']}` = :comment
+                WHERE `{$columns['id']}` = :id
+            ");
 
             // fetch the comments as we need them, save fetching all the data in sql memory
-            $commentStatement = $this->getDatabaseInternal()->prepareQuery(
-                "SELECT
-                    `" . $columns['id'] . "` as id,
-                    `_" . $columns['comment'] . "` as comment
+            $commentStatement = $this->getDatabaseInternal()->prepareQuery("
+                SELECT `{$columns['id']}` as id, `_{$columns['comment']}` as comment
                 FROM `$table`
-                WHERE `" . $columns['id'] . "` = :id"
-            );
+                WHERE `{$columns['id']}` = :id
+            ");
 
             foreach ($commentIds as $commentId) {
                 /**
