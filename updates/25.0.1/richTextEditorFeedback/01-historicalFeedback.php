@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Version\Version;
 
@@ -32,15 +33,14 @@ $app = new class extends CliTool\App {
         // only fetch this number of comment rows per loop
         $chunkSize = 1000;
 
-        // Set absurdly high max iterations
-        $maxIterations = 1_000_000_000;
-
         // Sleep for up to this long (microseconds) between iterations,
         // just so that the update is staggered a little on cloud.
         $maxSleepMicroseconds = 250_000;
 
+        $remainingCounts = [];
         foreach ($tables as $table => $columns) {
             $start = microtime(true);
+            $remainingCounts[$table] = 0;
 
             // First output a count (can remove if too slow)
             $commentCountQuery = $this->getDatabaseInternal()->executeQuery("
@@ -63,6 +63,10 @@ $app = new class extends CliTool\App {
                 )
             );
             $commentCountQuery->close();
+
+            // Max iterations should be no more than $commentCount / $chunkSize,
+            // but leave some leeway
+            $maxIterations = ceil($commentCount / $chunkSize) + 100;
 
             // Create a chunk fetch query:
             // only processes rows whose new comment isn't yet set
@@ -170,7 +174,33 @@ $app = new class extends CliTool\App {
                     $table
                 )
             );
+
+            // Are there any remaining? Raise warning if so
+            $commentCountQuery->execute();
+            $commentCount = $commentCountQuery->fetchColumn();
+            if ($commentCount > 0) {
+                $this->getLogger()->warning(
+                    sprintf("%d comments in %s have not been processed!", $commentCount, $table),
+                );
+            }
+            $remainingCounts[$table] = $commentCount;
         }
+
+        // Summarise, and error if not everything was processed
+        $exitCode = CliKernelAbstract::EXIT_STATUS_OK;
+        $this->getLogger()->info("Comments not processed:");
+        foreach ($remainingCounts as $table => $count) {
+            $this->getLogger()->info(
+                sprintf("  %s: %d", $table, $commentCount),
+            );
+            if ($count > 0) {
+                $exitCode = CliKernelAbstract::EXIT_STATUS_APP_ERROR;
+            }
+        }
+        if ($exitCode === CliKernelAbstract::EXIT_STATUS_APP_ERROR) {
+            $this->getLogger()->warning('Not all comments were processed successfully.');
+        }
+        exit($exitCode);
     }
     public function runAsRoot(): ?bool
     {
