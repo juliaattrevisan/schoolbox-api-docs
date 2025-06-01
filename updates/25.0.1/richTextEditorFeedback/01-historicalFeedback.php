@@ -55,18 +55,22 @@ $app = new class extends CliTool\App {
                 $this->getLogger()->info("No comments to process in $table");
                 continue;
             }
-            $this->getLogger()->info(
-                sprintf(
-                    "Found %d comments for %s",
-                    $commentCount,
-                    $table,
-                )
-            );
             $commentCountQuery->close();
 
             // Max iterations should be no more than $commentCount / $chunkSize,
             // but leave some leeway
-            $maxIterations = ceil($commentCount / $chunkSize) + 100;
+            $maxIterations = ceil($commentCount / $chunkSize);
+            $leeway        = 100;
+            $this->getLogger()->info(
+                sprintf(
+                    "Found %d comments for %s (max iterations: %d + %d)",
+                    $commentCount,
+                    $table,
+                    $maxIterations,
+                    $leeway,
+                )
+            );
+            $maxIterations += $leeway;
 
             // Create a chunk fetch query:
             // only processes rows whose new comment isn't yet set
