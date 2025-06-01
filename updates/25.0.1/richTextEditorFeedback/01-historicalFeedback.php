@@ -74,8 +74,10 @@ $app = new class extends CliTool\App {
 
             // Create a chunk fetch query:
             // only processes rows whose new comment isn't yet set
-            $commentIdsStatement = $this->getDatabaseInternal()->executeQuery("
-                SELECT `{$columns['id']}` as id
+            $commentsStatement = $this->getDatabaseInternal()->executeQuery("
+                SELECT
+                    `{$columns['id']}` as id,
+                    `_{$columns['comment']}` as comment
                 FROM `$table`
                 WHERE `_{$columns['comment']}` IS NOT NULL
                 AND   `_{$columns['comment']}` != ''
@@ -91,15 +93,7 @@ $app = new class extends CliTool\App {
                 WHERE `{$columns['id']}` = :id
             ");
 
-            // fetch the comments as we need them, save fetching all the data in sql memory
-            $commentStatement = $this->getDatabaseInternal()->prepareQuery("
-                SELECT `{$columns['id']}` as id, `_{$columns['comment']}` as comment
-                FROM `$table`
-                WHERE `{$columns['id']}` = :id
-            ");
-
             $runningCount = 0;
-
             $instanceInfo = new Version($this->getConfig());
             $isCloud      = $instanceInfo->isCloudHosted();
 
@@ -107,8 +101,8 @@ $app = new class extends CliTool\App {
             $iteration = 0;
             while ($iteration < $maxIterations) {
                 $iteration++;
-                $commentIdsStatement->execute();
-                $commentChunkCount = $commentIdsStatement->rowCount();
+                $commentsStatement->execute();
+                $commentChunkCount = $commentsStatement->rowCount();
                 if ($commentChunkCount === 0) {
                     $this->getLogger()->info(sprintf('No more %s comments to process', $table));
                     break;
@@ -123,18 +117,10 @@ $app = new class extends CliTool\App {
                         $commentCount - $runningCount,
                     )
                 );
-                $commentIds = $commentIdsStatement->fetchAll();
-                $commentIdsStatement->close();
+                $comments = $commentsStatement->fetchAll();
+                $commentsStatement->close();
 
-                foreach ($commentIds as $commentId) {
-                    /**
-                     * Fetch the comment from the database
-                     */
-                    $commentStatement->execute([
-                        "id" => $commentId['id'],
-                    ]);
-                    $comment = $commentStatement->fetch();
-
+                foreach ($comments as $comment) {
                     /**
                      * Start by converting any html entities to their unicode equivalents,
                      * as we still want "Jana, make sure you place a <p> tag around the text" to show up correctly
