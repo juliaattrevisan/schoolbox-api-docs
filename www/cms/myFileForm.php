@@ -3,6 +3,7 @@
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
+use Schoolbox\Application\Exception\AccessDenied;
 use Schoolbox\Resource\File\IFile;
 use Schoolbox\Resource\My\File\Mapper as MyFileMapper;
 use Schoolbox\Resource\My\File\Model as MyFile;
@@ -51,6 +52,10 @@ if (isset($_POST['description'])) {
     // if we're editing an existing file, ensure the file exists
     if (is_numeric($_POST['fileID'] ?? false)) {
         $file = MyFileMapper::getInstance()->findById($_POST['fileID']);
+        if (!isOwnerSuper($file)) {
+            // no perms, no access
+            throw new AccessDenied();
+        }
     } else {
         try {
             $file = MyFileMapper::getInstance()->createModel();
@@ -259,11 +264,8 @@ function deleteMyFile($fileId)
 {
     try {
         $file      = MyFileMapper::getInstance()->findById($fileId);
-        $ownerId   = $file->getOwner()->getId();
-        $sessionId = $_SESSION['user']->getId();
-        $isSuper   = $_SESSION['user']->isSuperuser();
 
-        if ($ownerId == $sessionId || $isSuper) {
+        if (isOwnerSuper($file)) {
             if (MyFileMapper::getInstance()->delete($file)) {
                 return $file->getFolder()->getId();
             }
@@ -273,6 +275,20 @@ function deleteMyFile($fileId)
     } catch (Schoolbox\Mapper\Exception $e) {
         throw new Schoolbox\Resource\Exception("Error", 41); // no any device exists
     }
+}
+
+/**
+ * Check if the current user is the owner of the file or a superuser.
+ *
+ * @param iFile $file
+ * @return bool
+ */
+function isOwnerSuper(iFile $file)
+{
+    $ownerId   = $file->getOwner()->getId();
+    $sessionId = $_SESSION['user']->getId();
+    $isSuper   = $_SESSION['user']->isSuperuser();
+    return $ownerId == $sessionId || $isSuper;
 }
 
 
