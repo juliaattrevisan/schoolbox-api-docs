@@ -260,6 +260,11 @@ class Subnav
                         'visible'     => true,
                         'description' => 'Configure the layout of the initial landing page when you first login for each role.',
                     ],
+                    '/adminv2/editor-templates' => [
+                        'name'        => 'Editor Templates',
+                        'visible'     => true,
+                        'description' => 'Add predefined content structures to the rich text editor.',
+                    ],
                     '/adminv2/lists/design/timetable-colour' => [
                         'name'        => 'Lists - Timetable Colours',
                         'visible'     => true,
