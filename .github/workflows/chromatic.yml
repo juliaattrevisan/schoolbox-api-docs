@@ -15,7 +15,7 @@ jobs:
     runs-on: onprem-k3s
     # Job steps
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v4
       - name: Install dependencies
         run: yarn
         # 👇 Adds Chromatic as a step in the workflow
