@@ -28,7 +28,7 @@ jobs:
     needs:
       - build-composer-artifact
       - build-npm-artifact
-    if: github.repository == 'alaress/schoolbox
+    if: github.repository == 'alaress/schoolbox'
     strategy:
       matrix:
         build:
