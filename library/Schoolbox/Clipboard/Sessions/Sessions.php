@@ -260,8 +260,18 @@ class Sessions implements IStrategy
              * the customFieldsMetadata struct as provided in each $session
              */
             $customFieldsMetadata = $sessions['customFieldsMetadata'] ?? null;
-
             foreach ($sessions['data'] as $session) {
+
+                /* Support asked about this particular data being "missing" but it never came through
+                 * the clipboard api. They have the capability to Postman-diagnose this payload, but
+                 * didn't act upon it: I've added some diagnostics around it instead.
+                 */
+                if (str_contains($session['title'], 'First XI') && str_contains($session['startDateTime'], '2025-05-03 ')) {
+
+                } else {
+                    continue;
+                }
+
                 /* Sport identifiers
                  */
                 $teamActivityId = (int)$session['activity']['id'];
@@ -418,6 +428,13 @@ class Sessions implements IStrategy
                         $customFieldLists = (new CustomFields())->generate($customFieldsMetadata);
 
                         foreach ($customFieldLists as $type => $customFieldList) {
+                            $this->log->debug(sprintf(
+                                'Inspecting "%s" custom fields in customFieldLists...',
+                                $type
+                            ));
+
+                            print_r($session['customFieldsData']);
+
                             foreach ($customFieldList as $key => $fieldData) {
                                 /* Look up what this was meant to be called
                                  */
@@ -429,10 +446,13 @@ class Sessions implements IStrategy
                                 /* $sessions[customFieldsData] contains a different list than the one we're currently consuming
                                  * Skip over it
                                  */
-                                if (!array_key_exists($key, $session['customFieldsData'])) {
+                                $customFieldKeys = array_keys($session['customFieldsData']);
+
+                                if (!array_key_exists($key, $customFieldKeys)) {
                                     $this->log->debug(sprintf(
-                                        'Skipping custom field metadata for "%s" - that is not in session[customFieldsData] list',
-                                        $key
+                                        'Skipping custom field metadata for "%s" - that is not in session[customFieldsData] list which contains the following keys directly from the API: %s',
+                                        $key,
+                                        implode(', ', $customFieldKeys)
                                     ));
 
                                     continue;
