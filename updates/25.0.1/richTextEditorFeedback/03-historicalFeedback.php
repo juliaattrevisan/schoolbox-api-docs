@@ -37,6 +37,12 @@ $app = new class extends CliTool\App {
         // just so that the update is staggered a little on cloud.
         $maxSleepMicroseconds = 250_000;
 
+        // Where is this being run?
+        // If it's on cloud, add some backoff between chunks so that not all
+        // updates are hitting the DB at once.
+        $instanceInfo = new Version($this->getConfig());
+        $isCloud      = $instanceInfo->isCloudHosted();
+
         $remainingCounts = [];
         foreach ($tables as $table => $columns) {
             $start = microtime(true);
@@ -89,9 +95,8 @@ $app = new class extends CliTool\App {
                 WHERE `{$columns['id']}` = :id
             ");
 
+            // How many rows have been processed?
             $runningCount = 0;
-            $instanceInfo = new Version($this->getConfig());
-            $isCloud      = $instanceInfo->isCloudHosted();
 
             // Failsafe for infinite loop
             $iteration = 0;
@@ -142,7 +147,9 @@ $app = new class extends CliTool\App {
                     ]);
                 }
 
-                // Go to sleep for a little bit, on cloud only
+                // Go to sleep for a little bit, on cloud only:
+                // this is to reduce load on multi-instance cloud servers, which
+                // may be updating multiple instances at once.
                 if ($isCloud) {
                     $sleep = random_int(0, $maxSleepMicroseconds);
                     $this->getLogger()->info(sprintf("Waiting %0.2fs for next process", $sleep / 1_000_000));
