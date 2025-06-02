@@ -224,9 +224,19 @@ class RelationshipFilterer
      */
     public function getTaughtStudentsAndLearners(User $user): Collection
     {
+        /* Students aren't classified as instructors, I suppose,
+         * even though we permitted that possibility elsewhere
+         */
         if (!$user->getRole()->isStaff()) {
             return $this->userMapper->createCollection();
         }
+
+        /* Find a list of folder codes for whom you're a staff (ie. you have WRITE access)
+         *
+         *  This inspects schoolbox folders for their codes: if you remove these codes, you'll
+         * maybe get a smaller (different) list of students than you expected since schoolbox might know
+         * something differently than the sis simply by virtue of its folder setup.
+         */
         $taughtFolders = $this->folderMapper->findForUser($user, true, UserAccess::ACCESS_WRITE, true);
 
         if (!\count($taughtFolders)) {
@@ -243,16 +253,49 @@ class RelationshipFilterer
 
         // Find students for these folders codes
         $classStudentExternalIds = [];
+
         if (\count($folderCodes) > 0) {
             foreach ($this->externalClass->getStudents(\implode(',', $folderCodes)) as $classStudent) {
                 $classStudentExternalIds[$classStudent['synergy_id']] = $classStudent['synergy_id'];
             }
         }
 
+        /* But also ask what the sis knows about the students this $user is teaching and add these
+         * to the list of $students being taught: synonymous with StudentLocator
+         *
+         * Let's literally just yoink that
+         */
+        // Load the subject codes for all given subjects
+        $subjectCodes  =
+            array_map(
+                fn ($x) => $this->classMatcher::generateFolderCode($x['campusCode'], $x['code']),
+                $this->externalUser->getSubjectList($user)
+            );
+        if (count($subjectCodes) === 0) {
+            return $this->userMapper->createCollection();
+        }
+
+        // Load the external students for this teacher's subjects
+        $externalStudents = $this->externalClass->getStudents(implode(',', $subjectCodes));
+
+        /* Smash these two lists together to make the ultimate list.
+         *
+         * Find the list of students being taught by $user, as per the sis
+         * Merge the lists: mathematically, 1 + 1 = 1 (lol)
+         * Ensure the external ids are unique
+         * Filter out duff data
+         * Reindex the resultant stack
+         */
+        $classStudentExternalIds = array_values(array_filter(array_unique(array_merge(array_column($externalStudents, 'synergy_id')))));
+
+        /* No students? No trabjo
+         */
         if (!\count($classStudentExternalIds)) {
             return $this->userMapper->createCollection();
         }
 
+        /* Find all the user instances associated with $classStudentExternalIds
+         */
         $outerPb = $this->userMapper->getPredicateBuilder()
                                     ->in('synergy_id', $classStudentExternalIds)
                                     ->equals('g.group_type', Role::STUDENT);
