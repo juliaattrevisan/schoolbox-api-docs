@@ -19,6 +19,7 @@ on:
 
 jobs:
   push-to-ecr:
+    timeout-minutes: 15
     env:
       AWS_ROLE_TO_ASSUME: ${{ secrets.AWS_ROLE_TO_ASSUME }}
     runs-on: onprem-k3s

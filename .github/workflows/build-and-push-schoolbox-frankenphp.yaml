@@ -18,6 +18,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref || github.run_id }}
   cancel-in-progress: true
 
+
 jobs:
   # Build artifacts before building image
   build-composer-artifact:
@@ -30,6 +31,7 @@ jobs:
 
   # Build schoolbox-frankenphp image
   build-and-push-schoolbox-frankenphp:
+    timeout-minutes: 60
     needs:
       - build-composer-artifact
       - build-npm-artifact
@@ -130,6 +132,7 @@ jobs:
           retention-days: 1
 
   join-schoolbox-frankenphp:
+    timeout-minutes: 15
     needs:
       - build-and-push-schoolbox-frankenphp
     if: always() && needs.build-and-push-schoolbox-frankenphp.result == 'success'

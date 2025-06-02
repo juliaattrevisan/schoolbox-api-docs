@@ -46,6 +46,7 @@ on:
 # QEMU building an ARM64 image on an AMD64 arch is too slow to be acceptable.
 jobs:
   build-and-push:
+    timeout-minutes: 60
     env:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}

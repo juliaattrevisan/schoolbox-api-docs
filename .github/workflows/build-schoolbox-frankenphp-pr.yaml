@@ -24,6 +24,7 @@ jobs:
 
   # Build schoolbox-frankenphp image
   build-schoolbox-frankenphp:
+    timeout-minutes: 60
     needs:
       - build-composer-artifact
       - build-npm-artifact

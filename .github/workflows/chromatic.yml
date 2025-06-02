@@ -14,6 +14,7 @@ concurrency:
 # List of jobs
 jobs:
   chromatic-deployment:
+    timeout-minutes: 15
     #Branch must contain -sb in the branch name
     if: ${{ contains(github.ref_name, '-sb') }}
     # Operating System
