@@ -57,20 +57,16 @@ $app = new class extends CliTool\App {
             }
             $commentCountQuery->close();
 
-            // Max iterations should be no more than $commentCount / $chunkSize,
-            // but leave some leeway
+            // Max iterations should be no more than $commentCount / $chunkSize
             $maxIterations = ceil($commentCount / $chunkSize);
-            $leeway        = 100;
             $this->getLogger()->info(
                 sprintf(
-                    "Found %d comments for %s (max iterations: %d + %d)",
+                    "Found %d comments for %s (max iterations: %d)",
                     $commentCount,
                     $table,
                     $maxIterations,
-                    $leeway,
                 )
             );
-            $maxIterations += $leeway;
 
             // Create a chunk fetch query:
             // only processes rows whose new comment isn't yet set
