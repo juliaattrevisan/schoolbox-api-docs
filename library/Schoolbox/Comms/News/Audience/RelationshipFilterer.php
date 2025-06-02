@@ -239,10 +239,6 @@ class RelationshipFilterer
          */
         $taughtFolders = $this->folderMapper->findForUser($user, true, UserAccess::ACCESS_WRITE, true);
 
-        if (!\count($taughtFolders)) {
-            return $this->userMapper->createCollection();
-        }
-
         // Get all the codes from all the folders
         $folderCodes = [];
         foreach ($taughtFolders as $taughtFolder) {
