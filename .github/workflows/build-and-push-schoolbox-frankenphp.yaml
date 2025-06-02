@@ -28,7 +28,7 @@ jobs:
     needs:
       - build-composer-artifact
       - build-npm-artifact
-    if: ${{ always() && github.repository == 'alaress/schoolbox' && (needs.build-and-push-php82-frankenphp.result == 'skipped' || needs.build-and-push-php82-frankenphp.result == 'success') }}
+    if: github.repository == 'alaress/schoolbox
     strategy:
       matrix:
         build:
