@@ -164,6 +164,7 @@ class ConfigMapper extends Mapper
 
     public const NAME_UPCOMING_ASSESSMENTS_ENABLED = 'upcoming_assessments_enabled';
     public const NAME_GRADES_ENABLED               = 'grades_enabled';
+    public const NAME_GRADE_GRADIENT_ENABLED       = 'grade_gradient_enable';
 
     public const NAME_LEARNING_MOMENTS_ENABLED       = 'learning_moments_enabled';
     public const NAME_BADGES_ENABLED                 = 'badges_enabled';

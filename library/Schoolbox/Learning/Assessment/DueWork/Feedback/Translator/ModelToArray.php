@@ -15,6 +15,8 @@ use Schoolbox\Json\Decorator\LinkDecorator;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model;
 use Schoolbox\Learning\Assessment\Translator\AssessmentForFeed;
 use Schoolbox\Learning\Assessment\Translator\Links;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Config\Loader as ConfigLoader;
 
 /**
  * Translator for converting DueWork Feedback to an array representation, for
@@ -23,12 +25,14 @@ use Schoolbox\Learning\Assessment\Translator\Links;
 class ModelToArray
 {
     /**
+     * @param ConfigLoader                                   $configLoader
      * @param AssessmentForFeed                              $assessmentTranslator
      * @param \Schoolbox\User\Translator\Author\ModelToArray $userTranslator
      * @param Links                                          $linkTranslator
      * @param LinkDecorator                                  $linkDecorator
      */
     public function __construct(
+        private ConfigLoader $configLoader,
         private AssessmentForFeed $assessmentTranslator,
         private \Schoolbox\User\Translator\Author\ModelToArray $userTranslator,
         private Links $linkTranslator,
@@ -51,10 +55,20 @@ class ModelToArray
         }
         $this->linkDecorator->decorate([], $model->getReviewer());
 
+        /* The gradientMark can be:
+         * - null: No mark was given
+         * - string: The gradient value to use, if the config is enabled and a mark exists
+         */
+        $gradientMark = null;
+        if (is_numeric($model->getNormalisedMark()) && $this->configLoader->get(ConfigMapper::NAME_GRADE_GRADIENT_ENABLED)) {
+            $gradientMark = (string)floor($model->getNormalisedMark() / 10);
+        }
+
         return [
             'id'             => $model->getId(),
             'mark'           => $model->getHumanReadableMark(),
-            'normalisedMark' => $model->getNormalisedMark(),
+            'normalisedMark' => $model->getNormalisedMark(), /* DEPRECATED IN 25.0 */
+            'gradientMark'   => $gradientMark,
             'comment'        => $this->purifier->purify($model->getComment()),
             'publishedAt'    => $model->getPublishedAt()->getUsingFormat(DATE_ATOM),
             'instructor'     => call_user_func($this->userTranslator, $model->getReviewer()),
