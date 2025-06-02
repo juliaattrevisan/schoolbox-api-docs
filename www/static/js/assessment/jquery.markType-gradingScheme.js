@@ -44,11 +44,6 @@
         if (config.sync) {
             const syncSwitch = document.querySelector(config.sync.switchSelector);
             syncSwitch.addEventListener("change", () => {
-                // If this is set to sync with another field, hide the dropdown if the switch is off
-                if (config.sync.syncWith !== null) {
-                    config.markTypeDropdown[0].closest(".row").style.display = syncSwitch.checked ? "block" : "none";
-                }
-
                 syncEntriesIfNeeded();
             });
 
@@ -56,6 +51,11 @@
             config.markTypeDropdown.on("change", syncEntriesIfNeeded);
             config.maxMarkInput.on("input", syncEntriesIfNeeded);
             config.gradingSchemeSelect.on("change", syncEntriesIfNeeded);
+
+            // If this is the first load and this isn't reliant on another field, apply the initial state
+            if (config.sync.syncWith === null) {
+                syncEntriesIfNeeded();
+            }
         }
 
         /**
@@ -96,6 +96,10 @@
                 /* Mark Type dropdown dictates what other elements become available
                  */
                 markTypeDropdown: $("#" + context + "markType"),
+
+                /* The label text for the mark type dropdown
+                 */
+                markTypeLabel: $("#" + context + "markTypeLabel"),
 
                 /* A container for the Total Mark elements
                  */
@@ -173,16 +177,32 @@
         /**
          * Sync the current values of all fields that are in sync mode with their source
          * if the switch is unchecked (i.e. only if the source field is in control)
+         *
+         * Also applies the correct state of which dropdowns are showing, and the correct label texts
          */
         function syncEntriesIfNeeded() {
-            // If this was triggered by a change in a target entry, ignore it (otherwise we'll get an infinite loop)
-            if (config.sync === null || config.sync.syncWith !== null) {
+            if (config.sync === null) {
                 return;
             }
 
+            // If this is set to sync with another field, hide the dropdown if the switch is off
             const sourceConfig = configEntries[config.sync.syncWith ?? config.context];
-            if (document.querySelector(sourceConfig.sync.switchSelector).checked) {
+            const syncSwitch = document.querySelector(sourceConfig.sync.switchSelector);
+            if (config.sync.syncWith !== null) {
+                config.markTypeDropdown[0].closest(".row").style.display = syncSwitch.checked ? "block" : "none";
+            }
+
+            config.markTypeLabel.text(
+                syncSwitch.checked ? config.sync.syncMarkTypeOnLabel : config.sync.syncMarkTypeOffLabel,
+            );
+
+            if (syncSwitch.checked) {
                 return; // the switch is enabled, so the fields shouldn't be sync'd
+            }
+
+            // If this was triggered by a change in a target entry, ignore it (otherwise we'll get an infinite loop)
+            if (config.sync.syncWith !== null) {
+                return;
             }
 
             // Find all target entries that should sync with this source entry

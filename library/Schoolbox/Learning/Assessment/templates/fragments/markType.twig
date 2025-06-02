@@ -18,8 +18,9 @@
  # @param string $markTypeTooltip       The tooltip text for the mark type selector (optional)
  # @param bool $courseManagedReadonly   A bool to decide if this is readonly or not
  # @param bool $rowHidden               If the row should be hidden by default (optional, default false)
- # @param string $syncSwitchSelector    The selector for the switch to toggle syncing of mark types (off means to sync)
- # @param string|null $syncContext      When keeping in sync for dual mark types, the context to sync with when the switch is disabled, if any
+ # @param string $syncSwitchSelector    The selector for the switch to toggle syncing of mark types (off means to sync) (optional)
+ # @param string|null $syncContext      When keeping in sync for dual mark types, the context to sync with when the switch is disabled (optional, default null)
+ # @param string $syncMarkTypeLabel     The label text to use on this mark type input when keeping in sync for dual mark types (optional, default $markTypeLabel)
  #}
 
 {# Letter Grade enables Grading Scheme
@@ -52,6 +53,8 @@
             sync: {
                 switchSelector: '{{ syncSwitchSelector }}',
                 syncWith: {% if syncContext ?? false %}'{{ syncContext }}'{% else %}null{% endif %},
+                syncMarkTypeOnLabel: '{{ markTypeLabel }}',
+                syncMarkTypeOffLabel: '{{ syncMarkTypeLabel ?? markTypeLabel }}',
             },
             {% endif %}
         });
@@ -61,7 +64,7 @@
 <div class="row" {% if rowHidden ?? false %}style="display:none;"{% endif %}>
     <div class="small-12 medium-6 columns">
         <label>
-            {{ markTypeLabel | default('Mark Type') }}
+            <span id="{{ context }}markTypeLabel">{{ markTypeLabel | default('Mark Type') }}</span>
             {% if markTypeTooltip ?? false %}
                 <span data-tooltip class="hint has-tip tip-top"  title="{{ markTypeTooltip }}">?</span>
             {% endif %}
