@@ -11,6 +11,11 @@ on:
     branches: ["develop", "master"]
     paths: ["**.js", "**.ts", "**.vue", ".eslintignore", ".eslintrc.js", "package.json", "tsconfig.json", "npm-shrinkwrap.json"]
 
+# Cancel on push to same branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
   build:
 

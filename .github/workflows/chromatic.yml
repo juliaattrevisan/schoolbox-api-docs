@@ -6,6 +6,11 @@ name: 'Chromatic'
 # Event for the workflow
 on: push
 
+# Cancel on push to same branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref || github.run_id }}
+  cancel-in-progress: true
+
 # List of jobs
 jobs:
   chromatic-deployment:
