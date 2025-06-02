@@ -63,6 +63,7 @@ class Api
      * @param string $apiHost
      * @param string $clientId
      * @param string $clientSecret
+     * @throws ApiException
      */
     public function __construct(
         private string $apiHost,
@@ -85,11 +86,7 @@ class Api
      * Retrieve Bearer Token from the OIDC
      *
      * @return string
-     * @throws ClientExceptionInterface if something went wrong fetching JWKS
-     * @throws InvalidArgumentException if key set or OIDC discovery couldn't be
-     *                                  written to or read from cache
-     * @throws \JsonException
-     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
+     * @throws ApiException
      */
     private function getToken(): string
     {
