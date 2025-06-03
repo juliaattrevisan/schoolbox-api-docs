@@ -86,7 +86,6 @@ class CustomFields
          * with fixtures_ is a custom field that somehow gets sequenced around
          * the ui elements "result" and "timeBlock".
          *
-         *
             Array
             (
                 [fixtures_studentArrivalTime] => fixtures_busReturnTime
@@ -98,24 +97,6 @@ class CustomFields
                 [fixtures_busDepartureTime] => timeBlock
                 [fixtures_mvpVote2] => fixtures_mvpVote3
                 [fixtures_studentPickupTime] => fixtures_studentArrivalTime
-            )
-
-         * To dodge around this crazy, we can flip that array struct so instead of
-         * (field, showAfterField) tuples, we have (showAfterField, field) tuples.
-         * In the struct below, fixtures_mvpVote5 comes after result,
-         * and fixtures_mvpVote4 comes after fixtures_mvpVote5 etc.
-         *
-            Array
-            (
-                [fixtures_busReturnTime] => fixtures_studentArrivalTime
-                [fixtures_busDepartureTime] => fixtures_busReturnTime
-                [result] => fixtures_mvpVote5
-                [fixtures_mvpVote2] => fixtures_mvpVote1
-                [fixtures_mvpVote5] => fixtures_mvpVote4
-                [fixtures_mvpVote4] => fixtures_mvpVote3
-                [timeBlock] => fixtures_busDepartureTime
-                [fixtures_mvpVote3] => fixtures_mvpVote2
-                [fixtures_studentArrivalTime] => fixtures_studentPickupTime
             )
          */
         foreach ($data as $previous => $next) {
