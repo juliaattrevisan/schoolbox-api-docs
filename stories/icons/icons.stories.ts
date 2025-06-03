@@ -3,6 +3,8 @@ import StorybookSlot from "../../vue/components/storybook-slot.vue";
 
 /**
  * Below is a list of all icons, which can be referenced by their name and used within the `<sbx-icon>` [component](?path=/docs/components-icon--docs).
+ *
+ * Note some icons allow multiple names due to their existing usage within the system.
  */
 const meta: Meta<typeof StorybookSlot> = {
     component: StorybookSlot,
@@ -136,7 +138,7 @@ export const Default: Story = {
                 <div class="box-icon">
                     <sbx-icon name="cloud"></sbx-icon>
                 </div>
-                <p>cloud</p>
+                <p>cloud | cloudy</p>
             </div>
             <div class="box-icon-wrapper">
                 <div class="box-icon">
@@ -154,7 +156,7 @@ export const Default: Story = {
                 <div class="box-icon">
                     <sbx-icon name="comment"></sbx-icon>
                 </div>
-                <p>comment</p>
+                <p>comment | blog</p>
             </div>
             <div class="box-icon-wrapper">
                 <div class="box-icon">
@@ -178,7 +180,7 @@ export const Default: Story = {
                 <div class="box-icon">
                     <sbx-icon name="course-builder"></sbx-icon>
                 </div>
-                <p>course-builder</p>
+                <p>course-builder | course</p>
             </div>
             <div class="box-icon-wrapper">
                 <div class="box-icon">
@@ -274,13 +276,13 @@ export const Default: Story = {
                 <div class="box-icon">
                     <sbx-icon name="dropdown"></sbx-icon>
                 </div>
-                <p>dropdown</p>
+                <p>dropdown | sort-down</p>
             </div>
             <div class="box-icon-wrapper">
                 <div class="box-icon">
                     <sbx-icon name="due-work"></sbx-icon>
                 </div>
-                <p>due-work</p>
+                <p>due-work | import | submissions</p>
             </div>
             <div class="box-icon-wrapper">
                 <div class="box-icon">
@@ -412,7 +414,7 @@ export const Default: Story = {
                 <div class="box-icon">
                     <sbx-icon name="group"></sbx-icon>
                 </div>
-                <p>group</p>
+                <p>group | team</p>
             </div>
             <div class="box-icon-wrapper">
                 <div class="box-icon">
@@ -436,7 +438,7 @@ export const Default: Story = {
                 <div class="box-icon">
                     <sbx-icon name="hidden"></sbx-icon>
                 </div>
-                <p>hidden</p>
+                <p>hidden | view-hollow</p>
             </div>
             <div class="box-icon-wrapper">
                 <div class="box-icon">
@@ -448,7 +450,7 @@ export const Default: Story = {
                 <div class="box-icon">
                     <sbx-icon name="home"></sbx-icon>
                 </div>
-                <p>home</p>
+                <p>home | house</p>
             </div>
             <div class="box-icon-wrapper">
                 <div class="box-icon">
@@ -508,7 +510,7 @@ export const Default: Story = {
                 <div class="box-icon">
                     <sbx-icon name="lesson-plan"></sbx-icon>
                 </div>
-                <p>lesson-plan</p>
+                <p>lesson-plan | learning-support</p>
             </div>
             <div class="box-icon-wrapper">
                 <div class="box-icon">
@@ -520,7 +522,7 @@ export const Default: Story = {
                 <div class="box-icon">
                     <sbx-icon name="list"></sbx-icon>
                 </div>
-                <p>list</p>
+                <p>list | itineraryitem</p>
             </div>
             <div class="box-icon-wrapper">
                 <div class="box-icon">
@@ -538,7 +540,7 @@ export const Default: Story = {
                 <div class="box-icon">
                     <sbx-icon name="location"></sbx-icon>
                 </div>
-                <p>location</p>
+                <p>location | venue</p>
             </div>
             <div class="box-icon-wrapper">
                 <div class="box-icon">
@@ -610,7 +612,7 @@ export const Default: Story = {
                 <div class="box-icon">
                     <sbx-icon name="modify-pen"></sbx-icon>
                 </div>
-                <p>modify-pen</p>
+                <p>modify-pen | modify</p>
             </div>
             <div class="box-icon-wrapper">
                 <div class="box-icon">
@@ -628,7 +630,7 @@ export const Default: Story = {
                 <div class="box-icon">
                     <sbx-icon name="mostly-cloudy"></sbx-icon>
                 </div>
-                <p>mostly-cloudy</p>
+                <p>mostly-cloudy | cloudy</p>
             </div>
             <div class="box-icon-wrapper">
                 <div class="box-icon">
@@ -736,7 +738,7 @@ export const Default: Story = {
                 <div class="box-icon">
                     <sbx-icon name="progress"></sbx-icon>
                 </div>
-                <p>progress</p>
+                <p>progress | result | report</p>
             </div>
             <div class="box-icon-wrapper">
                 <div class="box-icon">
@@ -766,7 +768,7 @@ export const Default: Story = {
                 <div class="box-icon">
                     <sbx-icon name="reach"></sbx-icon>
                 </div>
-                <p>reach</p>
+                <p>reach | reach-logo</p>
             </div>
             <div class="box-icon-wrapper">
                 <div class="box-icon">
@@ -784,7 +786,7 @@ export const Default: Story = {
                 <div class="box-icon">
                     <sbx-icon name="resource-booking"></sbx-icon>
                 </div>
-                <p>resource-booking</p>
+                <p>resource-booking | camera</p>
             </div>
             <div class="box-icon-wrapper">
                 <div class="box-icon">
@@ -826,19 +828,7 @@ export const Default: Story = {
                 <div class="box-icon">
                     <sbx-icon name="showcase"></sbx-icon>
                 </div>
-                <p>showcase</p>
-            </div>
-            <div class="box-icon-wrapper">
-                <div class="box-icon">
-                    <sbx-icon name="achievement"></sbx-icon>
-                </div>
-                <p>achievement</p>
-            </div>
-            <div class="box-icon-wrapper">
-                <div class="box-icon">
-                    <sbx-icon name="trophy"></sbx-icon>
-                </div>
-                <p>trophy</p>
+                <p>showcase | achievement | trophy</p>
             </div>
             <div class="box-icon-wrapper">
                 <div class="box-icon">
@@ -868,19 +858,19 @@ export const Default: Story = {
                 <div class="box-icon">
                     <sbx-icon name="staff"></sbx-icon>
                 </div>
-                <p>staff</p>
+                <p>staff | pastoral</p>
             </div>
             <div class="box-icon-wrapper">
                 <div class="box-icon">
                     <sbx-icon name="staff-students"></sbx-icon>
                 </div>
-                <p>staff-students</p>
+                <p>staff-students | player | user</p>
             </div>
             <div class="box-icon-wrapper">
                 <div class="box-icon">
                     <sbx-icon name="sun"></sbx-icon>
                 </div>
-                <p>sun</p>
+                <p>sun | sunny | clear</p>
             </div>
             <div class="box-icon-wrapper">
                 <div class="box-icon">
@@ -916,7 +906,7 @@ export const Default: Story = {
                 <div class="box-icon">
                     <sbx-icon name="thunder"></sbx-icon>
                 </div>
-                <p>thunder</p>
+                <p>thunder | storm</p>
             </div>
             <div class="box-icon-wrapper">
                 <div class="box-icon">
@@ -928,7 +918,7 @@ export const Default: Story = {
                 <div class="box-icon">
                     <sbx-icon name="time-value"></sbx-icon>
                 </div>
-                <p>time-value</p>
+                <p>time-value | hourglass</p>
             </div>
             <div class="box-icon-wrapper">
                 <div class="box-icon">
