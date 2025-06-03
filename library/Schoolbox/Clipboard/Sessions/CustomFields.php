@@ -8,7 +8,7 @@ class CustomFields
      * Safety mechanism to forcibly exit a while() loop
      * based on mutating data
      */
-    private CONST MAX_ITERATIONS = 100;
+    private const MAX_ITERATIONS = 100;
 
 
     /**
@@ -109,7 +109,7 @@ class CustomFields
 
             /* Knock them off the list: we've already added them
              */
-            unset ($data[$previous]);
+            unset($data[$previous]);
         }
 
         /* Look for stuff in $data that we need to insert back into $stack
