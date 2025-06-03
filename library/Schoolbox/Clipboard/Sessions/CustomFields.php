@@ -27,7 +27,6 @@ class CustomFields
      *
      * @param array $customFieldsMetadata
      * @return array
-     * @throws DebugBarException
      */
     public function generate(array $customFieldsMetadata): array
     {
@@ -55,12 +54,12 @@ class CustomFields
                 continue;
             }
 
+            /* Compile data in a prescribed order, ignoring anything that's meaningless
+             * such as looking for data corresponding to a clipboard ui element
+             */
             $nodes = $this->sorter($key, array_flip($temp[$key]));
 
             foreach ($nodes as $current) {
-                /* Compile data in a prescribed order, ignoring anything that's meaningless
-                 * such as looking for data corresponding to a clipboard ui element
-                 */
                 if (isset($customFieldsMetadata[$current])) {
                     $output[$key][$current] = $customFieldsMetadata[$current];
                 }
