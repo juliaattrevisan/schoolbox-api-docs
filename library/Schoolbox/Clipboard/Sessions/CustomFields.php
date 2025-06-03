@@ -100,14 +100,20 @@ class CustomFields
             )
          */
         foreach ($data as $previous => $next) {
-            if (!str_contains($previous, "{$index}_")) {
-                $stack[] = $previous;
-                $stack[] = $next;
-
-                /* Knock them off the list: we've already added them
-                 */
-                unset ($data[$previous]);
+            /* This is a custom field, not a clipboard ui anchor - skip past this for now
+             * since we're looking for their ui anchors. These anchors are ancestors of the
+             * custom fields somehow.
+             */
+            if (str_contains($previous, "{$index}_")) {
+                continue;
             }
+
+            $stack[] = $previous;
+            $stack[] = $next;
+
+            /* Knock them off the list: we've already added them
+             */
+            unset ($data[$previous]);
         }
 
         /* Look for stuff in $data that we need to insert back into $stack
@@ -118,33 +124,47 @@ class CustomFields
          */
         while (\count($data) && $n < self::MAX_ITERATIONS) {
             foreach ($data as $key => $value) {
-                if (in_array($key, $stack)) {
-                    for ($i = 0; $i < count($stack); $i++) {
-                        $current = $stack[$i];
+                /* $key is currently not in the $stack
+                 * This means we haven't encountered its predecessor yet, because clipboard sent
+                 * us a randomly-ordered set of fields. We'll have to circle back multple times
+                 * to fill in its predecessors first.
+                 */
+                if (!in_array($key, $stack)) {
+                    continue;
+                }
 
-                        /* We know that $data now contains all the actual custom fields and that the tuples
-                         * always work in pairs, like crabs: it's a "before" and "after" definition. That means
-                         * we can exploit something about its nature to simplify our splicing and dicing
-                         */
-                        if ($current === $key) {
-                            $before = array_slice($stack, 0, $i + 1);
-                            $after = array_slice($stack, $i + 1, count($stack));
+                /* Otherwise, its predecessor was here, and $current goes in after that
+                 */
+                for ($i = 0; $i < count($stack); $i++) {
+                    $current = $stack[$i];
 
-                            /* Insert whatever comes after $current into position in the $stack
-                             */
-                            $before[] = $data[$current];
-
-                            /* Join them back up
-                             */
-                            $stack = array_merge($before, $after);
-
-                            /* Remove it from the $data then jump start the process again
-                             */
-                            unset($data[$current]);
-
-                            break;
-                        }
+                    /* Not the key we're looking for in the $stack - keep looking to find the place
+                     * into which we need to insert $current
+                     */
+                    if ($current !== $key) {
+                        continue;
                     }
+
+                    /* We know that $data now contains all the actual custom fields and that the tuples
+                     * always work in pairs, like crabs: it's a "before" and "after" definition. That means
+                     * we can exploit something about its nature to simplify our splicing and dicing
+                     */
+                    $before = array_slice($stack, 0, $i + 1);
+                    $after = array_slice($stack, $i + 1, count($stack));
+
+                    /* Insert whatever comes after $current into position in the $stack
+                     */
+                    $before[] = $data[$current];
+
+                    /* Join them back up
+                     */
+                    $stack = array_merge($before, $after);
+
+                    /* Remove it from the $data then jump start the process again
+                     */
+                    unset($data[$current]);
+
+                    break;
                 }
             }
 
