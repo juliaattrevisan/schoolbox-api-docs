@@ -79,7 +79,7 @@ class Csv extends Base
          */
         $hasCampusColumn = array_key_exists('campus', $headerColumns);
         $hasRolesColumn = array_key_exists('role', $headerColumns);
-        $hasOwnerColumn = array_key_exists('event owner', $headerColumns);
+        $hasOwnerColumn = array_key_exists('event owner id', $headerColumns);
         $hasGroupColumn = array_key_exists('group ids', $headerColumns);
 
         while (($thisRow = fgetcsv($handle, 0, ",")) !== false) {
@@ -100,7 +100,7 @@ class Csv extends Base
             $folderIds    = $this->getColumnValues($headerColumns, $thisRow, 'group ids');
             $campuses     = $this->getColumnValues($headerColumns, $thisRow, 'campus', true);
             $roles        = $this->getColumnValues($headerColumns, $thisRow, 'role', true);
-            $owner        = $this->getColumnValues($headerColumns, $thisRow, 'event owner');
+            $owner        = $this->getColumnValues($headerColumns, $thisRow, 'event owner id');
 
             $cloneCampuses = $allCampuses;
             if ($hasCampusColumn) {
@@ -342,7 +342,7 @@ class Csv extends Base
                         'name'   => $name,
                         'status' => 'Not Added',
                         'error'  => sprintf(
-                            'Invalid owner ID (%s) provided',
+                            'Invalid event owner ID (%s) provided',
                             $owner
                         )
                     ];
