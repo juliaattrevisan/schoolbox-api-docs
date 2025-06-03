@@ -43,23 +43,27 @@ class Participations
      */
     public function __invoke(Participant $participation): array
     {
-        $assessId = $participation->getAssessable()->getId();
-        $userId = $participation->getUser()->getId();
+        $assess = $participation->getAssessable();
+        $participant = $participation->getUser();
         return [
             'id'         => $participation->getId(),
-            'user'       => $participation->getUser(),
+            'user'       => $participant,
             'plan'       => call_user_func(new ParticipationPlans(), $participation->getPlan()),
             'createdAt'  => $participation->getCreatedAt()?->toRfc3339String(),
             'updatedAt'  => $participation->getUpdatedAt()?->toRfc3339String(),
             'excludedAt' => $participation->getExcludedAt()?->toRfc3339String(),
             '_links'     => [
                 'exclude' => $this->getRouteIfAuthorized('learningAssessment.postExclude', [
-                    'assessmentId' => $assessId,
-                    'studentId'    => $userId,
+                    'assessment' => $assess,
+                    'assessmentId' => $assess->getId(),
+                    'student' => $participant,
+                    'studentId'    => $participant->getId(),
                 ]),
                 'include' => $this->getRouteIfAuthorized('learningAssessment.postInclude', [
-                    'assessmentId' => $assessId,
-                    'studentId'    => $userId,
+                    'assessment' => $assess,
+                    'assessmentId' => $assess->getId(),
+                    'student' => $participant,
+                    'studentId'    => $participant->getId(),
                 ]),
             ]
         ];
