@@ -568,7 +568,9 @@ class Session
              */
             if ($user->getRole()->isStudent()) {
                 $externalStudent = $synUser->getStudent($synergyId);
-                $_SESSION['isBirthdayCelebration'] = $user->isBirthday($externalStudent['StudentBirthDate']);
+                /* In case where the external database is offline, the StudentBirthDate won't exist, so we need to null-coalesce it
+                 */
+                $_SESSION['isBirthdayCelebration'] = $user->isBirthday($externalStudent['StudentBirthDate'] ?? null);
             }
         }
     }
