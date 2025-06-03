@@ -111,13 +111,17 @@ class CustomFields
         foreach ($data as $previous => $next) {
             if (!str_contains($previous, "{$index}_")) {
                 $stack[$previous] = $next;
+
+                /* Knock them off the list: we've already added them
+                 */
+                unset ($data[$previous]);
             }
         }
 
         /* Now that the anchors are in place (if any existed...)
          * start compiling the rest of the fields around them...somehow
          */
-        new \Alaress_Probe($stack);
+
 
 
 
