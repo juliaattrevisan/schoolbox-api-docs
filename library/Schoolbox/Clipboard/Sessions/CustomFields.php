@@ -147,7 +147,7 @@ class CustomFields
 
                     /* We know that $data now contains all the actual custom fields and that the tuples
                      * always work in pairs, like crabs: it's a "before" and "after" definition. That means
-                     * we can exploit something about its nature to simplify our splicing and dicing
+                     * we can exploit something about its nature to simplify our slicing and dicing
                      */
                     $before = array_slice($stack, 0, $i + 1);
                     $after = array_slice($stack, $i + 1, count($stack));
