@@ -20,6 +20,7 @@ class CustomFields
      */
     private const KNOWN_LIST_PREFIXES = ['fixtures', 'sessions', 'teams'];
 
+
     /**
      * Split the giant pile of $customFieldsMetadata into two distinct lists
      * which can be individually sorted. Clipboard intends to open this to
@@ -71,9 +72,6 @@ class CustomFields
 
     /**
      * Sorts a set of custom fields by their showAfterField node
-     *
-     * Yoinked directly from
-     * https://stackoverflow.com/questions/67056611/php-associative-array-sorting-by-previous-value
      */
     private function sorter(string $index, array $data): array
     {
