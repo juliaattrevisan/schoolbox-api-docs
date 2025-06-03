@@ -119,15 +119,30 @@ class CustomFields
             }
         }
 
+        new \Alaress_Probe('$data', '$stack');
         new \Alaress_Probe($data, $stack);
+        new \Alaress_Probe('<hr>');
 
         /* Now that the anchors are in place (if any existed...)
          * start compiling the rest of the fields around them...somehow
          */
-        foreach ($data as $previous => $next) {
+        for ($i = 0; $i < $maxIterations; $i++) {
+            $current = $stack[$i];
+
+            /* If $current is in the array_keys of $data, then we need to insert something
+             * from $data into $stack
+             */
+
+            if (in_array($previous, $stack)) {
+                foreach ($data as $previous => $next) {
+                    /* Slice and splice around these array keys
+                     */
+                    if ($current === $previous) {
+                    }
+                }
+            }
 
         }
-
 
 
 
@@ -152,7 +167,6 @@ class CustomFields
 //
 //        }
 
-        new \Alaress_Probe($array, $stack);
         die();
     }
 }
