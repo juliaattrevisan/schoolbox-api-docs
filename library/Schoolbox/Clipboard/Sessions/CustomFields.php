@@ -2,8 +2,6 @@
 
 namespace Schoolbox\Clipboard\Sessions;
 
-use DebugBar\DebugBarException;
-
 class CustomFields
 {
     /**
