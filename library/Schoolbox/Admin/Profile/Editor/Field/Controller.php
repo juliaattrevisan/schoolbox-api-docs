@@ -84,6 +84,9 @@ class Controller extends Base
                 ]
             ]);
 
+            /* Avoid adding the same field twice */
+            $fields->filter(fn(Model $f): bool => $f->getField() === $field->getField());
+
             /* Then find out what sequence we need to inject a field
              * and add it to the stack in the right spot
              */
