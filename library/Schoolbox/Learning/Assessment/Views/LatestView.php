@@ -136,12 +136,11 @@ class LatestView
         /**
          * check if there was a view recorded? in our special table
          */
-        $feedback = null;
         if (null !== $studentView) {
             $views['student']['status'] = 'has viewed';
             $views['student']['date'] = $studentView->getLastVisit()->getLong();
 
-            if ($studentView->getFeedbackWasVisible()) {
+            if ($studentView->getFeedbackWasVisible() && $participant->getAuthoritativeFeedback(true)) {
                 $views['student']['object'] = 'feedback';
             }
         }
@@ -171,7 +170,7 @@ class LatestView
                 $view['date'] = $parentView->getLastVisit()->getLong();
                 $view['status'] = 'has viewed';
 
-                if ($parentView->getFeedbackWasVisible()) {
+                if ($parentView->getFeedbackWasVisible() && $participant->getAuthoritativeFeedback(true)) {
                     $view['object'] = 'feedback';
                 }
             }
