@@ -58,10 +58,15 @@ class CustomFields
             $nodes = $this->sorter($key, array_flip($temp[$key]));
 
             foreach ($nodes as $current) {
-                $output[$key][$current] = $customFieldsMetadata[$current];
+                /* Compile data in a prescribed order, ignoring anything that's meaningless
+                 * such as looking for data corresponding to a clipboard ui element
+                 */
+                if (isset($customFieldsMetadata[$current])) {
+                    $output[$key][$current] = $customFieldsMetadata[$current];
+                }
             }
         }
-new \Alaress_Probe($output);
+
         return $output;
     }
 
