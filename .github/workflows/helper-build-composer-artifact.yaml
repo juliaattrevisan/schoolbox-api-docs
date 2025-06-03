@@ -5,10 +5,11 @@ on:
 
 jobs:
   build-composer-artifact:
-    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    runs-on: onprem-k3s
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Load vendor cache
         uses: actions/cache@v4

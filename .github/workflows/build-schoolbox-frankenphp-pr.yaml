@@ -7,7 +7,12 @@ name: Build schoolbox-frankenphp (pull request)
 # will be re-enabled when it's actually in use.
 on:
   workflow_call:
-#  pull_request:
+  pull_request:
+
+# Cancel upon push to same branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref || github.run_id }}
+  cancel-in-progress: true
 
 jobs:
   # Build artifacts before building image
@@ -19,25 +24,29 @@ jobs:
 
   # Build schoolbox-frankenphp image
   build-schoolbox-frankenphp:
+    timeout-minutes: 60
     needs:
       - build-composer-artifact
       - build-npm-artifact
     strategy:
       matrix:
         build:
-          - runs-on: ubuntu-latest
+          - runs-on: onprem-k3s
             platform: linux
             arch: amd64
-          - runs-on: ubuntu-arm
+          - runs-on: onprem-k3s-arm
             platform: linux
             arch: arm64
     runs-on: ${{ matrix.build.runs-on }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: |
+            network=host
 
       # Extract artifacts
       - name: Download composer artifact
@@ -76,11 +85,11 @@ jobs:
       - name: Test schoolbox-frankenphp
         run: |
           docker image ls
-          image=$(docker image ls -q schoolbox-frankenphp-${{ matrix.build.arch }})
-          docker run -i $image ls -al /etc/
-          docker run -i $image ls -al /etc/caddy
-          docker run -i $image ls -al /usr/local/lib/php/extensions/no-debug-zts-20220829/
-          docker run -i $image ls -al /usr/local/etc/php/conf.d/
-          docker run -i $image ls -al /usr/share/schoolbox/
-          docker run -i $image ls -al /usr/share/schoolbox/vendor/
-          docker run -i $image ls -al /usr/share/schoolbox/www/static/js/bundle/
+          image="$(docker image ls -q schoolbox-frankenphp-${{ matrix.build.arch }})"
+          docker run -i "$image" ls -al /etc/
+          docker run -i "$image" ls -al /etc/caddy
+          docker run -i "$image" ls -al /usr/local/lib/php/extensions/no-debug-zts-20220829/
+          docker run -i "$image" ls -al /usr/local/etc/php/conf.d/
+          docker run -i "$image" ls -al /usr/share/schoolbox/
+          docker run -i "$image" ls -al /usr/share/schoolbox/vendor/
+          docker run -i "$image" ls -al /usr/share/schoolbox/www/static/js/bundle/
