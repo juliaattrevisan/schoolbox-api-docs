@@ -7,6 +7,13 @@ use DebugBar\DebugBarException;
 class CustomFields
 {
     /**
+     * Safety mechanism to forcibly exit a while() loop
+     * based on mutating data
+     */
+    private CONST MAX_ITERATIONS = 100;
+
+
+    /**
      * Clipboard can allow multiple list prefixes: sessions and fixtures were ones we
      * actually knew about, but discovered Teams could also be returned here, while in
      * prod.
@@ -125,7 +132,9 @@ class CustomFields
 
         /* Look for stuff in $data that we need to insert back into $stack
          */
-        while (\count($data)) {
+        $n = 0;
+
+        while (\count($data) && $n < self::MAX_ITERATIONS) {
             foreach ($data as $key => $value) {
                 if (in_array($key, $stack)) {
                     for ($i = 0; $i < count($stack); $i++) {
@@ -158,6 +167,10 @@ class CustomFields
                     }
                 }
             }
+
+            /* For Safety
+             */
+            $n++;
         }
 
 new \Alaress_Probe($stack, $data);
