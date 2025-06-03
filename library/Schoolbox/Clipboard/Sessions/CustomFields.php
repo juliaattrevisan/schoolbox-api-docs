@@ -127,6 +127,32 @@ class CustomFields
          * always work in pairs, like crabs: it's a "before" and "after" definition. That means
          * we can exploit something about its nature to simplify our splicing and dicing
          */
+        for ($i = 0; $i < count($stack); $i++) {
+            $current = $stack[$i];
+
+            /* Look for stuff in $data that we need to insert back into $stack
+             */
+            foreach ($data as $key => $value) {
+                if ($current === $key) {
+                    $before = array_splice($stack, 0, $i + 1);
+                    $after = array_splice($stack, $i - 1, count($stack));
+
+                    new \Alaress_Probe($key, $before, $after);
+
+                    /* Insert whatever comes after $current into position in the $stack
+                     */
+                    $before[] = $data[$current];
+
+                    new \Alaress_Probe($key, $before, $after);
+
+                    /* Join them back up
+                     */
+                    $stack = array_merge($before, $after);
+
+                    new \Alaress_Probe($stack);
+                }
+            }
+        }
 
 
 
