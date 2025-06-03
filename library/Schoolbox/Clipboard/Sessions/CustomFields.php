@@ -123,11 +123,6 @@ class CustomFields
         new \Alaress_Probe($data, $stack);
         new \Alaress_Probe('<hr>');
 
-        /* We know that $data now contains all the actual custom fields and that the tuples
-         * always work in pairs, like crabs: it's a "before" and "after" definition. That means
-         * we can exploit something about its nature to simplify our splicing and dicing
-         */
-
         /* Look for stuff in $data that we need to insert back into $stack
          */
         while (\count($data)) {
@@ -136,6 +131,10 @@ class CustomFields
                     for ($i = 0; $i < count($stack); $i++) {
                         $current = $stack[$i];
 
+                        /* We know that $data now contains all the actual custom fields and that the tuples
+                         * always work in pairs, like crabs: it's a "before" and "after" definition. That means
+                         * we can exploit something about its nature to simplify our splicing and dicing
+                         */
                         if ($current === $key) {
                             $before = array_slice($stack, 0, $i + 1);
                             $after = array_slice($stack, $i + 1, count($stack));
@@ -159,7 +158,6 @@ class CustomFields
                     }
                 }
             }
-
         }
 
 new \Alaress_Probe($stack, $data);
