@@ -260,18 +260,8 @@ class Sessions implements IStrategy
              * the customFieldsMetadata struct as provided in each $session
              */
             $customFieldsMetadata = $sessions['customFieldsMetadata'] ?? null;
+
             foreach ($sessions['data'] as $session) {
-
-                /* Support asked about this particular data being "missing" but it never came through
-                 * the clipboard api. They have the capability to Postman-diagnose this payload, but
-                 * didn't act upon it: I've added some diagnostics around it instead.
-                 */
-                if (str_contains($session['title'], 'First XI') && str_contains($session['startDateTime'], '2025-05-03 ')) {
-
-                } else {
-                    continue;
-                }
-
                 /* Sport identifiers
                  */
                 $teamActivityId = (int)$session['activity']['id'];
