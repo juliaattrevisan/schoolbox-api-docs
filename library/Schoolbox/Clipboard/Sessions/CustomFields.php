@@ -11,7 +11,7 @@ class CustomFields
      * actually knew about, but discovered Teams could also be returned here, while in
      * prod.
      */
-    private const KNOWN_LIST_PREFIXES = ['sessions', 'fixtures', 'teams'];
+    private const KNOWN_LIST_PREFIXES = ['fixtures', 'sessions', 'teams'];
 
     /**
      * Split the giant pile of $customFieldsMetadata into two distinct lists
@@ -48,7 +48,7 @@ class CustomFields
                 continue;
             }
 
-            $nodes = $this->sorter($temp[$key]);
+            $nodes = $this->sorter($key, array_flip($temp[$key]));
 
             foreach ($nodes as $current => $previous) {
                 $output[$key][$current] = $customFieldsMetadata[$current];
@@ -64,22 +64,85 @@ class CustomFields
      * Yoinked directly from
      * https://stackoverflow.com/questions/67056611/php-associative-array-sorting-by-previous-value
      */
-    private function sorter(array $array): array
+    private function sorter(string $index, array $data): array
     {
-        // find the key which doesn't have a matching value
-        $unique = array_diff(array_keys($array), $array);
-        $key = reset($unique);
-        $value = $array[$key];
-        $result = [$key => $value];
-        // follow the values backwards until the key matches the value
-        while ($key != $value) {
-            $key = $array[$key] ?? null;
-            $value = $array[$key] ?? null;
-            $result = [$key => $value] + $result;
+        $maxIterations = 100;
+        $stack = [];
+
+        /* Try to find "anchor points" from Clipboard's ui.
+         * These showAfterField values are part of their ui, not a custom field,
+         * and represent potential starting points. In the example struct below,
+         * "result" and "timeBlock" are their ui elements: everything starting
+         * with fixtures_ is a custom field that somehow gets sequenced around
+         * the ui elements "result" and "timeBlock".
+         *
+         *
+            Array
+            (
+                [fixtures_studentArrivalTime] => fixtures_busReturnTime
+                [fixtures_busReturnTime] => fixtures_busDepartureTime
+                [fixtures_mvpVote5] => result
+                [fixtures_mvpVote1] => fixtures_mvpVote2
+                [fixtures_mvpVote4] => fixtures_mvpVote5
+                [fixtures_mvpVote3] => fixtures_mvpVote4
+                [fixtures_busDepartureTime] => timeBlock
+                [fixtures_mvpVote2] => fixtures_mvpVote3
+                [fixtures_studentPickupTime] => fixtures_studentArrivalTime
+            )
+
+         * To dodge around this crazy, we can flip that array struct so instead of
+         * (field, showAfterField) tuples, we have (showAfterField, field) tuples.
+         * In the struct below, fixtures_mvpVote5 comes after result,
+         * and fixtures_mvpVote4 comes after fixtures_mvpVote5 etc.
+         *
+            Array
+            (
+                [fixtures_busReturnTime] => fixtures_studentArrivalTime
+                [fixtures_busDepartureTime] => fixtures_busReturnTime
+                [result] => fixtures_mvpVote5
+                [fixtures_mvpVote2] => fixtures_mvpVote1
+                [fixtures_mvpVote5] => fixtures_mvpVote4
+                [fixtures_mvpVote4] => fixtures_mvpVote3
+                [timeBlock] => fixtures_busDepartureTime
+                [fixtures_mvpVote3] => fixtures_mvpVote2
+                [fixtures_studentArrivalTime] => fixtures_studentPickupTime
+            )
+         */
+        foreach ($data as $previous => $next) {
+            if (!str_contains($previous, "{$index}_")) {
+                $stack[$previous] = $next;
+            }
         }
 
-        /* Remove dead elements: we don't need empty nodes etc.
+        /* Now that the anchors are in place (if any existed...)
+         * start compiling the rest of the fields around them...somehow
          */
-        return array_filter($result);
+        new \Alaress_Probe($stack);
+
+
+
+
+
+//
+//        foreach ($array as $key => $value) {
+//            /* First of its kind
+//             */
+//            if (!isset($stack[$key])) {
+//                $stack[$key] = $value;
+//                continue;
+//            }
+//
+//            while (\count($stack) !== \count($array()) && $n < $maxIterations) {
+//                $n++;
+//
+//
+//            }
+//
+//
+//
+//        }
+
+        new \Alaress_Probe($array, $stack);
+        die();
     }
 }
