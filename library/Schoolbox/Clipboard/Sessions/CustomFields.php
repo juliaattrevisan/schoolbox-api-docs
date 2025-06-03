@@ -57,11 +57,11 @@ class CustomFields
 
             $nodes = $this->sorter($key, array_flip($temp[$key]));
 
-            foreach ($nodes as $current => $previous) {
+            foreach ($nodes as $current) {
                 $output[$key][$current] = $customFieldsMetadata[$current];
             }
         }
-
+new \Alaress_Probe($output);
         return $output;
     }
 
@@ -73,7 +73,6 @@ class CustomFields
      */
     private function sorter(string $index, array $data): array
     {
-        $maxIterations = 100;
         $stack = [];
 
         /* Try to find "anchor points" from Clipboard's ui.
@@ -126,10 +125,6 @@ class CustomFields
             }
         }
 
-        new \Alaress_Probe('$data', '$stack');
-        new \Alaress_Probe($data, $stack);
-        new \Alaress_Probe('<hr>');
-
         /* Look for stuff in $data that we need to insert back into $stack
          */
         $n = 0;
@@ -147,8 +142,6 @@ class CustomFields
                         if ($current === $key) {
                             $before = array_slice($stack, 0, $i + 1);
                             $after = array_slice($stack, $i + 1, count($stack));
-
-                            new \Alaress_Probe($key, $before, $after);
 
                             /* Insert whatever comes after $current into position in the $stack
                              */
@@ -173,31 +166,6 @@ class CustomFields
             $n++;
         }
 
-new \Alaress_Probe($stack, $data);
-        die();
-
-
-
-
-//
-//        foreach ($array as $key => $value) {
-//            /* First of its kind
-//             */
-//            if (!isset($stack[$key])) {
-//                $stack[$key] = $value;
-//                continue;
-//            }
-//
-//            while (\count($stack) !== \count($array()) && $n < $maxIterations) {
-//                $n++;
-//
-//
-//            }
-//
-//
-//
-//        }
-
-        die();
+        return $stack;
     }
 }
