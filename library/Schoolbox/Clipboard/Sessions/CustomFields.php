@@ -114,6 +114,8 @@ class CustomFields
          */
         $n = 0;
 
+        /*  Note that $data is a reductive data set
+         */
         while (\count($data) && $n < self::MAX_ITERATIONS) {
             foreach ($data as $key => $value) {
                 if (in_array($key, $stack)) {
