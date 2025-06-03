@@ -127,33 +127,40 @@ class CustomFields
          * always work in pairs, like crabs: it's a "before" and "after" definition. That means
          * we can exploit something about its nature to simplify our splicing and dicing
          */
-        for ($i = 0; $i < count($stack); $i++) {
-            $current = $stack[$i];
 
-            /* Look for stuff in $data that we need to insert back into $stack
-             */
-            foreach ($data as $key => $value) {
-                if ($current === $key) {
-                    $before = array_splice($stack, 0, $i + 1);
-                    $after = array_splice($stack, $i - 1, count($stack));
+        /* Look for stuff in $data that we need to insert back into $stack
+         */
+        foreach ($data as $key => $value) {
+            if (in_array($key, $stack)) {
+                for ($i = 0; $i < count($stack); $i++) {
+                    $current = $stack[$i];
 
-                    new \Alaress_Probe($key, $before, $after);
+                    if ($current === $key) {
+                        $before = array_slice($stack, 0, $i + 1);
+                        $after = array_slice($stack, $i + 1, count($stack));
 
-                    /* Insert whatever comes after $current into position in the $stack
-                     */
-                    $before[] = $data[$current];
+                        new \Alaress_Probe($key, $before, $after);
 
-                    new \Alaress_Probe($key, $before, $after);
+                        /* Insert whatever comes after $current into position in the $stack
+                         */
+                        $before[] = $data[$current];
 
-                    /* Join them back up
-                     */
-                    $stack = array_merge($before, $after);
+                        /* Join them back up
+                         */
+                        $stack = array_merge($before, $after);
 
-                    new \Alaress_Probe($stack);
+                        /* Remove it from the $data then jump start the process again
+                         */
+                        unset($data[$current]);
+
+                        break;
+                    }
                 }
             }
         }
 
+new \Alaress_Probe($stack, $data);
+        die();
 
 
 
