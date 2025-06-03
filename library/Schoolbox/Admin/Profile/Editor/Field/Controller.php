@@ -26,6 +26,31 @@ class Controller extends Base
     ) {
     }
 
+    /**
+     * Re-assigns sequences to all the fields if they have changed
+     * @param Model[] $fields
+     */
+    private function saveSequence(array $fields): void
+    {
+        /* Portrait Image must always be sequence 0, so start at 1 */
+        $i = 1;
+        foreach ($fields as $field) {
+            $initialSequence = $field->getSequence();
+
+            if (Payload::FIELD_PORTRAIT_IMAGE === $field->getField()) {
+                $field->setSequence(0);
+            } else {
+                $field->setSequence($i++);
+            }
+
+            if ($field->getSequence() === $initialSequence) {
+                /* No need to save, as the sequence hasn't changed */
+                continue;
+            }
+
+            $this->fieldMapper->save($field);
+        }
+    }
 
     /**
      * POST Enable a field so it is visible on a role type's profile screen
@@ -59,33 +84,21 @@ class Controller extends Base
                 ]
             ]);
 
-            /* Then find out what sequence we need to inject a field.
+            /* Then find out what sequence we need to inject a field
+             * and add it to the stack in the right spot
              */
             /** @var int|null $index - The index at which to insert the field */
             $index = (int)($this->requestPost->get('index')) + 1;
 
-            /* ...then increment fields whose sequences are equal to, or greater than, $index
-             */
-            foreach ($fields as $currentField) {
-                if (Payload::FIELD_PORTRAIT_IMAGE === $currentField->getField()) {
-                    /* Portrait Image is always sequence zero
-                     */
-                    $currentField->setSequence(0);
-                } elseif ($currentField->getSequence() >= $index) {
-                    /* Increment by one
-                     */
-                    $currentField->setSequence($currentField->getSequence() + 1);
-                }
+            $stack = $fields->getAll();
+            array_splice($stack, $index, 0, [$field]);
 
-                $this->fieldMapper->save($currentField);
-            }
-
-            /* Spawn in place using the index provided by frontend
+            /* Temporarily set the sequence of the field to -1 to force it to save when resequenced
              */
-            $field->setSequence($index);
+            $field->setSequence(-1);
             $field->setEnabled(1);
 
-            $this->fieldMapper->save($field);
+            $this->saveSequence($stack);
 
             $this->response = $this->responseAsJson(['success' => true]);
         } catch (\Exception $e) {
@@ -110,6 +123,7 @@ class Controller extends Base
     {
         try {
             $field->setEnabled(0);
+            $field->setSequence(0);
             $this->fieldMapper->save($field);
 
             /* I think that we should remove the Availability and Visibility settings
@@ -137,23 +151,7 @@ class Controller extends Base
                 ]
             ]);
 
-            /* ...then reassign them in 1-indexed order.
-             */
-            $i = 1;
-
-            foreach ($fields as $currentField) {
-                if (Payload::FIELD_PORTRAIT_IMAGE === $currentField->getField()) {
-                    /* Portrait Image is always sequence zero
-                     */
-                    $field->setSequence(0);
-                } else {
-                    /* Assign new sequence
-                     */
-                    $field->setSequence($i++);
-                }
-
-                $this->fieldMapper->save($currentField);
-            }
+            $this->saveSequence($fields->getAll());
 
             $this->response = $this->responseAsJson(['success' => true]);
         } catch (\Exception $e) {
@@ -303,33 +301,26 @@ class Controller extends Base
             $fields = $this->fieldMapper->findByColumnList([
                 'roleType' => $roleType,
                 'enabled' => true,
-            ])->indexBy('field');
+            ]);
 
-            /* Sequence is actually a (int, string) tuple that represents
-             * (index, field name), not its primary key in profile_field.
-             */
-            foreach ($sequence as $index => $field) {
-                $fieldModel = $fields->getOffset($field);
-
-                /* For some edge-casey reason, the model doesn't exist anymore;
-                 * someone else might have deleted it at the same moment we were
-                 * trying to resequence it
+            $fields->sortByCallback(function (Model $a, Model $b) use ($sequence) {
+                /* Sequence is actually a (int, string) tuple that represents
+                 * (index, field name), not its primary key in profile_field.
                  */
-                if (null === $fieldModel) {
-                    continue;
-                }
+                $aIndex = array_search($a->getField(), $sequence, true);
+                $bIndex = array_search($b->getField(), $sequence, true);
 
-                /* Portrait Image should never appear in this $sequence array
-                 * But if it does one day, is always sequence zero
-                 *
-                 * if (Payload::FIELD_PORTRAIT_IMAGE === $field) {
-                 *     $fieldModel->setSequence(0);
-                 * }
+                /* If it isn't found, put it at the start
+                 * For example, Portrait Image should never appear in the $sequence array
+                 * but should always be at the start of the list
                  */
-                $fieldModel->setSequence($index + 1);
+                $aIndex = $aIndex === false ? PHP_INT_MIN : $aIndex;
+                $bIndex = $bIndex === false ? PHP_INT_MIN : $bIndex;
+                return $aIndex <=> $bIndex;
+            });
 
-                $this->fieldMapper->save($fieldModel);
-            }
+            // Reset sequences for all fields to avoid duplicates
+            $this->saveSequence($fields->getAll());
 
             $this->response = $this->responseAsJson(['success' => true]);
         } catch (\Exception $e) {
