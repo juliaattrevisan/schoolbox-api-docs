@@ -130,33 +130,36 @@ class CustomFields
 
         /* Look for stuff in $data that we need to insert back into $stack
          */
-        foreach ($data as $key => $value) {
-            if (in_array($key, $stack)) {
-                for ($i = 0; $i < count($stack); $i++) {
-                    $current = $stack[$i];
+        while (\count($data)) {
+            foreach ($data as $key => $value) {
+                if (in_array($key, $stack)) {
+                    for ($i = 0; $i < count($stack); $i++) {
+                        $current = $stack[$i];
 
-                    if ($current === $key) {
-                        $before = array_slice($stack, 0, $i + 1);
-                        $after = array_slice($stack, $i + 1, count($stack));
+                        if ($current === $key) {
+                            $before = array_slice($stack, 0, $i + 1);
+                            $after = array_slice($stack, $i + 1, count($stack));
 
-                        new \Alaress_Probe($key, $before, $after);
+                            new \Alaress_Probe($key, $before, $after);
 
-                        /* Insert whatever comes after $current into position in the $stack
-                         */
-                        $before[] = $data[$current];
+                            /* Insert whatever comes after $current into position in the $stack
+                             */
+                            $before[] = $data[$current];
 
-                        /* Join them back up
-                         */
-                        $stack = array_merge($before, $after);
+                            /* Join them back up
+                             */
+                            $stack = array_merge($before, $after);
 
-                        /* Remove it from the $data then jump start the process again
-                         */
-                        unset($data[$current]);
+                            /* Remove it from the $data then jump start the process again
+                             */
+                            unset($data[$current]);
 
-                        break;
+                            break;
+                        }
                     }
                 }
             }
+
         }
 
 new \Alaress_Probe($stack, $data);
