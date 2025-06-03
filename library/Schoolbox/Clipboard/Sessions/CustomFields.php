@@ -2,8 +2,17 @@
 
 namespace Schoolbox\Clipboard\Sessions;
 
+use DebugBar\DebugBarException;
+
 class CustomFields
 {
+    /**
+     * Clipboard can allow multiple list prefixes: sessions and fixtures were ones we
+     * actually knew about, but discovered Teams could also be returned here, while in
+     * prod.
+     */
+    private const KNOWN_LIST_PREFIXES = ['sessions', 'fixtures', 'teams'];
+
     /**
      * Split the giant pile of $customFieldsMetadata into two distinct lists
      * which can be individually sorted. Clipboard intends to open this to
@@ -11,6 +20,7 @@ class CustomFields
      *
      * @param array $customFieldsMetadata
      * @return array
+     * @throws DebugBarException
      */
     public function generate(array $customFieldsMetadata): array
     {
@@ -21,14 +31,17 @@ class CustomFields
                 $temp['sessions'][$id] = $data['showAfterField'];
             } elseif (str_contains($id, 'fixtures_')) {
                 $temp['fixtures'][$id] = $data['showAfterField'];
+            } elseif (str_contains($id, 'teams_')) {
+                $temp['teams'][$id] = $data['showAfterField'];
             }
         }
 
+        new \Alaress_Probe($temp);
         /* Return all the mini-lists in one big struct, already split and sorted
          */
         $output = [];
 
-        foreach (['sessions', 'fixtures'] as $key) {
+        foreach (['sessions', 'fixtures', 'teams'] as $key) {
             /* One or more of these keys didn't have a set of data in the custom fields
              * Skip it
              */
