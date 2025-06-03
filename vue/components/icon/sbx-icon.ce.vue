@@ -792,7 +792,7 @@ function alertInvalidIconName(): false {
                 ></path>
             </svg>
             <svg
-                v-else-if="props.name === 'home'"
+                v-else-if="props.name === 'home' || props.name === 'house'"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -1328,7 +1328,7 @@ function alertInvalidIconName(): false {
                 ></path>
             </svg>
             <svg
-                v-else-if="props.name === 'reach'"
+                v-else-if="props.name === 'reach' || props.name === 'reach-logo'"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -1495,7 +1495,7 @@ function alertInvalidIconName(): false {
                 ></path>
             </svg>
             <svg
-                v-else-if="props.name === 'staff-students' || props.name === 'player'"
+                v-else-if="props.name === 'staff-students' || props.name === 'player' || props.name === 'user'"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -1584,7 +1584,7 @@ function alertInvalidIconName(): false {
                 ></path>
             </svg>
             <svg
-                v-else-if="props.name === 'time-value'"
+                v-else-if="props.name === 'time-value' || props.name === 'hourglass'"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
