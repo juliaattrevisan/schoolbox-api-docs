@@ -36,7 +36,6 @@ class CustomFields
             }
         }
 
-        new \Alaress_Probe($temp);
         /* Return all the mini-lists in one big struct, already split and sorted
          */
         $output = [];
