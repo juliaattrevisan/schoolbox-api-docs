@@ -26,13 +26,13 @@ class CustomFields
     {
         $temp = [];
 
+        /* Precompute available list prefixes, setting up a data payload
+         */
         foreach ($customFieldsMetadata as $id => $data) {
-            if (str_contains($id, 'sessions_')) {
-                $temp['sessions'][$id] = $data['showAfterField'];
-            } elseif (str_contains($id, 'fixtures_')) {
-                $temp['fixtures'][$id] = $data['showAfterField'];
-            } elseif (str_contains($id, 'teams_')) {
-                $temp['teams'][$id] = $data['showAfterField'];
+            foreach (self::KNOWN_LIST_PREFIXES as $prefix) {
+                if (str_contains($id, "{$prefix}_")) {
+                    $temp[$prefix][$id] = $data['showAfterField'];
+                }
             }
         }
 
@@ -41,7 +41,7 @@ class CustomFields
          */
         $output = [];
 
-        foreach (['sessions', 'fixtures', 'teams'] as $key) {
+        foreach (self::KNOWN_LIST_PREFIXES as $key) {
             /* One or more of these keys didn't have a set of data in the custom fields
              * Skip it
              */
