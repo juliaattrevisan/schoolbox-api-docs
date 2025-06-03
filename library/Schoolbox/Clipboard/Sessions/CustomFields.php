@@ -123,26 +123,10 @@ class CustomFields
         new \Alaress_Probe($data, $stack);
         new \Alaress_Probe('<hr>');
 
-        /* Now that the anchors are in place (if any existed...)
-         * start compiling the rest of the fields around them...somehow
+        /* We know that $data now contains all the actual custom fields and that the tuples
+         * always work in pairs, like crabs: it's a "before" and "after" definition. That means
+         * we can exploit something about its nature to simplify our splicing and dicing
          */
-        for ($i = 0; $i < $maxIterations; $i++) {
-            $current = $stack[$i];
-
-            /* If $current is in the array_keys of $data, then we need to insert something
-             * from $data into $stack
-             */
-
-            if (in_array($previous, $stack)) {
-                foreach ($data as $previous => $next) {
-                    /* Slice and splice around these array keys
-                     */
-                    if ($current === $previous) {
-                    }
-                }
-            }
-
-        }
 
 
 
