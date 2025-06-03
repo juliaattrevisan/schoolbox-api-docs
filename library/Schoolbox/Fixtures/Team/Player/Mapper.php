@@ -130,7 +130,7 @@ class Mapper extends BaseMapper
 
             (SELECT DISTINCT team_id
             FROM sportsfixtures_team_coach stc
-            INNER JOIN sportsfixtures_coach sc ON stc.coach_id = sc.user_id
+            INNER JOIN sportsfixtures_coach sc ON stc.coach_id = sc.id
             WHERE sc.user_id = :userId)
         ";
 
