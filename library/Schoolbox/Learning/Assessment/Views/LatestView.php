@@ -61,7 +61,15 @@ class LatestView
                 ->setUser($user);
         }
 
-        $feedbackIsVisibleToUser = $this->isMarkVisibleToUser($assessment, $user, $participant);
+        $feedbackIsVisibleToUser = match ($assessment->getMarkVisibility()) {
+            IAssessable::MARK_VISIBILITY_PARENT_STUDENT => $user->isParentOf($participant),
+            IAssessable::MARK_VISIBILITY_STUDENT => $user->getRole()->isStudent(),
+            IAssessable::MARK_VISIBILITY_PRIVATE => (
+                // Note class instructors can see feedback on that class' assessments.
+                $user->getRole()->isStaff() || $this->access->isInstructor($user, $assessment->getContext()->getFolder())
+            ),
+            default => false
+        };
 
         /**
          * Update last visit time to now, and set whether feedback was visible on this visit.
@@ -177,36 +185,5 @@ class LatestView
             $views['parents'][] = $view;
         }
         return $views;
-    }
-
-    /**
-     * Check if the mark is visible to the user viewing the page
-     *
-     * @param IAssessable $assessment
-     * @param User        $viewer
-     * @param User        $participant
-     * @return bool
-     * @throws Exception
-     */
-    private function isMarkVisibleToUser(IAssessable $assessment, User $viewer, User $participant): bool
-    {
-        $markVisibility = $assessment->getMarkVisibility();
-
-        // Note class instructors can see feedback on that class' assessments.
-        if ($viewer->getRole()->isStaff() || $this->access->isInstructor($viewer, $assessment->getContext()->getFolder())) {
-            if ($markVisibility >= IAssessable::MARK_VISIBILITY_PRIVATE) {
-                return true;
-            }
-        } else if ($viewer->getRole()->isStudent() && $participant->getId() === $viewer->getId()) {
-            if ($markVisibility >= IAssessable::MARK_VISIBILITY_STUDENT) {
-                return true;
-            }
-        } else if ($viewer->getRole()->isParent() && $viewer->isParentOf($participant)) {
-            if ($markVisibility >= IAssessable::MARK_VISIBILITY_PARENT_STUDENT) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }
