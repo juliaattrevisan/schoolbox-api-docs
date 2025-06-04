@@ -122,7 +122,7 @@ class CustomFields
             foreach ($data as $key => $value) {
                 /* $key is currently not in the $stack
                  * This means we haven't encountered its predecessor yet, because clipboard sent
-                 * us a randomly-ordered set of fields. We'll have to circle back multple times
+                 * us a randomly-ordered set of fields. We'll have to circle back multiple times
                  * to fill in its predecessors first.
                  */
                 if (!in_array($key, $stack)) {
@@ -145,16 +145,7 @@ class CustomFields
                      * always work in pairs, like crabs: it's a "before" and "after" definition. That means
                      * we can exploit something about its nature to simplify our slicing and dicing
                      */
-                    $before = array_slice($stack, 0, $i + 1);
-                    $after = array_slice($stack, $i + 1, count($stack));
-
-                    /* Insert whatever comes after $current into position in the $stack
-                     */
-                    $before[] = $data[$current];
-
-                    /* Join them back up
-                     */
-                    $stack = array_merge($before, $after);
+                    array_splice($stack, $i + 1, 0, [$data[$current]]);
 
                     /* Remove it from the $data then jump start the process again
                      */
