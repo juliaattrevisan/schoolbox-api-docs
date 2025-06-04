@@ -289,7 +289,7 @@ function alertInvalidIconName(): false {
                 <path d="M28 0l-12 12-12-12-4 4 12 12-12 12 4 4 12-12 12 12 4-4-12-12 12-12z"></path>
             </svg>
             <svg
-                v-else-if="props.name === 'cloud'"
+                v-else-if="['cloud', 'cloudy'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -317,7 +317,7 @@ function alertInvalidIconName(): false {
                 <path d="M0 14h32v4h-32v-4z"></path>
             </svg>
             <svg
-                v-else-if="props.name === 'comment'"
+                v-else-if="['comment', 'blog'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -351,7 +351,7 @@ function alertInvalidIconName(): false {
                 ></path>
             </svg>
             <svg
-                v-else-if="props.name === 'course-builder'"
+                v-else-if="['course-builder', 'course'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -493,7 +493,7 @@ function alertInvalidIconName(): false {
                 <path d="M18 10v-10h-14v32h10v-8h-6l8-8 8 8h-6v8h10v-22h-8zM20 0v8h8z"></path>
             </svg>
             <svg
-                v-else-if="props.name === 'dropdown'"
+                v-else-if="['dropdown', 'sort-down'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -501,7 +501,7 @@ function alertInvalidIconName(): false {
                 <path d="M32 8h-32l16 16z"></path>
             </svg>
             <svg
-                v-else-if="props.name === 'due-work'"
+                v-else-if="['due-work', 'import', 'submissions'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -731,7 +731,7 @@ function alertInvalidIconName(): false {
                 ></path>
             </svg>
             <svg
-                v-else-if="props.name === 'group'"
+                v-else-if="['group', 'team'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -769,7 +769,7 @@ function alertInvalidIconName(): false {
                 ></path>
             </svg>
             <svg
-                v-else-if="props.name === 'hidden'"
+                v-else-if="['hidden', 'view-hollow'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -792,7 +792,7 @@ function alertInvalidIconName(): false {
                 ></path>
             </svg>
             <svg
-                v-else-if="props.name === 'home'"
+                v-else-if="['home', 'house'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -896,7 +896,7 @@ function alertInvalidIconName(): false {
                 ></path>
             </svg>
             <svg
-                v-else-if="props.name === 'lesson-plan'"
+                v-else-if="['lesson-plan', 'learning-support'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -922,7 +922,7 @@ function alertInvalidIconName(): false {
                 ></path>
             </svg>
             <svg
-                v-else-if="props.name === 'list'"
+                v-else-if="['list', 'itineraryitem'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -954,7 +954,7 @@ function alertInvalidIconName(): false {
                 ></path>
             </svg>
             <svg
-                v-else-if="props.name === 'location'"
+                v-else-if="['location', 'venue'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -1069,7 +1069,7 @@ function alertInvalidIconName(): false {
                 <path d="M6 0v32h20v-32h-20zM18 30h-4v-4h4v4zM24 24h-16v-20h16v20z"></path>
             </svg>
             <svg
-                v-else-if="props.name === 'modify-pen'"
+                v-else-if="['modify-pen', 'modify'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -1095,7 +1095,7 @@ function alertInvalidIconName(): false {
                 <path d="M12 0h8v8h-8v-8zM12 12h8v8h-8v-8zM12 24h8v8h-8v-8z"></path>
             </svg>
             <svg
-                v-else-if="props.name === 'mostly-cloudy'"
+                v-else-if="['mostly-cloudy', 'weather'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -1277,7 +1277,7 @@ function alertInvalidIconName(): false {
                 <path d="M8 0h16v8h-16v-8zM32 10h-32v16h4v6h24v-6h4v-16zM24 28h-16v-6h16v6zM28 18h-4v-4h4v4z"></path>
             </svg>
             <svg
-                v-else-if="props.name === 'progress'"
+                v-else-if="['progress', 'result', 'report'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -1328,7 +1328,7 @@ function alertInvalidIconName(): false {
                 ></path>
             </svg>
             <svg
-                v-else-if="props.name === 'reach'"
+                v-else-if="['reach', 'reach-logo'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -1359,7 +1359,7 @@ function alertInvalidIconName(): false {
                 <path d="M32 14l-14-14v8c0 0-18 4-18 24h2c0 0 0-12 16-12v8l14-14z"></path>
             </svg>
             <svg
-                v-else-if="props.name === 'resource-booking'"
+                v-else-if="['resource-booking', 'camera'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -1485,7 +1485,7 @@ function alertInvalidIconName(): false {
                 ></path>
             </svg>
             <svg
-                v-else-if="props.name === 'staff'"
+                v-else-if="['staff', 'pastoral'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -1495,7 +1495,7 @@ function alertInvalidIconName(): false {
                 ></path>
             </svg>
             <svg
-                v-else-if="props.name === 'staff-students'"
+                v-else-if="['staff-students', 'player', 'user'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -1505,7 +1505,7 @@ function alertInvalidIconName(): false {
                 ></path>
             </svg>
             <svg
-                v-else-if="props.name === 'sun'"
+                v-else-if="['sun', 'sunny', 'clear'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -1563,7 +1563,7 @@ function alertInvalidIconName(): false {
                 <path d="M0 0v32h32v-32h-32zM24 12h-2l-2-2h-2v12h2v2h-8v-2h2v-12h-2l-2 2h-2v-4h16v4z"></path>
             </svg>
             <svg
-                v-else-if="props.name === 'thunder'"
+                v-else-if="['thunder', 'storm'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -1584,7 +1584,7 @@ function alertInvalidIconName(): false {
                 ></path>
             </svg>
             <svg
-                v-else-if="props.name === 'time-value'"
+                v-else-if="['time-value', 'hourglass'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
