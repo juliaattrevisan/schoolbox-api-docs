@@ -65,8 +65,6 @@ class Health
                     /* Overwrite with lookupped values
                      * If any of the following fields has contents, then they have a Medical Alert
                      */
-                    $this->lookup[$externalId] = false;
-
                     foreach (['allergies_symptoms', 'current_medications', 'general_medical_notes'] as $field) {
                         if ('' !== trim((string)$record[$field])) {
                             $this->lookup[$externalId] = true;
@@ -75,7 +73,7 @@ class Health
                 }
             }
         }
-print_r($this->lookup);die();
+
         return $this->lookup;
     }
 }
