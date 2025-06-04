@@ -61,14 +61,11 @@ class LatestView
                 ->setUser($user);
         }
 
-        /* Is the feedback already published and viewable by the student/parent
-         */
-        $isFeedbackVisible = null !== $assessment->getParticipantIfExtant($participant)?->getAuthoritativeFeedback(true);
-
+        $feedbackIsVisibleToUser = $this->isFeedbackVisibleToUser($assessment, $user, $participant);
         /**
          * Update last visit time to now, and set whether feedback was visible on this visit.
          */
-        $lastView->setLastVisit(\Alaress_Date_Format::now())->setFeedbackWasVisible($isFeedbackVisible);
+        $lastView->setLastVisit(\Alaress_Date_Format::now())->setFeedbackWasVisible($feedbackIsVisibleToUser);
 
         /**
          * check if use is either that student or the parents, then save
@@ -180,5 +177,45 @@ class LatestView
             $views['parents'][] = $view;
         }
         return $views;
+    }
+
+    /**
+     * Check if the mark is visible to the user visiting the page
+     *
+     * @param IAssessable $assessment
+     * @param User        $viewer
+     * @param User        $participant
+     * @return bool
+     * @throws Exception
+     */
+    private function isFeedbackVisibleToUser(IAssessable $assessment, User $viewer, User $participant): bool
+    {
+        /* Is the feedback already published and viewable by the student/parent
+         */
+        $isFeedbackVisible = $assessment->getParticipantIfExtant($participant)?->getAuthoritativeFeedback(true);
+        if (null === $isFeedbackVisible) {
+            return false;
+        }
+
+        /* Check if feedback/mark is visible to the visitor
+         */
+        $markVisibility = $assessment->getMarkVisibility();
+
+        // Note class instructors can see feedback on that class' assessments.
+        if ($viewer->getRole()->isStaff() || $this->access->isInstructor($viewer, $assessment->getContext()->getFolder())) {
+            if ($markVisibility >= IAssessable::MARK_VISIBILITY_PRIVATE) {
+                return true;
+            }
+        } else if ($viewer->getRole()->isStudent() && $participant->getId() === $viewer->getId()) {
+            if ($markVisibility >= IAssessable::MARK_VISIBILITY_STUDENT) {
+                return true;
+            }
+        } else if ($viewer->getRole()->isParent() && $viewer->isParentOf($participant)) {
+            if ($markVisibility >= IAssessable::MARK_VISIBILITY_PARENT_STUDENT) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
