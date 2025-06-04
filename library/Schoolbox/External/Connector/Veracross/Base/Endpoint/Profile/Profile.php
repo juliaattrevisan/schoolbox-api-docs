@@ -160,7 +160,7 @@ class Profile implements IStrategy
         /* Prefetch a list of medically-afflicted dudes
          */
         $this->log->debug('Prefetching medicals...');
-        $medicalLookup = (new Health($this->api))->generate();
+        $medicalLookup = (new Health($this->api, $this->watchlist))->generate();
 
         /* Prefetch a list of language usages
          */
