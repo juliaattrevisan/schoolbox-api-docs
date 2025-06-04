@@ -61,20 +61,14 @@ class LatestView
                 ->setUser($user);
         }
 
-        $feedbackIsVisibleToUser = match ($assessment->getMarkVisibility()) {
-            IAssessable::MARK_VISIBILITY_PARENT_STUDENT => $user->isParentOf($participant),
-            IAssessable::MARK_VISIBILITY_STUDENT => $user->getRole()->isStudent(),
-            IAssessable::MARK_VISIBILITY_PRIVATE => (
-                // Note class instructors can see feedback on that class' assessments.
-                $user->getRole()->isStaff() || $this->access->isInstructor($user, $assessment->getContext()->getFolder())
-            ),
-            default => false
-        };
+        /* Is the feedback already published and viewable by the student/parent
+         */
+        $isFeedbackVisible = null !== $assessment->getParticipantIfExtant($participant)?->getAuthoritativeFeedback(true);
 
         /**
          * Update last visit time to now, and set whether feedback was visible on this visit.
          */
-        $lastView->setLastVisit(\Alaress_Date_Format::now())->setFeedbackWasVisible($feedbackIsVisibleToUser);
+        $lastView->setLastVisit(\Alaress_Date_Format::now())->setFeedbackWasVisible($isFeedbackVisible);
 
         /**
          * check if use is either that student or the parents, then save
