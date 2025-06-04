@@ -219,7 +219,10 @@ class Profile implements IStrategy
 
                 $academicHouse = '';
                 $boardingStatus = false;
-                $campusName = '';
+
+                /* Maybe the campus node exists...not sure if it ALWAYS exists, or just sometimes.
+                 */
+                $campusName = $student['campus']['description'] ?? '';
 
                 $dob = trim((string)$student['birthday']);
                 $email = trim((string)$student['email_1']);
