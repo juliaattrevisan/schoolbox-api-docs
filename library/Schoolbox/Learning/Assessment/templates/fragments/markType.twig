@@ -21,6 +21,7 @@
  # @param string $syncSwitchSelector    The selector for the switch to toggle syncing of mark types (off means to sync) (optional)
  # @param string|null $syncContext      When keeping in sync for dual mark types, the context to sync with when the switch is disabled (optional, default null)
  # @param string $syncMarkTypeLabel     The label text to use on this mark type input when keeping in sync for dual mark types (optional, default $markTypeLabel)
+ # @param string $syncMarkTypeTooltip   The tooltip text to use on this mark type input when keeping in sync for dual mark types (optional, default null)
  #}
 
 {# Letter Grade enables Grading Scheme
@@ -66,7 +67,10 @@
         <label>
             <span id="{{ context }}markTypeLabel">{{ markTypeLabel | default('Mark Type') }}</span>
             {% if markTypeTooltip ?? false %}
-                <span data-tooltip class="hint has-tip tip-top"  title="{{ markTypeTooltip }}">?</span>
+                <span id="{{ context }}markTypeTooltip" data-tooltip class="hint has-tip tip-top"  title="{{ markTypeTooltip }}">?</span>
+            {% endif %}
+            {% if syncMarkTypeTooltip ?? false %}
+                <span id="{{ context }}syncMarkTypeTooltip" data-tooltip class="hint has-tip tip-top" title="{{ syncMarkTypeTooltip }}" style="display: none">?</span>
             {% endif %}
             <select id="{{ context }}markType" name="{{ context }}markType" data-test="assessment-form-select-{{ context }}markType" {% if courseManagedReadonly ?? false %}readonly{% endif %}>
                 {% for index, title in allMarkTypes %}

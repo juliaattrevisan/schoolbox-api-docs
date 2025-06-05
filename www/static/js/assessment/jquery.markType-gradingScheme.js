@@ -101,6 +101,14 @@
                  */
                 markTypeLabel: $("#" + context + "markTypeLabel"),
 
+                /* The tooltip for the mark type dropdown when sync is disabled
+                 */
+                markTypeTooltip: $("#" + context + "markTypeTooltip"),
+
+                /* The tooltip for the mark type dropdown when sync is enabled
+                 */
+                markTypeSyncTooltip: $("#" + context + "syncMarkTypeTooltip"),
+
                 /* A container for the Total Mark elements
                  */
                 maxMarkDiv: $('[data-max-mark="' + context + '"]'),
@@ -189,7 +197,16 @@
             const sourceConfig = configEntries[config.sync.syncWith ?? config.context];
             const syncSwitch = document.querySelector(sourceConfig.sync.switchSelector);
             if (config.sync.syncWith !== null) {
-                config.markTypeDropdown[0].closest(".row").style.display = syncSwitch.checked ? "block" : "none";
+                config.markTypeDropdown[0].closest(".row").style.display = syncSwitch.checked ? "" : "none";
+            }
+
+            // Show the correct tooltip based on the switch state
+            if (syncSwitch.checked) {
+                config.markTypeTooltip.show();
+                config.markTypeSyncTooltip.hide();
+            } else {
+                config.markTypeTooltip.hide();
+                config.markTypeSyncTooltip.show();
             }
 
             config.markTypeLabel.text(
