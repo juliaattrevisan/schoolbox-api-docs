@@ -16,7 +16,7 @@ const props = defineProps<Props>();
     <div class="small-12 island">
         <dl ref="tabsEl" class="tabs" data-test="editor-templates-tabs">
             <dd v-for="category in props.categories" :key="category.id" class="">
-                <a :data-test="`editor-templates-tab-${category.type}`">{{ kebabToTitleCase(category.type) }}</a>
+                <a :data-test="`editor-templates-tab-${category.name}`">{{ kebabToTitleCase(category.name) }}</a>
             </dd>
         </dl>
     </div>

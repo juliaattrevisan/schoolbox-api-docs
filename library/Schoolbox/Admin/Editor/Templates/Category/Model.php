@@ -6,7 +6,7 @@
  * @link        https://schoolbox.education/
  */
 
-declare(strict_types=1);
+ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Editor\Templates\Category;
 
@@ -17,27 +17,27 @@ class Model
     use Id;
 
     /**
-     * The type this template is for.
+     * The name of this category.
      *
      * @var string|null
      */
-    private ?string $type = null;
+    private ?string $name = null;
 
     /**
      * @return string|null
      */
-    public function getType(): ?string
+    public function getName(): ?string
     {
-        return $this->type;
+        return $this->name;
     }
 
     /**
-     * @param string|null $type
+     * @param string|null $name
      * @return Model
      */
-    public function setType(?string $type): self
+    public function setName(?string $name): self
     {
-        $this->type = $type;
+        $this->name = $name;
         return $this;
     }
 }

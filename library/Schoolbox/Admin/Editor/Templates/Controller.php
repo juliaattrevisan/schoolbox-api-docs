@@ -35,8 +35,8 @@ class Controller extends Base
      */
     public function getList(): void
     {
-
-        $categories = $this->categoryMapper->findAll()->sortNaturally('type');
+        // Get the categories from the mapper and transform each category into an array
+        $categories = $this->categoryMapper->findAll()->sortNaturally('name');
         $translator = new ModelToArray();
 
         $this->response = $this->responseFromTemplate(

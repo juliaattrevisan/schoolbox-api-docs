@@ -1,32 +1,13 @@
--- A list of editor template categories to organize templates
-
-CREATE TABLE `editor_template_category_type` (
-    `name` VARCHAR(255) PRIMARY KEY
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
-
--- Insert the initial categories for editor templates
-INSERT INTO
-    `editor_template_category_type` (`name`)
-VALUES ('badge-evidence'),
-    ('calendar-events'),
-    ('email'),
-    ('feedback'),
-    ('homepage'),
-    ('learning-activity'),
-    ('learning-moments'),
-    ('news');
-
--- A list of editor template categories, each linked to a category type
+-- A list of editor template categories
 CREATE TABLE `editor_template_category` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `type` VARCHAR(255) NOT NULL,
-    PRIMARY KEY (`id`),
-    CONSTRAINT `fk_category_type` FOREIGN KEY (`type`) REFERENCES `editor_template_category_type` (`name`)
+    `name` VARCHAR(255) NOT NULL,
+    PRIMARY KEY (`id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 -- Insert the initial categories into the editor_template_category table
 INSERT INTO
-    `editor_template_category` (`type`)
+    `editor_template_category` (`name`)
 VALUES ('badge-evidence'),
     ('calendar-events'),
     ('email'),

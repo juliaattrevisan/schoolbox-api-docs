@@ -27,6 +27,6 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasTable('editor_template_category');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->uses('type', self::TYPE_STRING);
+        $this->uses('name', self::TYPE_STRING);
     }
 }

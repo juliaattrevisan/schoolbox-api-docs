@@ -12,17 +12,8 @@ namespace Schoolbox\Admin\Editor\Templates\Category;
 
 
 /**
- * Translator for translating a user model into an array, ready for JSON
+ * Translator for translating a category model into an array, ready for JSON
  * encoding.
- *
- * This variant translates only the subset of fields that are relevant for
- * conveying that the user is the author of content.
- *
- * The information returned by this translator is guaranteed to be fit for all
- * audiences: it contains only publicly available information such as:
- * * the user's ID
- * * any names
- * * links to the profile page and profile image
  */
 class ModelToArray
 {
@@ -35,7 +26,7 @@ class ModelToArray
     {
         return [
             'id' => $model->getId(),
-            'type' => $model->getType(),
+            'name' => $model->getName(),
         ];
     }
 }
