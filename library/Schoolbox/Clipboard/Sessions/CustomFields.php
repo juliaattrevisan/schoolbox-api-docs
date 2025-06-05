@@ -32,7 +32,21 @@ class CustomFields
         $temp = [];
 
         /* Precompute available list prefixes, setting up a data payload
-         */
+         * Here's an example struct for $data.
+         *
+            Array
+            (
+                [fixtures_studentArrivalTime] => fixtures_busReturnTime
+                [fixtures_busReturnTime] => fixtures_busDepartureTime
+                [fixtures_mvpVote5] => result
+                [fixtures_mvpVote1] => fixtures_mvpVote2
+                [fixtures_mvpVote4] => fixtures_mvpVote5
+                [fixtures_mvpVote3] => fixtures_mvpVote4
+                [fixtures_busDepartureTime] => timeBlock
+                [fixtures_mvpVote2] => fixtures_mvpVote3
+                [fixtures_studentPickupTime] => fixtures_studentArrivalTime
+            )
+        */
         foreach ($customFieldsMetadata as $id => $data) {
             foreach (self::KNOWN_LIST_PREFIXES as $prefix) {
                 if (str_contains($id, "{$prefix}_")) {
@@ -77,23 +91,13 @@ class CustomFields
 
         /* Try to find "anchor points" from Clipboard's ui.
          * These showAfterField values are part of their ui, not a custom field,
-         * and represent potential starting points. In the example struct below,
+         * and represent potential starting points. In the example struct above,
          * "result" and "timeBlock" are their ui elements: everything starting
          * with fixtures_ is a custom field that somehow gets sequenced around
          * the ui elements "result" and "timeBlock".
          *
-            Array
-            (
-                [fixtures_studentArrivalTime] => fixtures_busReturnTime
-                [fixtures_busReturnTime] => fixtures_busDepartureTime
-                [fixtures_mvpVote5] => result
-                [fixtures_mvpVote1] => fixtures_mvpVote2
-                [fixtures_mvpVote4] => fixtures_mvpVote5
-                [fixtures_mvpVote3] => fixtures_mvpVote4
-                [fixtures_busDepartureTime] => timeBlock
-                [fixtures_mvpVote2] => fixtures_mvpVote3
-                [fixtures_studentPickupTime] => fixtures_studentArrivalTime
-            )
+         * By the time you get here, $data has had its keys and values flipped,
+         * to make traversing a bit more manageable.
          */
         foreach ($data as $previous => $next) {
             /* This is a custom field, not a clipboard ui anchor - skip past this for now
