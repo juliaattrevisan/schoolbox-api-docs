@@ -800,7 +800,7 @@
 
                             $.post(route, payload)
                                 .done((responseText) => {
-                                    toast.timeout({ text: "Saved. Redirecting..." });
+                                    toast.timeout({ text: "Saved. Reloading..." });
                                     window.location.reload();
                                 })
                                 .fail(() => {
