@@ -133,17 +133,15 @@ class CustomFields
                     continue;
                 }
 
-                $current = $stack[$i];
-
                 /* We know that $data now contains all the actual custom fields and that the tuples
                  * always work in pairs, like crabs: it's a "before" and "after" definition. That means
                  * we can exploit something about its nature to simplify our slicing and dicing
                  */
-                array_splice($stack, $i + 1, 0, [$data[$current]]);
+                array_splice($stack, $i + 1, 0, [$value]);
 
                 /* Remove it from the $data then jump start the process again
                  */
-                unset($data[$current]);
+                unset($data[$key]);
             }
 
             /* For Safety
