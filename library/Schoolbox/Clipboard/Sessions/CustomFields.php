@@ -120,39 +120,30 @@ class CustomFields
          */
         while (\count($data) && $n < self::MAX_ITERATIONS) {
             foreach ($data as $key => $value) {
+                /* Otherwise, its predecessor was here, and $current goes in after that
+                 */
+                $i = array_search($key, $stack);
+
                 /* $key is currently not in the $stack
                  * This means we haven't encountered its predecessor yet, because clipboard sent
                  * us a randomly-ordered set of fields. We'll have to circle back multiple times
                  * to fill in its predecessors first.
                  */
-                if (!in_array($key, $stack)) {
+                if (false === $i) {
                     continue;
                 }
 
-                /* Otherwise, its predecessor was here, and $current goes in after that
+                $current = $stack[$i];
+
+                /* We know that $data now contains all the actual custom fields and that the tuples
+                 * always work in pairs, like crabs: it's a "before" and "after" definition. That means
+                 * we can exploit something about its nature to simplify our slicing and dicing
                  */
-                for ($i = 0; $i < count($stack); $i++) {
-                    $current = $stack[$i];
+                array_splice($stack, $i + 1, 0, [$data[$current]]);
 
-                    /* Not the key we're looking for in the $stack - keep looking to find the place
-                     * into which we need to insert $current
-                     */
-                    if ($current !== $key) {
-                        continue;
-                    }
-
-                    /* We know that $data now contains all the actual custom fields and that the tuples
-                     * always work in pairs, like crabs: it's a "before" and "after" definition. That means
-                     * we can exploit something about its nature to simplify our slicing and dicing
-                     */
-                    array_splice($stack, $i + 1, 0, [$data[$current]]);
-
-                    /* Remove it from the $data then jump start the process again
-                     */
-                    unset($data[$current]);
-
-                    break;
-                }
+                /* Remove it from the $data then jump start the process again
+                 */
+                unset($data[$current]);
             }
 
             /* For Safety
