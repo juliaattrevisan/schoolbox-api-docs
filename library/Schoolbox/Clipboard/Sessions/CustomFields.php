@@ -5,13 +5,6 @@ namespace Schoolbox\Clipboard\Sessions;
 class CustomFields
 {
     /**
-     * Safety mechanism to forcibly exit a while() loop
-     * based on mutating data
-     */
-    private const MAX_ITERATIONS = 100;
-
-
-    /**
      * Clipboard can allow multiple list prefixes: sessions and fixtures were ones we
      * actually knew about, but discovered Teams could also be returned here, while in
      * prod.
