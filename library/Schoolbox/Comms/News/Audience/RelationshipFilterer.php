@@ -218,7 +218,7 @@ class RelationshipFilterer
      * Note that this only treats STAFF as being class-teachers or group-instructors.
      *
      * @param User $user
-     * @return Collection|User[]
+     * @return Collection
      * @throws \UnderflowException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
@@ -282,9 +282,13 @@ class RelationshipFilterer
          * Filter out duff data
          * Reindex the resultant stack
          */
-        $classStudentExternalIds = array_values(array_filter(array_unique(array_merge(array_column($externalStudents, 'synergy_id')))));
+        $mergedList = array_merge($classStudentExternalIds, array_column($externalStudents, 'synergy_id'));
 
-        /* No students? No trabjo
+        /* Clean up stuff like null/falsey values, reindex the stack for niceness
+         */
+        $classStudentExternalIds = array_values(array_filter(array_unique($mergedList)));
+
+        /* No students? No trabajo
          */
         if (!\count($classStudentExternalIds)) {
             return $this->userMapper->createCollection();
