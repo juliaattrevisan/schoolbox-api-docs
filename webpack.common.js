@@ -185,6 +185,7 @@ module.exports = {
         courseBuilder: "./library/Schoolbox/Admin/CourseBuilder/templates/vue/courseBuilder.ts",
         oauthClientList: "./library/Schoolbox/Admin/Oauth/Client/vue/oauthClientList.ts",
         profileEditor: "./library/Schoolbox/Admin/Profile/Editor/templates/vue/profileEditor.ts",
+        editorTemplates: "./library/Schoolbox/Admin/Editor/Templates/templates/vue/editorTemplates.ts",
 
         //Vue component to display data in a table
         dataTable: "./vue/components/dataTable/dataTable.ts",
