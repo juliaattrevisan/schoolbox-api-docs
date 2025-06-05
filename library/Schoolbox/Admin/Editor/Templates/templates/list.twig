@@ -12,10 +12,12 @@
     {{ renderAdminNavigation(pageCurrent) }}
 
     {# {% set createRoute = routeLookupIfAuthorized('adminLessonPlanTemplate.getCreate') %} #}
-    <div id="editor-templates-container">
-        <editor-templates
-            :categories="{{ (categories ?? []) | json_encode }}"
-        />
+    <div class="admin-content">
+        <div id="editor-templates-container">
+            <editor-templates
+                :categories="{{ (categories ?? []) | json_encode }}"
+            />
+        </div>
+        <script src="{{ CDN_PREFIX }}/js/bundle/editorTemplates.js?v={{ config.site_version }}"></script>
     </div>
-    <script src="{{ CDN_PREFIX }}/js/bundle/editorTemplates.js?v={{ config.site_version }}"></script>
 </div>

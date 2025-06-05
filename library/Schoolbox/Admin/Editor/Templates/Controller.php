@@ -31,7 +31,7 @@ class Controller extends Base
 
 
     /**
-     * Provide form
+     * Display list of editor template categories
      */
     public function getList(): void
     {
