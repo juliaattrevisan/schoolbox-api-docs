@@ -36,15 +36,15 @@ class CustomFields
          *
             Array
             (
-                [fixtures_studentArrivalTime] => fixtures_busReturnTime
-                [fixtures_busReturnTime] => fixtures_busDepartureTime
-                [fixtures_mvpVote5] => result
-                [fixtures_mvpVote1] => fixtures_mvpVote2
-                [fixtures_mvpVote4] => fixtures_mvpVote5
-                [fixtures_mvpVote3] => fixtures_mvpVote4
-                [fixtures_busDepartureTime] => timeBlock
-                [fixtures_mvpVote2] => fixtures_mvpVote3
-                [fixtures_studentPickupTime] => fixtures_studentArrivalTime
+                [fixtures][fixtures_studentArrivalTime] => fixtures_busReturnTime
+                [fixtures][fixtures_busReturnTime] => fixtures_busDepartureTime
+                [fixtures][fixtures_mvpVote5] => result
+                [fixtures][fixtures_mvpVote1] => fixtures_mvpVote2
+                [fixtures][fixtures_mvpVote4] => fixtures_mvpVote5
+                [fixtures][fixtures_mvpVote3] => fixtures_mvpVote4
+                [fixtures][fixtures_busDepartureTime] => timeBlock
+                [fixtures][fixtures_mvpVote2] => fixtures_mvpVote3
+                [fixtures][fixtures_studentPickupTime] => fixtures_studentArrivalTime
             )
         */
         foreach ($customFieldsMetadata as $id => $data) {
