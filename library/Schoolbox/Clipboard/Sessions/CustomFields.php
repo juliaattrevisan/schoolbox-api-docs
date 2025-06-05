@@ -32,7 +32,7 @@ class CustomFields
         $temp = [];
 
         /* Precompute available list prefixes, setting up a data payload
-         * Here's an example struct for $data.
+         * Here's an example struct for what $temp is going to be like.
          *
             Array
             (
