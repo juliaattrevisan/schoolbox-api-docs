@@ -23,8 +23,12 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
+     * @param ErrorMapper $errorMapper
+     * @param Mapper $categoryMapper
      */
     public function __construct(
+        private ErrorMapper $errorMapper,
+        private Mapper $categoryMapper,
     ) {
     }
 
@@ -39,6 +43,7 @@ class Controller extends Base
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminEditorTemplates.getList'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminEditorTemplates.getList')),
+                'categories' => json_encode($this->categoryMapper->findAll()->sortNaturally('type')),
             ]
         );
     }
