@@ -1629,7 +1629,7 @@ class Controller extends Assessment\Controller
          * forcibly submit them.
          */
         foreach ($postData['draft']['ids'] ?? [] as $studentId) {
-            $userStub = $this->getUserMapper()->createModel()->setId($studentId);
+            $userStub = $this->getUserMapper()->createModel()->setId((int)$studentId);
 
             /** @var \Schoolbox\Learning\Assessment\DueWork\Response\Model|null $latestResponse */
             $latestResponse = $assessment->getParticipant($userStub)->findMostRecentDraftResponse();
@@ -1663,7 +1663,7 @@ class Controller extends Assessment\Controller
         /* Acknowledge receipts of submission for each of these user ids in $assessment.
          */
         foreach ($postData['offline']['ids'] ?? [] as $studentId) {
-            $userStub = $this->getUserMapper()->createModel()->setId($studentId);
+            $userStub = $this->getUserMapper()->createModel()->setId((int)$studentId);
 
             /* If the postData[offline][punctual] was selected,
              * set the submission time to be just before the due date.
