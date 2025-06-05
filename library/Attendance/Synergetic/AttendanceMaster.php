@@ -80,8 +80,21 @@ class Attendance_Synergetic_AttendanceMaster
         $this->setFileSemester($fileSemester);
         $this->timetableGroup = $timetableGroup;
 
-        // Get the attendance master sequence number
+        // Stored proc should delete wk table but for some reason it may not
+        $cleanupQuery = "DELETE wkAttendances, wkAttendanceMaster
+                  FROM wkAttendanceMaster
+                  JOIN wkAttendances ON wkAttendanceMaster.wkAttendanceMasterSeq = wkAttendances.wkAttendanceMasterSeq
+                  WHERE FileType = {$this->getClassFileType()} AND
+                        FileYear = {$this->getFileYear()} AND
+                        FileSemester = {$this->getFileSemester()} AND
+                        ClassCampus =  {$this->getClassCampus()} AND
+                        ClassCode = {$this->getClassCode()} AND
+                        AttendanceDate = '{$attendanceDate->getDatabaseDate()} 00:00:00.000' AND
+                        AttendancePeriod = '{$this->getAttendancePeriod()}'
+                 ";
+        $this->connector->executeQuery($cleanupQuery);
 
+        // Get the attendance master sequence number
         $statement = $this->connector->prepareStoredProcedure('spiwkAttendances');
 
         $statement->bindInputs(
