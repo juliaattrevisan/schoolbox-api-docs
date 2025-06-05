@@ -51,7 +51,7 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->getMapperFactory()->get(ErrorMapper::class),
-            $this->getMapperFactory()->get(\Schoolbox\Admin\Editor\Templates\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Admin\Editor\Templates\Category\Mapper::class),
         );
     }
 

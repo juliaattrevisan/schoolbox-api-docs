@@ -6,7 +6,6 @@
 interface Props {
     categories: Array<unknown>;
 }
-
 const props = defineProps<Props>();
 </script>
 

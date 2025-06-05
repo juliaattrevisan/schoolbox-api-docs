@@ -10,13 +10,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Editor\Templates;
 
-use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web\Controller\Base;
-use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Mapper\Exception;
-use Schoolbox\Role;
+use Schoolbox\Admin\Editor\Templates\Category\ModelToArray;
 
 class Controller extends Base
 {
@@ -28,7 +25,7 @@ class Controller extends Base
      */
     public function __construct(
         private ErrorMapper $errorMapper,
-        private Mapper $categoryMapper,
+        private Category\Mapper $categoryMapper,
     ) {
     }
 
@@ -38,12 +35,16 @@ class Controller extends Base
      */
     public function getList(): void
     {
+
+        $categories = $this->categoryMapper->findAll()->sortNaturally('type');
+        $translator = new ModelToArray();
+
         $this->response = $this->responseFromTemplate(
             '@adminEditorTemplates/list.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminEditorTemplates.getList'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminEditorTemplates.getList')),
-                'categories' => json_encode($this->categoryMapper->findAll()->sortNaturally('type')),
+                'categories' => $categories->map($translator),
             ]
         );
     }

@@ -14,7 +14,7 @@
     {# {% set createRoute = routeLookupIfAuthorized('adminLessonPlanTemplate.getCreate') %} #}
     <div id="editor-templates-container">
         <editor-templates
-            :categories="{{ categories }}"
+            :categories="{{ (categories ?? []) | json_encode }}"
         />
     </div>
     <script src="{{ CDN_PREFIX }}/js/bundle/editorTemplates.js?v={{ config.site_version }}"></script>
