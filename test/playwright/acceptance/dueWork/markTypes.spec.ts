@@ -56,6 +56,7 @@ test.describe("Due Work - Mark type tests", () => {
         await assessmentForm.setTitle(dueWorkName1);
         await assessmentForm.setWorkType(AssessmentForm.WORKTYPE_ASSESSMENT_TASK);
         await assessmentForm.setSelfReflection(AssessmentForm.SELF_REFLECTION_FULL);
+        await assessmentForm.enableDualMarkTypes();
         await assessmentForm.setMarkType(AssessmentForm.MARK_TYPE_LETTER_GRADE);
         await assessmentForm.setInstructorMarkType(AssessmentForm.MARK_TYPE_PERCENTAGE);
         await assessmentForm.create();
@@ -67,6 +68,7 @@ test.describe("Due Work - Mark type tests", () => {
         await assessmentForm.setTitle(dueWorkName2);
         await assessmentForm.setWorkType(AssessmentForm.WORKTYPE_ASSESSMENT_TASK);
         await assessmentForm.setSelfReflection(AssessmentForm.SELF_REFLECTION_FULL);
+        await assessmentForm.enableDualMarkTypes();
         await assessmentForm.setMarkType(AssessmentForm.MARK_TYPE_PERCENTAGE);
         await assessmentForm.setInstructorMarkType(AssessmentForm.MARK_TYPE_TOTAL_MARK);
         await assessmentForm.toggleUseRubric();
@@ -120,6 +122,7 @@ test.describe("Due Work - Mark type tests", () => {
         await assessmentForm.setTitle(dueWorkName3);
         await assessmentForm.setWorkType(AssessmentForm.WORKTYPE_ASSESSMENT_TASK);
         await assessmentForm.setSelfReflection(AssessmentForm.SELF_REFLECTION_FULL);
+        await assessmentForm.enableDualMarkTypes();
         await assessmentForm.setMarkType(AssessmentForm.MARK_TYPE_NONE);
         await assessmentForm.setInstructorMarkType(AssessmentForm.MARK_TYPE_PERCENTAGE);
         await assessmentForm.toggleUseRubric();
