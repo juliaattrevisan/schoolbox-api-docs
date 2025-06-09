@@ -5,7 +5,7 @@
  # @param array $payload      A struct containing all the curriculum nodes, feedbacks and student metadata
  # @param bool $annotate      Optionally show some diagnostic data
  #}
-{% if payload is not null %}
+{% if payload is not null and payload.data is not null and payload.data|length %}
 <style>
     table.victorian-progression  {
         border-collapse: collapse;
