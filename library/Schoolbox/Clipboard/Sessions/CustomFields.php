@@ -5,6 +5,14 @@ namespace Schoolbox\Clipboard\Sessions;
 class CustomFields
 {
     /**
+     * Clipboard can allow multiple list prefixes: sessions and fixtures were ones we
+     * actually knew about, but discovered Teams could also be returned here, while in
+     * prod.
+     */
+    private const KNOWN_LIST_PREFIXES = ['fixtures', 'sessions', 'teams'];
+
+
+    /**
      * Split the giant pile of $customFieldsMetadata into two distinct lists
      * which can be individually sorted. Clipboard intends to open this to
      * user customisation at some point
@@ -16,11 +24,27 @@ class CustomFields
     {
         $temp = [];
 
+        /* Precompute available list prefixes, setting up a data payload
+         * Here's an example struct for what $temp is going to be like.
+         *
+            Array
+            (
+                [fixtures][fixtures_studentArrivalTime] => fixtures_busReturnTime
+                [fixtures][fixtures_busReturnTime] => fixtures_busDepartureTime
+                [fixtures][fixtures_mvpVote5] => result
+                [fixtures][fixtures_mvpVote1] => fixtures_mvpVote2
+                [fixtures][fixtures_mvpVote4] => fixtures_mvpVote5
+                [fixtures][fixtures_mvpVote3] => fixtures_mvpVote4
+                [fixtures][fixtures_busDepartureTime] => timeBlock
+                [fixtures][fixtures_mvpVote2] => fixtures_mvpVote3
+                [fixtures][fixtures_studentPickupTime] => fixtures_studentArrivalTime
+            )
+        */
         foreach ($customFieldsMetadata as $id => $data) {
-            if (str_contains($id, 'sessions_')) {
-                $temp['sessions'][$id] = $data['showAfterField'];
-            } elseif (str_contains($id, 'fixtures_')) {
-                $temp['fixtures'][$id] = $data['showAfterField'];
+            foreach (self::KNOWN_LIST_PREFIXES as $prefix) {
+                if (str_contains($id, "{$prefix}_")) {
+                    $temp[$prefix][$id] = $data['showAfterField'];
+                }
             }
         }
 
@@ -28,7 +52,7 @@ class CustomFields
          */
         $output = [];
 
-        foreach (['sessions', 'fixtures'] as $key) {
+        foreach (self::KNOWN_LIST_PREFIXES as $key) {
             /* One or more of these keys didn't have a set of data in the custom fields
              * Skip it
              */
@@ -36,10 +60,15 @@ class CustomFields
                 continue;
             }
 
-            $nodes = $this->sorter($temp[$key]);
+            /* Compile data in a prescribed order, ignoring anything that's meaningless
+             * such as looking for data corresponding to a clipboard ui element
+             */
+            $nodes = $this->sorter($key, array_flip($temp[$key]));
 
-            foreach ($nodes as $current => $previous) {
-                $output[$key][$current] = $customFieldsMetadata[$current];
+            foreach ($nodes as $current) {
+                if (isset($customFieldsMetadata[$current])) {
+                    $output[$key][$current] = $customFieldsMetadata[$current];
+                }
             }
         }
 
@@ -48,26 +77,27 @@ class CustomFields
 
     /**
      * Sorts a set of custom fields by their showAfterField node
-     *
-     * Yoinked directly from
-     * https://stackoverflow.com/questions/67056611/php-associative-array-sorting-by-previous-value
      */
-    private function sorter(array $array): array
+    private function sorter(string $index, array $data): array
     {
-        // find the key which doesn't have a matching value
-        $unique = array_diff(array_keys($array), $array);
-        $key = reset($unique);
-        $value = $array[$key];
-        $result = [$key => $value];
-        // follow the values backwards until the key matches the value
-        while ($key != $value) {
-            $key = $array[$key] ?? null;
-            $value = $array[$key] ?? null;
-            $result = [$key => $value] + $result;
+        $stack = [];
+
+        foreach (array_keys($data) as $anchor) {
+            if (str_contains($anchor, "{$index}_")) {
+                continue;
+            }
+
+            $current = $anchor;
+
+            while ($current !== null) {
+                $stack[] = $current;
+                $next = $data[$current] ?? null;
+
+                unset($data[$current]);
+                $current = $next;
+            }
         }
 
-        /* Remove dead elements: we don't need empty nodes etc.
-         */
-        return array_filter($result);
+        return $stack;
     }
 }

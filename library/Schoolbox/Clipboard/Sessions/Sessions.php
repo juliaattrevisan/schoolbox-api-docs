@@ -418,21 +418,20 @@ class Sessions implements IStrategy
                         $customFieldLists = (new CustomFields())->generate($customFieldsMetadata);
 
                         foreach ($customFieldLists as $type => $customFieldList) {
-                            foreach ($customFieldList as $key => $fieldData) {
-                                /* Look up what this was meant to be called
-                                 */
-                                if (!array_key_exists($key, $customFieldsMetadata)) {
-                                    $this->log->debug(sprintf('Skipping custom field "%s"; because no metadata exists', $key));
-                                    continue;
-                                }
+                            $this->log->debug(sprintf(
+                                'Inspecting "%s" custom fields in customFieldLists...',
+                                $type
+                            ));
 
+                            foreach ($customFieldList as $key => $fieldData) {
                                 /* $sessions[customFieldsData] contains a different list than the one we're currently consuming
                                  * Skip over it
                                  */
                                 if (!array_key_exists($key, $session['customFieldsData'])) {
                                     $this->log->debug(sprintf(
-                                        'Skipping custom field metadata for "%s" - that is not in session[customFieldsData] list',
-                                        $key
+                                        'Skipping custom field metadata for "%s" - that is not in session[customFieldsData] list which contains the following keys directly from the API: %s',
+                                        $key,
+                                        implode(', ', array_keys($session['customFieldsData']))
                                     ));
 
                                     continue;
@@ -507,10 +506,15 @@ class Sessions implements IStrategy
                              *
                              * so I guess we just concatenate all their values for now
                              */
-                            $notes .= sprintf(
+                            $notes .= trim(sprintf(
                                 self::ADDITIONAL_FIELDS_TEMPLATE,
                                 implode('', $customFields)
-                            );
+                            ));
+
+                            $this->log->debug(sprintf(
+                                "Found the following custom field data: %s\n    ",
+                                $notes
+                            ));
                         }
                     }
 
