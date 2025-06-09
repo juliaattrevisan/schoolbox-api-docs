@@ -23,12 +23,12 @@ class Lists
     /**
      * Maximum number of Recently Accepted articles to show
      */
-    private const NUM_RECENTLY_ACCEPTED = 5;
+    private const NUM_RECENTLY_ACCEPTED = 20;
 
     /**
      * Maximum number of Recently Rejected articles to show
      */
-    private const NUM_RECENTLY_REJECTED = 5;
+    private const NUM_RECENTLY_REJECTED = 20;
 
     /**
      * @var News\Mapper
