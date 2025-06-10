@@ -185,6 +185,13 @@
                     <a href="{{ modifyContentsRoute }}{% if RETURN_URL.previous.encoded %}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}{% endif %}" class="icon-modify" title="Modify Contents">Modify Contents</a>
                 </li>
             {% endif %}
+            {% set viewCustomParticipationRoute = routeLookupIfAuthorized('learningAssessment.getAssessmentParticipationForm', {
+                assessmentId: assessment.id,
+                assessment: assessment
+            }) %}
+            {% if viewCustomParticipationRoute and (assessment is dueWork or assessment is quiz or assessment is task) %}
+                <li><a class="icon-group" href="{{ viewCustomParticipationRoute }}">Student Participation</a></li>
+            {% endif %}
             <li>
                 <a class="icon-delete" title="Delete Activity" data-delete>Delete Activity</a>
             </li>

@@ -140,6 +140,13 @@
                                 <li><a class="icon-task" href="{{ viewGradeRoute }}" >View and {{ locale.grades }} submissions</a></li>
                                 {% endif %}
                             {% endif %}
+                            {% set viewCustomParticipationRoute = routeLookupIfAuthorized('learningAssessment.getAssessmentParticipationForm', {
+                                assessmentId: assessment.id,
+                                assessment: assessment
+                            }) %}
+                            {% if viewCustomParticipationRoute and assessment is not project and assessment is not lessonPlan %}
+                                <li><a class="icon-group" href="{{ viewCustomParticipationRoute }}">Student Participation</a></li>
+                            {% endif %}
                             {% if assessment is dueWork and assessment.enableWorksheet and kamiWorksheetRoute %}
                                 <li>
                                     <a id="kamiWorksheet" class="icon-surveys" href="{{ kamiWorksheetRoute }}">Class View</a>
