@@ -77,10 +77,12 @@ class CourseGroup
         string $folderAlias = 'folder',
         string $parentFolderAlias = 'parent'
     ): Builder {
+        /* Escape the course code to prevent something like "07LANFRE.12025" breaking the regex */
+        $courseCodeEscaped = preg_quote($courseCode, '/');
 
         $innerPb = $this->accountBridge
             ->equalsAccountFolder($accountCanvasId, $parentFolderAlias)
-            ->regex("$folderAlias.name", "^.+\\({$this::codePrefix()}-{$courseCode}\\)$");
+            ->regex("$folderAlias.name", "^.+\\({$this::codePrefix()}-{$courseCodeEscaped}\\)$");
 
         return (new Builder($this->schoolboxDb->getQuoter(), $folderAlias))->all($innerPb);
     }
