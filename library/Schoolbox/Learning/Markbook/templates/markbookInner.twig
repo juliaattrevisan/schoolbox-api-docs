@@ -43,7 +43,7 @@
     </nav>
     <ul id="header-options" class="f-dropdown" data-dropdown-content>
         <li class="separator">Report</li>
-        <li><a href='{{ routeLookup('learningMarkbook.getMarkbookExportForClass', {folder: folder, folderId: folder.id}) }}?{{ queryArgs }}'
+        <li><a href='{{ _routes['learningMarkbook.getMarkbookExportForClass'] }}'
                data-download-spreadsheet
                class='icon-download'>Download Spreadsheet</a>
     </ul>
@@ -66,7 +66,7 @@
             <tr class="rotate-headers" data-headers data-hidable-columns>
                 <th class="fixed-left"><div></div></th>
                 <th class="fixed-left"><div><span>Student Weighted Average</span></div></th>
-                {% if rankEnabled %}
+                {% if rank %}
                 <th>
                     <div>
                         <span>Class Ranking</span>
@@ -103,7 +103,7 @@
                     <span data-actual-mark>{{ weightedMean | default('-') }}</span>
                     <span data-draft-mark style="display:none">{{ draftWeightedMean | default('-') }}</span>
                 </th>
-                {% if rankEnabled %}
+                {% if rank %}
                 <th>-</th>
                 {% endif %}
                 {% for assessment in markbook.assessments %}
@@ -136,12 +136,12 @@
             <tr class="sub-row">
                 <th class="fixed-left">Visibility</th>
                 <th class="fixed-left"></th>
-                {% if rankEnabled %}
+                {% if rank %}
                 <td>&nbsp;</td>
                 {% endif %}
                 {% for assessment in markbook.assessments %}
                     <td data-assessment="{{ assessment.id }}">
-                        {% if assessment is not task %}
+                        {% if assessment.familyName != 'task' %}
                             {% set selected = assessment.markvisibility %}
                             {% set allOptions = {
                                 0: { css: 'icon-locked', icon: '&#xe63e;', description: 'Staff Only' },
@@ -207,7 +207,7 @@
                         </a>
                     {% endif %}
                 </th>
-                {% if rankEnabled %}
+                {% if rank %}
                 <td>
                     {% if rank[student.id] is defined and meanNormalised %}
                         {# check if the rank object exits, and there is / was a mean score #}
@@ -219,36 +219,37 @@
                 {% endif %}
 
                 {% for assessment in markbook.assessments %}
-                    {% set participant = assessment.getParticipantIfExtant(student, false) %}
+                    {% set participant = markbook.participants[assessment.id][student.id] %}
                     <td
                         class="column-{{ assessment.id }}
                             {% if not participant or participant.isExcluded %} excluded
                             {% endif %} student-grade-cell"
                             data-test="markbook-cell-{{ assessment.id }}-{{ student.id }}"
                             data-assessment="{{ assessment.id }}"
-                            {% if assessment is dueWork or assessment is quiz or assessment is lti %}
+                            {% if assessment.familyName == 'dueWork' or assessment.familyName == 'quiz' or assessment.familyName == 'lti' %}
                             data-pop-out-menu
                             {% endif %}
-                            data-assessment-type="{{ assessment.getFamilyName }}"
-                            data-endpoint="{{ routeLookupIfAuthorized('learningAssessmentTimeline.getFullTimeline', {assessment: assessment, assessmentId: assessment.id, userId: student.id }) }}"
-                            data-update-route="{{ routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
-                            data-review-route="{{ routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
-                            data-publish-route="{{ routeLookupIfAuthorized('learningDueWorkFeedback.postPublishFeedback', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
-                            data-exclude-route="{{ routeLookupIfAuthorized('learningAssessment.postExclude', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
-                            data-include-route="{{ routeLookupIfAuthorized('learningAssessment.postInclude', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
+                            data-assessment-type="{{ assessment.familyName }}"
+                            data-endpoint="{{ assessment._routes.student[student.id]['learningAssessmentTimeline.getFullTimeline'] }}"
+                            data-update-route="{{ assessment._routes.student[student.id]['learningDueWorkResponse.getParticularResponse'] }}"
+                            data-review-route="{{ assessment._routes.student[student.id]['learningDueWorkResponse.getParticularResponse'] }}"
+                            data-publish-route="{{ assessment._routes.student[student.id]['learningDueWorkFeedback.postPublishFeedback'] }}"
+                            data-exclude-route="{{ assessment._routes.student[student.id]['learningAssessment.postExclude'] }}"
+                            data-include-route="{{ assessment._routes.student[student.id]['learningAssessment.postInclude'] }}"
                             data-is-participant="{% if participant %}true{% else %}false{% endif %}"
                             data-is-excluded="{% if participant and not participant.isExcluded %}false{% else %}true{% endif %}"
-                            data-history-route="{{ routeLookupIfAuthorized('learningAssessment.getSummary', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
+                            data-history-route="{{ assessment._routes.student[student.id]['learningAssessment.getSummary'] }}"
                     >
                     <!-- Add data for the popup menu above -->
                         {% if participant and not participant.isExcluded %}
-                            {% if assessment is task %}
+                            {% if assessment.familyName == 'task' %}
                                 {# An icon that shows if the student has attempted the task or not #}
                                 {% if studentCount < functionDegradeLimit %}
-                                    {% include '@learningAssessment/fragments/progressTick.twig' with {
+                                    {# {% include '@learningAssessment/fragments/progressTick.twig' with {
                                         assessment: assessment,
                                         student: participant.user
-                                    } only %}
+                                    } only %} #}
+                                    TICK
                                 {% else %}
                                     {% if participant.isResponseRequired %}
                                         <div
@@ -268,14 +269,13 @@
                                     {% endif %}
                                 {% endif %}
                             {% else %}
-                                {% set normalisedMark = participant.normalisedMark(true) %}
                                 {% set participationRoute = routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) %}
                                 {% set draftMark = markbook.hasDraft[assessment.id][student.id] is defined %}
                                 <span
-                                    class="{{ urgency.marks(normalisedMark) }}"
+                                    class="{{ urgency.marks(participant.normalisedMark) }}"
                                     href="{{ participationRoute }}"
                                     {% if draftMark %} data-actual-mark {% endif %}
-                                    title="{{ participant.authoritativeFeedback(true) ? participant.authoritativeFeedback(true).comment|html2text : '' }}"
+                                    title="{{ participant.authoritativeFeedback ? participant.authoritativeFeedback.comment : '' }}"
                                 >
                                     <span data-instructor-mark>{{ decorator.label(participant, true, true) }}</span>
                                     <span data-learner-mark style="display: none">{{ decorator.label(participant, true, false) }}</span>
@@ -286,7 +286,7 @@
                                         data-draft-mark
                                         style="display: none"
                                         class="meta"
-                                        title="{{ participant.authoritativeFeedback(false) ? participant.authoritativeFeedback(false).comment|html2text : '' }}"
+                                        title="{{ participant.authoritativeFeedback ? participant.authoritativeFeedback.comment : '' }}"
                                     >
                                         <span data-instructor-mark>{{ decorator.label(participant, false, true) }}</span>
                                         <span data-learner-mark style="display: none">{{ decorator.label(participant, false, false) }}</span>
@@ -296,7 +296,7 @@
                                     <span class="legend-indicator indicator-{{ decorator.indicator(participant, draftMark) }}" title="{{ decorator.notchTitle(participant, draftMark) }}"></span>
                                 {% endif %}
                                 {% if not participant.plan.isDynamic %}
-                                    <span class="individualisation has-tip tip-left" data-width="200" data-tooltip title="{{ participant.plan.name }} ({{ participant.plan.duedate.short }})">i</span>
+                                    <span class="individualisation has-tip tip-left" data-width="200" data-tooltip title="{{ participant.plan.name }} ({{ participant.plan.dueDate }})">i</span>
                                 {% endif %}
                             {% endif %}
                         {% endif %}

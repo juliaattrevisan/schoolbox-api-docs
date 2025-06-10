@@ -134,17 +134,165 @@ class Controller extends Base
              */
             $rank = $markbook->getRanking();
 
+            // TODO: clean this up a bit once the payload structure is finalised
+            $data = [
+                'rank' => (bool)$this->getConfigLoader()->get('view_rank') ? $rank : null,
+                'markbook' => [
+                    'assessments' => $markbook->getAssessments()->map(fn(IAssessable $assessment) => [
+                        'id'             => $assessment->getId(),
+                        'title'          => $assessment->getTitle(),
+                        'typeName'       => $assessment->getTypeName(),
+                        'familyName'     => $assessment->getFamilyName(),
+                        'markvisibility' => $assessment->getMarkVisibility(),
+                        'courseManaged'  => $assessment->getCourseManaged(),
+                        'weight'         => $assessment->getWeight(),
+                        '_routes'        => [
+                            'learningAssessment.getStatus' => $this->routeGenerator->generate(
+                                'learningAssessment.getStatus',
+                                [ 'assessmentId' => $assessment->getId() ]
+                            ),
+                            'student' => $markbook->getStudents()->map(fn(User $student) => [
+                                'learningAssessmentTimeline.getFullTimeline' => $this->getRouteIfAuthorized(
+                                    'learningAssessmentTimeline.getFullTimeline',
+                                    [
+                                        'assessment' => $assessment,
+                                        'assessmentId' => $assessment->getId(),
+                                        'userId' => $student->getId(),
+                                    ]
+                                ),
+                                'learningDueWorkResponse.getParticularResponse' => $this->getRouteIfAuthorized(
+                                    'learningDueWorkResponse.getParticularResponse',
+                                    [
+                                        'assessment' => $assessment,
+                                        'assessmentId' => $assessment->getId(),
+                                        'studentId' => $student->getId(),
+                                        'student' => $student,
+                                    ]
+                                ),
+                                'learningDueWorkFeedback.postPublishFeedback' => $this->getRouteIfAuthorized(
+                                    'learningDueWorkFeedback.postPublishFeedback',
+                                    [
+                                        'assessment' => $assessment,
+                                        'assessmentId' => $assessment->getId(),
+                                        'studentId' => $student->getId(),
+                                        'student' => $student,
+                                    ]
+                                ),
+                                'learningAssessment.postExclude' => $this->getRouteIfAuthorized(
+                                    'learningAssessment.postExclude',
+                                    [
+                                        'assessment' => $assessment,
+                                        'assessmentId' => $assessment->getId(),
+                                        'studentId' => $student->getId(),
+                                        'student' => $student,
+                                    ]
+                                ),
+                                'learningAssessment.postInclude' => $this->getRouteIfAuthorized(
+                                    'learningAssessment.postInclude',
+                                    [
+                                        'assessment' => $assessment,
+                                        'assessmentId' => $assessment->getId(),
+                                        'studentId' => $student->getId(),
+                                        'student' => $student,
+                                    ]
+                                ),
+                                'learningAssessment.getSummary' => $this->getRouteIfAuthorized(
+                                    'learningAssessment.getSummary',
+                                    [
+                                        'assessment' => $assessment,
+                                        'assessmentId' => $assessment->getId(),
+                                        'studentId' => $student->getId(),
+                                        'student' => $student,
+                                    ]
+                                ),
+                            ]),
+                        ],
+                    ]),
+                    'participants' => [], // filled in later
+                    'students'    => $markbook->getStudents(),
+                    // 'topLevelAssessments'
+                    // 'defaultMarkScheme'
+                    // 'viewingUser'
+                    // 'totalWeight' => $markbook->getTotalWeight(),
+                    'normalisedMean' => $markbook->getNormalisedMean(),
+                    'draftNormalisedMean' => $markbook->getDraftNormalisedMean(),
+                    'weightedMean' => $markbook->getWeightedMean(),
+                    'draftWeightedMean' => $markbook->getDraftWeightedMean(),
+                    'assessmentStatistics' => $markbook->getAssessmentStatistics(),
+                    'studentStatistics' => $markbook->getStudentStatistics(),
+                    'hasDraft' => $markbook->getHasDraft(),
+                ],
+                'writable' => $this->getAssessmentsWritability($markbook->getAssessments()),
+                '_routes'               => [
+                    'learningMarkbook.getMarkbookExportForClass' => sprintf(
+                        "%s?%s",
+                        $this->routeGenerator->generate(
+                            'learningMarkbook.getMarkbookExportForClass',
+                            [
+                                'folder'   => $folder,
+                                'folderId' => $folder->getId(),
+                            ]
+                        ),
+                        $codec->convertSelectionsToQueryString($selectionsPerFilter),
+                    ),
+                ],
+                'availableVisibilities' => Visibility::getAvailableVisibilities((int)$this->getConfigLoader()->get('submission_visibility_max')),
+            ];
+
+            foreach ($markbook->getAssessments() as $assessment) {
+                $data['markbook']['participants'][$assessment->getId()] = [];
+                foreach ($markbook->getStudents() as $student) {
+                    $participant = $assessment->getParticipantIfExtant($student, false);
+
+                    if ($participant === null) {
+                        continue;
+                    }
+
+                    $draftMark = isset($data['markbook']['hasDraft'][$assessment->getId()][$student->getId()]);
+
+                    $authoritativeFeedback = $participant->getAuthoritativeFeedback(true);
+                    $authoritativeFeedbackDraft = $draftMark ? $participant->getAuthoritativeFeedback(false) : null;
+
+                    $data['markbook']['participants'][$assessment->getId()][$student->getId()] = [
+                        'isExcluded'         => $participant->isExcluded(),
+                        'isResponseRequired' => $participant->isResponseRequired(),
+                        'isFeedbackRequired' => $participant->isFeedbackRequired(),
+                        'isReviewComplete'   => $participant->isReviewComplete(),
+                        'hasSubmittedResponse' => $participant->hasSubmittedResponse(),
+                        'hasPublishedFeedback' => $participant->hasPublishedFeedback(),
+                        'resubmissionRequired' => $participant->isResubmissionRequired(),
+                        'normalisedMark'     => $participant->getNormalisedMark(true),
+                        'humanReadableInstructorMark' => [
+                            'published' => $participant->getHumanReadableInstructorMark(true),
+                            'unpublished' => $participant->getHumanReadableInstructorMark(false),
+                        ],
+                        'humanReadableMark' => [
+                            'published' => $participant->getHumanReadableMark(true),
+                            'unpublished' => $participant->getHumanReadableMark(false),
+                        ],
+                        'authoritativeFeedback' => $authoritativeFeedback ? [
+                            'comment' => \Scrub::html2text($authoritativeFeedback->getComment()),
+                        ] : null,
+                        'authoritativeFeedbackDraft' => $authoritativeFeedbackDraft ? [
+                            'comment' => \Scrub::html2text($authoritativeFeedbackDraft->getComment()),
+                        ] : null,
+                        'plan' => [
+                            'isDynamic' => $participant->getPlan()->getIsDynamic(),
+                            'name' => $participant->getPlan()->getName(),
+                            'dueDate' => $participant->getPlan()->getDueDate()?->getShort() ?? null,
+                        ],
+                    ];
+                }
+            }
+
+            $data = json_decode(json_encode($data), true); // TEMP to ensure it can be encoded
+
             $this->response = $this->responseAsJson([
                 'status'  => 200,
-                'content' => $this->responseFromTemplateUnthemed('@learningMarkbook/markbookInner.twig', [
-                    'markbook'              => $markbook,
-                    'folder'                => $folder,
-                    'rank'                  => $rank,
-                    'rankEnabled'           => (bool)$this->getConfigLoader()->get('view_rank'),
-                    'writable'              => $this->getAssessmentsWritability($markbook->getAssessments()),
-                    'queryArgs'             => $codec->convertSelectionsToQueryString($selectionsPerFilter),
-                    'availableVisibilities' => Visibility::getAvailableVisibilities((int)$this->getConfigLoader()->get('submission_visibility_max')),
-                ])->getBody()->getContents(),
+                'content' => $this->responseFromTemplateUnthemed(
+                    '@learningMarkbook/markbookInner.twig',
+                    $data,
+                )->getBody()->getContents(),
             ]);
         } catch (Filter\BrokenFilterException $e) {
             $this->captureException($e);
