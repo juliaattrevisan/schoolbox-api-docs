@@ -41,7 +41,7 @@ class Module extends BaseModule
             )
         );
 
-        $this->register('GET', '', 'getTemplates', $perms);
+        $this->register('GET', '/{categoryId:\d+}', 'getTemplates', $perms);
     }
 
     /**
@@ -51,7 +51,7 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->getMapperFactory()->get(ErrorMapper::class),
-            $this->getMapperFactory()->get(\Schoolbox\Editor\Templates\Mapper::class),
+            $this->getMapperFactory()->get(Mapper::class),
         );
     }
 

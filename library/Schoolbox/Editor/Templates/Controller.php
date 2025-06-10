@@ -29,12 +29,19 @@ class Controller extends Base
 
     /**
      * Return a list of templates according to the category
+     *
+     * GET /editor/templates/{categoryId}
      */
-    public function getTemplates(): void
+    public function getTemplates(int $categoryId): void
     {
 
-        $output = [];
-        $this->response = $this->responseAsJson($output);
+        // validate further...
+
+        $templates = $this->mapper->findByColumn('category_id', $categoryId);
+        $translator = new ModelToArray();
+
+        $this->response = $this->responseAsJson($templates->map($translator));
+
     }
 
 }
