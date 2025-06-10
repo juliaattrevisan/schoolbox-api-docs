@@ -29,7 +29,6 @@ class Controller extends Base
     ) {
     }
 
-
     /**
      * Display list of editor template categories
      */
