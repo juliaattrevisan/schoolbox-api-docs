@@ -134,7 +134,9 @@ class Controller extends Base
 
         // Don't store to the history
         $this->setAllowBackToTheFuture(false);
-        $this->response = $this->responseAsJson($manifest);
+        $this->response = $this->responseAsJson($manifest)
+            ->withHeader('Cache-Control', 'max-age=86400, private')
+            ->withHeader('Pragma', '');
     }
 
     /**
@@ -171,6 +173,8 @@ class Controller extends Base
         $this->response = $this
             ->responseFromTemplateUnthemed('@manifest/service-worker.js.twig', ['debug' => (bool)$this->getConfigLoader()->get('debug_mode')])
             ->withHeader('Content-Type', 'application/javascript')
+            ->withHeader('Cache-Control', 'max-age=86400, private')
+            ->withHeader('Pragma', '')
         ;
     }
 }
