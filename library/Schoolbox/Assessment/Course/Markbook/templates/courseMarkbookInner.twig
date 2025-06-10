@@ -19,12 +19,11 @@
 {% import '@learning/macro/markDecorator.twig' as decorator %}
 
     <div class="actions-small-1">
-        {% if not courseSpec.courseImplementations|length %}
-        {% set importUrl = routeLookup('courseImport.getImport', {courseSpecId: courseSpec.id, folderId: 0, componentId: 0}) %}
+        {% if not courseSpec.hasImplementations %}
         <div class="empty-state">
             <i class="icon-curriculum"></i>
             <p>
-                This course has not yet been imported to any classes or groups. <a href="{{ importUrl }}">Import this course</a>.
+                This course has not yet been imported to any classes or groups. <a href="{{ courseSpec._routes['courseImport.getImport'] }}">Import this course</a>.
             </p>
         </div>
         {% elseif not collapsedAssessments | length %}
@@ -61,7 +60,7 @@
         </nav>
         <ul id="header-options" class="f-dropdown" data-dropdown-content="">
             <li class="separator">Report</li>
-            <li><a href='{{ routeLookup('courseMarkbook.getMarkbookExport', {courseSpecId: courseSpec.id} ) }}?{{ queryArgs }}'
+            <li><a href='{{ courseSpec._routes['courseMarkbook.getMarkbookExport'] }}'
                    data-download-spreadsheet
                    class='icon-download'>Download Spreadsheet</a></li>
         </ul>
@@ -72,7 +71,7 @@
             <tr class="rotate-headers">
                 <th class="fixed-left"><div></div></th>
                 <th class="fixed-left"><div><span>Student Weighted Average</span></div></th>
-                {% if rankEnabled %}
+                {% if rank %}
                     <th>
                         <div>
                             <span>Course Ranking</span>
@@ -82,9 +81,8 @@
                 {% for assessment in collapsedAssessments %}
                         <th data-test="markbook-assessment" data-assessment="{{ assessment.id }}"><div><span>
                             {% if assessment.isSpecification %}
-                                {% set participationRoute = routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: USER.id}) %}
-                                {% if participationRoute %}
-                                    <a href="{{ participationRoute }}">{{ assessment.title }}</a>
+                                {% if assessment._routes['learningAssessment.getSummary'] %}
+                                    <a href="{{ assessment._routes['learningAssessment.getSummary'] }}">{{ assessment.title }}</a>
                                 {% else %}
                                     <span>{{ assessment.title }}</span>
                                 {% endif %}
@@ -99,30 +97,24 @@
             <tr class="course-headers">
                 <th class="fixed-left transparent"></th>
                 <th class="fixed-left white"></th>
-                {% if rankEnabled %}
+                {% if rank %}
                 <th class="white"></th>
                 {% endif %}
                 {# Ensure single-source-of-truth regarding column ordering #}
                 {% set currentUnitSpec = null %}
                 {% set countUnitAssessments = 0 %}
                 {% for assessment in collapsedAssessments %}
-                    {% if assessment.isSpecification %}
-                        {% set unitSpec = assessment.baseContext %}
-                    {% else %}
-                        {% set unitSpec = assessment.baseContext.specification %}
-                    {% endif %}
-
                     {% if currentUnitSpec is null %}
                         {# first column #}
-                        {% set currentUnitSpec = unitSpec %}
+                        {% set currentUnitSpec = assessment.unitSpec %}
                         {% set countUnitAssessments = countUnitAssessments + 1 %}
-                    {% elseif currentUnitSpec.id == unitSpec.id %}
+                    {% elseif currentUnitSpec.id == assessment.unitSpec.id %}
                         {# next column of current unit #}
                         {% set countUnitAssessments = countUnitAssessments + 1 %}
                     {% else %}
                         {# first column of next unit #}
                         <th class="unit-title" colspan="{{ countUnitAssessments }}">{{ currentUnitSpec.title }}</th>
-                        {% set currentUnitSpec = unitSpec %}
+                        {% set currentUnitSpec = assessment.unitSpec %}
                         {% set countUnitAssessments = 1 %}
                     {% endif %}
                 {% endfor %}
@@ -133,13 +125,13 @@
             <tr>
                 <th class="course-row class-row-heading fixed-left">Course Average <span data-tooltip class="hint has-tip tip-top" title="Average student cohort mark">?</span></th>
                 <th class="course-row fixed-left"></th>
-                {% if rankEnabled %}
+                {% if rank %}
                     <th></th>
                 {% endif %}
                 {% for assessment in collapsedAssessments %}
                     {% if assessment.isSpecification %}
                         <td class="course-row">
-                            {% if assessment is task or assessmentSpecMarks[assessment.id] is not defined %}
+                            {% if assessment.familyName == 'task' or assessmentSpecMarks[assessment.id] is not defined %}
                                 <span>–</span>
                             {% else %}
                                 {% set marks         = assessmentSpecMarks[assessment.id] %}
@@ -160,23 +152,22 @@
                 <tr>
                     <th class="class-row class-row-heading fixed-left"><a href="/homepage/{{ courseImpl.folder.id }}">{{ courseImpl.folder.title }}</a></th>
                     <th class="class-row fixed-left"></th>
-                    {% if rankEnabled %}
+                    {% if rank %}
                         <th></th>
                     {% endif %}
                     {% for assessment in collapsedAssessments %}
                         {% if courseImportAssessments[courseImpl.id][assessment.id] is defined %}
                             {% set assessmentImpl = courseImportAssessments[courseImpl.id][assessment.id] %}
-                            {% set statusRoute = routeLookup('learningAssessment.getStatus', {assessmentId: assessmentImpl.id}) %}
                             <td class="class-row">
-                                {% if assessment is task or assessmentImplMarks[assessmentImpl.id] is not defined %}
-                                    <a href="{{ statusRoute }}">–</a>
+                                {% if assessment.familyName == 'task' or assessmentImplMarks[assessmentImpl.id] is not defined %}
+                                    <a href="{{ assessmentImpl._routes['learningAssessment.getStatus'] }}">–</a>
                                 {% else %}
                                     {% set marks         = assessmentImplMarks[assessmentImpl.id] %}
                                     {% set publishedMark = marks.published ?? null %}
                                     {% set draftMark     = marks.any ?? null %}
-                                    <a href="{{ statusRoute }}" {% if marks.any is defined %}data-actual-mark{% endif %}>{% if publishedMark is null %}–{% else %}{{ publishedMark | round(2) }} %{% endif %}</a>
+                                    <a href="{{ assessmentImpl._routes['learningAssessment.getStatus'] }}" {% if marks.any is defined %}data-actual-mark{% endif %}>{% if publishedMark is null %}–{% else %}{{ publishedMark | round(2) }} %{% endif %}</a>
                                     {% if marks.any is defined %}
-                                        <a href="{{ statusRoute }}" class="meta" style="display: none;" data-draft-mark>{% if draftMark is null %}–{% else %}{{ draftMark | round(2) }} %{% endif %}</a>
+                                        <a href="{{ assessmentImpl._routes['learningAssessment.getStatus'] }}" class="meta" style="display: none;" data-draft-mark>{% if draftMark is null %}–{% else %}{{ draftMark | round(2) }} %{% endif %}</a>
                                     {% endif %}
                                 {% endif %}
                             </td>
@@ -209,13 +200,12 @@
                         {% set draftsOnClass = marks.any is defined and marks.any.hr ? urgency.marks(draftNormMark) ~ '-bg' : 'gradient-off-bg' %}
 
                         <th class="fixed-left student-average {{ draftsOffClass }}" {% if marks.any is defined %}data-student-average{% endif %} data-off-class="{{ draftsOffClass }}" data-on-class="{{ draftsOnClass }}">
-                            {% set gradesRoute = routeLookup('learningGrades.getGrades', {viewee: student, userId: student.id, termCode: ''}) %}
-                            <a class="{{ draftsOffClass }}" href="{{ gradesRoute }}" {% if marks.any is defined %}data-actual-mark{% endif %} title="View students {{ locale.grades.plural }}">{{ publishedHrMark }}</a>
+                            <a class="{{ draftsOffClass }}" href="{{ student._routes['learningGrades.getGrades'] }}" {% if marks.any is defined %}data-actual-mark{% endif %} title="View students {{ locale.grades.plural }}">{{ publishedHrMark }}</a>
                             {% if marks.any is defined %}
-                                  <a class="{{ draftsOnClass }}" href="{{ gradesRoute }}" data-draft-mark style="display: none" data-tooltip="right" class="meta has-tip tip-right" data-width="105" title="Draft Mark">{{ draftHrMark }}</a>
+                                  <a class="{{ draftsOnClass }}" href="{{ student._routes['learningGrades.getGrades'] }}" data-draft-mark style="display: none" data-tooltip="right" class="meta has-tip tip-right" data-width="105" title="Draft Mark">{{ draftHrMark }}</a>
                             {% endif %}
                         </th>
-                        {% if rankEnabled %}
+                        {% if rank %}
                             <td class="course-ranking">
                                 {% if rank[student.id] is defined and publishedNormMark %}
                                     {# check if the rank object exits, and there is / was a mean score #}
@@ -228,28 +218,28 @@
 
                         {% for assessment in collapsedAssessments %}
                             {% set aImpl = courseImportAssessments[courseImpl.id][assessment.id] ?? null %}
-                            {% set participant = aImpl.participantIfExtant(student, false) ?? null %}
                             {% if aImpl %}
+                            {% set participant = aImpl.participants[student.id] %}
                             <td
                                 class="column-{{ assessment.id }} {% if not participant or participant.isExcluded %} excluded {% endif %} student-grade-cell"
                                 data-test="markbook-cell-{{ assessment.id }}-{{ student.id }}"
                                 data-assessment="{{ assessment.id }}"
-                                {% if canAccessPopOut and (assessment is dueWork or assessment is quiz or assessment is lti ) %}
+                                {% if canAccessPopOut and (assessment.familyName == 'dueWork' or assessment.familyName == 'quiz' or assessment.familyName == 'lti' ) %}
                                 data-pop-out-menu
                                 {% endif %}
-                                data-assessment-type="{{ assessment.getFamilyName }}"
+                                data-assessment-type="{{ assessment.familyName }}"
                                 data-is-participant="{% if participant %}true{% else %}false{% endif %}"
                                 data-is-excluded="{% if participant and not participant.isExcluded %}false{% else %}true{% endif %}"
-                                data-endpoint="{{ routeLookupIfAuthorized('learningAssessmentTimeline.getFullTimeline', {assessment: aImpl, assessmentId: aImpl.id, userId: student.id }) }}"
-                                data-update-route="{{ routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessment: aImpl, assessmentId: aImpl.id, student: student, studentId: student.id }) }}"
-                                data-review-route="{{ routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessment: aImpl, assessmentId: aImpl.id, student: student, studentId: student.id }) }}"
-                                data-publish-route="{{ routeLookupIfAuthorized('learningDueWorkFeedback.postPublishFeedback', {assessment: aImpl, assessmentId: aImpl.id, student: student, studentId: student.id }) }}"
-                                data-exclude-route="{{ routeLookupIfAuthorized('learningAssessment.postExclude', {assessment: aImpl, assessmentId: aImpl.id, student: student, studentId: student.id }) }}"
-                                data-include-route="{{ routeLookupIfAuthorized('learningAssessment.postInclude', {assessment: aImpl, assessmentId: aImpl.id, student: student, studentId: student.id }) }}"
-                                data-history-route="{{ routeLookupIfAuthorized('learningAssessment.getSummary', {assessment: aImpl, assessmentId: aImpl.id, student: student, studentId: student.id }) }}"
+                                data-endpoint="{{ assessment._routes.student[courseImpl.id][student.id]['learningAssessmentTimeline.getFullTimeline'] }}"
+                                data-update-route="{{ assessment._routes.student[courseImpl.id][student.id]['learningDueWorkResponse.getParticularResponse'] }}"
+                                data-review-route="{{ assessment._routes.student[courseImpl.id][student.id]['learningDueWorkResponse.getParticularResponse'] }}"
+                                data-publish-route="{{ assessment._routes.student[courseImpl.id][student.id]['learningDueWorkFeedback.postPublishFeedback'] }}"
+                                data-exclude-route="{{ assessment._routes.student[courseImpl.id][student.id]['learningAssessment.postExclude'] }}"
+                                data-include-route="{{ assessment._routes.student[courseImpl.id][student.id]['learningAssessment.postInclude'] }}"
+                                data-history-route="{{ assessment._routes.student[courseImpl.id][student.id]['learningAssessment.getSummary'] }}"
                             >
                             {% if participant and not participant.isExcluded %}
-                                {% if assessment is task %}
+                                {% if assessment.familyName == 'task' %}
                                     {% set progressStatus = taskProgress[courseImpl.id][assessment.id][student.id] %}
 
                                     {# Tasks do not have drafts #}
@@ -275,7 +265,7 @@
                                     {% set draftMark          = marks.draft ?? null %}
 
                                     <span
-                                        class="{{ urgency.marks(participant.normalisedMark(true)) }}"
+                                        class="{{ urgency.marks(participant.normalisedMark) }}"
                                         {% if marks.draft is defined %}data-actual-mark{% endif %}
                                         title="{{ comment|html2text }}"
                                     >

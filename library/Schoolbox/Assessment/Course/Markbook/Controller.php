@@ -19,11 +19,13 @@ use Schoolbox\Filter\Codec;
 use Schoolbox\Filter\Filters\Assessment\AssessmentType\Definition as AssessmentTypeDefinition;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\User;
 use Throwable;
 
 use function array_combine;
@@ -216,32 +218,213 @@ class Controller extends WebController\Base
             $assessmentIds  = $this->assessmentIdFinder->findIdsByFilters($filters, $this->getUser());
             $courseMarkbook = $this->buildCourseMarkbook($courseSpec, $assessmentIds);
 
-            /**
-             * need to get an list of the students by id, with their ranking
-             */
-            $rank = $courseMarkbook->getRanking();
+            // TODO: clean this up a bit once the payload structure is finalised
+            $data = [
+                'rank' => (bool)$this->getConfigLoader()->get('view_rank') ? $courseMarkbook->getRanking() : null,
+                'courseSpec' => [
+                    'hasImplementations' => $courseSpec->getCourseImplementations()->count() > 0,
+                    '_routes' => [
+                        'courseImport.getImport' => $this->routeGenerator->generate(
+                            'courseImport.getImport',
+                            [
+                                'courseSpecId' => $courseSpec->getId(),
+                                'folderId'     => 0,
+                                'componentId'  => 0,
+                            ]
+                        ),
+                        'courseMarkbook.getMarkbookExport' => sprintf(
+                            "%s?%s",
+                            $this->routeGenerator->generate(
+                                'courseMarkbook.getMarkbookExport',
+                                [
+                                    'courseSpecId' => $courseSpec->getId(),
+                                ]
+                            ),
+                            $codec->convertSelectionsToQueryString($selectionsPerFilter),
+                        ),
+                    ],
+                ],
+                'collapsedAssessments' => $courseMarkbook->getCollapsedAssessments()->map(fn(IAssessable $assessment) => [
+                    'id'                => $assessment->getId(),
+                    'title'             => $assessment->getTitle(),
+                    'typeName'          => $assessment->getTypeName(),
+                    'familyName'        => $assessment->getFamilyName(),
+                    'isSpecification'   => $assessment->isSpecification(),
+                    'unitSpec'          => [
+                        // I think this can be simplified, it's only used to render those horizontal unit bars at the top
+                        'id'    => $assessment->isSpecification() ?
+                            $assessment->getBaseContext()->getId() : $assessment->getBaseContext()->getSpecification()->getId(),
+                        'title'    => $assessment->isSpecification() ?
+                            $assessment->getBaseContext()->getTitle() : $assessment->getBaseContext()->getSpecification()->getTitle(),
+                    ],
+                    '_routes'        => [
+                        'learningAssessment.getSummary' => $this->routeGenerator->generate(
+                            'learningAssessment.getSummary',
+                            [
+                                'assessmentId' => $assessment->getId(),
+                                'studentId'    => $this->getUser()->getId(), // apparently this is just the current user?
+                            ]
+                        ),
+                        'student' => $courseMarkbook->getCourseImportStudents()->map(
+                            fn($courseImplStudents) => $courseImplStudents->map(fn(User $student) => [
+                                'learningAssessmentTimeline.getFullTimeline' => $this->getRouteIfAuthorized(
+                                    'learningAssessmentTimeline.getFullTimeline',
+                                    [
+                                        'assessment' => $assessment,
+                                        'assessmentId' => $assessment->getId(),
+                                        'userId' => $student->getId(),
+                                    ]
+                                ),
+                                'learningDueWorkResponse.getParticularResponse' => $this->getRouteIfAuthorized(
+                                    'learningDueWorkResponse.getParticularResponse',
+                                    [
+                                        'assessment' => $assessment,
+                                        'assessmentId' => $assessment->getId(),
+                                        'studentId' => $student->getId(),
+                                        'student' => $student,
+                                    ]
+                                ),
+                                'learningDueWorkFeedback.postPublishFeedback' => $this->getRouteIfAuthorized(
+                                    'learningDueWorkFeedback.postPublishFeedback',
+                                    [
+                                        'assessment' => $assessment,
+                                        'assessmentId' => $assessment->getId(),
+                                        'studentId' => $student->getId(),
+                                        'student' => $student,
+                                    ]
+                                ),
+                                'learningAssessment.postExclude' => $this->getRouteIfAuthorized(
+                                    'learningAssessment.postExclude',
+                                    [
+                                        'assessment' => $assessment,
+                                        'assessmentId' => $assessment->getId(),
+                                        'studentId' => $student->getId(),
+                                        'student' => $student,
+                                    ]
+                                ),
+                                'learningAssessment.postInclude' => $this->getRouteIfAuthorized(
+                                    'learningAssessment.postInclude',
+                                    [
+                                        'assessment' => $assessment,
+                                        'assessmentId' => $assessment->getId(),
+                                        'studentId' => $student->getId(),
+                                        'student' => $student,
+                                    ]
+                                ),
+                                'learningAssessment.getSummary' => $this->getRouteIfAuthorized(
+                                    'learningAssessment.getSummary',
+                                    [
+                                        'assessment' => $assessment,
+                                        'assessmentId' => $assessment->getId(),
+                                        'studentId' => $student->getId(),
+                                        'student' => $student,
+                                    ]
+                                ),
+                            ]),
+                        ),
+                    ],
+                ]),
+                'courseImpls' => $courseMarkbook->getCourseImpls()->map(
+                    fn(CourseImpl\Model $courseImpl) => [
+                        'id'    => $courseImpl->getId(),
+                        'folder' => [
+                            'id'    => $courseImpl->getFolder()->getId(),
+                            'title' => $courseImpl->getFolder()->getTitle(),
+                        ],
+                    ]
+                ),
+                'courseImportAssessments' => $courseMarkbook->getCourseImportAssessments()->map(
+                    fn(GenericCollection $assessments, $courseImplId) => $assessments->map(
+                        fn(IAssessable $aImpl) => [
+                            'id' => $aImpl->getId(),
+                            'participants' => $courseMarkbook->getCourseImportStudents()[$courseImplId]->map(
+                                function (User $student) use ($aImpl) {
+                                    $participant = $aImpl->getParticipantIfExtant($student, false) ?? null;
+                                    if ($participant === null) {
+                                        return null;
+                                    }
+                                    return [
+                                        'id'    => $participant->getId(),
+                                        'isExcluded' => $participant->isExcluded(),
+                                        'hasSubmittedResponse' => $participant->hasSubmittedResponse(),
+                                        'hasPublishedFeedback' => $participant->hasPublishedFeedback(),
+                                        'resubmissionRequired' => $participant->isResubmissionRequired(),
+                                        'normalisedMark'     => $participant->getNormalisedMark(true),
+                                        'humanReadableInstructorMark' => [
+                                            'published' => $participant->getHumanReadableInstructorMark(true),
+                                            'unpublished' => $participant->getHumanReadableInstructorMark(false),
+                                        ],
+                                        'humanReadableMark' => [
+                                            'published' => $participant->getHumanReadableMark(true),
+                                            'unpublished' => $participant->getHumanReadableMark(false),
+                                        ],
+                                    ];
+                                }
+                            ),
+                            '_routes' => [
+                                'learningAssessment.getStatus' => $this->routeGenerator->generate(
+                                    'learningAssessment.getStatus',
+                                    ['assessmentId' => $aImpl->getId()]
+                                ),
+                            ]
+                        ]
+                    )
+                ),
+                'courseImportStudents' => $courseMarkbook->getCourseImportStudents()->map(
+                    fn(GenericCollection $students) => $students->map(
+                        function (User $student) {
+                            return [
+                                'id'         => $student->getId(),
+                                'externalId' => $student->getExternalId(), // ...for portrait.twig
+                                'fullName'   => $student->getFullName(),
+                                '_routes'    => [
+                                    'learningGrades.getGrades' => $this->routeGenerator->generate(
+                                        'learningGrades.getGrades',
+                                        [
+                                            'viewee'   => $student,
+                                            'userId'   => $student->getId(),
+                                            'termCode' => '',
+                                        ]
+                                    ),
+                                ]
+                            ];
+                        }
+                    )
+                ),
+                'assessmentSpecMarks'  => $courseMarkbook->getAssessmentSpecAverages(),
+                'assessmentImplMarks'  => $courseMarkbook->getAssessmentImplAverages(),
+                'studentMarks'         => $courseMarkbook->getStudentMarks(),
+                'studentAverageMarks'  => $courseMarkbook->getStudentAverageMarks(),
+                'studentComments'      => $courseMarkbook->getStudentComments(),
+                'taskProgress'         => $courseMarkbook->getTaskProgress(),
+                'taskProgressPending'  => Completion::STATUS_SELF_ASSESSED_COMPLETE,
+                'taskProgressComplete' => Completion::STATUS_TEACHER_ASSESSED_COMPLETE,
+                'canAccessPopOut'      => $this->getCanAccessPopOut($courseSpec)
+            ];
+
+            $data = json_decode(json_encode($data), true); // TEMP to ensure it can be encoded
 
             $contentResponse = $this->responseFromTemplateUnthemed(
                 '@courseMarkbook/courseMarkbookInner.twig',
                 [
-                    'rank'                    => $rank,
-                    'rankEnabled'             => (bool)$this->getConfigLoader()->get('view_rank'),
-                    'courseSpec'              => $courseSpec,
-                    'collapsedAssessments'    => $courseMarkbook->getCollapsedAssessments(),
-                    'unitSpecs'               => $courseMarkbook->getUnitSpecs(),
-                    'courseImpls'             => $courseMarkbook->getCourseImpls(),
-                    'courseImportAssessments' => $courseMarkbook->getCourseImportAssessments(),
-                    'courseImportStudents'    => $courseMarkbook->getCourseImportStudents(),
-                    'assessmentSpecMarks'     => $courseMarkbook->getAssessmentSpecAverages(),
-                    'assessmentImplMarks'     => $courseMarkbook->getAssessmentImplAverages(),
-                    'studentMarks'            => $courseMarkbook->getStudentMarks(),
-                    'studentAverageMarks'     => $courseMarkbook->getStudentAverageMarks(),
-                    'studentComments'         => $courseMarkbook->getStudentComments(),
-                    'taskProgress'            => $courseMarkbook->getTaskProgress(),
-                    'taskProgressPending'     => Completion::STATUS_SELF_ASSESSED_COMPLETE,
-                    'taskProgressComplete'    => Completion::STATUS_TEACHER_ASSESSED_COMPLETE,
-                    'queryArgs'               => $codec->convertSelectionsToQueryString($selectionsPerFilter),
-                    'canAccessPopOut'         => $this->getCanAccessPopOut($courseSpec),
+                    'rank'                    => $data['rank'],
+                    // 'rankEnabled'             => (bool)$this->getConfigLoader()->get('view_rank'),
+                    'courseSpec'              => $data['courseSpec'],
+                    'collapsedAssessments'    => $data['collapsedAssessments'],
+                    // 'unitSpecs'               => $courseMarkbook->getUnitSpecs(),
+                    'courseImpls'             => $data['courseImpls'],
+                    'courseImportAssessments' => $data['courseImportAssessments'],
+                    'courseImportStudents'    => $data['courseImportStudents'],
+                    'assessmentSpecMarks'     => $data['assessmentSpecMarks'],
+                    'assessmentImplMarks'     => $data['assessmentImplMarks'],
+                    'studentMarks'            => $data['studentMarks'],
+                    'studentAverageMarks'     => $data['studentAverageMarks'],
+                    'studentComments'         => $data['studentComments'],
+                    'taskProgress'            => $data['taskProgress'],
+                    'taskProgressPending'     => $data['taskProgressPending'],
+                    'taskProgressComplete'    => $data['taskProgressComplete'],
+                    // 'queryArgs'               => $data['queryArgs'],
+                    'canAccessPopOut'         => $data['canAccessPopOut'],
                 ]
             );
             $this->response = $this->responseAsJson([
