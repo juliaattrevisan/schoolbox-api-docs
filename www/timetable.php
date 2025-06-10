@@ -280,7 +280,7 @@ foreach ($userList as $user) {
 
                                     $this->setVar([
                                         'PERIOD_DESC'   => Scrub::Text($description),
-                                        'PERIOD_CODE'   => strlen($periodCode) ? "({$periodCode})" : '',
+                                        'PERIOD_CODE'   => strlen($periodCode) ? "({$periodCode})<br>" : '',
                                         'PERIOD_ROOM'   => Scrub::Text($class['room']),
                                         'PERIOD_STAFF'  => Scrub::Text($staffIdNameMap[$class['staffID']]),
                                         'PERIOD_COLOUR' => Scrub::text($subjectColourMap[$cacheKey] ?? ''),
