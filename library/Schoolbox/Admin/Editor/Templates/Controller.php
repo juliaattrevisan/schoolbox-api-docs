@@ -13,7 +13,7 @@ namespace Schoolbox\Admin\Editor\Templates;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Admin\Editor\Templates\Category\ModelToArray;
+use Schoolbox\Admin\Editor\Templates\ModelToArray;
 
 class Controller extends Base
 {
@@ -25,7 +25,7 @@ class Controller extends Base
      */
     public function __construct(
         private ErrorMapper $errorMapper,
-        private Category\Mapper $categoryMapper,
+        private Mapper $categoryMapper,
     ) {
     }
 
@@ -47,16 +47,6 @@ class Controller extends Base
                 'categories' => $categories->map($translator),
             ]
         );
-    }
-
-    /**
-     * Return a list of templates according to the category
-     */
-    public function getTemplates(): void
-    {
-
-        $output = [];
-        $this->response = $this->responseAsJson($output);
     }
 
 }

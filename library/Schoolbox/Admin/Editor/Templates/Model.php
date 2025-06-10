@@ -8,7 +8,7 @@
 
  declare(strict_types=1);
 
-namespace Schoolbox\Admin\Editor\Templates\Category;
+namespace Schoolbox\Admin\Editor\Templates;
 
 use Schoolbox\Mapper\Traits\Model\Id;
 
