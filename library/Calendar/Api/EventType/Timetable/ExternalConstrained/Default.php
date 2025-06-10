@@ -257,16 +257,20 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
 
                         $event->setPeriod($period['periodNumber']);
                         $event->setPeriodName($period['periodName']);
-                        // Load the color for this timetabled class
-                        if ($period['code'] && !array_key_exists($period['code'], $colorMap)) {
+
+                        /* Load the color for this timetabled class
+                         * Treats empty $subjectCode '' as a valid index. Hence all subjects which lack a code will have the same colour.
+                         */
+                        $colourMapKey = trim($period['code'] ?? '');
+                        if (!array_key_exists($colourMapKey, $colorMap)) {
                             // not enough colors: loop around to index 0.
                             if (!$colorList->offsetExists($colorIndex)) {
                                 $colorIndex = 0;
                             }
-                            $colorMap[$period['code']] = $colorList->offsetGet($colorIndex)->getHexColour();
+                            $colorMap[$colourMapKey] = $colorList->offsetGet($colorIndex)->getHexColour();
                             $colorIndex++;
                         }
-                        $event->setColour($colorMap[$period['code']]);
+                        $event->setColour($colorMap[$colourMapKey]);
 
                         $event->setConnectorId($this->getConnectorId());
                         $addedEvents[$key] = $event;

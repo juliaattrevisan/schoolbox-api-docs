@@ -55,14 +55,15 @@ class Timetable_ColourManager
         if (count($this->colorList) === 0) {
             return '';
         }
-        if ($value && !array_key_exists($value, $this->colorMap)) {
+        $colourMapKey = trim($value ?? '');
+        if (!array_key_exists($colourMapKey, $this->colorMap)) {
             // not enough colors: loop around to index 0.
             if (!$this->colorList->offsetExists($this->colorIndex)) {
                 $this->colorIndex = 0;
             }
-            $this->colorMap[$value] = $this->colorList->offsetGet($this->colorIndex)->getHexColour();
+            $this->colorMap[$colourMapKey] = $this->colorList->offsetGet($this->colorIndex)->getHexColour();
             $this->colorIndex++;
         }
-        return $this->colorMap[$value];
+        return $this->colorMap[$colourMapKey];
     }
 }
