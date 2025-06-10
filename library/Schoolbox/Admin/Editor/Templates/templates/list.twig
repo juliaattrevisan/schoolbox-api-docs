@@ -11,11 +11,11 @@
     {# Shared navigation menu #}
     {{ renderAdminNavigation(pageCurrent) }}
 
-    {# {% set createRoute = routeLookupIfAuthorized('adminLessonPlanTemplate.getCreate') %} #}
     <div class="admin-content">
         <div id="editor-templates-container">
             <editor-templates
                 :categories="{{ (categories ?? []) | json_encode }}"
+                :templates-endpoint="{{ routeLookupIfAuthorized('editorTemplates.getTemplates') ?? '' }}"
             />
         </div>
         <script src="{{ CDN_PREFIX }}/js/bundle/editorTemplates.js?v={{ config.site_version }}"></script>
