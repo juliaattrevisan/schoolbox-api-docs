@@ -24,11 +24,9 @@ class Mapper extends \Schoolbox\Mapper
      */
     protected function mapping(): void
     {
-        $this->hasTable('editor_template');
+        $this->hasTable('editor_template_category');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->uses('title', self::TYPE_STRING);
-        $this->uses('description', self::TYPE_STRING);
-        $this->uses('body', self::TYPE_STRING);
+        $this->uses('name', self::TYPE_STRING);
     }
 }

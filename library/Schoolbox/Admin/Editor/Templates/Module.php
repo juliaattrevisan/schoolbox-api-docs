@@ -42,6 +42,7 @@ class Module extends BaseModule
         );
 
         $this->register('GET', '', 'getList', $perms);
+        $this->register('GET', '/{categoryId:\d+}', 'getTemplates', $perms);
     }
 
     /**

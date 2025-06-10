@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\Editor\Templates\Category;
+namespace Schoolbox\Admin\Editor\Templates;
 
 /**
  * @method Model createModel($idValue = null)
@@ -24,9 +24,11 @@ class Mapper extends \Schoolbox\Mapper
      */
     protected function mapping(): void
     {
-        $this->hasTable('editor_template_category');
+        $this->hasTable('editor_template');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->uses('name', self::TYPE_STRING);
+        $this->uses('title', self::TYPE_STRING);
+        $this->uses('description', self::TYPE_STRING);
+        $this->uses('body', self::TYPE_STRING);
     }
 }

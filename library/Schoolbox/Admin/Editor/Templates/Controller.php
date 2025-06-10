@@ -49,4 +49,14 @@ class Controller extends Base
         );
     }
 
+    /**
+     * Return a list of templates according to the category
+     */
+    public function getTemplates(): void
+    {
+
+        $output = [];
+        $this->response = $this->responseAsJson($output);
+    }
+
 }

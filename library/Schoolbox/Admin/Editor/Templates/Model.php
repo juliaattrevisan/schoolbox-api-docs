@@ -8,7 +8,7 @@
 
  declare(strict_types=1);
 
-namespace Schoolbox\Admin\Editor\Templates;
+namespace Schoolbox\Admin\Editor\Templates\Category;
 
 use Schoolbox\Mapper\Traits\Model\Id;
 
@@ -19,69 +19,23 @@ class Model
     /**
      * @var string
      */
-    private string $title;
-
-    /**
-     * @var string
-     */
-    private string $description;
-
-    /**
-     * @var string
-     */
-    private string $body;
+    private string $name;
 
     /**
      * @return string
      */
-    public function getTitle(): string
+    public function getName(): string
     {
-        return $this->title;
+        return $this->name;
     }
 
     /**
-     * @param string $title
+     * @param string $name
      * @return Model
      */
-    public function setTitle(string $title): self
+    public function setName(string $name): self
     {
-        $this->title = $title;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDescription(): string
-    {
-        return $this->description;
-    }
-
-    /**
-     * @param string $description
-     * @return Model
-     */
-    public function setDescription(string $description): self
-    {
-        $this->description = $description;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getBody(): string
-    {
-        return $this->body;
-    }
-
-    /**
-     * @param string $body
-     * @return Model
-     */
-    public function setBody(string $body): self
-    {
-        $this->body = $body;
+        $this->name = $name;
         return $this;
     }
 }

@@ -26,7 +26,7 @@ class ModelToArray
     {
         return [
             'id' => $model->getId(),
-            'title' => $model->getTitle(),
+            'name' => $model->getName(),
         ];
     }
 }

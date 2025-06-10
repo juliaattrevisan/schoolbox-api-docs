@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\Editor\Templates\Category;
+namespace Schoolbox\Admin\Editor\Templates;
 
 
 /**
@@ -26,7 +26,7 @@ class ModelToArray
     {
         return [
             'id' => $model->getId(),
-            'name' => $model->getName(),
+            'title' => $model->getTitle(),
         ];
     }
 }
