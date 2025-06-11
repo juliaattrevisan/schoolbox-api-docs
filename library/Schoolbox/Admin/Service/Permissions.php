@@ -133,7 +133,7 @@ class Permissions
                 case 'Calendar':
                     $campus = $campuses->getBy('id', $row['sid']);
                     if ($campus === null) {
-                        // Assume the campus referred to by $row['sid'] has been deleted.
+                        // Campus $row['sid'] does not exist or has been deleted, so ignore this userAccess row.
                         continue (2);
                     }
                     $sidLabel = 'Campus';
@@ -142,7 +142,7 @@ class Permissions
                 case 'Impersonator':
                     $role = $roles->getBy('id', $row['sid']);
                     if ($role === null) {
-                        // Assume the role referred to by $row['sid'] has been deleted.
+                        // Role $row['sid'] does not exist or has been deleted, so ignore this userAccess row.
                         continue (2);
                     }
                     $sidLabel = 'Role';
