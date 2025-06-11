@@ -62,6 +62,11 @@ class ExternalUserValueInTest extends TestCase
             ->setLastname(' \ Chemistry\Phy\sics T\eacher & Assist\ant\ \D\irector of Academic Operations 7-12 (SS)   \   ')
         ;
 
+        $specialChars3 = (new Staff())
+            ->setGivenName('Chemis*try/Physics Teacher & A\ ss \   *\ \is/tan/t/ D/i/r/e/ctor *of Academic Operations 7-1*2 (SS)')
+            ->setLastname(' \ Chemistry\Ph*y\sics T\eacher & Assist\ant\ \D*\irector of Academic Operati*ons 7-12 (SS) *  \   ')
+        ;
+
         // Simple match (or not) on name
         yield 'match on single valid name' => [
             'givenName',
@@ -425,6 +430,22 @@ class ExternalUserValueInTest extends TestCase
             'lastName',
             '*(SS)*',
             $specialChars2,
+            true
+        ];
+
+        /* Even more even extreme, with additional random asterix
+         */
+        yield 'special characters in value 20' => [
+            'givenName',
+            '*(SS)*',
+            $specialChars3,
+            true
+        ];
+
+        yield 'special characters in value 21' => [
+            'lastName',
+            '*(SS)*',
+            $specialChars3,
             true
         ];
     }
