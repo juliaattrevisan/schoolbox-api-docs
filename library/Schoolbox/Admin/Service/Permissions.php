@@ -113,7 +113,7 @@ class Permissions
 
         $userIds = array_unique(array_column($userAccessRows, 'userId'));
         $users = $this->userMapper->findByColumn('id', $userIds);
-        $campuses = $this->campusMapper->findAll();
+        $campuses = $this->campusMapper->findAll(['deleted' => true]);
         $roles = $this->roleMapper->findAll();
 
         $servicePermissionTablesData = [];
@@ -126,6 +126,29 @@ class Permissions
 
         foreach ($userAccessRows as $row) {
             $serviceName = $serviceNameLookup[$row['serviceId']];
+            $sidLabel = '';
+            $sidDisplayValue = '';
+
+            switch ($serviceName) {
+                case 'Calendar':
+                    $campus = $campuses->getBy('id', $row['sid']);
+                    if ($campus->isDeleted()) {
+                        continue (2);
+                    }
+                    $sidLabel = 'Campus';
+                    $sidDisplayValue = $campus->getName();
+                    break;
+                case 'Impersonator':
+                    $role = $roles->getBy('id', $row['sid']);
+                    if ($role->isDeleted()) {
+                        continue (2);
+                    }
+                    $sidLabel = 'Role';
+                    $sidDisplayValue = $role->getName();
+                    break;
+                default:
+                    // Leave $sidLabel and $sidDisplayValue as blank.
+            }
 
             if (!array_key_exists($serviceName, $servicePermissionTablesData)) {
                 $servicePermissionTablesData[$serviceName] = [];
@@ -134,16 +157,8 @@ class Permissions
             $servicePermissionTablesData[$serviceName][] = [
                 'user' => $users->getBy('id', $row['userId']),
                 'accessName' => ucfirst($accessLevelToNameModified[$row['accessLevel']]),
-                'sidLabel' => match ($serviceName) {
-                    'Calendar' => 'Campus',
-                    'Impersonator' => 'Role',
-                    default => ''
-                },
-                'sidDisplayValue' => match ($serviceName) {
-                    'Calendar' => $campuses->getBy('id', $row['sid'])->getName(),
-                    'Impersonator' => $roles->getBy('id', $row['sid'])->getName(),
-                    default => ''
-                },
+                'sidLabel' => $sidLabel,
+                'sidDisplayValue' => $sidDisplayValue
             ];
         }
 
