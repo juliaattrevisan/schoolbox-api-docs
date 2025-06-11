@@ -214,6 +214,9 @@ class Mapper extends BaseMapper
      * Gets number of attempts this student has made on this assessment. Doesn't
      * include deleted assessments.
      *
+     * Note that this function expect `$studentId` to be int, but sometimes it might be string or other
+     * so make sure that you convert it to int before inputting
+     *
      * @param int $ltiAssessmentId LTI assessment to check.
      * @param int $studentId The student to check.
      *
