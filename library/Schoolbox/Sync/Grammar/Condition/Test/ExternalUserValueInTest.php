@@ -374,10 +374,14 @@ class ExternalUserValueInTest extends TestCase
             'givenName',
             '*(SS)*',
             $specialChars,
-            /* This is actually intended usage of the vendor library, despite it maybe being misleading
-             * if you're used to vanilla regex.
+            /* false
+             * This is actually intended usage of the vendor library, despite it maybe being misleading
+             * if you're used to vanilla regex. We translate * to ** on behalf of users, allowing this
+             * syntax to succeed when normally the vendor library would have returned false, failing to
+             * match; simply to avoid having to teach users the difference between * and ** for values
+             * that contain one slash or the other based on operating system environments.
              */
-            false
+            true
         ];
 
         yield 'special characters in value 2' => [
