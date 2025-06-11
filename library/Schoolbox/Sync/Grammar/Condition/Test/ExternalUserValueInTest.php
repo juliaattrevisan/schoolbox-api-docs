@@ -374,7 +374,8 @@ class ExternalUserValueInTest extends TestCase
             'givenName',
             '*(SS)*',
             $specialChars,
-            /* false
+            /* "false" normally.
+             *
              * This is actually intended usage of the vendor library, despite it maybe being misleading
              * if you're used to vanilla regex. We translate * to ** on behalf of users, allowing this
              * syntax to succeed when normally the vendor library would have returned false, failing to
@@ -384,6 +385,9 @@ class ExternalUserValueInTest extends TestCase
             true
         ];
 
+        /* double asterisk variant that you were SUPPOSED to have been doing for data like this,
+         * but users don't know that and it'll be too annoying for them to learn its nuances.
+         */
         yield 'special characters in value 2' => [
             'lastName',
             '**(SS)**',
@@ -391,6 +395,15 @@ class ExternalUserValueInTest extends TestCase
             /* This is actually intended usage of the vendor library, despite it maybe being misleading
              * if you're used to vanilla regex.
              */
+            true
+        ];
+
+        /* A bit of an extreme case
+         */
+        yield 'special characters in value 3' => [
+            'lastName',
+            '*********(SS)**',
+            $specialChars,
             true
         ];
     }
