@@ -127,7 +127,7 @@ class CompletionMapper extends Mapper
             $latestTaskCompletion = null;
         }
 
-        if ($latestTaskCompletion->isDeleted()) {
+        if ($latestTaskCompletion?->isDeleted()) {
             $latestTaskCompletion = null;
         }
 
