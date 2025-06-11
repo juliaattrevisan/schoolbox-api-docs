@@ -3,8 +3,10 @@
  * Display a list of editor templates.
  */
 
+import { isAbortError, hasErrorMessage } from "@js/util/errorUtils";
+import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import { kebabToTitleCase } from "@js/util/stringUtils";
-import type { Category } from "../js/types/editorTemplatesTypes";
+import type { Category, Template } from "../js/types/editorTemplatesTypes";
 
 interface Props {
     categories: Category[]; // The categories of templates to display
@@ -21,6 +23,57 @@ const currentCategory = window.Vue.ref<Category>(props.categories[0]);
 function onCategorySelected(category: Category): void {
     currentCategory.value = category;
 }
+
+const isLoading = window.Vue.ref<boolean>(false);
+const loadError = window.Vue.ref<string | null>(null);
+const currentTemplates = window.Vue.ref<Template[]>([]);
+
+/**
+ *
+ */
+async function loadCategoryTemplates(): Promise<void> {
+    if (props.templatesEndpoint === "") {
+        return;
+    }
+    const url = props.templatesEndpoint.replace("{categoryId}", currentCategory.value.id.toString());
+    try {
+        isLoading.value = true;
+        const response = await fetch(url, {
+            headers: {
+                Accept: "application/json",
+            },
+        });
+        if (!response.ok) {
+            const errorMessage = await extractErrorMessage(response);
+            throw new Error(errorMessage);
+        }
+        const responseJson = (await response.json()) as Template[];
+        // check if the response in not null and is an array
+        if (responseJson === null || !Array.isArray(responseJson)) {
+            throw new Error("Unexpected response format");
+        }
+        currentTemplates.value = responseJson;
+        isLoading.value = false;
+    } catch (error) {
+        // ignore abort errors, as the previous request was cancelled
+        if (isAbortError(error)) {
+            return;
+        }
+        if (error instanceof Error && hasErrorMessage(error)) {
+            loadError.value = error.message;
+        }
+        console.error(error);
+        isLoading.value = false;
+    }
+}
+
+/**
+ * Load the first category's templates when
+ * the component is mounted.
+ */
+window.Vue.onMounted((): void => {
+    void loadCategoryTemplates();
+});
 </script>
 
 <template>
