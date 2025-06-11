@@ -956,4 +956,12 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $data
         );
     }
+
+    public function getAssessmentParticipationLearningPlan(): void
+    {
+        $this->response = $this->responseFromTemplate(
+            '@learningAssessment/participation/learningPlan.twig',
+            []
+        );
+    }
 }
