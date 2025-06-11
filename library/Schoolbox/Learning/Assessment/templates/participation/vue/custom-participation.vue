@@ -225,6 +225,7 @@ window.Vue.onMounted(() => {
                             v-model="selectedList"
                             type="checkbox"
                             :value="participant.user.id"
+                            :data-test="`custom-participation-checkbox-${participant.user.id}`"
                         />
                         <label :for="`id-${participant.user.id}`" class="checkbox-label"></label>
                     </td>
@@ -315,7 +316,7 @@ window.Vue.onMounted(() => {
         </table>
         <!-- container for the sbx-pop-out to be displayed in -->
         <div id="pop-out-container"></div>
-        <bottom-drawer :show-drawer="selectedList.length > 0">
+        <bottom-drawer data-test="custom-participation-bottom-drawer" :show-drawer="selectedList.length > 0">
             <h3 class="selected-count">
                 <em>{{ selectedList.length }} selected</em>
             </h3>

@@ -34,3 +34,18 @@ test("select all check box is visible when more than one participant", () => {
     });
     expect(wrapper.find('[data-test^="custom-participation-select-all"]').isVisible()).toBe(true);
 });
+
+test("bottom drawer is visible when two participants are selected", async () => {
+    const wrapper = mount(CustomParticipation, {
+        props: {
+            allParticipants,
+            getStudentsPastoralCountsUrl: "",
+        },
+    });
+
+    const checkboxes = wrapper.findAll('[data-test^="custom-participation-checkbox-"]');
+    await checkboxes[0].setValue(true);
+    await checkboxes[1].setValue(true);
+
+    expect(wrapper.find('[data-test="custom-participation-bottom-drawer"]').isVisible()).toBe(true);
+});
