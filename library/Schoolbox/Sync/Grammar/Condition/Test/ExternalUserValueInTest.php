@@ -448,5 +448,21 @@ class ExternalUserValueInTest extends TestCase
             $specialChars3,
             true
         ];
+
+        /* For some reason people were escaping the parantheses but you don't need to do that
+         */
+        yield 'special characters in value 31' => [
+            'givenName',
+            '*\(SS\)*',
+            $specialChars3,
+            true
+        ];
+
+        yield 'special characters in value 32' => [
+            'lastName',
+            '*\(SS\)*',
+            $specialChars3,
+            true
+        ];
     }
 }
