@@ -24,3 +24,13 @@ test("select all check box is not visible when only one participant", () => {
     });
     expect(wrapper.find('[data-test^="custom-participation-select-all"]').exists()).toBe(false);
 });
+
+test("select all check box is visible when more than one participant", () => {
+    const wrapper = mount(CustomParticipation, {
+        props: {
+            allParticipants,
+            getStudentsPastoralCountsUrl: "",
+        },
+    });
+    expect(wrapper.find('[data-test^="custom-participation-select-all"]').isVisible()).toBe(true);
+});
