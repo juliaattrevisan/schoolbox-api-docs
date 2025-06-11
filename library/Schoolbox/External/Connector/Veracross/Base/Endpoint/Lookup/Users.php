@@ -21,6 +21,14 @@ use Schoolbox\External\Event\Mapper;
 class Users
 {
     /**
+     * Cache of user profiles indexed by external_id
+     * both students and staff will be stored here
+     * students first, then staff, so staff can override students (if they have the same external_id)
+     * @var array
+     */
+    private array $userLookup = [];
+
+    /**
      * Lookup constructor.
      */
     public function __construct(private Mapper $eventMapper)
@@ -39,18 +47,24 @@ class Users
         /* Combine these two; external ids are Veracross' internal identifier
          * and should be unique across the board
          *
+         * // https://www.php.net/manual/en/function.array-merge.php
+         * // Don't forget that numeric keys will be renumbered!
          * return array_merge($this->initStudentLookup(), $this->initStaffLookup());
+         *
+         * new solution is to use a single array that we keep building up [SA-20288]
          */
-        return $this->initStudentLookup();
+        $this->initStudentLookup();
+//        $this->initStaffLookup();
+        return $this->userLookup;
     }
 
 
     /**
      * Get a list of (external_id, sis_user_profile) tuples
      *
-     * @return array
+     * @return void
      */
-    private function initStudentLookup(): array
+    private function initStudentLookup(): void
     {
         $userProfileTable    = \Schoolbox\External\Profile\Mapper::getInstance()->getTable();
         $studentProfileTable = \Schoolbox\External\Profile\Student\Mapper::getInstance()->getTable();
@@ -61,13 +75,9 @@ class Users
             WHERE external_id IS NOT NULL
         ");
 
-        $students = [];
-
         foreach ($userStatement as $row) {
-            $students[(string)$row['external_id']] = $row;
+            $this->userLookup[(string)$row['external_id']] = $row;
         }
-
-        return $students;
     }
 
 
@@ -77,9 +87,9 @@ class Users
 //    /**
 //     * Get a list of (external_id, sis_user_profile) tuples
 //     *
-//     * @return array
+//     * @return void
 //     */
-//    private function initStaffLookup(): array
+//    private function initStaffLookup(): void
 //    {
 //        $userStatement = $this->eventMapper->getDatabase()->query('
 //            SELECT external_id, firstname, lastname
@@ -88,12 +98,8 @@ class Users
 //            WHERE external_id IS NOT NULL
 //        ');
 //
-//        $staff = [];
-//
 //        foreach ($userStatement as $row) {
-//            $staff[(string)$row['external_id']] = $row;
+//            $this->userLookup[(string)$row['external_id']] = $row;
 //        }
-//
-//        return $staff;
 //    }
 }

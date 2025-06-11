@@ -29,6 +29,13 @@ class IdToMisId
      */
     private const NUM_PER_PAGE = 200;
 
+    /**
+     * Cache of user profiles indexed by external_id
+     * both students and staff will be stored here
+     * students first, then staff, so staff can override students (if they have the same external_id)
+     * @var array
+     */
+    private array $userLookup = [];
 
     /**
      * @param IApi $api
@@ -46,19 +53,19 @@ class IdToMisId
      */
     public function generate(): array
     {
-        return array_merge($this->generateStudentLookup(), $this->generateStaffLookup());
+        $this->generateStudentLookup();
+        $this->generateStaffLookup();
+        return $this->userLookup;
     }
 
 
     /**
      * Tuples for students' identifiers
      *
-     * @return array
+     * @return void
      */
-    private function generateStudentLookup(): array
+    private function generateStudentLookup(): void
     {
-        $lookup = [];
-
         $nextUrl = sprintf(
             'students?page=%s&per_page=%s',
             1,
@@ -79,7 +86,7 @@ class IdToMisId
 
                 /* Build a lookup progressively
                  */
-                $lookup[$internalIdentifier] = $misId;
+                $this->userLookup[$internalIdentifier] = $misId;
             }
 
             /* If there's a pagination struct, there's more data to come...
@@ -91,20 +98,16 @@ class IdToMisId
                 $nextUrl = $students['meta']['pagination']['next'] ?? false;
             }
         }
-
-        return $lookup;
     }
 
 
     /**
      * Tuples for staffs' identifiers
      *
-     * @return array
+     * @return void
      */
-    private function generateStaffLookup(): array
+    private function generateStaffLookup(): void
     {
-        $lookup = [];
-
         $nextUrl = sprintf(
             'employees?page=%s&per_page=%s',
             1,
@@ -125,7 +128,7 @@ class IdToMisId
 
                 /* Build a lookup progressively
                  */
-                $lookup[$internalIdentifier] = $misId;
+                $this->userLookup[$internalIdentifier] = $misId;
             }
 
             /* If there's a pagination struct, there's more data to come...
@@ -137,7 +140,5 @@ class IdToMisId
                 $nextUrl = $staffs['meta']['pagination']['next'] ?? false;
             }
         }
-
-        return $lookup;
     }
 }
