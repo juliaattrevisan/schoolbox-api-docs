@@ -365,8 +365,15 @@ class Payload
         $params = [
             'workTypeId' => $this->workTypeId,
             'studentId' => $student->getId(),
-            'startDate' => $startDate->getDatabaseDate(),
-            'endDate' => $endDate->getDatabaseDate()
+            /* Go from the $startDate's start of day to the $endDate's end of day
+             * Without this, it'll infer '$startDate 00:00:00' to '$endDate 00:00:00'
+             * which natively excludes anything that happened after '$endDate 00:00:00',
+             * causing it to exclude stuff that happened on this last day.
+             *
+             * https://stackoverflow.com/questions/5080824/mysql-between-clause-not-inclusive
+             */
+            'startDate' => $startDate->getDatabaseDate() . ' 00:00:00',
+            'endDate' => $endDate->getDatabaseDate() . ' 23:59:59',
         ];
 
         /* Optional class filter (uses folderId)
