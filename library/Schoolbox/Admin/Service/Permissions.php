@@ -125,12 +125,10 @@ class Permissions
         $accessLevelToNameModified[UserAccess::ACCESS_FULL] = 'moderate';
 
         foreach ($userAccessRows as $row) {
-            $serviceName = $serviceNameLookup[$row['serviceId']];
             $sidLabel = '';
             $sidDisplayValue = '';
-
-            switch ($serviceName) {
-                case 'Calendar':
+            switch ($row['serviceId']) {
+                case UserAccess::SERVICE_CALENDAR:
                     $campus = $campuses->getBy('id', $row['sid']);
                     if ($campus === null) {
                         // Campus $row['sid'] does not exist or has been deleted, so ignore this userAccess row.
@@ -139,7 +137,7 @@ class Permissions
                     $sidLabel = 'Campus';
                     $sidDisplayValue = $campus->getName();
                     break;
-                case 'Impersonator':
+                case UserAccess::SERVICE_IMPERSONATOR:
                     $role = $roles->getBy('id', $row['sid']);
                     if ($role === null) {
                         // Role $row['sid'] does not exist or has been deleted, so ignore this userAccess row.
@@ -151,6 +149,8 @@ class Permissions
                 default:
                     // Leave $sidLabel and $sidDisplayValue as blank.
             }
+
+            $serviceName = $serviceNameLookup[$row['serviceId']];
 
             if (!array_key_exists($serviceName, $servicePermissionTablesData)) {
                 $servicePermissionTablesData[$serviceName] = [];
