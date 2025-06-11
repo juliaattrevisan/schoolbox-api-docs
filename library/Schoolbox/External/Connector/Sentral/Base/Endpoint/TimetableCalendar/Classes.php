@@ -114,7 +114,7 @@ class Classes implements IStrategy
                 $this->log->debug(sprintf(
                     'No timetable metadata for %s (%s) - perhaps user profiles need to be reimported. Skipping',
                     $name,
-                    trim((string)$data['external_id'])
+                    $externalId
                 ));
 
                 continue;
@@ -128,7 +128,7 @@ class Classes implements IStrategy
                 $this->log->warning(sprintf(
                     '%s (%s) does not have metadata: cannot load timetable data. Skipping',
                     $name,
-                    trim((string)$data['external_id'])
+                    $externalId
                 ));
 
                 continue;
@@ -143,7 +143,7 @@ class Classes implements IStrategy
              */
             $struct = [
                 'person' => [
-                    'externalId' => trim((string)$data['external_id']),
+                    'externalId' => $externalId,
                     'firstname' => trim((string)$data['firstname']),
                     'lastname' => trim((string)$data['lastname']),
                     'id' => trim((string)$metadata['id']),
@@ -170,7 +170,7 @@ class Classes implements IStrategy
                 $this->log->warning(sprintf(
                     'Unknown profile type for %s (%s); skipping timetable preload.',
                     $name,
-                    trim((string)$data['external_id'])
+                    $externalId
                 ));
 
                 continue;

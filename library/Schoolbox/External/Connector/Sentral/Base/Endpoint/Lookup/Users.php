@@ -25,6 +25,14 @@ class Users
     private string $studentProfileTable;
     private string $staffProfileTable;
 
+    /**
+     * Cache of user profiles indexed by external_id
+     * both students and staff will be stored here
+     * students first, then staff, so staff can override students (if they have the same external_id)
+     * @var array
+     */
+    private array $userLookup = [];
+
 
     /**
      * Lookup constructor.
@@ -48,19 +56,18 @@ class Users
      */
     public function generate(): array
     {
-        /* We have to presume that external ids are unique, for now
-         * I know in some circles they aren't, but here, they *seem* to be
-         */
-        return array_merge($this->initStudentLookup(), $this->initStaffLookup());
+        $this->initStudentLookup();
+        $this->initStaffLookup();
+        return $this->userLookup;
     }
 
 
     /**
      * Get a list of (external_id, sis_user_profile) tuples
      *
-     * @return array
+     * @return void
      */
-    private function initStudentLookup(): array
+    private function initStudentLookup(): void
     {
         $result = $this->baseProfileMapper->getDatabase()->executeQuery("
             SELECT external_id, firstname, lastname, metadata
@@ -69,22 +76,19 @@ class Users
             WHERE external_id IS NOT NULL
         ");
 
-        $students = [];
 
         while ($row = $result->fetch(\PDO::FETCH_ASSOC)) {
-            $students[(string)$row['external_id']] = $row;
+            $this->userLookup[(string)$row['external_id']] = $row;
         }
-
-        return $students;
     }
 
 
     /**
      * Get a list of (external_id, sis_user_profile) tuples
      *
-     * @return array
+     * @return void
      */
-    private function initStaffLookup(): array
+    private function initStaffLookup(): void
     {
         $result = $this->baseProfileMapper->getDatabase()->executeQuery("
             SELECT external_id, firstname, lastname, metadata
@@ -93,12 +97,8 @@ class Users
             WHERE external_id IS NOT NULL
         ");
 
-        $staff = [];
-
         while ($row = $result->fetch(\PDO::FETCH_ASSOC)) {
-            $staff[(string)$row['external_id']] = $row;
+            $this->userLookup[(string)$row['external_id']] = $row;
         }
-
-        return $staff;
     }
 }
