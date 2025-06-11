@@ -219,7 +219,7 @@ class Mapper extends BaseMapper
      *
      * @return int
      */
-    public function getScoreCountForStudent(int $ltiAssessmentId, $studentId): int
+    public function getScoreCountForStudent(int $ltiAssessmentId, int $studentId): int
     {
         $query = "
             SELECT COUNT(*) AS scores
