@@ -113,7 +113,7 @@ class Permissions
 
         $userIds = array_unique(array_column($userAccessRows, 'userId'));
         $users = $this->userMapper->findByColumn('id', $userIds);
-        $campuses = $this->campusMapper->findAll(['deleted' => true]);
+        $campuses = $this->campusMapper->findAll();
         $roles = $this->roleMapper->findAll();
 
         $servicePermissionTablesData = [];
@@ -132,7 +132,8 @@ class Permissions
             switch ($serviceName) {
                 case 'Calendar':
                     $campus = $campuses->getBy('id', $row['sid']);
-                    if ($campus->isDeleted()) {
+                    if ($campus === null) {
+                        // Assume the campus referred to by $row['sid'] has been deleted.
                         continue (2);
                     }
                     $sidLabel = 'Campus';
@@ -140,7 +141,8 @@ class Permissions
                     break;
                 case 'Impersonator':
                     $role = $roles->getBy('id', $row['sid']);
-                    if ($role->isDeleted()) {
+                    if ($role === null) {
+                        // Assume the role referred to by $row['sid'] has been deleted.
                         continue (2);
                     }
                     $sidLabel = 'Role';
