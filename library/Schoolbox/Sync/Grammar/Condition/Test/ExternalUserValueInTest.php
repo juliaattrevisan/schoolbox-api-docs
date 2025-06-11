@@ -52,6 +52,11 @@ class ExternalUserValueInTest extends TestCase
             ->addEmail((new Email())->setAddress('john@example.com'))
         ;
 
+        $specialChars = (new Staff())
+            ->setGivenName('Chemistry/Physics Teacher & Assistant Director of Academic Operations 7-12 (SS)')
+            ->setLastname('Chemistry\Physics Teacher & Assistant Director of Academic Operations 7-12 (SS)')
+        ;
+
         // Simple match (or not) on name
         yield 'match on single valid name' => [
             'givenName',
@@ -360,6 +365,29 @@ class ExternalUserValueInTest extends TestCase
             ['{jack', 'jack'],
             $staffUser,
             true,
+        ];
+
+        /* This is a real-life example of a position title that contains characters
+         * specially handled by the Matcher which uses PHLAK/Splat to do the matching.
+         */
+        yield 'special characters in value 1' => [
+            'givenName',
+            '*(SS)*',
+            $specialChars,
+            /* This is actually intended usage of the vendor library, despite it maybe being misleading
+             * if you're used to vanilla regex.
+             */
+            false
+        ];
+
+        yield 'special characters in value 2' => [
+            'lastName',
+            '**(SS)**',
+            $specialChars,
+            /* This is actually intended usage of the vendor library, despite it maybe being misleading
+             * if you're used to vanilla regex.
+             */
+            true
         ];
     }
 }
