@@ -143,7 +143,7 @@ class Classes implements IStrategy
              */
             $struct = [
                 'person' => [
-                    'externalId' => $externalId,
+                    'externalId' => trim((string)$externalId),
                     'firstname' => trim((string)$data['firstname']),
                     'lastname' => trim((string)$data['lastname']),
                     'id' => trim((string)$metadata['id']),
