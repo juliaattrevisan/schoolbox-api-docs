@@ -172,6 +172,20 @@ class Module extends BaseModule
             new IsSafeExamBrowserRequired(),
         );
 
+        $canModifyCustomParticipation = new Rule\All(
+            /* Should only be accessible if the custom participation config is enabled
+            */
+            new Rule\IsConfigOn(ConfigMapper::NAME_CUSTOM_ASSESSMENT_PARTICIPATION, $this->getConfig()),
+            new Rule\Any(
+                $isSuper,
+                new Rule\All(
+                    $canWrite,
+                    new AssessmentNotDeleted(),
+                    new IsModifyUnLocked(new LockedChecker($this->getTermMapper())),
+                )
+            )
+        );
+
         // pluralise for REST
         $contextTypes = AssessmentContextType::getStringValuesAsRegex(function ($name) {
             return $name . 's';
@@ -204,7 +218,7 @@ class Module extends BaseModule
         $this->register('GET', "$assRoute/overview", 'getOverview', $canViewStatus, $preloadAssessment); // a || c
         $this->register('GET', "$assRoute/overview/export", 'downloadOverview', $canViewStatus, $preloadAssessment); // a || c
         $this->register('GET', "$assRoute/submissions/download", 'downloadSubmissions', $canViewStatus, $preloadAssessment); // a || c
-        $this->register('GET', "$assRoute/participation", 'getAssessmentParticipationForm', $canModify, $preloadAssessmentForParticipant);
+        $this->register('GET', "$assRoute/participation", 'getAssessmentParticipationForm', $canModifyCustomParticipation, $preloadAssessmentForParticipant);
 
         /* Rescore Feedbacks
          */
