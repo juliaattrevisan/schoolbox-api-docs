@@ -520,6 +520,12 @@ class Classes implements IStrategy
                 $endTime = substr($periodData['PRD_END'], 11, 8);
 
                 foreach ($periodData['SUBJECTS'] as $subject) {
+                    /* DEBUG
+                     */
+                    if ('D308011' !== $subject['SUB_CODE']) {
+                        continue;
+                    }
+                    print_r($subject);
                     /* For each entry in $timetable[$day], create a new SUDS Timetable event
                      * Use the date that we got from the outer loop
                      * Combine it with the time in the current array element
@@ -527,6 +533,7 @@ class Classes implements IStrategy
                      */
                     $startAt = new \Alaress_Date_Format("{$date} {$startTime}", \Alaress_Date_Format::DATABASE_FORMAT);
                     $finishAt = new \Alaress_Date_Format("{$date} {$endTime}", \Alaress_Date_Format::DATABASE_FORMAT);
+                    $current = new \Alaress_Date_Format("{$date} 00:00:00", \Alaress_Date_Format::DATABASE_FORMAT);
 
                     /* Across the fleet, some schools use SUBTAB_YEAR_GROUP
                      * but some schools use YEAR_GROUP instead; find the first
@@ -567,19 +574,47 @@ class Classes implements IStrategy
                     );
 
                     /* Compare this subject's TO_DATE to $startAt
-                      * Subjects that aren't actually relevant to this date still appear here
-                      * for us to manually deduce validity (thanks tass)
-                      *
-                      * FROM_DATE and TO_DATE are optionally mandatory - they could be empty string/null
-                      * or not even here, despite what the docs say: Undefined array key "TO_DATE"
-                      */
-
-                    /* If TO_DATE is before $startDate, it is no longer occurring and we can
-                     * skip over it
+                     * Subjects that aren't actually relevant to this date still appear here
+                     * for us to manually deduce validity (thanks tass)
+                     *
+                     * FROM_DATE and TO_DATE are optionally mandatory - they could be empty string/null
+                     * or not even here, despite what the docs say: Undefined array key "TO_DATE"
                      */
                     $subjectTo = substr(trim((string)($subject['TO_DATE'] ?? null)), 0, 19);
                     $subjectFrom = substr(trim((string)($subject['FROM_DATE'] ?? null)), 0, 19);
 
+                    /* If there's a conclusive date range for this subject, then it's going to expire
+                     * at a particular datetime and we need to check whether it's happening.
+                     *
+                     * If either date is missing, do individual checks as well.
+                     */
+                    if ('' !== $subjectTo && '' !== $subjectFrom) {
+                        $subjectFromADF = new \Alaress_Date_Format($subjectFrom, \Alaress_Date_Format::DATABASE_FORMAT);
+                        $subjectToADF = new \Alaress_Date_Format($subjectTo, \Alaress_Date_Format::DATABASE_FORMAT);
+
+                        $this->log->debug(sprintf(
+                            'Checking whether current date %s is within the subject lifespan %s to %s...%s',
+                            $current->getDatabase(),
+                            $subjectFromADF->getDatabase(),
+                            $subjectToADF->getDatabase(),
+                            $current->between($subjectFromADF, $subjectToADF) ? 'it is, so we process involvements' : 'out of range; skipping'
+                        ));
+
+                        if (!$current->between($subjectFromADF, $subjectToADF)) {
+                            $this->log->debug(sprintf(
+                                'Current date %s is outside of the subject lifespan %s to %s; skipping',
+                                $current->getDatabase(),
+                                $subjectFromADF->getDatabase(),
+                                $subjectToADF->getDatabase()
+                            ));
+
+                            continue;
+                        }
+                    }
+
+                    /* If TO_DATE is before $startAt, it is no longer occurring and we can
+                     * skip over it
+                     */
                     if ('' !== $subjectTo) {
                         $subjectToADF = new \Alaress_Date_Format($subjectTo, \Alaress_Date_Format::DATABASE_FORMAT);
 
@@ -595,13 +630,13 @@ class Classes implements IStrategy
                         }
                     }
 
-                    /* If FROM_DATE is after $startDate, it's not yet occurring and we can
-                     * skip over it
+                    /* If FROM_DATE is after $finishAt, it's not yet occurring (it's going to start later)
+                     * and we can skip over it
                      */
                     if ('' !== $subjectFrom) {
                         $subjectFromADF = new \Alaress_Date_Format($subjectFrom, \Alaress_Date_Format::DATABASE_FORMAT);
 
-                        if ($subjectFromADF->gt($finishAt)) {
+                        if ($subjectFromADF->gte($finishAt)) {
                             $this->log->debug(sprintf(
                                 '%s %s is an upcoming class which starts on %s; skipping',
                                 $title,
@@ -612,6 +647,8 @@ class Classes implements IStrategy
                             continue;
                         }
                     }
+
+                    $this->log->debug('');
 
                     /* Try to find an event that already exists
                      * If it already exists, just continue; it's already been made
