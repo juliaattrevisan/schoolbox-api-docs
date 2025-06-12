@@ -49,7 +49,7 @@ class Classes implements IStrategy
      * events of that day if UPS ran and deleted those events because they were
      * just "in the past"
      */
-    private const PAST_THRESHOLD = 30;
+    private const PAST_THRESHOLD = 10;
 
 
     /**
