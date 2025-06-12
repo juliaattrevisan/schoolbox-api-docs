@@ -260,7 +260,7 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
 
                     $this->log->notice(
                         sprintf(
-                            'Message %s:%s delivery delayed until %ss after end of quiet period (%s-%s) (exact time: %s) (delay: %s)',
+                            'Message %s:%s delivery delayed until %ss after end of quiet period (%s-%s) (exact time: %s) (delaying: %s seconds)',
                             $payload->getBaseHash(),
                             $payload->getParamHash(),
                             $jitter,
