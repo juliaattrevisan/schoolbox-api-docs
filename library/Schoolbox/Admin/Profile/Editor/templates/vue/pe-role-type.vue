@@ -12,7 +12,14 @@ window.Vue.onMounted(() => {
     /* When users manually change the hash in the url rather than using the ui
      */
     window.addEventListener("hashchange", () => {
-        window.location.reload();
+        const roleType = window.location.hash.slice(1);
+        const role = peStore.roleTypes.find((r) => r.roleType === roleType);
+
+        if (role === undefined) {
+            return; // It was changed to an invalid role type, so do nothing
+        }
+
+        peStore.setSelectedRoleType(role);
     });
 });
 
