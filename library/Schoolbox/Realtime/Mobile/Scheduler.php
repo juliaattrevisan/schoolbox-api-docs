@@ -250,15 +250,24 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
                     $delayTimestamp   = strtotime($this->blackoutEndTime) + $jitter;
                     $currentTimestamp = strtotime($currentTime);
                     $delay            = $delayTimestamp - $currentTimestamp;
+
+                    /* if delay is negative, it means we need to add a day
+                     * (and the negative delay will roll back to the actual time)
+                     */
+                    if ($delay < 0) {
+                        $delay += 86400; // add a day in seconds
+                    }
+
                     $this->log->notice(
                         sprintf(
-                            'Message %s:%s delivery delayed until %ss after end of quiet period (%s-%s) (exact time: %s)',
+                            'Message %s:%s delivery delayed until %ss after end of quiet period (%s-%s) (exact time: %s) (delaying: %s seconds)',
                             $payload->getBaseHash(),
                             $payload->getParamHash(),
                             $jitter,
                             $this->blackoutStartTime,
                             $this->blackoutEndTime,
                             Alaress_Date_Format::newFromTimestamp($delayTimestamp)->toRfc3339String(),
+                            $delay
                         )
                     );
 
