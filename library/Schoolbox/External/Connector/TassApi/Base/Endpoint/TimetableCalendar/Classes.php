@@ -765,8 +765,7 @@ class Classes implements IStrategy
         ClassEntry $classEntry,
         string $name,
         string $externalId
-    ): void
-    {
+    ): void {
         $studentSubtractOverride = $this->overridesMapper->createModel()
             ->setEventId($event->getId())
             ->setExternalId($externalId)

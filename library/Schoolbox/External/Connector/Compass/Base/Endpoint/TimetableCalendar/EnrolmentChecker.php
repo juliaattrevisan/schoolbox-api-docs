@@ -36,8 +36,7 @@ class EnrolmentChecker
         \Alaress_Date_Format $current,
         \Alaress_Date_Format $startAt,
         \Alaress_Date_Format $finishAt,
-    ): bool
-    {
+    ): bool {
         /* Compare this subject's TO_DATE to $startAt
          * Subjects that aren't actually relevant to this date still appear here
          * for us to manually deduce validity (thanks tass)
