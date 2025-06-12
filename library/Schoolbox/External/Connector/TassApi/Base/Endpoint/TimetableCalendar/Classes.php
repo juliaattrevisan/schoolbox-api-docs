@@ -15,6 +15,7 @@ use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\Connector\ClassCode;
+use Schoolbox\External\Connector\Compass\Base\Endpoint\TimetableCalendar\EnrolmentChecker;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\Code;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\DSN;
@@ -513,11 +514,24 @@ class Classes implements IStrategy
              */
             $guidCodec = new Guid();
 
+            /* Decide if someone's enrolment stopped halfway through this payload timespan
+             */
+            $enrolmentChecker = new EnrolmentChecker($this->log);
+
             foreach ($timetable['DAYS'][$dayNumber]['PERIODS'] as $periodData) {
                 /* Extract the useful time from this microsecond format
                  */
                 $startTime = substr($periodData['PRD_START'], 11, 8);
                 $endTime = substr($periodData['PRD_END'], 11, 8);
+
+                /* For each entry in $timetable[$day], create a new SUDS Timetable event
+                 * Use the date that we got from the outer loop
+                 * Combine it with the time in the current array element
+                 * Save it
+                 */
+                $startAt = new \Alaress_Date_Format("{$date} {$startTime}", \Alaress_Date_Format::DATABASE_FORMAT);
+                $finishAt = new \Alaress_Date_Format("{$date} {$endTime}", \Alaress_Date_Format::DATABASE_FORMAT);
+                $current = new \Alaress_Date_Format("{$date} 00:00:00", \Alaress_Date_Format::DATABASE_FORMAT);
 
                 foreach ($periodData['SUBJECTS'] as $subject) {
                     /* DEBUG
@@ -525,15 +539,6 @@ class Classes implements IStrategy
                     if ('D308011' !== $subject['SUB_CODE']) {
                         continue;
                     }
-                    print_r($subject);
-                    /* For each entry in $timetable[$day], create a new SUDS Timetable event
-                     * Use the date that we got from the outer loop
-                     * Combine it with the time in the current array element
-                     * Save it
-                     */
-                    $startAt = new \Alaress_Date_Format("{$date} {$startTime}", \Alaress_Date_Format::DATABASE_FORMAT);
-                    $finishAt = new \Alaress_Date_Format("{$date} {$endTime}", \Alaress_Date_Format::DATABASE_FORMAT);
-                    $current = new \Alaress_Date_Format("{$date} 00:00:00", \Alaress_Date_Format::DATABASE_FORMAT);
 
                     /* Across the fleet, some schools use SUBTAB_YEAR_GROUP
                      * but some schools use YEAR_GROUP instead; find the first
@@ -573,82 +578,12 @@ class Classes implements IStrategy
                         $classCode
                     );
 
-                    /* Compare this subject's TO_DATE to $startAt
-                     * Subjects that aren't actually relevant to this date still appear here
-                     * for us to manually deduce validity (thanks tass)
-                     *
-                     * FROM_DATE and TO_DATE are optionally mandatory - they could be empty string/null
-                     * or not even here, despite what the docs say: Undefined array key "TO_DATE"
+                    /* Decide if someone's enrolment is continuing or not. FROM_DATE and TO_DATE actually
+                     * represent the lifespan of a student's *enrolment* in a subject which we don't really
+                     * support like this: we need to add REMOVE overrides to essentially blacklist someone's
+                     * enrolment in subjects they've discontinued, but those subjects are still being taught.
                      */
-                    $subjectTo = substr(trim((string)($subject['TO_DATE'] ?? null)), 0, 19);
-                    $subjectFrom = substr(trim((string)($subject['FROM_DATE'] ?? null)), 0, 19);
-
-                    /* If there's a conclusive date range for this subject, then it's going to expire
-                     * at a particular datetime and we need to check whether it's happening.
-                     *
-                     * If either date is missing, do individual checks as well.
-                     */
-                    if ('' !== $subjectTo && '' !== $subjectFrom) {
-                        $subjectFromADF = new \Alaress_Date_Format($subjectFrom, \Alaress_Date_Format::DATABASE_FORMAT);
-                        $subjectToADF = new \Alaress_Date_Format($subjectTo, \Alaress_Date_Format::DATABASE_FORMAT);
-
-                        $this->log->debug(sprintf(
-                            'Checking whether current date %s is within the subject lifespan %s to %s...%s',
-                            $current->getDatabase(),
-                            $subjectFromADF->getDatabase(),
-                            $subjectToADF->getDatabase(),
-                            $current->between($subjectFromADF, $subjectToADF) ? 'it is, so we process involvements' : 'out of range; skipping'
-                        ));
-
-                        if (!$current->between($subjectFromADF, $subjectToADF)) {
-                            $this->log->debug(sprintf(
-                                'Current date %s is outside of the subject lifespan %s to %s; skipping',
-                                $current->getDatabase(),
-                                $subjectFromADF->getDatabase(),
-                                $subjectToADF->getDatabase()
-                            ));
-
-                            continue;
-                        }
-                    }
-
-                    /* If TO_DATE is before $startAt, it is no longer occurring and we can
-                     * skip over it
-                     */
-                    if ('' !== $subjectTo) {
-                        $subjectToADF = new \Alaress_Date_Format($subjectTo, \Alaress_Date_Format::DATABASE_FORMAT);
-
-                        if ($subjectToADF->lt($startAt)) {
-                            $this->log->debug(sprintf(
-                                '%s %s is an expired class which went until %s; skipping',
-                                $title,
-                                $classCode,
-                                $subjectTo
-                            ));
-
-                            continue;
-                        }
-                    }
-
-                    /* If FROM_DATE is after $finishAt, it's not yet occurring (it's going to start later)
-                     * and we can skip over it
-                     */
-                    if ('' !== $subjectFrom) {
-                        $subjectFromADF = new \Alaress_Date_Format($subjectFrom, \Alaress_Date_Format::DATABASE_FORMAT);
-
-                        if ($subjectFromADF->gte($finishAt)) {
-                            $this->log->debug(sprintf(
-                                '%s %s is an upcoming class which starts on %s; skipping',
-                                $title,
-                                $classCode,
-                                $subjectFrom
-                            ));
-
-                            continue;
-                        }
-                    }
-
-                    $this->log->debug('');
+                    $isEnrolled = $enrolmentChecker->isEnrolled($subject, $title, $classCode, $current, $startAt, $finishAt);
 
                     /* Try to find an event that already exists
                      * If it already exists, just continue; it's already been made
@@ -762,6 +697,16 @@ class Classes implements IStrategy
                      * Everyone is always involved
                      */
                     $this->saveRegularInvolvement($event, $classEntry, $name, $person['external_id']);
+
+                    /* Students might have been enrolled but no longer: if they are no longer enrolled,
+                     * add a REMOVE override to prevent them from appearing in class instances still
+                     * being taught. Students will have been enrolled in suds if this data payload contained
+                     * records where they were still in a class but stopped at some point in this very
+                     * same payload.
+                     */
+                    if (self::STUDENT === $roleType) {
+                        // save a REMOVE override for this student's externalId
+                    }
 
                     /* Teachers get a special override so different teachers can be conducting
                      * the class instead of the usual guy defined by saveRegularInvolvement
