@@ -175,7 +175,18 @@ class Cache
             );
             $responseBody = (string)$result;
         }
-        $this->internalCache->set($key, $responseBody, $ttl ?? $this->defaultLifetime);
+        try {
+            $this->internalCache->set($key, $responseBody, $ttl ?? $this->defaultLifetime);
+        } catch (\TypeError $e) {
+            // If the value is not serializable, we can't cache it.
+            // This is a safeguard against non-serializable values being cached.
+            // This may have also been it cached the entry but for a timeout of 0, so it fetched null.
+            trigger_error(
+                'Failed to cache response: ' . $e->getMessage(),
+                E_USER_WARNING,
+            );
+        }
+
         return $responseBody;
     }
 
