@@ -119,16 +119,12 @@ class CompletionMapper extends Mapper
     {
         $student = $object->getStudent();
         $task = $object->getTask();
+        $latestTaskCompletion = null;
 
         try {
             $latestTaskCompletion = $this->findLatestForTaskAndStudent($task->getId(), $student->getId());
         } catch (Mapper\Exception) {
             // Could not find latest task completion, probably because none exists.
-            $latestTaskCompletion = null;
-        }
-
-        if ($latestTaskCompletion?->isDeleted()) {
-            $latestTaskCompletion = null;
         }
 
         // If no task completion exists, the student's participation can be removed.
@@ -305,9 +301,10 @@ class CompletionMapper extends Mapper
                 AND `ti`.`student_id`       = `x`.`student_id`
                 AND `ti`.`completion_date`  = `x`.`completion_date`
         ";
-        $where_parts = array(
+        $where_parts = [
+            'ti.deleted_at IS NULL',
             'ti.task_id IN ' . $this->getArrayPlaceholders($task_id_list, 'ti')
-        );
+        ];
         $params = $this->getArrayParameters($task_id_list, 'ti');
         if (!empty($student_id)) {
             $where_parts[]     = 'ti.student_id = :student';
