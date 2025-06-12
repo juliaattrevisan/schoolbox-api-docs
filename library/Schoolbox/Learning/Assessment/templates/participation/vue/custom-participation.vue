@@ -295,7 +295,14 @@ window.Vue.onMounted(() => {
                                 </template>
                                 <template v-else>
                                     <li class="separator">Manage</li>
-                                    <li><a class="icon-modify">Modify</a></li>
+                                    <li>
+                                        <a
+                                            class="icon-modify"
+                                            :href="`${participant._links.learningPlanNew}`"
+                                        >
+                                            Modify
+                                        </a>
+                                    </li>
                                     <li>
                                         <button
                                             class="icon-staff-students"
