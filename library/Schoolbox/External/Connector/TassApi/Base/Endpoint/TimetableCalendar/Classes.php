@@ -535,12 +535,6 @@ class Classes implements IStrategy
                 $current = new \Alaress_Date_Format("{$date} 00:00:00", \Alaress_Date_Format::DATABASE_FORMAT);
 
                 foreach ($periodData['SUBJECTS'] as $subject) {
-                    /* DEBUG
-                     */
-                    if ('D308011' !== $subject['SUB_CODE']) {
-                        continue;
-                    }
-
                     /* Across the fleet, some schools use SUBTAB_YEAR_GROUP
                      * but some schools use YEAR_GROUP instead; find the first
                      * meaningful value and use that; one will exist, but the
