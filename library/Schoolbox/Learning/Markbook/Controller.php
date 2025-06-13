@@ -21,6 +21,8 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Feedback\Visibility;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Task;
+use Schoolbox\Learning\Assessment\Translator\UnitAssessments;
 use Schoolbox\Learning\MarkScheme\Factory;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Model as FolderModel;
@@ -260,6 +262,18 @@ class Controller extends Base
                         continue;
                     }
 
+                    /* Find the progress tick status, only relevant for tasks */
+                    $progressTick = null;
+                    if ($assessment instanceof Task\Model) {
+                        $unitAssessmentsTranslator = new UnitAssessments(
+                            $this->routeGenerator,
+                            $this->getAuthorizer(),
+                            $participant->getUser(),
+                            $this->getUser(),
+                        );
+                        $progressTick = $unitAssessmentsTranslator->getProgressTick($assessment, $participant);
+                    }
+
                     $draftMark = isset($data['markbook']['hasDraft'][$assessment->getId()][$student->getId()]);
 
                     $authoritativeFeedback = $participant->getAuthoritativeFeedback(true);
@@ -293,6 +307,7 @@ class Controller extends Base
                             'name' => $participant->getPlan()->getName(),
                             'dueDate' => $participant->getPlan()->getDueDate()?->getShort() ?? null,
                         ],
+                        'progressTick' => $progressTick,
                     ];
                 }
             }

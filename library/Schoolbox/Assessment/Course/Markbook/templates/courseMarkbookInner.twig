@@ -156,8 +156,8 @@
                         <th></th>
                     {% endif %}
                     {% for assessment in collapsedAssessments %}
-                        {% if courseImportAssessments[courseImpl.id][assessment.id] is defined %}
-                            {% set assessmentImpl = courseImportAssessments[courseImpl.id][assessment.id] %}
+                        {% if courseImpl.assessments[assessment.id] is defined %}
+                            {% set assessmentImpl = courseImpl.assessments[assessment.id] %}
                             <td class="class-row">
                                 {% if assessment.familyName == 'task' or assessmentImplMarks[assessmentImpl.id] is not defined %}
                                     <a href="{{ assessmentImpl._routes['learningAssessment.getStatus'] }}">–</a>
@@ -176,7 +176,7 @@
                         {% endif %}
                     {% endfor %}
                 </tr>
-                {% for student in courseImportStudents[courseImpl.id] %}
+                {% for student in courseImpl.students %}
                     <tr>
                         <th class="profile-cell fixed-left white">
                             <div class="c-card">
@@ -217,7 +217,7 @@
                         {% endif %}
 
                         {% for assessment in collapsedAssessments %}
-                            {% set aImpl = courseImportAssessments[courseImpl.id][assessment.id] ?? null %}
+                            {% set aImpl = courseImpl.assessments[assessment.id] ?? null %}
                             {% if aImpl %}
                             {% set participant = aImpl.participants[student.id] %}
                             <td
@@ -240,24 +240,13 @@
                             >
                             {% if participant and not participant.isExcluded %}
                                 {% if assessment.familyName == 'task' %}
-                                    {% set progressStatus = taskProgress[courseImpl.id][assessment.id][student.id] %}
-
-                                    {# Tasks do not have drafts #}
-                                    {% set style = 'style="margin-bottom:0; position:absolute; top:0px;"' %}
-                                    {% if taskProgressComplete == progressStatus %}
-                                        {% set progressClass = 'reviewed' %}
-                                    {% elseif taskProgressPending == progressStatus %}
-                                        {# note there is no such thing as draft task masks #}
-                                        {% set progressClass = 'pending' %}
-                                    {% else %}
-                                        {% set progressClass = 'readonly' %}
-                                    {% endif %}
-
                                     <div
-                                        {{ style | raw  }}
-                                        class="no-text progress-tick {{ progressClass }}"
+                                        style="margin-bottom:0; position:absolute; top:0px;"
+                                        class="no-text progress-tick {{ participant.progressTick.progressClass }}"
+                                        {# always incomplete...? nope, that's wrong #}
                                         title="Incomplete"
-                                        data-progress-tick-status="incomplete"></div>
+                                        data-progress-tick-status="incomplete"
+                                    ></div>
                                 {% else %}
                                     {% set comment            = studentComments[courseImpl.id][student.id][assessment.id] ?? '' %}
                                     {% set marks              = studentMarks[courseImpl.id][assessment.id][student.id] ?? null %}

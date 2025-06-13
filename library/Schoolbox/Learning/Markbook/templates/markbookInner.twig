@@ -242,29 +242,25 @@
                         {% if participant and not participant.isExcluded %}
                             {% if assessment.familyName == 'task' %}
                                 {# An icon that shows if the student has attempted the task or not #}
-                                {% if studentCount < functionDegradeLimit %}
-                                    {# {% include '@learningAssessment/fragments/progressTick.twig' with {
-                                        assessment: assessment,
-                                        student: participant.user
-                                    } only %} #}
-                                    TICK
+                                {% if studentCount < functionDegradeLimit and participant.progressTick.postRouteUrl %}
+                                    <form action="{{ participant.progressTick.postRouteUrl }}"
+                                    method="post"
+                                    class="progress-tick-form"
+                                    data-progress-tick-form="{{ assessment.isSelfAssessable ?? false ? 'selfAssessed' : 'teacherAssessed' }}">
+                                        <a
+                                            class="no-text progress-tick {{ participant.progressTick.progressClass }}"
+                                            {# placeholder for now, this'll get taken out eventually #}
+                                            title="Incomplete"
+                                            data-progress-tick-status="incomplete"
+                                        /></a>
+                                    </form>
                                 {% else %}
-                                    {% if participant.isResponseRequired %}
-                                        <div
-                                           class="no-text progress-tick readonly"
-                                           title="Incomplete"
-                                           data-progress-tick-status="incomplete"></div>
-                                    {% elseif participant.isFeedbackRequired %}
-                                        <div
-                                           class="no-text progress-tick pending"
-                                           title="Self-assessed"
-                                           data-progress-tick-status="selfAssessed"></div>
-                                    {% elseif participant.isReviewComplete %}
-                                        <div
-                                           class="no-text progress-tick reviewed"
-                                           title="Completed"
-                                           data-progress-tick-status="teacherAssessed"></div>
-                                    {% endif %}
+                                    <div
+                                        class="no-text progress-tick {{ participant.progressTick.progressClass }}"
+                                        {# placeholder for now, this'll get taken out eventually #}
+                                        title="Incomplete"
+                                        data-progress-tick-status="incomplete"
+                                    ></div>
                                 {% endif %}
                             {% else %}
                                 {% set draftMark = markbook.hasDraft[assessment.id][student.id] is defined %}

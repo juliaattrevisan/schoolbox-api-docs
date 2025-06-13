@@ -20,6 +20,8 @@ use Schoolbox\Filter\Filters\Assessment\AssessmentType\Definition as AssessmentT
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Task;
+use Schoolbox\Learning\Assessment\Translator\UnitAssessments;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
@@ -332,56 +334,70 @@ class Controller extends WebController\Base
                             'title' => $courseImpl->getFolder()->getTitle(),
                         ],
                         'assessments' => $courseMarkbook->getCourseImportAssessments()->getOffset($courseImpl->getId())->map(
-                        fn(IAssessable $aImpl) => [
-                            'id' => $aImpl->getId(),
+                            fn(IAssessable $aImpl) => [
+                                'id' => $aImpl->getId(),
                                 'participants' => $courseMarkbook->getCourseImportStudents()[$courseImpl->getId()]->map(
-                                function (User $student) use ($aImpl) {
-                                    $participant = $aImpl->getParticipantIfExtant($student, false) ?? null;
-                                    if ($participant === null) {
-                                        return null;
+                                    function (User $student) use ($aImpl) {
+                                        $participant = $aImpl->getParticipantIfExtant($student, false) ?? null;
+                                        if ($participant === null) {
+                                            return null;
+                                        }
+
+                                        /* Find the progress tick status, only relevant for tasks */
+                                        $progressTick = null;
+                                        if ($aImpl instanceof Task\Model) {
+                                            $unitAssessmentsTranslator = new UnitAssessments(
+                                                $this->routeGenerator,
+                                                $this->getAuthorizer(),
+                                                $participant->getUser(),
+                                                $this->getUser(),
+                                            );
+                                            $progressTick = $unitAssessmentsTranslator->getProgressTick($aImpl, $participant);
+                                        }
+
+                                        return [
+                                            'isExcluded' => $participant->isExcluded(),
+                                            'hasSubmittedResponse' => $participant->hasSubmittedResponse(),
+                                            'hasPublishedFeedback' => $participant->hasPublishedFeedback(),
+                                            'resubmissionRequired' => $participant->isResubmissionRequired(),
+                                            'normalisedMark'     => $participant->getNormalisedMark(true),
+                                            'humanReadableInstructorMark' => [
+                                                'published' => $participant->getHumanReadableInstructorMark(true),
+                                                'unpublished' => $participant->getHumanReadableInstructorMark(false),
+                                            ],
+                                            'humanReadableMark' => [
+                                                'published' => $participant->getHumanReadableMark(true),
+                                                'unpublished' => $participant->getHumanReadableMark(false),
+                                            ],
+                                            'progressTick' => $progressTick,
+                                        ];
                                     }
-                                    return [
-                                        'isExcluded' => $participant->isExcluded(),
-                                        'hasSubmittedResponse' => $participant->hasSubmittedResponse(),
-                                        'hasPublishedFeedback' => $participant->hasPublishedFeedback(),
-                                        'resubmissionRequired' => $participant->isResubmissionRequired(),
-                                        'normalisedMark'     => $participant->getNormalisedMark(true),
-                                        'humanReadableInstructorMark' => [
-                                            'published' => $participant->getHumanReadableInstructorMark(true),
-                                            'unpublished' => $participant->getHumanReadableInstructorMark(false),
-                                        ],
-                                        'humanReadableMark' => [
-                                            'published' => $participant->getHumanReadableMark(true),
-                                            'unpublished' => $participant->getHumanReadableMark(false),
-                                        ],
-                                    ];
-                                }
-                            ),
-                            '_routes' => [
-                                'learningAssessment.getStatus' => $this->routeGenerator->generate(
-                                    'learningAssessment.getStatus',
-                                    ['assessmentId' => $aImpl->getId()]
                                 ),
+                                '_routes' => [
+                                    'learningAssessment.getStatus' => $this->routeGenerator->generate(
+                                        'learningAssessment.getStatus',
+                                        ['assessmentId' => $aImpl->getId()]
+                                    ),
+                                ]
                             ]
-                        ]
-                ),
+                        ),
                         'students' => $courseMarkbook->getCourseImportStudents()[$courseImpl->getId()]->map(
-                        fn(User $student) => [
-                            'id'         => $student->getId(),
-                            'externalId' => $student->getExternalId(), // ...for portrait.twig
-                            // The class markbook uses [lastname, first name] to display names, whereas the course markbook uses just [fullName] for some reason
-                            'fullName'   => $student->getFullName(),
-                            '_routes'    => [
-                                'learningGrades.getGrades' => $this->routeGenerator->generate(
-                                    'learningGrades.getGrades',
-                                    [
-                                        'viewee'   => $student,
-                                        'userId'   => $student->getId(),
-                                        'termCode' => '',
-                                    ]
-                                ),
+                            fn(User $student) => [
+                                'id'         => $student->getId(),
+                                'externalId' => $student->getExternalId(), // ...for portrait.twig
+                                // The class markbook uses [lastname, first name] to display names, whereas the course markbook uses just [fullName] for some reason
+                                'fullName'   => $student->getFullName(),
+                                '_routes'    => [
+                                    'learningGrades.getGrades' => $this->routeGenerator->generate(
+                                        'learningGrades.getGrades',
+                                        [
+                                            'viewee'   => $student,
+                                            'userId'   => $student->getId(),
+                                            'termCode' => '',
+                                        ]
+                                    ),
+                                ]
                             ]
-                        ]
                         ),
                     ]
                 ),
@@ -389,9 +405,6 @@ class Controller extends WebController\Base
                 'studentMarks'         => $courseMarkbook->getStudentMarks(),
                 'studentAverageMarks'  => $courseMarkbook->getStudentAverageMarks(),
                 'studentComments'      => $courseMarkbook->getStudentComments(),
-                'taskProgress'         => $courseMarkbook->getTaskProgress(),
-                'taskProgressPending'  => Completion::STATUS_SELF_ASSESSED_COMPLETE,
-                'taskProgressComplete' => Completion::STATUS_TEACHER_ASSESSED_COMPLETE,
                 'canAccessPopOut'      => $this->getCanAccessPopOut($courseSpec)
             ];
 

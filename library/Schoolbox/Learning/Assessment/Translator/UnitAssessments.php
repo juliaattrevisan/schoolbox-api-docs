@@ -27,7 +27,7 @@ class UnitAssessments
     /**
      * @param Generator|null  $routeGenerator
      * @param Authorizer|null $authorizer
-     * @param User|null       $student         The student whose lesson plan is being viewed.
+     * @param User|null       $student         The student whose assessment is being viewed.
      * @param User|null       $loggedInUser    The logged-in user.
      * @param bool            $hideLessonPlan  Should we be removing lesson plans from the output?
      */
@@ -140,7 +140,14 @@ class UnitAssessments
             $studentCount++;
         }
 
-        $progressTick = $this->getProgressTick($assessment);
+
+        // Progress ticks should only be shown if the logged-in user is the user whose activities are being viewed.
+        $progressTick = null;
+        if ($this->student->getId() === $this->loggedInUser->getId()) {
+            $participant = $assessment->getParticipantIfExtant($this->student);
+            $progressTick = $this->getProgressTick($assessment, $participant);
+        }
+
         $dueAt = $this->getDueAt($assessment);
 
         return [
@@ -204,19 +211,13 @@ class UnitAssessments
      * The logic used in this function is intended to match the logic used in progressTick.twig.
      *
      * @param IAssessable $assessable
+     * @param Participant|null $participant
      * @return ?array
      * @throws RouteNotFound
      * @see library/Schoolbox/Learning/Assessment/templates/fragments/progressTick.twig
      */
-    private function getProgressTick(IAssessable $assessable): ?array
+    public function getProgressTick(IAssessable $assessable, ?Participant $participant): ?array
     {
-        // Progress ticks should only be shown if the logged-in user is the user whose activities are being viewed.
-        if ($this->student->getId() !== $this->loggedInUser->getId()) {
-            return null;
-        }
-
-        $participant = $assessable->getParticipantIfExtant($this->student);
-
         if (null === $participant || $participant->isExcluded()) {
             // The student ought to be a participant.  The only way this situation could arise is if the student was
             // excluded from the assessment, or marked as deleted, by another process, since permissions were checked
