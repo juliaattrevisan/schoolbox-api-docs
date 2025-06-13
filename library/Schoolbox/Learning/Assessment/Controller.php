@@ -957,11 +957,27 @@ abstract class Controller extends ListController implements IAssessmentControlle
         );
     }
 
-    public function getAssessmentParticipationLearningPlan(): void
+    public function getAssessmentParticipationLearningPlan(IAssessable $assessment): void
     {
+        $participationModelToArray = new Participations(
+            $this->getRouteGenerator(),
+            $this->getAuthorizer(),
+            $this->getUser(),
+        );
+
+        $participant = $assessment->getAllParticipants()->map(function ($participant) {
+            return [
+                'id' =>  $participant->getUser()->getId(),
+                'name' => $participant->getUser()->getFullName(),
+            ];
+        })->reindex();
+
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/participation/learningPlan/learningPlan.twig',
-            []
+            [
+                'assessment' => $assessment,
+                'participant' => $participant,
+            ]
         );
     }
 }
