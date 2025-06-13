@@ -1,10 +1,10 @@
 {#
     courseSpec               CourseSpec\Model
-    collapsedAssessments     IAssessable[]       Column headers. Will be specs if imported from spec, impl if created in class's unit-import
+    assessments              IAssessable[]       Column headers. Will be specs if imported from spec, impl if created in class's unit-import
     unitSpecs                UnitSpec/Model[]    The unit-specs to display as column header groups
     courseImpls              CourseImpl/Model[]  The vertical sections of the table.
-    courseImportAssessments  IAssessable[][]     Indexed by courseImpl.id, then assessmentImpl.spec.id if imported from spec, or assessmentImpl.id otherwise
-    courseImportStudents     User[][]            Indexed by courseImpl.id, then user.id
+    courseImportAssessments  IAssessable[][]     Indexed by assessmentImpl.spec.id if imported from spec, or assessmentImpl.id otherwise
+    courseImportStudents     User[][]            Indexed by user.id
     assessmentImplMarks      float[][]           Average mark for an assessment impl. Indexed by [assessment spec id]['any'|'published']
     assessmentSpecMarks      float[][]           Average mark for an assessment impl. Indexed by [assessment spec id]['any'|'published']
     studentMarks             float[][][][][]     Indexed by [courseImplId][assessmentId][userId]['published'|'draft']['norm'|'hr']
@@ -26,7 +26,7 @@
                 This course has not yet been imported to any classes or groups. <a href="{{ courseSpec._routes['courseImport.getImport'] }}">Import this course</a>.
             </p>
         </div>
-        {% elseif not collapsedAssessments | length %}
+        {% elseif not assessments | length %}
         <div class="empty-state">
             <i class="icon-curriculum"></i>
             <p>
@@ -78,7 +78,7 @@
                         </div>
                     </th>
                 {% endif %}
-                {% for assessment in collapsedAssessments %}
+                {% for assessment in assessments %}
                         <th data-test="markbook-assessment" data-assessment="{{ assessment.id }}"><div><span>
                             {% if assessment.isSpecification %}
                                 {% if assessment._routes['learningAssessment.getSummary'] %}
@@ -103,7 +103,7 @@
                 {# Ensure single-source-of-truth regarding column ordering #}
                 {% set currentUnitSpec = null %}
                 {% set countUnitAssessments = 0 %}
-                {% for assessment in collapsedAssessments %}
+                {% for assessment in assessments %}
                     {% if currentUnitSpec is null %}
                         {# first column #}
                         {% set currentUnitSpec = assessment.unitSpec %}
@@ -128,19 +128,16 @@
                 {% if rank %}
                     <th></th>
                 {% endif %}
-                {% for assessment in collapsedAssessments %}
+                {% for assessment in assessments %}
                     {% if assessment.isSpecification %}
                         <td class="course-row">
-                            {% if assessment.familyName == 'task' or assessmentSpecMarks[assessment.id] is not defined %}
-                                <span>–</span>
-                            {% else %}
-                                {% set marks         = assessmentSpecMarks[assessment.id] %}
-                                {% set publishedMark = marks.published ?? null %}
-                                {% set draftMark     = marks.any ?? null %}
-                                <span {% if marks.any is defined %}data-actual-mark{% endif %}>{% if publishedMark is null %}–{% else %}{{ publishedMark | round(2) }} %{% endif %}</span>
-                                {% if marks.any is defined %}
-                                    <span data-draft-mark class="meta" style="display: none;">{% if draftMark is null %}–{% else %}{{ draftMark | round(2) }} %{% endif %}</span>
-                                {% endif %}
+                            <span {% if assessment.stats.draftMean is defined %} data-actual-mark {% endif %}>
+                                {{ assessment.stats.mean | default('-') }}
+                            </span>
+                            {% if assessment.stats.draftMean is defined %}
+                                <span data-draft-mark class="meta" style="display:none;">
+                                    {{ assessment.stats.draftMean | default('-') }}
+                                </span>
                             {% endif %}
                         </td>
                     {% else %}
@@ -155,21 +152,20 @@
                     {% if rank %}
                         <th></th>
                     {% endif %}
-                    {% for assessment in collapsedAssessments %}
+                    {% for assessment in assessments %}
                         {% if courseImpl.assessments[assessment.id] is defined %}
                             {% set assessmentImpl = courseImpl.assessments[assessment.id] %}
                             <td class="class-row">
-                                {% if assessment.familyName == 'task' or assessmentImplMarks[assessmentImpl.id] is not defined %}
-                                    <a href="{{ assessmentImpl._routes['learningAssessment.getStatus'] }}">–</a>
-                                {% else %}
-                                    {% set marks         = assessmentImplMarks[assessmentImpl.id] %}
-                                    {% set publishedMark = marks.published ?? null %}
-                                    {% set draftMark     = marks.any ?? null %}
-                                    <a href="{{ assessmentImpl._routes['learningAssessment.getStatus'] }}" {% if marks.any is defined %}data-actual-mark{% endif %}>{% if publishedMark is null %}–{% else %}{{ publishedMark | round(2) }} %{% endif %}</a>
-                                    {% if marks.any is defined %}
-                                        <a href="{{ assessmentImpl._routes['learningAssessment.getStatus'] }}" class="meta" style="display: none;" data-draft-mark>{% if draftMark is null %}–{% else %}{{ draftMark | round(2) }} %{% endif %}</a>
+                                <a href="{{ assessmentImpl._routes['learningAssessment.getStatus'] }}">
+                                    <span {% if assessment.stats.draftMean is defined %} data-actual-mark {% endif %}>
+                                        {{ assessmentImpl.stats.mean | default('-') }}
+                                    </span>
+                                    {% if assessmentImpl.stats.draftMean is defined %}
+                                        <span data-draft-mark class="meta" style="display:none;">
+                                            {{ assessmentImpl.stats.draftMean | default('-') }}
+                                        </span>
                                     {% endif %}
-                                {% endif %}
+                                </a>
                             </td>
                         {% else %}
                             <td class="class-row na"></td>
@@ -189,8 +185,8 @@
                             </div>
                         </th>
 
-                        {#studentAverageMarks      float[][][]         Indexed by [courseImport.id][student.id]['any'|'published']#}
-                        {% set marks             = studentAverageMarks[courseImpl.id][student.id] ?? null %}
+                        {#studentAverageMarks      float[][]         Indexed by [student.id]['any'|'published']#}
+                        {% set marks             = courseImpl.studentAverageMarks[student.id] ?? null %}
                         {% set publishedNormMark = marks.published.norm ?? null %}
                         {% set draftNormMark     = marks.any.norm ?? null %}
                         {% set publishedHrMark   = marks.published.hr ?? '–' %}
@@ -216,7 +212,7 @@
                             </td>
                         {% endif %}
 
-                        {% for assessment in collapsedAssessments %}
+                        {% for assessment in assessments %}
                             {% set aImpl = courseImpl.assessments[assessment.id] ?? null %}
                             {% if aImpl %}
                             {% set participant = aImpl.participants[student.id] %}
@@ -230,13 +226,13 @@
                                 data-assessment-type="{{ assessment.familyName }}"
                                 data-is-participant="{% if participant %}true{% else %}false{% endif %}"
                                 data-is-excluded="{% if participant and not participant.isExcluded %}false{% else %}true{% endif %}"
-                                data-endpoint="{{ assessment._routes.student[courseImpl.id][student.id]['learningAssessmentTimeline.getFullTimeline'] }}"
-                                data-update-route="{{ assessment._routes.student[courseImpl.id][student.id]['learningDueWorkResponse.getParticularResponse'] }}"
-                                data-review-route="{{ assessment._routes.student[courseImpl.id][student.id]['learningDueWorkResponse.getParticularResponse'] }}"
-                                data-publish-route="{{ assessment._routes.student[courseImpl.id][student.id]['learningDueWorkFeedback.postPublishFeedback'] }}"
-                                data-exclude-route="{{ assessment._routes.student[courseImpl.id][student.id]['learningAssessment.postExclude'] }}"
-                                data-include-route="{{ assessment._routes.student[courseImpl.id][student.id]['learningAssessment.postInclude'] }}"
-                                data-history-route="{{ assessment._routes.student[courseImpl.id][student.id]['learningAssessment.getSummary'] }}"
+                                data-endpoint="{{ aImpl._routes.student[student.id]['learningAssessmentTimeline.getFullTimeline'] }}"
+                                data-update-route="{{ aImpl._routes.student[student.id]['learningDueWorkResponse.getParticularResponse'] }}"
+                                data-review-route="{{ aImpl._routes.student[student.id]['learningDueWorkResponse.getParticularResponse'] }}"
+                                data-publish-route="{{ aImpl._routes.student[student.id]['learningDueWorkFeedback.postPublishFeedback'] }}"
+                                data-exclude-route="{{ aImpl._routes.student[student.id]['learningAssessment.postExclude'] }}"
+                                data-include-route="{{ aImpl._routes.student[student.id]['learningAssessment.postInclude'] }}"
+                                data-history-route="{{ aImpl._routes.student[student.id]['learningAssessment.getSummary'] }}"
                             >
                             {% if participant and not participant.isExcluded %}
                                 {% if assessment.familyName == 'task' %}
@@ -248,8 +244,8 @@
                                         data-progress-tick-status="incomplete"
                                     ></div>
                                 {% else %}
-                                    {% set comment            = studentComments[courseImpl.id][student.id][assessment.id] ?? '' %}
-                                    {% set marks              = studentMarks[courseImpl.id][assessment.id][student.id] ?? null %}
+                                    {% set comment            = courseImpl.studentComments[student.id][assessment.id] ?? '' %}
+                                    {% set marks              = courseImpl.studentMarks[assessment.id][student.id] ?? null %}
                                     {% set publishedMark      = marks.published ?? null %}
                                     {% set draftMark          = marks.draft ?? null %}
 

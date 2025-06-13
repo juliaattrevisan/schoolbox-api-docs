@@ -106,14 +106,13 @@
                 <th>-</th>
                 {% endif %}
                 {% for assessment in markbook.assessments %}
-                    {% set stats = markbook.assessmentStatistics[assessment.id] %}
                     <th data-assessment="{{ assessment.id }}" class="student-grade-cell white">
-                        <span {% if stats.draftMean is defined and (markbook.hasDraft[assessment.id] is defined) %} data-actual-mark {% endif %}>
-                            {{ stats.mean | default('-') }}
+                        <span {% if assessment.stats.draftMean is defined and (markbook.hasDraft[assessment.id] is defined) %} data-actual-mark {% endif %}>
+                            {{ assessment.stats.mean | default('-') }}
                         </span>
-                        {% if stats.draftMean is defined and (markbook.hasDraft[assessment.id] is defined) %}
+                        {% if assessment.stats.draftMean is defined and (markbook.hasDraft[assessment.id] is defined) %}
                             <span data-draft-mark class="meta" style="display:none;">
-                                {{ stats.draftMean | default('-') }}
+                                {{ assessment.stats.draftMean | default('-') }}
                             </span>
                         {% endif %}
                     </th>
@@ -141,7 +140,7 @@
                 {% for assessment in markbook.assessments %}
                     <td data-assessment="{{ assessment.id }}">
                         {% if assessment.familyName != 'task' %}
-                            {% set selected = assessment.markvisibility %}
+                            {% set selected = assessment.markVisibility %}
                             {% set allOptions = {
                                 0: { css: 'icon-locked', icon: '&#xe63e;', description: 'Staff Only' },
                                 1: { css: 'icon-staff-students', icon: '&#xe667;', description: 'Staff and Students' },
@@ -217,7 +216,7 @@
                 {% endif %}
 
                 {% for assessment in markbook.assessments %}
-                    {% set participant = markbook.participants[assessment.id][student.id] ?? null %}
+                    {% set participant = assessment.participants[student.id] ?? null %}
                     <td
                         class="column-{{ assessment.id }}
                             {% if not participant or participant.isExcluded %} excluded

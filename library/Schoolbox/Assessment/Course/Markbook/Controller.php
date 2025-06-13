@@ -246,7 +246,7 @@ class Controller extends WebController\Base
                         ),
                     ],
                 ],
-                'collapsedAssessments' => $courseMarkbook->getCollapsedAssessments()->map(fn(IAssessable $assessment) => [
+                'assessments' => $courseMarkbook->getCollapsedAssessments()->map(fn(IAssessable $assessment) => [
                     'id'                => $assessment->getId(),
                     'title'             => $assessment->getTitle(),
                     'typeName'          => $assessment->getTypeName(),
@@ -259,70 +259,21 @@ class Controller extends WebController\Base
                         'title'    => $assessment->isSpecification() ?
                             $assessment->getBaseContext()->getTitle() : $assessment->getBaseContext()->getSpecification()->getTitle(),
                     ],
-                    '_routes'        => [
+                    'stats' => array_map(
+                        /* Get the stats in the same format as returned by the class markbook */
+                        fn($mark): string|null => $mark === null ? null : sprintf("%.2f %%", $mark),
+                        [
+                            'mean'      => $courseMarkbook->getAssessmentSpecAverages()[$assessment->getId()]['published'] ?? null,
+                            'draftMean' => $courseMarkbook->getAssessmentSpecAverages()[$assessment->getId()]['any'] ?? null,
+                        ]
+                    ),
+                    '_routes'           => [
                         'learningAssessment.getSummary' => $this->routeGenerator->generate(
                             'learningAssessment.getSummary',
                             [
                                 'assessmentId' => $assessment->getId(),
                                 'studentId'    => $this->getUser()->getId(), // apparently this is just the current user?
                             ]
-                        ),
-                        'student' => $courseMarkbook->getCourseImportStudents()->map(
-                            fn($courseImplStudents) => $courseImplStudents->map(fn(User $student) => [
-                                'learningAssessmentTimeline.getFullTimeline' => $this->getRouteIfAuthorized(
-                                    'learningAssessmentTimeline.getFullTimeline',
-                                    [
-                                        'assessment' => $assessment,
-                                        'assessmentId' => $assessment->getId(),
-                                        'userId' => $student->getId(),
-                                    ]
-                                ),
-                                'learningDueWorkResponse.getParticularResponse' => $this->getRouteIfAuthorized(
-                                    'learningDueWorkResponse.getParticularResponse',
-                                    [
-                                        'assessment' => $assessment,
-                                        'assessmentId' => $assessment->getId(),
-                                        'studentId' => $student->getId(),
-                                        'student' => $student,
-                                    ]
-                                ),
-                                'learningDueWorkFeedback.postPublishFeedback' => $this->getRouteIfAuthorized(
-                                    'learningDueWorkFeedback.postPublishFeedback',
-                                    [
-                                        'assessment' => $assessment,
-                                        'assessmentId' => $assessment->getId(),
-                                        'studentId' => $student->getId(),
-                                        'student' => $student,
-                                    ]
-                                ),
-                                'learningAssessment.postExclude' => $this->getRouteIfAuthorized(
-                                    'learningAssessment.postExclude',
-                                    [
-                                        'assessment' => $assessment,
-                                        'assessmentId' => $assessment->getId(),
-                                        'studentId' => $student->getId(),
-                                        'student' => $student,
-                                    ]
-                                ),
-                                'learningAssessment.postInclude' => $this->getRouteIfAuthorized(
-                                    'learningAssessment.postInclude',
-                                    [
-                                        'assessment' => $assessment,
-                                        'assessmentId' => $assessment->getId(),
-                                        'studentId' => $student->getId(),
-                                        'student' => $student,
-                                    ]
-                                ),
-                                'learningAssessment.getSummary' => $this->getRouteIfAuthorized(
-                                    'learningAssessment.getSummary',
-                                    [
-                                        'assessment' => $assessment,
-                                        'assessmentId' => $assessment->getId(),
-                                        'studentId' => $student->getId(),
-                                        'student' => $student,
-                                    ]
-                                ),
-                            ]),
                         ),
                     ],
                 ]),
@@ -373,11 +324,74 @@ class Controller extends WebController\Base
                                         ];
                                     }
                                 ),
+                                'stats' => array_map(
+                                    /* Get the stats in the same format as returned by the class markbook */
+                                    fn($mark): string|null => $mark === null ? null : sprintf("%.2f %%", $mark),
+                                    [
+                                        'mean'      => $courseMarkbook->getAssessmentImplAverages()[$aImpl->getId()]['published'] ?? null,
+                                        'draftMean' => $courseMarkbook->getAssessmentImplAverages()[$aImpl->getId()]['any'] ?? null,
+                                    ]
+                                ),
                                 '_routes' => [
                                     'learningAssessment.getStatus' => $this->routeGenerator->generate(
                                         'learningAssessment.getStatus',
                                         ['assessmentId' => $aImpl->getId()]
                                     ),
+                                    'student' => $courseMarkbook->getCourseImportStudents()[$courseImpl->getId()]->map(fn(User $student) => [
+                                        'learningAssessmentTimeline.getFullTimeline' => $this->getRouteIfAuthorized(
+                                            'learningAssessmentTimeline.getFullTimeline',
+                                            [
+                                                'assessment' => $aImpl,
+                                                'assessmentId' => $aImpl->getId(),
+                                                'userId' => $student->getId(),
+                                            ]
+                                        ),
+                                        'learningDueWorkResponse.getParticularResponse' => $this->getRouteIfAuthorized(
+                                            'learningDueWorkResponse.getParticularResponse',
+                                            [
+                                                'assessment' => $aImpl,
+                                                'assessmentId' => $aImpl->getId(),
+                                                'studentId' => $student->getId(),
+                                                'student' => $student,
+                                            ]
+                                        ),
+                                        'learningDueWorkFeedback.postPublishFeedback' => $this->getRouteIfAuthorized(
+                                            'learningDueWorkFeedback.postPublishFeedback',
+                                            [
+                                                'assessment' => $aImpl,
+                                                'assessmentId' => $aImpl->getId(),
+                                                'studentId' => $student->getId(),
+                                                'student' => $student,
+                                            ]
+                                        ),
+                                        'learningAssessment.postExclude' => $this->getRouteIfAuthorized(
+                                            'learningAssessment.postExclude',
+                                            [
+                                                'assessment' => $aImpl,
+                                                'assessmentId' => $aImpl->getId(),
+                                                'studentId' => $student->getId(),
+                                                'student' => $student,
+                                            ]
+                                        ),
+                                        'learningAssessment.postInclude' => $this->getRouteIfAuthorized(
+                                            'learningAssessment.postInclude',
+                                            [
+                                                'assessment' => $aImpl,
+                                                'assessmentId' => $aImpl->getId(),
+                                                'studentId' => $student->getId(),
+                                                'student' => $student,
+                                            ]
+                                        ),
+                                        'learningAssessment.getSummary' => $this->getRouteIfAuthorized(
+                                            'learningAssessment.getSummary',
+                                            [
+                                                'assessment' => $aImpl,
+                                                'assessmentId' => $aImpl->getId(),
+                                                'studentId' => $student->getId(),
+                                                'student' => $student,
+                                            ]
+                                        ),
+                                    ]),
                                 ]
                             ]
                         ),
@@ -399,16 +413,18 @@ class Controller extends WebController\Base
                                 ]
                             ]
                         ),
+                        'studentAverageMarks'  => $courseMarkbook->getStudentAverageMarks()[$courseImpl->getId()],
+                        'studentComments'      => $courseMarkbook->getStudentComments()[$courseImpl->getId()],
+                        'studentMarks'         => $courseMarkbook->getStudentMarks()[$courseImpl->getId()],
                     ]
                 ),
-                'assessmentImplMarks'  => $courseMarkbook->getAssessmentImplAverages(),
-                'studentMarks'         => $courseMarkbook->getStudentMarks(),
-                'studentAverageMarks'  => $courseMarkbook->getStudentAverageMarks(),
-                'studentComments'      => $courseMarkbook->getStudentComments(),
                 'canAccessPopOut'      => $this->getCanAccessPopOut($courseSpec)
             ];
 
             $data = json_decode(json_encode($data), true); // TEMP to ensure it can be encoded
+
+            // echo (json_encode($data));
+            // die();
 
             $contentResponse = $this->responseFromTemplateUnthemed(
                 '@courseMarkbook/courseMarkbookInner.twig',
