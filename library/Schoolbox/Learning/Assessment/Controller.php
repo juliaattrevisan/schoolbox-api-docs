@@ -959,11 +959,11 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
     public function getAssessmentParticipationLearningPlan(IAssessable $assessment): void
     {
-        $participationModelToArray = new Participations(
-            $this->getRouteGenerator(),
-            $this->getAuthorizer(),
-            $this->getUser(),
-        );
+        $breadcrumbs = $this->getBakery()
+                            ->produceFromAssessment(
+                                $assessment,
+                                $this->getUser()
+                            )->add([$assessment->getTitle() . ' Modify Activity', '']);
 
         $participant = $assessment->getAllParticipants()->map(function ($participant) {
             return [
@@ -975,6 +975,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/participation/learningPlan/learningPlan.twig',
             [
+                'breadcrumbs' => $breadcrumbs,
                 'assessment' => $assessment,
                 'participant' => $participant,
             ]
