@@ -296,9 +296,10 @@ interface IAssessable extends ISoftDeletable
      * including the case where the participant is excluded or the user is deleted
      *
      * @param User $user
+     * @param bool $removeExcluded - If this is true, participants with isExcluded() true will be treated as non-extant.
      * @return Participant|null
      */
-    public function getParticipantIfExtant(User $user);
+    public function getParticipantIfExtant(User $user, $removeExcluded = true);
 
     /**
      * Removes the specified user's participation from this IAssessment.
