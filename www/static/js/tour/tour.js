@@ -204,6 +204,11 @@ $(function () {
             var tour = tourData[0];
             window.tours[tour.uuid] = tour;
 
+            // Is this the staff dashboard tour? Make sure the sidebar is pinned, lol (see SA-20040)
+            if (tour.title === "Staff Dashboard Tour" && !$("#inner-wrap").hasClass("left-open")) {
+                $("#left-menu-dock").trigger("click");
+            }
+
             $(tour.triggers).each(function (j, trigger) {
                 if (trigger.selector && trigger.event) {
                     // jQuery is unable to select document/window dynamically from a variable- need to check if the
