@@ -331,20 +331,16 @@ class Controller extends WebController\Base
                             'id'    => $courseImpl->getFolder()->getId(),
                             'title' => $courseImpl->getFolder()->getTitle(),
                         ],
-                    ]
-                ),
-                'courseImportAssessments' => $courseMarkbook->getCourseImportAssessments()->map(
-                    fn(GenericCollection $assessments, $courseImplId) => $assessments->map(
+                        'assessments' => $courseMarkbook->getCourseImportAssessments()->getOffset($courseImpl->getId())->map(
                         fn(IAssessable $aImpl) => [
                             'id' => $aImpl->getId(),
-                            'participants' => $courseMarkbook->getCourseImportStudents()[$courseImplId]->map(
+                                'participants' => $courseMarkbook->getCourseImportStudents()[$courseImpl->getId()]->map(
                                 function (User $student) use ($aImpl) {
                                     $participant = $aImpl->getParticipantIfExtant($student, false) ?? null;
                                     if ($participant === null) {
                                         return null;
                                     }
                                     return [
-                                        'id'    => $participant->getId(),
                                         'isExcluded' => $participant->isExcluded(),
                                         'hasSubmittedResponse' => $participant->hasSubmittedResponse(),
                                         'hasPublishedFeedback' => $participant->hasPublishedFeedback(),
@@ -368,10 +364,8 @@ class Controller extends WebController\Base
                                 ),
                             ]
                         ]
-                    )
                 ),
-                'courseImportStudents' => $courseMarkbook->getCourseImportStudents()->map(
-                    fn(GenericCollection $students) => $students->map(
+                        'students' => $courseMarkbook->getCourseImportStudents()[$courseImpl->getId()]->map(
                         fn(User $student) => [
                             'id'         => $student->getId(),
                             'externalId' => $student->getExternalId(), // ...for portrait.twig
@@ -388,9 +382,9 @@ class Controller extends WebController\Base
                                 ),
                             ]
                         ]
-                    )
+                        ),
+                    ]
                 ),
-                'assessmentSpecMarks'  => $courseMarkbook->getAssessmentSpecAverages(),
                 'assessmentImplMarks'  => $courseMarkbook->getAssessmentImplAverages(),
                 'studentMarks'         => $courseMarkbook->getStudentMarks(),
                 'studentAverageMarks'  => $courseMarkbook->getStudentAverageMarks(),
