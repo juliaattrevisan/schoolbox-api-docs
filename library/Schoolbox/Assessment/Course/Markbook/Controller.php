@@ -220,6 +220,13 @@ class Controller extends WebController\Base
             $assessmentIds  = $this->assessmentIdFinder->findIdsByFilters($filters, $this->getUser());
             $courseMarkbook = $this->buildCourseMarkbook($courseSpec, $assessmentIds);
 
+            $unitSpecs = $courseMarkbook->getCollapsedAssessments()->map(function (IAssessable $assessment) {
+                if ($assessment->isSpecification()) {
+                    return $assessment->getBaseContext();
+                }
+                return $assessment->getSpecificationAssessment()->getBaseContext();
+            });
+
             // TODO: clean this up a bit once the payload structure is finalised
             $data = [
                 'rank' => (bool)$this->getConfigLoader()->get('view_rank') ? $courseMarkbook->getRanking() : null,
@@ -253,28 +260,28 @@ class Controller extends WebController\Base
                     'familyName'        => $assessment->getFamilyName(),
                     'isSpecification'   => $assessment->isSpecification(),
                     'unitSpec'          => [
-                        // I think this can be simplified, it's only used to render those horizontal unit bars at the top
-                        'id'    => $assessment->isSpecification() ?
-                            $assessment->getBaseContext()->getId() : $assessment->getBaseContext()->getSpecification()->getId(),
-                        'title'    => $assessment->isSpecification() ?
-                            $assessment->getBaseContext()->getTitle() : $assessment->getBaseContext()->getSpecification()->getTitle(),
+                        /* for rendering the unit bars at the top of the page */
+                        'id'    => $unitSpecs[$assessment->getId()]->getId(),
+                        'title' => $unitSpecs[$assessment->getId()]->getTitle(),
                     ],
-                    'stats' => array_map(
+                    /* stats here are only relevant for specs */
+                    'stats' => $assessment->isSpecification() ? array_map(
                         /* Get the stats in the same format as returned by the class markbook */
                         fn($mark): string|null => $mark === null ? null : sprintf("%.2f %%", $mark),
                         [
                             'mean'      => $courseMarkbook->getAssessmentSpecAverages()[$assessment->getId()]['published'] ?? null,
                             'draftMean' => $courseMarkbook->getAssessmentSpecAverages()[$assessment->getId()]['any'] ?? null,
                         ]
-                    ),
+                    ) : null,
                     '_routes'           => [
-                        'learningAssessment.getSummary' => $this->routeGenerator->generate(
+                        /* only show the summary link for specs */
+                        'learningAssessment.getSummary' => $assessment->isSpecification() ? $this->routeGenerator->generate(
                             'learningAssessment.getSummary',
                             [
                                 'assessmentId' => $assessment->getId(),
-                                'studentId'    => $this->getUser()->getId(), // apparently this is just the current user?
+                                'studentId'    => $this->getUser()->getId(),
                             ]
-                        ),
+                        ) : null,
                     ],
                 ]),
                 'courseImpls' => $courseMarkbook->getCourseImpls()->map(

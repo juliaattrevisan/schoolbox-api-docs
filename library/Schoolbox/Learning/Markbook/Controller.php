@@ -139,6 +139,19 @@ class Controller extends Base
             // TODO: clean this up a bit once the payload structure is finalised
             $data = [
                 'rank' => (bool)$this->getConfigLoader()->get('view_rank') ? $rank : null,
+                'assessments' => $markbook->getAssessments()->map(fn(IAssessable $assessment) => [
+                    'id'              => $assessment->getId(),
+                    'title'           => $assessment->getTitle(),
+                    'typeName'        => $assessment->getTypeName(),
+                    'familyName'      => $assessment->getFamilyName(),
+                    /* the class markbook doesn't need any of the below, as this is always an implementation */
+                    'isSpecification' => $assessment->isSpecification(),
+                    'unitSpec'        => null,
+                    'stats'           => null,
+                    '_routes'         => [
+                        'learningAssessment.getSummary' => null,
+                    ],
+                ]),
                 'markbook' => [
                     'folder' => [
                         'id'    => $folder->getFolder()->getId(),
@@ -146,9 +159,6 @@ class Controller extends Base
                     ],
                     'assessments' => $markbook->getAssessments()->map(fn(IAssessable $aImpl) => [
                         'id'             => $aImpl->getId(),
-                        'title'          => $aImpl->getTitle(),
-                        'typeName'       => $aImpl->getTypeName(),
-                        'familyName'     => $aImpl->getFamilyName(),
                         'markVisibility' => $aImpl->getMarkVisibility(),
                         'courseManaged'  => $aImpl->getCourseManaged(),
                         'weight'         => $aImpl->getWeight(),
