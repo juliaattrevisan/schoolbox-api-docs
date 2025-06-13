@@ -6,8 +6,8 @@
     {% endif %}
     {% for assessment in assessments  %}
     <td data-assessment="{{ assessment.id }}" class="student-grade-cell">
-        {% if assessment.stats[key] is defined and writable[assessment.id] is defined %}
-            {% if input ?? false and assessment is not task and not assessment.courseManaged and writable[assessment.id] %}
+        {% if assessment.stats[key] is defined and assessment.writable is not null %}
+            {% if input ?? false and assessment is not task and not assessment.courseManaged and assessment.writable %}
                 <input type="number" inputmode="numeric" name="weight" data-weight value="{{ assessment.weight }}" min=0 data-assessment="{{ assessment.id }}">
             {% elseif round is defined %}
                 {{ assessment.stats[key] | round(round) }}

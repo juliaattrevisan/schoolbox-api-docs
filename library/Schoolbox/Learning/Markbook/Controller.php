@@ -136,6 +136,8 @@ class Controller extends Base
              */
             $rank = $markbook->getRanking();
 
+            $writable = $this->getAssessmentsWritability($markbook->getAssessments());
+
             // TODO: clean this up a bit once the payload structure is finalised
             $data = [
                 'rank' => (bool)$this->getConfigLoader()->get('view_rank') ? $rank : null,
@@ -174,6 +176,8 @@ class Controller extends Base
                         'markVisibility' => $aImpl->getMarkVisibility(),
                         'courseManaged'  => $aImpl->getCourseManaged(),
                         'weight'         => $aImpl->getWeight(),
+                        'hasDraft'       => $markbook->getHasDraft()[$aImpl->getId()] ?? [],
+                        'writable'       => $writable[$aImpl->getId()] ?? null,
                         'participants'   => $markbook->getStudents()->map(
                             function (User $student) use ($aImpl, $markbook) {
                                 $participant = $aImpl->getParticipantIfExtant($student, false);
@@ -227,6 +231,9 @@ class Controller extends Base
                                         'name' => $participant->getPlan()->getName(),
                                         'dueDate' => $participant->getPlan()->getDueDate()?->getShort() ?? null,
                                     ],
+                                    /* unused on the class markbook: */
+                                    // 'marks' => ...,
+                                    // 'comment' => ...,
                                 ];
                             }
                         ),
@@ -296,10 +303,11 @@ class Controller extends Base
                     'students'    => $markbook->getStudents()->map(fn (User $student) => [
                         'id'         => $student->getId(),
                         'externalId' => $student->getExternalId(), // ...for portrait.twig
-                        // The class markbook uses [lastname, first name] to display names, whereas the course markbook uses just [fullName] for some reason                        'firstName' => $student->getFirstname(),
+                        /* The class markbook uses [lastname, first name] to display names, whereas the course markbook uses just [fullName] for some reason */
                         // 'fullName'   => $student->getFullName(),
                         'firstName'  => $student->getFirstname(),
                         'lastName'   => $student->getLastname(),
+                        'stats'      => $markbook->getStudentStatistics()[$student->getId()],
                         '_routes'    => [
                             'learningGrades.getGrades' => $this->routeGenerator->generate(
                                 'learningGrades.getGrades',
@@ -311,12 +319,12 @@ class Controller extends Base
                             ),
                         ]
                     ]),
-                    'normalisedMean' => $markbook->getNormalisedMean(),
-                    'draftNormalisedMean' => $markbook->getDraftNormalisedMean(),
-                    'weightedMean' => $markbook->getWeightedMean(),
-                    'draftWeightedMean' => $markbook->getDraftWeightedMean(),
-                    'studentStatistics' => $markbook->getStudentStatistics(),
-                    'hasDraft' => $markbook->getHasDraft(),
+                    'stats' => [
+                        'normalisedMean' => $markbook->getNormalisedMean(),
+                        'draftNormalisedMean' => $markbook->getDraftNormalisedMean(),
+                        'weightedMean' => $markbook->getWeightedMean(),
+                        'draftWeightedMean' => $markbook->getDraftWeightedMean(),
+                    ],
                 ]],
                 '_routes' => [
                     'exportReport' => sprintf(
@@ -332,7 +340,6 @@ class Controller extends Base
                     ),
                 ],
                 'canAccessPopOut' => true, /* can always access the pop-out on the class markbook, I suppose */
-                'writable' => $this->getAssessmentsWritability($markbook->getAssessments()),
                 'availableVisibilities' => Visibility::getAvailableVisibilities((int)$this->getConfigLoader()->get('submission_visibility_max')),
             ];
 

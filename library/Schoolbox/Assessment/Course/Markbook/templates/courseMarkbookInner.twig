@@ -127,10 +127,10 @@
                 {% for assessment in assessments %}
                     {% if assessment.stats %}
                         <td class="course-row">
-                            <span {% if assessment.stats.draftMean is defined %} data-actual-mark {% endif %}>
+                            <span {% if assessment.stats.draftMean is not null %} data-actual-mark {% endif %}>
                                 {{ assessment.stats.mean | default('-') }}
                             </span>
-                            {% if assessment.stats.draftMean is defined %}
+                            {% if assessment.stats.draftMean is not null %}
                                 <span data-draft-mark class="meta" style="display:none;">
                                     {{ assessment.stats.draftMean | default('-') }}
                                 </span>
@@ -153,10 +153,10 @@
                             {% set assessmentImpl = classImpl.assessments[assessment.id] %}
                             <td class="class-row">
                                 <a href="{{ assessmentImpl._routes['learningAssessment.getStatus'] }}">
-                                    <span {% if assessment.stats.draftMean is defined %} data-actual-mark {% endif %}>
+                                    <span {% if assessment.stats.draftMean is not null %} data-actual-mark {% endif %}>
                                         {{ assessmentImpl.stats.mean | default('-') }}
                                     </span>
-                                    {% if assessmentImpl.stats.draftMean is defined %}
+                                    {% if assessmentImpl.stats.draftMean is not null %}
                                         <span data-draft-mark class="meta" style="display:none;">
                                             {{ assessmentImpl.stats.draftMean | default('-') }}
                                         </span>
@@ -181,8 +181,7 @@
                             </div>
                         </th>
 
-                        {#studentAverageMarks      float[][]         Indexed by [student.id]['any'|'published']#}
-                        {% set marks             = classImpl.studentAverageMarks[student.id] ?? null %}
+                        {% set marks             = student.averageMarks ?? null %}
                         {% set publishedNormMark = marks.published.norm ?? null %}
                         {% set draftNormMark     = marks.any.norm ?? null %}
                         {% set publishedHrMark   = marks.published.hr ?? '–' %}
@@ -240,15 +239,14 @@
                                         data-progress-tick-status="incomplete"
                                     ></div>
                                 {% else %}
-                                    {% set comment            = classImpl.studentComments[student.id][assessment.id] ?? '' %}
-                                    {% set marks              = classImpl.studentMarks[assessment.id][student.id] ?? null %}
+                                    {% set marks              = participant.marks %}
                                     {% set publishedMark      = marks.published ?? null %}
                                     {% set draftMark          = marks.draft ?? null %}
 
                                     <span
                                         class="{{ urgency.marks(participant.normalisedMark) }}"
                                         {% if marks.draft is defined %}data-actual-mark{% endif %}
-                                        title="{{ comment|html2text }}"
+                                        title="{{ participant.comment }}"
                                     >
                                         <span data-instructor-mark>{{ decorator.label(participant, true, true) }}</span>
                                         <span data-learner-mark style="display: none">{{ decorator.label(participant, true, false) }}</span>

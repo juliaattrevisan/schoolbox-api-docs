@@ -290,14 +290,16 @@ class Controller extends WebController\Base
                             'title' => $courseImpl->getFolder()->getTitle(),
                         ],
                         'assessments' => $courseMarkbook->getCourseImportAssessments()->getOffset($courseImpl->getId())->map(
-                            fn(IAssessable $aImpl) => [
+                            fn(IAssessable $aImpl, int $assessmentId) => [
                                 'id' => $aImpl->getId(),
                                 /* unused on the course markbook: */
                                 // 'markVisibility' => ...,
                                 // 'courseManaged'  => ...,
                                 // 'weight'         => ...,
+                                // 'hasDraft'       => ...,
+                                // 'writable'       => ...,
                                 'participants' => $courseMarkbook->getCourseImportStudents()[$courseImpl->getId()]->map(
-                                    function (User $student) use ($aImpl) {
+                                    function (User $student) use ($aImpl, $courseImpl, $assessmentId, $courseMarkbook) {
                                         $participant = $aImpl->getParticipantIfExtant($student, false) ?? null;
                                         if ($participant === null) {
                                             return null;
@@ -314,6 +316,9 @@ class Controller extends WebController\Base
                                             );
                                             $progressTick = $unitAssessmentsTranslator->getProgressTick($aImpl, $participant);
                                         }
+
+                                        $marks = $courseMarkbook->getStudentMarks()[$courseImpl->getId()];
+                                        $comments = $courseMarkbook->getStudentComments()[$courseImpl->getId()];
 
                                         return [
                                             'isExcluded' => $participant->isExcluded(),
@@ -337,6 +342,8 @@ class Controller extends WebController\Base
                                             // 'authoritativeFeedback' => ...,
                                             // 'authoritativeFeedbackDraft' => ...,
                                             // 'plan' => ...,
+                                            'marks'    => $marks[$assessmentId][$student->getId()] ?? null,
+                                            'comment'  => \Scrub::html2text($comments[$student->getId()][$assessmentId] ?? ''),
                                         ];
                                     }
                                 ),
@@ -415,10 +422,13 @@ class Controller extends WebController\Base
                             fn(User $student) => [
                                 'id'         => $student->getId(),
                                 'externalId' => $student->getExternalId(), // ...for portrait.twig
-                                // The class markbook uses [lastname, first name] to display names, whereas the course markbook uses just [fullName] for some reason
+                                /* The class markbook uses [lastname, first name] to display names, whereas the course markbook uses just [fullName] for some reason */
                                 'fullName'   => $student->getFullName(),
                                 // 'firstName'  => $student->getFirstname(),
                                 // 'lastName'   => $student->getLastname(),
+                                /* no stats on the course markbook */
+                                'stats' => null,
+                                'averageMarks' => $courseMarkbook->getStudentAverageMarks()[$courseImpl->getId()][$student->getId()] ?? null,
                                 '_routes'    => [
                                     'learningGrades.getGrades' => $this->routeGenerator->generate(
                                         'learningGrades.getGrades',
@@ -431,9 +441,8 @@ class Controller extends WebController\Base
                                 ]
                             ]
                         ),
-                        'studentAverageMarks'  => $courseMarkbook->getStudentAverageMarks()[$courseImpl->getId()],
-                        'studentComments'      => $courseMarkbook->getStudentComments()[$courseImpl->getId()],
-                        'studentMarks'         => $courseMarkbook->getStudentMarks()[$courseImpl->getId()],
+                        /* no stats on the course markbook */
+                        'stats' => null,
                     ]
                 ),
                 '_routes' => [
@@ -449,6 +458,8 @@ class Controller extends WebController\Base
                     ),
                 ],
                 'canAccessPopOut' => $this->getCanAccessPopOut($courseSpec),
+                /* unused on the course markbook */
+                // 'availableVisibilities' => ...,
             ];
 
             $data = json_decode(json_encode($data), true); // TEMP to ensure it can be encoded
