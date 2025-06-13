@@ -220,6 +220,7 @@ class Module extends BaseModule
         $this->register('GET', "$assRoute/submissions/download", 'downloadSubmissions', $canViewStatus, $preloadAssessment); // a || c
         $this->register('GET', "$assRoute/participation", 'getAssessmentParticipationForm', $canModifyCustomParticipation, $preloadAssessmentForParticipant);
         $this->register('GET', "$assRoute/participation/new", 'getAssessmentParticipationLearningPlan', $canModify, $preloadAssessmentForParticipant);
+        $this->register('POST', "$assRoute/participation/new", 'postAssessmentParticipationLearningPlan', $canModify, $preloadAssessmentForParticipant);
 
         /* Rescore Feedbacks
          */
