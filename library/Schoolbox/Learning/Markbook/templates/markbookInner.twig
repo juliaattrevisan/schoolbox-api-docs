@@ -77,9 +77,8 @@
                 <th data-test="markbook-assessment" data-assessment="{{ assessment.id }}">
                     <div>
                         {# A teacher clicking an assessment from the markbook is most likely interested in seeing more granular results #}
-                        {% set href = routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id}) %}
                         <span>
-                            <a href="{{ href }}" title="{{ assessment.title }}">{{ assessment.title }}</a><br/>
+                            <a href="{{ assessment._routes['learningAssessment.getStatus'] }}" title="{{ assessment.title }}">{{ assessment.title }}</a><br/>
                             <span class="meta">{{ assessment.typeName }}</span>
                         </span>
                     </div>
@@ -176,7 +175,7 @@
                                 {% include "include/portrait.twig" with {user: student, render: "tiny", roundedCorners: true} only %}
                             {% endif %}
                             <div class="l-flex-col l-flex--justify-center f-no-margins">
-                                <a href="/search/user/{{ student.id }}" title="View Profile">{{ student.lastname }}, {{ student.firstname }}</a>
+                                <a href="/search/user/{{ student.id }}" title="View Profile">{{ student.lastName }}, {{ student.firstName }}</a>
                             </div>
                         </div>
                     </div>
@@ -194,15 +193,14 @@
                 <th class="fixed-left {{ draftsOffClass }} student-grade-cell"
                     {% if draftWeightedMean %}data-student-average{% endif %}
                     data-off-class="{{ draftsOffClass }}" data-on-class="{{ draftsOnClass }}">
-                    {% set gradesRoute = routeLookup('learningGrades.getGrades', {viewee: student, userId: student.id, termCode: ''}) %}
                     {# Regardless of which term is being filtered to, link to default term grades page (ie empty termCode) #}
                     <a class="{{ draftsOffClass }}"
-                       href="{{ gradesRoute }}" {% if draftWeightedMean %}data-actual-mark{% endif %}
+                       href="{{ student._routes['learningGrades.getGrades'] }}" {% if draftWeightedMean %}data-actual-mark{% endif %}
                        title="View students {{ locale.grades.plural }}"> {{ studentMean | default('-') }}
                     </a>
                     {% if draftWeightedMean %}
                         <a class="{{ draftsOnClass }}"
-                           href="{{ gradesRoute }}" data-draft-mark style="display: none"
+                           href="{{ student._routes['learningGrades.getGrades'] }}" data-draft-mark style="display: none"
                            title="View student draft {{ locale.grades.plural }}"> {{ draftWeightedMean | default('-') }}
                         </a>
                     {% endif %}
@@ -219,7 +217,7 @@
                 {% endif %}
 
                 {% for assessment in markbook.assessments %}
-                    {% set participant = markbook.participants[assessment.id][student.id] %}
+                    {% set participant = markbook.participants[assessment.id][student.id] ?? null %}
                     <td
                         class="column-{{ assessment.id }}
                             {% if not participant or participant.isExcluded %} excluded
@@ -269,11 +267,10 @@
                                     {% endif %}
                                 {% endif %}
                             {% else %}
-                                {% set participationRoute = routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) %}
                                 {% set draftMark = markbook.hasDraft[assessment.id][student.id] is defined %}
                                 <span
                                     class="{{ urgency.marks(participant.normalisedMark) }}"
-                                    href="{{ participationRoute }}"
+                                    href="{{ assessment._routes.student[student.id]['learningAssessment.getSummary'] }}"
                                     {% if draftMark %} data-actual-mark {% endif %}
                                     title="{{ participant.authoritativeFeedback ? participant.authoritativeFeedback.comment : '' }}"
                                 >
@@ -282,7 +279,7 @@
                                 </span>
                                 {% if draftMark %}
                                     <span
-                                        href="{{ participationRoute }}"
+                                        href="{{ assessment._routes.student[student.id]['learningAssessment.getSummary'] }}"
                                         data-draft-mark
                                         style="display: none"
                                         class="meta"

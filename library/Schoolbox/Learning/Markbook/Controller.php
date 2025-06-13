@@ -209,11 +209,23 @@ class Controller extends Base
                         ],
                     ]),
                     'participants' => [], // filled in later
-                    'students'    => $markbook->getStudents(),
-                    // 'topLevelAssessments'
-                    // 'defaultMarkScheme'
-                    // 'viewingUser'
-                    // 'totalWeight' => $markbook->getTotalWeight(),
+                    'students'    => $markbook->getStudents()->map(fn (User $student) => [
+                        'id'        => $student->getId(),
+                        'externalId' => $student->getExternalId(), // ...for portrait.twig
+                        // The class markbook uses [lastname, first name] to display names, whereas the course markbook uses just [fullName] for some reason                        'firstName' => $student->getFirstname(),
+                        'firstName' => $student->getFirstname(),
+                        'lastName'  => $student->getLastname(),
+                        '_routes'   => [
+                            'learningGrades.getGrades' => $this->routeGenerator->generate(
+                                'learningGrades.getGrades',
+                                [
+                                    'viewee'   => $student,
+                                    'userId'   => $student->getId(),
+                                    'termCode' => '',
+                                ]
+                            ),
+                        ]
+                    ]),
                     'normalisedMean' => $markbook->getNormalisedMean(),
                     'draftNormalisedMean' => $markbook->getDraftNormalisedMean(),
                     'weightedMean' => $markbook->getWeightedMean(),

@@ -372,23 +372,22 @@ class Controller extends WebController\Base
                 ),
                 'courseImportStudents' => $courseMarkbook->getCourseImportStudents()->map(
                     fn(GenericCollection $students) => $students->map(
-                        function (User $student) {
-                            return [
-                                'id'         => $student->getId(),
-                                'externalId' => $student->getExternalId(), // ...for portrait.twig
-                                'fullName'   => $student->getFullName(),
-                                '_routes'    => [
-                                    'learningGrades.getGrades' => $this->routeGenerator->generate(
-                                        'learningGrades.getGrades',
-                                        [
-                                            'viewee'   => $student,
-                                            'userId'   => $student->getId(),
-                                            'termCode' => '',
-                                        ]
-                                    ),
-                                ]
-                            ];
-                        }
+                        fn(User $student) => [
+                            'id'         => $student->getId(),
+                            'externalId' => $student->getExternalId(), // ...for portrait.twig
+                            // The class markbook uses [lastname, first name] to display names, whereas the course markbook uses just [fullName] for some reason
+                            'fullName'   => $student->getFullName(),
+                            '_routes'    => [
+                                'learningGrades.getGrades' => $this->routeGenerator->generate(
+                                    'learningGrades.getGrades',
+                                    [
+                                        'viewee'   => $student,
+                                        'userId'   => $student->getId(),
+                                        'termCode' => '',
+                                    ]
+                                ),
+                            ]
+                        ]
                     )
                 ),
                 'assessmentSpecMarks'  => $courseMarkbook->getAssessmentSpecAverages(),
@@ -406,26 +405,7 @@ class Controller extends WebController\Base
 
             $contentResponse = $this->responseFromTemplateUnthemed(
                 '@courseMarkbook/courseMarkbookInner.twig',
-                [
-                    'rank'                    => $data['rank'],
-                    // 'rankEnabled'             => (bool)$this->getConfigLoader()->get('view_rank'),
-                    'courseSpec'              => $data['courseSpec'],
-                    'collapsedAssessments'    => $data['collapsedAssessments'],
-                    // 'unitSpecs'               => $courseMarkbook->getUnitSpecs(),
-                    'courseImpls'             => $data['courseImpls'],
-                    'courseImportAssessments' => $data['courseImportAssessments'],
-                    'courseImportStudents'    => $data['courseImportStudents'],
-                    'assessmentSpecMarks'     => $data['assessmentSpecMarks'],
-                    'assessmentImplMarks'     => $data['assessmentImplMarks'],
-                    'studentMarks'            => $data['studentMarks'],
-                    'studentAverageMarks'     => $data['studentAverageMarks'],
-                    'studentComments'         => $data['studentComments'],
-                    'taskProgress'            => $data['taskProgress'],
-                    'taskProgressPending'     => $data['taskProgressPending'],
-                    'taskProgressComplete'    => $data['taskProgressComplete'],
-                    // 'queryArgs'               => $data['queryArgs'],
-                    'canAccessPopOut'         => $data['canAccessPopOut'],
-                ]
+                $data,
             );
             $this->response = $this->responseAsJson([
                 'status'  => 200,
