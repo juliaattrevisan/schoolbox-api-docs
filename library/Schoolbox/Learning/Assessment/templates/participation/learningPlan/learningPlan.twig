@@ -19,57 +19,58 @@
     <div class="small-12 columns">
         <h1>Modify Activity</h1>
     </div>
-    <div class="row">
-        <div class="small-12 columns island">
-            <form method="post" id="participation-plan-form" class="mage">
-                <section>
-                    <fieldset class="content" data-mage>
-                        <div class="small-12 columns">
-                            <fieldset>
-                                <label>
-                                    Plan Name
-                                    <input type="text" name="plan-name" id="plan-name" data-test="participation-plan-customise-modal-input-name" maxlength="256">
-                                </label>
-                            </fieldset>
-                            <fieldset>
-                                <legend>Custom Activity Details</legend>
-                                <div class="row">
-                                    <div class="columns small-12">
-                                        <label>
-                                            Description
-                                            <textarea name="plan-desc" id="plan-desc"></textarea>
-                                        </label>
-                                    </div>
-                                    <div class="columns small-12">
-                                        {% set dummyDate = {local: ''} %}
-                                        {% if acceptingResponses is defined and acceptingResponses %}
-                                            {{ dateForm.dateField('Publish', 'planPublish', dummyDate, ''                , '#planOpenDate' ) }}
-                                            {{ dateForm.dateField('Open'   , 'planOpen'   , dummyDate, '#planPublishDate', '#planDueDate'  ) }}
-                                            {{ dateForm.dateField('Due'    , 'planDue'    , dummyDate, '#planOpenDate'   , '#planCloseDate') }}
-                                            {{ dateForm.dateField('Late'   , 'planClose'  , dummyDate, '#planDueDate'    , ''              ) }}
-                                        {% else %}
-                                            {{ dateForm.dateField('Publish', 'planPublish', dummyDate, ''                , '#planDueDate'  ) }}
-                                            {{ dateForm.dateField('Due'    , 'planDue'    , dummyDate, '#planPublishDate', ''              ) }}
-                                        {% endif %}
-                                    </div>
+</div>
+<div class="row">
+    <div class="small-12 columns island">
+        <form method="post" id="participation-plan-form" class="mage">
+            <section>
+                <fieldset class="content" data-mage>
+                    <div class="small-12 columns">
+                        <fieldset>
+                            <label>
+                                Plan Name
+                                <input type="text" name="plan-name" id="plan-name" data-test="participation-plan-customise-modal-input-name" maxlength="256">
+                            </label>
+                        </fieldset>
+                        <fieldset>
+                            <legend>Custom Activity Details</legend>
+                            <div class="row">
+                                <div class="columns small-12">
+                                    <label>
+                                        Description
+                                        <textarea name="plan-desc" id="plan-desc"></textarea>
+                                    </label>
                                 </div>
-                            </fieldset>
-                            <fieldset>
-                                <legend>Plan Participants</legend>
-                                <label>
-                                    <input type="text" name="plan-participants" id="plan-participants" placeholder="Search Students" data-selectizeuser>
-                                </label>
-                            </fieldset>
-                            <input type="hidden" name="plan-id" id="plan-id">
-                            <input type="submit" value="Update" data-test="participation-plan-form-button-save">
-                        </div>
+                                <div class="columns small-12">
+                                    {% set dummyDate = {local: ''} %}
+                                    {% if acceptingResponses is defined and acceptingResponses %}
+                                        {{ dateForm.dateField('Publish', 'planPublish', dummyDate, ''                , '#planOpenDate' ) }}
+                                        {{ dateForm.dateField('Open'   , 'planOpen'   , dummyDate, '#planPublishDate', '#planDueDate'  ) }}
+                                        {{ dateForm.dateField('Due'    , 'planDue'    , dummyDate, '#planOpenDate'   , '#planCloseDate') }}
+                                        {{ dateForm.dateField('Late'   , 'planClose'  , dummyDate, '#planDueDate'    , ''              ) }}
+                                    {% else %}
+                                        {{ dateForm.dateField('Publish', 'planPublish', dummyDate, ''                , '#planDueDate'  ) }}
+                                        {{ dateForm.dateField('Due'    , 'planDue'    , dummyDate, '#planPublishDate', ''              ) }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset>
+                            <legend>Plan Participants</legend>
+                            <label>
+                                <input type="text" name="plan-participants" id="plan-participants" placeholder="Search Students" data-selectizeuser>
+                            </label>
+                        </fieldset>
+                        <input type="hidden" name="plan-id" id="plan-id">
+                        <input type="submit" value="Update" data-test="participation-plan-form-button-save">
+                    </div>
 
-                    </fieldset>
+                </fieldset>
 
-                </section>
-            </form>
-        </div>
+            </section>
+        </form>
     </div>
+</div>
 </div>
 
 <script>
