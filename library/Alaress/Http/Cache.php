@@ -182,7 +182,7 @@ class Cache
             // This is a safeguard against non-serializable values being cached.
             // This may have also been it cached the entry but for a timeout of 0, so it fetched null.
             trigger_error(
-                'Failed to cache response: ' . $e->getMessage(),
+                'Failed to cache response, (Possibly cache timeout set to 0). Error: ' . $e->getMessage(),
                 E_USER_WARNING,
             );
         }
