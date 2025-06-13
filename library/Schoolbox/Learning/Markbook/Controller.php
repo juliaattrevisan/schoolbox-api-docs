@@ -139,20 +139,32 @@ class Controller extends Base
             // TODO: clean this up a bit once the payload structure is finalised
             $data = [
                 'rank' => (bool)$this->getConfigLoader()->get('view_rank') ? $rank : null,
-                'assessments' => $markbook->getAssessments()->map(fn(IAssessable $assessment) => [
+                /* unused on the class markbook: */
+                // 'courseSpec' => ...,
+                'assessments' => $markbook->getAssessments()->indexBy('id')->map(fn(IAssessable $assessment) => [
                     'id'              => $assessment->getId(),
                     'title'           => $assessment->getTitle(),
                     'typeName'        => $assessment->getTypeName(),
                     'familyName'      => $assessment->getFamilyName(),
+                    /* unused on the class markbook: */
+                    // 'unitSpec' => ...,
                     /* the class markbook doesn't need any of the below, as this is always an implementation */
                     'isSpecification' => $assessment->isSpecification(),
-                    'unitSpec'        => null,
                     'stats'           => null,
                     '_routes'         => [
                         'learningAssessment.getSummary' => null,
                     ],
                 ]),
-                'markbook' => [
+                /**
+                 * A "class implementation" is a course/class markbook-specific term.
+                 * Since the class markbook can contain non-unit assessments, this is a generalised term to allow
+                 * each of the course markbook's course implementation data and the class markbook's class data to
+                 * be returned as a similar payload structure
+                 *
+                 * For the class markbook, there is only ever one of these - the class folder itself
+                 */
+                'classImpls' => [[
+                    'courseImplId' => null, /* This is not a course implementation, so null */
                     'folder' => [
                         'id'    => $folder->getFolder()->getId(),
                         'title' => $folder->getFolder()->getTitle(),
@@ -282,12 +294,13 @@ class Controller extends Base
                         ],
                     ]),
                     'students'    => $markbook->getStudents()->map(fn (User $student) => [
-                        'id'        => $student->getId(),
+                        'id'         => $student->getId(),
                         'externalId' => $student->getExternalId(), // ...for portrait.twig
                         // The class markbook uses [lastname, first name] to display names, whereas the course markbook uses just [fullName] for some reason                        'firstName' => $student->getFirstname(),
-                        'firstName' => $student->getFirstname(),
-                        'lastName'  => $student->getLastname(),
-                        '_routes'   => [
+                        // 'fullName'   => $student->getFullName(),
+                        'firstName'  => $student->getFirstname(),
+                        'lastName'   => $student->getLastname(),
+                        '_routes'    => [
                             'learningGrades.getGrades' => $this->routeGenerator->generate(
                                 'learningGrades.getGrades',
                                 [
@@ -304,10 +317,9 @@ class Controller extends Base
                     'draftWeightedMean' => $markbook->getDraftWeightedMean(),
                     'studentStatistics' => $markbook->getStudentStatistics(),
                     'hasDraft' => $markbook->getHasDraft(),
-                ],
-                'writable' => $this->getAssessmentsWritability($markbook->getAssessments()),
-                '_routes'               => [
-                    'learningMarkbook.getMarkbookExportForClass' => sprintf(
+                ]],
+                '_routes' => [
+                    'exportReport' => sprintf(
                         "%s?%s",
                         $this->routeGenerator->generate(
                             'learningMarkbook.getMarkbookExportForClass',
@@ -319,6 +331,8 @@ class Controller extends Base
                         $codec->convertSelectionsToQueryString($selectionsPerFilter),
                     ),
                 ],
+                'canAccessPopOut' => true, /* can always access the pop-out on the class markbook, I suppose */
+                'writable' => $this->getAssessmentsWritability($markbook->getAssessments()),
                 'availableVisibilities' => Visibility::getAvailableVisibilities((int)$this->getConfigLoader()->get('submission_visibility_max')),
             ];
 

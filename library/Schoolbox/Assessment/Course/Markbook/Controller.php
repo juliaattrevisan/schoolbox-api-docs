@@ -241,19 +241,9 @@ class Controller extends WebController\Base
                                 'componentId'  => 0,
                             ]
                         ),
-                        'courseMarkbook.getMarkbookExport' => sprintf(
-                            "%s?%s",
-                            $this->routeGenerator->generate(
-                                'courseMarkbook.getMarkbookExport',
-                                [
-                                    'courseSpecId' => $courseSpec->getId(),
-                                ]
-                            ),
-                            $codec->convertSelectionsToQueryString($selectionsPerFilter),
-                        ),
                     ],
                 ],
-                'assessments' => $courseMarkbook->getCollapsedAssessments()->map(fn(IAssessable $assessment) => [
+                'assessments' => $courseMarkbook->getCollapsedAssessments()->indexBy('id')->map(fn(IAssessable $assessment) => [
                     'id'                => $assessment->getId(),
                     'title'             => $assessment->getTitle(),
                     'typeName'          => $assessment->getTypeName(),
@@ -284,9 +274,17 @@ class Controller extends WebController\Base
                         ) : null,
                     ],
                 ]),
-                'courseImpls' => $courseMarkbook->getCourseImpls()->map(
+                /**
+                 * A "class implementation" is a course/class markbook-specific term.
+                 * Since the class markbook can contain non-unit assessments, this is a generalised term to allow
+                 * each of the course markbook's course implementation data and the class markbook's class data to
+                 * be returned as a similar payload structure
+                 *
+                 * For the course markbook, there is one of these for each course implementation
+                 */
+                'classImpls' => $courseMarkbook->getCourseImpls()->reIndex()->map(
                     fn(CourseImpl\Model $courseImpl) => [
-                        'id'    => $courseImpl->getId(),
+                        'courseImplId'    => $courseImpl->getId(),
                         'folder' => [
                             'id'    => $courseImpl->getFolder()->getId(),
                             'title' => $courseImpl->getFolder()->getTitle(),
@@ -294,6 +292,10 @@ class Controller extends WebController\Base
                         'assessments' => $courseMarkbook->getCourseImportAssessments()->getOffset($courseImpl->getId())->map(
                             fn(IAssessable $aImpl) => [
                                 'id' => $aImpl->getId(),
+                                /* unused on the course markbook: */
+                                // 'markVisibility' => ...,
+                                // 'courseManaged'  => ...,
+                                // 'weight'         => ...,
                                 'participants' => $courseMarkbook->getCourseImportStudents()[$courseImpl->getId()]->map(
                                     function (User $student) use ($aImpl) {
                                         $participant = $aImpl->getParticipantIfExtant($student, false) ?? null;
@@ -328,6 +330,13 @@ class Controller extends WebController\Base
                                                 'unpublished' => $participant->getHumanReadableMark(false),
                                             ],
                                             'progressTick' => $progressTick,
+                                            /* unused on the course markbook: */
+                                            // 'isResponseRequired' => ...,
+                                            // 'isFeedbackRequired' => ...,
+                                            // 'isReviewComplete'   => ...,
+                                            // 'authoritativeFeedback' => ...,
+                                            // 'authoritativeFeedbackDraft' => ...,
+                                            // 'plan' => ...,
                                         ];
                                     }
                                 ),
@@ -408,6 +417,8 @@ class Controller extends WebController\Base
                                 'externalId' => $student->getExternalId(), // ...for portrait.twig
                                 // The class markbook uses [lastname, first name] to display names, whereas the course markbook uses just [fullName] for some reason
                                 'fullName'   => $student->getFullName(),
+                                // 'firstName'  => $student->getFirstname(),
+                                // 'lastName'   => $student->getLastname(),
                                 '_routes'    => [
                                     'learningGrades.getGrades' => $this->routeGenerator->generate(
                                         'learningGrades.getGrades',
@@ -425,7 +436,19 @@ class Controller extends WebController\Base
                         'studentMarks'         => $courseMarkbook->getStudentMarks()[$courseImpl->getId()],
                     ]
                 ),
-                'canAccessPopOut'      => $this->getCanAccessPopOut($courseSpec)
+                '_routes' => [
+                    'exportReport' => sprintf(
+                        "%s?%s",
+                        $this->routeGenerator->generate(
+                            'courseMarkbook.getMarkbookExport',
+                            [
+                                'courseSpecId' => $courseSpec->getId(),
+                            ]
+                        ),
+                        $codec->convertSelectionsToQueryString($selectionsPerFilter),
+                    ),
+                ],
+                'canAccessPopOut' => $this->getCanAccessPopOut($courseSpec),
             ];
 
             $data = json_decode(json_encode($data), true); // TEMP to ensure it can be encoded

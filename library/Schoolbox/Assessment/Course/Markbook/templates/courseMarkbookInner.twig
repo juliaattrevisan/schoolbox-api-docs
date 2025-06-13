@@ -2,15 +2,15 @@
     courseSpec               CourseSpec\Model
     assessments              IAssessable[]       Column headers. Will be specs if imported from spec, impl if created in class's unit-import
     unitSpecs                UnitSpec/Model[]    The unit-specs to display as column header groups
-    courseImpls              CourseImpl/Model[]  The vertical sections of the table.
+    classImpls               CourseImpl/Model[]  The vertical sections of the table.
     courseImportAssessments  IAssessable[][]     Indexed by assessmentImpl.spec.id if imported from spec, or assessmentImpl.id otherwise
     courseImportStudents     User[][]            Indexed by user.id
     assessmentImplMarks      float[][]           Average mark for an assessment impl. Indexed by [assessment spec id]['any'|'published']
     assessmentSpecMarks      float[][]           Average mark for an assessment impl. Indexed by [assessment spec id]['any'|'published']
-    studentMarks             float[][][][][]     Indexed by [courseImplId][assessmentId][userId]['published'|'draft']['norm'|'hr']
+    studentMarks             float[][][][][]     Indexed by [classImplId][assessmentId][userId]['published'|'draft']['norm'|'hr']
     studentAverageMarks      float[][][][]       Indexed by [courseImport.id][student.id]['any'|'published']['norm'|'hr']
-    studentComments          string[][][]        Indexed by [courseImplId][assessmentId][userId]
-    taskProgress             int[][][]           Indexed by [courseImplId][assessmentId][userId]
+    studentComments          string[][][]        Indexed by [classImplId][assessmentId][userId]
+    taskProgress             int[][][]           Indexed by [classImplId][assessmentId][userId]
     taskProgressPending      int                 Student has claimed completion
     taskProgressComplete     int                 Teacher has verified completion
     queryArgs                string              The filters used to generate this report, so we can export the exact same report
@@ -60,7 +60,7 @@
         </nav>
         <ul id="header-options" class="f-dropdown" data-dropdown-content="">
             <li class="separator">Report</li>
-            <li><a href='{{ courseSpec._routes['courseMarkbook.getMarkbookExport'] }}'
+            <li><a href='{{ _routes.exportReport }}'
                    data-download-spreadsheet
                    class='icon-download'>Download Spreadsheet</a></li>
         </ul>
@@ -141,16 +141,16 @@
                     {% endif %}
                 {% endfor %}
             </tr>
-            {% for courseImpl in courseImpls %}
+            {% for classImpl in classImpls %}
                 <tr>
-                    <th class="class-row class-row-heading fixed-left"><a href="/homepage/{{ courseImpl.folder.id }}">{{ courseImpl.folder.title }}</a></th>
+                    <th class="class-row class-row-heading fixed-left"><a href="/homepage/{{ classImpl.folder.id }}">{{ classImpl.folder.title }}</a></th>
                     <th class="class-row fixed-left"></th>
                     {% if rank %}
                         <th></th>
                     {% endif %}
                     {% for assessment in assessments %}
-                        {% if courseImpl.assessments[assessment.id] is defined %}
-                            {% set assessmentImpl = courseImpl.assessments[assessment.id] %}
+                        {% if classImpl.assessments[assessment.id] is defined %}
+                            {% set assessmentImpl = classImpl.assessments[assessment.id] %}
                             <td class="class-row">
                                 <a href="{{ assessmentImpl._routes['learningAssessment.getStatus'] }}">
                                     <span {% if assessment.stats.draftMean is defined %} data-actual-mark {% endif %}>
@@ -168,7 +168,7 @@
                         {% endif %}
                     {% endfor %}
                 </tr>
-                {% for student in courseImpl.students %}
+                {% for student in classImpl.students %}
                     <tr>
                         <th class="profile-cell fixed-left white">
                             <div class="c-card">
@@ -182,7 +182,7 @@
                         </th>
 
                         {#studentAverageMarks      float[][]         Indexed by [student.id]['any'|'published']#}
-                        {% set marks             = courseImpl.studentAverageMarks[student.id] ?? null %}
+                        {% set marks             = classImpl.studentAverageMarks[student.id] ?? null %}
                         {% set publishedNormMark = marks.published.norm ?? null %}
                         {% set draftNormMark     = marks.any.norm ?? null %}
                         {% set publishedHrMark   = marks.published.hr ?? '–' %}
@@ -209,7 +209,7 @@
                         {% endif %}
 
                         {% for assessment in assessments %}
-                            {% set aImpl = courseImpl.assessments[assessment.id] ?? null %}
+                            {% set aImpl = classImpl.assessments[assessment.id] ?? null %}
                             {% if aImpl %}
                             {% set participant = aImpl.participants[student.id] %}
                             <td
@@ -240,8 +240,8 @@
                                         data-progress-tick-status="incomplete"
                                     ></div>
                                 {% else %}
-                                    {% set comment            = courseImpl.studentComments[student.id][assessment.id] ?? '' %}
-                                    {% set marks              = courseImpl.studentMarks[assessment.id][student.id] ?? null %}
+                                    {% set comment            = classImpl.studentComments[student.id][assessment.id] ?? '' %}
+                                    {% set marks              = classImpl.studentMarks[assessment.id][student.id] ?? null %}
                                     {% set publishedMark      = marks.published ?? null %}
                                     {% set draftMark          = marks.draft ?? null %}
 

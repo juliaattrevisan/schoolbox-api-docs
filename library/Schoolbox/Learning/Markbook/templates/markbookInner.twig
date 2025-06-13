@@ -12,9 +12,12 @@
 {% import '@learning/macro/urgency.twig' as urgency %}
 {% import '@learning/macro/markDecorator.twig' as decorator %}
 
+{# There's only 1 of these currently #}
+{% set classImpl = classImpls[0] %}
+
 {# If the markbook has more than this number of participants reduce functionality to improve browser performance#}
 {% set functionDegradeLimit = 80 %}
-{% set studentCount = markbook.students|length %}
+{% set studentCount = classImpl.students|length %}
 
 <div class="actions-small-1">
     <div class="legend">
@@ -43,7 +46,7 @@
     </nav>
     <ul id="header-options" class="f-dropdown" data-dropdown-content>
         <li class="separator">Report</li>
-        <li><a href='{{ _routes['learningMarkbook.getMarkbookExportForClass'] }}'
+        <li><a href='{{ _routes.exportReport }}'
                data-download-spreadsheet
                class='icon-download'>Download Spreadsheet</a>
     </ul>
@@ -60,7 +63,7 @@
 {% endif %}
 
 <div class="diagonal-headings-table-container small-12 island" data-diagonal-headings-table-container>
-    {% if markbook.assessments|length > 0 %}
+    {% if classImpl.assessments|length > 0 %}
     <table id="marksheet-styles" class="diagonal-headings-table marksheet" data-mark-sheet>
         <thead>
             <tr class="rotate-headers" data-headers data-hidable-columns>
@@ -73,12 +76,13 @@
                     </div>
                 </th>
                 {% endif %}
-                {% for assessment in markbook.assessments %}
+                {% for aImpl in classImpl.assessments %}
+                {% set assessment = assessments[aImpl.id] %}
                 <th data-test="markbook-assessment" data-assessment="{{ assessment.id }}">
                     <div>
                         {# A teacher clicking an assessment from the markbook is most likely interested in seeing more granular results #}
                         <span>
-                            <a href="{{ assessment._routes['learningAssessment.getStatus'] }}" title="{{ assessment.title }}">{{ assessment.title }}</a><br/>
+                            <a href="{{ aImpl._routes['learningAssessment.getStatus'] }}" title="{{ assessment.title }}">{{ assessment.title }}</a><br/>
                             <span class="meta">{{ assessment.typeName }}</span>
                         </span>
                     </div>
@@ -91,10 +95,10 @@
                     <a href="#" class='icon-down-arrow' title="Show additional metrics" data-toggle-averages></a>
                     Class Average
                 </th>
-                {% set weightedMean = markbook.weightedMean %}
-                {% set draftWeightedMean = markbook.draftWeightedMean %}
-                {% set draftsOffClass = (weightedMean is null ? 'gradient-off' : urgency.marks(markbook.normalisedMean) ~ '-bg') %}
-                {% set draftsOnClass = (draftWeightedMean is null ? 'gradient-off' : urgency.marks(markbook.draftNormalisedMean) ~ '-bg') %}
+                {% set weightedMean = classImpl.weightedMean %}
+                {% set draftWeightedMean = classImpl.draftWeightedMean %}
+                {% set draftsOffClass = (weightedMean is null ? 'gradient-off' : urgency.marks(classImpl.normalisedMean) ~ '-bg') %}
+                {% set draftsOnClass = (draftWeightedMean is null ? 'gradient-off' : urgency.marks(classImpl.draftNormalisedMean) ~ '-bg') %}
                 <th class="fixed-left student-grade-cell {{ draftsOffClass }}"
                     {% if draftWeightedMean %}data-student-average{% endif %}
                     data-off-class="{{ draftsOffClass }}"
@@ -105,12 +109,12 @@
                 {% if rank %}
                 <th>-</th>
                 {% endif %}
-                {% for assessment in markbook.assessments %}
+                {% for assessment in classImpl.assessments %}
                     <th data-assessment="{{ assessment.id }}" class="student-grade-cell white">
-                        <span {% if assessment.stats.draftMean is defined and (markbook.hasDraft[assessment.id] is defined) %} data-actual-mark {% endif %}>
+                        <span {% if assessment.stats.draftMean is defined and (classImpl.hasDraft[assessment.id] is defined) %} data-actual-mark {% endif %}>
                             {{ assessment.stats.mean | default('-') }}
                         </span>
-                        {% if assessment.stats.draftMean is defined and (markbook.hasDraft[assessment.id] is defined) %}
+                        {% if assessment.stats.draftMean is defined and (classImpl.hasDraft[assessment.id] is defined) %}
                             <span data-draft-mark class="meta" style="display:none;">
                                 {{ assessment.stats.draftMean | default('-') }}
                             </span>
@@ -123,24 +127,25 @@
 
         <tbody>
             {# Statistics: weight, visibility, mean, SD, min, max, submitted, returned #}
-            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {writable: writable, markbook: markbook, label: 'Weight', key: 'weight', input: true} %}
-            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {writable: writable, markbook: markbook, label: 'Weight in ' ~ locale.project.proper, key: 'weightInProject', input: true} %}
-            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {writable: writable, markbook: markbook, label: '% Total Weight', key: 'weightPercent', round: 2} %}
-            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {writable: writable, markbook: markbook, label: '% Total Weight in  ' ~ locale.project.proper, key: 'projectWeightPercent', round: 2} %}
-            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {writable: writable, markbook: markbook, label: 'Mean', key: 'mean'} %}
-            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {writable: writable, markbook: markbook, label: 'Standard Deviation', key: 'sd'} %}
-            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {writable: writable, markbook: markbook, label: 'Min', key: 'min'} %}
-            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {writable: writable, markbook: markbook, label: 'Max', key: 'max'} %}
+            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {writable: writable, assessments: classImpl.assessments, label: 'Weight', key: 'weight', input: true} %}
+            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {writable: writable, assessments: classImpl.assessments, label: 'Weight in ' ~ locale.project.proper, key: 'weightInProject', input: true} %}
+            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {writable: writable, assessments: classImpl.assessments, label: '% Total Weight', key: 'weightPercent', round: 2} %}
+            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {writable: writable, assessments: classImpl.assessments, label: '% Total Weight in  ' ~ locale.project.proper, key: 'projectWeightPercent', round: 2} %}
+            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {writable: writable, assessments: classImpl.assessments, label: 'Mean', key: 'mean'} %}
+            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {writable: writable, assessments: classImpl.assessments, label: 'Standard Deviation', key: 'sd'} %}
+            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {writable: writable, assessments: classImpl.assessments, label: 'Min', key: 'min'} %}
+            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {writable: writable, assessments: classImpl.assessments, label: 'Max', key: 'max'} %}
             <tr class="sub-row">
                 <th class="fixed-left">Visibility</th>
                 <th class="fixed-left"></th>
                 {% if rank %}
                 <td>&nbsp;</td>
                 {% endif %}
-                {% for assessment in markbook.assessments %}
+                {% for aImpl in classImpl.assessments %}
+                    {% set assessment = assessments[aImpl.id] %}
                     <td data-assessment="{{ assessment.id }}">
                         {% if assessment.familyName != 'task' %}
-                            {% set selected = assessment.markVisibility %}
+                            {% set selected = aImpl.markVisibility %}
                             {% set allOptions = {
                                 0: { css: 'icon-locked', icon: '&#xe63e;', description: 'Staff Only' },
                                 1: { css: 'icon-staff-students', icon: '&#xe667;', description: 'Staff and Students' },
@@ -165,7 +170,7 @@
             </tr>
             {# Need all students that ever participated in any assessments #}
             {% apply spaceless %}
-            {% for student in markbook.students %}
+            {% for student in classImpl.students %}
             <tr data-student="{{ student.id }}">
                 <th class="fixed-left white profile-cell">
                     <div class="c-card">
@@ -181,10 +186,10 @@
 
                 </th>
 
-                {% set studentMean         = markbook.studentStatistics[student.id].weightedMean %}
-                {% set draftWeightedMean   = markbook.studentStatistics[student.id].draftWeightedMean %}
-                {% set meanNormalised      = markbook.studentStatistics[student.id].meanNormalised %}
-                {% set meanDraftNormalised = markbook.studentStatistics[student.id].meanDraftNormalised %}
+                {% set studentMean         = classImpl.studentStatistics[student.id].weightedMean %}
+                {% set draftWeightedMean   = classImpl.studentStatistics[student.id].draftWeightedMean %}
+                {% set meanNormalised      = classImpl.studentStatistics[student.id].meanNormalised %}
+                {% set meanDraftNormalised = classImpl.studentStatistics[student.id].meanDraftNormalised %}
 
                 {% set draftsOffClass      = studentMean is null ? 'gradient-off-bg' : urgency.marks(meanNormalised) ~ '-bg' %}
                 {% set draftsOnClass       = draftWeightedMean is null ? 'gradient-off-bg' : urgency.marks(meanDraftNormalised) ~ '-bg' %}
@@ -215,8 +220,9 @@
                 </td>
                 {% endif %}
 
-                {% for assessment in markbook.assessments %}
-                    {% set participant = assessment.participants[student.id] ?? null %}
+                {% for aImpl in classImpl.assessments %}
+                    {% set assessment = assessments[aImpl.id] %}
+                    {% set participant = aImpl.participants[student.id] ?? null %}
                     <td
                         class="column-{{ assessment.id }}
                             {% if not participant or participant.isExcluded %} excluded
@@ -227,15 +233,15 @@
                             data-pop-out-menu
                             {% endif %}
                             data-assessment-type="{{ assessment.familyName }}"
-                            data-endpoint="{{ assessment._routes.student[student.id]['learningAssessmentTimeline.getFullTimeline'] }}"
-                            data-update-route="{{ assessment._routes.student[student.id]['learningDueWorkResponse.getParticularResponse'] }}"
-                            data-review-route="{{ assessment._routes.student[student.id]['learningDueWorkResponse.getParticularResponse'] }}"
-                            data-publish-route="{{ assessment._routes.student[student.id]['learningDueWorkFeedback.postPublishFeedback'] }}"
-                            data-exclude-route="{{ assessment._routes.student[student.id]['learningAssessment.postExclude'] }}"
-                            data-include-route="{{ assessment._routes.student[student.id]['learningAssessment.postInclude'] }}"
+                            data-endpoint="{{ aImpl._routes.student[student.id]['learningAssessmentTimeline.getFullTimeline'] }}"
+                            data-update-route="{{ aImpl._routes.student[student.id]['learningDueWorkResponse.getParticularResponse'] }}"
+                            data-review-route="{{ aImpl._routes.student[student.id]['learningDueWorkResponse.getParticularResponse'] }}"
+                            data-publish-route="{{ aImpl._routes.student[student.id]['learningDueWorkFeedback.postPublishFeedback'] }}"
+                            data-exclude-route="{{ aImpl._routes.student[student.id]['learningAssessment.postExclude'] }}"
+                            data-include-route="{{ aImpl._routes.student[student.id]['learningAssessment.postInclude'] }}"
                             data-is-participant="{% if participant %}true{% else %}false{% endif %}"
                             data-is-excluded="{% if participant and not participant.isExcluded %}false{% else %}true{% endif %}"
-                            data-history-route="{{ assessment._routes.student[student.id]['learningAssessment.getSummary'] }}"
+                            data-history-route="{{ aImpl._routes.student[student.id]['learningAssessment.getSummary'] }}"
                     >
                     <!-- Add data for the popup menu above -->
                         {% if participant and not participant.isExcluded %}
@@ -262,10 +268,10 @@
                                     ></div>
                                 {% endif %}
                             {% else %}
-                                {% set draftMark = markbook.hasDraft[assessment.id][student.id] is defined %}
+                                {% set draftMark = classImpl.hasDraft[assessment.id][student.id] is defined %}
                                 <span
                                     class="{{ urgency.marks(participant.normalisedMark) }}"
-                                    href="{{ assessment._routes.student[student.id]['learningAssessment.getSummary'] }}"
+                                    href="{{ aImpl._routes.student[student.id]['learningAssessment.getSummary'] }}"
                                     {% if draftMark %} data-actual-mark {% endif %}
                                     title="{{ participant.authoritativeFeedback ? participant.authoritativeFeedback.comment : '' }}"
                                 >
@@ -274,7 +280,7 @@
                                 </span>
                                 {% if draftMark %}
                                     <span
-                                        href="{{ assessment._routes.student[student.id]['learningAssessment.getSummary'] }}"
+                                        href="{{ aImpl._routes.student[student.id]['learningAssessment.getSummary'] }}"
                                         data-draft-mark
                                         style="display: none"
                                         class="meta"
