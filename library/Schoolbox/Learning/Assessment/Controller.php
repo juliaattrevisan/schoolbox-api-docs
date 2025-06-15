@@ -543,8 +543,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 ->setAttachmentsLabel('')
                 ->setMimeFilter(implode(",", $kamiFiles))
                 ->setFilesystemContext('worksheet')
-//                ->setReadOnly(true) // Disallow modification of worksheet templates in the update assessment form.
-                ->setReadOnly($courseManagedFields->isReadOnly())
+                ->setReadOnly(true) // Disallow modification of worksheet templates in the update assessment form.
                 ->setFileVar('worksheet');
             if ($assessment->getWorksheetTemplate()) {
                 $zone = $zone->attachFiles([$assessment->getWorksheetTemplate()]);
