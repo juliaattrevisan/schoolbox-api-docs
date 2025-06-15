@@ -6,6 +6,8 @@
 import { isAbortError, hasErrorMessage } from "@js/util/errorUtils";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import { kebabToTitleCase } from "@js/util/stringUtils";
+import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
+import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import type { Category, Template } from "../js/types/editorTemplatesTypes";
 
 interface Props {
@@ -38,6 +40,7 @@ async function loadCategoryTemplates(): Promise<void> {
     const url = props.templatesEndpoint.replace("{categoryId}", currentCategory.value.id.toString());
     try {
         isLoading.value = true;
+        loadError.value = null;
         const response = await fetch(url, {
             headers: {
                 Accept: "application/json",
@@ -53,7 +56,6 @@ async function loadCategoryTemplates(): Promise<void> {
             throw new Error("Unexpected response format");
         }
         currentTemplates.value = responseJson;
-        isLoading.value = false;
     } catch (error) {
         // ignore abort errors, as the previous request was cancelled
         if (isAbortError(error)) {
@@ -63,6 +65,7 @@ async function loadCategoryTemplates(): Promise<void> {
             loadError.value = error.message;
         }
         console.error(error);
+    } finally {
         isLoading.value = false;
     }
 }
@@ -89,6 +92,26 @@ window.Vue.onMounted((): void => {
                 }}</a>
             </dd>
         </dl>
+        <loading-table v-if="isLoading" />
+        <data-load-error v-else-if="loadError" :data-title="currentCategory.name" />
+        <div v-else-if="currentTemplates.length === 0" class="empty-state-flex-centered">
+            <i class="icon-curriculum"></i>
+            <p>No {{ currentCategory.name }} templates have been created.</p>
+        </div>
+        <div v-else class="templates">
+            <ul class="template-list">
+                <li v-for="template in currentTemplates" :key="template.id" class="template-item">
+                    <a
+                        :href="`/editor/${template.id}`"
+                        :data-test="`editor-template-${template.title}`"
+                        class="template-link"
+                    >
+                        <span class="sbx-icon sbx-icon-template"></span>
+                        <span>{{ template.title }}</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
     </div>
 </template>
 
