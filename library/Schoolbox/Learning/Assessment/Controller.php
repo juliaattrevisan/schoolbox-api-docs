@@ -543,7 +543,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 ->setAttachmentsLabel('')
                 ->setMimeFilter(implode(",", $kamiFiles))
                 ->setFilesystemContext('worksheet')
-                ->setReadOnly(true) // Disallow modification of worksheet templates in the update assessment form.
+//                ->setReadOnly(true) // Disallow modification of worksheet templates in the update assessment form.
+                ->setReadOnly($courseManagedFields->isReadOnly())
                 ->setFileVar('worksheet');
             if ($assessment->getWorksheetTemplate()) {
                 $zone = $zone->attachFiles([$assessment->getWorksheetTemplate()]);
@@ -574,8 +575,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         // If we are dealing with a due work, and it already has a worksheet template attached...
         if ($assessment instanceof DueWork\Model && $assessment->getWorksheetTemplate()) {
-            // Overwrite any new worksheet template info from the client with the existing worksheet template info.
-            // This is done because modification of existing worksheet templates has been disallowed.
+            // Ensure the 'worksheet' info supplied to persistAssessment() below will always be the existing worksheet
+            // info.  This is done because modification of existing worksheet templates has been disallowed.
             $existingWorksheetTemplate = $assessment->getWorksheetTemplate();
             $requestPostArray['worksheet'] = (
                 'store:' .
