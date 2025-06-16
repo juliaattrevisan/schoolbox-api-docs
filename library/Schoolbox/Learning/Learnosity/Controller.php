@@ -2461,7 +2461,7 @@ class Controller extends Base
          *  creator identifiers, etc.
          */
         $struct = [
-            'quiz' => [
+            'settings' => [
                 /* Configuration
                  */
                 'title' => $assessment->getTitle(),
@@ -2501,7 +2501,10 @@ class Controller extends Base
                  */
 //                'courseManaged' => $assessment->getCourseManaged(),
 //                'sebEnabled' => $assessment->getSebEnabled(),
-            ]
+            ],
+            /* Learnosity stuff goes here
+             */
+            'content' => []
         ];
 
         new \Alaress_Probe($assessment, $struct);
