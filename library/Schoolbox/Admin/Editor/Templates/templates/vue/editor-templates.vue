@@ -17,21 +17,12 @@ interface Props {
 const props = defineProps<Props>();
 
 const currentCategory = window.Vue.ref<Category>(props.categories[0]);
-
-/**
- * Load and display the templates for the selected category.
- * @param category - the category that has been selected
- */
-function onCategorySelected(category: Category): void {
-    currentCategory.value = category;
-}
-
 const isLoading = window.Vue.ref<boolean>(false);
 const loadError = window.Vue.ref<string | null>(null);
 const currentTemplates = window.Vue.ref<Template[]>([]);
 
 /**
- *
+ * Load the templates for the current category from the server.
  */
 async function loadCategoryTemplates(): Promise<void> {
     if (props.templatesEndpoint === "") {
@@ -71,6 +62,15 @@ async function loadCategoryTemplates(): Promise<void> {
 }
 
 /**
+ * Load and display the templates for the selected category.
+ * @param category - the category that has been selected
+ */
+function onCategorySelected(category: Category): void {
+    currentCategory.value = category;
+    void loadCategoryTemplates();
+}
+
+/**
  * Load the first category's templates when
  * the component is mounted.
  */
@@ -95,8 +95,8 @@ window.Vue.onMounted((): void => {
         <loading-table v-if="isLoading" />
         <data-load-error v-else-if="loadError" :data-title="currentCategory.name" />
         <div v-else-if="currentTemplates.length === 0" class="empty-state-flex-centered">
-            <i class="icon-curriculum"></i>
-            <p>No {{ currentCategory.name }} templates have been created.</p>
+            <i class="icon-textbox"></i>
+            <p>No {{ kebabToTitleCase(currentCategory.name) }} templates have been created.</p>
         </div>
         <div v-else class="templates">
             <ul class="template-list">
