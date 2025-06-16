@@ -53,5 +53,4 @@ class Controller extends Base
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_PROCESSING);
         }
     }
-
 }

@@ -51,5 +51,4 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(Mapper::class),
         );
     }
-
 }
