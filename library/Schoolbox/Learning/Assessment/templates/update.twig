@@ -186,7 +186,7 @@
                 </li>
                 {% set exportRoute = routeLookupIfAuthorized('learnosity.exportToJson', {assessment: assessment, assessmentId: assessment.id}) %}
                 <li>
-                    <a href="{{ exportRoute }}{% if RETURN_URL.previous.encoded %}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}{% endif %}" class="icon-modify" title="Export to text file">Export</a>
+                    <a href="{{ exportRoute }}{% if RETURN_URL.previous.encoded %}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}{% endif %}" class="icon-modify" title="Download a file that you can use to reimport elsewhere">Download</a>
                 </li>
             {% endif %}
             {% set viewCustomParticipationRoute = routeLookupIfAuthorized('learningAssessment.getAssessmentParticipationForm', {
