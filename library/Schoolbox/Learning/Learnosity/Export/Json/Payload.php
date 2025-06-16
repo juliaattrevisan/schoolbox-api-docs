@@ -98,7 +98,6 @@ class Payload
             'content' => []
         ];
 
-
         return $struct;
     }
 

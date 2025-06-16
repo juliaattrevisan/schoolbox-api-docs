@@ -2457,7 +2457,22 @@ class Controller extends Base
      */
     public function exportToJson(QuizDomainObject $assessment): void
     {
-        $struct = (new Payload())->generate($assessment);
+        /* Start generating output to stream
+         */
+        $filename = sprintf(
+            'quiz_%s.json',
+            $assessment->getId()
+        );
+
+        header('Cache-Control: private');
+        header('Content-type: application/json');
+        header("Content-disposition: attachment; filename=\"{$filename}\"");
+
+        $output = fopen('php://output', 'rw');
+
+        fputs($output, (new Payload())->generate($assessment));
+
+        fclose($output);
     }
 
 
