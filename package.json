@@ -66,7 +66,7 @@
     "dropzone": "~6.0.0-beta.2",
     "firebase": "~11.9.1",
     "flatpickr": "~4.6.13",
-    "focus-trap": "~7.6.4",
+    "focus-trap": "^7.6.5",
     "gsap": "npm:@gsap/business@~3.12.7",
     "highcharts": "~12.1.2",
     "highcharts-vue": "~2.0.1",

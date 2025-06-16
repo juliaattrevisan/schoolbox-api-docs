@@ -58,12 +58,12 @@
         "@fullcalendar/resource-timeline": "~6.1.17",
         "@fullcalendar/timegrid": "~6.1.17",
         "@fullcalendar/vue3": "~6.1.17",
-        "@melloware/coloris": "^0.25.0",
+        "@melloware/coloris": "~0.25.0",
         "@microsoft/immersive-reader-sdk": "~1.4.0",
         "@phudak/ckeditor5-emoji": "~1.1.1",
-        "@vueuse/components": "^13.3.0",
-        "@vueuse/core": "^13.3.0",
-        "@vueuse/integrations": "^13.3.0",
+        "@vueuse/components": "~13.3.0",
+        "@vueuse/core": "~13.3.0",
+        "@vueuse/integrations": "~13.3.0",
         "clipboard": "~2.0.11",
         "datatables.net": "~1.13.8",
         "datatables.net-fixedcolumns": "~4.3.0",
@@ -71,7 +71,7 @@
         "dropzone": "~6.0.0-beta.2",
         "firebase": "~11.9.1",
         "flatpickr": "~4.6.13",
-        "focus-trap": "~7.6.4",
+        "focus-trap": "^7.6.5",
         "gsap": "npm:@gsap/business@~3.12.7",
         "highcharts": "~12.1.2",
         "highcharts-vue": "~2.0.1",
@@ -16245,9 +16245,10 @@
       }
     },
     "node_modules/focus-trap": {
-      "version": "7.6.4",
-      "resolved": "https://registry.npmjs.org/focus-trap/-/focus-trap-7.6.4.tgz",
-      "integrity": "sha512-xx560wGBk7seZ6y933idtjJQc1l+ck+pI3sKvhKozdBV1dRZoKhkW5xoCaFv9tQiX5RH1xfSxjuNu6g+lmN/gw==",
+      "version": "7.6.5",
+      "resolved": "https://registry.npmjs.org/focus-trap/-/focus-trap-7.6.5.tgz",
+      "integrity": "sha512-7Ke1jyybbbPZyZXFxEftUtxFGLMpE2n6A+z//m4CRDlj0hW+o3iYSmh8nFlYMurOiJVDmJRilUQtJr08KfIxlg==",
+      "license": "MIT",
       "dependencies": {
         "tabbable": "^6.2.0"
       }
@@ -40629,9 +40630,9 @@
       "dev": true
     },
     "focus-trap": {
-      "version": "7.6.4",
-      "resolved": "https://registry.npmjs.org/focus-trap/-/focus-trap-7.6.4.tgz",
-      "integrity": "sha512-xx560wGBk7seZ6y933idtjJQc1l+ck+pI3sKvhKozdBV1dRZoKhkW5xoCaFv9tQiX5RH1xfSxjuNu6g+lmN/gw==",
+      "version": "7.6.5",
+      "resolved": "https://registry.npmjs.org/focus-trap/-/focus-trap-7.6.5.tgz",
+      "integrity": "sha512-7Ke1jyybbbPZyZXFxEftUtxFGLMpE2n6A+z//m4CRDlj0hW+o3iYSmh8nFlYMurOiJVDmJRilUQtJr08KfIxlg==",
       "requires": {
         "tabbable": "^6.2.0"
       }
