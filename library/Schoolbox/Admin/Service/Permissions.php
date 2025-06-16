@@ -125,6 +125,31 @@ class Permissions
         $accessLevelToNameModified[UserAccess::ACCESS_FULL] = 'moderate';
 
         foreach ($userAccessRows as $row) {
+            $sidLabel = '';
+            $sidDisplayValue = '';
+            switch ($row['serviceId']) {
+                case UserAccess::SERVICE_CALENDAR:
+                    $campus = $campuses->getBy('id', $row['sid']);
+                    if ($campus === null) {
+                        // Campus $row['sid'] does not exist or has been deleted, so ignore this userAccess row.
+                        continue (2);
+                    }
+                    $sidLabel = 'Campus';
+                    $sidDisplayValue = $campus->getName();
+                    break;
+                case UserAccess::SERVICE_IMPERSONATOR:
+                    $role = $roles->getBy('id', $row['sid']);
+                    if ($role === null) {
+                        // Role $row['sid'] does not exist or has been deleted, so ignore this userAccess row.
+                        continue (2);
+                    }
+                    $sidLabel = 'Role';
+                    $sidDisplayValue = $role->getName();
+                    break;
+                default:
+                    // Leave $sidLabel and $sidDisplayValue as blank.
+            }
+
             $serviceName = $serviceNameLookup[$row['serviceId']];
 
             if (!array_key_exists($serviceName, $servicePermissionTablesData)) {
@@ -134,16 +159,8 @@ class Permissions
             $servicePermissionTablesData[$serviceName][] = [
                 'user' => $users->getBy('id', $row['userId']),
                 'accessName' => ucfirst($accessLevelToNameModified[$row['accessLevel']]),
-                'sidLabel' => match ($serviceName) {
-                    'Calendar' => 'Campus',
-                    'Impersonator' => 'Role',
-                    default => ''
-                },
-                'sidDisplayValue' => match ($serviceName) {
-                    'Calendar' => $campuses->getBy('id', $row['sid'])->getName(),
-                    'Impersonator' => $roles->getBy('id', $row['sid'])->getName(),
-                    default => ''
-                },
+                'sidLabel' => $sidLabel,
+                'sidDisplayValue' => $sidDisplayValue
             ];
         }
 
