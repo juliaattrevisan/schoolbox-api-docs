@@ -599,7 +599,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
             return;
         }
 
-        $postReturnUrl = $this->requestPost->get(Redirect::RETURN_URL);
         $postReturnUrl = $requestPostArray[Redirect::RETURN_URL] ?? null;
 
         // we're done here
