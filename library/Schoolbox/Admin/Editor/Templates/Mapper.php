@@ -10,6 +10,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Editor\Templates;
 
+use Schoolbox\GenericCollection;
+
 /**
  * @method Model createModel($idValue = null)
  * @method GenericCollection|Model[] findAll($options = [])

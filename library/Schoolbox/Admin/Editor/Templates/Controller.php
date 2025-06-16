@@ -12,7 +12,6 @@ namespace Schoolbox\Admin\Editor\Templates;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\Navigation\Subnav;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Admin\Editor\Templates\ModelToArray;
 
 class Controller extends Base
@@ -20,11 +19,9 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
-     * @param ErrorMapper $errorMapper
      * @param Mapper $categoryMapper
      */
     public function __construct(
-        private ErrorMapper $errorMapper,
         private Mapper $categoryMapper,
     ) {
     }
