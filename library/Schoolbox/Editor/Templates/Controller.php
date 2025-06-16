@@ -34,14 +34,15 @@ class Controller extends Base
      */
     public function getTemplates(int $categoryId): void
     {
-
         // validate further...
 
         $templates = $this->mapper->findByColumn('category_id', $categoryId);
-        $translator = new ModelToArray();
+        $translator = new ModelToArray(
+            new \Schoolbox\User\Translator\Author\ModelToArray(),
+            new \Schoolbox\UserMapper(),
+        );
 
         $this->response = $this->responseAsJson($templates->map($translator));
-
     }
 
 }

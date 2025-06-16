@@ -107,7 +107,18 @@ window.Vue.onMounted((): void => {
                         <h3>
                             <a href="#">{{ template.title }}</a>
                         </h3>
-                        <span class="meta"></span>
+                        <p class="meta">
+                            <span
+                                >By
+                                <a :href="`/search/user/${template.createdBy.id}`">{{
+                                    template.createdBy.fullName
+                                }}</a></span
+                            >
+                            <!-- <span>
+                                —
+                                <time title="Monday June 16th 2025 6:00am">6 hours ago</time></span
+                            > -->
+                        </p>
                     </div>
                 </div>
             </div>

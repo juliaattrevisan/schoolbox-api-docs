@@ -30,5 +30,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('title', self::TYPE_STRING);
         $this->uses('description', self::TYPE_STRING);
         $this->uses('body', self::TYPE_STRING);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP, 'createdAt');
+        $this->uses('created_by', self::TYPE_INTEGER);
     }
 }

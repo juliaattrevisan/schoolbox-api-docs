@@ -11,10 +11,14 @@
 namespace Schoolbox\Editor\Templates;
 
 use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\CreatedBy;
 
 class Model
 {
     use Id;
+    use CreatedAtDate;
+    use CreatedBy;
 
     /**
      * @var string

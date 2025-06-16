@@ -1,3 +1,5 @@
+import type { User } from "@schoolboxLibrary/types/User";
+
 /**
  * A category a template can belong to.
  */
@@ -15,4 +17,5 @@ export type Template = {
     title: string;
     description: string;
     body: string;
+    createdBy: User;
 };
