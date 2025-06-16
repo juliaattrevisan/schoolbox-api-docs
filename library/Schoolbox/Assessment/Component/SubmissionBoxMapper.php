@@ -653,7 +653,7 @@ class SubmissionBoxMapper extends BaseMapper
      *
      * @return array The submission box ID as the key, the count as the value.
      */
-    public function findReturnedWorkCountsForSubmissionBoxes(array $boxIds, $userId): array
+    public function findReturnedWorkCountsForSubmissionBoxes(array $boxIds, int $userId): array
     {
         // Retrieve count of submission IDs from a list of IDs for a user
         if (empty($boxIds)) {
@@ -691,7 +691,7 @@ class SubmissionBoxMapper extends BaseMapper
      */
     public function findSubmissionCountsForSubmissionBoxes(
         array $boxIds,
-        $userId,
+        int $userId,
         bool $includeUnsubmitted = true,
         bool $includeDeleted = false
     ): array {

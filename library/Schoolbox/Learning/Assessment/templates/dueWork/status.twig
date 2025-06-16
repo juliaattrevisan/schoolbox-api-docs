@@ -796,9 +796,22 @@
                         let route = '{{ routeLookupIfAuthorized('learningAssessment.postManageSubmissions', {assessmentId: assessment.id, assessment: assessment}) }}';
 
                         if (route.length) {
-                            $.post(route, payload, function(responseText) {
-                                window.location.reload();
-                            })
+                            const toast = window.sbProps.toastActivate("Saving...");
+
+                            $.post(route, payload)
+                                .done((responseText) => {
+                                    toast.timeout({ text: "Saved. Reloading..." });
+                                    window.location.reload();
+                                })
+                                .fail(() => {
+                                    /* this could potentially be that the assessment has been marked as submitted but
+                                     * but some other things have gone wrong (ie. notifier), so will use a more generic message
+                                     */
+                                    toast.timeout({
+                                        text: "Something has gone wrong, please contact your support if the problem persists",
+                                        isSuccess: false
+                                    });
+                                });
                         }
                     });
 
