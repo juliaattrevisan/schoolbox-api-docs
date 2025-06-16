@@ -1,3 +1,4 @@
+import type { AlaressDateFormat } from "@schoolboxLibrary/types/AlaressDateFormat";
 import type { User } from "@schoolboxLibrary/types/User";
 
 /**
@@ -17,5 +18,6 @@ export type Template = {
     title: string;
     description: string;
     body: string;
+    createdAt: AlaressDateFormat;
     createdBy: User;
 };

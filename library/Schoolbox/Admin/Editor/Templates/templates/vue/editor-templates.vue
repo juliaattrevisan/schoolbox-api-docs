@@ -6,6 +6,7 @@
 import { isAbortError, hasErrorMessage } from "@js/util/errorUtils";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import { kebabToTitleCase } from "@js/util/stringUtils";
+import { getFromNow } from "@js/util/dateUtils";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import type { Category, Template } from "../js/types/editorTemplatesTypes";
@@ -110,14 +111,19 @@ window.Vue.onMounted((): void => {
                         <p class="meta">
                             <span
                                 >By
-                                <a :href="`/search/user/${template.createdBy.id}`">{{
-                                    template.createdBy.fullName
-                                }}</a></span
-                            >
-                            <!-- <span>
+                                <a
+                                    v-if="template.createdBy._links && template.createdBy._links.profile"
+                                    :href="template.createdBy._links.profile"
+                                    >{{ template.createdBy.fullName }}</a
+                                >
+                                <template v-else>{{ template.createdBy.fullName }}</template>
+                            </span>
+                            <span>
                                 —
-                                <time title="Monday June 16th 2025 6:00am">6 hours ago</time></span
-                            > -->
+                                <time :title="template.createdAt.local">{{
+                                    getFromNow(template.createdAt.unixTimestamp)
+                                }}</time></span
+                            >
                         </p>
                     </div>
                 </div>

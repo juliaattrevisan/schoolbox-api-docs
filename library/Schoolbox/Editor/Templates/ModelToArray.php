@@ -53,6 +53,7 @@ class ModelToArray
             'title' => $model->getTitle(),
             'description' => $model->getDescription(),
             'body' => $model->getBody(),
+            'createdAt' => $model->getCreatedAt(),
             'createdBy' => $createdBy,
         ];
     }
