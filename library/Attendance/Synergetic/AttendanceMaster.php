@@ -119,6 +119,17 @@ class Attendance_Synergetic_AttendanceMaster
              * The DELETE permission was denied on the object 'wkAttendances', database 'Synergetic_AUVIC_ALARESS_PRD', schema 'dbo'."thrown on /usr/share/schoolbox/library/Alaress/Database/Statement/Base.php:226
              */
             $this->connector->executeQuery($cleanupQuery);
+
+            $cleanupQuery = "
+                DELETE 
+                FROM wkAttendanceMaster
+                WHERE wkAttendanceMasterSeq = {$attendanceMasterSeq}
+            ";
+
+            /* Now you need DELETE perms on wkAttendanceMaster cos you have to micromanage that directly:
+             * The DELETE permission was denied on the object 'wkAttendanceMaster', database 'Synergetic_AUVIC_ALARESS_PRD', schema 'dbo'."thrown on /usr/share/schoolbox/library/Alaress/Database/Statement/Base.php:226
+             */
+            $this->connector->executeQuery($cleanupQuery);
         }
 
         // Get the attendance master sequence number
