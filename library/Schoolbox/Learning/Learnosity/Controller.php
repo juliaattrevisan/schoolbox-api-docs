@@ -2474,7 +2474,6 @@ class Controller extends Base
                     'closeAt' => $assessment->getCloseAt()->getDatabase(),
                 ],
                 'weight' => $assessment->getWeight(),
-                'defaultOpenSpan' => $assessment->getDefaultOpenSpan(),
                 'shuffleItems' => $assessment->getShuffleItems(),
                 'promptsMode' => $assessment->getPromptsMode(),
                 'maxAttempts' => $assessment->getMaxAttempts(),
@@ -2501,6 +2500,7 @@ class Controller extends Base
                  */
 //                'courseManaged' => $assessment->getCourseManaged(),
 //                'sebEnabled' => $assessment->getSebEnabled(),
+//                'defaultOpenSpan' => $assessment->getDefaultOpenSpan(),
             ],
             /* Learnosity stuff goes here
              */
