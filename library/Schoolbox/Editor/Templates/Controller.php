@@ -34,15 +34,24 @@ class Controller extends Base
      */
     public function getTemplates(int $categoryId): void
     {
-        // validate further...
+        // Validate categoryId is positive integer
+        if ($categoryId <= 0) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+        }
 
-        $templates = $this->mapper->findByColumn('category_id', $categoryId);
-        $translator = new ModelToArray(
-            new \Schoolbox\User\Translator\Author\ModelToArray(),
-            new \Schoolbox\UserMapper(),
-        );
+        try {
+            $templates = $this->mapper->findByColumn('category_id', $categoryId);
 
-        $this->response = $this->responseAsJson($templates->map($translator));
+            $translator = new ModelToArray(
+                new \Schoolbox\User\Translator\Author\ModelToArray(),
+                new \Schoolbox\UserMapper(),
+            );
+
+            $this->response = $this->responseAsJson($templates->map($translator));
+
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PROCESSING);
+        }
     }
 
 }
