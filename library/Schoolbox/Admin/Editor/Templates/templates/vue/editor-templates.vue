@@ -21,6 +21,7 @@ const currentCategory = window.Vue.ref<Category>(props.categories[0]);
 const isLoading = window.Vue.ref<boolean>(false);
 const loadError = window.Vue.ref<string | null>(null);
 const currentTemplates = window.Vue.ref<Template[]>([]);
+const categoryParamName = "category";
 
 /**
  * Load the templates for the current category from the server.
@@ -63,19 +64,34 @@ async function loadCategoryTemplates(): Promise<void> {
 }
 
 /**
- * Load and display the templates for the selected category.
+ * Load and display the templates for the selected category,
+ * updating the URL to reflect the current category.
  * @param category - the category that has been selected
  */
 function onCategorySelected(category: Category): void {
     currentCategory.value = category;
+    // Update URL without adding to browser history
+    const url = new URL(window.location.href);
+    url.searchParams.set(categoryParamName, category.name);
+    window.history.replaceState(null, "", url.toString());
     void loadCategoryTemplates();
 }
 
 /**
  * Load the first category's templates when
- * the component is mounted.
+ * the component is mounted, also checking the URL for a category.
  */
 window.Vue.onMounted((): void => {
+    // Check if there's a category in the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const categoryParam = urlParams.get(categoryParamName);
+    // and if so update the current category if available
+    if (categoryParam) {
+        const foundCategory = props.categories.find((cat) => cat.name === categoryParam);
+        if (foundCategory) {
+            currentCategory.value = foundCategory;
+        }
+    }
     void loadCategoryTemplates();
 });
 </script>
