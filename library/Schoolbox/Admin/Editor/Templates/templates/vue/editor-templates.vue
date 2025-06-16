@@ -98,19 +98,19 @@ window.Vue.onMounted((): void => {
             <i class="icon-textbox"></i>
             <p>No {{ kebabToTitleCase(currentCategory.name) }} templates have been created.</p>
         </div>
-        <div v-else class="templates">
-            <ul class="template-list">
-                <li v-for="template in currentTemplates" :key="template.id" class="template-item">
-                    <a
-                        :href="`/editor/${template.id}`"
-                        :data-test="`editor-template-${template.title}`"
-                        class="template-link"
-                    >
-                        <span class="sbx-icon sbx-icon-template"></span>
-                        <span>{{ template.title }}</span>
-                    </a>
-                </li>
-            </ul>
+        <div v-else class="c-island">
+            <div v-for="(template, index) in currentTemplates" :key="template.id" class="c-card">
+                <div
+                    :class="`l-flex-row l-gap-m l-pad-m ${index !== currentTemplates.length - 1 ? `c-card--border-end-alt` : ''}`"
+                >
+                    <div class="l-flex-col l-flex--justify-center l-flex__item--1 f-no-margins">
+                        <h3>
+                            <a href="#">{{ template.title }}</a>
+                        </h3>
+                        <span class="meta"></span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </template>
