@@ -9,10 +9,18 @@ namespace Schoolbox\Editor\OpenAI;
 class ErrorInterpreter
 {
     /**
+     * A stock-standard statement about something generic going wrong that isn't easily
+     * repaired by users or superusers; we'd have to dig to help them
+     */
+    private const DEFAULT_PHRASE = 'There was an AI services error; please try again. If the problem persists, consult your system administrator.';
+
+
+    /**
      * Translate these nerdy words via a regex, I guess, for versatility
      */
     private const MAPPING = [
-        '/Invalid schema for/' => 'There was an AI services error; please try again. If the problem persists, consult your system administrator.',
+        '/does not support Structured Outputs/' => self::DEFAULT_PHRASE,
+        '/Invalid schema for/' => self::DEFAULT_PHRASE,
         '/Incorrect API key/' => 'AI services are not configured correctly; consult your system administrator.'
     ];
 
