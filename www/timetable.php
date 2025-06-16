@@ -276,9 +276,11 @@ foreach ($userList as $user) {
                                         $description = $class['code'];
                                     }
 
+                                    $periodCode = Scrub::Text($class['code']);
+
                                     $this->setVar([
                                         'PERIOD_DESC'   => Scrub::Text($description),
-                                        'PERIOD_CODE'   => '(' . Scrub::Text($class['code']) . ')',
+                                        'PERIOD_CODE'   => strlen($periodCode) ? "({$periodCode})<br>" : '',
                                         'PERIOD_ROOM'   => Scrub::Text($class['room']),
                                         'PERIOD_STAFF'  => Scrub::Text($staffIdNameMap[$class['staffID']]),
                                         'PERIOD_COLOUR' => Scrub::text($subjectColourMap[$cacheKey] ?? ''),
