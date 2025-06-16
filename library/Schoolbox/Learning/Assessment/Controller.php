@@ -570,14 +570,13 @@ abstract class Controller extends ListController implements IAssessmentControlle
      */
     public function postUpdateAssessment(IAssessable $assessment): void
     {
-        $requestPostArray = $this->requestPost->getArrayCopy();
-
         // If we are dealing with a due work, and it already has a worksheet template attached...
         if ($assessment instanceof DueWork\Model && $assessment->getWorksheetTemplate()) {
             // Ensure the 'worksheet' info supplied to persistAssessment() below will always be the existing worksheet
             // info.  This is done because modification of existing worksheet templates has been disallowed.
             $existingWorksheetTemplate = $assessment->getWorksheetTemplate();
-            $requestPostArray['worksheet'] = (
+            $this->requestPost->offsetSet(
+                'worksheet',
                 'store:' . $existingWorksheetTemplate->getHash() . ':' . $existingWorksheetTemplate->getBasename()
             );
         }
@@ -587,7 +586,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         try {
             $assessmentInfo = $this->persistAssessment(
                 $this->getUser(),
-                $requestPostArray,
+                $this->requestPost,
                 $assessment
             );
         } catch (DomainException | InvalidArgumentException $e) {
@@ -598,7 +597,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             return;
         }
 
-        $postReturnUrl = $requestPostArray[Redirect::RETURN_URL] ?? null;
+        $postReturnUrl = $this->requestPost->get(Redirect::RETURN_URL);
 
         // we're done here
         $this->redirect($this->determineRedirect(
