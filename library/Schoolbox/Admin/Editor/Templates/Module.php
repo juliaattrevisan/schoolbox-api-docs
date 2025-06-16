@@ -32,12 +32,13 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        /* Superusers only
+        /* Superusers and those with the full design service permission can access the templates.
          */
         $perms = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
+                new Rule\HasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL)
             )
         );
 
