@@ -2456,7 +2456,55 @@ class Controller extends Base
      */
     public function exportToJson(QuizDomainObject $assessment): void
     {
+        /* TODO There's probably already a shortcut to this kind of serialization
+         *  but I need it in its entirety except for school-specific data like folder,
+         *  creator identifiers, etc.
+         */
+        $struct = [
+            'quiz' => [
+                /* Configuration
+                 */
+                'title' => $assessment->getTitle(),
+                'description' => $assessment->getDescription(),
+                'workType' => $assessment->getWorkType()->getName(),
+                'dates' => [
+                    'publishAt' => $assessment->getPublishAt()->getDatabase(),
+                    'openAt' => $assessment->getOpenAt()->getDatabase(),
+                    'dueAt' => $assessment->getDueAt()->getDatabase(),
+                    'closeAt' => $assessment->getCloseAt()->getDatabase(),
+                ],
+                'weight' => $assessment->getWeight(),
+                'defaultOpenSpan' => $assessment->getDefaultOpenSpan(),
+                'shuffleItems' => $assessment->getShuffleItems(),
+                'promptsMode' => $assessment->getPromptsMode(),
+                'maxAttempts' => $assessment->getMaxAttempts(),
+                'duration' => $assessment->getDuration(),
+                'readingTimeDuration' => $assessment->getReadingTimeDuration(),
+                'completionMessage' => $assessment->getCompletionMessage(),
+                /* Curriculum nodes might not be present in the destination instance, so...
+                 * you'll just have to list them by their code and hope for the best?
+                 */
+                'curriculumNodes' => $assessment->getCurriculumNodes()->indexBy('code')->keys(),
+                /* Marking and assessing
+                 */
+                'markType' => $assessment->getMarkType()->getName(),
+                'gradeGroup' => $assessment->getGradeGroup()?->getName(),
+                'markScheme' => $assessment->getMarkScheme()->getTemplate(),
+                'markVisibility' => $assessment->getMarkVisibility(),
+                /* These are school-specific nodes that we probably need to specify later
+                 * when re-importing.
+                 */
+                'creator' => null,
+                'context' => null,
+                'sequence' => null,
+                /* Not supported by quiz, it seems
+                 */
+//                'courseManaged' => $assessment->getCourseManaged(),
+//                'sebEnabled' => $assessment->getSebEnabled(),
+            ]
+        ];
 
+        new \Alaress_Probe($assessment, $struct);
     }
 
 
