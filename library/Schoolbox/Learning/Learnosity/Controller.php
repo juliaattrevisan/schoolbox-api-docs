@@ -2489,6 +2489,5 @@ class Controller extends Base
      */
     public function importFromJson(QuizDomainObject $assessment): void
     {
-
     }
 }
