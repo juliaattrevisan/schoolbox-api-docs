@@ -2458,8 +2458,6 @@ class Controller extends Base
     public function exportToJson(QuizDomainObject $assessment): void
     {
         $struct = (new Payload())->generate($assessment);
-
-        new \Alaress_Probe($assessment, $struct);
     }
 
 

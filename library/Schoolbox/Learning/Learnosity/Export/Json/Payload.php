@@ -74,11 +74,40 @@ class Payload
                 //                'sebEnabled' => $assessment->getSebEnabled(),
                 //                'defaultOpenSpan' => $assessment->getDefaultOpenSpan(),
             ],
+            /* These are locally-grown storage models that were used somewhere in this quiz.
+             * When importing into your own school, you'll already have them: but, importing
+             * into a different school means you probably won't have them, and need them shoved
+             * into the destination's storage. I guess we make a zip file for this, now?
+             */
+            'assets' => array_values(array_unique(array_merge(
+                $this->detectAssets($assessment->getDescription()),
+                $this->detectAssets($assessment->getCompletionMessage()),
+            ))),
             /* Learnosity stuff goes here
              */
             'content' => []
         ];
 
+        new \Alaress_Probe($struct);
+
+
         return $struct;
+    }
+
+
+    /**
+     * In the text slab $input, find all the references to storage accesses
+     * and make a list of their hashes
+     *
+     * @param string $input
+     * @return array
+     */
+    private function detectAssets(string $input): array
+    {
+        /* Accommodate both relative and absolute urls
+         */
+        preg_match_all('/\/storage\/(image|fetch)\.php\?hash=([^"]+)/', $input, $matches);
+
+        return $matches[2] ?? [];
     }
 }
