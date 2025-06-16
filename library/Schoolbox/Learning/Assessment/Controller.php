@@ -577,10 +577,9 @@ abstract class Controller extends ListController implements IAssessmentControlle
             // Ensure the 'worksheet' info supplied to persistAssessment() below will always be the existing worksheet
             // info.  This is done because modification of existing worksheet templates has been disallowed.
             $existingWorksheetTemplate = $assessment->getWorksheetTemplate();
+            $requestPostArray['worksheet'] =
             $requestPostArray['worksheet'] = (
-                'store:' .
-                $existingWorksheetTemplate->getHash() . ':' .
-                $existingWorksheetTemplate->getFilename() . '.' . $existingWorksheetTemplate->getExtension()
+                'store:' . $existingWorksheetTemplate->getHash() . ':' . $existingWorksheetTemplate->getBasename()
             );
         }
 
