@@ -78,6 +78,16 @@ class Payload
              * When importing into your own school, you'll already have them: but, importing
              * into a different school means you probably won't have them, and need them shoved
              * into the destination's storage. I guess we make a zip file for this, now?
+             *
+             * There are a few options available:
+             *  - Do nothing. Don't support assets of any kind. This is brutal for users, probably,
+             *    but cheap for us.
+             *  - Have a base64 representation somewhere in the xml that we can just shove into
+             *    the destination's storage. We already have an InlineConverter which probably
+             *    services this use case, but we'd have to apply it somehow. This bloats the resultant
+             *    json file substantially, especially for large media like audio/video/high-res images
+             *  - Zip file containing json text file + any associated assets. But then you have to
+             *    deal with taskd, zip files, download limits, all this hankypanky
              */
             'assets' => array_values(array_unique(array_merge(
                 $this->detectAssets($assessment->getDescription()),
@@ -87,8 +97,6 @@ class Payload
              */
             'content' => []
         ];
-
-        new \Alaress_Probe($struct);
 
 
         return $struct;
