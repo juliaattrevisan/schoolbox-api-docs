@@ -115,6 +115,6 @@ class Payload
          */
         preg_match_all('/\/storage\/(image|fetch)\.php\?hash=([^"]+)/', $input, $matches);
 
-        return $matches[2] ?? [];
+        return $matches[2];
     }
 }
