@@ -193,8 +193,8 @@ $definition = $externalTimetable->getTimetableDefinition(
     $timetableDay
 );
 
-$firstPeriodNumber = array_search($firstPeriod, $definition['number'], true);
-$lastPeriodNumber  = array_search($lastPeriod, $definition['number'], true);
+$firstPeriodNumber = array_search($firstPeriod, $definition['number'] ?? [], true);
+$lastPeriodNumber  = array_search($lastPeriod, $definition['number'] ?? [], true);
 $startTime   = $definition['start'][$firstPeriodNumber];
 $endTime     = $definition['end'][$lastPeriodNumber];
 $periodNames = array_unique([$definition['desc'][$firstPeriodNumber], $definition['desc'][$lastPeriodNumber]]);

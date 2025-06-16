@@ -81,18 +81,45 @@ class Attendance_Synergetic_AttendanceMaster
         $this->timetableGroup = $timetableGroup;
 
         // Stored proc should delete wk table but for some reason it may not
-        $cleanupQuery = "DELETE wkAttendances, wkAttendanceMaster
-                  FROM wkAttendanceMaster
-                  JOIN wkAttendances ON wkAttendanceMaster.wkAttendanceMasterSeq = wkAttendances.wkAttendanceMasterSeq
-                  WHERE FileType = {$this->getClassFileType()} AND
-                        FileYear = {$this->getFileYear()} AND
-                        FileSemester = {$this->getFileSemester()} AND
-                        ClassCampus =  {$this->getClassCampus()} AND
-                        ClassCode = {$this->getClassCode()} AND
-                        AttendanceDate = '{$attendanceDate->getDatabaseDate()} 00:00:00.000' AND
-                        AttendancePeriod = '{$this->getAttendancePeriod()}'
-                 ";
-        $this->connector->executeQuery($cleanupQuery);
+        /* This is stolen from their dbo.spiwkAttendances stored proc where it's conducted
+         * in two separate queries, due to a limitation in mssql where it can't delete
+         * from multiple tables in the same query, forcing you to split them.
+         *
+         * The first query finds the AttendanceMasterSeq values for wkAttendanceMaster
+         * which we'll use to delete corresponding rows from wkAttendances next.
+         */
+        $attendanceMasterSeqStatement = $this->connector->prepareQuery("
+            SELECT wkAttendanceMasterSeq
+            FROM wkAttendanceMaster
+            WHERE FileType = '{$this->getClassFileType()}' AND
+            FileYear = '{$this->getFileYear()}' AND
+            FileSemester = '{$this->getFileSemester()}' AND
+            ClassCampus = '{$this->getClassCampus()}' AND
+            ClassCode = '{$this->getClassCode()}' AND
+            AttendanceDate = '{$attendanceDate->getDatabaseDate()} 00:00:00.000' AND
+            AttendancePeriod = '{$this->getAttendancePeriod()}'
+        ");
+
+        $attendanceMasterSeqStatement->execute();
+
+        /* Seems like there's only supposed to be one record here: not sure if you can find more
+         * for the same class that occurred at this time for a given filetype/filesemester and
+         * campus...that seems like a mistake
+         */
+        $attendanceMasterSeq = $attendanceMasterSeqStatement->fetch()['wkAttendanceMasterSeq'];
+
+        if ($attendanceMasterSeq) {
+            $cleanupQuery = "
+                DELETE 
+                FROM wkAttendances
+                WHERE wkAttendanceMasterSeq = {$attendanceMasterSeq}
+            ";
+
+            /* Now you need DELETE perms on wkAttendances cos you have to micromanage that directly:
+             * The DELETE permission was denied on the object 'wkAttendances', database 'Synergetic_AUVIC_ALARESS_PRD', schema 'dbo'."thrown on /usr/share/schoolbox/library/Alaress/Database/Statement/Base.php:226
+             */
+            $this->connector->executeQuery($cleanupQuery);
+        }
 
         // Get the attendance master sequence number
         $statement = $this->connector->prepareStoredProcedure('spiwkAttendances');
