@@ -38,17 +38,13 @@ class Controller extends Base
         if ($categoryId <= 0) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
-
         try {
             $templates = $this->mapper->findByColumn('category_id', $categoryId);
-
             $translator = new ModelToArray(
                 new \Schoolbox\User\Translator\Author\ModelToArray(),
                 new \Schoolbox\UserMapper(),
             );
-
             $this->response = $this->responseAsJson($templates->map($translator));
-
         } catch (\Schoolbox\Mapper\Exception $e) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_PROCESSING);
         }
