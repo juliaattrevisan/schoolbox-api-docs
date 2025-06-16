@@ -2439,4 +2439,40 @@ class Controller extends Base
          */
         $this->messageProducer->send($message);
     }
+
+
+    /**
+     * This exports a schoolbox quiz and its learnosity content into a json struct,
+     * dumping it into a text file so you can port it around between instances.
+     *
+     * I can't think of a nice name for this that doesn't already collide with the
+     * legacy import/export mechanism, other than relating it by its data type.
+     *
+     * TODO Maybe have a think about this and rename it again later.
+     * TODO Maybe belongs in a different controller?
+     *
+     * @param QuizDomainObject $assessment
+     * @return void
+     */
+    public function exportToJson(QuizDomainObject $assessment): void
+    {
+
+    }
+
+
+    /**
+     * Takes a text file containing a schoolbox quiz and its learnosity contents in a
+     * json payload and puts it back into learnosity with a new school code and identifier
+     * corresponding to the destination into which it's imported (even if it's the same school)
+     *
+     * TODO Maybe have a think about this and rename it again later.
+     * TODO Maybe belongs in a different controller?
+     *
+     * @param QuizDomainObject $assessment
+     * @return void
+     */
+    public function importFromJson(QuizDomainObject $assessment): void
+    {
+
+    }
 }
