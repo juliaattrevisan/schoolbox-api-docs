@@ -32,13 +32,10 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        /* Superusers only
+        /* Currently those logged in can access the templates.
          */
         $perms = new Rule\All(
-            new Rule\IsLoggedIn(),
-            new Rule\Any(
-                new Rule\IsSuperuser(),
-            )
+            new Rule\IsLoggedIn()
         );
 
         $this->register('GET', '/{categoryId:\d+}', 'getTemplates', $perms);
