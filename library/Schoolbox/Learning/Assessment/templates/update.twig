@@ -184,6 +184,10 @@
                 <li>
                     <a href="{{ modifyContentsRoute }}{% if RETURN_URL.previous.encoded %}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}{% endif %}" class="icon-modify" title="Modify Contents">Modify Contents</a>
                 </li>
+                {% set exportRoute = routeLookupIfAuthorized('learnosity.exportToJson', {assessment: assessment, assessmentId: assessment.id}) %}
+                <li>
+                    <a href="{{ exportRoute }}{% if RETURN_URL.previous.encoded %}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}{% endif %}" class="icon-modify" title="Export to text file">Export</a>
+                </li>
             {% endif %}
             {% set viewCustomParticipationRoute = routeLookupIfAuthorized('learningAssessment.getAssessmentParticipationForm', {
                 assessmentId: assessment.id,
