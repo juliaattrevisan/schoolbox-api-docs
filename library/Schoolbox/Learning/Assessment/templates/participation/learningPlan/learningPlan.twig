@@ -40,7 +40,7 @@
                     <div class="small-12 columns">
                         <fieldset>
                             <label>
-                                Plan Name
+                                Title
                                 <input type="text" name="plan-name" id="plan-name" data-test="participation-plan-customise-modal-input-name" maxlength="256">
                             </label>
                         </fieldset>
@@ -67,12 +67,6 @@
                                 </div>
                             </div>
                         </fieldset>
-                        <fieldset>
-                            <legend>Plan Participants</legend>
-                            <label>
-                                <input type="text" name="plan-participants" id="plan-participants" placeholder="Search Students" data-selectizeuser>
-                            </label>
-                        </fieldset>
                         <input type="hidden" name="plan-id" id="plan-id">
                         <input type="submit" value="Update" data-test="participation-plan-form-button-save">
                     </div>
@@ -87,21 +81,6 @@
 
 <script>
     (function() {
-        const planParticipants = $("#plan-participants");
-        planParticipants.selectize({
-            delimiter: ",",
-            options: {{ participant | json_encode | raw }},
-            dropdownParent: "body",
-            plugins: ["remove_button"],
-            create: false,
-            hideSelected: true,
-            createOnBlur: true,
-            persist: false,
-            searchField: "name",
-            labelField: "name",
-            valueField: "id",
-        });
-
         // Dispatch signal to initalise CKEditor
         document.dispatchEvent(
                 new CustomEvent("EDITOR__CREATE", {
