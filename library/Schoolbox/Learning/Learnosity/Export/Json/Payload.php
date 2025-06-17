@@ -276,7 +276,7 @@ class Payload
 
         /* Anonymise activity refs
          */
-        unset($activity['reference']);
+        unset($activity['reference'], $activity['tags']);
 
         foreach ($activity['data']['items'] as &$item) {
             $item['id'] = $itemReplacementRefs[$item['reference']];
