@@ -2460,8 +2460,6 @@ class Controller extends Base
      *
      * @param QuizDomainObject $assessment
      * @return void
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
      */
     public function exportToJson(QuizDomainObject $assessment): void
     {
@@ -2472,16 +2470,15 @@ class Controller extends Base
             $assessment->getId()
         );
 
-        header('Cache-Control: private');
-        header('Content-type: application/json');
-        header("Content-disposition: attachment; filename=\"{$filename}\"");
+//        header('Cache-Control: private');
+//        header('Content-type: application/json');
+//        header("Content-disposition: attachment; filename=\"{$filename}\"");
 
         $output = fopen('php://output', 'rw');
 
-        /** @var FilesystemProxy $filesystemProxy */
-        $filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
+        $struct = (new Payload($this->storageMapper, $this->filesystemProxy, $this->api))->generate($assessment);
 
-        fputs($output, (new Payload($this->storageMapper, $this->filesystemProxy))->generate($assessment));
+        fputs($output, $struct);
 
         fclose($output);
     }

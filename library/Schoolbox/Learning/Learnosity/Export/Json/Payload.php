@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Learnosity\Export\Json;
 
+use DebugBar\DebugBarException;
 use League\Flysystem\FilesystemException;
+use LearnositySdk\Exceptions\ValidationException;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainObject;
+use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Mapper;
 
@@ -14,10 +17,12 @@ class Payload
     /**
      * @param Mapper $storageMapper
      * @param FilesystemProxy $filesystemProxy
+     * @param Api $api
      */
     public function __construct(
         private \Schoolbox\Resource\Storage\Mapper $storageMapper,
-        private FilesystemProxy $filesystemProxy
+        private FilesystemProxy $filesystemProxy,
+        private Api $api
     ) {
     }
 
@@ -108,7 +113,7 @@ class Payload
             'assets' => $this->indexAssets($assessment),
             /* Learnosity stuff goes here
              */
-            'content' => []
+            'content' => $this->fetchLearnosityContent($assessment->getLearnosityReference())
         ];
 
         return $struct;
@@ -184,5 +189,48 @@ class Payload
         preg_match_all('/\/storage\/(image|fetch)\.php\?hash=([^"]+)/', $input, $matches);
 
         return $matches[2];
+    }
+
+
+    /**
+     * Grab the learnosity api payloads for $learnosityReference and pile them into one big
+     * mega struct...hopefully this works
+     *
+     * @param string $learnosityReference
+     * @return array
+     * @throws DebugBarException
+     * @throws \JsonException
+     * @throws ValidationException
+     */
+    private function fetchLearnosityContent(string $learnosityReference): array
+    {
+        /* Get the activity we wanna export
+         */
+        $activity = $this->api->dataGetRequest('/itembank/activities', ['references' => [$learnosityReference]]);
+
+        /* Get the items in that activity
+         */
+        $itemReferences = array_column($activity['data'][0]['data']['items'], 'reference');
+
+        $items = $this->api->dataGetRequest('/itembank/items', ['references' => $itemReferences]);
+
+        /* Get the questions in each item
+         * TODO Maybe needs chunking
+         */
+        foreach ($items['data'] as $item) {
+            $questionReferences = [];
+
+            /* TODO Maybe needs chunking
+             */
+            foreach ($item['questions'] as $question) {
+                $questionReferences[] =  $question['reference'];
+            }
+
+            $question = $this->api->dataGetRequest('/itembank/questions', ['references' => $questionReferences]);
+
+            new \Alaress_Probe($itemReferences, $items, $question);
+        }
+
+        return [];
     }
 }
