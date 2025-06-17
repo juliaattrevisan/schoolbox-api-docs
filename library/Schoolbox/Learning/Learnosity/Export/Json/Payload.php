@@ -245,6 +245,9 @@ class Payload
          *
          * Anonymise the references as we further manipulate this stack.
          */
+
+        /* Anonymise question refs
+         */
         $questionStack = [];
 
         foreach ($questionData as &$question) {
@@ -254,6 +257,8 @@ class Payload
 
         unset($question);
 
+        /* Anonymise item refs
+         */
         $itemStack = [];
 
         foreach ($itemData as &$item) {
@@ -269,14 +274,24 @@ class Payload
 
         unset($item);
 
+        /* Anonymise activity refs
+         */
+        unset($activity['reference']);
+
+        foreach ($activity['data']['items'] as &$item) {
+            $item['id'] = $itemReplacementRefs[$item['reference']];
+            $item['reference'] = $itemReplacementRefs[$item['reference']];
+        }
+
         /* Don't need these old stacks anymore
          */
         unset($itemData, $questionData);
 
-        new \Alaress_Probe($itemStack, $questionStack);
-        die();
-
-        return [];
+        return [
+            'activity' => $activity,
+            'items' => $itemStack,
+            'questions' => $questionStack,
+        ];
     }
 
 

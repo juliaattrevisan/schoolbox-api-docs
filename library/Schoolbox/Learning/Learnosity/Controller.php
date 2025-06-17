@@ -2470,9 +2470,9 @@ class Controller extends Base
             $assessment->getId()
         );
 
-//        header('Cache-Control: private');
-//        header('Content-type: application/json');
-//        header("Content-disposition: attachment; filename=\"{$filename}\"");
+        header('Cache-Control: private');
+        header('Content-type: application/json');
+        header("Content-disposition: attachment; filename=\"{$filename}\"");
 
         $output = fopen('php://output', 'rw');
 
