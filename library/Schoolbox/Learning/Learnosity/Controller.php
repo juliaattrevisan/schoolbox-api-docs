@@ -19,6 +19,7 @@ use DebugBar\DebugBarException;
 use Http\Discovery\Psr17Factory;
 use Interop\Queue\Exception\InvalidDestinationException;
 use Interop\Queue\Exception\InvalidMessageException;
+use League\Flysystem\FilesystemException;
 use LearnositySdk\Exceptions\ValidationException;
 use LearnositySdk\Utils\Uuid;
 use Psr\Container\ContainerExceptionInterface;
@@ -2460,6 +2461,7 @@ class Controller extends Base
      *
      * @param QuizDomainObject $assessment
      * @return void
+     * @throws FilesystemException
      */
     public function exportToJson(QuizDomainObject $assessment): void
     {
