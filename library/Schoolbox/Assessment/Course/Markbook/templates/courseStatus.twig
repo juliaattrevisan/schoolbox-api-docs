@@ -1,0 +1,4 @@
+{% for class in classes %}
+    <h1> {{ class.title }}</h1>
+    {% include template with class.twigData only %}
+{% endfor %}
