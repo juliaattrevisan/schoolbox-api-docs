@@ -245,11 +245,16 @@ class Payload
          *
          * Anonymise the references as we further manipulate this stack.
          */
+        $questionStack = [];
+
         foreach ($questionData as &$question) {
             $question['reference'] = $questionReplacementRefs[$question['reference']];
+            $questionStack[$question['reference']] = $question;
         }
 
         unset($question);
+
+        $itemStack = [];
 
         foreach ($itemData as &$item) {
             foreach ($item['questions'] as &$question) {
@@ -257,23 +262,11 @@ class Payload
             }
 
             $item['reference'] = $itemReplacementRefs[$item['reference']];
-        }
 
-        unset($item);
-
-        /* Index by identifiers, for hash lookup convenience
-         */
-        $itemStack = [];
-
-        foreach ($itemData as $item) {
             $itemStack[$item['reference']] = $item;
         }
 
-        $questionStack = [];
-
-        foreach ($questionData as $question) {
-            $questionStack[$question['reference']] = $question;
-        }
+        unset($item);
 
         /* Don't need these old stacks anymore
          */
