@@ -268,7 +268,7 @@ class Payload
             }
 
             $item['reference'] = $itemReplacementRefs[$item['reference']];
-            unset($item['definition']['widgets']);
+            unset($item['definition']['widgets'], $item['tags']);
 
             $itemStack[$item['reference']] = $item;
         }
