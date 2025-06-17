@@ -298,7 +298,7 @@ window.Vue.onMounted(() => {
                                     <li>
                                         <a
                                             class="icon-modify"
-                                            :href="`${participant._links.learningPlanNew}`"
+                                            :href="`${participant._links.learningPlanNew}?student=${participant.user.id}`"
                                         >
                                             Modify
                                         </a>
