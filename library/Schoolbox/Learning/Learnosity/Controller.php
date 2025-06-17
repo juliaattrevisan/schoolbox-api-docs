@@ -2463,7 +2463,7 @@ class Controller extends Base
      * @return void
      * @throws FilesystemException
      */
-    public function exportToJson(QuizDomainObject $assessment): void
+    public function getExportToJson(QuizDomainObject $assessment): void
     {
         /* Start generating output to stream
          */
@@ -2497,7 +2497,7 @@ class Controller extends Base
      * @param QuizDomainObject $assessment
      * @return void
      */
-    public function importFromJson(QuizDomainObject $assessment): void
+    public function postImportFromJson(QuizDomainObject $assessment): void
     {
     }
 }

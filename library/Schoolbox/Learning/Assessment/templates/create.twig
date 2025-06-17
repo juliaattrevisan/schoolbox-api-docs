@@ -213,7 +213,7 @@
     <div id="jsonImportModal" class="reveal-modal" data-reveal>
         <h2>Upload quiz</h2>
 
-        {% set jsonImportRoute = routeLookup('learnosity.importFromJson', {
+        {% set jsonImportRoute = routeLookup('learnosity.postImportFromJson', {
             contextId: context.id,
             contextType: contextType
         }) %}
