@@ -225,6 +225,16 @@ class Payload
 
         $questionData = $this->api->dataGetRequest('/itembank/questions', ['references' => $questionReferences])['data'];
 
+        /* Get the features in each item
+         */
+        $featureReferences = [];
+
+        foreach ($itemData as $item) {
+            $featureReferences = array_merge($featureReferences, array_column($item['features'], 'reference'));
+        }
+
+        $featureData = $this->api->dataGetRequest('/itembank/features', ['references' => $featureReferences])['data'];
+
         /* Predetermine new identifiers for items and questions
          */
         $itemReplacementRefs = [];
@@ -237,6 +247,12 @@ class Payload
 
         foreach ($questionData as $question) {
             $questionReplacementRefs[$question['reference']] = $this->generateGuid();
+        }
+
+        $featureReplacementRefs = [];
+
+        foreach ($featureData as $feature) {
+            $featureReplacementRefs[$feature['reference']] = $this->generateGuid();
         }
 
         /* All this stuff contains learnosity references that shouldn't perpetuate beyond this school
@@ -258,6 +274,17 @@ class Payload
 
         unset($question);
 
+        /* Anonymise feature refs
+         */
+        $featureStack = [];
+
+        foreach ($featureData as &$feature) {
+            $feature['reference'] = $featureReplacementRefs[$feature['reference']];
+            $featureStack[$feature['reference']] = $feature;
+        }
+
+        unset($feature);
+
         /* Anonymise item refs
          */
         $itemStack = [];
@@ -265,6 +292,10 @@ class Payload
         foreach ($itemData as &$item) {
             foreach ($item['questions'] as &$question) {
                 $question['reference'] = $questionReplacementRefs[$question['reference']];
+            }
+
+            foreach ($item['features'] as &$feature) {
+                $feature['reference'] = $featureReplacementRefs[$feature['reference']];
             }
 
             $item['reference'] = $itemReplacementRefs[$item['reference']];
@@ -286,12 +317,13 @@ class Payload
 
         /* Don't need these old stacks anymore
          */
-        unset($itemData, $questionData);
+        unset($itemData, $questionData, $featureData);
 
         return [
             'activity' => $activity,
             'items' => $itemStack,
             'questions' => $questionStack,
+            'features' => $featureStack
         ];
     }
 
