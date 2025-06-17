@@ -19,6 +19,7 @@
     <custom-participation
     :all-participants="{{ (allParticipants ?? []) | json_encode }}"
     get-students-pastoral-counts-url="{{ routeLookup('pastoral.getStudentsCount') }}"
+    get-learning-plan-new-url="{{ learningPlanNew }}"
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/customParticipation.js?v={{ config.site_version }}"></script>

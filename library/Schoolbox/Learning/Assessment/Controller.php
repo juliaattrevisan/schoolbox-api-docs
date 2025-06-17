@@ -949,7 +949,10 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $this->getUser(),
         );
         $data['allParticipants'] = $assessment->getAllParticipants()->map($participationModelToArray)->reindex();
-
+        $data['learningPlanNew'] = $this->getRouteIfAuthorized('learningAssessment.getAssessmentParticipationLearningPlan', [
+            'assessment' => $assessment,
+            'assessmentId' => $assessment->getId(),
+        ]);
 
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/participation/update.twig',

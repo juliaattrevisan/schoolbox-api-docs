@@ -64,10 +64,6 @@ class Participations
                     'assessmentId' => $assess->getId(),
                     'student' => $participant,
                     'studentId'    => $participant->getId(),
-                ]),
-                'learningPlanNew' => $this->getRouteIfAuthorized('learningAssessment.getAssessmentParticipationLearningPlan', [
-                    'assessment' => $assess,
-                    'assessmentId' => $assess->getId(),
                 ])
             ]
         ];

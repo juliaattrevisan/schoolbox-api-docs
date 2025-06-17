@@ -11,6 +11,7 @@ import type { Participant } from "../js/types/customParticipationTypes";
 interface Props {
     allParticipants: Participant[];
     getStudentsPastoralCountsUrl: string;
+    getLearningPlanNewUrl: string;
 }
 const props = defineProps<Props>();
 
@@ -298,7 +299,7 @@ window.Vue.onMounted(() => {
                                     <li>
                                         <a
                                             class="icon-modify"
-                                            :href="`${participant._links.learningPlanNew}?student=${participant.user.id}`"
+                                            :href="`${getLearningPlanNewUrl}?student=${participant.user.id}`"
                                         >
                                             Modify
                                         </a>
@@ -345,7 +346,14 @@ window.Vue.onMounted(() => {
                     <div class="l-flex__item--1">
                         <button class="icon-staff-students submit" @click.prevent="excludeSelected">Exclude</button>
                     </div>
-                    <div class="l-flex__item--1"><a class="icon-modify submit">Modify</a></div>
+                    <div class="l-flex__item--1">
+                        <a
+                            class="icon-modify submit"
+                            :href="`${getLearningPlanNewUrl}?student=${selectedList.join(',')}`"
+                        >
+                            Modify
+                        </a>
+                    </div>
                     <div class="l-flex__item--1"><a class="icon-submissions submit">New Activity</a></div>
                 </template>
             </div>
