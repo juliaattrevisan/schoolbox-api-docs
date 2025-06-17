@@ -228,12 +228,21 @@ class Payload
 
         new \Alaress_Probe($itemReferences, $items, $questions);
 
+        /* All this stuff contains learnosity references that shouldn't perpetuate beyond this school
+         * otherwise you can access data you're not supposed to access. Unfortunately the learnosity
+         * scheme is security by obscurity, relying on guessing-the-hash being too difficult to brute
+         * force. Revealing them here would negate this "security"
+         *
+         * Anonymise the references as we further manipulate this stack.
+         */
         $stack = [
             'activity' => $activity,
             'items' => $items,
             'questions' => $questions,
         ];
 
+
+new \Alaress_Probe($stack);
         return [];
     }
 }
