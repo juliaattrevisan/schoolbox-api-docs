@@ -20,6 +20,18 @@
         <h1>Modify Activity</h1>
     </div>
 </div>
+<div class="small-12 column">
+    <ul class="meta">
+        <li>
+            {% include 'sub/userListMetadata.twig'
+                with {
+                users:   participant,
+                message: 'Modifying customisation for '
+            } only
+            %}
+        </li>
+    </ul>
+</div>
 <div class="row">
     <div class="small-12 columns island">
         <form method="post" id="participation-plan-form" class="mage">
@@ -92,11 +104,11 @@
 
         // Dispatch signal to initalise CKEditor
         document.dispatchEvent(
-            new CustomEvent("EDITOR__CREATE", {
-                detail: {
-                    targetElements: ["#plan-desc"],
-                },
-            }),
+                new CustomEvent("EDITOR__CREATE", {
+                    detail: {
+                        targetElements: ["#plan-desc"],
+                    },
+                }),
         );
     })()
 </script>

@@ -959,18 +959,23 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
     public function getAssessmentParticipationLearningPlan(IAssessable $assessment): void
     {
+        $student = explode(',', $this->requestQuery->get('student', ''));
+
         $breadcrumbs = $this->getBakery()
                             ->produceFromAssessment(
                                 $assessment,
                                 $this->getUser()
                             )->add([$assessment->getTitle() . ' Modify Activity', '']);
 
-        $participant = $assessment->getAllParticipants()->map(function ($participant) {
-            return [
-                'id' =>  $participant->getUser()->getId(),
-                'name' => $participant->getUser()->getFullName(),
-            ];
-        })->reindex();
+        $participant = $assessment
+            ->getAllParticipants()
+            ->filter(fn ($participant) => in_array($participant->getUser()->getId(), $student))
+            ->map(function ($participant) {
+                return [
+                    'id' =>  $participant->getUser()->getId(),
+                    'fullName' => $participant->getUser()->getFullName(),
+                ];
+            })->reindex();
 
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/participation/learningPlan/learningPlan.twig',
