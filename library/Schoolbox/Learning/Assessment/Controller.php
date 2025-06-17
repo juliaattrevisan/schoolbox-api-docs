@@ -42,6 +42,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Attachment\Zone;
+use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Assessment\Term;
@@ -578,6 +579,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             // is not allowed).  The $this->persistAssessment() function is used for both create and modify cases, and
             // expects 'worksheet' data to be supplied.  So for the modify case (which is handled by this function), we
             // just make sure the supplied 'worksheet' is the existing worksheet.
+            /** @var IStorage $existingWorksheetTemplate */
             $existingWorksheetTemplate = $assessment->getWorksheetTemplate();
             $this->requestPost->offsetSet(
                 'worksheet',
