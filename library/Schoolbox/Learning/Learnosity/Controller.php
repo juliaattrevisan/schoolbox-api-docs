@@ -2494,10 +2494,10 @@ class Controller extends Base
      * TODO Maybe have a think about this and rename it again later.
      * TODO Maybe belongs in a different controller?
      *
-     * @param QuizDomainObject $assessment
      * @return void
      */
-    public function postImportFromJson(QuizDomainObject $assessment): void
+    public function postImportFromJson(): void
     {
+        echo 'we made it';
     }
 }

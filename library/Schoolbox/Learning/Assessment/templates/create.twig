@@ -165,12 +165,20 @@
     <script type="text/javascript" src="{{CDN_PREFIX}}/js/resource/jquery.resourceAttach.js?v={SITE_VERSION}"></script>
     <script>
         $(function() {
-            $('[data-import]').on('click', function(event) {
+            $('[data-import-legacy]').on('click', function(event) {
                 event.preventDefault();
 
                 $('#xmlImportForm').submit().hide();
                 $('#xml-import-actions').hide();
                 $('#xml-loader').show();
+            });
+
+            $('[data-import-json]').on('click', function(event) {
+                event.preventDefault();
+
+                $('#jsonImportForm').submit().hide();
+                $('#json-import-actions').hide();
+                $('#json-loader').show();
             });
         });
     </script>
@@ -202,7 +210,7 @@
         </form>
         <div id='xml-import-actions' class="component-action">
             <section>
-                <a class="button" data-import>
+                <a class="button" data-import-legacy>
                     Import
                 </a>
             </section>
@@ -238,7 +246,7 @@
             </form>
             <div id='json-import-actions' class="component-action">
                 <section>
-                    <a class="button" data-import>
+                    <a class="button" data-import-json>
                         Upload
                     </a>
                 </section>
