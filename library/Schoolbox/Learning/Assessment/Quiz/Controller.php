@@ -177,7 +177,7 @@ class Controller extends Assessment\Controller
      * @api GET /learning/assessment/:assessmentId/status
      *
      */
-    public function getStatus(IAssessable $assessment, bool $courseView = false): void
+    public function getStatus(IAssessable $assessment, bool $courseView = false)
     {
         $baseUrl = $this->getRouteIfAuthorized('learningAssessment.getStatus', ['assessmentId' => $assessment->getId(), 'assessment' => $assessment]);
         $returnUrlSuffix = Redirect::queryString($baseUrl);
@@ -285,6 +285,11 @@ class Controller extends Assessment\Controller
             'returnUrl' => Redirect::encode($baseUrl),
             'returnUrlSuffix' => $returnUrlSuffix
         ];
+
+        // shortcut if course status view, as we are building the twig elsewhere...
+        if ($courseView) {
+            return $twigData;
+        }
 
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/quiz/status.twig',

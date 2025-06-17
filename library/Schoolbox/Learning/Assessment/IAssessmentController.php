@@ -89,12 +89,12 @@ interface IAssessmentController
     /**
      * @param IAssessable $assessment
      * @param bool $courseView
-     * @return void
+     * @return
      *@since 165
      *
      * @api   GET /learning/assessments/:assessmentId/status
      */
-    public function getStatus(IAssessable $assessment, bool $courseView = false): void;
+    public function getStatus(IAssessable $assessment, bool $courseView = false);
 
     /**
      * @api   GET /learning/assessments/:assessmentId/:studentId

@@ -154,7 +154,7 @@ class Controller extends Assessment\Controller
      * @param bool $courseView
      * @api GET /learning/assessment/:assessmentId/status
      */
-    public function getStatus(IAssessable $assessment, bool $courseView = false): void
+    public function getStatus(IAssessable $assessment, bool $courseView = false)
     {
 
         // Calculate summary totals for display purposes
@@ -182,6 +182,11 @@ class Controller extends Assessment\Controller
                 ? Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL))
                 : $this->getSession()->getHistory(),
         ];
+
+        // shortcut if course status view, as we are building the twig elsewhere...
+        if ($courseView) {
+            return $twigData;
+        }
 
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/project/status/staff.twig',

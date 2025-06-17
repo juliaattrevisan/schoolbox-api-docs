@@ -115,9 +115,9 @@ class Controller extends Assessment\Controller
      *
      * @param IAssessable $assessment
      * @param bool $courseView
-     * @return void
+     * @return
      */
-    public function getStatus(IAssessable $assessment, bool $courseView = false): void
+    public function getStatus(IAssessable $assessment, bool $courseView = false)
     {
         // noop
     }

@@ -260,7 +260,7 @@ class Controller extends Assessment\Controller
      * @throws UnexpectedValueException
      * @api GET /learning/assessments/:assessmentId/status
      */
-    public function getStatus(IAssessable $assessment, bool $courseView = false): void
+    public function getStatus(IAssessable $assessment, bool $courseView = false)
     {
         /* Find out which users have a draft submission
          * MAYBE you can do this purely in twig...but I'm not enamourd by frontend making
@@ -304,6 +304,11 @@ class Controller extends Assessment\Controller
              */
             'draftResponses' => $draftResponses
         ];
+
+        // shortcut if course status view, as we are building the twig elsewhere...
+        if ($courseView) {
+            return $twigData;
+        }
 
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/dueWork/status.twig',
