@@ -78,7 +78,7 @@
     "locutus": "~2.0.32",
     "lodash": "~4.17.21",
     "mediaelement": "~7.0.7",
-    "pinia": "~2.3.1",
+    "pinia": "~3.0.3",
     "qrcode.vue": "~3.6.0",
     "sanitize-html": "~2.14.0",
     "sortablejs": "~1.15.6",
