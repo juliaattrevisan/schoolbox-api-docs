@@ -206,27 +206,45 @@ class Payload
     {
         /* Get the activity we wanna export
          */
-        $activity = $this->api->dataGetRequest('/itembank/activities', ['references' => [$learnosityReference]]);
+        $activity = $this->api->dataGetRequest('/itembank/activities', ['references' => [$learnosityReference]])['data'][0];
 
         /* Get the items in that activity
          */
-        $itemReferences = array_column($activity['data'][0]['data']['items'], 'reference');
+        $itemReferences = array_column($activity['data']['items'], 'reference');
 
-        $items = $this->api->dataGetRequest('/itembank/items', ['references' => $itemReferences]);
+        /* Find all the items in learnosity land
+         */
+        $itemData = $this->api->dataGetRequest('/itembank/items', ['references' => $itemReferences])['data'];
+
+        /* Index by reference and replace what we originally had
+         */
+        $itemLookup = [];
+
+        foreach ($itemData as $item) {
+            $itemLookup[$item['reference']] = $item;
+        }
+
+        $itemData = $itemLookup;
+        unset($itemLookup);
 
         /* Get the questions in each item
          */
-        foreach ($items['data'] as $item) {
-            $questionReferences = [];
-
-            foreach ($item['questions'] as $question) {
-                $questionReferences[] =  $question['reference'];
-            }
+        foreach ($itemData as $item) {
+            $questionReferences = array_column($item['questions'], 'reference');
         }
 
-        $questions = $this->api->dataGetRequest('/itembank/questions', ['references' => $questionReferences]);
+        $questionData = $this->api->dataGetRequest('/itembank/questions', ['references' => $questionReferences])['data'];
 
-        new \Alaress_Probe($itemReferences, $items, $questions);
+        /* Index by reference and replace what we originally had
+         */
+        $questionLookup = [];
+
+        foreach ($questionData as $question) {
+            $questionLookup[$question['reference']] = $question;
+        }
+
+        $questionData = $questionLookup;
+        unset($questionLookup);
 
         /* All this stuff contains learnosity references that shouldn't perpetuate beyond this school
          * otherwise you can access data you're not supposed to access. Unfortunately the learnosity
@@ -235,21 +253,42 @@ class Payload
          *
          * Anonymise the references as we further manipulate this stack.
          */
-        $stack = [
-            'activity' => $activity,
-            'items' => $items,
-            'questions' => $questions,
-        ];
+        foreach ($itemData as $itemRef => &$item) {
+            /* This bleeds identifiers
+             * If it bleeds, we can leak it (don't)
+             */
+            unset ($item['definition']);
 
-        /* Anonymise somewhat
-         */
-        unset($stack['activity']['data'][0]['reference']);
+            /* Rewrite identifiers for every question in this item
+             */
+            foreach ($item['questions'] as $questionRef => &$question) {
+                $oldGuid = $question['reference'];
+                $newGuid = $this->generateGuid();
+
+                /* This is in the $items stack
+                 */
+                $question['reference'] = $newGuid;
+
+                /* Rewrite the old reference entirely
+                 */
+                $questionData[$oldGuid]['reference'] = $newGuid;
+
+                /* Reinsert it into the stack
+                 */
+                $questionData[$newGuid] = $questionData[$oldGuid];
+
+                /* Remove what was previously here
+                 */
+                unset($questionData[$oldGuid]);
+            }
+        }
+
+new \Alaress_Probe($activity, $itemData, $questionData);
 
         /* Convert learnosity references to something similar for lookup reasons
          */
 
 
-        new \Alaress_Probe($stack);
         return [];
     }
 
