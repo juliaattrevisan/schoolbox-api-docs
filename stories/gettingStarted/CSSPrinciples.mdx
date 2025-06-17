@@ -19,9 +19,9 @@ To get started understanding our use of CSS, it's best to simply open this file 
 
 The layering mentioned above is one issue our legacy styles face. Other issues include they're:
 
--   dated compared to more modern styling techniques, for example with heavy use of floats for layout via the Foundation framework
--   riddled with specificity issues, with their being many rules applied to elements that are overruled several times over
--   bloated, with everything being in the one css file, only about 3% of this file is used on the home page
+- dated compared to more modern styling techniques, for example with heavy use of floats for layout via the Foundation framework
+- riddled with specificity issues, with their being many rules applied to elements that are overruled several times over
+- bloated, with everything being in the one css file, only about 3% of this file is used on the home page
 
 ## Moving Forward
 
@@ -34,37 +34,37 @@ There should be much less chance for styles to leak out into different parts of 
 
 The solution is comprised of three key factors:
 
--   An increased usage of global properties (design tokens) to set up the the majority of base styles for the system
--   A more component driven approach to our CSS, aided by the use of Storybook and BEM
--   The introduction of utility classes to help reduce the amount of custom CSS we need to write
+- An increased usage of global properties (design tokens) to set up the the majority of base styles for the system
+- A more component driven approach to our CSS, aided by the use of Storybook and BEM
+- The introduction of utility classes to help reduce the amount of custom CSS we need to write
 
 To evaluate the benefits of this approach have a read through the following articles:
 
--   [**Building a Scalable CSS Architecture With BEM and Utility Classes**](https://css-tricks.com/building-a-scalable-css-architecture-with-bem-and-utility-classes/)
--   [**Battling BEM CSS: 10 Common Problems And How To Avoid Them**](https://www.smashingmagazine.com/2016/06/battling-bem-extended-edition-common-problems-and-how-to-avoid-them/)
--   [**When and When Not to Use Utility Classes With BEM**](https://markus.oberlehner.net/blog/when-and-when-not-to-use-utility-classes-with-bem/)
+- [**Building a Scalable CSS Architecture With BEM and Utility Classes**](https://css-tricks.com/building-a-scalable-css-architecture-with-bem-and-utility-classes/)
+- [**Battling BEM CSS: 10 Common Problems And How To Avoid Them**](https://www.smashingmagazine.com/2016/06/battling-bem-extended-edition-common-problems-and-how-to-avoid-them/)
+- [**When and When Not to Use Utility Classes With BEM**](https://markus.oberlehner.net/blog/when-and-when-not-to-use-utility-classes-with-bem/)
 
 ### Style rules
 
 To help ensure our CSS is written in a consistent manner, we've introduced a set of rules to follow:
 
--   New styling must be detailed within Storybook
--   Accessibility considerations must be validated
--   When adding a new compoent, the linked styling should be contained within one SCSS file
--   Styles within selectors should be ordered alphabetically
--   When using BEM, Parent styles, followed by elements, followed by modifiers should be added
--   Ideally no more than 3 levels of nesting should ever exist. If more are required, consider using a utility class or a new component
--   All new styles are to be prefixed
+- New styling must be detailed within Storybook
+- Accessibility considerations must be validated
+- When adding a new compoent, the linked styling should be contained within one SCSS file
+- Styles within selectors should be ordered alphabetically
+- When using BEM, Parent styles, followed by elements, followed by modifiers should be added
+- Ideally no more than 3 levels of nesting should ever exist. If more are required, consider using a utility class or a new component
+- All new styles are to be prefixed
 
 ### Prefixes
 
 To identify new styles, we've introduced a new set of prefixes to our CSS. This helps clearly identify what is new and what is legacy.
 
--   `c-*` : A component
--   `f-*` : An override linked to the old styles, which should be removed once the related old styles are removed
--   `l-*` : Layout utility classes like `.l-flex-row` or `.l-gap-m`
--   `t-*` : Typography utility classes like `.t-uppercase` or `.t-break-word`
--   `sbx-*` : Web Component
+- `c-*` : A component
+- `f-*` : An override linked to the old styles, which should be removed once the related old styles are removed
+- `l-*` : Layout utility classes like `.l-flex-row` or `.l-gap-m`
+- `t-*` : Typography utility classes like `.t-uppercase` or `.t-break-word`
+- `sbx-*` : Web Component
 
 ## Compiling CSS within Schoolbox
 

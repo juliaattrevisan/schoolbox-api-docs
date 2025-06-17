@@ -669,8 +669,9 @@ button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
 .lrn .lrn_btn:is(.lds-btn-secondary):hover {
     background-color: var(--content-ui-hover);
     color: var(--content-ui-foreground);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica,
-        Arial, sans-serif !important;
+    font-family:
+        -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica, Arial,
+        sans-serif !important;
     font-size: 1rem;
 }
 .lds-btn-secondary,
