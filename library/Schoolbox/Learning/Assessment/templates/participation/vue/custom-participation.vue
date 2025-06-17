@@ -46,6 +46,10 @@ const hasExcludedInSelection = window.Vue.computed(() => {
 const loadError = window.Vue.ref<string | null>(null);
 const studentPastoralCounts = window.Vue.ref<Record<string, StudentPastoralCountBadge[]>>({});
 
+//Getting the return url for user to return to the landing page after submission
+const returnUrl = window.Vue.computed( () => {
+    return btoa(window.location.pathname)
+});
 /**
  * Fetch the pastoral counts for the students
  */
@@ -299,7 +303,7 @@ window.Vue.onMounted(() => {
                                     <li>
                                         <a
                                             class="icon-modify"
-                                            :href="`${getLearningPlanNewUrl}?student=${participant.user.id}`"
+                                            :href="`${getLearningPlanNewUrl}?student=${participant.user.id}&returnUrl=${returnUrl}`"
                                         >
                                             Modify
                                         </a>
@@ -349,7 +353,7 @@ window.Vue.onMounted(() => {
                     <div class="l-flex__item--1">
                         <a
                             class="icon-modify submit"
-                            :href="`${getLearningPlanNewUrl}?student=${selectedList.join(',')}`"
+                            :href="`${getLearningPlanNewUrl}?student=${selectedList.join(',')}&returnUrl=${returnUrl}`"
                         >
                             Modify
                         </a>

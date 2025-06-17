@@ -1272,4 +1272,18 @@ class ListController extends Web\Controller\Base
     {
         $this->getLaunchAssessmentAsStudentReturnWindow($assessment, $student);
     }
+
+    /**
+     * Process the learning plan for the custom participation
+     *
+     * @param IAssessable $assessment
+     * @return void
+     */
+    public function postAssessmentParticipationLearningPlan(IAssessable $assessment): void
+    {
+        $post = $this->requestPost;
+
+        $returnUrl = $this->requestQuery->get('returnUrl');
+        $this->response = $this->redirectAfterPost($returnUrl ? Redirect::decode($returnUrl) : $this->getSession()->getHistory());
+    }
 }
