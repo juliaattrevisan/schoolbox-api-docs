@@ -217,8 +217,10 @@ class Payload
 
         /* Get the questions in each item
          */
+        $questionReferences = [];
+
         foreach ($itemData as $item) {
-            $questionReferences = array_column($item['questions'], 'reference');
+            $questionReferences = array_merge($questionReferences, array_column($item['questions'], 'reference'));
         }
 
         $questionData = $this->api->dataGetRequest('/itembank/questions', ['references' => $questionReferences])['data'];
