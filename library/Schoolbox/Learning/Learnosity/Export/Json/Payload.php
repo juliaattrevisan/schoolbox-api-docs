@@ -4,10 +4,24 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Learnosity\Export\Json;
 
+use League\Flysystem\FilesystemException;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainObject;
+use Schoolbox\Resource\Storage\FilesystemProxy;
+use Schoolbox\Resource\Storage\Mapper;
 
 class Payload
 {
+    /**
+     * @param Mapper $storageMapper
+     * @param FilesystemProxy $filesystemProxy
+     */
+    public function __construct(
+        private \Schoolbox\Resource\Storage\Mapper $storageMapper,
+        private FilesystemProxy $filesystemProxy
+    ) {
+    }
+
+
     /**
      * Create a JSON representation of the quiz $assessment
      *
@@ -89,16 +103,63 @@ class Payload
              *  - Zip file containing json text file + any associated assets. But then you have to
              *    deal with taskd, zip files, download limits, all this hankypanky
              */
-            'assets' => array_values(array_unique(array_merge(
-                $this->detectAssets($assessment->getDescription()),
-                $this->detectAssets($assessment->getCompletionMessage()),
-            ))),
+            'assets' => $this->indexAssets($assessment),
             /* Learnosity stuff goes here
              */
             'content' => []
         ];
 
         return $struct;
+    }
+
+
+    /**
+     * Find all the storage info about each asset. Note that an asset can be reused across
+     * multiple ckeditors in the quiz such as for Description and Completion Message; we only
+     * need to index their storage data once per usage which is why we do it here and not in
+     * detectAssets()
+     *
+     * @param QuizDomainObject $assessment
+     * @return array
+     * @throws FilesystemException
+     */
+    private function indexAssets(QuizDomainObject $assessment): array
+    {
+        $hashes = array_values(array_unique(array_merge(
+            $this->detectAssets($assessment->getDescription()),
+            $this->detectAssets($assessment->getCompletionMessage()),
+        )));
+
+        /* No assets? No trabajo
+         */
+        if (!\count($hashes)) {
+            return [];
+        }
+
+        /* Find all the storage instances corresponding to these hashes
+         */
+        $instances = $this->storageMapper->findByColumn('hash', $hashes);
+
+        $stack = [];
+
+        foreach ($instances as $instance) {
+            $index = $instance->getHash();
+
+            /* A string that represents binary data. Hopefully this decodes without corruption.
+             * There used to be a thing way back in the early 2000s where people stored binary
+             * data in the db (images for image galleries etc) in exactly this kind of manner,
+             * but sometimes it...corrupted data. Can't remember the details now, but it used to
+             * be a bit of thing
+             */
+            $fileContents = base64_encode($this->filesystemProxy->read($instance));
+
+            $stack[$index] = [
+                'basename' => $instance->getBaseName(),
+                'contents' => $fileContents
+            ];
+        }
+
+        return $stack;
     }
 
 

@@ -46,6 +46,7 @@ use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\TaskDaemon\Producer;
 use Schoolbox\TaskDaemon\Request\HttpRequest\MessageFactory;
 use Schoolbox\TaskDaemon\Request\DownloadPages\MessageFactory as DownloadPagesMessageFactory;
@@ -2470,7 +2471,12 @@ class Controller extends Base
 
         $output = fopen('php://output', 'rw');
 
-        fputs($output, (new Payload())->generate($assessment));
+        $storageMapper = \Schoolbox\Resource\Storage\Mapper::getInstance();
+
+        /** @var FilesystemProxy $filesystemProxy */
+        $filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
+
+        fputs($output, (new Payload($storageMapper, $filesystemProxy))->generate($assessment));
 
         fclose($output);
     }
