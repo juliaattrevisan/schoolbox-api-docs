@@ -85,9 +85,9 @@
         "mediaelement": "~7.0.7",
         "pinia": "~3.0.3",
         "qrcode.vue": "~3.6.0",
-        "sanitize-html": "^2.17.0",
+        "sanitize-html": "~2.17.0",
         "sortablejs": "~1.15.6",
-        "swiper": "~11.2.2",
+        "swiper": "^11.2.8",
         "tinycolor2": "~1.6.0",
         "ts-ebml": "~3.0.1",
         "v-tables-3-select-rows": "~0.4.9",
@@ -25768,9 +25768,9 @@
       "dev": true
     },
     "node_modules/swiper": {
-      "version": "11.2.2",
-      "resolved": "https://registry.npmjs.org/swiper/-/swiper-11.2.2.tgz",
-      "integrity": "sha512-FmAN6zACpVUbd/1prO9xQ9gKo9cc6RE2UKU/z4oXtS8fNyX4sdOW/HHT/e444WucLJs0jeMId6WjdWM2Lrs8zA==",
+      "version": "11.2.8",
+      "resolved": "https://registry.npmjs.org/swiper/-/swiper-11.2.8.tgz",
+      "integrity": "sha512-S5FVf6zWynPWooi7pJ7lZhSUe2snTzqLuUzbd5h5PHUOhzgvW0bLKBd2wv0ixn6/5o9vwc/IkQT74CRcLJQzeg==",
       "funding": [
         {
           "type": "patreon",
@@ -25781,6 +25781,7 @@
           "url": "http://opencollective.com/swiper"
         }
       ],
+      "license": "MIT",
       "engines": {
         "node": ">= 4.7.0"
       }
@@ -47623,9 +47624,9 @@
       }
     },
     "swiper": {
-      "version": "11.2.2",
-      "resolved": "https://registry.npmjs.org/swiper/-/swiper-11.2.2.tgz",
-      "integrity": "sha512-FmAN6zACpVUbd/1prO9xQ9gKo9cc6RE2UKU/z4oXtS8fNyX4sdOW/HHT/e444WucLJs0jeMId6WjdWM2Lrs8zA=="
+      "version": "11.2.8",
+      "resolved": "https://registry.npmjs.org/swiper/-/swiper-11.2.8.tgz",
+      "integrity": "sha512-S5FVf6zWynPWooi7pJ7lZhSUe2snTzqLuUzbd5h5PHUOhzgvW0bLKBd2wv0ixn6/5o9vwc/IkQT74CRcLJQzeg=="
     },
     "tabbable": {
       "version": "6.2.0",
