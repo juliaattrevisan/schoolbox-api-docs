@@ -572,8 +572,12 @@ abstract class Controller extends ListController implements IAssessmentControlle
     {
         // If we are dealing with a due work, and it already has a worksheet template attached...
         if ($assessment instanceof DueWork\Model && $assessment->getWorksheetTemplate()) {
-            // Ensure the 'worksheet' info supplied to persistAssessment() below will always be the existing worksheet
-            // info.  This is done because modification of existing worksheet templates has been disallowed.
+            // Add (or replace) 'worksheet' info to $this->requestPost.
+            // Note 'worksheet' is expected to be included in form submissions from the 'Create due work' page, but not
+            // the 'Modify due work' page (since modification of worksheet templates once the due work has been created
+            // is not allowed).  The $this->persistAssessment() function is used for both create and modify cases, and
+            // expects 'worksheet' data to be supplied.  So for the modify case (which is handled by this function), we
+            // just make sure the supplied 'worksheet' is the existing worksheet.
             $existingWorksheetTemplate = $assessment->getWorksheetTemplate();
             $this->requestPost->offsetSet(
                 'worksheet',
