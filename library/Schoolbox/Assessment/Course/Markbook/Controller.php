@@ -626,40 +626,50 @@ class Controller extends WebController\Base
         $twigData = [];
         // switch based on which assessment type
         if ($assessmentSpec instanceof \Schoolbox\Learning\Assessment\DueWork\Model) {
-            /** @var \Schoolbox\Learning\Assessment\DueWork\Controller $dueWorkController */
-            $dueWorkController = $this->fetchController(AssessmentType::TYPE_DUE_WORK);
-            $dueWorkController->setUser($this->getUser())
+            /** @var \Schoolbox\Learning\Assessment\DueWork\Controller $assessmentController */
+            $assessmentController = $this->fetchController(AssessmentType::TYPE_DUE_WORK);
+            $assessmentController->setUser($this->getUser())
             ->setRouteGenerator($this->routeGenerator);
-            foreach ($assessments as $assessment) {
-                $classes[$assessment->getId()] = [
-                    'title' => $assessment->getBaseContext()->getFolder()->getNameWithCodes(),
-                    'twigData' => $dueWorkController->getStatus($assessment, true),
-                ];
-            }
-            $twigData = [
-                'type' => AssessmentType::objectToString($assessmentSpec),
-                'assessments' => $assessments->map($unitAssessmentsMap),
-                'classes' => $classes,
-                'template' => '@learningAssessment/dueWork/status.twig',
-            ];
+
+            $template = '@learningAssessment/dueWork/status.twig';
         } elseif ($assessmentSpec instanceof \Schoolbox\Learning\Assessment\Lti\Model) {
-            $twigData = [
-                'type' => AssessmentType::objectToString($assessmentSpec),
-                'assessments' => $assessments->map($unitAssessmentsMap),
-            ];
+            /** @var \Schoolbox\Learning\Assessment\Lti\Controller $assessmentController */
+            $assessmentController = $this->fetchController(AssessmentType::TYPE_LTI_ASSESSMENT);
+            $assessmentController->setUser($this->getUser())
+                ->setRouteGenerator($this->routeGenerator);
+
+            $template = '@learningAssessment/lti/status.twig';
         } elseif ($assessmentSpec instanceof \Schoolbox\Learning\Assessment\Task\Model) {
-            $twigData = [
-                'type' => AssessmentType::objectToString($assessmentSpec),
-                'assessments' => $assessments->map($unitAssessmentsMap),
-            ];
+            /** @var \Schoolbox\Learning\Assessment\Task\Controller $assessmentController */
+            $assessmentController = $this->fetchController(AssessmentType::TYPE_TASK);
+            $assessmentController->setUser($this->getUser())
+                ->setRouteGenerator($this->routeGenerator);
+
+            $template = '@learningAssessment/task/status.twig';
         } elseif ($assessmentSpec instanceof \Schoolbox\Learning\Assessment\Quiz\Model) {
-            $twigData = [
-                'type' => AssessmentType::objectToString($assessmentSpec),
-                'assessments' => $assessments->map($unitAssessmentsMap),
-            ];
+            /** @var \Schoolbox\Learning\Assessment\Quiz\Controller $assessmentController */
+            $assessmentController = $this->fetchController(AssessmentType::TYPE_QUIZ);
+            $assessmentController->setUser($this->getUser())
+                ->setRouteGenerator($this->routeGenerator);
+
+            $template = '@learningAssessment/quiz/status.twig';
         } else {
             throw new NotFound('Unsupported assessment type: ' . AssessmentType::objectToString($assessmentSpec));
         }
+
+        foreach ($assessments as $assessment) {
+            $classes[$assessment->getId()] = [
+                'title' => $assessment->getBaseContext()->getFolder()->getNameWithCodes(),
+                'twigData' => $assessmentController->getStatus($assessment, true),
+            ];
+        }
+        $twigData = [
+            'type' => AssessmentType::objectToString($assessmentSpec),
+            'assessments' => $assessments->map($unitAssessmentsMap),
+            'classes' => $classes,
+            'template' => $template,
+        ];
+
         $this->response = $this->responseFromTemplate(
             '@courseMarkbook/courseStatus.twig',
             $twigData,
