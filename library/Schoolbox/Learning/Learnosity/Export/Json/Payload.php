@@ -27,6 +27,7 @@ class Payload
      *
      * @param QuizDomainObject $assessment
      * @return string
+     * @throws FilesystemException
      */
     public function generate(QuizDomainObject $assessment): string
     {
@@ -39,6 +40,7 @@ class Payload
      *
      * @param QuizDomainObject $assessment
      * @return array
+     * @throws FilesystemException
      */
     private function generateArray(QuizDomainObject $assessment): array
     {
@@ -150,6 +152,11 @@ class Payload
              * data in the db (images for image galleries etc) in exactly this kind of manner,
              * but sometimes it...corrupted data. Can't remember the details now, but it used to
              * be a bit of thing
+             *
+             * Note that fetch.php does a bunch of S3 related stuff that MAYBE needs to be here too
+             * I'm...not sure on the particulars
+             *
+             * TODO find out from mr sannang
              */
             $fileContents = base64_encode($this->filesystemProxy->read($instance));
 
