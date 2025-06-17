@@ -150,6 +150,9 @@
          <li>
              <a class="icon-import" title="Import legacy XML" data-reveal-id="xmlImportModal" />Import Legacy XML</a>
          </li>
+         <li>
+             <a class="icon-upload" title="Upload quiz" data-reveal-id="jsonImportModal" />Upload quiz</a>
+         </li>
      </ul>
      {% endif %}
 </div>
@@ -204,6 +207,42 @@
                 </a>
             </section>
         </div>
+        {% endif %}
+        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+    </div>
+    <div id="jsonImportModal" class="reveal-modal" data-reveal>
+        <h2>Upload quiz</h2>
+
+        {% set jsonImportRoute = routeLookup('learnosity.importFromJson', {
+            contextId: context.id,
+            contextType: contextType
+        }) %}
+
+        {% if jsonImportRoute %}
+            <div id="json-loader" style="display:none">
+                <div class="loader"></div>
+                <p class="text-center">Uploading quiz...</p>
+            </div>
+
+            <form id='jsonImportForm' method="post" action="{{ jsonImportRoute }}">
+                <input type="hidden" name="contextId" value="{{ context.id }}" />
+                <input type="hidden" name="contextType" value="{{ contextType }}" />
+
+                <section>
+                    <fieldset class="no-pad">
+                        <div class="small-12 columns no-pad">
+                            {% include 'sub/attachzone.twig' with {attachzone: jsonAttachzone} %}
+                        </div>
+                    </fieldset>
+                </section>
+            </form>
+            <div id='json-import-actions' class="component-action">
+                <section>
+                    <a class="button" data-import>
+                        Upload
+                    </a>
+                </section>
+            </div>
         {% endif %}
         <a class="close-reveal-modal" aria-label="Close">&#215;</a>
     </div>
