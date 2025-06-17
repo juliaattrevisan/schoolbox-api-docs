@@ -150,6 +150,16 @@ class Payload
         $stack = [];
 
         foreach ($instances as $instance) {
+            /* Skip video/audio for now. They're too big.
+             */
+            if ($instance->getMimeType()->isAudio() || $instance->getMimeType()->isVideo()) {
+                continue;
+            }
+
+            /* Otherwise I guess we try to include it...
+             * Nothing stops you embedding a 2gb video into a .jpeg file extension though.
+             * hmm
+             */
             $index = $instance->getHash();
 
             /* A string that represents binary data. Hopefully this decodes without corruption.
