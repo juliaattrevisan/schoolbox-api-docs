@@ -198,7 +198,6 @@ class Payload
      *
      * @param string $learnosityReference
      * @return array
-     * @throws DebugBarException
      * @throws \JsonException
      * @throws ValidationException
      */
