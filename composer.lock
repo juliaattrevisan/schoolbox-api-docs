@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e421c2ed86cfaf9388bfde4e90e1d640",
+    "content-hash": "ddc21d59c2b9b0f132ab1643122436e1",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
@@ -4704,16 +4704,16 @@
         },
         {
             "name": "learnosity/learnosity-sdk-php",
-            "version": "v1.0.3",
+            "version": "v1.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Learnosity/learnosity-sdk-php.git",
-                "reference": "2c4a567b341e3473eb6b51a3b3c1678173eac982"
+                "reference": "405247b0e9fc2b82f1104d7a46d1a114fcf68f04"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Learnosity/learnosity-sdk-php/zipball/2c4a567b341e3473eb6b51a3b3c1678173eac982",
-                "reference": "2c4a567b341e3473eb6b51a3b3c1678173eac982",
+                "url": "https://api.github.com/repos/Learnosity/learnosity-sdk-php/zipball/405247b0e9fc2b82f1104d7a46d1a114fcf68f04",
+                "reference": "405247b0e9fc2b82f1104d7a46d1a114fcf68f04",
                 "shasum": ""
             },
             "require": {
@@ -4723,7 +4723,8 @@
                 "php": "^7.0 || ^8.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^6.0 || ^7.0 || ^8.0 || ^9.0"
+                "phpunit/phpunit": "^6.0 || ^7.0 || ^8.0 || ^9.0",
+                "squizlabs/php_codesniffer": "*"
             },
             "type": "library",
             "autoload": {
@@ -4745,9 +4746,9 @@
             ],
             "support": {
                 "issues": "https://github.com/Learnosity/learnosity-sdk-php/issues",
-                "source": "https://github.com/Learnosity/learnosity-sdk-php/tree/v1.0.3"
+                "source": "https://github.com/Learnosity/learnosity-sdk-php/tree/v1.0.5"
             },
-            "time": "2024-07-10T16:42:33+00:00"
+            "time": "2024-10-14T16:24:35+00:00"
         },
         {
             "name": "maennchen/zipstream-php",
