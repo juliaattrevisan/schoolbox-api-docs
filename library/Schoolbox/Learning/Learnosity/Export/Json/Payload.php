@@ -216,17 +216,6 @@ class Payload
          */
         $itemData = $this->api->dataGetRequest('/itembank/items', ['references' => $itemReferences])['data'];
 
-        /* Index by reference and replace what we originally had
-         */
-        $itemLookup = [];
-
-        foreach ($itemData as $item) {
-            $itemLookup[$item['reference']] = $item;
-        }
-
-        $itemData = $itemLookup;
-        unset($itemLookup);
-
         /* Get the questions in each item
          */
         foreach ($itemData as $item) {
@@ -235,16 +224,19 @@ class Payload
 
         $questionData = $this->api->dataGetRequest('/itembank/questions', ['references' => $questionReferences])['data'];
 
-        /* Index by reference and replace what we originally had
+        /* Predetermine new identifiers for items and questions
          */
-        $questionLookup = [];
+        $itemReplacementRefs = [];
 
-        foreach ($questionData as $question) {
-            $questionLookup[$question['reference']] = $question;
+        foreach ($itemData as $item) {
+            $itemReplacementRefs[$item['reference']] = $this->generateGuid();
         }
 
-        $questionData = $questionLookup;
-        unset($questionLookup);
+        $questionReplacementRefs = [];
+
+        foreach ($questionData as $question) {
+            $questionReplacementRefs[$question['reference']] = $this->generateGuid();
+        }
 
         /* All this stuff contains learnosity references that shouldn't perpetuate beyond this school
          * otherwise you can access data you're not supposed to access. Unfortunately the learnosity
@@ -253,41 +245,42 @@ class Payload
          *
          * Anonymise the references as we further manipulate this stack.
          */
-        foreach ($itemData as $itemRef => &$item) {
-            /* This bleeds identifiers
-             * If it bleeds, we can leak it (don't)
-             */
-            unset ($item['definition']);
-
-            /* Rewrite identifiers for every question in this item
-             */
-            foreach ($item['questions'] as $questionRef => &$question) {
-                $oldGuid = $question['reference'];
-                $newGuid = $this->generateGuid();
-
-                /* This is in the $items stack
-                 */
-                $question['reference'] = $newGuid;
-
-                /* Rewrite the old reference entirely
-                 */
-                $questionData[$oldGuid]['reference'] = $newGuid;
-
-                /* Reinsert it into the stack
-                 */
-                $questionData[$newGuid] = $questionData[$oldGuid];
-
-                /* Remove what was previously here
-                 */
-                unset($questionData[$oldGuid]);
-            }
+        foreach ($questionData as &$question) {
+            $question['reference'] = $questionReplacementRefs[$question['reference']];
         }
 
-new \Alaress_Probe($activity, $itemData, $questionData);
+        unset($question);
 
-        /* Convert learnosity references to something similar for lookup reasons
+        foreach ($itemData as &$item) {
+            foreach ($item['questions'] as &$question) {
+                $question['reference'] = $questionReplacementRefs[$question['reference']];
+            }
+
+            $item['reference'] = $itemReplacementRefs[$item['reference']];
+        }
+
+        unset($item);
+
+        /* Index by identifiers, for hash lookup convenience
          */
+        $itemStack = [];
 
+        foreach ($itemData as $item) {
+            $itemStack[$item['reference']] = $item;
+        }
+
+        $questionStack = [];
+
+        foreach ($questionData as $question) {
+            $questionStack[$question['reference']] = $question;
+        }
+
+        /* Don't need these old stacks anymore
+         */
+        unset($itemData, $questionData);
+
+        new \Alaress_Probe($itemStack, $questionStack);
+        die();
 
         return [];
     }
