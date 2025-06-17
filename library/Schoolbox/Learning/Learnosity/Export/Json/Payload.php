@@ -317,7 +317,7 @@ class Payload
             $itemStack[$item['reference']] = $item;
         }
 
-        unset($item);
+        unset($item, $question, $feature);
 
         /* Anonymise activity refs
          */
@@ -327,6 +327,8 @@ class Payload
             $item['id'] = $itemReplacementRefs[$item['reference']];
             $item['reference'] = $itemReplacementRefs[$item['reference']];
         }
+
+        unset($item);
 
         /* Don't need these old stacks anymore
          */
