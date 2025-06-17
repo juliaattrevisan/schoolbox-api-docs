@@ -215,21 +215,24 @@ class Payload
         $items = $this->api->dataGetRequest('/itembank/items', ['references' => $itemReferences]);
 
         /* Get the questions in each item
-         * TODO Maybe needs chunking
          */
         foreach ($items['data'] as $item) {
             $questionReferences = [];
 
-            /* TODO Maybe needs chunking
-             */
             foreach ($item['questions'] as $question) {
                 $questionReferences[] =  $question['reference'];
             }
-
-            $question = $this->api->dataGetRequest('/itembank/questions', ['references' => $questionReferences]);
-
-            new \Alaress_Probe($itemReferences, $items, $question);
         }
+
+        $questions = $this->api->dataGetRequest('/itembank/questions', ['references' => $questionReferences]);
+
+        new \Alaress_Probe($itemReferences, $items, $questions);
+
+        $stack = [
+            'activity' => $activity,
+            'items' => $items,
+            'questions' => $questions,
+        ];
 
         return [];
     }
