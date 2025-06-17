@@ -1,10 +1,15 @@
 <?php
 
+/**
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2025, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Learning\Learnosity\Export\Json;
 
-use DebugBar\DebugBarException;
 use League\Flysystem\FilesystemException;
 use LearnositySdk\Exceptions\ValidationException;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainObject;
@@ -53,7 +58,7 @@ class Payload
          *  but I need it in its entirety except for school-specific data like folder,
          *  creator identifiers, etc.
          */
-        $struct = [
+        return [
             'settings' => [
                 /* Configuration
                  */
@@ -91,9 +96,9 @@ class Payload
                 'sequence' => null,
                 /* Not supported by quiz, it seems
                  */
-                //                'courseManaged' => $assessment->getCourseManaged(),
-                //                'sebEnabled' => $assessment->getSebEnabled(),
-                //                'defaultOpenSpan' => $assessment->getDefaultOpenSpan(),
+                // 'courseManaged' => $assessment->getCourseManaged(),
+                // 'sebEnabled' => $assessment->getSebEnabled(),
+                // 'defaultOpenSpan' => $assessment->getDefaultOpenSpan(),
             ],
             /* These are locally-grown storage models that were used somewhere in this quiz.
              * When importing into your own school, you'll already have them: but, importing
@@ -115,8 +120,6 @@ class Payload
              */
             'content' => $this->fetchLearnosityContent($assessment->getLearnosityReference())
         ];
-
-        return $struct;
     }
 
 
