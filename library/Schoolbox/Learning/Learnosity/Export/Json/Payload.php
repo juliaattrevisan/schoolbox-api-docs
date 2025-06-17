@@ -241,8 +241,39 @@ class Payload
             'questions' => $questions,
         ];
 
+        /* Anonymise somewhat
+         */
+        unset($stack['activity']['data'][0]['reference']);
 
-new \Alaress_Probe($stack);
+        /* Convert learnosity references to something similar for lookup reasons
+         */
+
+
+        new \Alaress_Probe($stack);
         return [];
+    }
+
+
+    /**
+     * Generate a microsofty style guid
+     *
+     * @return string
+     */
+    private function generateGuid(): string
+    {
+        $uuid = md5(uniqid((string)mt_rand(), true));
+
+        /* Add an arbitrary prefix to the start of this string to make it clear that
+         * it's one of our own making, not belonging to learnosity at all
+         */
+        return sprintf(
+            '%s-%s-%s-%s-%s-%s',
+            'sb',
+            substr($uuid, 0, 8),
+            substr($uuid, 8, 4),
+            substr($uuid, 12, 4),
+            substr($uuid, 16, 4),
+            substr($uuid, 20, 12)
+        );
     }
 }
