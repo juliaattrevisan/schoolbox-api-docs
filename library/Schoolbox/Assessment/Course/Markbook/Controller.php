@@ -18,8 +18,11 @@ use Schoolbox\Filter;
 use Schoolbox\Filter\Codec;
 use Schoolbox\Filter\Filters\Assessment\AssessmentType\Definition as AssessmentTypeDefinition;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Translator\UnitAssessments;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Task;
 use Schoolbox\Learning\Assessment\Feedback\Visibility;
@@ -27,6 +30,9 @@ use Schoolbox\Learning\Assessment\Translator\UnitAssessments;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
+use Schoolbox\Learning\Course\DataModel\Specification\Model;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
@@ -500,6 +506,86 @@ class Controller extends WebController\Base
             $this->captureException($e);
             $this->returnJsonError($e);
         }
+    }
+
+
+    /**
+     * View status page for a course level assessment filtered by markbook filters
+     * this will take a courseSpec and an assessmentId, then filter from url query args mostly the following filters:
+     * * folders
+     * * due in academic period
+     * * activity status
+     * (the rest of the filters are not relevant for this page)
+     *
+     * @param Model $courseSpec
+     * @param IAssessable $assessmentSpec
+     * @return void
+     * @throws Exception
+     * @api GET /learning/courseMarkbook/{courseSpecId:\d+}/assessment/{assessmentId:\d+}
+     */
+    public function getAssessment(CourseSpec\Model $courseSpec, IAssessable $assessmentSpec): void
+    {
+        // This report may take a while
+        $this->extendExecutionTime();
+
+        $request = $this->requestPost['filter_selection'] ?: [];
+
+        /**
+         * @var null[]|Collection[]        $filters
+         * @var Filter\Codec               $codec
+         * @var Filter\Selection\Model[][] $selectionsPerFilter
+         */
+        // TODO add some intelligence around which filter settings to save (eg AssessmentType but not units)
+        [$filters, $codec, $selectionsPerFilter] = $this->convertRequestToFilters($courseSpec, $request, true);
+
+        $assessmentIds  = $this->assessmentIdFinder->findIdsByFilters($filters, $this->getUser());
+
+        // Fetch assessments
+        $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds)->indexBy('id');
+        // filter to only the assessment we are looking for
+        $assessments = $assessments->filter(static function (IAssessable $assessment) use ($assessmentSpec) {
+            return $assessment->getSpecificationAssessment()?->getId() === $assessmentSpec->getId();
+        });
+        // hydrate participants
+        $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, null, true);
+
+        $unitAssessmentsMap = new UnitAssessments(null, $this->authorizer, null, $this->getUser());
+        // switch based on which assessment type
+        if ($assessmentSpec instanceof \Schoolbox\Learning\Assessment\DueWork\Model) {
+            $twigData = [
+                'type' => AssessmentType::objectToString($assessmentSpec),
+                'assessments' => $assessments->map($unitAssessmentsMap),
+            ];
+        } elseif ($assessmentSpec instanceof \Schoolbox\Learning\Assessment\Lti\Model) {
+            $twigData = [
+                'type' => AssessmentType::objectToString($assessmentSpec),
+                'assessments' => $assessments->map($unitAssessmentsMap),
+            ];
+        } elseif ($assessmentSpec instanceof \Schoolbox\Learning\Assessment\Task\Model) {
+            $twigData = [
+                'type' => AssessmentType::objectToString($assessmentSpec),
+                'assessments' => $assessments->map($unitAssessmentsMap),
+            ];
+        } elseif ($assessmentSpec instanceof \Schoolbox\Learning\Assessment\Quiz\Model) {
+            $twigData = [
+                'type' => AssessmentType::objectToString($assessmentSpec),
+                'assessments' => $assessments->map($unitAssessmentsMap),
+            ];
+        } else {
+            throw new NotFound('Unsupported assessment type: ' . AssessmentType::objectToString($assessmentSpec));
+        }
+        $this->response = $this->responseAsJson($twigData);
+    }
+
+    /**
+     * @param Model $courseSpec
+     * @param $assessmentId
+     * @return void
+     * @api POST /learning/courseMarkbook/{courseSpecId:\d+}/assessment/{assessmentId:\d+}/publish
+     */
+    public function postPublishFeedback(CourseSpec\Model $courseSpec, IAssessable $assessmentSpec): void
+    {
+        new \Alaress_Probe($courseSpec, $assessmentSpec);
     }
 
 

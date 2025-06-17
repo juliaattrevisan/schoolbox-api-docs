@@ -53,7 +53,7 @@ class UnitAssessments
                 'summary' => ["route" => "learningAssessment.getSummary", "params" => [
                     'assessmentId' => $assessment->getId(),
                     'assessment' => $assessment,
-                    'studentId' => $this->student->getId(),
+                    'studentId' => $this->student?->getId(),
                     'student' => $this->student,
                 ]],
                 'status' => ["route" => "learningAssessment.getStatus", "params" => [
@@ -218,6 +218,11 @@ class UnitAssessments
      */
     public function getProgressTick(IAssessable $assessable, ?Participant $participant): ?array
     {
+        // Progress ticks should only be shown if the logged-in user is the user whose activities are being viewed.
+        if ($this->student?->getId() !== $this->loggedInUser->getId()) {
+            return null;
+        }
+
         if (null === $participant || $participant->isExcluded()) {
             // The student ought to be a participant.  The only way this situation could arise is if the student was
             // excluded from the assessment, or marked as deleted, by another process, since permissions were checked
@@ -235,7 +240,7 @@ class UnitAssessments
                 'assessment' => $assessable,
                 'assessmentId' => $assessable->getId(),
                 'student' => $this->student,
-                'studentId' => $this->student->getId()
+                'studentId' => $this->student?->getId()
             ];
 
             if ($this->authorizer->isPathAuthorizedForUser($postRouteName, $postRouteParams, $this->loggedInUser)) {
@@ -294,6 +299,9 @@ class UnitAssessments
      */
     private function getDueAt(IAssessable $assessable): ?Alaress_Date_Format
     {
+        if (!$this->student) {
+            return null;
+        }
         $participant = $assessable->getParticipantIfExtant($this->student);
 
         if (null === $participant || $participant->isExcluded()) {
