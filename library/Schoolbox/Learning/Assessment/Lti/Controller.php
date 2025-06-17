@@ -180,12 +180,13 @@ class Controller extends Assessment\Controller
     /**
      * Placeholder for progress summary for all students on an LTI assessment.
      *
+     * @param IAssessable|Model $assessment
+     * @param bool $courseView
      * @api GET /learning/assessment/:assessmentId/status
      * @since 21.1.0
      *
-     * @param IAssessable|Model $assessment
      */
-    public function getStatus(IAssessable $assessment)
+    public function getStatus(IAssessable $assessment, bool $courseView = false)
     {
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/lti/status.twig',

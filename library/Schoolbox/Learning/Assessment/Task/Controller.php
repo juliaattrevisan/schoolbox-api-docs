@@ -126,11 +126,12 @@ class Controller extends Assessment\Controller
      *
      * This place is Staff Only
      *
-     * @api GET /learning/assessment/:assessmentId/status
      * @param IAssessable $assessment
+     * @param bool $courseView
      * @throws MapperException
+     * @api GET /learning/assessment/:assessmentId/status
      */
-    public function getStatus(IAssessable $assessment): void
+    public function getStatus(IAssessable $assessment, bool $courseView = false): void
     {
         // Ensure completions are sorted most recent first
         foreach ($assessment->getAllParticipants() as $participant) {

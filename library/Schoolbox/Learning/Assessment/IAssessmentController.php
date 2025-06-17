@@ -87,13 +87,14 @@ interface IAssessmentController
     public function postDeleteAssessment(IAssessable $assessment);
 
     /**
-     * @api   GET /learning/assessments/:assessmentId/modify
-     * @since 165
-     *
      * @param IAssessable $assessment
+     * @param bool $courseView
      * @return void
+     *@since 165
+     *
+     * @api   GET /learning/assessments/:assessmentId/status
      */
-    public function getStatus(IAssessable $assessment);
+    public function getStatus(IAssessable $assessment, bool $courseView = false): void;
 
     /**
      * @api   GET /learning/assessments/:assessmentId/:studentId

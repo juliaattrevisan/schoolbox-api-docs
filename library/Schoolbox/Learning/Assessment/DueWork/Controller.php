@@ -254,12 +254,13 @@ class Controller extends Assessment\Controller
      * This place is Staff Only
      *
      * @param Model $assessment
+     * @param bool $courseView
      * @throws InvalidArgumentException If assessment due date is null.
      * @throws PDOException
      * @throws UnexpectedValueException
      * @api GET /learning/assessments/:assessmentId/status
      */
-    public function getStatus(IAssessable $assessment): void
+    public function getStatus(IAssessable $assessment, bool $courseView = false): void
     {
         /* Find out which users have a draft submission
          * MAYBE you can do this purely in twig...but I'm not enamourd by frontend making

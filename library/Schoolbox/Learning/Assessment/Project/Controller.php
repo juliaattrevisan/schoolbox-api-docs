@@ -150,10 +150,11 @@ class Controller extends Assessment\Controller
      *
      * This place is Staff Only
      *
-     * @api GET /learning/assessment/:assessmentId/status
      * @param Project|IAssessable $assessment
+     * @param bool $courseView
+     * @api GET /learning/assessment/:assessmentId/status
      */
-    public function getStatus(IAssessable $assessment): void
+    public function getStatus(IAssessable $assessment, bool $courseView = false): void
     {
 
         // Calculate summary totals for display purposes

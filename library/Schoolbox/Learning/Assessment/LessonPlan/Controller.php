@@ -114,9 +114,10 @@ class Controller extends Assessment\Controller
      * Lesson Plans don't have any feedbacks.
      *
      * @param IAssessable $assessment
+     * @param bool $courseView
      * @return void
      */
-    public function getStatus(IAssessable $assessment): void
+    public function getStatus(IAssessable $assessment, bool $courseView = false): void
     {
         // noop
     }
