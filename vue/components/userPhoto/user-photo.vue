@@ -87,6 +87,13 @@ const renderParameterMap = {
     profile: "&size=constrain200",
 } as const;
 
+const renderRoundClassMap = {
+    tiny: "c-img--xxs",
+    small: "c-img--s",
+    menuMobile: "c-img--s",
+    profile: "c-img--s",
+};
+
 const dimensions = window.Vue.computed(() => {
     if (props.render === "menuMobile") {
         return { width: 72, height: 72 };
@@ -108,7 +115,7 @@ const srcBase = window.Vue.computed(() => `/portrait.php?${userParameter.value}`
         :title="props.description ?? undefined"
     />
 
-    <div v-else-if="props.roundedCorners" class="c-img c-img--s c-img--round">
+    <div v-else-if="props.roundedCorners" class="c-img c-img--round" :class="renderRoundClassMap[props.render]">
         <div class="c-img__wrapper">
             <img
                 :src="`${srcBase}${renderParameterMap[props.render]}${props.appendQueryParam}`"
@@ -131,3 +138,18 @@ const srcBase = window.Vue.computed(() => `/portrait.php?${userParameter.value}`
         :title="props.description ?? undefined"
     />
 </template>
+
+<style scoped lang="scss">
+/**
+ * Some overrides to mimic the old <user-photo> component usage on the markbook popout..
+ * I expect we can remove this in the future and tweak the global styles instead, but quick fix for now
+ */
+.c-img--round.c-img--xxs {
+    overflow: visible;
+
+    > .c-img__wrapper {
+        max-width: 32px;
+        max-height: 32px;
+    }
+}
+</style>
