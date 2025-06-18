@@ -396,10 +396,7 @@ function onToggleSelected(): void {
         <div v-else ref="markbookElement" class="pop-out-menu" :class="{ 'is-expanded': isExpanded }">
             <div class="collapsible">
                 <small-card v-for="(activityItem, index) in activityItems" :key="index">
-                    <user-photo
-                        :src="`/portrait.php?id=${activityItem.effector.id}&size=square32`"
-                        :size="32"
-                    ></user-photo>
+                    <user-photo :user-id="activityItem.effector.id" render="tiny" rounded-corners></user-photo>
                     <div class="c-card__details">
                         <div class="c-card__text">{{ activityItem.effector.name }} {{ getAction(activityItem) }}</div>
                         <div class="c-card__subtext">{{ activityItem.date.short }}</div>
