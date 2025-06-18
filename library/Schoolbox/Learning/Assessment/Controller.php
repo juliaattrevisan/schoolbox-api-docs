@@ -973,10 +973,14 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $participant = $assessment
             ->getAllParticipants()
             ->filter(fn ($participant) => in_array($participant->getUser()->getId(), $student))
-            ->map(function ($participant) {
+            ->map(function (Participant $participant) {
+                $student = $participant->getUser();
                 return [
-                    'id' =>  $participant->getUser()->getId(),
+                    'id' =>  $student->getId(),
                     'fullName' => $participant->getUser()->getFullName(),
+                    'excludedAt' => $participant->getExcludedAt(),
+                    'user' => $student,
+                    'plan' => $participant->getPlan(),
                 ];
             })->reindex();
 
@@ -985,7 +989,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             [
                 'breadcrumbs' => $breadcrumbs,
                 'assessment' => $assessment,
-                'participant' => $participant,
+                'participants' => $participant,
             ]
         );
     }

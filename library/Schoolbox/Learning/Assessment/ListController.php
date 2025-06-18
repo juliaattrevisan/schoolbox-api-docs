@@ -1281,9 +1281,26 @@ class ListController extends Web\Controller\Base
      */
     public function postAssessmentParticipationLearningPlan(IAssessable $assessment): void
     {
-        $post = $this->requestPost;
+        $postData = $this->requestPost;
 
         $returnUrl = $this->requestQuery->get('returnUrl');
+
+        $postData['plans'][-1] = [
+            'id' => -1,
+            'name' =>  $postData['plan-name'],
+            'description' => $postData['plan-desc'],
+            'publish_date' =>  $postData['planPublishDate'],
+            'open_date' => $postData['planOpenDate'],
+            'due_date' => $postData['planDueDate'],
+            'close_date' => $postData['planCloseDate'],
+        ];
+        // Note: in the returned collection
+        //    - any plans CREATED by this method will be NEGATIVELY INDEXED (the object has a real ID though)
+        //    - any plans UPDATED by this method will be ID INDEXED
+        $plans = $this->savePlanData($assessment, $postData['plans'] ?? []);
+
+        $this->saveParticipationData($assessment, $plans, $postData['participant-include'] ?? [], $postData['participant-plan'] ?? []);
+
         $this->response = $this->redirectAfterPost($returnUrl ? Redirect::decode($returnUrl) : $this->getSession()->getHistory());
     }
 }
