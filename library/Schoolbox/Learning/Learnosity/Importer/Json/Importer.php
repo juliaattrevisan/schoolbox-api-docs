@@ -20,6 +20,8 @@ use Schoolbox\Learning\Assessment\WorkType\Mapper;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\Export\Json\Payload;
+use Schoolbox\Learning\Learnosity\Importer\Legacy\Xml\ContextLookup;
+use Schoolbox\Learning\Learnosity\TagFactory;
 use Schoolbox\Learning\Quiz\Model;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
@@ -127,6 +129,18 @@ class Importer
         /* Process storage instances from assets included in the json
          */
         $this->processAssets($json['assets']);
+
+        /* Generates sets of tags for Activities' and Items' assignations
+         */
+        $tagFactory = new TagFactory($this->schoolCode);
+
+        /* A context lookup builder thing for conveniently deriving tags
+         *
+         *  Replaced with usage of AssessmentContext since we have no
+         *  idea where this assessment's context details are (it comes from
+         *  an xml where there's no record of it in the db)
+         */
+        $contextLookup = new ContextLookup($tagFactory, $this->context);
 
         /* Start manufacturing quiz payloads for learnosity in this order because learnosity build upwards
          * Features, Questions, Items, Activity
@@ -332,6 +346,27 @@ class Importer
              */
             $payload[$key][] = $object;
 
+            /* Assign this random meta node to questions specifically
+             */
+            if ('questions' === $key) {
+                $payload['meta'] = [
+                    'user' => [
+                        /* This author identifier should be a (schoolcode, user id) tuple for
+                         * auditing reasons, to deconflict with other schools who used the same
+                         * user id. It's mandatory as part of Question creation. We can assign
+                         * it here in the blueprint, or in the actual api payload itself while
+                         * performing. This is because user 123 in one school means a whole
+                         * different dude in another school.
+                         */
+                        'id' => sprintf(
+                            '%s__%s',
+                            $this->schoolCode,
+                            $this->user->getId()
+                        )
+                    ]
+                ];
+            }
+
             /* Maximum size reached. Send it and start another.
              */
             if (\count($payload[$key]) === self::LEARNOSITY_MAX_PAYLOAD_SIZE) {
@@ -388,6 +423,9 @@ class Importer
          *
          * While you're doing that, remember all the temporary sb- references
          * and how they related to new ones you generated en route
+         *
+         * Slap on this random meta node that for some reason exists here and nowhere else,
+         * for learnosity reasons I suppose
          */
         $questionMapping = $this->transmit($learnosityContent['questions'], 'itembank/questions', 'questions');
 
