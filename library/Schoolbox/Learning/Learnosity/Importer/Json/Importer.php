@@ -557,6 +557,10 @@ class Importer
 
         $activityMapping = $this->transmit($learnosityContent['activities'], 'itembank/activities', 'activity');
 
+        /* Diagnostic
+         */
+        // new \Alaress_Probe($learnosityContent, $featureMapping, $questionMapping, $itemMapping, $activityMapping);
+
         /* Maybe a big leap of faith, but ok
          */
         return array_values($activityMapping)[0];
