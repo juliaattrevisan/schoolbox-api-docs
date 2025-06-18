@@ -20,6 +20,13 @@ use Schoolbox\Resource\Storage\Mapper;
 class Payload
 {
     /**
+     * A switch on widget.widget_type to figure out if this object is a feature or a question
+     * specifically applicable to item.definition.widget nodes.
+     */
+    private CONST WIDGET_FEATURE = 'feature';
+
+
+    /**
      * @param Mapper $storageMapper
      * @param FilesystemProxy $filesystemProxy
      * @param Api $api
@@ -277,17 +284,6 @@ class Payload
          * Anonymise the references as we further manipulate this stack.
          */
 
-        /* Anonymise question refs
-         */
-        $questionStack = [];
-
-        foreach ($questionData as &$question) {
-            $question['reference'] = $questionReplacementRefs[$question['reference']];
-            $questionStack[$question['reference']] = $question;
-        }
-
-        unset($question);
-
         /* Anonymise feature refs
          */
         $featureStack = [];
@@ -299,26 +295,55 @@ class Payload
 
         unset($feature);
 
+        /* Anonymise question refs
+         */
+        $questionStack = [];
+
+        foreach ($questionData as &$question) {
+            $question['reference'] = $questionReplacementRefs[$question['reference']];
+            $questionStack[$question['reference']] = $question;
+        }
+
+        unset($question);
+
         /* Anonymise item refs
          */
         $itemStack = [];
 
         foreach ($itemData as &$item) {
-            foreach ($item['questions'] as &$question) {
-                $question['reference'] = $questionReplacementRefs[$question['reference']];
-            }
-
+            /* Constituents of an item is assumed to be either a feature or a question
+             */
             foreach ($item['features'] as &$feature) {
                 $feature['reference'] = $featureReplacementRefs[$feature['reference']];
             }
 
-            $item['reference'] = $itemReplacementRefs[$item['reference']];
-            unset($item['definition']['widgets'], $item['tags']);
+            foreach ($item['questions'] as &$question) {
+                $question['reference'] = $questionReplacementRefs[$question['reference']];
+            }
 
+            /* Rewrite this layout reference business: these identifiers are either
+             * features or questions: figure it out based on widget_type being either
+             * "feature" for a feature, or "response" for a question (...)
+             */
+            foreach ($item['definition']['widgets'] as &$widget) {
+                if (self::WIDGET_FEATURE === $widget['widget_type']) {
+                    $widget['reference'] = $featureReplacementRefs[$widget['reference']];
+                } else {
+                    $widget['reference'] = $questionReplacementRefs[$widget['reference']];
+                }
+            }
+
+            /* Update this item's identifier
+             */
+            $item['reference'] = $itemReplacementRefs[$item['reference']];
+            unset($item['tags']);
+
+            /* Push it into the stack
+             */
             $itemStack[$item['reference']] = $item;
         }
 
-        unset($item, $question, $feature);
+        unset($item, $widget, $question, $feature);
 
         /* Anonymise activity refs
          */
