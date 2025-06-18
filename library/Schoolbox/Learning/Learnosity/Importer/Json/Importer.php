@@ -237,6 +237,11 @@ class Importer
             $workType = $this->workTypeMapper->findAll()->sortBy('sequence', 'ASC')->first();
         }
 
+        /* Find a matching Mark Type if one was specified
+         * Note that quiz lets you have letter grades now, too: you'll also have to check grading schemes
+         */
+
+
         // Create the IAssessable
         $assessment = (new \Schoolbox\Learning\Assessment\Quiz\Model())
             ->setCreator($this->user)
@@ -249,10 +254,7 @@ class Importer
             ->setDueAt($inUnitSpec ? null : new \Alaress_Date_Format(new \DateTime('+1 day 23:59:59')))
             ->setCloseAt($inUnitSpec ? null : new \Alaress_Date_Format(new \DateTime('+2 day 23:59:59')))
             ->setWeight($settings['weight'])
-            /* Apparently this wasn't supported anywhere else, but xmls did...?
-             * TODO investigate what happened with this; setting null for now
-             */
-            ->setDefaultOpenSpan(null)
+            ->setDefaultOpenSpan($settings['defaultOpenSpan'])
             ->setMaxAttempts($settings['maxAttempts'])
             ->setMarkVisibility($settings['markVisibility'])
             /* Learnosity-era unlimited durations are represented by zero, not -1

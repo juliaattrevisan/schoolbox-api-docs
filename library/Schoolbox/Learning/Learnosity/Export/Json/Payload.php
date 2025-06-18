@@ -78,6 +78,7 @@ class Payload
                 'duration' => $assessment->getDuration(),
                 'readingTimeDuration' => $assessment->getReadingTimeDuration(),
                 'completionMessage' => $assessment->getCompletionMessage(),
+                'defaultOpenSpan' => $assessment->getDefaultOpenSpan(),
                 /* Curriculum nodes might not be present in the destination instance, so...
                  * you'll just have to list them by their code and hope for the best?
                  */
@@ -98,7 +99,7 @@ class Payload
                  */
                 // 'courseManaged' => $assessment->getCourseManaged(),
                 // 'sebEnabled' => $assessment->getSebEnabled(),
-                // 'defaultOpenSpan' => $assessment->getDefaultOpenSpan(),
+
             ],
             /* These are locally-grown storage models that were used somewhere in this quiz.
              * When importing into your own school, you'll already have them: but, importing
