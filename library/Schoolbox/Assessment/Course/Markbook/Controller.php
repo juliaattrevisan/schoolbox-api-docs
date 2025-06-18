@@ -236,7 +236,7 @@ class Controller extends WebController\Base
                     'id'                => $assessment->getId(),
                     'title'             => $assessment->getTitle(),
                     'typeName'          => $assessment->getTypeName(),
-                    'familyName'        => $assessment->getFamilyName(),
+                    'assessmentType'    => $assessment->getFamilyName(),
                     'isSpecification'   => $assessment->isSpecification(),
                     'unitSpec'          => [
                         /* for rendering the unit bars at the top of the page */
@@ -252,9 +252,9 @@ class Controller extends WebController\Base
                             'draftMean' => $courseMarkbook->getAssessmentSpecAverages()[$assessment->getId()]['any'] ?? null,
                         ]
                     ) : null,
-                    '_routes'           => [
+                    '_links'          => [
                         /* only show the summary link for specs */
-                        'learningAssessment.getSummary' => $assessment->isSpecification() ? $this->routeGenerator->generate(
+                        'summary' => $assessment->isSpecification() ? $this->routeGenerator->generate(
                             'learningAssessment.getSummary',
                             [
                                 'assessmentId' => $assessment->getId(),

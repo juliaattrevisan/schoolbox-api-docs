@@ -142,20 +142,18 @@ class Controller extends Base
             // TODO: clean this up a bit once the payload structure is finalised
             $data = [
                 'rank' => (bool)$this->getConfigLoader()->get('view_rank') ? $rank : null,
-                /* unused on the class markbook: */
-                // 'courseSpec' => ...,
                 'assessments' => $markbook->getAssessments()->indexBy('id')->map(fn(IAssessable $assessment) => [
                     'id'              => $assessment->getId(),
                     'title'           => $assessment->getTitle(),
                     'typeName'        => $assessment->getTypeName(),
-                    'familyName'      => $assessment->getFamilyName(),
+                    'assessmentType'  => $assessment->getFamilyName(),
                     /* unused on the class markbook: */
                     // 'unitSpec' => ...,
                     /* the class markbook doesn't need any of the below, as this is always an implementation */
                     'isSpecification' => $assessment->isSpecification(),
                     'stats'           => null,
-                    '_routes'         => [
-                        'learningAssessment.getSummary' => null,
+                    '_links'          => [
+                        'summary' => null,
                     ],
                 ]),
                 /**

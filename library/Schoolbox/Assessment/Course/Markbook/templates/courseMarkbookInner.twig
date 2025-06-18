@@ -215,10 +215,10 @@
                                 class="column-{{ assessment.id }} {% if not participant or participant.isExcluded %} excluded {% endif %} student-grade-cell"
                                 data-test="markbook-cell-{{ assessment.id }}-{{ student.id }}"
                                 data-assessment="{{ assessment.id }}"
-                                {% if canAccessPopOut and (assessment.familyName == 'dueWork' or assessment.familyName == 'quiz' or assessment.familyName == 'lti' ) %}
+                                {% if canAccessPopOut and (assessment.assessmentType == 'dueWork' or assessment.assessmentType == 'quiz' or assessment.assessmentType == 'lti' ) %}
                                 data-pop-out-menu
                                 {% endif %}
-                                data-assessment-type="{{ assessment.familyName }}"
+                                data-assessment-type="{{ assessment.assessmentType }}"
                                 data-is-participant="{% if participant %}true{% else %}false{% endif %}"
                                 data-is-excluded="{% if participant and not participant.isExcluded %}false{% else %}true{% endif %}"
                                 data-endpoint="{{ aImpl._routes.student[student.id]['learningAssessmentTimeline.getFullTimeline'] }}"
@@ -230,7 +230,7 @@
                                 data-history-route="{{ aImpl._routes.student[student.id]['learningAssessment.getSummary'] }}"
                             >
                             {% if participant and not participant.isExcluded %}
-                                {% if assessment.familyName == 'task' %}
+                                {% if assessment.assessmentType == 'task' %}
                                     <div
                                         style="margin-bottom:0; position:absolute; top:0px;"
                                         class="no-text progress-tick {{ participant.progressTick.progressClass }}"

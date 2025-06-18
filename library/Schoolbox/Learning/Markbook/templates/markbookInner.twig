@@ -144,7 +144,7 @@
                 {% for aImpl in classImpl.assessments %}
                     {% set assessment = assessments[aImpl.id] %}
                     <td data-assessment="{{ assessment.id }}">
-                        {% if assessment.familyName != 'task' %}
+                        {% if assessment.assessmentType != 'task' %}
                             {% set selected = aImpl.markVisibility %}
                             {% set allOptions = {
                                 0: { css: 'icon-locked', icon: '&#xe63e;', description: 'Staff Only' },
@@ -229,10 +229,10 @@
                             {% endif %} student-grade-cell"
                             data-test="markbook-cell-{{ assessment.id }}-{{ student.id }}"
                             data-assessment="{{ assessment.id }}"
-                            {% if assessment.familyName == 'dueWork' or assessment.familyName == 'quiz' or assessment.familyName == 'lti' %}
+                            {% if assessment.assessmentType == 'dueWork' or assessment.assessmentType == 'quiz' or assessment.assessmentType == 'lti' %}
                             data-pop-out-menu
                             {% endif %}
-                            data-assessment-type="{{ assessment.familyName }}"
+                            data-assessment-type="{{ assessment.assessmentType }}"
                             data-endpoint="{{ aImpl._routes.student[student.id]['learningAssessmentTimeline.getFullTimeline'] }}"
                             data-update-route="{{ aImpl._routes.student[student.id]['learningDueWorkResponse.getParticularResponse'] }}"
                             data-review-route="{{ aImpl._routes.student[student.id]['learningDueWorkResponse.getParticularResponse'] }}"
@@ -245,7 +245,7 @@
                     >
                     <!-- Add data for the popup menu above -->
                         {% if participant and not participant.isExcluded %}
-                            {% if assessment.familyName == 'task' %}
+                            {% if assessment.assessmentType == 'task' %}
                                 {# An icon that shows if the student has attempted the task or not #}
                                 {% if studentCount < functionDegradeLimit and participant.progressTick.postRouteUrl %}
                                     <form action="{{ participant.progressTick.postRouteUrl }}"
