@@ -813,6 +813,8 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(UserMapper::class),
             $this->getMapperFactory()->get(StateMapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Resource\Storage\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\WorkType\Mapper::class),
             $this->injector->get('filesystem.storageProxy'),
             $this->injector->get('httpFactory'),
             $this->injector->get('taskd.httpRequestMessageFactory'),

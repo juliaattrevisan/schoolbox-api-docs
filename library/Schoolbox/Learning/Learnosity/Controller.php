@@ -26,7 +26,9 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Random\RandomException;
 use Schoolbox\Application\Exception\Exception;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Project\ResultCache;
@@ -34,6 +36,7 @@ use Schoolbox\Learning\Assessment\Project\ResultCache\Mapper;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainObject;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\IFeedback;
+use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Learning\Learnosity\Api\Duplicator;
 use Schoolbox\Learning\Learnosity\Cli\RescoreProcessor;
@@ -49,6 +52,7 @@ use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\TaskDaemon\Producer;
 use Schoolbox\TaskDaemon\Request\HttpRequest\MessageFactory;
@@ -226,6 +230,8 @@ class Controller extends Base
         private \Schoolbox\UserMapper $userMapper,
         private StateMapper $stateMapper,
         private \Schoolbox\Resource\Storage\Mapper $storageMapper,
+        private \Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper $markTypeMapper,
+        private \Schoolbox\Learning\Assessment\WorkType\Mapper $workTypeMapper,
         private \Schoolbox\Resource\Storage\FilesystemProxy $filesystemProxy,
         private Psr17Factory $httpFactory,
         private MessageFactory $messageFactory,
@@ -2496,8 +2502,69 @@ class Controller extends Base
      *
      * @return void
      */
-    public function postImportFromJson(): void
+    public function postImportFromJson(AssessmentContext $context): void
     {
-        echo 'we made it';
+        /* Intentionally prefill with an instance of AssessmentContext
+         * and other POST vars the Factory assumes exist
+         */
+        $postData = array_merge($this->requestPost->getArrayCopy(), [
+            'assessmentType' => AssessmentType::TYPE_QUIZ,
+            'context' => $context,
+        ]);
+
+        /* No upload? No trabajo
+         */
+        if (!isset($postData['attachment'])) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_IMPORT_FILE_NOT_FOUND);
+        }
+
+        /* An unusual outcome where the key might exist, but nothing else is in
+         * the way we thought - probably our mistake
+         */
+        if (!is_array($postData['attachment'])) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_IMPORT_FILE_NOT_FOUND);
+        }
+
+        /* Milk out some of the assessment settings from the xml itself
+         */
+        try {
+            /** @var \Schoolbox\Resource\Storage\Model $file */
+            $file = (new CollectorFactory())->build($postData['attachment'] ?: [])->getFirst();
+
+            /** @var \Schoolbox\Resource\Storage\FilesystemProxy $filesystemProxy */
+            $filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
+            $data            = $filesystemProxy->read($file);
+        } catch (\Schoolbox\Resource\Exception $e) {
+            /* Something went wrong reading the file's contents
+             */
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_IMPORT_FILE_NOT_FOUND);
+        }
+
+        /** @var AssessmentMapperProxy $assessmentMapperProxy */
+        $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
+
+        /* Used to segregate each school's data; used in tags and author identifiers
+         */
+        $schoolCode = $this->getConfigLoader()->get('site_school_code');
+
+        /* For converting urls
+         */
+        $server     = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
+        $serverName = $server->getHost();
+        $domain     = (string)$server;
+
+        (new Importer\Json\Importer(
+            $this->api,
+            $schoolCode,
+            $domain,
+            $this->getDi()->get('databaseInternal'),
+            $context,
+            $this->getUser(),
+            $assessmentMapperProxy,
+            $this->quizMapper,
+            $this->workTypeMapper,
+            $this->markTypeMapper,
+            $this->storageMapper
+        ))->import($data);
     }
 }
