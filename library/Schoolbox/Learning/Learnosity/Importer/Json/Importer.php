@@ -146,68 +146,9 @@ class Importer
 
         /* Start manufacturing quiz payloads for learnosity in this order because learnosity build upwards
          * Features, Questions, Items, Activity
-         *
-         * The order of items is based on their ordering in the activity node,
-         * since learnosity couldn't figure out how to provide an explicit sequence
-         *
-         * Also, you can only send 50 at a time per payload, which is annoying
          */
+        $learnosityReference = $this->assemble($learnosityContent);
 
-        /* For each feature,
-         * rewrite its old identifier and store the data struct in a temporary payload.
-         * If the payload contains 50 items, send it and start a new one until all are uploaded.
-         *
-         * While you're doing that, remember all the temporary sb- references
-         * and how they related to new ones you generated en route
-         */
-        $featureMapping = $this->transmit($learnosityContent['features'], 'itembank/features', 'features');
-
-        /* For each question,
-         * rewrite its old identifier and store the data struct in a temporary payload.
-         * If the payload contains 50 items, send it and start a new one until all are uploaded.
-         *
-         * While you're doing that, remember all the temporary sb- references
-         * and how they related to new ones you generated en route
-         */
-        $questionMapping = $this->transmit($learnosityContent['questions'], 'itembank/questions', 'questions');
-
-        /* For each item
-         * rewrite its old identifier and store the data struct in a temporary payload.
-         * If the payload contains 50 items, send it and start a new one until all are uploaded.
-         *
-         * While you're doing that, remember all the temporary sb- references
-         * and how they related to new ones you generated en route
-         */
-        foreach ($learnosityContent['items'] as $item) {
-            foreach ($item['features'] as &$feature) {
-                $question['reference'] = $featureMapping[$feature['reference']];
-            }
-
-            foreach ($item['questions'] as &$question) {
-                $question['reference'] = $questionMapping[$question['reference']];
-            }
-        }
-
-        unset ($feature, $question);
-
-        $itemMapping = $this->transmit($learnosityContent['items'], 'itembank/items', 'items');
-
-        /* There should be only one activity, but that activity could have a lot of items
-         * rewrite its old identifier and send 50 items at a time
-         */
-        foreach ($learnosityContent['activities'] as $activity) {
-            foreach ($activity['data']['items'] as &$item) {
-                /* These two fields are the same, due to a bug in learnosity they need to co-exist
-                 * since learnosity let you make content in an obsolete format without telling you
-                 */
-                $item['reference'] = $itemMapping[$item['reference']];
-                $item['id'] = $item['reference'];
-            }
-        }
-
-        $activityMapping = $this->transmit($learnosityContent['activities'], 'itembank/activities', 'activity');
-
-        new \Alaress_Probe($learnosityContent, $featureMapping, $questionMapping, $itemMapping, $activityMapping);
 
         //        /* Rewrite identifiers and remember them
 //         */
@@ -545,6 +486,81 @@ class Importer
         return $mapping;
     }
 
+
+    /**
+     * Puts all your json content into learnosity in its hierarchical way.
+     * Returns the learnosity reference for the quiz/activity that we just made.
+     *
+     * The order of items is based on their ordering in the activity node,
+     * since learnosity couldn't figure out how to provide an explicit sequence
+     *
+     * Also, you can only send 50 at a time per payload, which is annoying
+     *
+     * @param array $learnosityContent
+     * @return string
+     * @throws ValidationException
+     * @throws \JsonException
+     */
+    private function assemble(array $learnosityContent): string
+    {
+        /* For each feature,
+         * rewrite its old identifier and store the data struct in a temporary payload.
+         * If the payload contains 50 items, send it and start a new one until all are uploaded.
+         *
+         * While you're doing that, remember all the temporary sb- references
+         * and how they related to new ones you generated en route
+         */
+        $featureMapping = $this->transmit($learnosityContent['features'], 'itembank/features', 'features');
+
+        /* For each question,
+         * rewrite its old identifier and store the data struct in a temporary payload.
+         * If the payload contains 50 items, send it and start a new one until all are uploaded.
+         *
+         * While you're doing that, remember all the temporary sb- references
+         * and how they related to new ones you generated en route
+         */
+        $questionMapping = $this->transmit($learnosityContent['questions'], 'itembank/questions', 'questions');
+
+        /* For each item
+         * rewrite its old identifier and store the data struct in a temporary payload.
+         * If the payload contains 50 items, send it and start a new one until all are uploaded.
+         *
+         * While you're doing that, remember all the temporary sb- references
+         * and how they related to new ones you generated en route
+         */
+        foreach ($learnosityContent['items'] as $item) {
+            foreach ($item['features'] as &$feature) {
+                $question['reference'] = $featureMapping[$feature['reference']];
+            }
+
+            foreach ($item['questions'] as &$question) {
+                $question['reference'] = $questionMapping[$question['reference']];
+            }
+        }
+
+        unset ($feature, $question);
+
+        $itemMapping = $this->transmit($learnosityContent['items'], 'itembank/items', 'items');
+
+        /* There should be only one activity, but that activity could have a lot of items
+         * rewrite its old identifier and send 50 items at a time
+         */
+        foreach ($learnosityContent['activities'] as $activity) {
+            foreach ($activity['data']['items'] as &$item) {
+                /* These two fields are the same, due to a bug in learnosity they need to co-exist
+                 * since learnosity let you make content in an obsolete format without telling you
+                 */
+                $item['reference'] = $itemMapping[$item['reference']];
+                $item['id'] = $item['reference'];
+            }
+        }
+
+        $activityMapping = $this->transmit($learnosityContent['activities'], 'itembank/activities', 'activity');
+
+        /* Maybe a big leap of faith, but ok
+         */
+        return array_values($activityMapping)[0];
+    }
 
 
     /**
