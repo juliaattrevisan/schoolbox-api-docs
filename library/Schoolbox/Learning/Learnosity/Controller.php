@@ -27,6 +27,7 @@ use Psr\Container\NotFoundExceptionInterface;
 use Random\RandomException;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
@@ -209,6 +210,9 @@ class Controller extends Base
      * @param UserMapper $userMapper
      * @param StateMapper $stateMapper
      * @param \Schoolbox\Resource\Storage\Mapper $storageMapper
+     * @param MarkTypeMapper $markTypeMapper
+     * @param \Schoolbox\Learning\Assessment\WorkType\Mapper $workTypeMapper
+     * @param \Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper $gradeGroupMapper
      * @param FilesystemProxy $filesystemProxy
      * @param Psr17Factory $httpFactory for creating HTTP requests
      * @param MessageFactory $messageFactory for creating messages to send to taskd
@@ -232,6 +236,7 @@ class Controller extends Base
         private \Schoolbox\Resource\Storage\Mapper $storageMapper,
         private \Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper $markTypeMapper,
         private \Schoolbox\Learning\Assessment\WorkType\Mapper $workTypeMapper,
+        private \Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper $gradeGroupMapper,
         private \Schoolbox\Resource\Storage\FilesystemProxy $filesystemProxy,
         private Psr17Factory $httpFactory,
         private MessageFactory $messageFactory,
@@ -2564,6 +2569,7 @@ class Controller extends Base
             $this->quizMapper,
             $this->workTypeMapper,
             $this->markTypeMapper,
+            $this->gradeGroupMapper,
             $this->storageMapper
         ))->import($data);
     }

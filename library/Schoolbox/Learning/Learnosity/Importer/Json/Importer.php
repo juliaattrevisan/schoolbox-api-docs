@@ -77,16 +77,17 @@ class Importer
     /**
      * Constructor.
      *
-     * @param Api                                $api
-     * @param string                             $schoolCode
-     * @param string                             $domain
-     * @param IConnector                         $databaseInternal
-     * @param AssessmentContext                  $context
-     * @param User                               $user
-     * @param AssessmentMapperProxy              $assessmentMapperProxy
-     * @param \Schoolbox\Learning\Quiz\Mapper    $quizMapper
-     * @param Mapper                             $workTypeMapper
-     * @param MarkTypeMapper                     $markTypeMapper
+     * @param Api $api
+     * @param string $schoolCode
+     * @param string $domain
+     * @param IConnector $databaseInternal
+     * @param AssessmentContext $context
+     * @param User $user
+     * @param AssessmentMapperProxy $assessmentMapperProxy
+     * @param \Schoolbox\Learning\Quiz\Mapper $quizMapper
+     * @param Mapper $workTypeMapper
+     * @param MarkTypeMapper $markTypeMapper
+     * @param \Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper $gradeGroupMapper
      * @param \Schoolbox\Resource\Storage\Mapper $storageMapper
      */
     public function __construct(
@@ -100,6 +101,7 @@ class Importer
         private \Schoolbox\Learning\Quiz\Mapper $quizMapper,
         private WorkType\Mapper $workTypeMapper,
         private MarkTypeMapper $markTypeMapper,
+        private \Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper $gradeGroupMapper,
         private \Schoolbox\Resource\Storage\Mapper $storageMapper
     ) {
         $this->associateStatement = $this->databaseInternal->prepare(self::QUERY_ASSOCIATE_LEARNOSITY);
@@ -240,7 +242,40 @@ class Importer
         /* Find a matching Mark Type if one was specified
          * Note that quiz lets you have letter grades now, too: you'll also have to check grading schemes
          */
+        if ($settings['markType']) {
+            try {
+                $markType = $this->markTypeMapper->findOneByColumn('name', $settings['markType']);
+            } catch (MapperException $e) {
+                /* The specified mark type doesn't exist; find the first meaningful one
+                 * Use percentage, as it's requires the least configuration
+                 *
+                 * This really shouldn't happen because users can't configure their own mark types,
+                 * but anyway, in case someone malforms it, or we rename something.
+                 */
+                $markType = $this->markTypeMapper->findByColumn('slug', MarkType::SLUG_PERCENT)->first();
+            }
+        } else {
+            /* Mark Type wasn't provided, but it's mandatory
+             * Use percentage, as it's requires the least configuration
+             */
+            $markType = $this->markTypeMapper->findByColumn('slug', MarkType::SLUG_PERCENT)->first();
+        }
 
+        /* Check for grade groups too
+         */
+        if ($settings['gradeGroup']) {
+            try {
+                $gradeGroup = $this->gradeGroupMapper->findOneByColumn('name', $settings['gradeGroup']);
+            } catch (MapperException $e) {
+                /* The specified grade group doesn't exist; find the first meaningful one
+                 */
+                $gradeGroup = $this->gradeGroupMapper->findAll()->sortBy('sequence', 'ASC')->first();
+            }
+        } else {
+            /* The specified grade group doesn't exist; find the first meaningful one
+             */
+            $gradeGroup = $this->gradeGroupMapper->findAll()->sortBy('sequence', 'ASC')->first();
+        }
 
         // Create the IAssessable
         $assessment = (new \Schoolbox\Learning\Assessment\Quiz\Model())
@@ -264,10 +299,9 @@ class Importer
              */
             ->setShuffleItems(false)
             ->setPromptsMode($settings['promptsMode'])
-//            /* Legacy XML only ever supported Total Mark
-//             */
-//            ->setMarkType($this->markTypeMapper->findOneByColumn('mark_type_id', MarkType::TYPE_TOTAL));
-//
+            ->setMarkType($markType)
+            ->setGradeGroup($gradeGroup);
+
 //        /* Update context if it's a Project
 //         * (for whatever reason, Project contexts need a list of their constituent assessments)
 //         */
