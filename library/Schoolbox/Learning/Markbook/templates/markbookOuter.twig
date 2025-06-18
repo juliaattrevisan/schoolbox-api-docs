@@ -34,6 +34,13 @@
     quickload: true,
 } only %}
 
+<div id="markbook-inner-container" class="marksheet-wrapper">
+    <markbook-inner
+        type='class'
+        endpoint='{{ routeLookup('learningMarkbook.postMarkbookForClass', { folderId: folder.id }) }}'
+    />
+</div>
+<script src="{{ CDN_PREFIX }}/js/bundle/markbookInner.js?v={{ config.site_version }}"></script>
 
 <div id="{{ reportContentId }}" class="row"></div>
 

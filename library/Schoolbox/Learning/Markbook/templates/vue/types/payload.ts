@@ -89,6 +89,11 @@ type MarkbookClassImplActivity = {
             }
         >;
     };
+    /* currently class markbook only */
+    markVisibility?: number;
+    courseManaged?: boolean | null;
+    weight: number;
+    hasDraft: Record<UserId, true>;
 };
 
 interface MarkbookClassImpl {
@@ -126,7 +131,7 @@ export interface Markbook {
     /** Student ranking based on the whole cohort/class  */
     rank: Record<UserId, number> | null;
     /** An overview of all the assessments that will be shown, in the order that they should be presented */
-    assessments: Record<MarkbookActivity["id"], MarkbookActivity[]>;
+    assessments: Record<MarkbookActivity["id"], MarkbookActivity>;
     /**
      * Essentially groups of participants to be presented, representing a course implementation or folder
      * - For the course markbook, there is one of these for each course implementation

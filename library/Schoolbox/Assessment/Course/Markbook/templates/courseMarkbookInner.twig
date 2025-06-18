@@ -80,8 +80,8 @@
                 {% endif %}
                 {% for assessment in assessments %}
                         <th data-test="markbook-assessment" data-assessment="{{ assessment.id }}"><div><span>
-                            {% if assessment._routes['learningAssessment.getSummary'] %}
-                                <a href="{{ assessment._routes['learningAssessment.getSummary'] }}">{{ assessment.title }}</a>
+                            {% if assessment._links.summary %}
+                                <a href="{{ assessment._links.summary }}">{{ assessment.title }}</a>
                             {% else %}
                                 <span>{{ assessment.title }}</span>
                             {% endif %}

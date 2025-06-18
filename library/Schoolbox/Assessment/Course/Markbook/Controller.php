@@ -473,16 +473,18 @@ class Controller extends WebController\Base
                 'availableVisibilities' => Visibility::getAvailableVisibilities((int)$this->getConfigLoader()->get(ConfigMapper::NAME_SUBMISSION_VISIBILITY_MAX)),
             ];
 
-            $data = json_decode(json_encode($data), true); // TEMP to ensure it can be encoded
+            $this->response = $this->responseAsJson($data);
 
-            $contentResponse = $this->responseFromTemplateUnthemed(
-                '@courseMarkbook/courseMarkbookInner.twig',
-                $data,
-            );
-            $this->response = $this->responseAsJson([
-                'status'  => 200,
-                'content' => $contentResponse->getBody()->getContents(),
-            ]);
+            // $data = json_decode(json_encode($data), true); // TEMP to ensure it can be encoded
+
+            // $contentResponse = $this->responseFromTemplateUnthemed(
+            //     '@courseMarkbook/courseMarkbookInner.twig',
+            //     $data,
+            // );
+            // $this->response = $this->responseAsJson([
+            //     'status'  => 200,
+            //     'content' => $contentResponse->getBody()->getContents(),
+            // ]);
         } catch (Filter\BrokenFilterException $e) {
             // For some reason: this never actually set status 500
             $data = [
