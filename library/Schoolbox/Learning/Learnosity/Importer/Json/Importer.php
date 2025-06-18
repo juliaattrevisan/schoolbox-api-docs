@@ -142,10 +142,14 @@ class Importer
          */
         $contextLookup = new ContextLookup($tagFactory, $this->context);
 
+        /* Find some taggies
+         */
+        $tags = $contextLookup->find((int)$instances['assessment']->getId());
+
         /* Start manufacturing quiz payloads for learnosity in this order because learnosity build upwards
          * Features, Questions, Items, Activity
          */
-        $learnosityReference = $this->assemble($learnosityContent);
+        $learnosityReference = $this->assemble($learnosityContent, $tags);
 
         $this->associate([
             'activityLearnosityReference' => $learnosityReference,
@@ -406,7 +410,7 @@ class Importer
      * @throws ValidationException
      * @throws \JsonException
      */
-    private function assemble(array $learnosityContent): string
+    private function assemble(array $learnosityContent, array $tags): string
     {
         /* For each feature,
          * rewrite its old identifier and store the data struct in a temporary payload.
@@ -454,6 +458,10 @@ class Importer
                     $widget['reference'] = $questionMapping[$widget['reference']];
                 }
             }
+
+            /* Tag it and bag it
+             */
+            $item['tags'] = $tags;
         }
 
         unset($feature, $question, $item, $widget);
@@ -476,6 +484,10 @@ class Importer
             /* Rewrite identifiers
              */
             $activity['reference'] = (string)UUid::uuid4();
+
+            /* Tag it and bag it
+             */
+            $activity['tags'] = $tags;
         }
 
         unset($item, $activity);
