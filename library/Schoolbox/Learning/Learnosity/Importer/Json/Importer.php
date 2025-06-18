@@ -530,7 +530,7 @@ class Importer
          */
         foreach ($learnosityContent['items'] as $item) {
             foreach ($item['features'] as &$feature) {
-                $question['reference'] = $featureMapping[$feature['reference']];
+                $feature['reference'] = $featureMapping[$feature['reference']];
             }
 
             foreach ($item['questions'] as &$question) {
