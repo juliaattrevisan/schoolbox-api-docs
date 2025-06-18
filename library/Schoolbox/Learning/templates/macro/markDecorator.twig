@@ -40,9 +40,9 @@
     {% if participant.hasSubmittedResponse and (not participant.hasPublishedFeedback and isPublished) %}
         Pending
     {% elseif useInstructorMark %}
-        {{ participant.humanReadableInstructorMark[isPublished ? 'published' : 'unpublished'] | default('–') }}
+        {{ participant.marks[isPublished ? 'published' : 'draft'].hrInstructor | default('–') }}
     {% else %}
-        {{ participant.humanReadableMark[isPublished ? 'published' : 'unpublished'] | default('–') }}
+        {{ participant.marks[isPublished ? 'published' : 'draft'].hr | default('–') }}
     {% endif %}
 {% endapply %}
 {% endmacro %}

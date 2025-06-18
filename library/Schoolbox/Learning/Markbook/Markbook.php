@@ -196,7 +196,7 @@ class Markbook
      *
      * @return array
      */
-    public function getAssessmentStatistics()
+    public function getAssessmentStatistics(): array
     {
         return $this->assessmentStatistics;
     }

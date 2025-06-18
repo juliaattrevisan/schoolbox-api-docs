@@ -19,7 +19,7 @@
 {% import '@learning/macro/markDecorator.twig' as decorator %}
 
     <div class="actions-small-1">
-        {% if not courseSpec.hasImplementations %}
+        {% if not classImpls | length %}
         <div class="empty-state">
             <i class="icon-curriculum"></i>
             <p>
@@ -244,14 +244,14 @@
                                     {% set draftMark          = marks.draft ?? null %}
 
                                     <span
-                                        class="{{ urgency.marks(participant.normalisedMark) }}"
-                                        {% if marks.draft is defined %}data-actual-mark{% endif %}
-                                        title="{{ participant.comment }}"
+                                        class="{{ urgency.marks(publishedMark.norm ?? null) }}"
+                                        {% if marks.draft %}data-actual-mark{% endif %}
+                                        title="{{ publishedMark.comment ?? '' }}"
                                     >
                                         <span data-instructor-mark>{{ decorator.label(participant, true, true) }}</span>
                                         <span data-learner-mark style="display: none">{{ decorator.label(participant, true, false) }}</span>
                                     </span>
-                                    {% if marks.draft is defined %}
+                                    {% if marks.draft %}
                                         <span
                                             data-draft-mark
                                             style="display: none"

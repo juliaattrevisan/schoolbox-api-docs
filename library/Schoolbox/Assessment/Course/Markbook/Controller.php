@@ -18,9 +18,11 @@ use Schoolbox\Filter;
 use Schoolbox\Filter\Codec;
 use Schoolbox\Filter\Filters\Assessment\AssessmentType\Definition as AssessmentTypeDefinition;
 use Schoolbox\GenericCollection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Task;
+use Schoolbox\Learning\Assessment\Feedback\Visibility;
 use Schoolbox\Learning\Assessment\Translator\UnitAssessments;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
@@ -230,19 +232,6 @@ class Controller extends WebController\Base
             // TODO: clean this up a bit once the payload structure is finalised
             $data = [
                 'rank' => (bool)$this->getConfigLoader()->get('view_rank') ? $courseMarkbook->getRanking() : null,
-                'courseSpec' => [
-                    'hasImplementations' => $courseSpec->getCourseImplementations()->count() > 0,
-                    '_routes' => [
-                        'courseImport.getImport' => $this->routeGenerator->generate(
-                            'courseImport.getImport',
-                            [
-                                'courseSpecId' => $courseSpec->getId(),
-                                'folderId'     => 0,
-                                'componentId'  => 0,
-                            ]
-                        ),
-                    ],
-                ],
                 'assessments' => $courseMarkbook->getCollapsedAssessments()->indexBy('id')->map(fn(IAssessable $assessment) => [
                     'id'                => $assessment->getId(),
                     'title'             => $assessment->getTitle(),
@@ -282,7 +271,7 @@ class Controller extends WebController\Base
                  *
                  * For the course markbook, there is one of these for each course implementation
                  */
-                'classImpls' => $courseMarkbook->getCourseImpls()->reIndex()->map(
+                'classImpls' => $courseMarkbook->getCourseImpls()->map(
                     fn(CourseImpl\Model $courseImpl) => [
                         'courseImplId'    => $courseImpl->getId(),
                         'folder' => [
@@ -317,7 +306,7 @@ class Controller extends WebController\Base
                                             $progressTick = $unitAssessmentsTranslator->getProgressTick($aImpl, $participant);
                                         }
 
-                                        $marks = $courseMarkbook->getStudentMarks()[$courseImpl->getId()];
+                                        $marks = $courseMarkbook->getStudentMarks()[$courseImpl->getId()][$assessmentId][$student->getId()] ?? null;
                                         $comments = $courseMarkbook->getStudentComments()[$courseImpl->getId()];
 
                                         return [
@@ -325,25 +314,31 @@ class Controller extends WebController\Base
                                             'hasSubmittedResponse' => $participant->hasSubmittedResponse(),
                                             'hasPublishedFeedback' => $participant->hasPublishedFeedback(),
                                             'resubmissionRequired' => $participant->isResubmissionRequired(),
-                                            'normalisedMark'     => $participant->getNormalisedMark(true),
-                                            'humanReadableInstructorMark' => [
-                                                'published' => $participant->getHumanReadableInstructorMark(true),
-                                                'unpublished' => $participant->getHumanReadableInstructorMark(false),
-                                            ],
-                                            'humanReadableMark' => [
-                                                'published' => $participant->getHumanReadableMark(true),
-                                                'unpublished' => $participant->getHumanReadableMark(false),
-                                            ],
                                             'progressTick' => $progressTick,
+                                            /* when all the values are null, the published/draft value itself will be null
+                                             * to allow checking for a draft mark / published mark */
+                                            'marks' => array_map(
+                                                fn($markSet) => array_filter($markSet, fn($v) => $v !== null) === [] ? null : $markSet,
+                                                [
+                                                    'published' => [
+                                                        'norm'         => $marks['published']['norm'],
+                                                        'hr'           => $marks['published']['hr'],
+                                                        'hrInstructor' => $marks['published']['hrInstructor'],
+                                                        'comment'      => \Scrub::html2text($comments[$student->getId()][$assessmentId] ?? ''),
+                                                    ],
+                                                    'draft' => [
+                                                        'norm'         => $marks['draft']['norm'],
+                                                        'hr'           => $marks['draft']['hr'],
+                                                        'hrInstructor' => $marks['draft']['hrInstructor'],
+                                                        'comment'      => null, /* draft comments are unused on the course markbook */
+                                                    ],
+                                                ],
+                                            ),
                                             /* unused on the course markbook: */
                                             // 'isResponseRequired' => ...,
                                             // 'isFeedbackRequired' => ...,
                                             // 'isReviewComplete'   => ...,
-                                            // 'authoritativeFeedback' => ...,
-                                            // 'authoritativeFeedbackDraft' => ...,
                                             // 'plan' => ...,
-                                            'marks'    => $marks[$assessmentId][$student->getId()] ?? null,
-                                            'comment'  => \Scrub::html2text($comments[$student->getId()][$assessmentId] ?? ''),
                                         ];
                                     }
                                 ),
@@ -419,32 +414,41 @@ class Controller extends WebController\Base
                             ]
                         ),
                         'students' => $courseMarkbook->getCourseImportStudents()[$courseImpl->getId()]->map(
-                            fn(User $student) => [
-                                'id'         => $student->getId(),
-                                'externalId' => $student->getExternalId(), // ...for portrait.twig
-                                /* The class markbook uses [lastname, first name] to display names, whereas the course markbook uses just [fullName] for some reason */
-                                'fullName'   => $student->getFullName(),
-                                // 'firstName'  => $student->getFirstname(),
-                                // 'lastName'   => $student->getLastname(),
-                                /* no stats on the course markbook */
-                                'stats' => null,
-                                'averageMarks' => $courseMarkbook->getStudentAverageMarks()[$courseImpl->getId()][$student->getId()] ?? null,
-                                '_routes'    => [
-                                    'learningGrades.getGrades' => $this->routeGenerator->generate(
-                                        'learningGrades.getGrades',
-                                        [
-                                            'viewee'   => $student,
-                                            'userId'   => $student->getId(),
-                                            'termCode' => '',
-                                        ]
-                                    ),
-                                ]
-                            ]
+                            function (User $student) use ($courseMarkbook, $courseImpl) {
+                                $stats = $courseMarkbook->getStudentAverageMarks()[$courseImpl->getId()][$student->getId()] ?? null;
+
+                                return [
+                                    'id'         => $student->getId(),
+                                    'externalId' => $student->getExternalId(), // ...for portrait.twig
+                                    /* The class markbook uses [lastname, first name] to display names, whereas the course markbook uses just [fullName] for some reason */
+                                    'fullName'   => $student->getFullName(),
+                                    // 'firstName'  => $student->getFirstname(),
+                                    // 'lastName'   => $student->getLastname(),
+                                    'stats' => [
+                                        /* Get the stats in the same format as returned by the class markbook */
+                                        'weightedMean'        => $stats['published']['hr'] ?? null,
+                                        'meanNormalised'      => $stats['published']['norm'] ?? null,
+                                        'draftWeightedMean'   => $stats['any']['hr'] ?? null,
+                                        'draftMeanNormalised' => $stats['any']['norm'] ?? null,
+                                    ],
+                                    'averageMarks' => $courseMarkbook->getStudentAverageMarks()[$courseImpl->getId()][$student->getId()] ?? null,
+                                    '_routes'    => [
+                                        'learningGrades.getGrades' => $this->routeGenerator->generate(
+                                            'learningGrades.getGrades',
+                                            [
+                                                'viewee'   => $student,
+                                                'userId'   => $student->getId(),
+                                                'termCode' => '',
+                                            ]
+                                        ),
+                                    ]
+                                ];
+                            }
                         ),
-                        /* no stats on the course markbook */
+                        /* no overall stats for the entire class on the course markbook */
                         'stats' => null,
                     ]
-                ),
+                )->reIndex(),
                 '_routes' => [
                     'exportReport' => sprintf(
                         "%s?%s",
@@ -456,16 +460,20 @@ class Controller extends WebController\Base
                         ),
                         $codec->convertSelectionsToQueryString($selectionsPerFilter),
                     ),
+                    'courseImport.getImport' => $this->routeGenerator->generate(
+                        'courseImport.getImport',
+                        [
+                            'courseSpecId' => $courseSpec->getId(),
+                            'folderId'     => 0,
+                            'componentId'  => 0,
+                        ]
+                    ),
                 ],
                 'canAccessPopOut' => $this->getCanAccessPopOut($courseSpec),
-                /* unused on the course markbook */
-                // 'availableVisibilities' => ...,
+                'availableVisibilities' => Visibility::getAvailableVisibilities((int)$this->getConfigLoader()->get(ConfigMapper::NAME_SUBMISSION_VISIBILITY_MAX)),
             ];
 
             $data = json_decode(json_encode($data), true); // TEMP to ensure it can be encoded
-
-            // echo (json_encode($data));
-            // die();
 
             $contentResponse = $this->responseFromTemplateUnthemed(
                 '@courseMarkbook/courseMarkbookInner.twig',

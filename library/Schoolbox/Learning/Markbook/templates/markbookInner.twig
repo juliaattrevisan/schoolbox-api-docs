@@ -111,10 +111,10 @@
                 {% endif %}
                 {% for assessment in classImpl.assessments %}
                     <th data-assessment="{{ assessment.id }}" class="student-grade-cell white">
-                        <span {% if assessment.stats.draftMean is defined and (assessment.hasDraft is defined) %} data-actual-mark {% endif %}>
+                        <span {% if assessment.stats.draftMean is defined and (assessment.hasDraft) %} data-actual-mark {% endif %}>
                             {{ assessment.stats.mean | default('-') }}
                         </span>
-                        {% if assessment.stats.draftMean is defined and (assessment.hasDraft is defined) %}
+                        {% if assessment.stats.draftMean is defined and (assessment.hasDraft) %}
                             <span data-draft-mark class="meta" style="display:none;">
                                 {{ assessment.stats.draftMean | default('-') }}
                             </span>
@@ -268,12 +268,12 @@
                                     ></div>
                                 {% endif %}
                             {% else %}
-                                {% set draftMark = assessment.hasDraft[student.id] is defined %}
+                                {% set draftMark = participant.marks.draft is not null %}
                                 <span
-                                    class="{{ urgency.marks(participant.normalisedMark) }}"
+                                    class="{{ urgency.marks(participant.marks.published.norm ?? null) }}"
                                     href="{{ aImpl._routes.student[student.id]['learningAssessment.getSummary'] }}"
                                     {% if draftMark %} data-actual-mark {% endif %}
-                                    title="{{ participant.authoritativeFeedback ? participant.authoritativeFeedback.comment : '' }}"
+                                    title="{{ participant.marks.published.comment ?? '' }}"
                                 >
                                     <span data-instructor-mark>{{ decorator.label(participant, true, true) }}</span>
                                     <span data-learner-mark style="display: none">{{ decorator.label(participant, true, false) }}</span>
@@ -284,7 +284,7 @@
                                         data-draft-mark
                                         style="display: none"
                                         class="meta"
-                                        title="{{ participant.authoritativeFeedback ? participant.authoritativeFeedback.comment : '' }}"
+                                        title="{{ participant.marks.draft.comment ?? '' }}"
                                     >
                                         <span data-instructor-mark>{{ decorator.label(participant, false, true) }}</span>
                                         <span data-learner-mark style="display: none">{{ decorator.label(participant, false, false) }}</span>

@@ -18,6 +18,7 @@ use Schoolbox\Filter;
 use Schoolbox\Filter\Codec;
 use Schoolbox\Filter\Filters\Assessment\AssessmentType\Definition as AssessmentTypeDefinition;
 use Schoolbox\GenericCollection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Feedback\Visibility;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -207,33 +208,34 @@ class Controller extends Base
                                     'hasSubmittedResponse' => $participant->hasSubmittedResponse(),
                                     'hasPublishedFeedback' => $participant->hasPublishedFeedback(),
                                     'resubmissionRequired' => $participant->isResubmissionRequired(),
-                                    'normalisedMark'     => $participant->getNormalisedMark(true),
-                                    'humanReadableInstructorMark' => [
-                                        'published'   => $participant->getHumanReadableInstructorMark(true),
-                                        'unpublished' => $participant->getHumanReadableInstructorMark(false),
-                                    ],
-                                    'humanReadableMark' => [
-                                        'published'   => $participant->getHumanReadableMark(true),
-                                        'unpublished' => $participant->getHumanReadableMark(false),
-                                    ],
                                     'progressTick'       => $progressTick,
+                                    /* when all the values are null, the published/draft value itself will be null
+                                     * to allow checking for a draft mark / published mark */
+                                    'marks' => array_map(
+                                        fn($markSet) => (!$markSet || array_filter($markSet, fn($v) => $v !== null) === []) ? null : $markSet,
+                                        [
+                                            'published' => [
+                                                'norm'         => $participant->getNormalisedMark(true),
+                                                'hr'           => $participant->getHumanReadableMark(true),
+                                                'hrInstructor' => $participant->getHumanReadableInstructorMark(true),
+                                                'comment'      => $authoritativeFeedback ? \Scrub::html2text($authoritativeFeedback->getComment()) : null,
+                                            ],
+                                            'draft' => $authoritativeFeedbackDraft ? [
+                                                'norm'         => $participant->getNormalisedMark(false),
+                                                'hr'           => $participant->getHumanReadableMark(false),
+                                                'hrInstructor' => $participant->getHumanReadableInstructorMark(false),
+                                                'comment'      => \Scrub::html2text($authoritativeFeedbackDraft->getComment()),
+                                            ] : null,
+                                        ],
+                                    ),
                                     'isResponseRequired' => $participant->isResponseRequired(),
                                     'isFeedbackRequired' => $participant->isFeedbackRequired(),
                                     'isReviewComplete'   => $participant->isReviewComplete(),
-                                    'authoritativeFeedback' => $authoritativeFeedback ? [
-                                        'comment' => \Scrub::html2text($authoritativeFeedback->getComment()),
-                                    ] : null,
-                                    'authoritativeFeedbackDraft' => $authoritativeFeedbackDraft ? [
-                                        'comment' => \Scrub::html2text($authoritativeFeedbackDraft->getComment()),
-                                    ] : null,
                                     'plan' => [
                                         'isDynamic' => $participant->getPlan()->getIsDynamic(),
                                         'name' => $participant->getPlan()->getName(),
                                         'dueDate' => $participant->getPlan()->getDueDate()?->getShort() ?? null,
                                     ],
-                                    /* unused on the class markbook: */
-                                    // 'marks' => ...,
-                                    // 'comment' => ...,
                                 ];
                             }
                         ),
@@ -319,6 +321,7 @@ class Controller extends Base
                             ),
                         ]
                     ]),
+                    /* overall stats for the entire class */
                     'stats' => [
                         'normalisedMean' => $markbook->getNormalisedMean(),
                         'draftNormalisedMean' => $markbook->getDraftNormalisedMean(),
@@ -338,9 +341,10 @@ class Controller extends Base
                         ),
                         $codec->convertSelectionsToQueryString($selectionsPerFilter),
                     ),
+                    'courseImport.getImport' => null, /* not relevant on the class markbook */
                 ],
                 'canAccessPopOut' => true, /* can always access the pop-out on the class markbook, I suppose */
-                'availableVisibilities' => Visibility::getAvailableVisibilities((int)$this->getConfigLoader()->get('submission_visibility_max')),
+                'availableVisibilities' => Visibility::getAvailableVisibilities((int)$this->getConfigLoader()->get(ConfigMapper::NAME_SUBMISSION_VISIBILITY_MAX)),
             ];
 
             $data = json_decode(json_encode($data), true); // TEMP to ensure it can be encoded
