@@ -2572,5 +2572,8 @@ class Controller extends Base
             $this->gradeGroupMapper,
             $this->storageMapper,
         ))->import($data);
+
+        /* TODO Add redirect back to the quiz you just made...I guess, its modify screen
+         */
     }
 }
