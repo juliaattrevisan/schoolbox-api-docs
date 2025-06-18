@@ -134,9 +134,10 @@
         ] %}
         {% set fullSetOfDates = true %}
     {% elseif assessmentSpec is lessonPlan %}
+        {# Use a different label for the assessmentImpl.dueAt field for Lesson Plans only. #}
         {% set dates = [
             {type: 'publish', label: 'Publish', date: assessmentImpl.publishAt},
-            {type: 'lesson',  label: 'Lesson',  date: assessmentImpl.dueAt},
+            {type: 'due',  label: 'Lesson',  date: assessmentImpl.dueAt},
         ] %}
         {% set fullSetOfDates = false %}
     {% else %}
