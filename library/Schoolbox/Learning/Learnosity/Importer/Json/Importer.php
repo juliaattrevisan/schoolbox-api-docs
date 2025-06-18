@@ -73,6 +73,7 @@ class Importer
      * @param MarkTypeMapper $markTypeMapper
      * @param \Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper $gradeGroupMapper
      * @param \Schoolbox\Resource\Storage\Mapper $storageMapper
+     * @param bool $perform
      */
     public function __construct(
         private Api $api,
@@ -86,7 +87,8 @@ class Importer
         private WorkType\Mapper $workTypeMapper,
         private MarkTypeMapper $markTypeMapper,
         private \Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper $gradeGroupMapper,
-        private \Schoolbox\Resource\Storage\Mapper $storageMapper
+        private \Schoolbox\Resource\Storage\Mapper $storageMapper,
+        private bool $perform
     ) {
         $this->associateStatement = $this->databaseInternal->prepare(self::QUERY_ASSOCIATE_LEARNOSITY);
     }
@@ -305,7 +307,7 @@ class Importer
      * @throws ValidationException
      * @throws \JsonException
      */
-    private function transmit(array $data, string $endpoint, string $key, bool $perform = false): array
+    private function transmit(array $data, string $endpoint, string $key): array
     {
         $payload = [
             $key => []
@@ -329,8 +331,11 @@ class Importer
             /* Maximum size reached. Send it and start another.
              */
             if (\count($payload[$key]) === self::LEARNOSITY_MAX_PAYLOAD_SIZE) {
-                if ($perform) {
+                if ($this->perform) {
                     $this->api->dataSetRequestHub($endpoint, $payload);
+                } else {
+                    // Diagnostic
+                    new \Alaress_Probe($endpoint, $payload);
                 }
 
                 $payload = [
@@ -342,8 +347,11 @@ class Importer
         /* Send any remainders
          */
         if (\count($payload[$key])) {
-            if ($perform) {
+            if ($this->perform) {
                 $this->api->dataSetRequestHub($endpoint, $payload);
+            } else {
+                // Diagnostic
+                new \Alaress_Probe($endpoint, $payload);
             }
         }
 

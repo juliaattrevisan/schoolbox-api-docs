@@ -2570,7 +2570,8 @@ class Controller extends Base
             $this->workTypeMapper,
             $this->markTypeMapper,
             $this->gradeGroupMapper,
-            $this->storageMapper
+            $this->storageMapper,
+            false
         ))->import($data);
     }
 }
