@@ -2571,7 +2571,6 @@ class Controller extends Base
             $this->markTypeMapper,
             $this->gradeGroupMapper,
             $this->storageMapper,
-            false
         ))->import($data);
     }
 }

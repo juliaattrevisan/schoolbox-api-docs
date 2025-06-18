@@ -74,7 +74,6 @@ class Importer
      * @param MarkTypeMapper $markTypeMapper
      * @param \Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper $gradeGroupMapper
      * @param \Schoolbox\Resource\Storage\Mapper $storageMapper
-     * @param bool $perform
      */
     public function __construct(
         private Api $api,
@@ -89,7 +88,6 @@ class Importer
         private MarkTypeMapper $markTypeMapper,
         private \Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper $gradeGroupMapper,
         private \Schoolbox\Resource\Storage\Mapper $storageMapper,
-        private bool $perform
     ) {
         $this->associateStatement = $this->databaseInternal->prepare(self::QUERY_ASSOCIATE_LEARNOSITY);
     }
@@ -303,7 +301,6 @@ class Importer
      * @param array $data
      * @param string $endpoint
      * @param string $key
-     * @param bool $perform
      * @return array
      * @throws ValidationException
      * @throws \JsonException
@@ -338,12 +335,9 @@ class Importer
             /* Maximum size reached. Send it and start another.
              */
             if (\count($payload[$key]) === self::LEARNOSITY_MAX_PAYLOAD_SIZE) {
-                if ($this->perform) {
-                    $this->api->dataSetRequestHub($endpoint, $payload);
-                } else {
-                    // Diagnostic
-                    new \Alaress_Probe($endpoint, $payload);
-                }
+                $this->api->dataSetRequestHub($endpoint, $payload);
+
+                new \Alaress_Probe($payload);
 
                 $payload = [
                     $key => []
@@ -354,12 +348,9 @@ class Importer
         /* Send any remainders
          */
         if (\count($payload[$key])) {
-            if ($this->perform) {
-                $this->api->dataSetRequestHub($endpoint, $payload);
-            } else {
-                // Diagnostic
-                new \Alaress_Probe($endpoint, $payload);
-            }
+            new \Alaress_Probe($payload);
+
+            $this->api->dataSetRequestHub($endpoint, $payload);
         }
 
         return $mapping;
@@ -443,19 +434,27 @@ class Importer
 
                 $item['id'] = $item['reference'];
             }
+
+            /* Rewrite identifiers
+             */
+            $activity['reference'] = (string)UUid::uuid4();
         }
 
         unset ($item, $activity);
 
-        $activityMapping = $this->transmit($learnosityContent['activities'], 'itembank/activities', 'activity');
-
-        /* Diagnostic
+        /* There's only ever one activity at a time: no need to micromanage large payloads
          */
-//         new \Alaress_Probe($learnosityContent, $featureMapping, $questionMapping, $itemMapping, $activityMapping);
+        $payload = [
+            'activities' => array_values($learnosityContent['activities'])
+        ];
+
+        $this->api->dataSetRequestHub('itembank/activities', $payload);
+
+        new \Alaress_Probe($payload);
 
         /* Maybe a big leap of faith, but ok
          */
-        return array_values($activityMapping)[0];
+        return $payload['activities'][0]['reference'];
     }
 
 
