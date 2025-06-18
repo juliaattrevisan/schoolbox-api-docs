@@ -85,7 +85,7 @@ class Payload
                 'curriculumNodes' => $assessment->getCurriculumNodes()->indexBy('code')->keys(),
                 /* Marking and assessing
                  */
-                'markType' => $assessment->getMarkType()->getName(),
+                'markType' => $assessment->getMarkType()->getSlug(),
                 'gradeGroup' => $assessment->getGradeGroup()?->getName(),
                 'markScheme' => $assessment->getMarkScheme()->getTemplate(),
                 'markVisibility' => $assessment->getMarkVisibility(),

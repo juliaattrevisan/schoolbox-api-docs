@@ -244,7 +244,7 @@ class Importer
          */
         if ($settings['markType']) {
             try {
-                $markType = $this->markTypeMapper->findOneByColumn('name', $settings['markType']);
+                $markType = $this->markTypeMapper->findOneByColumn('slug', $settings['markType']);
             } catch (MapperException $e) {
                 /* The specified mark type doesn't exist; find the first meaningful one
                  * Use percentage, as it's requires the least configuration
@@ -301,7 +301,7 @@ class Importer
             ->setPromptsMode($settings['promptsMode'])
             ->setMarkType($markType)
             ->setGradeGroup($gradeGroup);
-
+new \Alaress_Probe($assessment);die();
         /* Update context if it's a Project
          * (for whatever reason, Project contexts need a list of their constituent assessments)
          */
