@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\Learnosity\Importer\Json;
 use Alaress\Database\Connector\IConnector;
 use Assess\Import\Parser\IParser;
 use LearnositySdk\Exceptions\ValidationException;
+use Ramsey\Uuid\Uuid;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -126,6 +127,10 @@ class Importer
          */
         try {
             $json = json_decode($data, true, 512, JSON_THROW_ON_ERROR);
+
+            /* A Shortcut To Content
+             */
+            $learnosityContent = $json['content'] ?? [];
         } catch (\JsonException $e) {
             throw new \RuntimeException('Could not decode this json data; could be corrupted or otherwise malformed.');
         }
@@ -139,9 +144,115 @@ class Importer
          */
         $this->processAssets($json['assets']);
 
-        /* Start manufacturing quiz payloads for learnosity
-         * This is mostly stolen from the cli ImporterTool
+        /* Start manufacturing quiz payloads for learnosity in this order because learnosity build upwards
+         * Features, Questions, Items, Activity
+         *
+         * The order of items is based on their ordering in the activity node,
+         * since learnosity couldn't figure out how to provide an explicit sequence
+         *
+         * Also, you can only send 50 at a time per payload, which is annoying
          */
+        $featureMapping = [];
+        $featureStruct = [];
+
+        $questionMapping = [];
+        $questionStruct = [];
+
+        $itemMapping = [];
+        $itemStruct = [];
+
+        $activityMapping = [];
+        $activityStruct = [];
+
+        /* For each feature,
+         * rewrite its old identifier and store the data struct in a temporary payload.
+         * If the payload contains 50 items, send it and start a new one until all are uploaded.
+         *
+         * While you're doing that, remember all the temporary sb- references
+         * and how they related to new ones you generated en route
+         */
+
+        /* For each question,
+         * rewrite its old identifier and store the data struct in a temporary payload.
+         * If the payload contains 50 items, send it and start a new one until all are uploaded.
+         *
+         * While you're doing that, remember all the temporary sb- references
+         * and how they related to new ones you generated en route
+         */
+
+        /* For each item
+         * rewrite its old identifier and store the data struct in a temporary payload.
+         * If the payload contains 50 items, send it and start a new one until all are uploaded.
+         *
+         * While you're doing that, remember all the temporary sb- references
+         * and how they related to new ones you generated en route
+         */
+
+        /* There should be only one activity, but that activity could have a lot of items
+         * rewrite its old identifier and send 50 items at a time
+         */
+
+//        /* Rewrite identifiers and remember them
+//         */
+//        foreach ($learnosityContent['activity']['data']['items'] as &$activityItem) {
+//            $oldRef = $activityItem['reference'];
+//            $newRef = (string)UUid::uuid4();
+//
+//            $itemMapping[$oldRef] = $newRef;
+//
+//            $activityItem['reference'] = $newRef;
+//            $activityItem['id'] = $newRef;
+//        }
+//
+//        /* Rewrite identifiers and remember them
+//         */
+//        $updatedItems = [];
+//
+//        foreach ($learnosityContent['items'] as &$item) {
+//            $oldRef = $item['reference'];
+//            $newRef = $itemMapping[$oldRef];
+//
+//            $item['reference'] = $newRef;
+//
+//            $updatedItems[$newRef] = $item;
+//        }
+//
+//        $learnosityContent['items'] = $updatedItems;
+//
+//        new \Alaress_Probe($learnosityContent, $itemMapping);
+
+//
+//        foreach ($learnosityContent['items'] as $itemRef => $item) {
+//            foreach ($item['features'] as $featureRef) {
+//                $feature = $learnosityContent['features'][$featureRef['reference']];
+//
+//                /* Rewrite identifiers and remember them
+//                 */
+//                $feature['reference'] = (string)UUid::uuid4();
+//                $itemStruct[$itemRef][] = $feature;
+//            }
+//
+//            foreach ($item['questions'] as $questionRef) {
+//                $question = $learnosityContent['questions'][$questionRef['reference']];
+//
+//                /* Rewrite identifiers and remember them
+//                 */
+//                $question['reference'] = (string)UUid::uuid4();
+//                $itemStruct[$itemRef][] = $question;
+//            }
+//        }
+
+//        new \Alaress_Probe($learnosityContent, $itemStruct);
+
+//        foreach ($json['content']['features'] as $feature) {
+//            $newFeature = $feature;
+//
+//            /* Rewrite identifier
+//             */
+//            $newFeature['reference'] = (string)UUid::uuid4()
+//        }
+
+//        /*
 //
 //        /* Used to make representations of questions and answers
 //         */
@@ -152,7 +263,7 @@ class Importer
 //        $quizBuilder = new Builder(
 //            $this->user,
 //            $strategyFactory,
-            new InlineImageConverter($this->storageMapper, null)
+//            new InlineImageConverter($this->storageMapper, null)
 //        );
 //
 //        /* Generates sets of tags for Activities' and Items' assignations
