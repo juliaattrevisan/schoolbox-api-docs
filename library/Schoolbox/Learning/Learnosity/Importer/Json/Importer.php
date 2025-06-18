@@ -134,7 +134,7 @@ class Importer
         $learnosityReference = $this->assemble($learnosityContent);
 
         $this->associate([
-            'learnosityReference' => $learnosityReference,
+            'activityLearnosityReference' => $learnosityReference,
             'quizId' => $instances['quiz']->getId()
         ]);
 
@@ -449,8 +449,6 @@ class Importer
         ];
 
         $this->api->dataSetRequestHub('itembank/activities', $payload);
-
-        new \Alaress_Probe($payload);
 
         /* Maybe a big leap of faith, but ok
          */
