@@ -418,7 +418,7 @@ class Importer
             }
         }
 
-        unset ($feature, $question, $item, $widget);
+        unset($feature, $question, $item, $widget);
 
         $itemMapping = $this->transmit($learnosityContent['items'], 'itembank/items', 'items');
 
@@ -440,7 +440,7 @@ class Importer
             $activity['reference'] = (string)UUid::uuid4();
         }
 
-        unset ($item, $activity);
+        unset($item, $activity);
 
         /* There's only ever one activity at a time: no need to micromanage large payloads
          */
