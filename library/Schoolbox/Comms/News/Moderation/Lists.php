@@ -19,7 +19,6 @@ use Schoolbox\GenericCollection;
 
 class Lists
 {
-
     /**
      * Maximum number of Recently Accepted articles to show
      */
@@ -57,8 +56,8 @@ class Lists
         return $this->newsMapper->findByPredicates($this->newsMapper->getPredicateApproved(), [
             'limit' => self::NUM_RECENTLY_ACCEPTED,
             'order' => [
-                'accepted_at' => 'desc'
-            ]
+                'accepted_at' => 'desc',
+            ],
         ]);
     }
 
@@ -75,8 +74,8 @@ class Lists
         return $this->newsMapper->findByPredicates($this->newsMapper->getPredicateRejected(), [
             'limit' => self::NUM_RECENTLY_REJECTED,
             'order' => [
-                'rejected_at' => 'desc'
-            ]
+                'rejected_at' => 'desc',
+            ],
         ]);
     }
 }
