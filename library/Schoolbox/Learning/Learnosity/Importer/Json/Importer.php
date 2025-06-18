@@ -19,6 +19,7 @@ use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Learning\Assessment\WorkType\Mapper;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Learnosity\Api;
+use Schoolbox\Learning\Learnosity\Export\Json\Payload;
 use Schoolbox\Learning\Quiz\Model;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
@@ -324,6 +325,12 @@ class Importer
             $mapping[$oldRef] = $newRef;
             $object['reference'] = $newRef;
 
+            /* Sometimes this is here
+             */
+            if (isset($object['id'])) {
+                $object['id'] = $object['reference'];
+            }
+
             /* Stick it into the payload
              */
             $payload[$key][] = $object;
@@ -400,7 +407,7 @@ class Importer
          * While you're doing that, remember all the temporary sb- references
          * and how they related to new ones you generated en route
          */
-        foreach ($learnosityContent['items'] as $item) {
+        foreach ($learnosityContent['items'] as &$item) {
             foreach ($item['features'] as &$feature) {
                 $feature['reference'] = $featureMapping[$feature['reference']];
             }
@@ -408,32 +415,43 @@ class Importer
             foreach ($item['questions'] as &$question) {
                 $question['reference'] = $questionMapping[$question['reference']];
             }
+
+            /* Update widgets too
+             */
+            foreach ($item['definition']['widgets'] as &$widget) {
+                if (Payload::WIDGET_FEATURE === $widget['widget_type']) {
+                    $widget['reference'] = $featureMapping[$widget['reference']];
+                } else {
+                    $widget['reference'] = $questionMapping[$widget['reference']];
+                }
+            }
         }
 
-        unset ($feature, $question);
+        unset ($feature, $question, $item, $widget);
 
         $itemMapping = $this->transmit($learnosityContent['items'], 'itembank/items', 'items');
 
         /* There should be only one activity, but that activity could have a lot of items
          * rewrite its old identifier and send 50 items at a time
          */
-        foreach ($learnosityContent['activities'] as $activity) {
+        foreach ($learnosityContent['activities'] as &$activity) {
             foreach ($activity['data']['items'] as &$item) {
                 /* These two fields are the same, due to a bug in learnosity they need to co-exist
                  * since learnosity let you make content in an obsolete format without telling you
                  */
                 $item['reference'] = $itemMapping[$item['reference']];
+
                 $item['id'] = $item['reference'];
             }
         }
 
-        unset ($item);
+        unset ($item, $activity);
 
         $activityMapping = $this->transmit($learnosityContent['activities'], 'itembank/activities', 'activity');
 
         /* Diagnostic
          */
-        // new \Alaress_Probe($learnosityContent, $featureMapping, $questionMapping, $itemMapping, $activityMapping);
+//         new \Alaress_Probe($learnosityContent, $featureMapping, $questionMapping, $itemMapping, $activityMapping);
 
         /* Maybe a big leap of faith, but ok
          */

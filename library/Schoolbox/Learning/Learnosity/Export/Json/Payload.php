@@ -23,7 +23,7 @@ class Payload
      * A switch on widget.widget_type to figure out if this object is a feature or a question
      * specifically applicable to item.definition.widget nodes.
      */
-    private CONST WIDGET_FEATURE = 'feature';
+    public const WIDGET_FEATURE = 'feature';
 
 
     /**
