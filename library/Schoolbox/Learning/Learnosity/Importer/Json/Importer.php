@@ -153,16 +153,9 @@ class Importer
          * Also, you can only send 50 at a time per payload, which is annoying
          */
         $featureMapping = [];
-        $featureStruct = [];
-
         $questionMapping = [];
-        $questionStruct = [];
-
         $itemMapping = [];
-        $itemStruct = [];
-
         $activityMapping = [];
-        $activityStruct = [];
 
         /* For each feature,
          * rewrite its old identifier and store the data struct in a temporary payload.
@@ -171,6 +164,7 @@ class Importer
          * While you're doing that, remember all the temporary sb- references
          * and how they related to new ones you generated en route
          */
+        $featureMapping = $this->transmit($learnosityContent['features'], 'itembank/features', 'features');
 
         /* For each question,
          * rewrite its old identifier and store the data struct in a temporary payload.
@@ -179,6 +173,7 @@ class Importer
          * While you're doing that, remember all the temporary sb- references
          * and how they related to new ones you generated en route
          */
+        $questionMapping = $this->transmit($learnosityContent['questions'], 'itembank/questions', 'questions');
 
         /* For each item
          * rewrite its old identifier and store the data struct in a temporary payload.
@@ -187,12 +182,36 @@ class Importer
          * While you're doing that, remember all the temporary sb- references
          * and how they related to new ones you generated en route
          */
+        foreach ($learnosityContent['items'] as $item) {
+            foreach ($item['features'] as &$feature) {
+                $question['reference'] = $featureMapping[$feature['reference']];
+            }
+
+            foreach ($item['questions'] as &$question) {
+                $question['reference'] = $questionMapping[$question['reference']];
+            }
+        }
+
+        unset ($feature, $question);
+
+        $itemMapping = $this->transmit($learnosityContent['items'], 'itembank/items', 'items');
 
         /* There should be only one activity, but that activity could have a lot of items
          * rewrite its old identifier and send 50 items at a time
          */
+        foreach ($learnosityContent['activity']['data']['items'] as &$item) {
+            /* These two fields are the same, due to a bug in learnosity they need to co-exist
+             * since learnosity let you make content in an obsolete format without telling you
+             */
+            $item['reference'] = $itemMapping[$item['reference']];
+            $item['id'] = $item['reference'];
+        }
 
-//        /* Rewrite identifiers and remember them
+        $activityMapping = $this->transmit(['activities' => $learnosityContent['activity']], 'itembank/activities', 'activity');
+
+        new \Alaress_Probe($learnosityContent, $featureMapping, $questionMapping, $itemMapping, $activityMapping);
+
+        //        /* Rewrite identifiers and remember them
 //         */
 //        foreach ($learnosityContent['activity']['data']['items'] as &$activityItem) {
 //            $oldRef = $activityItem['reference'];
@@ -469,6 +488,65 @@ class Importer
              */
         }
     }
+
+
+    /**
+     * Transmits the $data[$key] data into learnosity via its Data API,
+     * returning a mapping of old refs to new refs.
+     *
+     * @param array $data
+     * @param string $endpoint
+     * @param string $key
+     * @param bool $perform
+     * @return array
+     * @throws ValidationException
+     * @throws \JsonException
+     */
+    private function transmit(array $data, string $endpoint, string $key, bool $perform = false): array
+    {
+        $payload = [
+            $key => []
+        ];
+
+        /* A remembering of old refs and their corresponding new learnosity-friendly refs
+         */
+        $mapping = [];
+
+        foreach ($data as $object) {
+            $oldRef = $object['reference'];
+            $newRef = (string)UUid::uuid4();
+
+            $mapping[$oldRef] = $newRef;
+            $object['reference'] = $newRef;
+
+            /* Stick it into the payload
+             */
+            $payload[$key][] = $object;
+
+            /* Maximum size reached. Send it and start another.
+             */
+            if (\count($payload[$key]) === self::LEARNOSITY_MAX_PAYLOAD_SIZE) {
+                if ($perform) {
+                    $this->api->dataSetRequestHub($endpoint, $payload);
+                }
+
+                $payload = [
+                    $key => []
+                ];
+            }
+        }
+
+        /* Send any remainders
+         */
+        if (\count($payload[$key])) {
+            if ($perform) {
+                $this->api->dataSetRequestHub($endpoint, $payload);
+            }
+        }
+
+        return $mapping;
+    }
+
 
 
     /**
