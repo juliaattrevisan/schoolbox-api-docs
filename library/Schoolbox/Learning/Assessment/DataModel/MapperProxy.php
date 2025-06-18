@@ -1379,6 +1379,7 @@ class MapperProxy
             $subObject->setLearnosityReference($assessable->getLearnosityReference());
             $subObject->setLearnosityJobReference($assessable->getLearnosityJobReference());
             $subObject->setMarkType($assessable->getMarkType());
+            $subObject->setGradeGroup($assessable->getGradeGroup());
 
             QuizMapper::getInstance()->save($subObject);
         } elseif ($subObject instanceof LtiAssessment\Model) {
