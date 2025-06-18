@@ -149,6 +149,11 @@ class Importer
          */
         $learnosityReference = $this->assemble($learnosityContent);
 
+        $this->associate([
+            'learnosityReference' => $learnosityReference,
+            'quizId' => $instances['quiz']->getId()
+        ]);
+
 
         //        /* Rewrite identifiers and remember them
 //         */
@@ -567,134 +572,134 @@ class Importer
          */
         return array_values($activityMapping)[0];
     }
-
-
-    /**
-     * Import a large quiz by spreading its contents over multiple payloads
-     *
-     * @param array            $legacyQuiz
-     * @param BlueprintBuilder $blueprintBuilder
-     * @param Api              $api
-     * @return array
-     * @throws \JsonException
-     * @throws ValidationException
-     */
-    private function importLarge(
-        array $legacyQuiz,
-        BlueprintBuilder $blueprintBuilder,
-        Api $api
-    ): array {
-        $errors = [];
-
-        /* Make the overall Learnosity payloads which we then send later with
-         * a little postprocessing to put things into the exactly correct format.
-         * Learnosity is really particular about such things.
-         */
-        try {
-            $blueprint = $blueprintBuilder->buildFlattenSections($legacyQuiz);
-        } catch (\DomainException $e) {
-            $errors[] = $e->getMessage();
-
-            return $errors;
-        }
-
-        foreach ($blueprint['payloadSequence'] as $payloadSequence) {
-            $endpoint = $payloadSequence['endpoint'];
-
-            if (BlueprintBuilder::ENDPOINT_FEATURES === $endpoint) {
-                $this->transmitUnconsolidated($api, 'features', $endpoint, $payloadSequence);
-            } elseif (BlueprintBuilder::ENDPOINT_QUESTIONS === $endpoint) {
-                $this->transmitUnconsolidated($api, 'questions', $endpoint, $payloadSequence);
-            } elseif (BlueprintBuilder::ENDPOINT_ITEMS === $endpoint) {
-                $this->transmitUnconsolidated($api, 'items', $endpoint, $payloadSequence);
-            } elseif (BlueprintBuilder::ENDPOINT_ACTIVITIES === $endpoint) {
-                $this->transmitUnconsolidated($api, 'activities', $endpoint, $payloadSequence);
-            }
-        }
-
-        /* Associations are always done last, once per quiz,
-         * and after their guts have been sent to Learnosity
-         */
-        $association = [
-            'quizId' => $blueprint['quizId'],
-            'assessmentId' => $blueprint['assessmentId'],
-            'activityLearnosityReference' => $blueprint['activityLearnosityReference']
-        ];
-
-        /* Associate with a retry mechanism
-         */
-        try {
-            $this->associate($association);
-        } catch (\RuntimeException $e) {
-            $errors[] = $e->getMessage();
-        }
-
-        return $errors;
-    }
-
-
-    /**
-     * Sends data to Learnosity and returns updated metrics
-     *
-     * @param Api    $api
-     * @param string $key
-     * @param string $endpoint
-     * @param array  $payloadSequence
-     * @return void
-     * @throws \JsonException
-     * @throws \LearnositySdk\Exceptions\ValidationException
-     */
-    private function transmitUnconsolidated(
-        Api $api,
-        string $key,
-        string $endpoint,
-        array $payloadSequence,
-    ): void {
-        $payload = [
-            $key => []
-        ];
-
-        foreach ($payloadSequence['payload'][$key] as $object) {
-            $payload[$key][] = $object;
-
-            /* A special case for Questions endpoint which requires this random
-             * meta object outside of everything else -_-
-             */
-            if (isset($object['meta'])) {
-                $payload['meta'] = $object['meta'];
-            }
-
-            /* Check if we're full; if so, send it and make a new payload
-             * ready for the next iteration
-             */
-            $currentPayloadSize = \count($payload[$key]);
-
-            if ($currentPayloadSize === self::LEARNOSITY_MAX_PAYLOAD_SIZE) {
-                $api->dataSetRequestHub($endpoint, $payload);
-
-                $payload = [
-                    $key => []
-                ];
-            }
-        }
-
-        /* Send any remainders
-         *
-         * When perform mode is on, actually send it as batches of features, questions,
-         * items, activities and just...hope/presumed that everything worked out
-         *
-         * Note that $payload might be empty because the quiz contained an exact multiple
-         * of the maximum payload size; in this case, $payload will be an empty array and
-         * there are no remainders in any of its keys.
-         */
-        $payloadSize = \count($payload[$key]);
-
-        /* Skip zero-sized payloads; Learnosity hates that
-         */
-        if ($payloadSize) {
-            $api->dataSetRequestHub($endpoint, $payload);
-        }
-    }
+//
+//
+//    /**
+//     * Import a large quiz by spreading its contents over multiple payloads
+//     *
+//     * @param array            $legacyQuiz
+//     * @param BlueprintBuilder $blueprintBuilder
+//     * @param Api              $api
+//     * @return array
+//     * @throws \JsonException
+//     * @throws ValidationException
+//     */
+//    private function importLarge(
+//        array $legacyQuiz,
+//        BlueprintBuilder $blueprintBuilder,
+//        Api $api
+//    ): array {
+//        $errors = [];
+//
+//        /* Make the overall Learnosity payloads which we then send later with
+//         * a little postprocessing to put things into the exactly correct format.
+//         * Learnosity is really particular about such things.
+//         */
+//        try {
+//            $blueprint = $blueprintBuilder->buildFlattenSections($legacyQuiz);
+//        } catch (\DomainException $e) {
+//            $errors[] = $e->getMessage();
+//
+//            return $errors;
+//        }
+//
+//        foreach ($blueprint['payloadSequence'] as $payloadSequence) {
+//            $endpoint = $payloadSequence['endpoint'];
+//
+//            if (BlueprintBuilder::ENDPOINT_FEATURES === $endpoint) {
+//                $this->transmitUnconsolidated($api, 'features', $endpoint, $payloadSequence);
+//            } elseif (BlueprintBuilder::ENDPOINT_QUESTIONS === $endpoint) {
+//                $this->transmitUnconsolidated($api, 'questions', $endpoint, $payloadSequence);
+//            } elseif (BlueprintBuilder::ENDPOINT_ITEMS === $endpoint) {
+//                $this->transmitUnconsolidated($api, 'items', $endpoint, $payloadSequence);
+//            } elseif (BlueprintBuilder::ENDPOINT_ACTIVITIES === $endpoint) {
+//                $this->transmitUnconsolidated($api, 'activities', $endpoint, $payloadSequence);
+//            }
+//        }
+//
+//        /* Associations are always done last, once per quiz,
+//         * and after their guts have been sent to Learnosity
+//         */
+//        $association = [
+//            'quizId' => $blueprint['quizId'],
+//            'assessmentId' => $blueprint['assessmentId'],
+//            'activityLearnosityReference' => $blueprint['activityLearnosityReference']
+//        ];
+//
+//        /* Associate with a retry mechanism
+//         */
+//        try {
+//            $this->associate($association);
+//        } catch (\RuntimeException $e) {
+//            $errors[] = $e->getMessage();
+//        }
+//
+//        return $errors;
+//    }
+//
+//
+//    /**
+//     * Sends data to Learnosity and returns updated metrics
+//     *
+//     * @param Api    $api
+//     * @param string $key
+//     * @param string $endpoint
+//     * @param array  $payloadSequence
+//     * @return void
+//     * @throws \JsonException
+//     * @throws \LearnositySdk\Exceptions\ValidationException
+//     */
+//    private function transmitUnconsolidated(
+//        Api $api,
+//        string $key,
+//        string $endpoint,
+//        array $payloadSequence,
+//    ): void {
+//        $payload = [
+//            $key => []
+//        ];
+//
+//        foreach ($payloadSequence['payload'][$key] as $object) {
+//            $payload[$key][] = $object;
+//
+//            /* A special case for Questions endpoint which requires this random
+//             * meta object outside of everything else -_-
+//             */
+//            if (isset($object['meta'])) {
+//                $payload['meta'] = $object['meta'];
+//            }
+//
+//            /* Check if we're full; if so, send it and make a new payload
+//             * ready for the next iteration
+//             */
+//            $currentPayloadSize = \count($payload[$key]);
+//
+//            if ($currentPayloadSize === self::LEARNOSITY_MAX_PAYLOAD_SIZE) {
+//                $api->dataSetRequestHub($endpoint, $payload);
+//
+//                $payload = [
+//                    $key => []
+//                ];
+//            }
+//        }
+//
+//        /* Send any remainders
+//         *
+//         * When perform mode is on, actually send it as batches of features, questions,
+//         * items, activities and just...hope/presumed that everything worked out
+//         *
+//         * Note that $payload might be empty because the quiz contained an exact multiple
+//         * of the maximum payload size; in this case, $payload will be an empty array and
+//         * there are no remainders in any of its keys.
+//         */
+//        $payloadSize = \count($payload[$key]);
+//
+//        /* Skip zero-sized payloads; Learnosity hates that
+//         */
+//        if ($payloadSize) {
+//            $api->dataSetRequestHub($endpoint, $payload);
+//        }
+//    }
 
 
     /**
