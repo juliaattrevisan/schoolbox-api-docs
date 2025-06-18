@@ -152,7 +152,7 @@ class Importer
 //        $quizBuilder = new Builder(
 //            $this->user,
 //            $strategyFactory,
-//            new InlineImageConverter($this->storageMapper, null)
+            new InlineImageConverter($this->storageMapper, null)
 //        );
 //
 //        /* Generates sets of tags for Activities' and Items' assignations
@@ -284,9 +284,13 @@ class Importer
         // Create the IAssessable
         $assessment = (new \Schoolbox\Learning\Assessment\Quiz\Model())
             ->setCreator($this->user)
+            /* TODO: Apply InlineImageConverter here
+             */
             ->setCompletionMessage($settings['completionMessage'])
             ->setTitle($settings['title'])
             ->setWorkType($workType)
+            /* TODO: Apply InlineImageConverter here
+             */
             ->setDescription($settings['description'])
             ->setPublishAt($inUnitSpec ? null : new \Alaress_Date_Format(new \DateTime('+1 hour')))
             ->setOpenAt($inUnitSpec ? null : new \Alaress_Date_Format(new \DateTime('+1 hour')))
