@@ -46,7 +46,7 @@ const hasExcludedInSelection = window.Vue.computed(() => {
 const loadError = window.Vue.ref<string | null>(null);
 const studentPastoralCounts = window.Vue.ref<Record<string, StudentPastoralCountBadge[]>>({});
 
-//Getting the return url for user to return to the landing page after submission
+// Getting the return url for user to return to the landing page after submission
 const returnUrl = window.Vue.computed(() => {
     return btoa(window.location.pathname);
 });
