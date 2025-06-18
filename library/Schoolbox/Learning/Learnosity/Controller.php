@@ -2530,7 +2530,7 @@ class Controller extends Base
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_IMPORT_FILE_NOT_FOUND);
         }
 
-        /* Milk out some of the assessment settings from the xml itself
+        /* Milk out some of the assessment settings from the json itself
          */
         try {
             /** @var \Schoolbox\Resource\Storage\Model $file */
