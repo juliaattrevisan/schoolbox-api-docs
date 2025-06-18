@@ -555,6 +555,8 @@ class Importer
             }
         }
 
+        unset ($item);
+
         $activityMapping = $this->transmit($learnosityContent['activities'], 'itembank/activities', 'activity');
 
         /* Diagnostic
