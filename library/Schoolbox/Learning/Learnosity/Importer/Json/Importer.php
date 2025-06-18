@@ -302,29 +302,29 @@ class Importer
             ->setMarkType($markType)
             ->setGradeGroup($gradeGroup);
 
-//        /* Update context if it's a Project
-//         * (for whatever reason, Project contexts need a list of their constituent assessments)
-//         */
-//        if ($this->context instanceof \Schoolbox\Learning\Assessment\Project) {
-//            // Attach context
-//            // @see Schoolbox\Learning\Assessment\Factory produceNew()
-//            $this->context->getAssessables()->add($assessment);
-//        }
-//
-//        $assessment->setContext($this->context);
-//
-//        $this->assessmentMapperProxy->save($assessment, $this->user);
-//
-//        // Notify about what was just made
-//        $this->assessmentMapperProxy->getNotifier()->notify($assessment, $this->user, []);
-//
-//        /* We might need this quiz instance for saving a learnosity_reference later
-//         */
-//        $quiz = $this->quizMapper->findOneByColumn('assessment_id', $assessment->getId());
+        /* Update context if it's a Project
+         * (for whatever reason, Project contexts need a list of their constituent assessments)
+         */
+        if ($this->context instanceof \Schoolbox\Learning\Assessment\Project) {
+            // Attach context
+            // @see Schoolbox\Learning\Assessment\Factory produceNew()
+            $this->context->getAssessables()->add($assessment);
+        }
+
+        $assessment->setContext($this->context);
+
+        $this->assessmentMapperProxy->save($assessment, $this->user);
+
+        // Notify about what was just made
+        $this->assessmentMapperProxy->getNotifier()->notify($assessment, $this->user, []);
+
+        /* We might need this quiz instance for saving a learnosity_reference later
+         */
+        $quiz = $this->quizMapper->findOneByColumn('assessment_id', $assessment->getId());
 
         return [
             'assessment' => $assessment,
-            'quiz'       => $quiz,
+            'quiz' => $quiz,
         ];
     }
 
