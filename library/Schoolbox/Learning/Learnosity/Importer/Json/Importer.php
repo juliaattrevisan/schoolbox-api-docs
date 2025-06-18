@@ -135,9 +135,13 @@ class Importer
          */
         $instances = $this->buildAssessment($json['settings']);
 
-//        /* Start manufacturing quiz payloads for learnosity
-//         * This is mostly stolen from the cli ImporterTool
-//         */
+        /* Process storage instances from assets included in the json
+         */
+        $this->processAssets($json['assets']);
+
+        /* Start manufacturing quiz payloads for learnosity
+         * This is mostly stolen from the cli ImporterTool
+         */
 //
 //        /* Used to make representations of questions and answers
 //         */
@@ -301,7 +305,7 @@ class Importer
             ->setPromptsMode($settings['promptsMode'])
             ->setMarkType($markType)
             ->setGradeGroup($gradeGroup);
-new \Alaress_Probe($assessment);die();
+
         /* Update context if it's a Project
          * (for whatever reason, Project contexts need a list of their constituent assessments)
          */
@@ -326,6 +330,29 @@ new \Alaress_Probe($assessment);die();
             'assessment' => $assessment,
             'quiz' => $quiz,
         ];
+    }
+
+
+    /**
+     * Import base64 encoded media into storage area
+     *
+     * @param array $assets
+     * @return void
+     */
+    private function processAssets(array $assets): void
+    {
+        foreach ($assets as $hash => $asset) {
+            $imageData = base64_decode($asset['contents']);
+            $newFilename = $asset['basename'];
+
+            /* Shank it into storage
+             */
+            $this->storageMapper->acceptStream($newFilename, $imageData);
+
+            /* FIXME Maybe do a double-verify comparing $hash to the output of acceptStream()
+             * to ensure they match. Not sure if that's necessary though.
+             */
+        }
     }
 
 
