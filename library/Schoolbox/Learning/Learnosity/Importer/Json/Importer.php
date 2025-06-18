@@ -252,12 +252,13 @@ class Importer
             ->setDefaultOpenSpan($settings['defaultOpenSpan'])
             ->setMaxAttempts($settings['maxAttempts'])
             ->setMarkVisibility($settings['markVisibility'])
+            ->setReadingTimeDuration($settings['readingTimeDuration'])
             /* Learnosity-era unlimited durations are represented by zero, not -1
              */
             ->setDuration(max($settings['duration'], Model::DURATION_UNLIMITED))
-            /* Learnosity doesn't support randomised items
+            /* Learnosity doesn't support randomised items but respect whatever this did
              */
-            ->setShuffleItems(false)
+            ->setShuffleItems($settings['shuffleItems'])
             ->setPromptsMode($settings['promptsMode'])
             ->setMarkType($markType)
             ->setGradeGroup($gradeGroup);
