@@ -152,10 +152,6 @@ class Importer
          *
          * Also, you can only send 50 at a time per payload, which is annoying
          */
-        $featureMapping = [];
-        $questionMapping = [];
-        $itemMapping = [];
-        $activityMapping = [];
 
         /* For each feature,
          * rewrite its old identifier and store the data struct in a temporary payload.
@@ -199,15 +195,17 @@ class Importer
         /* There should be only one activity, but that activity could have a lot of items
          * rewrite its old identifier and send 50 items at a time
          */
-        foreach ($learnosityContent['activity']['data']['items'] as &$item) {
-            /* These two fields are the same, due to a bug in learnosity they need to co-exist
-             * since learnosity let you make content in an obsolete format without telling you
-             */
-            $item['reference'] = $itemMapping[$item['reference']];
-            $item['id'] = $item['reference'];
+        foreach ($learnosityContent['activities'] as $activity) {
+            foreach ($activity['data']['items'] as &$item) {
+                /* These two fields are the same, due to a bug in learnosity they need to co-exist
+                 * since learnosity let you make content in an obsolete format without telling you
+                 */
+                $item['reference'] = $itemMapping[$item['reference']];
+                $item['id'] = $item['reference'];
+            }
         }
 
-        $activityMapping = $this->transmit(['activities' => $learnosityContent['activity']], 'itembank/activities', 'activity');
+        $activityMapping = $this->transmit($learnosityContent['activities'], 'itembank/activities', 'activity');
 
         new \Alaress_Probe($learnosityContent, $featureMapping, $questionMapping, $itemMapping, $activityMapping);
 

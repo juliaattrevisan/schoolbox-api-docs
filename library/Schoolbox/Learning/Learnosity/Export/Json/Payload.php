@@ -322,7 +322,9 @@ class Payload
 
         /* Anonymise activity refs
          */
-        unset($activity['reference'], $activity['tags']);
+        $activity['reference'] = $this->generateGuid();
+
+        unset($activity['tags']);
 
         foreach ($activity['data']['items'] as &$item) {
             $item['id'] = $itemReplacementRefs[$item['reference']];
@@ -335,8 +337,12 @@ class Payload
          */
         unset($itemData, $questionData, $featureData);
 
+        /* Assign an arbitrary guid here, for a later lookup nicety
+         */
         return [
-            'activity' => $activity,
+            'activities' => [
+                $activity['reference'] => $activity
+            ],
             'items' => $itemStack,
             'questions' => $questionStack,
             'features' => $featureStack
