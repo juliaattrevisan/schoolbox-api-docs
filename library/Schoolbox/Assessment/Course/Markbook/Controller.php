@@ -280,7 +280,6 @@ class Controller extends WebController\Base
                  */
                 'classImpls' => $courseMarkbook->getCourseImpls()->map(
                     fn(CourseImpl\Model $courseImpl) => [
-                        'courseImplId'    => $courseImpl->getId(),
                         'folder' => [
                             'id'    => $courseImpl->getFolder()->getId(),
                             'title' => $courseImpl->getFolder()->getTitle(),

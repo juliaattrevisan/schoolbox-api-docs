@@ -169,7 +169,6 @@ class Controller extends Base
                  * For the class markbook, there is only ever one of these - the class folder itself
                  */
                 'classImpls' => [[
-                    'courseImplId' => null, /* This is not a course implementation, so null */
                     'folder' => [
                         'id'    => $folder->getFolder()->getId(),
                         'title' => $folder->getFolder()->getTitle(),
