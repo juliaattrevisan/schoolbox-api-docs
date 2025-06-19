@@ -49,6 +49,7 @@
     <div class="row">
         <div class="button-action small-12 columns">
             {{ _self.myProfileHeading(user, nameFormat) }}
+            {% set linkInfo = linksInfo|first %}
             {% if linkInfo.disabled %}
                 <a
                     class="{{ linkInfo.iconClass }} button menu_disabled"
