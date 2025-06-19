@@ -3,6 +3,7 @@
  */
 
 import { defineStore } from "pinia";
+import { useDomContentLoaded } from "@schoolboxVue/composables/events/useDomContentLoaded";
 import type { Node } from "@schoolboxCurriculum/types/Node";
 /* eslint-disable-next-line import/no-cycle -- Same as [SA-18428] */
 import { useNodesStore } from "./csAllNodesStore";
@@ -28,6 +29,7 @@ interface InitProps {
 
 export const useStore = defineStore(`curriculumSelector`, () => {
     const isLoading = window.Vue.ref(true); // to display loading note
+    const { hasDomContentLoaded } = useDomContentLoaded(); // to detect when the DOM content is loaded
     const hasLoadError = window.Vue.ref(false); // to display loading error
     const isProcessing = window.Vue.ref(false); // to notify that an action is taking place, like updating a member access
     const formValueName = window.Vue.ref(""); // the name of the form value to update
@@ -50,7 +52,11 @@ export const useStore = defineStore(`curriculumSelector`, () => {
             return !isLoading.value && !hasLoadError.value;
         }
         return (
-            !isLoading.value && !hasLoadError.value && currentNodesStore.hasLoaded && !currentNodesStore.hasLoadError
+            hasDomContentLoaded.value &&
+            !isLoading.value &&
+            !hasLoadError.value &&
+            currentNodesStore.hasLoaded &&
+            !currentNodesStore.hasLoadError
         );
     });
 

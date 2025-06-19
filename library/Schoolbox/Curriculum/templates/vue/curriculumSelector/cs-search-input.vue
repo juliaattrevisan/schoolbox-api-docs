@@ -52,8 +52,8 @@ const props = defineProps({
  * @returns { String }
  */
 const inputPlaceholder = window.Vue.computed(() => {
-    if (store.isLoading) {
-        return "Loading Curriculum Codes...";
+    if (!store.hasLoadedOk) {
+        return "Loading curriculum data...";
     } else if (store.hasLoadError) {
         return "Currently unable to load Curriculum Codes. Please contact your IT support if the problem persists.";
     } else {
