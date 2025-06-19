@@ -57,6 +57,12 @@ export default {
                             />
                             <img
                                 v-else
+                                :srcset="
+                                    article.featureImage._links.image.href +
+                                    '&size=constrain200, ' +
+                                    article.featureImage._links.image.href +
+                                    '&size=constrain300 1.5x'
+                                "
                                 :src="article.featureImage._links.image.href + '&size=constrain200'"
                                 alt="feature image"
                             />

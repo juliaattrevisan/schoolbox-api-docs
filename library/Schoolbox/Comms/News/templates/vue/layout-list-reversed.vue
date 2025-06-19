@@ -55,6 +55,12 @@ export default {
                         />
                         <img
                             v-else
+                            :srcset="
+                                article.featureImage._links.image.href +
+                                '&size=constrain200, ' +
+                                article.featureImage._links.image.href +
+                                '&size=constrain300 1.5x'
+                            "
                             :src="article.featureImage._links.image.href + '&size=constrain200'"
                             alt="feature image"
                         />
@@ -90,9 +96,9 @@ export default {
                 </template>
                 <div class="card-actions">
                     <h3>
-                        <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">{{
-                            article.title
-                        }}</a>
+                        <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer"
+                            >{{ article.title }}
+                        </a>
                     </h3>
                     <div class="spacer"></div>
                     <nav>
@@ -132,9 +138,9 @@ export default {
                         <template v-for="(topic, index) in article.topics">
                             <template v-if="index">, </template>
                             <!-- Tab change event is triggered on parent article-list, as that has the full list of articles -->
-                            <a v-if="changeTabOnMeta" @click="$parent.onTabChange(topic.slug, false, false, true)">{{
-                                topic.name
-                            }}</a>
+                            <a v-if="changeTabOnMeta" @click="$parent.onTabChange(topic.slug, false, false, true)"
+                                >{{ topic.name }}
+                            </a>
                             <a v-else :href="getIndexRoute + '?' + queryStringTopic + '=' + topic.slug">{{
                                 topic.name
                             }}</a>
