@@ -12,11 +12,9 @@ namespace Schoolbox\Editor\Templates;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
-use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Mapper\Exception\NotFound;
-use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\UserMapper;
 
 class Module extends BaseModule
 {
@@ -49,6 +47,7 @@ class Module extends BaseModule
         return new Controller(
             $this->getMapperFactory()->get(ErrorMapper::class),
             $this->getMapperFactory()->get(Mapper::class),
+            $this->getMapperFactory()->get(UserMapper::class),
         );
     }
 }
