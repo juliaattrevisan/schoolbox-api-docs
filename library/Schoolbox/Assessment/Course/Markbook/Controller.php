@@ -226,7 +226,14 @@ class Controller extends WebController\Base
                 if ($assessment->isSpecification()) {
                     return $assessment->getBaseContext();
                 }
-                return $assessment->getSpecificationAssessment()->getBaseContext();
+
+                /** some assessments may not have a specification assessment (i.e. one created from an imported unit) */
+                $specificationAssessment = $assessment->getSpecificationAssessment();
+                if ($specificationAssessment === null) {
+                    return null;
+                }
+
+                return $specificationAssessment->getBaseContext();
             });
 
             // TODO: clean this up a bit once the payload structure is finalised
@@ -238,11 +245,11 @@ class Controller extends WebController\Base
                     'typeName'          => $assessment->getTypeName(),
                     'assessmentType'    => $assessment->getFamilyName(),
                     'isSpecification'   => $assessment->isSpecification(),
-                    'unitSpec'          => [
+                    'unitSpec'          => $unitSpecs[$assessment->getId()] !== null ? [
                         /* for rendering the unit bars at the top of the page */
                         'id'    => $unitSpecs[$assessment->getId()]->getId(),
                         'title' => $unitSpecs[$assessment->getId()]->getTitle(),
-                    ],
+                    ] : null,
                     /* stats here are only relevant for specs */
                     'stats' => $assessment->isSpecification() ? array_map(
                         /* Get the stats in the same format as returned by the class markbook */
