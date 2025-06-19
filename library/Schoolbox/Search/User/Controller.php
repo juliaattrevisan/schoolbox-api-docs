@@ -584,7 +584,7 @@ class Controller extends BaseController
                             ),
                             'iconClass' => 'icon-staff-students',
                             'disabled' => $student->isDeleted(),
-                            'mouseoverText' => $student->isDeleted() ? 'Account Disabled': 'Login as user',
+                            'mouseoverText' => $student->isDeleted() ? 'Account Disabled' : 'Login as user',
                             'dataTest' => $student->isDeleted() ? '' : 'admin-user-modify-impersonate'
                         ],
                         [
