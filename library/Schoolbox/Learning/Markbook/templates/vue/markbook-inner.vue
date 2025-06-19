@@ -211,7 +211,7 @@ window.Vue.onMounted(async () => {
                         <th class="profile-cell fixed-left white">
                             <div class="c-card">
                                 <div class="l-flex-row l-gap-m l-pad-s">
-                                    <user-photo v-if="!isDegraded" :user="student" render="tiny" rounded-corners />
+                                    <user-photo v-if="!isDegraded" :user="student" render="small" rounded-corners />
                                     <div class="l-flex-col l-flex--justify-center f-no-margins">
                                         <a href="/search/user/{{ student.id }}" title="View Profile">
                                             <template v-if="'fullName' in student"> {{ student.fullName }}</template>
