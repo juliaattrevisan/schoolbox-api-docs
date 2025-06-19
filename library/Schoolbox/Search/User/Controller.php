@@ -132,6 +132,7 @@ class Controller extends BaseController
      * @throws \InvalidArgumentException
      * @throws \LogicException
      * @throws \UnexpectedValueException
+     * @throws RouteNotFound
      */
     private function renderStudent(User $student): void
     {
@@ -559,8 +560,47 @@ class Controller extends BaseController
                 /* The current user session - sadly a superglobal for portability reasons
                  */
                 'session' => $_SESSION,
-
-
+                /* Links to be displayed in the 3-dot menu.
+                 * Links not authorized for the user are filtered out.
+                 */
+                'linksInfo' => array_filter(
+                    [
+                        [
+                            'title' => 'Modify User',
+                            'url' => $this->getRouteIfAuthorized(
+                                'adminUser.getModify',
+                                ['userId' => $student->getId()]
+                            ),
+                            'iconClass' => 'icon-modify',
+                            'disabled' => false,
+                            'mouseoverText' => 'Modify User',
+                            'dataTest' => 'user-profile-modify'
+                        ],
+                        [
+                            'title' => 'Impersonate',
+                            'url' => $this->getRouteIfAuthorized(
+                                'user.impersonate',
+                                ['userId' => $student->getId()]
+                            ),
+                            'iconClass' => 'icon-staff-students',
+                            'disabled' => $student->isDeleted(),
+                            'mouseoverText' => $student->isDeleted() ? 'Account Disabled': 'Login as user',
+                            'dataTest' => $student->isDeleted() ? '' : 'admin-user-modify-impersonate'
+                        ],
+                        [
+                            'title' => 'Create Pastoral Record',
+                            'url' => $this->getRouteIfAuthorized(
+                                'pastoral.getStudentRecordInsertForm',
+                                ['studentId' => $student->getId()]
+                            ),
+                            'iconClass' => 'icon-pastoral',
+                            'disabled' => false,
+                            'mouseoverText' => 'Create Pastoral Record',
+                            'dataTest' => ''
+                        ]
+                    ],
+                    fn ($item) => $item['url'] !== false
+                ),
                 /* Old implementation
                  */
                 'subjects'                 => $subjects,
