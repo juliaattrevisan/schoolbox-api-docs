@@ -1,7 +1,8 @@
 /**
  * Sometimes we need to know when the DOM content is loaded, so we can wait for it before performing certain actions.
  * This was originally created to be used in the curriculum selector, so we can wait for Foundation to be ready before
- * the curriculum modal can be opened
+ * the curriculum modal (which currently uses the foundation sequential modal) can be opened. This is an issue on slower connections
+ * and when the curriculum selector is used on a page that has a lot of other JS to be loaded below (like CKEditor) the selector.
  */
 
 import type { Ref } from "vue";
@@ -21,11 +22,12 @@ export function useDomContentLoaded(): {
     function onDomContentLoaded(): void {
         void window.Vue.nextTick().then(() => {
             hasDomContentLoaded.value = true;
+            window.removeEventListener("DOMContentLoaded", onDomContentLoaded);
         });
     }
 
     /**
-     *  Listens for the DOMContentLoaded event to set hasDomContentLoaded to true
+     * Listens for the DOMContentLoaded event to set hasDomContentLoaded to true.
      */
     window.addEventListener("DOMContentLoaded", onDomContentLoaded);
 
