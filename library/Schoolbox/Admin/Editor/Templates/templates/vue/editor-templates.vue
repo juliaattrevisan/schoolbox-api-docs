@@ -1,6 +1,7 @@
 <script setup lang="ts">
 /**
- * Display a list of editor templates.
+ * Display a list of editor templates. The page divides the templates into categories,
+ * which are displayed as tabs. When a category is selected, the templates for that category are loaded.
  */
 
 import { isAbortError, hasErrorMessage } from "@js/util/errorUtils";
