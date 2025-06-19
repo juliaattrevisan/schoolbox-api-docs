@@ -52,7 +52,13 @@ const participant = window.Vue.computed(() => {
     >
         <template v-if="participant === null || participant.isExcluded"></template>
         <div v-else-if="participant.progressTick" style="display: flex; justify-content: center">
-            <progress-tick :progress-tick="participant.progressTick" :is-self-assessable="false" can-modify no-margin />
+            <progress-tick
+                :progress-tick="participant.progressTick"
+                :is-self-assessable="false"
+                can-modify
+                no-margin
+                @update:class="(newClass) => (participant!.progressTick!.progressClass = newClass)"
+            />
         </div>
         <template v-else>
             <span
