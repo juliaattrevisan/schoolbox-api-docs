@@ -63,15 +63,19 @@ window.Vue.onMounted(async () => {
         </div>
 
         <div class="checklist">
-            <input v-model="showDisplayMarks" type="checkbox" />
-            <label for="show-display-marks" data-test="markbook-show-display-marks">
+            <input v-model="mbStore.showDisplayMarks" type="checkbox" />
+            <label
+                for="show-display-marks"
+                data-test="markbook-show-display-marks"
+                @click="mbStore.showDisplayMarks = !mbStore.showDisplayMarks"
+            >
                 Show Display Marks
                 <span class="hint has-tip tip-top" title="Shows marks in the same format that students see">?</span>
             </label>
         </div>
         <div class="checklist">
-            <input v-model="showDrafts" type="checkbox" />
-            <label for="show-drafts">Show Drafts</label>
+            <input v-model="mbStore.showDrafts" type="checkbox" />
+            <label for="show-drafts" @click="mbStore.showDrafts = !mbStore.showDrafts">Show Drafts</label>
         </div>
         <template v-if="mbStore.data._routes.exportReport">
             <nav>
