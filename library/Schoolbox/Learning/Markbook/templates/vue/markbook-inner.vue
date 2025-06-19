@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import locale from "@js/terminology/rosettaStone";
-import userPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
+import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
 import { useMarkbookStore } from "./store/markbookStore";
+import MiCellGrade from "./mi-cell-grade.vue";
 
 interface Props {
     type: "course" | "class";
@@ -10,9 +11,6 @@ interface Props {
 
 const props = defineProps<Props>();
 const mbStore = useMarkbookStore();
-
-const showDisplayMarks = window.Vue.ref(false);
-const showDrafts = window.Vue.ref(false);
 
 const showAverages = window.Vue.ref(false);
 
@@ -127,9 +125,14 @@ window.Vue.onMounted(async () => {
                         <div>
                             <!-- A teacher clicking an assessment from the markbook is most likely interested in seeing more granular results -->
                             <span>
-                                <a href="{{ activity._routes.summary }}" title="{{ activity.title }}">
+                                <a
+                                    v-if="activity._links.summary !== null"
+                                    :href="activity._links.summary"
+                                    :title="activity.title"
+                                >
                                     {{ activity.title }}
                                 </a>
+                                <span v-else :title="activity.title">{{ activity.title }}</span>
                                 <br />
                                 <span class="meta">{{ activity.typeName }}</span>
                             </span>
@@ -149,7 +152,7 @@ window.Vue.onMounted(async () => {
                         </th>
                         <!-- todo: draftsOffClass/draftsOnClass -->
                         <th class="fixed-left student-grade-cell">
-                            {{ showDrafts ? classImpl.stats.draftWeightedMean : classImpl.stats.weightedMean }}
+                            {{ mbStore.showDrafts ? classImpl.stats.draftWeightedMean : classImpl.stats.weightedMean }}
                         </th>
                         <th v-if="mbStore.data.rank !== null">-</th>
                         <th
@@ -159,7 +162,7 @@ window.Vue.onMounted(async () => {
                         >
                             <span
                                 v-if="
-                                    showDrafts &&
+                                    mbStore.showDrafts &&
                                     assessment.stats.draftMean &&
                                     Object.keys(assessment.hasDraft).length > 0
                                 "
@@ -183,7 +186,7 @@ window.Vue.onMounted(async () => {
 
                     <tr>
                         <th class="class-row class-row-heading fixed-left">
-                            <a href="/homepage/{{ classImpl.folder.id }}">{{ classImpl.folder.title }}</a>
+                            <a :href="`/homepage/${classImpl.folder.id}`">{{ classImpl.folder.title }}</a>
                         </th>
                         <th class="class-row fixed-left"></th>
                         <td v-if="mbStore.data.rank !== null"></td>
@@ -192,7 +195,8 @@ window.Vue.onMounted(async () => {
                                 <a :href="classImpl.assessments[assessment.id]._routes['learningAssessment.getStatus']">
                                     <span
                                         v-if="
-                                            showDrafts && classImpl.assessments[assessment.id].stats.draftMean !== null
+                                            mbStore.showDrafts &&
+                                            classImpl.assessments[assessment.id].stats.draftMean !== null
                                         "
                                         class="meta"
                                     >
@@ -213,7 +217,7 @@ window.Vue.onMounted(async () => {
                                 <div class="l-flex-row l-gap-m l-pad-s">
                                     <user-photo v-if="!isDegraded" :user="student" render="small" rounded-corners />
                                     <div class="l-flex-col l-flex--justify-center f-no-margins">
-                                        <a href="/search/user/{{ student.id }}" title="View Profile">
+                                        <a :href="`/search/user/${student.id}`" title="View Profile">
                                             <template v-if="'fullName' in student"> {{ student.fullName }}</template>
                                             <template v-else>
                                                 {{ student.lastName }}, {{ student.firstName }}
@@ -228,7 +232,7 @@ window.Vue.onMounted(async () => {
                         <th class="fixed-left student-grade-cell">
                             <!-- todo: draftsOffClass/draftsOnClass -->
                             <a
-                                v-if="showDrafts && student.stats.draftWeightedMean !== null"
+                                v-if="mbStore.showDrafts && student.stats.draftWeightedMean !== null"
                                 :href="student._routes.grades"
                                 :title="`View students ${locale.grades.plural}`"
                             >
@@ -239,6 +243,20 @@ window.Vue.onMounted(async () => {
                                 {{ student.stats.weightedMean ?? "–" }}
                             </a>
                         </th>
+                        <td v-if="mbStore.data.rank !== null">
+                            <span v-if="mbStore.data.rank[student.id] !== undefined && student.stats.weightedMean">
+                                {{ mbStore.data.rank[student.id] }}
+                            </span>
+                            <span v-else>–</span>
+                        </td>
+
+                        <mi-cell-grade
+                            v-for="assessment in mbStore.data.assessments"
+                            :key="assessment.id"
+                            :assessment-id="assessment.id"
+                            :class-impl-id="classImplId"
+                            :student-id="student.id"
+                        />
                     </tr>
                 </template>
             </tbody>

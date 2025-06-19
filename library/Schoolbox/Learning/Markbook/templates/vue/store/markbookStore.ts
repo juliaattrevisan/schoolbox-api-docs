@@ -5,6 +5,9 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
     const endpoint = window.Vue.ref<string>("");
     const markbook = window.Vue.ref<Markbook | null>(null);
 
+    const showDisplayMarks = window.Vue.ref(false);
+    const showDrafts = window.Vue.ref(false);
+
     /**
      * Fetch markbook data
      */
@@ -33,5 +36,7 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
     return {
         init,
         data: markbook,
+        showDisplayMarks,
+        showDrafts,
     };
 });

@@ -45,7 +45,7 @@ type MarkbookClassImplActivity = {
                     hr: string | null;
                     hrInstructor: string | null;
                     comment: string | null;
-                }
+                } | null
             >;
             /** the following are only used the class markbook at the moment: */
             isResponseRequired?: boolean;
