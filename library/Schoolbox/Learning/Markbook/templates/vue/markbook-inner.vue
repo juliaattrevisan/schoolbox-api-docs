@@ -45,6 +45,8 @@ window.Vue.onMounted(async () => {
         { immediate: true },
     );
 });
+
+// todo: sequencing
 </script>
 
 <template>
@@ -192,22 +194,23 @@ window.Vue.onMounted(async () => {
 
                         <th v-if="mbStore.data.rank !== null">-</th>
                         <th
-                            v-for="assessment in classImpl.assessments"
+                            v-for="assessment in mbStore.data.assessments"
                             :key="assessment.id"
                             class="student-grade-cell white"
                         >
+                            <span v-if="classImpl.assessments[assessment.id] === undefined" class="na"></span>
                             <span
                                 v-if="
                                     mbStore.showDrafts &&
-                                    assessment.stats.draftMean &&
-                                    Object.keys(assessment.hasDraft).length > 0
+                                    classImpl.assessments[assessment.id].stats.draftMean &&
+                                    Object.keys(classImpl.assessments[assessment.id].hasDraft).length > 0
                                 "
                                 class="meta"
                             >
-                                {{ assessment.stats.draftMean ?? "-" }}
+                                {{ classImpl.assessments[assessment.id].stats.draftMean ?? "-" }}
                             </span>
                             <span v-else>
-                                {{ assessment.stats.mean ?? "–" }}
+                                {{ classImpl.assessments[assessment.id].stats.mean ?? "–" }}
                             </span>
                         </th>
                     </tr>
