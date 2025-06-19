@@ -20,6 +20,10 @@
     :all-participants="{{ (allParticipants ?? []) | json_encode }}"
     get-students-pastoral-counts-url="{{ routeLookup('pastoral.getStudentsCount') }}"
     get-learning-plan-new-url="{{ learningPlanNew }}"
+    get-assessment-participation="{{ routeLookupIfAuthorized('learningAssessment.getAssessmentParticipationForm', {
+        assessmentId: assessment.id,
+        assessment: assessment
+    }) }}"
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/customParticipation.js?v={{ config.site_version }}"></script>

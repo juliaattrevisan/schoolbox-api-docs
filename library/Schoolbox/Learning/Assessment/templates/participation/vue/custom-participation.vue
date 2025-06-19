@@ -12,6 +12,7 @@ interface Props {
     allParticipants: Participant[];
     getStudentsPastoralCountsUrl: string;
     getLearningPlanNewUrl: string;
+    getAssessmentParticipation: string;
 }
 const props = defineProps<Props>();
 
@@ -280,6 +281,13 @@ window.Vue.onMounted(() => {
                     </td>
                     <td>
                         <span v-if="participant.excludedAt !== null">Excluded</span>
+                        <span v-else-if="participant.plan !== null">
+                            <a
+                                :href="`${getAssessmentParticipation}/${participant.plan.id}/modify?returnUrl=${returnUrl}`"
+                            >
+                                {{participant.plan.name}}
+                            </a>
+                        </span>
                     </td>
                     <td class="no-pad">
                         <div v-if="participant.user.id" class="actions-small-1">

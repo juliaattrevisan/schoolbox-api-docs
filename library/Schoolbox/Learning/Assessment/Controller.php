@@ -54,6 +54,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecifi
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
 use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
+use Schoolbox\Assessment\Participant\Plan\Model as PlanModel;
 
 /**
  * Class Controller
@@ -953,6 +954,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'assessment' => $assessment,
             'assessmentId' => $assessment->getId(),
         ]);
+        $data['assessment'] = $assessment;
 
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/participation/update.twig',
@@ -968,11 +970,54 @@ abstract class Controller extends ListController implements IAssessmentControlle
                             ->produceFromAssessment(
                                 $assessment,
                                 $this->getUser()
-                            )->add([$assessment->getTitle() . ' Modify Activity', '']);
+                            )->add([
+                               "Update " . $assessment->getTitle() . " Participation",
+                               $this->getRouteIfAuthorized('learningAssessment.getAssessmentParticipationForm', [
+                                   'assessmentId' => $assessment->getId(),
+                                   'assessment' => $assessment,
+                               ])])->add([$assessment->getTitle() . ' Modify Activity', '']);
 
         $participant = $assessment
             ->getAllParticipants()
             ->filter(fn ($participant) => in_array($participant->getUser()->getId(), $student))
+            ->map(function (Participant $participant) {
+                $student = $participant->getUser();
+                return [
+                    'id' =>  $student->getId(),
+                    'fullName' => $participant->getUser()->getFullName(),
+                    'excludedAt' => $participant->getExcludedAt(),
+                    'user' => $student,
+                    'plan' => $participant->getPlan(),
+                ];
+            })->reindex();
+
+        $this->response = $this->responseFromTemplate(
+            '@learningAssessment/participation/learningPlan/learningPlan.twig',
+            [
+                'breadcrumbs' => $breadcrumbs,
+                'assessment' => $assessment,
+                'participants' => $participant,
+            ]
+        );
+    }
+
+    public function getUpdateAssessmentParticipationLearningPlan(IAssessable $assessment, PlanModel $plan): void
+    {
+        $breadcrumbs = $this->getBakery()
+                            ->produceFromAssessment(
+                                $assessment,
+                                $this->getUser()
+                            )->add([
+                              "Update " . $assessment->getTitle() . " Participation",
+                              $this->getRouteIfAuthorized('learningAssessment.getAssessmentParticipationForm', [
+                                  'assessmentId' => $assessment->getId(),
+                                  'assessment' => $assessment,
+                              ])])->add([$assessment->getTitle() . ' Modify Activity', '']);
+
+
+        $participant = $assessment
+            ->getAllParticipants()
+            ->filter(fn ($participant) => $plan->getParticipants()->keyExists($participant->getUser()->getId()))
             ->map(function (Participant $participant) {
                 $student = $participant->getUser();
                 return [
