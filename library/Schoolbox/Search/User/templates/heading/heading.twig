@@ -38,6 +38,9 @@
                 <a class="icon-staff-students menu_disabled" title="Account disabled">Impersonate</a>
             {% endif %}
         </li>
+        {% if true %}
+            <li><a href="{{ routeLookup('pastoral.getStudentRecordInsertForm', {'studentId': user.id}) }}" class="icon-pastoral" title="Create Pastoral Record">Create Pastoral Record</a></li>
+        {% endif %}
     </ul>
 </div>
 {% elseif canImpersonate %}
