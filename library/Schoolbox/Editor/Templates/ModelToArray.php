@@ -13,7 +13,7 @@ namespace Schoolbox\Editor\Templates;
 use Schoolbox\UserMapper;
 
 /**
- * Translator for translating a category model into an array, ready for JSON
+ * Translator for translating a template model into an array, ready for JSON
  * encoding.
  */
 class ModelToArray
@@ -44,7 +44,7 @@ class ModelToArray
                 $createdBy = call_user_func($this->userTranslator, $createdBy);
             } catch (\Exception $e) {
                 // User not found or other error
-                $createdBy = null;
+                // noop
             }
         }
 
