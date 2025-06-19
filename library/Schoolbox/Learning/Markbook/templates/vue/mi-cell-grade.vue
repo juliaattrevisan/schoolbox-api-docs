@@ -51,8 +51,8 @@ const participant = window.Vue.computed(() => {
         data-pop-out-menu
     >
         <template v-if="participant === null || participant.isExcluded"></template>
-        <div v-else-if="participant.progressTick" style="margin-bottom: 0; position: absolute; top: 0px">
-            <progress-tick :progress-tick="participant.progressTick" :is-self-assessable="false" can-modify />
+        <div v-else-if="participant.progressTick" style="display: flex; justify-content: center">
+            <progress-tick :progress-tick="participant.progressTick" :is-self-assessable="false" can-modify no-margin />
         </div>
         <template v-else>
             <span

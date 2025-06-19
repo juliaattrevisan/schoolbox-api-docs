@@ -19,11 +19,16 @@ interface Props {
      * Defaults to false
      */
     isSelfAssessable?: boolean;
+    /**
+     * To turn off the margin created by progress-tick-form, defaults to false
+     */
+    noMargin?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     canModify: true,
     isSelfAssessable: false,
+    noMargin: false,
 });
 
 const postRouteUrl = window.Vue.computed(() => {
@@ -83,16 +88,24 @@ const mouseoverTitle = window.Vue.computed(() => {
         :action="postRouteUrl"
         method="post"
         class="progress-tick-form"
+        :style="{ margin: props.noMargin ? '0' : undefined }"
         :data-progress-tick-form="props.isSelfAssessable ? 'selfAssessed' : 'teacherAssessed'"
     >
         <a
             class="no-text progress-tick"
             :class="progressClass"
+            :style="{ margin: props.noMargin ? '0' : undefined }"
             :data-progress-tick-status="progressTickStatus"
             :title="mouseoverTitle"
         ></a>
     </form>
-    <span v-else-if="progressClass" class="no-text progress-tick" :class="progressClass" :title="mouseoverTitle"></span>
+    <span
+        v-else-if="progressClass"
+        class="no-text progress-tick"
+        :class="progressClass"
+        :style="{ margin: props.noMargin ? '0' : undefined }"
+        :title="mouseoverTitle"
+    ></span>
 </template>
 
 <style scoped></style>
