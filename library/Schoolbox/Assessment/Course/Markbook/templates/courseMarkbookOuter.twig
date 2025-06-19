@@ -13,21 +13,6 @@ Usage:
     <div class="small-12 columns"><h1>Course Markbook: {{ courseSpec.title }}</h1></div>
 </div>
 
-<div id="markbook-inner-container">
-    <markbook-inner
-        type='course'
-        endpoint='{{ routeLookup('courseMarkbook.postMarkbook', { courseSpecId: courseSpec.id }) }}'
-    />
-</div>
-<script src="{{ CDN_PREFIX }}/js/bundle/markbookInner.js?v={{ config.site_version }}"></script>
-
-{% if canAccessPopOut %}
-<div id="pop-out-menu-markbook-container">
-    <pop-out-menu-markbook></pop-out-menu-markbook>
-</div>
-<script src="{{ CDN_PREFIX }}/js/bundle/popOutMenuMarkbook.js?v={{ config.site_version }}"></script>
-{% endif %}
-
 {% set reportContentId = 'courseMarkbookContent' %}
 
 {% include '@filters/panel.twig' with {
@@ -35,6 +20,22 @@ Usage:
     panel:     filterPanel,
     quickload: true
 } only %}
+
+<div id="markbook-inner-container" class="marksheet-wrapper">
+    <markbook-inner
+        type='course'
+        endpoint='{{ routeLookup('courseMarkbook.postMarkbook', { courseSpecId: courseSpec.id }) }}'
+    />
+</div>
+<script src="{{ CDN_PREFIX }}/js/bundle/markbookInner.js?v={{ config.site_version }}"></script>
+
+
+{% if canAccessPopOut %}
+<div id="pop-out-menu-markbook-container">
+    <pop-out-menu-markbook></pop-out-menu-markbook>
+</div>
+<script src="{{ CDN_PREFIX }}/js/bundle/popOutMenuMarkbook.js?v={{ config.site_version }}"></script>
+{% endif %}
 
 {% autoescape 'js' %}
     <script type="text/javascript">

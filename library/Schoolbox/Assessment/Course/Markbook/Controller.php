@@ -433,7 +433,7 @@ class Controller extends WebController\Base
                                     ],
                                     'averageMarks' => $courseMarkbook->getStudentAverageMarks()[$courseImpl->getId()][$student->getId()] ?? null,
                                     '_routes'    => [
-                                        'learningGrades.getGrades' => $this->routeGenerator->generate(
+                                        'grades' => $this->routeGenerator->generate(
                                             'learningGrades.getGrades',
                                             [
                                                 'viewee'   => $student,

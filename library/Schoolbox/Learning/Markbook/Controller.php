@@ -313,7 +313,7 @@ class Controller extends Base
                         'lastName'   => $student->getLastname(),
                         'stats'      => $markbook->getStudentStatistics()[$student->getId()],
                         '_routes'    => [
-                            'learningGrades.getGrades' => $this->routeGenerator->generate(
+                            'grades' => $this->routeGenerator->generate(
                                 'learningGrades.getGrades',
                                 [
                                     'viewee'   => $student,

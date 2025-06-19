@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import locale from "@js/terminology/rosettaStone";
+import userPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
 import { useMarkbookStore } from "./store/markbookStore";
 
 interface Props {
@@ -205,8 +207,38 @@ window.Vue.onMounted(async () => {
                         </template>
                     </tr>
 
-                    <tr v-for="student in classImpl.students" :key="student.id" :data-student="student.id">
-                        <!-- todo: students -->
+                    <tr v-for="student in classImpl.students" :key="student.id">
+                        <th class="profile-cell fixed-left white">
+                            <div class="c-card">
+                                <div class="l-flex-row l-gap-m l-pad-s">
+                                    <user-photo v-if="!isDegraded" :user="student" render="tiny" rounded-corners />
+                                    <div class="l-flex-col l-flex--justify-center f-no-margins">
+                                        <a href="/search/user/{{ student.id }}" title="View Profile">
+                                            <template v-if="'fullName' in student"> {{ student.fullName }}</template>
+                                            <template v-else>
+                                                {{ student.lastName }}, {{ student.firstName }}
+                                            </template>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </th>
+
+                        <!-- todo: draftsOffClass/draftsOnClass -->
+                        <th class="fixed-left student-grade-cell">
+                            <!-- todo: draftsOffClass/draftsOnClass -->
+                            <a
+                                v-if="showDrafts && student.stats.draftWeightedMean !== null"
+                                :href="student._routes.grades"
+                                :title="`View students ${locale.grades.plural}`"
+                            >
+                                {{ student.stats.draftWeightedMean }}
+                            </a>
+                            <!-- todo: draftsOffClass/draftsOnClass -->
+                            <a v-else :href="student._routes.grades" :title="`View students ${locale.grades.plural}`">
+                                {{ student.stats.weightedMean }}
+                            </a>
+                        </th>
                     </tr>
                 </template>
             </tbody>

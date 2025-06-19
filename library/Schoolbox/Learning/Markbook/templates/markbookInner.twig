@@ -199,12 +199,12 @@
                     data-off-class="{{ draftsOffClass }}" data-on-class="{{ draftsOnClass }}">
                     {# Regardless of which term is being filtered to, link to default term grades page (ie empty termCode) #}
                     <a class="{{ draftsOffClass }}"
-                       href="{{ student._routes['learningGrades.getGrades'] }}" {% if draftWeightedMean %}data-actual-mark{% endif %}
-                       title="View students {{ locale.grades.plural }}"> {{ studentMean | default('-') }}
+                       href="{{ student._routes.grades }}" {% if draftWeightedMean %}data-actual-mark{% endif %}
+                       title="View student's {{ locale.grades.plural }}"> {{ studentMean | default('-') }}
                     </a>
                     {% if draftWeightedMean %}
                         <a class="{{ draftsOnClass }}"
-                           href="{{ student._routes['learningGrades.getGrades'] }}" data-draft-mark style="display: none"
+                           href="{{ student._routes.grades }}" data-draft-mark style="display: none"
                            title="View student draft {{ locale.grades.plural }}"> {{ draftWeightedMean | default('-') }}
                         </a>
                     {% endif %}

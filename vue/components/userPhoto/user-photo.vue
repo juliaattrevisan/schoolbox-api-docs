@@ -9,7 +9,7 @@ interface Props {
      * User takes precedence over userId and externalId
      * If set to false, it will render the default portrait image
      */
-    user?: { id?: number; externalId?: string } | false;
+    user?: { id?: number | null; externalId?: string | number | null } | false;
     userId?: number;
     externalId?: string;
     /**
@@ -60,7 +60,7 @@ const resolvedExternalId = window.Vue.computed(() => {
     }
 
     // Prefer to take the externalId from the `user` object
-    if (props.user && props.user.externalId !== undefined) {
+    if (props.user && props.user.externalId) {
         return props.user.externalId;
     }
 

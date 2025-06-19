@@ -191,9 +191,9 @@
                         {% set draftsOnClass = marks.any is defined and marks.any.hr ? urgency.marks(draftNormMark) ~ '-bg' : 'gradient-off-bg' %}
 
                         <th class="fixed-left student-average {{ draftsOffClass }}" {% if marks.any is defined %}data-student-average{% endif %} data-off-class="{{ draftsOffClass }}" data-on-class="{{ draftsOnClass }}">
-                            <a class="{{ draftsOffClass }}" href="{{ student._routes['learningGrades.getGrades'] }}" {% if marks.any is defined %}data-actual-mark{% endif %} title="View students {{ locale.grades.plural }}">{{ publishedHrMark }}</a>
+                            <a class="{{ draftsOffClass }}" href="{{ student._routes.grades }}" {% if marks.any is defined %}data-actual-mark{% endif %} title="View students {{ locale.grades.plural }}">{{ publishedHrMark }}</a>
                             {% if marks.any is defined %}
-                                  <a class="{{ draftsOnClass }}" href="{{ student._routes['learningGrades.getGrades'] }}" data-draft-mark style="display: none" data-tooltip="right" class="meta has-tip tip-right" data-width="105" title="Draft Mark">{{ draftHrMark }}</a>
+                                  <a class="{{ draftsOnClass }}" href="{{ student._routes.grades }}" data-draft-mark style="display: none" data-tooltip="right" class="meta has-tip tip-right" data-width="105" title="Draft Mark">{{ draftHrMark }}</a>
                             {% endif %}
                         </th>
                         {% if rank %}
