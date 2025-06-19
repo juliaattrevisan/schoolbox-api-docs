@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import locale from "@js/terminology/rosettaStone";
+import { getGradient } from "@js/util/cssUtils";
 import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
 import { useMarkbookStore } from "./store/markbookStore";
 import MiCellGrade from "./mi-cell-grade.vue";
@@ -173,10 +174,22 @@ window.Vue.onMounted(async () => {
                             ></a>
                             Class Average
                         </th>
-                        <!-- todo: draftsOffClass/draftsOnClass -->
-                        <th class="fixed-left student-grade-cell">
-                            {{ mbStore.showDrafts ? classImpl.stats.draftWeightedMean : classImpl.stats.weightedMean }}
+
+                        <th
+                            v-if="mbStore.showDrafts"
+                            class="fixed-left student-grade-cell"
+                            :class="getGradient(classImpl.stats.draftNormalisedMean, 100, true)"
+                        >
+                            {{ classImpl.stats.draftWeightedMean }}
                         </th>
+                        <th
+                            v-else
+                            class="fixed-left student-grade-cell"
+                            :class="getGradient(classImpl.stats.normalisedMean, 100, true)"
+                        >
+                            {{ classImpl.stats.weightedMean }}
+                        </th>
+
                         <th v-if="mbStore.data.rank !== null">-</th>
                         <th
                             v-for="assessment in classImpl.assessments"
@@ -251,18 +264,32 @@ window.Vue.onMounted(async () => {
                             </div>
                         </th>
 
-                        <!-- todo: draftsOffClass/draftsOnClass -->
-                        <th class="fixed-left student-grade-cell">
-                            <!-- todo: draftsOffClass/draftsOnClass -->
+                        <th
+                            class="fixed-left student-grade-cell"
+                            :class="
+                                getGradient(
+                                    mbStore.showDrafts && student.stats.draftWeightedMean !== null
+                                        ? student.stats.meanDraftNormalised
+                                        : student.stats.meanNormalised,
+                                    100,
+                                    true,
+                                )
+                            "
+                        >
                             <a
                                 v-if="mbStore.showDrafts && student.stats.draftWeightedMean !== null"
+                                :class="getGradient(student.stats.meanDraftNormalised, 100, true)"
                                 :href="student._routes.grades"
                                 :title="`View students ${locale.grades.plural()}`"
                             >
                                 {{ student.stats.draftWeightedMean }}
                             </a>
-                            <!-- todo: draftsOffClass/draftsOnClass -->
-                            <a v-else :href="student._routes.grades" :title="`View students ${locale.grades.plural()}`">
+                            <a
+                                v-else
+                                :class="getGradient(student.stats.meanNormalised, 100, true)"
+                                :href="student._routes.grades"
+                                :title="`View students ${locale.grades.plural()}`"
+                            >
                                 {{ student.stats.weightedMean ?? "–" }}
                             </a>
                         </th>

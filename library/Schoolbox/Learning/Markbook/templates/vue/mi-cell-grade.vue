@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { getGradient } from "@js/util/cssUtils";
 import ProgressTick from "@schoolboxLibrary/Learning/Assessment/templates/fragments/vue/progress-tick.vue";
 import { useMarkbookStore } from "./store/markbookStore";
 
@@ -65,14 +66,18 @@ const participant = window.Vue.computed(() => {
                 v-if="mbStore.showDrafts && participant.marks.draft !== null"
                 data-tooltip="right"
                 class="has-tip tip-right meta"
+                :class="getGradient(participant.marks.draft.norm, 100, false)"
                 data-width="105"
                 title="Draft Mark"
             >
                 <!-- todo: decorator.label -->
                 {{ participant.marks.draft[mbStore.showDisplayMarks ? "hr" : "hrInstructor"] }}
             </span>
-            <!-- todo: urgency.marks -->
-            <span v-else-if="participant.marks.published !== null" :title="participant.marks.published.comment ?? ''">
+            <span
+                v-else-if="participant.marks.published !== null"
+                :title="participant.marks.published.comment ?? ''"
+                :class="getGradient(participant.marks.published.norm, 100, false)"
+            >
                 <!-- todo: decorator.label -->
                 {{ participant.marks.published[mbStore.showDisplayMarks ? "hr" : "hrInstructor"] }}
             </span>

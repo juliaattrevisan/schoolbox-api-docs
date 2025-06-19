@@ -41,17 +41,23 @@ export function removeClassesThatContain(element: HTMLElement, search: string): 
  * Return a colour between a gradient of red (0) to green (10) based on the current count and total count
  * @param currentCount - the current count of the total
  * @param totalCount - the total count
+ * @param background - whether this will be used as a background colour or not (appends "-bg"), default false
  * @returns - the class name of the gradient
  */
-export function getGradient(currentCount: number | null, totalCount: number | null): string {
+export function getGradient(
+    currentCount: number | null,
+    totalCount: number | null,
+    background: boolean = false,
+): string {
+    const gradientNone = background ? "gradient-none-bg" : "gradient-none";
     if (typeof currentCount !== "number" || typeof totalCount !== "number") {
-        return "gradient-none";
+        return gradientNone;
     }
     if (currentCount === 0 && totalCount === 0) {
-        return "gradient-none";
+        return gradientNone;
     }
     if (currentCount > totalCount) {
-        return "gradient-none";
+        return gradientNone;
     }
     const gradient = (currentCount / totalCount) * 100;
     let index = Math.floor(gradient / 10);
@@ -63,5 +69,5 @@ export function getGradient(currentCount: number | null, totalCount: number | nu
     if (index < min) {
         index = min;
     }
-    return `gradient-${index}`;
+    return `gradient-${index}${background ? "-bg" : ""}`;
 }
