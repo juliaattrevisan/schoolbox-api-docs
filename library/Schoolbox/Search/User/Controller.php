@@ -578,9 +578,13 @@ class Controller extends BaseController
                         ],
                         [
                             'title' => 'Impersonate',
-                            'url' => $this->getRouteIfAuthorized(
-                                'user.impersonate',
-                                ['userId' => $student->getId()]
+                            'url' => (
+                                $viewer->getId() === $student->getId()
+                                ? false
+                                : $this->getRouteIfAuthorized(
+                                    'user.impersonate',
+                                    ['userId' => $student->getId()]
+                                )
                             ),
                             'iconClass' => 'icon-staff-students',
                             'disabled' => $student->isDeleted(),
