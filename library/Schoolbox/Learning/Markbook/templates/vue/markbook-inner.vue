@@ -30,6 +30,19 @@ const isDegraded = window.Vue.computed(() => {
 
 window.Vue.onMounted(async () => {
     await mbStore.init(props.endpoint);
+
+    /**
+     * Ensure tooltips are reflowed when the markbook is changed
+     */
+    window.Vue.watch(
+        () => [mbStore.showDisplayMarks, mbStore.showDrafts],
+        () => {
+            // @ts-expect-error -- When a tooltip is added after the page is loaded, we need to tell foundation to fix the tooltips
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- foundation isn't typed, see above
+            $(document).foundation("tooltip", "reflow");
+        },
+        { immediate: true },
+    );
 });
 </script>
 
@@ -70,7 +83,13 @@ window.Vue.onMounted(async () => {
                 @click="mbStore.showDisplayMarks = !mbStore.showDisplayMarks"
             >
                 Show Display Marks
-                <span class="hint has-tip tip-top" title="Shows marks in the same format that students see">?</span>
+                <span
+                    class="hint has-tip tip-top"
+                    data-tooltip
+                    title="Shows marks in the same format that students see"
+                >
+                    ?
+                </span>
             </label>
         </div>
         <div class="checklist">
@@ -238,12 +257,12 @@ window.Vue.onMounted(async () => {
                             <a
                                 v-if="mbStore.showDrafts && student.stats.draftWeightedMean !== null"
                                 :href="student._routes.grades"
-                                :title="`View students ${locale.grades.plural}`"
+                                :title="`View students ${locale.grades.plural()}`"
                             >
                                 {{ student.stats.draftWeightedMean }}
                             </a>
                             <!-- todo: draftsOffClass/draftsOnClass -->
-                            <a v-else :href="student._routes.grades" :title="`View students ${locale.grades.plural}`">
+                            <a v-else :href="student._routes.grades" :title="`View students ${locale.grades.plural()}`">
                                 {{ student.stats.weightedMean ?? "–" }}
                             </a>
                         </th>
