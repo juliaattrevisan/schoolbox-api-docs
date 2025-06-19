@@ -281,7 +281,7 @@ window.Vue.onMounted(() => {
                     </td>
                     <td>
                         <span v-if="participant.excludedAt !== null">Excluded</span>
-                        <span v-else-if="participant.plan !== null">
+                        <span v-else-if="participant.plan.name !== null">
                             <a
                                 :href="`${getAssessmentParticipation}/${participant.plan.id}/modify?returnUrl=${returnUrl}`"
                             >
@@ -299,6 +299,14 @@ window.Vue.onMounted(() => {
                             </nav>
                             <ul :id="`participant-${participant.user.id}`" data-dropdown-content="" class="f-dropdown">
                                 <template v-if="participant.excludedAt !== null">
+                                    <li class="separator">Manage</li>
+                                    <li>
+                                        <button class="icon-close" @click.prevent="includeParticipant(participant)">
+                                            Remove Customisation
+                                        </button>
+                                    </li>
+                                </template>
+                                <template v-else-if="participant.plan.name !== null">
                                     <li class="separator">Manage</li>
                                     <li>
                                         <button class="icon-close" @click.prevent="includeParticipant(participant)">
