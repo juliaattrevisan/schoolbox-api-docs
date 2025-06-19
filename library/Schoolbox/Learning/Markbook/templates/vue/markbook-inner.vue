@@ -168,7 +168,7 @@ window.Vue.onMounted(async () => {
                                 {{ assessment.stats.draftMean ?? "-" }}
                             </span>
                             <span v-else>
-                                {{ assessment.stats.mean ?? "-" }}
+                                {{ assessment.stats.mean ?? "–" }}
                             </span>
                         </th>
                     </tr>
@@ -196,10 +196,10 @@ window.Vue.onMounted(async () => {
                                         "
                                         class="meta"
                                     >
-                                        {{ classImpl.assessments[assessment.id].stats.draftMean ?? "-" }}
+                                        {{ classImpl.assessments[assessment.id].stats.draftMean ?? "–" }}
                                     </span>
                                     <span v-else>
-                                        {{ classImpl.assessments[assessment.id].stats.mean ?? "-" }}
+                                        {{ classImpl.assessments[assessment.id].stats.mean ?? "–" }}
                                     </span>
                                 </a>
                             </td>
@@ -236,7 +236,7 @@ window.Vue.onMounted(async () => {
                             </a>
                             <!-- todo: draftsOffClass/draftsOnClass -->
                             <a v-else :href="student._routes.grades" :title="`View students ${locale.grades.plural}`">
-                                {{ student.stats.weightedMean }}
+                                {{ student.stats.weightedMean ?? "–" }}
                             </a>
                         </th>
                     </tr>
