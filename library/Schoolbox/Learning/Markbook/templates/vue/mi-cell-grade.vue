@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ProgressTick from "@schoolboxLibrary/Learning/Assessment/templates/fragments/vue/progress-tick.vue";
 import { useMarkbookStore } from "./store/markbookStore";
 
 interface Props {
@@ -50,15 +51,9 @@ const participant = window.Vue.computed(() => {
         data-pop-out-menu
     >
         <template v-if="participant === null || participant.isExcluded"></template>
-        <!-- todo: add actual progress tick functionality -->
-        <div
-            v-else-if="participant.progressTick"
-            style="margin-bottom: 0; position: absolute; top: 0px"
-            class="no-text progress-tick"
-            :class="participant.progressTick.progressClass"
-            title="Incomplete"
-            data-progress-tick-status="incomplete"
-        ></div>
+        <div v-else-if="participant.progressTick" style="margin-bottom: 0; position: absolute; top: 0px">
+            <progress-tick :progress-tick="participant.progressTick" :is-self-assessable="false" can-modify />
+        </div>
         <template v-else>
             <span
                 v-if="mbStore.showDrafts && participant.marks.draft !== null"
