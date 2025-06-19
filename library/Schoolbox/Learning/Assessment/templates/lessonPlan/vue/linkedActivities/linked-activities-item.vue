@@ -2,6 +2,7 @@
 import { kebabCase } from "lodash";
 import { getGradient } from "@js/util/cssUtils";
 import type { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
+import ProgressTick from "@schoolboxLibrary/Learning/Assessment/templates/fragments/vue/progress-tick.vue";
 import { useLinkedActivitiesStore } from "./store/linkedActivitiesStore";
 
 interface Props {
@@ -42,67 +43,6 @@ function getUrgency(): string {
     return store.gradeGradientEnable
         ? getGradient(props.activity.completionCount, props.activity.studentCount)
         : "gradient-none";
-}
-
-/**
- * This is intended to match the behaviour in progressTick.twig.
- * @param activity The activity whose progressTick we want to describe.
- * @returns A description to be used as mouseover text.
- */
-function getProgressTickMouseoverTitle(activity: Activity): string {
-    const { progressTick } = activity; // This syntax means the same as 'progressTick = activity.progressTick;'
-
-    if (progressTick === null) {
-        throw new Error("This function should not have been called.");
-    }
-
-    const postRouteUrlSupplied = progressTick.postRouteUrl !== "";
-
-    switch (progressTick.progressClass) {
-        case "incomplete":
-            return "Incomplete";
-        case "pending":
-            return postRouteUrlSupplied ? "Self-assessed" : "Awaiting Feedback";
-        case "failed":
-            return postRouteUrlSupplied ? "N/A" : "Resubmission Required";
-        case "reviewed":
-            return "Completed";
-        default:
-            return "";
-    }
-}
-
-/**
- * This is intended to match the behaviour in progressTick.twig.
- * @param activity The relevant activity.
- * @returns A string to be used as the value of the 'data-progress-tick-status' attribute.
- */
-function getDataProgressTickStatus(activity: Activity): string {
-    const { progressTick } = activity; // This syntax means the same as 'progressTick = activity.progressTick;'
-
-    if (progressTick === null) {
-        throw new Error("This function should not have been called.");
-    }
-
-    switch (progressTick.progressClass) {
-        case "incomplete":
-            return "incomplete";
-        case "pending":
-            return "selfAssessed";
-        case "reviewed":
-            return "teacherAssessed";
-        default:
-            return "";
-    }
-}
-
-/**
- * This is intended to match the behaviour in progressTick.twig.
- * @param activity The activity whose progressTick we want to describe
- * @returns A description to be used as mouseover text
- */
-function getDataProgressTickForm(activity: Activity): string {
-    return activity.isSelfAssessableTask ? "selfAssessed" : "teacherAssessed";
 }
 
 const activityLink = window.Vue.computed(() => {
@@ -147,24 +87,11 @@ const activityLink = window.Vue.computed(() => {
         <a class="icon-close no-text" title="Unlink Assessment" @click.prevent="handleUnlinkClick()"></a>
     </nav>
     <nav v-else-if="activity.progressTick !== null" class="progress-tick-container">
-        <form
-            v-if="activity.progressTick.postRouteUrl !== ''"
-            :action="activity.progressTick.postRouteUrl || undefined"
-            method="post"
-            class="progress-tick-form"
-            :data-progress-tick-form="getDataProgressTickForm(activity)"
-        >
-            <a
-                :class="'no-text progress-tick ' + activity.progressTick.progressClass"
-                :data-progress-tick-status="getDataProgressTickStatus(activity)"
-                :title="getProgressTickMouseoverTitle(activity)"
-            ></a>
-        </form>
-        <span
-            v-else-if="activity.progressTick.progressClass !== ''"
-            :class="'no-text progress-tick ' + activity.progressTick.progressClass"
-            :title="getProgressTickMouseoverTitle(activity)"
-        ></span>
+        <progress-tick
+            :progress-tick="activity.progressTick"
+            :can-modify="true"
+            :is-self-assessable="activity.isSelfAssessableTask"
+        />
     </nav>
 </template>
 
