@@ -12,6 +12,7 @@ use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Module\Registry;
 use Alaress\Web;
 use Alaress\Web\Controller\Exception;
+use Alaress\Web\Request\Values;
 use Aura\Router\Exception\RouteNotFound;
 use Crell\ApiProblem\ApiProblem;
 use DomainException;
@@ -1274,19 +1275,50 @@ class ListController extends Web\Controller\Base
     }
 
     /**
-     * Process the learning plan for the custom participation
+     * Creating new learning plan customisation for the assessment
      *
      * @param IAssessable $assessment
      * @return void
+     * @throws MapperException
      */
-    public function postAssessmentParticipationLearningPlan(IAssessable $assessment): void
+    public function postCreateAssessmentParticipationLearningPlan(IAssessable $assessment): void
     {
         $postData = $this->requestPost;
 
+        $this->persistAssessmentParticipationLearningPlan($assessment, $postData);
+    }
+
+    /**
+     * Updating existing learning plan customisation
+     *
+     * @param IAssessable $assessment
+     * @return void
+     * @throws MapperException
+     */
+    public function postUpdateAssessmentParticipationLearningPlan(IAssessable $assessment): void
+    {
+        $postData = $this->requestPost;
+
+        $this->persistAssessmentParticipationLearningPlan($assessment, $postData);
+    }
+
+    /**
+     * Process the learning plan for the custom participation
+     *
+     * @param IAssessable $assessment
+     * @param Values      $postData
+     * @return void
+     * @throws MapperException
+     */
+    public function persistAssessmentParticipationLearningPlan(
+        IAssessable $assessment,
+        Web\Request\Values $postData,
+    ): void {
         $returnUrl = $this->requestQuery->get('returnUrl');
 
-        $postData['plans'][-1] = [
-            'id' => -1,
+        $planId = $postData['plan-id'];
+        $planData[$planId] = [
+            'id' => $planId,
             'name' =>  $postData['plan-name'],
             'description' => $postData['plan-desc'],
             'publish_date' =>  $postData['planPublishDate'],
@@ -1297,7 +1329,7 @@ class ListController extends Web\Controller\Base
         // Note: in the returned collection
         //    - any plans CREATED by this method will be NEGATIVELY INDEXED (the object has a real ID though)
         //    - any plans UPDATED by this method will be ID INDEXED
-        $plans = $this->savePlanData($assessment, $postData['plans'] ?? []);
+        $plans = $this->savePlanData($assessment, $planData ?? []);
 
         $this->saveParticipationData($assessment, $plans, $postData['participant-include'] ?? [], $postData['participant-plan'] ?? []);
 
