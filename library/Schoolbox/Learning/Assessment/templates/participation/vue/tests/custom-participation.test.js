@@ -49,3 +49,28 @@ test("bottom drawer is visible when two participants are selected", async () => 
 
     expect(wrapper.find('[data-test="custom-participation-bottom-drawer"]').isVisible()).toBe(true);
 });
+
+test("When one of the three students is excluded, Copy Activity button does not appear", async () => {
+    const modified = allParticipants.slice(0, 3).map((p, index) => {
+        if (index === 2) {
+            return { ...p, excludedAt: "2025-06-20T10:00:00+10:00" };
+        }
+        return p;
+    });
+
+    const wrapper = mount(CustomParticipation, {
+        props: {
+            allParticipants: modified,
+            getStudentsPastoralCountsUrl: "",
+        },
+    });
+
+    const checkboxes = wrapper.findAll('[data-test^="custom-participation-checkbox-"]');
+    await checkboxes[0].setValue(true);
+    await checkboxes[1].setValue(true);
+    await checkboxes[2].setValue(true);
+    await wrapper.vm.$nextTick();
+
+    const copyButton = wrapper.find('[data-test="custom-participation-copy-activity"]');
+    expect(copyButton.exists()).toBe(false);
+});

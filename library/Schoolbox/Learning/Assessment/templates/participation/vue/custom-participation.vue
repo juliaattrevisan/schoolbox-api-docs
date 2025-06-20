@@ -326,7 +326,9 @@ window.Vue.onMounted(() => {
                     <button class="icon-close submit" @click.prevent="includeSelected">Remove Customisation</button>
                 </template>
                 <template v-else>
-                    <div class="l-flex__item--1"><a class="icon-copy submit">Copy Activity</a></div>
+                    <div class="l-flex__item--1">
+                        <a class="icon-copy submit" data-test="custom-participation-copy-activity">Copy Activity</a>
+                    </div>
                     <div class="l-flex__item--1">
                         <button class="icon-staff-students submit" @click.prevent="excludeSelected">Exclude</button>
                     </div>
