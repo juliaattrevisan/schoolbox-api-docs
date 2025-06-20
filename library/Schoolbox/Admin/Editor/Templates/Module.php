@@ -14,6 +14,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
+use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Admin\Editor\Templates\Category\Mapper;
 
@@ -41,7 +42,13 @@ class Module extends BaseModule
             )
         );
 
+        $preloadCategory = function ($params) {
+            return $this->preloadCategory($params);
+        };
+
         $this->register('GET', '', 'getList', $perms);
+        $this->register('GET', '/{categoryId}/create', 'getCreate', $perms, $preloadCategory);
+        $this->register('POST', '/{categoryId}/create', 'postCreate', $perms, $preloadCategory);
     }
 
     /**
@@ -50,7 +57,9 @@ class Module extends BaseModule
     public function buildController(): Base
     {
         return new Controller(
+            $this->getMapperFactory()->get(\Schoolbox\Error\Mapper::class),
             $this->getMapperFactory()->get(Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Editor\Templates\Mapper::class),
         );
     }
 
@@ -60,5 +69,29 @@ class Module extends BaseModule
     public function initTemplatePaths(IChainLoader $templateLoader): void
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
+    }
+
+    /**
+     * Preload a category for template creation
+     *
+     * @param array $params
+     * @return array
+     * @throws \Schoolbox\Mapper\Exception\NotFound
+     * @throws \InvalidArgumentException
+     */
+    private function preloadCategory(array $params): array
+    {
+        if (\array_key_exists('category', $params)) {
+            $template = $params['category'];
+        } else {
+            try {
+                $template = $this->getMapperFactory()->get(Mapper::class)->findById($params['categoryId']);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                throw new NotFound('Unknown category submitted.', 0, $e);
+            }
+        }
+        return [
+            'category' => $template
+        ];
     }
 }

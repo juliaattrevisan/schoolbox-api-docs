@@ -11,19 +11,27 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Editor\Templates;
 
 use Alaress\Web\Controller\Base;
+use Alaress\Web\Exception\NotFound;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Editor\Templates\Category\ModelToArray;
-use Schoolbox\Admin\Editor\Templates\Category\Mapper;
+use Schoolbox\Admin\Editor\Templates\Category\Mapper as CategoryMapper;
+use Schoolbox\Editor\Templates\Mapper as TemplateMapper;
+use Schoolbox\Editor\Templates\Model as TemplateModel;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 class Controller extends Base
 {
     /**
      * Controller constructor.
      *
-     * @param Mapper $categoryMapper
+     * @param ErrorMapper $errorMapper
+     * @param CategoryMapper $categoryMapper
+     * @param TemplateMapper $templateMapper
      */
     public function __construct(
-        private Mapper $categoryMapper,
+        private ErrorMapper $errorMapper,
+        private CategoryMapper $categoryMapper,
+        private TemplateMapper $templateMapper,
     ) {
     }
 
@@ -43,6 +51,63 @@ class Controller extends Base
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminEditorTemplates.getList')),
                 'categories' => $categories->map($translator),
             ]
+            );
+    }
+
+    /**
+     * Create a new editor template
+     *
+     * @param object $category
+     * @return void
+     * @throws \Aura\Router\Exception\RouteNotFound
+     */
+    public function getCreate(object $category): void
+    {
+        $this->response = $this->responseFromTemplate(
+            '@adminEditorTemplates/create.twig',
+            [
+                'pageCurrent' => $this->routeGenerator->generate('adminEditorTemplates.getList'),
+                'allBreadcrumbs' => array_merge(
+                    (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminEditorTemplates.getList')),
+                    [['Create Template', null]]
+                ),
+                'category' => $category,
+                'template' => null,
+            ]
         );
+    }
+
+    /**
+     * Persist a new editor template
+     *
+     * @param object $category
+     * @return void
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \PDOException
+     * @throws \Schoolbox\Application\Exception\Exception
+     * @throws \UnexpectedValueException
+     */
+    public function postCreate(object $category): void
+    {
+        $postData = $this->requestPost->getArrayCopy();
+
+        // Validate required fields
+        if (empty(trim((string)($postData['title'] ?? '')))) {
+            throw $this->errorMapper->generateException(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
+        }
+
+        // Create new template
+        $template = $this->templateMapper->createModel()
+            ->setCategoryId($category->id)
+            ->setTitle(trim((string)$postData['title']))
+            ->setDescription(trim((string)($postData['description'] ?? '')))
+            ->setBody(trim((string)($postData['body'] ?? '')))
+            ->setCreatedBy($this->getUser()->getId());
+
+        $this->templateMapper->save($template);
+
+        // Redirect back to list
+        $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminEditorTemplates.getList'));
     }
 }

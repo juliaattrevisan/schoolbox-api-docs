@@ -21,6 +21,11 @@ class Model
     use CreatedBy;
 
     /**
+     * @var int
+     */
+    private int $categoryId;
+
+    /**
      * @var string
      */
     private string $title;
@@ -34,6 +39,24 @@ class Model
      * @var string
      */
     private string $body;
+
+    /**
+     * @return int
+     */
+    public function getCategoryId(): int
+    {
+        return $this->categoryId;
+    }
+
+    /**
+     * @param int $categoryId
+     * @return Model
+     */
+    public function setCategoryId(int $categoryId): self
+    {
+        $this->categoryId = $categoryId;
+        return $this;
+    }
 
     /**
      * @return string

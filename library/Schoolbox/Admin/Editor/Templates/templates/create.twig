@@ -1,0 +1,89 @@
+{% extends "admin/master.twig" %}
+
+{% block title %}Create {{ category.name|replace({'-': ' '})|title }} Template{% endblock %}
+
+{% block content %}
+<div class="content">
+    <div class="row">
+        <div class="large-12 columns">
+            <h1>Create {{ category.name|replace({'-': ' '})|title }} Template</h1>
+
+            <form method="post" action="{{ url('adminEditorTemplates.postCreate', {'categoryId': category.id}) }}">
+                <div class="row">
+                    <div class="large-6 columns">
+                        <label for="title">Template Title <span class="required">*</span></label>
+                        <input type="text"
+                               id="title"
+                               name="title"
+                               value="{{ formData.title|default('') }}"
+                               required
+                               maxlength="255"
+                               placeholder="Enter template title">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="large-12 columns">
+                        <label for="description">Description</label>
+                        <textarea id="description"
+                                  name="description"
+                                  rows="3"
+                                  maxlength="1000"
+                                  placeholder="Enter template description">{{ formData.description|default('') }}</textarea>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="large-12 columns">
+                        <label for="body">Template Content <span class="required">*</span></label>
+                        <textarea id="body"
+                                  name="body"
+                                  rows="15"
+                                  required
+                                  placeholder="Enter template HTML content">{{ formData.body|default('') }}</textarea>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="large-12 columns">
+                        <div class="button-group">
+                            <button type="submit" class="button">Create Template</button>
+                            <a href="{{ url('adminEditorTemplates.getList') }}" class="button secondary">Cancel</a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Basic form validation
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form');
+        const titleInput = document.getElementById('title');
+        const bodyInput = document.getElementById('body');
+
+        form.addEventListener('submit', function(e) {
+            const title = titleInput.value.trim();
+            const body = bodyInput.value.trim();
+
+            if (!title) {
+                alert('Please enter a template title.');
+                titleInput.focus();
+                e.preventDefault();
+                return false;
+            }
+
+            if (!body) {
+                alert('Please enter template content.');
+                bodyInput.focus();
+                e.preventDefault();
+                return false;
+            }
+        });
+    });
+</script>
+{% endblock %}
