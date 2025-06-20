@@ -561,7 +561,6 @@ class Controller extends BaseController
                  */
                 'session' => $_SESSION,
                 /* Links to be displayed in the 3-dot menu.
-                 * Links not authorized for the user are filtered out.
                  */
                 'linksInfo' => $this->getProfileThreeDotMenuLinksInfo($viewer, $student),
                 /* Old implementation
@@ -585,6 +584,7 @@ class Controller extends BaseController
      * @throws MapperException
      * @throws \DomainException
      * @throws \UnexpectedValueException
+     * @throws RouteNotFound
      */
     private function renderStaff(User $staff): void
     {
@@ -637,6 +637,9 @@ class Controller extends BaseController
                 /* Decides if the Geosnapshot button could be accessed
                  */
                 'isGeosnapshotAvailable' => $isGeosnapshotAvailable,
+                /* Links to be displayed in the 3-dot menu.
+                 */
+                'linksInfo'      => $this->getProfileThreeDotMenuLinksInfo($this->getUser(), $staff),
 
                 /* Old implementation
                  */
@@ -645,7 +648,6 @@ class Controller extends BaseController
                 'eportfolioAuth' => $this->eportfolioAuthenticator->canView(),
                 'now'            => Alaress_Date_Format::now(),
                 'showDetails'    => (new ValidDetailsVisible($this->externalUser, $this->getConfigLoader()))->isSatisfiedBy($staff, $this->getUser()),
-                'linksInfo'      => $this->getProfileThreeDotMenuLinksInfo($this->getUser(), $staff),
             ],
             'User'
         );
@@ -660,6 +662,7 @@ class Controller extends BaseController
      * @throws MapperException
      * @throws \DomainException
      * @throws \UnexpectedValueException
+     * @throws RouteNotFound
      */
     private function renderParent(User $parent): void
     {
@@ -701,6 +704,9 @@ class Controller extends BaseController
                  * custom buttons, as far as the end user is concerned
                  */
                 'buttons'  => $buttons,
+                /* Links to be displayed in the 3-dot menu.
+                 */
+                'linksInfo'      => $this->getProfileThreeDotMenuLinksInfo($this->getUser(), $parent),
 
                 /* Old implementation
                  */
@@ -711,7 +717,6 @@ class Controller extends BaseController
                 'now'            => Alaress_Date_Format::now(),
                 'showDetails'    => (new ValidDetailsVisible($this->externalUser, $this->getConfigLoader()))->isSatisfiedBy($parent, $this->getUser()),
                 'sharedCampuses' => $this->getUser()->getCampusCollection()->intersect($parent->getCampusCollection()),
-                'linksInfo'      => $this->getProfileThreeDotMenuLinksInfo($this->getUser(), $parent),
             ]
         );
     }
