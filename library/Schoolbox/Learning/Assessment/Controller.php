@@ -991,12 +991,14 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 ];
             })->reindex();
 
+        $assessmentData = $this->getAssessmentTwigData($assessment);
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/participation/learningPlan/learningPlan.twig',
             [
                 'breadcrumbs' => $breadcrumbs,
                 'assessment' => $assessment,
                 'participants' => $participant,
+                'acceptingResponses' => $assessmentData['acceptingResponses'] ?? false,
             ]
         );
     }
@@ -1029,12 +1031,16 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 ];
             })->reindex();
 
+        $assessmentData = $this->getAssessmentTwigData($assessment);
+
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/participation/learningPlan/learningPlan.twig',
             [
                 'breadcrumbs' => $breadcrumbs,
                 'assessment' => $assessment,
                 'participants' => $participant,
+                'plan' => $plan,
+                'acceptingResponses' => $assessmentData['acceptingResponses'] ?? false,
             ]
         );
     }
