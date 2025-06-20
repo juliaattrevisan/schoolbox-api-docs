@@ -108,6 +108,8 @@ interface MarkbookClassImpl {
         {
             id: UserId;
             externalId: string | null;
+            givenName: string;
+            lastName: string;
             stats: {
                 weightedMean: string | null;
                 meanNormalised: number | null;
@@ -117,7 +119,7 @@ interface MarkbookClassImpl {
             _routes: {
                 grades: string;
             };
-        } & ({ fullName: string } | { firstName: string; lastName: string })
+        }
     >;
     /* overall stats for the entire class, currently only on the class markbook */
     stats: {

@@ -365,10 +365,7 @@ window.Vue.onMounted(async () => {
                                     <user-photo v-if="!isDegraded" :user="student" render="small" rounded-corners />
                                     <div class="l-flex-col l-flex--justify-center f-no-margins">
                                         <a :href="`/search/user/${student.id}`" title="View Profile">
-                                            <template v-if="'fullName' in student"> {{ student.fullName }}</template>
-                                            <template v-else>
-                                                {{ student.lastName }}, {{ student.firstName }}
-                                            </template>
+                                            {{ student.lastName }}, {{ student.givenName }}
                                         </a>
                                     </div>
                                 </div>

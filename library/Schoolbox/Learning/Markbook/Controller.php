@@ -306,9 +306,7 @@ class Controller extends Base
                     'students'    => $markbook->getStudents()->map(fn (User $student) => [
                         'id'         => $student->getId(),
                         'externalId' => $student->getExternalId(), // ...for portrait.twig
-                        /* The class markbook uses [lastname, first name] to display names, whereas the course markbook uses just [fullName] for some reason */
-                        // 'fullName'   => $student->getFullName(),
-                        'firstName'  => $student->getFirstname(),
+                        'givenName'  => $student->getGivenName(),
                         'lastName'   => $student->getLastname(),
                         'stats'      => $markbook->getStudentStatistics()[$student->getId()],
                         '_routes'    => [

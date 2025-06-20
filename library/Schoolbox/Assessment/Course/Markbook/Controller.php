@@ -426,10 +426,8 @@ class Controller extends WebController\Base
                                 return [
                                     'id'         => $student->getId(),
                                     'externalId' => $student->getExternalId(), // ...for portrait.twig
-                                    /* The class markbook uses [lastname, first name] to display names, whereas the course markbook uses just [fullName] for some reason */
-                                    'fullName'   => $student->getFullName(),
-                                    // 'firstName'  => $student->getFirstname(),
-                                    // 'lastName'   => $student->getLastname(),
+                                    'givenName'  => $student->getGivenName(),
+                                    'lastName'   => $student->getLastname(),
                                     'stats' => [
                                         /* Get the stats in the same format as returned by the class markbook */
                                         'weightedMean'        => $stats['published']['hr'] ?? null,
