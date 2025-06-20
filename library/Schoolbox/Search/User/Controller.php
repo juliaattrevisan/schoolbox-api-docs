@@ -729,7 +729,7 @@ class Controller extends BaseController
                     'title' => 'Modify User',
                     'url' => $this->getRouteIfAuthorized(
                         'adminUser.getModify',
-                        ['userId' => $viewee->getId()]
+                        ['userId' => $viewee->getId(), 'user' => $viewee]
                     ),
                     'iconClass' => 'icon-modify',
                     'disabled' => false,
@@ -743,7 +743,7 @@ class Controller extends BaseController
                         ? false
                         : $this->getRouteIfAuthorized(
                             'user.impersonate',
-                            ['userId' => $viewee->getId()]
+                            ['userId' => $viewee->getId(), 'user' => $viewee]
                         )
                     ),
                     'iconClass' => 'icon-staff-students',
@@ -755,7 +755,7 @@ class Controller extends BaseController
                     'title' => 'Create Pastoral Record',
                     'url' => $this->getRouteIfAuthorized(
                         'pastoral.getStudentRecordInsertForm',
-                        ['studentId' => $viewee->getId()]
+                        ['studentId' => $viewee->getId(), 'student' => $viewee]
                     ),
                     'iconClass' => 'icon-pastoral',
                     'disabled' => false,
