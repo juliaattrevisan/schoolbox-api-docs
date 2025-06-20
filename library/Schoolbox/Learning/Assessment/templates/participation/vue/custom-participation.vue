@@ -285,7 +285,7 @@ window.Vue.onMounted(() => {
                             <a
                                 :href="`${getAssessmentParticipation}/${participant.plan.id}/modify?returnUrl=${returnUrl}`"
                             >
-                                {{participant.plan.name}}
+                                {{ participant.plan.name }}
                             </a>
                         </span>
                     </td>
