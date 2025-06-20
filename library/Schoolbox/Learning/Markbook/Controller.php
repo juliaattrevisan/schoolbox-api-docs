@@ -142,11 +142,12 @@ class Controller extends Base
             // TODO: clean this up a bit once the payload structure is finalised
             $data = [
                 'rank' => (bool)$this->getConfigLoader()->get('view_rank') ? $rank : null,
-                'assessments' => $markbook->getAssessments()->indexBy('id')->map(fn(IAssessable $assessment) => [
+                'assessments' => $markbook->getAssessments()->reindex()->map(fn(IAssessable $assessment, $sequence) => [
                     'id'              => $assessment->getId(),
                     'title'           => $assessment->getTitle(),
                     'typeName'        => $assessment->getTypeName(),
                     'assessmentType'  => $assessment->getFamilyName(),
+                    'sequence'        => $sequence,
                     /* unused on the class markbook: */
                     // 'unitSpec' => ...,
                     /* the class markbook doesn't need any of the below, as this is always an implementation */
@@ -159,7 +160,7 @@ class Controller extends Base
                             [ 'assessmentId' => $assessment->getId() ]
                         ),
                     ],
-                ]),
+                ])->indexByCallback(fn(array $assessment) => $assessment['id']),
                 /**
                  * A "class implementation" is a course/class markbook-specific term.
                  * Since the class markbook can contain non-unit assessments, this is a generalised term to allow
@@ -173,7 +174,7 @@ class Controller extends Base
                         'id'    => $folder->getFolder()->getId(),
                         'title' => $folder->getFolder()->getTitle(),
                     ],
-                    'assessments' => $markbook->getAssessments()->map(fn(IAssessable $aImpl) => [
+                    'assessments' => $markbook->getAssessments()->indexBy('id')->map(fn(IAssessable $aImpl) => [
                         'id'             => $aImpl->getId(),
                         'markVisibility' => $aImpl->getMarkVisibility(),
                         'courseManaged'  => $aImpl->getCourseManaged(),

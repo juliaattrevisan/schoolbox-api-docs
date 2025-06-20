@@ -17,6 +17,7 @@ export type MarkbookActivity = Pick<Activity, "id" | "title" | "assessmentType">
         id: number;
         title: string;
     };
+    sequence: number;
     /** stats and the summary link are currently only relevant for specs */
     isSpecification: boolean;
     stats: {

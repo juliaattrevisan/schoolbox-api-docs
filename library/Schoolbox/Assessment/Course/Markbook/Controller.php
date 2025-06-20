@@ -239,11 +239,12 @@ class Controller extends WebController\Base
             // TODO: clean this up a bit once the payload structure is finalised
             $data = [
                 'rank' => (bool)$this->getConfigLoader()->get('view_rank') ? $courseMarkbook->getRanking() : null,
-                'assessments' => $courseMarkbook->getCollapsedAssessments()->indexBy('id')->map(fn(IAssessable $assessment) => [
+                'assessments' => $courseMarkbook->getCollapsedAssessments()->reindex()->map(fn(IAssessable $assessment, $sequence) => [
                     'id'                => $assessment->getId(),
                     'title'             => $assessment->getTitle(),
                     'typeName'          => $assessment->getTypeName(),
                     'assessmentType'    => $assessment->getFamilyName(),
+                    'sequence'          => $sequence,
                     'isSpecification'   => $assessment->isSpecification(),
                     'unitSpec'          => $unitSpecs[$assessment->getId()] !== null ? [
                         /* for rendering the unit bars at the top of the page */
@@ -269,7 +270,7 @@ class Controller extends WebController\Base
                             ]
                         ) : null,
                     ],
-                ]),
+                ])->indexByCallback(fn(array $assessment) => $assessment['id']),
                 /**
                  * A "class implementation" is a course/class markbook-specific term.
                  * Since the class markbook can contain non-unit assessments, this is a generalised term to allow

@@ -59,12 +59,20 @@ const activityGroups = window.Vue.computed(() => {
         return [];
     }
 
+    /**
+     * Assessments are currently ordered by the backend based on a provided sequence,
+     * but this is the point to change that if needed
+     */
+    const assessments = [...Object.values(mbStore.data.assessments)].sort((left, right) => {
+        return left.sequence - right.sequence;
+    });
+
     const groups: {
         unitSpec?: MarkbookActivity["unitSpec"];
         activities: MarkbookActivity[];
     }[] = [];
 
-    Object.values(mbStore.data.assessments).forEach((activity) => {
+    assessments.forEach((activity) => {
         let group = groups.find((g) => g.unitSpec?.id === activity.unitSpec?.id);
         if (!group) {
             group = {
@@ -81,7 +89,8 @@ const activityGroups = window.Vue.computed(() => {
 });
 
 /**
- * The source of truth for the sequence to display activities in
+ * The source of truth for the sequence to display activities in,
+ * the actual sorting occurs in activityGroups above since that also determines the sort order of the unit specs
  */
 const orderedActivities = window.Vue.computed(() => activityGroups.value.flatMap((group) => group.activities));
 
@@ -258,7 +267,7 @@ window.Vue.onMounted(async () => {
                         >
                             <span v-if="classImpl.assessments[assessment.id] === undefined" class="na"></span>
                             <span
-                                v-if="
+                                v-else-if="
                                     mbStore.showDrafts &&
                                     classImpl.assessments[assessment.id].stats.draftMean &&
                                     Object.keys(classImpl.assessments[assessment.id].hasDraft).length > 0
