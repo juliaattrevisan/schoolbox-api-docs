@@ -276,7 +276,26 @@ window.Vue.onMounted(async () => {
                 </tr>
             </thead>
             <tbody>
-                <!-- todo: course average (course markbook) -->
+                <tr v-if="props.type === 'course'">
+                    <th class="course-row class-row-heading fixed-left">
+                        Course Average
+                        <span data-tooltip class="hint has-tip tip-top" title="Average student cohort mark">?</span>
+                    </th>
+                    <th class="course-row fixed-left"></th>
+                    <th v-if="mbStore.data.rank !== null"></th>
+                    <template v-for="assessment in orderedActivities" :key="assessment.id">
+                        <td v-if="assessment.stats !== null" class="course-row">
+                            <span v-if="mbStore.showDrafts && assessment.stats.draftMean !== null" class="meta">
+                                {{ assessment.stats.draftMean ?? "–" }}
+                            </span>
+                            <span v-else>
+                                {{ assessment.stats.mean ?? "–" }}
+                            </span>
+                        </td>
+                        <td v-else class="course-row na"></td>
+                    </template>
+                </tr>
+
                 <!-- todo: statistics (class markbook) -->
                 <template v-for="(classImpl, classImplId) in mbStore.data.classImpls" :key="classImplId">
                     <tr v-if="props.type === 'class'" class="sub-row">
