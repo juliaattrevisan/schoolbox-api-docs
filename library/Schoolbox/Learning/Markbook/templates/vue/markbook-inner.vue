@@ -5,6 +5,7 @@ import { ACTIVITY_TYPE_TASK } from "@schoolboxAssessment/Types/assessmentTypes";
 import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
 import { useMarkbookStore } from "./store/markbookStore";
 import MiCellGrade from "./mi-cell-grade.vue";
+import type { MarkbookActivity } from "./types/payload";
 
 interface Props {
     type: "course" | "class";
@@ -36,6 +37,41 @@ const isDegraded = window.Vue.computed(() => {
     const students = mbStore.data.classImpls.reduce((acc, impl) => acc + Object.keys(impl.students).length, 0);
     return students > functionDegradeLimit;
 });
+
+/**
+ * For the course markbook, we show headers for the unit spec groups of assessments
+ * This groups all the assessments into groups of unit specs
+ */
+const activityGroups = window.Vue.computed(() => {
+    if (mbStore.data === null) {
+        return [];
+    }
+
+    const groups: {
+        unitSpec?: MarkbookActivity["unitSpec"];
+        activities: MarkbookActivity[];
+    }[] = [];
+
+    Object.values(mbStore.data.assessments).forEach((activity) => {
+        let group = groups.find((g) => g.unitSpec?.id === activity.unitSpec?.id);
+        if (!group) {
+            group = {
+                unitSpec: activity.unitSpec,
+                activities: [],
+            };
+            groups.push(group);
+        }
+
+        group.activities.push(activity);
+    });
+
+    return groups;
+});
+
+/**
+ * The source of truth for the sequence to display activities in
+ */
+const orderedActivities = window.Vue.computed(() => activityGroups.value.flatMap((group) => group.activities));
 
 window.Vue.onMounted(async () => {
     await mbStore.init(props.endpoint);
@@ -134,7 +170,7 @@ window.Vue.onMounted(async () => {
     </div>
 
     <div v-if="mbStore.data" class="diagonal-headings-table-container small-12 island">
-        <div v-if="Object.keys(mbStore.data.assessments).length === 0" class="empty-state">
+        <div v-if="activityGroups.length === 0" class="empty-state">
             <i class="icon-curriculum"></i>
             <p>
                 There are no activities that match the selected filters. Try altering the filters to broaden your
@@ -154,7 +190,7 @@ window.Vue.onMounted(async () => {
                         </div>
                     </th>
                     <th
-                        v-for="activity in mbStore.data.assessments"
+                        v-for="activity in orderedActivities"
                         :key="activity.id"
                         :data-test="`markbook-assessment-${activity.id}`"
                     >
@@ -204,7 +240,7 @@ window.Vue.onMounted(async () => {
 
                         <th v-if="mbStore.data.rank !== null">-</th>
                         <th
-                            v-for="assessment in mbStore.data.assessments"
+                            v-for="assessment in orderedActivities"
                             :key="assessment.id"
                             class="student-grade-cell white"
                         >
@@ -225,7 +261,19 @@ window.Vue.onMounted(async () => {
                         </th>
                     </tr>
                 </template>
-                <!-- todo: course-headers -->
+                <tr v-if="props.type === 'course'" class="course-headers">
+                    <th class="fixed-left transparent"></th>
+                    <th class="fixed-left white"></th>
+                    <th v-if="mbStore.data.rank !== null" class="white"></th>
+                    <th
+                        v-for="group in activityGroups"
+                        :key="group.unitSpec?.id"
+                        class="unit-title"
+                        :colspan="group.activities.length"
+                    >
+                        {{ group.unitSpec?.title ?? "" }}
+                    </th>
+                </tr>
             </thead>
             <tbody>
                 <!-- todo: course average (course markbook) -->
@@ -235,7 +283,7 @@ window.Vue.onMounted(async () => {
                         <th class="fixed-left">Visibility</th>
                         <th class="fixed-left"></th>
                         <th v-if="mbStore.data.rank !== null"></th>
-                        <template v-for="assessment in mbStore.data.assessments" :key="assessment.id">
+                        <template v-for="assessment in orderedActivities" :key="assessment.id">
                             <td
                                 v-if="
                                     classImpl.assessments[assessment.id] &&
@@ -270,7 +318,7 @@ window.Vue.onMounted(async () => {
                         </th>
                         <th class="class-row fixed-left"></th>
                         <td v-if="mbStore.data.rank !== null"></td>
-                        <template v-for="assessment in mbStore.data.assessments" :key="assessment.id">
+                        <template v-for="assessment in orderedActivities" :key="assessment.id">
                             <td v-if="classImpl.assessments[assessment.id]?.stats" class="class-row">
                                 <a :href="classImpl.assessments[assessment.id]._routes['learningAssessment.getStatus']">
                                     <span
@@ -345,7 +393,7 @@ window.Vue.onMounted(async () => {
                         </td>
 
                         <mi-cell-grade
-                            v-for="assessment in mbStore.data.assessments"
+                            v-for="assessment in orderedActivities"
                             :key="assessment.id"
                             :assessment-id="assessment.id"
                             :class-impl-id="classImplId"

@@ -223,17 +223,17 @@ class Controller extends WebController\Base
             $courseMarkbook = $this->buildCourseMarkbook($courseSpec, $assessmentIds);
 
             $unitSpecs = $courseMarkbook->getCollapsedAssessments()->map(function (IAssessable $assessment) {
-                if ($assessment->isSpecification()) {
-                    return $assessment->getBaseContext();
+                $base = $assessment->getBaseContext();
+                if ($base instanceof \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model) {
+                    // Implementation
+                    return $base->getSpecification();
+                } elseif ($base instanceof \Schoolbox\Learning\Course\DataModel\Specification\Unit\Model) {
+                    // Specification
+                    return $base;
                 }
 
-                /** some assessments may not have a specification assessment (i.e. one created from an imported unit) */
-                $specificationAssessment = $assessment->getSpecificationAssessment();
-                if ($specificationAssessment === null) {
-                    return null;
-                }
-
-                return $specificationAssessment->getBaseContext();
+                // no unit spec, return null
+                return null;
             });
 
             // TODO: clean this up a bit once the payload structure is finalised

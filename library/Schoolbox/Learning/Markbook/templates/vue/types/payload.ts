@@ -9,7 +9,7 @@ import type { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
 type UserId = number;
 type ParticipantId = number;
 
-type MarkbookActivity = Pick<Activity, "id" | "title" | "assessmentType"> & {
+export type MarkbookActivity = Pick<Activity, "id" | "title" | "assessmentType"> & {
     /** the readable type name of the activity, e.g. "Project", "Quiz", "Essay", "Homework", etc */
     typeName: string;
     /** for rendering the unit bars at the top of the page, course markbook only */
