@@ -563,48 +563,7 @@ class Controller extends BaseController
                 /* Links to be displayed in the 3-dot menu.
                  * Links not authorized for the user are filtered out.
                  */
-                'linksInfo' => array_filter(
-                    [
-                        [
-                            'title' => 'Modify User',
-                            'url' => $this->getRouteIfAuthorized(
-                                'adminUser.getModify',
-                                ['userId' => $student->getId()]
-                            ),
-                            'iconClass' => 'icon-modify',
-                            'disabled' => false,
-                            'mouseoverText' => 'Modify User',
-                            'dataTest' => 'user-profile-modify'
-                        ],
-                        [
-                            'title' => 'Impersonate',
-                            'url' => (
-                                $viewer->getId() === $student->getId()
-                                ? false
-                                : $this->getRouteIfAuthorized(
-                                    'user.impersonate',
-                                    ['userId' => $student->getId()]
-                                )
-                            ),
-                            'iconClass' => 'icon-staff-students',
-                            'disabled' => $student->isDeleted(),
-                            'mouseoverText' => $student->isDeleted() ? 'Account Disabled' : 'Login as user',
-                            'dataTest' => $student->isDeleted() ? '' : 'admin-user-modify-impersonate'
-                        ],
-                        [
-                            'title' => 'Create Pastoral Record',
-                            'url' => $this->getRouteIfAuthorized(
-                                'pastoral.getStudentRecordInsertForm',
-                                ['studentId' => $student->getId()]
-                            ),
-                            'iconClass' => 'icon-pastoral',
-                            'disabled' => false,
-                            'mouseoverText' => 'Create Pastoral Record',
-                            'dataTest' => ''
-                        ]
-                    ],
-                    fn ($item) => $item['url'] !== false
-                ),
+                'linksInfo' => $this->getProfileThreeDotMenuLinksInfo($viewer, $student),
                 /* Old implementation
                  */
                 'subjects'                 => $subjects,
@@ -686,6 +645,7 @@ class Controller extends BaseController
                 'eportfolioAuth' => $this->eportfolioAuthenticator->canView(),
                 'now'            => Alaress_Date_Format::now(),
                 'showDetails'    => (new ValidDetailsVisible($this->externalUser, $this->getConfigLoader()))->isSatisfiedBy($staff, $this->getUser()),
+                'linksInfo'      => $this->getProfileThreeDotMenuLinksInfo($this->getUser(), $staff),
             ],
             'User'
         );
@@ -751,7 +711,59 @@ class Controller extends BaseController
                 'now'            => Alaress_Date_Format::now(),
                 'showDetails'    => (new ValidDetailsVisible($this->externalUser, $this->getConfigLoader()))->isSatisfiedBy($parent, $this->getUser()),
                 'sharedCampuses' => $this->getUser()->getCampusCollection()->intersect($parent->getCampusCollection()),
+                'linksInfo'      => $this->getProfileThreeDotMenuLinksInfo($this->getUser(), $parent),
             ]
+        );
+    }
+
+    /**
+     * Return an array containing information about the links to be displayed in the 3-dot menu at the top-right of the
+     * profile page.  Links not accessible by the user are filtered out in the returned array.
+     * @throws RouteNotFound
+     */
+    private function getProfileThreeDotMenuLinksInfo(User $viewer, User $viewee): array
+    {
+        return array_filter(
+            [
+                [
+                    'title' => 'Modify User',
+                    'url' => $this->getRouteIfAuthorized(
+                        'adminUser.getModify',
+                        ['userId' => $viewee->getId()]
+                    ),
+                    'iconClass' => 'icon-modify',
+                    'disabled' => false,
+                    'mouseoverText' => 'Modify User',
+                    'dataTest' => 'user-profile-modify'
+                ],
+                [
+                    'title' => 'Impersonate',
+                    'url' => (
+                        $viewer->getId() === $viewee->getId()
+                        ? false
+                        : $this->getRouteIfAuthorized(
+                            'user.impersonate',
+                            ['userId' => $viewee->getId()]
+                        )
+                    ),
+                    'iconClass' => 'icon-staff-students',
+                    'disabled' => $viewee->isDeleted(),
+                    'mouseoverText' => $viewee->isDeleted() ? 'Account Disabled' : 'Login as user',
+                    'dataTest' => $viewee->isDeleted() ? '' : 'admin-user-modify-impersonate'
+                ],
+                [
+                    'title' => 'Create Pastoral Record',
+                    'url' => $this->getRouteIfAuthorized(
+                        'pastoral.getStudentRecordInsertForm',
+                        ['studentId' => $viewee->getId()]
+                    ),
+                    'iconClass' => 'icon-pastoral',
+                    'disabled' => false,
+                    'mouseoverText' => 'Create Pastoral Record',
+                    'dataTest' => ''
+                ]
+            ],
+            fn ($item) => $item['url'] !== false
         );
     }
 }
