@@ -20,6 +20,7 @@ use Schoolbox\Learning\Assessment\WorkType\Mapper;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\Export\Json\Payload;
+use Schoolbox\Learning\Learnosity\Importer\InlineImageConverter;
 use Schoolbox\Learning\Learnosity\Importer\Legacy\Xml\ContextLookup;
 use Schoolbox\Learning\Learnosity\TagFactory;
 use Schoolbox\Learning\Quiz\Model;
@@ -173,6 +174,7 @@ class Importer
      * @return array
      * @throws Deleted
      * @throws MapperException
+     * @throws \DOMException
      */
     private function buildAssessment(array $settings): array
     {
@@ -233,17 +235,15 @@ class Importer
             $gradeGroup = $this->gradeGroupMapper->findAll()->sortBy('sequence', 'ASC')->first();
         }
 
+        $inlineImageConverter = new InlineImageConverter($this->storageMapper, null);
+
         // Create the IAssessable
         $assessment = (new \Schoolbox\Learning\Assessment\Quiz\Model())
             ->setCreator($this->user)
-            /* TODO: Apply InlineImageConverter here
-             */
-            ->setCompletionMessage($settings['completionMessage'])
+            ->setCompletionMessage($inlineImageConverter->convert($settings['completionMessage']))
             ->setTitle($settings['title'])
             ->setWorkType($workType)
-            /* TODO: Apply InlineImageConverter here
-             */
-            ->setDescription($settings['description'])
+            ->setDescription($inlineImageConverter->convert($settings['description']))
             ->setPublishAt($inUnitSpec ? null : new \Alaress_Date_Format(new \DateTime('+1 hour')))
             ->setOpenAt($inUnitSpec ? null : new \Alaress_Date_Format(new \DateTime('+1 hour')))
             ->setDueAt($inUnitSpec ? null : new \Alaress_Date_Format(new \DateTime('+1 day 23:59:59')))
