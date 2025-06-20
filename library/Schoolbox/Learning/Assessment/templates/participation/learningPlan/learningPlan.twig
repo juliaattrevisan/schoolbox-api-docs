@@ -39,7 +39,14 @@
                         <fieldset>
                             <label>
                                 Title
-                                <input type="text" name="plan-name" id="plan-name" data-test="participation-plan-customise-modal-input-name" maxlength="256">
+                                <input
+                                        type="text"
+                                        name="plan-name"
+                                        id="plan-name"
+                                        data-test="participation-plan-customise-modal-input-name"
+                                        maxlength="256"
+                                        value="{{ plan is defined ? plan.name : '' }}"
+                                >
                             </label>
                         </fieldset>
                         <fieldset>
@@ -48,19 +55,24 @@
                                 <div class="columns small-12">
                                     <label>
                                         Description
-                                        <textarea name="plan-desc" id="plan-desc"></textarea>
+                                        <textarea name="plan-desc" id="plan-desc">
+                                            {{ plan is defined ? plan.description : assessment.description }}
+                                        </textarea>
                                     </label>
                                 </div>
                                 <div class="columns small-12">
-                                    {% set dummyDate = {local: ''} %}
+                                    {% set publishAt = plan is defined ? plan.publishDate : assessment.publishAt %}
+                                    {% set openAt = plan is defined ? plan.openDate : assessment.openAt %}
+                                    {% set dueAt = plan is defined ? plan.dueDate : assessment.dueAt %}
+                                    {% set lateAt = plan is defined ? plan.closeDate : assessment.closeAt %}
                                     {% if acceptingResponses is defined and acceptingResponses %}
-                                        {{ dateForm.dateField('Publish', 'planPublish', dummyDate, ''                , '#planOpenDate' ) }}
-                                        {{ dateForm.dateField('Open'   , 'planOpen'   , dummyDate, '#planPublishDate', '#planDueDate'  ) }}
-                                        {{ dateForm.dateField('Due'    , 'planDue'    , dummyDate, '#planOpenDate'   , '#planCloseDate') }}
-                                        {{ dateForm.dateField('Late'   , 'planClose'  , dummyDate, '#planDueDate'    , ''              ) }}
+                                        {{ dateForm.dateField('Publish', 'planPublish', publishAt, '', '#planOpenDate' ) }}
+                                        {{ dateForm.dateField('Open'   , 'planOpen'   , openAt, '#planPublishDate', '#planDueDate'  ) }}
+                                        {{ dateForm.dateField('Due'    , 'planDue'    , dueAt, '#planOpenDate'   , '#planCloseDate') }}
+                                        {{ dateForm.dateField('Late'   , 'planClose'  , lateAt, '#planDueDate'    , ''              ) }}
                                     {% else %}
-                                        {{ dateForm.dateField('Publish', 'planPublish', dummyDate, ''                , '#planDueDate'  ) }}
-                                        {{ dateForm.dateField('Due'    , 'planDue'    , dummyDate, '#planPublishDate', ''              ) }}
+                                        {{ dateForm.dateField('Publish', 'planPublish', publishAt, ''                , '#planDueDate'  ) }}
+                                        {{ dateForm.dateField('Due'    , 'planDue'    , dueAt, '#planPublishDate', ''              ) }}
                                     {% endif %}
                                 </div>
                             </div>
