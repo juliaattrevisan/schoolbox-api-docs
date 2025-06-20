@@ -109,6 +109,22 @@ const decorator = window.Vue.computed(() => {
         notchTitle: "Unmarked",
     };
 });
+
+/**
+ * Format a mark to be displayed
+ * If the norm mark is null, the mark may be an empty string; so fall back to a dash
+ * If the mark doesn't exist at all, also return a dash
+ * @param mark The mark to format, either a published or draft mark
+ * @returns The formatted mark
+ */
+function formatMark(mark: NonNullable<typeof participant.value>["marks"]["published" | "draft"]): string {
+    if (mark === null || mark.norm === null) {
+        return "–";
+    }
+
+    const relevantMark = mbStore.showDisplayMarks ? mark.hr : mark.hrInstructor;
+    return relevantMark ?? "–";
+}
 </script>
 
 <template>
@@ -138,7 +154,7 @@ const decorator = window.Vue.computed(() => {
                 data-width="105"
                 title="Draft Mark"
             >
-                {{ participant.marks.draft[mbStore.showDisplayMarks ? "hr" : "hrInstructor"] ?? "–" }}
+                {{ formatMark(participant.marks.draft) }}
             </span>
             <span
                 v-else-if="participant.hasSubmittedResponse && !participant.hasPublishedFeedback"
@@ -151,8 +167,9 @@ const decorator = window.Vue.computed(() => {
                 :title="participant.marks.published.comment ?? ''"
                 :class="getGradient(participant.marks.published.norm, 100, false)"
             >
-                {{ participant.marks.published[mbStore.showDisplayMarks ? "hr" : "hrInstructor"] ?? "–" }}
+                {{ formatMark(participant.marks.published) }}
             </span>
+            <span v-else>–</span>
 
             <span
                 v-if="decorator !== null"
