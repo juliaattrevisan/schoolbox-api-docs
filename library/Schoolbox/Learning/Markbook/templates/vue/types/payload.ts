@@ -92,6 +92,7 @@ type MarkbookClassImplActivity = {
     /* currently class markbook only */
     markVisibility?: number;
     courseManaged?: boolean | null;
+    writable?: boolean;
     weight: number;
     hasDraft: Record<UserId, true>;
 };

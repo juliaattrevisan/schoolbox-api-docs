@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import locale from "@js/terminology/rosettaStone";
 import { getGradient } from "@js/util/cssUtils";
+import { ACTIVITY_TYPE_TASK } from "@schoolboxAssessment/Types/assessmentTypes";
 import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
 import { useMarkbookStore } from "./store/markbookStore";
 import MiCellGrade from "./mi-cell-grade.vue";
@@ -14,6 +15,13 @@ const props = defineProps<Props>();
 const mbStore = useMarkbookStore();
 
 const showAverages = window.Vue.ref(false);
+
+const markVisibilityOptions = {
+    // Please note; .icon output via v-html and is not escaped
+    0: { id: 0, icon: "&#xe63e;", description: "Staff Only" },
+    1: { id: 1, icon: "&#xe667;", description: "Staff and Students" },
+    2: { id: 2, icon: "&#xe666;", description: "Staff, Students and their Parents" },
+} as const;
 
 /**
  * If the markbook has more than this number of participants,
@@ -47,6 +55,8 @@ window.Vue.onMounted(async () => {
 });
 
 // todo: sequencing
+// todo: check performance
+// todo: split files a bit
 </script>
 
 <template>
@@ -221,9 +231,40 @@ window.Vue.onMounted(async () => {
                 <!-- todo: course average (course markbook) -->
                 <!-- todo: statistics (class markbook) -->
                 <template v-for="(classImpl, classImplId) in mbStore.data.classImpls" :key="classImplId">
-                    <!-- todo: visibility (class markbook) -->
+                    <tr v-if="props.type === 'class'" class="sub-row">
+                        <th class="fixed-left">Visibility</th>
+                        <th class="fixed-left"></th>
+                        <th v-if="mbStore.data.rank !== null"></th>
+                        <template v-for="assessment in mbStore.data.assessments" :key="assessment.id">
+                            <td
+                                v-if="
+                                    classImpl.assessments[assessment.id] &&
+                                    assessment.assessmentType != ACTIVITY_TYPE_TASK
+                                "
+                            >
+                                <!-- todo: saving ability -->
+                                <select
+                                    v-if="classImpl.assessments[assessment.id].writable"
+                                    v-model="classImpl.assessments[assessment.id].markVisibility"
+                                    name="visibility"
+                                >
+                                    <option
+                                        v-for="option in markVisibilityOptions"
+                                        :key="option.id"
+                                        :value="option.id"
+                                        :disabled="!mbStore.data.availableVisibilities.includes(option.id) || undefined"
+                                    >
+                                        <!-- eslint-disable-next-line vue/no-v-html -- we can't use <sbx-icon> in a select, so this is the other way for now. option.icon is defined above -->
+                                        <span v-html="option.icon"></span>
+                                        {{ option.description }}
+                                    </option>
+                                </select>
+                            </td>
+                            <td v-else></td>
+                        </template>
+                    </tr>
 
-                    <tr>
+                    <tr v-if="props.type === 'course'">
                         <th class="class-row class-row-heading fixed-left">
                             <a :href="`/homepage/${classImpl.folder.id}`">{{ classImpl.folder.title }}</a>
                         </th>
