@@ -10,7 +10,7 @@ export default class ToggleFullWidthCommand extends Command {
     /**
      * Whether the button is on or off
      */
-    public declare isOn: boolean;
+    declare public isOn: boolean;
 
     constructor(editor: Editor) {
         super(editor);

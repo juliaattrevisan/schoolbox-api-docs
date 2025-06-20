@@ -11,7 +11,7 @@ export default class InsertResourceLinkCommand extends Command {
     /**
      * Whether the button is on or off
      */
-    public declare isOn: boolean;
+    declare public isOn: boolean;
 
     // @ts-expect-error -- as .bind() returns a new function object, we need to store it in a variable
     messageBinding;
