@@ -28,7 +28,7 @@ export type MarkbookActivity = Pick<Activity, "id" | "title" | "assessmentType">
     };
 };
 
-type MarkbookClassImplActivity = {
+export type MarkbookClassImplActivity = {
     id: number;
     participants: Record<
         ParticipantId,
@@ -71,9 +71,11 @@ type MarkbookClassImplActivity = {
         quartile1: number | null;
         quartile2: number | null;
         quartile3: number | null;
-        weight: number | null;
+        weight?: number | null;
+        weightInProject?: number | null;
         sdNormalized: number | null;
-        weightPercent: number | null;
+        weightPercent?: number | null;
+        projectWeightPercent?: number | null;
     };
     _routes: {
         "learningAssessment.getStatus": string;
@@ -97,7 +99,7 @@ type MarkbookClassImplActivity = {
     hasDraft: Record<UserId, true>;
 };
 
-interface MarkbookClassImpl {
+export interface MarkbookClassImpl {
     folder: {
         id: number;
         title: string;

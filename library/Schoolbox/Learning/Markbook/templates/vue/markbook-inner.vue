@@ -5,6 +5,7 @@ import { ACTIVITY_TYPE_TASK } from "@schoolboxAssessment/Types/assessmentTypes";
 import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
 import { useMarkbookStore } from "./store/markbookStore";
 import MiCellGrade from "./mi-cell-grade.vue";
+import MiStatisticRow from "./mi-statistic-row.vue";
 import type { MarkbookActivity } from "./types/payload";
 
 interface Props {
@@ -23,6 +24,17 @@ const markVisibilityOptions = {
     1: { id: 1, icon: "&#xe667;", description: "Staff and Students" },
     2: { id: 2, icon: "&#xe666;", description: "Staff, Students and their Parents" },
 } as const;
+
+const classStatisticRows = [
+    { label: "Weight", statsKey: "weight", input: true },
+    { label: `Weight in ${locale.project.proper()}`, statsKey: "weightInProject", input: true },
+    { label: "% Total Weight", statsKey: "weightPercent", round: 2 },
+    { label: `% Total Weight in ${locale.project.proper()}`, statsKey: "projectWeightPercent", round: 2 },
+    { label: "Mean", statsKey: "mean" },
+    { label: "Standard Deviation", statsKey: "sd" },
+    { label: "Min", statsKey: "min" },
+    { label: "Max", statsKey: "max" },
+] as const;
 
 /**
  * If the markbook has more than this number of participants,
@@ -216,7 +228,7 @@ window.Vue.onMounted(async () => {
                         <th class="fixed-left white profile-cell average-expander">
                             <a
                                 href="#"
-                                class="icon-down-arrow"
+                                :class="showAverages ? 'icon-up-arrow' : 'icon-down-arrow'"
                                 title="Show additional metrics"
                                 @click="showAverages = !showAverages"
                             ></a>
@@ -296,8 +308,20 @@ window.Vue.onMounted(async () => {
                     </template>
                 </tr>
 
-                <!-- todo: statistics (class markbook) -->
                 <template v-for="(classImpl, classImplId) in mbStore.data.classImpls" :key="classImplId">
+                    <template v-if="props.type === 'class' && showAverages">
+                        <mi-statistic-row
+                            v-for="row in classStatisticRows"
+                            :key="row.statsKey"
+                            :assessments="orderedActivities"
+                            :class-impl="classImpl"
+                            :label="row.label"
+                            :stats-key="row.statsKey"
+                            :input="'input' in row ? row.input : undefined"
+                            :round="'round' in row ? row.round : undefined"
+                        />
+                    </template>
+
                     <tr v-if="props.type === 'class'" class="sub-row">
                         <th class="fixed-left">Visibility</th>
                         <th class="fixed-left"></th>
