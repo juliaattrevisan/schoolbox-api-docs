@@ -323,7 +323,13 @@ window.Vue.onMounted(() => {
             <button class="button-clear" @click.prevent="selectedList.length = 0">Clear selection</button>
             <div class="l-flex-row l-flex--justify l-gap-xs">
                 <template v-if="hasExcludedInSelection">
-                    <button class="icon-close submit" @click.prevent="includeSelected">Remove Customisation</button>
+                    <button
+                        class="icon-close submit"
+                        data-test="custom-participation-remove-customisation"
+                        @click.prevent="includeSelected"
+                    >
+                        Remove Customisation
+                    </button>
                 </template>
                 <template v-else>
                     <div class="l-flex__item--1">

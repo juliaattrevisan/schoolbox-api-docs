@@ -74,3 +74,18 @@ test("When one of the three students is excluded, Copy Activity button does not 
     const copyButton = wrapper.find('[data-test="custom-participation-copy-activity"]');
     expect(copyButton.exists()).toBe(false);
 });
+
+test("When two students are selected, and one is excluded, the Remove Customisation button appears in the bottom drawer", async () => {
+    const wrapper = mount(CustomParticipation, {
+        props: {
+            allParticipants,
+            getStudentsPastoralCountsUrl: "",
+        },
+    });
+
+    const checkboxes = wrapper.findAll('[data-test^="custom-participation-checkbox-"]');
+    await checkboxes[1].setValue(true);
+    await checkboxes[2].setValue(true);
+
+    expect(wrapper.find('[data-test="custom-participation-remove-customisation"]').exists()).toBe(true);
+});
