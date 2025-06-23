@@ -238,7 +238,7 @@ class Controller extends Base
         private \Schoolbox\Learning\Assessment\WorkType\Mapper $workTypeMapper,
         private \Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper $gradeGroupMapper,
         private \Schoolbox\Curriculum\Node\Mapper $curriculumNodeMapper,
-        private \Schoolbox\Resource\Storage\FilesystemProxy $filesystemProxy,
+        private FilesystemProxy $filesystemProxy,
         private Psr17Factory $httpFactory,
         private MessageFactory $messageFactory,
         private Producer $messageProducer,
@@ -2517,6 +2517,8 @@ class Controller extends Base
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      * @throws \Schoolbox\Mapper\Exception
+     * @throws Error
+     * @throws \Exception
      */
     public function postImportFromJson(AssessmentContext $context): void
     {
@@ -2547,7 +2549,7 @@ class Controller extends Base
             /** @var \Schoolbox\Resource\Storage\Model $file */
             $file = (new CollectorFactory())->build($postData['attachment'] ?: [])->getFirst();
 
-            /** @var \Schoolbox\Resource\Storage\FilesystemProxy $filesystemProxy */
+            /** @var FilesystemProxy $filesystemProxy */
             $filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
             $data            = $filesystemProxy->read($file);
         } catch (\Schoolbox\Resource\Exception $e) {
