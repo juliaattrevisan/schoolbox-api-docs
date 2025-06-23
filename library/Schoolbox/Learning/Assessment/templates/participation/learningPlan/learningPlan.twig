@@ -74,7 +74,7 @@
                             {% set userInclude = (not participant.excludedAt) %}
                             <input type="hidden" name="participant-include[{{ user.id }}]" id="participant-include-{{ user.id }}" value="{{ userInclude ? 1 : 0 }}">
                             <input type="hidden" name="participant-plan[{{ user.id }}]" id="participant-plan-{{ user.id }}"
-                                   value="{{ (participant.plan.id and not participant.plan.isDynamic) ? participant.plan.id : -1 }}">
+                                   value="{{ plan is not defined ? -1 : (participant.plan.id and not participant.plan.isDynamic) ? participant.plan.id : -1 }}">
                         {% endfor %}
                         <input type="hidden" name="plan-id" id="plan-id" value="{{ plan is defined ? plan.id : -1 }}">
                         <input type="submit" value="Update" data-test="participation-plan-form-button-save">
