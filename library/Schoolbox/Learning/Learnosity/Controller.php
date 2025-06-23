@@ -36,6 +36,7 @@ use Schoolbox\Learning\Learnosity\Api\Duplicator;
 use Schoolbox\Learning\Learnosity\Cli\RescoreProcessor;
 use Schoolbox\Learning\Learnosity\Codec\UserIdentifier;
 use Schoolbox\Learning\Learnosity\Export\Csv\Processor;
+use Schoolbox\Learning\Learnosity\Export\Json\Payload;
 use Schoolbox\Learning\Learnosity\Feedback\SanitiseScores;
 use Schoolbox\Learning\Learnosity\Importer\Cli\CopyMissingQuizException;
 use Schoolbox\Learning\Learnosity\Importer\Cli\SourceAssociationException;
@@ -2438,5 +2439,55 @@ class Controller extends Base
         /* Send it to task for async processing
          */
         $this->messageProducer->send($message);
+    }
+
+
+    /**
+     * This exports a schoolbox quiz and its learnosity content into a json struct,
+     * dumping it into a text file so you can port it around between instances.
+     *
+     * I can't think of a nice name for this that doesn't already collide with the
+     * legacy import/export mechanism, other than relating it by its data type.
+     *
+     * TODO Maybe have a think about this and rename it again later.
+     * TODO Maybe belongs in a different controller?
+     *
+     * @param QuizDomainObject $assessment
+     * @return void
+     */
+    public function exportToJson(QuizDomainObject $assessment): void
+    {
+        /* Start generating output to stream
+         */
+        $filename = sprintf(
+            'quiz_%s.json',
+            $assessment->getId()
+        );
+
+        header('Cache-Control: private');
+        header('Content-type: application/json');
+        header("Content-disposition: attachment; filename=\"{$filename}\"");
+
+        $output = fopen('php://output', 'rw');
+
+        fputs($output, (new Payload())->generate($assessment));
+
+        fclose($output);
+    }
+
+
+    /**
+     * Takes a text file containing a schoolbox quiz and its learnosity contents in a
+     * json payload and puts it back into learnosity with a new school code and identifier
+     * corresponding to the destination into which it's imported (even if it's the same school)
+     *
+     * TODO Maybe have a think about this and rename it again later.
+     * TODO Maybe belongs in a different controller?
+     *
+     * @param QuizDomainObject $assessment
+     * @return void
+     */
+    public function importFromJson(QuizDomainObject $assessment): void
+    {
     }
 }

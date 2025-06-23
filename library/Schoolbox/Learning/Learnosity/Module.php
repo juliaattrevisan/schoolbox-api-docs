@@ -256,6 +256,11 @@ class Module extends BaseModule
         /* Archive a set of reference identifiers in Learnosity
          */
         $this->register('GET', '/archive/{learnosityReference}', 'getArchiveReference', $instructorPerms, null);
+
+        /* Export a schoolbox quiz and its learnosity content into a portable json payload
+         */
+        $this->register('GET', '/{assessmentId}/export/json', 'exportToJson', $instructorPerms, $preloadAssessment);
+        $this->register('GET', '/{assessmentId}/import/json', 'importFromJson', $instructorPerms, $preloadAssessment);
     }
 
 
