@@ -61,7 +61,26 @@ class Exporter
      */
     private function generateArray(QuizDomainObject $assessment): array
     {
-        /* TODO There's probably already a shortcut to this kind of serialization
+        /* Not all curriculum nodes were assigned a uuid which, if it existed, would have been conclusive.
+         * Using just the curric code means the destination might have multiple matches since there's no
+         * UNIQUE key on curric codes; In this case you won't be able to tell which one of those should be
+         * assigned to this quiz. It's inconclusive.
+         *
+         * Anyway, supply both, using the uuid to match first, otherwise falling back to the curric code,
+         * and if that doesn't exist, we can omit this curric code entirely.
+         */
+        $nodes = $assessment->getCurriculumNodes();
+
+        $curriculumNodes = [];
+
+        foreach ($nodes as $node) {
+            $curriculumNodes[] = [
+                'code' => $node->getCode(),
+                'uuid' => $node->getUuid()
+            ];
+        }
+
+        /* FIXME There's probably already a shortcut to this kind of serialization
          *  but I need it in its entirety except for school-specific data like folder,
          *  creator identifiers, etc.
          */
@@ -87,9 +106,9 @@ class Exporter
                 'completionMessage' => $assessment->getCompletionMessage(),
                 'defaultOpenSpan' => $assessment->getDefaultOpenSpan(),
                 /* Curriculum nodes might not be present in the destination instance, so...
-                 * you'll just have to list them by their code and hope for the best?
+                 * you'll just have to list them by their (code, uuid) and hope for the best?
                  */
-                'curriculumNodes' => $assessment->getCurriculumNodes()->indexBy('code')->keys(),
+                'curriculumNodes' => $curriculumNodes,
                 /* Marking and assessing
                  */
                 'markType' => $assessment->getMarkType()->getSlug(),

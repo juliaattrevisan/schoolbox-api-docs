@@ -22,6 +22,8 @@ use Interop\Queue\Exception\InvalidMessageException;
 use League\Flysystem\FilesystemException;
 use LearnositySdk\Exceptions\ValidationException;
 use LearnositySdk\Utils\Uuid;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Random\RandomException;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
@@ -2503,7 +2505,17 @@ class Controller extends Base
      * TODO Maybe have a think about this and rename it again later.
      * TODO Maybe belongs in a different controller?
      *
+     * @param AssessmentContext $context
      * @return void
+     * @throws Deleted
+     * @throws FilesystemException
+     * @throws RouteNotFound
+     * @throws ValidationException
+     * @throws \DOMException
+     * @throws \JsonException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function postImportFromJson(AssessmentContext $context): void
     {
