@@ -153,7 +153,7 @@ window.Vue.onMounted((): void => {
                     </div>
                     <div>
                         <a
-                            class="l-flex-row l-gap-s f-no-bkg f-no-margins"
+                            class="f-no-bkg f-no-margins"
                             aria-label="Edit template"
                             title="Edit template"
                             :href="props.updateTemplateEndpoint.replace('{templateId}', template.id.toString())"
