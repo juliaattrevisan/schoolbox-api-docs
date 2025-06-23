@@ -98,14 +98,18 @@ class Controller extends Base
         if (empty(trim((string)($postData['title'] ?? '')))) {
             throw $this->errorMapper->generateException(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
         }
+        if (empty(trim((string)($postData['body'] ?? '')))) {
+            throw $this->errorMapper->generateException(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
+        }
 
         // Create new template
         $template = $this->templateMapper->createModel()
-            ->setCategoryId($category->id)
+            ->setCategoryId($category->getId())
             ->setTitle(trim((string)$postData['title']))
             ->setDescription(trim((string)($postData['description'] ?? '')))
             ->setBody(trim((string)($postData['body'] ?? '')))
-            ->setCreatedBy($this->getUser()->getId());
+            ->setCreatedBy($this->getUser()->getId())
+            ->setUpdatedBy($this->getUser()->getId());
 
         $this->templateMapper->save($template);
 

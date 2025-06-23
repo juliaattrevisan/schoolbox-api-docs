@@ -13,12 +13,16 @@ namespace Schoolbox\Editor\Templates;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\CreatedBy;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
+use Schoolbox\Mapper\Traits\Model\UpdatedBy;
 
 class Model
 {
     use Id;
     use CreatedAtDate;
     use CreatedBy;
+    use UpdatedAtDate;
+    use UpdatedBy;
 
     /**
      * @var int

@@ -25,13 +25,13 @@
                             <input type="text" id="template-title" name="title" maxlength="255" value="{{ template.title ?? ''}}" />
                         </div>
                         <div class="small-12 columns">
-                            <label for="template-title">Title</label>
+                            <label for="template-description">Description</label>
                             {# This maxlength corresponds to the schema field length #}
-                            <input type="text" id="template-title" name="title" maxlength="255" value="{{ template.title ?? ''}}" />
+                            <input type="text" id="template-description" name="description" maxlength="255" value="{{ template.description ?? ''}}" />
                         </div>
                         <div class="small-12 columns">
                             <label for="template-body" class="required">Body</label>
-                            <textarea id="template-body" name="template-body" rows="5">{{ template.body ?? '' }}</textarea>
+                            <textarea id="template-body" name="body" rows="5">{{ template.body ?? '' }}</textarea>
                         </div>
                     </fieldset>
                 </section>
@@ -45,7 +45,7 @@
 <script>
 
 /**
-* Initialise the body editor, adding tokens and show the word count
+* Initialise the body editor
 */
 document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
     detail: {
