@@ -89,3 +89,15 @@ test("When two students are selected, and one is excluded, the Remove Customisat
 
     expect(wrapper.find('[data-test="custom-participation-remove-customisation"]').exists()).toBe(true);
 });
+
+test("If a student is excluded, Excluded is visible in their row", async () => {
+    const wrapper = mount(CustomParticipation, {
+        props: {
+            allParticipants,
+            getStudentsPastoralCountsUrl: "",
+        },
+    });
+
+    const row = wrapper.find(`[data-test="custom-participation-row-${allParticipants[0].user.id}"]`);
+    expect(row.text()).toContain("Excluded");
+});
