@@ -327,7 +327,7 @@ class Importer
             $uuid = trim((string)$curriculumNode['uuid']);
             $code =  trim((string)$curriculumNode['code']);
 
-            /* Prefef fetching by something conclusive first;
+            /* Prefer fetching by something conclusive first;
              * fall back to codes otherwise
              */
             if ('' !== $uuid) {
@@ -354,10 +354,14 @@ class Importer
 
         /* Fetch the sets
          */
-        $set1 = $this->curriculumNodeMapper->findByColumn('uuid', $uuids);
-        $set2 = $this->curriculumNodeMapper->findByColumn('code', $codes);
+        if (\count($uuids) || \count($codes)) {
+            $set1 = $this->curriculumNodeMapper->findByColumn('uuid', $uuids);
+            $set2 = $this->curriculumNodeMapper->findByColumn('code', $codes);
 
-        $nodes = $set1->merge($set2);
+            $nodes = $set1->merge($set2);
+        } else {
+            $nodes = $this->curriculumNodeMapper->createCollection();
+        }
 
         return [
             'nodes' => $nodes,
@@ -383,7 +387,7 @@ class Importer
             $this->storageMapper->acceptStream($newFilename, $imageData);
 
             /* FIXME Maybe do a double-verify comparing $hash to the output of acceptStream()
-             * to ensure they match. Not sure if that's necessary though.
+             *  to ensure they match. Not sure if that's necessary though.
              */
         }
     }
@@ -479,6 +483,7 @@ class Importer
      * Also, you can only send 50 at a time per payload, which is annoying
      *
      * @param array $learnosityContent
+     * @param array $tags
      * @return string
      * @throws ValidationException
      * @throws \JsonException
