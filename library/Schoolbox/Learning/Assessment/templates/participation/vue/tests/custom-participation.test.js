@@ -139,3 +139,17 @@ test("A participants preferred name is set and visible in their name", async () 
     const row = wrapper.find(`[data-test="custom-participation-row-${modifiedParticipants[0].user.id}"]`);
     expect(row.text()).toContain("Moshe P.");
 });
+
+test("When a load error occurs the load error note is visible ", async () => {
+    const wrapper = mount(CustomParticipation, {
+        props: {
+            allParticipants: [],
+            getStudentsPastoralCountsUrl: "",
+        },
+    });
+
+    wrapper.vm.loadError = "Some error occurred";
+    await nextTick();
+    expect(wrapper.find('[data-test="custom-participation-load-error"]').isVisible()).toBe(true);
+    expect(wrapper.text()).toContain("Some error occurred");
+});

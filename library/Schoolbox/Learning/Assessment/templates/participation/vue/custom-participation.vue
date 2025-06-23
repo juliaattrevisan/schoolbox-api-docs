@@ -186,7 +186,7 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
-    <div v-if="loadError" class="c-island l-pad-m">
+    <div v-if="loadError" class="c-island l-pad-m" data-test="custom-participation-load-error">
         <div class="alert-box alert f-no-margins">
             Sorry, there was an error during report retrieval. Please
             <a href="" title="refresh the page"> refresh the page </a>
