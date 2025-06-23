@@ -377,8 +377,6 @@ class Importer
             if (\count($payload[$key]) === self::LEARNOSITY_MAX_PAYLOAD_SIZE) {
                 $this->api->dataSetRequestHub($endpoint, $payload);
 
-                new \Alaress_Probe($payload);
-
                 $payload = [
                     $key => []
                 ];
@@ -388,8 +386,6 @@ class Importer
         /* Send any remainders
          */
         if (\count($payload[$key])) {
-            new \Alaress_Probe($payload);
-
             $this->api->dataSetRequestHub($endpoint, $payload);
         }
 

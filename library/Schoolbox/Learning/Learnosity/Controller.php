@@ -2558,7 +2558,7 @@ class Controller extends Base
         $serverName = $server->getHost();
         $domain     = (string)$server;
 
-        (new Importer\Json\Importer(
+        $newInstances = (new Importer\Json\Importer(
             $this->api,
             $schoolCode,
             $domain,
@@ -2573,7 +2573,10 @@ class Controller extends Base
             $this->storageMapper,
         ))->import($data);
 
-        /* TODO Add redirect back to the quiz you just made...I guess, its modify screen
+        /* Redirect back to the quiz you just made...its modify screen, I guess.
          */
+        $this->response = $this->redirectFound($this->routeGenerator->generate('learningAssessment.getUpdateAssessmentForm', [
+            'assessmentId' => $newInstances['assessment']->getId()
+        ]));
     }
 }
