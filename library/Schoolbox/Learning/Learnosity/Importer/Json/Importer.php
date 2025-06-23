@@ -112,7 +112,7 @@ class Importer
      */
     public function import(string $data): array
     {
-        $warnings = [];
+        $errors = [];
 
         /* Convert the raw data into a json format...hopefully
          */
@@ -133,7 +133,7 @@ class Importer
 
         /* Collate random issues with the import
          */
-        $warnings = array_merge($warnings, $instances['warnings']);
+        $errors = array_merge($errors, $instances['errors']);
 
         /* Process storage instances from assets included in the json
          */
@@ -170,7 +170,7 @@ class Importer
         return [
             'assessment' => $instances['assessment'],
             'quiz' => $instances['quiz'],
-            'errors' => $warnings
+            'errors' => $errors
         ];
     }
 
@@ -247,9 +247,9 @@ class Importer
          */
         $nodeStruct = $this->processCurriculumNodes($settings['curriculumNodes']);
 
-        /* Start introducing warnings
+        /* Start introducing errors
          */
-        $warnings = $nodeStruct['warnings'];
+        $errors = $nodeStruct['errors'];
 
         /* Any random base64 images that just somehow happened to be here will get converted
          * into local storage instances instead, as per the Omega Import
@@ -306,7 +306,7 @@ class Importer
         return [
             'assessment' => $assessment,
             'quiz' => $quiz,
-            'warnings' => $warnings
+            'errors' => $errors
         ];
     }
 
@@ -323,7 +323,7 @@ class Importer
 
         $uuids = [];
         $codes = [];
-        $warnings = [];
+        $errors = [];
 
         foreach ($curriculumNodes as $curriculumNode) {
             $uuid = trim((string)$curriculumNode['uuid']);
@@ -337,7 +337,7 @@ class Importer
             } elseif ('' !== $code) {
                 $codes[] = $code;
 
-                $warnings[] = sprintf(
+                $errors[] = sprintf(
                     'Curriculum node %s did not have a uuid; double check quiz curriculum settings after import.',
                     $code
                 );
@@ -348,7 +348,7 @@ class Importer
         $diff = $nTotal - $nFound;
 
         if ($diff) {
-            $warnings[] = sprintf(
+            $errors[] = sprintf(
                 '%s curriculum node(s) were omitted; double check quiz curriculum settings after import.',
                 $diff
             );
@@ -363,7 +363,7 @@ class Importer
 
         return [
             'nodes' => $nodes,
-            'warnings' => $warnings
+            'errors' => $errors
         ];
     }
 

@@ -1,0 +1,27 @@
+{##
+ # Import Error screen for user feedback
+ #
+ # Shows a list of errors/warnings whenever something went strangely with the json data. Usually this is a result
+ # of trying to import curriculum nodes that didn't have uuids, but other errors/warnings turn up here too
+ #
+ # @param array $breadcrumbs        A set of nodes to render as breadcrumb elements
+ # @param IAssessable $assessment   The new quiz instance we just spawned
+ # @param array $errors             A stack of strings for each weird thing we encountered during import
+ #}
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(breadcrumbs) }}
+
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">{{ assessment.title }}</h2>
+        <section class="content">
+            <ul class="information-list">
+                {% for error in errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </section>
+        <a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id}) }}" class="full-width button" title="Modify">Modify quiz settings</a>
+    </div>
+</div>

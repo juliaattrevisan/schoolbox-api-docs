@@ -2583,10 +2583,28 @@ class Controller extends Base
             $this->storageMapper,
         ))->import($data);
 
-        /* Redirect back to the quiz you just made...its modify screen, I guess.
+        /* Check for errors: if there were any, go to a new screen to explain this.
+         * Otherwise just redirect back to the quiz you just made...its modify screen, I guess.
          */
-        $this->response = $this->redirectFound($this->routeGenerator->generate('learningAssessment.getUpdateAssessmentForm', [
-            'assessmentId' => $newInstances['assessment']->getId()
-        ]));
+        if (\count($newInstances['errors'])) {
+            /* Breadcrumbs
+             */
+            $breadcrumbs = $this->bakery->produceFromAssessment($newInstances['assessment'], $this->getUser())
+                ->add([
+                    $newInstances['assessment']->getTitle(),
+                    $newInstances['assessment']->isImplementation() ? $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $newInstances['assessment']->getId()]) : null
+                ])
+                ->add(['Import', null]);
+
+            $this->response = $this->responseFromTemplate('@learnosity/importErrors.twig', [
+                'breadcrumbs' => $breadcrumbs,
+                'assessment' => $newInstances['assessment'],
+                'errors' => $newInstances['errors']
+            ], 'Import errors');
+        } else {
+            /* Redirect back to the quiz you just made...its modify screen, I guess.
+             */
+            $this->response = $this->redirectFound($this->routeGenerator->generate('learningAssessment.getUpdateAssessmentForm', ['assessmentId' => $newInstances['assessment']->getId()]));
+        }
     }
 }
