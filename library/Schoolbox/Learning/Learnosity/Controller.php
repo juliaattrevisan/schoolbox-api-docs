@@ -19,8 +19,11 @@ use DebugBar\DebugBarException;
 use Http\Discovery\Psr17Factory;
 use Interop\Queue\Exception\InvalidDestinationException;
 use Interop\Queue\Exception\InvalidMessageException;
+use League\Flysystem\FilesystemException;
 use LearnositySdk\Exceptions\ValidationException;
 use LearnositySdk\Utils\Uuid;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Random\RandomException;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -46,6 +49,7 @@ use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\TaskDaemon\Producer;
 use Schoolbox\TaskDaemon\Request\HttpRequest\MessageFactory;
 use Schoolbox\TaskDaemon\Request\DownloadPages\MessageFactory as DownloadPagesMessageFactory;
@@ -200,11 +204,12 @@ class Controller extends Base
      * @param Feedback\Mapper $feedbackMapper
      * @param UserMapper $userMapper
      * @param StateMapper $stateMapper
+     * @param \Schoolbox\Resource\Storage\Mapper $storageMapper
+     * @param FilesystemProxy $filesystemProxy
      * @param Psr17Factory $httpFactory for creating HTTP requests
      * @param MessageFactory $messageFactory for creating messages to send to taskd
      * @param Producer $messageProducer for sending messages to taskd
      * @param DownloadPagesMessageFactory $downloadMessageFactory for creating download page messages to send to taskd
-     * @throws \DomainException
      */
     public function __construct(
         \Schoolbox\Url\Factory $urlFactory,
@@ -220,6 +225,8 @@ class Controller extends Base
         private \Schoolbox\Learning\Learnosity\Feedback\Mapper $feedbackMapper,
         private \Schoolbox\UserMapper $userMapper,
         private StateMapper $stateMapper,
+        private \Schoolbox\Resource\Storage\Mapper $storageMapper,
+        private \Schoolbox\Resource\Storage\FilesystemProxy $filesystemProxy,
         private Psr17Factory $httpFactory,
         private MessageFactory $messageFactory,
         private Producer $messageProducer,
@@ -2454,6 +2461,7 @@ class Controller extends Base
      *
      * @param QuizDomainObject $assessment
      * @return void
+     * @throws FilesystemException
      */
     public function exportToJson(QuizDomainObject $assessment): void
     {
@@ -2470,7 +2478,9 @@ class Controller extends Base
 
         $output = fopen('php://output', 'rw');
 
-        fputs($output, (new Payload())->generate($assessment));
+        $struct = (new Payload($this->storageMapper, $this->filesystemProxy, $this->api))->generate($assessment);
+
+        fputs($output, $struct);
 
         fclose($output);
     }

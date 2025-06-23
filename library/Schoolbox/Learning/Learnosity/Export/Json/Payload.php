@@ -1,18 +1,43 @@
 <?php
 
+/**
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2025, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Learning\Learnosity\Export\Json;
 
+use League\Flysystem\FilesystemException;
+use LearnositySdk\Exceptions\ValidationException;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainObject;
+use Schoolbox\Learning\Learnosity\Api;
+use Schoolbox\Resource\Storage\FilesystemProxy;
+use Schoolbox\Resource\Storage\Mapper;
 
 class Payload
 {
+    /**
+     * @param Mapper $storageMapper
+     * @param FilesystemProxy $filesystemProxy
+     * @param Api $api
+     */
+    public function __construct(
+        private \Schoolbox\Resource\Storage\Mapper $storageMapper,
+        private FilesystemProxy $filesystemProxy,
+        private Api $api
+    ) {
+    }
+
+
     /**
      * Create a JSON representation of the quiz $assessment
      *
      * @param QuizDomainObject $assessment
      * @return string
+     * @throws FilesystemException
      */
     public function generate(QuizDomainObject $assessment): string
     {
@@ -25,6 +50,7 @@ class Payload
      *
      * @param QuizDomainObject $assessment
      * @return array
+     * @throws FilesystemException
      */
     private function generateArray(QuizDomainObject $assessment): array
     {
@@ -32,7 +58,7 @@ class Payload
          *  but I need it in its entirety except for school-specific data like folder,
          *  creator identifiers, etc.
          */
-        $struct = [
+        return [
             'settings' => [
                 /* Configuration
                  */
@@ -70,9 +96,9 @@ class Payload
                 'sequence' => null,
                 /* Not supported by quiz, it seems
                  */
-                //                'courseManaged' => $assessment->getCourseManaged(),
-                //                'sebEnabled' => $assessment->getSebEnabled(),
-                //                'defaultOpenSpan' => $assessment->getDefaultOpenSpan(),
+                // 'courseManaged' => $assessment->getCourseManaged(),
+                // 'sebEnabled' => $assessment->getSebEnabled(),
+                // 'defaultOpenSpan' => $assessment->getDefaultOpenSpan(),
             ],
             /* These are locally-grown storage models that were used somewhere in this quiz.
              * When importing into your own school, you'll already have them: but, importing
@@ -89,16 +115,76 @@ class Payload
              *  - Zip file containing json text file + any associated assets. But then you have to
              *    deal with taskd, zip files, download limits, all this hankypanky
              */
-            'assets' => array_values(array_unique(array_merge(
-                $this->detectAssets($assessment->getDescription()),
-                $this->detectAssets($assessment->getCompletionMessage()),
-            ))),
+            'assets' => $this->indexAssets($assessment),
             /* Learnosity stuff goes here
              */
-            'content' => []
+            'content' => $this->fetchLearnosityContent($assessment->getLearnosityReference())
         ];
+    }
 
-        return $struct;
+
+    /**
+     * Find all the storage info about each asset. Note that an asset can be reused across
+     * multiple ckeditors in the quiz such as for Description and Completion Message; we only
+     * need to index their storage data once per usage which is why we do it here and not in
+     * detectAssets()
+     *
+     * @param QuizDomainObject $assessment
+     * @return array
+     * @throws FilesystemException
+     */
+    private function indexAssets(QuizDomainObject $assessment): array
+    {
+        $hashes = array_values(array_unique(array_merge(
+            $this->detectAssets($assessment->getDescription()),
+            $this->detectAssets($assessment->getCompletionMessage()),
+        )));
+
+        /* No assets? No trabajo
+         */
+        if (!\count($hashes)) {
+            return [];
+        }
+
+        /* Find all the storage instances corresponding to these hashes
+         */
+        $instances = $this->storageMapper->findByColumn('hash', $hashes);
+
+        $stack = [];
+
+        foreach ($instances as $instance) {
+            /* Skip video/audio for now. They're too big.
+             */
+            if ($instance->getMimeType()->isAudio() || $instance->getMimeType()->isVideo()) {
+                continue;
+            }
+
+            /* Otherwise I guess we try to include it...
+             * Nothing stops you embedding a 2gb video into a .jpeg file extension though.
+             * hmm
+             */
+            $index = $instance->getHash();
+
+            /* A string that represents binary data. Hopefully this decodes without corruption.
+             * There used to be a thing way back in the early 2000s where people stored binary
+             * data in the db (images for image galleries etc) in exactly this kind of manner,
+             * but sometimes it...corrupted data. Can't remember the details now, but it used to
+             * be a bit of thing
+             *
+             * Note that fetch.php does a bunch of S3 related stuff that MAYBE needs to be here too
+             * I'm...not sure on the particulars
+             *
+             * TODO find out from mr sannang
+             */
+            $fileContents = base64_encode($this->filesystemProxy->read($instance));
+
+            $stack[$index] = [
+                'basename' => $instance->getBaseName(),
+                'contents' => $fileContents
+            ];
+        }
+
+        return $stack;
     }
 
 
@@ -116,5 +202,167 @@ class Payload
         preg_match_all('/\/storage\/(image|fetch)\.php\?hash=([^"]+)/', $input, $matches);
 
         return $matches[2];
+    }
+
+
+    /**
+     * Grab the learnosity api payloads for $learnosityReference and pile them into one big
+     * mega struct...hopefully this works
+     *
+     * @param string $learnosityReference
+     * @return array
+     * @throws \JsonException
+     * @throws ValidationException
+     */
+    private function fetchLearnosityContent(string $learnosityReference): array
+    {
+        /* Get the activity we wanna export
+         */
+        $activity = $this->api->dataGetRequest('/itembank/activities', ['references' => [$learnosityReference]])['data'][0];
+
+        /* Get the items in that activity
+         */
+        $itemReferences = array_column($activity['data']['items'], 'reference');
+
+        /* Find all the items in learnosity land
+         */
+        $itemData = $this->api->dataGetRequest('/itembank/items', ['references' => $itemReferences])['data'];
+
+        /* Get the questions in each item
+         */
+        $questionReferences = [];
+
+        foreach ($itemData as $item) {
+            $questionReferences = array_merge($questionReferences, array_column($item['questions'], 'reference'));
+        }
+
+        $questionData = $this->api->dataGetRequest('/itembank/questions', ['references' => $questionReferences])['data'];
+
+        /* Get the features in each item
+         */
+        $featureReferences = [];
+
+        foreach ($itemData as $item) {
+            $featureReferences = array_merge($featureReferences, array_column($item['features'], 'reference'));
+        }
+
+        $featureData = $this->api->dataGetRequest('/itembank/features', ['references' => $featureReferences])['data'];
+
+        /* Predetermine new identifiers for items and questions
+         */
+        $itemReplacementRefs = [];
+
+        foreach ($itemData as $item) {
+            $itemReplacementRefs[$item['reference']] = $this->generateGuid();
+        }
+
+        $questionReplacementRefs = [];
+
+        foreach ($questionData as $question) {
+            $questionReplacementRefs[$question['reference']] = $this->generateGuid();
+        }
+
+        $featureReplacementRefs = [];
+
+        foreach ($featureData as $feature) {
+            $featureReplacementRefs[$feature['reference']] = $this->generateGuid();
+        }
+
+        /* All this stuff contains learnosity references that shouldn't perpetuate beyond this school
+         * otherwise you can access data you're not supposed to access. Unfortunately the learnosity
+         * scheme is security by obscurity, relying on guessing-the-hash being too difficult to brute
+         * force. Revealing them here would negate this "security"
+         *
+         * Anonymise the references as we further manipulate this stack.
+         */
+
+        /* Anonymise question refs
+         */
+        $questionStack = [];
+
+        foreach ($questionData as &$question) {
+            $question['reference'] = $questionReplacementRefs[$question['reference']];
+            $questionStack[$question['reference']] = $question;
+        }
+
+        unset($question);
+
+        /* Anonymise feature refs
+         */
+        $featureStack = [];
+
+        foreach ($featureData as &$feature) {
+            $feature['reference'] = $featureReplacementRefs[$feature['reference']];
+            $featureStack[$feature['reference']] = $feature;
+        }
+
+        unset($feature);
+
+        /* Anonymise item refs
+         */
+        $itemStack = [];
+
+        foreach ($itemData as &$item) {
+            foreach ($item['questions'] as &$question) {
+                $question['reference'] = $questionReplacementRefs[$question['reference']];
+            }
+
+            foreach ($item['features'] as &$feature) {
+                $feature['reference'] = $featureReplacementRefs[$feature['reference']];
+            }
+
+            $item['reference'] = $itemReplacementRefs[$item['reference']];
+            unset($item['definition']['widgets'], $item['tags']);
+
+            $itemStack[$item['reference']] = $item;
+        }
+
+        unset($item, $question, $feature);
+
+        /* Anonymise activity refs
+         */
+        unset($activity['reference'], $activity['tags']);
+
+        foreach ($activity['data']['items'] as &$item) {
+            $item['id'] = $itemReplacementRefs[$item['reference']];
+            $item['reference'] = $itemReplacementRefs[$item['reference']];
+        }
+
+        unset($item);
+
+        /* Don't need these old stacks anymore
+         */
+        unset($itemData, $questionData, $featureData);
+
+        return [
+            'activity' => $activity,
+            'items' => $itemStack,
+            'questions' => $questionStack,
+            'features' => $featureStack
+        ];
+    }
+
+
+    /**
+     * Generate a microsofty style guid
+     *
+     * @return string
+     */
+    private function generateGuid(): string
+    {
+        $uuid = md5(uniqid((string)mt_rand(), true));
+
+        /* Add an arbitrary prefix to the start of this string to make it clear that
+         * it's one of our own making, not belonging to learnosity at all
+         */
+        return sprintf(
+            '%s-%s-%s-%s-%s-%s',
+            'sb',
+            substr($uuid, 0, 8),
+            substr($uuid, 8, 4),
+            substr($uuid, 12, 4),
+            substr($uuid, 16, 4),
+            substr($uuid, 20, 12)
+        );
     }
 }
