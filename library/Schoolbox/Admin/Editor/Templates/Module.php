@@ -15,6 +15,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Admin\Editor\Templates\Category\Mapper;
 
 class Module extends BaseModule
 {

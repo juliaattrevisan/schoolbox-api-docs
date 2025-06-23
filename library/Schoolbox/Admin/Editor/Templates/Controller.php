@@ -12,7 +12,8 @@ namespace Schoolbox\Admin\Editor\Templates;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\Navigation\Subnav;
-use Schoolbox\Admin\Editor\Templates\ModelToArray;
+use Schoolbox\Admin\Editor\Templates\Category\ModelToArray;
+use Schoolbox\Admin\Editor\Templates\Category\Mapper;
 
 class Controller extends Base
 {

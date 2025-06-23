@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\Editor\Templates;
+namespace Schoolbox\Admin\Editor\Templates\Category;
 
 /**
  * Translator for translating a category model into an array, ready for JSON
