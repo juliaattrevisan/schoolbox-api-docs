@@ -25,7 +25,7 @@
                             <input type="text" id="template-title" name="title" maxlength="255" value="{{ template.title ?? ''}}" />
                         </div>
                         <div class="small-12 columns">
-                            <label for="template-description">Description</label>
+                            <label for="template-description">Description <span data-tooltip class="hint has-tip tip-top" data-width="200" title="To provide more context about what the template should be used for.">?</span></label>
                             {# This maxlength corresponds to the schema field length #}
                             <input type="text" id="template-description" name="description" maxlength="255" value="{{ template.description ?? ''}}" />
                         </div>
