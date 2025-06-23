@@ -1,3 +1,10 @@
+{##
+ # Create Editor Templates
+ #
+ # @param Model $category The category to create the template in
+ # @param Editor/Templates/Model $template The current template being edited
+ #}
+
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
 
@@ -8,17 +15,23 @@
 
     <div class="admin-content">
         <div class="small-12 island">
-            <form>
+            {% set formAction = routeLookupIfAuthorized('adminEditorTemplates.postCreate', {categoryId: category.id}) %}
+            <form action="{{ formAction }}" method="post">
                 <section>
                     <fieldset class="content">
-                        <div class="small-12">
-
+                        <div class="small-12 columns">
+                            <label for="template-title" class="required">Title</label>
+                            {# This maxlength corresponds to the schema field length #}
+                            <input type="text" id="template-title" name="title" maxlength="255" value="{{ template.title ?? ''}}" />
                         </div>
-                        <div class="small-12">
-
+                        <div class="small-12 columns">
+                            <label for="template-title">Title</label>
+                            {# This maxlength corresponds to the schema field length #}
+                            <input type="text" id="template-title" name="title" maxlength="255" value="{{ template.title ?? ''}}" />
                         </div>
-                        <div class="small-12">
-
+                        <div class="small-12 columns">
+                            <label for="template-body" class="required">Body</label>
+                            <textarea id="template-body" name="template-body" rows="5">{{ template.body ?? '' }}</textarea>
                         </div>
                     </fieldset>
                 </section>
@@ -27,3 +40,17 @@
         </div>
     </div><!-- admin-content -->
 </div><!-- admin-container -->
+
+<script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
+<script>
+
+/**
+* Initialise the body editor, adding tokens and show the word count
+*/
+document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+    detail: {
+        targetElements: ['#template-body']
+    }
+}));
+
+</script>
