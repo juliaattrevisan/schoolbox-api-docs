@@ -1,0 +1,24 @@
+{##
+ # List of Editor Templates
+ #
+ # @param GenericCollection $categories  The categories to display
+ #}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+<div class="admin-container row">
+
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent) }}
+
+    <div class="admin-content">
+        {% set templatesEndpoint = routeLookupIfAuthorized('editorTemplates.getTemplates') %}
+        <div id="editor-templates-container">
+            <editor-templates
+                :categories="{{ (categories ?? []) | json_encode }}"
+                templates-endpoint="{{ templatesEndpoint ?? ''}}"
+            />
+        </div>
+        <script src="{{ CDN_PREFIX }}/js/bundle/editorTemplates.js?v={{ config.site_version }}"></script>
+    </div>
+</div>

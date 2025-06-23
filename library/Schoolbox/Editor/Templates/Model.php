@@ -1,0 +1,91 @@
+<?php
+
+/**
+ * @author      Michael Heydon <michael.heydon@schoolbox.education>
+ * @copyright   Copyright 2025, Schoolbox Pty Ltd
+ * @link        https://schoolbox.education/
+ */
+
+ declare(strict_types=1);
+
+namespace Schoolbox\Editor\Templates;
+
+use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\CreatedBy;
+
+class Model
+{
+    use Id;
+    use CreatedAtDate;
+    use CreatedBy;
+
+    /**
+     * @var string
+     */
+    private string $title;
+
+    /**
+     * @var string
+     */
+    private string $description;
+
+    /**
+     * @var string
+     */
+    private string $body;
+
+    /**
+     * @return string
+     */
+    public function getTitle(): string
+    {
+        return $this->title;
+    }
+
+    /**
+     * @param string $title
+     * @return Model
+     */
+    public function setTitle(string $title): self
+    {
+        $this->title = $title;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription(): string
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param string $description
+     * @return Model
+     */
+    public function setDescription(string $description): self
+    {
+        $this->description = $description;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBody(): string
+    {
+        return $this->body;
+    }
+
+    /**
+     * @param string $body
+     * @return Model
+     */
+    public function setBody(string $body): self
+    {
+        $this->body = $body;
+        return $this;
+    }
+}

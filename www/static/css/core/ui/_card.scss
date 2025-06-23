@@ -127,6 +127,10 @@
         border-block-end: 1px solid var(--border-colour);
     }
 
+    &--border-end-alt {
+        border-block-end: 1px solid var(--body-background);
+    }
+
     &--alt-bkg {
         background-color: var(--alt-foreground-colour);
     }

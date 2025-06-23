@@ -1,4 +1,12 @@
 /**
+ * Auto generated links provided for the User
+ */
+type UserLinks = {
+    avatar?: string;
+    profile?: string;
+};
+
+/**
  * The start of a SBX User type
  */
 export type User = {
@@ -11,4 +19,5 @@ export type User = {
     preferredName: string | null;
     title: string | null;
     pronoun: string | null;
+    _links?: UserLinks;
 };
