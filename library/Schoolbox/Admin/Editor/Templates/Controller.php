@@ -11,12 +11,10 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Editor\Templates;
 
 use Alaress\Web\Controller\Base;
-use Alaress\Web\Exception\NotFound;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Editor\Templates\Category\ModelToArray;
 use Schoolbox\Admin\Editor\Templates\Category\Mapper as CategoryMapper;
 use Schoolbox\Editor\Templates\Mapper as TemplateMapper;
-use Schoolbox\Editor\Templates\Model as TemplateModel;
 use Schoolbox\Error\Mapper as ErrorMapper;
 
 use function SSNepenthe\ColorUtils\name;
