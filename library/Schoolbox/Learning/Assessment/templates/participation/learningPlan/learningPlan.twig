@@ -1,8 +1,5 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import "@learningAssessment/fragments/macro/date.twig" as dateForm %}
-<script src="{{ CDN_PREFIX }}/js/bundle/mage.js?v={{ config.site_version }}"></script>
-{#<script src="{{ CDN_PREFIX }}/js/assessment/validationRules.js?v={{ config.site_version }}" data-locale-grading-proper="{{ locale.grading.proper }}"></script>#}
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/jquery-validation/dist/additional-methods.min.js?v={{ config.site_version }}"></script>
 <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 
 {#
@@ -31,33 +28,29 @@
 </div>
 <div class="row">
     <div class="small-12 columns island">
-        <form method="post" id="participation-plan-form" class="mage">
+        <form method="post" id="participation-plan-form">
             <section>
-                <fieldset class="content" data-mage>
+                <fieldset class="content">
                     <div class="small-12 columns">
                         <fieldset>
-                            <label>
-                                Title
-                                <input
-                                        type="text"
-                                        name="plan-name"
-                                        id="plan-name"
-                                        data-test="participation-plan-customise-modal-input-name"
-                                        maxlength="256"
-                                        value="{{ plan is defined ? plan.name : '' }}"
-                                >
-                            </label>
+                            <label for="plan-name" class="required">Title</label>
+                            <input
+                                    type="text"
+                                    name="plan-name"
+                                    id="plan-name"
+                                    data-test="participation-plan-customise-modal-input-name"
+                                    maxlength="256"
+                                    value="{{ plan is defined ? plan.name : '' }}"
+                            >
                         </fieldset>
                         <fieldset>
                             <legend>Custom Activity Details</legend>
                             <div class="row">
                                 <div class="columns small-12">
-                                    <label>
-                                        Description
-                                        <textarea name="plan-desc" id="plan-desc">
-                                            {{ plan is defined ? plan.description : assessment.description }}
-                                        </textarea>
-                                    </label>
+                                    <label for="plan-desc" class="required">Description</label>
+                                    <textarea name="plan-desc" id="plan-desc">
+                                        {{ plan is defined ? plan.description : assessment.description }}
+                                    </textarea>
                                 </div>
                                 <div class="columns small-12">
                                     {% set publishAt = plan is defined ? plan.publishDate : assessment.publishAt %}
@@ -93,7 +86,7 @@
         </form>
     </div>
 </div>
-
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/jquery-validation/dist/additional-methods.min.js?v={{ config.site_version }}"></script>
 <script>
     // Dispatch signal to initalise CKEditor
     document.dispatchEvent(
@@ -104,44 +97,31 @@
             }),
     );
 
-    var defaults = {
-        getAvailableDateFields: function () {
-            return ["publish", "open", "due", "close"];
-        },
-    };
     $(function() {
         // Validate plan form
-        console.log($("#participation-plan-form").alaressValidate({
+        $("#participation-plan-form").alaressValidate({
             rules: {
                 "plan-name": {
                     requiredNotBlank: true
                 },
-                "plan-description": "required",
+                "plan-desc": "required",
                 planPublishDate: {
                     required: true,
                     datepickerDate: true,
                 },
                 planOpenDate: {
-                    required: function () {
-                        return $.inArray("open", options.getAvailableDateFields()) > -1;
-                    },
-                    datepickerDate: function () {
-                        return $.inArray("open", options.getAvailableDateFields()) > -1;
-                    },
+                    required: true,
+                    datepickerDate: true,
                 },
                 planDueDate: {
                     required: true,
                     datepickerDate: true,
                 },
                 planCloseDate: {
-                    required: function () {
-                        return $.inArray("close", options.getAvailableDateFields()) > -1;
-                    },
-                    datepickerDate: function () {
-                        return $.inArray("close", options.getAvailableDateFields()) > -1;
-                    },
+                    required: true,
+                    datepickerDate: true,
                 },
             },
-        }));
+        });
     });
 </script>
