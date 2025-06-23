@@ -213,6 +213,7 @@ class Controller extends Base
      * @param MarkTypeMapper $markTypeMapper
      * @param \Schoolbox\Learning\Assessment\WorkType\Mapper $workTypeMapper
      * @param \Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper $gradeGroupMapper
+     * @param \Schoolbox\Curriculum\Node\Mapper $curriculumNodeMapper
      * @param FilesystemProxy $filesystemProxy
      * @param Psr17Factory $httpFactory for creating HTTP requests
      * @param MessageFactory $messageFactory for creating messages to send to taskd
@@ -237,6 +238,7 @@ class Controller extends Base
         private \Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper $markTypeMapper,
         private \Schoolbox\Learning\Assessment\WorkType\Mapper $workTypeMapper,
         private \Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper $gradeGroupMapper,
+        private \Schoolbox\Curriculum\Node\Mapper $curriculumNodeMapper,
         private \Schoolbox\Resource\Storage\FilesystemProxy $filesystemProxy,
         private Psr17Factory $httpFactory,
         private MessageFactory $messageFactory,
@@ -2581,6 +2583,7 @@ class Controller extends Base
             $this->markTypeMapper,
             $this->gradeGroupMapper,
             $this->storageMapper,
+            $this->curriculumNodeMapper,
         ))->import($data);
 
         /* Check for errors: if there were any, go to a new screen to explain this.

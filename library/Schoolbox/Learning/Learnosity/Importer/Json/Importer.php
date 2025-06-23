@@ -77,6 +77,7 @@ class Importer
      * @param MarkTypeMapper $markTypeMapper
      * @param \Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper $gradeGroupMapper
      * @param \Schoolbox\Resource\Storage\Mapper $storageMapper
+     * @param \Schoolbox\Curriculum\Node\Mapper $curriculumNodeMapper
      */
     public function __construct(
         private Api $api,
@@ -91,10 +92,9 @@ class Importer
         private MarkTypeMapper $markTypeMapper,
         private \Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper $gradeGroupMapper,
         private \Schoolbox\Resource\Storage\Mapper $storageMapper,
+        private \Schoolbox\Curriculum\Node\Mapper $curriculumNodeMapper
     ) {
         $this->associateStatement = $this->databaseInternal->prepare(self::QUERY_ASSOCIATE_LEARNOSITY);
-
-        $this->curriculumNodeMapper = \Schoolbox\Curriculum\Node\Mapper::getInstance();
     }
 
 
