@@ -243,143 +243,159 @@ class Exporter
      */
     private function fetchLearnosityContent(string $learnosityReference): array
     {
+        $itemStack = [];
+        $questionStack = [];
+        $featureStack = [];
+
         /* Get the activity we wanna export
          */
         $activity = $this->api->dataGetRequest('/itembank/activities', ['references' => [$learnosityReference]])['data'][0];
 
-        /* Get the items in that activity
+        /* No items in the activity? No trabajo
          */
-        $itemReferences = array_column($activity['data']['items'], 'reference');
-
-        /* Find all the items in learnosity land
-         */
-        $itemData = $this->api->dataGetRequest('/itembank/items', ['references' => $itemReferences])['data'];
-
-        /* Get the questions in each item
-         */
-        $questionReferences = [];
-
-        foreach ($itemData as $item) {
-            $questionReferences = array_merge($questionReferences, array_column($item['questions'], 'reference'));
-        }
-
-        $questionData = $this->api->dataGetRequest('/itembank/questions', ['references' => $questionReferences])['data'];
-
-        /* Get the features in each item
-         */
-        $featureReferences = [];
-
-        foreach ($itemData as $item) {
-            $featureReferences = array_merge($featureReferences, array_column($item['features'], 'reference'));
-        }
-
-        $featureData = $this->api->dataGetRequest('/itembank/features', ['references' => $featureReferences])['data'];
-
-        /* Predetermine new identifiers for items and questions
-         */
-        $itemReplacementRefs = [];
-
-        foreach ($itemData as $item) {
-            $itemReplacementRefs[$item['reference']] = $this->generateGuid();
-        }
-
-        $questionReplacementRefs = [];
-
-        foreach ($questionData as $question) {
-            $questionReplacementRefs[$question['reference']] = $this->generateGuid();
-        }
-
-        $featureReplacementRefs = [];
-
-        foreach ($featureData as $feature) {
-            $featureReplacementRefs[$feature['reference']] = $this->generateGuid();
-        }
-
-        /* All this stuff contains learnosity references that shouldn't perpetuate beyond this school
-         * otherwise you can access data you're not supposed to access. Unfortunately the learnosity
-         * scheme is security by obscurity, relying on guessing-the-hash being too difficult to brute
-         * force. Revealing them here would negate this "security"
-         *
-         * Anonymise the references as we further manipulate this stack.
-         */
-
-        /* Anonymise feature refs
-         */
-        $featureStack = [];
-
-        foreach ($featureData as &$feature) {
-            $feature['reference'] = $featureReplacementRefs[$feature['reference']];
-            $featureStack[$feature['reference']] = $feature;
-        }
-
-        unset($feature);
-
-        /* Anonymise question refs
-         */
-        $questionStack = [];
-
-        foreach ($questionData as &$question) {
-            $question['reference'] = $questionReplacementRefs[$question['reference']];
-            $questionStack[$question['reference']] = $question;
-        }
-
-        unset($question);
-
-        /* Anonymise item refs
-         */
-        $itemStack = [];
-
-        foreach ($itemData as &$item) {
-            /* Constituents of an item is assumed to be either a feature or a question
+        if (\count($activity['data']['items'] ?? [])) {
+            /* Get the items in that activity
              */
-            foreach ($item['features'] as &$feature) {
+            $itemReferences = array_column($activity['data']['items'], 'reference');
+
+            /* Find all the items in learnosity land
+             */
+            $itemData = $this->api->dataGetRequest('/itembank/items', ['references' => $itemReferences])['data'];
+
+            /* Get the questions in each item
+             */
+            $questionReferences = [];
+            $questionData = [];
+
+            foreach ($itemData as $item) {
+                $questionReferences = array_merge($questionReferences, array_column($item['questions'], 'reference'));
+            }
+
+            /* Only fetch questions if there are references
+             */
+            if (\count($questionReferences)) {
+                $questionData = $this->api->dataGetRequest('/itembank/questions', ['references' => $questionReferences])['data'];
+            }
+
+            /* Get the features in each item
+             */
+            $featureReferences = [];
+            $featureData = [];
+
+            foreach ($itemData as $item) {
+                $featureReferences = array_merge($featureReferences, array_column($item['features'], 'reference'));
+            }
+
+            /* Only fetch features if there are references
+             */
+            if (\count($featureReferences)) {
+                $featureData = $this->api->dataGetRequest('/itembank/features', ['references' => $featureReferences])['data'];
+            }
+
+            /* Predetermine new identifiers for items and questions
+             */
+            $itemReplacementRefs = [];
+
+            foreach ($itemData as $item) {
+                $itemReplacementRefs[$item['reference']] = $this->generateGuid();
+            }
+
+            $questionReplacementRefs = [];
+
+            foreach ($questionData as $question) {
+                $questionReplacementRefs[$question['reference']] = $this->generateGuid();
+            }
+
+            $featureReplacementRefs = [];
+
+            foreach ($featureData as $feature) {
+                $featureReplacementRefs[$feature['reference']] = $this->generateGuid();
+            }
+
+            /* All this stuff contains learnosity references that shouldn't perpetuate beyond this school
+             * otherwise you can access data you're not supposed to access. Unfortunately the learnosity
+             * scheme is security by obscurity, relying on guessing-the-hash being too difficult to brute
+             * force. Revealing them here would negate this "security"
+             *
+             * Anonymise the references as we further manipulate this stack.
+             */
+            $featureStack = [];
+
+            foreach ($featureData as &$feature) {
                 $feature['reference'] = $featureReplacementRefs[$feature['reference']];
+                $featureStack[$feature['reference']] = $feature;
             }
 
-            foreach ($item['questions'] as &$question) {
+            unset($feature);
+
+            /* Anonymise question refs
+             */
+            $questionStack = [];
+
+            foreach ($questionData as &$question) {
                 $question['reference'] = $questionReplacementRefs[$question['reference']];
+                $questionStack[$question['reference']] = $question;
             }
 
-            /* Rewrite this layout reference business: these identifiers are either
-             * features or questions: figure it out based on widget_type being either
-             * "feature" for a feature, or "response" for a question (...)
+            unset($question);
+
+            /* Anonymise item refs
              */
-            foreach ($item['definition']['widgets'] as &$widget) {
-                if (self::WIDGET_FEATURE === $widget['widget_type']) {
-                    $widget['reference'] = $featureReplacementRefs[$widget['reference']];
-                } else {
-                    $widget['reference'] = $questionReplacementRefs[$widget['reference']];
+            $itemStack = [];
+
+            foreach ($itemData as &$item) {
+                /* Constituents of an item is assumed to be either a feature or a question
+                 */
+                foreach ($item['features'] as &$feature) {
+                    $feature['reference'] = $featureReplacementRefs[$feature['reference']];
                 }
+
+                foreach ($item['questions'] as &$question) {
+                    $question['reference'] = $questionReplacementRefs[$question['reference']];
+                }
+
+                /* Rewrite this layout reference business: these identifiers are either
+                 * features or questions: figure it out based on widget_type being either
+                 * "feature" for a feature, or "response" for a question (...)
+                 */
+                foreach ($item['definition']['widgets'] as &$widget) {
+                    if (self::WIDGET_FEATURE === $widget['widget_type']) {
+                        $widget['reference'] = $featureReplacementRefs[$widget['reference']];
+                    } else {
+                        $widget['reference'] = $questionReplacementRefs[$widget['reference']];
+                    }
+                }
+
+                /* Update this item's identifier
+                 */
+                $item['reference'] = $itemReplacementRefs[$item['reference']];
+
+                unset($item['tags']);
+
+                /* Push it into the stack
+                 */
+                $itemStack[$item['reference']] = $item;
             }
 
-            /* Update this item's identifier
+            unset($item, $widget, $question, $feature);
+
+            /* Anonymise activity refs
              */
-            $item['reference'] = $itemReplacementRefs[$item['reference']];
-            unset($item['tags']);
+            $activity['reference'] = $this->generateGuid();
 
-            /* Push it into the stack
+            unset($activity['tags']);
+
+            foreach ($activity['data']['items'] as &$item) {
+                $item['id'] = $itemReplacementRefs[$item['reference']];
+                $item['reference'] = $itemReplacementRefs[$item['reference']];
+            }
+
+            unset($item);
+
+            /* Don't need these old stacks anymore
              */
-            $itemStack[$item['reference']] = $item;
+            unset($itemData, $questionData, $featureData);
         }
-
-        unset($item, $widget, $question, $feature);
-
-        /* Anonymise activity refs
-         */
-        $activity['reference'] = $this->generateGuid();
-
-        unset($activity['tags']);
-
-        foreach ($activity['data']['items'] as &$item) {
-            $item['id'] = $itemReplacementRefs[$item['reference']];
-            $item['reference'] = $itemReplacementRefs[$item['reference']];
-        }
-
-        unset($item);
-
-        /* Don't need these old stacks anymore
-         */
-        unset($itemData, $questionData, $featureData);
 
         /* Assign an arbitrary guid here, for a later lookup nicety
          */

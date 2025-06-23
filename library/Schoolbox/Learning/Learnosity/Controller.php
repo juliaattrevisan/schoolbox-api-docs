@@ -2484,17 +2484,17 @@ class Controller extends Base
             $assessment->getId()
         );
 
-        header('Cache-Control: private');
-        header('Content-type: application/json');
-        header("Content-disposition: attachment; filename=\"{$filename}\"");
-
-        $output = fopen('php://output', 'rw');
+//        header('Cache-Control: private');
+//        header('Content-type: application/json');
+//        header("Content-disposition: attachment; filename=\"{$filename}\"");
+//
+//        $output = fopen('php://output', 'rw');
 
         $struct = (new Exporter($this->storageMapper, $this->filesystemProxy, $this->api))->generate($assessment);
 
-        fputs($output, $struct);
+//        fputs($output, $struct);
 
-        fclose($output);
+//        fclose($output);
     }
 
 
