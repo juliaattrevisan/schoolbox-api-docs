@@ -19,6 +19,8 @@ use Schoolbox\Editor\Templates\Mapper as TemplateMapper;
 use Schoolbox\Editor\Templates\Model as TemplateModel;
 use Schoolbox\Error\Mapper as ErrorMapper;
 
+use function SSNepenthe\ColorUtils\name;
+
 class Controller extends Base
 {
     /**
@@ -69,7 +71,7 @@ class Controller extends Base
                 'pageCurrent' => $this->routeGenerator->generate('adminEditorTemplates.getList'),
                 'allBreadcrumbs' => array_merge(
                     (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminEditorTemplates.getList')),
-                    [['Create Template', null]]
+                    [['Create ' . ucwords(str_replace('-', ' ', $category->getName())) . ' Template', null]]
                 ),
                 'category' => $category,
                 'template' => null,
