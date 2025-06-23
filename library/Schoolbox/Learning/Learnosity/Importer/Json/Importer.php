@@ -19,7 +19,7 @@ use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Learning\Assessment\WorkType\Mapper;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Learnosity\Api;
-use Schoolbox\Learning\Learnosity\Export\Json\Payload;
+use Schoolbox\Learning\Learnosity\Export\Json\Exporter;
 use Schoolbox\Learning\Learnosity\Importer\InlineImageConverter;
 use Schoolbox\Learning\Learnosity\Importer\Legacy\Xml\ContextLookup;
 use Schoolbox\Learning\Learnosity\TagFactory;
@@ -449,7 +449,7 @@ class Importer
             /* Update widgets too
              */
             foreach ($item['definition']['widgets'] as &$widget) {
-                if (Payload::WIDGET_FEATURE === $widget['widget_type']) {
+                if (Exporter::WIDGET_FEATURE === $widget['widget_type']) {
                     $widget['reference'] = $featureMapping[$widget['reference']];
                 } else {
                     $widget['reference'] = $questionMapping[$widget['reference']];

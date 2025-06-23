@@ -22,11 +22,8 @@ use Interop\Queue\Exception\InvalidMessageException;
 use League\Flysystem\FilesystemException;
 use LearnositySdk\Exceptions\ValidationException;
 use LearnositySdk\Utils\Uuid;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 use Random\RandomException;
 use Schoolbox\Application\Exception\Exception;
-use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\AssessmentType;
@@ -43,6 +40,7 @@ use Schoolbox\Learning\Learnosity\Api\Duplicator;
 use Schoolbox\Learning\Learnosity\Cli\RescoreProcessor;
 use Schoolbox\Learning\Learnosity\Codec\UserIdentifier;
 use Schoolbox\Learning\Learnosity\Export\Csv\Processor;
+use Schoolbox\Learning\Learnosity\Export\Json\Exporter;
 use Schoolbox\Learning\Learnosity\Export\Json\Payload;
 use Schoolbox\Learning\Learnosity\Feedback\SanitiseScores;
 use Schoolbox\Learning\Learnosity\Importer\Cli\CopyMissingQuizException;
@@ -2489,7 +2487,7 @@ class Controller extends Base
 
         $output = fopen('php://output', 'rw');
 
-        $struct = (new Payload($this->storageMapper, $this->filesystemProxy, $this->api))->generate($assessment);
+        $struct = (new Exporter($this->storageMapper, $this->filesystemProxy, $this->api))->generate($assessment);
 
         fputs($output, $struct);
 

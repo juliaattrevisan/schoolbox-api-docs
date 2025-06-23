@@ -17,7 +17,7 @@ use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Mapper;
 
-class Payload
+class Exporter
 {
     /**
      * A switch on widget.widget_type to figure out if this object is a feature or a question
