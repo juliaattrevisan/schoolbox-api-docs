@@ -58,6 +58,8 @@ class Exporter
      * @param QuizDomainObject $assessment
      * @return array
      * @throws FilesystemException
+     * @throws ValidationException
+     * @throws \JsonException
      */
     private function generateArray(QuizDomainObject $assessment): array
     {
@@ -80,9 +82,17 @@ class Exporter
             ];
         }
 
-        /* FIXME There's probably already a shortcut to this kind of serialization
-         *  but I need it in its entirety except for school-specific data like folder,
-         *  creator identifiers, etc.
+        /* All quizzes should have a learnosity reference these days, but for that random occasion
+         * where it somehow doesn't, let's not die outright.
+         */
+        $content = [];
+
+        if ($assessment->getLearnosityReference()) {
+            $content = $this->fetchLearnosityContent($assessment->getLearnosityReference());
+        }
+
+        /* FIXME There's probably already a shortcut to this kind of serialization but I need it
+         *  in its entirety except for school-specific data like folder, creator identifiers, etc.
          */
         return [
             'settings' => [
@@ -145,7 +155,7 @@ class Exporter
             'assets' => $this->indexAssets($assessment),
             /* Learnosity stuff goes here
              */
-            'content' => $this->fetchLearnosityContent($assessment->getLearnosityReference())
+            'content' => $content
         ];
     }
 
