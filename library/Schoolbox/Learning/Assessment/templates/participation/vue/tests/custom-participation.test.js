@@ -101,3 +101,22 @@ test("If a student is excluded, Excluded is visible in their row", async () => {
     const row = wrapper.find(`[data-test="custom-participation-row-${allParticipants[0].user.id}"]`);
     expect(row.text()).toContain("Excluded");
 });
+
+test("If a participant's user id is not set, their name is not wrapped in an <a> tag", async () => {
+    const modifiedParticipants = allParticipants.map((p) => {
+        if (p.user.id === 20) {
+            return { ...p, user: { ...p.user, id: null } };
+        }
+        return p;
+    });
+
+    const wrapper = mount(CustomParticipation, {
+        props: {
+            allParticipants: modifiedParticipants,
+            getStudentsPastoralCountsUrl: "",
+        },
+    });
+
+    const row = wrapper.find('[data-test="custom-participation-row-null"]');
+    expect(row.find("a").exists()).toBe(false);
+});
