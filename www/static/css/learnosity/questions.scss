@@ -778,3 +778,14 @@ button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
     border-left: unset;
     border-bottom: 1px solid #ccc;
 }
+
+/* Reset styles for radio buttons */
+input[type="radio"]:not(.plain),
+.checklist input[type="radio"]:not(.plain),
+.radiolist input[type="radio"]:not(.plain) {
+    position: static;
+    width: auto;
+    height: auto;
+    min-height: 0;
+    opacity: 1;
+}
