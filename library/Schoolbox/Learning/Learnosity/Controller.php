@@ -2564,16 +2564,12 @@ class Controller extends Base
          */
         $schoolCode = $this->getConfigLoader()->get('site_school_code');
 
-        /* For converting urls
+        /* There used to be stuff here that was used to convert url domains but I'm not sure we even
+         * needed them. We needed them in the xml days, but I don't think we needed them here.
          */
-        $server     = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
-        $serverName = $server->getHost();
-        $domain     = (string)$server;
-
         $newInstances = (new Importer\Json\Importer(
             $this->api,
             $schoolCode,
-            $domain,
             $this->getDi()->get('databaseInternal'),
             $context,
             $this->getUser(),

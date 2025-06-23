@@ -67,7 +67,6 @@ class Importer
      *
      * @param Api $api
      * @param string $schoolCode
-     * @param string $domain
      * @param IConnector $databaseInternal
      * @param AssessmentContext $context
      * @param User $user
@@ -82,7 +81,6 @@ class Importer
     public function __construct(
         private Api $api,
         private string $schoolCode,
-        private string $domain,
         private IConnector $databaseInternal,
         private AssessmentContext $context,
         private \Schoolbox\User $user,
