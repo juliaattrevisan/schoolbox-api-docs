@@ -8,14 +8,6 @@ import type { ProfileEditorRoleType } from "./types/profileEditorTypes";
 
 const peStore = useProfileEditorStore();
 
-window.Vue.onMounted(() => {
-    /* When users manually change the hash in the url rather than using the ui
-     */
-    window.addEventListener("hashchange", () => {
-        window.location.reload();
-    });
-});
-
 /**
  * When the role type changes, change the url hash
  * @param role The role type to set
@@ -24,10 +16,38 @@ function setSelectedRoleType(role: ProfileEditorRoleType): void {
     window.location.hash = role.roleType;
     peStore.setSelectedRoleType(role);
 
-    // @ts-expect-error -- When we switch tabs, we need to tell foundation to fix the tooltips
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- foundation isn't typed, see above
-    $(document).foundation("tooltip", "reflow");
+    if (document.readyState === "complete") {
+        // @ts-expect-error -- When we switch tabs, we need to tell foundation to fix the tooltips
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- foundation isn't typed, see above
+        $(document).foundation("tooltip", "reflow");
+    }
 }
+
+/**
+ * Set the selected role type based on the current URL hash
+ * Will fall back to the first role type if the hash is invalid
+ */
+function applyRoleTypeHash(): void {
+    const hashValue = window.location.hash.slice(1);
+    const roleType = peStore.roleTypes.find((r) => r.roleType === hashValue);
+
+    if (roleType === undefined) {
+        setSelectedRoleType(peStore.roleTypes[0]);
+        return;
+    }
+
+    setSelectedRoleType(roleType);
+}
+
+window.Vue.onMounted(async () => {
+    await window.Vue.nextTick(); // To wait for the store to have data
+
+    /* Apply the initial role type if the hash has one */
+    applyRoleTypeHash();
+
+    /* When users manually change the hash in the url rather than using the ui */
+    window.addEventListener("hashchange", applyRoleTypeHash);
+});
 </script>
 
 <template>
