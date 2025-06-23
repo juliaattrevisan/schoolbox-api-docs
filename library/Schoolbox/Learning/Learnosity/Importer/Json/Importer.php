@@ -55,6 +55,12 @@ class Importer
 
 
     /**
+     * For an extremely annoying idiosyncracy of the learnosity api
+     */
+    private const NODE_QUESTIONS = 'questions';
+
+
+    /**
      * A set of prepared statements we can recycle
      *
      * @var \PDOStatement
@@ -444,7 +450,7 @@ class Importer
 
             /* Assign this random meta node to questions specifically
              */
-            if ('questions' === $key) {
+            if (self::NODE_QUESTIONS === $key) {
                 $payload['meta'] = [
                     'user' => [
                         /* This author identifier should be a (schoolcode, user id) tuple for
