@@ -16,6 +16,7 @@ interface Props {
     categories: Category[]; // The categories of templates to display
     templatesEndpoint: string; // The endpoint to fetch templates from
     createTemplateEndpoint: string; // The endpoint to create a new template
+    updateTemplateEndpoint: string; // The endpoint to update an existing template
 }
 const props = defineProps<Props>();
 
@@ -149,6 +150,16 @@ window.Vue.onMounted((): void => {
                                 }}</time></span
                             >
                         </p>
+                    </div>
+                    <div>
+                        <a
+                            class="l-flex-row l-gap-s f-no-bkg f-no-margins"
+                            aria-label="Edit template"
+                            title="Edit template"
+                            :href="props.updateTemplateEndpoint.replace('{templateId}', template.id.toString())"
+                        >
+                            <sbx-icon name="modify" />
+                        </a>
                     </div>
                 </div>
             </div>

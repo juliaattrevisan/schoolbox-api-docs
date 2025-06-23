@@ -46,9 +46,15 @@ class Module extends BaseModule
             return $this->preloadCategory($params);
         };
 
+        $preloadTemplate = function ($params) {
+            return $this->preloadTemplate($params);
+        };
+
         $this->register('GET', '', 'getList', $perms);
         $this->register('GET', '/{categoryId}/create', 'getCreate', $perms, $preloadCategory);
         $this->register('POST', '/{categoryId}/create', 'postCreate', $perms, $preloadCategory);
+        $this->register('GET', '/update/{templateId}', 'getUpdate', $perms, $preloadTemplate);
+        $this->register('POST', '/update/{templateId}', 'postUpdate', $perms, $preloadTemplate);
     }
 
     /**
@@ -82,16 +88,40 @@ class Module extends BaseModule
     private function preloadCategory(array $params): array
     {
         if (\array_key_exists('category', $params)) {
-            $template = $params['category'];
+            $category = $params['category'];
         } else {
             try {
-                $template = $this->getMapperFactory()->get(Mapper::class)->findById($params['categoryId']);
+                $category = $this->getMapperFactory()->get(Mapper::class)->findById($params['categoryId']);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 throw new NotFound('Unknown category submitted.', 0, $e);
             }
         }
         return [
-            'category' => $template
+            'category' => $category
+        ];
+    }
+
+    /**
+     * Preload an existing template
+     *
+     * @param array $params
+     * @return array
+     * @throws \Schoolbox\Mapper\Exception\NotFound
+     * @throws \InvalidArgumentException
+     */
+    private function preloadTemplate(array $params): array
+    {
+        if (\array_key_exists('template', $params)) {
+            $template = $params['template'];
+        } else {
+            try {
+                $template = $this->getMapperFactory()->get(\Schoolbox\Editor\Templates\Mapper::class)->findById($params['templateId']);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                throw new NotFound('Unknown category submitted.', 0, $e);
+            }
+        }
+        return [
+            'template' => $template
         ];
     }
 }

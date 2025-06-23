@@ -117,4 +117,62 @@ class Controller extends Base
         $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminEditorTemplates.getList') . '?category=' . $category->getName());
 
     }
+
+    /**
+     * To update an editor template
+     *
+     * @param object $template
+     * @return void
+     * @throws \Aura\Router\Exception\RouteNotFound
+     */
+    public function getUpdate(object $template): void
+    {
+        $category = $this->categoryMapper->findById($template->getCategoryId());
+
+        $this->response = $this->responseFromTemplate(
+            '@adminEditorTemplates/create.twig',
+            [
+                'pageCurrent' => $this->routeGenerator->generate('adminEditorTemplates.getList'),
+                'allBreadcrumbs' => array_merge(
+                    (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminEditorTemplates.getList')),
+                    [['Update ' . $template->getTitle(), null]]
+                ),
+                'category' => $category,
+                'template' => $template,
+            ]
+        );
+    }
+
+    /**
+     * Update an editor template
+     *
+     * @param object $template
+     * @return void
+     * @throws \Aura\Router\Exception\RouteNotFound
+     */
+    public function postUpdate(object $template): void
+    {
+        $postData = $this->requestPost->getArrayCopy();
+
+        // Validate required fields
+        if (empty(trim((string)($postData['title'] ?? '')))) {
+            throw $this->errorMapper->generateException(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
+        }
+        if (empty(trim((string)($postData['body'] ?? '')))) {
+            throw $this->errorMapper->generateException(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
+        }
+
+        // Update the existing template
+        $template
+            ->setTitle(trim((string)$postData['title']))
+            ->setDescription(trim((string)($postData['description'] ?? '')))
+            ->setBody(trim((string)($postData['body'] ?? '')))
+            ->setUpdatedBy($this->getUser()->getId());
+
+        $this->templateMapper->save($template);
+
+        // Redirect back to list
+        $category = $this->categoryMapper->findById($template->getCategoryId());
+        $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminEditorTemplates.getList') . '?category=' . $category->getName());
+    }
 }
