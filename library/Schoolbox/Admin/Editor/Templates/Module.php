@@ -93,7 +93,7 @@ class Module extends BaseModule
             try {
                 $category = $this->getMapperFactory()->get(Mapper::class)->findById($params['categoryId']);
             } catch (\Schoolbox\Mapper\Exception $e) {
-                throw new NotFound('Unknown category submitted.', 0, $e);
+                throw new NotFound('Unknown category id submitted.', 0, $e);
             }
         }
         return [
@@ -117,7 +117,7 @@ class Module extends BaseModule
             try {
                 $template = $this->getMapperFactory()->get(\Schoolbox\Editor\Templates\Mapper::class)->findById($params['templateId']);
             } catch (\Schoolbox\Mapper\Exception $e) {
-                throw new NotFound('Unknown category submitted.', 0, $e);
+                throw new NotFound('Unknown template id submitted.', 0, $e);
             }
         }
         return [
