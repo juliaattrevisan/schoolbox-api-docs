@@ -114,6 +114,7 @@ class Controller extends Base
         $this->templateMapper->save($template);
 
         // Redirect back to list
-        $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminEditorTemplates.getList'));
+        $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminEditorTemplates.getList') . '?category=' . $category->getName());
+
     }
 }

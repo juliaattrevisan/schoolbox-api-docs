@@ -15,6 +15,7 @@ import type { Category, Template } from "../js/types/editorTemplatesTypes";
 interface Props {
     categories: Category[]; // The categories of templates to display
     templatesEndpoint: string; // The endpoint to fetch templates from
+    createTemplateEndpoint: string; // The endpoint to create a new template
 }
 const props = defineProps<Props>();
 
@@ -115,6 +116,11 @@ window.Vue.onMounted((): void => {
         <div v-else-if="currentTemplates.length === 0" class="empty-state-flex-centered">
             <i class="icon-textbox"></i>
             <p>No {{ kebabToTitleCase(currentCategory.name) }} templates have been created.</p>
+            <a
+                v-if="props.createTemplateEndpoint !== ''"
+                :href="props.createTemplateEndpoint.replace('{categoryId}', currentCategory.id.toString())"
+                >Create a new template</a
+            >
         </div>
         <div v-else class="c-island">
             <div v-for="(template, index) in currentTemplates" :key="template.id" class="c-card">
@@ -144,6 +150,15 @@ window.Vue.onMounted((): void => {
                         </p>
                     </div>
                 </div>
+            </div>
+            <div v-if="props.createTemplateEndpoint !== ''" class="component-action">
+                <section>
+                    <a
+                        :href="props.createTemplateEndpoint.replace('{categoryId}', currentCategory.id.toString())"
+                        class="button"
+                        >Add template</a
+                    >
+                </section>
             </div>
         </div>
     </div>

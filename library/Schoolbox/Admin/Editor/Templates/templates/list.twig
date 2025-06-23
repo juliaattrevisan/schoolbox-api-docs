@@ -13,10 +13,12 @@
 
     <div class="admin-content">
         {% set templatesEndpoint = routeLookupIfAuthorized('editorTemplates.getTemplates') %}
+        {% set createTemplateEndpoint = routeLookupIfAuthorized('adminEditorTemplates.getCreate') %}
         <div id="editor-templates-container">
             <editor-templates
                 :categories="{{ (categories ?? []) | json_encode }}"
                 templates-endpoint="{{ templatesEndpoint ?? ''}}"
+                create-template-endpoint="{{ createTemplateEndpoint ?? '' }}"
             />
         </div>
         <script src="{{ CDN_PREFIX }}/js/bundle/editorTemplates.js?v={{ config.site_version }}"></script>
