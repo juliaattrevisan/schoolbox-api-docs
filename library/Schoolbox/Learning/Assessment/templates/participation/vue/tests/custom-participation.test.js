@@ -120,3 +120,22 @@ test("If a participant's user id is not set, their name is not wrapped in an <a>
     const row = wrapper.find('[data-test="custom-participation-row-null"]');
     expect(row.find("a").exists()).toBe(false);
 });
+
+test("A participants preferred name is set and visible in their name", async () => {
+    const modifiedParticipants = allParticipants.map((p) => {
+        if (p.user.id === 20) {
+            return { ...p, user: { ...p.user, preferredName: "Moshe P." } };
+        }
+        return p;
+    });
+
+    const wrapper = mount(CustomParticipation, {
+        props: {
+            allParticipants: modifiedParticipants,
+            getStudentsPastoralCountsUrl: "",
+        },
+    });
+
+    const row = wrapper.find(`[data-test="custom-participation-row-${modifiedParticipants[0].user.id}"]`);
+    expect(row.text()).toContain("Moshe P.");
+});
