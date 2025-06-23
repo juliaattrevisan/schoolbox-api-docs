@@ -93,6 +93,8 @@ class Importer
         private \Schoolbox\Resource\Storage\Mapper $storageMapper,
     ) {
         $this->associateStatement = $this->databaseInternal->prepare(self::QUERY_ASSOCIATE_LEARNOSITY);
+
+        $this->curriculumNodeMapper = \Schoolbox\Curriculum\Node\Mapper::getInstance();
     }
 
 
@@ -110,6 +112,8 @@ class Importer
      */
     public function import(string $data): array
     {
+        $warnings = [];
+
         /* Convert the raw data into a json format...hopefully
          */
         try {
@@ -126,6 +130,10 @@ class Importer
          * (these are already persisted in the db)
          */
         $instances = $this->buildAssessment($json['settings']);
+
+        /* Collate random issues with the import
+         */
+        $warnings = array_merge($warnings, $instances['warnings']);
 
         /* Process storage instances from assets included in the json
          */
@@ -157,12 +165,12 @@ class Importer
             'quizId' => $instances['quiz']->getId()
         ]);
 
-        /* TODO Add error handling next, as I try to snap this
+        /* Add error handling next, as I try to snap this
          */
         return [
             'assessment' => $instances['assessment'],
             'quiz' => $instances['quiz'],
-            'errors' => []
+            'errors' => $warnings
         ];
     }
 
@@ -235,6 +243,17 @@ class Importer
             $gradeGroup = $this->gradeGroupMapper->findAll()->sortBy('sequence', 'ASC')->first();
         }
 
+        /* Import curriculum nodes. Some might not exist by uuid
+         */
+        $nodeStruct = $this->processCurriculumNodes($settings['curriculumNodes']);
+
+        /* Start introducing warnings
+         */
+        $warnings = $nodeStruct['warnings'];
+
+        /* Any random base64 images that just somehow happened to be here will get converted
+         * into local storage instances instead, as per the Omega Import
+         */
         $inlineImageConverter = new InlineImageConverter($this->storageMapper, null);
 
         // Create the IAssessable
@@ -244,6 +263,7 @@ class Importer
             ->setTitle($settings['title'])
             ->setWorkType($workType)
             ->setDescription($inlineImageConverter->convert($settings['description']))
+            ->setCurriculumNodes($nodeStruct['nodes'])
             ->setPublishAt($inUnitSpec ? null : new \Alaress_Date_Format(new \DateTime('+1 hour')))
             ->setOpenAt($inUnitSpec ? null : new \Alaress_Date_Format(new \DateTime('+1 hour')))
             ->setDueAt($inUnitSpec ? null : new \Alaress_Date_Format(new \DateTime('+1 day 23:59:59')))
@@ -286,6 +306,64 @@ class Importer
         return [
             'assessment' => $assessment,
             'quiz' => $quiz,
+            'warnings' => $warnings
+        ];
+    }
+
+
+    /**
+     * Compile curriculum nodes as best we can
+     *
+     * @param array $curriculumNodes
+     * @return array
+     */
+    private function processCurriculumNodes(array $curriculumNodes): array
+    {
+        $nTotal = \count($curriculumNodes);
+
+        $uuids = [];
+        $codes = [];
+        $warnings = [];
+
+        foreach ($curriculumNodes as $curriculumNode) {
+            $uuid = trim((string)$curriculumNode['uuid']);
+            $code =  trim((string)$curriculumNode['code']);
+
+            /* Prefef fetching by something conclusive first;
+             * fall back to codes otherwise
+             */
+            if ('' !== $uuid) {
+                $uuids[] = $uuid;
+            } elseif ('' !== $code) {
+                $codes[] = $code;
+
+                $warnings[] = sprintf(
+                    'Curriculum node %s did not have a uuid; double check quiz curriculum settings after import.',
+                    $code
+                );
+            }
+        }
+
+        $nFound = \count($uuids) + \count($codes);
+        $diff = $nTotal - $nFound;
+
+        if ($diff) {
+            $warnings[] = sprintf(
+                '%s curriculum node(s) were omitted; double check quiz curriculum settings after import.',
+                $diff
+            );
+        }
+
+        /* Fetch the sets
+         */
+        $set1 = $this->curriculumNodeMapper->findByColumn('uuid', $uuids);
+        $set2 = $this->curriculumNodeMapper->findByColumn('code', $codes);
+
+        $nodes = $set1->merge($set2);
+
+        return [
+            'nodes' => $nodes,
+            'warnings' => $warnings
         ];
     }
 
