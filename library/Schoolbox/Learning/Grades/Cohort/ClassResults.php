@@ -250,7 +250,7 @@ class ClassResults
         foreach ($this->assessments as $assessment) {
             /* Not in the worktypes whitelist: skip it
              */
-            if (!in_array($assessment->getWorkType()->getId(), $workTypeWhitelist, true)) {
+            if (!in_array($assessment->getWorkType()?->getId(), $workTypeWhitelist, true)) {
                 continue;
             }
 
