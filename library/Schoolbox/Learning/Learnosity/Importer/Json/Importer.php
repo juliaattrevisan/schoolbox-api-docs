@@ -137,26 +137,37 @@ class Importer
          */
         $this->processAssets($json['assets']);
 
-        /* Generates sets of tags for Activities' and Items' assignations
-         */
-        $tagFactory = new TagFactory($this->schoolCode);
-
-        /* A context lookup builder thing for conveniently deriving tags
-         *
-         *  Replaced with usage of AssessmentContext since we have no
-         *  idea where this assessment's context details are (it comes from
-         *  an xml where there's no record of it in the db)
-         */
-        $contextLookup = new ContextLookup($tagFactory, $this->context);
-
-        /* Find some taggies
-         */
-        $tags = $contextLookup->find((int)$instances['assessment']->getId());
-
         /* Start manufacturing quiz payloads for learnosity in this order because learnosity build upwards
          * Features, Questions, Items, Activity
+         *
+         * $learnosityReference should always exist...but maybe doesn't, somehow: I'm not sure if that's even
+         * a possibility, but you can craft it by direct db edit which might not be easily diagnosed.
          */
-        $learnosityReference = $this->assemble($learnosityContent, $tags);
+        $learnosityReference = null;
+
+        if (!empty($learnosityContent)) {
+            /* Generates sets of tags for Activities' and Items' assignations
+             */
+            $tagFactory = new TagFactory($this->schoolCode);
+
+            /* A context lookup builder thing for conveniently deriving tags
+             *
+             *  Replaced with usage of AssessmentContext since we have no
+             *  idea where this assessment's context details are (it comes from
+             *  an xml where there's no record of it in the db)
+             */
+            $contextLookup = new ContextLookup($tagFactory, $this->context);
+
+            /* Find some taggies
+             */
+            $tags = $contextLookup->find((int)$instances['assessment']->getId());
+
+            /* Grab a learnosity reference we can associate
+             */
+            $learnosityReference = $this->assemble($learnosityContent, $tags);
+        } else {
+            $errors[] = 'Could not import learnosity content: missing learnosity reference.';
+        }
 
         $this->associate([
             'activityLearnosityReference' => $learnosityReference,
