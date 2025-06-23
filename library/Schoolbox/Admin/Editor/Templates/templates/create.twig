@@ -16,7 +16,7 @@
     <div class="admin-content">
         <div class="small-12 island">
             {% set formAction = routeLookupIfAuthorized('adminEditorTemplates.postCreate', {categoryId: category.id}) %}
-            <form action="{{ formAction }}" method="post">
+            <form id="editor-template-form" action="{{ formAction }}" method="post">
                 <section>
                     <fieldset class="content">
                         <div class="small-12 columns">
@@ -37,7 +37,7 @@
                 </section>
                 <input type="submit" value="Save">
             </form>
-        </div>
+        </div><!-- small-12 island -->
     </div><!-- admin-content -->
 </div><!-- admin-container -->
 
@@ -45,12 +45,28 @@
 <script>
 
 /**
-* Initialise the body editor
-*/
+ * Initialise the body editor
+ */
 document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
     detail: {
         targetElements: ['#template-body']
     }
 }));
+
+$(function() {
+    /**
+     * Ensure title and body are not blank
+     */
+    $('#editor-template-form').alaressValidate({
+        rules: {
+            title: {
+                requiredNotBlank: true
+            },
+            body: {
+                requiredNotBlank: true
+            }
+        }
+    });
+});
 
 </script>
