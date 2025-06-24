@@ -12,7 +12,6 @@ interface Props {
     allParticipants: Participant[];
     getStudentsPastoralCountsUrl: string;
 }
-
 const props = defineProps<Props>();
 
 const allParticipants = window.Vue.ref<Participant[]>(props.allParticipants);
@@ -50,6 +49,9 @@ const studentPastoralCounts = window.Vue.ref<Record<string, StudentPastoralCount
  * Fetch the pastoral counts for the students
  */
 async function getStudentPastoralCounts(): Promise<void> {
+    if (props.getStudentsPastoralCountsUrl === "") {
+        return;
+    }
     const url = props.getStudentsPastoralCountsUrl.replace(
         "{studentIds}",
         allParticipants.value.map((participant) => participant.user.id).join(","),
@@ -85,6 +87,7 @@ async function getStudentPastoralCounts(): Promise<void> {
         console.error(error);
     }
 }
+
 /**
  * Excludes a participant.
  * @param participant - The participant to exclude.
@@ -174,13 +177,16 @@ async function includeSelected(): Promise<void> {
     selectedList.value = [];
 }
 
+/**
+ * Load the student pastoral counts when the component is mounted.
+ */
 window.Vue.onMounted(() => {
     void getStudentPastoralCounts();
 });
 </script>
 
 <template>
-    <div v-if="loadError" class="c-island l-pad-m">
+    <div v-if="loadError" class="c-island l-pad-m" data-test="custom-participation-load-error">
         <div class="alert-box alert f-no-margins">
             Sorry, there was an error during report retrieval. Please
             <a href="" title="refresh the page"> refresh the page </a>
@@ -192,7 +198,7 @@ window.Vue.onMounted(() => {
         <table>
             <thead>
                 <tr>
-                    <th v-if="showCheckboxes" width="40">
+                    <th v-if="showCheckboxes" width="40" data-test="custom-participation-select-all">
                         <input
                             id="select-all"
                             v-model="allSelected"
@@ -208,13 +214,18 @@ window.Vue.onMounted(() => {
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="participant in allParticipants" :key="participant.id">
+                <tr
+                    v-for="participant in allParticipants"
+                    :key="participant.id"
+                    :data-test="`custom-participation-row-${participant.user.id}`"
+                >
                     <td v-if="showCheckboxes">
                         <input
                             :id="`id-${participant.user.id}`"
                             v-model="selectedList"
                             type="checkbox"
                             :value="participant.user.id"
+                            :data-test="`custom-participation-checkbox-${participant.user.id}`"
                         />
                         <label :for="`id-${participant.user.id}`" class="checkbox-label"></label>
                     </td>
@@ -305,17 +316,25 @@ window.Vue.onMounted(() => {
         </table>
         <!-- container for the sbx-pop-out to be displayed in -->
         <div id="pop-out-container"></div>
-        <bottom-drawer :show-drawer="selectedList.length > 0">
+        <bottom-drawer data-test="custom-participation-bottom-drawer" :show-drawer="selectedList.length > 0">
             <h3 class="selected-count">
                 <em>{{ selectedList.length }} selected</em>
             </h3>
             <button class="button-clear" @click.prevent="selectedList.length = 0">Clear selection</button>
             <div class="l-flex-row l-flex--justify l-gap-xs">
                 <template v-if="hasExcludedInSelection">
-                    <button class="icon-close submit" @click.prevent="includeSelected">Remove Customisation</button>
+                    <button
+                        class="icon-close submit"
+                        data-test="custom-participation-remove-customisation"
+                        @click.prevent="includeSelected"
+                    >
+                        Remove Customisation
+                    </button>
                 </template>
                 <template v-else>
-                    <div class="l-flex__item--1"><a class="icon-copy submit">Copy Activity</a></div>
+                    <div class="l-flex__item--1">
+                        <a class="icon-copy submit" data-test="custom-participation-copy-activity">Copy Activity</a>
+                    </div>
                     <div class="l-flex__item--1">
                         <button class="icon-staff-students submit" @click.prevent="excludeSelected">Exclude</button>
                     </div>
