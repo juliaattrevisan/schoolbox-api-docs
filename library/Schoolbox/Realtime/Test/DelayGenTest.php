@@ -100,6 +100,16 @@ class DelayGenTest extends TestCase
                 ['12:00', '12:00', '01:00'],
                 null
             ],
+
+            '1 min blackout time' => [
+                ['18:00', '18:01', '18:00'],
+                1
+            ],
+
+            '1 min open time' => [
+                ['18:01', '18:00', '17:00'],
+                3600
+            ],
         ];
     }
 }
