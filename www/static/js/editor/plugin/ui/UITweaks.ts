@@ -123,7 +123,10 @@ export default class UITweaks extends Plugin {
                     // register the button under the link form view, so it's also managed within the view instance
                     linkFormView.registerChild(button);
                     // add the resource button after the url input
-                    insertElementAfter(linkFormView.urlInputView.fieldView.element, button.element as HTMLElement);
+                    const referenceElement = linkFormView.urlInputView.fieldView.element?.parentElement?.parentElement;
+                    if (referenceElement) {
+                        insertElementAfter(referenceElement, button.element as HTMLElement);
+                    }
                     /**
                      * Let's listen for the same event as packages/ckeditor5-ui/src/bindings/clickoutsidehandler.ts does,
                      * but with higher priority.
