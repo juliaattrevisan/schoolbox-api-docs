@@ -3,32 +3,38 @@ Usage:
     filterPanel: FilterPanel - a filter panel that can filter and AJAX in the report
     courseSpec:  CourseSpec
 #}
+
+{% if false %}
+
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.marksheet.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/task/jquery.progressTickForm.js?v={{ config.site_version }}"></script>
+
+{% endif %}
 
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(['Courses', routeLookupIfAuthorized('course.courseList') ], ['Course Markbook']) }}
 
 <div class="row">
-    <div class="small-12 columns"><h1>Course Markbook: {{ courseSpec.title }}</h1></div>
+    <div class="small-12 columns">
+        <h1>Course Markbook: {{ courseSpec.title }}</h1>
+    </div>
 </div>
 
-{% set reportContentId = 'courseMarkbookContent' %}
+{% set filterEventKey = 'MARKBOOK' %}
 
 {% include '@filters/panel.twig' with {
-    contentId: reportContentId,
+    contentId: null,
+    eventKey:  filterEventKey,
     panel:     filterPanel,
-    quickload: true
+    quickload: false,
 } only %}
 
 <div id="markbook-inner-container" class="marksheet-wrapper">
-    <markbook-inner
-        type='course'
-        endpoint='{{ routeLookup('courseMarkbook.postMarkbook', { courseSpecId: courseSpec.id }) }}'
-    />
+    <markbook-inner type='course' filter-event-key="{{ filterEventKey }}" />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/markbookInner.js?v={{ config.site_version }}"></script>
 
+{% if false %}
 
 {% if canAccessPopOut %}
 <div id="pop-out-menu-markbook-container">
@@ -115,3 +121,5 @@ Usage:
        </section>
    </div>
 </div>
+
+{% endif %}

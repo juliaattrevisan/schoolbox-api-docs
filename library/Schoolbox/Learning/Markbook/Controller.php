@@ -347,17 +347,10 @@ class Controller extends Base
                 'availableVisibilities' => Visibility::getAvailableVisibilities((int)$this->getConfigLoader()->get(ConfigMapper::NAME_SUBMISSION_VISIBILITY_MAX)),
             ];
 
-            $this->response = $this->responseAsJson($data);
-
-            // $data = json_decode(json_encode($data), true); // TEMP to ensure it can be encoded
-
-            // $this->response = $this->responseAsJson([
-            //     'status'  => 200,
-            //     'content' => $this->responseFromTemplateUnthemed(
-            //         '@learningMarkbook/markbookInner.twig',
-            //         $data,
-            //     )->getBody()->getContents(),
-            // ]);
+            $this->response = $this->responseAsJson([
+                'status'  => 200,
+                'content' => $data,
+            ]);
         } catch (Filter\BrokenFilterException $e) {
             $this->captureException($e);
             $data = [

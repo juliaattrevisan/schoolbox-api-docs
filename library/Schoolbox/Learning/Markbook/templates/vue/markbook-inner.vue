@@ -5,14 +5,14 @@ import MiClassimplRows from "./mi-classimpl-rows.vue";
 
 interface Props {
     type: "course" | "class";
-    endpoint: string;
+    filterEventKey: string;
 }
 
 const props = defineProps<Props>();
 const mbStore = useMarkbookStore();
 
-window.Vue.onMounted(async () => {
-    await mbStore.init(props.endpoint);
+window.Vue.onMounted(() => {
+    mbStore.init(props.filterEventKey);
 
     /**
      * Ensure tooltips are reflowed when the markbook is changed
@@ -20,6 +20,11 @@ window.Vue.onMounted(async () => {
     window.Vue.watch(
         () => [mbStore.showDisplayMarks, mbStore.showDrafts],
         () => {
+            if (document.readyState !== "complete") {
+                // If the document isn't ready, we can't reflow tooltips yet
+                return;
+            }
+
             // @ts-expect-error -- When a tooltip is added after the page is loaded, we need to tell foundation to fix the tooltips
             // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- foundation isn't typed, see above
             $(document).foundation("tooltip", "reflow");

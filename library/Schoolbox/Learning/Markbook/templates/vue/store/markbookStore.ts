@@ -1,8 +1,8 @@
 import { defineStore } from "pinia";
 import type { Markbook, MarkbookActivity, MarkbookClassImpl, MarkbookClassImplActivity } from "../types/payload";
+import { listenForFilterLoad, listenForFilterLoading } from "./filterEvent";
 
 export const useMarkbookStore = defineStore("markbookStore", () => {
-    const endpoint = window.Vue.ref<string>("");
     const data = window.Vue.ref<Markbook | null>(null);
 
     const showDisplayMarks = window.Vue.ref(false);
@@ -24,28 +24,30 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
     });
 
     /**
-     * Fetch markbook data
+     * When we start loading new markbood data, we reset the data to null to show the loading state
      */
-    async function fetchMarkbook(): Promise<void> {
-        if (!endpoint.value) {
-            throw new Error("No markbook endpoint provided");
-        }
+    function onLoading(): void {
+        data.value = null; // Reset the data to show loading state
+    }
 
-        // todo: add error handling and filters support...
-        const response = await fetch(endpoint.value, {
-            method: "POST",
-        });
-
-        data.value = (await response.json()) as Markbook;
+    /**
+     * When the markbook data has successfully loaded
+     * @param markbook - The markbook data
+     */
+    function onMarkbookLoaded(markbook: Markbook): void {
+        data.value = markbook;
     }
 
     /**
      * Initialise the store
-     * @param $endpoint - The endpoint for the markbook data
+     * @param filterKey - The key of the filter to listen for loading events
      */
-    async function init($endpoint: string): Promise<void> {
-        endpoint.value = $endpoint;
-        await fetchMarkbook();
+    function init(filterKey: string): void {
+        /**
+         * Listen to the filter overlords which control what we show and when we show it
+         */
+        listenForFilterLoading(filterKey, onLoading);
+        listenForFilterLoad<Markbook>(filterKey, (detail) => onMarkbookLoaded(detail.content));
     }
 
     /**

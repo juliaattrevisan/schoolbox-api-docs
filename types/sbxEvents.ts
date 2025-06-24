@@ -11,6 +11,7 @@ import type { PopOutMenuMarkbookDocumentEventHandlerMap } from "@schoolboxVue/co
 import type { ImageLightboxDocumentEventHandlerMap } from "@js/image-lightbox/imageLightboxEvent";
 import type { SwiperDocumentEventHandlerMap } from "@js/slideshow/slideshowEvent";
 import type { ActivityStatusPageDocumentEventHandlerMap } from "@schoolboxLibrary/Learning/Assessment/templates/status/activityStatusPageEvent";
+import type { FilterEventHandlerMap } from "@schoolboxLibrary/Learning/Markbook/templates/vue/store/filterEvent";
 
 /**
  * FOR EVENTS DISPATCHED TO THE DOCUMENT
@@ -23,7 +24,8 @@ export interface SbxGlobalDocumentEventHandlerMap
         ImageLightboxDocumentEventHandlerMap,
         SwiperDocumentEventHandlerMap,
         PopOutMenuMarkbookDocumentEventHandlerMap,
-        ActivityStatusPageDocumentEventHandlerMap {}
+        ActivityStatusPageDocumentEventHandlerMap,
+        FilterEventHandlerMap {}
 
 /**
  * FOR EVENTS DISPATCHED TO ANY ELEMENT
