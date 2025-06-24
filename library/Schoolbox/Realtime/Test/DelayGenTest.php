@@ -22,12 +22,17 @@ class DelayGenTest extends TestCase
     {
         [$delay, $jitter, $delayTimestamp]  = (new DelayGen())->getQuitePeriod($input[0], $input[1], $input[2]);
 
+        // check delay is either null (no delay) or a positive integer
         if (null === $expected) {
             $this->assertEquals($expected, $delay);
         } else {
             // delay is expected to be a positive integer
             $this->assertGreaterThan($expected, $delay);
         }
+
+        // check jitter is always positive and less than or equal to BLACKOUT_END_JITTER
+        $this->assertGreaterThanOrEqual(0, $jitter);
+        $this->assertLessThanOrEqual(DelayGen::BLACKOUT_END_JITTER, $jitter);
     }
 
     /**

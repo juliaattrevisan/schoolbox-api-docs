@@ -16,7 +16,7 @@ class DelayGen
      * `$this->blackoutEndTime`: jitter the send by this number of seconds to
      * protect against overwhelming notification services.
      */
-    private const BLACKOUT_END_JITTER = 60;
+    public const BLACKOUT_END_JITTER = 60;
 
     /**
      * If now is within the quiet period, return a delay until the end of the quiet period.
