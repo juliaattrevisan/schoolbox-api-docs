@@ -55,8 +55,14 @@ class BaseDisable implements IStrategy
          * and see if it's different to what it is right now, prior to shadow table restoration.
          * If they were different, simply abort with a log message.
          */
-        if ($this->getVersion() !== $this->version) {
-            $this->log->warning('Instance version changed while import was running; shadow table schema might be different. Abandoning import without applying changes.');
+        $currentVersion = $this->getVersion();
+
+        if ($currentVersion !== $this->version) {
+            $this->log->warning(sprintf(
+                'Instance version changed while import was running; it was %s, but is now %s. shadow table schema might be different. Abandoning import without applying changes.',
+                $this->version,
+                $currentVersion
+            ));
 
             return;
         }
