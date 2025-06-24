@@ -326,3 +326,14 @@ button.submit {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
 }
+
+.sbx-icon-only-button {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    min-height: 40px;
+    min-width: 40px;
+    &:hover {
+        background: var(--content-ui-hover);
+    }
+}

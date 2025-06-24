@@ -155,7 +155,7 @@ window.Vue.onMounted((): void => {
                     </div>
                     <div>
                         <a
-                            class="f-no-bkg f-no-margins"
+                            class="sbx-icon-only-button f-no-margins"
                             aria-label="Edit template"
                             title="Edit template"
                             :href="props.updateTemplateEndpoint.replace('{templateId}', template.id.toString())"
