@@ -34,7 +34,11 @@ window.Vue.onMounted(async () => {
 </script>
 
 <template>
-    <div v-if="mbStore.data === null">... loading (todo: add a better spinner or skeleton here)</div>
+    <div v-if="mbStore.data === null" class="diagonal-headings-table-container small-12 island">
+        <section class="content">
+            <div class="loader"></div>
+        </section>
+    </div>
     <div
         v-else
         :class="{
