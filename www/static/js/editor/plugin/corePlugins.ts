@@ -9,7 +9,7 @@ import {
     Underline,
     Strikethrough,
     Link,
-    DocumentList,
+    List,
     BlockQuote,
     GeneralHtmlSupport,
     PasteFromOffice,
@@ -29,7 +29,7 @@ export function getCorePlugins(): (
     | typeof Underline
     | typeof Strikethrough
     | typeof Link
-    | typeof DocumentList
+    | typeof List
     | typeof BlockQuote
     | typeof Legacy
     | typeof Notification
@@ -42,7 +42,7 @@ export function getCorePlugins(): (
         Underline,
         Strikethrough,
         Link,
-        DocumentList,
+        List,
         BlockQuote,
         GeneralHtmlSupport,
         Legacy,
