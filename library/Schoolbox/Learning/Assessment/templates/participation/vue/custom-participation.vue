@@ -302,7 +302,6 @@ window.Vue.onMounted(() => {
                                     </li>
                                 </template>
                                 <template v-else-if="participant.plan.name !== null">
-                                    <li class="separator">Manage</li>
                                     <li>
                                         <button class="icon-close" @click.prevent="includeParticipant(participant)">
                                             Remove Customisation
