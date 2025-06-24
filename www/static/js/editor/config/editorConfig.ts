@@ -24,11 +24,10 @@ import {
     HorizontalLine,
     Alignment,
     FindAndReplace,
-    SourceEditing,
     WordCount,
     type EditorConfig,
 } from "ckeditor5";
-import { AIAssistant, OpenAITextAdapter } from "ckeditor5-premium-features";
+import { AIAssistant, OpenAITextAdapter, SourceEditingEnhanced } from "ckeditor5-premium-features";
 import UploadAdapterPlugin from "@js/editor/plugin/uploadAdapter/UploadAdapterPlugin";
 import { getToolbar } from "@js/editor/toolbar/editorToolbar";
 import { getLinkSettings } from "@js/editor/settings/linkSettings";
@@ -76,7 +75,7 @@ export function getConfig(config: SbxEditorConfig): EditorConfig & { sbConfig: S
             HorizontalLine,
             Alignment,
             FindAndReplace,
-            SourceEditing,
+            SourceEditingEnhanced,
             WordCount,
             // Eqneditor5,
             Resource,
