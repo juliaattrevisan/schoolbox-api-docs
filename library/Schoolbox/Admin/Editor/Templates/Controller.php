@@ -17,8 +17,6 @@ use Schoolbox\Admin\Editor\Templates\Category\Mapper as CategoryMapper;
 use Schoolbox\Editor\Templates\Mapper as TemplateMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 
-use function SSNepenthe\ColorUtils\name;
-
 class Controller extends Base
 {
     /**
@@ -51,7 +49,7 @@ class Controller extends Base
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminEditorTemplates.getList')),
                 'categories' => $categories->map($translator),
             ]
-            );
+        );
     }
 
     /**
@@ -113,7 +111,6 @@ class Controller extends Base
 
         // Redirect back to list
         $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminEditorTemplates.getList') . '?category=' . $category->getName());
-
     }
 
     /**
