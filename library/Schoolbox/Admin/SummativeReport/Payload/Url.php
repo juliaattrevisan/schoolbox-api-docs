@@ -244,16 +244,16 @@ class Url
                     $footer = $tokenReplacer->replace(
                         $report->getFooter(),
                         [
-                            '[firstname]'        => \Scrub::text($student->getFirstname() ?: ''),
-                            '[surname]'          => \Scrub::text($student->getLastname() ?: ''),
-                            '[externalId]'       => \Scrub::text($student->getExternalId() ?: ''),
-                            '[year]'             => \Scrub::text($student->getYear()?->getName() ?: ''),
+                            '[firstname]'        => ($student->getFirstname() ?: ''),
+                            '[surname]'          => ($student->getLastname() ?: ''),
+                            '[externalId]'       => ($student->getExternalId() ?: ''),
+                            '[year]'             => ($student->getYear()?->getName() ?: ''),
                             //yes getGivenName returns the firstname if the preferred name is not set. but it says it can also return null... I don't trust this. so null coalesce
-                            '[preferredname]'    => \Scrub::text($student->getGivenName() ?: ''),
-                            '[fullname]'         => \Scrub::text($student->getFullName() ?: ''),
-                            '[title]'            => \Scrub::text($student->getTitle() ?: ''),
-                            '[govstudentnumber]' => \Scrub::text($govtStudentNumber ?: ''),
-                            '[reportTitle]'      => \Scrub::text($report->getTitle() ?: ''),
+                            '[preferredname]'    => ($student->getGivenName() ?: ''),
+                            '[fullname]'         => ($student->getFullName() ?: ''),
+                            '[title]'            => ($student->getTitle() ?: ''),
+                            '[govstudentnumber]' => ($govtStudentNumber ?: ''),
+                            '[reportTitle]'      => ($report->getTitle() ?: ''),
                         ]
                     );
 
