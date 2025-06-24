@@ -24,18 +24,15 @@ class DelayGen
      *
      * @param string|null $startTime
      * @param string|null $endTime
+     * @param string      $currentTime
      * @return array
      */
-    public function getQuitePeriod(?string $startTime, ?string $endTime): array
+    public function getQuitePeriod(?string $startTime, ?string $endTime, string $currentTime): array
     {
         // If no start or end time is provided, return null (send now).
         if (null === $startTime || null === $endTime) {
             return [null, null, null];
         }
-
-        // Is the current time within the quiet period?
-        $now         = Alaress_Date_Format::now();
-        $currentTime = $now->getUsingFormat('H:i');
 
         if ($startTime <= $endTime) {
             // Start time < end time:

@@ -226,9 +226,14 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
             } else {
                 /* generate the delay or null if not in quiet period
                  */
+                // Is the current time within the quiet period?
+                $now         = Alaress_Date_Format::now();
+                $currentTime = $now->getUsingFormat('H:i');
+
                 [$delay, $jitter, $delayTimestamp] = (new DelayGen())->getQuitePeriod(
                     $this->blackoutStartTime,
                     $this->blackoutEndTime,
+                    $currentTime
                 );
 
                 if ($delay) {

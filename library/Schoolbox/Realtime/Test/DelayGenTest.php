@@ -20,7 +20,7 @@ class DelayGenTest extends TestCase
     #[DataProvider('providerValidExample')]
     public function testValidExample($input, $expected)
     {
-        [$delay, $jitter, $delayTimestamp]  = (new DelayGen())->getQuitePeriod($input[0], $input[1]);
+        [$delay, $jitter, $delayTimestamp]  = (new DelayGen())->getQuitePeriod($input[0], $input[1], $input[2]);
 
         if (null === $expected) {
             $this->assertEquals($expected, $delay);
@@ -42,28 +42,38 @@ class DelayGenTest extends TestCase
             /* Add other cases that you expect to be valid
              */
             'No delay' => [
-                [null, null],    // goes into testValidExample() as $input
+                [null, null, '09:00'],    // goes into testValidExample() as $input
                 null  // goes into testValidExample() as $expected
             ],
 
             'no start, has end' => [
-                [null, '23:59'],
+                [null, '23:59', '09:00'],
                 null
             ],
 
             'has start, no end' => [
-                ['18:00', null],
+                ['18:00', null, '09:00'],
                 null
             ],
 
-            'over midnight' => [
-                ['18:00', '06:00'],
-                43200 // 12 hours in seconds (should be same or greater than)
+            'over midnight, delay' => [
+                ['18:00', '06:00', '19:00'],
+                39600 // 11 hours in seconds (should be same or greater than)
+            ],
+
+            'over midnight, no delay' => [
+                ['18:00', '06:00', '15:00'],
+                null
             ],
 
             '1 hr time' => [
-                ['18:00', '19:00'],
+                ['18:00', '19:00', '18:00'],
                 3600
+            ],
+
+            '1 hr time, half way through' => [
+                ['18:00', '19:00', '18:30'],
+                1800
             ],
         ];
     }
