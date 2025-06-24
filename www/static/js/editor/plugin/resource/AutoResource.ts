@@ -11,6 +11,7 @@ import {
     type FileLoader,
     type FileRepository,
     type ViewDocumentClipboardInputEvent,
+    type DataTransfer,
 } from "ckeditor5";
 import { slideUp } from "@js/util/animateUtils";
 import type { Resource } from "@js/editor/plugin/resource/resourceUtils";
