@@ -12,6 +12,8 @@ describe("EditorTemplates", () => {
             { id: 3, name: "email" },
         ],
         templatesEndpoint: "",
+        createTemplateEndpoint: "",
+        updateTemplateEndpoint: "",
     };
 
     test("renders without crashing", () => {
