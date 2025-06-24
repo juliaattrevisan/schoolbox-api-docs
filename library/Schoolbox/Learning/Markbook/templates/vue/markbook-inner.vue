@@ -18,12 +18,12 @@ const mbStore = useMarkbookStore();
 
 const showAverages = window.Vue.ref(false);
 
-const markVisibilityOptions = {
-    // Please note; .icon output via v-html and is not escaped
-    0: { id: 0, icon: "&#xe63e;", description: "Staff Only" },
-    1: { id: 1, icon: "&#xe667;", description: "Staff and Students" },
-    2: { id: 2, icon: "&#xe666;", description: "Staff, Students and their Parents" },
-} as const;
+const markVisibilityOptions = [
+    // Please note; .icon and .description are both output via v-html are is not escaped
+    { id: 0, icon: "&#xe63e;", description: "Staff Only" },
+    { id: 1, icon: "&#xe667;", description: "Staff and Students" },
+    { id: 2, icon: "&#xe666;", description: "Staff, Students and their Parents" },
+] as const;
 
 const classStatisticRows = [
     { label: "Weight", statsKey: "weight", input: true },
@@ -348,16 +348,16 @@ window.Vue.onMounted(async () => {
                                     v-model="classImpl.assessments[assessment.id].markVisibility"
                                     name="visibility"
                                 >
+                                    <!-- eslint-disable vue/no-v-html -- we can't use <sbx-icon> in a select, so this is the other way for now.
+                                      -- option.icon/description is defined above, and since html spec doesn't allow elements in options, the whole thing is v-html'd -->
                                     <option
                                         v-for="option in markVisibilityOptions"
                                         :key="option.id"
                                         :value="option.id"
                                         :disabled="!mbStore.data.availableVisibilities.includes(option.id) || undefined"
-                                    >
-                                        <!-- eslint-disable-next-line vue/no-v-html -- we can't use <sbx-icon> in a select, so this is the other way for now. option.icon is defined above -->
-                                        <span v-html="option.icon"></span>
-                                        {{ option.description }}
-                                    </option>
+                                        v-html="`${option.icon} ${option.description}`"
+                                    ></option>
+                                    <!-- eslint-enable vue/no-v-html -->
                                 </select>
                             </td>
                             <td v-else></td>
