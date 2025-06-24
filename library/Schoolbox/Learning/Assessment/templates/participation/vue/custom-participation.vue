@@ -38,10 +38,12 @@ const isIndeterminate = window.Vue.computed(() => {
     return selectedList.value.length > 0 && selectedList.value.length < allParticipants.value.length;
 });
 
-// Function to check if any selected participant is excluded
-const hasExcludedInSelection = window.Vue.computed(() => {
+// Function to check if any selected participants has and customisation, whether excluded or assigned a different activity
+const hasCustomisedInSelection = window.Vue.computed(() => {
     return allParticipants.value.some(
-        (participant) => selectedList.value.includes(participant.user.id) && participant.excludedAt !== null,
+        (participant) =>
+            selectedList.value.includes(participant.user.id) &&
+            (participant.excludedAt !== null || participant.plan.name !== null),
     );
 });
 
@@ -345,7 +347,7 @@ window.Vue.onMounted(() => {
             </h3>
             <button class="button-clear" @click.prevent="selectedList.length = 0">Clear selection</button>
             <div class="l-flex-row l-flex--justify l-gap-xs">
-                <template v-if="hasExcludedInSelection">
+                <template v-if="hasCustomisedInSelection">
                     <button
                         class="icon-close submit"
                         data-test="custom-participation-remove-customisation"
