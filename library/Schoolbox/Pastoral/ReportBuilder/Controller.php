@@ -355,6 +355,29 @@ class Controller extends Base
         $showSeverity   = $this->getConfigLoader()->get('pastoral_severity');
         $severityColors = $showSeverity ? $this->getSeverityColors() : [];
 
+        $defaultSummaryOptions = [
+            ['title' => 'List', 'type' => 'list']
+        ];
+
+        /* Find the selected list of options
+         */
+        $selectedSummaryOptions = array_values(
+            array_filter(
+                PastoralReport::SUMMARY_TABLES_OPTIONS,
+                function ($key) use ($report) {
+                    return in_array($key, explode(',', $report->getSummaryTables() ?? ''));
+                },
+                ARRAY_FILTER_USE_KEY
+            )
+        );
+
+        $tabs = array_merge(
+            $defaultSummaryOptions,
+            array_map(
+                fn($option) => ['title' => $option['label'], 'type' => $option['type']],
+                $selectedSummaryOptions
+            )
+        );
         // And spit this thing out
 
         $this->response = $this->responseFromTemplate(
@@ -366,6 +389,9 @@ class Controller extends Base
                 'report'         => $report,
                 'showSeverity'   => $showSeverity,
                 'severityColors' => $severityColors,
+                /* Summary tables tabs
+                 */
+                'tabs'           => $tabs,
             ],
             $report->getName(),
         );
