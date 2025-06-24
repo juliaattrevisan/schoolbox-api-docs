@@ -36,7 +36,6 @@ export default class UITweaks extends Plugin {
     init(): void {
         (this.editor as ClassicEditor).sourceElement?.addEventListener(EditorEvent.EDITOR__CREATED, () => {
             this.updateDropdownPositions();
-            this.checkForModal();
             this.addLinkBrowseButton();
         });
     }
@@ -93,28 +92,6 @@ export default class UITweaks extends Plugin {
             item.panelView.element.style.left = `${left}px`;
             item.panelView.element.style.top = `${top}px`;
         });
-    }
-
-    /**
-     * if the editor is inside a reveal modal, we need to make sure
-     * the balloon is on top of the modal, otherwise it will be hidden underneath
-     */
-    checkForModal(): void {
-        const zIndex = "var(--sbx-depth-modal-ui-overlay)";
-        if ((this.editor as ClassicEditor).sourceElement?.closest("[data-reveal]")) {
-            const contextualBalloon = this.editor.plugins.get("ContextualBalloon");
-            // fired when the balloon is shown or hidden by any UI
-            contextualBalloon.on("change:visibleView", (eventInfo, name, value: null | View<HTMLElement>) => {
-                if (value === null) return;
-
-                const balloonElement = value.element?.parentElement?.parentElement?.parentElement ?? null;
-                if (balloonElement && balloonElement.style.zIndex !== zIndex) {
-                    balloonElement.style.zIndex = zIndex;
-                    // we also need to add the editor id to the balloon so we can potentially access it later
-                    balloonElement.setAttribute("data-balloon-editor-id", this.editor.id);
-                }
-            });
-        }
     }
 
     /**
