@@ -358,15 +358,26 @@
                                     Select the summary tables to include in the report
                                 </p>
                                 <ul class="option-list">
+                                    {% for key,values in summaryTablesOptions %}
                                     <li>
-                                        <input id="summaryStudentByTypeAndSubtype"
-                                               name="summaryStudentByTypeAndSubtype"
-                                               value="1"
+                                        <input id="summary-tables-{{ key }}"
+                                               name="summaryTables[]"
+                                               value="{{ key }}"
                                                type="checkbox"
-{#                                               {% if report.summaryStudentByTypeAndSubtype %}checked{% endif %}#}
+                                               {% if key in (report.summaryTables) %}checked{% endif %}
                                         >
-                                        <label for="summaryStudentByTypeAndSubtype">Student by Type/Sub-Type</label>
+                                        <label for="summary-tables-{{ key }}">
+                                            {{ values.label }}
+                                            {% if values.tooltip is defined %}
+                                            <span
+                                                    class="hint has-tip tip-top"
+                                                    data-tooltip
+                                                    title="{{ values.tooltip }}"
+                                            >?</span>
+                                            {% endif %}
+                                        </label>
                                     </li>
+                                    {% endfor %}
                                 </ul>
                             </div>
                         </div>

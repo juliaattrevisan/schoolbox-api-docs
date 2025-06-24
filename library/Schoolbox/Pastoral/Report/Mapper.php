@@ -52,6 +52,9 @@ class Mapper extends BaseMapper
         $this->uses('include_archived_records', self::TYPE_BOOLEAN);
         $this->uses('involved', self::TYPE_BOOLEAN);
 
+        // Summary table options
+        $this->uses('summary_tables', self::TYPE_STRING);
+
         // Filter criteria CSV strings
 
         $this->uses('types', self::TYPE_STRING, null, 'typesCsv');

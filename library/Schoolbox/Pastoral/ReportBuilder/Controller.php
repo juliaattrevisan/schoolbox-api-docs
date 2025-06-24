@@ -300,6 +300,7 @@ class Controller extends Base
                 'moderatorIds'         => $this->userMapper->findByAccess(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)->getPropertyValues('id'),
                 'roles'                => $roles,
                 'orderFields'          => $orderFields,
+                'summaryTablesOptions' => PastoralReport::SUMMARY_TABLES_OPTIONS,
             ],
             'Pastoral Report',
         );
@@ -601,6 +602,9 @@ class Controller extends Base
 
         $report->setIncludeStudentsWithoutYear($post->getBool('includeStudentsWithoutYear', false));
         $report->setIncludeStudentsWithoutHouse($post->getBool('includeStudentsWithoutHouse', false));
+
+        // Saving the summary tables options
+        $report->setSummaryTables(implode(',', $post->get('summaryTables', [])));
 
         if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
             $report->setActionsCsv($this->getCsv($post->get('actions')));
