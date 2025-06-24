@@ -3,7 +3,6 @@
  */
 
 const path = require("path");
-const { styles } = require("@ckeditor/ckeditor5-dev-utils"); // https://www.npmjs.com/package/@ckeditor/ckeditor5-dev-utils
 
 module.exports = {
     entry: {
@@ -311,7 +310,6 @@ module.exports = {
             },
             {
                 test: /\.css$/,
-                exclude: /ckeditor5-[^/\\]+[/\\]theme[/\\].+\.css$/, // ensure ckeditor5 related styling setup below isn't applied elsewhere
                 use: [
                     { loader: "vue-style-loader" },
                     {
@@ -321,32 +319,6 @@ module.exports = {
                         },
                     },
                     { loader: "css-loader" },
-                ],
-            },
-            {
-                test: /ckeditor5-[^/\\]+[/\\]theme[/\\].+\.css$/,
-                use: [
-                    {
-                        loader: "style-loader",
-                        options: {
-                            injectType: "singletonStyleTag", // applies all styles within in <style> tag
-                            attributes: {
-                                "data-cke": true, // adds data-cke attribute to the <style> tag
-                            },
-                        },
-                    },
-                    "css-loader",
-                    {
-                        loader: "postcss-loader",
-                        options: {
-                            postcssOptions: styles.getPostCssConfig({
-                                themeImporter: {
-                                    themePath: require.resolve("@ckeditor/ckeditor5-theme-lark"),
-                                },
-                                minify: true,
-                            }),
-                        },
-                    },
                 ],
             },
             {
@@ -393,8 +365,8 @@ module.exports = {
                 ],
             },
             {
-                // to process svg files in the ckeditor5/theme/icons folder as well as the @caspingus/lt/src/authoring/extensions/ui/imageUploader/assets/ folder (for the Learnosity image uploader extension)
-                test: /(ckeditor5-[^/\\]+[/\\]theme[/\\]icons[/\\][^/\\]+\.svg$)|(@caspingus[/\\]lt[/\\]src[/\\]authoring[/\\]extensions[/\\]ui[/\\]imageUploader[/\\]assets[/\\][^/\\]+\.svg$)/,
+                // to process svg files in the @caspingus/lt/src/authoring/extensions/ui/imageUploader/assets/ folder (for the Learnosity image uploader extension)
+                test: /(@caspingus[/\\]lt[/\\]src[/\\]authoring[/\\]extensions[/\\]ui[/\\]imageUploader[/\\]assets[/\\][^/\\]+\.svg$)/,
                 use: ["raw-loader"],
             },
         ],
