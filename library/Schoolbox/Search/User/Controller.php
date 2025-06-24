@@ -132,7 +132,6 @@ class Controller extends BaseController
      * @throws \InvalidArgumentException
      * @throws \LogicException
      * @throws \UnexpectedValueException
-     * @throws RouteNotFound
      */
     private function renderStudent(User $student): void
     {
@@ -584,7 +583,6 @@ class Controller extends BaseController
      * @throws MapperException
      * @throws \DomainException
      * @throws \UnexpectedValueException
-     * @throws RouteNotFound
      */
     private function renderStaff(User $staff): void
     {
@@ -662,7 +660,6 @@ class Controller extends BaseController
      * @throws MapperException
      * @throws \DomainException
      * @throws \UnexpectedValueException
-     * @throws RouteNotFound
      */
     private function renderParent(User $parent): void
     {
@@ -724,18 +721,30 @@ class Controller extends BaseController
     /**
      * Return an array containing information about the links to be displayed in the 3-dot menu at the top-right of the
      * profile page.  Links not accessible by the user are filtered out in the returned array.
-     * @throws RouteNotFound
      */
     private function getProfileThreeDotMenuLinksInfo(User $viewer, User $viewee): array
     {
+        // Get URLs for routes, while handling RouteNotFound exceptions.
+        $routeParamsByName = [
+            'adminUser.getModify' => ['userId' => $viewee->getId(), 'user' => $viewee],
+            'user.impersonate' => ['userId' => $viewee->getId(), 'user' => $viewee],
+            'pastoral.getStudentRecordInsertForm' => ['studentId' => $viewee->getId(), 'student' => $viewee],
+        ];
+        $urlByRouteName = [];
+        foreach ($routeParamsByName as $routeName => $routeParams) {
+            try {
+                $url = $this->getRouteIfAuthorized($routeName, $routeParams);
+            } catch (RouteNotFound) {
+                $url = false;
+            }
+            $urlByRouteName[$routeName] = $url;
+        }
+
         return array_filter(
             [
                 [
                     'title' => 'Modify User',
-                    'url' => $this->getRouteIfAuthorized(
-                        'adminUser.getModify',
-                        ['userId' => $viewee->getId(), 'user' => $viewee]
-                    ),
+                    'url' => $urlByRouteName['adminUser.getModify'],
                     'iconClass' => 'icon-modify',
                     'disabled' => false,
                     'mouseoverText' => 'Modify User',
@@ -743,14 +752,7 @@ class Controller extends BaseController
                 ],
                 [
                     'title' => 'Impersonate',
-                    'url' => (
-                        $viewer->getId() === $viewee->getId()
-                        ? false
-                        : $this->getRouteIfAuthorized(
-                            'user.impersonate',
-                            ['userId' => $viewee->getId(), 'user' => $viewee]
-                        )
-                    ),
+                    'url' => ($viewer->getId() === $viewee->getId()) ? false : $urlByRouteName['user.impersonate'],
                     'iconClass' => 'icon-staff-students',
                     'disabled' => $viewee->isDeleted(),
                     'mouseoverText' => $viewee->isDeleted() ? 'Account Disabled' : 'Login as user',
@@ -758,10 +760,7 @@ class Controller extends BaseController
                 ],
                 [
                     'title' => 'Create Pastoral Record',
-                    'url' => $this->getRouteIfAuthorized(
-                        'pastoral.getStudentRecordInsertForm',
-                        ['studentId' => $viewee->getId(), 'student' => $viewee]
-                    ),
+                    'url' => $urlByRouteName['pastoral.getStudentRecordInsertForm'],
                     'iconClass' => 'icon-pastoral',
                     'disabled' => false,
                     'mouseoverText' => 'Create Pastoral Record',
