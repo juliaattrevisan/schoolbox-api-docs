@@ -172,7 +172,7 @@ class Importer
              */
             $learnosityReference = $this->assemble($learnosityContent, $tags);
         } else {
-            $errors[] = 'Could not import learnosity content: missing learnosity reference.';
+            $errors[] = 'Could not import learnosity content: it might not exist. This is okay if your quiz was intentionally empty.';
         }
 
         $this->associate([
