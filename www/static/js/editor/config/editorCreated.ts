@@ -113,22 +113,6 @@ function configureIframelyListener(editor: SbxEditor): void {
 }
 
 /**
- * Add the inspector to the editor to help with debugging
- * in development mode: https://ckeditor.com/docs/ckeditor5/latest/framework/development-tools.html
- * The process.env.NODE_ENV is built into node/webpack:
- * https://webpack.js.org/configuration/mode/
- * so it will only be imported in development mode, not in production
- * No longer used, but kept for any future debugging needs
- * @param { SbxEditor } editor - the CKEditor instance
- */
-// async function attachInspector(editor: SbxEditor) {
-//     if (process.env.NODE_ENV === "development") {
-//         const inspector = await import("@ckeditor/ckeditor5-inspector");
-//         inspector.default.attach(editor);
-//     }
-// }
-
-/**
  * Add in any additional setup required and then dispatch that the editor is ready
  * @param sourceElement - the sourceElement the CKEditor will replace
  * @param editor - the CKEditor instance
