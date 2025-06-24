@@ -190,14 +190,32 @@ NULLTYPE;
             $timeout
         ));
 
-        /* Accept perform param from opts
-         */
-        $perform = $this->perform();
-
         /* This is needed to process liss data from storage files
          */
         /** @var FilesystemProxy $filesystemProxy */
         $filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
+
+        /* Accept perform param from opts
+         */
+        $perform = $this->perform();
+
+        $logMapper = \Schoolbox\External\Connector\Log\Mapper::getInstance();
+
+        // Queries should not be time-limited here
+        $logMapper->getDatabase()->executeDirectly('SET MAX_STATEMENT_TIME=0;');
+
+        /* Remember the current instance's version number right before we import.
+         * We encountered a scenario where an upgrade changed schema after the
+         * shadow tables started, causing it to restore the old schema when it
+         * finished, resulting in mysteriously-missing columns. We now detecct
+         * version changes before shadow tables commit themselves at the end.
+         */
+        $version = $this->getVersion();
+
+        /* This identifier indicates that the scheduler(s) were part of this
+         * script execution together
+         */
+        $runId = (new Guid())->generate();
 
         /* Execute scheduler
          */
@@ -205,19 +223,13 @@ NULLTYPE;
             $host,
             $key,
             $perform,
+            $version,
             $lissAdditiveMode,
             $this->getLogger(),
             $watchlist,
             $validStrats,
             $filesystemProxy
         );
-
-        $logMapper = \Schoolbox\External\Connector\Log\Mapper::getInstance();
-
-        // Queries should not be time-limited here
-        $logMapper->getDatabase()->executeDirectly('SET MAX_STATEMENT_TIME=0;');
-
-        $runId = (new Guid())->generate();
 
         (new Endpoint\Scheduler(
             $frequency,

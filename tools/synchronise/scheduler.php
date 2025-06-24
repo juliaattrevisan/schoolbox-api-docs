@@ -149,6 +149,14 @@ HELP;
         // Queries should not be time-limited here
         $logMapper->getDatabase()->query('SET MAX_STATEMENT_TIME=0;');
 
+        /* Remember the current instance's version number right before we import.
+         * We encountered a scenario where an upgrade changed schema after the
+         * shadow tables started, causing it to restore the old schema when it
+         * finished, resulting in mysteriously-missing columns. We now detecct
+         * version changes before shadow tables commit themselves at the end.
+         */
+        $version = $this->getVersion();
+
         /* This identifier indicates that the two schedulers were part of this
          * script execution together
          */
@@ -198,7 +206,13 @@ HELP;
                 /* Execute scheduler: calendar stuff
                  * Not all connectivities contain a calendar importer, just some
                  */
-                $calendarFactory = new Endpoint\CalendarFactory($host, $key, $perform, $this->getLogger());
+                $calendarFactory = new Endpoint\CalendarFactory(
+                    $host,
+                    $key,
+                    $perform,
+                    $version,
+                    $this->getLogger()
+                );
 
                 (new Endpoint\Scheduler(
                     $frequency,
@@ -228,6 +242,7 @@ HELP;
                     $host,
                     $key,
                     $perform,
+                    $version,
                     $lissAdditiveMode,
                     $this->getLogger(),
                     [],

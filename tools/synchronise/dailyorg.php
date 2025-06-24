@@ -161,6 +161,11 @@ HELP;
             $timeout
         ));
 
+        /* This is needed to process liss data from storage files
+         */
+        /** @var FilesystemProxy $filesystemProxy */
+        $filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
+
         /* This always perform updates
          */
         $perform = true;
@@ -171,6 +176,14 @@ HELP;
 
         // Queries should not be time-limited here
         $randomMapper->getDatabase()->query('SET MAX_STATEMENT_TIME=0;');
+
+        /* Remember the current instance's version number right before we import.
+         * We encountered a scenario where an upgrade changed schema after the
+         * shadow tables started, causing it to restore the old schema when it
+         * finished, resulting in mysteriously-missing columns. We now detecct
+         * version changes before shadow tables commit themselves at the end.
+         */
+        $version = $this->getVersion();
 
         /* This identifier indicates that the two schedulers were part of this
          * script execution together
@@ -188,11 +201,6 @@ HELP;
          */
         $time = time();
 
-        /* This is needed to process liss data from storage files
-         */
-        /** @var FilesystemProxy $filesystemProxy */
-        $filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
-
         $validStrats = new ValidStrats($currentStrat);
 
         /* Execute scheduler: sis stuff
@@ -201,6 +209,7 @@ HELP;
             $host,
             $key,
             $perform,
+            $version,
             $lissAdditiveMode,
             $this->getLogger(),
             [],

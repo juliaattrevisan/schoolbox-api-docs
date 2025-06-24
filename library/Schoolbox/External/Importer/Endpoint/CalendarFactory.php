@@ -39,15 +39,17 @@ class CalendarFactory implements IFactory
     /**
      * CalendarFactory constructor.
      *
-     * @param string          $host
-     * @param string          $key
-     * @param bool            $perform
+     * @param string $host
+     * @param string $key
+     * @param bool $perform
+     * @param string $version
      * @param LoggerInterface $logger
      */
     public function __construct(
         private string $host,
         #[SensitiveParameter] private string $key,
         private bool $perform,
+        private string $version,
         private LoggerInterface $logger
     ) {
     }

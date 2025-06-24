@@ -618,4 +618,16 @@ abstract class App
             $this->readLine('Press enter to continue');
         }
     }
+
+
+    /**
+     * Fetch the freshest version number from config,
+     * bypassing any mapper-related caching mechanisms
+     */
+    protected function getVersion(): string
+    {
+        return trim((string)$this->databaseInternal->executeQuery("
+            SELECT value FROM config WHERE name = 'site_version' LIMIT 1
+        ")->fetchColumn());
+    }
 }
