@@ -16,6 +16,7 @@ use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\Base\ShadowTable\BaseDisable;
 use Schoolbox\External\Event;
 use Schoolbox\External\Profile;
+use Schoolbox\External\Profile\Mapper;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
 
@@ -49,27 +50,29 @@ class Disable extends BaseDisable
     /**
      * Constructor
      *
-     * @param LoggerInterface             $log
-     * @param bool                        $perform
-     * @param Profile\Mapper              $userProfileMapper
-     * @param Profile\Student\Mapper      $studentProfileMapper
-     * @param Profile\Parent\Mapper       $parentProfileMapper
-     * @param Profile\Staff\Mapper        $staffProfileMapper
+     * @param LoggerInterface $log
+     * @param bool $perform
+     * @param string $version
+     * @param Mapper $userProfileMapper
+     * @param Profile\Student\Mapper $studentProfileMapper
+     * @param Profile\Parent\Mapper $parentProfileMapper
+     * @param Profile\Staff\Mapper $staffProfileMapper
      * @param Profile\Relationship\Mapper $relationshipProfileMapper
-     * @param ClassEntryMapper            $classEntryMapper
-     * @param ClassInvolvementMapper      $classInvolvementMapper
-     * @param ClassPeriodMapper           $classPeriodMapper
-     * @param TimetableCycleMapper        $cycleMapper
-     * @param TimetablePeriodMapper       $periodMapper
-     * @param Event\Mapper                $eventMapper
-     * @param Event\Overrides\Mapper      $classInvolvementOverridesMapper
-     * @param Event\Roletype\Mapper       $eventRoleTypeMapper
-     * @param Event\Campus\Mapper         $eventCampusMapper
-     * @param Event\User\Mapper           $eventUserMapper
+     * @param ClassEntryMapper $classEntryMapper
+     * @param ClassInvolvementMapper $classInvolvementMapper
+     * @param ClassPeriodMapper $classPeriodMapper
+     * @param TimetableCycleMapper $cycleMapper
+     * @param TimetablePeriodMapper $periodMapper
+     * @param Event\Mapper $eventMapper
+     * @param Event\Overrides\Mapper $classInvolvementOverridesMapper
+     * @param Event\Roletype\Mapper $eventRoleTypeMapper
+     * @param Event\Campus\Mapper $eventCampusMapper
+     * @param Event\User\Mapper $eventUserMapper
      */
     public function __construct(
         LoggerInterface $log,
         bool $perform,
+        string $version,
         Profile\Mapper $userProfileMapper,
         Profile\Student\Mapper $studentProfileMapper,
         Profile\Parent\Mapper $parentProfileMapper,
@@ -89,6 +92,7 @@ class Disable extends BaseDisable
         parent::__construct(
             $log,
             $perform,
+            $version,
             $userProfileMapper,
             $studentProfileMapper,
             $parentProfileMapper,

@@ -132,6 +132,7 @@ class CalendarFactory implements IFactory
                 new ShadowTable\Calendar\Disable(
                     $this->logger,
                     $this->perform,
+                    $this->version,
                     \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
                     \Schoolbox\External\Event\Roletype\Mapper::getInstance()->disableCache(),
                     \Schoolbox\External\Event\Campus\Mapper::getInstance()->disableCache(),

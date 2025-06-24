@@ -417,6 +417,7 @@ class Factory implements IFactory
                 new ShadowTable\All\Disable(
                     $this->logger,
                     $this->perform,
+                    $this->version,
                     UserProfile\Mapper::getInstance()->disableCache(),
                     UserProfile\Student\Mapper::getInstance()->disableCache(),
                     UserProfile\Parent\Mapper::getInstance()->disableCache(),
