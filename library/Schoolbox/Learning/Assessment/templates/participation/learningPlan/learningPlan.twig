@@ -95,7 +95,11 @@
         $("#participation-plan-form").alaressValidate({
             rules: {
                 "plan-name": {
-                    requiredNotBlank: true
+                    requiredNotBlank: true,
+                    cannotMatch: {
+                        value: "{{ assessment.title }}",
+                        message: "The title cannot be the same as the original activity"
+                    }
                 },
                 "plan-desc": "required",
                 planPublishDate: {
