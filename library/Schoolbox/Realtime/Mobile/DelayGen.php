@@ -53,9 +53,9 @@ class DelayGen
             /* if delay is negative, it means we need to add a day
              * (and the negative delay will roll back to the actual time)
              */
-            if ($delay < 0) {
-                $delay += 86400; // add a day in seconds
-            }
+//            if ($delay < 0) {
+//                $delay += 86400; // add a day in seconds
+//            }
             return [$delay, $jitter, $delayTimestamp];
         }
         return [null, null, null];
