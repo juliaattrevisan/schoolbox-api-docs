@@ -80,6 +80,26 @@ class DelayGenTest extends TestCase
                 ['18:00', '19:00', '18:30'],
                 1800
             ],
+
+            'everything midnight' => [
+                ['00:00', '00:00', '00:00'],
+                0
+            ],
+
+            'everything midnight, send at 1am' => [
+                ['00:00', '00:00', '01:00'],
+                null
+            ],
+
+            'everything midday' => [
+                ['12:00', '12:00', '12:00'],
+                0
+            ],
+
+            'everything midday, send at 1am' => [
+                ['12:00', '12:00', '01:00'],
+                null
+            ],
         ];
     }
 }
