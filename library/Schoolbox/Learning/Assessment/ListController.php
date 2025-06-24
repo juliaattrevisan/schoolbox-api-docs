@@ -1329,7 +1329,7 @@ class ListController extends Web\Controller\Base
         // Note: in the returned collection
         //    - any plans CREATED by this method will be NEGATIVELY INDEXED (the object has a real ID though)
         //    - any plans UPDATED by this method will be ID INDEXED
-        $plans = $this->savePlanData($assessment, $planData ?? []);
+        $plans = $this->savePlanData($assessment, $planData);
 
         $this->saveParticipationData($assessment, $plans, $postData['participant-include'] ?? [], $postData['participant-plan'] ?? []);
 

@@ -588,7 +588,7 @@ class Module extends BaseModule
 
         return [
             'assessment' => $assessment,
-            'plan' => $plan
+            'plan' => $plan ?? null
         ];
     }
 
