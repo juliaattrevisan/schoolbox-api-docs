@@ -1,6 +1,5 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import "@learningAssessment/fragments/macro/date.twig" as dateForm %}
-<script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 
 {#
 # Modal for creating/modifying a custom learning plan on an assessment.
@@ -32,69 +31,63 @@
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <fieldset>
-                            <label for="plan-name" class="required">Title</label>
-                            <input
-                                    type="text"
-                                    name="plan-name"
-                                    id="plan-name"
-                                    data-test="participation-plan-customise-modal-input-name"
-                                    maxlength="256"
-                                    value="{{ plan is defined ? plan.name : '' }}"
-                            >
-                        </fieldset>
-                        <fieldset>
-                            <legend>Custom Activity Details</legend>
-                            <div class="row">
-                                <div class="columns small-12">
-                                    <label for="plan-desc" class="required">Description</label>
-                                    <textarea name="plan-desc" id="plan-desc">
-                                        {{ plan is defined ? plan.description : assessment.description }}
-                                    </textarea>
-                                </div>
-                                <div class="columns small-12">
-                                    {% set publishAt = plan is defined ? plan.publishDate : assessment.publishAt %}
-                                    {% set openAt = plan is defined ? plan.openDate : assessment.openAt %}
-                                    {% set dueAt = plan is defined ? plan.dueDate : assessment.dueAt %}
-                                    {% set lateAt = plan is defined ? plan.closeDate : assessment.closeAt %}
-                                    {% if acceptingResponses is defined and acceptingResponses %}
-                                        {{ dateForm.dateField('Publish', 'planPublish', publishAt, '', '#planOpenDate' ) }}
-                                        {{ dateForm.dateField('Open'   , 'planOpen'   , openAt, '#planPublishDate', '#planDueDate'  ) }}
-                                        {{ dateForm.dateField('Due'    , 'planDue'    , dueAt, '#planOpenDate'   , '#planCloseDate') }}
-                                        {{ dateForm.dateField('Late'   , 'planClose'  , lateAt, '#planDueDate'    , ''              ) }}
-                                    {% else %}
-                                        {{ dateForm.dateField('Publish', 'planPublish', publishAt, ''                , '#planDueDate'  ) }}
-                                        {{ dateForm.dateField('Due'    , 'planDue'    , dueAt, '#planPublishDate', ''              ) }}
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </fieldset>
-                        {% for participant in participants %}
-                            {% set user = participant.user %}
-                            {% set userInclude = (not participant.excludedAt) %}
-                            <input type="hidden" name="participant-include[{{ user.id }}]" id="participant-include-{{ user.id }}" value="{{ userInclude ? 1 : 0 }}">
-                            <input type="hidden" name="participant-plan[{{ user.id }}]" id="participant-plan-{{ user.id }}"
-                                   value="{{ plan is not defined ? -1 : (participant.plan.id and not participant.plan.isDynamic) ? participant.plan.id : -1 }}">
-                        {% endfor %}
+                        <label for="plan-name" class="required">Title</label>
+                        <input
+                                type="text"
+                                name="plan-name"
+                                id="plan-name"
+                                data-test="participation-plan-customise-modal-input-name"
+                                maxlength="256"
+                                value="{{ plan is defined ? plan.name : '' }}"
+                        >
+                    </div>
+                    <div class="columns small-12">
+                        <label for="plan-desc" class="required">Description</label>
+                        <textarea name="plan-desc" id="plan-desc">
+                            {{ plan is defined ? plan.description : assessment.description }}
+                        </textarea>
+                    </div>
+                    <div class="columns small-12">
+                        {% set publishAt = plan is defined ? plan.publishDate : assessment.publishAt %}
+                        {% set openAt = plan is defined ? plan.openDate : assessment.openAt %}
+                        {% set dueAt = plan is defined ? plan.dueDate : assessment.dueAt %}
+                        {% set lateAt = plan is defined ? plan.closeDate : assessment.closeAt %}
+                        {% if acceptingResponses is defined and acceptingResponses %}
+                            {{ dateForm.dateField('Publish', 'planPublish', publishAt, '', '#planOpenDate' ) }}
+                            {{ dateForm.dateField('Open'   , 'planOpen'   , openAt, '#planPublishDate', '#planDueDate'  ) }}
+                            {{ dateForm.dateField('Due'    , 'planDue'    , dueAt, '#planOpenDate'   , '#planCloseDate') }}
+                            {{ dateForm.dateField('Late'   , 'planClose'  , lateAt, '#planDueDate'    , ''              ) }}
+                        {% else %}
+                            {{ dateForm.dateField('Publish', 'planPublish', publishAt, ''                , '#planDueDate'  ) }}
+                            {{ dateForm.dateField('Due'    , 'planDue'    , dueAt, '#planPublishDate', ''              ) }}
+                        {% endif %}
+                    </div>
+                    {% for participant in participants %}
+                        {% set user = participant.user %}
+                        {% set userInclude = (not participant.excludedAt) %}
+                        <input type="hidden" name="participant-include[{{ user.id }}]" id="participant-include-{{ user.id }}" value="{{ userInclude ? 1 : 0 }}">
+                        <input type="hidden" name="participant-plan[{{ user.id }}]" id="participant-plan-{{ user.id }}"
+                                value="{{ plan is not defined ? -1 : (participant.plan.id and not participant.plan.isDynamic) ? participant.plan.id : -1 }}">
+                    {% endfor %}
+                    <div class="columns small-12">
                         <input type="hidden" name="plan-id" id="plan-id" value="{{ plan is defined ? plan.id : -1 }}">
                         <input type="submit" value="Update" data-test="participation-plan-form-button-save">
                     </div>
-
                 </fieldset>
-
             </section>
         </form>
     </div>
 </div>
+<script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/jquery-validation/dist/additional-methods.min.js?v={{ config.site_version }}"></script>
 <script>
-    // Dispatch signal to initalise CKEditor
+    // Dispatch event to initialise CKEditor
     document.dispatchEvent(
-            new CustomEvent("EDITOR__CREATE", {
-                detail: {
-                    targetElements: ["#plan-desc"],
-                },
-            }),
+        new CustomEvent("EDITOR__CREATE", {
+            detail: {
+                targetElements: ["#plan-desc"],
+            },
+        }),
     );
 
     $(function() {
