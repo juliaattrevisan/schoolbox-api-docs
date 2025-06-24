@@ -29,7 +29,15 @@ export function useDomContentLoaded(): {
     /**
      * Listens for the DOMContentLoaded event to set hasDomContentLoaded to true.
      */
-    window.addEventListener("DOMContentLoaded", onDomContentLoaded);
+    if (document.readyState === "loading") {
+        // DOM is still loading, listen for the event
+        window.addEventListener("DOMContentLoaded", onDomContentLoaded);
+    } else {
+        // DOM is already loaded (interactive or complete)
+        void window.Vue.nextTick().then(() => {
+            hasDomContentLoaded.value = true;
+        });
+    }
 
     return {
         hasDomContentLoaded,
