@@ -7,6 +7,8 @@ import type { LinkConfig } from "ckeditor5";
 export function getLinkSettings(): { link: LinkConfig } {
     return {
         link: {
+            // Automatically add target="_blank" and rel="noopener noreferrer" to all external links.
+            addTargetToExternalLinks: true,
             // see https://ckeditor.com/docs/ckeditor5/latest/features/link.html
             decorators: {
                 openInNewTab: {
