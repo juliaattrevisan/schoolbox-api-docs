@@ -267,6 +267,8 @@ $app = new class extends CliTool\App {
             'pastoral_record_view' => 'SELECT COUNT(*) FROM pastoral_audit WHERE pastoral_id IS NOT NULL',
             'pastoral_user_view' => 'SELECT COUNT(*) FROM pastoral_audit WHERE pastoral_id IS NULL AND report_id is NULL AND search IS NULL',
             'pastoral_report_view' => 'SELECT COUNT(*) FROM pastoral_audit WHERE report_id is NOT NULL',
+            'pastoral_records_active' => 'SELECT count(*) FROM `pastoral` WHERE (expires_at IS NULL OR expires_at > NOW()) and deleted_at IS NULL',
+            'pastoral_records_archived' =>  'SELECT count(*) FROM `pastoral` WHERE expires_at <= NOW() and deleted_at IS NULL',
 
 
 
