@@ -34,7 +34,7 @@ window.Vue.onMounted(async () => {
 </script>
 
 <template>
-    <div v-if="mbStore.data === null" class="diagonal-headings-table-container small-12 island">
+    <div v-if="mbStore.data === null" class="markbook-loader small-12 island">
         <section class="content">
             <div class="loader"></div>
         </section>
@@ -208,4 +208,10 @@ window.Vue.onMounted(async () => {
     </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+/* getting around some chaotic other styles for the loader to stay in the right place */
+.markbook-loader {
+    padding-left: 0;
+    padding-right: 0;
+}
+</style>
