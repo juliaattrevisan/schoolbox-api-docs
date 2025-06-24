@@ -346,6 +346,35 @@
             {% endif %}
 
             <div class="row">
+                <div class="small-12 columns">
+                    <h2 class="subheader">Summary Tables</h2>
+                    <section>
+                        <div class="small-12 columns content">
+                            <div class="checklist">
+                                <label>
+                                    Select the summary table you want to include in the report
+                                </label>
+                                <p class="meta">
+                                    Select the summary tables to include in the report
+                                </p>
+                                <ul class="option-list">
+                                    <li>
+                                        <input id="summaryStudentByTypeAndSubtype"
+                                               name="summaryStudentByTypeAndSubtype"
+                                               value="1"
+                                               type="checkbox"
+{#                                               {% if report.summaryStudentByTypeAndSubtype %}checked{% endif %}#}
+                                        >
+                                        <label for="summaryStudentByTypeAndSubtype">Student by Type/Sub-Type</label>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <div class="row">
                 <div class="small-12 medium-6 columns">
                     <label><h2 class="subheader"><span>{{ locale.yearLevel.properPlural }}</span></h2></label>
                     <p class="meta">Select the {{ locale.yearLevel.plural }} you want included in the report</p>
