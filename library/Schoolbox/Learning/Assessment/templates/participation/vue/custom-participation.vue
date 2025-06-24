@@ -140,7 +140,8 @@ async function includeParticipant(participant: Participant): Promise<void> {
             const errorMessage = await extractErrorMessage(response);
             throw new Error(errorMessage);
         }
-        participant.excludedAt = null;
+        participant.excludedAt = null; // Resetting the exclusion timestamp
+        participant.plan.name = null; // Resetting the plan
         toast.timeout({ text: "Customisation removed successfully" });
     } catch (error) {
         if (error instanceof Error && hasErrorMessage(error)) {
