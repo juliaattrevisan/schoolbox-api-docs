@@ -126,9 +126,9 @@ window.Vue.onMounted((): void => {
         <div v-else class="c-island">
             <div v-for="(template, index) in currentTemplates" :key="template.id" class="c-card">
                 <div
-                    :class="`l-flex-row l-gap-m l-pad-m ${index !== currentTemplates.length - 1 ? `c-card--border-end-alt` : ''}`"
+                    :class="`l-flex-row l-gap-m ${index !== currentTemplates.length - 1 ? `c-card--border-end-alt` : ''}`"
                 >
-                    <div class="l-flex-col l-flex--justify-center l-flex__item--1 l-gap-xs f-no-margins">
+                    <div class="l-flex-col l-flex--justify-center l-flex__item--1 l-gap-xs l-pad-m f-no-margins">
                         <h3>
                             <a href="#">{{ template.title }}</a>
                         </h3>
