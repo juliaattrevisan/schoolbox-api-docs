@@ -19,6 +19,8 @@ import type {
 } from "@js/editor/event/editorEvent";
 import { initCheckData } from "@js/editor/config/editorCheckData";
 import { modifyEditor } from "@js/editor/config/editorCreated";
+import "ckeditor5/ckeditor5.css";
+import "ckeditor5-premium-features/ckeditor5-premium-features.css";
 import "@js/editor/styles/editor.css"; // to overwrite some of the styles
 
 /**
