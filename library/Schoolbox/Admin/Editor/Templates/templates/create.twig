@@ -16,9 +16,9 @@
     <div class="admin-content">
         <div class="small-12 island">
             {% if template and template.id %}
-                {% set formAction = routeLookupIfAuthorized('adminEditorTemplates.postUpdate', {template: template, templateId: template.id}) %}
+                {% set formAction = routeLookupIfAuthorized('adminEditorTemplates.postUpdate', { template: template, templateId: template.id }) %}
             {% else %}
-                {% set formAction = routeLookupIfAuthorized('adminEditorTemplates.postCreate') %}
+                {% set formAction = routeLookupIfAuthorized('adminEditorTemplates.postCreate', { categoryId: category.id }) %}
             {% endif %}
             <form id="editor-template-form" action="{{ formAction }}" method="post">
                 <section>
