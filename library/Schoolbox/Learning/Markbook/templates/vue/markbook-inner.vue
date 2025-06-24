@@ -6,7 +6,7 @@ import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
 import { useMarkbookStore } from "./store/markbookStore";
 import MiCellGrade from "./mi-cell-grade.vue";
 import MiStatisticRow from "./mi-statistic-row.vue";
-import type { MarkbookActivity } from "./types/payload";
+import MiClassAverageHeader from "./mi-class-average-header.vue";
 
 interface Props {
     type: "course" | "class";
@@ -15,8 +15,6 @@ interface Props {
 
 const props = defineProps<Props>();
 const mbStore = useMarkbookStore();
-
-const showAverages = window.Vue.ref(false);
 
 const markVisibilityOptions = [
     // Please note; .icon and .description are both output via v-html are is not escaped
@@ -49,50 +47,6 @@ const isDegraded = window.Vue.computed(() => {
     const students = mbStore.data.classImpls.reduce((acc, impl) => acc + Object.keys(impl.students).length, 0);
     return students > functionDegradeLimit;
 });
-
-/**
- * For the course markbook, we show headers for the unit spec groups of assessments
- * This groups all the assessments into groups of unit specs
- */
-const activityGroups = window.Vue.computed(() => {
-    if (mbStore.data === null) {
-        return [];
-    }
-
-    /**
-     * Assessments are currently ordered by the backend based on a provided sequence,
-     * but this is the point to change that if needed
-     */
-    const assessments = [...Object.values(mbStore.data.assessments)].sort((left, right) => {
-        return left.sequence - right.sequence;
-    });
-
-    const groups: {
-        unitSpec?: MarkbookActivity["unitSpec"];
-        activities: MarkbookActivity[];
-    }[] = [];
-
-    assessments.forEach((activity) => {
-        let group = groups.find((g) => g.unitSpec?.id === activity.unitSpec?.id);
-        if (!group) {
-            group = {
-                unitSpec: activity.unitSpec,
-                activities: [],
-            };
-            groups.push(group);
-        }
-
-        group.activities.push(activity);
-    });
-
-    return groups;
-});
-
-/**
- * The source of truth for the sequence to display activities in,
- * the actual sorting occurs in activityGroups above since that also determines the sort order of the unit specs
- */
-const orderedActivities = window.Vue.computed(() => activityGroups.value.flatMap((group) => group.activities));
 
 window.Vue.onMounted(async () => {
     await mbStore.init(props.endpoint);
@@ -191,7 +145,7 @@ window.Vue.onMounted(async () => {
     </div>
 
     <div v-if="mbStore.data" class="diagonal-headings-table-container small-12 island">
-        <div v-if="activityGroups.length === 0" class="empty-state">
+        <div v-if="mbStore.activityGroups.length === 0" class="empty-state">
             <i class="icon-curriculum"></i>
             <p>
                 There are no activities that match the selected filters. Try altering the filters to broaden your
@@ -211,7 +165,7 @@ window.Vue.onMounted(async () => {
                         </div>
                     </th>
                     <th
-                        v-for="activity in orderedActivities"
+                        v-for="activity in mbStore.orderedActivities"
                         :key="activity.id"
                         :data-test="`markbook-assessment-${activity.id}`"
                     >
@@ -232,62 +186,21 @@ window.Vue.onMounted(async () => {
                         </div>
                     </th>
                 </tr>
-                <template v-for="(classImpl, classImplId) in mbStore.data.classImpls" :key="classImplId">
-                    <tr v-if="props.type === 'class' && classImpl.stats !== null" class="average-headers">
-                        <th class="fixed-left white profile-cell average-expander">
-                            <a
-                                href="#"
-                                :class="showAverages ? 'icon-up-arrow' : 'icon-down-arrow'"
-                                title="Show additional metrics"
-                                @click="showAverages = !showAverages"
-                            ></a>
-                            Class Average
-                        </th>
 
-                        <th
-                            v-if="mbStore.showDrafts"
-                            class="fixed-left student-grade-cell"
-                            :class="getGradient(classImpl.stats.draftNormalisedMean, 100, true)"
-                        >
-                            {{ classImpl.stats.draftWeightedMean }}
-                        </th>
-                        <th
-                            v-else
-                            class="fixed-left student-grade-cell"
-                            :class="getGradient(classImpl.stats.normalisedMean, 100, true)"
-                        >
-                            {{ classImpl.stats.weightedMean }}
-                        </th>
-
-                        <th v-if="mbStore.data.rank !== null">-</th>
-                        <th
-                            v-for="assessment in orderedActivities"
-                            :key="assessment.id"
-                            class="student-grade-cell white"
-                        >
-                            <span v-if="classImpl.assessments[assessment.id] === undefined" class="na"></span>
-                            <span
-                                v-else-if="
-                                    mbStore.showDrafts &&
-                                    classImpl.assessments[assessment.id].stats.draftMean &&
-                                    Object.keys(classImpl.assessments[assessment.id].hasDraft).length > 0
-                                "
-                                class="meta"
-                            >
-                                {{ classImpl.assessments[assessment.id].stats.draftMean ?? "-" }}
-                            </span>
-                            <span v-else>
-                                {{ classImpl.assessments[assessment.id].stats.mean ?? "–" }}
-                            </span>
-                        </th>
-                    </tr>
+                <template v-if="props.type === 'class'">
+                    <mi-class-average-header
+                        v-for="(classImpl, classImplId) in mbStore.data.classImpls"
+                        :key="classImplId"
+                        :class-impl="classImpl"
+                    />
                 </template>
+
                 <tr v-if="props.type === 'course'" class="course-headers">
                     <th class="fixed-left transparent"></th>
                     <th class="fixed-left white"></th>
                     <th v-if="mbStore.data.rank !== null" class="white"></th>
                     <th
-                        v-for="group in activityGroups"
+                        v-for="group in mbStore.activityGroups"
                         :key="group.unitSpec?.id"
                         class="unit-title"
                         :colspan="group.activities.length"
@@ -304,7 +217,7 @@ window.Vue.onMounted(async () => {
                     </th>
                     <th class="course-row fixed-left"></th>
                     <th v-if="mbStore.data.rank !== null"></th>
-                    <template v-for="assessment in orderedActivities" :key="assessment.id">
+                    <template v-for="assessment in mbStore.orderedActivities" :key="assessment.id">
                         <td v-if="assessment.stats !== null" class="course-row">
                             <span v-if="mbStore.showDrafts && assessment.stats.draftMean !== null" class="meta">
                                 {{ assessment.stats.draftMean ?? "–" }}
@@ -318,11 +231,10 @@ window.Vue.onMounted(async () => {
                 </tr>
 
                 <template v-for="(classImpl, classImplId) in mbStore.data.classImpls" :key="classImplId">
-                    <template v-if="props.type === 'class' && showAverages">
+                    <template v-if="props.type === 'class' && mbStore.showAverages">
                         <mi-statistic-row
                             v-for="row in classStatisticRows"
                             :key="row.statsKey"
-                            :assessments="orderedActivities"
                             :class-impl="classImpl"
                             :label="row.label"
                             :stats-key="row.statsKey"
@@ -335,7 +247,7 @@ window.Vue.onMounted(async () => {
                         <th class="fixed-left">Visibility</th>
                         <th class="fixed-left"></th>
                         <th v-if="mbStore.data.rank !== null"></th>
-                        <template v-for="assessment in orderedActivities" :key="assessment.id">
+                        <template v-for="assessment in mbStore.orderedActivities" :key="assessment.id">
                             <td
                                 v-if="
                                     classImpl.assessments[assessment.id] &&
@@ -370,7 +282,7 @@ window.Vue.onMounted(async () => {
                         </th>
                         <th class="class-row fixed-left"></th>
                         <td v-if="mbStore.data.rank !== null"></td>
-                        <template v-for="assessment in orderedActivities" :key="assessment.id">
+                        <template v-for="assessment in mbStore.orderedActivities" :key="assessment.id">
                             <td v-if="classImpl.assessments[assessment.id]?.stats" class="class-row">
                                 <a :href="classImpl.assessments[assessment.id]._routes['learningAssessment.getStatus']">
                                     <span
@@ -442,7 +354,7 @@ window.Vue.onMounted(async () => {
                         </td>
 
                         <mi-cell-grade
-                            v-for="assessment in orderedActivities"
+                            v-for="assessment in mbStore.orderedActivities"
                             :key="assessment.id"
                             :assessment-id="assessment.id"
                             :class-impl-id="classImplId"

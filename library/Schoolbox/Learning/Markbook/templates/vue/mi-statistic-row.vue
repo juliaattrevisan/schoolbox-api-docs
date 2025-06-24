@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import { ACTIVITY_TYPE_TASK } from "@schoolboxAssessment/Types/assessmentTypes";
 import { useMarkbookStore } from "./store/markbookStore";
-import type { MarkbookActivity, MarkbookClassImplActivity, MarkbookClassImpl } from "./types/payload";
+import type { MarkbookClassImplActivity, MarkbookClassImpl } from "./types/payload";
 
 interface Props {
     label: string;
     statsKey: keyof MarkbookClassImplActivity["stats"];
     input?: boolean;
     round?: number;
-    assessments: MarkbookActivity[];
     classImpl: MarkbookClassImpl;
 }
 
@@ -16,7 +15,7 @@ const props = defineProps<Props>();
 const mbStore = useMarkbookStore();
 
 const activities = window.Vue.computed(() =>
-    props.assessments.map((assessment) => {
+    mbStore.orderedActivities.map((assessment) => {
         const aImpl = props.classImpl.assessments[assessment.id] ?? null;
 
         return {
