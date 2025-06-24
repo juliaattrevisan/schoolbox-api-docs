@@ -39,20 +39,20 @@ const mbStore = useMarkbookStore();
         </th>
 
         <th v-if="mbStore.data.rank !== null">-</th>
-        <th v-for="assessment in mbStore.orderedActivities" :key="assessment.id" class="student-grade-cell white">
-            <span v-if="props.classImpl.assessments[assessment.id] === undefined" class="na"></span>
+        <th
+            v-for="{ activity, aImpl } in mbStore.orderedClassImplActivities(props.classImpl)"
+            :key="activity.id"
+            class="student-grade-cell white"
+        >
+            <span v-if="aImpl === null" class="na"></span>
             <span
-                v-else-if="
-                    mbStore.showDrafts &&
-                    props.classImpl.assessments[assessment.id].stats.draftMean &&
-                    Object.keys(props.classImpl.assessments[assessment.id].hasDraft).length > 0
-                "
+                v-else-if="mbStore.showDrafts && aImpl.stats.draftMean && Object.keys(aImpl.hasDraft).length > 0"
                 class="meta"
             >
-                {{ props.classImpl.assessments[assessment.id].stats.draftMean ?? "-" }}
+                {{ aImpl.stats.draftMean ?? "-" }}
             </span>
             <span v-else>
-                {{ props.classImpl.assessments[assessment.id].stats.mean ?? "–" }}
+                {{ aImpl.stats.mean ?? "–" }}
             </span>
         </th>
     </tr>
