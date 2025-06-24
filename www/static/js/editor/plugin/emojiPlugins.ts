@@ -1,34 +1,13 @@
 /**
- * Returns the tokens plugins for the editor
+ * Returns the emoji plugins for the editor
  */
 
-import type { PluginConstructor } from "ckeditor5";
-import {
-    Emoji,
-    EmojiActivity,
-    EmojiFlags,
-    EmojiFood,
-    EmojiNature,
-    EmojiObjects,
-    EmojiPeople,
-    EmojiPlaces,
-    EmojiSymbols,
-} from "@phudak/ckeditor5-emoji/src";
+import { Emoji } from "ckeditor5";
 
 /**
  * All the emoji plugins
  * @returns - the emoji plugins
  */
-export function getEmojiPlugins(): PluginConstructor[] {
-    return [
-        Emoji,
-        EmojiPeople,
-        EmojiNature,
-        EmojiFood,
-        EmojiPlaces,
-        EmojiActivity,
-        EmojiObjects,
-        EmojiSymbols,
-        EmojiFlags,
-    ];
+export function getEmojiPlugins(): (typeof Emoji)[] {
+    return [Emoji];
 }
