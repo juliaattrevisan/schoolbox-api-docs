@@ -1,4 +1,4 @@
-import type { GeneralHtmlSupportConfig } from "@ckeditor/ckeditor5-html-support";
+import type { GeneralHtmlSupportConfig } from "ckeditor5";
 
 /**
  * Add support for the listed HTML, so the editor doesn't automatically remove what's listed

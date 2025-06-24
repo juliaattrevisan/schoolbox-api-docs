@@ -2,15 +2,20 @@
  * Returns the plugins that all editor type instances use
  */
 
-import { Essentials } from "@ckeditor/ckeditor5-essentials";
-import { Bold, Italic, Underline, Strikethrough } from "@ckeditor/ckeditor5-basic-styles";
-import { Link } from "@ckeditor/ckeditor5-link";
-import { DocumentList } from "@ckeditor/ckeditor5-list";
-import { BlockQuote } from "@ckeditor/ckeditor5-block-quote";
-import { GeneralHtmlSupport } from "@ckeditor/ckeditor5-html-support";
-import { PasteFromOffice } from "@ckeditor/ckeditor5-paste-from-office";
-import { PasteFromOfficeEnhanced } from "@ckeditor/ckeditor5-paste-from-office-enhanced";
-import { Notification } from "@ckeditor/ckeditor5-ui";
+import {
+    Essentials,
+    Bold,
+    Italic,
+    Underline,
+    Strikethrough,
+    Link,
+    DocumentList,
+    BlockQuote,
+    GeneralHtmlSupport,
+    PasteFromOffice,
+    Notification,
+} from "ckeditor5";
+import { PasteFromOfficeEnhanced } from "ckeditor5-premium-features";
 import Legacy from "@js/editor/plugin/legacy/Legacy";
 
 /**

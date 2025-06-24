@@ -2,9 +2,7 @@
  * Handles the toggling on/off to make the selected media full width
  */
 
-import { Command, type Editor } from "@ckeditor/ckeditor5-core";
-import type { Element } from "@ckeditor/ckeditor5-engine";
-import type { ImageResizeHandles, ImageResizeButtons } from "@ckeditor/ckeditor5-image";
+import { Command, type Editor, type Element, type ImageResizeHandles, type ImageResizeButtons } from "ckeditor5";
 
 export default class ToggleFullWidthCommand extends Command {
     /**

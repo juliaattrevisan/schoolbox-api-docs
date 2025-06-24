@@ -1,4 +1,4 @@
-import type { StyleConfig } from "@ckeditor/ckeditor5-style";
+import type { StyleConfig } from "ckeditor5";
 
 /**
  * Returns the settings for the Styles dropdown

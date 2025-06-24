@@ -1,4 +1,4 @@
-import type { LinkConfig } from "@ckeditor/ckeditor5-link/src/linkconfig";
+import type { LinkConfig } from "ckeditor5";
 
 /**
  * Returns the settings for the links

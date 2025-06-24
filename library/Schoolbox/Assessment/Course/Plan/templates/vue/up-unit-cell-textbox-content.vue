@@ -5,7 +5,7 @@
 import { useEditor } from "@schoolboxVue/composables/editor/useEditor";
 import { EditorType } from "@js/editor/types/editorTypes";
 import type { EditorCreatedEventInfo } from "@js/editor/event/editorEvent";
-import type { InlineEditor } from "@ckeditor/ckeditor5-editor-inline";
+import type { InlineEditor } from "ckeditor5";
 import MediaArticle from "@schoolboxVue/components/media-article.vue";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerTextboxStore } from "./store/unitPlannerTextboxStore";

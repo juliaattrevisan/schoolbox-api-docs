@@ -1,4 +1,4 @@
-import type { AIAssistantConfig } from "@ckeditor/ckeditor5-ai/src/aiassistant";
+import type { AIAssistantConfig } from "ckeditor5-premium-features";
 
 interface SbxAIAssistantConfig {
     ai: {

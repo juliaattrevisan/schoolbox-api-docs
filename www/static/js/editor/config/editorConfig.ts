@@ -8,21 +8,27 @@ import { getImagePlugins } from "@js/editor/plugin/imagePlugins";
 import { getTablePlugins } from "@js/editor/plugin/tablePlugins";
 import { getTokensPlugins } from "@js/editor/plugin/tokensPlugins";
 import { getEmojiPlugins } from "@js/editor/plugin/emojiPlugins";
-import { Heading, HeadingButtonsUI } from "@ckeditor/ckeditor5-heading";
-import { Paragraph, ParagraphButtonUI } from "@ckeditor/ckeditor5-paragraph";
-import { Style } from "@ckeditor/ckeditor5-style";
-import { Subscript, Superscript } from "@ckeditor/ckeditor5-basic-styles";
-import { Font } from "@ckeditor/ckeditor5-font";
-import { RemoveFormat } from "@ckeditor/ckeditor5-remove-format";
-import { MediaEmbed } from "@ckeditor/ckeditor5-media-embed";
-import { SpecialCharacters, SpecialCharactersEssentials } from "@ckeditor/ckeditor5-special-characters";
-import { HorizontalLine } from "@ckeditor/ckeditor5-horizontal-line";
-import { Alignment } from "@ckeditor/ckeditor5-alignment";
-import { FindAndReplace } from "@ckeditor/ckeditor5-find-and-replace";
-import { SourceEditing } from "@ckeditor/ckeditor5-source-editing";
-import { WordCount } from "@ckeditor/ckeditor5-word-count";
-import { AIAssistant, OpenAITextAdapter } from "@ckeditor/ckeditor5-ai";
-import type { EditorConfig } from "@ckeditor/ckeditor5-core";
+import {
+    Heading,
+    HeadingButtonsUI,
+    Paragraph,
+    ParagraphButtonUI,
+    Style,
+    Subscript,
+    Superscript,
+    Font,
+    RemoveFormat,
+    MediaEmbed,
+    SpecialCharacters,
+    SpecialCharactersEssentials,
+    HorizontalLine,
+    Alignment,
+    FindAndReplace,
+    SourceEditing,
+    WordCount,
+    type EditorConfig,
+} from "ckeditor5";
+import { AIAssistant, OpenAITextAdapter } from "ckeditor5-premium-features";
 import UploadAdapterPlugin from "@js/editor/plugin/uploadAdapter/UploadAdapterPlugin";
 import { getToolbar } from "@js/editor/toolbar/editorToolbar";
 import { getLinkSettings } from "@js/editor/settings/linkSettings";

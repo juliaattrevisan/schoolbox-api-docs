@@ -4,7 +4,7 @@
  * For more information on plugins, see https://ckeditor.com/docs/ckeditor5/latest/installation/plugins/plugins.html
  */
 
-import { Plugin } from "@ckeditor/ckeditor5-core";
+import { Plugin } from "ckeditor5";
 import ResourceUI from "./ResourceUI";
 import ResourceEditing from "./ResourceEditing";
 import AutoResource from "./AutoResource";

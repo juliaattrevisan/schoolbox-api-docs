@@ -5,8 +5,7 @@
  * when a user clicks the icon to insert an equation.
  */
 
-import { View, ButtonView, submitHandler } from "@ckeditor/ckeditor5-ui/src";
-import { icons } from "@ckeditor/ckeditor5-core/src";
+import { View, ButtonView, submitHandler, icons } from "ckeditor5";
 
 export default class EqnEditorView extends View {
     constructor(locale) {

@@ -2,7 +2,7 @@
  * Handles the insertion of a resource into the editor
  */
 
-import { Command, type Editor } from "@ckeditor/ckeditor5-core";
+import { Command, type Editor } from "ckeditor5";
 import { getSrc } from "@js/editor/plugin/resource/resourceUtils";
 import type { Resource } from "@js/editor/plugin/resource/resourceUtils";
 import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
@@ -11,7 +11,7 @@ export default class InsertResourceLinkCommand extends Command {
     /**
      * Whether the button is on or off
      */
-    declare public isOn: boolean;
+    public declare isOn: boolean;
 
     // @ts-expect-error -- as .bind() returns a new function object, we need to store it in a variable
     messageBinding;

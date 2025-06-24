@@ -2,13 +2,7 @@
  * Returns the table plugins for the editor
  */
 
-import {
-    Table,
-    TableToolbar,
-    TableProperties,
-    TableCellProperties,
-    TableColumnResize,
-} from "@ckeditor/ckeditor5-table";
+import { Table, TableToolbar, TableProperties, TableCellProperties, TableColumnResize } from "ckeditor5";
 import TableUpdates from "@js/editor/plugin/tableUpdates/TableUpdates";
 
 /**

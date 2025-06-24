@@ -4,18 +4,21 @@
  * Note that images are handled more comprehensively by the native ImageUpload plugin
  */
 
-import { Plugin } from "@ckeditor/ckeditor5-core";
+import {
+    Plugin,
+    isHtmlIncluded,
+    createImageTypeRegExp,
+    type ImageUploadCompleteEvent,
+    type FileLoader,
+    type FileRepository,
+    type ViewDocumentClipboardInputEvent,
+} from "ckeditor5";
 import { slideUp } from "@js/util/animateUtils";
-import { isHtmlIncluded } from "@ckeditor/ckeditor5-image/src/imageupload/imageuploadediting";
-import type { ImageUploadCompleteEvent } from "@ckeditor/ckeditor5-image/src/imageupload/imageuploadediting";
 import type { Resource } from "@js/editor/plugin/resource/resourceUtils";
 import { addResource } from "@js/editor/plugin/resource/resourceUtils";
 import ResourceUI from "@js/editor/plugin/resource/ResourceUI";
 import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
 import { EditorToolbar } from "@js/editor/types/editorTypes";
-import type { FileLoader, FileRepository } from "@ckeditor/ckeditor5-upload/";
-import type { ViewDocumentClipboardInputEvent } from "@ckeditor/ckeditor5-clipboard/src/clipboardobserver";
-import { createImageTypeRegExp } from "@ckeditor/ckeditor5-image/src/imageupload/utils";
 
 export default class ResourceEditing extends Plugin {
     totalUploadCount = 0; // the total number of files to upload

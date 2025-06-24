@@ -3,7 +3,7 @@
  * groups of buttons with a drop down to access provided
  */
 
-import type { ToolbarConfig, ToolbarConfigItem } from "@ckeditor/ckeditor5-core";
+import type { ToolbarConfig, ToolbarConfigItem } from "ckeditor5";
 import { EditorType, EditorToolbar } from "@js/editor/types/editorTypes";
 import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
 

@@ -2,7 +2,7 @@
  * Returns the tokens plugins for the editor
  */
 
-import type { PluginConstructor } from "@ckeditor/ckeditor5-core";
+import type { PluginConstructor } from "ckeditor5";
 import {
     Emoji,
     EmojiActivity,

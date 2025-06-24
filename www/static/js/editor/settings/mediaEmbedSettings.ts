@@ -2,7 +2,7 @@
  * Returns the setting for the mediaEmbed plugin, which rely primarily
  * on our use of iframely to embed media.
  */
-import type { MediaEmbedConfig } from "@ckeditor/ckeditor5-media-embed";
+import type { MediaEmbedConfig } from "ckeditor5";
 
 const IFRAME_SRC = "//cdn.iframe.ly/api/iframe";
 

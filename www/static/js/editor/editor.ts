@@ -2,8 +2,7 @@
  * To create CKEditor instances.
  * Refer to templates/core/pantry/editor.htm for further details on how to use this script.
  */
-import { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
-import { InlineEditor } from "@ckeditor/ckeditor5-editor-inline";
+import { ClassicEditor, InlineEditor } from "ckeditor5";
 import { getConfig } from "@js/editor/config/editorConfig";
 import { EditorType, EditorToolbar, allowedEditorElements } from "@js/editor/types/editorTypes";
 import type {

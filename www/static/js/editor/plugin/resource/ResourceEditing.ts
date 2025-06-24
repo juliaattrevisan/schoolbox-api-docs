@@ -3,9 +3,7 @@
  * and add the insertResource command to the editor
  */
 
-import { Plugin } from "@ckeditor/ckeditor5-core";
-import type { ResizeImageCommand } from "@ckeditor/ckeditor5-image";
-import type { Element } from "@ckeditor/ckeditor5-engine";
+import { Plugin, type ResizeImageCommand, type Element } from "ckeditor5";
 import InsertResourceCommand from "./InsertResourceCommand";
 import { ResourceType, getExtraAttributes } from "./resourceUtils";
 

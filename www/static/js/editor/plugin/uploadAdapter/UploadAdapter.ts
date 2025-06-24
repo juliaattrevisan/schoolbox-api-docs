@@ -5,8 +5,7 @@
  */
 
 import type { AsyncUploadResponse, Resource } from "@js/editor/plugin/resource/resourceUtils";
-import type { Editor } from "@ckeditor/ckeditor5-core";
-import type { FileLoader, UploadResponse } from "@ckeditor/ckeditor5-upload/src/filerepository";
+import type { Editor, FileLoader, UploadResponse } from "ckeditor5";
 
 type UploadResolve = (value: UploadResponse | PromiseLike<UploadResponse>) => void;
 type UploadReject = (reason?: string) => void;

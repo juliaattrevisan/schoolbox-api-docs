@@ -3,17 +3,19 @@
  * within the SBX context should be added here.
  */
 
-import { Plugin } from "@ckeditor/ckeditor5-core";
-import type { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
-import { getOptimalPosition } from "@ckeditor/ckeditor5-utils";
+import {
+    Plugin,
+    getOptimalPosition,
+    ButtonView,
+    LinkUI,
+    type ClassicEditor,
+    type DropdownView,
+    type ViewCollection,
+    type View,
+    type PanelPosition,
+    type Position,
+} from "ckeditor5";
 import { EditorEvent } from "@js/editor/event/editorEvent";
-import { ButtonView } from "@ckeditor/ckeditor5-ui";
-import { LinkUI } from "@ckeditor/ckeditor5-link";
-import type { DropdownView } from "@ckeditor/ckeditor5-ui";
-import type ViewCollection from "@ckeditor/ckeditor5-ui/src/viewcollection";
-import type View from "@ckeditor/ckeditor5-ui/src/view";
-import type { PanelPosition } from "@ckeditor/ckeditor5-ui/src/dropdown/dropdownpanelview";
-import type { Position } from "@ckeditor/ckeditor5-utils/src/dom/position";
 import { insertElementAfter } from "@js/util/domUtils";
 import ResourceLinkEditing from "@js/editor/plugin/resourceLink/ResourceLinkEditing";
 import type InsertResourceLinkCommand from "@js/editor/plugin/resourceLink/InsertResourceLinkCommand";

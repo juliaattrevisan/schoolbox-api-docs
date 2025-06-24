@@ -1,4 +1,4 @@
-import type { TableConfig } from "@ckeditor/ckeditor5-table";
+import type { TableConfig } from "ckeditor5";
 import { tableBorderColourSwatches, tableBackgroundColourSwatches } from "./colourSettings";
 
 /**
