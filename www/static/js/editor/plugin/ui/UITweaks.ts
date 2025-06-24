@@ -11,9 +11,8 @@ import {
     type ClassicEditor,
     type DropdownView,
     type ViewCollection,
+    type DomPoint,
     type View,
-    type PanelPosition,
-    type Position,
 } from "ckeditor5";
 import { EditorEvent } from "@js/editor/event/editorEvent";
 import { insertElementAfter } from "@js/util/domUtils";
@@ -79,16 +78,20 @@ export default class UITweaks extends Plugin {
                     this.updateDropdownPosition($item);
                 });
             }
-            const optimalPosition = getOptimalPosition({
-                element: item.panelView.element as HTMLElement,
-                target: item.buttonView.element as HTMLElement,
+            if (item.panelView.element === null || item.buttonView.element === null) {
+                return;
+            }
+            const { left, top } = getOptimalPosition({
+                element: item.panelView.element,
+                target: item.buttonView.element.getBoundingClientRect(),
                 fitInViewport: true,
                 limiter: document.getElementById("content"),
-                // @ts-expect-error - Acessing the private property is intentional here, for now
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- see above
+                // @ts-expect-error - Accessing the private property is intentional here, for now
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- is any as cant access private property
                 positions: item._panelPositions,
-            }) as Position;
-            item.panelView.position = optimalPosition.name as PanelPosition;
+            }) as DomPoint;
+            item.panelView.element.style.left = `${left}px`;
+            item.panelView.element.style.top = `${top}px`;
         });
     }
 
