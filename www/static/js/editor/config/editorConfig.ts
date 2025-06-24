@@ -43,7 +43,7 @@ import { getWordCountSettings } from "@js/editor/settings/wordCountSettings";
 import { getHTMLSupportSettings } from "@js/editor/settings/htmlSupportSettings";
 import { getAISettings } from "@js/editor/settings/aiSettings";
 import { EditorToolbar, type SbxEditorConfig } from "@js/editor/types/editorTypes";
-import Eqneditor5 from "@js/editor/plugin/eqnEditor/eqneditor5";
+// import Eqneditor5 from "@js/editor/plugin/eqnEditor/eqneditor5";
 import Resource from "@js/editor/plugin/resource/Resource";
 import UITweaks from "@js/editor/plugin/ui/UITweaks";
 
@@ -78,7 +78,7 @@ export function getConfig(config: SbxEditorConfig): EditorConfig & { sbConfig: S
             FindAndReplace,
             SourceEditing,
             WordCount,
-            Eqneditor5,
+            // Eqneditor5,
             Resource,
             UITweaks,
             AIAssistant,

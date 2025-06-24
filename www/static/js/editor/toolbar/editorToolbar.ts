@@ -109,7 +109,8 @@ export function getToolbar(config: SbxEditorConfig): ToolbarConfig {
             {
                 label: "Other",
                 icon: "threeVerticalDots",
-                items: ["specialCharacters", "eqneditor5Button", "horizontalLine", "findAndReplace", "sourceEditing"],
+                // items: ["specialCharacters", "eqneditor5Button", "horizontalLine", "findAndReplace", "sourceEditing"],
+                items: ["specialCharacters", "horizontalLine", "findAndReplace", "sourceEditing"],
             },
         ];
     }
