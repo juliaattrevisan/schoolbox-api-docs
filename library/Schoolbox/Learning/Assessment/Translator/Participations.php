@@ -64,7 +64,7 @@ class Participations
                     'assessmentId' => $assess->getId(),
                     'student' => $participant,
                     'studentId'    => $participant->getId(),
-                ]),
+                ])
             ]
         ];
     }

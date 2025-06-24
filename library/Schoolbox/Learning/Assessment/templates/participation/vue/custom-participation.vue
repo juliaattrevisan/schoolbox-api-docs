@@ -3,6 +3,7 @@
  * Custom Participation Vue Component
  */
 import { isAbortError, hasErrorMessage } from "@js/util/errorUtils";
+import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
 import type { StudentPastoralCountBadge } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
@@ -11,6 +12,8 @@ import type { Participant } from "../js/types/customParticipationTypes";
 interface Props {
     allParticipants: Participant[];
     getStudentsPastoralCountsUrl: string;
+    getLearningPlanNewUrl: string;
+    getAssessmentParticipation: string;
 }
 const props = defineProps<Props>();
 
@@ -35,10 +38,12 @@ const isIndeterminate = window.Vue.computed(() => {
     return selectedList.value.length > 0 && selectedList.value.length < allParticipants.value.length;
 });
 
-// Function to check if any selected participant is excluded
-const hasExcludedInSelection = window.Vue.computed(() => {
+// Function to check if any selected participants has and customisation, whether excluded or assigned a different activity
+const hasCustomisedInSelection = window.Vue.computed(() => {
     return allParticipants.value.some(
-        (participant) => selectedList.value.includes(participant.user.id) && participant.excludedAt !== null,
+        (participant) =>
+            selectedList.value.includes(participant.user.id) &&
+            (participant.excludedAt !== null || participant.plan.name !== null),
     );
 });
 
@@ -137,7 +142,8 @@ async function includeParticipant(participant: Participant): Promise<void> {
             const errorMessage = await extractErrorMessage(response);
             throw new Error(errorMessage);
         }
-        participant.excludedAt = null;
+        participant.excludedAt = null; // Resetting the exclusion timestamp
+        participant.plan.name = null; // Resetting the plan
         toast.timeout({ text: "Customisation removed successfully" });
     } catch (error) {
         if (error instanceof Error && hasErrorMessage(error)) {
@@ -275,6 +281,11 @@ window.Vue.onMounted(() => {
                     </td>
                     <td>
                         <span v-if="participant.excludedAt !== null">Excluded</span>
+                        <span v-else-if="participant.plan.name !== null">
+                            <a :href="`${getAssessmentParticipation}/${participant.plan.id}/modify?${getReturnUrl()}`">
+                                {{ participant.plan.name }}
+                            </a>
+                        </span>
                     </td>
                     <td class="no-pad">
                         <div v-if="participant.user.id" class="actions-small-1">
@@ -293,9 +304,23 @@ window.Vue.onMounted(() => {
                                         </button>
                                     </li>
                                 </template>
+                                <template v-else-if="participant.plan.name !== null">
+                                    <li>
+                                        <button class="icon-close" @click.prevent="includeParticipant(participant)">
+                                            Remove Customisation
+                                        </button>
+                                    </li>
+                                </template>
                                 <template v-else>
                                     <li class="separator">Manage</li>
-                                    <li><a class="icon-modify">Modify</a></li>
+                                    <li>
+                                        <a
+                                            class="icon-modify"
+                                            :href="`${getLearningPlanNewUrl}?student=${participant.user.id}&${getReturnUrl()}`"
+                                        >
+                                            Modify
+                                        </a>
+                                    </li>
                                     <li>
                                         <button
                                             class="icon-staff-students"
@@ -322,7 +347,7 @@ window.Vue.onMounted(() => {
             </h3>
             <button class="button-clear" @click.prevent="selectedList.length = 0">Clear selection</button>
             <div class="l-flex-row l-flex--justify l-gap-xs">
-                <template v-if="hasExcludedInSelection">
+                <template v-if="hasCustomisedInSelection">
                     <button
                         class="icon-close submit"
                         data-test="custom-participation-remove-customisation"
@@ -338,7 +363,14 @@ window.Vue.onMounted(() => {
                     <div class="l-flex__item--1">
                         <button class="icon-staff-students submit" @click.prevent="excludeSelected">Exclude</button>
                     </div>
-                    <div class="l-flex__item--1"><a class="icon-modify submit">Modify</a></div>
+                    <div class="l-flex__item--1">
+                        <a
+                            class="icon-modify submit"
+                            :href="`${getLearningPlanNewUrl}?student=${selectedList.join(',')}&${getReturnUrl()}`"
+                        >
+                            Modify
+                        </a>
+                    </div>
                     <div class="l-flex__item--1"><a class="icon-submissions submit">New Activity</a></div>
                 </template>
             </div>
@@ -353,11 +385,11 @@ window.Vue.onMounted(() => {
 }
 
 .button-clear {
-    display: inline-block;
-    padding: 0px;
     background: none;
-    vertical-align: baseline;
+    display: inline-block;
     font-size: 0.8rem;
+    padding: 0px;
+    vertical-align: baseline;
 }
 
 @media (max-width: 768px) {

@@ -29,5 +29,6 @@ export type Participant = {
     _links: {
         exclude: string;
         include: string;
+        learningPlanNew: string;
     };
 };

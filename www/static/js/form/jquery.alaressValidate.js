@@ -1,5 +1,5 @@
 (function ($) {
-    "use strict";
+    ("use strict");
 
     $.alaressValidate = {};
 
@@ -295,6 +295,21 @@
             return $(element).val() == $(otherElement).val();
         },
         "Values do not match",
+    );
+
+    /**
+     * Use to ensure a field cannot match a restricted value.
+     */
+    $.validator.addMethod(
+        "cannotMatch",
+        function (value, element, params) {
+            var restrictedValue = typeof params === "string" ? params : params.value;
+            return $(element).val().toLowerCase() !== restrictedValue.toLowerCase();
+        },
+        function (params, element) {
+            var message = typeof params === "string" ? "Cannot be the same" : params.message;
+            return message || "Cannot be the same";
+        },
     );
 
     /**
