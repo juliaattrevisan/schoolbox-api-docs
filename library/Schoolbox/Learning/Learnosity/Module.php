@@ -24,6 +24,7 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\AssessmentContextType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\LockedChecker;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainObject;
@@ -35,12 +36,15 @@ use Schoolbox\Learning\Authorizer\Rule\IsImplementation;
 use Schoolbox\Learning\Authorizer\Rule\IsInstructor;
 use Schoolbox\Learning\Authorizer\Rule\IsInstructorOrHasHomepageAccess;
 use Schoolbox\Learning\Authorizer\Rule\IsInteractionUnLocked;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -228,6 +232,15 @@ class Module extends BaseModule
             $preloadAttempt,
         );
 
+        // pluralise for REST
+        $contextTypes = AssessmentContextType::getStringValuesAsRegex(function ($name) {
+            return $name . 's';
+        });
+
+        $preloadContext = function ($params) {
+            return $this->preloadContext($params);
+        };
+
         /* Update a particular attempt due to rescoring being finished asynchronously via polld
          */
         $this->register('POST', '/{assessmentId}/rescore/{studentId}/{learnositySessionReference}', 'postRescoreAttemptsCallback', $instructorPerms, $preloadAttemptForReview);
@@ -259,8 +272,38 @@ class Module extends BaseModule
 
         /* Export a schoolbox quiz and its learnosity content into a portable json payload
          */
-        $this->register('GET', '/{assessmentId}/export/json', 'exportToJson', $instructorPerms, $preloadAssessment);
-        $this->register('GET', '/{assessmentId}/import/json', 'importFromJson', $instructorPerms, $preloadAssessment);
+        $this->register('GET', '/{assessmentId}/export/json', 'getExportToJson', $instructorPerms, $preloadAssessment);
+        $this->register('POST', "/import/{contextType:$contextTypes}/{contextId:\\d+}/json", 'postImportFromJson', $instructorPerms, $preloadContext);
+    }
+
+
+    /**
+     * Convert route params into a context object
+     *
+     * @param array $params
+     * @return array
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    protected function preloadContext(array $params): array
+    {
+        try {
+            $contextFactory = new \Schoolbox\Learning\Assessment\DataModel\Context\Factory(
+                $this->getMapperFactory()->get(FolderMapper::class),
+                $this->getMapperFactory()->get(UnitImplementationMapper::class),
+                $this->injector->get('assessmentDataSource'),
+                $this->getMapperFactory()->get(UnitSpecificationMapper::class)
+            );
+            $c = $contextFactory->produce($params['contextType'], $params['contextId']);
+        } catch (MapperException\Deleted $e) {
+            $c = $e->getDeletedObject();
+        } catch (MapperException $e) {
+            throw new NotFound();
+        }
+
+        return [
+            'context' => $c
+        ];
     }
 
 

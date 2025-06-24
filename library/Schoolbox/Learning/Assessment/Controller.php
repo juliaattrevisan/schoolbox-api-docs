@@ -414,6 +414,19 @@ abstract class Controller extends ListController implements IAssessmentControlle
                     ->setMimeFilter('text/xml,application/xml')
                     ->setFilesystemContext('xml')
                     ->getTwigContext();
+
+                $data['jsonAttachzone'] = (new Zone('jsonImport'))
+                    /* XML Imports should have an expiry date so they can be automatically removed
+                     * to save space. While this would be nice to have as a "backup for users" the
+                     * number of times they've asked us for a copy of their own data is basically 0
+                     */
+                    ->setExpiryDate(\Alaress_Date_Format::now()->addHours(1))
+                    ->setMulti(false)
+                    ->setAttachPrompt('Attach a quiz json file')
+                    ->setAttachmentsLabel('')
+                    ->setMimeFilter('application/json')
+                    ->setFilesystemContext('.json')
+                    ->getTwigContext();
             }
 
             // either output the fragment to the mage, or use the synchronous form

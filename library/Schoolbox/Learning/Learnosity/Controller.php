@@ -2463,7 +2463,7 @@ class Controller extends Base
      * @return void
      * @throws FilesystemException
      */
-    public function exportToJson(QuizDomainObject $assessment): void
+    public function getExportToJson(QuizDomainObject $assessment): void
     {
         /* Start generating output to stream
          */
@@ -2494,10 +2494,10 @@ class Controller extends Base
      * TODO Maybe have a think about this and rename it again later.
      * TODO Maybe belongs in a different controller?
      *
-     * @param QuizDomainObject $assessment
      * @return void
      */
-    public function importFromJson(QuizDomainObject $assessment): void
+    public function postImportFromJson(): void
     {
+        echo 'we made it';
     }
 }
