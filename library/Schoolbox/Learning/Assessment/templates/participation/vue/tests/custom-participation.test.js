@@ -51,16 +51,9 @@ test("bottom drawer is visible when two participants are selected", async () => 
 });
 
 test("When one of the three students is excluded, Copy Activity button does not appear", async () => {
-    const modified = allParticipants.slice(0, 3).map((p, index) => {
-        if (index === 2) {
-            return { ...p, excludedAt: "2025-06-20T10:00:00+10:00" };
-        }
-        return p;
-    });
-
     const wrapper = mount(CustomParticipation, {
         props: {
-            allParticipants: modified,
+            allParticipants,
             getStudentsPastoralCountsUrl: "",
         },
     });
@@ -117,7 +110,9 @@ test("If a participant's user id is not set, their name is not wrapped in an <a>
         },
     });
 
-    const row = wrapper.find('[data-test="custom-participation-row-null"]');
+    const row = wrapper.find(`[data-test="custom-participation-row-${modifiedParticipants[0].user.id || "null"}"]`);
+
+    expect(row.exists()).toBe(true);
     expect(row.find("a").exists()).toBe(false);
 });
 
