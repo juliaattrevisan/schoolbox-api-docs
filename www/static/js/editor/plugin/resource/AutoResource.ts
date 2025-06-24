@@ -6,7 +6,6 @@
 
 import {
     Plugin,
-    isHtmlIncluded,
     createImageTypeRegExp,
     type ImageUploadCompleteEvent,
     type FileLoader,
@@ -19,6 +18,15 @@ import { addResource } from "@js/editor/plugin/resource/resourceUtils";
 import ResourceUI from "@js/editor/plugin/resource/ResourceUI";
 import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
 import { EditorToolbar } from "@js/editor/types/editorTypes";
+
+/**
+ * Returns `true` if non-empty `text/html` is included in the data transfer.
+ * @param dataTransfer - the data transfer object
+ * @returns - whether the data transfer object includes text/html
+ */
+function isHtmlIncluded(dataTransfer: DataTransfer): boolean {
+    return Array.from(dataTransfer.types).includes("text/html") && dataTransfer.getData("text/html") !== "";
+}
 
 export default class ResourceEditing extends Plugin {
     totalUploadCount = 0; // the total number of files to upload
