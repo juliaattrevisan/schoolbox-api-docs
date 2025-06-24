@@ -20,6 +20,7 @@
     --ck-input-width: 19rem;
     /* to sit above the side menus */
     --ck-z-modal: var(--sbx-depth-ui-overlay);
+    --ck-z-panel: var(--sbx-depth-ui-overlay);
 
     /* The colours that are referenced in the overrides below */
     --sb-ck-active: #cae3fa;
