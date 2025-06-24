@@ -385,11 +385,11 @@ window.Vue.onMounted(() => {
 }
 
 .button-clear {
-    display: inline-block;
-    padding: 0px;
     background: none;
-    vertical-align: baseline;
+    display: inline-block;
     font-size: 0.8rem;
+    padding: 0px;
+    vertical-align: baseline;
 }
 
 @media (max-width: 768px) {
