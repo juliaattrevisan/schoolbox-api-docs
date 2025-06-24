@@ -132,7 +132,9 @@ window.Vue.onMounted((): void => {
                         <h3>
                             <a href="#">{{ template.title }}</a>
                         </h3>
-                        <h5 v-if="template.description && template.description !== ''">{{ template.description }}</h5>
+                        <p v-if="template.description && template.description !== ''" class="f-no-margins">
+                            {{ template.description }}
+                        </p>
                         <p class="meta">
                             <span
                                 >By
