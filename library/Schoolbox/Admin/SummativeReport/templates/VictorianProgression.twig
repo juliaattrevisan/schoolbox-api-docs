@@ -79,6 +79,9 @@
 
     table.victorian-progression .dot.black {
         background-color: #000;
+        /* ensure the background colour is displayed when printing */
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
     }
 
     /* Line between dots; z-index ensures it's always rendered below a .dot
@@ -108,6 +111,9 @@
      */
     table.victorian-progression .yellow {
         background-color: gold;
+        /* ensure the background colour is displayed when printing */
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
     }
 
     /* The top-left corner of the grid
