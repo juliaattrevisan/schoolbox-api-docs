@@ -962,6 +962,13 @@ abstract class Controller extends ListController implements IAssessmentControlle
         );
     }
 
+    /**
+     * Get the learning plan participation page for a specific assessment
+     *
+     * @param IAssessable $assessment
+     * @throws Error
+     * @throws RouteNotFound
+     */
     public function getAssessmentParticipationLearningPlan(IAssessable $assessment): void
     {
         $student = explode(',', $this->requestQuery->get('student', ''));
@@ -1003,6 +1010,14 @@ abstract class Controller extends ListController implements IAssessmentControlle
         );
     }
 
+    /**
+     * Get the form to update an existing Assessment's participation learning plan
+     *
+     * @param IAssessable $assessment
+     * @param PlanModel   $plan
+     * @throws Error
+     * @throws RouteNotFound
+     */
     public function getUpdateAssessmentParticipationLearningPlan(IAssessable $assessment, PlanModel $plan): void
     {
         $breadcrumbs = $this->getBakery()
