@@ -116,10 +116,10 @@ export function getToolbar(config: SbxEditorConfig): ToolbarConfig {
                     "findAndReplace",
                     "sourceEditingEnhanced",
                 ],
-                // items: ["specialCharacters", "horizontalLine", "findAndReplace", "sourceEditingEnhanced"],
             },
         ];
     }
+
     /**
      * remove any individual plugins for specific use cases
      * refer to removeItems at: https://ckeditor.com/docs/ckeditor5/latest/features/toolbar/toolbar.html
@@ -128,13 +128,7 @@ export function getToolbar(config: SbxEditorConfig): ToolbarConfig {
     if (config.removeFromToolbar) {
         removeItems = config.removeFromToolbar;
     }
-    /**
-     * Source Editing is currently only available in the classic editor
-     * https://ckeditor.com/docs/ckeditor5/latest/features/source-editing.html#installation
-     */
-    if (config.type !== EditorType.CLASSIC) {
-        removeItems = [...removeItems, "sourceEditing"];
-    }
+
     /**
      * add any individual plugins for specific use cases for example
      * the Blank plugin for Quiz cloze questions
