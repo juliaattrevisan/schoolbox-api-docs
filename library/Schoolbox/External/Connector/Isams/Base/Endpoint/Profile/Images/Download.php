@@ -141,6 +141,16 @@ class Download implements IStrategy
                     'sisPhotoId' => $sisPhotoId
                 ]]));
 
+                /* Persist this so changing the id in the sis_user_profile.metadata column
+                 * causes a photo retrieval
+                 */
+                $this->baseProfileMapper->save($baseProfile);
+
+                /* $data still has the old identifier in it at this point, not the new $sisPhotoId
+                 * so update that first before attempting to retrieve it lol
+                 */
+                $data['person']['sisPhotoId'] = $sisPhotoId;
+
                 $this->importPortrait($baseProfile, $data);
             } else {
                 $this->log->debug(sprintf(
