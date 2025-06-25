@@ -1,5 +1,11 @@
 import { defineStore } from "pinia";
-import type { Markbook, MarkbookActivity, MarkbookClassImpl, MarkbookClassImplActivity } from "../types/payload";
+import type {
+    Markbook,
+    MarkbookActivity,
+    MarkbookClassImpl,
+    MarkbookClassImplActivity,
+    MarkbookSelectedCellInfo,
+} from "../types/payload";
 import { listenForFilterLoad, listenForFilterLoading } from "./filterEvent";
 
 export const useMarkbookStore = defineStore("markbookStore", () => {
@@ -8,6 +14,8 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
     const showDisplayMarks = window.Vue.ref(false);
     const showDrafts = window.Vue.ref(false);
     const showAverages = window.Vue.ref(false);
+
+    const popoutSelectedCell = window.Vue.ref<MarkbookSelectedCellInfo | null>(null);
 
     /**
      * If the markbook has more than this number of participants,
@@ -120,5 +128,6 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
         activityGroups,
         orderedActivities,
         orderedClassImplActivities,
+        popoutSelectedCell,
     };
 });

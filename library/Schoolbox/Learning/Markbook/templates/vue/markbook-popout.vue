@@ -10,15 +10,16 @@ import {
     ACTIVITY_TYPE_PROJECT,
     ACTIVITY_TYPE_DUE_WORK,
 } from "@schoolboxAssessment/Types/assessmentTypes";
-import type { ActivityType } from "@schoolboxAssessment/Types/assessmentTypes";
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import { usePopOut } from "@schoolboxVue/composables/popOut/usePopOut";
 import SmallCard from "@schoolboxVue/components/card/small-card.vue";
 import PopOutMenuItem from "@schoolboxVue/components/menu/pop-out-menu-item.vue";
 import PopOutMenuDivider from "@schoolboxVue/components/menu/pop-out-menu-divider.vue";
 import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
-import { EVENT_POP_OUT_MENU_MARKBOOK_SELECTED } from "./popOutMenuMarkbookEvent";
-import type { PopOutMenuMarkbookSelectedEvent, PopOutMenuMarkbookRoutes } from "./popOutMenuMarkbookEvent";
+import { useMarkbookStore } from "./store/markbookStore";
+import type { MarkbookClassImplActivityParticipant } from "./types/payload";
+
+const mbStore = useMarkbookStore();
 
 /**
  * an activity linked to the selected mark book item
@@ -42,7 +43,6 @@ type ActivityItem = {
 // FloatingUI specific, declared here as showPopOut relies on one of these values existing.
 const popOutElement = window.Vue.ref<HTMLDivElement | null>(null);
 const referenceElement = window.Vue.ref<HTMLDivElement | null>(null);
-const assessmentType = window.Vue.ref<ActivityType>();
 
 const isLoading = window.Vue.ref(false);
 const hasLoadError = window.Vue.ref(false);
@@ -59,19 +59,67 @@ const hasDraftFeedback = window.Vue.computed(() =>
     activityItems.value.some((item) => item.type === "feedback" && item.published === false),
 );
 // is the user excluded from the assessment
-const isExcluded = window.Vue.ref(false);
-const isParticipant = window.Vue.ref(false);
 const isActivityEmpty = window.Vue.computed(() => activityItems.value.length === 0);
 const isExpansionDisabled = window.Vue.computed(() => activityItems.value.length === 1);
-const routes: Ref<PopOutMenuMarkbookRoutes> = window.Vue.ref({
-    dataEndpoint: "",
-    updateRoute: "",
-    reviewRoute: "",
-    publishRoute: "",
-    excludeRoute: "",
-    includeRoute: "",
-    historyRoute: "",
+
+/**
+ * All the data relating to the currently selected cell in the markbook
+ */
+const cellInfo = window.Vue.computed(() => {
+    if (mbStore.data === null || mbStore.popoutSelectedCell === null) {
+        return null;
+    }
+
+    const activity = mbStore.data.assessments[mbStore.popoutSelectedCell.activityId];
+    if (activity === undefined) {
+        console.warn("Activity not found for selected cell", mbStore.popoutSelectedCell);
+        return null;
+    }
+
+    const classImpl = mbStore.data.classImpls[mbStore.popoutSelectedCell.classImplId];
+    if (activity === undefined) {
+        console.warn("Class implementation not found for selected cell", mbStore.popoutSelectedCell);
+        return null;
+    }
+
+    const student = classImpl.students[mbStore.popoutSelectedCell.studentId];
+    if (student === undefined) {
+        console.warn("Student not found for selected cell", mbStore.popoutSelectedCell);
+        return null;
+    }
+
+    const aImpl = classImpl.assessments[mbStore.popoutSelectedCell.activityId];
+    if (aImpl === undefined) {
+        console.warn("aImpl not found for selected cell", mbStore.popoutSelectedCell);
+        return null;
+    }
+
+    // It's possible to render this popout for a student that isn't a participant in the class
+    const participant = aImpl.participants[student.id] ?? null;
+
+    return {
+        ...mbStore.popoutSelectedCell,
+        activity,
+        classImpl,
+        aImpl,
+        participant,
+    };
 });
+
+const routes = window.Vue.computed(() => {
+    const studentRoutes = cellInfo.value ? cellInfo.value.aImpl._routes.student[cellInfo.value.studentId] : undefined;
+
+    return {
+        dataEndpoint: studentRoutes?.["learningAssessmentTimeline.getFullTimeline"] ?? null,
+        updateRoute: studentRoutes?.["learningDueWorkResponse.getParticularResponse"] ?? null,
+        reviewRoute: studentRoutes?.["learningDueWorkResponse.getParticularResponse"] ?? null,
+        publishRoute: studentRoutes?.["learningDueWorkFeedback.postPublishFeedback"] ?? null,
+        excludeRoute: studentRoutes?.["learningAssessment.postExclude"] ?? null,
+        includeRoute: studentRoutes?.["learningAssessment.postInclude"] ?? null,
+        historyRoute: studentRoutes?.["learningAssessment.getSummary"] ?? null,
+    };
+});
+
 const markbookElement = window.Vue.ref<HTMLDivElement | null>(null);
 
 // Exclude confirm, popout
@@ -81,6 +129,7 @@ const excludeModalEl = window.Vue.ref<InstanceType<typeof RevealModal> | null>(n
  * When the pop out is closed, clear out the selected state
  */
 function onPopOutClosed(): void {
+    mbStore.popoutSelectedCell = null;
     referenceElement.value?.classList.remove("is-selected");
     referenceElement.value = null;
 }
@@ -103,13 +152,16 @@ const { onButtonSelected, close } = usePopOut(
  *  the activity they're expecting to see might not be there.
  */
 const viewAllText = window.Vue.computed(() => {
-    if (assessmentType.value === ACTIVITY_TYPE_TASK || assessmentType.value === ACTIVITY_TYPE_PROJECT) {
+    if (cellInfo.value === null) {
         return "";
     }
-    if (!isParticipant.value) {
+    if ([ACTIVITY_TYPE_TASK, ACTIVITY_TYPE_PROJECT].includes(cellInfo.value.activity.assessmentType)) {
+        return "";
+    }
+    if (cellInfo.value.participant === null) {
         return "The student is no longer a participant in the class.";
     }
-    if (isExcluded.value) {
+    if (cellInfo.value.participant.isExcluded) {
         return "The student has been excluded. You may include this student in this activity";
     }
     if (isActivityEmpty.value) {
@@ -128,13 +180,16 @@ const viewAllText = window.Vue.computed(() => {
  * Used to determine the text shown for the view status link / menu
  */
 const viewStatusText = window.Vue.computed(() => {
-    if (assessmentType.value === ACTIVITY_TYPE_DUE_WORK) {
+    if (cellInfo.value === null) {
+        return "";
+    }
+    if (cellInfo.value.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK) {
         return "Submission History";
     }
-    if (assessmentType.value === ACTIVITY_TYPE_TASK) {
+    if (cellInfo.value.activity.assessmentType === ACTIVITY_TYPE_TASK) {
         return "Student View";
     }
-    if (assessmentType.value === ACTIVITY_TYPE_PROJECT) {
+    if (cellInfo.value.activity.assessmentType === ACTIVITY_TYPE_PROJECT) {
         return "View Progress";
     }
     return "View Attempts";
@@ -145,9 +200,18 @@ const viewStatusText = window.Vue.computed(() => {
  *  an array of items corresponding to recent activity events.
  */
 async function getActivity(): Promise<void> {
+    if (cellInfo.value === null) {
+        throw new Error("No selected cell to fetch activity for");
+    }
+
+    const route = routes.value.dataEndpoint;
+    if (route === null) {
+        throw new Error("Unable to find route for retrieving activity items");
+    }
+
     try {
         isLoading.value = true;
-        const response = await fetch(routes.value.dataEndpoint, {
+        const response = await fetch(route, {
             headers: {
                 "Content-Type": "application/json",
                 Accept: "application/json",
@@ -183,31 +247,16 @@ function reloadMarkbook(): void {
 
     // reload the markbook
     document.getElementById("submit_button")?.click();
-
-    /**
-     * disable the markbook popout
-     */
-    const elements = document.querySelectorAll("[data-pop-out-menu]");
-    elements.forEach((cell) => {
-        delete (cell as HTMLElement).dataset.popOutMenu;
-    });
 }
 
 /**
  * UI toggle student to exclusion display
  * are change from excluded included and visa-versa
+ * @param participant - The participant to toggle exclusion for
  */
-function toggleExclusion(): void {
+function toggleExclusion(participant: MarkbookClassImplActivityParticipant): void {
     // invert the excluded option that is currently the only post system
-    isExcluded.value = !isExcluded.value;
-    // update the data location in html, so if you click back in it doesn't break...
-    const element = referenceElement.value;
-    if (element) {
-        element.classList.toggle("excluded");
-        const currentValue = element.getAttribute("data-is-excluded");
-        const newValue = currentValue === "true" ? "false" : "true";
-        element.setAttribute("data-is-excluded", newValue);
-    }
+    participant.isExcluded = !participant.isExcluded;
 }
 
 /**
@@ -215,7 +264,14 @@ function toggleExclusion(): void {
  * @param target - The URL we want to navigate to.
  * @param action - Should we redirect, or do a specific action? (exclude,publish)
  */
-async function onMenuItemSelected(target: string, action: string | null = null): Promise<void> {
+async function onMenuItemSelected(target: string | null, action: string | null = null): Promise<void> {
+    // No target was specified, the user likely doesn't have access to the route
+    if (target === null) {
+        hasLoadError.value = true;
+        console.warn("No target specified for menu item selection");
+        return;
+    }
+
     // No specific action, just redirect
     if (action === null) {
         // we should append the returnUrl, for all calls, so we can get back to the markbook on save.
@@ -223,6 +279,12 @@ async function onMenuItemSelected(target: string, action: string | null = null):
         window.location.href = target + returnUrl;
         return;
     }
+
+    if (cellInfo.value === null) {
+        throw new Error("No selected cell to perform action on");
+    }
+
+    const { activity, participant } = cellInfo.value;
 
     // Not as basic redirect, js fetch things...
     try {
@@ -238,12 +300,12 @@ async function onMenuItemSelected(target: string, action: string | null = null):
             hasLoadError.value = false;
 
             // if action is exclude then toggle the exclusion UI
-            if (action === "exclude") {
-                toggleExclusion();
+            if (action === "exclude" && participant !== null) {
+                toggleExclusion(participant);
             }
 
             // If including student reload the activity list
-            if (assessmentType.value === ACTIVITY_TYPE_DUE_WORK) {
+            if (activity.assessmentType === ACTIVITY_TYPE_DUE_WORK) {
                 await getActivity();
             } else {
                 activityItems.value = [];
@@ -304,20 +366,22 @@ async function openPopOut(): Promise<void> {
 }
 
 /**
- * A linked button has been selected so populate the pop out
- * @param event - the event fired from the mark book
+ * React to changes in the selected popout cell
  */
-function onPopOutSelected(event: CustomEvent<PopOutMenuMarkbookSelectedEvent>): void {
-    // Make sure we're not reloading a menu we already have open.
-    if (referenceElement.value !== event.detail.target) {
-        routes.value = event.detail.routes;
-        isExpanded.value = false;
-        isExcluded.value = event.detail.isExcluded;
-        isParticipant.value = event.detail.isParticipant;
-        assessmentType.value = event.detail.assessmentType;
-        referenceElement.value = event.detail.target;
+window.Vue.watch(
+    () => mbStore.popoutSelectedCell,
+    () => {
+        if (cellInfo.value === null) {
+            // The popout was closed by something else
+            referenceElement.value = null;
+            return;
+        }
 
-        if (assessmentType.value === ACTIVITY_TYPE_TASK || assessmentType.value === ACTIVITY_TYPE_PROJECT) {
+        // A linked button has been selected so populate the pop out
+        referenceElement.value = cellInfo.value.referenceElement;
+        isExpanded.value = false;
+
+        if ([ACTIVITY_TYPE_TASK, ACTIVITY_TYPE_PROJECT].includes(cellInfo.value.activity.assessmentType)) {
             hasLoadError.value = false;
             isLoading.value = false;
             activityItems.value = [];
@@ -326,23 +390,9 @@ function onPopOutSelected(event: CustomEvent<PopOutMenuMarkbookSelectedEvent>): 
 
         void getActivity();
         void openPopOut();
-    }
-}
-
-/**
- * Start listening for selection events
- * Currently dispatched from library/Schoolbox/Learning/Markbook/templates/markbookOuter.twig
- */
-window.Vue.onMounted(() => {
-    document.addEventListener(EVENT_POP_OUT_MENU_MARKBOOK_SELECTED, onPopOutSelected);
-});
-
-/**
- * Remove the added listeners
- */
-window.Vue.onUnmounted(() => {
-    document.removeEventListener(EVENT_POP_OUT_MENU_MARKBOOK_SELECTED, onPopOutSelected);
-});
+    },
+    { immediate: true },
+);
 
 /**
  * Translate types into more human-readable "action" format.
@@ -390,7 +440,7 @@ function onToggleSelected(): void {
                 </div>
             </pop-out-menu-item>
         </div>
-        <div v-else-if="isLoading && !hasLoadError" class="pop-out-menu__loader">
+        <div v-else-if="isLoading || cellInfo === null" class="pop-out-menu__loader">
             <div class="loader"></div>
         </div>
         <div v-else ref="markbookElement" class="pop-out-menu" :class="{ 'is-expanded': isExpanded }">
@@ -404,7 +454,7 @@ function onToggleSelected(): void {
                 </small-card>
             </div>
             <div class="pop-out-menu__options">
-                <template v-if="assessmentType !== ACTIVITY_TYPE_PROJECT">
+                <template v-if="cellInfo.activity.assessmentType !== ACTIVITY_TYPE_PROJECT">
                     <pop-out-menu-item
                         :class="{ 'is-disabled': isExpansionDisabled || isActivityEmpty }"
                         @selected="onToggleSelected()"
@@ -412,10 +462,16 @@ function onToggleSelected(): void {
                         {{ viewAllText }}
                     </pop-out-menu-item>
                 </template>
-                <template v-if="assessmentType === ACTIVITY_TYPE_DUE_WORK && !isExcluded">
+                <template
+                    v-if="
+                        cellInfo.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK &&
+                        cellInfo.participant &&
+                        !cellInfo.participant.isExcluded
+                    "
+                >
                     <pop-out-menu-divider />
                     <pop-out-menu-item
-                        v-if="!isExcluded"
+                        v-if="!cellInfo.participant.isExcluded"
                         :class="{ 'is-disabled': !routes.updateRoute }"
                         @selected="onMenuItemSelected(routes.updateRoute)"
                     >
@@ -435,26 +491,29 @@ function onToggleSelected(): void {
                     </pop-out-menu-item>
                 </template>
                 <pop-out-menu-item
-                    v-if="isExcluded && isParticipant"
-                    :class="{ 'is-disabled': !isExcluded }"
+                    v-if="cellInfo.participant && cellInfo.participant.isExcluded"
+                    :class="{ 'is-disabled': !routes.includeRoute || !cellInfo.participant.isExcluded }"
                     @selected="onMenuItemSelected(routes.includeRoute, 'exclude')"
                 >
                     Include Student
                 </pop-out-menu-item>
                 <pop-out-menu-item
-                    v-if="!isExcluded && assessmentType !== ACTIVITY_TYPE_PROJECT"
-                    :class="{ 'is-disabled': isExcluded }"
+                    v-if="
+                        cellInfo.participant &&
+                        !cellInfo.participant.isExcluded &&
+                        cellInfo.activity.assessmentType !== ACTIVITY_TYPE_PROJECT
+                    "
                     @selected="excludeCheck()"
                 >
                     Exclude Student
                 </pop-out-menu-item>
                 <pop-out-menu-item
-                    v-if="!isExcluded"
+                    v-if="cellInfo.participant && !cellInfo.participant.isExcluded"
                     :class="{
                         'is-disabled':
                             !routes.historyRoute ||
-                            isExcluded ||
-                            (isActivityEmpty && assessmentType === ACTIVITY_TYPE_DUE_WORK),
+                            cellInfo.participant.isExcluded ||
+                            (isActivityEmpty && cellInfo.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK),
                     }"
                     @selected="onMenuItemSelected(routes.historyRoute)"
                 >

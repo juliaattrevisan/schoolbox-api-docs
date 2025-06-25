@@ -125,15 +125,41 @@ function formatMark(mark: NonNullable<typeof participant.value>["marks"]["publis
     const relevantMark = mbStore.showDisplayMarks ? mark.hr : mark.hrInstructor;
     return relevantMark ?? "–";
 }
+
+const cellEl = window.Vue.useTemplateRef<HTMLTableCellElement>("cellEl");
+
+/**
+ * When the user clicks the cell, open the pop-out menu if available, otherwise do nothing
+ */
+function onClickCell(): void {
+    if (hasPopOutMenu.value && cellEl.value) {
+        mbStore.popoutSelectedCell = {
+            classImplId: props.classImplId,
+            studentId: props.studentId,
+            activityId: props.assessmentId,
+            referenceElement: cellEl.value,
+        };
+    }
+}
+
+const isSelected = window.Vue.computed(
+    () =>
+        mbStore.popoutSelectedCell &&
+        mbStore.popoutSelectedCell.classImplId === props.classImplId &&
+        mbStore.popoutSelectedCell.studentId === props.studentId &&
+        mbStore.popoutSelectedCell.activityId === props.assessmentId,
+);
 </script>
 
 <template>
     <td
         v-if="mbStore.data && classImpl && assessment && student"
+        ref="cellEl"
         class="student-grade-cell"
-        :class="{ excluded: !participant || participant.isExcluded }"
+        :class="{ excluded: !participant || participant.isExcluded, 'is-selected': isSelected }"
         :data-test="`markbook-cell-${assessment.id}-${student.id}`"
         :data-pop-out-menu="hasPopOutMenu || undefined"
+        @click="onClickCell"
     >
         <template v-if="participant === null || participant.isExcluded"></template>
         <div v-else-if="participant.progressTick" style="display: flex; justify-content: center">

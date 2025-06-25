@@ -29,36 +29,35 @@ export type MarkbookActivity = Pick<Activity, "id" | "title" | "assessmentType">
     };
 };
 
+export type MarkbookClassImplActivityParticipant = {
+    isExcluded: boolean;
+    hasSubmittedResponse: boolean;
+    hasPublishedFeedback: boolean;
+    resubmissionRequired: boolean;
+    progressTick: Activity["progressTick"] | null;
+    marks: Record<
+        "published" | "draft",
+        {
+            norm: number | null;
+            hr: string | null;
+            hrInstructor: string | null;
+            comment: string | null;
+        } | null
+    >;
+    /** the following are only used the class markbook at the moment: */
+    isResponseRequired?: boolean;
+    isFeedbackRequired?: boolean;
+    isReviewComplete?: boolean;
+    plan?: {
+        isDynamic: boolean;
+        name: string | null;
+        dueDate: string | null;
+    };
+};
+
 export type MarkbookClassImplActivity = {
     id: number;
-    participants: Record<
-        ParticipantId,
-        {
-            isExcluded: boolean;
-            hasSubmittedResponse: boolean;
-            hasPublishedFeedback: boolean;
-            resubmissionRequired: boolean;
-            progressTick: Activity["progressTick"] | null;
-            marks: Record<
-                "published" | "draft",
-                {
-                    norm: number | null;
-                    hr: string | null;
-                    hrInstructor: string | null;
-                    comment: string | null;
-                } | null
-            >;
-            /** the following are only used the class markbook at the moment: */
-            isResponseRequired?: boolean;
-            isFeedbackRequired?: boolean;
-            isReviewComplete?: boolean;
-            plan?: {
-                isDynamic: boolean;
-                name: string | null;
-                dueDate: string | null;
-            };
-        }
-    >;
+    participants: Partial<Record<ParticipantId, MarkbookClassImplActivityParticipant>>;
     stats: {
         mean?: string | null;
         draftMean?: string | null;
@@ -154,3 +153,12 @@ export interface Markbook {
     /** A list of available visibilities, currently only used on the class markbook */
     availableVisibilities: number[];
 }
+
+/** -------- other types -------- */
+
+export type MarkbookSelectedCellInfo = {
+    classImplId: number;
+    studentId: UserId;
+    activityId: MarkbookActivity["id"];
+    referenceElement: HTMLTableCellElement;
+};
