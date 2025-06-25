@@ -22,7 +22,8 @@ use SensitiveParameter;
 
 class Download implements IStrategy
 {
-    private IPhotoDownloader $photoDownloader;
+    private RestPhotoDownloader|BatchPhotoDownloader $photoDownloader;
+
 
     /**
      * The photo downloader chooses between the BatchXML zip archive and
