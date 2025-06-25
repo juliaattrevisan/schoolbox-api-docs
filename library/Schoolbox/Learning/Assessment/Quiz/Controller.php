@@ -158,6 +158,8 @@ class Controller extends Assessment\Controller
      *
      * This place is Staff Only
      *
+     * @api GET /learning/assessment/:assessmentId/status
+     *
      * @param IAssessable $assessment
      * @throws ApiException
      * @throws DefinitionException
@@ -173,8 +175,6 @@ class Controller extends Assessment\Controller
      * @throws \InvalidArgumentException
      * @throws \JsonException
      * @throws \LogicException
-     * @api GET /learning/assessment/:assessmentId/status
-     *
      */
     public function getStatus(IAssessable $assessment): void
     {
@@ -284,11 +284,6 @@ class Controller extends Assessment\Controller
             'returnUrl' => Redirect::encode($baseUrl),
             'returnUrlSuffix' => $returnUrlSuffix
         ];
-
-        // shortcut if course status view, as we are building the twig elsewhere...
-        if ($courseView) {
-            return $twigData;
-        }
 
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/quiz/status.twig',

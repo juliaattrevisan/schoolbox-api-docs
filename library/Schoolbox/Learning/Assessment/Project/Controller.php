@@ -150,8 +150,8 @@ class Controller extends Assessment\Controller
      *
      * This place is Staff Only
      *
-     * @param Project|IAssessable $assessment
      * @api GET /learning/assessment/:assessmentId/status
+     * @param Project|IAssessable $assessment
      */
     public function getStatus(IAssessable $assessment): void
     {
@@ -181,11 +181,6 @@ class Controller extends Assessment\Controller
                 ? Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL))
                 : $this->getSession()->getHistory(),
         ];
-
-        // shortcut if course status view, as we are building the twig elsewhere...
-        if ($courseView) {
-            return $twigData;
-        }
 
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/project/status/staff.twig',

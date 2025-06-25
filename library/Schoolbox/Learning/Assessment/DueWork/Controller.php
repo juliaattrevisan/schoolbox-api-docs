@@ -254,7 +254,6 @@ class Controller extends Assessment\Controller
      * This place is Staff Only
      *
      * @param Model $assessment
-     * @param bool $courseView
      * @throws InvalidArgumentException If assessment due date is null.
      * @throws PDOException
      * @throws UnexpectedValueException
@@ -304,11 +303,6 @@ class Controller extends Assessment\Controller
              */
             'draftResponses' => $draftResponses
         ];
-
-//        // shortcut if course status view, as we are building the twig elsewhere...
-//        if ($courseView) {
-//            return $twigData;
-//        }
 
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/dueWork/status.twig',

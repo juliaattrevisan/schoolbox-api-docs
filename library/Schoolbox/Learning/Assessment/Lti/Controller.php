@@ -180,30 +180,23 @@ class Controller extends Assessment\Controller
     /**
      * Placeholder for progress summary for all students on an LTI assessment.
      *
-     * @param IAssessable|Model $assessment
      * @api GET /learning/assessment/:assessmentId/status
      * @since 21.1.0
      *
+     * @param IAssessable|Model $assessment
      */
-    public function getStatus(IAssessable $assessment): void
+    public function getStatus(IAssessable $assessment)
     {
-        $twigData = [
-            'type'        => Assessment\AssessmentType::objectToString($assessment),
-            'assessment'  => $assessment,
-            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())
-                ->add([ $assessment->getTitle(), '' ]),
-            'message'      => strip_tags($this->requestQuery->get('lti_msg', '')),
-            'errorMessage' => strip_tags($this->requestQuery->get('lti_errormsg', '')),
-        ];
-
-        // shortcut if course status view, as we are building the twig elsewhere...
-        if ($courseView) {
-            return $twigData;
-        }
-
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/lti/status.twig',
-            $twigData,
+            [
+                'type'        => Assessment\AssessmentType::objectToString($assessment),
+                'assessment'  => $assessment,
+                'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())
+                                                   ->add([ $assessment->getTitle(), '' ]),
+                'message'      => strip_tags($this->requestQuery->get('lti_msg', '')),
+                'errorMessage' => strip_tags($this->requestQuery->get('lti_errormsg', '')),
+            ],
             "Status of {$assessment->getTitle()}",
             'submission'
         );
