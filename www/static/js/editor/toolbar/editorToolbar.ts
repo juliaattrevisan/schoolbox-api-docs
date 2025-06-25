@@ -66,6 +66,8 @@ export function getToolbar(config: SbxEditorConfig): ToolbarConfig {
         ];
     } else {
         items = [
+            "fullscreen",
+            "|",
             "bold",
             "italic",
             {
