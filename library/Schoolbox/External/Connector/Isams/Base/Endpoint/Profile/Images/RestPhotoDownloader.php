@@ -48,7 +48,7 @@ class RestPhotoDownloader implements IPhotoDownloader
      * @throws ApiException
      * @param LoggerInterface $log
      */
-    public function __construct(#[SensitiveParameter] array $credentials, private LoggerInterface $log,)
+    public function __construct(#[SensitiveParameter] array $credentials, private LoggerInterface $log)
     {
         /* Store this locally just once
          */
@@ -137,6 +137,11 @@ class RestPhotoDownloader implements IPhotoDownloader
 
 
     /**
+     * $identifier is the isams internal identifier that they need for the rest api urls.
+     *
+     * The internal id is in "Id" and the value we use for external id is "PersonId".
+     * The identifier used here is the isams internal id, which is NOT the same as their external id.
+     *
      * @inheritDoc
      */
     public function getLatestPhotoId(string $roleType = Role::STUDENT, string|int|null $identifier = null): ?int
@@ -153,9 +158,7 @@ class RestPhotoDownloader implements IPhotoDownloader
                 $userObj =  $this->api->request($url, 'GET');
                 break;
             case Role::STAFF:
-                /* The internal id is in "Id" and the value we use for external id is "PersonId".
-                 * The identifier used here is the isams internal id, which is NOT the same as their external id.
-                 */
+
                 $url = sprintf('Main/api/humanresources/employees/%s', $identifier);
 
                 $this->log->debug(sprintf(
@@ -164,7 +167,6 @@ class RestPhotoDownloader implements IPhotoDownloader
                 ));
 
                 $userObj = $this->api->request($url, 'GET');
-
                 break;
             default:
                 return null;
