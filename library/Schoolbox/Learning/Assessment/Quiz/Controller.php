@@ -176,7 +176,7 @@ class Controller extends Assessment\Controller
      * @api GET /learning/assessment/:assessmentId/status
      *
      */
-    public function getStatus(IAssessable $assessment)
+    public function getStatus(IAssessable $assessment): void
     {
         $baseUrl = $this->getRouteIfAuthorized('learningAssessment.getStatus', ['assessmentId' => $assessment->getId(), 'assessment' => $assessment]);
         $returnUrlSuffix = Redirect::queryString($baseUrl);

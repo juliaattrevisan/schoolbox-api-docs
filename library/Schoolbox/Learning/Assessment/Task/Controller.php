@@ -130,7 +130,7 @@ class Controller extends Assessment\Controller
      * @throws MapperException
      * @api GET /learning/assessment/:assessmentId/status
      */
-    public function getStatus(IAssessable $assessment)
+    public function getStatus(IAssessable $assessment): void
     {
         // Ensure completions are sorted most recent first
         foreach ($assessment->getAllParticipants() as $participant) {

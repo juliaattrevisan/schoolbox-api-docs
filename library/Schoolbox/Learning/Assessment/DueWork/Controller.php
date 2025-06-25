@@ -260,7 +260,7 @@ class Controller extends Assessment\Controller
      * @throws UnexpectedValueException
      * @api GET /learning/assessments/:assessmentId/status
      */
-    public function getStatus(IAssessable $assessment)
+    public function getStatus(IAssessable $assessment): void
     {
         /* Find out which users have a draft submission
          * MAYBE you can do this purely in twig...but I'm not enamourd by frontend making

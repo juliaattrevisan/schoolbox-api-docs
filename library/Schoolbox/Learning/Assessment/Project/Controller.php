@@ -153,7 +153,7 @@ class Controller extends Assessment\Controller
      * @param Project|IAssessable $assessment
      * @api GET /learning/assessment/:assessmentId/status
      */
-    public function getStatus(IAssessable $assessment)
+    public function getStatus(IAssessable $assessment): void
     {
 
         // Calculate summary totals for display purposes

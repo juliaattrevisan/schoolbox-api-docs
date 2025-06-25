@@ -185,7 +185,7 @@ class Controller extends Assessment\Controller
      * @since 21.1.0
      *
      */
-    public function getStatus(IAssessable $assessment)
+    public function getStatus(IAssessable $assessment): void
     {
         $twigData = [
             'type'        => Assessment\AssessmentType::objectToString($assessment),
