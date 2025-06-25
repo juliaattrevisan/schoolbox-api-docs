@@ -510,6 +510,7 @@ class UserAccessMapper extends Mapper
     {
         $userMapper = $this->getJoinMapper('user');
         $roleMapper = $userMapper->getJoinMapper('role');
+        $campusMapper = $userMapper->getJoinMapper('userCampus');
 
         $pb = new Builder($userMapper->getDatabase()->getQuoter(), 'u');
         $pb->equals('ua.service', $service);
@@ -526,7 +527,8 @@ class UserAccessMapper extends Mapper
         $query = "
             SELECT
                 {$this->getJoinColumnString('user', 'u')},
-                {$roleMapper->getColumnString( 'r')}
+                {$roleMapper->getColumnString( 'r')},
+                ua.sid AS serviceId,
             FROM
                 `{$this->getTable()}` ua
             INNER JOIN {$this->getJoinSql('user', 'ua', 'u')}
@@ -538,12 +540,33 @@ class UserAccessMapper extends Mapper
         $stmt = $this->getDatabase()->prepare($query);
         $stmt->execute($pb->getParams());
 
+        if (UserAccess::SERVICE_CALENDAR === $service) {
+            $campusIds = $campusMapper->findAllIds();
+        }
+
+        if (UserAccess::SERVICE_IMPERSONATOR === $service) {
+            $roleIds = $roleMapper->findAllIds();
+        }
+
         $userCollection = $this->getJoinMapper('user')->createCollection();
         foreach ($stmt as $row) {
             $role = $roleMapper->hydrate($row, 'r');
             $user = $this->hydrateJoin($row, 'user', 'u');
             $user->setRole($role);
 
+            /* If the role or campus don't exist or deleted. skip it.
+             */
+            if (
+                UserAccess::SERVICE_CALENDAR === $service &&
+                !in_array($row['serviceId'], $campusIds ?? [])
+            ) {
+                continue;
+            } else if (
+                UserAccess::SERVICE_IMPERSONATOR === $service &&
+                !in_array($row['serviceId'], $roleIds ?? [])
+            ) {
+                continue;
+            }
             $userCollection->add($user);
         }
         return $userCollection;
