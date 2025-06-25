@@ -660,7 +660,7 @@ class Controller extends WebController\Base
         foreach ($assessments as $assessment) {
             $classes[$assessment->getId()] = [
                 'title' => $assessment->getBaseContext()->getFolder()->getNameWithCodes(),
-                'twigData' => $assessmentController->getStatus($assessment, true),
+                'twigData' => $assessmentController->getStatus($assessment),
             ];
         }
         $twigData = [

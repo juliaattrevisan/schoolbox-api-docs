@@ -159,7 +159,6 @@ class Controller extends Assessment\Controller
      * This place is Staff Only
      *
      * @param IAssessable $assessment
-     * @param bool $courseView
      * @throws ApiException
      * @throws DefinitionException
      * @throws Deleted
@@ -177,7 +176,7 @@ class Controller extends Assessment\Controller
      * @api GET /learning/assessment/:assessmentId/status
      *
      */
-    public function getStatus(IAssessable $assessment, bool $courseView = false)
+    public function getStatus(IAssessable $assessment)
     {
         $baseUrl = $this->getRouteIfAuthorized('learningAssessment.getStatus', ['assessmentId' => $assessment->getId(), 'assessment' => $assessment]);
         $returnUrlSuffix = Redirect::queryString($baseUrl);
