@@ -5,15 +5,18 @@
  * when a user clicks the icon to insert an equation.
  */
 
-import { View, ButtonView, submitHandler, icons } from "ckeditor5";
+import { View, ButtonView, submitHandler, IconView, IconCheck, IconCancel } from "ckeditor5";
 
 export default class EqnEditorView extends View {
     constructor(locale) {
         super(locale);
-
-        this.saveButtonView = this._createButton("Save", icons.check, "ck-button-save");
+        const iconCheck = new IconView();
+        iconCheck.content = IconCheck;
+        this.saveButtonView = this._createButton("Save", iconCheck.content, "ck-button-save");
         this.saveButtonView.type = "submit";
-        this.cancelButtonView = this._createButton("Cancel", icons.cancel, "ck-button-cancel");
+        const iconCancel = new IconView();
+        iconCancel.content = IconCancel;
+        this.cancelButtonView = this._createButton("Cancel", iconCancel.content, "ck-button-cancel");
         // Delegate ButtonView#execute to FormView#cancel.
         this.cancelButtonView.delegate("execute").to(this, "cancel");
 
@@ -77,6 +80,7 @@ export default class EqnEditorView extends View {
         button.set({
             label,
             icon,
+            withText: true,
             tooltip: true,
             class: className,
         });
