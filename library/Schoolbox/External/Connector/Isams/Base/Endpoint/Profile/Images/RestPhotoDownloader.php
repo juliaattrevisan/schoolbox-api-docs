@@ -25,8 +25,21 @@ use SensitiveParameter;
  */
 class RestPhotoDownloader implements IPhotoDownloader
 {
+    /**
+     * A set of (isams internal identifier, sis photo id) tuples that remember when we fetched
+     * a picture for someone; if they never had a sis photo id, we'll get the latest one.
+     * Otherwise we'll use the one specified there.
+     *
+     * @var array
+     */
     private array $photoCache = [];
+
+
+    /**
+     * @var Api
+     */
     private Api $api;
+
 
     /**
      * Constructor.
