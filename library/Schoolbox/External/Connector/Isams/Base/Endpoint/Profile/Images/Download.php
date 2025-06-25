@@ -94,6 +94,13 @@ class Download implements IStrategy
         $users = $this->baseProfileMapper->findByColumn('external_id', $this->registry->keys());
 
         foreach ($this->registry->recallAll() as $externalId => $data) {
+            $this->log->debug(sprintf(
+                'Processing photo for %s %s (%s)',
+                $data['person']['firstname'],
+                $data['person']['lastname'],
+                $externalId
+            ));
+
             /**
              * we are only wanting to update the profile photo if
              * the sis photo has been updated,

@@ -151,7 +151,7 @@ class RestPhotoDownloader implements IPhotoDownloader
                 $url = sprintf('Main/api/students/%s', $identifier);
 
                 $this->log->debug(sprintf(
-                    'Looking for the latest student profile picture at %s',
+                    'Looking for the latest student profile picture identifier at %s',
                     $url
                 ));
 
@@ -161,7 +161,7 @@ class RestPhotoDownloader implements IPhotoDownloader
                 $url = sprintf('Main/api/humanresources/employees/%s', $identifier);
 
                 $this->log->debug(sprintf(
-                    'Looking for the latest staff profile picture at %s',
+                    'Looking for the latest staff profile picture identifier at %s',
                     $url
                 ));
 
