@@ -118,13 +118,31 @@ class Download implements IStrategy
 
             /* We can detect when an identifier is different in isams than what we previously knew.
              * This gives us a clue as to when a profile picture is different than before.
+             *
+             * Note that $newSisPhotoId itself might be null, because it's latestPhotoId is also null
+             * in isams land, via their api. In that case, that person probably never had a picture.
              */
             $this->log->debug(sprintf(
                 'Comparing old sis photo id %s to new sis photo id %s',
                 $data['person']['sisPhotoId'] ?? '(null)',
-                $newSisPhotoId,
+                $newSisPhotoId ?? '(null)',
             ));
 
+            if (null === $newSisPhotoId) {
+                $this->log->info(sprintf(
+                    '%s %s (%s) has a null latest photo identifier; probably no picture exists. Skipping.',
+                    $data['person']['firstname'],
+                    $data['person']['lastname'],
+                    $externalId
+                ));
+
+                continue;
+            }
+
+            /* If a person never had a profile picture,
+             * or someone changed the profile picture in the sis,
+             * we need to update our own records to know about the newest ones.
+             */
             if (null === $data['person']['portrait'] || $newSisPhotoId !== $data['person']['sisPhotoId']) {
                 $this->log->info(sprintf(
                     'Downloading profile photo for %s %s (%s)',
@@ -140,6 +158,11 @@ class Download implements IStrategy
                 $baseProfile->setMetadata((new Metadata\Builder())->build(['profile' => [
                     'sisPhotoId' => $newSisPhotoId
                 ]]));
+
+                $this->log->debug(sprintf(
+                    'Updating sisPhotoId metadata to new value %s',
+                    $newSisPhotoId
+                ));
 
                 /* Persist this so changing the id in the sis_user_profile.metadata column
                  * causes a photo retrieval

@@ -158,7 +158,6 @@ class RestPhotoDownloader implements IPhotoDownloader
                 $userObj =  $this->api->request($url, 'GET');
                 break;
             case Role::STAFF:
-
                 $url = sprintf('Main/api/humanresources/employees/%s', $identifier);
 
                 $this->log->debug(sprintf(
@@ -171,6 +170,9 @@ class RestPhotoDownloader implements IPhotoDownloader
             default:
                 return null;
         }
+
+        /* Note that $userObj['latestPhotoId'] might actually be null in isams land.
+         */
 
         /**
          * ignore all user data other than the latestPhotoId
