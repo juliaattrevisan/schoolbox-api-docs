@@ -67,11 +67,11 @@ class RestPhotoDownloader implements IPhotoDownloader
      * the school's updated a picture in isams: it'll be different id in that circumstance.
      * Also, we need to use that in a url for an api request to obtain the picture's binary data.
      */
-    public function getPhoto(string $roleType, string $identifier, int $sisPhotoId): ?string
+    public function getPhoto(string $roleType, string $identifier, ?int $sisPhotoId): ?string
     {
         switch ($roleType) {
             case Role::STUDENT:
-                if (!isset($this->photoCache[$identifier])) {
+                if (!isset($this->photoCache[$identifier]) || null === $sisPhotoId) {
                     // fetch the latest portrait
                     $url = sprintf('Main/api/students/%s/photos/current', $identifier);
 
@@ -93,7 +93,7 @@ class RestPhotoDownloader implements IPhotoDownloader
                 return $this->api->request(path: $url, method: 'GET', raw: true);
 
             case Role::STAFF:
-                if (!isset($this->photoCache[$identifier])) {
+                if (!isset($this->photoCache[$identifier]) || null === $sisPhotoId) {
                     // fetch the latest portrait
                     $url = sprintf('Main/api/humanresources/employees/%s/photos/current', $identifier);
 
