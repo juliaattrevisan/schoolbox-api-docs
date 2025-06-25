@@ -118,6 +118,19 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
         }));
     }
 
+    /**
+     * Retrieve an ordered list of students for a class implementation
+     * This is the source of truth for the order of students in the markbook
+     * @param classImpl - The class implementation
+     * @returns ordered students
+     */
+    function orderedClassImplStudents(classImpl: MarkbookClassImpl): MarkbookClassImpl["students"][number][] {
+        // alphabetical order by lastName then givenName
+        return Object.values(classImpl.students).sort(
+            (a, b) => a.lastName.localeCompare(b.lastName) || a.givenName.localeCompare(b.givenName),
+        );
+    }
+
     return {
         init,
         data,
@@ -128,6 +141,7 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
         activityGroups,
         orderedActivities,
         orderedClassImplActivities,
+        orderedClassImplStudents,
         popoutSelectedCell,
     };
 });

@@ -34,7 +34,6 @@ window.Vue.onMounted(() => {
     );
 });
 
-// todo: sequencing
 // todo: check performance
 // todo: split files a bit
 </script>

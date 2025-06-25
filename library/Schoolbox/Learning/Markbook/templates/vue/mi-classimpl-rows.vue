@@ -44,6 +44,12 @@ const orderedClassImplActivities = window.Vue.computed(() => {
 
     return mbStore.orderedClassImplActivities(classImpl.value);
 });
+
+const orderedClassImplStudents = window.Vue.computed(() => {
+    if (classImpl.value === null) return [];
+
+    return mbStore.orderedClassImplStudents(classImpl.value);
+});
 </script>
 
 <template>
@@ -105,7 +111,7 @@ const orderedClassImplActivities = window.Vue.computed(() => {
             </template>
         </tr>
 
-        <tr v-for="student in classImpl.students" :key="student.id">
+        <tr v-for="student in orderedClassImplStudents" :key="student.id">
             <th class="profile-cell fixed-left white">
                 <div class="c-card">
                     <div class="l-flex-row l-gap-m l-pad-s">
