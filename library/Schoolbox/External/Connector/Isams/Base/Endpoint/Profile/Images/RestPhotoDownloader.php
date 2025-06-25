@@ -47,7 +47,12 @@ class RestPhotoDownloader implements IPhotoDownloader
     }
 
     /**
-     * @inheritDoc
+     * This uses the roletype, internal identifier and sis photo identifier to construct a url
+     * to obtain a photo from the rest api.
+     *
+     * Ths sis photo identifier is stored in sis_user_profile.metadata and used to decide when
+     * the school's updated a picture in isams: it'll be different id in that circumstance.
+     * Also, we need to use that in a url for an api request to obtain the picture's binary data.
      */
     public function getPhoto(string $roleType, string $identifier, int $sisPhotoId): ?string
     {
@@ -56,9 +61,21 @@ class RestPhotoDownloader implements IPhotoDownloader
                 if (!isset($this->photoCache[$identifier])) {
                     // fetch the latest portrait
                     $url = sprintf('Main/api/students/%s/photos/current', $identifier);
+
+                    $this->log->debug(sprintf(
+                        'Getting the current %s photo from %s',
+                        $roleType,
+                        $url
+                    ));
                 } else {
                     // fetch a specific portrait
                     $url = sprintf('Main/api/students/%s/photos/%s', $identifier, $this->photoCache[$identifier]);
+
+                    $this->log->debug(sprintf(
+                        'Getting a specific %s photo from %s',
+                        $roleType,
+                        $url
+                    ));
                 }
                 return $this->api->request(path: $url, method: 'GET', raw: true);
 

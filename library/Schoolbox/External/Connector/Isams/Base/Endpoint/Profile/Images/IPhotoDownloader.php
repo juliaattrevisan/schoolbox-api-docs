@@ -9,8 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Profile\Images;
 
-use Schoolbox\Role;
-
 /**
  * Class IPhotoDownloader
  *
@@ -34,18 +32,6 @@ interface IPhotoDownloader
      * @throws \RuntimeException
      */
     public function downloadStaffPhotos(): void;
-
-
-    /**
-     * Get a photo's contents after decide if $personId has a picture
-     * Returns null if the file doesn't exist
-     *
-     * @param string $roleType should be one of the ROLE_* constants
-     * @param string $identifier
-     * @param int $sisPhotoId
-     * @return string|null
-     */
-    public function getPhoto(string $roleType, string $identifier, int $sisPhotoId): ?string;
 
 
     /**
