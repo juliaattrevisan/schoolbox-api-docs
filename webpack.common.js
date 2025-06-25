@@ -253,7 +253,6 @@ module.exports = {
 
         // Markbook
         markbookInner: "./library/Schoolbox/Learning/Markbook/templates/vue/markbookInner.ts",
-        popOutMenuMarkbook: "./vue/components/menu/popOutMenuMarkbook.ts",
 
         // Birthday pop up
         birthdaySurprise: "./vue/components/birthday/birthdaySurprise.ts",

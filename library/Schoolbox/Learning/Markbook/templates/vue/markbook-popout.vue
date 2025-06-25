@@ -13,10 +13,10 @@ import {
 import type { ActivityType } from "@schoolboxAssessment/Types/assessmentTypes";
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import { usePopOut } from "@schoolboxVue/composables/popOut/usePopOut";
-import SmallCard from "../card/small-card.vue";
-import PopOutMenuItem from "./pop-out-menu-item.vue";
-import PopOutMenuDivider from "./pop-out-menu-divider.vue";
-import UserPhoto from "../userPhoto/user-photo.vue";
+import SmallCard from "@schoolboxVue/components/card/small-card.vue";
+import PopOutMenuItem from "@schoolboxVue/components/menu/pop-out-menu-item.vue";
+import PopOutMenuDivider from "@schoolboxVue/components/menu/pop-out-menu-divider.vue";
+import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
 import { EVENT_POP_OUT_MENU_MARKBOOK_SELECTED } from "./popOutMenuMarkbookEvent";
 import type { PopOutMenuMarkbookSelectedEvent, PopOutMenuMarkbookRoutes } from "./popOutMenuMarkbookEvent";
 

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useMarkbookStore } from "./store/markbookStore";
+import MarkbookPopout from "./markbook-popout.vue";
 import MiClassAverageHeader from "./mi-class-average-header.vue";
 import MiClassimplRows from "./mi-classimpl-rows.vue";
 
@@ -211,6 +212,8 @@ window.Vue.onMounted(() => {
             </tbody>
         </table>
     </div>
+
+    <markbook-popout />
 </template>
 
 <style scoped>
