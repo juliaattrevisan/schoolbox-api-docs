@@ -100,7 +100,7 @@ class Download implements IStrategy
              * we don't have a photo for the user yet
              */
             try {
-                $sisPhotoId = $this->photoDownloader->getLatestPhotoId($data['person']['type'], $data['person']['internalId']);
+                $newSisPhotoId = $this->photoDownloader->getLatestPhotoId($data['person']['type'], $data['person']['internalId']);
             } catch (ApiException $e) {
                 $this->log->info(sprintf(
                     'Could not obtain portrait picture for %s %s (%s). Skipping',
@@ -122,10 +122,10 @@ class Download implements IStrategy
             $this->log->debug(sprintf(
                 'Comparing old sis photo id %s to new sis photo id %s',
                 $data['person']['sisPhotoId'] ?? '(null)',
-                $sisPhotoId,
+                $newSisPhotoId,
             ));
 
-            if (null === $data['person']['portrait'] || $sisPhotoId !== $data['person']['sisPhotoId']) {
+            if (null === $data['person']['portrait'] || $newSisPhotoId !== $data['person']['sisPhotoId']) {
                 $this->log->info(sprintf(
                     'Downloading profile photo for %s %s (%s)',
                     $data['person']['firstname'],
@@ -138,7 +138,7 @@ class Download implements IStrategy
 
                 // seeing as we are updating the photo, we need to remember this
                 $baseProfile->setMetadata((new Metadata\Builder())->build(['profile' => [
-                    'sisPhotoId' => $sisPhotoId
+                    'sisPhotoId' => $newSisPhotoId
                 ]]));
 
                 /* Persist this so changing the id in the sis_user_profile.metadata column
@@ -146,10 +146,10 @@ class Download implements IStrategy
                  */
                 $this->baseProfileMapper->save($baseProfile);
 
-                /* $data still has the old identifier in it at this point, not the new $sisPhotoId
+                /* $data still has the old identifier in it at this point, not the new $newSisPhotoId
                  * so update that first before attempting to retrieve it lol
                  */
-                $data['person']['sisPhotoId'] = $sisPhotoId;
+                $data['person']['sisPhotoId'] = $newSisPhotoId;
 
                 $this->importPortrait($baseProfile, $data);
             } else {
