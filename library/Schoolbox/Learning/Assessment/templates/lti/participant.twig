@@ -1,0 +1,159 @@
+{% set latestFeedback    = participant.findMostRecentInstructorGivenFeedback %}
+    {% set latestResponse    = participant.findMostRecentSubmittedResponse %}
+    {% set multipleResponses = participant.allResponses | length > 1 %}
+
+    {% set isPublished  = latestFeedback and latestFeedback.published %}
+    {% set canPublish   = latestFeedback and not isPublished %}
+
+    {% set pStatusClass   = participant.responseRequired ? statusIncomplete : (participant.feedbackRequired ? statusPending : statusReviewed) %}
+    {% set pTooltip       = participant.responseRequired ? labelIncomplete : (participant.feedbackRequired ? labelPending : labelReviewed) %}
+    {% set pStatusText    = pTooltip %}
+    {% set pActionSummary = routeLookupIfAuthorized('learningAssessment.getSummary', routeArgs) %}
+
+<li data-status="{{ pStatusClass }}"  data-participant="{{ participant.user.id }}" data-participant-name="{{ participant.user.fullName }}">
+    <div class="small-12 columns">
+        <div class="row actions-small-1">
+            <div class="flex-grade list-item">
+                {% include '@learningAssessment/fragments/lti/participantStatus.twig' with {
+                    participant: participant,
+                    statusClass: pStatusClass,
+                    statusText:  pStatusText,
+                    statusTip:   pTooltip,
+                    routeArgs:   routeArgs,
+                } only %}
+
+                {% if (latestFeedback.humanReadableMark ?? null) is not null %}
+                    {% set urgencyClass = latestFeedback ? urgency.marks(latestFeedback.normalisedMark) : '' %}
+                    <div class="grade {{ urgencyClass }}-bg">
+                        <span>{{ latestFeedback.humanReadableMark ?? ''}}</span>
+                    </div>
+                {% endif %}
+            </div>
+
+            {% set createAttemptIdBase = "createAttempt-" ~ participant.user.id %}
+            <nav>
+                <sbx-pop-out content-id="feedbackOptions-{{ participant.user.id }}"></sbx-pop-out>
+            </nav>
+
+            <ul id="feedbackOptions-{{ participant.user.id }}" class="f-dropdown" data-dropdown-content>
+                {%- apply spaceless %}
+                    {% if pActionSummary %}
+                        <li><a class="icon-history" href="{{ pActionSummary }}" title="View {{ participant.user.givenName }}'s attempt history">View Attempt History</a></li>
+                    {% endif %}
+                    <li><a href="#" data-collapser="{{ createAttemptIdBase }}-createScore" class="icon-due-work" title="Create score for {{ participant.user.givenName }}">Create Score</a></li>
+                {% endapply -%}
+            </ul>
+        </div>
+    </div>
+
+    <form
+            action="{{ routeLookup(
+                'learningAssessment.postCreateResponse',
+                {assessmentId: participant.assessable.id, studentId: participant.user.id })
+            }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}"
+            method="post"
+    >
+        <div
+                class="small-12 columns hide"
+                data-collapse-state="collapsed"
+                data-collapsable="{{ createAttemptIdBase }}-createScore"
+        >
+            <div class="row">
+                <div class="small-12 columns">
+                    <label for="{{ createAttemptIdBase }}-markingUser">
+                        Marking User
+                        <span data-tooltip
+                              class="has-tip tip-top hint"
+                              title="Which user marked the participant with this score? (3rd party assessments may not be able to determine who marked a student, thus the Anonymous option.)">?</span>
+                    </label>
+                    <select id="{{ createAttemptIdBase }}-markingUser" name="markingUser">
+                        <option value="">Anonymous</option>
+                        <option value="{{ participant.user.id }}">Participant ({{ participant.user.fullname }})</option>
+                        <option value="{{ USER.id }}">Current User ({{ USER.fullname }})</option>
+                    </select>
+                </div>
+                <div class="small-6 columns">
+                    <label class="checkbox-label" for="{{ createAttemptIdBase }}-isResponse">
+                        Response
+                        <span data-tooltip
+                              class="has-tip tip-top hint"
+                              title="If checked, this score will be created as a response by the participant.">?</span>
+                    </label>
+                    <div class="switch">
+                        <input id="{{ createAttemptIdBase }}-isResponse" name="isResponse" type="checkbox" value="1">
+                        <label for="{{ createAttemptIdBase }}-isResponse">
+                            <span class="icon-approve"></span>
+                            <span class="icon-cancel"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="small-6 columns">
+                    <label class="checkbox-label" for="{{ createAttemptIdBase }}-isFeedback">
+                        Feedback
+                        <span data-tooltip
+                              class="has-tip tip-top hint"
+                              title="If checked, this score will be created as a feedback for the participant.">?</span>
+                    </label>
+                    <div class="switch">
+                        <input id="{{ createAttemptIdBase }}-isFeedback" name="isFeedback" type="checkbox" value="1">
+                        <label for="{{ createAttemptIdBase }}-isFeedback">
+                            <span class="icon-approve"></span>
+                            <span class="icon-cancel"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="small-6 columns">
+                    <label for="{{ createAttemptIdBase }}-scoreGiven">Score Given</label>
+                    <input id="{{ createAttemptIdBase }}-scoreGiven" name="scoreGiven" type="number" inputmode="numeric" />
+                </div>
+                <div class="small-6 columns">
+                    <label for="{{ createAttemptIdBase }}-scoreMaximum">Score Maximum</label>
+                    <input id="{{ createAttemptIdBase }}-scoreMaximum" name="scoreMaximum" type="number" inputmode="numeric" value="{{ participant.assessable.scoreMaximum ?? '' }}" />
+                </div>
+                <div class="small-12 columns">
+                    <label for="{{ createAttemptIdBase }}-comment">Comment</label>
+                    <textarea id="{{ createAttemptIdBase }}-comment" name="comment" rows="5"></textarea>
+                </div>
+            </div>
+        </div>
+        <div
+                class="small-12 column no-pad hide"
+                data-collapse-state="collapsed"
+                data-collapsable="{{ createAttemptIdBase }}-createScore"
+        >
+            <div class="component-action">
+                <section>
+                    <div><button type="submit">Create Score</button></div>
+                </section>
+            </div>
+        </div>
+    </form>
+</li>
+<script type="text/javascript" src='{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}'></script>
+<script type="text/javascript">
+    $(function () {
+        $('[data-collapser="{{ createAttemptIdBase }}-createScore"]')
+            .on('click', () => {
+                // spawn the editor only after expanding once (for performance reasons with many students)
+                const editorId = "{{ createAttemptIdBase }}-comment";
+                if (window.sbProps.editors[editorId]) {
+                    return; // editor already exists, nothing to do
+                }
+                document.dispatchEvent(
+                    new CustomEvent("EDITOR__CREATE", {
+                        detail: {
+                            targetElements: [`#${editorId}`],
+                            showWordCount: true,
+                            hasTokens: true,
+                            toolbar: "comment_ai",
+                        },
+                    }),
+                );
+            })
+            .collapsable({
+                // we don't want to use the changing icon here, so force it to be the same
+                iconCollapsed: "icon-due-work",
+                iconExpanded: "icon-due-work",
+            });
+    });
+</script>
