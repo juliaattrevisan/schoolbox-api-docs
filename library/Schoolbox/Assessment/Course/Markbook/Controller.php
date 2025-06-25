@@ -10,80 +10,17 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Course\Markbook;
 
-use Alaress\Authorizer\Rule;
-use Alaress\Module\Module as BaseModule;
-use Alaress\Twig\Loader\IChainLoader;
-use Alaress\Web\Controller\Base;
-use DomainException;
-use InvalidArgumentException;
-use LogicException;
-use OutOfBoundsException;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
-use Schoolbox\Application\Exception as ApplicationException;
 use Schoolbox\Application\Exception\NotFound;
-use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as SubmissionReturnMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as StudentSubmissionMapper;
-use Schoolbox\Assessment\Course\Task\CompletionMapper as TaskResponseMapper;
-use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Rubric\DataModel\IndicatorMark\Mapper as RubricIndicatorMarkMapper;
-use Schoolbox\Assessment\Rubric\DataModel\Result\Mapper as RubricResultSetMapper;
 use Schoolbox\Assessment\Term;
-use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\Breadcrumb;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
 use Schoolbox\Learning\Assessment\Participant;
-use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
-use Schoolbox\Learning\Assessment\Task\Response\MapperProxy as TaskResponseDataSource;
-use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
-use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
-use Schoolbox\Learning\AssessmentContext;
-use Schoolbox\Learning\Authorizer\Rule\AssessmentNotDeleted;
-use Schoolbox\Learning\Authorizer\Rule\CanAcknowledgeAssessment;
-use Schoolbox\Learning\Authorizer\Rule\CanPreview;
-use Schoolbox\Learning\Authorizer\Rule\CanRespondToAssessment;
-use Schoolbox\Learning\Authorizer\Rule\CanSeeParticipation;
-use Schoolbox\Learning\Authorizer\Rule\CanViewAssessable;
-use Schoolbox\Learning\Assessment\DueWork\Authorizer\Rule\CanSelfAssess;
-use Schoolbox\Learning\Authorizer\Rule\IsAssessmentOpen;
-use Schoolbox\Learning\Authorizer\Rule\IsDeletionUnLocked;
-use Schoolbox\Learning\Authorizer\Rule\IsImplementation;
-use Schoolbox\Learning\Authorizer\Rule\IsInstructorOrHasHomepageAccess;
-use Schoolbox\Learning\Authorizer\Rule\IsInteractionUnLocked;
-use Schoolbox\Learning\Authorizer\Rule\IsModifyUnLocked;
-use Schoolbox\Learning\Authorizer\Rule\IsSafeExamBrowserRequired;
-use Schoolbox\Learning\Authorizer\Rule\IsSimilarityCheckEnabled;
-use Schoolbox\Learning\Authorizer\Rule\IsSpecification;
-use Schoolbox\Learning\Authorizer\Rule\ParticipantHasNoInteractions;
-use Schoolbox\Learning\Authorizer\Rule\ValidAssessmentType;
-use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
-use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\DueWork\StateMapper;
-use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\Learning\InlineGrader\StudentCarousel;
-use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
-use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
-use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
-use Schoolbox\Learning\Turnitin;
-use Schoolbox\LTI\Assessment\Mapper as LtiAssessmentMapper;
-use Schoolbox\LTI\Assessment\Score\Mapper as LtiAssessmentScoreMapper;
-use Schoolbox\LTI\Provider\Mapper as LtiToolMapper;
-use Schoolbox\Mapper;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\Storage\Mapper as StorageMapper;
-use Schoolbox\Role;
-use Schoolbox\User;
-use Schoolbox\UserMapper;
-use UnexpectedValueException;
 use Alaress\Web\Controller as WebController;
 use Schoolbox\Assessment\Course\Markbook\Export\CSV;
 use Schoolbox\Assessment\Course\Task\Completion;
@@ -644,11 +581,6 @@ class Controller extends WebController\Base
         ];
         // switch based on which assessment type
         if ($assessmentSpec instanceof \Schoolbox\Learning\Assessment\DueWork\Model) {
-            /** @var \Schoolbox\Learning\Assessment\DueWork\Controller $assessmentController */
-            $assessmentController = $this->fetchController(AssessmentType::TYPE_DUE_WORK);
-            $assessmentController->setUser($this->getUser())
-            ->setRouteGenerator($this->routeGenerator);
-
             // duework specific data
             $twigData['errors'] = StateMapper::getInstance()->listDisplayValues();
 
@@ -690,37 +622,17 @@ class Controller extends WebController\Base
 
             $template = '@courseMarkbook/status/duework.twig';
         } elseif ($assessmentSpec instanceof \Schoolbox\Learning\Assessment\Lti\Model) {
-            /** @var \Schoolbox\Learning\Assessment\Lti\Controller $assessmentController */
-            $assessmentController = $this->fetchController(AssessmentType::TYPE_LTI_ASSESSMENT);
-            $assessmentController->setUser($this->getUser())
-                ->setRouteGenerator($this->routeGenerator);
-
             $template = '@learningAssessment/lti/status.twig';
         } elseif ($assessmentSpec instanceof \Schoolbox\Learning\Assessment\Task\Model) {
-            /** @var \Schoolbox\Learning\Assessment\Task\Controller $assessmentController */
-            $assessmentController = $this->fetchController(AssessmentType::TYPE_TASK);
-            $assessmentController->setUser($this->getUser())
-                ->setRouteGenerator($this->routeGenerator);
-
             $template = '@courseMarkbook/status/task.twig';
         } elseif ($assessmentSpec instanceof \Schoolbox\Learning\Assessment\Quiz\Model) {
-            /** @var \Schoolbox\Learning\Assessment\Quiz\Controller $assessmentController */
-            $assessmentController = $this->fetchController(AssessmentType::TYPE_QUIZ);
-            $assessmentController->setUser($this->getUser())
-                ->setRouteGenerator($this->routeGenerator);
-
             $template = '@learningAssessment/quiz/status.twig';
+//            project doesn't have a status page yet
+//        } elseif ($assessmentSpec instanceof \Schoolbox\Learning\Assessment\Project) {
+//            $template = '@learningAssessment/quiz/status.twig';
         } else {
             throw new NotFound('Unsupported assessment type: ' . AssessmentType::objectToString($assessmentSpec));
         }
-
-//        foreach ($assessments as $assessment) {
-//            $classes[$assessment->getId()] = [
-//                'title' => $assessment->getBaseContext()->getFolder()->getNameWithCodes(),
-//                'twigData' => $assessmentController->getStatus($assessment),
-//            ];
-//        }
-
 
         $this->response = $this->responseFromTemplate(
             $template,
@@ -884,209 +796,6 @@ class Controller extends WebController\Base
         }
         return true;
     }
-
-    private function fetchController($className) {
-        // Common dependencies across the controllers this module _may_ create.
-        $userMapper                = UserMapper::getInstance();
-        $errorMapper               = ErrorMapper::getInstance();
-        $workTypeMapper            = WorkTypeMapper::getInstance();
-        $courseSpecMapper          = CourseSpecificationMapper::getInstance();
-        $unitSpecMapper            = UnitSpecificationMapper::getInstance();
-        $folderMapper              = FolderMapper::getInstance();
-        $termMapper                = Term\Mapper::getInstance();
-        $viewLatestMapper          = LatestViewMapper::getInstance();
-        $stateMapper               = StateMapper::getInstance();
-        $projectResultCacheMapper  = ResultCache\Mapper::getInstance();
-        $lessonPlanTemplateMapper  = \Schoolbox\Admin\LessonPlan\Template\Mapper::getInstance();
-        $lessonPlanDataModelMapper = \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper::getInstance();
-        $linkedAssessmentsMapper   = \Schoolbox\Learning\Assessment\DataModel\LessonPlan\LinkedAssessments\Mapper::getInstance();
-        $courseImplementationMapper = CourseImplementationMapper::getInstance();
-        $unitImplementationMapper = UnitImplementationMapper::getInstance();
-
-        /** @var AssessmentMapperProxy $assessmentDataSource */
-        $assessmentDataSource = $this->assessmentMapperProxy;
-
-        /** @var Transactor $transactor */
-        $transactor = $this->getDi()->get('transactor');
-
-        /** @var ParticipantDataSource $participantDataSource */
-        $participantDataSource = $this->getDi()->get('participantDataSource');
-
-        $bakery = new Factory(
-            $this->getRouter()->getGenerator(),
-            $this->getAuthorizer(),
-            $this->access,
-        );
-
-        $replicator = $this->getDi()->get('assessment.replicator');
-
-        switch ($className) {
-            case ListController::class:
-                return new ListController(
-                    $userMapper,
-                    $errorMapper,
-                    $assessmentDataSource,
-                    $this->access,
-                    $transactor,
-                    $participantDataSource,
-                    $this->getDi()->get('mapperFactory')->get(UnitSpecificationMapper::class),
-                    $this->getDi()->get('l10n'),
-                    $projectResultCacheMapper
-                );
-
-            case AssessmentType::TYPE_DUE_WORK:
-                $dueWorkDownloadMessageFactory = new Assessment\DueWork\Download\MessageFactory(
-                    $this->getDi()->get('taskd.downloadPagesMessageFactory'),
-                    (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified(),
-                    $this->getDi()->get('l10n'),
-                    $this->getRouter()->getGenerator(),
-                    new User\Translator\Author\ModelToArray(),
-                    (new Turnitin\Helper($this->getConfigLoader()))->isConfigured(),
-                );
-
-                return new Assessment\DueWork\Controller(
-                    $userMapper,
-                    $errorMapper,
-                    $assessmentDataSource,
-                    $workTypeMapper,
-                    $this->access,
-                    $transactor,
-                    $bakery,
-                    $this->getDi()->get('mapperFactory')->get(RubricDataSource::class),
-                    $this->getDi()->get('mapperFactory')->get(RubricResultSetMapper::class),
-                    $this->getDi()->get('submissionDataSource'),
-                    $participantDataSource,
-                    $termMapper,
-                    $this->getDi()->get('mapperFactory')->get(SingleFile\Mapper::class),
-                    $this->getDi()->get('kamiConnector'),
-                    $this->getDi()->get('mapperFactory')->get(Kami\Mapper::class),
-                    $participantDataSource,
-                    $courseSpecMapper,
-                    $unitSpecMapper,
-                    $replicator,
-                    $this->getDi()->get('taskd.messageProducer'),
-                    $this->getDi()->get('mapperFactory')->get(\Schoolbox\Learning\Turnitin\File\Mapper::class),
-                    $this->getDi()->get('feedbackDataSource'),
-                    $folderMapper,
-                    $viewLatestMapper,
-                    $this->getDi()->get('filesystem.storageProxy'),
-                    $stateMapper,
-                    $this->getDi()->get('l10n'),
-                    $dueWorkDownloadMessageFactory,
-                    $projectResultCacheMapper,
-                    $lessonPlanTemplateMapper,
-                    $lessonPlanDataModelMapper,
-                    MimetypeMapper::getInstance(),
-                );
-
-            case AssessmentType::TYPE_PROJECT:
-                return new Assessment\Project\Controller(
-                    $userMapper,
-                    $errorMapper,
-                    $assessmentDataSource,
-                    $workTypeMapper,
-                    $this->access,
-                    $transactor,
-                    $bakery,
-                    $termMapper,
-                    $participantDataSource,
-                    $courseSpecMapper,
-                    $unitSpecMapper,
-                    $this->getDi()->get('l10n'),
-                    $replicator,
-                    $viewLatestMapper,
-                    $projectResultCacheMapper,
-                    $lessonPlanTemplateMapper,
-                    $lessonPlanDataModelMapper
-                );
-
-            case AssessmentType::TYPE_QUIZ:
-                return new Assessment\Quiz\Controller(
-                    $userMapper,
-                    $errorMapper,
-                    $assessmentDataSource,
-                    $workTypeMapper,
-                    $this->access,
-                    $transactor,
-                    $bakery,
-                    $this->getDi()->get('mapperFactory')->get(QuizMapper::class),
-                    $this->getDi()->get('mapperFactory')->get(QuizSectionMapper::class),
-                    $this->getDi()->get('mapperFactory')->get(QuizAttemptMapper::class),
-                    $termMapper,
-                    $participantDataSource,
-                    $courseSpecMapper,
-                    $unitSpecMapper,
-                    $this->getDi()->get('l10n'),
-                    $replicator,
-                    $folderMapper,
-                    $viewLatestMapper,
-                    $projectResultCacheMapper,
-                    $lessonPlanTemplateMapper,
-                    $lessonPlanDataModelMapper,
-                    $this->getDi()->get('mapperFactory')->get(\Schoolbox\Learning\Quiz\Attempt\Mapper::class),
-                    $stateMapper,
-                    new \Schoolbox\Url\Factory($this->getConfigLoader()),
-                    (string)$this->getConfigLoader()->get('learnosity_version'),
-                    (string)$this->getConfigLoader()->get('learnosity_consumer_key'),
-                    (string)$this->getConfigLoader()->get('learnosity_consumer_secret'),
-                );
-
-            case AssessmentType::TYPE_TASK:
-                return new Assessment\Task\Controller(
-                    $userMapper,
-                    $errorMapper,
-                    $assessmentDataSource,
-                    $workTypeMapper,
-                    $this->access,
-                    $transactor,
-                    $bakery,
-                    new TaskResponseDataSource($this->getDi()->get('mapperFactory')->get(TaskResponseMapper::class)),
-                    $termMapper,
-                    $participantDataSource,
-                    $courseSpecMapper,
-                    $unitSpecMapper,
-                    $this->getDi()->get('l10n'),
-                    $replicator,
-                    $viewLatestMapper,
-                    $projectResultCacheMapper,
-                    $lessonPlanTemplateMapper,
-                    $lessonPlanDataModelMapper
-                );
-
-            case AssessmentType::TYPE_LTI_ASSESSMENT:
-                return new Assessment\Lti\Controller(
-                    $userMapper,
-                    $errorMapper,
-                    $assessmentDataSource,
-                    $workTypeMapper,
-                    $this->access,
-                    $transactor,
-                    $bakery,
-                    $termMapper,
-                    $participantDataSource,
-                    $courseSpecMapper,
-                    $unitSpecMapper,
-                    $this->getDi()->get('l10n'),
-                    $replicator,
-                    $this->getDi()->get('mapperFactory')->get(LtiToolMapper::class),
-                    $this->getDi()->get('mapperFactory')->get(LtiAssessmentMapper::class),
-                    $this->getDi()->get('mapperFactory')->get(LtiAssessmentScoreMapper::class),
-                    $this->getDi()->get('lti.registrations'),
-                    $this->getDi()->get('instance'),
-                    $this->getDi()->get('lti.userCodec'),
-                    $viewLatestMapper,
-                    $projectResultCacheMapper,
-                    $lessonPlanTemplateMapper,
-                    $lessonPlanDataModelMapper
-                );
-
-            default:
-                throw new InvalidArgumentException(
-                    sprintf('Assessment controller for class "%s" not found', $className),
-                );
-        }
-    }
-
 
     /**
      * Determine if there are any submission files or feedback available for download on the assessment
