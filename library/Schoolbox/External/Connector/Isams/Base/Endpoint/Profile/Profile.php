@@ -177,6 +177,7 @@ class Profile implements IStrategy
          */
         foreach ($students as $student) {
             $externalId = trim((string)$student->SchoolId);
+            $internalId = trim((string)$student->xpath('@Id')[0]->Id);
 
             /* Only import data for externalIds in $watchlist, if provided
              */
@@ -395,10 +396,14 @@ class Profile implements IStrategy
             $this->registry->remember($externalId, [
                 'person' => [
                     'type' => Role::STUDENT,
-                    'personId' => $personId,
-                    'portrait'  => $studentBaseProfile->getPortrait()?->getHash(),
-                    'sisPhotoId' => $metadataReader->getProfileSisPhotoId($studentBaseProfile->getMetadata()),
+                    /* "@Id" is the isams internal identifier which is used to obtain their profile pictures.
+                     * This is NOT the same as their external id.
+                     */
+                    'internalId' => $internalId,
                     'externalId' => $externalId,
+                    'personId' => $personId,
+                    'sisPhotoId' => $metadataReader->getProfileSisPhotoId($studentBaseProfile->getMetadata()),
+                    'portrait'  => $studentBaseProfile->getPortrait()?->getHash(),
                     'firstname' => $studentBaseProfile->getFirstname(),
                     'firstnamePreferred' => $studentBaseProfile->getFirstnamePreferred(),
                     'lastname' => $studentBaseProfile->getLastname()
