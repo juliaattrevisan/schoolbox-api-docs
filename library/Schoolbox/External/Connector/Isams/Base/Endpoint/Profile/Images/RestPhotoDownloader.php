@@ -82,7 +82,7 @@ class RestPhotoDownloader implements IPhotoDownloader
                     ));
                 } else {
                     // fetch a specific portrait
-                    $url = sprintf('Main/api/students/%s/photos/%s', $identifier, $this->photoCache[$identifier]);
+                    $url = sprintf('Main/api/students/%s/photos/%s', $identifier, $sisPhotoId);
 
                     $this->log->debug(sprintf(
                         'Getting a specific %s photo from %s',
