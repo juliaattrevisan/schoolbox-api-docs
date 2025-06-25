@@ -163,7 +163,7 @@ class Factory
                     $this->relationshipMapper,
                 ));
         }
-        if ($this->includePhoto && $this->validStrats->isPhotoStratEnabled()) {
+        if ($this->includePhoto) {
             $bus
                 ->add(new Profile\Images\Prepare(
                     $this->log,
