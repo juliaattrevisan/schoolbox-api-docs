@@ -33,6 +33,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Learning\Assessment;
+use Schoolbox\Learning\Assessment\Breadcrumb;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Task\Response\MapperProxy as TaskResponseDataSource;
@@ -123,6 +124,7 @@ class Controller extends WebController\Base
      * @param CourseImpl\Mapper                  $courseImplMapper
      * @param UnitImpl\Mapper                    $unitImplMapper
      * @param Access                             $access
+     * @param Breadcrumb\Factory                 $bakery
      */
     public function __construct(
         private Filter\IFactoryFactory $filterFactoryFactory,
@@ -132,7 +134,8 @@ class Controller extends WebController\Base
         private AssessmentMapperProxy $assessmentMapperProxy,
         private CourseImpl\Mapper $courseImplMapper,
         private UnitImpl\Mapper $unitImplMapper,
-        private Access $access
+        private Access $access,
+        private Breadcrumb\Factory $bakery
     ) {
     }
 
@@ -645,7 +648,7 @@ class Controller extends WebController\Base
             $assessmentController->setUser($this->getUser())
                 ->setRouteGenerator($this->routeGenerator);
 
-            $template = '@learningAssessment/task/status.twig';
+            $template = '@courseMarkbook/status/task.twig';
         } elseif ($assessmentSpec instanceof \Schoolbox\Learning\Assessment\Quiz\Model) {
             /** @var \Schoolbox\Learning\Assessment\Quiz\Controller $assessmentController */
             $assessmentController = $this->fetchController(AssessmentType::TYPE_QUIZ);
@@ -657,21 +660,24 @@ class Controller extends WebController\Base
             throw new NotFound('Unsupported assessment type: ' . AssessmentType::objectToString($assessmentSpec));
         }
 
-        foreach ($assessments as $assessment) {
-            $classes[$assessment->getId()] = [
-                'title' => $assessment->getBaseContext()->getFolder()->getNameWithCodes(),
-                'twigData' => $assessmentController->getStatus($assessment),
-            ];
-        }
+//        foreach ($assessments as $assessment) {
+//            $classes[$assessment->getId()] = [
+//                'title' => $assessment->getBaseContext()->getFolder()->getNameWithCodes(),
+//                'twigData' => $assessmentController->getStatus($assessment),
+//            ];
+//        }
         $twigData = [
             'type' => AssessmentType::objectToString($assessmentSpec),
-            'assessments' => $assessments->map($unitAssessmentsMap),
+            'breadcrumbs' => $this->bakery->produceFromAssessment($assessmentSpec, $this->getUser())->add([ $assessmentSpec->getTitle(), '' ]),
+            'assessmentInfo' => $assessments->map($unitAssessmentsMap),
+            'assessments' => $assessments,
+            'assessmentSpec'  => $assessmentSpec,
             'classes' => $classes,
             'template' => $template,
         ];
 
         $this->response = $this->responseFromTemplate(
-            '@courseMarkbook/courseStatus.twig',
+            $template,
             $twigData,
             "Status of {$assessmentSpec->getTitle()}",
             'submission'

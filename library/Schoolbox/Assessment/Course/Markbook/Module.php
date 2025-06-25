@@ -17,6 +17,7 @@ use Alaress\Authorizer\Failure\InvalidPath;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Mapper;
 use Schoolbox\Role;
+use Schoolbox\Learning\Assessment\Breadcrumb;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Filter;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
@@ -97,6 +98,14 @@ class Module extends \Alaress\Module\Module
      */
     public function buildController(): Base
     {
+        $access = $this->getMapperFactory()->get(Access::class);
+
+        $bakery = new Breadcrumb\Factory(
+            $this->getRouter()->getGenerator(),
+            $this->getAuthorizer(),
+            $access,
+        );
+
         return new Controller(
             $this->injector->get('filters.factoryFactory'),
             $this->getMapperFactory()->get(Filter\Mapper::class),
@@ -105,7 +114,8 @@ class Module extends \Alaress\Module\Module
             $this->getAssessmentMapper(),
             $this->getMapperFactory()->get(CourseImpl\Mapper::class),
             $this->getMapperFactory()->get(UnitImpl\Mapper::class),
-            $this->getMapperFactory()->get(Access::class),
+            $access,
+            $bakery
         );
     }
 
