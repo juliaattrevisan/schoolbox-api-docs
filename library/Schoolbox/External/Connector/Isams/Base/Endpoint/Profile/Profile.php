@@ -166,6 +166,10 @@ class Profile implements IStrategy
          */
         $campusMapping = $this->prefetchCampuses();
 
+        /* Used to manipulate metadata json for each person
+         */
+        $metadataReader = new Reader();
+
         $students = $this->api[DSN::MODULE_BATCHXML]->fetchXml('/iSAMS/PupilManager/CurrentPupils/Pupil');
 
         /* $student is a stdclass derived from xml data,
@@ -393,7 +397,7 @@ class Profile implements IStrategy
                     'type' => Role::STUDENT,
                     'personId' => $personId,
                     'portrait'  => $studentBaseProfile->getPortrait()?->getHash(),
-                    'sisPhotoId' => (new Reader())->getProfileSisPhotoId($studentBaseProfile->getMetadata()),
+                    'sisPhotoId' => $metadataReader->getProfileSisPhotoId($studentBaseProfile->getMetadata()),
                     'externalId' => $externalId,
                     'firstname' => $studentBaseProfile->getFirstname(),
                     'firstnamePreferred' => $studentBaseProfile->getFirstnamePreferred(),
@@ -909,6 +913,10 @@ class Profile implements IStrategy
      */
     private function importStaff(): void
     {
+        /* Used to manipulate metadata json for each person
+         */
+        $metadataReader = new Reader();
+
         $staffs =  $this->api[DSN::MODULE_BATCHXML]->fetchXml('/iSAMS/HRManager/CurrentStaff/StaffMember');
 
         /* $staff is a stdclass derived from xml data,
@@ -1087,7 +1095,7 @@ class Profile implements IStrategy
                     /* We remembered the last identifier used to obtain a profile picture
                      * so we can tell when the school updates it on their end.
                      */
-                    'sisPhotoId' => (new Reader())->getProfileSisPhotoId($staffBaseProfile->getMetadata()),
+                    'sisPhotoId' => $metadataReader->getProfileSisPhotoId($staffBaseProfile->getMetadata()),
                     /* schoolbox stuff
                      */
                     'portrait'  => $staffBaseProfile->getPortrait()?->getHash(),
