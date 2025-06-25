@@ -27,6 +27,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as StudentSubmissionMapper;
 use Schoolbox\Assessment\Course\Task\CompletionMapper as TaskResponseMapper;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
+use Schoolbox\Assessment\Rubric\DataModel\IndicatorMark\Mapper as RubricIndicatorMarkMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Result\Mapper as RubricResultSetMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Config\ConfigMapper;
@@ -35,6 +36,8 @@ use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\Breadcrumb;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
+use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Task\Response\MapperProxy as TaskResponseDataSource;
 use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
@@ -64,6 +67,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificat
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Learning\InlineGrader\Kami;
+use Schoolbox\Learning\InlineGrader\StudentCarousel;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
@@ -625,8 +629,19 @@ class Controller extends WebController\Base
 
         $unitAssessmentsMap = new UnitAssessments(null, $this->authorizer, null, $this->getUser());
 
+        // Injectables...
+        $rubricIndicatorMarkMapper = RubricIndicatorMarkMapper::getInstance();
+        $termMapper = Term\Mapper::getInstance();
+
         $classes = [];
-        $twigData = [];
+        // init the twig data
+        $twigData = [
+            'type' => AssessmentType::objectToString($assessmentSpec),
+            'breadcrumbs' => $this->bakery->produceFromAssessment($assessmentSpec, $this->getUser())->add([ $assessmentSpec->getTitle(), '' ]),
+            'assessments' => $assessments,
+            'assessmentSpec'  => $assessmentSpec,
+            'classes' => $classes,
+        ];
         // switch based on which assessment type
         if ($assessmentSpec instanceof \Schoolbox\Learning\Assessment\DueWork\Model) {
             /** @var \Schoolbox\Learning\Assessment\DueWork\Controller $assessmentController */
@@ -634,7 +649,46 @@ class Controller extends WebController\Base
             $assessmentController->setUser($this->getUser())
             ->setRouteGenerator($this->routeGenerator);
 
-            $template = '@learningAssessment/dueWork/status.twig';
+            // duework specific data
+            $twigData['errors'] = StateMapper::getInstance()->listDisplayValues();
+
+            /* Draft Responses made by each guy
+             */
+            $twigData['draftResponses'] = [];
+
+            // class assessment specific data
+            foreach ($assessments as $assessment) {
+                // Only display download link if there are actually files to download in any of the classes
+                $twigData['download'] = $twigData['download'] ?: $this->hasDownloadableSubmissionFiles($assessment);
+
+                $twigData['rubricMarks'][$assessment->getId()] = $rubricIndicatorMarkMapper->findMarkedByAssessment($assessment->getId());
+                $twigData['interactionLocked'][$assessment->getId()] = (new Assessment\LockedChecker($termMapper))->isLockedForInteractions($assessment);
+                /* Find the first valid Blind Review url
+                */
+                $twigData['blindReviewUrl'][$assessment->getId()] = (new StudentCarousel\Blind(
+                    $this->routeGenerator,
+                    null,
+                    $assessment
+                ))->getFirstUrl();
+
+                /* Find out which users have a draft submission
+                * MAYBE you can do this purely in twig...but I'm not enamourd by frontend making
+                * those sort of data collecting maneuvers mainly because they don't know when their
+                * calls access a potentially expensive method.
+                */
+                foreach ($assessment->getAllParticipants() as $participant) {
+                    $draftResponse = $participant->findMostRecentDraftResponse();
+
+                    if ($draftResponse) {
+                        $twigData['draftResponses'][$assessment->getId()][$participant->getUser()->getId()] = $draftResponse->getId();
+                    }
+                }
+            }
+
+            $twigData['selfReflect'] = false;
+            $twigData['selfAssess'] = false;
+
+            $template = '@courseMarkbook/status/duework.twig';
         } elseif ($assessmentSpec instanceof \Schoolbox\Learning\Assessment\Lti\Model) {
             /** @var \Schoolbox\Learning\Assessment\Lti\Controller $assessmentController */
             $assessmentController = $this->fetchController(AssessmentType::TYPE_LTI_ASSESSMENT);
@@ -666,15 +720,7 @@ class Controller extends WebController\Base
 //                'twigData' => $assessmentController->getStatus($assessment),
 //            ];
 //        }
-        $twigData = [
-            'type' => AssessmentType::objectToString($assessmentSpec),
-            'breadcrumbs' => $this->bakery->produceFromAssessment($assessmentSpec, $this->getUser())->add([ $assessmentSpec->getTitle(), '' ]),
-            'assessmentInfo' => $assessments->map($unitAssessmentsMap),
-            'assessments' => $assessments,
-            'assessmentSpec'  => $assessmentSpec,
-            'classes' => $classes,
-            'template' => $template,
-        ];
+
 
         $this->response = $this->responseFromTemplate(
             $template,
@@ -1039,5 +1085,43 @@ class Controller extends WebController\Base
                     sprintf('Assessment controller for class "%s" not found', $className),
                 );
         }
+    }
+
+
+    /**
+     * Determine if there are any submission files or feedback available for download on the assessment
+     *
+     * Direct clone from \Schoolbox\Learning\Assessment\DueWork\Controller::hasDownloadableSubmissionFiles
+     * @see \Schoolbox\Learning\Assessment\DueWork\Controller::hasDownloadableSubmissionFiles
+     * @param IAssessable $assessment
+     * @return bool
+     */
+    private function hasDownloadableSubmissionFiles(IAssessable $assessment): bool
+    {
+        // Grab all participants in the assessment
+
+        /** @var Participant $participant */
+        foreach ($assessment->getAllParticipants() as $participant) {
+            // Iterate all feedbacks
+            foreach ($participant->getAllFeedbacks() as $feedback) {
+                if ($feedback instanceof \Schoolbox\Learning\Assessment\DueWork\Feedback\Model && $feedback->isPublished()) {
+                    return true;
+                }
+            }
+
+            // Iterate all their responses
+            /** @var Submission $response */
+            foreach ($participant->getAllResponses() as $response) {
+                // If the response is a submission...
+
+                if ($response instanceof Submission && !$response->isDraft()) {
+                    if ($response->getAllFiles()->count() > 0) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 }
