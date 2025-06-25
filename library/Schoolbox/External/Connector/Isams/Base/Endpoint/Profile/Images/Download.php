@@ -121,7 +121,7 @@ class Download implements IStrategy
              */
             $this->log->debug(sprintf(
                 'Comparing old sis photo id %s to new sis photo id %s',
-                $data['person']['sisPhotoId'],
+                $data['person']['sisPhotoId'] ?? '(null)',
                 $sisPhotoId,
             ));
 
