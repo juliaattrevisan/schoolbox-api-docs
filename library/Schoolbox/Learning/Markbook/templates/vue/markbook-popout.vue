@@ -17,7 +17,7 @@ import PopOutMenuItem from "@schoolboxVue/components/menu/pop-out-menu-item.vue"
 import PopOutMenuDivider from "@schoolboxVue/components/menu/pop-out-menu-divider.vue";
 import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
 import { useMarkbookStore } from "./store/markbookStore";
-import type { MarkbookClassImplActivityParticipant } from "./types/payload";
+import type { MarkbookSelectedCellInfo, MarkbookClassImplActivityParticipant } from "./types/payload";
 
 const mbStore = useMarkbookStore();
 
@@ -63,34 +63,41 @@ const isActivityEmpty = window.Vue.computed(() => activityItems.value.length ===
 const isExpansionDisabled = window.Vue.computed(() => activityItems.value.length === 1);
 
 /**
+ * The currently selected cell, this is not set to null when the popout is closed
+ * in case a user is interacting with a modal (i.e. exclude) or something else and it closes the popout
+ * we still need to know which cell was selected to be able to perform actions on it
+ */
+const selectedCell = window.Vue.ref<MarkbookSelectedCellInfo | null>(null);
+
+/**
  * All the data relating to the currently selected cell in the markbook
  */
 const cellInfo = window.Vue.computed(() => {
-    if (mbStore.data === null || mbStore.popoutSelectedCell === null) {
+    if (mbStore.data === null || selectedCell.value === null) {
         return null;
     }
 
-    const activity = mbStore.data.assessments[mbStore.popoutSelectedCell.activityId];
+    const activity = mbStore.data.assessments[selectedCell.value.activityId];
     if (activity === undefined) {
-        console.warn("Activity not found for selected cell", mbStore.popoutSelectedCell);
+        console.warn("Activity not found for selected cell", selectedCell.value);
         return null;
     }
 
-    const classImpl = mbStore.data.classImpls[mbStore.popoutSelectedCell.classImplId];
+    const classImpl = mbStore.data.classImpls[selectedCell.value.classImplId];
     if (activity === undefined) {
-        console.warn("Class implementation not found for selected cell", mbStore.popoutSelectedCell);
+        console.warn("Class implementation not found for selected cell", selectedCell.value);
         return null;
     }
 
-    const student = classImpl.students[mbStore.popoutSelectedCell.studentId];
+    const student = classImpl.students[selectedCell.value.studentId];
     if (student === undefined) {
-        console.warn("Student not found for selected cell", mbStore.popoutSelectedCell);
+        console.warn("Student not found for selected cell", selectedCell.value);
         return null;
     }
 
-    const aImpl = classImpl.assessments[mbStore.popoutSelectedCell.activityId];
+    const aImpl = classImpl.assessments[selectedCell.value.activityId];
     if (aImpl === undefined) {
-        console.warn("aImpl not found for selected cell", mbStore.popoutSelectedCell);
+        console.warn("aImpl not found for selected cell", selectedCell.value);
         return null;
     }
 
@@ -98,7 +105,7 @@ const cellInfo = window.Vue.computed(() => {
     const participant = aImpl.participants[student.id] ?? null;
 
     return {
-        ...mbStore.popoutSelectedCell,
+        ...selectedCell.value,
         activity,
         classImpl,
         aImpl,
@@ -260,6 +267,12 @@ function toggleExclusion(participant: MarkbookClassImplActivityParticipant): voi
 }
 
 /**
+ * The returnUrl to use when selecting a menu item that redirects,
+ * so that users will return to the markbook after performing an action
+ */
+// const returnUrl = `?returnUrl=${btoa(window.location.pathname)}`;
+
+/**
  * Navigate to a new page
  * @param target - The URL we want to navigate to.
  * @param action - Should we redirect, or do a specific action? (exclude,publish)
@@ -320,8 +333,11 @@ async function onMenuItemSelected(target: string | null, action: string | null =
         console.error(error);
     } finally {
         isLoading.value = false;
-        // trigger a markbook reload
-        reloadMarkbook();
+
+        // trigger a markbook reload for actions that can't just apply reactively
+        if (action !== "exclude") {
+            reloadMarkbook();
+        }
     }
 }
 
@@ -370,14 +386,19 @@ async function openPopOut(): Promise<void> {
  */
 window.Vue.watch(
     () => mbStore.popoutSelectedCell,
-    () => {
-        if (cellInfo.value === null) {
+    (newValue) => {
+        if (newValue === null) {
             // The popout was closed by something else
             referenceElement.value = null;
             return;
         }
 
         // A linked button has been selected so populate the pop out
+        selectedCell.value = newValue;
+        if (cellInfo.value === null) {
+            throw new Error("No cell info available for selected cell");
+        }
+
         referenceElement.value = cellInfo.value.referenceElement;
         isExpanded.value = false;
 
