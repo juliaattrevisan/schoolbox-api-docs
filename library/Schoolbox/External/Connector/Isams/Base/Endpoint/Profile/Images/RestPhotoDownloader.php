@@ -66,7 +66,7 @@ class RestPhotoDownloader implements IPhotoDownloader
                     $url = sprintf('Main/api/humanresources/employees/%s/photos/current', $externalId);
                 } else {
                     // fetch a specific portrait
-                    $url = sprintf('Main/api/humanresources/employees/%s/photos/%s', $externalId, $this->photoCache[$externalId]);
+                    $url = sprintf('Main/api/humanresources/employees/%s/photos/%s', 1176, 916);
                 }
                 return $this->api->request($url, 'GET', raw: true);
 
@@ -103,8 +103,12 @@ class RestPhotoDownloader implements IPhotoDownloader
                 $userObj =  $this->api->request($url, 'GET');
                 break;
             case Role::STAFF:
-                $url = sprintf('Main/api/humanresources/employees/%s', $externalId);
+                /* The internal id is in "Id" and the value we use for external id is "PersonId".
+                 * The id used here is the isams internal id, which is NOT the same as their external id.
+                 */
+                $url = sprintf('Main/api/humanresources/employees/%s', 1176);
                 $userObj =  $this->api->request($url, 'GET');
+                print_r($userObj);
                 break;
             default:
                 return null;
