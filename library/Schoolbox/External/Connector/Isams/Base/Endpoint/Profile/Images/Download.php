@@ -119,6 +119,12 @@ class Download implements IStrategy
             /* We can detect when an identifier is different in isams than what we previously knew.
              * This gives us a clue as to when a profile picture is different than before.
              */
+            $this->log->debug(sprintf(
+                'Comparing old sis photo id %s to new sis photo id %s',
+                $data['person']['sisPhotoId'],
+                $sisPhotoId,
+            ));
+
             if (null === $data['person']['portrait'] || $sisPhotoId !== $data['person']['sisPhotoId']) {
                 $this->log->info(sprintf(
                     'Downloading profile photo for %s %s (%s)',

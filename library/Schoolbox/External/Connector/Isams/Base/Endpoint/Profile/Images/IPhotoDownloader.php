@@ -42,7 +42,7 @@ interface IPhotoDownloader
      *
      * @param string $roleType should be one of the ROLE_* constants
      * @param string $identifier
-     * @param string $sisPhotoId
+     * @param int $sisPhotoId
      * @return string|null
      */
     public function getPhoto(string $roleType, string $identifier, int $sisPhotoId): ?string;
