@@ -28,7 +28,6 @@ function addToGlobalScope(editor: SbxEditor, sourceElement: SbxEditorElement): v
  */
 function checkReadonly(editor: SbxEditor, sourceElement: SbxEditorElement): void {
     if (sourceElement instanceof HTMLTextAreaElement && sourceElement.readOnly) {
-        console.warn("readonly");
         editor.enableReadOnlyMode("readonly");
     }
 }

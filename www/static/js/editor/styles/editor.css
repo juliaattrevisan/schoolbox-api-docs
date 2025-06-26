@@ -69,7 +69,7 @@
 }
 
 /**
- * to allow enough space for the media/table baloon UI's
+ * to allow enough space for the media/table balloon UI's
  * so they don't overlap the toolbar
  */
 .ck.ck-content > figure:first-child,
