@@ -138,7 +138,6 @@ const excludeModalEl = window.Vue.ref<InstanceType<typeof RevealModal> | null>(n
  */
 function onPopOutClosed(): void {
     mbStore.popoutSelectedCell = null;
-    referenceElement.value?.classList.remove("is-selected");
     referenceElement.value = null;
 }
 
