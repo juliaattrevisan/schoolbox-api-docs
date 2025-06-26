@@ -32,8 +32,6 @@ window.Vue.onMounted(() => {
         { immediate: true },
     );
 });
-
-// todo: check performance
 </script>
 
 <template>
@@ -66,7 +64,7 @@ window.Vue.onMounted(() => {
 <style scoped>
 /* getting around some chaotic other styles for the loader to stay in the right place */
 .markbook-loader {
-    padding-left: 0;
-    padding-right: 0;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
 }
 </style>
