@@ -113,8 +113,8 @@ const exportReportRoute = window.Vue.computed(() => {
         <div class="small-12 column list-item">
             <ul class="meta">
                 <li class="icon-alert">
-                    This markbook is showing a large number of students; for performance reasons, student portraits and
-                    marking of tasks have been disabled.
+                    This markbook is showing a large number of students; for performance reasons, student portraits have
+                    been disabled.
                 </li>
             </ul>
         </div>
