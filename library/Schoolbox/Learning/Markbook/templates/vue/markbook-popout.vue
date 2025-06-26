@@ -18,7 +18,7 @@ import PopOutMenuItem from "@schoolboxVue/components/menu/pop-out-menu-item.vue"
 import PopOutMenuDivider from "@schoolboxVue/components/menu/pop-out-menu-divider.vue";
 import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
 import { useMarkbookStore } from "./store/markbookStore";
-import type { MarkbookSelectedCellInfo, MarkbookClassImplActivityParticipant } from "./types/payload";
+import type { MarkbookPopoutSelectedCellInfo, MarkbookClassImplActivityParticipant } from "./types/payload";
 
 const mbStore = useMarkbookStore();
 
@@ -68,7 +68,7 @@ const isExpansionDisabled = window.Vue.computed(() => activityItems.value.length
  * in case a user is interacting with a modal (i.e. exclude) or something else and it closes the popout
  * we still need to know which cell was selected to be able to perform actions on it
  */
-const selectedCell = window.Vue.ref<MarkbookSelectedCellInfo | null>(null);
+const selectedCell = window.Vue.ref<MarkbookPopoutSelectedCellInfo | null>(null);
 
 /**
  * All the data relating to the currently selected cell in the markbook
@@ -342,6 +342,24 @@ async function onMenuItemSelected(target: string | null, action: string | null =
 }
 
 /**
+ * Trigger the update feedback UI to appear for this cell
+ */
+function onUpdateFeedbackSelected(): void {
+    if (cellInfo.value === null) {
+        throw new Error("No selected cell to update feedback for");
+    }
+
+    // Close the popout
+    close();
+
+    mbStore.feedbackSelectedCell = {
+        classImplId: cellInfo.value.classImplId,
+        activityId: cellInfo.value.activityId,
+        studentId: cellInfo.value.studentId,
+    };
+}
+
+/**
  * Exclude route.
  * Checks if the student has any feedback or submissions, if they do not, then it just excludes. else will prompt
  */
@@ -495,6 +513,7 @@ function onToggleSelected(): void {
                     "
                 >
                     <pop-out-menu-divider />
+                    <pop-out-menu-item @selected="onUpdateFeedbackSelected"> Update Feedback v2 </pop-out-menu-item>
                     <pop-out-menu-item
                         v-if="!cellInfo.participant.isExcluded"
                         :class="{ 'is-disabled': !routes.updateRoute }"

@@ -4,10 +4,10 @@ import { getGradient } from "@js/util/cssUtils";
 import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
 import { useMarkbookStore } from "./store/markbookStore";
 import MbStudentGradeCell from "./mb-student-grade-cell.vue";
+import MbClassimplRowStudentFeedback from "./mb-classimpl-row-student-feedback.vue";
 import type { MarkbookClassImplStudent } from "./types/payload";
 
 interface Props {
-    type: "course" | "class";
     classImplId: number;
     student: MarkbookClassImplStudent;
 }
@@ -75,6 +75,17 @@ const mbStore = useMarkbookStore();
             :student-id="student.id"
         />
     </tr>
+
+    <mb-classimpl-row-student-feedback
+        v-if="
+            mbStore.feedbackSelectedCell &&
+            mbStore.feedbackSelectedCell.classImplId === props.classImplId &&
+            mbStore.feedbackSelectedCell.studentId === student.id
+        "
+        :activity-id="mbStore.feedbackSelectedCell.activityId"
+        :class-impl-id="props.classImplId"
+        :student="student"
+    />
 </template>
 
 <style scoped></style>
