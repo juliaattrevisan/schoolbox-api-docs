@@ -10,17 +10,15 @@ export default class MarkbookPage {
 
     static readonly URL = "/homepage/{class_id}";
 
-    static readonly REPORT_CONTENT = "#report_content";
-
     static readonly DATA_TEST_MARKBOOK_SHOW_DISPLAY_MARKS = "markbook-show-display-marks";
 
-    static readonly DATA_TEST_MARKBOOK_ASSESSMENT = "markbook-assessment";
+    static readonly DATA_TEST_MARKBOOK_ASSESSMENT = "markbook-assessment-[ASSESSMENT_ID]"; // Replace [ASSESSMENT_ID] with the actual ID
 
     static readonly DATA_TEST_MARKBOOK_CELL = "markbook-cell-[ASSESSMENT_ID]-[STUDENT_ID]"; // Replace [ASSESSMENT_ID] and [STUDENT ID] with the actual IDs
 
-    static readonly SELECTOR_MARKBOOK_CELL_DISPLAY_MARK = "[data-learner-mark]";
+    static readonly DATA_TEST_MARKBOOK_CELL_DISPLAY_MARK = "markbook-learner-mark";
 
-    static readonly SELECTOR_MARKBOOK_CELL_INPUT_MARK = "[data-instructor-mark]";
+    static readonly DATA_TEST_MARKBOOK_CELL_INPUT_MARK = "markbook-instructor-mark";
 
     constructor(page: Page) {
         this.page = page;
@@ -46,7 +44,7 @@ export default class MarkbookPage {
     }
 
     /**
-     * clas smarkbook filter - select work type
+     * class markbook filter - select work type
      * @param workType - The work type to select: None 13, Assessment Task 1, Assignment 2, Homework3 etc
      */
     async selectWorkType(workType: number): Promise<void> {
@@ -78,7 +76,8 @@ export default class MarkbookPage {
      * @param title - The title of the assessment
      */
     async canSeeAssessment(title: string): Promise<void> {
-        const assessments = this.page.getByTestId(MarkbookPage.DATA_TEST_MARKBOOK_ASSESSMENT);
+        const selectorRegex = new RegExp(MarkbookPage.DATA_TEST_MARKBOOK_ASSESSMENT.replace("[ASSESSMENT_ID]", "\\d+"));
+        const assessments = this.page.getByTestId(selectorRegex);
         await expect(assessments.locator(`a:has-text("${title}")`)).toBeVisible();
     }
 
@@ -88,16 +87,21 @@ export default class MarkbookPage {
      * @returns The ID of the assessment
      */
     async getAssessmentId(title: string): Promise<string> {
-        const assessments = this.page.getByTestId(MarkbookPage.DATA_TEST_MARKBOOK_ASSESSMENT);
+        const selectorRegex = new RegExp(MarkbookPage.DATA_TEST_MARKBOOK_ASSESSMENT.replace("[ASSESSMENT_ID]", "\\d+"));
+        const assessments = this.page.getByTestId(selectorRegex);
         const assessment = assessments.filter({ hasText: title });
-        const assessmentId = await assessment.getAttribute("data-assessment");
+        const assessmentDataTest = await assessment.getAttribute("data-test");
 
-        if (assessmentId === null) {
-            expect(assessmentId).not.toBeNull();
-            throw new Error(`Unable to find assessment ID for title: ${title}`);
+        if (assessmentDataTest === null) {
+            expect(assessmentDataTest).not.toBeNull();
+            throw new Error(`Unable to find assessment's data-test for title: ${title}`);
         }
 
-        return assessmentId;
+        // Strip the assessment ID from the data-test attribute
+        return assessmentDataTest.replace(
+            MarkbookPage.DATA_TEST_MARKBOOK_ASSESSMENT.replace("[ASSESSMENT_ID]", ""),
+            "",
+        );
     }
 
     /**
@@ -158,7 +162,7 @@ export default class MarkbookPage {
         mark: string | number,
     ): Promise<void> {
         const cell = this.getCell(studentId, assessmentId);
-        await expect(cell.locator(MarkbookPage.SELECTOR_MARKBOOK_CELL_DISPLAY_MARK)).toHaveText(mark.toString());
+        await expect(cell).toHaveText(mark.toString());
     }
 
     /**
@@ -174,6 +178,6 @@ export default class MarkbookPage {
         mark: string | number,
     ): Promise<void> {
         const cell = this.getCell(studentId, assessmentId);
-        await expect(cell.locator(MarkbookPage.SELECTOR_MARKBOOK_CELL_INPUT_MARK)).toHaveText(mark.toString());
+        await expect(cell).toHaveText(mark.toString());
     }
 }
