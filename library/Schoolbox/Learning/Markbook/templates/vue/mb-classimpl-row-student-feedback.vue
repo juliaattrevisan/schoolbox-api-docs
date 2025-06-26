@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import locale from "@js/terminology/rosettaStone";
+import ResubmissionRequired from "@schoolboxLibrary/Learning/Assessment/templates/dueWork/vue/resubmission-required.vue";
 import { useMarkbookStore } from "./store/markbookStore";
 import type { MarkbookClassImplStudent } from "./types/payload";
 
@@ -63,7 +64,11 @@ const cellInfo = window.Vue.computed(() => {
                     {{ locale.grades.proper }}
                     INPUT
                 </label>
-                RESUBMISSION REQUIRED
+                <resubmission-required
+                    v-model:resubmission-required="cellInfo.participant.resubmissionRequired"
+                    :identifier="props.student.id"
+                    :tab-index="-1"
+                />
             </div>
             <div
                 class="small-12 column"
@@ -72,7 +77,13 @@ const cellInfo = window.Vue.computed(() => {
                 }"
             >
                 COMMENT
-                <template v-if="cellInfo.instructorMarkSchemeTemplate === null"> RESUBMISSION REQUIRED </template>
+
+                <resubmission-required
+                    v-if="cellInfo.instructorMarkSchemeTemplate === null"
+                    v-model:resubmission-required="cellInfo.participant.resubmissionRequired"
+                    :identifier="props.student.id"
+                    :tab-index="-1"
+                />
             </div>
         </td>
     </tr>
