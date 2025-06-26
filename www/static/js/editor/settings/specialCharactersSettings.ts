@@ -7,7 +7,7 @@ import type { SpecialCharactersConfig } from "ckeditor5";
 export function getSpecialCharactersSettings(): { specialCharacters: SpecialCharactersConfig } {
     return {
         specialCharacters: {
-            order: ["Arrows", "Currency", "Latin", "Language", "Mathematical", "Text"],
+            order: ["Arrows", "Currency", "Language", "Mathematical", "Text"],
         },
     };
 }
