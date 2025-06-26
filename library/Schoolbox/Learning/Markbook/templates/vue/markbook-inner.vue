@@ -44,24 +44,24 @@ window.Vue.onMounted(() => {
             <div class="loader"></div>
         </section>
     </div>
-    <div
-        v-else
-        :class="{
-            'actions-small-1': mbStore.data._routes.exportReport !== null,
-        }"
-    >
-        <div v-if="mbStore.data.classImpls.length === 0" class="empty-state">
-            <i class="icon-curriculum"></i>
-            <p>
-                This course has not yet been imported to any classes or groups.
-                <a
-                    v-if="mbStore.data._routes['courseImport.getImport']"
-                    :href="mbStore.data._routes['courseImport.getImport']"
-                >
-                    Import this course </a
-                >.
-            </p>
-        </div>
+    <div v-else-if="mbStore.data.classImpls.length === 0" class="empty-state">
+        <i class="icon-curriculum"></i>
+        <p>
+            This course has not yet been imported to any classes or groups.
+            <a
+                v-if="mbStore.data._routes['courseImport.getImport']"
+                :href="mbStore.data._routes['courseImport.getImport']"
+            >
+                Import this course </a
+            >.
+        </p>
+    </div>
+    <div v-else-if="mbStore.activityGroups.length === 0" class="empty-state">
+        <i class="icon-curriculum"></i>
+        <p>There are no activities that match the selected filters. Try altering the filters to broaden your search.</p>
+    </div>
+
+    <div v-else :class="{ 'actions-small-1': mbStore.data._routes.exportReport !== null }">
         <div class="legend">
             <div class="indicators">
                 <p class="meta"><span class="legend-indicator indicator-none"></span>Unmarked</p>
@@ -116,15 +116,11 @@ window.Vue.onMounted(() => {
         </div>
     </div>
 
-    <div v-if="mbStore.data" class="diagonal-headings-table-container small-12 island">
-        <div v-if="mbStore.activityGroups.length === 0" class="empty-state">
-            <i class="icon-curriculum"></i>
-            <p>
-                There are no activities that match the selected filters. Try altering the filters to broaden your
-                search.
-            </p>
-        </div>
-        <table v-else class="diagonal-headings-table marksheet">
+    <div
+        v-if="mbStore.data && mbStore.data.classImpls.length && mbStore.activityGroups.length"
+        class="diagonal-headings-table-container small-12 island"
+    >
+        <table class="diagonal-headings-table marksheet">
             <thead>
                 <tr class="rotate-headers">
                     <th class="fixed-left"><div></div></th>
