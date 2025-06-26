@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { useMarkbookStore } from "./store/markbookStore";
+import type { MarkbookActivity } from "./types/payload";
 import MbTableHead from "./mb-table-head.vue";
 import MbClassimplRows from "./mb-classimpl-rows.vue";
+import MbTableHeadActivityDropdown from "./mb-table-head-activity-dropdown.vue";
 
 interface Props {
     type: "course" | "class";
@@ -9,6 +11,11 @@ interface Props {
 
 const props = defineProps<Props>();
 const mbStore = useMarkbookStore();
+
+const activityHeaderSelection = window.Vue.ref<MarkbookActivity | null>(null);
+const activityHeaderDropdownEl = window.Vue.ref<HTMLElement | null>(null);
+window.Vue.provide("activityHeaderSelection", activityHeaderSelection);
+window.Vue.provide("activityHeaderDropdownEl", activityHeaderDropdownEl);
 
 const resizeObserver = window.Vue.ref<ResizeObserver | null>(null);
 const tableContainerEl = window.Vue.useTemplateRef<HTMLElement>("tableContainerRef");
@@ -162,6 +169,10 @@ const exportReportRoute = window.Vue.computed(() => {
             </tbody>
         </table>
     </div>
+
+    <ul ref="activityHeaderDropdownEl" class="f-dropdown">
+        <mb-table-head-activity-dropdown v-if="activityHeaderSelection" :activity="activityHeaderSelection" />
+    </ul>
 </template>
 
 <style scoped>

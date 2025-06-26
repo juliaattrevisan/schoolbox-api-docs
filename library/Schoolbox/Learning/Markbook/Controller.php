@@ -129,25 +129,28 @@ class Controller extends Base
 
             $data = [
                 'rank' => (bool)$this->getConfigLoader()->get('view_rank') ? $rank : null,
-                'assessments' => $markbook->getAssessments()->reindex()->map(fn(IAssessable $assessment, $sequence) => [
-                    'id'              => $assessment->getId(),
-                    'title'           => $assessment->getTitle(),
-                    'typeName'        => $assessment->getTypeName(),
-                    'assessmentType'  => $assessment->getFamilyName(),
-                    'sequence'        => $sequence,
-                    /* unused on the class markbook: */
-                    // 'unitSpec' => ...,
-                    /* the class markbook doesn't need any of the below, as this is always an implementation */
-                    'isSpecification' => $assessment->isSpecification(),
-                    'stats'           => null,
-                    '_links'          => [
-                        /* on the class markbook, this is actually the status page of the impl */
-                        'summary' => $this->routeGenerator->generate(
-                            'learningAssessment.getStatus',
-                            [ 'assessmentId' => $assessment->getId() ]
-                        ),
-                    ],
-                ])->indexByCallback(fn(array $assessment) => $assessment['id']),
+                'assessments' => $markbook->getAssessments()->reindex()->map(function (IAssessable $assessment, $sequence) {
+                    $unitAssessmentsTranslator = new UnitAssessments(
+                        $this->routeGenerator,
+                        $this->getAuthorizer(),
+                        $this->getUser(),
+                        $this->getUser(),
+                    );
+
+                    return [
+                        'id'              => $assessment->getId(),
+                        'title'           => $assessment->getTitle(),
+                        'typeName'        => $assessment->getTypeName(),
+                        'assessmentType'  => $assessment->getFamilyName(),
+                        'sequence'        => $sequence,
+                        /* unused on the class markbook: */
+                        // 'unitSpec' => ...,
+                        /* the class markbook doesn't need any of the below, as this is always an implementation */
+                        'isSpecification' => $assessment->isSpecification(),
+                        'stats'           => null,
+                        '_links'          => $unitAssessmentsTranslator->getLinks($assessment, false),
+                    ];
+                })->indexByCallback(fn(array $assessment) => $assessment['id']),
                 /**
                  * A "class implementation" is a course/class markbook-specific term.
                  * Since the class markbook can contain non-unit assessments, this is a generalised term to allow

@@ -246,38 +246,39 @@ class Controller extends WebController\Base
 
             $data = [
                 'rank' => (bool)$this->getConfigLoader()->get('view_rank') ? $courseMarkbook->getRanking() : null,
-                'assessments' => $courseMarkbook->getCollapsedAssessments()->reindex()->map(fn(IAssessable $assessment, $sequence) => [
-                    'id'                => $assessment->getId(),
-                    'title'             => $assessment->getTitle(),
-                    'typeName'          => $assessment->getTypeName(),
-                    'assessmentType'    => $assessment->getFamilyName(),
-                    'sequence'          => $sequence,
-                    'isSpecification'   => $assessment->isSpecification(),
-                    'unitSpec'          => $unitSpecs[$assessment->getId()] !== null ? [
-                        /* for rendering the unit bars at the top of the page */
-                        'id'    => $unitSpecs[$assessment->getId()]->getId(),
-                        'title' => $unitSpecs[$assessment->getId()]->getTitle(),
-                    ] : null,
-                    /* stats here are only relevant for specs */
-                    'stats' => $assessment->isSpecification() ? array_map(
-                        /* Get the stats in the same format as returned by the class markbook */
-                        fn($mark): string|null => $mark === null ? null : sprintf("%.2f %%", $mark),
-                        [
-                            'mean'      => $courseMarkbook->getAssessmentSpecAverages()[$assessment->getId()]['published'] ?? null,
-                            'draftMean' => $courseMarkbook->getAssessmentSpecAverages()[$assessment->getId()]['any'] ?? null,
-                        ]
-                    ) : null,
-                    '_links'          => [
-                        /* only show the summary link for specs */
-                        'summary' => $assessment->isSpecification() ? $this->routeGenerator->generate(
-                            'learningAssessment.getSummary',
+                'assessments' => $courseMarkbook->getCollapsedAssessments()->reindex()->map(function (IAssessable $assessment, $sequence) use ($courseMarkbook, $unitSpecs) {
+                    $unitAssessmentsTranslator = new UnitAssessments(
+                        $this->routeGenerator,
+                        $this->getAuthorizer(),
+                        $this->getUser(),
+                        $this->getUser(),
+                    );
+
+                    return [
+                        'id'                => $assessment->getId(),
+                        'title'             => $assessment->getTitle(),
+                        'typeName'          => $assessment->getTypeName(),
+                        'assessmentType'    => $assessment->getFamilyName(),
+                        'sequence'          => $sequence,
+                        'isSpecification'   => $assessment->isSpecification(),
+                        'unitSpec'          => $unitSpecs[$assessment->getId()] !== null ? [
+                            /* for rendering the unit bars at the top of the page */
+                            'id'    => $unitSpecs[$assessment->getId()]->getId(),
+                            'title' => $unitSpecs[$assessment->getId()]->getTitle(),
+                        ] : null,
+                        /* stats here are only relevant for specs */
+                        'stats' => $assessment->isSpecification() ? array_map(
+                            /* Get the stats in the same format as returned by the class markbook */
+                            fn($mark): string|null => $mark === null ? null : sprintf("%.2f %%", $mark),
                             [
-                                'assessmentId' => $assessment->getId(),
-                                'studentId'    => $this->getUser()->getId(),
+                                'mean'      => $courseMarkbook->getAssessmentSpecAverages()[$assessment->getId()]['published'] ?? null,
+                                'draftMean' => $courseMarkbook->getAssessmentSpecAverages()[$assessment->getId()]['any'] ?? null,
                             ]
                         ) : null,
-                    ],
-                ])->indexByCallback(fn(array $assessment) => $assessment['id']),
+                        /* only show the links for specs, for historical reasons i guess... */
+                        '_links'          => $unitAssessmentsTranslator->getLinks($assessment, false),
+                    ];
+                })->indexByCallback(fn(array $assessment) => $assessment['id']),
                 /**
                  * A "class implementation" is a course/class markbook-specific term.
                  * Since the class markbook can contain non-unit assessments, this is a generalised term to allow
