@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import type { Ref } from "vue";
-import { usePopOut } from "@schoolboxVue/composables/popOut/usePopOut";
 import type { MarkbookActivity } from "./types/payload";
 
 interface Props {
