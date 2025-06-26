@@ -9,8 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Profile\Images;
 
-use Psr\Http\Client\ClientExceptionInterface;
-use Psr\SimpleCache\InvalidArgumentException;
 use Schoolbox\Application\Exception\ApiException;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Api\Rest\Api;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
