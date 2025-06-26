@@ -36,13 +36,6 @@ Usage:
 
 {% if false %}
 
-{% if canAccessPopOut %}
-<div id="pop-out-menu-markbook-container">
-    <pop-out-menu-markbook></pop-out-menu-markbook>
-</div>
-<script src="{{ CDN_PREFIX }}/js/bundle/popOutMenuMarkbook.js?v={{ config.site_version }}"></script>
-{% endif %}
-
 {% autoescape 'js' %}
     <script type="text/javascript">
         $(function() {
@@ -63,52 +56,6 @@ Usage:
                    resizeObserver.observe(container);
                 }
             });
-
-            /**
-            *  Handle creation of our base Popout menu.
-            *  - Get information about the object we're clicking on
-            *  - Pass this information into our onClick menu
-            *  - Make menu vanish when clicked off.
-            */
-
-            // Locate the courseMarkbookContent container, which we will bind our event listener to.
-            const reportContent = document.getElementById('courseMarkbookContent');
-            reportContent.addEventListener('click', (event) => {
-
-                const popOutMenuSelector = '[data-pop-out-menu]';
-
-                /**
-                * If we haven't clicked on a student grade cell, or we have but we've
-                * clicked on something /within/ the cell (such as an <a>), exit
-                */
-                if(!event.target.closest(popOutMenuSelector) || event.target.closest('a')) return;
-
-                // Remove any highlights from cells we've clicked on.
-                document.querySelector(`${popOutMenuSelector}.is-selected`)?.classList.remove('is-selected');
-                // Also highlight the cell we've clicked on.
-                event.target.closest(popOutMenuSelector).classList.add('is-selected');
-
-                const target = event.target.closest(popOutMenuSelector);
-
-                document.dispatchEvent(new CustomEvent('pop-out-menu-markbook__selected', {
-                    detail: {
-                        target: target,
-                        routes: {
-                            dataEndpoint: target.dataset.endpoint,
-                            updateRoute: target.dataset.updateRoute,
-                            reviewRoute: target.dataset.reviewRoute,
-                            publishRoute: target.dataset.publishRoute,
-                            excludeRoute: target.dataset.excludeRoute,
-                            includeRoute: target.dataset.includeRoute,
-                            historyRoute: target.dataset.historyRoute,
-                        },
-                        isExcluded: (target.dataset.isExcluded === 'true'),
-                        isParticipant: (target.dataset.isParticipant === 'true'),
-                        assessmentType: target.dataset.assessmentType,
-                    }
-                }))
-
-        });
         });
     </script>
 {% endautoescape %}
