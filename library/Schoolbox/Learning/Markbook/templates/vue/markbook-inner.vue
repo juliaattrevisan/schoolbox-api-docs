@@ -9,6 +9,31 @@ interface Props {
 
 const props = defineProps<Props>();
 const mbStore = useMarkbookStore();
+
+const resizeObserver = window.Vue.ref<ResizeObserver | null>(null);
+const tableContainerEl = window.Vue.ref<HTMLElement | null>(null);
+const markbookHeightOffset = window.Vue.ref(window.innerHeight);
+
+/**
+ * Updates the height of the scrollable area, such that the user is able to fit the
+ * visible area of the markbook within the viewport and see the relevant scrollbars
+ */
+function updateContainerHeight(): void {
+    markbookHeightOffset.value = tableContainerEl.value
+        ? Math.round(tableContainerEl.value.getBoundingClientRect().top)
+        : 0;
+}
+
+window.Vue.onMounted(() => {
+    // Initialize the ResizeObserver
+    resizeObserver.value = new ResizeObserver(updateContainerHeight);
+    resizeObserver.value.observe(document.querySelector("#container")!);
+    resizeObserver.value.observe(document.querySelector("#markbook-outer-container")!);
+
+    // Set the initial height, and update it again when the DOM is fully loaded to ensure the footer is included
+    updateContainerHeight();
+    window.addEventListener("DOMContentLoaded", updateContainerHeight, { once: true });
+});
 </script>
 
 <template>
@@ -67,7 +92,12 @@ const mbStore = useMarkbookStore();
         </div>
     </div>
 
-    <div v-if="mbStore.data" class="diagonal-headings-table-container small-12 island">
+    <div
+        v-if="mbStore.data"
+        ref="tableContainerEl"
+        class="diagonal-headings-table-container small-12 island"
+        :style="{ '--markbook-height-offset': `${markbookHeightOffset}px` }"
+    >
         <table class="diagonal-headings-table marksheet">
             <thead>
                 <tr class="rotate-headers">
@@ -159,4 +189,8 @@ const mbStore = useMarkbookStore();
     </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.diagonal-headings-table-container {
+    max-height: calc(100vh - var(--markbook-height-offset));
+}
+</style>

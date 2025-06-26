@@ -29,44 +29,7 @@ Usage:
     quickload: false,
 } only %}
 
-<div id="markbook-outer-container" class="marksheet-wrapper">
+<div id="markbook-outer-container" class="marksheet-wrapper row">
     <markbook-outer type='course' filter-event-key="{{ filterEventKey }}" />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/markbookOuter.js?v={{ config.site_version }}"></script>
-
-{% if false %}
-
-{% autoescape 'js' %}
-    <script type="text/javascript">
-        $(function() {
-            $('#{{ reportContentId }}').on('filterContentLoaded', function () {
-                $.marksheetToggleDrafts('#show-drafts');
-                $.marksheetToggleDisplayMarks('#show-display-marks');
-
-                // Note that we cannot use window.resize here because we must respond to the pinning of the left nav
-                // menu or right notifications window.  Also we cannot listen for resize events on the container,
-                // because resize events only occur on the window.  This is a task for the ResizeObserver.
-                // @see https://developer.mozilla.org/en-US/docs/Web/API/Window/resize_event
-                // @see similar code in markbookOuter.twig.
-                const container = document.querySelector("[data-diagonal-headings-table-container]");
-                if (container !== null) {
-                   const resizeObserver = new ResizeObserver(() => {
-                       container.style.maxHeight = 'calc(100vh - ' + Math.round(container.getBoundingClientRect().top) + 'px)';
-                   });
-                   resizeObserver.observe(container);
-                }
-            });
-        });
-    </script>
-{% endautoescape %}
-
-
-<div id="{{ reportContentId }}" class="marksheet-wrapper row" data-loaded="0">
-   <div class="small-12 island" data-placeholder>
-       <section class="content">
-           <img src="{{ CDN_PREFIX }}/images/foundation/preloader.gif" alt="preloader.gif" style="text-align:center; margin:auto; display:block;">
-       </section>
-   </div>
-</div>
-
-{% endif %}
