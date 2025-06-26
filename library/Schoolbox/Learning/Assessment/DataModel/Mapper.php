@@ -1927,7 +1927,9 @@ class Mapper extends BaseMapper
             // longer be linked to projects.
             foreach ($this->hydrateSelectRecursive($statement) as $subAssessment) {
                 foreach ($links->offsetGet($subAssessment->getId()) as $lessonPlan) {
-                    $lessonPlans[$lessonPlan->getLessonPlan()->getId()]->getLinkedAssessments()[$subAssessment->getId()] = $subAssessment;
+                    if ($lessonPlans[$lessonPlan->getLessonPlan()->getId()] instanceof LessonPlan\Model) {
+                        $lessonPlans[$lessonPlan->getLessonPlan()->getId()]->getLinkedAssessments()[$subAssessment->getId()] = $subAssessment;
+                    }
                 }
             }
         }
