@@ -5,7 +5,6 @@
 export enum FilterEvent {
     FILTER__CONTENT_LOADED = "FILTER__CONTENT_LOADED",
     FILTER__CONTENT_LOADING = "FILTER__CONTENT_LOADING",
-    // FILTER__CONTENT_ERROR = 'FILTER__CONTENT_ERROR',
 }
 
 type FilterEventKey = string | null;

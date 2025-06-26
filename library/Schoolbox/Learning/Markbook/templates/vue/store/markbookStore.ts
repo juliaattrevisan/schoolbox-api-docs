@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { listenForFilterLoad, listenForFilterLoading } from "@schoolboxLibrary/Filter/templates/ts/filterEvent";
 import type {
     Markbook,
     MarkbookActivity,
@@ -6,7 +7,6 @@ import type {
     MarkbookClassImplActivity,
     MarkbookSelectedCellInfo,
 } from "../types/payload";
-import { listenForFilterLoad, listenForFilterLoading } from "./filterEvent";
 
 export const useMarkbookStore = defineStore("markbookStore", () => {
     const data = window.Vue.ref<Markbook | null>(null);
