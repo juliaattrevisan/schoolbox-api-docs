@@ -95,6 +95,8 @@ export function getToolbar(config: SbxEditorConfig): ToolbarConfig {
             ...getToolbarAI(),
             "|",
             "link",
+            "bookmark",
+            "|",
             "resource",
             "mediaEmbed",
             "emoji",

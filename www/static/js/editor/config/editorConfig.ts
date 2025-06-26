@@ -26,6 +26,7 @@ import {
     FindAndReplace,
     WordCount,
     Fullscreen,
+    Bookmark,
     type EditorConfig,
 } from "ckeditor5";
 import { AIAssistant, OpenAITextAdapter, SourceEditingEnhanced } from "ckeditor5-premium-features";
@@ -85,6 +86,7 @@ export function getConfig(config: SbxEditorConfig): EditorConfig & { sbConfig: S
             AIAssistant,
             OpenAITextAdapter,
             Fullscreen,
+            Bookmark,
         ],
         extraPlugins: config.toolbar !== EditorToolbar.SIMPLE ? [UploadAdapterPlugin] : [],
         licenseKey: window.sbProps.ckeditor5LicenseKey,
