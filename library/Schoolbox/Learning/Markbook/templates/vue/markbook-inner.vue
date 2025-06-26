@@ -34,10 +34,38 @@ window.Vue.onMounted(() => {
     updateContainerHeight();
     window.addEventListener("DOMContentLoaded", updateContainerHeight, { once: true });
 });
+
+/**
+ * The route for exporting the markbook as a CSV
+ * Also appends a query parameter to show drafts or show display marks, if applicable
+ */
+const PARAM_SHOW_DRAFTS = "showDrafts";
+const PARAM_SHOW_DISPLAY_MARKS = "showDisplayMarks";
+const exportReportRoute = window.Vue.computed(() => {
+    if (mbStore.data === null || mbStore.data._routes.exportReport === null) {
+        return null;
+    }
+
+    const url = new URL(mbStore.data._routes.exportReport, window.location.origin);
+
+    if (mbStore.showDrafts) {
+        url.searchParams.set(PARAM_SHOW_DRAFTS, "1");
+    } else {
+        url.searchParams.delete(PARAM_SHOW_DRAFTS);
+    }
+
+    if (mbStore.showDisplayMarks) {
+        url.searchParams.set(PARAM_SHOW_DISPLAY_MARKS, "1");
+    } else {
+        url.searchParams.delete(PARAM_SHOW_DISPLAY_MARKS);
+    }
+
+    return url.toString();
+});
 </script>
 
 <template>
-    <div v-if="mbStore.data" :class="{ 'actions-small-1': mbStore.data._routes.exportReport !== null }">
+    <div v-if="mbStore.data" :class="{ 'actions-small-1': exportReportRoute !== null }">
         <div class="legend">
             <div class="indicators">
                 <p class="meta"><span class="legend-indicator indicator-none"></span>Unmarked</p>
@@ -68,14 +96,14 @@ window.Vue.onMounted(() => {
             <input v-model="mbStore.showDrafts" type="checkbox" />
             <label for="show-drafts" @click="mbStore.showDrafts = !mbStore.showDrafts">Show Drafts</label>
         </div>
-        <template v-if="mbStore.data._routes.exportReport">
+        <template v-if="exportReportRoute">
             <nav>
                 <sbx-pop-out content-id="header-options"></sbx-pop-out>
             </nav>
             <ul id="header-options" class="f-dropdown" data-dropdown-content>
                 <li class="separator">Report</li>
                 <li>
-                    <a :href="mbStore.data._routes.exportReport" class="icon-download"> Download Spreadsheet </a>
+                    <a :href="exportReportRoute" class="icon-download"> Download Spreadsheet </a>
                 </li>
             </ul>
         </template>

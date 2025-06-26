@@ -116,8 +116,7 @@ class Controller extends Assessment\Controller
 
     /**
      * The querystring param for Show Drafts from the ui
-     * Note that jquery.marksheet.js hardcodes this value
-     * and it needs to match this
+     * Note that the markbooks currently hardcode this value in both the frontend and backend
      */
     private const SHOW_DRAFTS_KEY = 'showDrafts';
 
