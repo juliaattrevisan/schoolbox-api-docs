@@ -205,4 +205,36 @@ class RestPhotoDownloader implements IPhotoDownloader
 
         return $userObj['latestPhotoId'];
     }
+
+
+    /**
+     * Only process new pictures if its identifier exists in isams: we can't process pictures
+     * that isams never had
+     *
+     * @param string $externalId
+     * @param array $data
+     * @param int|null $newSisPhotoId
+     * @return bool
+     */
+    public function needsUpdating(string $externalId, array $data, ?int $newSisPhotoId): bool
+    {
+        $this->log->debug(sprintf(
+            'Comparing old sis photo id %s to new sis photo id %s',
+            $data['person']['sisPhotoId'] ?? '(null)',
+            $newSisPhotoId ?? '(null)',
+        ));
+
+        if (null === $newSisPhotoId) {
+            $this->log->info(sprintf(
+                '%s %s (%s) has a null latest photo identifier; probably no picture exists. Skipping.',
+                $data['person']['firstname'],
+                $data['person']['lastname'],
+                $externalId
+            ));
+
+            return false;
+        }
+
+        return true;
+    }
 }

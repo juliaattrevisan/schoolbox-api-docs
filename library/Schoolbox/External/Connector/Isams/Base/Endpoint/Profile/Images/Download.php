@@ -135,30 +135,13 @@ class Download implements IStrategy
              * Note that $newSisPhotoId itself might be null, because it's latestPhotoId is also null
              * in isams land, via their api. In that case, that person probably never had a picture.
              */
-            if ($this->photoDownloader instanceof RestPhotoDownloader) {
-                $this->log->debug(sprintf(
-                    'Comparing old sis photo id %s to new sis photo id %s',
-                    $data['person']['sisPhotoId'] ?? '(null)',
-                    $newSisPhotoId ?? '(null)',
-                ));
-
-                if (null === $newSisPhotoId) {
-                    $this->log->info(sprintf(
-                        '%s %s (%s) has a null latest photo identifier; probably no picture exists. Skipping.',
-                        $data['person']['firstname'],
-                        $data['person']['lastname'],
-                        $externalId
-                    ));
-
-                    continue;
-                }
-            }
+            $needsUpdating = $this->photoDownloader->needsUpdating((string)$externalId, $data, $newSisPhotoId);
 
             /* If a person never had a profile picture,
              * or someone changed the profile picture in the sis,
              * we need to update our own records to know about the newest ones.
              */
-            if (null === $data['person']['portrait'] || $newSisPhotoId !== $data['person']['sisPhotoId'] || $this->photoDownloader instanceof BatchPhotoDownloader) {
+            if (null === $data['person']['portrait'] || $needsUpdating) {
                 $this->log->info(sprintf(
                     'Downloading profile photo for %s %s (%s)',
                     $data['person']['firstname'],

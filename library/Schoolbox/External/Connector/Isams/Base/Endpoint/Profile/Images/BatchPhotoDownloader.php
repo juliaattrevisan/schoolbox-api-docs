@@ -241,4 +241,18 @@ class BatchPhotoDownloader implements IPhotoDownloader
     {
         return null;
     }
+
+
+    /**
+     * Always process pictures from batchxml zips
+     *
+     * @param string $externalId
+     * @param array $data
+     * @param int|null $newSisPhotoId
+     * @return bool
+     */
+    public function needsUpdating(string $externalId, array $data, ?int $newSisPhotoId): bool
+    {
+        return true;
+    }
 }

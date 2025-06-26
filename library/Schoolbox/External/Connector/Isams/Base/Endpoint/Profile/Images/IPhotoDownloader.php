@@ -57,4 +57,16 @@ interface IPhotoDownloader
      * @throws \JsonException
      */
     public function getLatestPhotoId(array $data): ?int;
+
+
+    /**
+     * Each implementation of IPhotoDownloader can figure out whether it needs to process its images,
+     * and will do so in their own unique manner.
+     *
+     * @param string $externalId
+     * @param array $data
+     * @param int|null $newSisPhotoId
+     * @return bool
+     */
+    public function needsUpdating(string $externalId, array $data, ?int $newSisPhotoId): bool;
 }
