@@ -27,7 +27,7 @@ class DelayGen
      * @param string $currentTime The current time in 'H:i' format (e.g., '23:30').
      * @return array{0: int|null, 1: int|null, 2: int|null} [null,null,null] if no delay, or the [delay, jitter, end timestamp] if within the quiet period.
      */
-    public function getQuitePeriod(?string $startTime, ?string $endTime, string $currentTime): array
+    public function getQuietPeriod(?string $startTime, ?string $endTime, string $currentTime): array
     {
         // If no start or end time is provided, return null (send now).
         if (null === $startTime || null === $endTime) {

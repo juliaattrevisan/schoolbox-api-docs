@@ -230,7 +230,7 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
                 $now         = Alaress_Date_Format::now();
                 $currentTime = $now->getUsingFormat('H:i');
 
-                [$delay, $jitter, $delayTimestamp] = (new DelayGen())->getQuitePeriod(
+                [$delay, $jitter, $delayTimestamp] = (new DelayGen())->getQuietPeriod(
                     $this->blackoutStartTime,
                     $this->blackoutEndTime,
                     $currentTime

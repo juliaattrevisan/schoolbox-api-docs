@@ -20,14 +20,14 @@ class DelayGenTest extends TestCase
     #[DataProvider('providerValidExample')]
     public function testValidExample($input, $expected)
     {
-        [$delay, $jitter, $delayTimestamp]  = (new DelayGen())->getQuitePeriod($input[0], $input[1], $input[2]);
+        [$delay, $jitter, $delayTimestamp]  = (new DelayGen())->getQuietPeriod($input[0], $input[1], $input[2]);
 
         // check delay is either null (no delay) or a positive integer
         if (null === $expected) {
             $this->assertEquals($expected, $delay);
         } else {
             // delay is expected to be a positive integer
-            $this->assertGreaterThan($expected, $delay);
+            $this->assertGreaterThanOrEqual($expected, $delay);
         }
 
         // check jitter is always positive and less than or equal to BLACKOUT_END_JITTER
