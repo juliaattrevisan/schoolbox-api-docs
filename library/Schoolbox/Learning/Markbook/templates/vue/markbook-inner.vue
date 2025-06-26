@@ -1,67 +1,18 @@
 <script setup lang="ts">
 import { useMarkbookStore } from "./store/markbookStore";
-import MarkbookPopout from "./markbook-popout.vue";
 import MiClassAverageHeader from "./mi-class-average-header.vue";
 import MiClassimplRows from "./mi-classimpl-rows.vue";
 
 interface Props {
     type: "course" | "class";
-    filterEventKey: string;
 }
 
 const props = defineProps<Props>();
 const mbStore = useMarkbookStore();
-
-window.Vue.onMounted(() => {
-    mbStore.init(props.filterEventKey);
-
-    /**
-     * Ensure tooltips are reflowed when the markbook is changed
-     */
-    window.Vue.watch(
-        () => [mbStore.showDisplayMarks, mbStore.showDrafts],
-        () => {
-            if (document.readyState !== "complete") {
-                // If the document isn't ready, we can't reflow tooltips yet
-                return;
-            }
-
-            // @ts-expect-error -- When a tooltip is added after the page is loaded, we need to tell foundation to fix the tooltips
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- foundation isn't typed, see above
-            $(document).foundation("tooltip", "reflow");
-        },
-        { immediate: true },
-    );
-});
-
-// todo: check performance
-// todo: split files a bit
 </script>
 
 <template>
-    <div v-if="mbStore.data === null" class="markbook-loader small-12 island">
-        <section class="content">
-            <div class="loader"></div>
-        </section>
-    </div>
-    <div v-else-if="mbStore.data.classImpls.length === 0" class="empty-state">
-        <i class="icon-curriculum"></i>
-        <p>
-            This course has not yet been imported to any classes or groups.
-            <a
-                v-if="mbStore.data._routes['courseImport.getImport']"
-                :href="mbStore.data._routes['courseImport.getImport']"
-            >
-                Import this course </a
-            >.
-        </p>
-    </div>
-    <div v-else-if="mbStore.activityGroups.length === 0" class="empty-state">
-        <i class="icon-curriculum"></i>
-        <p>There are no activities that match the selected filters. Try altering the filters to broaden your search.</p>
-    </div>
-
-    <div v-else :class="{ 'actions-small-1': mbStore.data._routes.exportReport !== null }">
+    <div v-if="mbStore.data" :class="{ 'actions-small-1': mbStore.data._routes.exportReport !== null }">
         <div class="legend">
             <div class="indicators">
                 <p class="meta"><span class="legend-indicator indicator-none"></span>Unmarked</p>
@@ -116,10 +67,7 @@ window.Vue.onMounted(() => {
         </div>
     </div>
 
-    <div
-        v-if="mbStore.data && mbStore.data.classImpls.length && mbStore.activityGroups.length"
-        class="diagonal-headings-table-container small-12 island"
-    >
+    <div v-if="mbStore.data" class="diagonal-headings-table-container small-12 island">
         <table class="diagonal-headings-table marksheet">
             <thead>
                 <tr class="rotate-headers">
@@ -207,14 +155,6 @@ window.Vue.onMounted(() => {
             </tbody>
         </table>
     </div>
-
-    <markbook-popout />
 </template>
 
-<style scoped>
-/* getting around some chaotic other styles for the loader to stay in the right place */
-.markbook-loader {
-    padding-left: 0;
-    padding-right: 0;
-}
-</style>
+<style scoped></style>

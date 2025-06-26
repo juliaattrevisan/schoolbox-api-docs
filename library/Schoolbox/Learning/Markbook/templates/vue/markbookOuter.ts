@@ -3,12 +3,12 @@
  */
 
 import { createPinia } from "pinia";
-import MarkbookInner from "./markbook-inner.vue";
+import MarkbookOuter from "./markbook-outer.vue";
 
 window.Vue.createApp({
     components: {
-        MarkbookInner,
+        MarkbookOuter,
     },
 })
     .use(createPinia())
-    .mount("#markbook-inner-container");
+    .mount("#markbook-outer-container");

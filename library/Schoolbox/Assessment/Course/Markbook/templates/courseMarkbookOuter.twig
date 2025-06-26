@@ -29,10 +29,10 @@ Usage:
     quickload: false,
 } only %}
 
-<div id="markbook-inner-container" class="marksheet-wrapper">
-    <markbook-inner type='course' filter-event-key="{{ filterEventKey }}" />
+<div id="markbook-outer-container" class="marksheet-wrapper">
+    <markbook-outer type='course' filter-event-key="{{ filterEventKey }}" />
 </div>
-<script src="{{ CDN_PREFIX }}/js/bundle/markbookInner.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/markbookOuter.js?v={{ config.site_version }}"></script>
 
 {% if false %}
 
