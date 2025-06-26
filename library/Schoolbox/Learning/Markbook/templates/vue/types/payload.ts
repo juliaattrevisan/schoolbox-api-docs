@@ -98,30 +98,29 @@ export type MarkbookClassImplActivity = {
     hasDraft: Record<UserId, true>;
 };
 
+export type MarkbookClassImplStudent = {
+    id: UserId;
+    externalId: string | null;
+    givenName: string;
+    lastName: string;
+    stats: {
+        weightedMean: string | null;
+        meanNormalised: number | null;
+        draftWeightedMean: string | null;
+        meanDraftNormalised: number | null;
+    };
+    _routes: {
+        grades: string;
+    };
+};
+
 export interface MarkbookClassImpl {
     folder: {
         id: number;
         title: string;
     };
     assessments: MarkbookClassImplActivity[];
-    students: Record<
-        UserId,
-        {
-            id: UserId;
-            externalId: string | null;
-            givenName: string;
-            lastName: string;
-            stats: {
-                weightedMean: string | null;
-                meanNormalised: number | null;
-                draftWeightedMean: string | null;
-                meanDraftNormalised: number | null;
-            };
-            _routes: {
-                grades: string;
-            };
-        }
-    >;
+    students: Record<UserId, MarkbookClassImplStudent>;
     /* overall stats for the entire class, currently only on the class markbook */
     stats: {
         normalisedMean: number;
