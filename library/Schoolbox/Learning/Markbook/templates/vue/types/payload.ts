@@ -76,6 +76,7 @@ export type MarkbookClassImplActivity = {
         sdNormalized: number | null;
         weightPercent?: number | null;
         projectWeightPercent?: number | null;
+        markVisibility?: number;
     };
     _routes: {
         "learningAssessment.getStatus": string;

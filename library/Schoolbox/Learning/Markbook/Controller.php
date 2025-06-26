@@ -241,7 +241,10 @@ class Controller extends Base
                                 ];
                             }
                         ),
-                        'stats'          => $markbook->getAssessmentStatistics()[$aImpl->getId()] ?? [],
+                        'stats'          => array_merge(
+                            $markbook->getAssessmentStatistics()[$aImpl->getId()] ?? [],
+                            [ 'markVisibility' => $aImpl->getMarkVisibility() ]
+                        ),
                         '_routes'        => [
                             'learningAssessment.getStatus' => $this->routeGenerator->generate(
                                 'learningAssessment.getStatus',

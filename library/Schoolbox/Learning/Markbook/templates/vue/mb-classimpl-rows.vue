@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import locale from "@js/terminology/rosettaStone";
 import { getGradient } from "@js/util/cssUtils";
-import { ACTIVITY_TYPE_TASK } from "@schoolboxAssessment/Types/assessmentTypes";
 import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
 import { useMarkbookStore } from "./store/markbookStore";
 import MbStudentGradeCell from "./mb-student-grade-cell.vue";
 import MbClassStatisticRow from "./mb-class-statistic-row.vue";
+import type { Props as MbClassStatisticRowProps } from "./mb-class-statistic-row.vue";
+import type { MarkbookClassImplActivity } from "./types/payload";
 
 interface Props {
     type: "course" | "class";
@@ -16,15 +17,37 @@ const props = defineProps<Props>();
 const mbStore = useMarkbookStore();
 
 const markVisibilityOptions = [
-    // Please note; .icon and .description are both output via v-html are is not escaped
-    { id: 0, icon: "&#xe63e;", description: "Staff Only" },
-    { id: 1, icon: "&#xe667;", description: "Staff and Students" },
-    { id: 2, icon: "&#xe666;", description: "Staff, Students and their Parents" },
-] as const;
+    // Please note; .label is output via v-html and is not escaped
+    { value: 0, label: "&#xe63e; Staff Only" },
+    { value: 1, label: "&#xe667; Staff and Students" },
+    { value: 2, label: "&#xe666; Staff, Students and their Parents" },
+] as { value: number; label: string }[];
 
-const classStatisticRows = [
-    { label: "Weight", statsKey: "weight", input: true },
-    { label: `Weight in ${locale.project.proper()}`, statsKey: "weightInProject", input: true },
+const classStatisticRows: Omit<MbClassStatisticRowProps, "classImpl">[] = [
+    {
+        label: "Weight",
+        statsKey: "weight",
+        input: {
+            key: "weight",
+            allowCourseManaged: false,
+            fetch: (assessmentId: number, aImpl: MarkbookClassImplActivity) => ({
+                url: `/learning/assessments/weight/${assessmentId}`,
+                data: { assessmentId, weight: aImpl.weight },
+            }),
+        },
+    },
+    {
+        label: `Weight in ${locale.project.proper()}`,
+        statsKey: "weightInProject",
+        input: {
+            key: "weight",
+            allowCourseManaged: false,
+            fetch: (assessmentId: number, aImpl: MarkbookClassImplActivity) => ({
+                url: `/learning/assessments/weight/${assessmentId}`,
+                data: { assessmentId, weight: aImpl.weight },
+            }),
+        },
+    },
     { label: "% Total Weight", statsKey: "weightPercent", round: 2 },
     { label: `% Total Weight in ${locale.project.proper()}`, statsKey: "projectWeightPercent", round: 2 },
     { label: "Mean", statsKey: "mean" },
@@ -66,29 +89,21 @@ const orderedClassImplStudents = window.Vue.computed(() => {
             />
         </template>
 
-        <tr v-if="props.type === 'class'" class="sub-row">
-            <th class="fixed-left">Visibility</th>
-            <th class="fixed-left"></th>
-            <th v-if="mbStore.data.rank !== null"></th>
-            <template v-for="{ activity, aImpl } in orderedClassImplActivities" :key="activity.id">
-                <td v-if="aImpl !== null && activity.assessmentType != ACTIVITY_TYPE_TASK">
-                    <!-- todo: saving ability -->
-                    <select v-if="aImpl.writable" v-model="aImpl.markVisibility" name="visibility">
-                        <!-- eslint-disable vue/no-v-html -- we can't use <sbx-icon> in a select, so this is the other way for now.
-                          -- option.icon/description is defined above, and since html spec doesn't allow elements in options, the whole thing is v-html'd -->
-                        <option
-                            v-for="option in markVisibilityOptions"
-                            :key="option.id"
-                            :value="option.id"
-                            :disabled="!mbStore.data.availableVisibilities.includes(option.id) || undefined"
-                            v-html="`${option.icon} ${option.description}`"
-                        ></option>
-                        <!-- eslint-enable vue/no-v-html -->
-                    </select>
-                </td>
-                <td v-else></td>
-            </template>
-        </tr>
+        <mb-class-statistic-row
+            v-if="props.type === 'class'"
+            :class-impl="classImpl"
+            label="Visibility"
+            stats-key="markVisibility"
+            :input="{
+                key: 'markVisibility',
+                selectOptions: markVisibilityOptions,
+                allowCourseManaged: true,
+                fetch: (assessmentId, aImpl) => ({
+                    url: `/learning/assessments/visibility/${assessmentId}`,
+                    data: { assessmentId, visibility: aImpl.markVisibility },
+                }),
+            }"
+        />
 
         <tr v-if="props.type === 'course'">
             <th class="class-row class-row-heading fixed-left">
