@@ -2,7 +2,14 @@
  * Returns the special character plugins for the editor
  */
 
-import { SpecialCharacters, SpecialCharactersEssentials, type Editor } from "ckeditor5";
+import {
+    SpecialCharacters,
+    SpecialCharactersArrows,
+    SpecialCharactersCurrency,
+    SpecialCharactersMathematical,
+    SpecialCharactersText,
+    type Editor,
+} from "ckeditor5";
 
 /**
  * Adds a collection of language-specific special characters to the SpecialCharacters plugin.
@@ -77,8 +84,18 @@ function SpecialCharactersLanguages(editor: Editor): void {
  */
 export function getSpecialCharactersPlugins(): (
     | typeof SpecialCharacters
-    | typeof SpecialCharactersEssentials
+    | typeof SpecialCharactersArrows
+    | typeof SpecialCharactersCurrency
+    | typeof SpecialCharactersMathematical
+    | typeof SpecialCharactersText
     | typeof SpecialCharactersLanguages
 )[] {
-    return [SpecialCharacters, SpecialCharactersEssentials, SpecialCharactersLanguages];
+    return [
+        SpecialCharacters,
+        SpecialCharactersArrows,
+        SpecialCharactersCurrency,
+        SpecialCharactersMathematical,
+        SpecialCharactersText,
+        SpecialCharactersLanguages,
+    ];
 }

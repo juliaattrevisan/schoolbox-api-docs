@@ -42,6 +42,7 @@ import { getWordCountSettings } from "@js/editor/settings/wordCountSettings";
 import { getHTMLSupportSettings } from "@js/editor/settings/htmlSupportSettings";
 import { getAISettings } from "@js/editor/settings/aiSettings";
 import { getFullscreenSettings } from "@js/editor/settings/fullScreenSettings";
+import { getSpecialCharactersSettings } from "@js/editor/settings/specialCharactersSettings";
 import { EditorToolbar, type SbxEditorConfig } from "@js/editor/types/editorTypes";
 import Eqneditor5 from "@js/editor/plugin/eqnEditor/eqneditor5";
 import Resource from "@js/editor/plugin/resource/Resource";
@@ -101,6 +102,7 @@ export function getConfig(config: SbxEditorConfig): EditorConfig & { sbConfig: S
         ...getHTMLSupportSettings(),
         ...getAISettings(window.sbProps.openAIModel),
         ...getFullscreenSettings(),
+        ...getSpecialCharactersSettings(),
         sbConfig: { ...config }, // to be able to access our editor config from within the editor,
     };
 }
