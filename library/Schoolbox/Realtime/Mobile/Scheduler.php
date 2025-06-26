@@ -61,13 +61,6 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
     private ?string $blackoutEndTime = null;
 
     /**
-     * Instead of sending all queued notifications immediately after
-     * `$this->blackoutEndTime`: jitter the send by this number of seconds to
-     * protect against overwhelming notification services.
-     */
-    private const BLACKOUT_END_JITTER = 60;
-
-    /**
      * Constructor
      *
      * @param LoopInterface             $loop
@@ -231,33 +224,19 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
                     )
                 );
             } else {
+                /* generate the delay or null if not in quiet period
+                 */
                 // Is the current time within the quiet period?
                 $now         = Alaress_Date_Format::now();
                 $currentTime = $now->getUsingFormat('H:i');
 
-                if ($this->blackoutStartTime <= $this->blackoutEndTime) {
-                    // Start time < end time:
-                    // the quiet period does not overlap 00:00
-                    $quiet = ($currentTime >= $this->blackoutStartTime && $currentTime <= $this->blackoutEndTime);
-                } else {
-                    // Start time > end time:
-                    // the quiet period overlaps 00:00
-                    $quiet = ($currentTime >= $this->blackoutStartTime || $currentTime <= $this->blackoutEndTime);
-                }
-                if ($quiet) {
-                    // How many seconds to go until quiet time expires?
-                    $jitter           = random_int(0, self::BLACKOUT_END_JITTER);
-                    $delayTimestamp   = strtotime($this->blackoutEndTime) + $jitter;
-                    $currentTimestamp = strtotime($currentTime);
-                    $delay            = $delayTimestamp - $currentTimestamp;
+                [$delay, $jitter, $delayTimestamp] = (new DelayGen())->getQuitePeriod(
+                    $this->blackoutStartTime,
+                    $this->blackoutEndTime,
+                    $currentTime
+                );
 
-                    /* if delay is negative, it means we need to add a day
-                     * (and the negative delay will roll back to the actual time)
-                     */
-                    if ($delay < 0) {
-                        $delay += 86400; // add a day in seconds
-                    }
-
+                if ($delay) {
                     $this->log->notice(
                         sprintf(
                             'Message %s:%s delivery delayed until %ss after end of quiet period (%s-%s) (exact time: %s) (delaying: %s seconds)',
