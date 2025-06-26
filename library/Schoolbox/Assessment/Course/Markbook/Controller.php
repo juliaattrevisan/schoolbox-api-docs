@@ -434,7 +434,7 @@ class Controller extends WebController\Base
                                         'weightedMean'        => $stats['published']['hr'] ?? null,
                                         'meanNormalised'      => $stats['published']['norm'] ?? null,
                                         'draftWeightedMean'   => $stats['any']['hr'] ?? null,
-                                        'draftMeanNormalised' => $stats['any']['norm'] ?? null,
+                                        'meanDraftNormalised' => $stats['any']['norm'] ?? null,
                                     ],
                                     'averageMarks' => $courseMarkbook->getStudentAverageMarks()[$courseImpl->getId()][$student->getId()] ?? null,
                                     '_routes'    => [
