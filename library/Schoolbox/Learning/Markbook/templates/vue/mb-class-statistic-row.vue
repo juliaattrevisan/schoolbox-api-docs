@@ -106,40 +106,33 @@ async function onValueChange(activityId: number, aImpl: MarkbookClassImplActivit
             :data-assessment="assessment.id"
         >
             <template v-if="stat === null || aImpl === null || !aImpl.writable"></template>
-            <select
-                v-else-if="
-                    props.input &&
-                    props.input.selectOptions &&
-                    assessment.assessmentType !== ACTIVITY_TYPE_TASK &&
-                    (props.input.allowCourseManaged || !aImpl.courseManaged)
-                "
-                v-model="aImpl[props.input.key]"
-                :name="props.statsKey"
-                @change="onValueChange(assessment.id, aImpl)"
-            >
-                <!-- eslint-disable vue/no-v-html -- we can't use <sbx-icon> in a select since html spec
-                  -- doesn't allow elements in options, so the whole thing is v-html'd instead... -->
-                <option
-                    v-for="option in props.input.selectOptions"
-                    :key="option.value"
-                    :value="option.value"
-                    v-html="option.label"
-                ></option>
-                <!-- eslint-enable vue/no-v-html -->
-            </select>
-            <input
-                v-else-if="
-                    props.input &&
-                    assessment.assessmentType !== ACTIVITY_TYPE_TASK &&
-                    (props.input.allowCourseManaged || !aImpl.courseManaged)
-                "
-                v-model="aImpl[props.input.key]"
-                type="number"
-                inputmode="numeric"
-                :name="props.statsKey"
-                min="0"
-                @change="onValueChange(assessment.id, aImpl)"
-            />
+            <template v-else-if="props.input && (props.input.allowCourseManaged || !aImpl.courseManaged)">
+                <select
+                    v-if="props.input.selectOptions && assessment.assessmentType !== ACTIVITY_TYPE_TASK"
+                    v-model="aImpl[props.input.key]"
+                    :name="props.statsKey"
+                    @change="onValueChange(assessment.id, aImpl)"
+                >
+                    <!-- eslint-disable vue/no-v-html -- we can't use <sbx-icon> in a select since html spec
+                    -- doesn't allow elements in options, so the whole thing is v-html'd instead... -->
+                    <option
+                        v-for="option in props.input.selectOptions"
+                        :key="option.value"
+                        :value="option.value"
+                        v-html="option.label"
+                    ></option>
+                    <!-- eslint-enable vue/no-v-html -->
+                </select>
+                <input
+                    v-else-if="assessment.assessmentType !== ACTIVITY_TYPE_TASK"
+                    v-model="aImpl[props.input.key]"
+                    type="number"
+                    inputmode="numeric"
+                    :name="props.statsKey"
+                    min="0"
+                    @change="onValueChange(assessment.id, aImpl)"
+                />
+            </template>
             <span v-else-if="props.round !== undefined">
                 {{ parseFloat(Number(stat).toFixed(props.round)) }}
             </span>
