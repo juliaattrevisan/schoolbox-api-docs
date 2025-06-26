@@ -19,8 +19,6 @@ import {
     Font,
     RemoveFormat,
     MediaEmbed,
-    SpecialCharacters,
-    SpecialCharactersEssentials,
     HorizontalLine,
     Alignment,
     FindAndReplace,
@@ -48,6 +46,7 @@ import { EditorToolbar, type SbxEditorConfig } from "@js/editor/types/editorType
 import Eqneditor5 from "@js/editor/plugin/eqnEditor/eqneditor5";
 import Resource from "@js/editor/plugin/resource/Resource";
 import UITweaks from "@js/editor/plugin/ui/UITweaks";
+import { getSpecialCharactersPlugins } from "../plugin/specialCharactersPlugins";
 
 /**
  * Return the default configuration
@@ -63,6 +62,7 @@ export function getConfig(config: SbxEditorConfig): EditorConfig & { sbConfig: S
             ...getTablePlugins(),
             ...getEmojiPlugins(),
             ...getTokensPlugins(config),
+            ...getSpecialCharactersPlugins(),
             Heading,
             Paragraph,
             HeadingButtonsUI,
@@ -73,8 +73,6 @@ export function getConfig(config: SbxEditorConfig): EditorConfig & { sbConfig: S
             Font,
             RemoveFormat,
             MediaEmbed,
-            SpecialCharacters,
-            SpecialCharactersEssentials,
             HorizontalLine,
             Alignment,
             FindAndReplace,
