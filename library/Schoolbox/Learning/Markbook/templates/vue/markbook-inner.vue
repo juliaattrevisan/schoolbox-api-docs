@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useMarkbookStore } from "./store/markbookStore";
-import MiClassAverageHeader from "./mi-class-average-header.vue";
-import MiClassimplRows from "./mi-classimpl-rows.vue";
+import MbClassAverageHeader from "./mb-class-average-header.vue";
+import MbClassimplRows from "./mb-classimpl-rows.vue";
 
 interface Props {
     type: "course" | "class";
@@ -104,7 +104,9 @@ const mbStore = useMarkbookStore();
                 </tr>
 
                 <template v-if="props.type === 'class'">
-                    <mi-class-average-header
+                    <!-- NB; This won't look correct if there are multiple classImpls.
+                      -- Currently that will never happen since this is restricted to the class markbook -->
+                    <mb-class-average-header
                         v-for="(classImpl, classImplId) in mbStore.data.classImpls"
                         :key="classImplId"
                         :class-impl="classImpl"
@@ -146,7 +148,7 @@ const mbStore = useMarkbookStore();
                     </template>
                 </tr>
 
-                <mi-classimpl-rows
+                <mb-classimpl-rows
                     v-for="(_, classImplId) in mbStore.data.classImpls"
                     :key="classImplId"
                     :type="props.type"

@@ -4,8 +4,8 @@ import { getGradient } from "@js/util/cssUtils";
 import { ACTIVITY_TYPE_TASK } from "@schoolboxAssessment/Types/assessmentTypes";
 import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
 import { useMarkbookStore } from "./store/markbookStore";
-import MiCellGrade from "./mi-cell-grade.vue";
-import MiStatisticRow from "./mi-statistic-row.vue";
+import MbStudentGradeCell from "./mb-student-grade-cell.vue";
+import MbClassStatisticRow from "./mb-class-statistic-row.vue";
 
 interface Props {
     type: "course" | "class";
@@ -55,7 +55,7 @@ const orderedClassImplStudents = window.Vue.computed(() => {
 <template>
     <template v-if="mbStore.data !== null && classImpl !== null">
         <template v-if="props.type === 'class' && mbStore.showAverages">
-            <mi-statistic-row
+            <mb-class-statistic-row
                 v-for="row in classStatisticRows"
                 :key="row.statsKey"
                 :class-impl="classImpl"
@@ -161,7 +161,7 @@ const orderedClassImplStudents = window.Vue.computed(() => {
                 <span v-else>–</span>
             </td>
 
-            <mi-cell-grade
+            <mb-student-grade-cell
                 v-for="activity in mbStore.orderedActivities"
                 :key="activity.id"
                 :assessment-id="activity.id"
