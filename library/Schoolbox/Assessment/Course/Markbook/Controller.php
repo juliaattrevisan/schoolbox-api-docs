@@ -236,7 +236,6 @@ class Controller extends WebController\Base
                 return null;
             });
 
-            // TODO: clean this up a bit once the payload structure is finalised
             $data = [
                 'rank' => (bool)$this->getConfigLoader()->get('view_rank') ? $courseMarkbook->getRanking() : null,
                 'assessments' => $courseMarkbook->getCollapsedAssessments()->reindex()->map(fn(IAssessable $assessment, $sequence) => [

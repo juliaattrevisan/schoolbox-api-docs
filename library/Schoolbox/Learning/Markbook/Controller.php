@@ -139,7 +139,6 @@ class Controller extends Base
 
             $writable = $this->getAssessmentsWritability($markbook->getAssessments());
 
-            // TODO: clean this up a bit once the payload structure is finalised
             $data = [
                 'rank' => (bool)$this->getConfigLoader()->get('view_rank') ? $rank : null,
                 'assessments' => $markbook->getAssessments()->reindex()->map(fn(IAssessable $assessment, $sequence) => [
