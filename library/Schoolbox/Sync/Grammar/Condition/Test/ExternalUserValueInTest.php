@@ -52,6 +52,21 @@ class ExternalUserValueInTest extends TestCase
             ->addEmail((new Email())->setAddress('john@example.com'))
         ;
 
+        $specialChars = (new Staff())
+            ->setGivenName('Chemistry/Physics Teacher & Assistant Director of Academic Operations 7-12 (SS)')
+            ->setLastname('Chemistry\Physics Teacher & Assistant Director of Academic Operations 7-12 (SS)')
+        ;
+
+        $specialChars2 = (new Staff())
+            ->setGivenName('Chemistry/Physics Teacher & A\ ss \   \ \is/tan/t/ D/i/r/e/ctor of Academic Operations 7-12 (SS)')
+            ->setLastname(' \ Chemistry\Phy\sics T\eacher & Assist\ant\ \D\irector of Academic Operations 7-12 (SS)   \   ')
+        ;
+
+        $specialChars3 = (new Staff())
+            ->setGivenName('Chemis*try/Physics Teacher & A\ ss \   *\ \is/tan/t/ D/i/r/e/ctor *of Academic Operations 7-1*2 (SS)')
+            ->setLastname(' \ Chemistry\Ph*y\sics T\eacher & Assist\ant\ \D*\irector of Academic Operati*ons 7-12 (SS) *  \   ')
+        ;
+
         // Simple match (or not) on name
         yield 'match on single valid name' => [
             'givenName',
@@ -360,6 +375,94 @@ class ExternalUserValueInTest extends TestCase
             ['{jack', 'jack'],
             $staffUser,
             true,
+        ];
+
+        /* This is a real-life example of a position title that contains characters
+         * specially handled by the Matcher which uses PHLAK/Splat to do the matching.
+         */
+        yield 'special characters in value 1' => [
+            'givenName',
+            '*(SS)*',
+            $specialChars,
+            /* "false" normally.
+             *
+             * This is actually intended usage of the vendor library, despite it maybe being misleading
+             * if you're used to vanilla regex. We translate * to ** on behalf of users, allowing this
+             * syntax to succeed when normally the vendor library would have returned false, failing to
+             * match; simply to avoid having to teach users the difference between * and ** for values
+             * that contain one slash or the other based on operating system environments.
+             */
+            true
+        ];
+
+        /* double asterisk variant that you were SUPPOSED to have been doing for data like this,
+         * but users don't know that and it'll be too annoying for them to learn its nuances.
+         */
+        yield 'special characters in value 2' => [
+            'lastName',
+            '**(SS)**',
+            $specialChars,
+            /* This is actually intended usage of the vendor library, despite it maybe being misleading
+             * if you're used to vanilla regex.
+             */
+            true
+        ];
+
+        /* A bit of an extreme case
+         */
+        yield 'special characters in value 3' => [
+            'lastName',
+            '*********(SS)**',
+            $specialChars,
+            true
+        ];
+
+        /* Even more extreme
+         */
+        yield 'special characters in value 10' => [
+            'givenName',
+            '*(SS)*',
+            $specialChars2,
+            true
+        ];
+
+        yield 'special characters in value 11' => [
+            'lastName',
+            '*(SS)*',
+            $specialChars2,
+            true
+        ];
+
+        /* Even more even extreme, with additional random asterix
+         */
+        yield 'special characters in value 20' => [
+            'givenName',
+            '*(SS)*',
+            $specialChars3,
+            true
+        ];
+
+        yield 'special characters in value 21' => [
+            'lastName',
+            '*(SS)*',
+            $specialChars3,
+            true
+        ];
+
+        /* For some reason people were escaping the parantheses but you don't need to do that
+         */
+        yield 'special characters in value 31' => [
+            'givenName',
+            '*\(SS\)*',
+            $specialChars3,
+            true
+        ];
+
+        yield 'special characters in value 32' => [
+            'lastName',
+            '*\(SS\)*',
+            $specialChars3,
+            true
         ];
     }
 }
