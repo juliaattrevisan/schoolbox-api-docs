@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Api\Rest;
 
 use GuzzleHttp\Client as HttpClient;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
 use Psr\Http\Client\ClientExceptionInterface;
@@ -62,6 +63,7 @@ class Api
      * @param string $apiHost
      * @param string $clientId
      * @param string $clientSecret
+     * @throws ApiException
      */
     public function __construct(
         private string $apiHost,
@@ -84,11 +86,7 @@ class Api
      * Retrieve Bearer Token from the OIDC
      *
      * @return string
-     * @throws ClientExceptionInterface if something went wrong fetching JWKS
-     * @throws InvalidArgumentException if key set or OIDC discovery couldn't be
-     *                                  written to or read from cache
-     * @throws \JsonException
-     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
+     * @throws ApiException
      */
     private function getToken(): string
     {
@@ -124,7 +122,7 @@ class Api
      * @param bool $requireToken
      * @param bool $raw - return raw data, not json decoded
      * @return mixed
-     * @throws GuzzleException
+     * @throws ApiException
      */
     public function request(string $path, string $method, array $options = [], bool $requireToken = true, bool $raw = false): mixed
     {
@@ -214,6 +212,19 @@ class Api
                 sleep($napTime);
 
                 continue;
+            } catch (ClientException $e) {
+                $response = $e->getResponse();
+                if ($response->getStatusCode() === 400) {
+                    if (str_contains($response->getBody()->getContents(), 'invalid_client')) {
+                        throw new ApiException('iSAMS REST API credentials are invalid', 400, $e);
+                    }
+                }
+            } catch (\JsonException $e) {
+                // If we can't decode the response, then throw an exception
+                throw new ApiException(sprintf(
+                    'iSAMS REST API returned an invalid JSON response: %s',
+                    $e->getMessage()
+                ), 500, $e);
             } catch (GuzzleException $e) {
                 /* 404 Not Found for images (raw mode), we should just return null, not throw an exception
                  */
