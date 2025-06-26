@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { Ref } from "vue";
+import { usePopOut } from "@schoolboxVue/composables/popOut/usePopOut";
 import { useMarkbookStore } from "./store/markbookStore";
 import type { MarkbookActivity } from "./types/payload";
 
@@ -8,6 +10,27 @@ interface Props {
 
 const props = defineProps<Props>();
 const mbStore = useMarkbookStore();
+
+const activityHeaderSelection = window.Vue.inject<Ref<MarkbookActivity | null>>("activityHeaderSelection");
+const activityHeaderDropdownEl = window.Vue.inject<Ref<HTMLElement | null>>("activityHeaderDropdownEl");
+if (activityHeaderDropdownEl === undefined) {
+    throw new Error("Unable to inject activityHeaderDropdownEl");
+}
+
+const referenceEl = window.Vue.useTemplateRef<HTMLElement | null>("referenceEl");
+const { onButtonSelected } = usePopOut(referenceEl, activityHeaderDropdownEl, "Actions", "bottom-start");
+
+/**
+ * When the user clicks on the activity, open the pop-out menu if desired
+ */
+async function onTitleClick(): Promise<void> {
+    if (activityHeaderSelection === undefined) {
+        throw new Error("Unable to inject activityHeaderSelection");
+    }
+
+    activityHeaderSelection.value = props.activity;
+    await onButtonSelected();
+}
 </script>
 
 <template>
@@ -25,6 +48,7 @@ const mbStore = useMarkbookStore();
                     v-if="props.activity._links?.summary !== null"
                     :href="props.activity._links?.summary"
                     :title="props.activity.title"
+                    @click.prevent="onTitleClick"
                 >
                     {{ props.activity.title }}
                 </a>
