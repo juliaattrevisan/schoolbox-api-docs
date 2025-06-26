@@ -4,6 +4,7 @@
  * as provide quick links to further actions
  */
 
+import { until } from "@vueuse/core";
 import type { Ref } from "vue";
 import {
     ACTIVITY_TYPE_TASK,
@@ -386,12 +387,16 @@ async function openPopOut(): Promise<void> {
  */
 window.Vue.watch(
     () => mbStore.popoutSelectedCell,
-    (newValue) => {
+    async (newValue) => {
         if (newValue === null) {
             // The popout was closed by something else
             referenceElement.value = null;
             return;
         }
+
+        // To avoid accidentally opening the popout for the wrong cell, or closing the popout unexpectedly
+        // if a user clicks on another cell while one is saving or loading already
+        await until(isLoading).toBe(false);
 
         // A linked button has been selected so populate the pop out
         selectedCell.value = newValue;
