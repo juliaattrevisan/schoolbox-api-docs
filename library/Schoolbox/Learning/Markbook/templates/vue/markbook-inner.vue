@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useMarkbookStore } from "./store/markbookStore";
-import MbClassAverageHeader from "./mb-class-average-header.vue";
+import MbTableHead from "./mb-table-head.vue";
 import MbClassimplRows from "./mb-classimpl-rows.vue";
 
 interface Props {
@@ -127,64 +127,7 @@ const exportReportRoute = window.Vue.computed(() => {
         :style="{ '--markbook-height-offset': `${markbookHeightOffset}px` }"
     >
         <table class="diagonal-headings-table marksheet">
-            <thead>
-                <tr class="rotate-headers">
-                    <th class="fixed-left"><div></div></th>
-                    <th class="fixed-left">
-                        <div><span>Student Weighted Average</span></div>
-                    </th>
-                    <th v-if="mbStore.data.rank !== null">
-                        <div>
-                            <span>{{ props.type === "class" ? "Class" : "Course" }} Ranking</span>
-                        </div>
-                    </th>
-                    <th
-                        v-for="activity in mbStore.orderedActivities"
-                        :key="activity.id"
-                        :data-test="`markbook-assessment-${activity.id}`"
-                    >
-                        <div>
-                            <!-- A teacher clicking an assessment from the markbook is most likely interested in seeing more granular results -->
-                            <span>
-                                <a
-                                    v-if="activity._links.summary !== null"
-                                    :href="activity._links.summary"
-                                    :title="activity.title"
-                                >
-                                    {{ activity.title }}
-                                </a>
-                                <span v-else :title="activity.title">{{ activity.title }}</span>
-                                <br />
-                                <span class="meta">{{ activity.typeName }}</span>
-                            </span>
-                        </div>
-                    </th>
-                </tr>
-
-                <template v-if="props.type === 'class'">
-                    <!-- NB; This won't look correct if there are multiple classImpls.
-                      -- Currently that will never happen since this is restricted to the class markbook -->
-                    <mb-class-average-header
-                        v-for="(classImpl, classImplId) in mbStore.data.classImpls"
-                        :key="classImplId"
-                        :class-impl="classImpl"
-                    />
-                </template>
-
-                <tr v-if="props.type === 'course'" class="course-headers">
-                    <th class="fixed-left transparent"></th>
-                    <th class="fixed-left white"></th>
-                    <th v-if="mbStore.data.rank !== null" class="white"></th>
-                    <th
-                        v-for="group in mbStore.activityGroups"
-                        :key="group.unitSpec?.id"
-                        class="unit-title"
-                        :colspan="group.activities.length"
-                    >
-                        {{ group.unitSpec?.title ?? "" }}
-                    </th>
-                </tr>
-            </thead>
+            <mb-table-head :type="props.type" />
             <tbody>
                 <tr v-if="props.type === 'course'">
                     <th class="course-row class-row-heading fixed-left">
