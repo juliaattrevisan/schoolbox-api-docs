@@ -98,14 +98,14 @@ class Language
                      */
                     $language = $valueLists['language'][$record['language']] ?? self::UNKNOWN_DESCRIPTION;
 
-                    /* Everyone is not a native speaker until otherwise decided
+                    /* Everyone is a native speaker until otherwise decided
                      */
-                    $eal = true;
+                    $eal = false;
 
                     /* Analyse the node to decide nativeness
                      */
-                    if ($record['is_primary'] && (self::ENGLISH_DESCRIPTION === strtolower($language))) {
-                        $eal = false;
+                    if ($record['is_primary'] && (self::ENGLISH_DESCRIPTION !== strtolower($language))) {
+                        $eal = true;
                     }
 
                     /* Simplify usage since we only care if English was is_primary

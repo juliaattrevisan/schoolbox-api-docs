@@ -266,7 +266,7 @@ class Profile implements IStrategy
 
                 /* Flags
                  */
-                $esl = (bool)($languageLookup[$externalId] ?? true);
+                $esl = (bool)($languageLookup[$externalId] ?? false);
                 $ib = false;
                 $ilp = false;
 
