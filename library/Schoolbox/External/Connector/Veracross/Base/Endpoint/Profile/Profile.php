@@ -165,7 +165,7 @@ class Profile implements IStrategy
         /* Prefetch a list of language usages
          */
         $this->log->debug('Prefetching languages...');
-        $languageLookup = (new Language($this->api))->generate();
+        $languageLookup = (new Language($this->api, $this->watchlist))->generate();
 
         /* Only available when Families strat is enabled
          */
@@ -266,7 +266,7 @@ class Profile implements IStrategy
 
                 /* Flags
                  */
-                $esl = (bool)($languageLookup[$externalId]['eal'] ?? true);
+                $esl = (bool)($languageLookup[$externalId] ?? true);
                 $ib = false;
                 $ilp = false;
 

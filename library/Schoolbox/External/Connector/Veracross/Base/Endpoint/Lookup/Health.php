@@ -30,6 +30,7 @@ class Health
      * Constructor
      *
      * @param IApi $api
+     * @param array $watchlist
      */
     public function __construct(private IApi $api, private array $watchlist)
     {
@@ -54,7 +55,7 @@ class Health
                 /* Avengers Assemble!
                  */
                 foreach ($page['data'] as $record) {
-                    $externalId = (string)$record['id'];
+                    $externalId = trim((string)$record['id']);
 
                     /* Only import for specific users
                      */
