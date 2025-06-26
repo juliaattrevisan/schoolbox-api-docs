@@ -1,3 +1,6 @@
+/**
+ * This is only used by the rubric markbook
+ */
 (function ($) {
     /**
      * Show draft data in markbook cells.
@@ -27,10 +30,9 @@
 
     /**
      * Change the download href in any download markbook links.
-     * @param {boolean|null} shouldShowDrafts - whether to show drafts in the download, null to keep the current state
-     * @param {boolean|null} shouldShowDisplayMarks - whether to show display marks in the download, null to keep the current state
+     * @param {boolean} shouldShowDrafts - whether to show drafts in the download
      */
-    const changeDownloadHref = function (shouldShowDrafts, shouldShowDisplayMarks) {
+    const changeDownloadHref = function (shouldShowDrafts) {
         let downloadLinks = document.querySelectorAll("a[data-download-spreadsheet]");
         downloadLinks.forEach(function (downloadLink) {
             if (downloadLink && "href" in downloadLink) {
@@ -41,13 +43,6 @@
                     downloadUrl.searchParams.set("showDrafts", "1");
                 } else if (shouldShowDrafts === false) {
                     downloadUrl.searchParams.delete("showDrafts");
-                }
-
-                // Update the showDisplayMarks query parameter if necessary, keeping the current state if null
-                if (shouldShowDisplayMarks === true) {
-                    downloadUrl.searchParams.set("showDisplayMarks", "1");
-                } else if (shouldShowDisplayMarks === false) {
-                    downloadUrl.searchParams.delete("showDisplayMarks");
                 }
 
                 downloadLink.href = downloadUrl;
@@ -68,46 +63,10 @@
         $(document).on("change", selector, function () {
             if ($(this).prop("checked")) {
                 showDrafts();
-                changeDownloadHref(true, null);
+                changeDownloadHref(true);
             } else {
                 hideDrafts();
-                changeDownloadHref(false, null);
-            }
-        });
-    };
-
-    /**
-     * Show the display (learner) mark in markbook cells and hide the instructor mark
-     */
-    function showDisplayMarks() {
-        $("[data-learner-mark]").show();
-        $("[data-instructor-mark]").hide();
-    }
-
-    /**
-     * Hide the display (learner) mark in markbook cells and show the instructor mark
-     */
-    function hideDisplayMarks() {
-        $("[data-learner-mark]").hide();
-        $("[data-instructor-mark]").show();
-    }
-
-    /**
-     * Set up toggle on/off of display marks.
-     *
-     * On changing the show/hide display marks checkbox:
-     * * show/hide display marks in the markbook
-     *
-     * @param selector
-     */
-    $.marksheetToggleDisplayMarks = function (selector) {
-        $(document).on("change", selector, function () {
-            if ($(this).prop("checked")) {
-                showDisplayMarks();
-                changeDownloadHref(null, true);
-            } else {
-                hideDisplayMarks();
-                changeDownloadHref(null, false);
+                changeDownloadHref(false);
             }
         });
     };

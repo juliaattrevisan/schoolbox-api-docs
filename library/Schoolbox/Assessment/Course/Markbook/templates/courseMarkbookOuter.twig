@@ -1,18 +1,16 @@
 {#
-Usage:
-    filterPanel: FilterPanel - a filter panel that can filter and AJAX in the report
-    courseSpec:  CourseSpec
+    Course Markbook report wrapper
+
+    Usage:
+        courseSpec:  CourseSpec
+        filterPanel: FilterPanel - a filter panel that can filter and AJAX in the report
 #}
 
-{% if false %}
-
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.marksheet.js?v={{ config.site_version }}"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/task/jquery.progressTickForm.js?v={{ config.site_version }}"></script>
-
-{% endif %}
-
 {% import 'sub/breadcrumbs.twig' as bread %}
-{{ bread.crumbs(['Courses', routeLookupIfAuthorized('course.courseList') ], ['Course Markbook']) }}
+{{ bread.crumbs(
+    ['Courses', routeLookupIfAuthorized('course.courseList') ],
+    ['Course Markbook'])
+}}
 
 <div class="row">
     <div class="small-12 columns">
