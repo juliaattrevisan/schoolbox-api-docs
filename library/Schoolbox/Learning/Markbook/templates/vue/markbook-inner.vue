@@ -76,12 +76,8 @@ const exportReportRoute = window.Vue.computed(() => {
         </div>
 
         <div class="checklist">
-            <input v-model="mbStore.showDisplayMarks" type="checkbox" />
-            <label
-                for="show-display-marks"
-                data-test="markbook-show-display-marks"
-                @click="mbStore.showDisplayMarks = !mbStore.showDisplayMarks"
-            >
+            <input id="show-display-marks" v-model="mbStore.showDisplayMarks" type="checkbox" />
+            <label for="show-display-marks" data-test="markbook-show-display-marks">
                 Show Display Marks
                 <span
                     class="hint has-tip tip-top"
@@ -93,8 +89,8 @@ const exportReportRoute = window.Vue.computed(() => {
             </label>
         </div>
         <div class="checklist">
-            <input v-model="mbStore.showDrafts" type="checkbox" />
-            <label for="show-drafts" @click="mbStore.showDrafts = !mbStore.showDrafts">Show Drafts</label>
+            <input id="show-drafts" v-model="mbStore.showDrafts" type="checkbox" />
+            <label for="show-drafts">Show Drafts</label>
         </div>
         <template v-if="exportReportRoute">
             <nav>
