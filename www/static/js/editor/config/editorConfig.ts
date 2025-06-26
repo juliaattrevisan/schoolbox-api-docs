@@ -47,7 +47,6 @@ import { EditorToolbar, type SbxEditorConfig } from "@js/editor/types/editorType
 import Eqneditor5 from "@js/editor/plugin/eqnEditor/eqneditor5";
 import Resource from "@js/editor/plugin/resource/Resource";
 import UITweaks from "@js/editor/plugin/ui/UITweaks";
-import CustomFullscreenHandling from "@js/editor/plugin/fullscreen/CustomFullscreenHandling";
 import { getSpecialCharactersPlugins } from "../plugin/specialCharactersPlugins";
 
 /**
@@ -86,7 +85,6 @@ export function getConfig(config: SbxEditorConfig): EditorConfig & { sbConfig: S
             AIAssistant,
             OpenAITextAdapter,
             Fullscreen,
-            CustomFullscreenHandling,
             Bookmark,
         ],
         extraPlugins: config.toolbar !== EditorToolbar.SIMPLE ? [UploadAdapterPlugin] : [],

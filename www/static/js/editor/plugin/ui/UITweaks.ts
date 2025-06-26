@@ -8,15 +8,17 @@ import {
     getOptimalPosition,
     ButtonView,
     LinkUI,
+    FullscreenEditing,
     type ClassicEditor,
+    type InlineEditor,
     type DropdownView,
     type ViewCollection,
     type DomPoint,
-    type View,
 } from "ckeditor5";
 import { EditorEvent } from "@js/editor/event/editorEvent";
 import { insertElementAfter } from "@js/util/domUtils";
 import ResourceLinkEditing from "@js/editor/plugin/resourceLink/ResourceLinkEditing";
+import InlineEditorHandler from "@js/editor/plugin/ui/InlineEditorHandler";
 import type InsertResourceLinkCommand from "@js/editor/plugin/resourceLink/InsertResourceLinkCommand";
 
 export default class UITweaks extends Plugin {
@@ -27,7 +29,7 @@ export default class UITweaks extends Plugin {
      * @returns - the required plugins
      */
     public static get requires(): readonly (typeof Plugin)[] {
-        return [ResourceLinkEditing] as const;
+        return [ResourceLinkEditing, FullscreenEditing] as const;
     }
 
     /**
@@ -38,6 +40,15 @@ export default class UITweaks extends Plugin {
             this.updateDropdownPositions();
             this.addLinkBrowseButton();
         });
+        /**
+         * For the InlineEditor, we need to override the default fullscreen handler
+         */
+        if ((this.editor.constructor as typeof InlineEditor).editorName === "InlineEditor") {
+            const toggleFullscreenCommand = this.editor.commands.get("toggleFullscreen");
+            if (toggleFullscreenCommand) {
+                toggleFullscreenCommand.fullscreenHandler = new InlineEditorHandler(this.editor as InlineEditor);
+            }
+        }
     }
 
     /**
