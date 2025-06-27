@@ -389,3 +389,28 @@ turned on */
 .ck.ck-editor__main .ck-source-editing-area textarea:focus {
     background-color: var(--sb-ck-active-grey) !important;
 }
+
+/**
+ * Fullscreen styles
+ * These styles are applied when the editor is in fullscreen mode.
+ * They ensure that the editor takes up the full screen displays
+ * in a 'page less' style, stretching across the entire screen
+ */
+
+.ck.ck-fullscreen__main-wrapper .ck-fullscreen__sidebar {
+    display: none;
+}
+
+.ck.ck-fullscreen__main-wrapper .ck-fullscreen__editable {
+    margin: 0;
+    width: 100%;
+}
+
+.ck.ck-fullscreen__main-wrapper .ck-fullscreen__editable .ck-editor__editable_inline:not(.ck-editor__nested-editable) {
+    border: 0;
+    margin: 0;
+    max-width: 100%;
+    min-height: 0;
+    padding: 1rem;
+    width: 100%;
+}
