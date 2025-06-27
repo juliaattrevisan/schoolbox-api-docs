@@ -21,12 +21,12 @@ class EnrolmentChecker
      * Figure out if this person's enrolment in a particular class expired.
      * If so, process a REMOVE override for them elsewhere.
      *
-     * @param \Alaress_Date_Format $current
-     * @param \Alaress_Date_Format $startAt
-     * @param \Alaress_Date_Format $finishAt
      * @param array $subject
      * @param string $title
      * @param string $classCode
+     * @param \Alaress_Date_Format $current
+     * @param \Alaress_Date_Format $startAt
+     * @param \Alaress_Date_Format $finishAt
      * @return bool
      */
     public function isEnrolled(
