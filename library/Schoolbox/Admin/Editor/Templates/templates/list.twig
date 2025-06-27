@@ -12,9 +12,9 @@
     {{ renderAdminNavigation(pageCurrent) }}
 
     <div class="admin-content">
-        {% set templatesEndpoint = routeLookupIfAuthorized('editorTemplates.getTemplates') %}
-        {% set createTemplateEndpoint = routeLookupIfAuthorized('adminEditorTemplates.getCreate') %}
-        {% set updateTemplateEndpoint = routeLookupIfAuthorized('adminEditorTemplates.getUpdate') %}
+        {% set templatesEndpoint = routeLookup('editorTemplates.getTemplates') %}
+        {% set createTemplateEndpoint = routeLookup('adminEditorTemplates.getCreate') %}
+        {% set updateTemplateEndpoint = routeLookup('adminEditorTemplates.getUpdate') %}
         <div id="editor-templates-container">
             <editor-templates
                 :categories="{{ (categories ?? []) | json_encode }}"
