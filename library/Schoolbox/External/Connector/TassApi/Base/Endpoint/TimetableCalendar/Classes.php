@@ -15,12 +15,14 @@ use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\Connector\ClassCode;
+use Schoolbox\External\Connector\Compass\Base\Endpoint\TimetableCalendar\EnrolmentChecker;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\Code;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\DSN;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\Guid;
 use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Event\Mapper;
+use Schoolbox\External\Event\Model;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\Mapper\Exception;
 
@@ -47,7 +49,7 @@ class Classes implements IStrategy
      * events of that day if UPS ran and deleted those events because they were
      * just "in the past"
      */
-    private const PAST_THRESHOLD = 30;
+    private const PAST_THRESHOLD = 10;
 
 
     /**
@@ -513,21 +515,25 @@ class Classes implements IStrategy
              */
             $guidCodec = new Guid();
 
+            /* Decide if someone's enrolment stopped halfway through this payload timespan
+             */
+            $enrolmentChecker = new EnrolmentChecker($this->log);
+
             foreach ($timetable['DAYS'][$dayNumber]['PERIODS'] as $periodData) {
                 /* Extract the useful time from this microsecond format
                  */
                 $startTime = substr($periodData['PRD_START'], 11, 8);
                 $endTime = substr($periodData['PRD_END'], 11, 8);
 
-                foreach ($periodData['SUBJECTS'] as $subject) {
-                    /* For each entry in $timetable[$day], create a new SUDS Timetable event
-                     * Use the date that we got from the outer loop
-                     * Combine it with the time in the current array element
-                     * Save it
-                     */
-                    $startAt = new \Alaress_Date_Format("{$date} {$startTime}", \Alaress_Date_Format::DATABASE_FORMAT);
-                    $finishAt = new \Alaress_Date_Format("{$date} {$endTime}", \Alaress_Date_Format::DATABASE_FORMAT);
+                /* For each entry in $timetable[$day], create a new SUDS Timetable event
+                 * Use the date that we got from the outer loop
+                 * Combine it with the time in the current array element
+                 * Save it
+                 */
+                $startAt = new \Alaress_Date_Format("{$date} {$startTime}", \Alaress_Date_Format::DATABASE_FORMAT);
+                $finishAt = new \Alaress_Date_Format("{$date} {$endTime}", \Alaress_Date_Format::DATABASE_FORMAT);
 
+                foreach ($periodData['SUBJECTS'] as $subject) {
                     /* Across the fleet, some schools use SUBTAB_YEAR_GROUP
                      * but some schools use YEAR_GROUP instead; find the first
                      * meaningful value and use that; one will exist, but the
@@ -566,52 +572,12 @@ class Classes implements IStrategy
                         $classCode
                     );
 
-                    /* Compare this subject's TO_DATE to $startAt
-                      * Subjects that aren't actually relevant to this date still appear here
-                      * for us to manually deduce validity (thanks tass)
-                      *
-                      * FROM_DATE and TO_DATE are optionally mandatory - they could be empty string/null
-                      * or not even here, despite what the docs say: Undefined array key "TO_DATE"
-                      */
-
-                    /* If TO_DATE is before $startDate, it is no longer occurring and we can
-                     * skip over it
+                    /* Decide if someone's enrolment is continuing or not. FROM_DATE and TO_DATE actually
+                     * represent the lifespan of a student's *enrolment* in a subject which we don't really
+                     * support like this: we need to add SUBTRACT overrides to essentially blacklist someone's
+                     * enrolment in subjects they've discontinued, but those subjects are still being taught.
                      */
-                    $subjectTo = substr(trim((string)($subject['TO_DATE'] ?? null)), 0, 19);
-                    $subjectFrom = substr(trim((string)($subject['FROM_DATE'] ?? null)), 0, 19);
-
-                    if ('' !== $subjectTo) {
-                        $subjectToADF = new \Alaress_Date_Format($subjectTo, \Alaress_Date_Format::DATABASE_FORMAT);
-
-                        if ($subjectToADF->lt($startAt)) {
-                            $this->log->debug(sprintf(
-                                '%s %s is an expired class which went until %s; skipping',
-                                $title,
-                                $classCode,
-                                $subjectTo
-                            ));
-
-                            continue;
-                        }
-                    }
-
-                    /* If FROM_DATE is after $startDate, it's not yet occurring and we can
-                     * skip over it
-                     */
-                    if ('' !== $subjectFrom) {
-                        $subjectFromADF = new \Alaress_Date_Format($subjectFrom, \Alaress_Date_Format::DATABASE_FORMAT);
-
-                        if ($subjectFromADF->gt($finishAt)) {
-                            $this->log->debug(sprintf(
-                                '%s %s is an upcoming class which starts on %s; skipping',
-                                $title,
-                                $classCode,
-                                $subjectFrom
-                            ));
-
-                            continue;
-                        }
-                    }
+                    $isEnrolled = $enrolmentChecker->isEnrolled($subject, $title, $classCode, $startAt, $finishAt);
 
                     /* Try to find an event that already exists
                      * If it already exists, just continue; it's already been made
@@ -726,6 +692,16 @@ class Classes implements IStrategy
                      */
                     $this->saveRegularInvolvement($event, $classEntry, $name, $person['external_id']);
 
+                    /* Students might have been enrolled but no longer: if they are no longer enrolled,
+                     * add a SUBTRACT override to prevent them from appearing in class instances still
+                     * being taught. Students will have been enrolled in suds if this data payload contained
+                     * records where they were still in a class but stopped at some point in this very
+                     * same payload.
+                     */
+                    if (self::STUDENT === $roleType && !$isEnrolled) {
+                        $this->saveStudentUnenrolment($event, $classEntry, $name, $person['external_id']);
+                    }
+
                     /* Teachers get a special override so different teachers can be conducting
                      * the class instead of the usual guy defined by saveRegularInvolvement
                      */
@@ -768,6 +744,54 @@ class Classes implements IStrategy
         }
 
         return $classEntry;
+    }
+
+
+    /**
+     * Yes, this is an odd name, but we're going to record an enrolment SUBTRACT override
+     * here to prevent students from being enrolled in classes they left and having that
+     * show up in their timetable screens.
+     *
+     * @param Model $event
+     * @param ClassEntry $classEntry
+     * @param string $name
+     * @param string $externalId
+     * @return void
+     * @throws Exception
+     */
+    private function saveStudentUnenrolment(
+        \Schoolbox\External\Event\Model $event,
+        ClassEntry $classEntry,
+        string $name,
+        string $externalId
+    ): void {
+        $studentSubtractOverride = $this->overridesMapper->createModel()
+            ->setEventId($event->getId())
+            ->setExternalId($externalId)
+            ->setAction(\Schoolbox\External\Event\Overrides\Model::SUBTRACT)
+            /* Sequences 1 and 2 are currently CLEAR_STAFF and ADD staff, respectively
+             * so I guess we pick an arbitrary sequence for this student micromanagement
+             */
+            ->setSequence(10);
+
+        if ($this->perform) {
+            $this->overridesMapper->save($studentSubtractOverride);
+        }
+
+        /* We use the Overrides system to specify a particular person's involvement
+         * in a particular sis_event instance, rather than being associated with all
+         */
+        $this->log->debug(sprintf(
+            '%s (%s) is no longer enrolled in timetable event %s - %s, %s, %s-%s ...they receive a %s override',
+            $name,
+            $externalId,
+            $event->getTitle(),
+            $event->getDay(),
+            $event->getPeriod(),
+            $event->getStartAt()->getDatabase(),
+            $event->getFinishAt()->getDatabase(),
+            \Schoolbox\External\Event\Overrides\Model::SUBTRACT
+        ));
     }
 
 
