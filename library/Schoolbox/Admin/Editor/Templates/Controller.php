@@ -153,19 +153,23 @@ class Controller extends Base
     {
         $postData = $this->requestPost->getArrayCopy();
 
+        $title = trim((string)($postData['title'] ?? ''));
+        $description = trim((string)($postData['description'] ?? ''));
+        $body = trim((string)($postData['body'] ?? ''));
+
         // Validate required fields
-        if (empty(trim((string)($postData['title'] ?? '')))) {
+        if (empty($title)) {
             throw $this->errorMapper->generateException(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
         }
-        if (empty(trim((string)($postData['body'] ?? '')))) {
+        if (empty($body)) {
             throw $this->errorMapper->generateException(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
         }
 
         // Update the existing template
         $template
-            ->setTitle(trim((string)$postData['title']))
-            ->setDescription(trim((string)($postData['description'] ?? '')))
-            ->setBody(trim((string)($postData['body'] ?? '')))
+            ->setTitle($title)
+            ->setDescription($description)
+            ->setBody($body)
             ->setUpdatedBy($this->getUser()->getId());
 
         $this->templateMapper->save($template);
