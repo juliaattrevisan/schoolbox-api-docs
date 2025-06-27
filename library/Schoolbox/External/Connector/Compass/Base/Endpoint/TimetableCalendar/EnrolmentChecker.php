@@ -24,7 +24,6 @@ class EnrolmentChecker
      * @param array $subject
      * @param string $title
      * @param string $classCode
-     * @param \Alaress_Date_Format $current
      * @param \Alaress_Date_Format $startAt
      * @param \Alaress_Date_Format $finishAt
      * @return bool
@@ -33,7 +32,6 @@ class EnrolmentChecker
         array $subject,
         string $title,
         string $classCode,
-        \Alaress_Date_Format $current,
         \Alaress_Date_Format $startAt,
         \Alaress_Date_Format $finishAt,
     ): bool {
@@ -58,16 +56,16 @@ class EnrolmentChecker
 
             $this->log->debug(sprintf(
                 'Checking whether current date %s is within the subject lifespan %s to %s...%s',
-                $current->getDatabase(),
+                $startAt->getDatabase(),
                 $subjectFromADF->getDatabase(),
                 $subjectToADF->getDatabase(),
-                $current->between($subjectFromADF, $subjectToADF) ? 'it is, so we process involvements' : 'out of range; skipping'
+                $startAt->between($subjectFromADF, $subjectToADF) ? 'it is, so we process involvements' : 'out of range; skipping'
             ));
 
-            if (!$current->between($subjectFromADF, $subjectToADF)) {
+            if (!$startAt->between($subjectFromADF, $subjectToADF)) {
                 $this->log->debug(sprintf(
                     'Current date %s is outside of the subject lifespan %s to %s; skipping',
-                    $current->getDatabase(),
+                    $startAt->getDatabase(),
                     $subjectFromADF->getDatabase(),
                     $subjectToADF->getDatabase()
                 ));

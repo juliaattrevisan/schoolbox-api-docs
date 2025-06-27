@@ -532,7 +532,6 @@ class Classes implements IStrategy
                  */
                 $startAt = new \Alaress_Date_Format("{$date} {$startTime}", \Alaress_Date_Format::DATABASE_FORMAT);
                 $finishAt = new \Alaress_Date_Format("{$date} {$endTime}", \Alaress_Date_Format::DATABASE_FORMAT);
-                $current = new \Alaress_Date_Format("{$date} 00:00:00", \Alaress_Date_Format::DATABASE_FORMAT);
 
                 foreach ($periodData['SUBJECTS'] as $subject) {
                     /* Across the fleet, some schools use SUBTAB_YEAR_GROUP
@@ -578,7 +577,7 @@ class Classes implements IStrategy
                      * support like this: we need to add SUBTRACT overrides to essentially blacklist someone's
                      * enrolment in subjects they've discontinued, but those subjects are still being taught.
                      */
-                    $isEnrolled = $enrolmentChecker->isEnrolled($subject, $title, $classCode, $current, $startAt, $finishAt);
+                    $isEnrolled = $enrolmentChecker->isEnrolled($subject, $title, $classCode, $startAt, $finishAt);
 
                     /* Try to find an event that already exists
                      * If it already exists, just continue; it's already been made
