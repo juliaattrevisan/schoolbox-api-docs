@@ -115,7 +115,7 @@ export default class UITweaks extends Plugin {
         const contextualBalloonPlugin = this.editor.plugins.get("ContextualBalloon");
         // listen to the link ui 'balloon' opening, so we can add the button
         this.listenTo(contextualBalloonPlugin, "change:visibleView", (event, name, visibleView) => {
-            if (visibleView === linkUI.formView) {
+            if (visibleView !== null && visibleView === linkUI.formView) {
                 // only need to add the button once, so remove the listener
                 this.stopListening(contextualBalloonPlugin, "change:visibleView");
                 const button = new ButtonView(this.editor.locale);
