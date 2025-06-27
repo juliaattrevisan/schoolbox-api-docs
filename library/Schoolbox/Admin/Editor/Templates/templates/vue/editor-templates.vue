@@ -11,6 +11,7 @@ import { getFromNow } from "@js/util/dateUtils";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
+import MediaArticle from "@schoolboxVue/components/media-article.vue";
 import type { Category, Template } from "../js/types/editorTemplatesTypes";
 
 interface Props {
@@ -199,7 +200,9 @@ function onTemplateSelected(template: Template): void {
             </div>
         </div>
     </div>
-    <basic-modal v-model:is-open="isPreviewOpen" :has-background-click="true"><p>Hai</p></basic-modal>
+    <basic-modal v-model:is-open="isPreviewOpen" :has-background-click="true"
+        ><media-article tag="div" :content="(currentTemplate as Template).body"></media-article
+    ></basic-modal>
 </template>
 
 <style scoped></style>
