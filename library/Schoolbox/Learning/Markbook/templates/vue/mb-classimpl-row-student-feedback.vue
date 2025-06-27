@@ -80,8 +80,11 @@ const feedbackElBounds = useElementBounding(feedbackEl);
 const leftElBounds = useElementBounding(targetLeftEl);
 
 const feedbackCellOffsets = window.Vue.computed(() => {
-    const tableScrollbarOffset = tableContainerEl.value
+    const tableScrollbarOffsetX = tableContainerEl.value
         ? tableContainerElBounds.width.value - tableContainerEl.value.clientWidth
+        : 0;
+    const tableScrollbarOffsetY = tableContainerEl.value
+        ? tableContainerElBounds.height.value - tableContainerEl.value.clientHeight
         : 0;
 
     // The maximum width that the feedback cell can take up, ensuring that it's fully visible on the screen
@@ -90,15 +93,28 @@ const feedbackCellOffsets = window.Vue.computed(() => {
         tableRowElBounds.width.value +
         tableRowElBounds.left.value -
         // To account for the left column, which can end up off the screen if you are on a small screen
-        Math.max(leftElBounds.right.value, tableScrollbarOffset) -
+        Math.max(leftElBounds.right.value, tableScrollbarOffsetX) -
         // The offset to account for the rotated headers and scrollbar
-        Math.max(tableRowElBounds.right.value - tableContainerElBounds.right.value + tableScrollbarOffset, 0);
+        Math.max(tableRowElBounds.right.value - tableContainerElBounds.right.value + tableScrollbarOffsetX, 0);
+
+    const elementLeft = Math.max(leftElBounds.right.value, tableContainerElBounds.left.value);
+    const elementTop = leftElBounds.top.value;
+
+    // Since the feedback cell is fixed, it will show up outside the table bounds, so clip it instead
+    const clipTop = Math.max(0, tableContainerElBounds.top.value - elementTop);
+    const clipBottom = Math.max(
+        0,
+        elementTop + feedbackElBounds.height.value - tableContainerElBounds.bottom.value + tableScrollbarOffsetY + 10, // the 10 is somewhat arbitrary... i can't find a calculation that works without it yet
+    );
+
+    const clipPath = `inset(${clipTop}px 0px ${clipBottom}px 0px)`;
 
     return {
-        left: Math.max(leftElBounds.right.value, tableContainerElBounds.left.value),
-        top: leftElBounds.top.value,
+        left: elementLeft,
+        top: elementTop,
         height: feedbackElBounds.height.value,
         maxWidth,
+        clipPath,
     };
 });
 
@@ -143,6 +159,7 @@ window.Vue.onUnmounted(() => {
                     left: `${feedbackCellOffsets.left}px`,
                     top: `calc(${feedbackCellOffsets.top}px + 0.625rem)`,
                     maxWidth: `${feedbackCellOffsets.maxWidth}px`,
+                    clipPath: feedbackCellOffsets.clipPath,
                 }"
             >
                 <div v-if="cellInfo.instructorMarkSchemeTemplate !== null" class="small-12 medium-3 column">
