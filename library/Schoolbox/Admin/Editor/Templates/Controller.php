@@ -180,4 +180,16 @@ class Controller extends Base
         $category = $this->categoryMapper->findById($template->getCategoryId());
         $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminEditorTemplates.getList') . '?category=' . $category->getName());
     }
+
+    /**
+     * Delete a template
+     *
+     * @param TemplateModel $template
+     * @return void
+     * @throws Exception
+     */
+    public function delete(TemplateModel $template): void
+    {
+        $this->templateMapper->delete($template);
+    }
 }

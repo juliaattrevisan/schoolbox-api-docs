@@ -19,6 +19,7 @@ interface Props {
     templatesEndpoint: string; // The endpoint to fetch templates from
     createTemplateEndpoint: string; // The endpoint to create a new template
     updateTemplateEndpoint: string; // The endpoint to update an existing template
+    deleteTemplateEndpoint: string; // The endpoint to delete an existing template
 }
 const props = defineProps<Props>();
 
