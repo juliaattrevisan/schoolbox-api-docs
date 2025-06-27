@@ -13,7 +13,9 @@ namespace Schoolbox\Admin\Editor\Templates;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Editor\Templates\Category\ModelToArray;
+use Schoolbox\Admin\Editor\Templates\Category\Model as CategoryModel;
 use Schoolbox\Admin\Editor\Templates\Category\Mapper as CategoryMapper;
+use Schoolbox\Editor\Templates\Model as TemplateModel;
 use Schoolbox\Editor\Templates\Mapper as TemplateMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 
@@ -55,11 +57,11 @@ class Controller extends Base
     /**
      * Create a new editor template
      *
-     * @param object $category
+     * @param CategoryModel $category
      * @return void
      * @throws \Aura\Router\Exception\RouteNotFound
      */
-    public function getCreate(object $category): void
+    public function getCreate(CategoryModel $category): void
     {
         $this->response = $this->responseFromTemplate(
             '@adminEditorTemplates/create.twig',
@@ -78,7 +80,7 @@ class Controller extends Base
     /**
      * Persist a new editor template
      *
-     * @param object $category
+     * @param CategoryModel $category
      * @return void
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Aura\Router\Exception\RouteNotFound
@@ -86,7 +88,7 @@ class Controller extends Base
      * @throws \Schoolbox\Application\Exception\Exception
      * @throws \UnexpectedValueException
      */
-    public function postCreate(object $category): void
+    public function postCreate(CategoryModel $category): void
     {
         $postData = $this->requestPost->getArrayCopy();
 
@@ -120,11 +122,11 @@ class Controller extends Base
     /**
      * To update an editor template
      *
-     * @param object $template
+     * @param TemplateModel $template
      * @return void
      * @throws \Aura\Router\Exception\RouteNotFound
      */
-    public function getUpdate(object $template): void
+    public function getUpdate(TemplateModel $template): void
     {
         $category = $this->categoryMapper->findById($template->getCategoryId());
 
@@ -145,11 +147,11 @@ class Controller extends Base
     /**
      * Update an editor template
      *
-     * @param object $template
+     * @param TemplateModel $template
      * @return void
      * @throws \Aura\Router\Exception\RouteNotFound
      */
-    public function postUpdate(object $template): void
+    public function postUpdate(TemplateModel $template): void
     {
         $postData = $this->requestPost->getArrayCopy();
 
