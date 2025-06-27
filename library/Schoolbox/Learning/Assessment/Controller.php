@@ -42,6 +42,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Attachment\Zone;
+use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Assessment\Term;
@@ -557,7 +558,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 ->setAttachmentsLabel('')
                 ->setMimeFilter(implode(",", $kamiFiles))
                 ->setFilesystemContext('worksheet')
-                ->setReadOnly($courseManagedFields->isReadonly()) //
+                 // Disallow modification of existing worksheet templates.
+                ->setReadOnly($assessment->getWorksheetTemplate() !== null)
                 ->setFileVar('worksheet');
             if ($assessment->getWorksheetTemplate()) {
                 $zone = $zone->attachFiles([$assessment->getWorksheetTemplate()]);
@@ -584,6 +586,22 @@ abstract class Controller extends ListController implements IAssessmentControlle
      */
     public function postUpdateAssessment(IAssessable $assessment): void
     {
+        // If we are dealing with a due work, and it already has a worksheet template attached...
+        if ($assessment instanceof DueWork\Model && $assessment->getWorksheetTemplate()) {
+            // Add (or replace) 'worksheet' info to $this->requestPost.
+            // Note 'worksheet' will only be included in the form submission from the Modify due work page if no
+            // worksheet template already exists on the due work.  (This is because modification or replacement of the
+            // worksheet template is forbidden once it has been added and the due work has been created).
+            // The $this->persistAssessment() function expects 'worksheet' data to always be supplied.  So if the due
+            // work has a worksheet template attached, add it to the form submission data.
+            /** @var IStorage $existingWorksheetTemplate */
+            $existingWorksheetTemplate = $assessment->getWorksheetTemplate();
+            $this->requestPost->offsetSet(
+                'worksheet',
+                'store:' . $existingWorksheetTemplate->getHash() . ':' . $existingWorksheetTemplate->getBasename()
+            );
+        }
+
         /* Regular update while you're creating the assessment, otherwise
          */
         try {
