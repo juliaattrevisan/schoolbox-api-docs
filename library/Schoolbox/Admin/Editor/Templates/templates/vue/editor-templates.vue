@@ -125,6 +125,8 @@ function onPreviewSelected(template: Template): void {
 // #region  delete the template
 
 const isDeleteOpen = window.Vue.ref<boolean>(false);
+const isDeleting = window.Vue.ref<boolean>(false);
+const deleteError = window.Vue.ref<string | null>(null);
 
 /**
  * Display the body of the selected template in a modal.
@@ -133,6 +135,40 @@ const isDeleteOpen = window.Vue.ref<boolean>(false);
 function onDeleteSelected(template: Template): void {
     currentTemplate.value = template;
     isDeleteOpen.value = true;
+}
+
+/**
+ * Delete the currently selected template.
+ */
+async function onDeleteConfirmed(): Promise<void> {
+    if (isDeleting.value || props.deleteTemplateEndpoint === "" || !currentTemplate.value) {
+        return;
+    }
+    const url = props.deleteTemplateEndpoint.replace("{templateId}", currentTemplate.value.id.toString());
+    try {
+        isDeleting.value = true;
+        deleteError.value = null;
+        const response = await fetch(url, {
+            headers: {
+                Accept: "application/json",
+            },
+        });
+        if (!response.ok) {
+            const errorMessage = await extractErrorMessage(response);
+            throw new Error(errorMessage);
+        }
+    } catch (error) {
+        // ignore abort errors, as the previous request was cancelled
+        if (isAbortError(error)) {
+            return;
+        }
+        if (error instanceof Error && hasErrorMessage(error)) {
+            deleteError.value = error.message;
+        }
+        console.error(error);
+    } finally {
+        isDeleting.value = false;
+    }
 }
 
 // #endregion
@@ -229,16 +265,22 @@ function onDeleteSelected(template: Template): void {
         <media-article tag="div" :content="(currentTemplate as Template).body"></media-article>
     </basic-modal>
     <basic-modal v-model:is-open="isDeleteOpen" :has-background-click="true">
-        <h2>Please confirm</h2>
-        <p>Are you sure you want to delete this template?</p>
-        <ul class="flex-list buttons">
-            <li>
-                <button class="button submit">Delete</button>
-            </li>
-            <li>
-                <button class="button" @click.prevent="isDeleteOpen = false">Cancel</button>
-            </li>
-        </ul>
+        <div class="l-flex-col l-gap-s f-no-margins">
+            <h2>Please confirm</h2>
+            <p>Are you sure you want to delete this template?</p>
+            <div v-if="deleteError" class="alert-box alert">
+                Sorry, there was an error deleting the template. Please
+                <a href="" title="refresh the page"> refresh the page </a>
+                to try again and contact your support if the problem persists.
+                <em>Further support info: {{ deleteError }}</em>
+            </div>
+            <div class="l-flex l-gap-xs f-no-margins">
+                <button class="button submit l-flex__item--1" @click.prevent="onDeleteConfirmed">
+                    {{ isDeleting ? "Deleting..." : "Delete" }}
+                </button>
+                <button class="button l-flex__item--1" @click.prevent="isDeleteOpen = false">Cancel</button>
+            </div>
+        </div>
     </basic-modal>
 </template>
 
