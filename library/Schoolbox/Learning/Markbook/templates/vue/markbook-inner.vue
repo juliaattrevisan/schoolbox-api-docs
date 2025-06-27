@@ -11,8 +11,10 @@ const props = defineProps<Props>();
 const mbStore = useMarkbookStore();
 
 const resizeObserver = window.Vue.ref<ResizeObserver | null>(null);
-const tableContainerEl = window.Vue.ref<HTMLElement | null>(null);
+const tableContainerEl = window.Vue.useTemplateRef<HTMLElement>("tableContainerEl");
 const markbookHeightOffset = window.Vue.ref(window.innerHeight);
+
+window.Vue.provide("markbookTableContainerEl", tableContainerEl);
 
 /**
  * Updates the height of the scrollable area, such that the user is able to fit the
@@ -33,6 +35,12 @@ window.Vue.onMounted(() => {
     // Set the initial height, and update it again when the DOM is fully loaded to ensure the footer is included
     updateContainerHeight();
     window.addEventListener("DOMContentLoaded", updateContainerHeight, { once: true });
+});
+
+window.Vue.onUnmounted(() => {
+    if (resizeObserver.value) {
+        resizeObserver.value.disconnect();
+    }
 });
 
 /**
