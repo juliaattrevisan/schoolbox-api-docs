@@ -10,6 +10,7 @@ import { kebabToTitleCase } from "@js/util/stringUtils";
 import { getFromNow } from "@js/util/dateUtils";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
+import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import type { Category, Template } from "../js/types/editorTemplatesTypes";
 
 interface Props {
@@ -19,6 +20,8 @@ interface Props {
     updateTemplateEndpoint: string; // The endpoint to update an existing template
 }
 const props = defineProps<Props>();
+
+// #region load / display a category
 
 const currentCategory = window.Vue.ref<Category>(props.categories[0]);
 const isLoading = window.Vue.ref<boolean>(false);
@@ -97,6 +100,24 @@ window.Vue.onMounted((): void => {
     }
     void loadCategoryTemplates();
 });
+
+// #endregion
+
+// #region display the templates body
+
+const isPreviewOpen = window.Vue.ref<boolean>(false);
+const currentTemplate = window.Vue.ref<Template | null>(null);
+
+/**
+ *
+ * @param template -
+ */
+function onTemplateSelected(template: Template): void {
+    currentTemplate.value = template;
+    isPreviewOpen.value = true;
+}
+
+// #endregion
 </script>
 
 <template>
@@ -130,7 +151,9 @@ window.Vue.onMounted((): void => {
                 >
                     <div class="l-flex-col l-flex--justify-center l-flex__item--1 l-gap-xs l-pad-m f-no-margins">
                         <h3>
-                            <a href="#">{{ template.title }}</a>
+                            <a href="#view-template" @click.prevent="onTemplateSelected(template)">{{
+                                template.title
+                            }}</a>
                         </h3>
                         <p v-if="template.description && template.description !== ''" class="f-no-margins">
                             {{ template.description }}
@@ -176,6 +199,7 @@ window.Vue.onMounted((): void => {
             </div>
         </div>
     </div>
+    <basic-modal v-model:is-open="isPreviewOpen" :has-background-click="true"><p>Hai</p></basic-modal>
 </template>
 
 <style scoped></style>
