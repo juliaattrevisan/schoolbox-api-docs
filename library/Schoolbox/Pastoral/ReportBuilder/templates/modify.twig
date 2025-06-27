@@ -346,6 +346,43 @@
             {% endif %}
 
             <div class="row">
+                <div class="small-12 columns">
+                    <h2 class="subheader">Summary Tables</h2>
+                    <p class="meta">
+                        Select the summary tables you want to include in the report
+                    </p>
+                    <section>
+                        <div class="small-12 columns content">
+                            <div class="checklist">
+                                <ul class="option-list">
+                                    {% for key,values in summaryTablesOptions %}
+                                    <li>
+                                        <input id="summary-tables-{{ key }}"
+                                               name="summaryTables[]"
+                                               value="{{ key }}"
+                                               type="checkbox"
+                                               {% if key in (report.summaryTables) %}checked{% endif %}
+                                        >
+                                        <label for="summary-tables-{{ key }}">
+                                            {{ values.label }}
+                                            {% if values.tooltip is defined %}
+                                            <span
+                                                    class="hint has-tip tip-top"
+                                                    data-tooltip
+                                                    title="{{ values.tooltip }}"
+                                            >?</span>
+                                            {% endif %}
+                                        </label>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <div class="row">
                 <div class="small-12 medium-6 columns">
                     <label><h2 class="subheader"><span>{{ locale.yearLevel.properPlural }}</span></h2></label>
                     <p class="meta">Select the {{ locale.yearLevel.plural }} you want included in the report</p>

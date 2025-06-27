@@ -300,6 +300,7 @@ class Controller extends Base
                 'moderatorIds'         => $this->userMapper->findByAccess(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)->getPropertyValues('id'),
                 'roles'                => $roles,
                 'orderFields'          => $orderFields,
+                'summaryTablesOptions' => PastoralReport::SUMMARY_TABLES_OPTIONS,
             ],
             'Pastoral Report',
         );
@@ -354,6 +355,29 @@ class Controller extends Base
         $showSeverity   = $this->getConfigLoader()->get('pastoral_severity');
         $severityColors = $showSeverity ? $this->getSeverityColors() : [];
 
+        $defaultSummaryOptions = [
+            ['title' => 'List', 'type' => 'list']
+        ];
+
+        /* Find the selected list of options
+         */
+        $selectedSummaryOptions = array_values(
+            array_filter(
+                PastoralReport::SUMMARY_TABLES_OPTIONS,
+                function ($key) use ($report) {
+                    return in_array($key, explode(',', $report->getSummaryTables() ?? ''));
+                },
+                ARRAY_FILTER_USE_KEY
+            )
+        );
+
+        $tabs = array_merge(
+            $defaultSummaryOptions,
+            array_map(
+                fn($option) => ['title' => $option['label'], 'type' => $option['type']],
+                $selectedSummaryOptions
+            )
+        );
         // And spit this thing out
 
         $this->response = $this->responseFromTemplate(
@@ -365,6 +389,9 @@ class Controller extends Base
                 'report'         => $report,
                 'showSeverity'   => $showSeverity,
                 'severityColors' => $severityColors,
+                /* Summary tables tabs
+                 */
+                'tabs'           => $tabs,
             ],
             $report->getName(),
         );
@@ -601,6 +628,9 @@ class Controller extends Base
 
         $report->setIncludeStudentsWithoutYear($post->getBool('includeStudentsWithoutYear', false));
         $report->setIncludeStudentsWithoutHouse($post->getBool('includeStudentsWithoutHouse', false));
+
+        // Saving the summary tables options
+        $report->setSummaryTables(implode(',', $post->get('summaryTables', [])));
 
         if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
             $report->setActionsCsv($this->getCsv($post->get('actions')));

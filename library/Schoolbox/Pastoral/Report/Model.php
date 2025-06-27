@@ -93,6 +93,35 @@ class Model implements ISoftDeletable
         self::TODAY            => 'Today',
     ];
 
+    // Mapping for the summary table options
+    public const SUMMARY_TABLES_OPTIONS = [
+        'studentByType' => [
+            'label' => 'Student by Type/Sub-Type',
+            'type' => 'table',
+        ],
+        //TODO: future updates for SA-19333
+//        'TypeByMonth' => [
+//            'label' => 'Type/Sub-Type by Month',
+//            'tooltip' => 'This table will display a maximum of 12 months of past data, counting back from the most recent record\'s date',
+//            'type' => 'table',
+//        ],
+//        'TypeByWeek' => [
+//            'label' => 'Type/Sub-Type by Week',
+//            'tooltip' => 'This table will display a maximum of 10 weeks of past data, counting back from the most recent record\'s date',
+//            'type' => 'table',
+//        ],
+//        'studentByMonth' => [
+//            'label' => 'Student by Month',
+//            'tooltip' => 'This table will display a maximum of 12 months of past data, counting back from the most recent record\'s date',
+//            'type' => 'table',
+//        ],
+//        'studentByWeek' => [
+//            'label' => 'Student by Week',
+//            'tooltip' => 'This table will display a maximum of 10 weeks of past data, counting back from the most recent record\'s date',
+//            'type' => 'table',
+//        ],
+    ];
+
     /** @var bool $dashboard */
     protected bool $dashboard = false;
 
@@ -207,6 +236,9 @@ class Model implements ISoftDeletable
 
     /** Actions */
     private GenericCollection $actions;
+
+    /** Summary Tables */
+    private ?string $summaryTables = null;
 
     /**
      * Will be null if severity is turned off in admin config
@@ -1059,5 +1091,23 @@ class Model implements ISoftDeletable
     {
         $this->foldersCsv = $foldersCsv;
         return $this;
+    }
+
+    /**
+     * @param string|null $summaryTables
+     * @return $this
+     */
+    public function setSummaryTables(?string $summaryTables = null): self
+    {
+        $this->summaryTables = $summaryTables;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getSummaryTables(): ?string
+    {
+        return $this->summaryTables;
     }
 }
