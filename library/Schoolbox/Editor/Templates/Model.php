@@ -54,7 +54,7 @@ class Model
 
     /**
      * @param int $categoryId
-     * @return Model
+     * @return self
      */
     public function setCategoryId(int $categoryId): self
     {
@@ -72,7 +72,7 @@ class Model
 
     /**
      * @param string $title
-     * @return Model
+     *@return self
      */
     public function setTitle(string $title): self
     {
@@ -90,7 +90,7 @@ class Model
 
     /**
      * @param string $description
-     * @return Model
+     * @return self
      */
     public function setDescription(string $description): self
     {
@@ -108,7 +108,7 @@ class Model
 
     /**
      * @param string $body
-     * @return Model
+     * @return self
      */
     public function setBody(string $body): self
     {

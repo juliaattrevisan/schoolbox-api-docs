@@ -31,7 +31,7 @@ class Model
 
     /**
      * @param string $name
-     * @return Model
+     * @return self
      */
     public function setName(string $name): self
     {
