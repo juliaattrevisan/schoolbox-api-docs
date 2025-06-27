@@ -17,6 +17,7 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Admin\Editor\Templates\Category\Mapper;
+use Schoolbox\Editor\Templates\Mapper as TemplateMapper;
 
 class Module extends BaseModule
 {
@@ -65,7 +66,7 @@ class Module extends BaseModule
         return new Controller(
             $this->getMapperFactory()->get(\Schoolbox\Error\Mapper::class),
             $this->getMapperFactory()->get(Mapper::class),
-            $this->getMapperFactory()->get(\Schoolbox\Editor\Templates\Mapper::class),
+            $this->getMapperFactory()->get(TemplateMapper::class),
         );
     }
 
@@ -115,7 +116,7 @@ class Module extends BaseModule
             $template = $params['template'];
         } else {
             try {
-                $template = $this->getMapperFactory()->get(\Schoolbox\Editor\Templates\Mapper::class)->findById($params['templateId']);
+                $template = $this->getMapperFactory()->get(TemplateMapper::class)->findById($params['templateId']);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 throw new NotFound('Unknown template id submitted.', 0, $e);
             }
