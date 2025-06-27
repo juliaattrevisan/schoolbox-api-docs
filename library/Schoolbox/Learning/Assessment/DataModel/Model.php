@@ -131,7 +131,10 @@ class Model implements ISoftDeletable
      */
     private ?bool $sebEnabled = null;
 
-
+    /**
+     * @var int|null
+     */
+    private ?int $originalAssessmentId = null;
     /**
      * The task which may or may not be associated with this assessment.
      *
@@ -973,6 +976,24 @@ class Model implements ISoftDeletable
     public function setSebEnabled(?bool $sebEnabled): self
     {
         $this->sebEnabled = $sebEnabled;
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getOriginalAssessmentId(): ?int
+    {
+        return $this->originalAssessmentId;
+    }
+
+    /**
+     * @param int|null $originalAssessmentId
+     * @return self
+     */
+    public function setOriginalAssessmentId(?int $originalAssessmentId): self
+    {
+        $this->originalAssessmentId = $originalAssessmentId;
         return $this;
     }
 }

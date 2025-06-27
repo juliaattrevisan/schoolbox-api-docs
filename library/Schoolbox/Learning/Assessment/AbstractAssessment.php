@@ -98,6 +98,10 @@ abstract class AbstractAssessment implements IAssessable
      */
     private ?bool $sebEnabled = null;
 
+    /**
+     * @var int|null
+     */
+    private ?int $originalAssessmentId = null;
 
     /**
      * The person who created this Assessable
@@ -1052,6 +1056,23 @@ abstract class AbstractAssessment implements IAssessable
         return $this;
     }
 
+    /**
+     * @return int|null
+     */
+    public function getOriginalAssessmentId(): ?int
+    {
+        return $this->originalAssessmentId;
+    }
+
+    /**
+     * @param int|null $originalAssessmentId
+     * @return self
+     */
+    public function setOriginalAssessmentId(?int $originalAssessmentId): self
+    {
+        $this->originalAssessmentId = $originalAssessmentId;
+        return $this;
+    }
 
     /**
      * @return User

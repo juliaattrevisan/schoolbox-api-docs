@@ -120,6 +120,11 @@ class Factory
     private bool $sebEnabled;
 
     /**
+     * @var int|null
+     */
+    private ?int $originalAssessmentId;
+
+    /**
      * @var string
      */
     protected $publishAt;
@@ -187,6 +192,7 @@ class Factory
         $this->setDefaultOpenSpan(empty($post['default_open_span']) ? null : intval($post['default_open_span']));
         $this->setCourseManaged((bool)($post['courseManaged'] ?? ''));
         $this->setSebEnabled((bool)($post['sebEnabled'] ?? ''));
+        $this->setOriginalAssessmentId(isset($post['customisedFor']) ? (int)($post['customisedFor'] ) : null);
         $this->setPublishAt(trim($post['publishDate'] ?? ''));
         $this->setOpenAt(trim($post['openDate'] ?? ''));
         $this->setDueAt(trim($post['dueDate'] ?? ''));
@@ -579,6 +585,7 @@ class Factory
                 ->setDefaultOpenSpan($this->getDefaultOpenSpan())
                 ->setCourseManaged($this->getCourseManaged())
                 ->setSebEnabled($this->getSebEnabled())
+                ->setOriginalAssessmentId($this->getOriginalAssessmentId())
                 ->setMarkVisibility($this->getMarkVisibility())
                 ->setPublishAt($this->deriveDate($assessment->getBaseContext(), $this->getPublishAt()))
                 ->setOpenAt($this->deriveDate($assessment->getBaseContext(), $this->getOpenAt()))
@@ -805,6 +812,23 @@ class Factory
         return $this;
     }
 
+    /**
+     * @return int|null
+     */
+    public function getOriginalAssessmentId(): ?int
+    {
+        return $this->originalAssessmentId;
+    }
+
+    /**
+     * @param int|null $originalAssessmentId
+     * @return self
+     */
+    public function setOriginalAssessmentId(?int $originalAssessmentId): self
+    {
+        $this->originalAssessmentId = $originalAssessmentId;
+        return $this;
+    }
 
     /**
      * @return string
