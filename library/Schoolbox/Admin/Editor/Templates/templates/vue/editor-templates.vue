@@ -110,8 +110,8 @@ const isPreviewOpen = window.Vue.ref<boolean>(false);
 const currentTemplate = window.Vue.ref<Template | null>(null);
 
 /**
- *
- * @param template -
+ * Display the body of the selected template in a modal.
+ * @param template - the template that has been selected
  */
 function onTemplateSelected(template: Template): void {
     currentTemplate.value = template;
