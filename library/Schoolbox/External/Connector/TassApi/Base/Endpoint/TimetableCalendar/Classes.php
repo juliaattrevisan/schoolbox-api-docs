@@ -775,7 +775,9 @@ class Classes implements IStrategy
              */
             ->setSequence(10);
 
-        $this->overridesMapper->save($studentSubtractOverride);
+        if ($this->perform) {
+            $this->overridesMapper->save($studentSubtractOverride);
+        }
 
         /* We use the Overrides system to specify a particular person's involvement
          * in a particular sis_event instance, rather than being associated with all
