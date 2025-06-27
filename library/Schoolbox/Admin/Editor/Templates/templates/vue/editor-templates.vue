@@ -22,6 +22,8 @@ interface Props {
 }
 const props = defineProps<Props>();
 
+const currentTemplate = window.Vue.ref<Template | null>(null); // the currently selected template, used for displaying or deleting a template
+
 // #region load / display a category
 
 const currentCategory = window.Vue.ref<Category>(props.categories[0]);
@@ -107,15 +109,29 @@ window.Vue.onMounted((): void => {
 // #region display the templates body
 
 const isPreviewOpen = window.Vue.ref<boolean>(false);
-const currentTemplate = window.Vue.ref<Template | null>(null);
 
 /**
  * Display the body of the selected template in a modal.
  * @param template - the template that has been selected
  */
-function onTemplateSelected(template: Template): void {
+function onPreviewSelected(template: Template): void {
     currentTemplate.value = template;
     isPreviewOpen.value = true;
+}
+
+// #endregion
+
+// #region  delete the template
+
+const isDeleteOpen = window.Vue.ref<boolean>(false);
+
+/**
+ * Display the body of the selected template in a modal.
+ * @param template - the template that has been selected
+ */
+function onDeleteSelected(template: Template): void {
+    currentTemplate.value = template;
+    isDeleteOpen.value = true;
 }
 
 // #endregion
@@ -152,9 +168,9 @@ function onTemplateSelected(template: Template): void {
                 >
                     <div class="l-flex-col l-flex--justify-center l-flex__item--1 l-gap-xs l-pad-m f-no-margins">
                         <h3>
-                            <a href="#view-template" @click.prevent="onTemplateSelected(template)">{{
-                                template.title
-                            }}</a>
+                            <button class="f-no-margins" @click.prevent="onPreviewSelected(template)">
+                                {{ template.title }}
+                            </button>
                         </h3>
                         <p v-if="template.description && template.description !== ''" class="f-no-margins">
                             {{ template.description }}
@@ -177,7 +193,7 @@ function onTemplateSelected(template: Template): void {
                             >
                         </p>
                     </div>
-                    <div>
+                    <div class="l-flex l-flex--align-start l-gap-xs">
                         <a
                             class="sbx-icon-only-button f-no-margins"
                             aria-label="Edit template"
@@ -186,6 +202,14 @@ function onTemplateSelected(template: Template): void {
                         >
                             <sbx-icon name="modify" />
                         </a>
+                        <button
+                            class="sbx-icon-only-button f-no-margins"
+                            aria-label="Delete template"
+                            title="Delete template"
+                            @click.prevent="onDeleteSelected(template)"
+                        >
+                            <sbx-icon name="delete" />
+                        </button>
                     </div>
                 </div>
             </div>
@@ -200,9 +224,21 @@ function onTemplateSelected(template: Template): void {
             </div>
         </div>
     </div>
-    <basic-modal v-model:is-open="isPreviewOpen" :has-background-click="true"
-        ><media-article tag="div" :content="(currentTemplate as Template).body"></media-article
-    ></basic-modal>
+    <basic-modal v-model:is-open="isPreviewOpen" :has-background-click="true">
+        <media-article tag="div" :content="(currentTemplate as Template).body"></media-article>
+    </basic-modal>
+    <basic-modal v-model:is-open="isDeleteOpen" :has-background-click="true">
+        <h2>Please confirm</h2>
+        <p>Are you sure you want to delete this template?</p>
+        <ul class="flex-list buttons">
+            <li>
+                <button class="button submit">Delete</button>
+            </li>
+            <li>
+                <button class="button" @click.prevent="isDeleteOpen = false">Cancel</button>
+            </li>
+        </ul>
+    </basic-modal>
 </template>
 
 <style scoped></style>
