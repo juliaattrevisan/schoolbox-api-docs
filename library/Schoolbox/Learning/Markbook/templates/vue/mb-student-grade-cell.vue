@@ -55,6 +55,11 @@ const hasPopOutMenu = window.Vue.computed(() => {
         return false;
     }
 
+    // You must be a participant (or excluded)
+    if (participant.value === null) {
+        return false;
+    }
+
     // You must have access to the pop-out menu
     if (!mbStore.data.canAccessPopOut) {
         return false;
