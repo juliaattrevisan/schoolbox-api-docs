@@ -180,9 +180,7 @@ class Controller extends Base
              */
             $returnCode = 404;
 
-            $errorMessage = (new ErrorInterpreter())->interpret($e->getMessage());
-
-            $problem = (new ApiProblem($errorMessage))
+            $problem = (new ApiProblem($e->getMessage()))
                 ->setStatus($returnCode)
                 ->asArray();
 
@@ -220,9 +218,7 @@ class Controller extends Base
              */
             $returnCode = 404;
 
-            $errorMessage = (new ErrorInterpreter())->interpret($e->getMessage());
-
-            $problem = (new ApiProblem($errorMessage))
+            $problem = (new ApiProblem($e->getMessage()))
                 ->setStatus($returnCode)
                 ->asArray();
 

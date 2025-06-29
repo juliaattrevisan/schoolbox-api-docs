@@ -166,13 +166,10 @@ class Helper
 
             $log->setReturnCode($returnCode)
                 ->setErrorMessage($data["error"]["message"]);
-
             $this->logMapper->save($log);
 
-            /* Reinterpret error message for humans
-             */
             throw new SchoolboxException(
-                (new ErrorInterpreter())->interpret($data["error"]["message"]),
+                $data["error"]["message"],
                 $returnCode
             );
         }
