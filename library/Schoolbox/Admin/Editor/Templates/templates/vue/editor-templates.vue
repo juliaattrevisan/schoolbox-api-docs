@@ -149,6 +149,7 @@ async function onDeleteConfirmed(): Promise<void> {
         isDeleting.value = true;
         deleteError.value = null;
         const response = await fetch(url, {
+            method: "DELETE",
             headers: {
                 Accept: "application/json",
             },
@@ -157,6 +158,12 @@ async function onDeleteConfirmed(): Promise<void> {
             const errorMessage = await extractErrorMessage(response);
             throw new Error(errorMessage);
         }
+        // filter out the deleted template from the current templates
+        currentTemplates.value = currentTemplates.value.filter(
+            (template) => template.id !== (currentTemplate.value as Template).id,
+        );
+        currentTemplate.value = null; // reset the current template
+        isDeleteOpen.value = false; // close the delete modal
     } catch (error) {
         // ignore abort errors, as the previous request was cancelled
         if (isAbortError(error)) {

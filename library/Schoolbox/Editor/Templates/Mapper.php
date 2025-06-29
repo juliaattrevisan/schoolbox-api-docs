@@ -37,5 +37,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('created_by', self::TYPE_INTEGER);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP, 'updatedAt');
         $this->uses('updated_by', self::TYPE_INTEGER);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+        $this->uses('deleted_by', self::TYPE_INTEGER);
     }
 }

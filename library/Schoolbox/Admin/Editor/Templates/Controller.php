@@ -186,10 +186,13 @@ class Controller extends Base
      *
      * @param TemplateModel $template
      * @return void
-     * @throws Exception
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     public function delete(TemplateModel $template): void
     {
+        // Soft delete the existing template
+        $template->setDeletedBy($this->getUser()->getId());
+        $this->templateMapper->save($template);
         $this->templateMapper->delete($template);
     }
 }
