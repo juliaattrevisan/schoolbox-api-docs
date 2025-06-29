@@ -44,11 +44,11 @@
         <div class="usage-charts">
             <div id="usage-global-container">
                 <usage-global
-                    :endpoint-total-payload="'{{ routeLookupIfAuthorized('adminUsage.getTotalPayload') }}'"
-                    :endpoint-system-payload="'{{ routeLookupIfAuthorized('adminUsage.getSystemPayload') }}'"
-                    :endpoint-file-type-payload="'{{ routeLookupIfAuthorized('adminUsage.getFileTypePayload') }}'"
-                    :endpoint-role-payload="'{{ routeLookupIfAuthorized('adminUsage.getRolePayload') }}'"
-                    :endpoint-user-payload="'{{ routeLookupIfAuthorized('adminUsage.getUserPayload') }}'"
+                    endpoint-total-payload="{{ routeLookupIfAuthorized('adminUsage.getTotalPayload') }}"
+                    endpoint-system-payload="{{ routeLookupIfAuthorized('adminUsage.getSystemPayload') }}"
+                    endpoint-file-type-payload="{{ routeLookupIfAuthorized('adminUsage.getFileTypePayload') }}"
+                    endpoint-role-payload="{{ routeLookupIfAuthorized('adminUsage.getRolePayload') }}"
+                    endpoint-user-payload="{{ routeLookupIfAuthorized('adminUsage.getUserPayload') }}"
                     :is-s3-adapter="{{ isS3Adapter ? 'true' : 'false' }}"
                 />
             </div>

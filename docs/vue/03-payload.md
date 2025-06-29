@@ -71,7 +71,7 @@ You can add more args to provide pieces of info to the `user-list` component. Se
     <user-list
         :payload="{{ hardcodedPayload | json_encode }}"
         :stuart-mahon="{{ stuartMahon | json_encode }}"
-        :datetime="'{{ datetime }}'"
+        datetime="{{ datetime }}"
     ></user-list>
 </div>
 

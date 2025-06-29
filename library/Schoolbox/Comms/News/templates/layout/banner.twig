@@ -121,8 +121,8 @@
             :is-thread-checkbox-enabled-on-load="Boolean({{ article.discussionThread ? article.discussionThread.open : 'false' }})"
             :is-thread-enabled-on-load="Boolean({{ article.discussionThread ? article.discussionThread.open : 'false' }})"
             :is-published="Boolean({{ article.isPublic }})"
-            :create-thread-endpoint="'{{ routeLookup('commsDiscussionThreads.createThread', { contextId: article.id } ) }}'"
-            :site-version="'{{ config.site_version }}'"
+            create-thread-endpoint="{{ routeLookup('commsDiscussionThreads.createThread', { contextId: article.id } ) }}"
+            site-version="{{ config.site_version }}"
         />
     </section>
 </div>
