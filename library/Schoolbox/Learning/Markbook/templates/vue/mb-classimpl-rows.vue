@@ -127,6 +127,7 @@ const orderedClassImplStudents = window.Vue.computed(() => {
         <mb-classimpl-row-student
             v-for="student in orderedClassImplStudents"
             :key="student.id"
+            :type="props.type"
             :class-impl-id="props.classImplId"
             :student="student"
         />
