@@ -1585,12 +1585,6 @@ parameters:
 			path: library/External/Doublefirst/Timetable.php
 
 		-
-			message: '#^Call to function is_array\(\) with array\<array\{periodName\: mixed, periodStart\: mixed, periodEnd\: mixed, periodNumber\: mixed, periodSequence\: mixed, class\: array\<array\{description\: mixed, code\: mixed, campus\: mixed, room\: mixed, staffID\: mixed\}\>\}\> will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: library/External/Doublefirst/Timetable.php
-
-		-
 			message: '#^Call to function is_array\(\) with array\<array\{periodName\: mixed, periodStart\: mixed, periodEnd\: mixed, periodNumber\: mixed, periodSequence\: mixed, day\: array\}\> will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
@@ -1664,12 +1658,6 @@ parameters:
 
 		-
 			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: library/External/Isams/Timetable.php
-
-		-
-			message: '#^Call to function is_array\(\) with array\<array\{periodName\: mixed, periodStart\: mixed, periodEnd\: mixed, periodNumber\: mixed, periodSequence\: mixed, class\: array\<array\{description\: mixed, code\: mixed, campus\: mixed, room\: mixed, staffID\: mixed\}\>\}\> will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
 			path: library/External/Isams/Timetable.php
@@ -1811,12 +1799,6 @@ parameters:
 			identifier: parameter.phpDocType
 			count: 1
 			path: library/External/Tass/Api/Connector.php
-
-		-
-			message: '#^Method External\\Tass\\Api\\ModelFactory\:\:buildTeacherTimetable\(\) should return array\<array\<External\\Tass\\Api\\Models\\TeacherTimetable\>\> but returns array\<int, array\<External\\Tass\\Api\\Models\\StudentTimetable\>\>\.$#'
-			identifier: return.type
-			count: 1
-			path: library/External/Tass/Api/ModelFactory.php
 
 		-
 			message: '#^Method External_Tass_Helper\:\:setDatabase\(\) is unused\.$#'
