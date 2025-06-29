@@ -1585,12 +1585,6 @@ parameters:
 			path: library/External/Doublefirst/Timetable.php
 
 		-
-			message: '#^Call to function is_array\(\) with array\<array\{periodName\: mixed, periodStart\: mixed, periodEnd\: mixed, periodNumber\: mixed, periodSequence\: mixed, day\: array\}\> will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: library/External/Doublefirst/Timetable.php
-
-		-
 			message: '#^Method External_Doublefirst_Timetable\:\:getDayNumber\(\) should return bool\|string but returns int\.$#'
 			identifier: return.type
 			count: 1
@@ -1658,12 +1652,6 @@ parameters:
 
 		-
 			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: library/External/Isams/Timetable.php
-
-		-
-			message: '#^Call to function is_array\(\) with array\<array\{periodName\: mixed, periodStart\: mixed, periodEnd\: mixed, periodNumber\: mixed, periodSequence\: mixed, day\: array\}\> will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
 			path: library/External/Isams/Timetable.php
@@ -2247,12 +2235,6 @@ parameters:
 		-
 			message: '#^PHPDoc tag @param for parameter \$unitImpls with type Schoolbox\\GenericCollection\|Schoolbox\\Learning\\Course\\DataModel\\Implementation\\Unit\\Model is not subtype of native type Schoolbox\\GenericCollection\.$#'
 			identifier: parameter.phpDocType
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/DataTransferObject.php
-
-		-
-			message: '#^Property Schoolbox\\Assessment\\Course\\Import\\DataTransferObject\:\:\$unitImplementations \(array\<Schoolbox\\Learning\\Course\\DataModel\\Implementation\\Unit\\Model\>\|\(iterable\<Schoolbox\\Learning\\Course\\DataModel\\Implementation\\Unit\\Model\>&Schoolbox\\GenericCollection\)\) is never assigned array\<Schoolbox\\Learning\\Course\\DataModel\\Implementation\\Unit\\Model\> so it can be removed from the property type\.$#'
-			identifier: property.unusedType
 			count: 1
 			path: library/Schoolbox/Assessment/Course/Import/DataTransferObject.php
 
@@ -5483,12 +5465,6 @@ parameters:
 			identifier: method.notFound
 			count: 1
 			path: library/Schoolbox/Pastoral/Revision/Mapper.php
-
-		-
-			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertEmpty\(\) with Schoolbox\\Collection and non\-falsy\-string will always evaluate to false\.$#'
-			identifier: method.impossibleType
-			count: 1
-			path: library/Schoolbox/Pastoral/Test/AccessLevelCensorTest.php
 
 		-
 			message: '#^PHPDoc tag @return with type iterable\<Schoolbox\\Pastoral\\Model\>&Schoolbox\\GenericCollection is incompatible with native type array\.$#'
