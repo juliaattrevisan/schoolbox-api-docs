@@ -231,7 +231,7 @@ class Api
                  * We're looking specifically at the 400 invalid_client exception for some special
                  * handling so humans know why we died
                  */
-                if (get_class($e) instanceof ClientException) {
+                if ($e instanceof ClientException) {
                     $response = $e->getResponse();
 
                     if ($response->getStatusCode() === 400) {
