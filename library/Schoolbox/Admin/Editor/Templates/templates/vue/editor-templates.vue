@@ -212,7 +212,7 @@ async function onDeleteConfirmed(): Promise<void> {
                 >
                     <div class="l-flex-col l-flex--justify-center l-flex__item--1 l-gap-xs l-pad-m f-no-margins">
                         <h3>
-                            <button class="f-no-margins" @click.prevent="onPreviewSelected(template)">
+                            <button class="sbx-link-button f-no-margins" @click.prevent="onPreviewSelected(template)">
                                 {{ template.title }}
                             </button>
                         </h3>

@@ -329,11 +329,22 @@ button.submit {
 
 .sbx-icon-only-button {
     align-items: center;
+    background: none;
     display: flex;
     justify-content: center;
     min-height: 40px;
     min-width: 40px;
     &:hover {
         background: var(--content-ui-hover);
+    }
+}
+
+// a button that displays similar to a link
+.sbx-link-button {
+    background: none;
+    min-height: auto;
+    padding: 0;
+    &:hover {
+        background: none;
     }
 }
