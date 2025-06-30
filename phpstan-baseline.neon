@@ -2238,6 +2238,12 @@ parameters:
 			count: 1
 			path: library/Schoolbox/Assessment/Course/Import/DataTransferObject.php
 
+	    -
+			message: '#^Property Schoolbox\\Assessment\\Course\\Import\\DataTransferObject\:\:\$unitImplementations \(array\<Schoolbox\\Learning\\Course\\DataModel\\Implementation\\Unit\\Model\>\|\(iterable\<Schoolbox\\Learning\\Course\\DataModel\\Implementation\\Unit\\Model\>&Schoolbox\\GenericCollection\)\) is never assigned array\<Schoolbox\\Learning\\Course\\DataModel\\Implementation\\Unit\\Model\> so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: library/Schoolbox/Assessment/Course/Import/DataTransferObject.php
+
 		-
 			message: '#^Property Schoolbox\\Assessment\\Course\\Import\\DataTransferObject\:\:\$unitSpecAssessments \(Schoolbox\\Learning\\Assessment\\IAssessable\|null\) does not accept Schoolbox\\GenericCollection\.$#'
 			identifier: assign.propertyType
