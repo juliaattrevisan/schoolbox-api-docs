@@ -21,7 +21,6 @@ use Schoolbox\GenericCollection;
  */
 class ModelFactory
 {
-
     /**
      * @param mixed[] $data
      * @return Models\Student
