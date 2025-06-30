@@ -64,6 +64,7 @@ const cellInfo = window.Vue.computed(() => {
 const resizeObserver = window.Vue.ref<ResizeObserver | null>(null);
 const tableRowEl = window.Vue.useTemplateRef<HTMLTableRowElement>("tableRowEl");
 const feedbackEl = window.Vue.useTemplateRef<HTMLElement>("feedbackEl");
+const placeholderEl = window.Vue.useTemplateRef<HTMLDivElement>("placeholderEl");
 const leftEls = useTemplateRefsList<HTMLTableCellElement>();
 
 // tableContainerEl is the element that contains the markbook table,
@@ -128,7 +129,7 @@ function updateFeedbackCellPosition(): void {
     leftElBounds.update();
 }
 
-window.Vue.onMounted(() => {
+window.Vue.onMounted(async () => {
     // Initialize the ResizeObserver
     resizeObserver.value = new ResizeObserver(updateFeedbackCellPosition);
     resizeObserver.value.observe(document.querySelector("#container")!);
@@ -137,6 +138,12 @@ window.Vue.onMounted(() => {
     // Set the initial position, and update it again when the DOM is fully loaded to ensure the footer is included
     updateFeedbackCellPosition();
     window.addEventListener("DOMContentLoaded", updateFeedbackCellPosition, { once: true });
+
+    if (placeholderEl.value) {
+        await window.Vue.nextTick();
+        // Ensure the table row is always at the top of the viewport
+        placeholderEl.value.scrollIntoView({ block: "end", behavior: "smooth" });
+    }
 });
 
 window.Vue.onUnmounted(() => {
@@ -267,7 +274,7 @@ window.Vue.watch(
                     </div>
                 </div>
             </form>
-            <div :style="{ height: `${feedbackCellOffsets.height}px` }"></div>
+            <div ref="placeholderEl" :style="{ height: `${feedbackCellOffsets.height}px` }"></div>
         </td>
     </tr>
 </template>
@@ -286,7 +293,7 @@ td:has(.fixed-feedback-cell) {
     padding: 0;
 }
 
-.fixed-feedback-cell > :nth-child(1) {
+.fixed-feedback-cell > div {
     padding-top: 0.625rem;
     padding-bottom: 0.625rem;
 }
