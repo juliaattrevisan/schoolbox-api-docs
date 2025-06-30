@@ -3,12 +3,45 @@
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/dataTables.js?v={{ config.site_version }}"></script>
 <script>
     $(function () {
-        $('[data-submit]').click(function (e) {
+        $('[data-restart-processing]').click(async function (e) {
             e.preventDefault();
-            var formName = '#update' + $(this).data('submit');
-            var form = $(formName);
-            $(formName + ' input[name="videoAction"]').val('resubmit');
-            form.submit();
+            const deleteId = $(this).data('restartProcessing');
+            const row = $(this).closest('tr');
+
+            const toast = window.sbProps.toastActivate("Restarting processing...");
+            try {
+                const response = await fetch(
+                    "{{ routeLookup('adminVideo.postSubmit') }}",
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            videoId: deleteId,
+                            videoAction: 'resubmit'
+                        })
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error('Error restarting processing of item');
+                }
+
+                toast.timeout({
+                    text: 'Started reprocessing item',
+                    isSuccess: true
+                });
+
+                // reload the page since the item will be in a different section now
+                window.location.reload();
+            } catch (error) {
+                console.error(error);
+                toast.timeout({
+                    text: 'Error restarting processing of item',
+                    isSuccess: false
+                });
+            }
         });
         $('[data-delete]').click(function (e) {
             e.preventDefault();
@@ -86,14 +119,10 @@
                                     <td class="actions-small-3">
                                         <nav>
                                             {% if video.isFailed %}
-                                                <form id="update{{ video.id }}" method="post" action="{{ routeLookup('adminVideo.postSubmit') }}">
-                                                    <input type="hidden" value="{{ video.id }}" name="videoId">
-                                                    <input type="hidden" value="" name="videoAction">
-                                                    <a class="icon-download no-text" href="/storage/fetch.php?hash={{ video.storage.hash }}" title="Download file"></a>
-                                                    <a class="icon-search no-text" data-view="{{ video.id }}" href="#" title="View Transcode Results" data-reveal-id="ajax-load" data-reveal-ajax="/adminv2/video/{{ video.id }}"></a>
-                                                    <a class="icon-refresh no-text" data-submit="{{ video.id }}" href="#" title="Restart Processing"></a>
-                                                    <a class="icon-delete no-text" data-delete="{{ video.id }}" href="#" title="Delete From Queue"></a>
-                                                </form>
+                                                <a class="icon-download no-text" href="/storage/fetch.php?hash={{ video.storage.hash }}" title="Download file"></a>
+                                                <a class="icon-search no-text" data-view="{{ video.id }}" href="#" title="View Transcode Results" data-reveal-id="ajax-load" data-reveal-ajax="/adminv2/video/{{ video.id }}"></a>
+                                                <a class="icon-refresh no-text" data-restart-processing="{{ video.id }}" href="#" title="Restart Processing"></a>
+                                                <a class="icon-delete no-text" data-delete="{{ video.id }}" href="#" title="Delete From Queue"></a>
                                             {% endif %}
                                         </nav>
                                     </td>
@@ -126,4 +155,3 @@
 <div data-reveal id="ajax-load" class="reveal-modal"></div>
 
 <div class="toast" id="toaster"></div>
-
