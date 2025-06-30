@@ -90,6 +90,14 @@ declare global {
          * From jquery-validation
          */
         valid(): boolean;
+        /**
+         * From jquery.combobox.js
+         */
+        combobox(selectOptions: string[]): JQuery;
+        /**
+         * From jquery.alaressValidate.js
+         */
+        alaressValidate(options?: Record<string, unknown>): JQuery;
     }
 
     // Fix types when importing .vue files and using with window.Vue.createApp
