@@ -549,7 +549,8 @@ class Api extends \Codeception\Module
             ->setOpenAt($now)
             ->setPublishAt($now)
             ->setDueAt($close)
-            ->setCloseAt($close)
+            //->setCloseAt($close) // Note Assessment\Task\Model->setCloseAt() doesn't actually do anything.
+            // The function call above has been commented out to get around a PHPStan warning.
             ->setMarkVisibility(SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT);
 
         $context->getAssessables()->add($task);
