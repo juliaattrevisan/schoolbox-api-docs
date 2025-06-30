@@ -380,7 +380,7 @@ class Exporter
                     }
                 }
 
-                unset ($widget);
+                unset($widget);
 
                 /* Constituents of an item is assumed to be either a feature or a question
                  */
@@ -388,13 +388,13 @@ class Exporter
                     $feature['reference'] = $featureReplacementRefs[$feature['reference']];
                 }
 
-                unset ($feature);
+                unset($feature);
 
                 foreach ($item['questions'] as &$question) {
                     $question['reference'] = $questionReplacementRefs[$question['reference']];
                 }
 
-                unset ($question);
+                unset($question);
 
                 /* Rewrite this layout reference business: these identifiers are either
                  * features or questions: figure it out based on widget_type being either
@@ -408,7 +408,7 @@ class Exporter
                     }
                 }
 
-                unset ($widget);
+                unset($widget);
 
                 /* Update this item's identifier
                  */
