@@ -67,8 +67,20 @@ class RestPhotoDownloader implements IPhotoDownloader
      * the school's updated a picture in isams: it'll be different id in that circumstance.
      * Also, we need to use that in a url for an api request to obtain the picture's binary data.
      */
-    public function getPhoto(string $roleType, string $identifier, ?int $sisPhotoId): ?string
+    public function getPhoto(array $data): ?string
     {
+        $roleType = $data['type'];
+        $sisPhotoId = $data['sisPhotoId'];
+
+        /* REST student photos require usage of SchoolId in the urls, which also happens to be
+         * what we assumed for a student's external id. Staff require usage of isams internal id
+         */
+        if (Role::STUDENT === $roleType) {
+            $identifier = $data['externalId'];
+        } else {
+            $identifier = $data['internalId'];
+        }
+
         switch ($roleType) {
             case Role::STUDENT:
                 if (!isset($this->photoCache[$identifier]) || null === $sisPhotoId) {
@@ -144,8 +156,19 @@ class RestPhotoDownloader implements IPhotoDownloader
      *
      * @inheritDoc
      */
-    public function getLatestPhotoId(string $roleType = Role::STUDENT, string|int|null $identifier = null): ?int
+    public function getLatestPhotoId(array $data): ?int
     {
+        $roleType = $data['type'];
+
+        /* REST student photos require usage of SchoolId in the urls, which also happens to be
+         * what we assumed for a student's external id. Staff require usage of isams internal id
+         */
+        if (Role::STUDENT === $roleType) {
+            $identifier = $data['externalId'];
+        } else {
+            $identifier = $data['internalId'];
+        }
+
         switch ($roleType) {
             case Role::STUDENT:
                 $url = sprintf('Main/api/students/%s', $identifier);

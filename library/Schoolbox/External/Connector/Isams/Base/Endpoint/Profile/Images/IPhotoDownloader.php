@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Profile\Images;
 
+use GuzzleHttp\Exception\GuzzleException;
+
 /**
  * Class IPhotoDownloader
  *
@@ -35,13 +37,24 @@ interface IPhotoDownloader
 
 
     /**
+     * Each implementation of IPhotoDownloader requires different scalars to produce the binary
+     * content of a profile picture. While this is conceptually synonymous, it is not syntactically
+     * synonymous: especially since the REST API requires different ids depending on the user's
+     * role type.
+     *
+     * @param array $data
+     * @return string|null
+     */
+    public function getPhoto(array $data): ?string;
+
+
+    /**
      * Get the latest photo ID for the user from the rest API
      *
-     * @param string $roleType
-     * @param string|int|null $identifier
+     * @param array $data
      * @return int|null
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws GuzzleException
      * @throws \JsonException
      */
-    public function getLatestPhotoId(string $roleType, string|int|null $identifier): ?int;
+    public function getLatestPhotoId(array $data): ?int;
 }

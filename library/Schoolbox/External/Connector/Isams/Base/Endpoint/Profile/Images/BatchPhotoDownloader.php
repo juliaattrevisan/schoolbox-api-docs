@@ -213,14 +213,19 @@ class BatchPhotoDownloader implements IPhotoDownloader
      *
      * All isams pictures seem to be pngs in a zip (god knows why)
      *
-     * @param string $roleType
-     * @param string $personId
+     * @param array $data
      * @return string|null
      */
-    public function getPhoto(string $roleType, string $personId): ?string
+    public function getPhoto(array $data): ?string
     {
-        $path = "{$this->cacheDir}/{$roleType}/{$personId}.png";
-print_r($path);
+        /* Batchxml photos are named after a person's isams internal identifier, not their school id
+         * TODO verify staff pictures are also named the same way
+         */
+        $roleType = $data['type'];
+        $identifier = $data['internalId'];
+
+        $path = "{$this->cacheDir}/{$roleType}/{$identifier}.png";
+
         if (file_exists($path)) {
             return file_get_contents($path);
         }
@@ -232,7 +237,7 @@ print_r($path);
     /**
      * @inheritDoc
      */
-    public function getLatestPhotoId(string $roleType = Role::STUDENT, string|int|null $identifier = null): ?int
+    public function getLatestPhotoId(array $data): ?int
     {
         return null;
     }
