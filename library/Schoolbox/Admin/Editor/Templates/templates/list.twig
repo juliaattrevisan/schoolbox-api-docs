@@ -12,11 +12,15 @@
     {{ renderAdminNavigation(pageCurrent) }}
 
     <div class="admin-content">
-        {% set templatesEndpoint = routeLookupIfAuthorized('editorTemplates.getTemplates') %}
+        {% set templatesEndpoint = routeLookup('editorTemplates.getTemplates') %}
+        {% set createTemplateEndpoint = routeLookup('adminEditorTemplates.getCreate') %}
+        {% set updateTemplateEndpoint = routeLookup('adminEditorTemplates.getUpdate') %}
         <div id="editor-templates-container">
             <editor-templates
                 :categories="{{ (categories ?? []) | json_encode }}"
                 templates-endpoint="{{ templatesEndpoint ?? ''}}"
+                create-template-endpoint="{{ createTemplateEndpoint ?? '' }}"
+                update-template-endpoint="{{ updateTemplateEndpoint ?? '' }}"
             />
         </div>
         <script src="{{ CDN_PREFIX }}/js/bundle/editorTemplates.js?v={{ config.site_version }}"></script>

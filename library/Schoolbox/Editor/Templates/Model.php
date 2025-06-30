@@ -13,12 +13,21 @@ namespace Schoolbox\Editor\Templates;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\CreatedBy;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
+use Schoolbox\Mapper\Traits\Model\UpdatedBy;
 
 class Model
 {
     use Id;
     use CreatedAtDate;
     use CreatedBy;
+    use UpdatedAtDate;
+    use UpdatedBy;
+
+    /**
+     * @var int
+     */
+    private int $categoryId;
 
     /**
      * @var string
@@ -36,6 +45,24 @@ class Model
     private string $body;
 
     /**
+     * @return int
+     */
+    public function getCategoryId(): int
+    {
+        return $this->categoryId;
+    }
+
+    /**
+     * @param int $categoryId
+     * @return self
+     */
+    public function setCategoryId(int $categoryId): self
+    {
+        $this->categoryId = $categoryId;
+        return $this;
+    }
+
+    /**
      * @return string
      */
     public function getTitle(): string
@@ -45,7 +72,7 @@ class Model
 
     /**
      * @param string $title
-     * @return Model
+     * @return self
      */
     public function setTitle(string $title): self
     {
@@ -63,7 +90,7 @@ class Model
 
     /**
      * @param string $description
-     * @return Model
+     * @return self
      */
     public function setDescription(string $description): self
     {
@@ -81,7 +108,7 @@ class Model
 
     /**
      * @param string $body
-     * @return Model
+     * @return self
      */
     public function setBody(string $body): self
     {

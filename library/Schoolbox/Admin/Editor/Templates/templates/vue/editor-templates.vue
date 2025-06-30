@@ -15,6 +15,8 @@ import type { Category, Template } from "../js/types/editorTemplatesTypes";
 interface Props {
     categories: Category[]; // The categories of templates to display
     templatesEndpoint: string; // The endpoint to fetch templates from
+    createTemplateEndpoint: string; // The endpoint to create a new template
+    updateTemplateEndpoint: string; // The endpoint to update an existing template
 }
 const props = defineProps<Props>();
 
@@ -115,16 +117,24 @@ window.Vue.onMounted((): void => {
         <div v-else-if="currentTemplates.length === 0" class="empty-state-flex-centered">
             <i class="icon-textbox"></i>
             <p>No {{ kebabToTitleCase(currentCategory.name) }} templates have been created.</p>
+            <a
+                v-if="props.createTemplateEndpoint !== ''"
+                :href="props.createTemplateEndpoint.replace('{categoryId}', currentCategory.id.toString())"
+                >Create a new template</a
+            >
         </div>
         <div v-else class="c-island">
             <div v-for="(template, index) in currentTemplates" :key="template.id" class="c-card">
                 <div
-                    :class="`l-flex-row l-gap-m l-pad-m ${index !== currentTemplates.length - 1 ? `c-card--border-end-alt` : ''}`"
+                    :class="`l-flex-row l-gap-m ${index !== currentTemplates.length - 1 ? `c-card--border-end-alt` : ''}`"
                 >
-                    <div class="l-flex-col l-flex--justify-center l-flex__item--1 f-no-margins">
+                    <div class="l-flex-col l-flex--justify-center l-flex__item--1 l-gap-xs l-pad-m f-no-margins">
                         <h3>
                             <a href="#">{{ template.title }}</a>
                         </h3>
+                        <p v-if="template.description && template.description !== ''" class="f-no-margins">
+                            {{ template.description }}
+                        </p>
                         <p class="meta">
                             <span
                                 >By
@@ -143,7 +153,26 @@ window.Vue.onMounted((): void => {
                             >
                         </p>
                     </div>
+                    <div>
+                        <a
+                            class="sbx-icon-only-button f-no-margins"
+                            aria-label="Edit template"
+                            title="Edit template"
+                            :href="props.updateTemplateEndpoint.replace('{templateId}', template.id.toString())"
+                        >
+                            <sbx-icon name="modify" />
+                        </a>
+                    </div>
                 </div>
+            </div>
+            <div v-if="props.createTemplateEndpoint !== ''" class="component-action">
+                <section>
+                    <a
+                        :href="props.createTemplateEndpoint.replace('{categoryId}', currentCategory.id.toString())"
+                        class="button"
+                        >Add template</a
+                    >
+                </section>
             </div>
         </div>
     </div>
