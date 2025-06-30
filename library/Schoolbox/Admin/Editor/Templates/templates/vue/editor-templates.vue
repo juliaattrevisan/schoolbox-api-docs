@@ -145,6 +145,7 @@ async function onDeleteConfirmed(): Promise<void> {
         return;
     }
     const url = props.deleteTemplateEndpoint.replace("{templateId}", currentTemplate.value.id.toString());
+    const toast = window.sbProps.toastActivate("Deleting...");
     try {
         isDeleting.value = true;
         deleteError.value = null;
@@ -164,6 +165,7 @@ async function onDeleteConfirmed(): Promise<void> {
         );
         currentTemplate.value = null; // reset the current template
         isDeleteOpen.value = false; // close the delete modal
+        toast.timeout({ text: "Deleted" });
     } catch (error) {
         // ignore abort errors, as the previous request was cancelled
         if (isAbortError(error)) {
@@ -172,6 +174,7 @@ async function onDeleteConfirmed(): Promise<void> {
         if (error instanceof Error && hasErrorMessage(error)) {
             deleteError.value = error.message;
         }
+        toast.timeout({ text: "Delete failed", isSuccess: false });
         console.error(error);
     } finally {
         isDeleting.value = false;
