@@ -133,7 +133,7 @@ const exportReportRoute = window.Vue.computed(() => {
         <table class="diagonal-headings-table marksheet">
             <mb-table-head :type="props.type" />
             <tbody>
-                <tr v-if="props.type === 'course'">
+                <tr v-if="props.type === 'course'" :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }">
                     <th class="course-row class-row-heading fixed-left">
                         Course Average
                         <span data-tooltip class="hint has-tip tip-top" title="Average student cohort mark">?</span>

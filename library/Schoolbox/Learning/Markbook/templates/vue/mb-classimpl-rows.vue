@@ -103,7 +103,7 @@ const orderedClassImplStudents = window.Vue.computed(() => {
             }"
         />
 
-        <tr v-if="props.type === 'course'">
+        <tr v-if="props.type === 'course'" :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }">
             <th class="class-row class-row-heading fixed-left">
                 <a :href="`/homepage/${classImpl.folder.id}`">{{ classImpl.folder.title }}</a>
             </th>

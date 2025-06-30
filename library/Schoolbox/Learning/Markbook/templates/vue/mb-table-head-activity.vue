@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useMarkbookStore } from "./store/markbookStore";
 import type { MarkbookActivity } from "./types/payload";
 
 interface Props {
@@ -6,10 +7,17 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const mbStore = useMarkbookStore();
 </script>
 
 <template>
-    <th :data-test="`markbook-assessment-${props.activity.id}`">
+    <th
+        :data-test="`markbook-assessment-${props.activity.id}`"
+        :class="{
+            'markbook-faded':
+                mbStore.feedbackSelectedCell && mbStore.feedbackSelectedCell.activityId !== props.activity.id,
+        }"
+    >
         <div ref="referenceEl">
             <!-- A teacher clicking an assessment from the markbook is most likely interested in seeing more granular results -->
             <span>

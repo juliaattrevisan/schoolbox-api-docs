@@ -12,7 +12,11 @@ const mbStore = useMarkbookStore();
 </script>
 
 <template>
-    <tr v-if="mbStore.data !== null && props.classImpl.stats !== null" class="average-headers">
+    <tr
+        v-if="mbStore.data !== null && props.classImpl.stats !== null"
+        class="average-headers"
+        :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }"
+    >
         <th class="fixed-left white profile-cell average-expander">
             <a
                 href="#"

@@ -147,12 +147,20 @@ function onClickCell(): void {
     }
 }
 
-const isSelected = window.Vue.computed(
+const isSelectedPopout = window.Vue.computed(
     () =>
         mbStore.popoutSelectedCell &&
         mbStore.popoutSelectedCell.classImplId === props.classImplId &&
         mbStore.popoutSelectedCell.studentId === props.studentId &&
         mbStore.popoutSelectedCell.activityId === props.assessmentId,
+);
+
+const isSelectedFeedback = window.Vue.computed(
+    () =>
+        mbStore.feedbackSelectedCell &&
+        mbStore.feedbackSelectedCell.classImplId === props.classImplId &&
+        mbStore.feedbackSelectedCell.studentId === props.studentId &&
+        mbStore.feedbackSelectedCell.activityId === props.assessmentId,
 );
 </script>
 
@@ -161,7 +169,10 @@ const isSelected = window.Vue.computed(
         v-if="mbStore.data && classImpl && assessment && student"
         ref="cellEl"
         class="student-grade-cell"
-        :class="{ excluded: !participant || participant.isExcluded, 'is-selected': isSelected }"
+        :class="{
+            excluded: !participant || participant.isExcluded,
+            'is-selected': isSelectedPopout || isSelectedFeedback,
+        }"
         :data-test="`markbook-cell-${assessment.id}-${student.id}`"
         :data-pop-out-menu="hasPopOutMenu || undefined"
         @click="onClickCell"

@@ -199,6 +199,14 @@
                 background-color: var(--content-ui-hover);
             }
         }
+
+        // When filling in feedback, the non-relevant rows are faded out
+        .markbook-faded {
+            opacity: 0.3;
+        }
+        tr.markbook-faded {
+            background-color: var(--body-background);
+        }
     }
 }
 

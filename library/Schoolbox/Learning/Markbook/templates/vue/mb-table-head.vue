@@ -15,10 +15,10 @@ const mbStore = useMarkbookStore();
     <thead v-if="mbStore.data !== null">
         <tr class="rotate-headers">
             <th class="fixed-left"><div></div></th>
-            <th class="fixed-left">
+            <th class="fixed-left" :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }">
                 <div><span>Student Weighted Average</span></div>
             </th>
-            <th v-if="mbStore.data.rank !== null">
+            <th v-if="mbStore.data.rank !== null" :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }">
                 <div>
                     <span>{{ props.type === "class" ? "Class" : "Course" }} Ranking</span>
                 </div>
@@ -40,7 +40,11 @@ const mbStore = useMarkbookStore();
             />
         </template>
 
-        <tr v-if="props.type === 'course'" class="course-headers">
+        <tr
+            v-if="props.type === 'course'"
+            class="course-headers"
+            :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }"
+        >
             <th class="fixed-left transparent"></th>
             <th class="fixed-left white"></th>
             <th v-if="mbStore.data.rank !== null" class="white"></th>
