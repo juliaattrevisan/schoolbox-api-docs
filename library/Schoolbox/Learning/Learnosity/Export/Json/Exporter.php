@@ -24,6 +24,7 @@ class Exporter
      * specifically applicable to item.definition.widget nodes.
      */
     public const WIDGET_FEATURE = 'feature';
+    public const WIDGET_QUESTION = 'question';
 
 
     /**
@@ -354,15 +355,46 @@ class Exporter
             $itemStack = [];
 
             foreach ($itemData as &$item) {
+                /* Older quiz nodes don't come with a widget_type node to check against; newer ones do.
+                 * To get around this learnosity deficiency we can search the questions and features nodes
+                 * for a widget reference to infer which type of widget this actually was.
+                 */
+                foreach ($item['definition']['widgets'] as &$widget) {
+                    /* Unknown type: try to infer what it was
+                     * Maybe it was a feature; maybe it was a question. Dig everywhere to find out
+                     */
+                    if ('' === ($widget['type'] ?? '')) {
+                        foreach ($item['features'] as $feature) {
+                            if ($feature['reference'] === $widget['reference']) {
+                                $widget['widget_type'] = self::WIDGET_FEATURE;
+                                break;
+                            }
+                        }
+
+                        foreach ($item['questions'] as $question) {
+                            if ($question['reference'] === $widget['reference']) {
+                                $widget['widget_type'] = self::WIDGET_QUESTION;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                unset ($widget);
+
                 /* Constituents of an item is assumed to be either a feature or a question
                  */
                 foreach ($item['features'] as &$feature) {
                     $feature['reference'] = $featureReplacementRefs[$feature['reference']];
                 }
 
+                unset ($feature);
+
                 foreach ($item['questions'] as &$question) {
                     $question['reference'] = $questionReplacementRefs[$question['reference']];
                 }
+
+                unset ($question);
 
                 /* Rewrite this layout reference business: these identifiers are either
                  * features or questions: figure it out based on widget_type being either
@@ -376,6 +408,8 @@ class Exporter
                     }
                 }
 
+                unset ($widget);
+
                 /* Update this item's identifier
                  */
                 $item['reference'] = $itemReplacementRefs[$item['reference']];
@@ -387,7 +421,7 @@ class Exporter
                 $itemStack[$item['reference']] = $item;
             }
 
-            unset($item, $widget, $question, $feature);
+            unset($item);
 
             /* Anonymise activity refs
              */
