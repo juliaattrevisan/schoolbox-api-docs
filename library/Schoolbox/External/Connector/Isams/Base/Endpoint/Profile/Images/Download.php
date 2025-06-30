@@ -110,6 +110,16 @@ class Download implements IStrategy
             try {
                 $newSisPhotoId = $this->photoDownloader->getLatestPhotoId($data['person']['type'], $data['person']['internalId']);
             } catch (ApiException $e) {
+                /* TODO double check this when there's student pics
+                 *  Students need to use external id, but staff use internal id! (404 if you access student url with internal id)
+                 *  SURELY this can't be the way they made it...
+                 */
+                if (\Schoolbox\Role::STUDENT === $data['person']['type']) {
+                    $newSisPhotoId = $this->photoDownloader->getLatestPhotoId($data['person']['type'], $data['person']['externalId']);
+                } else {
+                    $newSisPhotoId = $this->photoDownloader->getLatestPhotoId($data['person']['type'], $data['person']['internalId']);
+                }
+            } catch (ApiException $e) {
                 /* Log something more verbose so we can debug better
                  */
                 $this->log->debug($e->getMessage());
