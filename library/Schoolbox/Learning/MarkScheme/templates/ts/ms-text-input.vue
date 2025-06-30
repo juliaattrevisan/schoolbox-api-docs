@@ -63,10 +63,21 @@ window.Vue.onMounted(() => {
     if (!props.readonly) {
         $(markInputEl.value).combobox(props.submissionErrorStates);
 
-        const validateTarget = props.alaressValidateTarget ? document.querySelector(props.alaressValidateTarget) : null;
-        const validateTargetJqEl = $(validateTarget || markInputEl.value);
-        validateTargetJqEl.alaressValidate(props.alaressValidateOptions);
-        validateTargetJqEl.valid(); /* always run upon load */
+        const validateTarget =
+            (props.alaressValidateTarget ? document.querySelector(props.alaressValidateTarget) : null) ||
+            markInputEl.value.form;
+
+        if (!validateTarget) {
+            throw new Error("Unable to initialise alaressValidate without a form element");
+        }
+
+        // Remove any existing validator, otherwise this will never re-initialise
+        // with the new values... this might be bad if you try to use the element in
+        // a form with other inputs... i'm not sure yet.
+        $.removeData(validateTarget, "validator");
+
+        $(validateTarget).alaressValidate(props.alaressValidateOptions);
+        $(validateTarget).valid(); /* always run upon load */
     }
 });
 
@@ -95,6 +106,11 @@ function onMarkChanged(): void {
 window.Vue.watch(mark, (newValue) => {
     if (!updatingFromInput) {
         localMark.value = newValue;
+
+        // for alaressValidate to pick up the change
+        void window.Vue.nextTick(() => {
+            markInputEl.value?.dispatchEvent(new Event("change", { bubbles: true }));
+        });
     }
 });
 </script>

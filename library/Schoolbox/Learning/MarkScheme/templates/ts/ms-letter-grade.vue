@@ -49,12 +49,12 @@ const mark = defineModel<string | null>("mark", { required: true });
         :alaress-validate-options="{
             rules: {
                 mark: {
-                    withinPercentageRange: true,
+                    withinLetterGradeRange: true,
                 },
             },
             messages: {
                 mark: {
-                    withinPercentageRange: `The grade must be between 0 and ${LIMIT}.`,
+                    withinLetterGradeRange: `Please select one of the available grade options.`,
                 },
             },
         }"

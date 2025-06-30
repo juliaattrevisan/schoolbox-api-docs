@@ -211,6 +211,7 @@ window.Vue.watch(
                     <label>
                         {{ locale.grades.proper() }}
                         <mark-scheme
+                            :key="cellInfo.aImpl.instructorMarkScheme.template"
                             v-model:mark="mark"
                             :participant="{ user: props.student }"
                             :mark-scheme="cellInfo.aImpl.instructorMarkScheme"

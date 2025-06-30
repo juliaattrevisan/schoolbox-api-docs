@@ -81,7 +81,7 @@ const limit = window.Vue.computed(() => {
             },
             messages: {
                 mark: {
-                    withinPercentageRange: `The grade must be between 0 and ${limit}.`,
+                    withinRange: `The grade must be between 0 and ${limit}.`,
                 },
             },
         }"
