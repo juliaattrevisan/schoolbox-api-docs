@@ -18,6 +18,7 @@ use Schoolbox\External\Connector\Isams\Base\Endpoint\Profile\Metadata;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Role;
 use SensitiveParameter;
 
 class Download implements IStrategy
@@ -108,13 +109,11 @@ class Download implements IStrategy
              * we don't have a photo for the user yet
              */
             try {
-                $newSisPhotoId = $this->photoDownloader->getLatestPhotoId($data['person']['type'], $data['person']['internalId']);
-            } catch (ApiException $e) {
                 /* TODO double check this when there's student pics
                  *  Students need to use external id, but staff use internal id! (404 if you access student url with internal id)
-                 *  SURELY this can't be the way they made it...
+                 *  SURELY this can't be the way they made it...but it is!!!!!11111111
                  */
-                if (\Schoolbox\Role::STUDENT === $data['person']['type']) {
+                if (Role::STUDENT === $data['person']['type']) {
                     $newSisPhotoId = $this->photoDownloader->getLatestPhotoId($data['person']['type'], $data['person']['externalId']);
                 } else {
                     $newSisPhotoId = $this->photoDownloader->getLatestPhotoId($data['person']['type'], $data['person']['internalId']);
@@ -224,7 +223,11 @@ class Download implements IStrategy
          * file_info node might not exist; if it doesn't, skip it
          */
         try {
-            $photoContents = $this->photoDownloader->getPhoto($data['person']['type'], $data['person']['internalId'], $data['person']['sisPhotoId']);
+            if (Role::STUDENT === $data['person']['type']) {
+                $photoContents = $this->photoDownloader->getPhoto($data['person']['type'], $data['person']['externalId'], $data['person']['sisPhotoId']);
+            } else {
+                $photoContents = $this->photoDownloader->getPhoto($data['person']['type'], $data['person']['internalId'], $data['person']['sisPhotoId']);
+            }
         } catch (ApiException $e) {
             $this->log->warning(sprintf(
                 "Unable to fetch Profile Photo: exception thrown for %s %s (%s) - %s",
