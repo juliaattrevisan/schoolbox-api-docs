@@ -139,28 +139,30 @@ class Download implements IStrategy
              * Note that $newSisPhotoId itself might be null, because it's latestPhotoId is also null
              * in isams land, via their api. In that case, that person probably never had a picture.
              */
-            $this->log->debug(sprintf(
-                'Comparing old sis photo id %s to new sis photo id %s',
-                $data['person']['sisPhotoId'] ?? '(null)',
-                $newSisPhotoId ?? '(null)',
-            ));
-
-            if (null === $newSisPhotoId) {
-                $this->log->info(sprintf(
-                    '%s %s (%s) has a null latest photo identifier; probably no picture exists. Skipping.',
-                    $data['person']['firstname'],
-                    $data['person']['lastname'],
-                    $externalId
+            if ($this->photoDownloader instanceof RestPhotoDownloader) {
+                $this->log->debug(sprintf(
+                    'Comparing old sis photo id %s to new sis photo id %s',
+                    $data['person']['sisPhotoId'] ?? '(null)',
+                    $newSisPhotoId ?? '(null)',
                 ));
 
-                continue;
+                if (null === $newSisPhotoId) {
+                    $this->log->info(sprintf(
+                        '%s %s (%s) has a null latest photo identifier; probably no picture exists. Skipping.',
+                        $data['person']['firstname'],
+                        $data['person']['lastname'],
+                        $externalId
+                    ));
+
+                    continue;
+                }
             }
 
             /* If a person never had a profile picture,
              * or someone changed the profile picture in the sis,
              * we need to update our own records to know about the newest ones.
              */
-            if (null === $data['person']['portrait'] || $newSisPhotoId !== $data['person']['sisPhotoId']) {
+            if (null === $data['person']['portrait'] || $newSisPhotoId !== $data['person']['sisPhotoId'] || $this->photoDownloader instanceof BatchPhotoDownloader) {
                 $this->log->info(sprintf(
                     'Downloading profile photo for %s %s (%s)',
                     $data['person']['firstname'],
@@ -224,7 +226,16 @@ class Download implements IStrategy
          */
         try {
             if (Role::STUDENT === $data['person']['type']) {
-                $photoContents = $this->photoDownloader->getPhoto($data['person']['type'], $data['person']['externalId'], $data['person']['sisPhotoId']);
+                if ($this->photoDownloader instanceof BatchPhotoDownloader) {
+                    /* Batch student photos require usage of internal id
+                     */
+                    $photoContents = $this->photoDownloader->getPhoto($data['person']['type'], $data['person']['internalId'], $data['person']['sisPhotoId']);
+                } else {
+                    /* REST student photos require usage of SchoolId in the urls, which also happens to
+                     * be what we assumed for a student's external id.
+                     */
+                    $photoContents = $this->photoDownloader->getPhoto($data['person']['type'], $data['person']['externalId'], $data['person']['sisPhotoId']);
+                }
             } else {
                 $photoContents = $this->photoDownloader->getPhoto($data['person']['type'], $data['person']['internalId'], $data['person']['sisPhotoId']);
             }

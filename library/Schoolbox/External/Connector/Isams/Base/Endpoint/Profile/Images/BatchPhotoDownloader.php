@@ -213,14 +213,14 @@ class BatchPhotoDownloader implements IPhotoDownloader
      *
      * All isams pictures seem to be pngs in a zip (god knows why)
      *
-     * @param string $personId
      * @param string $roleType
+     * @param string $personId
      * @return string|null
      */
-    public function getPhoto(string $personId, string $roleType = Role::STUDENT): ?string
+    public function getPhoto(string $roleType, string $personId): ?string
     {
         $path = "{$this->cacheDir}/{$roleType}/{$personId}.png";
-
+print_r($path);
         if (file_exists($path)) {
             return file_get_contents($path);
         }

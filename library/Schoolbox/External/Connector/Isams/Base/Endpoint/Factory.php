@@ -180,12 +180,12 @@ class Factory
                     $this->zipDir,
                     $this->baseProfileMapper,
                     $this->storageMapper
-                ))
-                ->add(new Profile\Images\Cleanup(
-                    $this->log,
-                    $this->key,
-                    $this->zipDir,
                 ));
+//                ->add(new Profile\Images\Cleanup(
+//                    $this->log,
+//                    $this->key,
+//                    $this->zipDir,
+//                ));
         }
 
         if ($this->validStrats->isTimetableStratEnabled()) {
