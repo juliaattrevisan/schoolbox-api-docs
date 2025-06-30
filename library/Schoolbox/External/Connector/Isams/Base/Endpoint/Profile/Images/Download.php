@@ -110,16 +110,16 @@ class Download implements IStrategy
             try {
                 $newSisPhotoId = $this->photoDownloader->getLatestPhotoId($data['person']['type'], $data['person']['internalId']);
             } catch (ApiException $e) {
+                /* Log something more verbose so we can debug better
+                 */
+                $this->log->debug($e->getMessage());
+
                 $this->log->info(sprintf(
                     'Could not obtain portrait picture for %s %s (%s). Skipping',
                     $data['person']['firstname'],
                     $data['person']['lastname'],
                     $externalId
                 ));
-
-                /* Log something more verbose so we can debug better
-                 */
-                $this->log->debug($e->getMessage());
 
                 continue;
             }
