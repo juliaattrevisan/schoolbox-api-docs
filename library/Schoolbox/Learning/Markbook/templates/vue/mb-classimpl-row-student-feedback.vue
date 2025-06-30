@@ -172,6 +172,12 @@ window.Vue.watch(
 </script>
 
 <template>
+    <tr v-if="mbStore.data !== null">
+        <th :ref="leftEls.set" class="fixed-left is-selected"></th>
+        <th :ref="leftEls.set" class="fixed-left is-selected"></th>
+        <th v-if="mbStore.data.rank !== null" :ref="leftEls.set" class="fixed-left is-selected"></th>
+        <td :colspan="mbStore.orderedActivities.length" class="fixed-left is-selected"></td>
+    </tr>
     <tr v-if="mbStore.data !== null && cellInfo !== null" ref="tableRowEl">
         <th :ref="leftEls.set" class="fixed-left white"></th>
         <th :ref="leftEls.set" class="fixed-left white"></th>
