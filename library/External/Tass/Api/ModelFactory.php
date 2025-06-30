@@ -12,7 +12,6 @@ namespace External\Tass\Api;
 
 use External\Tass\Api\Exception\NotFound;
 use External\Tass\Api\Exception\UdParseException;
-use External\Tass\Api\Models\TeacherTimetable;
 use Alaress_Date_Format;
 use Schoolbox\GenericCollection;
 
@@ -425,7 +424,7 @@ class ModelFactory
 
     /**
      * @param string[][][]|string[][][][]|int[][][] $data
-     * @return array<array<TeacherTimetable>>
+     * @return array<(int|string), array<Models\StudentTimetable>>
      */
     public function buildTeacherTimetable(array $data): array
     {
