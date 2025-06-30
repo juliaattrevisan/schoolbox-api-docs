@@ -528,7 +528,7 @@ class UserAccessMapper extends Mapper
             SELECT
                 {$this->getJoinColumnString('user', 'u')},
                 {$roleMapper->getColumnString( 'r')},
-                ua.sid AS serviceId,
+                ua.sid AS serviceId
             FROM
                 `{$this->getTable()}` ua
             INNER JOIN {$this->getJoinSql('user', 'ua', 'u')}
