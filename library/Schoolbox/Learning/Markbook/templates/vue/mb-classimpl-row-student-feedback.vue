@@ -183,7 +183,7 @@ window.Vue.watch(
                 class="fixed-feedback-cell row"
                 :style="{
                     left: `${feedbackCellOffsets.left}px`,
-                    top: `calc(${feedbackCellOffsets.top}px + 0.625rem)`,
+                    top: `${feedbackCellOffsets.top}px`,
                     maxWidth: `${feedbackCellOffsets.maxWidth}px`,
                     clipPath: feedbackCellOffsets.clipPath,
                 }"
@@ -245,8 +245,20 @@ window.Vue.watch(
 
 <style scoped>
 .fixed-feedback-cell {
+    margin: 0;
     position: fixed;
+    text-wrap: wrap;
     width: 100%;
     z-index: 1;
+}
+
+/* need to move the padding into the inner div so that the component actions are flush */
+td:has(.fixed-feedback-cell) {
+    padding: 0;
+}
+
+.fixed-feedback-cell > :nth-child(1) {
+    padding-top: 0.625rem;
+    padding-bottom: 0.625rem;
 }
 </style>
