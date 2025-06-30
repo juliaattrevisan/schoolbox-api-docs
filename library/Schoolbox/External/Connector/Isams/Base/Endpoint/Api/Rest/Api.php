@@ -127,6 +127,7 @@ class Api
      * @return mixed
      * @throws GuzzleException
      * @throws RandomException
+     * @throws \JsonException
      */
     public function request(string $path, string $method, array $options = [], bool $requireToken = true, bool $raw = false): mixed
     {
