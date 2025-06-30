@@ -10,7 +10,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Profile\Images;
 
+use GuzzleHttp\Exception\GuzzleException;
 use Psr\Log\LoggerInterface;
+use Random\RandomException;
 use Schoolbox\Application\Exception\ApiException;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Registry;
@@ -18,7 +20,6 @@ use Schoolbox\External\Connector\Isams\Base\Endpoint\Profile\Metadata;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
-use Schoolbox\Role;
 use SensitiveParameter;
 
 class Download implements IStrategy
@@ -81,7 +82,7 @@ class Download implements IStrategy
              */
             try {
                 $this->photoDownloader = new RestPhotoDownloader($credentials, $this->log);
-            } catch (ApiException $e) {
+            } catch (ApiException|GuzzleException|RandomException $e) {
                 $this->log->error(sprintf("Could not start RestPhotoDownloader: %s", $e->getMessage()));
                 return;
             }
@@ -114,7 +115,7 @@ class Download implements IStrategy
                  *  SURELY this can't be the way they made it...but it is!!!!!11111111
                  */
                 $newSisPhotoId = $this->photoDownloader->getLatestPhotoId($data['person']);
-            } catch (ApiException $e) {
+            } catch (ApiException|GuzzleException|RandomException|\JsonException $e) {
                 /* Log something more verbose so we can debug better
                  */
                 $this->log->debug($e->getMessage());

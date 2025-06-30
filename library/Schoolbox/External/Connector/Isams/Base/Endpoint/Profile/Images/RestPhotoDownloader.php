@@ -9,7 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Profile\Images;
 
-use Schoolbox\Application\Exception\ApiException;
+use GuzzleHttp\Exception\GuzzleException;
+use Random\RandomException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Api\Rest\Api;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
@@ -45,8 +46,9 @@ class RestPhotoDownloader implements IPhotoDownloader
      * Constructor.
      *
      * @param array $credentials
-     * @throws ApiException
      * @param LoggerInterface $log
+     * @throws GuzzleException
+     * @throws RandomException
      */
     public function __construct(#[SensitiveParameter] array $credentials, private LoggerInterface $log)
     {
@@ -59,6 +61,7 @@ class RestPhotoDownloader implements IPhotoDownloader
         );
     }
 
+
     /**
      * This uses the roletype, internal identifier and sis photo identifier to construct a url
      * to obtain a photo from the rest api.
@@ -66,6 +69,10 @@ class RestPhotoDownloader implements IPhotoDownloader
      * Ths sis photo identifier is stored in sis_user_profile.metadata and used to decide when
      * the school's updated a picture in isams: it'll be different id in that circumstance.
      * Also, we need to use that in a url for an api request to obtain the picture's binary data.
+     * @param array $data
+     * @return string|null
+     * @throws GuzzleException
+     * @throws RandomException
      */
     public function getPhoto(array $data): ?string
     {
@@ -155,6 +162,7 @@ class RestPhotoDownloader implements IPhotoDownloader
      * The identifier used here is the isams internal id, which is NOT the same as their external id.
      *
      * @inheritDoc
+     * @throws RandomException
      */
     public function getLatestPhotoId(array $data): ?int
     {

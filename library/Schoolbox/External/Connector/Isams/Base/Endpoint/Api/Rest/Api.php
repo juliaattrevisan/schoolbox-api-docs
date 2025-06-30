@@ -16,6 +16,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\SimpleCache\InvalidArgumentException;
+use Random\RandomException;
 use Schoolbox\Application\Exception\ApiException;
 use Schoolbox\Application\Exception\RateLimitException;
 use Schoolbox\Url\Uri;
@@ -63,7 +64,8 @@ class Api
      * @param string $apiHost
      * @param string $clientId
      * @param string $clientSecret
-     * @throws ApiException
+     * @throws GuzzleException
+     * @throws RandomException
      */
     public function __construct(
         private string $apiHost,
@@ -86,7 +88,8 @@ class Api
      * Retrieve Bearer Token from the OIDC
      *
      * @return string
-     * @throws ApiException
+     * @throws GuzzleException
+     * @throws RandomException
      */
     private function getToken(): string
     {
@@ -122,7 +125,8 @@ class Api
      * @param bool $requireToken
      * @param bool $raw - return raw data, not json decoded
      * @return mixed
-     * @throws ApiException
+     * @throws GuzzleException
+     * @throws RandomException
      */
     public function request(string $path, string $method, array $options = [], bool $requireToken = true, bool $raw = false): mixed
     {
