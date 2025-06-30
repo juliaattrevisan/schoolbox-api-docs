@@ -139,7 +139,7 @@ class RestPhotoDownloader implements IPhotoDownloader
     /**
      * @inheritDoc
      */
-    public function getLatestPhotoID(string $roleType = Role::STUDENT, string|int|null $identifier = null): ?int
+    public function getLatestPhotoId(string $roleType = Role::STUDENT, string|int|null $identifier = null): ?int
     {
         switch ($roleType) {
             case Role::STUDENT:

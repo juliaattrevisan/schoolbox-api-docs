@@ -43,5 +43,5 @@ interface IPhotoDownloader
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \JsonException
      */
-    public function getLatestPhotoID(string $roleType, string|int|null $identifier): ?int;
+    public function getLatestPhotoId(string $roleType, string|int|null $identifier): ?int;
 }

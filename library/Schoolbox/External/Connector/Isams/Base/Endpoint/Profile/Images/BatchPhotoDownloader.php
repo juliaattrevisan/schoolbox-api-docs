@@ -232,7 +232,7 @@ class BatchPhotoDownloader implements IPhotoDownloader
     /**
      * @inheritDoc
      */
-    public function getLatestPhotoID(string $roleType = Role::STUDENT, string|int|null $externalId = null): ?int
+    public function getLatestPhotoId(string $roleType = Role::STUDENT, string|int|null $identifier = null): ?int
     {
         return null;
     }
