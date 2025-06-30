@@ -139,6 +139,18 @@
                 thisSelector.hide();
             }
         };
+
+        // watch for changes in the width of the input element so that the selector is always aligned correctly
+        if (this.combobox.textInputElement[0]) {
+            const resizeObserver = new ResizeObserver(() => {
+                const selectorWidth =
+                    this.combobox.textInputElement.outerWidth() !== 0
+                        ? `${this.combobox.textInputElement.outerWidth()}px`
+                        : "100%"; // default to 100% if the input element has no width
+                this.selectorElement.css("width", selectorWidth);
+            });
+            resizeObserver.observe(this.combobox.textInputElement[0]);
+        }
     };
 
     ComboboxSelector.prototype = {
