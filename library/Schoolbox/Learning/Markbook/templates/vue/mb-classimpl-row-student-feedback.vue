@@ -141,8 +141,8 @@ window.Vue.onMounted(async () => {
 
     if (placeholderEl.value) {
         await window.Vue.nextTick();
-        // Ensure the table row is always at the top of the viewport
-        placeholderEl.value.scrollIntoView({ block: "end", behavior: "smooth" });
+        // Ensure the table row is always in the center of the visible table area
+        placeholderEl.value.scrollIntoView({ block: "center", behavior: "smooth" });
     }
 });
 
@@ -192,7 +192,7 @@ window.Vue.watch(
 </script>
 
 <template>
-    <tr v-if="mbStore.data !== null">
+    <tr v-if="mbStore.data !== null" ref="placeholderEl">
         <th :ref="leftEls.set" class="fixed-left is-selected"></th>
         <th :ref="leftEls.set" class="fixed-left is-selected"></th>
         <th v-if="mbStore.data.rank !== null" :ref="leftEls.set" class="fixed-left is-selected"></th>
@@ -274,7 +274,7 @@ window.Vue.watch(
                     </div>
                 </div>
             </form>
-            <div ref="placeholderEl" :style="{ height: `${feedbackCellOffsets.height}px` }"></div>
+            <div :style="{ height: `${feedbackCellOffsets.height}px` }"></div>
         </td>
     </tr>
 </template>
