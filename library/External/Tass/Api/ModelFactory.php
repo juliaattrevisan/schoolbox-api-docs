@@ -433,6 +433,7 @@ class ModelFactory
         foreach ($data as $key => $val) {
             if (\is_numeric($key)) {
                 foreach ($val as $subKey => $subVal) {
+                    // Note Models\StudentTimetable has been used here.  Models\TeacherTimetable is an empty class.
                     $timetables[$key][$subKey] = new Models\StudentTimetable(
                         $subVal['DATE'],
                         $subVal['DAY_CODE'],

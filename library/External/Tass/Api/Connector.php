@@ -428,7 +428,7 @@ class Connector
      *
      * @param string                   $teacherCode
      * @param Alaress_Date_Format|null $date
-     * @return Models\TeacherTimetable[][]
+     * @return array<int|string, array<Models\StudentTimetable>> Should be TeacherTimetable, but StudentTimetable is actually used.
      * @throws Unauthorised If credentials are incorrect
      * @throws InvalidArg If method args are invalid
      * @throws ResponseDecodeException If unable to decode API response
