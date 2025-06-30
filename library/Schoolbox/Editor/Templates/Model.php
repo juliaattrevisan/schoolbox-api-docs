@@ -72,7 +72,7 @@ class Model
 
     /**
      * @param string $title
-     *@return self
+     * @return self
      */
     public function setTitle(string $title): self
     {
