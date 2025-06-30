@@ -11,6 +11,7 @@ namespace Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup;
 
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Profile\Profile;
+use Schoolbox\External\Connector\Watchlist;
 
 /**
  * Grab all the Language proficiencies. We can presume that English
@@ -51,8 +52,9 @@ class Language
      * Constructor
      *
      * @param IApi $api
+     * @param array $watchlist
      */
-    public function __construct(private IApi $api)
+    public function __construct(private IApi $api, private array $watchlist)
     {
     }
 
@@ -84,23 +86,31 @@ class Language
                 /* Avengers Assemble!
                  */
                 foreach ($page['data'] as $record) {
+                    $externalId = trim((string)$record['person_id']);
+
+                    /* Only import for specific users
+                     */
+                    if (!(new Watchlist())->isOnWatchlist($externalId, $this->watchlist)) {
+                        continue;
+                    }
+
                     /* Overwrite with lookupped values
                      */
                     $language = $valueLists['language'][$record['language']] ?? self::UNKNOWN_DESCRIPTION;
 
-                    /* Everyone is not a native speaker until otherwise decided
+                    /* Everyone is a native speaker until otherwise decided
                      */
-                    $eal = true;
+                    $eal = false;
 
                     /* Analyse the node to decide nativeness
                      */
-                    if ($record['is_primary'] && (self::ENGLISH_DESCRIPTION === strtolower($language))) {
-                        $eal = false;
+                    if ($record['is_primary'] && (self::ENGLISH_DESCRIPTION !== strtolower($language))) {
+                        $eal = true;
                     }
 
                     /* Simplify usage since we only care if English was is_primary
                      */
-                    $this->lookup[$record['person_id']] = $eal;
+                    $this->lookup[$externalId] = $eal;
                 }
             }
         }
