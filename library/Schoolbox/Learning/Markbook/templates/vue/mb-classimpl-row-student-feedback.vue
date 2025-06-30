@@ -4,6 +4,7 @@ import { useTemplateRefsList, useElementBounding } from "@vueuse/core";
 import locale from "@js/terminology/rosettaStone";
 import CommentField from "@schoolboxLibrary/Learning/Assessment/templates/dueWork/vue/comment-field.vue";
 import ResubmissionRequired from "@schoolboxLibrary/Learning/Assessment/templates/dueWork/vue/resubmission-required.vue";
+import MarkScheme from "@schoolboxLibrary/Learning/MarkScheme/templates/ts/mark-scheme.vue";
 import { useMarkbookStore } from "./store/markbookStore";
 import type { MarkbookClassImplStudent } from "./types/payload";
 
@@ -50,7 +51,6 @@ const cellInfo = window.Vue.computed(() => {
         classImpl,
         aImpl,
         participant,
-        instructorMarkSchemeTemplate: aImpl.instructorMarkScheme?.template || null,
     };
 });
 
@@ -147,12 +147,15 @@ window.Vue.onUnmounted(() => {
 
 // todo: make this actually work with draft/published feedback chaos
 const comment = window.Vue.ref<string>("");
+const mark = window.Vue.ref<string | null>(null);
+
 window.Vue.watch(
     () => [props.classImplId, props.activityId, props.student.id],
     async () => {
         await window.Vue.nextTick();
         if (cellInfo.value === null || cellInfo.value.participant === undefined) {
             comment.value = "";
+            mark.value = null;
             return;
         }
 
@@ -165,6 +168,16 @@ window.Vue.watch(
             comment.value = marks.published.comment;
         } else {
             comment.value = "";
+        }
+
+        if (marks === undefined || marks === null) {
+            mark.value = null;
+        } else if (marks.draft && marks.draft.hrInstructor) {
+            mark.value = marks.draft.hrInstructor;
+        } else if (marks.published && marks.published.hrInstructor) {
+            mark.value = marks.published.hrInstructor;
+        } else {
+            mark.value = null;
         }
     },
     { immediate: true },
@@ -184,7 +197,7 @@ window.Vue.watch(
         <th v-if="mbStore.data.rank !== null" :ref="leftEls.set" class="fixed-left white"></th>
 
         <td :colspan="mbStore.orderedActivities.length">
-            <div
+            <form
                 ref="feedbackEl"
                 class="fixed-feedback-cell row"
                 :style="{
@@ -194,10 +207,15 @@ window.Vue.watch(
                     clipPath: feedbackCellOffsets.clipPath,
                 }"
             >
-                <div v-if="cellInfo.instructorMarkSchemeTemplate !== null" class="small-12 medium-3 column">
+                <div v-if="cellInfo.aImpl.instructorMarkScheme.template.length" class="small-12 medium-3 column">
                     <label>
                         {{ locale.grades.proper() }}
-                        INPUT
+                        <mark-scheme
+                            v-model:mark="mark"
+                            :participant="{ user: props.student }"
+                            :mark-scheme="cellInfo.aImpl.instructorMarkScheme"
+                            :submission-error-states="mbStore.data.submissionErrorStates"
+                        />
                     </label>
                     <resubmission-required
                         v-model:resubmission-required="cellInfo.participant.resubmissionRequired"
@@ -205,7 +223,10 @@ window.Vue.watch(
                         :tab-index="-1"
                     />
                 </div>
-                <div class="small-12 column" :class="{ 'medium-9': cellInfo.instructorMarkSchemeTemplate !== null }">
+                <div
+                    class="small-12 column"
+                    :class="{ 'medium-9': cellInfo.aImpl.instructorMarkScheme.template.length }"
+                >
                     <comment-field
                         v-model:comment="comment"
                         :participant="{ user: props.student }"
@@ -213,7 +234,7 @@ window.Vue.watch(
                     />
 
                     <resubmission-required
-                        v-if="cellInfo.instructorMarkSchemeTemplate === null"
+                        v-if="cellInfo.aImpl.instructorMarkScheme.template.length === 0"
                         v-model:resubmission-required="cellInfo.participant.resubmissionRequired"
                         :identifier="props.student.id"
                     />
@@ -243,7 +264,7 @@ window.Vue.watch(
                         </section>
                     </div>
                 </div>
-            </div>
+            </form>
             <div :style="{ height: `${feedbackCellOffsets.height}px` }"></div>
         </td>
     </tr>

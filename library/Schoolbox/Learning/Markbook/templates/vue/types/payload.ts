@@ -4,6 +4,7 @@
  */
 
 import type { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
+import type { MarkScheme, SubmissionErrorStates } from "@schoolboxLibrary/Learning/MarkScheme/templates/ts/markScheme";
 
 // Types for semantic clarity when referring to them later on...
 type UserId = number;
@@ -90,6 +91,7 @@ export type MarkbookClassImplActivity = {
             }
         >;
     };
+    instructorMarkScheme: MarkScheme;
     /* currently class markbook only */
     markVisibility?: number;
     courseManaged?: boolean | null;
@@ -150,6 +152,7 @@ export interface Markbook {
     canAccessPopOut: boolean;
     /** A list of available visibilities, currently only used on the class markbook */
     availableVisibilities: number[];
+    submissionErrorStates: SubmissionErrorStates;
 }
 
 /** -------- other types -------- */

@@ -23,11 +23,7 @@ interface Props {
     /**
      * Should this form input be rendered as readonly?
      */
-    readonly: boolean;
-    /**
-     * Should the instructor mark be used? (only relevant for due works)
-     */
-    useInstructorMark: boolean;
+    readonly?: boolean;
 }
 
 const props = defineProps<Props>();
