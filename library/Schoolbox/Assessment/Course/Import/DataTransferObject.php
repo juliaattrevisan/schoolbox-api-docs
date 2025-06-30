@@ -35,7 +35,7 @@ class DataTransferObject
      * All UnitImpls must link to their UnitSpec.
      * If the UnitImpl does not yet exist, its ID will be null.
      *
-     * @var GenericCollection<UnitImplementation>
+     * @var UnitImplementation[]|GenericCollection<UnitImplementation>
      */
     private $unitImplementations;
 
@@ -49,7 +49,9 @@ class DataTransferObject
      * 2. Both AssessmentSpec + AssessmentImpl => UnitSpec imported and AssessmentSpec imported. Spec may be deleted.
      * 3. Just an AssessmentImpl               => Assessment was created directly in UnitImpl. Impl cannot be deleted.
      *
-     * @var IAssessable[][][]|AssessmentPair[][] $unitSpecAssessments ([unitSpec.id][]['spec'] or [unitSpec.id][]['impl'])
+     * @var IAssessable[][][]|AssessmentPair[][] $unitSpecAssessments
+     * @var IAssessable|null                     $unitSpecAssessments [unitSpec.id][]['impl']
+     * @var IAssessable|null                     $unitSpecAssessments [unitSpec.id][]['impl']
      */
     private $unitSpecAssessments;
 
