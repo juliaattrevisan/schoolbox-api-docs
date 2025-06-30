@@ -220,7 +220,7 @@ window.Vue.watch(
                     <resubmission-required
                         v-model:resubmission-required="cellInfo.participant.resubmissionRequired"
                         :identifier="props.student.id"
-                        :tab-index="-1"
+                        style="margin-top: 0.5rem"
                     />
                 </div>
                 <div
@@ -237,6 +237,7 @@ window.Vue.watch(
                         v-if="cellInfo.aImpl.instructorMarkScheme.template.length === 0"
                         v-model:resubmission-required="cellInfo.participant.resubmissionRequired"
                         :identifier="props.student.id"
+                        style="margin-top: 0.5rem"
                     />
                 </div>
                 <div class="small-12 column no-pad">

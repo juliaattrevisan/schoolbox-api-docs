@@ -4,11 +4,15 @@
  * Renders an input where teachers can check whether the learner must resubmit
  */
 
+import type { StyleValue } from "vue";
+
 interface Props {
     identifier: number;
     readonly?: boolean;
     tabIndex?: number;
+    style?: StyleValue;
 }
+
 const props = defineProps<Props>();
 const resubmissionRequired = defineModel<boolean>("resubmission-required", { required: true });
 </script>
@@ -23,7 +27,9 @@ const resubmissionRequired = defineModel<boolean>("resubmission-required", { req
         :tabindex="props.tabIndex"
         :readonly="props.readonly"
     />
-    <label :for="`resubmissionRequired-${identifier}`" class="checkbox-label"> Resubmission required </label>
+    <label :for="`resubmissionRequired-${identifier}`" class="checkbox-label" :style="props.style">
+        Resubmission required
+    </label>
 </template>
 
 <style scoped></style>
