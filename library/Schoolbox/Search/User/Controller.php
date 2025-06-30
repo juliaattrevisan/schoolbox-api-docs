@@ -22,6 +22,7 @@ use Schoolbox\Admin\Profile\Editor\Field\Mapper;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Geosnapshot\ValidPhotosAvailable;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Count\Helper as PastoralCountHelper;
 use Schoolbox\Pastoral\DataSource as PastoralDataSource;
@@ -90,7 +91,8 @@ class Controller extends BaseController
         private \Schoolbox\External\User $userRelationHydrator,
         private \Schoolbox\Admin\Profile\Editor\Field\Mapper $fieldMapper,
         private \Schoolbox\Admin\Profile\Editor\Tab\Mapper $tabMapper,
-        private Calendar_Api_Factory $calendarApiFactory
+        private Calendar_Api_Factory $calendarApiFactory,
+        private RosettaStone $rosettaStone,
     ) {
     }
 
@@ -759,7 +761,7 @@ class Controller extends BaseController
                     'dataTest' => $viewee->isDeleted() ? '' : 'admin-user-modify-impersonate'
                 ],
                 [
-                    'title' => 'Create Pastoral Record',
+                    'title' => 'Create ' . $this->rosettaStone->translate('pastoral', false, true) . ' Record',
                     'url' => $urlByRouteName['pastoral.getStudentRecordInsertForm'],
                     'iconClass' => 'icon-pastoral',
                     'disabled' => false,
