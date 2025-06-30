@@ -250,12 +250,12 @@ class Importer
             } catch (MapperException $e) {
                 /* The specified grade group doesn't exist; find the first meaningful one
                  */
-                $gradeGroup = $this->gradeGroupMapper->findAll()->sortBy('sequence', 'ASC')->first();
+                $gradeGroup = $this->gradeGroupMapper->findAll()->first();
             }
         } else {
             /* The specified grade group doesn't exist; find the first meaningful one
              */
-            $gradeGroup = $this->gradeGroupMapper->findAll()->sortBy('sequence', 'ASC')->first();
+            $gradeGroup = $this->gradeGroupMapper->findAll()->first();
         }
 
         /* Import curriculum nodes. Some might not exist by uuid
