@@ -215,7 +215,7 @@ module.exports = {
         pastoralRecordCommentsPublic: "./library/Schoolbox/Pastoral/templates/vue/pastoralRecordCommentsPublic.ts",
         pastoralRecordCommentsPrivate: "./library/Schoolbox/Pastoral/templates/vue/pastoralRecordCommentsPrivate.ts",
         pastoralClassReport: "./library/Schoolbox/Pastoral/ClassReport/vue/pastoralClassReport.ts",
-        pastoralReport: "./ibrary/Schoolbox/Pastoral/ReportBuilder/templates/vue/pastoralReport.ts",
+        pastoralReport: "./library/Schoolbox/Pastoral/ReportBuilder/templates/vue/pastoralReport.ts",
 
         // Resource
         googleFiles: "./library/Schoolbox/Resource/GoogleFile/templates/component/js/googleFiles.js",
