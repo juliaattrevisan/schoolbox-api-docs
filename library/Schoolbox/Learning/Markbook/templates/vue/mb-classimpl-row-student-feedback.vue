@@ -2,6 +2,7 @@
 import type { Ref } from "vue";
 import { useTemplateRefsList, useElementBounding } from "@vueuse/core";
 import locale from "@js/terminology/rosettaStone";
+import CommentField from "@schoolboxLibrary/Learning/Assessment/templates/dueWork/vue/comment-field.vue";
 import ResubmissionRequired from "@schoolboxLibrary/Learning/Assessment/templates/dueWork/vue/resubmission-required.vue";
 import { useMarkbookStore } from "./store/markbookStore";
 import type { MarkbookClassImplStudent } from "./types/payload";
@@ -143,6 +144,31 @@ window.Vue.onUnmounted(() => {
         resizeObserver.value.disconnect();
     }
 });
+
+// todo: make this actually work with draft/published feedback chaos
+const comment = window.Vue.ref<string>("");
+window.Vue.watch(
+    () => [props.classImplId, props.activityId, props.student.id],
+    async () => {
+        await window.Vue.nextTick();
+        if (cellInfo.value === null || cellInfo.value.participant === undefined) {
+            comment.value = "";
+            return;
+        }
+
+        const { marks } = cellInfo.value.participant;
+        if (marks === undefined || marks === null) {
+            comment.value = "";
+        } else if (marks.draft && marks.draft.comment) {
+            comment.value = marks.draft.comment;
+        } else if (marks.published && marks.published.comment) {
+            comment.value = marks.published.comment;
+        } else {
+            comment.value = "";
+        }
+    },
+    { immediate: true },
+);
 </script>
 
 <template>
@@ -174,13 +200,16 @@ window.Vue.onUnmounted(() => {
                     />
                 </div>
                 <div class="small-12 column" :class="{ 'medium-9': cellInfo.instructorMarkSchemeTemplate !== null }">
-                    COMMENT
+                    <comment-field
+                        v-model:comment="comment"
+                        :participant="{ user: props.student }"
+                        :is-rich-text="true"
+                    />
 
                     <resubmission-required
                         v-if="cellInfo.instructorMarkSchemeTemplate === null"
                         v-model:resubmission-required="cellInfo.participant.resubmissionRequired"
                         :identifier="props.student.id"
-                        :tab-index="-1"
                     />
                 </div>
             </div>
