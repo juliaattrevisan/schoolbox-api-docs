@@ -111,6 +111,7 @@ class Factory implements IFactory
      * @param string $host
      * @param string $key
      * @param bool $perform
+     * @param string $version
      * @param bool $lissAdditiveMode
      * @param LoggerInterface $logger
      * @param array $watchlist
@@ -121,6 +122,7 @@ class Factory implements IFactory
         private string $host,
         #[SensitiveParameter] private string $key,
         private bool $perform,
+        private string $version,
         private bool $lissAdditiveMode,
         private LoggerInterface $logger,
         private array $watchlist,
@@ -415,6 +417,7 @@ class Factory implements IFactory
                 new ShadowTable\All\Disable(
                     $this->logger,
                     $this->perform,
+                    $this->version,
                     UserProfile\Mapper::getInstance()->disableCache(),
                     UserProfile\Student\Mapper::getInstance()->disableCache(),
                     UserProfile\Parent\Mapper::getInstance()->disableCache(),

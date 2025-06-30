@@ -29,12 +29,14 @@ class BaseDisable implements IStrategy
      * Constructor
      *
      * @param LoggerInterface $log
-     * @param bool            $perform
-     * @param Mapper          ...$mappers
+     * @param bool $perform
+     * @param string $version
+     * @param Mapper ...$mappers
      */
     public function __construct(
         private LoggerInterface $log,
         private bool $perform,
+        private string $version,
         Mapper ...$mappers,
     ) {
         $this->mappers = $mappers;
@@ -49,6 +51,22 @@ class BaseDisable implements IStrategy
             return;
         }
 
+        /* Compare the version of schoolbox detected at the start of the import process
+         * and see if it's different to what it is right now, prior to shadow table restoration.
+         * If they were different, simply abort with a log message.
+         */
+        $currentVersion = $this->getVersion();
+
+        if ($currentVersion !== $this->version) {
+            $this->log->warning(sprintf(
+                'Instance version changed while import was running; it was %s, but is now %s. shadow table schema might be different. Abandoning import without applying changes.',
+                $this->version,
+                $currentVersion
+            ));
+
+            return;
+        }
+
         $this->log->info('Configuring mappers to write to base tables');
         foreach ($this->mappers as $mapper) {
             $this->log->info(sprintf('%s (%s => %s)', get_class($mapper), $mapper->getShadowTableName(), $mapper->getBaseTableName()));
@@ -59,5 +77,21 @@ class BaseDisable implements IStrategy
         $this->log->info('Swapping shadow tables with base tables');
         $shadowTable->swapShadowWithBase();
         $shadowTable->disable();
+    }
+
+
+    /**
+     * Fetch the freshest version number from config,
+     * bypassing any mapper-related caching mechanisms
+     */
+    protected function getVersion(): string
+    {
+        /* Make a massive assumption that we have at least one mapper dependency-injected
+         * I'm not sure how this would work without such mappers and so far, every subclass
+         * instance of BaseDisable always has at least one mapper hardcoded...so
+         */
+        return trim((string)$this->mappers[0]->getDatabase()->executeQuery("
+            SELECT value FROM config WHERE name = 'site_version' LIMIT 1
+        ")->fetchColumn());
     }
 }
