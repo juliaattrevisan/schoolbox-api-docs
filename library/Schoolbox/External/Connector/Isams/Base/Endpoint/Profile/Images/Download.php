@@ -10,7 +10,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Profile\Images;
 
-use GuzzleHttp\Exception\GuzzleException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Application\Exception\ApiException;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
@@ -79,7 +78,7 @@ class Download implements IStrategy
             /* Obtain each person's photo individually
              */
             try {
-                $this->photoDownloader = new RestPhotoDownloader($credentials);
+                $this->photoDownloader = new RestPhotoDownloader($credentials, $this->log);
             } catch (ApiException $e) {
                 $this->log->error(sprintf("Could not start RestPhotoDownloader: %s", $e->getMessage()));
                 return;
@@ -101,7 +100,7 @@ class Download implements IStrategy
              * we don't have a photo for the user yet
              */
             try {
-                $sisPhotoId = $this->photoDownloader->getLatestPhotoID($data['person']['type'], $externalId);
+                $sisPhotoId = $this->photoDownloader->getLatestPhotoID($data['person']['type'], $data['person']['internalId']);
             } catch (ApiException $e) {
                 $this->log->info(sprintf(
                     'Could not obtain portrait picture for %s %s (%s). Skipping',
@@ -168,7 +167,7 @@ class Download implements IStrategy
          * file_info node might not exist; if it doesn't, skip it
          */
         try {
-            $photoContents = $this->photoDownloader->getPhoto($data['person']['personId'], $data['person']['type'], $baseProfile->getExternalId());
+            $photoContents = $this->photoDownloader->getPhoto($data['person']['type'], $data['person']['internalId'], $data['person']['sisPhotoId']);
         } catch (ApiException $e) {
             $this->log->warning(sprintf(
                 "Unable to fetch Profile Photo: exception thrown for %s %s (%s) - %s",
@@ -179,6 +178,7 @@ class Download implements IStrategy
             ));
             return;
         }
+
         if (null === $photoContents) {
             $this->log->debug(sprintf(
                 'Profile picture: no data found for %s %s (%s)',

@@ -916,6 +916,7 @@ class Profile implements IStrategy
          */
         foreach ($staffs as $staff) {
             $externalId = trim((string)$staff->xpath('@PersonId')[0]->PersonId);
+            $internalId = trim((string)$staff->xpath('@Id')[0]->Id);
 
             /* Only import data for externalIds in $watchlist, if provided
              */
@@ -1074,10 +1075,22 @@ class Profile implements IStrategy
             $this->registry->remember($externalId, [
                 'person' => [
                     'type' => Role::STAFF,
-                    'personId' => $personId,
-                    'portrait'  => $staffBaseProfile->getPortrait()?->getHash(),
-                    'sisPhotoId' => (new Reader())->getProfileSisPhotoId($staffBaseProfile->getMetadata()),
+                    /* "@Id" is the isams internal identifier which is used to obtain their profile pictures.
+                     * This is NOT the same as their external id.
+                     */
+                    'internalId' => $internalId,
+                    /* "@PersonId" attribute is used for our external id
+                     * Philosophically $personId is the same as $externalId
+                     */
                     'externalId' => $externalId,
+                    'personId' => $personId,
+                    /* We remembered the last identifier used to obtain a profile picture
+                     * so we can tell when the school updates it on their end.
+                     */
+                    'sisPhotoId' => (new Reader())->getProfileSisPhotoId($staffBaseProfile->getMetadata()),
+                    /* schoolbox stuff
+                     */
+                    'portrait'  => $staffBaseProfile->getPortrait()?->getHash(),
                     'firstname' => $staffBaseProfile->getFirstname(),
                     'firstnamePreferred' => $staffBaseProfile->getFirstnamePreferred(),
                     'lastname' => $staffBaseProfile->getLastname()
