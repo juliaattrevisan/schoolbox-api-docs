@@ -517,13 +517,13 @@ function onToggleSelected(): void {
                     <pop-out-menu-item
                         v-if="!cellInfo.participant.isExcluded"
                         :class="{ 'is-disabled': !routes.updateRoute }"
-                        @selected="onMenuItemSelected(routes.updateRoute)"
+                        :link="routes.updateRoute ?? undefined"
                     >
                         Update Feedback
                     </pop-out-menu-item>
                     <pop-out-menu-item
                         :class="{ 'is-disabled': !routes.reviewRoute || isActivityEmpty || !hasSubmissions }"
-                        @selected="onMenuItemSelected(routes.reviewRoute)"
+                        :link="routes.reviewRoute ?? undefined"
                     >
                         Review Submission
                     </pop-out-menu-item>
@@ -559,7 +559,7 @@ function onToggleSelected(): void {
                             cellInfo.participant.isExcluded ||
                             (isActivityEmpty && cellInfo.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK),
                     }"
-                    @selected="onMenuItemSelected(routes.historyRoute)"
+                    :link="routes.historyRoute ?? undefined"
                 >
                     {{ viewStatusText }}
                 </pop-out-menu-item>
