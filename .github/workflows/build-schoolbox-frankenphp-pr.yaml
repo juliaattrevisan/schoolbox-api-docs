@@ -1,13 +1,12 @@
 name: Build schoolbox-frankenphp (pull request)
 
-# Build a new schoolbox-frankenphp image for this pull request, for CI.
-# Works around the fact that PRs can't use base images in repositories, by
-# building the base image and copying its files as artifacts.
-# Commented out for now, as CI doesn't use it yet and it costs us $:
-# will be re-enabled when it's actually in use.
 on:
-  workflow_call:
-  pull_request:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  id-token: write
+  contents: read
 
 # Cancel upon push to same branch
 concurrency:
@@ -24,6 +23,8 @@ jobs:
 
   # Build schoolbox-frankenphp image
   build-schoolbox-frankenphp:
+    env:
+      AWS_REGION: ap-southeast-2
     timeout-minutes: 60
     needs:
       - build-composer-artifact
@@ -41,6 +42,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: AWS Configure
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.READ_ECR_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: AWS ECR Login
+        uses: aws-actions/amazon-ecr-login@v2
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -66,8 +76,6 @@ jobs:
         with:
           context: docker/schoolbox-frankenphp
           file: docker/schoolbox-frankenphp/deploy-image.Dockerfile
-          cache-from: type=gha
-          cache-to: type=gha
           build-contexts: |
             code=${{ github.workspace }}
           push: false
@@ -77,6 +85,7 @@ jobs:
           build-args: |
             ENV=prod
             ARCH=${{ matrix.build.arch }}
+            TAG=latest-${{ github.base_ref }}
           tags: |
             schoolbox-frankenphp-${{ matrix.build.arch }}
 
