@@ -2602,9 +2602,19 @@ class Controller extends Base
                 'errors' => $newInstances['errors']
             ], 'Import errors');
         } else {
-            /* Redirect back to the quiz you just made...its modify screen, I guess.
-             */
-            $this->response = $this->redirectFound($this->routeGenerator->generate('learningAssessment.getUpdateAssessmentForm', ['assessmentId' => $newInstances['assessment']->getId()]));
+            $returnUrlEncoded = $this->requestPost['returnUrl'];
+
+            if ($returnUrlEncoded !== null) {
+                /* Go back to the place from whence you came
+                 */
+                $returnUrl = Redirect::decode($returnUrlEncoded);
+            } else {
+                /* Otherwise redirect back to the quiz you just made...its modify screen, I guess.
+                 */
+                $returnUrl = $this->routeGenerator->generate('learningAssessment.getUpdateAssessmentForm', ['assessmentId' => $newInstances['assessment']->getId()]);
+            }
+
+            $this->response = $this->redirectFound($returnUrl);
         }
     }
 }
