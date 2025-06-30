@@ -50,7 +50,7 @@ class DataTransferObject
      * 3. Just an AssessmentImpl               => Assessment was created directly in UnitImpl. Impl cannot be deleted.
      *
      * @var IAssessable[][][]|AssessmentPair[][] $unitSpecAssessments
-     * @var IAssessable|null                     $unitSpecAssessments [unitSpec.id][]['impl']
+     * @var IAssessable|null                     $unitSpecAssessments [unitSpec.id][]['spec']
      * @var IAssessable|null                     $unitSpecAssessments [unitSpec.id][]['impl']
      */
     private $unitSpecAssessments;
