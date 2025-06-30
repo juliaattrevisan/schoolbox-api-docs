@@ -2,6 +2,7 @@
 /**
  * Display a list of editor templates. The page divides the templates into categories,
  * which are displayed as tabs. When a category is selected, the templates for that category are loaded.
+ * From here we can also add new templates, edit existing ones, or delete them.
  */
 
 import { isAbortError, hasErrorMessage } from "@js/util/errorUtils";
@@ -281,7 +282,7 @@ async function onDeleteConfirmed(): Promise<void> {
             <div v-if="deleteError" class="alert-box alert">
                 Sorry, there was an error deleting the template. Please
                 <a href="" title="refresh the page"> refresh the page </a>
-                to try again and contact your support if the problem persists.
+                to try again and contact your support if the problem persists.<br />
                 <em>Further support info: {{ deleteError }}</em>
             </div>
             <div class="l-flex l-gap-xs f-no-margins">
