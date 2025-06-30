@@ -701,7 +701,7 @@ class SitePage
     {
         try {
             throw new Unauthenticated();
-        } catch (NotFoundExceptionInterface | ContainerExceptionInterface | RuntimeException $e) {
+        } catch (RuntimeException) {
             $parts = parse_url($_SERVER['REQUEST_URI']);
             if (!($parts['path'] == '/login/' || $parts['path'] == '/login')) {
                 if ($parts['path'] != '/') {
