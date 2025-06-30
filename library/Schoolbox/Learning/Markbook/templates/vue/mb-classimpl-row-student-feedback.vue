@@ -212,6 +212,31 @@ window.Vue.watch(
                         :identifier="props.student.id"
                     />
                 </div>
+                <div class="small-12 column no-pad">
+                    <div class="component-action" data-action-bar="60" data-mass-publish>
+                        <section>
+                            <div>
+                                <button
+                                    data-sobo
+                                    title="Acknowledge receipt of student submission"
+                                    href="/learning/assessments/767/60/received"
+                                >
+                                    Mark as Submitted
+                                </button>
+                                <button
+                                    class="button disabled"
+                                    data-draft="drafted"
+                                    title="You can discard this draft from the Grading Overview screen"
+                                    data-test="assessment-response-info-saved-as-draft"
+                                    disabled
+                                >
+                                    Saved as Draft
+                                </button>
+                                <a class="button" data-draft="publish" data-draft-id="187">Publish</a>
+                            </div>
+                        </section>
+                    </div>
+                </div>
             </div>
             <div :style="{ height: `${feedbackCellOffsets.height}px` }"></div>
         </td>
