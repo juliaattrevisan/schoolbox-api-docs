@@ -82,7 +82,7 @@ class Download implements IStrategy
              */
             try {
                 $this->photoDownloader = new RestPhotoDownloader($credentials, $this->log);
-            } catch (ApiException|GuzzleException|RandomException $e) {
+            } catch (ApiException | GuzzleException | RandomException $e) {
                 $this->log->error(sprintf("Could not start RestPhotoDownloader: %s", $e->getMessage()));
                 return;
             }
@@ -115,7 +115,7 @@ class Download implements IStrategy
                  *  SURELY this can't be the way they made it...but it is!!!!!11111111
                  */
                 $newSisPhotoId = $this->photoDownloader->getLatestPhotoId($data['person']);
-            } catch (ApiException|GuzzleException|RandomException|\JsonException $e) {
+            } catch (ApiException | GuzzleException | RandomException | \JsonException $e) {
                 /* Log something more verbose so we can debug better
                  */
                 $this->log->debug($e->getMessage());
