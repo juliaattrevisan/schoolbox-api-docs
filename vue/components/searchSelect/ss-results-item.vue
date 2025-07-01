@@ -84,7 +84,7 @@ function onMouseout(): void {
 /**
  * To allow keyboard navigation of the search results
  */
-const resultEl = useTemplateRef<HTMLDivElement | null>("resultEl");
+const resultEl = useTemplateRef<HTMLDivElement | null>("resultRef");
 const { isActive } = useActiveIndex(
     resultEl,
     toRef(() => props.index),
@@ -95,7 +95,7 @@ const { isActive } = useActiveIndex(
 
 <template>
     <div
-        ref="resultEl"
+        ref="resultRef"
         :class="`search-result ${isActive ? 'search-result--active' : ''} f-no-margins`"
         :data-test="`ss-results-item-container-${props.result.id}`"
         @click="onClick"

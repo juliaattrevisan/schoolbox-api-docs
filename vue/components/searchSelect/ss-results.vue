@@ -116,7 +116,7 @@ function onHover(index: number): void {
     activeIndex.value = index;
 }
 
-const resultsEl = useTemplateRef<HTMLDivElement | null>("resultsEl"); // to detect when the results container is scrolled to the bottom
+const resultsEl = useTemplateRef<HTMLDivElement | null>("resultsRef"); // to detect when the results container is scrolled to the bottom
 const maxResultsHeight = 400; // the maximum height of the results container
 
 const currentHeight = window.Vue.ref(0);
@@ -152,7 +152,7 @@ window.Vue.watch(
 );
 </script>
 <template>
-    <div ref="resultsEl" class="results">
+    <div ref="resultsRef" class="results">
         <div v-if="props.isSearching" class="results__status">Searching for results....</div>
         <div v-else-if="props.hasNoResults" class="results__status">No results found for your current search.</div>
         <fieldset v-else class="results__fieldset">

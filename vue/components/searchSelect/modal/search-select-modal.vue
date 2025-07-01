@@ -96,7 +96,7 @@ const { query, isActive, isSearching, hasNoResults, hasError } = useQuerySearch(
     false,
 ); // to search for results
 
-const searchSelectEl = useTemplateRef<HTMLDivElement | null>("searchSelectEl"); // to clear the search results when clicking outside / not focused
+const searchSelectEl = useTemplateRef<HTMLDivElement | null>("searchSelectRef"); // to clear the search results when clicking outside / not focused
 
 /**
  * To close the search results when clicking outside
@@ -236,7 +236,7 @@ window.Vue.watch(isOpen, async (newIsOpen) => {
         <basic-modal v-model:is-open="isOpen">
             <div class="l-flex-col l-gap-m">
                 <h2 class="f-no-margins">{{ props.title }}</h2>
-                <div ref="searchSelectEl" class="f-no-margins">
+                <div ref="searchSelectRef" class="f-no-margins">
                     <label :for="props.labelId">{{ props.label }}</label>
                     <ss-query-input
                         v-model:query="query"
