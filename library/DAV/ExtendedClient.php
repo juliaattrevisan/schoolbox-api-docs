@@ -1,15 +1,19 @@
 <?php
-
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+namespace DAV;
+
+use InvalidArgumentException;
+use Sabre\DAV\Client;
+use Sabre\HTTP\Request;
 
 /**
  * Extension of SabreDAV client for Schoolbox purposes
  */
-class DAV_ExtendedClient extends Sabre\DAV\Client
+class ExtendedClient extends Client
 {
     /**
      * Uploads a file via a PUT request
@@ -23,7 +27,7 @@ class DAV_ExtendedClient extends Sabre\DAV\Client
     public function put($path, $file)
     {
         $absolutePath = $this->getAbsoluteUrl($path);
-        $request      = new Sabre\HTTP\Request('PUT', $absolutePath);
+        $request      = new Request('PUT', $absolutePath);
         $curl         = curl_init($absolutePath);
         if (is_resource($file)) {
             $request->setBody($file);
@@ -33,9 +37,9 @@ class DAV_ExtendedClient extends Sabre\DAV\Client
         }
 
         $settings = $this->createCurlSettingsArray($request);
-        $settings[CURLOPT_HTTPAUTH]   = Config::get('webdav_allow_any_auth') ? CURLAUTH_ANY : CURLAUTH_BASIC;
+        $settings[CURLOPT_HTTPAUTH]   = \Config::get('webdav_allow_any_auth') ? CURLAUTH_ANY : CURLAUTH_BASIC;
         $settings[CURLOPT_COOKIEFILE] = '';
-        if (Config::get('webdav_allow_insecure')) {
+        if (\Config::get('webdav_allow_insecure')) {
             $settings[CURLOPT_SSL_VERIFYHOST] = false;
             $settings[CURLOPT_SSL_VERIFYPEER] = false;
         }

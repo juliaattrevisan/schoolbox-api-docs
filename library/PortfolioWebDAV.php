@@ -10,6 +10,7 @@
 
 use Alaress\File\Remote\FetcherInterface;
 use Sabre\HTTP\ClientHttpException;
+use DAV\ExtendedClient;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -27,7 +28,7 @@ use Schoolbox\WebDav\Model as WebDav;
 
 class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, FetcherInterface
 {
-    /** @var DAV_ExtendedClient */
+    /** @var ExtendedClient */
     private $client;
 
     /** @var array Stores collection results so files and directories can be returned separately */
@@ -54,11 +55,11 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
     protected $errorMapper;
 
     /**
-     * @param DAV_ExtendedClient $client
+     * @param ExtendedClient $client
      * @param array $paths List of paths from the baseUri to access
      * @param bool $lite
      */
-    public function __construct(DAV_ExtendedClient $client, array $paths = ['/'], $lite = false)
+    public function __construct(ExtendedClient $client, array $paths = ['/'], $lite = false)
     {
         $this->client = $client;
         $this->rootPaths = $paths;
@@ -200,7 +201,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
             throw new DomainException("Drives is not configured");
         }
 
-        $client = new DAV_ExtendedClient($settings);
+        $client = new ExtendedClient($settings);
 
         self::$instance = new self($client, $paths, $lite);
         return self::$instance;
