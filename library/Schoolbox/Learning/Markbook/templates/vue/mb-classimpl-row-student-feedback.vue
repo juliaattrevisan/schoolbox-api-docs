@@ -222,6 +222,7 @@ window.Vue.watch(
                         />
                     </label>
                     <resubmission-required
+                        v-if="cellInfo.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK"
                         v-model:resubmission-required="cellInfo.participant.resubmissionRequired"
                         :identifier="props.student.id"
                         style="margin-top: 0.5rem"
@@ -238,7 +239,10 @@ window.Vue.watch(
                     />
 
                     <resubmission-required
-                        v-if="cellInfo.aImpl.instructorMarkScheme.template.length === 0"
+                        v-if="
+                            cellInfo.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK &&
+                            cellInfo.aImpl.instructorMarkScheme.template.length === 0
+                        "
                         v-model:resubmission-required="cellInfo.participant.resubmissionRequired"
                         :identifier="props.student.id"
                         style="margin-top: 0.5rem"
