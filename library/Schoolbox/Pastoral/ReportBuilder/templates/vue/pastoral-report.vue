@@ -2,13 +2,35 @@
 /**
  * Pastoral Report Tabs Component
  */
-import type { PastoralReportTab } from "../js/types/pastoralReportTypes";
+import type {
+    PastoralReportTab,
+    SeverityColors,
+    PastoralConfig,
+    LocaleConfig,
+    PastoralRecord,
+} from "../js/types/pastoralReportTypes";
 
 const props = defineProps<{
     tabs: PastoralReportTab[];
+    results: PastoralRecord[];
+    showSeverity?: boolean;
+    severityColors: SeverityColors;
+    config: PastoralConfig;
+    locale: LocaleConfig;
 }>();
 
 const selectedTab = window.Vue.ref(props.tabs[0]?.type ?? "");
+
+const routeLookup = (route: string, params?: Record<string, any>) => {
+    // Implementation for route generation
+    return "#"; // Placeholder
+};
+
+const profile = {
+    link: (user: any) => `#`, // Placeholder
+    imageSquare64: (user: any) => `<img src="#" alt="${user.fullName}" />`, // Placeholder
+    imageSquare32: (user: any) => `<img src="#" alt="${user.fullName}" />`, // Placeholder
+};
 </script>
 
 <template>
@@ -22,6 +44,126 @@ const selectedTab = window.Vue.ref(props.tabs[0]?.type ?? "");
             <a>{{ tab.title }}</a>
         </dd>
     </dl>
+
+    <div class="row">
+        <div v-if="props.results.length > 0" class="small-12 island">
+            <section v-for="record in props.results" :key="record.id">
+                <ul class="information-list threaded">
+                    <li :class="{ faded: record.isArchived }">
+                        <div class="small-12 card wrap-down" :id="`record${record.id}`">
+                            <!-- Student profile link and image -->
+                            <a :href="profile.link(record.student)" v-html="profile.imageSquare64(record.student)"></a>
+
+                            <a
+                                :href="
+                                    routeLookup('pastoral.getStudentRecord', {
+                                        studentId: record.student.id,
+                                        recordId: record.id,
+                                    })
+                                "
+                            >
+                                <h4 class="l-flex l-flex--align-center l-gap-s">
+                                    {{ record.student.fullName }}: {{ record.heading }}
+
+                                    <!-- Pastoral event severity -->
+                                    <span
+                                        v-if="
+                                            props.showSeverity &&
+                                            record.severity &&
+                                            props.severityColors[record.severity.id]
+                                        "
+                                        class="circle l-mar--0"
+                                        :style="`background-color:${props.severityColors[record.severity.id].back}`"
+                                        :title="record.severity.name"
+                                    ></span>
+
+                                    <!-- Archive icon -->
+                                    <sbx-icon
+                                        v-if="record.isArchived"
+                                        name="archive"
+                                        size="0.75rem"
+                                        :title="`Record archived - ${record.expiresAt}`"
+                                    ></sbx-icon>
+
+                                    <!-- Pastoral points -->
+                                    <sbx-label-pastoral-points
+                                        v-if="props.config.pastoral_point_enabled && record.points"
+                                        :points="record.points"
+                                    ></sbx-label-pastoral-points>
+                                </h4>
+                            </a>
+
+                            <p class="meta">
+                                <!-- Pastoral event type -->
+                                {{ record.type.name }}
+                                <span v-if="record.subtype.name">({{ record.subtype.name }})</span>
+                                | Created by
+                                <a :href="`/search/user/${record.owner.id}`">{{ record.owner.fullName }}</a>
+                                {{ record.createdAt.short }}
+
+                                <!-- Pastoral action -->
+                                <span v-if="props.config.pastoral_action_enable && record.uncompletedActionCount > 0">
+                                    | {{ record.uncompletedActionCount }} follow up action{{
+                                        record.uncompletedActionCount === 1 ? "" : "s"
+                                    }}
+                                    remaining
+                                </span>
+                            </p>
+                        </div>
+
+                        <!-- Show article body -->
+                        <article>
+                            <div v-if="record.bodyPublic" v-html="record.bodyPublic"></div>
+
+                            <p v-if="record.tags.length > 0" class="spaced">
+                                <template v-for="tag in record.tags" :key="tag.id">
+                                    <a
+                                        class="neutral label hide-on-print"
+                                        :href="routeLookup('pastoralReportBuilder.getReportTags', { tagId: tag.id })"
+                                    >
+                                        {{ tag.name }}
+                                    </a>
+                                    <b class="show-for-print"> {{ tag.name }}</b>
+                                </template>
+                            </p>
+                        </article>
+
+                        <!-- Comments section -->
+                        <ul v-if="record.comments.length" class="information-list reply">
+                            <li v-for="comment in record.comments.filter((c) => !c.private)" :key="comment.owner.id">
+                                <div class="card compact small-12">
+                                    <!-- Comment author photo -->
+                                    <a
+                                        :href="profile.link(comment.owner)"
+                                        title="View Profile"
+                                        v-html="profile.imageSquare32(comment.owner)"
+                                    >
+                                        <!-- Show comment author -->
+                                        <p>
+                                            {{ comment.owner.fullName }}
+                                            <span class="pipe meta">{{ comment.createdAt.short }}</span>
+                                        </p>
+                                    </a>
+                                </div>
+                                <!-- Show comment body -->
+                                <article v-html="comment.body"></article>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+        </div>
+
+        <!-- Empty state -->
+        <div v-else class="small-12 column">
+            <div class="empty-state">
+                <i class="icon-pastoral"></i>
+                <p>No {{ props.locale.pastoral }} records matched your report criteria.</p>
+            </div>
+
+            <a class="button submit" :href="routeLookup('pastoralReportBuilder.getIndex')"> Select Another Report </a>
+        </div>
+    </div>
 </template>
 
 <style scoped></style>

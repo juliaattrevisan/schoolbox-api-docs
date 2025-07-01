@@ -113,17 +113,6 @@ export type LocaleConfig = {
 };
 
 /**
- * Main pastoral report data structure
- */
-export type PastoralReportData = {
-    results: PastoralRecord[];
-    showSeverity?: boolean;
-    severityColors: SeverityColors;
-    config: PastoralConfig;
-    locale: LocaleConfig;
-};
-
-/**
  * Pastoral report tab type (from your Vue component)
  */
 export type PastoralReportTab = {
