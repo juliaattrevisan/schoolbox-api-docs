@@ -1,8 +1,8 @@
 {
     frankenphp {
         php_ini expose_php off
-        metrics
     }
+    metrics
 }
 
 :80 {
