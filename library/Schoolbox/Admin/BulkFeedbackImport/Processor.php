@@ -96,7 +96,7 @@ class Processor
      * The submissionBoxMapper is used to craft a returned work model so that its corresponding mapper
      * can create Participant and Participant Plan records for feedbacks
      *
-     * Tje returnedWorkMapper is used to create Participant and Participant Plan records for a feedback
+     * The returnedWorkMapper is used to create Participant and Participant Plan records for a feedback
      * via its postsave hooks
      *
      * @param MapperProxy $assessmentMapperProxy
