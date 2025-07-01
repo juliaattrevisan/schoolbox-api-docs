@@ -646,6 +646,57 @@ class Controller extends WebController\Base
         new \Alaress_Probe($courseSpec, $assessmentSpec);
     }
 
+    /**
+     * for a specific participant and an assessment we need to fetch the max mark (from learnosity or fallback to the assessment spec)
+     * same as status page
+     *
+     *
+     * @param Model $courseSpec
+     * @param $assessmentId
+     * @return void
+     * @api GET /learning/courseMarkbook/{courseSpecId:\d+}/assessment/{assessmentId:\d+}/maxMarks
+     */
+    public function getMaxMarks(CourseSpec\Model $courseSpec, IAssessable $assessmentSpec): void
+    {
+        // this only exists for learnosity / quiz
+        if (!$assessmentSpec instanceof \Schoolbox\Learning\Assessment\Quiz\Model) {
+            throw new NotFound('This endpoint is only available for quizzes');
+        }
+        // This report may take a while
+        $this->extendExecutionTime();
+
+        $request = $this->requestPost['filter_selection'] ?: [];
+
+        /**
+         * @var null[]|Collection[]        $filters
+         * @var Filter\Codec               $codec
+         * @var Filter\Selection\Model[][] $selectionsPerFilter
+         */
+        // TODO add some intelligence around which filter settings to save (eg AssessmentType but not units)
+        [$filters, $codec, $selectionsPerFilter] = $this->convertRequestToFilters($courseSpec, $request, true);
+
+        $assessmentIds  = $this->assessmentIdFinder->findIdsByFilters($filters, $this->getUser());
+
+        // Fetch assessments
+        $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds)->indexBy('id');
+        // filter to only the assessment we are looking for
+        $assessments = $assessments->filter(static function (IAssessable $assessment) use ($assessmentSpec) {
+            return $assessment->getSpecificationAssessment()?->getId() === $assessmentSpec->getId();
+        });
+        // hydrate participants
+        $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, null, true);
+
+        $maxMarks = [];
+//
+//        foreach ($assessments as $assessment) {
+//            $maxMarks[$assessment->getId()] = $this->getlearnosityMaxMarks($assessment);
+//        }
+
+        $this->response = $this->responseAsJson([
+            'maxMarks' => $maxMarks,
+        ]);
+    }
+
 
     /**
      * @param CourseSpec\Model $courseSpec
