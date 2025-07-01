@@ -15,7 +15,6 @@ use Schoolbox\User;
 
 interface IAssessmentController
 {
-
     /**
      * Retrieve a list of assessments that exist, by context
      *
