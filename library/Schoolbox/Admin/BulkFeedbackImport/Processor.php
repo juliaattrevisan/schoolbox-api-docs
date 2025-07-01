@@ -405,19 +405,38 @@ class Processor
                 /* Slam in a new submission_return
                  */
                 if ($this->perform) {
+                    /* TODO inefficient/non-conventional, I know
+                     *  Solution had a time constraint.
+                     */
+                    $box = $this->submissionBoxMapper->findById($boxId);
+                    $learner = $this->userMapper->findById($learner['id']);
+
+                    $returnedWork = $this->returnedWorkMapper->createModel()
+                        ->setSubmissionBox($box)
+                        ->setMarker($creator)
+                        ->setOwner($learner)
+                        ->setReviewRoute('instructor')
+                        ->setComment($comment)
+                        ->setHumanReadableMark($humanReadableMark)
+                        ->setHumanReadableInstructorMark($instructorHumanReadableMark)
+                        ->setNormalizedMark($normalisedMark)
+                        ->setResubmissionRequired(false)
+                        ->setPublishedBy($creator->getId());
+
+
                     $this->feedbackQuery->execute([
-                        'boxId' => $boxId,
-                        'marker' => $creator->getId(),
-                        'owner' => $learner['id'],
-                        'reviewRoute' => 'instructor',
-                        'comment' => $comment,
-                        'mark' => $humanReadableMark,
-                        'instructorMark' => $instructorHumanReadableMark,
-                        'normMark' => $normalisedMark,
-                        'resubmissionRequired' => 0,
+//                        'boxId' => $boxId,
+//                        'marker' => $creator->getId(),
+//                        'owner' => $learner['id'],
+//                        'reviewRoute' => 'instructor',
+//                        'comment' => $comment,
+//                        'mark' => $humanReadableMark,
+//                        'instructorMark' => $instructorHumanReadableMark,
+//                        'normMark' => $normalisedMark,
+//                        'resubmissionRequired' => 0,
                         'createdAt' => $datetime,
                         'publishedAt' => $datetime,
-                        'publishedBy' => $creator->getId(),
+//                        'publishedBy' => $creator->getId(),
                         'updatedAt' => $datetime
                     ]);
                 }
