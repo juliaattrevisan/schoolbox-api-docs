@@ -15,12 +15,39 @@ use Alaress\Redis\Async\Event\PMessage;
 use Alaress\Redis\Async\Event\Pong;
 use React\EventLoop\LoopInterface;
 use Predis;
+use React\EventLoop\TimerInterface;
 use stdClass;
 
 class Client
 {
     /** @var Predis\Async\Client */
     private $client;
+
+    private Predis\PubSub\Consumer $pubSubConsumer;
+
+    /**
+     * Subscriptions to a single channel.
+     *
+     * @var array<string, array<array{loop: Predis\PubSub\Consumer, listener: EventListener}>>
+     */
+    private array $subscriptions = [];
+
+    /**
+     * Subscriptions to a channel pattern.
+     *
+     * @var array<string, array<array{loop: Predis\PubSub\Consumer, listener: EventListener}>>
+     */
+    private array $patternSubscriptions = [];
+
+    /**
+     * The timer function used for fetching subscriptions.
+     */
+    private ?TimerInterface $timer = null;
+
+    /**
+     * @var array<EventListener>
+     */
+    private array $eventListeners = [];
 
     /**
      * @param Predis\ClientInterface $redisClient
@@ -30,7 +57,7 @@ class Client
     public function __construct(
         private Predis\ClientInterface $redisClient,
         $dsn,
-        LoopInterface $loop
+        private LoopInterface $loop
     ) {
         $this->client = new Predis\Async\Client($dsn, $loop);
     }
@@ -42,7 +69,13 @@ class Client
      */
     public function subscribe($channel, EventListener $listener)
     {
-        $this->addSubscription(Predis\Async\PubSub\Consumer::SUBSCRIBE, $channel, $listener);
+        $pubSubLoop = $this->redisClient->pubSubLoop();
+        $pubSubLoop->subscribe($channel);
+        $this->subscriptions[$channel][] = [
+            'loop'     => $pubSubLoop,
+            'listener' => $listener
+        ];
+        $this->timer ??= $this->addTimer();
     }
 
 
@@ -53,7 +86,14 @@ class Client
      */
     public function psubscribe($pattern, EventListener $listener)
     {
-        $this->addSubscription(Predis\Async\PubSub\Consumer::PSUBSCRIBE, $pattern, $listener);
+        $pubSubLoop = $this->redisClient->pubSubLoop();
+        $pubSubLoop->psubscribe($pattern);
+        $this->patternSubscriptions[$pattern][] = [
+            'loop'     => $pubSubLoop,
+            'listener' => $listener
+        ];
+        $this->timer ??= $this->addTimer();
+//        $this->addSubscription(Predis\Async\PubSub\Consumer::PSUBSCRIBE, $pattern, $listener);
     }
 
 
@@ -63,7 +103,10 @@ class Client
      */
     public function unsubscribe($channel)
     {
-        $this->removeSubscription(Predis\Async\PubSub\Consumer::UNSUBSCRIBE, $channel);
+        $pubSubLoop = $this->redisClient->pubSubLoop();
+        $pubSubLoop->unsubscribe($channel);
+        unset($this->subscriptions[$channel]);
+//        $this->removeSubscription(Predis\Async\PubSub\Consumer::UNSUBSCRIBE, $channel);
     }
 
 
@@ -73,8 +116,41 @@ class Client
      */
     public function punsubscribe($pattern)
     {
-        $this->removeSubscription(Predis\Async\PubSub\Consumer::PUNSUBSCRIBE, $pattern);
+        $pubSubLoop = $this->redisClient->pubSubLoop();
+        $pubSubLoop->punsubscribe($pattern);
+        unset($this->patternSubscriptions[$pattern]);
+//        $this->removeSubscription(Predis\Async\PubSub\Consumer::PUNSUBSCRIBE, $pattern);
     }
+
+
+    private function addTimer(): TimerInterface
+    {
+        return $this->loop->addPeriodicTimer(
+            0.1,
+            function () {
+                foreach ($this->subscriptions as $subscriptions) {
+                    foreach ($subscriptions as $subscription) {
+                        foreach ($subscription['loop'] as $event) {
+                            if ($e = $this->castEvent($event)) {
+                                $subscription['listener']->handle($e);
+                            }
+                        }
+                    }
+                }
+                foreach ($this->patternSubscriptions as $subscriptions) {
+                    foreach ($subscriptions as $subscription) {
+                        foreach ($subscription['loop'] as $event) {
+                            if ($e = $this->castEvent($event)) {
+                                $subscription['listener']->handle($e);
+                            }
+                        }
+                    }
+                }
+            }
+        );
+    }
+
+//    private function processSubscription(array $subscription)
 
 
     /**
