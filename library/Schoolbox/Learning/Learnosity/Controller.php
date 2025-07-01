@@ -26,7 +26,9 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Random\RandomException;
 use Schoolbox\Application\Exception\Exception;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Project\ResultCache;
@@ -34,12 +36,13 @@ use Schoolbox\Learning\Assessment\Project\ResultCache\Mapper;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainObject;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\IFeedback;
+use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Learning\Learnosity\Api\Duplicator;
 use Schoolbox\Learning\Learnosity\Cli\RescoreProcessor;
 use Schoolbox\Learning\Learnosity\Codec\UserIdentifier;
 use Schoolbox\Learning\Learnosity\Export\Csv\Processor;
-use Schoolbox\Learning\Learnosity\Export\Json\Payload;
+use Schoolbox\Learning\Learnosity\Export\Json\Exporter;
 use Schoolbox\Learning\Learnosity\Feedback\SanitiseScores;
 use Schoolbox\Learning\Learnosity\Importer\Cli\CopyMissingQuizException;
 use Schoolbox\Learning\Learnosity\Importer\Cli\SourceAssociationException;
@@ -49,6 +52,7 @@ use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\TaskDaemon\Producer;
 use Schoolbox\TaskDaemon\Request\HttpRequest\MessageFactory;
@@ -205,6 +209,10 @@ class Controller extends Base
      * @param UserMapper $userMapper
      * @param StateMapper $stateMapper
      * @param \Schoolbox\Resource\Storage\Mapper $storageMapper
+     * @param MarkTypeMapper $markTypeMapper
+     * @param \Schoolbox\Learning\Assessment\WorkType\Mapper $workTypeMapper
+     * @param \Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper $gradeGroupMapper
+     * @param \Schoolbox\Curriculum\Node\Mapper $curriculumNodeMapper
      * @param FilesystemProxy $filesystemProxy
      * @param Psr17Factory $httpFactory for creating HTTP requests
      * @param MessageFactory $messageFactory for creating messages to send to taskd
@@ -226,7 +234,11 @@ class Controller extends Base
         private \Schoolbox\UserMapper $userMapper,
         private StateMapper $stateMapper,
         private \Schoolbox\Resource\Storage\Mapper $storageMapper,
-        private \Schoolbox\Resource\Storage\FilesystemProxy $filesystemProxy,
+        private \Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper $markTypeMapper,
+        private \Schoolbox\Learning\Assessment\WorkType\Mapper $workTypeMapper,
+        private \Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper $gradeGroupMapper,
+        private \Schoolbox\Curriculum\Node\Mapper $curriculumNodeMapper,
+        private FilesystemProxy $filesystemProxy,
         private Psr17Factory $httpFactory,
         private MessageFactory $messageFactory,
         private Producer $messageProducer,
@@ -2472,13 +2484,13 @@ class Controller extends Base
             $assessment->getId()
         );
 
+        $struct = (new Exporter($this->storageMapper, $this->filesystemProxy, $this->api))->generate($assessment);
+
         header('Cache-Control: private');
         header('Content-type: application/json');
         header("Content-disposition: attachment; filename=\"{$filename}\"");
 
         $output = fopen('php://output', 'rw');
-
-        $struct = (new Payload($this->storageMapper, $this->filesystemProxy, $this->api))->generate($assessment);
 
         fputs($output, $struct);
 
@@ -2494,10 +2506,115 @@ class Controller extends Base
      * TODO Maybe have a think about this and rename it again later.
      * TODO Maybe belongs in a different controller?
      *
+     * @param AssessmentContext $context
      * @return void
+     * @throws Deleted
+     * @throws FilesystemException
+     * @throws RouteNotFound
+     * @throws ValidationException
+     * @throws \DOMException
+     * @throws \JsonException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws Error
+     * @throws \Exception
      */
-    public function postImportFromJson(): void
+    public function postImportFromJson(AssessmentContext $context): void
     {
-        echo 'we made it';
+        /* Intentionally prefill with an instance of AssessmentContext
+         * and other POST vars the Factory assumes exist
+         */
+        $postData = array_merge($this->requestPost->getArrayCopy(), [
+            'assessmentType' => AssessmentType::TYPE_QUIZ,
+            'context' => $context,
+        ]);
+
+        /* No upload? No trabajo
+         */
+        if (!isset($postData['attachment'])) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_IMPORT_FILE_NOT_FOUND);
+        }
+
+        /* An unusual outcome where the key might exist, but nothing else is in
+         * the way we thought - probably our mistake
+         */
+        if (!is_array($postData['attachment'])) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_IMPORT_FILE_NOT_FOUND);
+        }
+
+        /* Milk out some of the assessment settings from the json itself
+         */
+        try {
+            /** @var \Schoolbox\Resource\Storage\Model $file */
+            $file = (new CollectorFactory())->build($postData['attachment'] ?: [])->getFirst();
+
+            /** @var FilesystemProxy $filesystemProxy */
+            $filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
+            $data            = $filesystemProxy->read($file);
+        } catch (\Schoolbox\Resource\Exception $e) {
+            /* Something went wrong reading the file's contents
+             */
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_IMPORT_FILE_NOT_FOUND);
+        }
+
+        /** @var AssessmentMapperProxy $assessmentMapperProxy */
+        $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
+
+        /* Used to segregate each school's data; used in tags and author identifiers
+         */
+        $schoolCode = $this->getConfigLoader()->get('site_school_code');
+
+        /* There used to be stuff here that was used to convert url domains but I'm not sure we even
+         * needed them. We needed them in the xml days, but I don't think we needed them here.
+         */
+        $newInstances = (new Importer\Json\Importer(
+            $this->api,
+            $schoolCode,
+            $this->getDi()->get('databaseInternal'),
+            $context,
+            $this->getUser(),
+            $assessmentMapperProxy,
+            $this->quizMapper,
+            $this->workTypeMapper,
+            $this->markTypeMapper,
+            $this->gradeGroupMapper,
+            $this->storageMapper,
+            $this->curriculumNodeMapper,
+        ))->import($data);
+
+        /* Check for errors: if there were any, go to a new screen to explain this.
+         * Otherwise just redirect back to the quiz you just made...its modify screen, I guess.
+         */
+        if (\count($newInstances['errors'])) {
+            /* Breadcrumbs
+             */
+            $breadcrumbs = $this->bakery->produceFromAssessment($newInstances['assessment'], $this->getUser())
+                ->add([
+                    $newInstances['assessment']->getTitle(),
+                    $newInstances['assessment']->isImplementation() ? $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $newInstances['assessment']->getId()]) : null
+                ])
+                ->add(['Import', null]);
+
+            $this->response = $this->responseFromTemplate('@learnosity/importErrors.twig', [
+                'breadcrumbs' => $breadcrumbs,
+                'assessment' => $newInstances['assessment'],
+                'errors' => $newInstances['errors']
+            ], 'Import errors');
+        } else {
+            $returnUrlEncoded = $this->requestPost['returnUrl'];
+
+            if ($returnUrlEncoded !== null) {
+                /* Go back to the place from whence you came
+                 */
+                $returnUrl = Redirect::decode($returnUrlEncoded);
+            } else {
+                /* Otherwise redirect back to the quiz you just made...its modify screen, I guess.
+                 */
+                $returnUrl = $this->routeGenerator->generate('learningAssessment.getUpdateAssessmentForm', ['assessmentId' => $newInstances['assessment']->getId()]);
+            }
+
+            $this->response = $this->redirectFound($returnUrl);
+        }
     }
 }
