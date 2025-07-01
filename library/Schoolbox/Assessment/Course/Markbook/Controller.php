@@ -584,7 +584,7 @@ class Controller extends WebController\Base
             // class assessment specific data
             foreach ($assessments as $assessment) {
                 // Only display download link if there are actually files to download in any of the classes
-                $twigData['download'] = $twigData['download'] ?: $this->hasDownloadableSubmissionFiles($assessment);
+                $twigData['download'] = ($twigData['download'] ?? false) ?: $this->hasDownloadableSubmissionFiles($assessment);
 
                 $twigData['rubricMarks'][$assessment->getId()] = $rubricIndicatorMarkMapper->findMarkedByAssessment($assessment->getId());
                 $twigData['interactionLocked'][$assessment->getId()] = (new Assessment\LockedChecker($termMapper))->isLockedForInteractions($assessment);
