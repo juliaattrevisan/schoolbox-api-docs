@@ -58,7 +58,8 @@ class External_Schoolpro_User implements External_UserInterface
                 'SpouseSurname'        => $currentParent['SpouseSurname'] ?? '',
                 'SpouseEmail'          => $currentParent['SpouseEmail'] ?? '',
                 'SpouseMobile'         => $currentParent['SpouseMobile'] ?? '',
-                'DirectoryIncludeFlag' => 1
+                'DirectoryIncludeFlag' => 1,
+                'SpouseDirectoryIncludeFlag' => 1,
             ];
         }
 
