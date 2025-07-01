@@ -11,6 +11,8 @@ namespace Schoolbox\Admin\BulkFeedbackImport;
 
 use League\Flysystem\FilesystemException;
 use Schoolbox\Admin\Import\Profile\Reader;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
@@ -106,6 +108,23 @@ class Processor
 
 
     /**
+     * Used to craft a returned work model so that its corresponding mapper
+     * can create Participant and Participant Plan records for feedbacks
+     *
+     * @var SubmissionBoxMapper
+     */
+    private SubmissionBoxMapper $submissionBoxMapper;
+
+
+    /**
+     * Used to create Participant and Participant Plan records for a feedback
+     *
+     * @var ReturnedWorkMapper
+     */
+    private ReturnedWorkMapper $returnedWorkMapper;
+
+
+    /**
      * Constructor
      *
      * @param MapperProxy $assessmentMapperProxy
@@ -133,6 +152,9 @@ class Processor
          */
         $this->assessmentQuery = $this->userMapper->getDatabase()->prepare(self::QUERY_ASSESSMENT_TITLE_WORKTYPE);
         $this->feedbackQuery = $this->userMapper->getDatabase()->prepare(self::QUERY_FEEDBACK);
+
+        $this->submissionBoxMapper = SubmissionBoxMapper::getInstance();
+        $this->returnedWorkMapper = ReturnedWorkMapper::getInstance();
     }
 
 
