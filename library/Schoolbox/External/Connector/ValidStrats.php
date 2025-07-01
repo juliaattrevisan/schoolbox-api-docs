@@ -27,7 +27,6 @@ class ValidStrats
     public const FAMILIES = 'families';
     public const TIMETABLE = 'timetable';
     public const CALENDAR = 'calendar';
-    public const PHOTO = 'photo';
 
 
     /**
@@ -86,10 +85,6 @@ class ValidStrats
         /* Loads all timetable-related stuff
          */
         self::TIMETABLE,
-
-        /* Loads all photos
-         */
-        self::PHOTO,
     ];
 
 
@@ -208,17 +203,6 @@ class ValidStrats
     public function isTimetableStratEnabled(): bool
     {
         return $this->isStratEnabled(self::TIMETABLE);
-    }
-
-
-    /**
-     * A convenience method that checks if the Photo strat is in the result set
-     *
-     * @return bool
-     */
-    public function isPhotoStratEnabled(): bool
-    {
-        return $this->isStratEnabled(self::PHOTO);
     }
 
 

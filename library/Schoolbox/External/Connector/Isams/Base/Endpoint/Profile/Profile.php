@@ -166,6 +166,10 @@ class Profile implements IStrategy
          */
         $campusMapping = $this->prefetchCampuses();
 
+        /* Used to manipulate metadata json for each person
+         */
+        $metadataReader = new Reader();
+
         $students = $this->api[DSN::MODULE_BATCHXML]->fetchXml('/iSAMS/PupilManager/CurrentPupils/Pupil');
 
         /* $student is a stdclass derived from xml data,
@@ -173,6 +177,7 @@ class Profile implements IStrategy
          */
         foreach ($students as $student) {
             $externalId = trim((string)$student->SchoolId);
+            $internalId = trim((string)$student->xpath('@Id')[0]->Id);
 
             /* Only import data for externalIds in $watchlist, if provided
              */
@@ -391,10 +396,14 @@ class Profile implements IStrategy
             $this->registry->remember($externalId, [
                 'person' => [
                     'type' => Role::STUDENT,
-                    'personId' => $personId,
-                    'portrait'  => $studentBaseProfile->getPortrait()?->getHash(),
-                    'sisPhotoId' => (new Reader())->getProfileSisPhotoId($studentBaseProfile->getMetadata()),
+                    /* "@Id" is the isams internal identifier which is used to obtain their profile pictures.
+                     * This is NOT the same as their external id.
+                     */
+                    'internalId' => $internalId,
                     'externalId' => $externalId,
+                    'personId' => $personId,
+                    'sisPhotoId' => $metadataReader->getProfileSisPhotoId($studentBaseProfile->getMetadata()),
+                    'portrait'  => $studentBaseProfile->getPortrait()?->getHash(),
                     'firstname' => $studentBaseProfile->getFirstname(),
                     'firstnamePreferred' => $studentBaseProfile->getFirstnamePreferred(),
                     'lastname' => $studentBaseProfile->getLastname()
@@ -909,6 +918,10 @@ class Profile implements IStrategy
      */
     private function importStaff(): void
     {
+        /* Used to manipulate metadata json for each person
+         */
+        $metadataReader = new Reader();
+
         $staffs =  $this->api[DSN::MODULE_BATCHXML]->fetchXml('/iSAMS/HRManager/CurrentStaff/StaffMember');
 
         /* $staff is a stdclass derived from xml data,
@@ -916,6 +929,7 @@ class Profile implements IStrategy
          */
         foreach ($staffs as $staff) {
             $externalId = trim((string)$staff->xpath('@PersonId')[0]->PersonId);
+            $internalId = trim((string)$staff->xpath('@Id')[0]->Id);
 
             /* Only import data for externalIds in $watchlist, if provided
              */
@@ -1074,10 +1088,22 @@ class Profile implements IStrategy
             $this->registry->remember($externalId, [
                 'person' => [
                     'type' => Role::STAFF,
-                    'personId' => $personId,
-                    'portrait'  => $staffBaseProfile->getPortrait()?->getHash(),
-                    'sisPhotoId' => (new Reader())->getProfileSisPhotoId($staffBaseProfile->getMetadata()),
+                    /* "@Id" is the isams internal identifier which is used to obtain their profile pictures.
+                     * This is NOT the same as their external id.
+                     */
+                    'internalId' => $internalId,
+                    /* "@PersonId" attribute is used for our external id
+                     * Philosophically $personId is the same as $externalId
+                     */
                     'externalId' => $externalId,
+                    'personId' => $personId,
+                    /* We remembered the last identifier used to obtain a profile picture
+                     * so we can tell when the school updates it on their end.
+                     */
+                    'sisPhotoId' => $metadataReader->getProfileSisPhotoId($staffBaseProfile->getMetadata()),
+                    /* schoolbox stuff
+                     */
+                    'portrait'  => $staffBaseProfile->getPortrait()?->getHash(),
                     'firstname' => $staffBaseProfile->getFirstname(),
                     'firstnamePreferred' => $staffBaseProfile->getFirstnamePreferred(),
                     'lastname' => $staffBaseProfile->getLastname()

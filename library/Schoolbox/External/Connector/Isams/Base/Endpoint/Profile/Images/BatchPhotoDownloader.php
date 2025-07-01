@@ -213,14 +213,18 @@ class BatchPhotoDownloader implements IPhotoDownloader
      *
      * All isams pictures seem to be pngs in a zip (god knows why)
      *
-     * @param string $personId
-     * @param string $roleType
-     * @param ?string $externalId = null
+     * @param array $data
      * @return string|null
      */
-    public function getPhoto(string $personId, string $roleType = Role::STUDENT, ?string $externalId = null): ?string
+    public function getPhoto(array $data): ?string
     {
-        $path = "{$this->cacheDir}/{$roleType}/{$personId}.png";
+        /* Batchxml photos are named after a person's isams internal identifier, not their school id
+         * TODO verify staff pictures are also named the same way
+         */
+        $roleType = $data['type'];
+        $identifier = $data['internalId'];
+
+        $path = "{$this->cacheDir}/{$roleType}/{$identifier}.png";
 
         if (file_exists($path)) {
             return file_get_contents($path);
@@ -233,8 +237,22 @@ class BatchPhotoDownloader implements IPhotoDownloader
     /**
      * @inheritDoc
      */
-    public function getLatestPhotoID(string $roleType = Role::STUDENT, string|int|null $externalId = null): ?int
+    public function getLatestPhotoId(array $data): ?int
     {
         return null;
+    }
+
+
+    /**
+     * Always process pictures from batchxml zips
+     *
+     * @param string $externalId
+     * @param array $data
+     * @param int|null $newSisPhotoId
+     * @return bool
+     */
+    public function needsUpdating(string $externalId, array $data, ?int $newSisPhotoId): bool
+    {
+        return true;
     }
 }

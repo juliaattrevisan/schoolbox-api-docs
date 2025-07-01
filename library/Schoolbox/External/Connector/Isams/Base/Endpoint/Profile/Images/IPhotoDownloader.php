@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Profile\Images;
 
-use Schoolbox\Role;
+use GuzzleHttp\Exception\GuzzleException;
 
 /**
  * Class IPhotoDownloader
@@ -37,26 +37,36 @@ interface IPhotoDownloader
 
 
     /**
-     * Get a photo's contents after decide if $personId has a picture
-     * Returns null if the file doesn't exist
+     * Each implementation of IPhotoDownloader requires different scalars to produce the binary
+     * content of a profile picture. While this is conceptually synonymous, it is not syntactically
+     * synonymous: especially since the REST API requires different ids depending on the user's
+     * role type.
      *
-     *
-     * @param string $personId
-     * @param string $roleType should be one of the ROLE_* constants
-     * @param null|string $externalId
+     * @param array $data
      * @return string|null
      */
-    public function getPhoto(string $personId, string $roleType = Role::STUDENT, ?string $externalId = null): ?string;
+    public function getPhoto(array $data): ?string;
 
 
     /**
      * Get the latest photo ID for the user from the rest API
      *
-     * @param string $roleType
-     * @param string|int|null $externalId
+     * @param array $data
      * @return int|null
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws GuzzleException
      * @throws \JsonException
      */
-    public function getLatestPhotoID(string $roleType = Role::STUDENT, string|int|null $externalId = null): ?int;
+    public function getLatestPhotoId(array $data): ?int;
+
+
+    /**
+     * Each implementation of IPhotoDownloader can figure out whether it needs to process its images,
+     * and will do so in their own unique manner.
+     *
+     * @param string $externalId
+     * @param array $data
+     * @param int|null $newSisPhotoId
+     * @return bool
+     */
+    public function needsUpdating(string $externalId, array $data, ?int $newSisPhotoId): bool;
 }

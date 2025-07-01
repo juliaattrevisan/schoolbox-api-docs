@@ -12,6 +12,7 @@ namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Profile\Images;
 
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Log\LoggerInterface;
+use Random\RandomException;
 use Schoolbox\Application\Exception\ApiException;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Registry;
@@ -24,6 +25,7 @@ use SensitiveParameter;
 class Download implements IStrategy
 {
     private IPhotoDownloader $photoDownloader;
+
 
     /**
      * The photo downloader chooses between the BatchXML zip archive and
@@ -79,8 +81,8 @@ class Download implements IStrategy
             /* Obtain each person's photo individually
              */
             try {
-                $this->photoDownloader = new RestPhotoDownloader($credentials);
-            } catch (ApiException $e) {
+                $this->photoDownloader = new RestPhotoDownloader($credentials, $this->log);
+            } catch (ApiException | GuzzleException | RandomException $e) {
                 $this->log->error(sprintf("Could not start RestPhotoDownloader: %s", $e->getMessage()));
                 return;
             }
@@ -95,14 +97,29 @@ class Download implements IStrategy
         $users = $this->baseProfileMapper->findByColumn('external_id', $this->registry->keys());
 
         foreach ($this->registry->recallAll() as $externalId => $data) {
+            $this->log->debug(sprintf(
+                'Processing photo for %s %s (%s)',
+                $data['person']['firstname'],
+                $data['person']['lastname'],
+                $externalId
+            ));
+
             /**
              * we are only wanting to update the profile photo if
              * the sis photo has been updated,
              * we don't have a photo for the user yet
              */
             try {
-                $sisPhotoId = $this->photoDownloader->getLatestPhotoID($data['person']['type'], $externalId);
-            } catch (ApiException $e) {
+                /* TODO double check this when there's student pics
+                 *  Students need to use external id, but staff use internal id! (404 if you access student url with internal id)
+                 *  SURELY this can't be the way they made it...but it is!!!!!11111111
+                 */
+                $newSisPhotoId = $this->photoDownloader->getLatestPhotoId($data['person']);
+            } catch (ApiException | GuzzleException | RandomException | \JsonException $e) {
+                /* Log something more verbose so we can debug better
+                 */
+                $this->log->debug($e->getMessage());
+
                 $this->log->info(sprintf(
                     'Could not obtain portrait picture for %s %s (%s). Skipping',
                     $data['person']['firstname'],
@@ -110,17 +127,22 @@ class Download implements IStrategy
                     $externalId
                 ));
 
-                /* Log something more verbose so we can debug better
-                 */
-                $this->log->debug($e->getMessage());
-
                 continue;
             }
 
             /* We can detect when an identifier is different in isams than what we previously knew.
              * This gives us a clue as to when a profile picture is different than before.
+             *
+             * Note that $newSisPhotoId itself might be null, because it's latestPhotoId is also null
+             * in isams land, via their api. In that case, that person probably never had a picture.
              */
-            if (null === $data['person']['portrait'] || $sisPhotoId !== $data['person']['sisPhotoId']) {
+            $needsUpdating = $this->photoDownloader->needsUpdating((string)$externalId, $data, $newSisPhotoId);
+
+            /* If a person never had a profile picture,
+             * or someone changed the profile picture in the sis,
+             * we need to update our own records to know about the newest ones.
+             */
+            if (null === $data['person']['portrait'] || $needsUpdating) {
                 $this->log->info(sprintf(
                     'Downloading profile photo for %s %s (%s)',
                     $data['person']['firstname'],
@@ -133,8 +155,23 @@ class Download implements IStrategy
 
                 // seeing as we are updating the photo, we need to remember this
                 $baseProfile->setMetadata((new Metadata\Builder())->build(['profile' => [
-                    'sisPhotoId' => $sisPhotoId
+                    'sisPhotoId' => $newSisPhotoId
                 ]]));
+
+                $this->log->debug(sprintf(
+                    'Updating sisPhotoId metadata to new value %s',
+                    $newSisPhotoId
+                ));
+
+                /* Persist this so changing the id in the sis_user_profile.metadata column
+                 * causes a photo retrieval
+                 */
+                $this->baseProfileMapper->save($baseProfile);
+
+                /* $data still has the old identifier in it at this point, not the new $newSisPhotoId
+                 * so update that first before attempting to retrieve it lol
+                 */
+                $data['person']['sisPhotoId'] = $newSisPhotoId;
 
                 $this->importPortrait($baseProfile, $data);
             } else {
@@ -168,7 +205,7 @@ class Download implements IStrategy
          * file_info node might not exist; if it doesn't, skip it
          */
         try {
-            $photoContents = $this->photoDownloader->getPhoto($data['person']['personId'], $data['person']['type'], $baseProfile->getExternalId());
+            $photoContents = $this->photoDownloader->getPhoto($data['person']);
         } catch (ApiException $e) {
             $this->log->warning(sprintf(
                 "Unable to fetch Profile Photo: exception thrown for %s %s (%s) - %s",
@@ -179,6 +216,7 @@ class Download implements IStrategy
             ));
             return;
         }
+
         if (null === $photoContents) {
             $this->log->debug(sprintf(
                 'Profile picture: no data found for %s %s (%s)',

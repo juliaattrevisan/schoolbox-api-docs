@@ -16,6 +16,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\SimpleCache\InvalidArgumentException;
+use Random\RandomException;
 use Schoolbox\Application\Exception\ApiException;
 use Schoolbox\Application\Exception\RateLimitException;
 use Schoolbox\Url\Uri;
@@ -63,7 +64,8 @@ class Api
      * @param string $apiHost
      * @param string $clientId
      * @param string $clientSecret
-     * @throws ApiException
+     * @throws GuzzleException
+     * @throws RandomException
      */
     public function __construct(
         private string $apiHost,
@@ -86,7 +88,8 @@ class Api
      * Retrieve Bearer Token from the OIDC
      *
      * @return string
-     * @throws ApiException
+     * @throws GuzzleException
+     * @throws RandomException
      */
     private function getToken(): string
     {
@@ -122,7 +125,9 @@ class Api
      * @param bool $requireToken
      * @param bool $raw - return raw data, not json decoded
      * @return mixed
-     * @throws ApiException
+     * @throws GuzzleException
+     * @throws RandomException
+     * @throws \JsonException
      */
     public function request(string $path, string $method, array $options = [], bool $requireToken = true, bool $raw = false): mixed
     {
@@ -212,13 +217,6 @@ class Api
                 sleep($napTime);
 
                 continue;
-            } catch (ClientException $e) {
-                $response = $e->getResponse();
-                if ($response->getStatusCode() === 400) {
-                    if (str_contains($response->getBody()->getContents(), 'invalid_client')) {
-                        throw new ApiException('iSAMS REST API credentials are invalid', 400, $e);
-                    }
-                }
             } catch (\JsonException $e) {
                 // If we can't decode the response, then throw an exception
                 throw new ApiException(sprintf(
@@ -226,6 +224,24 @@ class Api
                     $e->getMessage()
                 ), 500, $e);
             } catch (GuzzleException $e) {
+                /* ClientException is the 4xx range of http status codes, including
+                 * 404: Failed to read employee photo - Employee Photo does not exist
+                 * 400: invalid_client is mentioned somewhere in here due to bad credentials etc.
+                 * 4xx: all other 400-class errors
+                 *
+                 * We're looking specifically at the 400 invalid_client exception for some special
+                 * handling so humans know why we died
+                 */
+                if ($e instanceof ClientException) {
+                    $response = $e->getResponse();
+
+                    if ($response->getStatusCode() === 400) {
+                        if (str_contains($response->getBody()->getContents(), 'invalid_client')) {
+                            throw new ApiException('iSAMS REST API credentials are invalid', 400, $e);
+                        }
+                    }
+                }
+
                 /* 404 Not Found for images (raw mode), we should just return null, not throw an exception
                  */
                 if ($raw && $e->getCode() === 404) {
