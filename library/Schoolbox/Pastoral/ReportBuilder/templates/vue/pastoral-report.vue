@@ -1,20 +1,20 @@
 <script setup lang="ts">
-import { ref } from "vue";
+/**
+ * Pastoral Report Tabs Component
+ */
 import type { PastoralReportTab } from "../js/types/pastoralReportTypes";
 
 const props = defineProps<{
     tabs: PastoralReportTab[];
 }>();
 
-const { tabs } = props;
-
-const selectedTab = ref(tabs[0]?.type ?? "");
+const selectedTab = window.Vue.ref(props.tabs[0]?.type ?? "");
 </script>
 
 <template>
-    <dl v-if="tabs.length > 1" class="tabs">
+    <dl v-if="props.tabs.length > 1" class="tabs">
         <dd
-            v-for="tab in tabs"
+            v-for="tab in props.tabs"
             :key="tab.type"
             :class="{ active: selectedTab === tab.type }"
             @click="selectedTab = tab.type"
