@@ -124,16 +124,6 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     private $linkedUser;
 
     /**
-     * The hash value is actually a digest key and it will change
-     * with the username and password and should not be exposed
-     * publically as it is an actual security token for the purposes
-     * of webdav auth.
-     *
-     * @var string
-     */
-    private $hash = '';
-
-    /**
      * Portrait images are stored in storage now
      *
      * @var Storage\Model|null
@@ -603,27 +593,6 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
         $this->preferredName = $preferredName;
         return $this;
     }
-
-
-    /**
-     * @param string $hash
-     * @return self
-     */
-    public function setHash($hash)
-    {
-        $this->hash = $hash;
-        return $this;
-    }
-
-
-    /**
-     * @return string
-     */
-    public function getHash()
-    {
-        return $this->hash;
-    }
-
 
     /**
      * @return Storage\Model|null
