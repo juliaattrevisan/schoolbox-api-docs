@@ -445,7 +445,7 @@ class Processor
                     $humanReadableMark,
                     $instructorHumanReadableMark,
                     $normalisedMark,
-                    $learner['fullname'],
+                    $learner->getFullName(),
                     $externalId,
                     $this->rosettaStone->translate('activity', false),
                     $assessment->getTitle(),
