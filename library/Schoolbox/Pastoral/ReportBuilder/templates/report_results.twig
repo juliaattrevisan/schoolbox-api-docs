@@ -24,11 +24,12 @@
 </div>
 
 <div class="row">
-    <div id="pastoral-report-container"
-        data-tabs='{{ tabs|json_encode|e('html_attr') }}'
-        data-results='{{ results|json_encode|e('html_attr') }}'
-        data-show-severity='{{ showSeverity ? 'true' : 'false' }}'
-        data-severity-colors='{{ severityColors|json_encode|e('html_attr') }}'>
+    <div id="pastoral-report-container">
+    <pastoral-report
+        :tabs='{{ tabs|json_encode}}'
+        :results='{{ results|json_encode}}'
+        :show-severity='{{ showSeverity ? 'true' : 'false' }}'
+        :severity-colors='{{ severityColors|json_encode}}'/>
     </div>
 </div>
 
