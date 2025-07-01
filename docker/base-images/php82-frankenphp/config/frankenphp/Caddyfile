@@ -1,5 +1,8 @@
 {
-    frankenphp
+    frankenphp {
+        php_ini expose_php off
+        metrics
+    }
 }
 
 :80 {
@@ -71,6 +74,8 @@
     log_skip /manifest
     encode  zstd  gzip
     php_server {
+        file_server off
         try_files index.php
+        root /usr/share/schoolbox/www
     }
 }
