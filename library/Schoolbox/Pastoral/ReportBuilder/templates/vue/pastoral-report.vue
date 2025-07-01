@@ -12,18 +12,16 @@ const selectedTab = ref(tabs[0]?.type ?? "");
 </script>
 
 <template>
-    <div>
-        <div v-if="tabs.length > 1" class="tabs">
-            <button
-                v-for="tab in tabs"
-                :key="tab.type"
-                :class="{ active: selectedTab === tab.type }"
-                @click="selectedTab = tab.type"
-            >
-                {{ tab.title }}
-            </button>
-        </div>
-    </div>
+    <dl class="tabs">
+        <dd
+            v-for="tab in tabs"
+            :key="tab.type"
+            :class="{ active: selectedTab === tab.type }"
+            @click="selectedTab = tab.type"
+        >
+            <a>{{ tab.title }}</a>
+        </dd>
+    </dl>
 </template>
 
 <style scoped></style>
