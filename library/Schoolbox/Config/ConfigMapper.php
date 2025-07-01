@@ -208,6 +208,8 @@ class ConfigMapper extends Mapper
     public const NAME_MOBILE_DAEMON_ENABLED = 'mobile_daemon_enabled';
     public const NAME_LMS_ENABLED = 'lms_enabled';
     public const NAME_RESTRICT_STUDENT_SUBMISSIONS = 'restrict_student_submissions';
+
+    public const NAME_SUBMISSION_VISIBILITY_MAX = 'submission_visibility_max';
     public const NAME_LTI_ASSESSMENTS_ENABLE = 'lti_assessments_enable';
 
     public const NAME_CUSTOM_ASSESSMENT_PARTICIPATION = 'custom_assessment_participation';

@@ -2,7 +2,12 @@
 A panel that displays various filters.
 
 Usage:
-    contentId string      - the ID of the HTML element where we will replace with AJAX content
+    contentId string|null - the ID of the HTML element where we will replace with AJAX content
+                            If unspecified or null, won't replace content
+                            If specified, will replace the HTML of the element with the AJAX response
+    eventKey  string|null - the filter event key to use for the various filter events
+                            If unspecified or null, won't trigger any events
+                            If specified, FILTER_XXXX events will include the eventKey in the event data
     panel     Filterpanel
     quickload bool        - if true, fill contentId with .innerHTML instead of jQuery.html()
                             When true, any JavaScript must be applied on the "filterContentLoaded"
@@ -29,7 +34,8 @@ Usage:
         var quickload = Boolean("{{ quickload }}");
 
         // ============== jQuery DOM handles
-        var $reportContent       = $('#{{ contentId }}');
+        var $reportContent       = {% if (contentId ?? null) is null %}null{% else %}$('#{{ contentId }}'){% endif %};
+        var $eventKey            = {% if (eventKey ?? null) is null %}null{% else %}'{{ eventKey }}'{% endif %};
         var $filterPanel         = $('#filter_panel');
         var $interactionContainer= $filterPanel.find('[data-interaction-container]');
         var $panelComponents     = $filterPanel.find('[data-component]');
@@ -218,6 +224,37 @@ Usage:
             updateFiltersInUseLabel();
         }
 
+
+        /**
+         * Dispatches the FILTER__CONTENT_LOADED event on the document
+         * @param {object} decodedSelections
+         * @param {object} content
+         */
+        function dispatchLoadedEvent(decodedSelections, content) {
+            document.dispatchEvent(new CustomEvent('FILTER__CONTENT_LOADED', {
+                detail: {
+                    key: $eventKey,
+                    content,
+                    decodedSelections,
+                }
+            }));
+        }
+
+
+        /**
+         * Dispatches the FILTER__LOADING event on the document
+         * @param {object} decodedSelections
+         */
+        function dispatchLoadingEvent(decodedSelections) {
+            document.dispatchEvent(new CustomEvent('FILTER__CONTENT_LOADING', {
+                detail: {
+                    key: $eventKey,
+                    decodedSelections,
+                }
+            }));
+        }
+
+
         /**
          * Requests a filtered report via AJAX
          */
@@ -233,6 +270,8 @@ Usage:
             if(isContentLoaded()){
                 showContentPlaceholder();
             }
+
+            dispatchLoadingEvent(decodedData);
 
             // Is there a href to post to?
             // Post there if so, otherwise update the history state and filters
@@ -254,6 +293,7 @@ Usage:
                         }
 
                         updateHistoryState(decodedData);
+                        dispatchLoadedEvent(decodedData, response.content);
                         replaceReportContent(response.content);
                         processFilterUpdateSuccess(decodedData);
                     })
@@ -275,6 +315,12 @@ Usage:
          * @param {string} html
          */
         function replaceReportContent(html) {
+            if ($reportContent === null) {
+                // If no contentId was specified, we can't replace the content
+                // so just return.
+                return;
+            }
+
             if (quickload) {
                 $reportContent.get(0).innerHTML = html;
             } else {
@@ -290,8 +336,10 @@ Usage:
          */
         function processFilterUpdateSuccess(decodedSelections) {
             $serverErrorFeedback.hide();
-            $reportContent.attr('data-loaded', '1');
-            $reportContent.trigger('filterContentLoaded', [decodedSelections]);
+            if ($reportContent !== null) {
+                $reportContent.attr('data-loaded', '1');
+                $reportContent.trigger('filterContentLoaded', [decodedSelections]);
+            }
             $(document).foundation();
         }
 
@@ -804,6 +852,13 @@ Usage:
         function showFilterLoader() {
             $filterLoaderIcon.prop('disabled', false);
             $filterLoaderIcon.css('display', 'inline-block');
+
+            document.dispatchEvent(new CustomEvent('FILTER__LOADING', {
+                detail: {
+                    isLoading: true,
+                    contentId: $reportContent ? $reportContent.attr('id') : null
+                }
+            }));
         }
 
         /**
@@ -812,26 +867,43 @@ Usage:
         function hideFilterLoader() {
             $filterLoaderIcon.prop('disabled', true);
             $filterLoaderIcon.css('display', 'none');
+
+            document.dispatchEvent(new CustomEvent('FILTER__LOADED', {
+                detail: {
+                    isLoading: false,
+                    contentId: $reportContent ? $reportContent.attr('id') : null
+                }
+            }));
         }
 
         /**
          * Hides the initially-rendered placeholder content
          */
         function hideContentPlaceholder() {
-            $reportContent.find('[data-placeholder]').hide();
+            if ($reportContent !== null) {
+                $reportContent.find('[data-placeholder]').hide();
+            }
         }
 
         /**
          * Hides the initially-rendered placeholder content
          */
         function showContentPlaceholder() {
-            $reportContent.find('[data-placeholder]').show();
+            if ($reportContent !== null) {
+                $reportContent.find('[data-placeholder]').show();
+            }
         }
 
         /**
          * Returns whether filter content has been loaded
          */
         function isContentLoaded() {
+            if ($reportContent === null) {
+                // If no contentId was specified, we can't check if the content is loaded
+                // For now this is probably fine, it's only used to show the placeholder
+                return false;
+            }
+
             return $reportContent.is('[data-loaded=0]');
         }
 

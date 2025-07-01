@@ -251,8 +251,8 @@ module.exports = {
         // Colour Picker
         colourPicker: "./www/static/js/colour-picker/colour-picker.ts",
 
-        // Markbook Pop Out
-        popOutMenuMarkbook: "./vue/components/menu/popOutMenuMarkbook.ts",
+        // Markbook
+        markbookOuter: "./library/Schoolbox/Learning/Markbook/templates/vue/markbookOuter.ts",
 
         // Birthday pop up
         birthdaySurprise: "./vue/components/birthday/birthdaySurprise.ts",

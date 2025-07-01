@@ -18,12 +18,18 @@ use Schoolbox\Filter;
 use Schoolbox\Filter\Codec;
 use Schoolbox\Filter\Filters\Assessment\AssessmentType\Definition as AssessmentTypeDefinition;
 use Schoolbox\GenericCollection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Task;
+use Schoolbox\Learning\Assessment\Feedback\Visibility;
+use Schoolbox\Learning\Assessment\Translator\UnitAssessments;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\User;
 use Throwable;
 
 use function array_combine;
@@ -216,37 +222,264 @@ class Controller extends WebController\Base
             $assessmentIds  = $this->assessmentIdFinder->findIdsByFilters($filters, $this->getUser());
             $courseMarkbook = $this->buildCourseMarkbook($courseSpec, $assessmentIds);
 
-            /**
-             * need to get an list of the students by id, with their ranking
-             */
-            $rank = $courseMarkbook->getRanking();
+            $unitSpecs = $courseMarkbook->getCollapsedAssessments()->map(function (IAssessable $assessment) {
+                $base = $assessment->getBaseContext();
+                if ($base instanceof \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model) {
+                    // Implementation
+                    return $base->getSpecification();
+                } elseif ($base instanceof \Schoolbox\Learning\Course\DataModel\Specification\Unit\Model) {
+                    // Specification
+                    return $base;
+                }
 
-            $contentResponse = $this->responseFromTemplateUnthemed(
-                '@courseMarkbook/courseMarkbookInner.twig',
-                [
-                    'rank'                    => $rank,
-                    'rankEnabled'             => (bool)$this->getConfigLoader()->get('view_rank'),
-                    'courseSpec'              => $courseSpec,
-                    'collapsedAssessments'    => $courseMarkbook->getCollapsedAssessments(),
-                    'unitSpecs'               => $courseMarkbook->getUnitSpecs(),
-                    'courseImpls'             => $courseMarkbook->getCourseImpls(),
-                    'courseImportAssessments' => $courseMarkbook->getCourseImportAssessments(),
-                    'courseImportStudents'    => $courseMarkbook->getCourseImportStudents(),
-                    'assessmentSpecMarks'     => $courseMarkbook->getAssessmentSpecAverages(),
-                    'assessmentImplMarks'     => $courseMarkbook->getAssessmentImplAverages(),
-                    'studentMarks'            => $courseMarkbook->getStudentMarks(),
-                    'studentAverageMarks'     => $courseMarkbook->getStudentAverageMarks(),
-                    'studentComments'         => $courseMarkbook->getStudentComments(),
-                    'taskProgress'            => $courseMarkbook->getTaskProgress(),
-                    'taskProgressPending'     => Completion::STATUS_SELF_ASSESSED_COMPLETE,
-                    'taskProgressComplete'    => Completion::STATUS_TEACHER_ASSESSED_COMPLETE,
-                    'queryArgs'               => $codec->convertSelectionsToQueryString($selectionsPerFilter),
-                    'canAccessPopOut'         => $this->getCanAccessPopOut($courseSpec),
-                ]
-            );
+                // no unit spec, return null
+                return null;
+            });
+
+            $data = [
+                'rank' => (bool)$this->getConfigLoader()->get('view_rank') ? $courseMarkbook->getRanking() : null,
+                'assessments' => $courseMarkbook->getCollapsedAssessments()->reindex()->map(fn(IAssessable $assessment, $sequence) => [
+                    'id'                => $assessment->getId(),
+                    'title'             => $assessment->getTitle(),
+                    'typeName'          => $assessment->getTypeName(),
+                    'assessmentType'    => $assessment->getFamilyName(),
+                    'sequence'          => $sequence,
+                    'isSpecification'   => $assessment->isSpecification(),
+                    'unitSpec'          => $unitSpecs[$assessment->getId()] !== null ? [
+                        /* for rendering the unit bars at the top of the page */
+                        'id'    => $unitSpecs[$assessment->getId()]->getId(),
+                        'title' => $unitSpecs[$assessment->getId()]->getTitle(),
+                    ] : null,
+                    /* stats here are only relevant for specs */
+                    'stats' => $assessment->isSpecification() ? array_map(
+                        /* Get the stats in the same format as returned by the class markbook */
+                        fn($mark): string|null => $mark === null ? null : sprintf("%.2f %%", $mark),
+                        [
+                            'mean'      => $courseMarkbook->getAssessmentSpecAverages()[$assessment->getId()]['published'] ?? null,
+                            'draftMean' => $courseMarkbook->getAssessmentSpecAverages()[$assessment->getId()]['any'] ?? null,
+                        ]
+                    ) : null,
+                    '_links'          => [
+                        /* only show the summary link for specs */
+                        'summary' => $assessment->isSpecification() ? $this->routeGenerator->generate(
+                            'learningAssessment.getSummary',
+                            [
+                                'assessmentId' => $assessment->getId(),
+                                'studentId'    => $this->getUser()->getId(),
+                            ]
+                        ) : null,
+                    ],
+                ])->indexByCallback(fn(array $assessment) => $assessment['id']),
+                /**
+                 * A "class implementation" is a course/class markbook-specific term.
+                 * Since the class markbook can contain non-unit assessments, this is a generalised term to allow
+                 * each of the course markbook's course implementation data and the class markbook's class data to
+                 * be returned as a similar payload structure
+                 *
+                 * For the course markbook, there is one of these for each course implementation
+                 */
+                'classImpls' => $courseMarkbook->getCourseImpls()->map(
+                    fn(CourseImpl\Model $courseImpl) => [
+                        'folder' => [
+                            'id'    => $courseImpl->getFolder()->getId(),
+                            'title' => $courseImpl->getFolder()->getTitle(),
+                        ],
+                        'assessments' => $courseMarkbook->getCourseImportAssessments()->getOffset($courseImpl->getId())->map(
+                            fn(IAssessable $aImpl, int $assessmentId) => [
+                                'id' => $aImpl->getId(),
+                                /* unused on the course markbook: */
+                                // 'markVisibility' => ...,
+                                // 'courseManaged'  => ...,
+                                // 'weight'         => ...,
+                                // 'hasDraft'       => ...,
+                                // 'writable'       => ...,
+                                'participants' => $courseMarkbook->getCourseImportStudents()[$courseImpl->getId()]->map(
+                                    function (User $student) use ($aImpl, $courseImpl, $assessmentId, $courseMarkbook) {
+                                        $participant = $aImpl->getParticipantIfExtant($student, false) ?? null;
+                                        if ($participant === null) {
+                                            return null;
+                                        }
+
+                                        /* Find the progress tick status, only relevant for tasks */
+                                        $progressTick = null;
+                                        if ($aImpl instanceof Task\Model) {
+                                            $unitAssessmentsTranslator = new UnitAssessments(
+                                                $this->routeGenerator,
+                                                $this->getAuthorizer(),
+                                                $participant->getUser(),
+                                                $this->getUser(),
+                                            );
+                                            $progressTick = $unitAssessmentsTranslator->getProgressTick($aImpl, $participant);
+                                        }
+
+                                        $marks = $courseMarkbook->getStudentMarks()[$courseImpl->getId()][$assessmentId][$student->getId()] ?? null;
+                                        $comments = $courseMarkbook->getStudentComments()[$courseImpl->getId()];
+
+                                        return [
+                                            'isExcluded' => $participant->isExcluded(),
+                                            'hasSubmittedResponse' => $participant->hasSubmittedResponse(),
+                                            'hasPublishedFeedback' => $participant->hasPublishedFeedback(),
+                                            'resubmissionRequired' => $participant->isResubmissionRequired(),
+                                            'progressTick' => $progressTick,
+                                            /* when all the values are null, the published/draft value itself will be null
+                                             * to allow checking for a draft mark / published mark */
+                                            'marks' => array_map(
+                                                fn($markSet) => array_filter($markSet, fn($v) => $v !== null) === [] ? null : $markSet,
+                                                [
+                                                    'published' => [
+                                                        'norm'         => $marks['published']['norm'],
+                                                        'hr'           => $marks['published']['hr'],
+                                                        'hrInstructor' => $marks['published']['hrInstructor'],
+                                                        'comment'      => \Scrub::html2text($comments[$student->getId()][$assessmentId] ?? ''),
+                                                    ],
+                                                    'draft' => [
+                                                        'norm'         => $marks['draft']['norm'],
+                                                        'hr'           => $marks['draft']['hr'],
+                                                        'hrInstructor' => $marks['draft']['hrInstructor'],
+                                                        'comment'      => null, /* draft comments are unused on the course markbook */
+                                                    ],
+                                                ],
+                                            ),
+                                            /* unused on the course markbook: */
+                                            // 'isResponseRequired' => ...,
+                                            // 'isFeedbackRequired' => ...,
+                                            // 'isReviewComplete'   => ...,
+                                            // 'plan' => ...,
+                                        ];
+                                    }
+                                ),
+                                'stats' => array_map(
+                                    /* Get the stats in the same format as returned by the class markbook */
+                                    fn($mark): string|null => $mark === null ? null : sprintf("%.2f %%", $mark),
+                                    [
+                                        'mean'      => $courseMarkbook->getAssessmentImplAverages()[$aImpl->getId()]['published'] ?? null,
+                                        'draftMean' => $courseMarkbook->getAssessmentImplAverages()[$aImpl->getId()]['any'] ?? null,
+                                    ]
+                                ),
+                                '_routes' => [
+                                    'learningAssessment.getStatus' => $this->routeGenerator->generate(
+                                        'learningAssessment.getStatus',
+                                        ['assessmentId' => $aImpl->getId()]
+                                    ),
+                                    'student' => $courseMarkbook->getCourseImportStudents()[$courseImpl->getId()]->map(fn(User $student) => [
+                                        'learningAssessmentTimeline.getFullTimeline' => $this->getRouteIfAuthorized(
+                                            'learningAssessmentTimeline.getFullTimeline',
+                                            [
+                                                'assessment' => $aImpl,
+                                                'assessmentId' => $aImpl->getId(),
+                                                'userId' => $student->getId(),
+                                            ]
+                                        ),
+                                        'learningDueWorkResponse.getParticularResponse' => $this->getRouteIfAuthorized(
+                                            'learningDueWorkResponse.getParticularResponse',
+                                            [
+                                                'assessment' => $aImpl,
+                                                'assessmentId' => $aImpl->getId(),
+                                                'studentId' => $student->getId(),
+                                                'student' => $student,
+                                            ]
+                                        ),
+                                        'learningDueWorkFeedback.postPublishFeedback' => $this->getRouteIfAuthorized(
+                                            'learningDueWorkFeedback.postPublishFeedback',
+                                            [
+                                                'assessment' => $aImpl,
+                                                'assessmentId' => $aImpl->getId(),
+                                                'studentId' => $student->getId(),
+                                                'student' => $student,
+                                            ]
+                                        ),
+                                        'learningAssessment.postExclude' => $this->getRouteIfAuthorized(
+                                            'learningAssessment.postExclude',
+                                            [
+                                                'assessment' => $aImpl,
+                                                'assessmentId' => $aImpl->getId(),
+                                                'studentId' => $student->getId(),
+                                                'student' => $student,
+                                            ]
+                                        ),
+                                        'learningAssessment.postInclude' => $this->getRouteIfAuthorized(
+                                            'learningAssessment.postInclude',
+                                            [
+                                                'assessment' => $aImpl,
+                                                'assessmentId' => $aImpl->getId(),
+                                                'studentId' => $student->getId(),
+                                                'student' => $student,
+                                            ]
+                                        ),
+                                        'learningAssessment.getSummary' => $this->getRouteIfAuthorized(
+                                            'learningAssessment.getSummary',
+                                            [
+                                                'assessment' => $aImpl,
+                                                'assessmentId' => $aImpl->getId(),
+                                                'studentId' => $student->getId(),
+                                                'student' => $student,
+                                            ]
+                                        ),
+                                    ]),
+                                ]
+                            ]
+                        ),
+                        'students' => $courseMarkbook->getCourseImportStudents()[$courseImpl->getId()]->map(
+                            function (User $student) use ($courseMarkbook, $courseImpl) {
+                                $stats = $courseMarkbook->getStudentAverageMarks()[$courseImpl->getId()][$student->getId()] ?? null;
+
+                                return [
+                                    'id'         => $student->getId(),
+                                    'externalId' => $student->getExternalId(), // ...for portrait.twig
+                                    'givenName'  => $student->getGivenName(),
+                                    'lastName'   => $student->getLastname(),
+                                    'stats' => [
+                                        /* Get the stats in the same format as returned by the class markbook */
+                                        'weightedMean'        => $stats['published']['hr'] ?? null,
+                                        'meanNormalised'      => $stats['published']['norm'] ?? null,
+                                        'draftWeightedMean'   => $stats['any']['hr'] ?? null,
+                                        'meanDraftNormalised' => $stats['any']['norm'] ?? null,
+                                    ],
+                                    'averageMarks' => $courseMarkbook->getStudentAverageMarks()[$courseImpl->getId()][$student->getId()] ?? null,
+                                    '_routes'    => [
+                                        'grades' => $this->routeGenerator->generate(
+                                            'learningGrades.getGrades',
+                                            [
+                                                'viewee'   => $student,
+                                                'userId'   => $student->getId(),
+                                                'termCode' => '',
+                                            ]
+                                        ),
+                                    ]
+                                ];
+                            }
+                        ),
+                        /* no overall stats for the entire class on the course markbook */
+                        'stats' => null,
+                    ]
+                )->reIndex(),
+                '_routes' => [
+                    'exportReport' => sprintf(
+                        "%s?%s",
+                        $this->routeGenerator->generate(
+                            'courseMarkbook.getMarkbookExport',
+                            [
+                                'courseSpecId' => $courseSpec->getId(),
+                            ]
+                        ),
+                        $codec->convertSelectionsToQueryString($selectionsPerFilter),
+                    ),
+                    'courseImport.getImport' => $this->routeGenerator->generate(
+                        'courseImport.getImport',
+                        [
+                            'courseSpecId' => $courseSpec->getId(),
+                            'folderId'     => 0,
+                            'componentId'  => 0,
+                        ]
+                    ),
+                ],
+                'canAccessPopOut' => $this->getCanAccessPopOut($courseSpec),
+                'availableVisibilities' => Visibility::getAvailableVisibilities((int)$this->getConfigLoader()->get(ConfigMapper::NAME_SUBMISSION_VISIBILITY_MAX)),
+            ];
+
             $this->response = $this->responseAsJson([
                 'status'  => 200,
-                'content' => $contentResponse->getBody()->getContents(),
+                'content' => $data,
             ]);
         } catch (Filter\BrokenFilterException $e) {
             // For some reason: this never actually set status 500

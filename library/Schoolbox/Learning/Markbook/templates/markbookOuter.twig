@@ -1,25 +1,17 @@
 {#
-    Markbook report wrapper
+    Class Markbook report wrapper
 
     Usage:
         folder        \Schoolbox\Resource\Folder\Model - what folder is this markbook for?
         filterPanel   \Schoolbox\Filter\Panel          - which assessments are writable? indexed by assessment.id
 #}
 
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.marksheet.js?v={{ config.site_version }}"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/task/jquery.progressTickForm.js?v={{ config.site_version }}"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/form/jquery.ajax-form.js?v={{ config.site_version }}"></script>
-
 {% import 'sub/breadcrumbs.twig' as bread %}
-{# Crumbz: Class > Markbook #}
 {{ bread.crumbs(
     ['Learning', '/learning/classes'],
     [folder.name, '/homepage/' ~ folder.id],
     ['Class Markbook']
 ) }}
-
-{% set reportContentId = 'report_content' %}
-
 
 <div class="row">
     <div class="small-12">
@@ -27,145 +19,16 @@
     </div>
 </div>
 
+{% set filterEventKey = 'MARKBOOK' %}
 
 {% include '@filters/panel.twig' with {
-    contentId: reportContentId,
-    panel: filterPanel,
-    quickload: true,
+    contentId: null,
+    eventKey:  filterEventKey,
+    panel:     filterPanel,
+    quickload: false,
 } only %}
 
-
-<div id="{{ reportContentId }}" class="row"></div>
-
-<div id="pop-out-menu-markbook-container">
-    <pop-out-menu-markbook></pop-out-menu-markbook>
+<div id="markbook-outer-container" class="marksheet-wrapper row">
+    <markbook-outer type='class' filter-event-key="{{ filterEventKey }}" />
 </div>
-<script src="{{ CDN_PREFIX }}/js/bundle/popOutMenuMarkbook.js?v={{ config.site_version }}"></script>
-
-{% autoescape 'js' %}
-<script type="text/javascript">
-    $(function() {
-        var $toast = $('[data-relation="submit-label"]');
-        var $weightInput;
-        $(document).on('change', '[data-weight]', function (e) {
-            let data = {
-                assessmentId: $(this).attr('data-assessment'),
-                weight: $(this).val()
-            }
-            $weightInput = $(this);
-            updateAssessment($(this).attr('name'), data);
-        });
-
-        $(document).on('change', '[data-visibility]', function (e) {
-            let data = {
-                assessmentId: $(this).attr('data-assessment'),
-                visibility: $(this).val()
-            }
-            updateAssessment($(this).attr('name'), data);
-        });
-
-        function updateAssessment(property, data) {
-            let path = '/learning/assessments/' + property + '/' + data['assessmentId'];
-            $toast.toastActivate({text: 'Updating assessment...'});
-
-            $.ajax({
-                type: "POST",
-                url: path,
-                data: data,
-                dataType: 'json',
-            }).done(function (response) {
-                if (typeof $weightInput !== 'undefined') {
-                    $weightInput.removeClass('invalid-data');
-                }
-                $toast.toastTimeout({text: response.message, css: 'success'});
-            }).fail(function (response) {
-                if (typeof $weightInput !== 'undefined') {
-                    $weightInput.focus().addClass('invalid-data');
-                }
-                var temp = $.parseJSON(response.responseText);
-                $toast.toastTimeout({
-                    text: 'Failed : ' + temp.error,
-                    css: 'alert'
-                });
-            });
-        }
-
-        /**
-         *  Handle creation of our base Popout menu.
-         *  - Get information about the object we're clicking on
-         *  - Pass this information into our onClick menu
-         *  - Make menu vanish when clicked off.
-         */
-
-        // Locate the report_content container, which we will bind our event listener to.
-        const reportContent = document.getElementById('report_content');
-        reportContent.addEventListener('click', (event) => {
-
-            const popOutMenuSelector = '[data-pop-out-menu]';
-
-            /**
-             * If we haven't clicked on a student grade cell, or we have but we've
-             * clicked on something /within/ the cell (such as an <a>), exit
-             */
-            if(!event.target.closest(popOutMenuSelector) || event.target.closest('a')) return;
-
-            // Remove any highlights from cells we've clicked on.
-            document.querySelector(`${popOutMenuSelector}.is-selected`)?.classList.remove('is-selected');
-            // Also highlight the cell we've clicked on.
-            event.target.closest(popOutMenuSelector).classList.add('is-selected');
-
-            const target = event.target.closest(popOutMenuSelector);
-
-            document.dispatchEvent(new CustomEvent('pop-out-menu-markbook__selected', {
-                detail: {
-                    target: target,
-                    routes: {
-                        dataEndpoint: target.dataset.endpoint,
-                        updateRoute: target.dataset.updateRoute,
-                        reviewRoute: target.dataset.reviewRoute,
-                        publishRoute: target.dataset.publishRoute,
-                        excludeRoute: target.dataset.excludeRoute,
-                        includeRoute: target.dataset.includeRoute,
-                        historyRoute: target.dataset.historyRoute,
-                    },
-                    isExcluded: (target.dataset.isExcluded === 'true'),
-                    isParticipant: (target.dataset.isParticipant === 'true'),
-                    assessmentType: target.dataset.assessmentType,
-                }
-            }))
-
-        });
-
-
-        $('#{{ reportContentId }}').on('filterContentLoaded', function() {
-            /* Controls for Averages and Dynamic updates for input fields
-             */
-            $('[data-mark-sheet]').marksheetAverages();
-
-            // Note that we cannot use window.resize here because we must respond to the pinning of the left nav
-            // menu or right notifications window.  Also we cannot listen for resize events on the container,
-            // because resize events only occur on the window.  This is a task for the ResizeObserver.
-            // @see https://developer.mozilla.org/en-US/docs/Web/API/Window/resize_event
-            // @see similar code in courseMarkbookOuter.twig.
-            const container = document.querySelector("[data-diagonal-headings-table-container]");
-            if (container !== null) {
-                const resizeObserver = new ResizeObserver(() => {
-                    container.style.maxHeight = 'calc(100vh - ' + Math.round(container.getBoundingClientRect().top) + 'px)';
-                });
-                resizeObserver.observe(container);
-            }
-        }).progressTickForm({
-            // Save form for task completion: apply only to report content,
-            // allow content to handle save
-            label: $('[data-save-progress-state]'),
-            transitions: {
-                incomplete:      'teacherAssessed',
-                selfAssessed:    'teacherAssessed',
-                teacherAssessed: 'incomplete'
-            }
-        });
-        $.marksheetToggleDrafts('#show-drafts');
-        $.marksheetToggleDisplayMarks('#show-display-marks');
-    });
-</script>
-{% endautoescape %}
+<script src="{{ CDN_PREFIX }}/js/bundle/markbookOuter.js?v={{ config.site_version }}"></script>

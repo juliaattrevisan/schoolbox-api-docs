@@ -1,108 +1,33 @@
 {#
-Usage:
-    filterPanel: FilterPanel - a filter panel that can filter and AJAX in the report
-    courseSpec:  CourseSpec
+    Course Markbook report wrapper
+
+    Usage:
+        courseSpec:  CourseSpec
+        filterPanel: FilterPanel - a filter panel that can filter and AJAX in the report
 #}
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.marksheet.js?v={{ config.site_version }}"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/task/jquery.progressTickForm.js?v={{ config.site_version }}"></script>
 
 {% import 'sub/breadcrumbs.twig' as bread %}
-{{ bread.crumbs(['Courses', routeLookupIfAuthorized('course.courseList') ], ['Course Markbook']) }}
+{{ bread.crumbs(
+    ['Courses', routeLookupIfAuthorized('course.courseList') ],
+    ['Course Markbook'])
+}}
 
 <div class="row">
-    <div class="small-12 columns"><h1>Course Markbook: {{ courseSpec.title }}</h1></div>
+    <div class="small-12 columns">
+        <h1>Course Markbook: {{ courseSpec.title }}</h1>
+    </div>
 </div>
 
-{% if canAccessPopOut %}
-<div id="pop-out-menu-markbook-container">
-    <pop-out-menu-markbook></pop-out-menu-markbook>
-</div>
-<script src="{{ CDN_PREFIX }}/js/bundle/popOutMenuMarkbook.js?v={{ config.site_version }}"></script>
-{% endif %}
-
-{% set reportContentId = 'courseMarkbookContent' %}
+{% set filterEventKey = 'MARKBOOK' %}
 
 {% include '@filters/panel.twig' with {
-    contentId: reportContentId,
+    contentId: null,
+    eventKey:  filterEventKey,
     panel:     filterPanel,
-    quickload: true
+    quickload: false,
 } only %}
 
-{% autoescape 'js' %}
-    <script type="text/javascript">
-        $(function() {
-            $('#{{ reportContentId }}').on('filterContentLoaded', function () {
-                $.marksheetToggleDrafts('#show-drafts');
-                $.marksheetToggleDisplayMarks('#show-display-marks');
-
-                // Note that we cannot use window.resize here because we must respond to the pinning of the left nav
-                // menu or right notifications window.  Also we cannot listen for resize events on the container,
-                // because resize events only occur on the window.  This is a task for the ResizeObserver.
-                // @see https://developer.mozilla.org/en-US/docs/Web/API/Window/resize_event
-                // @see similar code in markbookOuter.twig.
-                const container = document.querySelector("[data-diagonal-headings-table-container]");
-                if (container !== null) {
-                   const resizeObserver = new ResizeObserver(() => {
-                       container.style.maxHeight = 'calc(100vh - ' + Math.round(container.getBoundingClientRect().top) + 'px)';
-                   });
-                   resizeObserver.observe(container);
-                }
-            });
-
-            /**
-            *  Handle creation of our base Popout menu.
-            *  - Get information about the object we're clicking on
-            *  - Pass this information into our onClick menu
-            *  - Make menu vanish when clicked off.
-            */
-
-            // Locate the courseMarkbookContent container, which we will bind our event listener to.
-            const reportContent = document.getElementById('courseMarkbookContent');
-            reportContent.addEventListener('click', (event) => {
-
-                const popOutMenuSelector = '[data-pop-out-menu]';
-
-                /**
-                * If we haven't clicked on a student grade cell, or we have but we've
-                * clicked on something /within/ the cell (such as an <a>), exit
-                */
-                if(!event.target.closest(popOutMenuSelector) || event.target.closest('a')) return;
-
-                // Remove any highlights from cells we've clicked on.
-                document.querySelector(`${popOutMenuSelector}.is-selected`)?.classList.remove('is-selected');
-                // Also highlight the cell we've clicked on.
-                event.target.closest(popOutMenuSelector).classList.add('is-selected');
-
-                const target = event.target.closest(popOutMenuSelector);
-
-                document.dispatchEvent(new CustomEvent('pop-out-menu-markbook__selected', {
-                    detail: {
-                        target: target,
-                        routes: {
-                            dataEndpoint: target.dataset.endpoint,
-                            updateRoute: target.dataset.updateRoute,
-                            reviewRoute: target.dataset.reviewRoute,
-                            publishRoute: target.dataset.publishRoute,
-                            excludeRoute: target.dataset.excludeRoute,
-                            includeRoute: target.dataset.includeRoute,
-                            historyRoute: target.dataset.historyRoute,
-                        },
-                        isExcluded: (target.dataset.isExcluded === 'true'),
-                        isParticipant: (target.dataset.isParticipant === 'true'),
-                        assessmentType: target.dataset.assessmentType,
-                    }
-                }))
-
-        });
-        });
-    </script>
-{% endautoescape %}
-
-
-<div id="{{ reportContentId }}" class="marksheet-wrapper row" data-loaded="0">
-   <div class="small-12 island" data-placeholder>
-       <section class="content">
-           <img src="{{ CDN_PREFIX }}/images/foundation/preloader.gif" alt="preloader.gif" style="text-align:center; margin:auto; display:block;">
-       </section>
-   </div>
+<div id="markbook-outer-container" class="marksheet-wrapper row">
+    <markbook-outer type='course' filter-event-key="{{ filterEventKey }}" />
 </div>
+<script src="{{ CDN_PREFIX }}/js/bundle/markbookOuter.js?v={{ config.site_version }}"></script>

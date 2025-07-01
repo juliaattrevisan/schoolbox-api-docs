@@ -280,6 +280,9 @@ $rotate-span-width: 11rem;
                 padding: 0 !important;
                 letter-spacing: 0.1ex;
 
+                /* The original divs that aren't skewed will block users from clicking anything on the skewed divs, this lets those actions pass through */
+                pointer-events: none;
+
                 // Prevent data showing under fixed cells when scrolling horizontally.
                 &:has(div:empty) {
                     background-color: $body-bg;
@@ -297,6 +300,9 @@ $rotate-span-width: 11rem;
                     top: 0;
                     left: $rotate-width + 0.5;
                     filter: none !important;
+
+                    /* undo the pointer-events: none from above */
+                    pointer-events: auto;
 
                     &:not(:empty) {
                         background-color: $white;
