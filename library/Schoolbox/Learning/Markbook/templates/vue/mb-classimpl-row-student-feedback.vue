@@ -5,6 +5,7 @@ import locale from "@js/terminology/rosettaStone";
 import CommentField from "@schoolboxLibrary/Learning/Assessment/templates/dueWork/vue/comment-field.vue";
 import ResubmissionRequired from "@schoolboxLibrary/Learning/Assessment/templates/dueWork/vue/resubmission-required.vue";
 import MarkScheme from "@schoolboxLibrary/Learning/MarkScheme/templates/ts/mark-scheme.vue";
+import { ACTIVITY_TYPE_DUE_WORK } from "@schoolboxAssessment/Types/assessmentTypes";
 import { useMarkbookStore } from "./store/markbookStore";
 import type { MarkbookClassImplStudent } from "./types/payload";
 
@@ -217,6 +218,7 @@ window.Vue.watch(
                             :participant="{ user: props.student }"
                             :mark-scheme="cellInfo.aImpl.instructorMarkScheme"
                             :submission-error-states="mbStore.data.submissionErrorStates"
+                            :limit="cellInfo.participant.quiz?.maxMark ?? undefined /** special quiz max mark chaos */"
                         />
                     </label>
                     <resubmission-required

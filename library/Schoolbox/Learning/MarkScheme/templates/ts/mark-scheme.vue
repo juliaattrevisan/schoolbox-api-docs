@@ -24,6 +24,11 @@ interface Props {
      * Should this form input be rendered as readonly?
      */
     readonly?: boolean;
+    /**
+     * Optional precedence: used for quiz only
+     * Maximum marks available per attempt, indexed by user id
+     */
+    limit?: number;
 }
 
 const props = defineProps<Props>();
@@ -57,6 +62,7 @@ const mark = defineModel<string | null>("mark", { required: true });
         :participant="props.participant"
         :tab-index="props.tabIndex"
         :readonly="props.readonly"
+        :limit="props.limit"
     />
 </template>
 

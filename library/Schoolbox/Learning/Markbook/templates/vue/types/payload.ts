@@ -43,6 +43,16 @@ export type MarkbookClassImplActivityParticipant = {
             comment: string | null;
         }
     >;
+    /**
+     * Special quiz data to allow for feedback submission
+     * this isn't sent through with the initial payload, since currently that would potentially
+     * require a lot of interaction with the Learnosity API, which most markbook loads won't need for all activities.
+     * Instead, the markbook popout will load this data when the user asks to create/edit feedback for a quiz
+     */
+    quiz?: {
+        responseId: string | null;
+        maxMark: number | null;
+    };
     /** the following are only used the class markbook at the moment: */
     isResponseRequired?: boolean;
     isFeedbackRequired?: boolean;

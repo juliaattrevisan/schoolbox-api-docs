@@ -10,6 +10,7 @@ import {
     ACTIVITY_TYPE_TASK,
     ACTIVITY_TYPE_PROJECT,
     ACTIVITY_TYPE_DUE_WORK,
+    ACTIVITY_TYPE_QUIZ,
 } from "@schoolboxAssessment/Types/assessmentTypes";
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import { usePopOut } from "@schoolboxVue/composables/popOut/usePopOut";
@@ -230,6 +231,14 @@ async function getActivity(): Promise<void> {
             hasLoadError.value = false;
         } else {
             hasLoadError.value = true;
+        }
+
+        // TODO: Also need to go and populate participant.quiz (responseId/maxMark), but that endpoint doesn't exist yet
+        if (cellInfo.value.activity.assessmentType === ACTIVITY_TYPE_QUIZ && cellInfo.value.participant) {
+            cellInfo.value.participant.quiz = {
+                responseId: null, // TODO see above...
+                maxMark: null, // TODO see above...
+            };
         }
     } catch (error) {
         hasLoadError.value = true;

@@ -33,7 +33,7 @@ interface Props {
      */
     alaressValidateTarget?: string;
     /**
-     * Optional precdence: used for quiz only
+     * Optional precedence: used for quiz only
      * Maximum marks available per attempt, indexed by user id
      */
     limit?: number;
