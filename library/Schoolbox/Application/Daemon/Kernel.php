@@ -429,7 +429,11 @@ EOL;
         $di->set('redis.signalQueue.sub', $di->lazy(function () use ($di) {
             /** @var IConfigLoader $conf */
             $conf = $di->get('config');
-            return new AsyncRedisClient($conf->get(ConfigMapper::NAME_REDIS_EPHEMERAL_URL), $di->get('react.loop'));
+            return new AsyncRedisClient(
+                $di->get('redis.signalQueue.pub'),
+                $conf->get(ConfigMapper::NAME_REDIS_EPHEMERAL_URL),
+                $di->get('react.loop'),
+            );
         }));
 
         // Multi-instance repositories
@@ -470,13 +474,24 @@ EOL;
             )
         );
         $di->set(
+            'multiInstance.redisCacheClientRepository',
+            $di->lazyNew(
+                MultiInstance\RedisClientRepository::class,
+                [
+                    'configRepository' => $di->lazyGet('multiInstance.configRepository'),
+                    'configKey'        => ConfigMapper::NAME_REDIS_EPHEMERAL_URL,
+                ],
+            )
+        );
+        $di->set(
             'multiInstance.redisAsyncClientRepository',
             $di->lazyNew(
                 MultiInstance\RedisAsyncClientRepository::class,
                 [
-                    'configRepository' => $di->lazyGet('multiInstance.configRepository'),
-                    'configKey'        => ConfigMapper::NAME_REDIS_EPHEMERAL_URL,
-                    'loop'             => $di->lazyGet('react.loop'),
+                    'redisClientRepository' => $di->lazyGet('multiInstance.redisCacheClientRepository'),
+                    'configRepository'      => $di->lazyGet('multiInstance.configRepository'),
+                    'configKey'             => ConfigMapper::NAME_REDIS_EPHEMERAL_URL,
+                    'loop'                  => $di->lazyGet('react.loop'),
                 ],
             )
         );

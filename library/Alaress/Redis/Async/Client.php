@@ -23,11 +23,15 @@ class Client
     private $client;
 
     /**
-     * @param string        $dsn
-     * @param LoopInterface $loop
+     * @param Predis\ClientInterface $redisClient
+     * @param string                 $dsn
+     * @param LoopInterface          $loop
      */
-    public function __construct($dsn, LoopInterface $loop)
-    {
+    public function __construct(
+        private Predis\ClientInterface $redisClient,
+        $dsn,
+        LoopInterface $loop
+    ) {
         $this->client = new Predis\Async\Client($dsn, $loop);
     }
 
