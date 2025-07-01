@@ -410,6 +410,7 @@ class Processor
                      */
                     $box = $this->submissionBoxMapper->findById($boxId);
                     $learner = $this->userMapper->findById($learner['id']);
+                    $adf = new \Alaress_Date_Format($datetime, \Alaress_Date_Format::DATABASE_FORMAT);
 
                     $returnedWork = $this->returnedWorkMapper->createModel()
                         ->setSubmissionBox($box)
@@ -421,24 +422,12 @@ class Processor
                         ->setHumanReadableInstructorMark($instructorHumanReadableMark)
                         ->setNormalizedMark($normalisedMark)
                         ->setResubmissionRequired(false)
-                        ->setPublishedBy($creator->getId());
+                        ->setPublishedBy($creator->getId())
+                        ->setCreatedAt($adf)
+                        ->setPublishedAt($adf)
+                        ->setUpdatedAt($adf);
 
-
-                    $this->feedbackQuery->execute([
-//                        'boxId' => $boxId,
-//                        'marker' => $creator->getId(),
-//                        'owner' => $learner['id'],
-//                        'reviewRoute' => 'instructor',
-//                        'comment' => $comment,
-//                        'mark' => $humanReadableMark,
-//                        'instructorMark' => $instructorHumanReadableMark,
-//                        'normMark' => $normalisedMark,
-//                        'resubmissionRequired' => 0,
-                        'createdAt' => $datetime,
-                        'publishedAt' => $datetime,
-//                        'publishedBy' => $creator->getId(),
-                        'updatedAt' => $datetime
-                    ]);
+                    $this->returnedWorkMapper->save($returnedWork);
                 }
 
                 /* Some convenient shortcuts
