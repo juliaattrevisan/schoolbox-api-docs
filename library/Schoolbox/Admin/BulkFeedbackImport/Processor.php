@@ -386,12 +386,13 @@ class Processor
 
                 /* Slam in a new submission_return
                  */
+                $learner = $this->userMapper->findById($learner['id']);
+
                 if ($this->perform) {
                     /* TODO inefficient/non-conventional, I know
                      *  Solution had a time constraint.
                      */
                     $box = $this->submissionBoxMapper->findById($boxId);
-                    $learner = $this->userMapper->findById($learner['id']);
                     $adf = new \Alaress_Date_Format($datetime, \Alaress_Date_Format::DATABASE_FORMAT);
 
                     $returnedWork = $this->returnedWorkMapper->createModel()
