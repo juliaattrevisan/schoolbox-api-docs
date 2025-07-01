@@ -12,7 +12,7 @@ const selectedTab = ref(tabs[0]?.type ?? "");
 </script>
 
 <template>
-    <dl class="tabs">
+    <dl v-if="tabs.length > 1" class="tabs">
         <dd
             v-for="tab in tabs"
             :key="tab.type"
