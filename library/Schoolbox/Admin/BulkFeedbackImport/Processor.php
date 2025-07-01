@@ -61,26 +61,9 @@ class Processor
 
 
     /**
-     * Feedback creation query
-     */
-    private const QUERY_FEEDBACK = "
-        INSERT INTO submission_return
-        (box_id, marker, owner, review_route, comment, mark, instructor_mark, norm_mark, resubmission_required, created_at, published_at, published_by, updated_at)
-        VALUES
-        (:boxId, :marker, :owner, :reviewRoute, :comment, :mark, :instructorMark, :normMark, :resubmissionRequired, :createdAt, :publishedAt, :publishedBy, :updatedAt)
-    ";
-
-
-    /**
      * @var \PDOStatement
      */
     private \PDOStatement $assessmentQuery;
-
-
-    /**
-     * @var \PDOStatement
-     */
-    private \PDOStatement $feedbackQuery;
 
 
     /**
@@ -151,7 +134,6 @@ class Processor
         /* We're going to reuse this a lot
          */
         $this->assessmentQuery = $this->userMapper->getDatabase()->prepare(self::QUERY_ASSESSMENT_TITLE_WORKTYPE);
-        $this->feedbackQuery = $this->userMapper->getDatabase()->prepare(self::QUERY_FEEDBACK);
 
         $this->submissionBoxMapper = SubmissionBoxMapper::getInstance();
         $this->returnedWorkMapper = ReturnedWorkMapper::getInstance();
