@@ -169,21 +169,15 @@ window.Vue.watch(
         const { marks } = cellInfo.value.participant;
         if (marks === undefined || marks === null) {
             comment.value = "";
-        } else if (marks.draft && marks.draft.comment) {
-            comment.value = marks.draft.comment;
-        } else if (marks.published && marks.published.comment) {
-            comment.value = marks.published.comment;
+            mark.value = null;
+        } else if (mbStore.hasMeaningfulMarks(marks.draft)) {
+            comment.value = marks.draft.comment ?? "";
+            mark.value = marks.draft.hrInstructor ?? null;
+        } else if (mbStore.hasMeaningfulMarks(marks.published)) {
+            comment.value = marks.published.comment ?? "";
+            mark.value = marks.published.hrInstructor ?? null;
         } else {
             comment.value = "";
-        }
-
-        if (marks === undefined || marks === null) {
-            mark.value = null;
-        } else if (marks.draft && marks.draft.hrInstructor) {
-            mark.value = marks.draft.hrInstructor;
-        } else if (marks.published && marks.published.hrInstructor) {
-            mark.value = marks.published.hrInstructor;
-        } else {
             mark.value = null;
         }
     },

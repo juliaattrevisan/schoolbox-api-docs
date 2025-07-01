@@ -83,12 +83,12 @@ const decorator = window.Vue.computed(() => {
         !participant.value.hasSubmittedResponse &&
         !participant.value.resubmissionRequired &&
         !participant.value.hasPublishedFeedback &&
-        !participant.value.marks.draft
+        !mbStore.hasMeaningfulMarks(participant.value.marks.draft)
     ) {
         return null;
     }
 
-    if (mbStore.showDrafts && participant.value.marks.draft !== null) {
+    if (mbStore.showDrafts && mbStore.hasMeaningfulMarks(participant.value.marks.draft)) {
         return {
             indicator: "pending",
             notchTitle: "Unpublished Draft",
@@ -123,7 +123,7 @@ const decorator = window.Vue.computed(() => {
  * @returns The formatted mark
  */
 function formatMark(mark: NonNullable<typeof participant.value>["marks"]["published" | "draft"]): string {
-    if (mark === null || mark.norm === null) {
+    if (mark.norm === null) {
         return "–";
     }
 
@@ -189,7 +189,7 @@ const isSelectedFeedback = window.Vue.computed(
         </div>
         <template v-else>
             <span
-                v-if="mbStore.showDrafts && participant.marks.draft !== null"
+                v-if="mbStore.showDrafts && mbStore.hasMeaningfulMarks(participant.marks.draft)"
                 data-tooltip="right"
                 class="has-tip tip-right meta"
                 :class="getGradient(participant.marks.draft.norm, 100, false)"
@@ -205,7 +205,7 @@ const isSelectedFeedback = window.Vue.computed(
                 Pending
             </span>
             <span
-                v-else-if="participant.marks.published !== null"
+                v-else-if="mbStore.hasMeaningfulMarks(participant.marks.published)"
                 :title="participant.marks.published.comment ?? ''"
                 :class="getGradient(participant.marks.published.norm, 100, false)"
             >

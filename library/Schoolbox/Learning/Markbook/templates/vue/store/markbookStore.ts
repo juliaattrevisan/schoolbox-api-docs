@@ -7,6 +7,7 @@ import type {
     MarkbookClassImplActivity,
     MarkbookPopoutSelectedCellInfo,
     MarkbookFeedbackSelectedCellInfo,
+    MarkbookClassImplActivityParticipant,
 } from "../types/payload";
 
 export const useMarkbookStore = defineStore("markbookStore", () => {
@@ -133,6 +134,15 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
         );
     }
 
+    /**
+     * Does a given mark-set have meaningful values?
+     * @param marks - The marks to check
+     * @returns bool
+     */
+    function hasMeaningfulMarks(marks: MarkbookClassImplActivityParticipant["marks"]["published" | "draft"]): boolean {
+        return Object.values(marks).some((mark) => mark !== null);
+    }
+
     return {
         init,
         data,
@@ -146,5 +156,6 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
         orderedClassImplStudents,
         popoutSelectedCell,
         feedbackSelectedCell,
+        hasMeaningfulMarks,
     };
 });

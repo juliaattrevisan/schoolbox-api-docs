@@ -335,25 +335,20 @@ class Controller extends WebController\Base
                                                 'hasPublishedFeedback' => $participant->hasPublishedFeedback(),
                                                 'resubmissionRequired' => $participant->isResubmissionRequired(),
                                                 'progressTick' => $progressTick,
-                                                /* when all the values are null, the published/draft value itself will be null
-                                                * to allow checking for a draft mark / published mark */
-                                                'marks' => array_map(
-                                                    fn($markSet) => array_filter($markSet, fn($v) => $v !== null) === [] ? null : $markSet,
-                                                    [
-                                                        'published' => [
-                                                            'norm'         => $marks['published']['norm'],
-                                                            'hr'           => $marks['published']['hr'],
-                                                            'hrInstructor' => $marks['published']['hrInstructor'],
-                                                            'comment'      => \Scrub::html2text($comments[$student->getId()][$assessmentId] ?? ''),
-                                                        ],
-                                                        'draft' => [
-                                                            'norm'         => $marks['draft']['norm'],
-                                                            'hr'           => $marks['draft']['hr'],
-                                                            'hrInstructor' => $marks['draft']['hrInstructor'],
-                                                            'comment'      => null, /* draft comments are unused on the course markbook */
-                                                        ],
+                                                'marks' => [
+                                                    'published' => [
+                                                        'norm'         => $marks['published']['norm'],
+                                                        'hr'           => $marks['published']['hr'],
+                                                        'hrInstructor' => $marks['published']['hrInstructor'],
+                                                        'comment'      => \Scrub::html2text($comments[$student->getId()][$assessmentId] ?? ''),
                                                     ],
-                                                ),
+                                                    'draft' => [
+                                                        'norm'         => $marks['draft']['norm'],
+                                                        'hr'           => $marks['draft']['hr'],
+                                                        'hrInstructor' => $marks['draft']['hrInstructor'],
+                                                        'comment'      => null,
+                                                    ],
+                                                ],
                                                 /* unused on the course markbook: */
                                                 // 'isResponseRequired' => ...,
                                                 // 'isFeedbackRequired' => ...,

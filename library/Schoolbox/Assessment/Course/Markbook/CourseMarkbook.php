@@ -607,6 +607,7 @@ class CourseMarkbook
                     $this->studentMarks[$courseImplId][$aId][$userId]['published']['norm'] = $publishedNormMark;
                     $this->studentMarks[$courseImplId][$aId][$userId]['published']['hr']   = $publishedHrMark;
                     $this->studentMarks[$courseImplId][$aId][$userId]['published']['hrInstructor'] = $publishedHrInstructorMark;
+                    $this->studentMarks[$courseImplId][$aId][$userId]['published']['comment'] = $authPublishedFeedback->getComment();
                 }
 
 
@@ -622,6 +623,7 @@ class CourseMarkbook
                     $this->studentMarks[$courseImplId][$aId][$userId]['draft']['norm'] = $authNormMark;
                     $this->studentMarks[$courseImplId][$aId][$userId]['draft']['hr']   = $authHrMark;
                     $this->studentMarks[$courseImplId][$aId][$userId]['draft']['hrInstructor'] = $authHrInstructorMark;
+                    $this->studentMarks[$courseImplId][$aId][$userId]['draft']['comment'] = $authAnyFeedback->getComment();
                 }
 
 

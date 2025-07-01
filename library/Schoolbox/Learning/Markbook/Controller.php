@@ -227,25 +227,20 @@ class Controller extends Base
                                         'hasPublishedFeedback' => $participant->hasPublishedFeedback(),
                                         'resubmissionRequired' => $participant->isResubmissionRequired(),
                                         'progressTick'       => $progressTick,
-                                        /* when all the values are null, the published/draft value itself will be null
-                                        * to allow checking for a draft mark / published mark */
-                                        'marks' => array_map(
-                                            fn($markSet) => (!$markSet || array_filter($markSet, fn($v) => $v !== null) === []) ? null : $markSet,
-                                            [
-                                                'published' => [
-                                                    'norm'         => $participant->getNormalisedMark(true),
-                                                    'hr'           => $participant->getHumanReadableMark(true),
-                                                    'hrInstructor' => $participant->getHumanReadableInstructorMark(true),
-                                                    'comment'      => $authoritativeFeedback ? \Scrub::html2text($authoritativeFeedback->getComment()) : null,
-                                                ],
-                                                'draft' => $authoritativeFeedbackDraft ? [
-                                                    'norm'         => $participant->getNormalisedMark(false),
-                                                    'hr'           => $participant->getHumanReadableMark(false),
-                                                    'hrInstructor' => $participant->getHumanReadableInstructorMark(false),
-                                                    'comment'      => \Scrub::html2text($authoritativeFeedbackDraft->getComment()),
-                                                ] : null,
+                                        'marks' => [
+                                            'published' => [
+                                                'norm'         => $authoritativeFeedback ? $participant->getNormalisedMark(true) : null,
+                                                'hr'           => $authoritativeFeedback ? $participant->getHumanReadableMark(true) : null,
+                                                'hrInstructor' => $authoritativeFeedback ? $participant->getHumanReadableInstructorMark(true) : null,
+                                                'comment'      => $authoritativeFeedback ? \Scrub::html2text($authoritativeFeedback->getComment()) : null,
                                             ],
-                                        ),
+                                            'draft' => [
+                                                'norm'         => $authoritativeFeedbackDraft ? $participant->getNormalisedMark(false) : null,
+                                                'hr'           => $authoritativeFeedbackDraft ? $participant->getHumanReadableMark(false) : null,
+                                                'hrInstructor' => $authoritativeFeedbackDraft ? $participant->getHumanReadableInstructorMark(false) : null,
+                                                'comment'      => $authoritativeFeedbackDraft ? \Scrub::html2text($authoritativeFeedbackDraft->getComment()) : null,
+                                            ],
+                                        ],
                                         'isResponseRequired' => $participant->isResponseRequired(),
                                         'isFeedbackRequired' => $participant->isFeedbackRequired(),
                                         'isReviewComplete'   => $participant->isReviewComplete(),
