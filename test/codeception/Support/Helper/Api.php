@@ -551,7 +551,7 @@ class Api extends \Codeception\Module
             ->setOpenAt($now)
             ->setPublishAt($now)
             ->setDueAt($close);
-            // The function calls below has been commented out to get around a PHPStan warning:
+            // The function calls below have been commented out to get around a PHPStan warning:
             // "Call to method Schoolbox\Learning\Assessment\Task\Model::setMarkVisibility() on a separate line has no effect."
             //->setCloseAt($close)                                                      // Note Assessment\Task\Model->setCloseAt() doesn't actually do anything.
             //->setMarkVisibility(SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT); // Note Assessment\Task\Model->setMarkVisibility() doesn't actually do anything.
