@@ -6,23 +6,22 @@ name: Build and push php82-frankenphp
 # * manually (workflow_dispatch)?
 # * on a cron?
 on:
-#  push:
-#    branches:
-##      - master
-#      - develop
-#    paths:
-#      - 'docker/base-images/**'
+  push:
+   branches:
+     - master
+     - develop
+   paths:
+     - 'docker/base-images/**'
   workflow_dispatch:
-  workflow_call:
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   build-and-push-php82-frankenphp-to-dockerhub:
-    # TODO use helper workflow (need to add arch to every tag first)
-#    uses: ./.github/workflows/helper-build-and-push-to-dockerhub.yaml
-#    with:
-#      image: php82-frankenphp
-#      context: docker/base-images/php82-frankenphp
-#    secrets: inherit
+    env:
+      AWS_REGION: ap-southeast-2
     strategy:
       matrix:
         build:
@@ -37,53 +36,94 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: AWS Configure
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.BUILD_ECR_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: AWS ECR Login
+        uses: aws-actions/amazon-ecr-login@v2
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
           driver-opts: |
             network=host
 
+      - name: Meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            alaress/php82-frankenphp
+            ${{ vars.FRANKENPHP_ECR_REPO }}
+
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push php82-frankenphp to Dockerhub
+      - name: Build and push php82-frankenphp
+        id: build-and-push
         uses: docker/build-push-action@v6
         with:
           context: docker/base-images/php82-frankenphp
-          cache-from: type=gha
-          cache-to: type=gha
           load: true
-          push: true
-          outputs: type=docker,dest=${{ runner.temp }}/php82-frankenphp-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
-          # Remove provenance and SBOM for now, as they convert the image build
-          # to a manifest, which prevents the images from being merged into a
-          # manifest later on.
           provenance: false
           sbom: false
+          outputs: type=image,push-by-digest=true,name-canonical=true,push=true
           build-args: |
             ENV=prod
-            ARCH=${{ matrix.build.arch }}
-#          platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
+          platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
+          labels: ${{ steps.meta.outputs.labels }}
           tags: |
-            alaress/php82-frankenphp:latest-${{ github.ref_name }}-${{ matrix.build.arch }}
+            alaress/php82-frankenphp
+            ${{ vars.FRANKENPHP_ECR_REPO }}
+
+      - name: Export digest
+        run: |
+          mkdir -p ${{ runner.temp }}/digests
+          digest="${{ steps.build-and-push.outputs.digest }}"
+          touch "${{ runner.temp }}/digests/${digest#sha256:}"
 
       - name: Upload php82-frankenphp artifact
         uses: actions/upload-artifact@v4
         with:
-          name: php82-frankenphp-${{ matrix.build.arch }}
-          path: ${{ runner.temp }}/php82-frankenphp-${{ matrix.build.platform }}-${{ matrix.build.arch }}.tar
+          name: digest-${{ matrix.build.arch }}
+          path: ${{ runner.temp }}/digests/*
+          if-no-files-found: 'error'
           retention-days: 1
 
   join-php82-frankenphp:
+    env:
+      AWS_REGION: ap-southeast-2
     needs:
       - build-and-push-php82-frankenphp-to-dockerhub
     runs-on: onprem-k3s
     steps:
+      - name: Meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            alaress/php82-frankenphp
+            ${{ vars.FRANKENPHP_ECR_REPO }}
+          tags: |
+            type=ref,event=branch,prefix=latest-
+            type=raw,value=latest-${{ github.ref_name }}
+
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+
+      - name: AWS Configure
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.BUILD_ECR_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: AWS ECR Login
+        uses: aws-actions/amazon-ecr-login@v2
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -91,19 +131,16 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Download php82-frankenphp artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ${{ runner.temp }}/digests
+          pattern: digest-*
+          merge-multiple: 'true'
+
       - name: Join php82-frankenphp images
+        working-directory: ${{ runner.temp }}/digests
         run: |
-          docker manifest create alaress/php82-frankenphp:latest-${{ github.ref_name }} \
-            --amend alaress/php82-frankenphp:latest-${{ github.ref_name }}-amd64 \
-            --amend alaress/php82-frankenphp:latest-${{ github.ref_name }}-arm64
-          docker manifest push --purge alaress/php82-frankenphp:latest-${{ github.ref_name }}
-
-      # Need artifact for the joined image too, or pull the just built image?
-
-  push-php82-to-ecr:
-    needs:
-      - join-php82-frankenphp
-    uses: ./.github/workflows/helper-push-to-ecr.yaml
-    with:
-      image: php82-frankenphp
-    secrets: inherit
+          docker buildx imagetools create $(jq -cr '.tags | map ("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            $(printf 'alaress/php82-frankenphp@sha256:%s ' *) \
+            $(printf '${{ vars.FRANKENPHP_ECR_REPO }}@sha256:%s ' *)
