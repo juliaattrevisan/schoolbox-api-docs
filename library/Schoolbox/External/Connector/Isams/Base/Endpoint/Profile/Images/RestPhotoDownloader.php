@@ -232,11 +232,32 @@ class RestPhotoDownloader implements IPhotoDownloader
             $newSisPhotoId ?? '(null)',
         ));
 
+        /* isams doesn't know the new id: probably because this person has never had a picture.
+         */
         if (null === $newSisPhotoId) {
             $this->log->info(sprintf(
                 '%s %s (%s) has a null latest photo identifier; probably no picture exists. Skipping.',
                 $data['person']['firstname'],
                 $data['person']['lastname'],
+                $externalId
+            ));
+
+            return false;
+        }
+
+        /* Old id is the same as the new id: no changes detected
+         *
+         * Do a string comparison to avoid json_decoded data from mismatching due to data type
+         * even though we probably could have made newSisPhotoId always come out as a string from
+         * the method that fetches it; not sure if we'd have needed it for something else later.
+         */
+        if ((string)$data['person']['sisPhotoId'] === (string)$newSisPhotoId) {
+            $this->log->info(sprintf(
+                '%s %s (%s) sis photo id %s is the same as latest: %s. Picture is the same. Skipping.',
+                $data['person']['firstname'],
+                $data['person']['lastname'],
+                $data['person']['sisPhotoId'],
+                $newSisPhotoId,
                 $externalId
             ));
 
