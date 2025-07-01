@@ -762,7 +762,13 @@ class Controller extends BaseController
                 ],
                 [
                     'title' => 'Create ' . $this->rosettaStone->translate('pastoral', false, true) . ' Record',
-                    'url' => $urlByRouteName['pastoral.getStudentRecordInsertForm'],
+                    'url' => (
+                        // Only show the 'Create pastoral record' link if the viewee is a student.
+                        // Permission rules allow creation of pastoral records on non-student users as of 25.0.5.
+                        $viewee->getRole()->isStudent()
+                        ? $urlByRouteName['pastoral.getStudentRecordInsertForm']
+                        : false
+                    ),
                     'iconClass' => 'icon-pastoral',
                     'disabled' => false,
                     'mouseoverText' => 'Create Pastoral Record',
