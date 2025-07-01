@@ -91,29 +91,20 @@ class Processor
 
 
     /**
-     * Used to craft a returned work model so that its corresponding mapper
+     * Constructor
+     *
+     * The submissionBoxMapper is used to craft a returned work model so that its corresponding mapper
      * can create Participant and Participant Plan records for feedbacks
      *
-     * @var SubmissionBoxMapper
-     */
-    private SubmissionBoxMapper $submissionBoxMapper;
-
-
-    /**
-     * Used to create Participant and Participant Plan records for a feedback
-     *
-     * @var ReturnedWorkMapper
-     */
-    private ReturnedWorkMapper $returnedWorkMapper;
-
-
-    /**
-     * Constructor
+     * Tje returnedWorkMapper is used to create Participant and Participant Plan records for a feedback
+     * via its postsave hooks
      *
      * @param MapperProxy $assessmentMapperProxy
      * @param FilesystemProxy $filesystemProxy
      * @param UserMapper $userMapper
      * @param Mapper $folderMapper
+     * @param SubmissionBoxMapper $submissionBoxMapper
+     * @param ReturnedWorkMapper $returnedWorkMapper
      * @param RosettaStone $rosettaStone
      * @param string $dateLocal
      * @param string $assessmentTitle
@@ -125,6 +116,8 @@ class Processor
         private FilesystemProxy $filesystemProxy,
         private \Schoolbox\UserMapper $userMapper,
         private \Schoolbox\Resource\Folder\Mapper $folderMapper,
+        private SubmissionBoxMapper $submissionBoxMapper,
+        private ReturnedWorkMapper $returnedWorkMapper,
         private RosettaStone $rosettaStone,
         private string $dateLocal,
         private string $assessmentTitle,
@@ -134,9 +127,6 @@ class Processor
         /* We're going to reuse this a lot
          */
         $this->assessmentQuery = $this->userMapper->getDatabase()->prepare(self::QUERY_ASSESSMENT_TITLE_WORKTYPE);
-
-        $this->submissionBoxMapper = SubmissionBoxMapper::getInstance();
-        $this->returnedWorkMapper = ReturnedWorkMapper::getInstance();
     }
 
 
