@@ -7,6 +7,10 @@
     .excluded {
         background-color: #f9f9f9;
     }
+
+    .markbook-faded .excluded {
+        background-color: unset;
+    }
 }
 
 #report_content,
