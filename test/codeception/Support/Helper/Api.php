@@ -113,6 +113,7 @@ class Api extends \Codeception\Module
      * @throws \Aura\Di\Exception\ServiceNotObject
      * @throws \Schoolbox\External\Exception
      */
+    // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     public function _initialize(): void
     {
         parent::_initialize();
@@ -152,6 +153,7 @@ class Api extends \Codeception\Module
     /**
      * @throws MapperException
      */
+    // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     public function _before(TestInterface $test): void
     {
         parent::_before($test);
