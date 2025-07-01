@@ -3,8 +3,8 @@
  * groups of buttons with a drop down to access provided
  */
 
-import type { ToolbarConfig, ToolbarConfigItem } from "@ckeditor/ckeditor5-core";
-import { EditorType, EditorToolbar } from "@js/editor/types/editorTypes";
+import type { ToolbarConfig, ToolbarConfigItem } from "ckeditor5";
+import { EditorToolbar } from "@js/editor/types/editorTypes";
 import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
 
 /**
@@ -66,6 +66,8 @@ export function getToolbar(config: SbxEditorConfig): ToolbarConfig {
         ];
     } else {
         items = [
+            "fullscreen",
+            "|",
             "bold",
             "italic",
             {
@@ -93,6 +95,8 @@ export function getToolbar(config: SbxEditorConfig): ToolbarConfig {
             ...getToolbarAI(),
             "|",
             "link",
+            "bookmark",
+            "|",
             "resource",
             "mediaEmbed",
             "emoji",
@@ -109,10 +113,17 @@ export function getToolbar(config: SbxEditorConfig): ToolbarConfig {
             {
                 label: "Other",
                 icon: "threeVerticalDots",
-                items: ["specialCharacters", "eqneditor5Button", "horizontalLine", "findAndReplace", "sourceEditing"],
+                items: [
+                    "specialCharacters",
+                    "eqneditor5Button",
+                    "horizontalLine",
+                    "findAndReplace",
+                    "sourceEditingEnhanced",
+                ],
             },
         ];
     }
+
     /**
      * remove any individual plugins for specific use cases
      * refer to removeItems at: https://ckeditor.com/docs/ckeditor5/latest/features/toolbar/toolbar.html
@@ -121,13 +132,7 @@ export function getToolbar(config: SbxEditorConfig): ToolbarConfig {
     if (config.removeFromToolbar) {
         removeItems = config.removeFromToolbar;
     }
-    /**
-     * Source Editing is currently only available in the classic editor
-     * https://ckeditor.com/docs/ckeditor5/latest/features/source-editing.html#installation
-     */
-    if (config.type !== EditorType.CLASSIC) {
-        removeItems = [...removeItems, "sourceEditing"];
-    }
+
     /**
      * add any individual plugins for specific use cases for example
      * the Blank plugin for Quiz cloze questions

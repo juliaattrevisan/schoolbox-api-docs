@@ -2,7 +2,7 @@
  * Returns the tokens plugins for the editor
  */
 
-import { Mention } from "@ckeditor/ckeditor5-mention";
+import { Mention } from "ckeditor5";
 
 import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
 

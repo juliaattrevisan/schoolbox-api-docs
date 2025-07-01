@@ -1,4 +1,4 @@
-import type { WordCountConfig } from "@ckeditor/ckeditor5-word-count";
+import type { WordCountConfig } from "ckeditor5";
 import { insertElementAfter } from "@js/util/domUtils";
 import type { EditorDeletedEventInfo } from "@js/editor/event/editorEvent";
 import { EditorEvent } from "@js/editor/event/editorEvent";

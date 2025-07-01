@@ -2,7 +2,7 @@
  * Handles the insertion of a resource into the editor
  */
 
-import { Command, type Editor } from "@ckeditor/ckeditor5-core";
+import { Command, type Editor } from "ckeditor5";
 import { getSrc } from "@js/editor/plugin/resource/resourceUtils";
 import type { Resource } from "@js/editor/plugin/resource/resourceUtils";
 import type { SbxEditorConfig } from "@js/editor/types/editorTypes";

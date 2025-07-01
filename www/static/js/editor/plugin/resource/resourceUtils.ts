@@ -2,8 +2,7 @@
  * Various utility functions/helpers for the resource plugins
  */
 
-import type { Editor } from "@ckeditor/ckeditor5-core";
-import type { Element } from "@ckeditor/ckeditor5-engine";
+import type { Editor, Element } from "ckeditor5";
 import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
 import { getWithoutExtension } from "@js/util/fileUtils";
 

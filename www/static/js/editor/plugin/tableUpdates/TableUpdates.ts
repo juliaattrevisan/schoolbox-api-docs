@@ -3,9 +3,14 @@
  * back inline with CKEditor4, which our users are used to.
  */
 
-import { Plugin } from "@ckeditor/ckeditor5-core";
-import type { DowncastInsertEvent, Element, ViewElement } from "@ckeditor/ckeditor5-engine";
-import type { InsertTableCommand, TableAlignmentCommand } from "@ckeditor/ckeditor5-table";
+import {
+    Plugin,
+    type DowncastInsertEvent,
+    type Element,
+    type ViewElement,
+    type InsertTableCommand,
+    type TableAlignmentCommand,
+} from "ckeditor5";
 
 export default class TableUpdates extends Plugin {
     isCK5Attribute = "data-is-ckeditor5-table";

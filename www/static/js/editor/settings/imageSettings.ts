@@ -1,4 +1,4 @@
-import type { ImageConfig } from "@ckeditor/ckeditor5-image";
+import type { ImageConfig } from "ckeditor5";
 
 /**
  * Returns the settings for the Images

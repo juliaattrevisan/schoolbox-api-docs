@@ -1,5 +1,4 @@
-import type { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
-import type { InlineEditor } from "@ckeditor/ckeditor5-editor-inline";
+import type { ClassicEditor, InlineEditor } from "ckeditor5";
 
 /**
  * The different types of editors that can be used

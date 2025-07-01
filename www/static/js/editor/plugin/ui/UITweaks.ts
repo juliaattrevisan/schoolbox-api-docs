@@ -3,19 +3,22 @@
  * within the SBX context should be added here.
  */
 
-import { Plugin } from "@ckeditor/ckeditor5-core";
-import type { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
-import { getOptimalPosition } from "@ckeditor/ckeditor5-utils";
+import {
+    Plugin,
+    getOptimalPosition,
+    ButtonView,
+    LinkUI,
+    FullscreenEditing,
+    type ClassicEditor,
+    type InlineEditor,
+    type DropdownView,
+    type ViewCollection,
+    type DomPoint,
+} from "ckeditor5";
 import { EditorEvent } from "@js/editor/event/editorEvent";
-import { ButtonView } from "@ckeditor/ckeditor5-ui";
-import { LinkUI } from "@ckeditor/ckeditor5-link";
-import type { DropdownView } from "@ckeditor/ckeditor5-ui";
-import type ViewCollection from "@ckeditor/ckeditor5-ui/src/viewcollection";
-import type View from "@ckeditor/ckeditor5-ui/src/view";
-import type { PanelPosition } from "@ckeditor/ckeditor5-ui/src/dropdown/dropdownpanelview";
-import type { Position } from "@ckeditor/ckeditor5-utils/src/dom/position";
 import { insertElementAfter } from "@js/util/domUtils";
 import ResourceLinkEditing from "@js/editor/plugin/resourceLink/ResourceLinkEditing";
+import InlineEditorHandler from "@js/editor/plugin/ui/InlineEditorHandler";
 import type InsertResourceLinkCommand from "@js/editor/plugin/resourceLink/InsertResourceLinkCommand";
 
 export default class UITweaks extends Plugin {
@@ -26,7 +29,7 @@ export default class UITweaks extends Plugin {
      * @returns - the required plugins
      */
     public static get requires(): readonly (typeof Plugin)[] {
-        return [ResourceLinkEditing] as const;
+        return [ResourceLinkEditing, FullscreenEditing] as const;
     }
 
     /**
@@ -35,9 +38,17 @@ export default class UITweaks extends Plugin {
     init(): void {
         (this.editor as ClassicEditor).sourceElement?.addEventListener(EditorEvent.EDITOR__CREATED, () => {
             this.updateDropdownPositions();
-            this.checkForModal();
             this.addLinkBrowseButton();
         });
+        /**
+         * For the InlineEditor, we need to override the default fullscreen handler
+         */
+        if ((this.editor.constructor as typeof InlineEditor).editorName === "InlineEditor") {
+            const toggleFullscreenCommand = this.editor.commands.get("toggleFullscreen");
+            if (toggleFullscreenCommand) {
+                toggleFullscreenCommand.fullscreenHandler = new InlineEditorHandler(this.editor as InlineEditor);
+            }
+        }
     }
 
     /**
@@ -77,39 +88,21 @@ export default class UITweaks extends Plugin {
                     this.updateDropdownPosition($item);
                 });
             }
-            const optimalPosition = getOptimalPosition({
-                element: item.panelView.element as HTMLElement,
-                target: item.buttonView.element as HTMLElement,
+            if (item.panelView.element === null || item.buttonView.element === null) {
+                return;
+            }
+            const { left, top } = getOptimalPosition({
+                element: item.panelView.element,
+                target: item.buttonView.element.getBoundingClientRect(),
                 fitInViewport: true,
                 limiter: document.getElementById("content"),
-                // @ts-expect-error - Acessing the private property is intentional here, for now
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- see above
+                // @ts-expect-error - Accessing the private property is intentional here, for now
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- is any as cant access private property
                 positions: item._panelPositions,
-            }) as Position;
-            item.panelView.position = optimalPosition.name as PanelPosition;
+            }) as DomPoint;
+            item.panelView.element.style.left = `${left}px`;
+            item.panelView.element.style.top = `${top}px`;
         });
-    }
-
-    /**
-     * if the editor is inside a reveal modal, we need to make sure
-     * the balloon is on top of the modal, otherwise it will be hidden underneath
-     */
-    checkForModal(): void {
-        const zIndex = "var(--sbx-depth-modal-ui-overlay)";
-        if ((this.editor as ClassicEditor).sourceElement?.closest("[data-reveal]")) {
-            const contextualBalloon = this.editor.plugins.get("ContextualBalloon");
-            // fired when the balloon is shown or hidden by any UI
-            contextualBalloon.on("change:visibleView", (eventInfo, name, value: null | View<HTMLElement>) => {
-                if (value === null) return;
-
-                const balloonElement = value.element?.parentElement?.parentElement?.parentElement ?? null;
-                if (balloonElement && balloonElement.style.zIndex !== zIndex) {
-                    balloonElement.style.zIndex = zIndex;
-                    // we also need to add the editor id to the balloon so we can potentially access it later
-                    balloonElement.setAttribute("data-balloon-editor-id", this.editor.id);
-                }
-            });
-        }
     }
 
     /**
@@ -122,7 +115,7 @@ export default class UITweaks extends Plugin {
         const contextualBalloonPlugin = this.editor.plugins.get("ContextualBalloon");
         // listen to the link ui 'balloon' opening, so we can add the button
         this.listenTo(contextualBalloonPlugin, "change:visibleView", (event, name, visibleView) => {
-            if (visibleView === linkUI.formView) {
+            if (visibleView !== null && visibleView === linkUI.formView) {
                 // only need to add the button once, so remove the listener
                 this.stopListening(contextualBalloonPlugin, "change:visibleView");
                 const button = new ButtonView(this.editor.locale);
@@ -141,7 +134,10 @@ export default class UITweaks extends Plugin {
                     // register the button under the link form view, so it's also managed within the view instance
                     linkFormView.registerChild(button);
                     // add the resource button after the url input
-                    insertElementAfter(linkFormView.urlInputView.fieldView.element, button.element as HTMLElement);
+                    const referenceElement = linkFormView.urlInputView.fieldView.element?.parentElement?.parentElement;
+                    if (referenceElement) {
+                        insertElementAfter(referenceElement, button.element as HTMLElement);
+                    }
                     /**
                      * Let's listen for the same event as packages/ckeditor5-ui/src/bindings/clickoutsidehandler.ts does,
                      * but with higher priority.

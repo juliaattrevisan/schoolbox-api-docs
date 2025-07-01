@@ -1,4 +1,4 @@
-import type { FontColorConfig, FontFamilyConfig, FontSizeConfig } from "@ckeditor/ckeditor5-font";
+import type { FontColorConfig, FontFamilyConfig, FontSizeConfig } from "ckeditor5";
 import { fontColourSwatches, fontBackgroundColourSwatches } from "./colourSettings";
 
 interface FontSettingsConfig {

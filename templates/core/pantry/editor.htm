@@ -1,108 +1,3 @@
-<script src="{CDN_PREFIX}/js/bundle/editor.js?v={SITE_VERSION}"></script>
-
-<script type="text/javascript">
-    $(function() {
-
-        /**
-         * Demonstrates how the default editor instance can be accessed once it's been created
-         */
-        document.getElementById("defaultCKEditor").addEventListener("EDITOR__CREATED", onDefaultEditorCreated);
-        function onDefaultEditorCreated(event) {
-            const editor = event.detail.editor;
-            editor.setData("<p>Some <strong>sample</strong> text added after the editor is initiated</p>");
-            /**
-             * editors can also be accessed globally via the window.sbProps.editors object
-             */
-            window.sbProps.editors['defaultCKEditor'].setData(editor.getData() + "<p>Some more global text</p>");
-            /**
-             * to listen for changes in the editor, use the editor's change event
-             */
-            editor.model.document.on("change:data", (event) => {
-                console.warn(editor.getData());
-            });
-        }
-
-        /**
-         * Initialise the default editor, adding tokens and show the word count
-         */
-        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
-            detail: {
-                targetElements: ['#defaultCKEditor'],
-                hasTokens: true,
-                showWordCount: true,
-            }
-        }));
-
-        /**
-         * Other usage notes:
-         * - Previously updateElement() (https://ckeditor.com/docs/ckeditor4/latest/api/CKEDITOR_editor.html#method-updateElement was sometimes used
-         * to update the textarea with the editor's data. This is no longer necessary if validation is not required as the editor will automatically update the textarea.
-         * - editor.setReadOnly(true) can be replaced with editor.enableReadOnlyMode('my-feature-id')
-         * https://ckeditor.com/docs/ckeditor5/latest/api/module_core_editor_editor-Editor.html#function-enableReadOnlyMode
-         */
-
-        /**
-         * Demonstrates how the comment editor instance can be accessed once it's been created
-         */
-        document.getElementById("commentCKEditor").addEventListener("EDITOR__CREATED", onCommentEditorCreated);
-        function onCommentEditorCreated(event) {
-            const editor = event.detail.editor;
-            editor.setData("<p>Here is a comment. Blah blah blah</p>");
-        }
-
-        /**
-         * Initialise the comment editor
-         */
-        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
-            detail: {
-                targetElements: ['#commentCKEditor'],
-                toolbar: "comment",
-                maxCharCount: 100,
-            }
-        }));
-
-        /**
-         * Demonstrates how the comment editor instance can be accessed once it's been created
-         */
-        document.getElementById("simpleCKEditor").addEventListener("EDITOR__CREATED", onSimpleEditorCreated);
-        function onSimpleEditorCreated(event) {
-            const editor = event.detail.editor;
-            editor.setData("<p>Here is a simple blurb. Blah blah blah</p>");
-        }
-
-        /**
-         * Initialise the simple editor.
-         * Also note the use of addToToolbar which adds the custom Blank plugin to the toolbar
-         */
-        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
-            detail: {
-                targetElements: ['#simpleCKEditor'],
-                toolbar: "simple",
-            }
-        }));
-
-        /**
-         * Initialise the inline editor.
-         */
-        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
-            detail: {
-                targetElements: ["#inlineCKEditor"],
-                type: "inline",
-            }
-        }));
-
-        /* Schoolbox Link Modal
-         */
-        $('#modalLinkButton').schoolboxLink({
-            onSelect: function(url, name, mime, dialog) {
-                $('#modalLinkTarget').val(url);
-                $('#modalLinkName').text(name + ' ' + mime);
-            }
-        });
-
-    });
-</script>
-
 <div class="row">
     <div class="small-12 columns">
         <h1>Pantry - Editor</h1>
@@ -256,3 +151,109 @@
         </form>
     </div>
 </div>
+
+<script src="{CDN_PREFIX}/js/bundle/editor.js?v={SITE_VERSION}"></script>
+
+<script type="text/javascript">
+
+    /**
+         * Demonstrates how the default editor instance can be accessed once it's been created
+         */
+         document.getElementById("defaultCKEditor").addEventListener("EDITOR__CREATED", onDefaultEditorCreated);
+        function onDefaultEditorCreated(event) {
+            const editor = event.detail.editor;
+            editor.setData("<p>Some <strong>sample</strong> text added after the editor is initiated</p>");
+            /**
+             * editors can also be accessed globally via the window.sbProps.editors object
+             */
+            window.sbProps.editors['defaultCKEditor'].setData(editor.getData() + "<p>Some more global text</p>");
+            /**
+             * to listen for changes in the editor, use the editor's change event
+             */
+            editor.model.document.on("change:data", (event) => {
+                console.warn(editor.getData());
+            });
+        }
+
+        /**
+         * Initialise the default editor, adding tokens and show the word count
+         */
+        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+            detail: {
+                targetElements: ['#defaultCKEditor'],
+                hasTokens: true,
+                showWordCount: true,
+            }
+        }));
+
+        /**
+         * Other usage notes:
+         * - Previously updateElement() (https://ckeditor.com/docs/ckeditor4/latest/api/CKEDITOR_editor.html#method-updateElement was sometimes used
+         * to update the textarea with the editor's data. This is no longer necessary if validation is not required as the editor will automatically update the textarea.
+         * - editor.setReadOnly(true) can be replaced with editor.enableReadOnlyMode('my-feature-id')
+         * https://ckeditor.com/docs/ckeditor5/latest/api/module_core_editor_editor-Editor.html#function-enableReadOnlyMode
+         */
+
+        /**
+         * Demonstrates how the comment editor instance can be accessed once it's been created
+         */
+        document.getElementById("commentCKEditor").addEventListener("EDITOR__CREATED", onCommentEditorCreated);
+        function onCommentEditorCreated(event) {
+            const editor = event.detail.editor;
+            editor.setData("<p>Here is a comment. Blah blah blah</p>");
+        }
+
+        /**
+         * Initialise the comment editor
+         */
+        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+            detail: {
+                targetElements: ['#commentCKEditor'],
+                toolbar: "comment",
+                maxCharCount: 100,
+            }
+        }));
+
+        /**
+         * Demonstrates how the comment editor instance can be accessed once it's been created
+         */
+        document.getElementById("simpleCKEditor").addEventListener("EDITOR__CREATED", onSimpleEditorCreated);
+        function onSimpleEditorCreated(event) {
+            const editor = event.detail.editor;
+            editor.setData("<p>Here is a simple blurb. Blah blah blah</p>");
+        }
+
+        /**
+         * Initialise the simple editor.
+         * Also note the use of addToToolbar which adds the custom Blank plugin to the toolbar
+         */
+        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+            detail: {
+                targetElements: ['#simpleCKEditor'],
+                toolbar: "simple",
+            }
+        }));
+
+        /**
+         * Initialise the inline editor.
+         */
+        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+            detail: {
+                targetElements: ["#inlineCKEditor"],
+                type: "inline",
+            }
+        }));
+
+    $(function() {
+
+        /* Schoolbox Link Modal
+         */
+        $('#modalLinkButton').schoolboxLink({
+            onSelect: function(url, name, mime, dialog) {
+                $('#modalLinkTarget').val(url);
+                $('#modalLinkName').text(name + ' ' + mime);
+            }
+        });
+
+    });
+</script>
