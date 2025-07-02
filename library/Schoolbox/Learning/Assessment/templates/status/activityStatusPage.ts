@@ -32,8 +32,8 @@ let pageConfig: {
         } | null; // null if no pagination
         filterEmptyState: HTMLElement;
         filterReset: HTMLElement;
-        participantLoader: HTMLElement;
-        participantContainer: HTMLElement;
+        participantLoader: HTMLElement[];
+        participantContainer: HTMLElement[];
         participantSearchInput: HTMLInputElement | null;
         participantFilters: HTMLInputElement[];
         participantRows: HTMLElement[];
@@ -159,8 +159,13 @@ function createPageTab(label: string | number, targetTab: number, activeTab: num
         e.preventDefault(); // always prevent default even if unavailable
         if (!isUnavailable && targetTab !== activeTab) {
             // Scroll to the top of the page and show the loader
-            pageConfig.elements.participantLoader.classList.remove("hide");
-            pageConfig.elements.participantContainer.classList.add("hide");
+            debugger;
+            pageConfig.elements.participantLoader.forEach((e) => {
+                e.classList.remove("hide");
+            });
+            pageConfig.elements.participantContainer.forEach((e) => {
+                e.classList.add("hide");
+            });
             if (pageConfig.elements.paginator) {
                 pageConfig.elements.paginator.wrapper.style.display = "none";
             }
@@ -234,8 +239,13 @@ async function onSelectedTabChange(activeTab: number, animate: boolean): Promise
     await createEditorForParticipants(editorsToCreate);
 
     // Remove the loader and show the participants
-    pageConfig.elements.participantLoader.classList.add("hide");
-    pageConfig.elements.participantContainer.classList.remove("hide");
+    debugger;
+    pageConfig.elements.participantLoader.forEach((e) => {
+        e.classList.add("hide");
+    });
+    pageConfig.elements.participantContainer.forEach((e) => {
+        e.classList.remove("hide");
+    });
 }
 
 let changeTabLock: Promise<void> | null = null;
@@ -336,14 +346,15 @@ document.addEventListener(ACTIVITY_STATUS_PAGE_INIT, (event) => {
     if (!(filterReset instanceof HTMLElement)) {
         throw new Error("Unable to find filter reset element");
     }
-    const participantLoader = document.querySelector(event.detail.selectors.participantLoader);
-    if (!(participantLoader instanceof HTMLElement)) {
-        throw new Error("Unable to find participant loader element");
-    }
-    const participantContainer = document.querySelector(event.detail.selectors.participantContainer);
-    if (!(participantContainer instanceof HTMLElement)) {
-        throw new Error("Unable to find participant container element");
-    }
+    const participantLoader = document.querySelectorAll(event.detail.selectors.participantLoader);
+    // if (!(participantLoader instanceof HTMLElement)) {
+    //     throw new Error("Unable to find participant loader element");
+    // }
+    const participantContainer = document.querySelectorAll(event.detail.selectors.participantContainer);
+    // if (!(participantContainer instanceof HTMLElement)) {
+    //     throw new Error("Unable to find participant container element");
+    // }
+    debugger;
     // We don't require a participant search input for every page
     const participantSearchInput = event.detail.selectors.participantSearchInput
         ? document.querySelector(event.detail.selectors.participantSearchInput)
