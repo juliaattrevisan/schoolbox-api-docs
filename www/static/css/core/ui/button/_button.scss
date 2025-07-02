@@ -344,7 +344,9 @@ button.submit {
     background: none;
     min-height: auto;
     padding: 0;
-    &:hover {
+    &:hover,
+    &:active,
+    &:focus {
         background: none;
     }
 }
