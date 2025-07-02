@@ -51,7 +51,7 @@ const mark = defineModel<string | null>("mark", { required: true });
 // but we only persist it back to mark if it's valid
 const localMark = window.Vue.ref(mark.value);
 
-const markInputEl = window.Vue.useTemplateRef<HTMLInputElement>("markInputEl");
+const markInputEl = window.Vue.useTemplateRef<HTMLInputElement>("markInputRef");
 
 window.Vue.onMounted(() => {
     localMark.value = mark.value;
@@ -118,7 +118,7 @@ window.Vue.watch(mark, (newValue) => {
 <template>
     <input
         :id="`mark-${props.participant.user.id}`"
-        ref="markInputEl"
+        ref="markInputRef"
         v-model="localMark"
         class="no-margin"
         name="mark"

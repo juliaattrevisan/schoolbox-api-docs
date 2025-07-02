@@ -11,7 +11,7 @@ const props = defineProps<Props>();
 const mbStore = useMarkbookStore();
 
 const resizeObserver = window.Vue.ref<ResizeObserver | null>(null);
-const tableContainerEl = window.Vue.useTemplateRef<HTMLElement>("tableContainerEl");
+const tableContainerEl = window.Vue.useTemplateRef<HTMLElement>("tableContainerRef");
 const markbookHeightOffset = window.Vue.ref(window.innerHeight);
 
 window.Vue.provide("markbookTableContainerEl", tableContainerEl);
@@ -126,7 +126,7 @@ const exportReportRoute = window.Vue.computed(() => {
 
     <div
         v-if="mbStore.data"
-        ref="tableContainerEl"
+        ref="tableContainerRef"
         class="diagonal-headings-table-container small-12 island"
         :style="{ '--markbook-height-offset': `${markbookHeightOffset}px` }"
     >

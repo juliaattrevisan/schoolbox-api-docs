@@ -33,7 +33,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const comment = defineModel<string>("comment", { required: true });
-const textareaEl = window.Vue.useTemplateRef<HTMLTextAreaElement>("textareaEl");
+const textareaEl = window.Vue.useTemplateRef<HTMLTextAreaElement>("textareaRef");
 
 /**
  * Initialize the CKEditor instance
@@ -94,7 +94,7 @@ window.Vue.onUnmounted(async () => {
         Comment
         <textarea
             :id="`comment-${participant.user.id}`"
-            ref="textareaEl"
+            ref="textareaRef"
             name="comment"
             :data-test="`assessment-feedback-comment-textarea-${participant.user.id}`"
             :placeholder="placeholder"

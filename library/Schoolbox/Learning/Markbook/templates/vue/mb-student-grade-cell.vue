@@ -131,7 +131,7 @@ function formatMark(mark: NonNullable<typeof participant.value>["marks"]["publis
     return relevantMark ?? "–";
 }
 
-const cellEl = window.Vue.useTemplateRef<HTMLTableCellElement>("cellEl");
+const cellEl = window.Vue.useTemplateRef<HTMLTableCellElement>("cellRef");
 
 /**
  * When the user clicks the cell, open the pop-out menu if available, otherwise do nothing
@@ -167,7 +167,7 @@ const isSelectedFeedback = window.Vue.computed(
 <template>
     <td
         v-if="mbStore.data && classImpl && assessment && student"
-        ref="cellEl"
+        ref="cellRef"
         class="student-grade-cell"
         :class="{
             excluded: !participant || participant.isExcluded,

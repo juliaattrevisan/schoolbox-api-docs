@@ -63,9 +63,9 @@ const cellInfo = window.Vue.computed(() => {
  */
 
 const resizeObserver = window.Vue.ref<ResizeObserver | null>(null);
-const tableRowEl = window.Vue.useTemplateRef<HTMLTableRowElement>("tableRowEl");
-const feedbackEl = window.Vue.useTemplateRef<HTMLElement>("feedbackEl");
-const placeholderEl = window.Vue.useTemplateRef<HTMLDivElement>("placeholderEl");
+const tableRowEl = window.Vue.useTemplateRef<HTMLTableRowElement>("tableRowRef");
+const feedbackEl = window.Vue.useTemplateRef<HTMLElement>("feedbackRef");
+const placeholderEl = window.Vue.useTemplateRef<HTMLDivElement>("placeholderRef");
 const leftEls = useTemplateRefsList<HTMLTableCellElement>();
 
 // tableContainerEl is the element that contains the markbook table,
@@ -187,20 +187,20 @@ window.Vue.watch(
 </script>
 
 <template>
-    <tr v-if="mbStore.data !== null" ref="placeholderEl">
+    <tr v-if="mbStore.data !== null" ref="placeholderRef">
         <th :ref="leftEls.set" class="fixed-left is-selected"></th>
         <th :ref="leftEls.set" class="fixed-left is-selected"></th>
         <th v-if="mbStore.data.rank !== null" :ref="leftEls.set" class="fixed-left is-selected"></th>
         <td :colspan="mbStore.orderedActivities.length" class="fixed-left is-selected"></td>
     </tr>
-    <tr v-if="mbStore.data !== null && cellInfo !== null" ref="tableRowEl">
+    <tr v-if="mbStore.data !== null && cellInfo !== null" ref="tableRowRef">
         <th :ref="leftEls.set" class="fixed-left white"></th>
         <th :ref="leftEls.set" class="fixed-left white"></th>
         <th v-if="mbStore.data.rank !== null" :ref="leftEls.set" class="fixed-left white"></th>
 
         <td :colspan="mbStore.orderedActivities.length">
             <form
-                ref="feedbackEl"
+                ref="feedbackRef"
                 class="fixed-feedback-cell row"
                 :style="{
                     left: `${feedbackCellOffsets.left}px`,
