@@ -1544,6 +1544,11 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         $this->htmlConverter->setHtml($pastoral->getBodyPrivate());
         $bodyPrivateText = $this->htmlConverter->getText();
 
+        // Synergetic will strip linefeed (0x0a) characters on import.
+        // Convert them to windows-style (0x0a, 0x0d) so line breaks will be exported as expected.
+        $bodyPublicText = str_replace("\n", "\r\n", $bodyPublicText);
+        $bodyPrivateText = str_replace("\n", "\r\n", $bodyPrivateText);
+
         // Return an array containing the parameters for the insert/update query
 
         $params = [
