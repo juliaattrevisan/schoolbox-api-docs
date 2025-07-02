@@ -121,6 +121,11 @@ class Module extends BaseModule
             }
         }
 
+        // ensure assessment is part of the course
+        if ($assessmentSpec->getBaseContext()->getCourse()->getId() !== $courseSpec->getId()) {
+            throw new NotFound("Assessment is not part of the course");
+        }
+
         return ['courseSpec' => $courseSpec, 'assessmentSpec' => $assessmentSpec];
     }
 
