@@ -162,30 +162,34 @@ class Factory
                     $this->staffProfileMapper,
                     $this->relationshipMapper,
                 ));
-        }
-        if ($this->includePhoto) {
-            $bus
-                ->add(new Profile\Images\Prepare(
-                    $this->log,
-                    $this->host,
-                    $this->key,
-                    $this->zipDir,
-                    $this->validStrats
-                ))->add(new Profile\Images\Download(
-                    $this->log,
-                    $this->perform,
-                    $registry,
-                    $this->host,
-                    $this->key,
-                    $this->zipDir,
-                    $this->baseProfileMapper,
-                    $this->storageMapper
-                ))
-                ->add(new Profile\Images\Cleanup(
-                    $this->log,
-                    $this->key,
-                    $this->zipDir,
-                ));
+
+                /* Only try to process photos if Load Photos From SIS was activated in admin,
+                 * and if you're doing the profile segment of a segregated import
+                 */
+                if ($this->includePhoto) {
+                    $bus
+                        ->add(new Profile\Images\Prepare(
+                            $this->log,
+                            $this->host,
+                            $this->key,
+                            $this->zipDir,
+                            $this->validStrats
+                        ))->add(new Profile\Images\Download(
+                            $this->log,
+                            $this->perform,
+                            $registry,
+                            $this->host,
+                            $this->key,
+                            $this->zipDir,
+                            $this->baseProfileMapper,
+                            $this->storageMapper
+                        ))
+                        ->add(new Profile\Images\Cleanup(
+                            $this->log,
+                            $this->key,
+                            $this->zipDir,
+                        ));
+                }
         }
 
         if ($this->validStrats->isTimetableStratEnabled()) {
