@@ -141,6 +141,7 @@ class Controller extends WebController\Base
             'breadcrumbs' => $this->bakery->produceFromAssessment($assessmentSpec, $this->getUser())->add([ $assessmentSpec->getTitle(), '' ]),
             'assessments' => $assessments,
             'assessmentSpec'  => $assessmentSpec,
+            'courseSpec' => $courseSpec,
             /* Need this suffix so we can return to the status screen after
              * finishing the modification of le quiz or project
              */

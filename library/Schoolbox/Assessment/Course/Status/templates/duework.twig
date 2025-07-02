@@ -27,46 +27,13 @@
 {% set readonly = interactionLocked and not USER.superUser %}
 
 {% block headerOptions %}
-    {% set kamiWorksheetRoute = routeLookupIfAuthorized('learningAssessment.getWorksheet', {assessmentId: assessmentSpec.id, assessment: assessmentSpec}) %}
-    {% if assessmentSpec.enableWorksheet and assessmentSpec.kamiWorksheetTemplate and kamiWorksheetRoute %}
-        <li>
-            <a id="kamiWorksheet" class="icon-surveys" href="{{ kamiWorksheetRoute }}">Class View</a>
-        </li>
-    {% endif %}
     <li>
         <a id="import-feedback" data-reveal-id="importFeedbackModal" class="icon-upload">Import Feedback</a>
     </li>
 
-    {% if blindReviewUrl %}
-        <li>
-            <a href="{{ blindReviewUrl }}" class="icon-task">Blind Review</a>
-        </li>
-    {% endif %}
-
-    {% if download %}
-        <li><a class="icon-download" data-mass="publish" data-reveal-id="mass-download">Download All</a></li>
-    {% endif %}
-
-    {% set similarityReportRoute = routeLookupIfAuthorized('learningAssessment.getSimilarityReport', {assessmentId: assessmentSpec.id, assessment: assessmentSpec}) %}
-    {% if similarityReportRoute %}
-        <li><a href="{{ similarityReportRoute }}" class="icon-due-work">Similarity Report</a></li>
-    {% endif %}
-
-    {% if assessmentSpec.useRubric %}
-        <li>
-            <a href="{{ routeLookup('learningAssessment.getOverview', { assessmentId: assessmentSpec.id }) }}"
-               class="icon-criteria">Rubric Report</a>
-        </li>
-    {% endif %}
     {% if not readonly %}
         <li class="separator">Bulk Actions</li>
-        <li><a class="icon-approve" data-mass="submit" data-reveal-id="manage-submissions">Manage submissions</a></li>
         <li><a class="icon-approve" data-mass="publish" data-reveal-id="mass-publish">Publish grades & feedback</a></li>
-
-        {% set rescoreRoute = routeLookupIfAuthorized('learningAssessment.getRescore', {assessment: assessmentSpec, assessmentId: assessmentSpec.id}) %}
-        {% if rescoreRoute %}
-            <li><a class="icon-due-work" href="{{ rescoreRoute }}">Rescore {{ locale.grades.plural }}</a></li>
-        {% endif %}
     {% endif %}
 {% endblock %}
 
@@ -196,28 +163,6 @@
                     {%- apply spaceless -%}
                         <a class="button">Cancel</a>
                         <a class="button" data-submit>Save</a>
-                    {%- endapply -%}
-                </section>
-            </div>
-            <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-        </div>
-
-        {# The div below is used by bulky.js to create the mass-download modal. #}
-        <div id="mass-download" class="reveal-modal" data-reveal data-list-id="mass-download-list" aria-hidden="true"
-             role="dialog">
-            <h2>Download All Submissions</h2>
-            <p>Download all submissions from these students:</p>
-            <section class="checklist" id="mass-download-list">
-                <div data-template>{# this will get detached from the DOM on pageload (jquery.bulky.js) #}
-                    <input type="checkbox" data-selected checked/>
-                    <label class="checkbox-label" data-participant-name>{# populated by JS (jquery.bulky.js) #}</label>
-                </div>
-            </section>
-            <div class="component-action">
-                <section>
-                    {%- apply spaceless -%}
-                        <a class="button" onclick="$('#mass-download').foundation('reveal', 'close');">Cancel</a>
-                        <a class="button" id="download-submissions" data-submit>Download</a>
                     {%- endapply -%}
                 </section>
             </div>
@@ -409,7 +354,7 @@
                             });
 
                             {#  this needs to be per class assessment #}
-                            $.post('{{ routeLookup('learningDueWorkFeedback.postParticipantFeedbacks', {assessmentId: assessmentSpec.id}) }}', {
+                            $.post('{{ routeLookup('courseStatus.postPublishFeedback', {assessmentId: assessmentSpec.id, assessment: assessmentSpec, courseSpec: courseSpec, courseSpecId: courseSpec.id}) }}', {
                                 'drafts': draftFeedbackIds
                             }).done(function (response) {
                                 let feedbackErrors = false;
