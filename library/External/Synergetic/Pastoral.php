@@ -132,7 +132,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
         $this->setupDatabase();
 
-        $this->htmlConverter = new Html2Text();
+        $this->htmlConverter = new Html2Text('', ['width' => 0]);
 
         $externalPing = new External_Ping();
 
