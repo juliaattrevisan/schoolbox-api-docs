@@ -1117,12 +1117,6 @@ parameters:
 			path: library/Custom/Tigs/Summative/SubjectReport/Report.php
 
 		-
-			message: '#^Method DAV_Auth_Digest\:\:getDigestHash\(\) should return string\|null but returns false\.$#'
-			identifier: return.type
-			count: 1
-			path: library/DAV/Auth/Digest.php
-
-		-
 			message: '#^Method EOTC\\ActivityLog\\Log\:\:getId\(\) should return string but returns int\.$#'
 			identifier: return.type
 			count: 1
@@ -6287,36 +6281,6 @@ parameters:
 			identifier: catch.neverThrown
 			count: 1
 			path: library/Schoolbox/Weather/WeatherstackClient.php
-
-		-
-			message: '#^Property Schoolbox\\WebDav\\FileServer\\File\:\:\$user \(Schoolbox\\User\) in isset\(\) is not nullable\.$#'
-			identifier: isset.property
-			count: 1
-			path: library/Schoolbox/WebDav/FileServer/File.php
-
-		-
-			message: '#^Property Schoolbox\\WebDav\\FileServer\\Folder\:\:\$user \(Schoolbox\\User\) in isset\(\) is not nullable\.$#'
-			identifier: isset.property
-			count: 1
-			path: library/Schoolbox/WebDav/FileServer/Folder.php
-
-		-
-			message: '#^Return type \(void\) of method Schoolbox\\WebDav\\FileServer\\Folder\:\:createFile\(\) should be compatible with return type \(string\|null\) of method Sabre\\DAV\\Collection\:\:createFile\(\)$#'
-			identifier: method.childReturnType
-			count: 1
-			path: library/Schoolbox/WebDav/FileServer/Folder.php
-
-		-
-			message: '#^Return type \(void\) of method Schoolbox\\WebDav\\FileServer\\Folder\:\:createFile\(\) should be compatible with return type \(string\|null\) of method Sabre\\DAV\\ICollection\:\:createFile\(\)$#'
-			identifier: method.childReturnType
-			count: 1
-			path: library/Schoolbox/WebDav/FileServer/Folder.php
-
-		-
-			message: '#^Property Schoolbox\\WebDav\\SubjectServer\\Server\:\:\$user \(Schoolbox\\User\) in isset\(\) is not nullable\.$#'
-			identifier: isset.property
-			count: 1
-			path: library/Schoolbox/WebDav/SubjectServer/Server.php
 
 		-
 			message: '#^Return type \(iterable\<Schoolbox\\Wiki\\Revision\>&Schoolbox\\Collection\) of method Schoolbox\\Wiki\\RevisionMapper\:\:findForFeed\(\) should be compatible with return type \(iterable\<Alaress\\Async\\Notification\\Instance\\Instance\>&Schoolbox\\Collection\) of method Schoolbox\\Feed\\FeedableMapperInterface\:\:findForFeed\(\)$#'
