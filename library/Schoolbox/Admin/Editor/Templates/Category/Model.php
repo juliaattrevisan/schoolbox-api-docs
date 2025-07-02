@@ -14,6 +14,15 @@ use Schoolbox\Mapper\Traits\Model\Id;
 
 class Model
 {
+    public const BADGE_EVIDENCE = 1;
+    public const CALENDAR_EVENTS = 2;
+    public const EMAIL = 3;
+    public const FEEDBACK = 4;
+    public const HOMEPAGE = 5;
+    public const LEARNING_ACTIVITY = 6;
+    public const LEARNING_MOMENTS = 7;
+    public const NEWS = 8;
+
     use Id;
 
     /**
