@@ -21,28 +21,6 @@ use SensitiveParameter;
 class Factory
 {
     /**
-     * API Endpoint url
-     *
-     * @var string
-     */
-    private string $host;
-
-
-    /**
-     * API Endpoint access token
-     *
-     * @var string
-     */
-    private string $key;
-
-
-    /**
-     * @var bool
-     */
-    private bool $includePhoto;
-
-
-    /**
      * Factory constructor.
      *
      * @param string $host
@@ -51,14 +29,11 @@ class Factory
      * @param string $customUserAgent
      */
     public function __construct(
-        string $host,
-        #[SensitiveParameter] string $key,
-        bool $includePhoto,
+        private string $host,
+        #[SensitiveParameter] private string $key,
+        private bool $includePhoto,
         private string $customUserAgent
     ) {
-        $this->host = $host;
-        $this->key = $key;
-        $this->includePhoto = $includePhoto;
     }
 
 
