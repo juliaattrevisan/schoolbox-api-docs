@@ -26,7 +26,7 @@ module.exports = {
         "../vue/components/**/*.stories.@(js|ts)",
     ],
     webpackFinal: async (config, { configType }) => {
-        // Add in the required matched rules from webpack.common.js
+        // Add in the required matched rules from rspack.common.js
         config.module.rules.push({
             test: /\.scss$/,
             use: ["style-loader", "css-loader", "sass-loader"],
