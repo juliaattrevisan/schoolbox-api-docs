@@ -16,7 +16,9 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\Project\ResultCache as ProjectResultCache;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
@@ -149,6 +151,11 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(Filter\Selection\Mapper::class),
             $this->getMapperFactory()->get(CourseImpl\Mapper::class),
             $this->getMapperFactory()->get(UnitImpl\Mapper::class),
+            $this->injector->get('assessmentDataSource'),
+            $this->injector->get('responseDataSource'),
+            $this->getMapperFactory()->get(ReturnedWorkMapper::class),
+            $this->getMapperFactory()->get(ProjectResultCache\Mapper::class),
+            $this->injector->get('kamiConnector'),
         );
     }
 

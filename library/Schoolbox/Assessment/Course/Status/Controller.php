@@ -12,7 +12,10 @@ namespace Schoolbox\Assessment\Course\Status;
 
 use Alaress\Lumberjack\Logger;
 use Alaress_Date_Format;
+use PDOException;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
 use Schoolbox\Assessment\Rubric\DataModel\IndicatorMark\Mapper as RubricIndicatorMarkMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -22,11 +25,16 @@ use Schoolbox\Filter\Mapper;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\Breadcrumb;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
 use Schoolbox\Learning\DueWork\StateMapper;
+use Schoolbox\Learning\InlineGrader\Kami\Connector;
 use Schoolbox\Learning\InlineGrader\StudentCarousel;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\Helper;
@@ -46,6 +54,7 @@ use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Learning\Course\DataModel\Specification\Model;
 use Schoolbox\Mapper\Exception;
 
+use Schoolbox\UserMapper;
 use function array_combine;
 
 class Controller extends WebController\Base
@@ -81,6 +90,11 @@ class Controller extends WebController\Base
         private Filter\Selection\Mapper $filterSelectionMapper,
         private CourseImpl\Mapper $courseImplMapper,
         private UnitImpl\Mapper $unitImplMapper,
+        private AssessmentDataSource $assessmentDataSource,
+        private ResponseDataSource $responseDataSource,
+        private ReturnedWorkMapper $returnedWorkMapper,
+        private Project\ResultCache\Mapper $projectResultCacheMapper,
+        private Connector $kamiConnector,
     ) {
     }
 
@@ -347,7 +361,97 @@ class Controller extends WebController\Base
      */
     public function postPublishFeedback(CourseSpec\Model $courseSpec, IAssessable $assessmentSpec): void
     {
-        new \Alaress_Probe($courseSpec, $assessmentSpec);
+        // This report may take a while
+        $this->extendExecutionTime();
+
+        /** @var int[] $draftFeedbackIds */
+        $draftFeedbackIds = $this->requestPost->get('drafts', []);
+        $now              = Alaress_Date_Format::now();
+        $results = [];
+        $projectCache = (new Project\ResultCache\ResultCache($this->projectResultCacheMapper));
+
+//        $queryArgs = $this->requestQuery->getArrayCopy();
+//        [$filters,] = $this->convertRequestToFilters($courseSpec, $queryArgs, false);
+
+        $request = $this->requestPost['filter_selection'] ?: [];
+
+        /**
+         * @var null[]|Collection[]        $filters
+         * @var Filter\Codec               $codec
+         * @var Filter\Selection\Model[][] $selectionsPerFilter
+         */
+        // TODO add some intelligence around which filter settings to save (eg AssessmentType but not units)
+        [$filters, $codec, $selectionsPerFilter] = $this->convertRequestToFilters($courseSpec, $request, true);
+
+        $assessmentIds  = $this->assessmentIdFinder->findIdsByFilters($filters, $this->getUser());
+
+        // Fetch assessments
+        $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds)->indexBy('id');
+        // filter to only the assessment we are looking for
+        $assessments = $assessments->filter(static function (IAssessable $assessment) use ($assessmentSpec) {
+            return $assessment->getSpecificationAssessment()?->getId() === $assessmentSpec->getId();
+        });
+        // hydrate participants
+        $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, null, true);
+
+        // class assessment specific data
+        /** @var \Schoolbox\Learning\Assessment\DueWork\Model $assessment */
+        foreach ($assessments as $assessment) {
+            foreach ($draftFeedbackIds as $draftFeedbackId) {
+                // Verify that this return is for this assessment
+                $submissionReturn = $this->returnedWorkMapper->findById($draftFeedbackId);
+                $publishSuccess = false;
+
+                if ($submissionReturn->getSubmissionBox()->getAssessmentModel()->getId() === $assessment->getId()) {
+                    $submissionReturn->setPublishedAt($now);
+
+                    try {
+                        $this->returnedWorkMapper->save($submissionReturn);
+                        $publishSuccess = true;
+
+                        // Find the Kami worksheet (if it exists)
+                        if ($submissionReturn->getSubmission()) {
+                            $responses = $this->responseDataSource->findForAssessment($assessment, $submissionReturn->getSubmission()->getOwner());
+                            if (0 !== $responses->count()) {
+                                $response = null;
+                                foreach ($responses as $responseCurrent) {
+                                    if ($responseCurrent->getId() == $submissionReturn->getSubmission()->getId()) {
+                                        $response = $responseCurrent;
+                                        break;
+                                    }
+                                }
+
+                                // attempt to clean as we go
+                                unset($responses);
+
+                                /** @var ?DueWork\Response\Model $response */
+                                $kamiModel = $response?->getAllFiles()->filter(function (SubmissionFile $file) {
+                                    return $file->getIsWorksheet();
+                                })->first()?->getKami();
+                                if ($kamiModel) {
+                                    // Save the kami doc to the feedback object
+                                    $this->kamiConnector->initiatePollingForKamiDownload(
+                                        $kamiModel,
+                                        'feedback',
+                                        $this->getUser(),
+                                    );
+                                }
+                            }
+                        }
+
+                        /* Update project result cache when Publish All is used
+                         */
+                        $projectCache->refresh($this->assessmentDataSource, $assessment, $submissionReturn->getOwner());
+                    } catch (PDOException|\DomainException|\InvalidArgumentException|\LogicException|\UnexpectedValueException $e) {
+                        $publishSuccess = false;
+                    }
+                }
+
+                $results[$draftFeedbackId] = ['publishSuccess' => $publishSuccess];
+            }
+        }
+
+        $this->response = $this->responseAsJson($results);
     }
 
     /**
