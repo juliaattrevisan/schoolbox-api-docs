@@ -15,10 +15,8 @@ use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Alaress\Authorizer\Failure\InvalidPath;
 use Schoolbox\Application\Exception\NotFound;
-use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Role;
-use Schoolbox\Learning\Assessment\Breadcrumb;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Filter;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
@@ -40,12 +38,6 @@ class Module extends \Alaress\Module\Module
         $preloadCourseSpec = $this->buildPreloadCourseSpec();
         $canSeeCourseMarkbook = $this->buildAuthRuleCanSeeCourseMarkbook();
 
-//        // only instructors of all courses can access the publish/enter feedback routes
-//        $instructorOfAll = new Rule\IsInstructorOfAllCourses();
-        $preloadCourseAssessment = function ($params) {
-            return $this->buildPreloadCourseAssessment($params);
-        };
-
         // Convenience redirects to the Course Markbook page
         $this->register('GET', '/{courseSpecId:\d+}/unit/{unitSpecId:\d+}/folder/{folderId:\d+}', 'getRedirect', $canSeeCourseMarkbook, $preloadCourseSpec);
 
@@ -53,13 +45,6 @@ class Module extends \Alaress\Module\Module
         $this->register('GET', '/{courseSpecId:\d+}', 'getMarkbook', $canSeeCourseMarkbook, $preloadCourseSpec);
         $this->register('POST', '/{courseSpecId:\d+}', 'postMarkbook', $canSeeCourseMarkbook, $preloadCourseSpec);
         $this->register('GET', '/export/{courseSpecId:\d+}', 'getMarkbookExport', $canSeeCourseMarkbook, $preloadCourseSpec);
-
-//        // single course level single assessment routes
-//        $this->register('GET', '/{courseSpecId:\d+}/assessment/{assessmentId:\d+}', 'getAssessment', $canSeeCourseMarkbook, $preloadCourseAssessment);
-//        // publish feedback for a single assessment
-//        $this->register('POST', '/{courseSpecId:\d+}/assessment/{assessmentId:\d+}/publish', 'postPublishFeedback', $canSeeCourseMarkbook, $preloadCourseAssessment);
-//        // quiz create feedback needs the learnosity endpoint's maxmarks
-//        $this->register('GET', '/{courseSpecId:\d+}/assessment/{assessmentId:\d+}/maxMarks', 'getMaxMarks', $canSeeCourseMarkbook, $preloadCourseAssessment);
     }
 
     /**
@@ -101,14 +86,6 @@ class Module extends \Alaress\Module\Module
      */
     public function buildController(): Base
     {
-        $access = $this->getMapperFactory()->get(Access::class);
-
-        $bakery = new Breadcrumb\Factory(
-            $this->getRouter()->getGenerator(),
-            $this->getAuthorizer(),
-            $access,
-        );
-
         return new Controller(
             $this->injector->get('filters.factoryFactory'),
             $this->getMapperFactory()->get(Filter\Mapper::class),
@@ -117,14 +94,7 @@ class Module extends \Alaress\Module\Module
             $this->getAssessmentMapper(),
             $this->getMapperFactory()->get(CourseImpl\Mapper::class),
             $this->getMapperFactory()->get(UnitImpl\Mapper::class),
-            $access,
-            $bakery,
-            new \Schoolbox\Url\Factory($this->getConfig()),
-            (string)$this->getConfig()->get('learnosity_version'),
-            (string)$this->getConfig()->get('learnosity_consumer_key'),
-            (string)$this->getConfig()->get('learnosity_consumer_secret'),
-            $this->getMapperFactory()->get(QuizMapper::class),
-
+            $this->getMapperFactory()->get(Access::class),
         );
     }
 
@@ -167,36 +137,5 @@ class Module extends \Alaress\Module\Module
             /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
             throw new NotFound('No Course id found in route');
         };
-    }
-
-
-    private function buildPreloadCourseAssessment($params): array
-    {
-        $courseSpec = $params['courseSpec'] ?? null;
-        $assessmentSpec = $params['assessmentSpec'] ?? null;
-        if (null === $courseSpec) {
-            if (array_key_exists('courseSpecId', $params)) {
-                try {
-                    /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
-                    $courseSpec = $this->getCourseSpecMapper()->findById($params['courseSpecId']);
-                } catch (Mapper\Exception $e) {
-                    /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
-                    throw new NotFound("No Course found for id: {$params['courseSpecId']}");
-                }
-            }
-        }
-        if (null === $assessmentSpec) {
-            if (array_key_exists('assessmentId', $params)) {
-                try {
-                    /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
-                    $assessmentSpec = $this->getAssessmentMapper()->findById($params['assessmentId']);
-                } catch (Mapper\Exception $e) {
-                    /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
-                    throw new NotFound("No Assessment found for id: {$params['assessmentId']}");
-                }
-            }
-        }
-
-        return ['courseSpec' => $courseSpec, 'assessmentSpec' => $assessmentSpec];
     }
 }
