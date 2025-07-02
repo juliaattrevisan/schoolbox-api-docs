@@ -8,7 +8,9 @@ import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
  * @param config - the config to use when creating the editor
  * @returns - the template settings
  */
-export function getTemplateSettings(config: SbxEditorConfig): TemplateConfig {
+export function getTemplateSettings(
+    config: SbxEditorConfig,
+): { template: TemplateConfig } | Record<PropertyKey, never> {
     if (config.templates && config.templates.length > 0) {
         return {
             template: {
