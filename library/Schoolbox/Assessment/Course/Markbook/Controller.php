@@ -578,6 +578,9 @@ class Controller extends WebController\Base
 
         $unitAssessmentsMap = new UnitAssessments(null, $this->authorizer, null, $this->getUser());
 
+        $baseUrl = $this->getRouteIfAuthorized('courseMarkbook.getAssessment', ['assessmentId' => $assessmentSpec->getId(), 'assessmentSpec' => $assessmentSpec, 'courseSpecId' => $courseSpec->getId(), 'courseSpec' => $courseSpec]);
+        $returnUrlSuffix = Redirect::queryString($baseUrl);
+
         // Injectables...
         $rubricIndicatorMarkMapper = RubricIndicatorMarkMapper::getInstance();
         $termMapper = Term\Mapper::getInstance();
@@ -591,6 +594,11 @@ class Controller extends WebController\Base
             'assessments' => $assessments,
             'assessmentSpec'  => $assessmentSpec,
             'classes' => $classes,
+            /* Need this suffix so we can return to the status screen after
+             * finishing the modification of le quiz or project
+             */
+            'returnUrl' => Redirect::encode($baseUrl),
+            'returnUrlSuffix' => $returnUrlSuffix,
         ];
         // switch based on which assessment type
         if ($assessmentSpec instanceof \Schoolbox\Learning\Assessment\DueWork\Model) {
@@ -641,8 +649,7 @@ class Controller extends WebController\Base
         } elseif ($assessmentSpec instanceof \Schoolbox\Learning\Assessment\Task\Model) {
             $template = '@courseMarkbook/status/task.twig';
         } elseif ($assessmentSpec instanceof \Schoolbox\Learning\Assessment\Quiz\Model) {
-            $baseUrl = $this->getRouteIfAuthorized('courseMarkbook.getAssessment', ['assessmentId' => $assessmentSpec->getId(), 'assessmentSpec' => $assessmentSpec, 'courseSpecId' => $courseSpec->getId(), 'courseSpec' => $courseSpec]);
-            $returnUrlSuffix = Redirect::queryString($baseUrl);
+
             $now = Alaress_Date_Format::now();
 
             /* Probably inject this one day, but for now,
@@ -742,17 +749,32 @@ class Controller extends WebController\Base
 
             $twigData['errors'] = $stateMapper->listDisplayValues();
 
-
-            /* Need this suffix so we can return to the status screen after
-             * finishing the modification of le quiz
-             */
-            $twigData['returnUrl'] = Redirect::encode($baseUrl);
-            $twigData['returnUrlSuffix'] = $returnUrlSuffix;
-
             $template = '@courseMarkbook/status/quiz.twig';
-//            project doesn't have a status page yet
-//        } elseif ($assessmentSpec instanceof \Schoolbox\Learning\Assessment\Project) {
-//            $template = '@learningAssessment/quiz/status.twig';
+        // project doesn't have a status page yet
+        } elseif ($assessmentSpec instanceof \Schoolbox\Learning\Assessment\Project) {
+            $twigData['assessmentStats'] = [];
+            $twigData['participantStats'] = [];
+            $twigData['baseContext'] = $assessmentSpec->getBaseContext();
+            // class assessment specific data
+            foreach ($assessments as $assessment) {
+                // Calculate summary totals for display purposes
+                $participants = $assessment->getAllParticipants();
+
+                $assessmentStats = new GenericCollection(Assessment\Statistics::class);
+                $assessmentStats[$assessment->getId()] = new Assessment\Statistics($assessment);
+                foreach ($assessment->getAssessables() as $subAssessable) {
+                    $assessmentStats[$subAssessable->getId()] = new Assessment\Statistics($subAssessable);
+                }
+
+                $participantStats = new GenericCollection(Assessment\ParticipantStatistics::class);
+                foreach ($participants as $participant) {
+                    $participantStats[$participant->getUser()->getId()] = new Assessment\ParticipantStatistics($participant);
+                }
+
+                $twigData['assessmentStats'][$assessment->getId()] = $assessmentStats;
+                $twigData['participantStats'][$assessment->getId()] = $participantStats;
+            }
+            $template = '@courseMarkbook/status/project.twig';
         } else {
             throw new NotFound('Unsupported assessment type: ' . AssessmentType::objectToString($assessmentSpec));
         }
