@@ -33,32 +33,20 @@ use Schoolbox\Learning\Learnosity\Helper;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Model as Quiz;
-use Schoolbox\Permission\Access\Access;
 use Alaress\Web\Controller as WebController;
-use Schoolbox\Assessment\Course\Markbook\Export\CSV;
-use Schoolbox\Assessment\Course\Task\Completion;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Codec;
-use Schoolbox\Filter\Filters\Assessment\AssessmentType\Definition as AssessmentTypeDefinition;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\AssessmentType;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\Translator\UnitAssessments;
-use Schoolbox\Learning\Assessment\Task;
-use Schoolbox\Learning\Assessment\Feedback\Visibility;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Learning\Course\DataModel\Specification\Model;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\User;
-use Throwable;
 
 use function array_combine;
-use function func_get_args;
 
 class Controller extends WebController\Base
 {
@@ -139,8 +127,6 @@ class Controller extends WebController\Base
         // hydrate participants
         $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, null, true);
 
-        $unitAssessmentsMap = new UnitAssessments(null, $this->authorizer, null, $this->getUser());
-
         $baseUrl = $this->getRouteIfAuthorized('courseStatus.getStatus', ['assessmentId' => $assessmentSpec->getId(), 'assessmentSpec' => $assessmentSpec, 'courseSpecId' => $courseSpec->getId(), 'courseSpec' => $courseSpec]);
         $returnUrlSuffix = Redirect::queryString($baseUrl);
 
@@ -149,20 +135,19 @@ class Controller extends WebController\Base
         $termMapper = Term\Mapper::getInstance();
         $stateMapper = StateMapper::getInstance();
 
-        $classes = [];
         // init the twig data
         $twigData = [
             'type' => AssessmentType::objectToString($assessmentSpec),
             'breadcrumbs' => $this->bakery->produceFromAssessment($assessmentSpec, $this->getUser())->add([ $assessmentSpec->getTitle(), '' ]),
             'assessments' => $assessments,
             'assessmentSpec'  => $assessmentSpec,
-            'classes' => $classes,
             /* Need this suffix so we can return to the status screen after
              * finishing the modification of le quiz or project
              */
             'returnUrl' => Redirect::encode($baseUrl),
             'returnUrlSuffix' => $returnUrlSuffix,
         ];
+
         // switch based on which assessment type
         if ($assessmentSpec instanceof \Schoolbox\Learning\Assessment\DueWork\Model) {
             // duework specific data
@@ -173,6 +158,7 @@ class Controller extends WebController\Base
             $twigData['draftResponses'] = [];
 
             // class assessment specific data
+            /** @var \Schoolbox\Learning\Assessment\DueWork\Model $assessment */
             foreach ($assessments as $assessment) {
                 // Only display download link if there are actually files to download in any of the classes
                 $twigData['download'] = ($twigData['download'] ?? false) ?: $this->hasDownloadableSubmissionFiles($assessment);
@@ -212,7 +198,6 @@ class Controller extends WebController\Base
         } elseif ($assessmentSpec instanceof \Schoolbox\Learning\Assessment\Task\Model) {
             $template = '@courseStatus/task.twig';
         } elseif ($assessmentSpec instanceof \Schoolbox\Learning\Assessment\Quiz\Model) {
-
             $now = Alaress_Date_Format::now();
 
             /* Probably inject this one day, but for now,
@@ -235,6 +220,7 @@ class Controller extends WebController\Base
             $learnosityHelper = new Helper($api, $logger);
 
             // class assessment specific data
+            /** @var \Schoolbox\Learning\Assessment\Quiz\Model $assessment */
             foreach ($assessments as $assessment) {
                 /* Auto-complete naturally expired quizzes
                  */
@@ -276,6 +262,7 @@ class Controller extends WebController\Base
                          *         swamp is a series of floatval() calls that cast nulls to zero.
                          *         TODO maybe find out the breadth of this idea and undo it to support null
                          */
+                        /** @var null|\Schoolbox\Learning\Assessment\Quiz\Attempt\Model $mostRecentResponse */
                         $mostRecentResponse = $participant->findMostRecentResponse();
 
                         if (!$mostRecentResponse) {
@@ -319,6 +306,7 @@ class Controller extends WebController\Base
             $twigData['participantStats'] = [];
             $twigData['baseContext'] = $assessmentSpec->getBaseContext();
             // class assessment specific data
+            /** @var \Schoolbox\Learning\Assessment\Project $assessment */
             foreach ($assessments as $assessment) {
                 // Calculate summary totals for display purposes
                 $participants = $assessment->getAllParticipants();
