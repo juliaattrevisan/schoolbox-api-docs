@@ -29,44 +29,6 @@ use SensitiveParameter;
 class Factory
 {
     /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $log;
-
-
-    /**
-     * The "perform" flag from the cli tool
-     *
-     * @var bool
-     */
-    private bool $perform;
-
-
-    /**
-     * @var string
-     */
-    private string $host;
-
-
-    /**
-     * @var string
-     */
-    private string $key;
-
-
-    /**
-     * @var \Schoolbox\External\Event\Mapper
-     */
-    private \Schoolbox\External\Event\Mapper $eventMapper;
-
-
-    /**
-     * @var \Schoolbox\External\Event\User\Mapper
-     */
-    private \Schoolbox\External\Event\User\Mapper $eventUserMapper;
-
-
-    /**
      * Factory constructor.
      *
      * @param LoggerInterface $log
@@ -78,20 +40,14 @@ class Factory
      * @param \Schoolbox\External\Event\User\Mapper $eventUserMapper
      */
     public function __construct(
-        LoggerInterface $log,
-        bool $perform,
-        string $host,
-        #[SensitiveParameter] string $key,
+        private LoggerInterface $log,
+        private bool $perform,
+        private string $host,
+        #[SensitiveParameter] private string $key,
         private string $customUserAgent,
-        \Schoolbox\External\Event\Mapper $eventMapper,
-        \Schoolbox\External\Event\User\Mapper $eventUserMapper
+        private \Schoolbox\External\Event\Mapper $eventMapper,
+        private \Schoolbox\External\Event\User\Mapper $eventUserMapper
     ) {
-        $this->log = $log;
-        $this->perform = $perform;
-        $this->host = $host;
-        $this->key = $key;
-        $this->eventMapper = $eventMapper;
-        $this->eventUserMapper = $eventUserMapper;
     }
 
 
