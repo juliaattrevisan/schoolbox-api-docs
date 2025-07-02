@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Course\Markbook;
 
+use Alaress\Lumberjack\Logger;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Rubric\DataModel\IndicatorMark\Mapper as RubricIndicatorMarkMapper;
 use Schoolbox\Assessment\Term;
@@ -20,6 +21,8 @@ use Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Learning\InlineGrader\StudentCarousel;
+use Schoolbox\Learning\Learnosity\Api;
+use Schoolbox\Learning\Learnosity\Helper;
 use Schoolbox\Permission\Access\Access;
 use Alaress\Web\Controller as WebController;
 use Schoolbox\Assessment\Course\Markbook\Export\CSV;
@@ -59,6 +62,10 @@ class Controller extends WebController\Base
      * @param UnitImpl\Mapper                    $unitImplMapper
      * @param Access                             $access
      * @param Breadcrumb\Factory                 $bakery
+     * @param \Schoolbox\Url\Factory             $urlFactory
+     * @param string                             $learnosityVersion
+     * @param string                             $learnosityConsumerKey
+     * @param string                             $learnosityConsumerSecret
      */
     public function __construct(
         private Filter\IFactoryFactory $filterFactoryFactory,
@@ -69,7 +76,11 @@ class Controller extends WebController\Base
         private CourseImpl\Mapper $courseImplMapper,
         private UnitImpl\Mapper $unitImplMapper,
         private Access $access,
-        private Breadcrumb\Factory $bakery
+        private Breadcrumb\Factory $bakery,
+        private \Schoolbox\Url\Factory $urlFactory,
+        private string $learnosityVersion,
+        #[\SensitiveParameter] private string $learnosityConsumerKey,
+        #[\SensitiveParameter] private string $learnosityConsumerSecret,
     ) {
     }
 
@@ -647,9 +658,8 @@ class Controller extends WebController\Base
     }
 
     /**
-     * for a specific participant and an assessment we need to fetch the max mark (from learnosity or fallback to the assessment spec)
+     * for each assessment we need to fetch the max mark (from learnosity or fallback to the assessment spec)
      * same as status page
-     *
      *
      * @param Model $courseSpec
      * @param $assessmentId
@@ -687,10 +697,28 @@ class Controller extends WebController\Base
         $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, null, true);
 
         $maxMarks = [];
-//
-//        foreach ($assessments as $assessment) {
-//            $maxMarks[$assessment->getId()] = $this->getlearnosityMaxMarks($assessment);
-//        }
+
+        /* Probably inject this one day, but for now,
+             * I want to avoid dumping Yet Another Thing into the kernel
+             * I don't have a convenient means to access SERVER_NAME except like this, sadly
+             */
+        $logger = new Logger(STDOUT, STDOUT, \Monolog\Level::Debug, [], true, 'learnosity');
+
+        /* TODO Derive from learnosity atm
+         *   Consider caching locally the standing maximum available marks for the assessment in the absence of an attempt.
+         *   This only matters when it's a Total Mark markscheme: everything else is out of 100
+         */
+        $api = new Api(
+            $this->urlFactory->buildFullyQualified()->getHost(),
+            $this->learnosityVersion,
+            $this->learnosityConsumerKey,
+            $this->learnosityConsumerSecret,
+            $logger
+        );
+        $helper = new Helper($api, $logger);
+        foreach ($assessments as $assessment) {
+            $maxMarks[$assessment->getId()] = $helper->findAvailableMarks($assessment->getLearnosityReference());
+        }
 
         $this->response = $this->responseAsJson([
             'maxMarks' => $maxMarks,

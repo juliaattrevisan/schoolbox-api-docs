@@ -117,7 +117,11 @@ class Module extends \Alaress\Module\Module
             $this->getMapperFactory()->get(CourseImpl\Mapper::class),
             $this->getMapperFactory()->get(UnitImpl\Mapper::class),
             $access,
-            $bakery
+            $bakery,
+            new \Schoolbox\Url\Factory($this->getConfig()),
+            (string)$this->getConfig()->get('learnosity_version'),
+            (string)$this->getConfig()->get('learnosity_consumer_key'),
+            (string)$this->getConfig()->get('learnosity_consumer_secret'),
         );
     }
 
