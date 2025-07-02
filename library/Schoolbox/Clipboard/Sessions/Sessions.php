@@ -347,11 +347,8 @@ class Sessions implements IStrategy
                     $startAt = (new \Alaress_Date_Format(explode('.', $session['startDateTime'])[0], \Alaress_Date_Format::DATABASE_FORMAT, new \DateTimeZone('UTC')))
                         ->setTimezone($this->timezone);
 
-                    $finishAt = (
-                        $session['endDateTime'] === null
-                        ? null()
-                        : (new \Alaress_Date_Format(explode('.', $session['endDateTime'])[0], \Alaress_Date_Format::DATABASE_FORMAT, new \DateTimeZone('UTC')))
-                    )?->setTimezone($this->timezone);
+                    $finishAt = (new \Alaress_Date_Format(explode('.', $session['endDateTime'])[0], \Alaress_Date_Format::DATABASE_FORMAT, new \DateTimeZone('UTC')))
+                        ->setTimezone($this->timezone);
 
                     /* See if this matchup exists by taking the bestest guess,
                      * then update its Notes in case it changed somehow in Clipboard
