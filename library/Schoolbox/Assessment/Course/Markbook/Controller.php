@@ -11,18 +11,24 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Course\Markbook;
 
 use Alaress\Lumberjack\Logger;
+use Alaress_Date_Format;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Rubric\DataModel\IndicatorMark\Mapper as RubricIndicatorMarkMapper;
 use Schoolbox\Assessment\Term;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\Breadcrumb;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Learning\InlineGrader\StudentCarousel;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\Helper;
+use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Permission\Access\Access;
 use Alaress\Web\Controller as WebController;
 use Schoolbox\Assessment\Course\Markbook\Export\CSV;
@@ -81,6 +87,8 @@ class Controller extends WebController\Base
         private string $learnosityVersion,
         #[\SensitiveParameter] private string $learnosityConsumerKey,
         #[\SensitiveParameter] private string $learnosityConsumerSecret,
+        private QuizMapper $quizMapper,
+
     ) {
     }
 
@@ -573,6 +581,7 @@ class Controller extends WebController\Base
         // Injectables...
         $rubricIndicatorMarkMapper = RubricIndicatorMarkMapper::getInstance();
         $termMapper = Term\Mapper::getInstance();
+        $stateMapper = StateMapper::getInstance();
 
         $classes = [];
         // init the twig data
@@ -586,7 +595,7 @@ class Controller extends WebController\Base
         // switch based on which assessment type
         if ($assessmentSpec instanceof \Schoolbox\Learning\Assessment\DueWork\Model) {
             // duework specific data
-            $twigData['errors'] = StateMapper::getInstance()->listDisplayValues();
+            $twigData['errors'] = $stateMapper->listDisplayValues();
 
             /* Draft Responses made by each guy
              */
@@ -630,7 +639,115 @@ class Controller extends WebController\Base
         } elseif ($assessmentSpec instanceof \Schoolbox\Learning\Assessment\Task\Model) {
             $template = '@courseMarkbook/status/task.twig';
         } elseif ($assessmentSpec instanceof \Schoolbox\Learning\Assessment\Quiz\Model) {
-            $template = '@learningAssessment/quiz/status.twig';
+            $baseUrl = $this->getRouteIfAuthorized('courseMarkbook.getAssessment', ['assessmentId' => $assessmentSpec->getId(), 'assessmentSpec' => $assessmentSpec, 'courseSpecId' => $courseSpec->getId(), 'courseSpec' => $courseSpec]);
+            $returnUrlSuffix = Redirect::queryString($baseUrl);
+            $now = Alaress_Date_Format::now();
+
+            /* Probably inject this one day, but for now,
+             * I want to avoid dumping Yet Another Thing into the kernel
+             * I don't have a convenient means to access SERVER_NAME except like this, sadly
+             */
+            $logger = new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity');
+
+            /* TODO Derive from learnosity atm
+             *   Consider caching locally the standing maximum available marks for the assessment in the absence of an attempt.
+             *   This only matters when it's a Total Mark markscheme: everything else is out of 100
+             */
+            $api = new Api(
+                $this->urlFactory->buildFullyQualified()->getHost(),
+                $this->learnosityVersion,
+                $this->learnosityConsumerKey,
+                $this->learnosityConsumerSecret,
+                $logger
+            );
+            $learnosityHelper = new Helper($api, $logger);
+
+            // class assessment specific data
+            foreach ($assessments as $assessment) {
+                /* Auto-complete naturally expired quizzes
+                 */
+                $quiz = $this->getQuizForAssessmentId($assessment->getId());
+
+                /* Apparently this is a thing
+                 */
+                $quiz = $this->quizMapper->loadAttemptsAndAnswers($quiz);
+
+                /* Close any expired attempts before checking for in-progress / unfinished attempts
+                 * Note that this requires $quiz to have its attempts already loaded via loadAttemptsAndAnswers()
+                 */
+                $numChanged = $this->quizMapper->closeExpiredAttempts($assessment, $quiz, $now);
+
+                /* Attempts list is hydrated as part of $assessment, but we might have changed that
+                 * If anyone got their attempt automatically closed, reload with the latest data.
+                 */
+                if ($numChanged) {
+                    $assessment = $this->assessmentMapperProxy->findByIdForReview($assessment->getId());
+                }
+
+                /* Each user's attempt could have its own different max mark value; it's not uniform across
+                 * every attempt. Each one could be unique. Build a hash lookup of what the maximums are,
+                 * and for those who never completed an attempt: ask learnosity how much is available
+                 */
+                $maxMarks = [];
+
+                foreach ($assessment->getAllParticipants() as $participant) {
+                    if ($assessment->getMarkScheme() instanceof TotalMarkFractional) {
+                        /* Ask learnosity to find out how much their attempt *would* be worth
+                         * based on the current set of questions if any of the following occurs:
+                         *
+                         *     - this participant never made an attempt.
+                         *     - this participant's attempt is still in progress (db row won't exist yet).
+                         *     - most recent response's marksAvailable is zero.
+                         *         this occurs when you spawn an arbitrary attempt with a Letter Grade,
+                         *         then changed it to Total Mark; we never asked or recorded what the
+                         *         quantitative total actually was. Deeper in the andyland part of the
+                         *         swamp is a series of floatval() calls that cast nulls to zero.
+                         *         TODO maybe find out the breadth of this idea and undo it to support null
+                         */
+                        $mostRecentResponse = $participant->findMostRecentResponse();
+
+                        if (!$mostRecentResponse) {
+                            $maxMarks[$participant->getUser()->getId()] = null;
+                        } elseif (!$mostRecentResponse->isSubmitted()) {
+                            $maxMarks[$participant->getUser()->getId()] = null;
+                        } else {
+                            $maxMarks[$participant->getUser()->getId()] = $mostRecentResponse->getMarksAvailable();
+                        }
+                    }
+                }
+
+                /* If the quiz is a Total Mark markscheme and if there was someone without a response,
+                 * ask learnosity what they could potentially get; otherwise skip the api penalty
+                 */
+                if (\count($maxMarks) && $assessment->getMarkScheme() instanceof TotalMarkFractional) {
+
+
+                    $available = $learnosityHelper->findAvailableMarks($assessment->getLearnosityReference());
+
+                    /* Now assign it to them
+                     */
+                    foreach ($maxMarks as $userId => $value) {
+                        if (null === $value) {
+                            $maxMarks[$userId] = $available;
+                        }
+                    }
+                }
+
+                /* Each guy's maximum available marks
+                */
+                $twigData[$assessment->getId()]['maxMarks'] = $maxMarks;
+            }
+
+            $twigData['errors'] = $stateMapper->listDisplayValues();
+
+
+            /* Need this suffix so we can return to the status screen after
+             * finishing the modification of le quiz
+             */
+            $twigData['returnUrl'] = Redirect::encode($baseUrl);
+            $twigData['returnUrlSuffix'] = $returnUrlSuffix;
+
+            $template = '@courseMarkbook/status/quiz.twig';
 //            project doesn't have a status page yet
 //        } elseif ($assessmentSpec instanceof \Schoolbox\Learning\Assessment\Project) {
 //            $template = '@learningAssessment/quiz/status.twig';
@@ -904,5 +1021,25 @@ class Controller extends WebController\Base
         }
 
         return false;
+    }
+
+
+    /**
+     * Converts an assessment_id to a Quiz
+     *
+     * @see \Schoolbox\Learning\Assessment\Quiz\Controller::getQuizForAssessmentId
+     * @param int $assessmentId
+     * @return Quiz
+     * @throws \Schoolbox\Application\Exception\Exception
+     */
+    protected function getQuizForAssessmentId($assessmentId): Quiz
+    {
+        /** @var Quiz $quiz */
+        $quiz = $this->quizMapper->findByColumn('assessment_id', $assessmentId, ['deleted' => true])->first();
+
+        if (Quiz::AVAILABILITY_ASSESS != $quiz->getAvailability()) {
+            throw ErrorMapper::GetInstance()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+        }
+        return $quiz;
     }
 }

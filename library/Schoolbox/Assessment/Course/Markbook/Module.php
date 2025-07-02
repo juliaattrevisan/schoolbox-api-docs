@@ -15,6 +15,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Alaress\Authorizer\Failure\InvalidPath;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Role;
 use Schoolbox\Learning\Assessment\Breadcrumb;
@@ -122,6 +123,8 @@ class Module extends \Alaress\Module\Module
             (string)$this->getConfig()->get('learnosity_version'),
             (string)$this->getConfig()->get('learnosity_consumer_key'),
             (string)$this->getConfig()->get('learnosity_consumer_secret'),
+            $this->getMapperFactory()->get(QuizMapper::class),
+
         );
     }
 
