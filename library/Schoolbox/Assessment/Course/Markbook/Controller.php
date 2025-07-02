@@ -635,7 +635,9 @@ class Controller extends WebController\Base
 
             $template = '@courseMarkbook/status/duework.twig';
         } elseif ($assessmentSpec instanceof \Schoolbox\Learning\Assessment\Lti\Model) {
-            $template = '@learningAssessment/lti/status.twig';
+            $twigData['message'] = strip_tags($this->requestQuery->get('lti_msg', ''));
+            $twigData['errorMessage'] = strip_tags($this->requestQuery->get('lti_errormsg', ''));
+            $template = '@courseMarkbook/status/lti.twig';
         } elseif ($assessmentSpec instanceof \Schoolbox\Learning\Assessment\Task\Model) {
             $template = '@courseMarkbook/status/task.twig';
         } elseif ($assessmentSpec instanceof \Schoolbox\Learning\Assessment\Quiz\Model) {

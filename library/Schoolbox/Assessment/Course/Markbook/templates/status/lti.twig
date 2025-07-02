@@ -1,0 +1,49 @@
+{#  usage: per-participation, configure the following vars for the parent template to use
+     - pActionResponses: a route to see the list of responses for this participation
+     - pStatusText:      the description to output under the user's name
+     - pStatusClass:     one of [ '', 'pending', 'complete' ] to denote the action status of this participation
+     - pTooltip:         a tooltip explaining the status marker
+
+    available varaibles:
+     - routeArgs:        an array that represents a participant, to be pushed into a routeLookup
+     - assessment:       the assessment we're looking at
+     - participant:      the current participant of the iteration
+     - statusIncomplete: a string representing the 'incomplete' state
+     - statusPending:    a string representing the 'pending/attempted' state
+     - statusReviewed:   a string representing the 'reviewed' state
+     - writable:         bool   Whether current user has WRITE+ perm to the assessment's folder
+
+#}
+{% import '@learning/macro/urgency.twig' as urgency %}
+
+{% extends '@courseMarkbook/courseStatus.twig' %}
+
+{% set labelIncomplete = 'Incomplete' %}
+{% set labelPending    = 'Self-Assessed' %}
+{% set labelReviewed   = 'Teacher-Assessed' %}
+
+{% block messages %}
+    {% include '@learningAssessment/fragments/lti/messages.twig' with {
+        errorMessage: errorMessage ?? '',
+        message: message ?? '',
+    } only %}
+{% endblock messages %}
+
+{% block headerOptions %}
+    <li>
+        {# Launch link depends on whether the tool opens in an iframe or not #}
+        <a class="icon-lti"
+           {% if assessmentSpec.ltiTool.isTargetWindow %}target="_blank"{% endif %}
+           href="{{ routeLookupIfAuthorized(
+               'learningAssessment.getLtiStatusLaunch',
+               {
+                   assessment:   assessmentSpec,
+                   assessmentId: assessmentSpec.id,
+               }
+           ) }}">View in LTI Tool</a>
+    </li>
+{% endblock %}
+
+{% block participant %}
+    {% include '@learningAssessment/lti/participant.twig' %}
+{% endblock %}
