@@ -349,7 +349,7 @@ class Sessions implements IStrategy
 
                     $finishAt = (
                         $session['endDateTime'] === null
-                        ? null
+                        ? null()
                         : (new \Alaress_Date_Format(explode('.', $session['endDateTime'])[0], \Alaress_Date_Format::DATABASE_FORMAT, new \DateTimeZone('UTC')))
                     )?->setTimezone($this->timezone);
 
