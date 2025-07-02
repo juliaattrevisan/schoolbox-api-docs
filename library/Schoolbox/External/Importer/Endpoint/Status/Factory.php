@@ -47,10 +47,15 @@ class Factory
      *
      * @param string $host
      * @param string $key
-     * @param bool   $includePhoto
+     * @param bool $includePhoto
+     * @param string $customUserAgent
      */
-    public function __construct(string $host, #[SensitiveParameter] string $key, bool $includePhoto)
-    {
+    public function __construct(
+        string $host,
+        #[SensitiveParameter] string $key,
+        bool $includePhoto,
+        private string $customUserAgent
+    ) {
         $this->host = $host;
         $this->key = $key;
         $this->includePhoto = $includePhoto;
@@ -80,7 +85,7 @@ class Factory
                 return new Connector\TassApi\Base\Endpoint\Status($this->host, $this->key, $this->includePhoto);
 
             case Endpoint\Factory::COMPASS:
-                return new Connector\Compass\Base\Endpoint\Status($this->host, $this->key);
+                return new Connector\Compass\Base\Endpoint\Status($this->host, $this->key, $this->customUserAgent);
 
             case Endpoint\Factory::WONDE:
                 return new Connector\Wonde\Base\Endpoint\Status($this->host, $this->key);

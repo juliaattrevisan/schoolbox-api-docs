@@ -72,15 +72,15 @@ class Api implements IApi
      *
      * @param string $host
      * @param string $apiKey
-     * @throws InvalidArgumentException
+     * @param string $customUserAgent
      */
-    public function __construct(string $host, #[SensitiveParameter] string $apiKey)
+    public function __construct(string $host, #[SensitiveParameter] string $apiKey, string $customUserAgent)
     {
         /* Enforce slash in the endpoint prefix
          */
         $this->host = rtrim($host, '/') . '/';
 
-        $this->client = $this->initClient($this->host, $apiKey, self::DEFAULT_TIMEOUT);
+        $this->client = $this->initClient($this->host, $apiKey, $customUserAgent, self::DEFAULT_TIMEOUT);
 
         /* Record some stats about api usage
          * Turn this into an Observer pattern if you want to record more details
@@ -94,17 +94,23 @@ class Api implements IApi
      *
      * @param string $host
      * @param string $dsn
+     * @param string $customUserAgent
      * @param int $timeout
      * @return Client
-     * @throws InvalidArgumentException
      */
-    private function initClient(string $host, #[SensitiveParameter] string $dsn, int $timeout): Client
+    private function initClient(string $host, #[SensitiveParameter] string $dsn, string $customUserAgent, int $timeout): Client
     {
         $credentials = (new Codec\DSN())->decode($dsn);
 
         $headers = [
             'CompassApiKey' => $credentials['key'],
             'Content-Type'  => 'application/json',
+            /* As per https://docs.guzzlephp.org/en/latest/request-options.html#headers
+             *
+             * Compass have finally protected their photo urls using cloudflare so they have to whitelist
+             * this user agent so we can bypass their restrictions.
+             */
+            'User-Agent' => $customUserAgent,
         ];
 
         return new Client([

@@ -153,23 +153,24 @@ class Factory
     /**
      * Factory constructor.
      *
-     * @param ValidStrats                                $validStrats
-     * @param LoggerInterface                            $log
-     * @param bool                                       $perform
-     * @param string                                     $host
-     * @param string                                     $key
-     * @param bool                                       $includePhoto
-     * @param Mapper                                     $baseProfileMapper
-     * @param UserProfile\Student\Mapper                 $studentProfileMapper
-     * @param UserProfile\Parent\Mapper                  $parentProfileMapper
-     * @param UserProfile\Staff\Mapper                   $staffProfileMapper
-     * @param UserProfile\Relationship\Mapper            $relationshipMapper
-     * @param StorageMapper                              $storageMapper
-     * @param \Schoolbox\External\Event\Mapper           $eventMapper
-     * @param ClassEntryMapper                           $classEntryMapper
-     * @param ClassInvolvementMapper                     $classInvolvementMapper
-     * @param ClassPeriodMapper                          $classPeriodMapper
-     * @param TimetablePeriodMapper                      $periodMapper
+     * @param ValidStrats $validStrats
+     * @param LoggerInterface $log
+     * @param bool $perform
+     * @param string $host
+     * @param string $key
+     * @param bool $includePhoto
+     * @param string $customUserAgent
+     * @param Mapper $baseProfileMapper
+     * @param UserProfile\Student\Mapper $studentProfileMapper
+     * @param UserProfile\Parent\Mapper $parentProfileMapper
+     * @param UserProfile\Staff\Mapper $staffProfileMapper
+     * @param UserProfile\Relationship\Mapper $relationshipMapper
+     * @param StorageMapper $storageMapper
+     * @param \Schoolbox\External\Event\Mapper $eventMapper
+     * @param ClassEntryMapper $classEntryMapper
+     * @param ClassInvolvementMapper $classInvolvementMapper
+     * @param ClassPeriodMapper $classPeriodMapper
+     * @param TimetablePeriodMapper $periodMapper
      * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
      */
     public function __construct(
@@ -179,6 +180,7 @@ class Factory
         string $host,
         #[SensitiveParameter] string $key,
         bool $includePhoto,
+        private string $customUserAgent,
         /* Profile pieces */
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
@@ -229,7 +231,7 @@ class Factory
      */
     public function produce(): GenericCollection
     {
-        $api = new Api($this->host, $this->key);
+        $api = new Api($this->host, $this->key, $this->customUserAgent);
 
         /* Data is obtained daily; remember lower and upper bound values
          * for api calls. It needs to be in a specific format so might
