@@ -28,12 +28,8 @@
                     throw new Error('Error restarting processing of item');
                 }
 
-                toast.timeout({
-                    text: 'Started reprocessing item',
-                    isSuccess: true
-                });
-
-                // reload the page since the item will be in a different section now
+                /* reload the page since the item will be in a different section now
+                 * note, the toast is left loading since the page will reload */
                 window.location.reload();
             } catch (error) {
                 console.error(error);
