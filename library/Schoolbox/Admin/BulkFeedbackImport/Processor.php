@@ -183,12 +183,15 @@ class Processor
             $datetime = trim((string)$row['Publish Date']);
 
             if ('' === $datetime) {
-                $datetime = $now->getDatabase();
+                $adf = $now;
             } else {
                 /* Check the format of the date: try both database and local short
                  */
                 try {
-                    $datetime = sprintf('%s %s', (new \Alaress_Date_Format($datetime, $this->dateLocal))->getDatabaseDate(), self::PUBLISH_TIME);
+                    $combined = sprintf('%s %s', $datetime, self::PUBLISH_TIME);
+                    $format = $this->dateLocal . ' H:i:s';
+
+                    $adf = new \Alaress_Date_Format($combined, $format);
                 } catch (\Carbon\Exceptions\InvalidFormatException $e) {
                     $this->log(sprintf("Row %s: Invalid date format. Make sure it's correct and try again.", $i), self::WARNING);
 
@@ -383,7 +386,6 @@ class Processor
                      *  Solution had a time constraint.
                      */
                     $box = $this->submissionBoxMapper->findById($boxId);
-                    $adf = new \Alaress_Date_Format($datetime, \Alaress_Date_Format::DATABASE_FORMAT);
 
                     $returnedWork = $this->returnedWorkMapper->createModel()
                         ->setSubmissionBox($box)
