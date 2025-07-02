@@ -329,7 +329,7 @@ class Sessions implements IStrategy
                      */
                     $venue = $this->findVenue($session['locationData'] ?? []);
 
-                    $matchupName = trim($session['title']);
+                    $matchupName = trim($session['title'] ?? ''); // Some sessions don't have a title.
 
                     /* Clipboard sends the timestamps as UTC but with no identification that they are UTC timestamps.
                      * so lets force the creation of the date object to be a UTC timezone,
