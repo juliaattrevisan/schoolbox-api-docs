@@ -14,6 +14,8 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\L10n\Mapper as L10nMapper;
 use Schoolbox\L10n\RosettaStoneFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
@@ -66,6 +68,8 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(\Schoolbox\UserMapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Resource\Folder\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Resource\Storage\Mapper::class),
+            $this->getMapperFactory()->get(SubmissionBoxMapper::class),
+            $this->getMapperFactory()->get(ReturnedWorkMapper::class),
             $this->injector->get('l10n'),
         );
     }

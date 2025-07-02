@@ -14,6 +14,8 @@ use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use League\Flysystem\FilesystemException;
 use Schoolbox\Admin\Navigation\Subnav;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Mapper\Exception\Deleted;
@@ -43,6 +45,8 @@ class Controller extends Base
         private \Schoolbox\UserMapper $userMapper,
         private \Schoolbox\Resource\Folder\Mapper $folderMapper,
         private \Schoolbox\Resource\Storage\Mapper $storageMapper,
+        private SubmissionBoxMapper $submissionBoxMapper,
+        private ReturnedWorkMapper $returnedWorkMapper,
         protected RosettaStone $rosettaStone,
     ) {
     }
@@ -113,6 +117,8 @@ class Controller extends Base
             $this->filesystemProxy,
             $this->userMapper,
             $this->folderMapper,
+            $this->submissionBoxMapper,
+            $this->returnedWorkMapper,
             $this->rosettaStone,
             trim((string)$this->getConfigLoader()->get('date_local')),
             $settings['assessmentTitle'],
@@ -162,6 +168,8 @@ class Controller extends Base
             $this->filesystemProxy,
             $this->userMapper,
             $this->folderMapper,
+            $this->submissionBoxMapper,
+            $this->returnedWorkMapper,
             $this->rosettaStone,
             trim((string)$this->getConfigLoader()->get('date_local')),
             $settings['assessmentTitle'],

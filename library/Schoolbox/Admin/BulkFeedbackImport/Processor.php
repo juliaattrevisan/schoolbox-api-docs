@@ -11,6 +11,8 @@ namespace Schoolbox\Admin\BulkFeedbackImport;
 
 use League\Flysystem\FilesystemException;
 use Schoolbox\Admin\Import\Profile\Reader;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
@@ -59,26 +61,9 @@ class Processor
 
 
     /**
-     * Feedback creation query
-     */
-    private const QUERY_FEEDBACK = "
-        INSERT INTO submission_return
-        (box_id, marker, owner, review_route, comment, mark, instructor_mark, norm_mark, resubmission_required, created_at, published_at, published_by, updated_at)
-        VALUES
-        (:boxId, :marker, :owner, :reviewRoute, :comment, :mark, :instructorMark, :normMark, :resubmissionRequired, :createdAt, :publishedAt, :publishedBy, :updatedAt)
-    ";
-
-
-    /**
      * @var \PDOStatement
      */
     private \PDOStatement $assessmentQuery;
-
-
-    /**
-     * @var \PDOStatement
-     */
-    private \PDOStatement $feedbackQuery;
 
 
     /**
@@ -108,10 +93,18 @@ class Processor
     /**
      * Constructor
      *
+     * The submissionBoxMapper is used to craft a returned work model so that its corresponding mapper
+     * can create Participant and Participant Plan records for feedbacks
+     *
+     * The returnedWorkMapper is used to create Participant and Participant Plan records for a feedback
+     * via its postsave hooks
+     *
      * @param MapperProxy $assessmentMapperProxy
      * @param FilesystemProxy $filesystemProxy
      * @param UserMapper $userMapper
      * @param Mapper $folderMapper
+     * @param SubmissionBoxMapper $submissionBoxMapper
+     * @param ReturnedWorkMapper $returnedWorkMapper
      * @param RosettaStone $rosettaStone
      * @param string $dateLocal
      * @param string $assessmentTitle
@@ -123,6 +116,8 @@ class Processor
         private FilesystemProxy $filesystemProxy,
         private \Schoolbox\UserMapper $userMapper,
         private \Schoolbox\Resource\Folder\Mapper $folderMapper,
+        private SubmissionBoxMapper $submissionBoxMapper,
+        private ReturnedWorkMapper $returnedWorkMapper,
         private RosettaStone $rosettaStone,
         private string $dateLocal,
         private string $assessmentTitle,
@@ -132,7 +127,6 @@ class Processor
         /* We're going to reuse this a lot
          */
         $this->assessmentQuery = $this->userMapper->getDatabase()->prepare(self::QUERY_ASSESSMENT_TITLE_WORKTYPE);
-        $this->feedbackQuery = $this->userMapper->getDatabase()->prepare(self::QUERY_FEEDBACK);
     }
 
 
@@ -189,12 +183,15 @@ class Processor
             $datetime = trim((string)$row['Publish Date']);
 
             if ('' === $datetime) {
-                $datetime = $now->getDatabase();
+                $adf = $now;
             } else {
                 /* Check the format of the date: try both database and local short
                  */
                 try {
-                    $datetime = sprintf('%s %s', (new \Alaress_Date_Format($datetime, $this->dateLocal))->getDatabaseDate(), self::PUBLISH_TIME);
+                    $combined = sprintf('%s %s', $datetime, self::PUBLISH_TIME);
+                    $format = $this->dateLocal . ' H:i:s';
+
+                    $adf = new \Alaress_Date_Format($combined, $format);
                 } catch (\Carbon\Exceptions\InvalidFormatException $e) {
                     $this->log(sprintf("Row %s: Invalid date format. Make sure it's correct and try again.", $i), self::WARNING);
 
@@ -382,22 +379,30 @@ class Processor
 
                 /* Slam in a new submission_return
                  */
+                $learner = $this->userMapper->findById($learner['id']);
+
                 if ($this->perform) {
-                    $this->feedbackQuery->execute([
-                        'boxId' => $boxId,
-                        'marker' => $creator->getId(),
-                        'owner' => $learner['id'],
-                        'reviewRoute' => 'instructor',
-                        'comment' => $comment,
-                        'mark' => $humanReadableMark,
-                        'instructorMark' => $instructorHumanReadableMark,
-                        'normMark' => $normalisedMark,
-                        'resubmissionRequired' => 0,
-                        'createdAt' => $datetime,
-                        'publishedAt' => $datetime,
-                        'publishedBy' => $creator->getId(),
-                        'updatedAt' => $datetime
-                    ]);
+                    /* TODO inefficient/non-conventional, I know
+                     *  Solution had a time constraint.
+                     */
+                    $box = $this->submissionBoxMapper->findById($boxId);
+
+                    $returnedWork = $this->returnedWorkMapper->createModel()
+                        ->setSubmissionBox($box)
+                        ->setMarker($creator)
+                        ->setOwner($learner)
+                        ->setReviewRoute('instructor')
+                        ->setComment($comment)
+                        ->setHumanReadableMark($humanReadableMark)
+                        ->setHumanReadableInstructorMark($instructorHumanReadableMark)
+                        ->setNormalizedMark($normalisedMark)
+                        ->setResubmissionRequired(false)
+                        ->setPublishedBy($creator->getId())
+                        ->setCreatedAt($adf)
+                        ->setPublishedAt($adf)
+                        ->setUpdatedAt($adf);
+
+                    $this->returnedWorkMapper->save($returnedWork);
                 }
 
                 /* Some convenient shortcuts
@@ -415,7 +420,7 @@ class Processor
                     $humanReadableMark,
                     $instructorHumanReadableMark,
                     $normalisedMark,
-                    $learner['fullname'],
+                    $learner->getFullName(),
                     $externalId,
                     $this->rosettaStone->translate('activity', false),
                     $assessment->getTitle(),
