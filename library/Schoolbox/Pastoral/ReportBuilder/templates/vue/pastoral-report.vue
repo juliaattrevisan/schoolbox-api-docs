@@ -22,14 +22,27 @@ const props = defineProps<{
 const selectedTab = window.Vue.ref(props.tabs[0]?.type ?? "");
 
 const routeLookup = (route: string, params?: Record<string, any>) => {
-    // Implementation for route generation
-    return "#"; // Placeholder
+    const routes: Record<string, string> = {
+        "pastoral.getStudentRecord": "/pastoral/student/{studentId}/record/{recordId}",
+        "pastoralReportBuilder.getReportTags": "/pastoral/report/tags/{tagId}",
+        "pastoralReportBuilder.getIndex": "/pastoral/report",
+    };
+
+    let url = routes[route] || "#";
+
+    if (params) {
+        Object.keys(params).forEach((key) => {
+            url = url.replace(`{${key}}`, params[key]);
+        });
+    }
+
+    return url;
 };
 
 const profile = {
-    link: (user: any) => `#`, // Placeholder
-    imageSquare64: (user: any) => `<img src="#" alt="${user.fullName}" />`, // Placeholder
-    imageSquare32: (user: any) => `<img src="#" alt="${user.fullName}" />`, // Placeholder
+    link: (user: any) => `/search/user/${user.id}`,
+    imageSquare64: (user: any) => `<img src="/portrait.php?id=${user.id}&size=square64" alt="${user.fullName}" />`,
+    imageSquare32: (user: any) => `<img src="/portrait.php?id=${user.id}&size=square32" alt="${user.fullName}" />`,
 };
 </script>
 
