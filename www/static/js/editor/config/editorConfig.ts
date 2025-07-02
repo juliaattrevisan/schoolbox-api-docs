@@ -27,7 +27,7 @@ import {
     Bookmark,
     type EditorConfig,
 } from "ckeditor5";
-import { AIAssistant, OpenAITextAdapter, SourceEditingEnhanced } from "ckeditor5-premium-features";
+import { AIAssistant, OpenAITextAdapter, SourceEditingEnhanced, Template } from "ckeditor5-premium-features";
 import UploadAdapterPlugin from "@js/editor/plugin/uploadAdapter/UploadAdapterPlugin";
 import { getToolbar } from "@js/editor/toolbar/editorToolbar";
 import { getLinkSettings } from "@js/editor/settings/linkSettings";
@@ -43,6 +43,7 @@ import { getHTMLSupportSettings } from "@js/editor/settings/htmlSupportSettings"
 import { getAISettings } from "@js/editor/settings/aiSettings";
 import { getFullscreenSettings } from "@js/editor/settings/fullScreenSettings";
 import { getSpecialCharactersSettings } from "@js/editor/settings/specialCharactersSettings";
+import { getTemplateSettings } from "@js/editor/settings/templateSettings";
 import { EditorToolbar, type SbxEditorConfig } from "@js/editor/types/editorTypes";
 import Eqneditor5 from "@js/editor/plugin/eqnEditor/eqneditor5";
 import Resource from "@js/editor/plugin/resource/Resource";
@@ -86,6 +87,7 @@ export function getConfig(config: SbxEditorConfig): EditorConfig & { sbConfig: S
             OpenAITextAdapter,
             Fullscreen,
             Bookmark,
+            Template,
         ],
         extraPlugins: config.toolbar !== EditorToolbar.SIMPLE ? [UploadAdapterPlugin] : [],
         licenseKey: window.sbProps.ckeditor5LicenseKey,
@@ -106,6 +108,7 @@ export function getConfig(config: SbxEditorConfig): EditorConfig & { sbConfig: S
         emoji: {
             definitionsUrl: "cdn", // use the default CDN for emoji definitions
         },
+        ...getTemplateSettings(config),
         sbConfig: { ...config }, // to be able to access our editor config from within the editor,
     };
 }

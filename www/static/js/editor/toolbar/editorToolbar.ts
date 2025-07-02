@@ -68,6 +68,8 @@ export function getToolbar(config: SbxEditorConfig): ToolbarConfig {
         items = [
             "fullscreen",
             "|",
+            // if there are templates defined in the config, add the insertTemplate button
+            ...(config.templates && config.templates.length > 0 ? ["insertTemplate", "|"] : []),
             "bold",
             "italic",
             {
