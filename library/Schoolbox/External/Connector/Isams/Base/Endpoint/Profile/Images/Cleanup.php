@@ -80,21 +80,25 @@ class Cleanup implements IStrategy
         ];
 
         foreach ($extractionPaths as $type => $path) {
-            $dirhandle = opendir($path);
+            /* If the path doesn't exist, skip it
+             */
+            if (is_dir($path)) {
+                $dirhandle = opendir($path);
 
-            while ($file = readdir($dirhandle)) {
-                /* There might not actually be any profile pictures here
-                 */
-                if ($file !== '.' && $file !== '..' && $file !== '') {
-                    $source = "{$path}/{$file}";
+                while ($file = readdir($dirhandle)) {
+                    /* There might not actually be any profile pictures here
+                     */
+                    if ($file !== '.' && $file !== '..' && $file !== '') {
+                        $source = "{$path}/{$file}";
 
-                    if (!is_dir($source)) {
-                        $this->log->debug(sprintf(
-                            'Unlinking zip remnants: %s',
-                            $source
-                        ));
+                        if (!is_dir($source)) {
+                            $this->log->debug(sprintf(
+                                'Unlinking zip remnants: %s',
+                                $source
+                            ));
 
-                        unlink($source);
+                            unlink($source);
+                        }
                     }
                 }
             }
