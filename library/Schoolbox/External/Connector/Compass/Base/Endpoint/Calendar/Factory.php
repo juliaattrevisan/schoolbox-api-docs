@@ -69,11 +69,12 @@ class Factory
     /**
      * Factory constructor.
      *
-     * @param LoggerInterface                       $log
-     * @param bool                                  $perform
-     * @param string                                $host
-     * @param string                                $key
-     * @param Mapper                                $eventMapper
+     * @param LoggerInterface $log
+     * @param bool $perform
+     * @param string $host
+     * @param string $key
+     * @param string $customUserAgent
+     * @param Mapper $eventMapper
      * @param \Schoolbox\External\Event\User\Mapper $eventUserMapper
      */
     public function __construct(
@@ -81,6 +82,7 @@ class Factory
         bool $perform,
         string $host,
         #[SensitiveParameter] string $key,
+        private string $customUserAgent,
         \Schoolbox\External\Event\Mapper $eventMapper,
         \Schoolbox\External\Event\User\Mapper $eventUserMapper
     ) {
@@ -101,7 +103,7 @@ class Factory
      */
     public function produce(): ?GenericCollection
     {
-        $api = new Api($this->host, $this->key);
+        $api = new Api($this->host, $this->key, $this->customUserAgent);
 
         /* Data is obtained daily; remember lower and upper bound values
          * for api calls. It needs to be in a specific format so might

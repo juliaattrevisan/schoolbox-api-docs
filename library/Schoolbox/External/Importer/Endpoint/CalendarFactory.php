@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Importer\Endpoint;
 
 use Psr\Log\LoggerInterface;
+use Schoolbox\Config\Loader;
 use Schoolbox\External\Connector\Base\ShadowTable;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint as TassApiEndpoint;
 use Schoolbox\External\Connector\Compass\Base\Endpoint as CompassEndpoint;
@@ -91,6 +92,7 @@ class CalendarFactory implements IFactory
                     $this->perform,
                     $this->host,
                     $this->key,
+                    Loader::getInstance()->get('guzzle_custom_user_agent'),
                     \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
                     \Schoolbox\External\Event\User\Mapper::getInstance()->disableCache()
                 ))->produce();
