@@ -88,7 +88,6 @@ class Controller extends WebController\Base
         #[\SensitiveParameter] private string $learnosityConsumerKey,
         #[\SensitiveParameter] private string $learnosityConsumerSecret,
         private QuizMapper $quizMapper,
-
     ) {
     }
 
