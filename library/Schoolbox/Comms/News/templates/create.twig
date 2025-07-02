@@ -7,6 +7,7 @@
     availableEntityTypes  string[]         The set of entity types that can be audienced by the current user
     entityTypesData       array
     mayChangeStickyStatus bool
+    editorTemplates       array            Retrieve any pre-existing editor templates to insert into the 'Body' rich text editor
 #}
 
 {% import '@commsNews/macro/indicator.twig' as indicator %}
@@ -107,6 +108,8 @@
     // HTML template for rendering audience audienceSelectize dropdown options.
     var $audienceSelectizeItemTemplate = $('#audience-selectize-dropdown-option').detach();
     var audienceIsReadOnly = {{ audienceIsReadOnly ? 1 : 0 }};
+
+    const editorTemplates = {{ editorTemplates|json_encode|raw }};
 
     $(function () {
         {# CKEditors #}

@@ -53,6 +53,7 @@ use UnderflowException;
 use UnexpectedValueException;
 use Schoolbox\User;
 use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 use Schoolbox\Admin\Editor\Templates\Category\Model as EditorTemplatesCategoryModel;
 
 use function array_keys;
@@ -87,6 +88,7 @@ class Controller extends Base
      * @param File\Mapper                      $fileMapper
      * @param ValidChangeStickyStatus          $validChangeStickyStatus Spec pattern for if sticky status may be changed
      * @param RosettaStone                     $l10n
+     * @param EditorTemplateHelper             $editorTemplateHelper
      */
     public function __construct(
         private Mapper $newsMapper,
@@ -105,6 +107,7 @@ class Controller extends Base
         private File\Mapper $fileMapper,
         private ValidChangeStickyStatus $validChangeStickyStatus,
         private RosettaStone $l10n,
+        private EditorTemplateHelper $editorTemplateHelper,
     ) {
     }
 
@@ -194,6 +197,11 @@ class Controller extends Base
             }
         }
 
+        // retrieve any pre-existing editor templates to insert into the 'Body' rich text editor
+        $editorTemplates = $this->editorTemplateHelper->getTemplatesForCategory(
+            EditorTemplatesCategoryModel::NEWS
+        );
+
         $this->response = $this->responseFromTemplate('@commsNews/create.twig', [
             'action'                => 'Create',
             'article'               => $article,
@@ -205,6 +213,7 @@ class Controller extends Base
             'returnUrl'             => $this->getExplicitReturnUrl(),
             'entityTypesData'       => $this->getEntityTypesData(),
             'mayChangeStickyStatus' => $this->validChangeStickyStatus->isSatisfiedBy($this->getUser()),
+            'editorTemplates'       => $editorTemplates,
         ], "Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}", 'news');
     }
 
