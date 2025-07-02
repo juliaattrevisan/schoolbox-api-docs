@@ -149,7 +149,7 @@ abstract class Base implements IBroker
             ini_set('default_socket_timeout', $defaultSocketTimeout);
 
             // Something went wrong during connection
-            throw new DatabaseException("Error connecting to database.\nDSN String: {$this->getDsn()}\nPDO Error: {$e->getMessage()}");
+            throw new DatabaseException("Error connecting to database; check your connection details.\nPDO Error: {$e->getMessage()}");
         }
         Tracer::getDefaultTrace()->finishSpan();
 
