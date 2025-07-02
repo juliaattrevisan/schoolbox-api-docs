@@ -295,13 +295,14 @@ class Controller extends ConfigController
         $key = $this->getConfigLoader()->get('schooldata_import_endpoint_key');
         $type = (string)$this->getConfigLoader()->get('schooldata_import_data_source');
         $includePhoto = $this->getConfigLoader()->get('photo_sis_import');
+        $customUserAgent = trim((string)$this->getConfigLoader()->get('guzzle_custom_user_agent'));
 
         $report = null;
         $message = self::DEFAULT_UNKNOWN_DATA_SOURCE;
 
         if ('' !== $type) {
             try {
-                $status = (new Endpoint\Status\Factory($host, $key, $includePhoto))->produce($type);
+                $status = (new Endpoint\Status\Factory($host, $key, $includePhoto, $customUserAgent))->produce($type);
 
                 if ($status) {
                     $report = $status->getReport();
