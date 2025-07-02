@@ -53,6 +53,7 @@ use UnderflowException;
 use UnexpectedValueException;
 use Schoolbox\User;
 use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
+use Schoolbox\Admin\Editor\Templates\Category\Model as EditorTemplatesCategoryModel;
 
 use function array_keys;
 use function array_merge;

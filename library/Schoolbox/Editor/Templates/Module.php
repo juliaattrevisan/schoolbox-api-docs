@@ -45,9 +45,11 @@ class Module extends BaseModule
     public function buildController(): Base
     {
         return new Controller(
-            $this->getMapperFactory()->get(ErrorMapper::class),
-            $this->getMapperFactory()->get(Mapper::class),
-            $this->getMapperFactory()->get(UserMapper::class),
+            new Helper(
+                $this->getMapperFactory()->get(ErrorMapper::class),
+                $this->getMapperFactory()->get(Mapper::class),
+                $this->getMapperFactory()->get(UserMapper::class)
+            )
         );
     }
 }
