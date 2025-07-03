@@ -2,6 +2,7 @@
 import type { Ref } from "vue";
 import { useTemplateRefsList, useElementBounding } from "@vueuse/core";
 import locale from "@js/terminology/rosettaStone";
+import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
 import CommentField from "@schoolboxLibrary/Learning/Assessment/templates/dueWork/vue/comment-field.vue";
 import ResubmissionRequired from "@schoolboxLibrary/Learning/Assessment/templates/dueWork/vue/resubmission-required.vue";
 import MarkScheme from "@schoolboxLibrary/Learning/MarkScheme/templates/ts/mark-scheme.vue";
@@ -269,39 +270,48 @@ window.Vue.onUnmounted(() => {
                         style="margin-top: 0.5rem"
                     />
                 </div>
-                <div class="small-12 column no-pad">
-                    <div class="component-action" data-action-bar="60" data-mass-publish>
-                        <section>
-                            <div>
-                                <!-- TODO: "Has Rubric"/files/etc message (see status.twig)? - will need extra payload data -->
-                                <!-- TODO: "Mark as Submitted" button? - will need extra payload data -->
-                                <button
-                                    v-if="cellInfo.feedback.hasDraftMark || cellInfo.feedback.showDraftDialogue"
-                                    class="button disabled"
-                                    :class="{ 'saving-error': cellInfo.feedback.hasAutoSaveError }"
-                                    title="You can discard this draft from the Grading Overview screen"
-                                    data-test="assessment-response-info-saved-as-draft"
-                                    disabled
-                                >
-                                    <template v-if="cellInfo.feedback.isAutoSaveInProgress">Saving...</template>
-                                    <template v-else-if="cellInfo.feedback.hasAutoSaveError"
-                                        >Saving failed</template
+                <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
+                    <div
+                        v-if="
+                            cellInfo.feedback.hasDraftMark ||
+                            cellInfo.feedback.showDraftDialogue ||
+                            cellInfo.feedback.isPublishedDirty
+                        "
+                        class="small-12 column no-pad"
+                    >
+                        <div class="component-action" data-action-bar="60" data-mass-publish>
+                            <section>
+                                <div>
+                                    <!-- TODO: "Has Rubric"/files/etc message (see status.twig)? - will need extra payload data -->
+                                    <!-- TODO: "Mark as Submitted" button? - will need extra payload data -->
+                                    <button
+                                        v-if="cellInfo.feedback.hasDraftMark || cellInfo.feedback.showDraftDialogue"
+                                        class="button disabled"
+                                        :class="{ 'saving-error': cellInfo.feedback.hasAutoSaveError }"
+                                        title="You can discard this draft from the Grading Overview screen"
+                                        data-test="assessment-response-info-saved-as-draft"
+                                        disabled
                                     >
-                                    <template v-else>Saved as Draft</template>
-                                </button>
-                                <button
-                                    v-if="cellInfo.feedback.isPublishedDirty"
-                                    class="button"
-                                    type="submit"
-                                    @click.prevent="cellInfo.feedback.publishFeedback"
-                                >
-                                    <template v-if="cellInfo.feedback.isPublishInProgress">Publishing...</template>
-                                    <template v-else>Publish</template>
-                                </button>
-                            </div>
-                        </section>
+                                        <template v-if="cellInfo.feedback.isAutoSaveInProgress">Saving...</template>
+                                        <template v-else-if="cellInfo.feedback.hasAutoSaveError"
+                                            >Saving failed</template
+                                        >
+                                        <template v-else>Saved as Draft</template>
+                                    </button>
+                                    <button
+                                        v-if="cellInfo.feedback.isPublishedDirty"
+                                        class="button"
+                                        type="submit"
+                                        @click.prevent="cellInfo.feedback.publishFeedback"
+                                    >
+                                        <template v-if="cellInfo.feedback.isPublishInProgress">Publishing...</template>
+                                        <template v-else>Publish</template>
+                                    </button>
+                                </div>
+                            </section>
+                        </div>
                     </div>
-                </div>
+                </Transition>
             </form>
             <div :style="{ height: `${feedbackCellOffsets.height}px` }"></div>
         </td>
