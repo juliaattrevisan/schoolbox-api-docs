@@ -103,6 +103,9 @@ export function getConfig(config: SbxEditorConfig): EditorConfig & { sbConfig: S
         ...getAISettings(window.sbProps.openAIModel),
         ...getFullscreenSettings(),
         ...getSpecialCharactersSettings(),
+        emoji: {
+            definitionsUrl: "cdn", // use the default CDN for emoji definitions
+        },
         sbConfig: { ...config }, // to be able to access our editor config from within the editor,
     };
 }
