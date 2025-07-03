@@ -5,9 +5,10 @@ import locale from "@js/terminology/rosettaStone";
 import CommentField from "@schoolboxLibrary/Learning/Assessment/templates/dueWork/vue/comment-field.vue";
 import ResubmissionRequired from "@schoolboxLibrary/Learning/Assessment/templates/dueWork/vue/resubmission-required.vue";
 import MarkScheme from "@schoolboxLibrary/Learning/MarkScheme/templates/ts/mark-scheme.vue";
-import { ACTIVITY_TYPE_DUE_WORK } from "@schoolboxAssessment/Types/assessmentTypes";
+import { ACTIVITY_TYPE_DUE_WORK, ACTIVITY_TYPE_QUIZ } from "@schoolboxAssessment/Types/assessmentTypes";
 import { useMarkbookStore } from "./store/markbookStore";
 import type { MarkbookClassImplStudent } from "./types/payload";
+import { useDynamicFeedback } from "./store/useDynamicFeedback";
 
 interface Props {
     classImplId: number;
@@ -51,11 +52,31 @@ const cellInfo = window.Vue.computed(() => {
         return null;
     }
 
+    const feedback = useDynamicFeedback(
+        { mark: markRef, comment: commentRef, resubmissionRequired: resubmissionRequiredRef },
+        {
+            mark: window.Vue.toRef(participant.marks.draft.hrInstructor),
+            comment: window.Vue.toRef(participant.marks.draft.comment),
+            resubmissionRequired: window.Vue.toRef(participant.resubmissionRequired),
+        },
+        {
+            mark: window.Vue.toRef(participant.marks.published.hrInstructor),
+            comment: window.Vue.toRef(participant.marks.published.comment),
+            resubmissionRequired: window.Vue.toRef(participant.resubmissionRequired),
+        },
+        {
+            route: " TODO ",
+            // extraFormData: .... TODO
+        },
+        activity.assessmentType === ACTIVITY_TYPE_QUIZ,
+    );
+
     return {
         activity,
         classImpl,
         aImpl,
         participant,
+        feedback,
     };
 });
 
@@ -156,35 +177,6 @@ window.Vue.onUnmounted(() => {
         resizeObserver.value.disconnect();
     }
 });
-
-// todo: make this actually work with draft/published feedback chaos
-window.Vue.watch(
-    () => [props.classImplId, props.activityId, props.student.id],
-    async () => {
-        await window.Vue.nextTick();
-        if (cellInfo.value === null || cellInfo.value.participant === undefined) {
-            commentRef.value = "";
-            markRef.value = null;
-            return;
-        }
-
-        const { marks } = cellInfo.value.participant;
-        if (marks === undefined || marks === null) {
-            commentRef.value = "";
-            markRef.value = null;
-        } else if (mbStore.hasMeaningfulMarks(marks.draft)) {
-            commentRef.value = marks.draft.comment ?? "";
-            markRef.value = marks.draft.hrInstructor ?? null;
-        } else if (mbStore.hasMeaningfulMarks(marks.published)) {
-            commentRef.value = marks.published.comment ?? "";
-            markRef.value = marks.published.hrInstructor ?? null;
-        } else {
-            commentRef.value = "";
-            markRef.value = null;
-        }
-    },
-    { immediate: true },
-);
 </script>
 
 <template>
