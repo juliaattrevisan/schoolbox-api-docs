@@ -54,6 +54,7 @@ use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Learning\Course\DataModel\Specification\Model;
 use Schoolbox\Mapper\Exception;
 
+use Schoolbox\Mapper\Exception\Deleted;
 use function array_combine;
 
 class Controller extends WebController\Base
@@ -363,9 +364,13 @@ class Controller extends WebController\Base
     }
 
     /**
+     * publish feedback for all assessments imported from a course level assessment (whilst matching filters in the post)
+     *
      * @param Model $courseSpec
-     * @param $assessmentId
+     * @param IAssessable $assessmentSpec
      * @return void
+     * @throws Exception
+     * @throws Deleted
      * @api POST /learning/courseMarkbook/{courseSpecId:\d+}/assessment/{assessmentId:\d+}/publish
      */
     public function postPublishFeedback(CourseSpec\Model $courseSpec, IAssessable $assessmentSpec): void
@@ -461,7 +466,6 @@ class Controller extends WebController\Base
             }
 
             $results[$draftFeedbackId] = ['publishSuccess' => $publishSuccess];
-
         }
 
         $this->response = $this->responseAsJson($results);
@@ -598,6 +602,7 @@ class Controller extends WebController\Base
 
 
     /**
+     * @see \Schoolbox\Assessment\Course\Markbook\Controller::convertRequestToFilters
      * @param CourseSpec\Model $courseSpec
      * @param array            $request  Indexed by filter.id, option.key
      * @param bool             $saveToDB Should we persist these selections to the DB ?
