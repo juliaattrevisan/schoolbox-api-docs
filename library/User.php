@@ -24,7 +24,7 @@ class User extends DeprecatedModel
     {
         $query = "
             SELECT
-                user.id as uid, title, firstname, preferred_name, lastname, username, `groups`.name AS gname, group_id, lu_year_level.name AS year, `key`, hash, eportfolio_enabled,
+                user.id as uid, title, firstname, preferred_name, lastname, username, `groups`.name AS gname, group_id, lu_year_level.name AS year, `key`, eportfolio_enabled,
                 position_title, hide_timetable, hide_contacts, synergy_id, local_email, alt_email, userCampus.campus, luCampus.name as campusName,
                 IF(superusers.id, 1, 0) as su, house, residential_house_id as residential_house, mail_handler, enabled
             FROM user
@@ -37,20 +37,6 @@ class User extends DeprecatedModel
             AND user.deleted_at IS NULL
         ";
         return $this->db->query($query, [$id])->fetch();
-    }
-
-    public function getByUsername($username)
-    {
-        $query = "SELECT user.id as uid, title, firstname, preferred_name, lastname, username, `groups`.name AS gname, group_id, lyl.name AS year, eportfolio_enabled,`key`, hash,
-                        position_title, hide_timetable, hide_contacts, synergy_id, local_email, alt_email, userCampus.campus, IF(superusers.id, 1, 0) as su, house, mail_handler, calendar_view, enabled
-                FROM user
-                    LEFT JOIN `groups` ON user.group_id = `groups`.id
-                    LEFT JOIN userCampus ON user.id = userCampus.uid
-                    LEFT JOIN superusers ON user.id = superusers.id
-                    LEFT JOIN lu_year_level lyl ON user.year_id = lyl.id
-                WHERE user.username = ?
-                AND user.deleted_at IS NULL";
-        return $this->db->query($query, [$username])->fetch();
     }
 
     public function getSuperusers()
