@@ -1,3 +1,4 @@
+import { debounce } from "lodash";
 import type { Ref } from "vue";
 
 interface DynamicFeedbackData {
@@ -149,28 +150,6 @@ export function useDynamicFeedback(
             return;
         }
 
-        // Is an auto-save in progress?
-        if (isAutoSaveInProgress.value) {
-            // Don't overlap requests, but indicate we have unsaved changes that must be auto-saved
-            isAutoSavePending.value = true;
-            return;
-        }
-
-        // No auto-saves currently queued for participant - so initiate a draft auto-save
-        await autoSaveDraft();
-    }
-
-    const commentBoxTimeout = window.Vue.ref<number | null>(null);
-
-    /**
-     * Save draft immediately (for grade field), or after a timeout (for comment box)
-     * to prevent excessive draft save requests while typing.
-     * New timeouts are continually added while typing, and cleared to allow saving once the user pauses typing
-     * @param types - The keys that were changed
-     */
-    async function timeoutUpdate(types: (keyof typeof data)[]): Promise<void> {
-        console.log("timeoutUpdate", types, data);
-
         /**
          * If this is a quiz, we don't want to save drafts, but instead provide the option
          * to publish the feedback on change immediately.
@@ -182,22 +161,15 @@ export function useDynamicFeedback(
             return;
         }
 
-        // If it's a comment box, delay the save to prevent excessive requests
-        if (types.includes("comment") && types.length === 1) {
-            // Clear any previous timeout set
-            if (commentBoxTimeout.value !== null) {
-                clearTimeout(commentBoxTimeout.value);
-            }
-
-            // Store the ID of this timeout so we can clear it safely later
-            commentBoxTimeout.value = window.setTimeout(() => {
-                commentBoxTimeout.value = null; // Clear the timeout ID
-                void onFeedbackChanged();
-            }, TIMEOUT_DURATION_MS); // 1 second timeout
-        } else {
-            // No point in using a timeout unless it's a comment box - save immediately
-            await onFeedbackChanged();
+        // Is an auto-save in progress?
+        if (isAutoSaveInProgress.value) {
+            // Don't overlap requests, but indicate we have unsaved changes that must be auto-saved
+            isAutoSavePending.value = true;
+            return;
         }
+
+        // No auto-saves currently queued for participant - so initiate a draft auto-save
+        await autoSaveDraft();
     }
 
     /**
@@ -219,23 +191,12 @@ export function useDynamicFeedback(
 
     /**
      * When the user changes any of the fields, make a draft accordingly
+     * For the comment, save after a timeout to avoid rapidly saving on every keystroke
+     * For the mark and resubmissionRequired, save immediately
      */
-    window.Vue.watch(data.comment, async (newValue, oldValue) => {
-        if (newValue !== oldValue) {
-            await timeoutUpdate(["comment"]);
-        }
-    });
-    window.Vue.watch(data.mark, async (newValue, oldValue) => {
-        console.log("Mark changed", newValue, oldValue);
-        if (newValue !== oldValue) {
-            await timeoutUpdate(["mark"]);
-        }
-    });
-    window.Vue.watch(data.resubmissionRequired, async (newValue, oldValue) => {
-        if (newValue !== oldValue) {
-            await timeoutUpdate(["resubmissionRequired"]);
-        }
-    });
+    const onFeedbackChangedDebounced = debounce(onFeedbackChanged, TIMEOUT_DURATION_MS);
+    window.Vue.watch(() => data.comment.value, onFeedbackChangedDebounced);
+    window.Vue.watch(() => [data.mark.value, data.resubmissionRequired.value], onFeedbackChanged);
 
     return {
         data,

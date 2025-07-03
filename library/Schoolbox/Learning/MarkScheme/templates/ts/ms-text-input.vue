@@ -49,6 +49,45 @@ const mark = defineModel<string | null>("mark", { required: true });
 
 const markInputEl = window.Vue.useTemplateRef<HTMLInputElement>("markInputRef");
 
+let updatingFromInput = false;
+
+/**
+ * When changes are made to the local mark, update the model
+ * only if the value is valid
+ */
+async function onMarkChanged(): Promise<void> {
+    if (props.readonly) {
+        return;
+    }
+
+    /* only persist the mark if it's valid */
+    if (markInputEl.value && $(markInputEl.value).valid()) {
+        const newValue = markInputEl.value.value;
+
+        /* ignore if the mark hasn't _meaningfully_ changed */
+        if ((newValue ?? "") === (mark.value ?? "")) {
+            return;
+        }
+
+        updatingFromInput = true;
+        mark.value = newValue;
+
+        await window.Vue.nextTick();
+        updatingFromInput = false;
+    }
+}
+
+/**
+ * Blur the input when the enter key is pressed rather than submitting the form
+ * This apparently needs to be handled here instead of on the form, since alaressValidate
+ * takes over the form submit event too early and we can't stop it
+ */
+function onClickEnter(): void {
+    if (markInputEl.value) {
+        markInputEl.value.blur();
+    }
+}
+
 window.Vue.onMounted(() => {
     if (!markInputEl.value) {
         throw new Error("Unable to initialise mark input without an input element");
@@ -73,53 +112,21 @@ window.Vue.onMounted(() => {
         $(validateTarget).alaressValidate(props.alaressValidateOptions);
         $(validateTarget).valid(); /* always run upon load */
     }
-});
 
-let updatingFromInput = false;
+    /**
+     * If the mark model is updated elsewhere, update the local mark
+     * to ensure the input is always in sync
+     */
+    window.Vue.watch(mark, async (newValue) => {
+        const input = markInputEl.value;
+        if (!updatingFromInput && input) {
+            input.value = newValue ?? "";
 
-/**
- * When changes are made to the local mark, update the model
- * only if the value is valid
- */
-async function onMarkChanged(): Promise<void> {
-    if (props.readonly) {
-        return;
-    }
-
-    /* only persist the mark if it's valid */
-    if (markInputEl.value && $(markInputEl.value).valid()) {
-        updatingFromInput = true;
-        mark.value = markInputEl.value.value;
-
-        await window.Vue.nextTick();
-        updatingFromInput = false;
-    }
-}
-
-/**
- * Blur the input when the enter key is pressed rather than submitting the form
- * This apparently needs to be handled here instead of on the form, since alaressValidate
- * takes over the form submit event too early and we can't stop it
- */
-function onClickEnter(): void {
-    if (markInputEl.value) {
-        markInputEl.value.blur();
-    }
-}
-
-/**
- * If the mark model is updated elsewhere, update the local mark
- * to ensure the input is always in sync
- */
-window.Vue.watch(mark, async (newValue) => {
-    const input = markInputEl.value;
-    if (!updatingFromInput && input) {
-        input.value = newValue ?? "";
-
-        // for alaressValidate to pick up the change
-        await window.Vue.nextTick();
-        input.dispatchEvent(new Event("change", { bubbles: true }));
-    }
+            // for alaressValidate to pick up the change
+            await window.Vue.nextTick();
+            input.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+    });
 });
 </script>
 

@@ -103,8 +103,8 @@ const isFaded = window.Vue.computed(() => {
             mbStore.feedbackSelectedCell.studentId === student.id
         "
         :activity-id="mbStore.feedbackSelectedCell.activityId"
-        :class-impl-id="props.classImplId"
-        :student="student"
+        :class-impl-id="mbStore.feedbackSelectedCell.classImplId"
+        :student-id="mbStore.feedbackSelectedCell.studentId"
     />
 </template>
 

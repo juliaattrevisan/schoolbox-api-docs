@@ -13,7 +13,7 @@ import { useDynamicFeedback } from "./store/useDynamicFeedback";
 interface Props {
     classImplId: number;
     activityId: number;
-    student: MarkbookClassImplStudent;
+    studentId: MarkbookClassImplStudent["id"];
 }
 
 const props = defineProps<Props>();
@@ -23,7 +23,13 @@ const commentRef = window.Vue.ref<string | null>("");
 const markRef = window.Vue.ref<string | null>(null);
 const resubmissionRequiredRef = window.Vue.ref<boolean>(false);
 
-const cellInfo = window.Vue.computed(() => {
+/**
+ * Retrieve the cell information for the current props
+ * This is done outside of a computed property to avoid unnecessary re-computations
+ * @returns studentId, activity, classImpl, aImpl, participant, feedback
+ */
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- we want this more complex type to be inferred
+function getCellInfo() {
     if (mbStore.data === null) {
         return null;
     }
@@ -46,7 +52,13 @@ const cellInfo = window.Vue.computed(() => {
         return null;
     }
 
-    const participant = aImpl.participants[props.student.id];
+    const student = classImpl.students[props.studentId];
+    if (student === undefined) {
+        console.warn("Student not found");
+        return null;
+    }
+
+    const participant = aImpl.participants[props.studentId];
     if (participant === undefined) {
         console.warn("Participant not found");
         return null;
@@ -72,13 +84,23 @@ const cellInfo = window.Vue.computed(() => {
     );
 
     return {
+        student,
         activity,
         classImpl,
         aImpl,
         participant,
         feedback,
     };
-});
+}
+
+const cellInfo = window.Vue.ref<ReturnType<typeof getCellInfo> | null>(getCellInfo());
+
+window.Vue.watch(
+    () => [props.classImplId, props.activityId, props.studentId],
+    () => {
+        cellInfo.value = getCellInfo();
+    },
+);
 
 /**
  * I can't figure out a way to force one particular table cell to be arbitrarily sticky
@@ -207,8 +229,8 @@ window.Vue.onUnmounted(() => {
                         {{ locale.grades.proper() }}
                         <mark-scheme
                             :key="cellInfo.aImpl.instructorMarkScheme.template"
-                            v-model:mark="markRef"
-                            :participant="{ user: props.student }"
+                            v-model:mark="cellInfo.feedback.data.mark"
+                            :participant="{ user: cellInfo.student }"
                             :mark-scheme="cellInfo.aImpl.instructorMarkScheme"
                             :submission-error-states="mbStore.data.submissionErrorStates"
                             :limit="cellInfo.participant.quiz?.maxMark ?? undefined /** special quiz max mark chaos */"
@@ -216,8 +238,8 @@ window.Vue.onUnmounted(() => {
                     </label>
                     <resubmission-required
                         v-if="cellInfo.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK"
-                        v-model:resubmission-required="resubmissionRequiredRef"
-                        :identifier="props.student.id"
+                        v-model:resubmission-required="cellInfo.feedback.data.resubmissionRequired"
+                        :identifier="cellInfo.student.id"
                         style="margin-top: 0.5rem"
                     />
                 </div>
@@ -226,8 +248,8 @@ window.Vue.onUnmounted(() => {
                     :class="{ 'medium-9': cellInfo.aImpl.instructorMarkScheme.template.length }"
                 >
                     <comment-field
-                        v-model:comment="commentRef"
-                        :participant="{ user: props.student }"
+                        v-model:comment="cellInfo.feedback.data.comment"
+                        :participant="{ user: cellInfo.student }"
                         :is-rich-text="true"
                     />
 
@@ -237,7 +259,7 @@ window.Vue.onUnmounted(() => {
                             cellInfo.aImpl.instructorMarkScheme.template.length === 0
                         "
                         v-model:resubmission-required="resubmissionRequiredRef"
-                        :identifier="props.student.id"
+                        :identifier="cellInfo.student.id"
                         style="margin-top: 0.5rem"
                     />
                 </div>
