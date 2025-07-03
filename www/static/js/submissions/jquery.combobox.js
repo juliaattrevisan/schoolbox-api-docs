@@ -79,8 +79,11 @@
         setValue: function (value) {
             var oldValue = this.textInputElement.val();
             this.textInputElement.val(value);
+            console.log("Combobox setValue", value, "oldValue", oldValue);
             if (oldValue != value) {
-                this.textInputElement.trigger("change");
+                /* use dispatchEvent and not .trigger("change") so that Vue
+                 * and other non-jquery listeners can pick up the change */
+                this.textInputElement[0].dispatchEvent(new Event("change", { bubbles: true }));
             }
         },
 

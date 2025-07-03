@@ -47,15 +47,9 @@ interface Props {
 const props = defineProps<Props>();
 const mark = defineModel<string | null>("mark", { required: true });
 
-// This is the most up-to-date value of the mark,
-// but we only persist it back to mark if it's valid
-const localMark = window.Vue.ref(mark.value);
-
 const markInputEl = window.Vue.useTemplateRef<HTMLInputElement>("markInputRef");
 
 window.Vue.onMounted(() => {
-    localMark.value = mark.value;
-
     if (!markInputEl.value) {
         throw new Error("Unable to initialise mark input without an input element");
     }
@@ -87,14 +81,17 @@ let updatingFromInput = false;
  * When changes are made to the local mark, update the model
  * only if the value is valid
  */
-function onMarkChanged(): void {
+async function onMarkChanged(): Promise<void> {
     if (props.readonly) {
         return;
     }
 
+    /* only persist the mark if it's valid */
     if (markInputEl.value && $(markInputEl.value).valid()) {
         updatingFromInput = true;
-        mark.value = localMark.value;
+        mark.value = markInputEl.value.value;
+
+        await window.Vue.nextTick();
         updatingFromInput = false;
     }
 }
@@ -103,14 +100,14 @@ function onMarkChanged(): void {
  * If the mark model is updated elsewhere, update the local mark
  * to ensure the input is always in sync
  */
-window.Vue.watch(mark, (newValue) => {
-    if (!updatingFromInput) {
-        localMark.value = newValue;
+window.Vue.watch(mark, async (newValue) => {
+    const input = markInputEl.value;
+    if (!updatingFromInput && input) {
+        input.value = newValue ?? "";
 
         // for alaressValidate to pick up the change
-        void window.Vue.nextTick(() => {
-            markInputEl.value?.dispatchEvent(new Event("change", { bubbles: true }));
-        });
+        await window.Vue.nextTick();
+        input.dispatchEvent(new Event("change", { bubbles: true }));
     }
 });
 </script>
@@ -119,7 +116,7 @@ window.Vue.watch(mark, (newValue) => {
     <input
         :id="`mark-${props.participant.user.id}`"
         ref="markInputRef"
-        v-model="localMark"
+        :value="mark"
         class="no-margin"
         name="mark"
         type="text"
