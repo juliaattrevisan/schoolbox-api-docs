@@ -173,12 +173,14 @@ export function useDynamicFeedback(
                 instructorMarkScheme,
                 submissionErrorStates,
             );
-            dataDraft.hrMarkInstructor.value =
-                data.hrMarkInstructor.value; /* TODO: This ideally un-normalises the mark */
-            dataDraft.hrMark.value =
-                data.hrMarkInstructor.value; /* TODO: This also requires un-normalising the mark lol */
-            dataDraft.comment.value = data.comment.value;
-            dataDraft.resubmissionRequired.value = data.resubmissionRequired.value;
+            dataDraft.hrMarkInstructor.value = window.Vue.unref(
+                data.hrMarkInstructor.value,
+            ); /* TODO: This ideally un-normalises the mark */
+            dataDraft.hrMark.value = window.Vue.unref(
+                data.hrMarkInstructor.value,
+            ); /* TODO: This also requires un-normalising the mark lol */
+            dataDraft.comment.value = window.Vue.unref(data.comment.value);
+            dataDraft.resubmissionRequired.value = window.Vue.unref(data.resubmissionRequired.value);
         } catch (error) {
             console.error("Error auto-saving draft feedback:", error);
             toast.timeout({ text: "Unable to save draft", isSuccess: false });
@@ -280,19 +282,21 @@ export function useDynamicFeedback(
                 instructorMarkScheme,
                 submissionErrorStates,
             );
-            dataPublished.hrMarkInstructor.value =
-                data.hrMarkInstructor.value; /* TODO: This ideally un-normalises the mark */
-            dataPublished.hrMark.value =
-                data.hrMarkInstructor.value; /* TODO: This also requires un-normalising the mark lol */
-            dataPublished.comment.value = data.comment.value;
-            dataPublished.resubmissionRequired.value = data.resubmissionRequired.value;
+            dataPublished.hrMarkInstructor.value = window.Vue.unref(
+                data.hrMarkInstructor,
+            ); /* TODO: This ideally un-normalises the mark */
+            dataPublished.hrMark.value = window.Vue.unref(
+                data.hrMarkInstructor,
+            ); /* TODO: This also requires un-normalising the mark lol */
+            dataPublished.comment.value = window.Vue.unref(data.comment);
+            dataPublished.resubmissionRequired.value = window.Vue.unref(data.resubmissionRequired);
 
             /* and reset the draft data to defaults */
             dataDraft.comment.value = null;
             dataDraft.hrMark.value = null;
             dataDraft.normMark.value = null;
             dataDraft.hrMarkInstructor.value = null;
-            dataDraft.resubmissionRequired.value = false;
+            // notable ommission of resubmissionRequired, since it's actually the same ref
         } catch (error) {
             console.error("Error publishing feedback:", error);
             toast.timeout({ text: "Unable to publish feedback", isSuccess: false });
