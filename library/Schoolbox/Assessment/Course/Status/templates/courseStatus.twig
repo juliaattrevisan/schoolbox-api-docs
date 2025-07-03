@@ -107,7 +107,7 @@
     </div>
 {% endblock participantSearchBar %}
 {% for assessment in assessments %}
-    <div>{{ assessment.getBaseContext.getFolder.getTitle }}</div>
+    <h4 class="subheader"><a href="/homepage/{{ assessment.getBaseContext.getFolder.id }}">{{ assessment.getBaseContext.getFolder.getTitle }}</a></h4>
     {% if assessment.allParticipants | length %}
         <div class="row">
             <div class="small-12 island">
