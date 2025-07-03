@@ -59,7 +59,10 @@ class ValueSerializer implements IFieldValueSerializer
         $value = (float) $value;
 
         // Is the value within the range?
-        if ($value < $options['min'] || $value > $options['max']) {
+        if (isset($options['min']) && $value < $options['min']) {
+            return false;
+        }
+        if (isset($options['max']) && $value > $options['max']) {
             return false;
         }
 
