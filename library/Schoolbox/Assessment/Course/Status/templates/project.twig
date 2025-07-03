@@ -119,12 +119,6 @@ Data:
                     data-assessment-list
                     data-action="{{ routeLookup('learningAssessment.postReorderAssessments', {contextType: 'projects', contextId: assessmentSpec.id, context: assessmentSpec}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">
                     {% for assessable in assessmentSpec.assessables %}
-{#                            {% set stats = assessmentStats[assessable.id] %}#}
-{#                            {% set stats.countParticipants = false %}#}
-{#                            {% if stats.countParticipants %}#}
-{#                                {% set completionGradient = ( (stats.countParticipants - stats.countResponseRequired) / stats.countParticipants ) * 100 %}#}
-{#                            {% endif %}#}
-
                         {% import '@learningAssessment/project/macro/icon.twig' as icon %}
                         {% set exportRoute = routeLookupIfAuthorized('learningAssessmentExporter.getExportFormForAssessment', {assessmentId: assessable.id, assessment: assessable}) %}
                         {% set statusRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessable.id, assessment: assessable}) %}
@@ -150,15 +144,6 @@ Data:
                                             <span class="{{ icon.renderClass(assessable) }}" title="{{ assessable.getTypeName }}"></span>
                                             <p>{{ assessable.title }}</p>
                                             {% if viewRoute %}</a>{% endif %}
-
-                                        {% if assessable.getDueAt %}
-                                            <p class="meta">
-                                                {{ dueDate.forAssessment(assessable) }}
-                                                {% if assessable is not lessonPlan %}
-                                                    <span class="pipe meta"><span class="{{ urgency.marks(completionGradient ?? '') }}">{{ stats.countParticipants - stats.countResponseRequired }}/{{ stats.countParticipants }} students completed</span></span>
-                                                {% endif %}
-                                            </p>
-                                        {% endif %}
                                     </div>
                                 </div>
                                 {% if hasActions %}
