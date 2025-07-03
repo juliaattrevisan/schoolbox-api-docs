@@ -175,7 +175,6 @@ class Controller extends Base
                             'markVisibility' => $aImpl->getMarkVisibility(),
                             'courseManaged'  => $aImpl->getCourseManaged(),
                             'weight'         => $aImpl->getWeight(),
-                            'hasDraft'       => $markbook->getHasDraft()[$aImpl->getId()] ?? [],
                             'writable'       => $writable[$aImpl->getId()] ?? null,
                             'instructorMarkScheme' => [
                                 'template' => $instructorMarkScheme->getTemplate(),

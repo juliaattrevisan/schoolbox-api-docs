@@ -143,6 +143,26 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
         return Object.values(marks).some((mark) => mark !== null);
     }
 
+    /**
+     * All activity IDs that have draft marks for any participant
+     */
+    const activityDraftMarks = window.Vue.computed(() => {
+        if (data.value === null) {
+            return [];
+        }
+
+        return data.value.classImpls.flatMap((classImpl) => {
+            return Object.values(classImpl.assessments)
+                .filter((aImpl) => aImpl.stats.draftMean !== null)
+                .map((aImpl) => aImpl.id);
+            // .filter((aImpl) => {
+            //     return Object.values(aImpl.participants).some(
+            //         (participant) => participant && hasMeaningfulMarks(participant.marks.draft),
+            //     );
+            // })
+        });
+    });
+
     return {
         init,
         data,
@@ -156,6 +176,7 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
         orderedClassImplStudents,
         popoutSelectedCell,
         feedbackSelectedCell,
+        activityDraftMarks,
         hasMeaningfulMarks,
     };
 });

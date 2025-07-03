@@ -306,7 +306,6 @@ class Controller extends WebController\Base
                                     // 'markVisibility' => ...,
                                     // 'courseManaged'  => ...,
                                     // 'weight'         => ...,
-                                    // 'hasDraft'       => ...,
                                     // 'writable'       => ...,
                                     'instructorMarkScheme' => [
                                         'template' => $instructorMarkScheme->getTemplate(),

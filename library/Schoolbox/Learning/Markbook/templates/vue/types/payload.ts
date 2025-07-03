@@ -104,7 +104,6 @@ export type MarkbookClassImplActivity = {
     courseManaged?: boolean | null;
     writable?: boolean;
     weight: number;
-    hasDraft: Record<UserId, true>;
 };
 
 export type MarkbookClassImplStudent = {

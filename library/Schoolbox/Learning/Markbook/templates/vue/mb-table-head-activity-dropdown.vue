@@ -45,6 +45,7 @@ const participantsWithDrafts = window.Vue.computed(() => {
             return {
                 classImplId,
                 classImpl,
+                aImpl,
                 participants,
             };
         })
@@ -78,6 +79,53 @@ async function onPublishAll(): Promise<void> {
 
     // TODO
     console.log("would have published drafts for", selected);
+
+    const activity = mbStore.data?.assessments[props.activity.id] ?? null;
+    if (activity === null) {
+        throw new Error("Activity not found, cannot publish drafts");
+    }
+
+    /* update all marks/stats for the selected participants */
+    let allSelected = true;
+    participantsWithDrafts.value.forEach(({ participants, aImpl }) => {
+        let allImplSelected = true;
+        participants.forEach((participant) => {
+            if (!selectedParticipants.value[participant.student.id]) {
+                allSelected = false;
+                allImplSelected = false;
+                return;
+            }
+
+            const dataPublished = participant.participant.marks.published;
+            const dataDraft = participant.participant.marks.draft;
+
+            /* persist the published data */
+            dataPublished.comment = dataDraft.comment;
+            dataPublished.hr = dataDraft.hr;
+            dataPublished.hrInstructor = dataDraft.hrInstructor;
+            dataPublished.norm = dataDraft.norm;
+
+            /* and reset the draft data to defaults */
+            dataDraft.comment = null;
+            dataDraft.hr = null;
+            dataDraft.hrInstructor = null;
+            dataDraft.norm = null;
+        });
+
+        // TODO: handle partial updates (not all participants selected)
+        if (allImplSelected) {
+            aImpl.stats.mean = aImpl.stats.draftMean;
+            aImpl.stats.draftMean = null;
+        }
+    });
+
+    if (allSelected && activity.stats) {
+        activity.stats.mean = activity.stats.draftMean;
+    }
+
+    if (allSelected && activity.stats) {
+        activity.stats.draftMean = null;
+    }
 
     isPublishModalOpen.value = false;
 }
