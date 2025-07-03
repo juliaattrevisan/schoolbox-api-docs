@@ -12,6 +12,7 @@ namespace Schoolbox\Assessment\Course\Status;
 
 use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Authorizer\Rule;
+use Alaress\Authorizer\Rule\IAuthorizationRule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
@@ -22,6 +23,7 @@ use Schoolbox\Learning\Assessment\Project\ResultCache as ProjectResultCache;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
 use Schoolbox\Learning\Assessment\Breadcrumb;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
@@ -29,6 +31,7 @@ use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Filter;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
+use Schoolbox\User;
 
 class Module extends BaseModule
 {
@@ -44,10 +47,9 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        $canSeeCourseMarkbook = $this->buildAuthRuleCanSeeCourseMarkbook();
+        $canSeeCourseMarkbook = $this->getCanAccessPopOut();
 
-//        // only instructors of all courses can access the publish/enter feedback routes
-//        $instructorOfAll = new Rule\IsInstructorOfAllCourses();
+        // only instructors of all courses can access the publish/enter feedback routes
         $preloadCourseAssessment = function ($params) {
             return $this->buildPreloadCourseAssessment($params);
         };
@@ -60,16 +62,20 @@ class Module extends BaseModule
         $this->register('GET', '/{courseSpecId:\d+}/assessment/{assessmentId:\d+}/maxMarks', 'getMaxMarks', $canSeeCourseMarkbook, $preloadCourseAssessment);
     }
 
-
     /**
-     * To visit the course markbook, you must be:
-     * * Logged in
-     * * A staff member or SU
+     * Only access with the following:
+     * markbook is enabled
+     * you are logged in
+     * you are a staff member (who can view student grades) or superuser
+     * if you have write access to all course implementations
+     * have write access to the course folder
      *
-     * @return Rule\IAuthorizationRule
-     * @throws \InvalidArgumentException
+     * route perm of `\Schoolbox\Assessment\Course\Markbook\Controller::getCanAccessPopOut`
+     * @see \Schoolbox\Assessment\Course\Markbook\Controller::getCanAccessPopOut
+     *
+     * @return IAuthorizationRule
      */
-    private function buildAuthRuleCanSeeCourseMarkbook(): Rule\IAuthorizationRule
+    private function getCanAccessPopOut(): Rule\IAuthorizationRule
     {
         return new Rule\All(
             new Rule\Callback(function (): void {
@@ -82,7 +88,33 @@ class Module extends BaseModule
             new Rule\Any(
                 new Rule\HasRolePermission(Role::PERMISSION_VIEW_STUDENT_GRADES, Role::STAFF),
                 new Rule\IsSuperuser()
-            )
+            ),
+            new Rule\Callback(function ($params, ?User $user): void {
+                if (null === $user) {
+                    /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
+                    throw new InvalidPath('You must be logged in to access this page');
+                }
+                // first check if the user has write access to the course
+                $hasCourseWriteAccess = $this->getAccessMapper()->getFolderAccess(
+                    $user,
+                    $params['courseSpec']->getFolder()->getId(),
+                ) >= UserAccess::ACCESS_WRITE;
+                if (!$hasCourseWriteAccess) {
+                    /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
+                    throw new InvalidPath('You do not have permission to access this course');
+                }
+                // then check if the user has write access to all the course implementations
+                foreach ($params['courseSpec']->getCourseImplementations() as $classImplementation) {
+                    $hasAccess = $this->getAccessMapper()->getFolderAccess(
+                        $user,
+                        $classImplementation->getFolder()->getId()
+                    ) >= UserAccess::ACCESS_WRITE;
+                    if (!$hasAccess) {
+                        /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
+                        throw new InvalidPath('You do not have permission to access this course implementation');
+                    }
+                }
+            })
         );
     }
 
@@ -137,7 +169,7 @@ class Module extends BaseModule
         $bakery = new Breadcrumb\Factory(
             $this->getRouter()->getGenerator(),
             $this->getAuthorizer(),
-            $this->getMapperFactory()->get(Access::class),
+            $this->getAccessMapper(),
         );
 
         return new Controller(
@@ -188,5 +220,13 @@ class Module extends BaseModule
     private function getAssessmentMapper(): Assessment\MapperProxy
     {
         return $this->injector->get('assessmentDataSource');
+    }
+
+    /**
+     * @return Access
+     */
+    private function getAccessMapper(): Access
+    {
+        return $this->getMapperFactory()->get(Access::class);
     }
 }
