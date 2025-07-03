@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Version\Test;
 
 use Alaress\Http\Cache;
-use Cache\Bridge\SimpleCache\SimpleCacheBridge;
 use GuzzleHttp\Client;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Config\ArrayLoader;
@@ -19,6 +18,7 @@ use Schoolbox\InstanceRegistry\InstanceRegistry;
 use Schoolbox\Url\Uri;
 use Schoolbox\Version\Version;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\Psr16Cache;
 
 /**
  * Tests for checking the version of the running instance
@@ -221,7 +221,7 @@ class VersionTest extends TestCase
                         $configLoader,
                         new Cache(
                             $this->getMockBuilder(Client::class)->getMock(),
-                            new SimpleCacheBridge(new ArrayAdapter()),
+                            new Psr16Cache(new ArrayAdapter()),
                             null,
                             new Uri('https://vagrant.dev.schoolbox.cloud'),
                         )

@@ -16,7 +16,6 @@ use Alaress\Redis\Cache\ItemPool;
 use Alaress\Redis\Cache\KeyGenerator;
 use Alaress\Sentry\Tracing\GuzzleTracingMiddleware;
 use Alaress\Sentry\Tracing\Tracer;
-use Cache\Bridge\SimpleCache\SimpleCacheBridge;
 use enshrined\svgSanitize\Sanitizer as BaseSvgSanitizer;
 use GuzzleHttp;
 use Http\Discovery\Psr17Factory;
@@ -63,6 +62,7 @@ use Sentry\SentrySdk;
 use Sentry\Tracing\SpanStatus;
 use Sentry\Tracing\TransactionSource;
 use SitePage;
+use Symfony\Component\Cache\Psr16Cache;
 use Twig\Environment;
 use Alaress\Twig\Method as TwigMethod;
 use Twig\Extension\DebugExtension;
@@ -308,7 +308,7 @@ class Kernel extends WebKernelAbstract
             'httpClient.internalCache',
             $di->lazy(
                 function () use ($di) {
-                    return new SimpleCacheBridge(
+                    return new Psr16Cache(
                         new ItemPool(
                             $di->get('redis.cache'),
                             new \Alaress\Codec\StringValue\Base64(),
@@ -527,7 +527,7 @@ class Kernel extends WebKernelAbstract
             'oidc.cache',
             $di->lazy(
                 function () use ($di) {
-                    return new SimpleCacheBridge(
+                    return new Psr16Cache(
                         new ItemPool(
                             $di->get('redis.cache'),
                             new Base64(),
@@ -543,7 +543,7 @@ class Kernel extends WebKernelAbstract
             'component.homepage.clickview.cache',
             $di->lazy(
                 function () use ($di) {
-                    return new SimpleCacheBridge(
+                    return new Psr16Cache(
                         new ItemPool(
                             $di->get('redis.cache'),
                             new Base64(),
@@ -558,7 +558,7 @@ class Kernel extends WebKernelAbstract
             'paperly.cache',
             $di->lazy(
                 function () use ($di) {
-                    return new SimpleCacheBridge(
+                    return new Psr16Cache(
                         new ItemPool(
                             $di->get('redis.cache'),
                             new Base64(),

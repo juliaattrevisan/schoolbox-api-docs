@@ -39,7 +39,6 @@ use Aura\Di;
 use Aura\Router\Generator;
 use Aura\Router\Map;
 use Aura\Router\RouterContainer;
-use Cache\Bridge\SimpleCache\SimpleCacheBridge;
 use Calendar\Api\ModuleChecker;
 use Calendar_Api_Factory;
 use Crell\ApiProblem\ApiProblem;
@@ -191,6 +190,7 @@ use Schoolbox\Weather\WeatherstackClient;
 use Scrub;
 use Sentry\SentrySdk;
 use SitePage;
+use Symfony\Component\Cache\Psr16Cache;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\RedisStore;
 use Throwable;
@@ -1789,7 +1789,7 @@ abstract class Kernel
             'httpClient.internalCache',
             $di->lazy(
                 function () use ($di) {
-                    return new SimpleCacheBridge(
+                    return new Psr16Cache(
                         new ItemPool(
                             $di->get('redis.cache'),
                             new \Alaress\Codec\StringValue\Base64(),
@@ -2185,7 +2185,7 @@ abstract class Kernel
             'oidc.cache',
             $di->lazy(
                 function () use ($di) {
-                    return new SimpleCacheBridge(
+                    return new Psr16Cache(
                         new ItemPool(
                             $di->get('redis.cache'),
                             new Base64(),
@@ -2201,7 +2201,7 @@ abstract class Kernel
             'component.homepage.clickview.cache',
             $di->lazy(
                 function () use ($di) {
-                    return new SimpleCacheBridge(
+                    return new Psr16Cache(
                         new ItemPool(
                             $di->get('redis.cache'),
                             new Base64(),
@@ -2216,7 +2216,7 @@ abstract class Kernel
             'paperly.cache',
             $di->lazy(
                 function () use ($di) {
-                    return new SimpleCacheBridge(
+                    return new Psr16Cache(
                         new ItemPool(
                             $di->get('redis.cache'),
                             new Base64(),

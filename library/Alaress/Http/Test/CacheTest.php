@@ -10,13 +10,13 @@ declare(strict_types=1);
 namespace Alaress\Http\Test;
 
 use Alaress\Http\Cache;
-use Cache\Bridge\SimpleCache\SimpleCacheBridge;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Url\Uri;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\Psr16Cache;
 
 /**
  * Test for cache.
@@ -31,7 +31,7 @@ class CacheTest extends TestCase
      */
     public function testAbsoluteRequest(): void
     {
-        $internalCache = new SimpleCacheBridge(new ArrayAdapter());
+        $internalCache = new Psr16Cache(new ArrayAdapter());
         $mockClient    = $this->createMock(Client::class);
         $mockClient->method('request')
             ->with('GET', 'https://schoolbox.education/test.php')
@@ -53,7 +53,7 @@ class CacheTest extends TestCase
      */
     public function testRelativeRequest(): void
     {
-        $internalCache = new SimpleCacheBridge(new ArrayAdapter());
+        $internalCache = new Psr16Cache(new ArrayAdapter());
         $mockClient    = $this->createMock(Client::class);
         $mockClient->method('request')
             ->with('GET', 'https://vagrant.dev.schoolbox.cloud/test.php')
@@ -77,7 +77,7 @@ class CacheTest extends TestCase
     {
         $result1       = 'test';
         $result2       = 'test2';
-        $internalCache = new SimpleCacheBridge(new ArrayAdapter());
+        $internalCache = new Psr16Cache(new ArrayAdapter());
         $mockClient    = $this->createMock(Client::class);
         $mockClient->method('request')
             ->willReturn(new Response(200, [], $result1));
@@ -123,8 +123,8 @@ class CacheTest extends TestCase
         $result2 = 'test2';
 
         // Custom cache which doesn't delete locks
-        $internalCache = new class (new ArrayAdapter()) extends SimpleCacheBridge {
-            public function delete($key)
+        $internalCache = new class (new ArrayAdapter()) extends Psr16Cache {
+            public function delete($key): bool
             {
                 if (str_contains($key, 'lock')) {
                     return true;
@@ -183,7 +183,7 @@ class CacheTest extends TestCase
     {
         $result1       = 'test';
         $result2       = 'test2';
-        $internalCache = new SimpleCacheBridge(new ArrayAdapter());
+        $internalCache = new Psr16Cache(new ArrayAdapter());
         $mockClient    = $this->createMock(Client::class);
         $mockClient->method('request')
             ->with('GET', 'https://vagrant.dev.schoolbox.cloud/test.php')
