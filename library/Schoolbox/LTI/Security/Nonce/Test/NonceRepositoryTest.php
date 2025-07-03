@@ -16,11 +16,11 @@ declare(strict_types=1);
 
 namespace Schoolbox\LTI\Security\Nonce\Test;
 
-use Cache\Adapter\PHPArray\ArrayCachePool;
 use OAT\Library\Lti1p3Core\Security\Nonce\Nonce;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\InvalidArgumentException;
 use Schoolbox\LTI\Security\Nonce\NonceRepository;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 /**
  * Tests:
@@ -37,7 +37,7 @@ final class NonceRepositoryTest extends TestCase
     public function testSaveAndFindANonceWithoutReservedCharacters(): void
     {
         #GIVEN
-        $nonceRepo = new NonceRepository(new ArrayCachePool());
+        $nonceRepo = new NonceRepository(new ArrayAdapter());
         $nonceValue = 'This nonce contains no reserved characters.';
         $nonce = new Nonce($nonceValue);
 
@@ -56,7 +56,7 @@ final class NonceRepositoryTest extends TestCase
     public function testSaveAndFindANonceWithReservedCharacters(): void
     {
         #GIVEN
-        $nonceRepo = new NonceRepository(new ArrayCachePool());
+        $nonceRepo = new NonceRepository(new ArrayAdapter());
         $nonceValue = 'This nonce contains reserved characters ({}()\/@:).';
         $nonce = new Nonce($nonceValue);
 
@@ -75,7 +75,7 @@ final class NonceRepositoryTest extends TestCase
     public function testSaveAndFindPotentiallyCollidingNonces(): void
     {
         #GIVEN
-        $nonceRepo = new NonceRepository(new ArrayCachePool());
+        $nonceRepo = new NonceRepository(new ArrayAdapter());
         $nonceValue1 = '(';
         $nonceValue2 = 'openbracket';
         $nonceValue3 = 'openbracket-';
