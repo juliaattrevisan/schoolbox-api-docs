@@ -39,6 +39,7 @@ use Schoolbox\Learning\InlineGrader\Kami\Connector;
 use Schoolbox\Learning\InlineGrader\StudentCarousel;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\Helper;
+use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Model as Quiz;
@@ -569,8 +570,29 @@ class Controller extends WebController\Base
             /* A list of Responses and Floating Feedbacks, as per the Submission History
             */
             if ($participant) {
-                $timeline = (new Full($participant))->getForTeacher();
-                $assessmentInfo[$assessment->getId()] = $timeline;
+                $feedback = $participant->getAuthoritativeFeedback(false);
+
+                // all things have this, even if there are no submissions...
+                $assessmentInfo[$assessment->getId()] = [
+                    'comment' => null,
+                    'published' => null,
+                    'normalisedMark' => null,
+                    'humanReadable' => null,
+                ];
+                if ($feedback) {
+                    $assessmentInfo[$assessment->getId()]['comment'] = $feedback->getComment();
+                    $assessmentInfo[$assessment->getId()]['published'] = $feedback->isPublished();
+                    $assessmentInfo[$assessment->getId()]['normalisedMark'] = $feedback->getNormalisedMark();
+                    $assessmentInfo[$assessment->getId()]['humanReadable'] = $feedback->getHumanReadableMark();
+
+                    if ($assessment instanceof DueWork\Model) {
+                        /** @var \Schoolbox\Learning\Assessment\DueWork\Feedback\Model $feedback  */
+                        $assessmentInfo[$assessment->getId()]['rubric'] = $assessment->getUseRubric();
+                        $assessmentInfo[$assessment->getId()]['resubmissionRequired'] = $feedback->getResubmissionRequired();
+                        $assessmentInfo[$assessment->getId()]['rubricMarkedGrid'] = $feedback->getRubricMarkedGrid();
+                        $assessmentInfo[$assessment->getId()]['hasResponseWithKamiDocs'] = $feedback->hasResponseWithKamiDocs();
+                    }
+                }
             }
         }
 
