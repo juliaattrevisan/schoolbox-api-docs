@@ -2,20 +2,15 @@
 /**
  * Pastoral Report Tabs Component
  */
-import type {
-    PastoralReportTab,
-    SeverityColors,
-    PastoralConfig,
-    LocaleConfig,
-    PastoralRecord,
-} from "../js/types/pastoralReportTypes";
+import type { PastoralReportTab, SeverityColors, LocaleConfig, PastoralRecord } from "../js/types/pastoralReportTypes";
 
 const props = defineProps<{
     tabs: PastoralReportTab[];
     results: PastoralRecord[];
     showSeverity?: boolean;
     severityColors: SeverityColors;
-    config: PastoralConfig;
+    pastoralPointEnabled: boolean;
+    pastoralAactionEnable: boolean;
     locale: LocaleConfig;
 }>();
 
@@ -95,10 +90,10 @@ const profile = {
                                         size="0.75rem"
                                         :title="`Record archived - ${record.expiresAt}`"
                                     ></sbx-icon>
-                                    <!--<sbx-label-pastoral-points
-                                    v-if="props.config.pastoral_point_enabled && record.points"
-                                    :points="record.points"
-                                ></sbx-label-pastoral-points> -->
+                                    <sbx-label-pastoral-points
+                                        v-if="props.pastoralPointEnabled && record.points"
+                                        :points="record.points"
+                                    ></sbx-label-pastoral-points>
                                 </h4>
                             </a>
                             <p class="meta">
@@ -108,7 +103,7 @@ const profile = {
                                 <a :href="`/search/user/${record.owner.id}`">{{ record.owner.fullName }}</a>
                                 {{ record.createdAt.local }}
 
-                                <span v-if="props.config.pastoral_action_enable && record.uncompletedActionCount > 0">
+                                <span v-if="props.pastoralAactionEnable && record.uncompletedActionCount > 0">
                                     | {{ record.uncompletedActionCount }} follow up action{{
                                         record.uncompletedActionCount === 1 ? "" : "s"
                                     }}
