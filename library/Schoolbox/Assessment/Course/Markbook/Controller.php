@@ -11,8 +11,8 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Course\Markbook;
 
 use Alaress\Web\Controller as WebController;
+use Alaress\HTMLPurifier\IPurifier;
 use Schoolbox\Assessment\Course\Markbook\Export\CSV;
-use Schoolbox\Assessment\Course\Task\Completion;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Codec;
@@ -49,6 +49,7 @@ class Controller extends WebController\Base
      * @param UnitImpl\Mapper                    $unitImplMapper
      * @param Access                             $access
      * @param StateMapper                        $stateMapper
+     * @param IPurifier                          $purifier
      */
     public function __construct(
         private Filter\IFactoryFactory $filterFactoryFactory,
@@ -60,6 +61,7 @@ class Controller extends WebController\Base
         private UnitImpl\Mapper $unitImplMapper,
         private Access $access,
         private StateMapper $stateMapper,
+        private IPurifier $purifier,
     ) {
     }
 
@@ -327,7 +329,6 @@ class Controller extends WebController\Base
                                             }
 
                                             $marks = $courseMarkbook->getStudentMarks()[$courseImpl->getId()][$assessmentId][$student->getId()] ?? null;
-                                            $comments = $courseMarkbook->getStudentComments()[$courseImpl->getId()];
 
                                             return [
                                                 'isExcluded' => $participant->isExcluded(),
@@ -340,13 +341,13 @@ class Controller extends WebController\Base
                                                         'norm'         => $marks['published']['norm'],
                                                         'hr'           => $marks['published']['hr'],
                                                         'hrInstructor' => $marks['published']['hrInstructor'],
-                                                        'comment'      => \Scrub::html2text($comments[$student->getId()][$assessmentId] ?? ''),
+                                                        'comment'      => $this->purifier->purify($marks['published']['comment']),
                                                     ],
                                                     'draft' => [
                                                         'norm'         => $marks['draft']['norm'],
                                                         'hr'           => $marks['draft']['hr'],
                                                         'hrInstructor' => $marks['draft']['hrInstructor'],
-                                                        'comment'      => null,
+                                                        'comment'      => $this->purifier->purify($marks['draft']['comment']),
                                                     ],
                                                 ],
                                                 /* unused on the course markbook: */

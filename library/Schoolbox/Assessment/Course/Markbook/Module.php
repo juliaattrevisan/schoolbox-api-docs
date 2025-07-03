@@ -14,6 +14,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Alaress\Authorizer\Failure\InvalidPath;
+use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Mapper;
 use Schoolbox\Role;
@@ -95,7 +96,8 @@ class Module extends \Alaress\Module\Module
             $this->getMapperFactory()->get(CourseImpl\Mapper::class),
             $this->getMapperFactory()->get(UnitImpl\Mapper::class),
             $this->getMapperFactory()->get(Access::class),
-            $this->getMapperFactory()->get(StateMapper::class)
+            $this->getMapperFactory()->get(StateMapper::class),
+            new ScrubAdapter(),
         );
     }
 

@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Markbook;
 
 use Alaress\Web\Controller\Base;
+use Alaress\HTMLPurifier\IPurifier;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Collection;
@@ -35,46 +36,24 @@ use function func_get_args;
 
 class Controller extends Base
 {
-    /** @var AssessmentMapperProxy */
-    private $assessmentMapperProxy;
-
-    /** @var Term\Mapper */
-    private $termMapper;
-
-    /** @var Access */
-    private $access;
-
-    /** @var Filter\Filters\Assessment\IdFinder */
-    private $assessmentIdFinder;
-
-    /** @var Filter\IFactoryFactory */
-    private $filterFactoryFactory;
-
-    /** @var StateMapper */
-    private $stateMapper;
-
-
     /**
      * @param AssessmentMapperProxy              $assessmentMapperProxy
      * @param Term\Mapper                        $termMapper
      * @param Access                             $access
      * @param Filter\Filters\Assessment\IdFinder $assessmentIdFinder
      * @param Filter\IFactoryFactory             $filterFactoryFactory
+     * @param StateMapper                        $stateMapper
+     * @param IPurifier                          $purifier
      */
     public function __construct(
-        AssessmentMapperProxy $assessmentMapperProxy,
-        Term\Mapper $termMapper,
-        Access $access,
-        Filter\Filters\Assessment\IdFinder $assessmentIdFinder,
-        Filter\IFactoryFactory $filterFactoryFactory,
-        StateMapper $stateMapper,
+        private AssessmentMapperProxy $assessmentMapperProxy,
+        private Term\Mapper $termMapper,
+        private Access $access,
+        private Filter\Filters\Assessment\IdFinder $assessmentIdFinder,
+        private Filter\IFactoryFactory $filterFactoryFactory,
+        private StateMapper $stateMapper,
+        private IPurifier $purifier,
     ) {
-        $this->assessmentMapperProxy = $assessmentMapperProxy;
-        $this->termMapper            = $termMapper;
-        $this->access                = $access;
-        $this->assessmentIdFinder    = $assessmentIdFinder;
-        $this->filterFactoryFactory  = $filterFactoryFactory;
-        $this->stateMapper           = $stateMapper;
     }
 
 
@@ -232,13 +211,13 @@ class Controller extends Base
                                                 'norm'         => $authoritativeFeedback ? $participant->getNormalisedMark(true) : null,
                                                 'hr'           => $authoritativeFeedback ? $participant->getHumanReadableMark(true) : null,
                                                 'hrInstructor' => $authoritativeFeedback ? $participant->getHumanReadableInstructorMark(true) : null,
-                                                'comment'      => $authoritativeFeedback ? \Scrub::html2text($authoritativeFeedback->getComment()) : null,
+                                                'comment'      => $this->purifier->purify($authoritativeFeedback->getComment()),
                                             ],
                                             'draft' => [
                                                 'norm'         => $authoritativeFeedbackDraft ? $participant->getNormalisedMark(false) : null,
                                                 'hr'           => $authoritativeFeedbackDraft ? $participant->getHumanReadableMark(false) : null,
                                                 'hrInstructor' => $authoritativeFeedbackDraft ? $participant->getHumanReadableInstructorMark(false) : null,
-                                                'comment'      => $authoritativeFeedbackDraft ? \Scrub::html2text($authoritativeFeedbackDraft->getComment()) : null,
+                                                'comment'      => $this->purifier->purify($authoritativeFeedbackDraft->getComment()),
                                             ],
                                         ],
                                         'isResponseRequired' => $participant->isResponseRequired(),

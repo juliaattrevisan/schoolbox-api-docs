@@ -267,7 +267,7 @@ class CourseMarkbook
 
 
     /**
-     * @return float[][][][][]
+     * @return (float|string)[][][][][]
      */
     public function getStudentMarks(): array
     {
