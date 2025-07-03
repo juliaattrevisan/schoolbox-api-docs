@@ -18,6 +18,10 @@ interface Props {
 const props = defineProps<Props>();
 const mbStore = useMarkbookStore();
 
+const commentRef = window.Vue.ref<string | null>("");
+const markRef = window.Vue.ref<string | null>(null);
+const resubmissionRequiredRef = window.Vue.ref<boolean>(false);
+
 const cellInfo = window.Vue.computed(() => {
     if (mbStore.data === null) {
         return null;
@@ -154,32 +158,29 @@ window.Vue.onUnmounted(() => {
 });
 
 // todo: make this actually work with draft/published feedback chaos
-const comment = window.Vue.ref<string>("");
-const mark = window.Vue.ref<string | null>(null);
-
 window.Vue.watch(
     () => [props.classImplId, props.activityId, props.student.id],
     async () => {
         await window.Vue.nextTick();
         if (cellInfo.value === null || cellInfo.value.participant === undefined) {
-            comment.value = "";
-            mark.value = null;
+            commentRef.value = "";
+            markRef.value = null;
             return;
         }
 
         const { marks } = cellInfo.value.participant;
         if (marks === undefined || marks === null) {
-            comment.value = "";
-            mark.value = null;
+            commentRef.value = "";
+            markRef.value = null;
         } else if (mbStore.hasMeaningfulMarks(marks.draft)) {
-            comment.value = marks.draft.comment ?? "";
-            mark.value = marks.draft.hrInstructor ?? null;
+            commentRef.value = marks.draft.comment ?? "";
+            markRef.value = marks.draft.hrInstructor ?? null;
         } else if (mbStore.hasMeaningfulMarks(marks.published)) {
-            comment.value = marks.published.comment ?? "";
-            mark.value = marks.published.hrInstructor ?? null;
+            commentRef.value = marks.published.comment ?? "";
+            markRef.value = marks.published.hrInstructor ?? null;
         } else {
-            comment.value = "";
-            mark.value = null;
+            commentRef.value = "";
+            markRef.value = null;
         }
     },
     { immediate: true },
@@ -214,7 +215,7 @@ window.Vue.watch(
                         {{ locale.grades.proper() }}
                         <mark-scheme
                             :key="cellInfo.aImpl.instructorMarkScheme.template"
-                            v-model:mark="mark"
+                            v-model:mark="markRef"
                             :participant="{ user: props.student }"
                             :mark-scheme="cellInfo.aImpl.instructorMarkScheme"
                             :submission-error-states="mbStore.data.submissionErrorStates"
@@ -223,7 +224,7 @@ window.Vue.watch(
                     </label>
                     <resubmission-required
                         v-if="cellInfo.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK"
-                        v-model:resubmission-required="cellInfo.participant.resubmissionRequired"
+                        v-model:resubmission-required="resubmissionRequiredRef"
                         :identifier="props.student.id"
                         style="margin-top: 0.5rem"
                     />
@@ -233,7 +234,7 @@ window.Vue.watch(
                     :class="{ 'medium-9': cellInfo.aImpl.instructorMarkScheme.template.length }"
                 >
                     <comment-field
-                        v-model:comment="comment"
+                        v-model:comment="commentRef"
                         :participant="{ user: props.student }"
                         :is-rich-text="true"
                     />
@@ -243,7 +244,7 @@ window.Vue.watch(
                             cellInfo.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK &&
                             cellInfo.aImpl.instructorMarkScheme.template.length === 0
                         "
-                        v-model:resubmission-required="cellInfo.participant.resubmissionRequired"
+                        v-model:resubmission-required="resubmissionRequiredRef"
                         :identifier="props.student.id"
                         style="margin-top: 0.5rem"
                     />

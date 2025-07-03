@@ -32,7 +32,15 @@ const props = withDefaults(defineProps<Props>(), {
     isRichText: false,
 });
 
-const comment = defineModel<string>("comment", { required: true });
+/* Allow the ref to be nullable for easier usage, but useEditor requires a string - null will be converted to an empty string */
+const commentNullable = defineModel<string | null>("comment", { required: true });
+const comment = window.Vue.computed({
+    get: () => commentNullable.value ?? "",
+    set: (value: string | null) => {
+        commentNullable.value = value;
+    },
+});
+
 const textareaEl = window.Vue.useTemplateRef<HTMLTextAreaElement>("textareaRef");
 
 /**
