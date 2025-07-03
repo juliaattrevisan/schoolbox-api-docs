@@ -137,19 +137,21 @@ async function onPublishAll(): Promise<void> {
             </section>
         </template>
 
-        <div class="component-action">
-            <section>
-                <button class="button" @click="isPublishModalOpen = false">Cancel</button>
-                <button
-                    v-if="participantsWithDrafts.length > 0"
-                    class="button"
-                    type="submit"
-                    @click.prevent="onPublishAll"
-                >
-                    Publish All
-                </button>
-            </section>
-        </div>
+        <template #footer>
+            <div class="component-action">
+                <section>
+                    <button class="button" @click="isPublishModalOpen = false">Cancel</button>
+                    <button
+                        v-if="participantsWithDrafts.length > 0"
+                        class="button"
+                        type="submit"
+                        @click.prevent="onPublishAll"
+                    >
+                        Publish All
+                    </button>
+                </section>
+            </div>
+        </template>
     </basic-modal>
 </template>
 
