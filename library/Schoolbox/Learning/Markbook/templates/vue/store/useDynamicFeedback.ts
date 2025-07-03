@@ -85,6 +85,9 @@ export function useDynamicFeedback(
             data.resubmissionRequired.value !== dataPublished.resubmissionRequired.value,
     );
 
+    const isPublishInProgress = window.Vue.ref(false);
+    const hasPublishError = window.Vue.ref(false);
+
     const isAutoSaveInProgress = window.Vue.ref(false);
     const isAutoSavePending = window.Vue.ref(false);
 
@@ -92,9 +95,34 @@ export function useDynamicFeedback(
     const showDraftDialogue = window.Vue.ref(false);
 
     /**
+     * @param isPublish - Whether the form data is being prepared for publishing or just saving a draft
+     * @returns The current form data
+     */
+    function getFormData(isPublish: boolean): Record<string, unknown> {
+        // If there's extra form data to send, include it
+        // This will be the case if the activity is a quiz, since it needs to include the responseId and maxMark
+        const body = postModify.extraFormData ?? {};
+
+        body.mark = data.mark.value;
+        body.comment = data.comment.value;
+        body.resubmissionRequired = data.resubmissionRequired.value;
+
+        if (isPublish) {
+            body.publish = "1"; /* This MUST be the string "1", not a boolean, lol */
+        }
+
+        return body;
+    }
+
+    /**
      * Save the draft feedback
      */
     async function autoSaveDraft(): Promise<void> {
+        /* don't auto-save if we are currently publishing */
+        if (isPublishInProgress.value) {
+            return;
+        }
+
         isAutoSaveInProgress.value = true;
         hasAutoSaveError.value = false;
 
@@ -104,23 +132,13 @@ export function useDynamicFeedback(
         const toast = window.sbProps.toastActivate("Autosaving...");
 
         try {
-            // If there's extra form data to send, include it
-            // This will be the case if the activity is a quiz, since it needs to include the responseId and maxMark
-            const body = postModify.extraFormData ?? {};
-
-            body.mark = data.mark.value;
-            body.comment = data.comment.value;
-            body.resubmissionRequired = data.resubmissionRequired.value;
-
-            console.log("Auto-saving draft feedback", body); // TODO: remove this
-
             const resp = await fetch(postModify.route, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     Accept: "application/json",
                 },
-                body: JSON.stringify(body),
+                body: JSON.stringify(getFormData(false)),
             });
 
             if (!resp.ok) {
@@ -183,28 +201,6 @@ export function useDynamicFeedback(
     }
 
     /**
-     * Publish the feedback
-     */
-    async function publishFeedback(): Promise<void> {
-        // TODO
-        console.log("would have published feedback", {
-            mark: data.mark.value,
-            comment: data.comment.value,
-            resubmissionRequired: data.resubmissionRequired.value,
-        });
-
-        // persist the published data
-        dataPublished.mark.value = data.mark.value;
-        dataPublished.comment.value = data.comment.value;
-        dataPublished.resubmissionRequired.value = data.resubmissionRequired.value;
-
-        // and reset the draft data to defaults
-        dataDraft.mark.value = null;
-        dataDraft.comment.value = null;
-        dataDraft.resubmissionRequired.value = false;
-    }
-
-    /**
      * When the user changes any of the fields, make a draft accordingly
      * For the comment, save after a timeout to avoid rapidly saving on every keystroke
      * For the mark and resubmissionRequired, save immediately
@@ -212,6 +208,61 @@ export function useDynamicFeedback(
     const onFeedbackChangedDebounced = debounce(onFeedbackChanged, TIMEOUT_DURATION_MS);
     window.Vue.watch(() => data.comment.value, onFeedbackChangedDebounced);
     window.Vue.watch(() => [data.mark.value, data.resubmissionRequired.value], onFeedbackChanged);
+
+    /**
+     * Publish the feedback
+     */
+    async function publishFeedback(): Promise<void> {
+        isPublishInProgress.value = true;
+        hasPublishError.value = false;
+
+        /* Now that we're publishing, we don't want to accidentally auto-save the draft after this point */
+        isAutoSavePending.value = false;
+        showDraftDialogue.value = false;
+        onFeedbackChangedDebounced.cancel();
+
+        const toast = window.sbProps.toastActivate("Publishing...");
+
+        try {
+            const resp = await fetch(postModify.route, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                },
+                body: JSON.stringify(getFormData(true)),
+            });
+
+            if (!resp.ok) {
+                throw new Error(`Failed to publish feedback: ${resp.status} ${resp.statusText}`);
+            }
+
+            toast.timeout({ text: "Feedback published", isSuccess: true });
+
+            /* persist the published data */
+            dataPublished.mark.value = data.mark.value;
+            dataPublished.comment.value = data.comment.value;
+            dataPublished.resubmissionRequired.value = data.resubmissionRequired.value;
+
+            /* and reset the draft data to defaults */
+            dataDraft.mark.value = null;
+            dataDraft.comment.value = null;
+            dataDraft.resubmissionRequired.value = false;
+        } catch (error) {
+            console.error("Error publishing feedback:", error);
+            toast.timeout({ text: "Unable to publish feedback", isSuccess: false });
+            isPublishInProgress.value = false;
+            hasPublishError.value = true;
+            return;
+        }
+
+        isPublishInProgress.value = false;
+
+        /* Just in case another draft auto-save was pending, clear it too */
+        isAutoSavePending.value = false;
+        showDraftDialogue.value = false;
+        onFeedbackChangedDebounced.cancel();
+    }
 
     return {
         data,
@@ -223,6 +274,8 @@ export function useDynamicFeedback(
         isPublishedDirty,
         isAutoSaveInProgress,
         isAutoSavePending,
+        isPublishInProgress,
+        hasPublishError,
         hasAutoSaveError,
         showDraftDialogue,
         publishFeedback,

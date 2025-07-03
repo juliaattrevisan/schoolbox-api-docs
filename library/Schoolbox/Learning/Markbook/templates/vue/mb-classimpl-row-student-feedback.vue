@@ -284,11 +284,19 @@ window.Vue.onUnmounted(() => {
                                     disabled
                                 >
                                     <template v-if="cellInfo.feedback.isAutoSaveInProgress">Saving...</template>
-                                    <template v-else-if="cellInfo.feedback.hasAutoSaveError">Saving failed</template>
+                                    <template v-else-if="cellInfo.feedback.hasAutoSaveError"
+                                        >Saving failed</template
+                                    >
                                     <template v-else>Saved as Draft</template>
                                 </button>
-                                <button class="button" type="submit" @click.prevent="cellInfo.feedback.publishFeedback">
-                                    Publish
+                                <button
+                                    v-if="cellInfo.feedback.isPublishedDirty"
+                                    class="button"
+                                    type="submit"
+                                    @click.prevent="cellInfo.feedback.publishFeedback"
+                                >
+                                    <template v-if="cellInfo.feedback.isPublishInProgress">Publishing...</template>
+                                    <template v-else>Publish</template>
                                 </button>
                             </div>
                         </section>
