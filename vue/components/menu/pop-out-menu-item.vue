@@ -4,6 +4,10 @@ interface Props {
      * To display this as a link instead of a button
      */
     link?: string;
+    /**
+     * Force callback over the link being followed
+     */
+    forceCallback?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -15,8 +19,14 @@ const emit = defineEmits(["selected"]);
 
 /**
  * Dispatch to notify of selection
+ * @param e - the event
  */
-function onSelected(): void {
+function onSelected(e: Event): void {
+    if (props.link && !props.forceCallback) {
+        return;
+    }
+
+    e.preventDefault();
     emit("selected");
 }
 </script>

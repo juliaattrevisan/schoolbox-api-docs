@@ -126,6 +126,7 @@ const routes = window.Vue.computed(() => {
         excludeRoute: studentRoutes?.["learningAssessment.postExclude"] ?? null,
         includeRoute: studentRoutes?.["learningAssessment.postInclude"] ?? null,
         historyRoute: studentRoutes?.["learningAssessment.getSummary"] ?? null,
+        postFeedback: studentRoutes?.postFeedback ?? null,
     };
 });
 
@@ -361,11 +362,20 @@ function onUpdateFeedbackSelected(): void {
     // Close the popout
     close();
 
-    mbStore.feedbackSelectedCell = {
+    // If this is already selected, then close it instead I guess
+    // TODO: Maybe when a cell is selected, any other popout click just immediately opens that relevant feedback... hmm
+    const newCell = {
         classImplId: cellInfo.value.classImplId,
         activityId: cellInfo.value.activityId,
         studentId: cellInfo.value.studentId,
     };
+
+    if (JSON.stringify(newCell) === JSON.stringify(mbStore.feedbackSelectedCell)) {
+        mbStore.feedbackSelectedCell = null;
+        return;
+    }
+
+    mbStore.feedbackSelectedCell = newCell;
 }
 
 /**
@@ -522,11 +532,12 @@ function onToggleSelected(): void {
                     "
                 >
                     <pop-out-menu-divider />
-                    <pop-out-menu-item @selected="onUpdateFeedbackSelected"> Update Feedback v2 </pop-out-menu-item>
                     <pop-out-menu-item
                         v-if="!cellInfo.participant.isExcluded"
                         :class="{ 'is-disabled': !routes.updateRoute }"
                         :link="routes.updateRoute ?? undefined"
+                        force-callback
+                        @selected="onUpdateFeedbackSelected"
                     >
                         Update Feedback
                     </pop-out-menu-item>
