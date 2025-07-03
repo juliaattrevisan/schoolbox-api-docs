@@ -8,7 +8,6 @@
      - statusReviewed:   a string representing the 'reviewed'   state
      - errors:           string[]  Admin-configured submission states, eg 'Absent', 'Pending', 'Not Submitted' etc
      - rubricMarks:       bool[]  Whether the student's instructor-given feedback exists and has rubric marks, indexed by user.id
-     - interactionLocked: bool Is the assessment locked for interactions because it is due in an archived term?
      - selfAssess:        bool            Is this being viewed in a self assessment context?
      - selfReflect:       bool            Is this being viewed in a self reflection context?
      - blindReviewUrl:   string
@@ -24,17 +23,12 @@
 {% set labelReviewed   = 'Reviewed' %}
 {% set statusFailed    = 'failed' %}
 
-{% set readonly = interactionLocked and not USER.superUser %}
-
 {% block headerOptions %}
     <li>
         <a id="import-feedback" data-reveal-id="importFeedbackModal" class="icon-upload">Import Feedback</a>
     </li>
-
-    {% if not readonly %}
-        <li class="separator">Bulk Actions</li>
-        <li><a class="icon-approve" data-mass="publish" data-reveal-id="mass-publish">Publish grades & feedback</a></li>
-    {% endif %}
+    <li class="separator">Bulk Actions</li>
+    <li><a class="icon-approve" data-mass="publish" data-reveal-id="mass-publish">Publish grades & feedback</a></li>
 {% endblock %}
 
 
@@ -45,6 +39,7 @@
  # Each type of assessment renders their participants uniquely
 #}
 {% block participant %}
+    {% set readonly = interactionLocked[assessment.id] and not USER.superUser %}
     {% include '@learningAssessment/dueWork/participant.twig' %}
 {% endblock %}
 
@@ -52,8 +47,6 @@
  # Massive javascript hulk
 #}
 {% block scripts %}
-{#    {% if not readonly and assessment.isImplementation %}#}
-    {% if true %}
         <script type="text/javascript" src="{{ CDN_PREFIX }}/js/select-all/jquery.select-all.basic.js?v={{ config.site_version }}"></script>
         <script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.bulky.js?v={{ config.site_version }}"></script>
 
@@ -762,5 +755,4 @@
 
             <a class="close-reveal-modal">&#215;</a>
         </div>
-    {% endif %}
 {% endblock %}

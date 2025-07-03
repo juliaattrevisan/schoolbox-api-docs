@@ -122,18 +122,13 @@ class Controller extends WebController\Base
         // This report may take a while
         $this->extendExecutionTime();
 
-//        $queryArgs = $this->requestQuery->getArrayCopy();
-//        [$filters,] = $this->convertRequestToFilters($courseSpec, $queryArgs, false);
-
-        $request = $this->requestPost['filter_selection'] ?: [];
-
         /**
-         * @var null[]|Collection[]        $filters
-         * @var Filter\Codec               $codec
-         * @var Filter\Selection\Model[][] $selectionsPerFilter
+         * we are assuming the links to this page have been appended with
+         * 'queryArgs'               => $codec->convertSelectionsToQueryString($selectionsPerFilter),
          */
-        // TODO add some intelligence around which filter settings to save (eg AssessmentType but not units)
-        [$filters, $codec, $selectionsPerFilter] = $this->convertRequestToFilters($courseSpec, $request, true);
+
+        $queryArgs = $this->requestQuery->getArrayCopy();
+        [$filters,] = $this->convertRequestToFilters($courseSpec, $queryArgs, false);
 
         $assessmentIds  = $this->assessmentIdFinder->findIdsByFilters($filters, $this->getUser());
 
@@ -395,7 +390,7 @@ class Controller extends WebController\Base
          * @var Filter\Selection\Model[][] $selectionsPerFilter
          */
         // TODO add some intelligence around which filter settings to save (eg AssessmentType but not units)
-        [$filters, $codec, $selectionsPerFilter] = $this->convertRequestToFilters($courseSpec, $request, true);
+        [$filters, $codec, $selectionsPerFilter] = $this->convertRequestToFilters($courseSpec, $request, false);
 
         $assessmentIds  = $this->assessmentIdFinder->findIdsByFilters($filters, $this->getUser());
 
@@ -489,15 +484,8 @@ class Controller extends WebController\Base
         // This report may take a while
         $this->extendExecutionTime();
 
-        $request = $this->requestPost['filter_selection'] ?: [];
-
-        /**
-         * @var null[]|Collection[]        $filters
-         * @var Filter\Codec               $codec
-         * @var Filter\Selection\Model[][] $selectionsPerFilter
-         */
-        // TODO add some intelligence around which filter settings to save (eg AssessmentType but not units)
-        [$filters, $codec, $selectionsPerFilter] = $this->convertRequestToFilters($courseSpec, $request, true);
+        $queryArgs = $this->requestQuery->getArrayCopy();
+        [$filters,] = $this->convertRequestToFilters($courseSpec, $queryArgs, false);
 
         $assessmentIds  = $this->assessmentIdFinder->findIdsByFilters($filters, $this->getUser());
 
