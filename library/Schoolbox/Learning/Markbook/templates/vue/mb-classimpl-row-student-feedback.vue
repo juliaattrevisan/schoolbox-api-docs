@@ -64,6 +64,12 @@ function getCellInfo() {
         return null;
     }
 
+    const { postFeedback } = aImpl._routes.student[props.studentId];
+    if (postFeedback === null) {
+        console.warn("Post feedback route not found");
+        return null;
+    }
+
     const feedback = useDynamicFeedback(
         { mark: markRef, comment: commentRef, resubmissionRequired: resubmissionRequiredRef },
         {
@@ -77,8 +83,8 @@ function getCellInfo() {
             resubmissionRequired: window.Vue.toRef(participant.resubmissionRequired),
         },
         {
-            route: " TODO ",
-            // extraFormData: .... TODO
+            route: postFeedback,
+            // extraFormData: .... TODO (need extra payload data)
         },
         activity.assessmentType === ACTIVITY_TYPE_QUIZ,
     );
@@ -267,23 +273,23 @@ window.Vue.onUnmounted(() => {
                     <div class="component-action" data-action-bar="60" data-mass-publish>
                         <section>
                             <div>
+                                <!-- TODO: "Has Rubric"/files/etc message (see status.twig)? - will need extra payload data -->
+                                <!-- TODO: "Mark as Submitted" button? - will need extra payload data -->
                                 <button
-                                    data-sobo
-                                    title="Acknowledge receipt of student submission"
-                                    href="/learning/assessments/767/60/received"
-                                >
-                                    Mark as Submitted
-                                </button>
-                                <button
+                                    v-if="cellInfo.feedback.hasDraftMark || cellInfo.feedback.showDraftDialogue"
                                     class="button disabled"
-                                    data-draft="drafted"
+                                    :class="{ 'saving-error': cellInfo.feedback.hasAutoSaveError }"
                                     title="You can discard this draft from the Grading Overview screen"
                                     data-test="assessment-response-info-saved-as-draft"
                                     disabled
                                 >
-                                    Saved as Draft
+                                    <template v-if="cellInfo.feedback.isAutoSaveInProgress">Saving...</template>
+                                    <template v-else-if="cellInfo.feedback.hasAutoSaveError">Saving failed</template>
+                                    <template v-else>Saved as Draft</template>
                                 </button>
-                                <a class="button" data-draft="publish" data-draft-id="187">Publish</a>
+                                <button class="button" type="submit" @click.prevent="cellInfo.feedback.publishFeedback">
+                                    Publish
+                                </button>
                             </div>
                         </section>
                     </div>

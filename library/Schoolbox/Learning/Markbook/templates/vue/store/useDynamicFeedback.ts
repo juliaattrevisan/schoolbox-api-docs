@@ -45,14 +45,17 @@ export function useDynamicFeedback(
         return marks.mark.value !== null || (marks.comment.value !== null && marks.comment.value.length > 0);
     }
 
+    const hasDraftMark = window.Vue.computed(() => hasMeaningfulMarks(dataDraft));
+    const hasPublishedMark = window.Vue.computed(() => hasMeaningfulMarks(dataPublished));
+
     /**
      * Figure out if there's any initial data to use, and if so - populate the data with it
      * Draft takes precedence over published if both are available
      */
     let initialData: DynamicFeedbackData | null = null;
-    if (hasMeaningfulMarks(dataDraft)) {
+    if (hasDraftMark.value) {
         initialData = dataDraft;
-    } else if (hasMeaningfulMarks(dataPublished)) {
+    } else if (hasPublishedMark.value) {
         initialData = dataPublished;
     }
 
@@ -85,7 +88,7 @@ export function useDynamicFeedback(
     const isAutoSaveInProgress = window.Vue.ref(false);
     const isAutoSavePending = window.Vue.ref(false);
 
-    const hasSaveError = window.Vue.ref(false);
+    const hasAutoSaveError = window.Vue.ref(false);
     const showDraftDialogue = window.Vue.ref(false);
 
     /**
@@ -93,7 +96,7 @@ export function useDynamicFeedback(
      */
     async function autoSaveDraft(): Promise<void> {
         isAutoSaveInProgress.value = true;
-        hasSaveError.value = false;
+        hasAutoSaveError.value = false;
 
         /* the first time a draft is saved, the "Draft saved"/"Saving failed"/etc dialogue should be shown */
         showDraftDialogue.value = true;
@@ -111,11 +114,18 @@ export function useDynamicFeedback(
 
             console.log("Auto-saving draft feedback", body); // TODO: remove this
 
-            await fetch(postModify.route, {
+            const resp = await fetch(postModify.route, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                },
                 body: JSON.stringify(body),
             });
+
+            if (!resp.ok) {
+                throw new Error(`Failed to auto-save draft feedback: ${resp.status} ${resp.statusText}`);
+            }
 
             toast.timeout({ text: "Draft saved", isSuccess: true });
 
@@ -127,7 +137,7 @@ export function useDynamicFeedback(
             console.error("Error auto-saving draft feedback:", error);
             toast.timeout({ text: "Unable to save draft", isSuccess: false });
             isAutoSaveInProgress.value = false;
-            hasSaveError.value = true;
+            hasAutoSaveError.value = true;
             return;
         }
 
@@ -187,6 +197,11 @@ export function useDynamicFeedback(
         dataPublished.mark.value = data.mark.value;
         dataPublished.comment.value = data.comment.value;
         dataPublished.resubmissionRequired.value = data.resubmissionRequired.value;
+
+        // and reset the draft data to defaults
+        dataDraft.mark.value = null;
+        dataDraft.comment.value = null;
+        dataDraft.resubmissionRequired.value = false;
     }
 
     /**
@@ -202,11 +217,13 @@ export function useDynamicFeedback(
         data,
         dataDraft,
         dataPublished,
+        hasDraftMark,
+        hasPublishedMark,
         isDraftDirty,
         isPublishedDirty,
         isAutoSaveInProgress,
         isAutoSavePending,
-        hasSaveError,
+        hasAutoSaveError,
         showDraftDialogue,
         publishFeedback,
     };

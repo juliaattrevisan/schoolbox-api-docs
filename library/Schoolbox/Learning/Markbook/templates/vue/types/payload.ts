@@ -98,6 +98,8 @@ export type MarkbookClassImplActivity = {
                 "learningAssessment.postExclude": string | null;
                 "learningAssessment.postInclude": string | null;
                 "learningAssessment.getSummary": string | null;
+                /* this will change depending on if it's a quiz or due work */
+                postFeedback: string | null;
             }
         >;
     };

@@ -24,6 +24,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use Schoolbox\Learning\Assessment\Feedback\Visibility;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DueWork;
+use Schoolbox\Learning\Assessment\Quiz;
 use Schoolbox\Learning\Assessment\Task;
 use Schoolbox\Learning\Assessment\Translator\UnitAssessments;
 use Schoolbox\Learning\MarkScheme\Factory;
@@ -211,13 +212,13 @@ class Controller extends Base
                                                 'norm'         => $authoritativeFeedback ? $participant->getNormalisedMark(true) : null,
                                                 'hr'           => $authoritativeFeedback ? $participant->getHumanReadableMark(true) : null,
                                                 'hrInstructor' => $authoritativeFeedback ? $participant->getHumanReadableInstructorMark(true) : null,
-                                                'comment'      => $this->purifier->purify($authoritativeFeedback->getComment()),
+                                                'comment'      => $this->purifier->purify($authoritativeFeedback?->getComment()),
                                             ],
                                             'draft' => [
                                                 'norm'         => $authoritativeFeedbackDraft ? $participant->getNormalisedMark(false) : null,
                                                 'hr'           => $authoritativeFeedbackDraft ? $participant->getHumanReadableMark(false) : null,
                                                 'hrInstructor' => $authoritativeFeedbackDraft ? $participant->getHumanReadableInstructorMark(false) : null,
-                                                'comment'      => $this->purifier->purify($authoritativeFeedbackDraft->getComment()),
+                                                'comment'      => $this->purifier->purify($authoritativeFeedbackDraft?->getComment()),
                                             ],
                                         ],
                                         'isResponseRequired' => $participant->isResponseRequired(),
@@ -293,6 +294,26 @@ class Controller extends Base
                                             'studentId' => $student->getId(),
                                             'student' => $student,
                                         ]
+                                    ),
+                                    /* this will change depending on if it's a quiz or due work */
+                                    'postFeedback' =>
+                                        $aImpl instanceof DueWork\Model ? $this->getRouteIfAuthorized(
+                                            'learningDueWorkFeedback.postParticipantFeedback',
+                                            [
+                                                'assessment' => $aImpl,
+                                                'assessmentId' => $aImpl->getId(),
+                                                'studentId' => $student->getId(),
+                                                'student' => $student,
+                                            ]
+                                        ) : ($aImpl instanceof Quiz\Model ? $this->getRouteIfAuthorized(
+                                            'learningQuizAttempt.postModify',
+                                            [
+                                                'assessment' => $aImpl,
+                                                'assessmentId' => $aImpl->getId(),
+                                                'studentId' => $student->getId(),
+                                                'student' => $student,
+                                            ],
+                                        ) : null
                                     ),
                                 ]),
                             ],

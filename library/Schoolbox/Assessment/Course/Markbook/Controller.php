@@ -22,6 +22,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DueWork;
+use Schoolbox\Learning\Assessment\Quiz;
 use Schoolbox\Learning\Assessment\Task;
 use Schoolbox\Learning\Assessment\Feedback\Visibility;
 use Schoolbox\Learning\Assessment\Translator\UnitAssessments;
@@ -424,6 +425,26 @@ class Controller extends WebController\Base
                                                     'studentId' => $student->getId(),
                                                     'student' => $student,
                                                 ]
+                                            ),
+                                            /* this will change depending on if it's a quiz or due work */
+                                            'postFeedback' =>
+                                                $aImpl instanceof DueWork\Model ? $this->getRouteIfAuthorized(
+                                                    'learningDueWorkFeedback.postParticipantFeedback',
+                                                    [
+                                                        'assessment' => $aImpl,
+                                                        'assessmentId' => $aImpl->getId(),
+                                                        'studentId' => $student->getId(),
+                                                        'student' => $student,
+                                                    ]
+                                                ) : ($aImpl instanceof Quiz\Model ? $this->getRouteIfAuthorized(
+                                                    'learningQuizAttempt.postModify',
+                                                    [
+                                                        'assessment' => $aImpl,
+                                                        'assessmentId' => $aImpl->getId(),
+                                                        'studentId' => $student->getId(),
+                                                        'student' => $student,
+                                                    ],
+                                                ) : null
                                             ),
                                         ]),
                                     ]
