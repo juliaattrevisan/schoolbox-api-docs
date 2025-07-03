@@ -1544,10 +1544,9 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         $this->htmlConverter->setHtml($pastoral->getBodyPrivate());
         $bodyPrivateText = $this->htmlConverter->getText();
 
-        // Synergetic will strip linefeed (0x0a) characters on import.
-        // Convert them to windows-style (0x0a, 0x0d) so line breaks will be exported as expected.
-        $bodyPublicText = str_replace("\n", "\r\n", $bodyPublicText);
-        $bodyPrivateText = str_replace("\n", "\r\n", $bodyPrivateText);
+        // Synergetic will ignore Unix-style line endings, so must convert to Dos-style before exporting.
+        $bodyPublicText = $this->convertLineEndingsUnixToDos($bodyPublicText);
+        $bodyPrivateText = $this->convertLineEndingsUnixToDos($bodyPrivateText);
 
         // Return an array containing the parameters for the insert/update query
 
@@ -1754,5 +1753,19 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             ];
         }
         return $exDocClassLookup;
+    }
+
+    /**
+     * Convert a string containing a mixture of Unix and Dos style line endings (LF or CRLF) to Dos style only (CRLF).
+     * @param string $string
+     * @return string
+     */
+    private function convertLineEndingsUnixToDos(string $string): string
+    {
+        // First strip CR characters.
+        $string = str_replace("\n", "\r\n", $string);
+
+        // Then convert all LF to CRLF.
+        return str_replace("\n", "\r\n", $string);
     }
 }

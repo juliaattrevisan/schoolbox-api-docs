@@ -185,6 +185,7 @@ class External_DatabaseFactory
             try {
                 return $this->buildSynergeticPastoralConnector($this->getSchoolCode($config));
             } catch (Alaress\Database\Exception $e) {
+            $a = $e;
             }
         }
         return new External_Offline_Pastoral();
