@@ -97,6 +97,17 @@ async function onMarkChanged(): Promise<void> {
 }
 
 /**
+ * Blur the input when the enter key is pressed rather than submitting the form
+ * This apparently needs to be handled here instead of on the form, since alaressValidate
+ * takes over the form submit event too early and we can't stop it
+ */
+function onClickEnter(): void {
+    if (markInputEl.value) {
+        markInputEl.value.blur();
+    }
+}
+
+/**
  * If the mark model is updated elsewhere, update the local mark
  * to ensure the input is always in sync
  */
@@ -130,5 +141,6 @@ window.Vue.watch(mark, async (newValue) => {
         data-combobox
         :readonly="props.readonly"
         @change="onMarkChanged"
+        @keypress.enter.prevent="onClickEnter"
     />
 </template>
