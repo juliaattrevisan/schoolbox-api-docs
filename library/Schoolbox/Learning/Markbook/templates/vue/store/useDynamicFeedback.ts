@@ -239,8 +239,13 @@ export function useDynamicFeedback(
 
     /**
      * Publish the feedback
+     * @returns whether the publish was successful
      */
-    async function publishFeedback(): Promise<void> {
+    async function publishFeedback(): Promise<boolean> {
+        if (isPublishInProgress.value) {
+            return false;
+        }
+
         isPublishInProgress.value = true;
         hasPublishError.value = false;
 
@@ -293,7 +298,7 @@ export function useDynamicFeedback(
             toast.timeout({ text: "Unable to publish feedback", isSuccess: false });
             isPublishInProgress.value = false;
             hasPublishError.value = true;
-            return;
+            return false;
         }
 
         isPublishInProgress.value = false;
@@ -302,6 +307,8 @@ export function useDynamicFeedback(
         isAutoSavePending.value = false;
         showDraftDialogue.value = false;
         onFeedbackChangedDebounced.cancel();
+
+        return true;
     }
 
     return {
