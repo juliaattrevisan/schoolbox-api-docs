@@ -90,7 +90,7 @@ class ItemPool implements CacheItemPoolInterface
      * @return CacheItemInterface
      * @throws InvalidArgumentException if `$key` isn't valid
      */
-    public function getItem($key)
+    public function getItem($key): CacheItemInterface
     {
         $this->assertKeyValid($key);
         if (isset($this->deferredItems[$key])) {
@@ -122,7 +122,7 @@ class ItemPool implements CacheItemPoolInterface
      * @return array<string, CacheItemInterface>
      * @throws InvalidArgumentException if any `$keys` aren't valid
      */
-    public function getItems(array $keys = [])
+    public function getItems(array $keys = []): iterable
     {
         $result = [];
         foreach ($keys as $key) {
@@ -138,7 +138,7 @@ class ItemPool implements CacheItemPoolInterface
      * @return bool
      * @throws InvalidArgumentException if `$key` isn't valid
      */
-    public function hasItem($key)
+    public function hasItem($key): bool
     {
         $this->assertKeyValid($key);
         if (isset($this->deferredItems[$key])) {
@@ -152,7 +152,7 @@ class ItemPool implements CacheItemPoolInterface
      *
      * @return bool
      */
-    public function clear()
+    public function clear(): bool
     {
         $keys = [];
         foreach (new SetKey($this->redis, $this->keyGenerator->generateKey(self::SET_KEY)) as $key) {
@@ -171,7 +171,7 @@ class ItemPool implements CacheItemPoolInterface
      * @return bool
      * @throws InvalidArgumentException if `$key` isn't valid
      */
-    public function deleteItem($key)
+    public function deleteItem($key): bool
     {
         $this->assertKeyValid($key);
         if ($this->redis->del($this->keyGenerator->generateKey($key))) {
@@ -189,7 +189,7 @@ class ItemPool implements CacheItemPoolInterface
      * @return bool
      * @throws InvalidArgumentException if any `$keys` aren't valid
      */
-    public function deleteItems(array $keys)
+    public function deleteItems(array $keys): bool
     {
         foreach ($keys as $key) {
             if (!$this->deleteItem($key)) {
@@ -205,7 +205,7 @@ class ItemPool implements CacheItemPoolInterface
      * @param CacheItemInterface $item
      * @return bool
      */
-    public function save(CacheItemInterface $item)
+    public function save(CacheItemInterface $item): bool
     {
         $key    = $this->keyGenerator->generateKey($item->getKey());
         $cached = $this->codec->encode($item->get());
@@ -237,7 +237,7 @@ class ItemPool implements CacheItemPoolInterface
      * @param CacheItemInterface $item
      * @return bool
      */
-    public function saveDeferred(CacheItemInterface $item)
+    public function saveDeferred(CacheItemInterface $item): bool
     {
         $this->deferredItems[$this->keyGenerator->generateKey($item->getKey())] = $item;
         return true;
@@ -248,7 +248,7 @@ class ItemPool implements CacheItemPoolInterface
      *
      * @return bool
      */
-    public function commit()
+    public function commit(): bool
     {
         foreach ($this->deferredItems as $key => $item) {
             if (!$this->save($item)) {
@@ -276,15 +276,4 @@ class ItemPool implements CacheItemPoolInterface
             throw new InvalidArgumentException(sprintf('Cache key "%s" is reserved and may not be used', $key));
         }
     }
-//
-//    /**
-//     * Determines the Redis key for the item's actual key.
-//     *
-//     * @param string $key
-//     * @return string
-//     */
-//    private function determineRedisKey(string $key): string
-//    {
-//        return sprintf('accessToken:%s:%s', INSTANCE_ID, $key);
-//    }
 }
