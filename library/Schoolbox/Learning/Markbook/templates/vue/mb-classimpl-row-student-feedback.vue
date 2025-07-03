@@ -72,22 +72,32 @@ function getCellInfo() {
     }
 
     const feedback = useDynamicFeedback(
-        { mark: markRef, comment: commentRef, resubmissionRequired: resubmissionRequiredRef },
+        { hrMarkInstructor: markRef, comment: commentRef, resubmissionRequired: resubmissionRequiredRef },
         {
-            mark: window.Vue.toRef(participant.marks.draft.hrInstructor),
-            comment: window.Vue.toRef(participant.marks.draft.comment),
-            resubmissionRequired: window.Vue.toRef(participant.resubmissionRequired),
+            hrMarkInstructor: window.Vue.toRef(participant.marks.draft, "hrInstructor"),
+            hrMark: window.Vue.toRef(participant.marks.draft, "hr"),
+            normMark: window.Vue.toRef(participant.marks.draft, "norm"),
+            comment: window.Vue.toRef(participant.marks.draft, "comment"),
+            resubmissionRequired: window.Vue.toRef(participant, "resubmissionRequired"),
         },
         {
-            mark: window.Vue.toRef(participant.marks.published.hrInstructor),
-            comment: window.Vue.toRef(participant.marks.published.comment),
-            resubmissionRequired: window.Vue.toRef(participant.resubmissionRequired),
+            hrMarkInstructor: window.Vue.toRef(participant.marks.published, "hrInstructor"),
+            hrMark: window.Vue.toRef(participant.marks.published, "hr"),
+            normMark: window.Vue.toRef(participant.marks.published, "norm"),
+            comment: window.Vue.toRef(participant.marks.published, "comment"),
+            resubmissionRequired: window.Vue.toRef(participant, "resubmissionRequired"),
+        },
+        {
+            hasSubmittedResponse: window.Vue.toRef(participant, "hasSubmittedResponse"),
+            hasPublishedFeedback: window.Vue.toRef(participant, "hasPublishedFeedback"),
         },
         {
             route: postFeedback,
             // extraFormData: .... TODO (need extra payload data)
         },
         activity.assessmentType === ACTIVITY_TYPE_QUIZ,
+        aImpl.instructorMarkScheme,
+        mbStore.data.submissionErrorStates,
     );
 
     return {
@@ -236,7 +246,7 @@ window.Vue.onUnmounted(() => {
                         {{ locale.grades.proper() }}
                         <mark-scheme
                             :key="cellInfo.aImpl.instructorMarkScheme.template"
-                            v-model:mark="cellInfo.feedback.data.mark"
+                            v-model:mark="cellInfo.feedback.data.hrMarkInstructor"
                             :participant="{ user: cellInfo.student }"
                             :mark-scheme="cellInfo.aImpl.instructorMarkScheme"
                             :submission-error-states="mbStore.data.submissionErrorStates"
@@ -299,7 +309,7 @@ window.Vue.onUnmounted(() => {
                                         <template v-else>Saved as Draft</template>
                                     </button>
                                     <button
-                                        v-if="cellInfo.feedback.isPublishedDirty"
+                                        v-if="cellInfo.feedback.isPublishedDirty || cellInfo.feedback.hasDraftMark"
                                         class="button"
                                         type="submit"
                                         @click.prevent="cellInfo.feedback.publishFeedback"

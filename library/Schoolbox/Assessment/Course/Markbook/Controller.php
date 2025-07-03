@@ -29,6 +29,7 @@ use Schoolbox\Learning\Assessment\Translator\UnitAssessments;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
+use Schoolbox\Learning\DueWork\State;
 use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -504,7 +505,11 @@ class Controller extends WebController\Base
                 ],
                 'canAccessPopOut' => $this->getCanAccessPopOut($courseSpec),
                 'availableVisibilities' => Visibility::getAvailableVisibilities((int)$this->getConfigLoader()->get(ConfigMapper::NAME_SUBMISSION_VISIBILITY_MAX)),
-                'submissionErrorStates' => $this->stateMapper->listDisplayValues(),
+                'submissionErrorStates' => $this->stateMapper->findAll()->map(fn(State $state) => [
+                    'id' => $state->getId(),
+                    'name' => $state->getDisplayAs(),
+                    'normaliseAs' => $state->getNormaliseAs(),
+                ])->reindex(),
             ];
 
             $this->response = $this->responseAsJson([

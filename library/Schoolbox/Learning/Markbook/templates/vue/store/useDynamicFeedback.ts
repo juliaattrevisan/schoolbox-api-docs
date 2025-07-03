@@ -1,10 +1,22 @@
 import { debounce } from "lodash";
 import type { Ref } from "vue";
+import type { MarkScheme, SubmissionErrorStates } from "@schoolboxLibrary/Learning/MarkScheme/templates/ts/markScheme";
+import { normaliseHrMark } from "@schoolboxLibrary/Learning/MarkScheme/templates/ts/markScheme";
 
-interface DynamicFeedbackData {
-    mark: Ref<string | null>;
+interface DynamicFeedbackEditableData {
+    hrMarkInstructor: Ref<string | null>;
     comment: Ref<string | null>;
     resubmissionRequired: Ref<boolean>;
+}
+
+interface DynamicFeedbackData extends DynamicFeedbackEditableData {
+    hrMark: Ref<string | null>;
+    normMark: Ref<number | null>;
+}
+
+interface DynamicFeedbackExtraData {
+    hasSubmittedResponse: Ref<boolean>;
+    hasPublishedFeedback: Ref<boolean>;
 }
 
 const TIMEOUT_DURATION_MS = 600; // After how many milliseconds should we auto-save user input
@@ -19,22 +31,28 @@ const TIMEOUT_DURATION_MS = 600; // After how many milliseconds should we auto-s
  *                                   these should be used in a v-model or similar to allow the user to edit them
  * @param dataDraft                - Refs to each field that should be treated as the saved draft data state
  * @param dataPublished            - Refs to each field that should be treated as the saved published data state
+ * @param dataExtra                - Extra refs to fields that get updated when the user does actions like publishing feedback
  * @param postModify               - See below:
  * @param postModify.route         - The route to post the modified data to
  * @param postModify.extraFormData - Any extra form data to include in the POST reques
  * @param isQuiz                   - Whether the activity is a quiz
+ * @param instructorMarkScheme     - The instructor mark scheme
+ * @param submissionErrorStates    - All the states from submission_errors
  * @returns properties
  */
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- we want the inferred type from this as it's more useful
 export function useDynamicFeedback(
-    data: DynamicFeedbackData,
+    data: DynamicFeedbackEditableData,
     dataDraft: DynamicFeedbackData,
     dataPublished: DynamicFeedbackData,
+    dataExtra: DynamicFeedbackExtraData,
     postModify: {
         route: string;
         extraFormData?: Record<string, unknown>;
     },
-    isQuiz: boolean = false,
+    isQuiz: boolean,
+    instructorMarkScheme: MarkScheme,
+    submissionErrorStates: SubmissionErrorStates,
 ) {
     /**
      * Is a given mark-set meaningful?
@@ -42,7 +60,9 @@ export function useDynamicFeedback(
      * @returns bool
      */
     function hasMeaningfulMarks(marks: DynamicFeedbackData): boolean {
-        return marks.mark.value !== null || (marks.comment.value !== null && marks.comment.value.length > 0);
+        return (
+            marks.hrMarkInstructor.value !== null || (marks.comment.value !== null && marks.comment.value.length > 0)
+        );
     }
 
     const hasDraftMark = window.Vue.computed(() => hasMeaningfulMarks(dataDraft));
@@ -60,7 +80,7 @@ export function useDynamicFeedback(
     }
 
     if (initialData !== null) {
-        data.mark.value = initialData.mark.value;
+        data.hrMarkInstructor.value = initialData.hrMarkInstructor.value;
         data.comment.value = initialData.comment.value;
         data.resubmissionRequired.value = initialData.resubmissionRequired.value;
     }
@@ -70,7 +90,7 @@ export function useDynamicFeedback(
      */
     const isDraftDirty = window.Vue.computed(
         (): boolean =>
-            data.mark.value !== dataDraft.mark.value ||
+            data.hrMarkInstructor.value !== dataDraft.hrMarkInstructor.value ||
             data.comment.value !== dataDraft.comment.value ||
             data.resubmissionRequired.value !== dataDraft.resubmissionRequired.value,
     );
@@ -80,7 +100,7 @@ export function useDynamicFeedback(
      */
     const isPublishedDirty = window.Vue.computed(
         (): boolean =>
-            data.mark.value !== dataPublished.mark.value ||
+            data.hrMarkInstructor.value !== dataPublished.hrMarkInstructor.value ||
             data.comment.value !== dataPublished.comment.value ||
             data.resubmissionRequired.value !== dataPublished.resubmissionRequired.value,
     );
@@ -103,7 +123,7 @@ export function useDynamicFeedback(
         // This will be the case if the activity is a quiz, since it needs to include the responseId and maxMark
         const body = postModify.extraFormData ?? {};
 
-        body.mark = data.mark.value;
+        body.mark = data.hrMarkInstructor.value;
         body.comment = data.comment.value;
         body.resubmissionRequired = data.resubmissionRequired.value;
 
@@ -148,7 +168,15 @@ export function useDynamicFeedback(
             toast.timeout({ text: "Draft saved", isSuccess: true });
 
             // persist the draft data
-            dataDraft.mark.value = data.mark.value;
+            dataDraft.normMark.value = normaliseHrMark(
+                data.hrMarkInstructor.value,
+                instructorMarkScheme,
+                submissionErrorStates,
+            );
+            dataDraft.hrMarkInstructor.value =
+                data.hrMarkInstructor.value; /* TODO: This ideally un-normalises the mark */
+            dataDraft.hrMark.value =
+                data.hrMarkInstructor.value; /* TODO: This also requires un-normalising the mark lol */
             dataDraft.comment.value = data.comment.value;
             dataDraft.resubmissionRequired.value = data.resubmissionRequired.value;
         } catch (error) {
@@ -207,7 +235,7 @@ export function useDynamicFeedback(
      */
     const onFeedbackChangedDebounced = debounce(onFeedbackChanged, TIMEOUT_DURATION_MS);
     window.Vue.watch(() => data.comment.value, onFeedbackChangedDebounced);
-    window.Vue.watch(() => [data.mark.value, data.resubmissionRequired.value], onFeedbackChanged);
+    window.Vue.watch(() => [data.hrMarkInstructor.value, data.resubmissionRequired.value], onFeedbackChanged);
 
     /**
      * Publish the feedback
@@ -239,14 +267,26 @@ export function useDynamicFeedback(
 
             toast.timeout({ text: "Feedback published", isSuccess: true });
 
+            dataExtra.hasPublishedFeedback.value = true;
+
             /* persist the published data */
-            dataPublished.mark.value = data.mark.value;
+            dataPublished.normMark.value = normaliseHrMark(
+                data.hrMarkInstructor.value,
+                instructorMarkScheme,
+                submissionErrorStates,
+            );
+            dataPublished.hrMarkInstructor.value =
+                data.hrMarkInstructor.value; /* TODO: This ideally un-normalises the mark */
+            dataPublished.hrMark.value =
+                data.hrMarkInstructor.value; /* TODO: This also requires un-normalising the mark lol */
             dataPublished.comment.value = data.comment.value;
             dataPublished.resubmissionRequired.value = data.resubmissionRequired.value;
 
             /* and reset the draft data to defaults */
-            dataDraft.mark.value = null;
             dataDraft.comment.value = null;
+            dataDraft.hrMark.value = null;
+            dataDraft.normMark.value = null;
+            dataDraft.hrMarkInstructor.value = null;
             dataDraft.resubmissionRequired.value = false;
         } catch (error) {
             console.error("Error publishing feedback:", error);

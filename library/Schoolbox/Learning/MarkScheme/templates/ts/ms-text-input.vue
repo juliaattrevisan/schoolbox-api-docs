@@ -94,7 +94,7 @@ window.Vue.onMounted(() => {
     }
 
     if (!props.readonly) {
-        $(markInputEl.value).combobox(props.submissionErrorStates);
+        $(markInputEl.value).combobox(props.submissionErrorStates.map((state) => state.name));
 
         const validateTarget =
             (props.alaressValidateTarget ? document.querySelector(props.alaressValidateTarget) : null) ||

@@ -100,7 +100,12 @@ const mark = defineModel<string | null>("mark", { required: true });
          like Submitted/Absent/Pending etc. so look there as well
          -->
         <optgroup v-if="props.studentView" label="States">
-            <option v-for="state in props.submissionErrorStates" :key="state" :value="state" :selected="mark === state">
+            <option
+                v-for="state in props.submissionErrorStates"
+                :key="state.id"
+                :value="state"
+                :selected="mark === state.name"
+            >
                 {{ state }}
             </option>
         </optgroup>
@@ -121,7 +126,7 @@ const mark = defineModel<string | null>("mark", { required: true });
                 mark !== null &&
                 mark.length &&
                 props.markScheme.context.conf.find((level) => level.caption === mark) === undefined &&
-                props.submissionErrorStates.find((state) => state === mark) === undefined
+                props.submissionErrorStates.find((state) => state.name === mark) === undefined
             "
             label="Original Deleted Grade"
         >

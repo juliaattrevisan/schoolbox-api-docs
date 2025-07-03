@@ -28,6 +28,7 @@ use Schoolbox\Learning\Assessment\Quiz;
 use Schoolbox\Learning\Assessment\Task;
 use Schoolbox\Learning\Assessment\Translator\UnitAssessments;
 use Schoolbox\Learning\MarkScheme\Factory;
+use Schoolbox\Learning\DueWork\State;
 use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Model as FolderModel;
@@ -357,7 +358,11 @@ class Controller extends Base
                 ],
                 'canAccessPopOut' => true, /* can always access the pop-out on the class markbook, I suppose */
                 'availableVisibilities' => Visibility::getAvailableVisibilities((int)$this->getConfigLoader()->get(ConfigMapper::NAME_SUBMISSION_VISIBILITY_MAX)),
-                'submissionErrorStates' => $this->stateMapper->listDisplayValues(),
+                'submissionErrorStates' => $this->stateMapper->findAll()->map(fn(State $state) => [
+                    'id' => $state->getId(),
+                    'name' => $state->getDisplayAs(),
+                    'normaliseAs' => $state->getNormaliseAs(),
+                ])->reindex(),
             ];
 
             $this->response = $this->responseAsJson([
