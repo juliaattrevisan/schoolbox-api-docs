@@ -124,7 +124,8 @@
         "ext-imap": "*",
         "ext-sockets": "*",
         "psr/http-message": "2.0 as 1.1",
-        "cweagans/composer-patches": "^1.0.0"
+        "cweagans/composer-patches": "^1.0.0",
+        "symfony/cache": "^7.2"
     },
     "autoload-dev": {
       "psr-4": {
