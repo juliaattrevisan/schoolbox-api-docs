@@ -107,7 +107,7 @@
     <script type="text/javascript" src='{{ CDN_PREFIX }}/js/submissions/jquery.dynamic-feedback.js'></script>
     <script type="text/javascript">
         $(function() {
-            var $participantList  = $('#assessment-status');
+            var $participantList  = $('[data-assessment-status]');
 
             /**
              * Currently quiz does not support a draft state, so any changes to grade/comment is published when a 'Save and Publish' button is selected instead.
@@ -223,34 +223,6 @@
                     const statusIcon = participantRow.find('.meta [data-status]');
                     statusIcon.removeClass('{{ statusIncomplete }}').addClass('{{ statusPending }}');
                     statusIcon.attr('title', '{{ labelPending }}');
-                });
-            });
-
-            {# download attempts delayed #}
-            $('[data-download]').click(function (e) {
-                e.preventDefault();
-                $(this).confirmDialog({
-                    header: 'Download all attempts?',
-                    format: 'html',
-                    text: `
-                                    <p>
-                                        Please be aware that your download will take some time
-                                        to complete, as we compile the students&rsquo; attempts.
-                                    </p>
-
-                                    <p>
-                                        Feel free to move away from this page and continue
-                                        working: we will send you a notification when the file
-                                        is ready to download.
-                                    </p>
-                                    `,
-                    confirmEvent: function () {
-                        toast = $('.toast[data-save-draft]');
-
-                        $.post('{{ routeLookup('learnosity.getExportDownload', { assessmentId: assessmentSpec.id }) }}').done(function () {
-                            toast.toastTimeout({text: 'Generating download...', css: 'info'});
-                        })
-                    }
                 });
             });
         });
