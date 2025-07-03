@@ -13,7 +13,15 @@
         {# If the type is password, set autocomplete to new-password to avoid autofill overriding it #}
         {% if (inputType ?? false) == 'password' %}autocomplete="new-password"{% endif %}
         {% if maxlength ?? false %}maxlength="{{ maxlength }}"{% endif %}
+        {% if minlength ?? false %}minlength="{{ minlength }}"{% endif %}
         {% if not editable %}disabled="disabled"{% endif %}
-        {% block extraInputAttributes %}{% endblock %}
+        {% block extraInputAttributes %}
+            {% if min ?? false %}
+                min="{{ min }}"
+            {% endif %}
+            {% if max ?? false %}
+               max="{{ max }}"
+            {% endif %}
+        {% endblock %}
     />
 {% endblock %}

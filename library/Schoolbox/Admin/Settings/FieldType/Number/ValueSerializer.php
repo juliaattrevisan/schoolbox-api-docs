@@ -1,0 +1,68 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Schoolbox\Admin\Settings\FieldType\Number;
+
+use Schoolbox\Admin\Settings\IFieldValueSerializer;
+
+class ValueSerializer implements IFieldValueSerializer
+{
+    /**
+     * @inheritdoc
+     */
+    public function serializeValue($value, $config): string
+    {
+        $options = $this->buildOptions($config->getOptions() ?? '');
+
+        // If invalid, return the maximum value instead
+        if (!$this->isValueValid($value, $options)) {
+            return (string) $options['max'];
+        }
+
+        return $value;
+    }
+
+    /**
+     * Converts a string representation of options into an array form
+     * The options for a range are a JSON object with the following keys:
+     * - min: float - The minimum value
+     * - max: float - The maximum value
+     *
+     * @param string $optionsString
+     * @return ?array{min:float,max:float}
+     */
+    public function buildOptions(string $optionsString): ?array
+    {
+        return json_decode($optionsString, true);
+    }
+
+    /**
+     * Returns whether the current value is valid because it matches the range options
+     *
+     * @param string|null $value
+     * @param ?array{min:float,max:float} $options
+     * @return bool
+     */
+    protected function isValueValid(?string $value, ?array $options): bool
+    {
+        // no options, just exit
+        if (null === $options) {
+            return true;
+        }
+
+        // Can the value be cast to a float?
+        if (!is_numeric($value)) {
+            return false;
+        }
+
+        $value = (float) $value;
+
+        // Is the value within the range?
+        if ($value < $options['min'] || $value > $options['max']) {
+            return false;
+        }
+
+        return true;
+    }
+}
