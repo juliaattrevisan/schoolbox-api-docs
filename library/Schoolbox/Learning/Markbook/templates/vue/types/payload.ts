@@ -8,7 +8,7 @@ import type { MarkScheme, SubmissionErrorStates } from "@schoolboxLibrary/Learni
 
 // Types for semantic clarity when referring to them later on...
 type UserId = number;
-type ParticipantId = number;
+export type ParticipantId = number;
 
 export type MarkbookActivity = Pick<Activity, "id" | "title" | "assessmentType"> & {
     /** the readable type name of the activity, e.g. "Project", "Quiz", "Essay", "Homework", etc */
