@@ -97,7 +97,7 @@ const decorator = window.Vue.computed(() => {
 
     if (participant.value.resubmissionRequired) {
         return {
-            indicator: "pending",
+            indicator: "resubmit",
             notchTitle: "Resubmission Required",
         };
     }
