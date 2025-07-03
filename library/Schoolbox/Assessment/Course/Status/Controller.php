@@ -33,6 +33,7 @@ use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
+use Schoolbox\Learning\Assessment\Timeline\Full;
 use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Learning\InlineGrader\Kami\Connector;
 use Schoolbox\Learning\InlineGrader\StudentCarousel;
@@ -55,6 +56,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Model;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 
+use Schoolbox\User;
 use function array_combine;
 
 class Controller extends WebController\Base
@@ -529,6 +531,51 @@ class Controller extends WebController\Base
     }
 
 
+    /**
+     * get assessment info for participant (for markbook popout feedback)
+     * we need all the info, draft, rubric, etc
+     *
+     * @param User $student
+     * @param Model $courseSpec
+     * @param IAssessable $assessmentSpec
+     * @return void
+     * @api GET /learning/markbook/assessment/{assessmentId}/{studentId}/info
+     */
+    public function getInfo(User $student, CourseSpec\Model $courseSpec, IAssessable $assessmentSpec): void
+    {
+        // fetch the assessment with the student's responses and feedback
+
+        // This report may take a while
+        $this->extendExecutionTime();
+
+        $queryArgs = $this->requestQuery->getArrayCopy();
+        [$filters,] = $this->convertRequestToFilters($courseSpec, $queryArgs, false);
+
+        $assessmentIds  = $this->assessmentIdFinder->findIdsByFilters($filters, $this->getUser());
+
+        // Fetch assessments
+        $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds)->indexBy('id');
+        // filter to only the assessment we are looking for
+        $assessments = $assessments->filter(static function (IAssessable $assessment) use ($assessmentSpec) {
+            return $assessment->getSpecificationAssessment()?->getId() === $assessmentSpec->getId();
+        });
+        // hydrate participant
+        $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, $student, true);
+
+        $assessmentInfo = [];
+
+        foreach ($assessments as $assessment) {
+            $participant = $assessment->getParticipantIfExtant($student);
+            /* A list of Responses and Floating Feedbacks, as per the Submission History
+            */
+            if ($participant) {
+                $timeline = (new Full($participant))->getForTeacher();
+                $assessmentInfo[$assessment->getId()] = $timeline;
+            }
+        }
+
+        $this->response = $this->responseAsJson($assessmentInfo);
+    }
 
 
     /**
