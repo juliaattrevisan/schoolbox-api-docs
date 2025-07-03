@@ -29,6 +29,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
+use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -570,29 +571,86 @@ class Controller extends WebController\Base
             /* A list of Responses and Floating Feedbacks, as per the Submission History
             */
             if ($participant) {
-                $feedback = $participant->getAuthoritativeFeedback(false);
+                $latestResponse = $participant->findMostRecentResponse();
+                $latestFeedback = $participant->findMostRecentInstructorGivenFeedback();
 
                 // all things have this, even if there are no submissions...
-                $assessmentInfo[$assessment->getId()] = [
+                $response = [
+                    'isSubmitted' => null,
+                    'isDraft' => null,
+                    'isSubmittedOffline' => null,
+                    'hasFiles' => null,
+                    'isSubmittedOnTime' => null,
+                    'getLearnosityReference' => null,
+                    'comment' => null,
+                    'duration' => null,
+                    'getHumanReadableMark' => null,
+                    'getNormalisedMark' => null,
+                    'getMarksAvailable' => null,
+                    'isSelfAssessed' => null,
+                    'getCompletionStatus' => null,
+                    'getScoreGiven' => null,
+                    'getScoreMaximum' => null,
+                ];
+                if ($latestResponse) {
+                    $response['isSubmitted'] = (bool)$latestResponse->getId();
+                    $response['isSubmittedOnTime'] = $latestResponse->isSubmittedOnTime();
+
+                    // now for assessment type specific data
+                    if ($latestResponse instanceof DueWork\Response\Model) {
+                        $response['isSubmitted'] = $latestResponse->isSubmitted();
+                        $response['isDraft'] = $latestResponse->isDraft();
+                        $response['isSubmittedOffline'] = $latestResponse->isSubmittedOffline();
+                        $response['hasFiles'] = $latestResponse->getAllFiles()->count() > 0;
+                    } elseif ($latestResponse instanceof Assessment\Task\Response\Model) {
+                        $response['isSubmitted'] = $latestResponse->isSubmitted();
+                        $response['getCompletionStatus'] = $latestResponse->getCompletionStatus();
+                        $response['isSelfAssessed'] = $latestResponse->isSelfAssessed();
+                    } elseif ($latestResponse instanceof Assessment\Lti\Response\Model) {
+                        $response['getScoreGiven'] = $latestResponse->getScoreGiven();
+                        $response['getScoreMaximum'] = $latestResponse->getScoreMaximum();
+                        $response['comment'] = $latestResponse->getComment();
+                    } elseif ($latestResponse instanceof Assessment\Quiz\Attempt\Model) {
+                        $response['getLearnosityReference'] = $latestResponse->getLearnosityReference();
+                        $response['getMarksAvailable'] = $latestResponse->getMarksAvailable();
+                        $response['duration'] = $latestResponse->getDuration();
+                        $response['comment'] = $latestResponse->getComment();
+                        $response['getHumanReadableMark'] = $latestResponse->getHumanReadableMark();
+                        $response['getNormalisedMark'] = $latestResponse->getNormalisedMark();
+                    }
+                }
+
+                $feedback = [
                     'comment' => null,
                     'published' => null,
                     'normalisedMark' => null,
                     'humanReadable' => null,
+                    'rubric' => null,
+                    'resubmissionRequired' => null,
+                    'rubricMarkedGrid' => null,
+                    'hasResponseWithKamiDocs' => null,
                 ];
-                if ($feedback) {
-                    $assessmentInfo[$assessment->getId()]['comment'] = $feedback->getComment();
-                    $assessmentInfo[$assessment->getId()]['published'] = $feedback->isPublished();
-                    $assessmentInfo[$assessment->getId()]['normalisedMark'] = $feedback->getNormalisedMark();
-                    $assessmentInfo[$assessment->getId()]['humanReadable'] = $feedback->getHumanReadableMark();
 
+                if ($latestFeedback) {
+                    $feedback['comment'] = $latestFeedback->getComment();
+                    $feedback['published'] = $latestFeedback->isPublished();
+                    $feedback['normalisedMark'] = $latestFeedback->getNormalisedMark();
+                    $feedback['humanReadable'] = $latestFeedback->getHumanReadableMark();
+
+                    // now for assessment type specific data
                     if ($assessment instanceof DueWork\Model) {
-                        /** @var \Schoolbox\Learning\Assessment\DueWork\Feedback\Model $feedback  */
-                        $assessmentInfo[$assessment->getId()]['rubric'] = $assessment->getUseRubric();
-                        $assessmentInfo[$assessment->getId()]['resubmissionRequired'] = $feedback->getResubmissionRequired();
-                        $assessmentInfo[$assessment->getId()]['rubricMarkedGrid'] = $feedback->getRubricMarkedGrid();
-                        $assessmentInfo[$assessment->getId()]['hasResponseWithKamiDocs'] = $feedback->hasResponseWithKamiDocs();
+                        /** @var \Schoolbox\Learning\Assessment\DueWork\Feedback\Model $latestFeedback  */
+                        $feedback['rubric'] = $assessment->getUseRubric();
+                        $feedback['resubmissionRequired'] = $latestFeedback->getResubmissionRequired();
+                        $feedback['rubricMarkedGrid'] = $latestFeedback->getRubricMarkedGrid();
+                        $feedback['hasResponseWithKamiDocs'] = $latestFeedback->hasResponseWithKamiDocs();
                     }
                 }
+
+                $assessmentInfo[$assessment->getId()] = [
+                    'response' => $response,
+                    'feedback' => $feedback,
+                ];
             }
         }
 
