@@ -142,6 +142,12 @@ class Controller extends WebController\Base
         $assessments = $assessments->filter(static function (IAssessable $assessment) use ($assessmentSpec) {
             return $assessment->getSpecificationAssessment()?->getId() === $assessmentSpec->getId();
         });
+
+        // sort the assessments in a standard order (class page name naturally) which appears to be the same as the main markbook screen
+        $assessments = $assessments->sortByCallback(function (IAssessable $a, IAssessable $b) {
+            return strnatcasecmp($a->getBaseContext()->getFolder()->getTitle(), $b->getBaseContext()->getFolder()->getTitle());
+        });
+
         // hydrate participants
         $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, null, true);
 
