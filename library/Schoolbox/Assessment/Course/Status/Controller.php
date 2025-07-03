@@ -629,6 +629,11 @@ class Controller extends WebController\Base
                     'resubmissionRequired' => null,
                     'rubricMarkedGrid' => null,
                     'hasResponseWithKamiDocs' => null,
+                    'hasFiles' => null,
+                    'getHumanReadableInstructorMark' => null,
+                    'getCompletionStatus' => null,
+                    'getScoreGiven' => null,
+                    'getScoreMaximum' => null,
                 ];
 
                 if ($latestFeedback) {
@@ -638,12 +643,19 @@ class Controller extends WebController\Base
                     $feedback['humanReadable'] = $latestFeedback->getHumanReadableMark();
 
                     // now for assessment type specific data
-                    if ($assessment instanceof DueWork\Model) {
+                    if ($latestFeedback instanceof \Schoolbox\Learning\Assessment\DueWork\Feedback\Model) {
                         /** @var \Schoolbox\Learning\Assessment\DueWork\Feedback\Model $latestFeedback  */
                         $feedback['rubric'] = $assessment->getUseRubric();
                         $feedback['resubmissionRequired'] = $latestFeedback->getResubmissionRequired();
                         $feedback['rubricMarkedGrid'] = $latestFeedback->getRubricMarkedGrid();
                         $feedback['hasResponseWithKamiDocs'] = $latestFeedback->hasResponseWithKamiDocs();
+                        $feedback['hasFiles'] = $latestFeedback->getAllFiles()->count() > 0;
+                        $feedback['getHumanReadableInstructorMark'] = $latestFeedback->getHumanReadableInstructorMark();
+                    } elseif ($latestFeedback instanceof \Schoolbox\Learning\Assessment\Task\Feedback\Model) {
+                        $feedback['getCompletionStatus'] = $latestFeedback->getCompletionStatus();
+                    } elseif ($latestFeedback instanceof \Schoolbox\Learning\Assessment\Lti\Feedback\Model) {
+                        $feedback['getScoreGiven'] = $latestFeedback->getScoreGiven();
+                        $feedback['getScoreMaximum'] = $latestFeedback->getScoreMaximum();
                     }
                 }
 
