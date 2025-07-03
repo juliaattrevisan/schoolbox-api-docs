@@ -15,6 +15,7 @@ use Schoolbox\User;
 
 interface IAssessmentController
 {
+
     /**
      * Retrieve a list of assessments that exist, by context
      *
@@ -86,13 +87,13 @@ interface IAssessmentController
     public function postDeleteAssessment(IAssessable $assessment);
 
     /**
+     * @api   GET /learning/assessments/:assessmentId/modify
+     * @since 165
+     *
      * @param IAssessable $assessment
      * @return void
-     *@since 165
-     *
-     * @api   GET /learning/assessments/:assessmentId/status
      */
-    public function getStatus(IAssessable $assessment): void;
+    public function getStatus(IAssessable $assessment);
 
     /**
      * @api   GET /learning/assessments/:assessmentId/:studentId

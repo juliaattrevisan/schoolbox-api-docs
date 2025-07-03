@@ -10,23 +10,24 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Course\Markbook;
 
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
-use Schoolbox\Permission\Access\Access;
 use Alaress\Web\Controller as WebController;
 use Schoolbox\Assessment\Course\Markbook\Export\CSV;
+use Schoolbox\Assessment\Course\Task\Completion;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Codec;
 use Schoolbox\Filter\Filters\Assessment\AssessmentType\Definition as AssessmentTypeDefinition;
 use Schoolbox\GenericCollection;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\Translator\UnitAssessments;
 use Schoolbox\Learning\Assessment\Task;
 use Schoolbox\Learning\Assessment\Feedback\Visibility;
+use Schoolbox\Learning\Assessment\Translator\UnitAssessments;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Throwable;
@@ -41,7 +42,7 @@ class Controller extends WebController\Base
      * @param Filter\Mapper                      $filterMapper
      * @param Filter\Selection\Mapper            $filterSelectionMapper
      * @param Filter\Filters\Assessment\IdFinder $assessmentIdFinder
-     * @param AssessmentMapperProxy             $assessmentMapperProxy
+     * @param Assessment\MapperProxy             $assessmentMapperProxy
      * @param CourseImpl\Mapper                  $courseImplMapper
      * @param UnitImpl\Mapper                    $unitImplMapper
      * @param Access                             $access
@@ -51,10 +52,10 @@ class Controller extends WebController\Base
         private Filter\Mapper $filterMapper,
         private Filter\Selection\Mapper $filterSelectionMapper,
         private Filter\Filters\Assessment\IdFinder $assessmentIdFinder,
-        private AssessmentMapperProxy $assessmentMapperProxy,
+        private Assessment\MapperProxy $assessmentMapperProxy,
         private CourseImpl\Mapper $courseImplMapper,
         private UnitImpl\Mapper $unitImplMapper,
-        private Access $access,
+        private Access $access
     ) {
     }
 
@@ -500,6 +501,7 @@ class Controller extends WebController\Base
             $this->returnJsonError($e);
         }
     }
+
 
     /**
      * @param CourseSpec\Model $courseSpec

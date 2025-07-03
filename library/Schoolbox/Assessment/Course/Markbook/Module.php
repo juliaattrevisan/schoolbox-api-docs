@@ -21,7 +21,6 @@ use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Filter;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
-use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Permission\Access\Access;
 
 class Module extends \Alaress\Module\Module
@@ -35,7 +34,7 @@ class Module extends \Alaress\Module\Module
      */
     protected function registerRoutes(): void
     {
-        $preloadCourseSpec = $this->buildPreloadCourseSpec();
+        $preloadCourseSpec    = $this->buildPreloadCourseSpec();
         $canSeeCourseMarkbook = $this->buildAuthRuleCanSeeCourseMarkbook();
 
         // Convenience redirects to the Course Markbook page
@@ -91,7 +90,7 @@ class Module extends \Alaress\Module\Module
             $this->getMapperFactory()->get(Filter\Mapper::class),
             $this->getMapperFactory()->get(Filter\Selection\Mapper::class),
             $this->injector->get('filters.assessmentIdFinder'),
-            $this->getAssessmentMapper(),
+            $this->injector->get('assessmentDataSource'),
             $this->getMapperFactory()->get(CourseImpl\Mapper::class),
             $this->getMapperFactory()->get(UnitImpl\Mapper::class),
             $this->getMapperFactory()->get(Access::class),
@@ -105,16 +104,6 @@ class Module extends \Alaress\Module\Module
     private function getCourseSpecMapper(): CourseSpec\Mapper
     {
         return $this->getMapperFactory()->get(CourseSpec\Mapper::class);
-    }
-
-    /**
-     * @return Assessment\MapperProxy
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
-     */
-    private function getAssessmentMapper(): Assessment\MapperProxy
-    {
-        return $this->injector->get('assessmentDataSource');
     }
 
     /**
