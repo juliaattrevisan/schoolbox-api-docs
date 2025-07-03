@@ -31,8 +31,7 @@ class ModelToArray
         protected Authorizer $authorizer,
         protected User $currentUser,
         private ScrubAdapter $scrubAdapter,
-    ) {
-    }
+    ) {}
 
     public function __invoke(Model $model): array
     {
@@ -91,7 +90,7 @@ class ModelToArray
             // Text and comments
             'bodyPublic'         => $this->scrubAdapter->purify($model->getBodyPublic()),
 
-            'comments'     => $model->getComments(),
+            'comments'            => $model->getComments()->map($this->commentTranslator)
         ];
     }
 
