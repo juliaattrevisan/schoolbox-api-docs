@@ -54,7 +54,6 @@ use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Learning\Course\DataModel\Specification\Model;
 use Schoolbox\Mapper\Exception;
 
-use Schoolbox\UserMapper;
 use function array_combine;
 
 class Controller extends WebController\Base
@@ -74,6 +73,11 @@ class Controller extends WebController\Base
      * @param Filter\Selection\Mapper $filterSelectionMapper
      * @param CourseImpl\Mapper $courseImplMapper
      * @param UnitImpl\Mapper $unitImplMapper
+     * @param AssessmentMapperProxy $assessmentDataSource
+     * @param ResponseDataSource $responseDataSource
+     * @param ReturnedWorkMapper $returnedWorkMapper
+     * @param Project\ResultCache\Mapper $projectResultCacheMapper
+     * @param Connector $kamiConnector
      */
     public function __construct(
         private ErrorMapper $errorMapper,
@@ -294,8 +298,7 @@ class Controller extends WebController\Base
                  * ask learnosity what they could potentially get; otherwise skip the api penalty
                  */
                 if (\count($maxMarks) && $assessment->getMarkScheme() instanceof TotalMarkFractional) {
-
-
+                    /** @var \Schoolbox\Learning\Assessment\Quiz\Model $assessment */
                     $available = $learnosityHelper->findAvailableMarks($assessment->getLearnosityReference());
 
                     /* Now assign it to them
@@ -442,7 +445,7 @@ class Controller extends WebController\Base
                         /* Update project result cache when Publish All is used
                          */
                         $projectCache->refresh($this->assessmentDataSource, $assessment, $submissionReturn->getOwner());
-                    } catch (PDOException|\DomainException|\InvalidArgumentException|\LogicException|\UnexpectedValueException $e) {
+                    } catch (PDOException | \DomainException | \InvalidArgumentException | \LogicException | \UnexpectedValueException $e) {
                         $publishSuccess = false;
                     }
                 }
@@ -513,6 +516,7 @@ class Controller extends WebController\Base
             $logger
         );
         $helper = new Helper($api, $logger);
+        /** @var \Schoolbox\Learning\Assessment\Quiz\Model $assessment */
         foreach ($assessments as $assessment) {
             $maxMarks[$assessment->getId()] = $helper->findAvailableMarks($assessment->getLearnosityReference());
         }

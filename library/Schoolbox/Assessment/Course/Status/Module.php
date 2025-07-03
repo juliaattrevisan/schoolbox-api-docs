@@ -37,7 +37,6 @@ class Module extends BaseModule
      */
     protected $basename = 'courseStatus';
 
-
     /**
      * Hook method for setting up routes via self::register()
      *
@@ -174,8 +173,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return \Schoolbox\Mapper|CourseSpec\Mapper
-     * @throws \InvalidArgumentException If mapper class not found
+     * @return CourseSpec\Mapper
      */
     private function getCourseSpecMapper(): CourseSpec\Mapper
     {
