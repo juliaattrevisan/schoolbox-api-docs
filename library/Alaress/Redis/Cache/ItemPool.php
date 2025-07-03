@@ -10,12 +10,13 @@ declare(strict_types=1);
 namespace Alaress\Redis\Cache;
 
 use Alaress\Codec\ICodec;
-use Cache\Adapter\Common\CacheItem;
+use Closure;
 use Cache\Adapter\Common\HasExpirationTimestampInterface;
 use Predis\ClientInterface;
 use Predis\Collection\Iterator\SetKey;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Cache\CacheItem;
 
 /**
  * A PSR-6 implementation with a Redis backend.
@@ -105,14 +106,31 @@ class ItemPool implements CacheItemPoolInterface
         $this->redis->exists($actualKey);
         $this->redis->get($actualKey);
         [$exists, $item] = $this->redis->exec();
+
+        // Really? Symfony's CacheItem doesn't allow setting the hit and value
+        // in any other way?
+        // This is how Symfony's cache does it.
+        // TODO create own CacheItem class, or use Symfony's Redis cache
+        $createCacheItem = Closure::bind(
+            function ($key, $isHit, $value) {
+                $cacheItem = new CacheItem();
+                $cacheItem->key   = $key;
+                $cacheItem->isHit = $isHit;
+                $cacheItem->value = $value;
+                return $cacheItem;
+            },
+            null,
+            CacheItem::class,
+        );
+
         if ($exists) {
             // return the stored item
             if (isset($item)) {
-                return new CacheItem($key, true, $this->codec->decode($item));
+                return $createCacheItem($key, true, $this->codec->decode($item));
             }
         }
         // return a miss
-        return new CacheItem($key, false, null);
+        return $createCacheItem($key, false, null);
     }
 
     /**
