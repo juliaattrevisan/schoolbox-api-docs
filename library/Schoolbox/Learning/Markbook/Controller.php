@@ -221,9 +221,6 @@ class Controller extends Base
                                                 'comment'      => $this->purifier->purify($authoritativeFeedbackDraft?->getComment()),
                                             ],
                                         ],
-                                        'isResponseRequired' => $participant->isResponseRequired(),
-                                        'isFeedbackRequired' => $participant->isFeedbackRequired(),
-                                        'isReviewComplete'   => $participant->isReviewComplete(),
                                         'plan' => [
                                             'isDynamic' => $participant->getPlan()->getIsDynamic(),
                                             'name' => $participant->getPlan()->getName(),

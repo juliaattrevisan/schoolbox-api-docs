@@ -54,9 +54,6 @@ export type MarkbookClassImplActivityParticipant = {
         maxMark: number | null;
     };
     /** the following are only used the class markbook at the moment: */
-    isResponseRequired?: boolean;
-    isFeedbackRequired?: boolean;
-    isReviewComplete?: boolean;
     plan?: {
         isDynamic: boolean;
         name: string | null;

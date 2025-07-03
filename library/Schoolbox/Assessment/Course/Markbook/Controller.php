@@ -352,9 +352,6 @@ class Controller extends WebController\Base
                                                     ],
                                                 ],
                                                 /* unused on the course markbook: */
-                                                // 'isResponseRequired' => ...,
-                                                // 'isFeedbackRequired' => ...,
-                                                // 'isReviewComplete'   => ...,
                                                 // 'plan' => ...,
                                             ];
                                         }
