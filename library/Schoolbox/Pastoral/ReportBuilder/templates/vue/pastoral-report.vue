@@ -24,7 +24,7 @@ const selectedTab = window.Vue.ref(props.tabs[0]?.type ?? "");
 const routeLookup = (route: string, params?: Record<string, any>) => {
     const routes: Record<string, string> = {
         "pastoral.getStudentRecord": "/pastoral/student/{studentId}/record/{recordId}",
-        "pastoralReportBuilder.getReportTags": "/pastoral/report/tags/{tagId}",
+        "pastoralReportBuilder.getReportTags": "/pastoral/report/results/tag/{tagId}",
         "pastoralReportBuilder.getIndex": "/pastoral/report",
     };
 
@@ -101,20 +101,20 @@ const profile = {
                                 ></sbx-label-pastoral-points> -->
                                 </h4>
                             </a>
-                            <!--<p class="meta">
-                            {{ record.type.name }}
-                            <span v-if="record.subtype.name">({{ record.subtype.name }})</span>
-                            | Created by
-                            <a :href="`/search/user/${record.owner.id}`">{{ record.owner.fullName }}</a>
-                            {{ record.createdAt.short }}
+                            <p class="meta">
+                                {{ record.type.name }}
+                                <span v-if="record.subType.name">({{ record.subType.name }})</span>
+                                | Created by
+                                <a :href="`/search/user/${record.owner.id}`">{{ record.owner.fullName }}</a>
+                                {{ record.createdAt.local }}
 
-                            <span v-if="props.config.pastoral_action_enable && record.uncompletedActionCount > 0">
-                                | {{ record.uncompletedActionCount }} follow up action{{
-                                    record.uncompletedActionCount === 1 ? "" : "s"
-                                }}
-                                remaining
-                            </span>
-                        </p>-->
+                                <span v-if="props.config.pastoral_action_enable && record.uncompletedActionCount > 0">
+                                    | {{ record.uncompletedActionCount }} follow up action{{
+                                        record.uncompletedActionCount === 1 ? "" : "s"
+                                    }}
+                                    remaining
+                                </span>
+                            </p>
                             <article>
                                 <div v-if="record.bodyPublic" v-html="record.bodyPublic"></div>
 

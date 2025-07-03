@@ -93,8 +93,7 @@ class Controller extends Base
         private UserAccessMapper $userAccessMapper,
         private RosettaStone $l10n,
         private ModelToArray $pastoralTranslator,
-    ) {
-    }
+    ) {}
 
     /**
      * Display report builder saved reports
@@ -320,6 +319,15 @@ class Controller extends Base
         $showSeverity   = $this->getConfigLoader()->get('pastoral_severity');
         $severityColors = $showSeverity ? $this->getSeverityColors() : [];
 
+        $defaultSummaryOptions = [
+            ['title' => 'List', 'type' => 'list']
+        ];
+
+
+        $tabs = array_merge(
+            $defaultSummaryOptions,
+        );
+
         // And spit this thing out
 
         $this->response = $this->responseFromTemplate(
@@ -327,9 +335,12 @@ class Controller extends Base
             [
                 'title'          => "Records By Tag - {$tag->getName()}",
                 'export'         => false,
-                'results'        => $records,
+                'results'        => $records->map($this->pastoralTranslator),
                 'showSeverity'   => $showSeverity,
                 'severityColors' => $severityColors,
+                /* Summary tables tabs
+                 */
+                'tabs'           => $tabs,
             ],
             'Pastoral Tag Report',
         );
@@ -655,9 +666,9 @@ class Controller extends Base
             foreach ($selectedGroups as $groupId => $checked) {
                 if ($validGroups->offsetExists($groupId)) {
                     $groupAccess = $this->reportAccessMapper->createModel()
-                                                            ->setGroup($validGroups->offsetGet($groupId))
-                                                            ->setAccess((int)$checked)
-                                                            ->setPastoralReport($report);
+                        ->setGroup($validGroups->offsetGet($groupId))
+                        ->setAccess((int)$checked)
+                        ->setPastoralReport($report);
                     $report->getAccess()->add($groupAccess);
                 }
             }
@@ -669,9 +680,9 @@ class Controller extends Base
             foreach ($selectedUsers as $userId => $checked) {
                 if ($validUsers->offsetExists($userId)) {
                     $userAccess = $this->reportAccessMapper->createModel()
-                                                           ->setUser($validUsers->offsetGet($userId))
-                                                           ->setAccess((int)$checked)
-                                                           ->setPastoralReport($report);
+                        ->setUser($validUsers->offsetGet($userId))
+                        ->setAccess((int)$checked)
+                        ->setPastoralReport($report);
                     $report->getAccess()->add($userAccess);
                 }
             }
@@ -706,9 +717,9 @@ class Controller extends Base
         $result = $this->updatePastoralDashboard($report, (bool)$post->get('display'));
 
         $this->response = $this->responseAsJson([
-                                                    'status' => 'OK',
-                                                    'result' => $result,
-                                                ]);
+            'status' => 'OK',
+            'result' => $result,
+        ]);
     }
 
     /**

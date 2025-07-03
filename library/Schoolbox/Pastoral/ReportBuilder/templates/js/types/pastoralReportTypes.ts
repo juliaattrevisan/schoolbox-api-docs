@@ -25,6 +25,7 @@ export type Owner = User & {
  */
 export type PastoralDate = {
     short: string;
+    local: string;
 };
 
 /**
@@ -79,7 +80,7 @@ export type PastoralRecord = {
     severity?: Severity;
     points?: number;
     type: PastoralType;
-    subtype: PastoralSubtype;
+    subType: PastoralSubtype;
     owner: Owner;
     createdAt: PastoralDate;
     uncompletedActionCount: number;
