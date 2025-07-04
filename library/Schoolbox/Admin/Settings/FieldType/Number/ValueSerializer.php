@@ -15,9 +15,14 @@ class ValueSerializer implements IFieldValueSerializer
     {
         $options = $this->buildOptions($config->getOptions() ?? '');
 
-        // If invalid, return the maximum value instead
+        // If invalid, return the correct value based on the options
         if (!$this->isValueValid($value, $options)) {
-            return (string) $options['max'];
+            if (isset($options['min']) && $value < $options['min']) {
+                return (string)$options['min'];
+            }
+            if (isset($options['max']) && $value > $options['max']) {
+                return (string)$options['max'];
+            }
         }
 
         return $value;
