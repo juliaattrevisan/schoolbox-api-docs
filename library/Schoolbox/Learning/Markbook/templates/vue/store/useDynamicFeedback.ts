@@ -1,7 +1,5 @@
 import { debounce } from "lodash";
 import type { Ref } from "vue";
-import type { MarkScheme, SubmissionErrorStates } from "@schoolboxLibrary/Learning/MarkScheme/templates/ts/markScheme";
-import { normaliseHrMark } from "@schoolboxLibrary/Learning/MarkScheme/templates/ts/markScheme";
 
 interface DynamicFeedbackEditableData {
     hrMarkInstructor: Ref<string | null>;
@@ -17,6 +15,14 @@ interface DynamicFeedbackData extends DynamicFeedbackEditableData {
 interface DynamicFeedbackExtraData {
     hasSubmittedResponse: Ref<boolean>;
     hasPublishedFeedback: Ref<boolean>;
+}
+
+interface PostModifyResponsePayload {
+    success: true;
+    id: number; // Response/Attempt ID
+    normalisedMark: number | null;
+    humanReadableMark: string | null;
+    humanReadableInstructorMark: string | null;
 }
 
 const TIMEOUT_DURATION_MS = 600; // After how many milliseconds should we auto-save user input
@@ -36,8 +42,6 @@ const TIMEOUT_DURATION_MS = 600; // After how many milliseconds should we auto-s
  * @param postModify.route         - The route to post the modified data to
  * @param postModify.extraFormData - Any extra form data to include in the POST reques
  * @param isQuiz                   - Whether the activity is a quiz
- * @param instructorMarkScheme     - The instructor mark scheme
- * @param submissionErrorStates    - All the states from submission_errors
  * @returns properties
  */
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- we want the inferred type from this as it's more useful
@@ -51,8 +55,6 @@ export function useDynamicFeedback(
         extraFormData?: Record<string, unknown>;
     },
     isQuiz: boolean,
-    instructorMarkScheme: MarkScheme,
-    submissionErrorStates: SubmissionErrorStates,
 ) {
     /**
      * Is a given mark-set meaningful?
@@ -165,20 +167,17 @@ export function useDynamicFeedback(
                 throw new Error(`Failed to auto-save draft feedback: ${resp.status} ${resp.statusText}`);
             }
 
+            const respData = (await resp.json()) as PostModifyResponsePayload;
+            if (!respData.success) {
+                throw new Error(`Failed to auto-save draft feedback`);
+            }
+
             toast.timeout({ text: "Draft saved", isSuccess: true });
 
             // persist the draft data
-            dataDraft.normMark.value = normaliseHrMark(
-                data.hrMarkInstructor.value,
-                instructorMarkScheme,
-                submissionErrorStates,
-            );
-            dataDraft.hrMarkInstructor.value = window.Vue.unref(
-                data.hrMarkInstructor.value,
-            ); /* TODO: This ideally un-normalises the mark */
-            dataDraft.hrMark.value = window.Vue.unref(
-                data.hrMarkInstructor.value,
-            ); /* TODO: This also requires un-normalising the mark lol */
+            dataDraft.normMark.value = respData.normalisedMark;
+            dataDraft.hrMarkInstructor.value = respData.humanReadableInstructorMark;
+            dataDraft.hrMark.value = respData.humanReadableMark;
             dataDraft.comment.value = window.Vue.unref(data.comment.value);
             dataDraft.resubmissionRequired.value = window.Vue.unref(data.resubmissionRequired.value);
         } catch (error) {
@@ -272,22 +271,19 @@ export function useDynamicFeedback(
                 throw new Error(`Failed to publish feedback: ${resp.status} ${resp.statusText}`);
             }
 
+            const respData = (await resp.json()) as PostModifyResponsePayload;
+            if (!respData.success) {
+                throw new Error(`Failed to publish feedback`);
+            }
+
             toast.timeout({ text: "Feedback published", isSuccess: true });
 
             dataExtra.hasPublishedFeedback.value = true;
 
             /* persist the published data */
-            dataPublished.normMark.value = normaliseHrMark(
-                data.hrMarkInstructor.value,
-                instructorMarkScheme,
-                submissionErrorStates,
-            );
-            dataPublished.hrMarkInstructor.value = window.Vue.unref(
-                data.hrMarkInstructor,
-            ); /* TODO: This ideally un-normalises the mark */
-            dataPublished.hrMark.value = window.Vue.unref(
-                data.hrMarkInstructor,
-            ); /* TODO: This also requires un-normalising the mark lol */
+            dataPublished.normMark.value = respData.normalisedMark;
+            dataPublished.hrMark.value = respData.humanReadableMark;
+            dataPublished.hrMarkInstructor.value = respData.humanReadableInstructorMark;
             dataPublished.comment.value = window.Vue.unref(data.comment);
             dataPublished.resubmissionRequired.value = window.Vue.unref(data.resubmissionRequired);
 

@@ -183,6 +183,10 @@ class Controller extends Base
             'success' => true,
             'message' => 'OK',
             'id'      => $attempt->getId(),
+            /* these extra fields are currently used by the Markbook to keep things responsive */
+            'normalisedMark'              => $attempt->getNormalisedMark(),
+            'humanReadableMark'           => $attempt->getMark(),
+            'humanReadableInstructorMark' => $attempt->getMark(), /* for compatibility with due work */
         ];
 
         $this->response = $this->responseDependentOnRequest('', $data)->withStatus(200);
