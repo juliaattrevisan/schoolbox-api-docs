@@ -10,13 +10,10 @@ declare(strict_types=1);
 namespace Alaress\Redis\Cache;
 
 use Alaress\Codec\ICodec;
-use Closure;
-use Cache\Adapter\Common\HasExpirationTimestampInterface;
 use Predis\ClientInterface;
 use Predis\Collection\Iterator\SetKey;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
-use Symfony\Component\Cache\CacheItem;
 
 /**
  * A PSR-6 implementation with a Redis backend.
@@ -106,31 +103,14 @@ class ItemPool implements CacheItemPoolInterface
         $this->redis->exists($actualKey);
         $this->redis->get($actualKey);
         [$exists, $item] = $this->redis->exec();
-
-        // Really? Symfony's CacheItem doesn't allow setting the hit and value
-        // in any other way?
-        // This is how Symfony's cache does it.
-        // TODO create own CacheItem class, or use Symfony's Redis cache
-        $createCacheItem = Closure::bind(
-            function ($key, $isHit, $value) {
-                $cacheItem = new CacheItem();
-                $cacheItem->key   = $key;
-                $cacheItem->isHit = $isHit;
-                $cacheItem->value = $value;
-                return $cacheItem;
-            },
-            null,
-            CacheItem::class,
-        );
-
         if ($exists) {
             // return the stored item
             if (isset($item)) {
-                return $createCacheItem($key, true, $this->codec->decode($item));
+                return new Item($key, true, $this->codec->decode($item));
             }
         }
         // return a miss
-        return $createCacheItem($key, false, null);
+        return new Item($key, false, null);
     }
 
     /**
@@ -227,16 +207,12 @@ class ItemPool implements CacheItemPoolInterface
     {
         $key    = $this->keyGenerator->generateKey($item->getKey());
         $cached = $this->codec->encode($item->get());
-        $ttl    = null;
-        if ($item instanceof HasExpirationTimestampInterface) {
-            // set an expiry
-            $expiry = $item->getExpirationTimestamp();
-            if ($expiry !== null && $expiry > 0) {
-                $ttl = $expiry - time();
-                if ($ttl <= 0) {
-                    return false;
-                }
-            }
+
+        // Special handling for TTL, as CacheItemInterface provides no method
+        // for getting TTL: only for setting
+        $ttl = null;
+        if ($item instanceof Item) {
+            $ttl = $item->getTtl();
         }
 
         // Put this in the key set, so it can be cleared later
