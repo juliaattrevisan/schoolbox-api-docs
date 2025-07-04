@@ -258,9 +258,9 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
             );
         }
 
-        // It's not clear what should happen with errors not caught by
-        // the previous error reporting: I'll silence them for now.
-        return true;
+        // didn't catch the in the above or previous error handler, let php handle as it would normally
+        // this is probably going to echo to the screen and log to the error log (which we had previously)
+        return false;
     }
 
     /**
