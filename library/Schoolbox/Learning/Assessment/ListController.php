@@ -1361,7 +1361,7 @@ class ListController extends Web\Controller\Base
             'rubric' => null,
             'resubmissionRequired' => null,
             'rubricMarkedGrid' => null,
-            'hasResponseWithKamiDocs' => null,
+            'responseWithKamiDocs' => null,
             'fileCount' => null,
             'humanReadableInstructorMark' => null,
             'completionStatus' => null,
@@ -1436,7 +1436,7 @@ class ListController extends Web\Controller\Base
                     $feedback['rubric'] = $assessment->getUseRubric();
                     $feedback['resubmissionRequired'] = $latestFeedback->getResubmissionRequired();
                     $feedback['rubricMarkedGrid'] = $latestFeedback->getRubricMarkedGrid();
-                    $feedback['hasResponseWithKamiDocs'] = $latestFeedback->hasResponseWithKamiDocs();
+                    $feedback['responseWithKamiDocs'] = $latestFeedback->hasResponseWithKamiDocs();
                     $feedback['fileCount'] = $latestFeedback->getAllFiles()->count();
                     $feedback['humanReadableInstructorMark'] = $latestFeedback->getHumanReadableInstructorMark();
                 } elseif ($latestFeedback instanceof \Schoolbox\Learning\Assessment\Task\Feedback\Model) {
