@@ -42,8 +42,10 @@ WHERE
     `name` = "schooldata_import_timeout";
 
 -- Restrict the value of existing configs to the new range
+-- why this field was not a number... and you could add any random text to it...
 UPDATE `config`
 SET
+    `field_id` = (SELECT `id` from lu_config_field where `field` = 'number'),
     `value` = "30"
 WHERE
     `name` = "schooldata_import_timeout"
