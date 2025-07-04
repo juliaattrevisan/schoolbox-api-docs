@@ -564,9 +564,36 @@ class Controller extends WebController\Base
         // hydrate participant
         $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, $student, true);
 
+        if ($assessmentSpec instanceof \Schoolbox\Learning\Assessment\Quiz\Model) {
+            /* Probably inject this one day, but for now,
+                 * I want to avoid dumping Yet Another Thing into the kernel
+                 * I don't have a convenient means to access SERVER_NAME except like this, sadly
+                 */
+            $logger = new Logger(STDOUT, STDOUT, \Monolog\Level::Debug, [], true, 'learnosity');
+
+            /* TODO Derive from learnosity atm
+             *   Consider caching locally the standing maximum available marks for the assessment in the absence of an attempt.
+             *   This only matters when it's a Total Mark markscheme: everything else is out of 100
+             */
+            $api = new Api(
+                $this->urlFactory->buildFullyQualified()->getHost(),
+                $this->learnosityVersion,
+                $this->learnosityConsumerKey,
+                $this->learnosityConsumerSecret,
+                $logger
+            );
+            $helper = new Helper($api, $logger);
+        }
+
         $assessmentInfo = [];
 
         foreach ($assessments as $assessment) {
+            $maxMarks = null;
+            if ($assessmentSpec instanceof \Schoolbox\Learning\Assessment\Quiz\Model) {
+                /** @var \Schoolbox\Learning\Assessment\Quiz\Model $assessment */
+                $maxMarks = $helper->findAvailableMarks($assessment->getLearnosityReference());
+            }
+
             $participant = $assessment->getParticipantIfExtant($student);
             /* A list of Responses and Floating Feedbacks, as per the Submission History
             */
@@ -660,6 +687,11 @@ class Controller extends WebController\Base
                 }
 
                 $assessmentInfo[$assessment->getId()] = [
+                    'assessmentId' => $assessment->getId(),
+                    'assessmentTitle' => $assessment->getTitle(),
+                    'assessmentType' => AssessmentType::objectToString($assessment),
+                    'workType' => $assessment->getWorkType()->getName(),
+                    'maxMarks' => $maxMarks,
                     'response' => $response,
                     'feedback' => $feedback,
                 ];
