@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import sanitizeHtml from "sanitize-html";
 import { getGradient } from "@js/util/cssUtils";
 import ProgressTick from "@schoolboxLibrary/Learning/Assessment/templates/fragments/vue/progress-tick.vue";
 import {
@@ -163,6 +164,21 @@ const isSelectedFeedback = window.Vue.computed(
         mbStore.feedbackSelectedCell.studentId === props.studentId &&
         mbStore.feedbackSelectedCell.activityId === props.assessmentId,
 );
+
+/**
+ * The comment is given to us with HTML since it's needed in a CKEditor.
+ * This strips all of the tags off and returns text instead
+ */
+const plaintextPublishedComment = window.Vue.computed(() => {
+    if (participant.value === null || participant.value.marks.published.comment === null) {
+        return undefined;
+    }
+
+    return sanitizeHtml(participant.value.marks.published.comment.replaceAll("<br />", " ").replaceAll("<br>", " "), {
+        allowedTags: [],
+        allowedAttributes: {},
+    }).trim();
+});
 </script>
 
 <template>
@@ -201,13 +217,13 @@ const isSelectedFeedback = window.Vue.computed(
             </span>
             <span
                 v-else-if="participant.hasSubmittedResponse && !participant.hasPublishedFeedback"
-                :title="participant.marks.published?.comment ?? ''"
+                :title="plaintextPublishedComment"
             >
                 Pending
             </span>
             <span
                 v-else-if="mbStore.hasMeaningfulMarks(participant.marks.published)"
-                :title="participant.marks.published.comment ?? ''"
+                :title="plaintextPublishedComment"
                 :class="getGradient(participant.marks.published.norm, 100, false)"
             >
                 {{ formatMark(participant.marks.published) }}
