@@ -1,0 +1,230 @@
+{#  usage: per-participation, configure the following vars for the parent template to use
+    available variables:
+     - routeArgs:        an array that represents a participant, to be pushed into a routeLookup
+     - assessment:       the assessment we're looking at
+     - participant:      the current participant of the iteration
+     - statusIncomplete: a string representing the 'incomplete' state
+     - statusPending:    a string representing the 'pending' state
+     - statusReviewed:   a string representing the 'reviewed' state
+#}
+{% import 'sub/assessmentResponse.twig' as assessmentResponse %}
+
+{% extends '@courseStatus/courseStatus.twig' %}
+
+{% set labelIncomplete = 'Not Attempted' %}
+{% set labelPending    = 'Review required' %}
+{% set labelReviewed   = 'Reviewed' %}
+
+{% block routeModify %}
+    {% set routeModify = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessmentSpec.id, assessment: assessmentSpec}) %}
+
+    {% if routeModify %}
+        {% set modifyContentsRoute = routeLookupIfAuthorized('learnosity.getContent', {assessment: assessmentSpec, assessmentId: assessmentSpec.id}) %}
+{#        {% set rescoreRoute = routeLookupIfAuthorized('learnosity.postRescoreAttempts', {assessment: assessmentSpec, assessmentId: assessmentSpec.id}) %}#}
+
+        <li><a class="icon-modify" href="{{ routeModify }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Modify Settings</a></li>
+        <li><a class="icon-modify" href="{{ modifyContentsRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Modify Contents</a></li>
+    {% endif %}
+{% endblock %}
+
+{% set responseHistory = locale.attemptHistory.proper %}
+
+{% block headerOptions %}
+    <li class="separator">Bulk Actions</li>
+    <li>
+        <a class="icon-approve" data-reveal-id="mass-review">Mark attempts as reviewed&hellip;</a>
+    </li>
+    <li>
+        <a class="icon-delete" data-reveal-id="mass-delete">Delete unreviewed attempts&hellip;</a>
+    </li>
+{% endblock %}
+
+
+{##
+ # Participant
+ #
+ # Each person in the list is rendered here
+ # Each type of assessment renders their participants uniquely
+#}
+{% block participant %}
+    {% include '@learningAssessment/quiz/participant.twig' %}
+{% endblock %}
+
+{##
+ # Massive javascript hulk
+#}
+{% block scripts %}
+    <script type="application/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.bulky.js?v={{ config.site_version }}"></script>
+    <div id="mass-review" class="reveal-modal" data-reveal data-list-id="mass-review-list" aria-hidden="true" role="dialog">
+        <h2>Mark Attempts as Reviewed</h2>
+        <p data-mass-unavailable>There aren't any unreviewed attempts for this activity.</p>
+        <p data-mass-available>The following attempts can be marked as reviewed:</p>
+        <div style="">
+            <section class="checklist" id="mass-review-list">
+                <div data-template>{# this will get detached from the DOM on pageload #}
+                    <input type="checkbox" data-selected checked />
+                    <label class="checkbox-label" data-participant-name>{# populated by JS #}</label>
+                </div>
+            </section>
+        </div>
+        <div class="component-action">
+            <section>
+                {%- apply spaceless -%}
+                    <a class="button">Cancel</a>
+                    <a class="button" data-submit>Mark All as Reviewed</a>
+                {%- endapply -%}
+            </section>
+        </div>
+        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+    </div>
+
+    <div id="mass-delete" class="reveal-modal" data-reveal data-list-id="mass-delete-list" aria-hidden="true" role="dialog">
+        <h2>Delete Attempts</h2>
+        <p data-mass-unavailable>There aren't any unreviewed attempts for this activity.</p>
+        <p data-mass-available>The following attempts can be deleted:</p>
+        <section class="checklist" id="mass-delete-list">
+            <div style="">
+                <div data-template>{# this will get detached from the DOM on pageload #}
+                    <input type="checkbox" data-selected checked />
+                    <label class="checkbox-label" data-participant-name>{# populated by JS #}</label>
+                </div>
+            </div>
+        </section>
+        <p data-mass-available><em>Note: all unreviewed attempts will be deleted for any students selected.</em></p>
+        <div class="component-action">
+            <section>
+                {%- apply spaceless -%}
+                    <a class="button">Cancel</a>
+                    <a class="button" data-submit>Delete All</a>
+                {%- endapply -%}
+            </section>
+        </div>
+        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+    </div>
+
+    <div class="toast" data-alert data-save-draft></div>
+
+    <script type="text/javascript" src='{{ CDN_PREFIX }}/js/submissions/jquery.dynamic-feedback.js'></script>
+    <script type="text/javascript">
+        $(function() {
+            var $participantList  = $('[data-assessment-status]');
+
+            /**
+             * Currently quiz does not support a draft state, so any changes to grade/comment is published when a 'Save and Publish' button is selected instead.
+             * We circumvent the draft state by showing the 'Save and Publish' button immediately and abort the saving of a draft state.
+             */
+            $.fn.dynamicFeedback({
+                isQuiz: true,
+                publishText: "Save and Publish",
+            });
+
+            {# Mass review submitted but unreviewed quiz attempts #}
+            $('#mass-review').bulky({
+                submitText: function (len, all) {
+                    if (!len) {
+                        return 'None Selected';
+                    }
+                    if (len == all) {
+                        return 'Mark All as Reviewed';
+                    }
+                    return 'Mark ' + len + ' Selected as Reviewed';
+                },
+                userList: $participantList,
+                userSelector: ' [data-interaction-review]:not([style*="display:none"])',
+                onSubmit: function (toReview) {
+                    let list = toReview.map(function () {
+                        return $(this).find('[data-interaction-review]').attr('data-interaction-review') }
+                    ).get();
+
+                    $.post(
+                        '{{ routeLookup('learnosity.postMassReviewAttempts', {assessmentId: assessmentSpec.id }) }}',
+                        { attemptIds: list }
+                    ).done(function () {
+                        location.reload();
+                    });
+                }
+            });
+
+            {# Mass delete unreviewed quiz attempts #}
+            $('#mass-delete').bulky({
+                submitText: function (len, all) {
+                    if (!len) {
+                        return 'None Selected';
+                    }
+                    if (len == all) {
+                        return 'Delete All';
+                    }
+                    return 'Delete ' + len + ' Selected';
+                },
+                userList: $participantList,
+                userSelector: '[data-mass-delete]',
+                onSubmit: function (toDelete) {
+
+                    var userList = toDelete.map(function () { return $(this).closest('[data-participant]').attr('data-participant') }).get();
+
+                    $.post(
+                        '{{ routeLookup('learnosity.postDeleteUnreviewedAttempts', {assessmentId: assessmentSpec.id }) }}',
+                        { userIds: userList }
+                    ).always(function () {
+                        location.reload();
+                    });
+                }
+            });
+
+            {# Delete attempt for single participant #}
+            $participantList.on('click', '[data-interaction-delete]', function (e) {
+                e.preventDefault();
+
+                let $a = $(this);
+
+                $(this).confirmDialog({
+                    text: 'Are you sure you want to delete this attempt?',
+                    confirmLabel: 'Delete',
+                    confirmEvent: function () {
+                        $.post(
+                            '{{ routeLookup('learnosity.postDeleteAttempts', {assessmentId: assessmentSpec.id }) }}',
+                            { attemptIds: [ $a.attr('data-interaction-delete') ]}
+                        ).done(function () {
+                            // We must reload page to populate the action bar with the previous attempt
+                            location.reload();
+                        });
+                    }
+                });
+            });
+
+            {# Submit/Finish an unfinished/unsubmitted/in-progress quiz attempt #}
+            $participantList.on('click', '[data-interaction-finish]', function (e) {
+                e.preventDefault();
+                let $a = $(this);
+
+                $.post(
+                    $a.attr('href'),
+                    {
+                        attemptId: $a.attr('data-interaction-finish'),
+                        learnosityReference: $a.attr('data-interaction-finish-reference')
+                    }
+                ).done(function () {
+                    var $actionBar = $a.closest('[data-action-bar]');
+                    $actionBar.attr('data-mass-review', '');
+                    $actionBar.find('[data-interaction-review]').show();
+                    $a.hide();
+
+                    // Update status for bulk actions to work
+                    const participantRow = $a.closest('li');
+                    participantRow.attr('data-status', '{{ statusPending }}');
+
+                    // Change "In Progress" grade indicator to "Awaiting Review"
+                    const gradeIndicator = participantRow.find(".grade");
+                    gradeIndicator.removeClass('in-progress').addClass('review');
+                    gradeIndicator.find('span').text('Awaiting Review');
+
+                    // Update status icon and label accordingly
+                    participantRow.find('.meta [data-status-label]').text('{{ labelPending }}');
+                    const statusIcon = participantRow.find('.meta [data-status]');
+                    statusIcon.removeClass('{{ statusIncomplete }}').addClass('{{ statusPending }}');
+                    statusIcon.attr('title', '{{ labelPending }}');
+                });
+            });
+        });
+    </script>
+{% endblock %}

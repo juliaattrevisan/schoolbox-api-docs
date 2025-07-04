@@ -1,0 +1,254 @@
+{# Renders a project status page for staff.
+Data:
+    'breadcrumbs'       string[][]
+    'baseContext'       AssessmentContext
+    'assessment'        IAssessable
+    'assessmentStats'   Assessment\Statistics[] Indexed by assessment.id
+    'participantStats'  ParticipantStatistics[] Indexed by user.id
+    'returnUrl'         string
+#}
+
+<script type="text/javascript">
+    $(function() {
+        // Setup sortable
+        var assessmentList = $('#assessment-list');
+        assessmentList.sortable({
+            handle: '.grip',
+            axis:   'y'
+        })
+            .on('sortstop', function() {
+                var sequence = [];
+                assessmentList.find('[data-assessment]').each(function(idx, elem){
+                    sequence.push($(elem).attr('data-assessment'));
+                });
+                var data = {
+                    id: sequence
+                };
+                $.post(assessmentList.attr('data-action'), data);
+            });
+
+        $('[data-delete]').click(function(event) {
+            event.preventDefault();
+
+            var element = $(this);
+
+            $(this).confirmDialog({
+                header: 'Are you sure you wish to delete this activity?',
+
+                {# When you're managing activities in a Course Specification context
+                 # there is nothing to delete like responses/feedback/marks, so just don't
+                 # really show anything in particular in that case
+                #}
+                {% if baseContext is not unitSpecification %}
+                text: '<span class=\"alert alert-box\"><b>WARNING</b> All student responses, feedback and marks will also be deleted.</span>',
+                {% else %}
+                text: '',
+                {% endif %}
+                format: 'html',
+                confirmLabel: 'Yes, permanently delete',
+                cancelLabel: 'No, keep it',
+                confirmEvent: function() {
+                    var listItem = $(element).parents('[data-assessment]');
+
+                    var assessmentId = $(element).attr('data-delete');
+                    var assessmentList = $('#assessment-list');
+                    var assessmentName = assessmentList
+                        .find('[data-assessment='+assessmentId+']')
+                        .attr('data-assessment-title');
+
+                    {# Toast success and remove row from template #}
+
+                    var toast = $('#assessment-toast');
+                    toast.toastActivate({text: 'Deleting ' + assessmentName + '...'});
+
+                    $.post($(element).attr('href'), {assessmentId: assessmentId})
+                        .done(function() {
+                            toast.toastTimeout({text: assessmentName + ' deleted.', css: 'success'});
+                            listItem.fadeOut({
+                                done: function() {
+                                    listItem.remove();
+
+                                    {# Hide component actions and respawn empty state #}
+                                    if (!assessmentList.find('li').length) {
+                                        $('#assessment-actions').remove();
+                                        $('#assessment-list-empty-state').removeClass('hide');
+                                    }
+                                }
+                            });
+                        })
+                        .fail(function() {
+                            {# Toast alert #}
+                            toast.toastTimeout({text: 'Could not delete ' + assessmentName, css: 'alert'});
+                        });
+                }
+            });
+        });
+    });
+</script>
+
+{% import '@learning/macro/dueDate.twig' as dueDate %}
+{% import '@learning/macro/urgency.twig' as urgency %}
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(breadcrumbs) }}
+
+<div class="row actions-small-1">
+    <div class="list-item small-12 columns">
+        <h1>{{ assessmentSpec.title }}</h1>
+    </div>
+    <nav>
+        <a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessmentSpec.id}) }}{{ returnUrlSuffix }}" class="icon-modify" title="Modify"></a>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        {% include '@learningAssessment/project/summary/meta.twig' with {assessment: assessmentSpec} only %}
+        {% include '@learningAssessment/project/summary/description.twig' with {assessment: assessmentSpec} only %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 large-6 island">
+        <h2 class="subheader">{{ locale.activity.properPlural }}</h2>
+
+        {% if assessmentSpec.assessables | length %}
+            <section>
+                <ul id='assessment-list' class="information-list sortable-card"
+                    data-sortable
+                    data-assessment-list
+                    data-action="{{ routeLookup('learningAssessment.postReorderAssessments', {contextType: 'projects', contextId: assessmentSpec.id, context: assessmentSpec}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">
+                    {% for assessable in assessmentSpec.assessables %}
+                        {% import '@learningAssessment/project/macro/icon.twig' as icon %}
+                        {% set exportRoute = routeLookupIfAuthorized('learningAssessmentExporter.getExportFormForAssessment', {assessmentId: assessable.id, assessment: assessable}) %}
+                        {% set statusRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessable.id, assessment: assessable}) %}
+                        {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessable.id, assessment: assessable}) %}
+                        {% if assessable is quiz %}
+                            {% set viewRoute = (assessment.baseContext is unitSpecification) ? modifyRoute : routeLookupIfAuthorized('learningAssessment.getSummary', {assessmentId: assessable.id, assessment: assessable, studentId: USER.id, student: USER}) %}
+                        {% else %}
+                            {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {assessmentId: assessable.id, assessment: assessable, studentId: USER.id, student: USER}) %}
+                        {% endif %}
+                        {% set deleteRoute = routeLookupIfAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessable.id, assessment: assessable}) %}
+                        {% set hasActions = statusRoute or modifyRoute or deleteRoute %}
+                        {% set similarityReportRoute = routeLookupIfAuthorized('learningAssessment.getSimilarityReport', {assessmentId: assessable.id, assessment: assessable}) %}
+                        {% set worksheetClassView = routeLookupIfAuthorized('learningAssessment.getWorksheet', {assessmentId: assessable.id, assessment: assessable}) %}
+
+                        <li data-assessment="{{ assessable.id }}" data-assessment-title="{{ assessable.title }}">
+                            <div{% if hasActions %} class="actions-small-1"{% endif %}>
+                                <div class="grip"></div>
+                                <div class="list-item">
+                                    <div class="compact card small-12 wrap-down">
+                                        {% if viewRoute %}
+                                        <a href="{{ viewRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">
+                                            {% endif %}
+                                            <span class="{{ icon.renderClass(assessable) }}" title="{{ assessable.getTypeName }}"></span>
+                                            <p>{{ assessable.title }}</p>
+                                            {% if viewRoute %}</a>{% endif %}
+                                    </div>
+                                </div>
+                                {% if hasActions %}
+                                    <nav>
+                                        <sbx-pop-out content-id="project-options{{ assessable.id }}"></sbx-pop-out>
+                                    </nav>
+                                    <ul data-dropdown-content class="f-dropdown" id="project-options{{ assessable.id }}">
+                                        {% if statusRoute and assessable.isImplementation %}<li><a href="{{ statusRoute }}" class="icon-progress">View Status</a></li>{% endif %}
+                                        {% if assessable is dueWork and assessable.enableWorksheet and assessable.kamiWorksheetTemplate and worksheetClassView %}
+                                            <li>
+                                                <a id="kamiWorksheet" class="icon-surveys" href="{{ worksheetClassView }}">Class View</a>
+                                            </li>
+                                        {% endif %}
+                                        {% if similarityReportRoute %}<li><a class="icon-due-work" href="{{ similarityReportRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Similarity Report</a></li>{% endif %}
+                                        {% if exportRoute %}<li><a href="{{ exportRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-export">Export to Classes</a></li>{% endif %}
+
+                                        {# Learnosity Quiz has two parts: Modify Quiz and Modify Contents #}
+                                        {% if assessable is quiz %}
+                                            {% set modifyContentsRoute = routeLookupIfAuthorized('learnosity.getContent', {assessment: assessable, assessmentId: assessable.id}) %}
+                                            <li><a class="icon-modify" href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" title="Modify this {{ locale.activity }} settings">Modify Settings</a></li>
+                                            <li><a class="icon-modify" href="{{ modifyContentsRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" title="Modify this {{ locale.activity }} contents">Modify Contents</a></li>
+                                        {% else %}
+                                            <li><a class="icon-modify" href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" title="Modify this {{ locale.activity }}">Modify</a></li>
+                                        {% endif %}
+
+                                        {% if deleteRoute %}<li><a href="{{ deleteRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-delete" data-delete="{{ assessable.id }}" title="Delete this {{ locale.activity }}">Delete</a></li>{% endif %}
+                                    </ul>
+                                {% endif %}
+                            </div>
+                        </li>
+
+                    {% endfor %}
+                </ul>
+
+                <div id="assessment-toast" class="toast"></div>
+
+                <div id="assessment-actions" class="component-action">
+                    <section>
+                        <a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'projects', contextId: assessmentSpec.id, context: assessmentSpec }) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="button" title="Create a new {{ locale.activity }}">Create {{ locale.activity.proper }}</a>
+                    </section>
+                </div>
+            </section>
+        {% endif %}
+
+        <div id='assessment-list-empty-state' class="empty-state {% if assessmentSpec.assessables|length %}hide{% endif %}">
+            {% set createRoute = routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'projects', contextId: assessmentSpec.id, context: assessmentSpec }) %}
+            <i class="icon-project"></i>
+            <p>This {{ locale.project }} currently has no {{ locale.activity.plural }}.<br />To start assessing students you should <a href="{{ createRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">create an {{ locale.activity }}</a> next.</p>
+        </div>
+    </div>
+    <div class="small-12 large-6 island">
+        <h2 class="subheader">Students</h2>
+        {% for assessment in assessments %}
+            <h4 class="subheader"><a href="/homepage/{{ assessment.getBaseContext.getFolder.id }}">{{ assessment.getBaseContext.getFolder.getTitle }}</a></h4>
+                {% if assessment.allParticipants | length %}
+                    <section>
+                        <ul class="information-list">
+                            {% for participant in assessment.allParticipants %}
+                                <li>
+                                    <div class="flex-grade">
+                                        <div class="small-12 compact card columns">
+                                            {# cache to prevent repeated traversals #}
+                                            <a href="{{ routeLookup('learningAssessment.getSummary', { assessmentId: assessment.id, studentId: participant.user.id}) }}">
+                                                {% include 'include/portrait.twig' with {user: participant.user} only %}
+                                                <p>
+                                                    {{ participant.user.formatName }}
+                                                    <span class="pipe meta">
+                                                {% set stats = participantStats[assessment.id][participant.user.id] %}
+                                                        {{ stats.countAssessments - stats.countResponseRequired }}/{{ stats.countAssessments }} activities completed
+                                            </span>
+                                                </p>
+                                            </a>
+                                        </div>
+
+                                        {% set publishedHumanReadableMark = participant.humanReadableMark(true) ?? null %}
+
+                                        {% if publishedHumanReadableMark is not null %}
+                                            <div class="grade {{ urgency.marks( participant.normalisedMark(true)) }}-bg">
+                                                <span>{{ publishedHumanReadableMark }}</span>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </section>
+                {% else %}
+                    {% set createRoute = routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'projects', contextId: assessment.id, context: assessment }) %}
+                    <div class="empty-state">
+                        <i class="icon-group"></i>
+                        <p>There are no students currently undertaking this {{ locale.project }}.</p>
+                        <p>As you <a href="{{ createRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">add {{ locale.activity.plural }}</a>, the participating students will appear here. </p>
+                    </div>
+                {% endif %}
+        {% endfor %}
+    </div>
+</div>
+<div class="row">
+    <div class="small-12 column">
+        {% if returnUrl %}
+            <a href={{ returnUrl }} class="button submit">Return</a>
+        {% elseif baseContext is unitSpecification %}
+            <a href="{{ routeLookup('course.modifyCourse', {id: baseContext.course.id })}}#{{ baseContext.id }}" class="button submit">Return to course</a>
+        {% else %}
+            <a href="/homepage/{{ baseContext.folder.id }}" class="button submit">Return to homepage</a>
+        {% endif %}
+    </div>
+</div>
