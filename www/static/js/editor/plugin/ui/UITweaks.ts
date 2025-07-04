@@ -91,7 +91,7 @@ export default class UITweaks extends Plugin {
             if (item.panelView.element === null || item.buttonView.element === null) {
                 return;
             }
-            const { left, top } = getOptimalPosition({
+            const { left } = getOptimalPosition({
                 element: item.panelView.element,
                 target: item.buttonView.element.getBoundingClientRect(),
                 fitInViewport: true,
@@ -101,7 +101,6 @@ export default class UITweaks extends Plugin {
                 positions: item._panelPositions,
             }) as DomPoint;
             item.panelView.element.style.left = `${left}px`;
-            item.panelView.element.style.top = `${top}px`;
         });
     }
 

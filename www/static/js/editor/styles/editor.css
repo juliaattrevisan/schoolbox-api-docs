@@ -8,15 +8,19 @@
 :root {
     /* Remove the border radius */
     --ck-border-radius: 0px;
+
     /* -- Border colours */
     --ck-color-toolbar-border: var(--form-border-color);
     --ck-color-base-border: var(--form-border-color);
+
     /* Button hover colour */
     --ck-color-button-default-hover-background: var(--form-bg-hover-color);
+
     /* Change the colour of the mentions */
     --ck-color-mention-background: var(--accent-background);
     --ck-color-mention-text: #222222;
-    /* to sit above the side menus */
+
+    /* resolve depth issues */
     --ck-z-modal: var(--sbx-depth-ui-overlay);
     --ck-z-panel: var(--sbx-depth-ui-overlay);
 
@@ -54,6 +58,11 @@
         var(--content-ui-submit-background-a)
     );
     --ck-color-button-action-text: var(--content-ui-submit-foreground);
+}
+
+body.ck-fullscreen {
+    /* resolve depth issues linked to the full screen plugin */
+    --ck-z-fullscreen: var(--sbx-depth-pop-over);
 }
 
 .ck.ck-editor {
@@ -112,6 +121,13 @@
 
 .ck.ck-button.ck-heading_heading5 {
     font-size: 0.9375rem;
+}
+
+.ck.ck-button.ck-heading_heading2 .ck-button__label,
+.ck.ck-button.ck-heading_heading3 .ck-button__label,
+.ck.ck-button.ck-heading_heading4 .ck-button__label,
+.ck.ck-button.ck-heading_heading5 .ck-button__label {
+    font-size: inherit;
 }
 
 /**
