@@ -85,7 +85,7 @@ const mark = defineModel<string | null>("mark", { required: true });
         <!-- If humanReadableMark has a value, look for it among the current Grade Group dropdown options.
          If it's not here, then it might be one of the Submission States
          -->
-        <optgroup v-else label="{{ locale.grades.properPlural }}">
+        <optgroup v-else :label="locale.grades.properPlural()">
             <option
                 v-for="(level, i) in props.markScheme.context.conf"
                 :key="i"
@@ -99,14 +99,14 @@ const mark = defineModel<string | null>("mark", { required: true });
         <!-- If it didn't exist in the Grade Group, it might have been one of the Submission States
          like Submitted/Absent/Pending etc. so look there as well
          -->
-        <optgroup v-if="props.studentView" label="States">
+        <optgroup v-if="!props.studentView" label="States">
             <option
                 v-for="state in props.submissionErrorStates"
                 :key="state.id"
                 :value="state"
                 :selected="mark === state.name"
             >
-                {{ state }}
+                {{ state.name }}
             </option>
         </optgroup>
 

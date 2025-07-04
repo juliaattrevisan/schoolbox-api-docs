@@ -109,7 +109,7 @@
             vertical-align: middle;
         }
 
-        select {
+        select:not(.letter-grade-select) {
             max-width: 3rem;
         }
 
