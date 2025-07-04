@@ -175,7 +175,7 @@ Data:
                                                 assessmentId: assessable.id,
                                                 assessment: assessable,
                                             }) %}
-                                            {% if viewGradeRoute %}
+                                            {% if viewGradeRoute and assessable.isImplementation %}
                                                 <li><a class="icon-task" href="{{ viewGradeRoute }}" >View and {{ locale.grades }} submissions</a></li>
                                             {% endif %}
                                         {% endif %}
