@@ -66,7 +66,11 @@ class Controller extends Assessment\Controller
         LessonPlanDataModelMapper $lessonPlanDataModelMapper,
         private CourseImplementation\Mapper $courseImplementationMapper,
         private UnitImplementation\Mapper $unitImplementationMapper,
-        private LinkedAssessmentsMapper $linkedAssessmentsMapper
+        private LinkedAssessmentsMapper $linkedAssessmentsMapper,
+        \Schoolbox\Url\Factory $urlFactory,
+        string $learnosityVersion,
+        #[\SensitiveParameter] string $learnosityConsumerKey,
+        #[\SensitiveParameter] string $learnosityConsumerSecret,
     ) {
         parent::__construct(
             $userMapper,
@@ -85,7 +89,11 @@ class Controller extends Assessment\Controller
             $latestViewMapper,
             $projectResultCacheMapper,
             $lessonPlanTemplateMapper,
-            $lessonPlanDataModelMapper
+            $lessonPlanDataModelMapper,
+            $urlFactory,
+            $learnosityVersion,
+            $learnosityConsumerKey,
+            $learnosityConsumerSecret,
         );
     }
 

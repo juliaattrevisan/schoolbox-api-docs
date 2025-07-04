@@ -43,6 +43,7 @@ use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Storage\IStorage;
+use Schoolbox\Url\Factory;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Assessment\Term;
@@ -71,23 +72,28 @@ abstract class Controller extends ListController implements IAssessmentControlle
     /**
      * Controller constructor.
      *
-     * @param UserMapper                 $userMapper
-     * @param ErrorMapper                $errorMapper
-     * @param MapperProxy                $assessmentMapper
-     * @param WorkTypeMapper             $workTypeMapper
-     * @param Access                     $access
-     * @param Transactor                 $transactor
-     * @param BreadcrumbFactory          $bakery
-     * @param Mapper                     $termMapper
-     * @param DataSource                 $participantDataSource
-     * @param CourseSpecificationMapper  $courseSpecificationMapper
-     * @param UnitSpecificationMapper    $unitSpecificationMapper
-     * @param RosettaStone               $rosettaStone
-     * @param Replicator                 $replicator
-     * @param LatestViewMapper           $latestViewMapper
+     * @param UserMapper $userMapper
+     * @param ErrorMapper $errorMapper
+     * @param MapperProxy $assessmentMapper
+     * @param WorkTypeMapper $workTypeMapper
+     * @param Access $access
+     * @param Transactor $transactor
+     * @param BreadcrumbFactory $bakery
+     * @param Mapper $termMapper
+     * @param DataSource $participantDataSource
+     * @param CourseSpecificationMapper $courseSpecificationMapper
+     * @param UnitSpecificationMapper $unitSpecificationMapper
+     * @param RosettaStone $rosettaStone
+     * @param Replicator $replicator
+     * @param LatestViewMapper $latestViewMapper
      * @param Project\ResultCache\Mapper $projectResultCacheMapper
-     * @param LessonPlanTemplateMapper   $lessonPlanTemplateMapper
-     * @param LessonPlanDataModelMapper  $lessonPlanDataModelMapper
+     * @param LessonPlanTemplateMapper $lessonPlanTemplateMapper
+     * @param LessonPlanDataModelMapper $lessonPlanDataModelMapper
+     * @param Factory $urlFactory
+     * @param string $learnosityVersion
+     * @param string $learnosityConsumerKey
+     * @param string $learnosityConsumerSecret
+     * @param MimetypeMapper|null $mimetypeMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -107,9 +113,27 @@ abstract class Controller extends ListController implements IAssessmentControlle
         protected Project\ResultCache\Mapper $projectResultCacheMapper,
         protected LessonPlanTemplateMapper $lessonPlanTemplateMapper,
         protected LessonPlanDataModelMapper $lessonPlanDataModelMapper,
+        \Schoolbox\Url\Factory $urlFactory,
+        string $learnosityVersion,
+        #[\SensitiveParameter] string $learnosityConsumerKey,
+        #[\SensitiveParameter] string $learnosityConsumerSecret,
         protected ?MimetypeMapper $mimetypeMapper = null,
     ) {
-        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor, $participantDataSource, $unitSpecificationMapper, $rosettaStone, $this->projectResultCacheMapper);
+        parent::__construct(
+            $userMapper,
+            $errorMapper,
+            $assessmentMapper,
+            $access,
+            $transactor,
+            $participantDataSource,
+            $unitSpecificationMapper,
+            $rosettaStone,
+            $this->projectResultCacheMapper,
+            $urlFactory,
+            $learnosityVersion,
+            $learnosityConsumerKey,
+            $learnosityConsumerSecret,
+        );
     }
 
 

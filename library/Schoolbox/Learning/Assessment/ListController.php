@@ -9,6 +9,7 @@
 namespace Schoolbox\Learning\Assessment;
 
 use Alaress\Database\Predicate\InvalidColumnException;
+use Alaress\Lumberjack\Logger;
 use Alaress\Module\Registry;
 use Alaress\Web;
 use Alaress\Web\Controller\Exception;
@@ -17,6 +18,7 @@ use Aura\Router\Exception\RouteNotFound;
 use Crell\ApiProblem\ApiProblem;
 use DomainException;
 use InvalidArgumentException;
+use LearnositySdk\Exceptions\ValidationException;
 use LogicException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -32,13 +34,19 @@ use Schoolbox\Learning\Assessment\Project\ResultCache\ValidCache;
 use Schoolbox\Learning\Assessment\Seb\Payload;
 use Schoolbox\Learning\Assessment\Seb\Payload as SebPayload;
 use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
+use Schoolbox\Learning\Assessment\Lti\Response\Model as LtiResponse;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkResponse;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Learning\Learnosity\Api;
+use Schoolbox\Learning\Learnosity\Helper;
 use Schoolbox\Mapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Assessment\Participant\Plan\Model as PlanModel;
@@ -47,6 +55,7 @@ use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Mapper as Folder;
 use Schoolbox\Role;
+use Schoolbox\Url\Factory;
 use Schoolbox\Url\Uri;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -82,55 +91,45 @@ class ListController extends Web\Controller\Base
     private $access;
 
     /**
-     * @var Transactor
-     */
-    private $transactor;
-
-    /**
-     * @var Participant\DataSource
-     */
-    protected $participantDataSource;
-
-    /**
-     * @var UnitSpecificationMapper
-     */
-    protected $unitSpecificationMapper;
-
-    /**
      * @var BreadcrumbFactory
      */
     protected BreadcrumbFactory $bakery;
 
 
     /**
-     * @param UserMapper                 $userMapper
-     * @param Error\Mapper               $errorMapper
-     * @param MapperProxy                $assessmentMapper
-     * @param Access                     $access
-     * @param Transactor                 $transactor
-     * @param DataSource                 $participantDataSource
-     * @param UnitSpecificationMapper    $unitSpecificationMapper
-     * @param RosettaStone               $rosettaStone
+     * @param UserMapper $userMapper
+     * @param Error\Mapper $errorMapper
+     * @param MapperProxy $assessmentMapper
+     * @param Access $access
+     * @param Transactor $transactor
+     * @param DataSource $participantDataSource
+     * @param UnitSpecificationMapper $unitSpecificationMapper
+     * @param RosettaStone $rosettaStone
      * @param Project\ResultCache\Mapper $projectResultCacheMapper
+     * @param Factory $urlFactory
+     * @param string $learnosityVersion
+     * @param string $learnosityConsumerKey
+     * @param string $learnosityConsumerSecret
      */
     public function __construct(
         UserMapper $userMapper,
         Error\Mapper $errorMapper,
         MapperProxy $assessmentMapper,
         Access $access,
-        Transactor $transactor,
-        Participant\DataSource $participantDataSource,
-        UnitSpecificationMapper $unitSpecificationMapper,
+        private Transactor $transactor,
+        private Participant\DataSource $participantDataSource,
+        private UnitSpecificationMapper $unitSpecificationMapper,
         private RosettaStone $rosettaStone,
-        protected \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
+        protected \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper,
+        private \Schoolbox\Url\Factory $urlFactory,
+        private string $learnosityVersion,
+        #[\SensitiveParameter] private string $learnosityConsumerKey,
+        #[\SensitiveParameter] private string $learnosityConsumerSecret,
     ) {
         $this->setUserMapper($userMapper);
         $this->setErrorMapper($errorMapper);
         $this->setAssessmentMapper($assessmentMapper);
         $this->setAccess($access);
-        $this->transactor              = $transactor;
-        $this->participantDataSource   = $participantDataSource;
-        $this->unitSpecificationMapper = $unitSpecificationMapper;
     }
 
 
@@ -1300,6 +1299,166 @@ class ListController extends Web\Controller\Base
         $postData = $this->requestPost;
 
         $this->persistAssessmentParticipationLearningPlan($assessment, $postData);
+    }
+
+
+    /**
+     * get assessment info for participant (for markbook popout feedback)
+     * we need all the info, draft, rubric, etc
+     *
+     * @param User $student
+     * @param IAssessable $assessment
+     * @return void
+     * @throws \JsonException
+     * @throws ValidationException
+     * @api GET GET /learning/assessments/{assessmentId}/{studentId}/info
+     */
+    public function getInfo(User $student, IAssessable $assessment): void
+    {
+        // hydrate participant
+        $assessments = $this->getAssessmentMapper()->createCollection([$assessment]);
+        $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection($assessments, $student, true);
+
+        $helper = null;
+        if ($assessment instanceof \Schoolbox\Learning\Assessment\Quiz\Model) {
+            /* Probably inject this one day, but for now,
+                 * I want to avoid dumping Yet Another Thing into the kernel
+                 * I don't have a convenient means to access SERVER_NAME except like this, sadly
+                 */
+            $logger = new Logger(STDOUT, STDOUT, \Monolog\Level::Debug, [], true, 'learnosity');
+
+            /* TODO Derive from learnosity atm
+             *   Consider caching locally the standing maximum available marks for the assessment in the absence of an attempt.
+             *   This only matters when it's a Total Mark markscheme: everything else is out of 100
+             */
+            $api = new Api(
+                $this->urlFactory->buildFullyQualified()->getHost(),
+                $this->learnosityVersion,
+                $this->learnosityConsumerKey,
+                $this->learnosityConsumerSecret,
+                $logger
+            );
+            $helper = new Helper($api, $logger);
+        }
+
+
+        $maxMarks = null;
+        if ($assessment instanceof \Schoolbox\Learning\Assessment\Quiz\Model && $helper) {
+            /** @var \Schoolbox\Learning\Assessment\Quiz\Model $assessment */
+            // this exists due to the above, and we are in a loop, so i don't want to new each time...
+            $maxMarks = $helper->findAvailableMarks($assessment->getLearnosityReference());
+        }
+
+        $participant = $assessment->getParticipantIfExtant($student);
+        /* A list of Responses and Floating Feedbacks, as per the Submission History
+        */
+        $feedback = [
+            'id' => null,
+            'comment' => null,
+            'published' => null,
+            'normalisedMark' => null,
+            'humanReadable' => null,
+            'rubric' => null,
+            'resubmissionRequired' => null,
+            'rubricMarkedGrid' => null,
+            'hasResponseWithKamiDocs' => null,
+            'hasFiles' => null,
+            'humanReadableInstructorMark' => null,
+            'completionStatus' => null,
+            'scoreGiven' => null,
+            'scoreMaximum' => null,
+        ];
+
+        // all things have this, even if there are no submissions...
+        $response = [
+            'id'  => null,
+            'isSubmitted' => null,
+            'isDraft' => null,
+            'isSubmittedOffline' => null,
+            'hasFiles' => null,
+            'isSubmittedOnTime' => null,
+            'learnosityReference' => null,
+            'comment' => null,
+            'duration' => null,
+            'humanReadableMark' => null,
+            'normalisedMark' => null,
+            'marksAvailable' => null,
+            'isSelfAssessed' => null,
+            'completionStatus' => null,
+            'scoreGiven' => null,
+            'scoreMaximum' => null,
+        ];
+
+        if ($participant) {
+            $latestResponse = $participant->findMostRecentResponse();
+            $latestFeedback = $participant->findMostRecentInstructorGivenFeedback();
+
+            if ($latestResponse) {
+                $response['id'] = $latestResponse->getId();
+                $response['isSubmitted'] = (bool)$latestResponse->getId();
+                $response['isSubmittedOnTime'] = $latestResponse->isSubmittedOnTime();
+
+                // now for assessment type specific data
+                if ($latestResponse instanceof DueWorkResponse) {
+                    $response['isSubmitted'] = $latestResponse->isSubmitted();
+                    $response['isDraft'] = $latestResponse->isDraft();
+                    $response['isSubmittedOffline'] = $latestResponse->isSubmittedOffline();
+                    $response['hasFiles'] = $latestResponse->getAllFiles()->count() > 0;
+                } elseif ($latestResponse instanceof TaskResponse) {
+                    $response['isSubmitted'] = $latestResponse->isSubmitted();
+                    $response['completionStatus'] = $latestResponse->getCompletionStatus();
+                    $response['isSelfAssessed'] = $latestResponse->isSelfAssessed();
+                } elseif ($latestResponse instanceof LtiResponse) {
+                    $response['scoreGiven'] = $latestResponse->getScoreGiven();
+                    $response['scoreMaximum'] = $latestResponse->getScoreMaximum();
+                    $response['comment'] = $latestResponse->getComment();
+                } elseif ($latestResponse instanceof QuizAttempt) {
+                    $response['learnosityReference'] = $latestResponse->getLearnosityReference();
+                    $response['marksAvailable'] = $latestResponse->getMarksAvailable();
+                    $response['duration'] = $latestResponse->getDuration();
+                    $response['comment'] = $latestResponse->getComment();
+                    $response['humanReadableMark'] = $latestResponse->getHumanReadableMark();
+                    $response['normalisedMark'] = $latestResponse->getNormalisedMark();
+                }
+            }
+
+            if ($latestFeedback) {
+                $feedback['id'] = $latestFeedback->getId();
+                $feedback['comment'] = $latestFeedback->getComment();
+                $feedback['published'] = $latestFeedback->isPublished();
+                $feedback['normalisedMark'] = $latestFeedback->getNormalisedMark();
+                $feedback['humanReadable'] = $latestFeedback->getHumanReadableMark();
+
+                // now for assessment type specific data
+                if ($latestFeedback instanceof \Schoolbox\Learning\Assessment\DueWork\Feedback\Model) {
+                    /** @var \Schoolbox\Learning\Assessment\DueWork\Feedback\Model $latestFeedback  */
+                    /** @var \Schoolbox\Learning\Assessment\DueWork\Model $assessment */
+                    $feedback['rubric'] = $assessment->getUseRubric();
+                    $feedback['resubmissionRequired'] = $latestFeedback->getResubmissionRequired();
+                    $feedback['rubricMarkedGrid'] = $latestFeedback->getRubricMarkedGrid();
+                    $feedback['hasResponseWithKamiDocs'] = $latestFeedback->hasResponseWithKamiDocs();
+                    $feedback['hasFiles'] = $latestFeedback->getAllFiles()->count() > 0;
+                    $feedback['humanReadableInstructorMark'] = $latestFeedback->getHumanReadableInstructorMark();
+                } elseif ($latestFeedback instanceof \Schoolbox\Learning\Assessment\Task\Feedback\Model) {
+                    $feedback['completionStatus'] = $latestFeedback->getCompletionStatus();
+                } elseif ($latestFeedback instanceof \Schoolbox\Learning\Assessment\Lti\Feedback\Model) {
+                    $feedback['scoreGiven'] = $latestFeedback->getScoreGiven();
+                    $feedback['scoreMaximum'] = $latestFeedback->getScoreMaximum();
+                }
+
+                // coalesce humanReadableInstructorMark with humanReadable if humanReadableInstructorMark wasn't set
+                $feedback['humanReadableInstructorMark'] = $feedback['humanReadableInstructorMark'] ?? $feedback['humanReadable'];
+            }
+        }
+
+        $this->response = $this->responseAsJson([
+            'assessmentTitle' => $assessment->getTitle(),
+            'assessmentType' => AssessmentType::objectToString($assessment),
+            'workType' => $assessment->getWorkType()?->getName(),
+            'maxMarks' => $maxMarks,
+            'response' => $response,
+            'feedback' => $feedback,
+        ]);
     }
 
     /**

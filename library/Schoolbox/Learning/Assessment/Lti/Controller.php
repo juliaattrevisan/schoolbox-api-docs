@@ -131,7 +131,11 @@ class Controller extends Assessment\Controller
         LatestViewMapper $latestViewMapper,
         protected Assessment\Project\ResultCache\Mapper $projectResultCacheMapper,
         protected LessonPlanTemplateMapper $lessonPlanTemplateMapper,
-        protected LessonPlanDataModelMapper $lessonPlanDataModelMapper
+        protected LessonPlanDataModelMapper $lessonPlanDataModelMapper,
+        \Schoolbox\Url\Factory $urlFactory,
+        string $learnosityVersion,
+        #[\SensitiveParameter] string $learnosityConsumerKey,
+        #[\SensitiveParameter] string $learnosityConsumerSecret,
     ) {
         parent::__construct(
             $userMapper,
@@ -150,7 +154,11 @@ class Controller extends Assessment\Controller
             $latestViewMapper,
             $this->projectResultCacheMapper,
             $lessonPlanTemplateMapper,
-            $lessonPlanDataModelMapper
+            $lessonPlanDataModelMapper,
+            $urlFactory,
+            $learnosityVersion,
+            $learnosityConsumerKey,
+            $learnosityConsumerSecret,
         );
         $this->ltiToolMapper            = $ltiToolMapper;
         $this->ltiAssessmentMapper      = $ltiAssessmentMapper;

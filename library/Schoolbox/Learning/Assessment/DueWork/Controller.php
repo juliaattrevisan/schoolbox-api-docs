@@ -187,6 +187,10 @@ class Controller extends Assessment\Controller
         protected Assessment\Project\ResultCache\Mapper $projectResultCacheMapper,
         protected LessonPlanTemplateMapper $lessonPlanTemplateMapper,
         protected LessonPlanDataModelMapper $lessonPlanDataModelMapper,
+        \Schoolbox\Url\Factory $urlFactory,
+        string $learnosityVersion,
+        #[\SensitiveParameter] string $learnosityConsumerKey,
+        #[\SensitiveParameter] string $learnosityConsumerSecret,
         protected MimetypeMapper $mimeTypeMapper,
     ) {
         parent::__construct(
@@ -207,6 +211,10 @@ class Controller extends Assessment\Controller
             $this->projectResultCacheMapper,
             $lessonPlanTemplateMapper,
             $lessonPlanDataModelMapper,
+            $urlFactory,
+            $learnosityVersion,
+            $learnosityConsumerKey,
+            $learnosityConsumerSecret,
             $this->mimeTypeMapper,
         );
     }
