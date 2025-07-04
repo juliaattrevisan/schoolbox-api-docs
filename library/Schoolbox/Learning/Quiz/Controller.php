@@ -247,18 +247,9 @@ class Controller extends AbstractController
      * @throws ValidationException
      * @throws Error
      */
-    public function postLegacyQuizImport(AssessmentContext $context): void
+    public function postImport(AssessmentContext $context): void
     {
-        /* Intentionally prefill with an instance of AssessmentContext
-         * and other POST vars the Factory assumes exist
-         */
-        $postData = array_merge($this->requestPost->getArrayCopy(), [
-            'assessmentType' => AssessmentType::TYPE_QUIZ,
-            'context'        => $context,
-            /* Legacy xml only ever supported Total Mark marktype
-             */
-            'markType'       => (string)MarkType::TYPE_TOTAL
-        ]);
+        $postData = $this->requestPost->getArrayCopy();
 
         /* No upload? No trabajo
          */
@@ -309,16 +300,80 @@ class Controller extends AbstractController
             null
         );
 
-        /* A 4-tuple of useful things we made
-         * Will likely be empty if something snapped along the way
+        /* Detect whether this is a json or xml file
+         * The presence of <?xml version="1.0" ?> denotes xml;
+         * otherwise, presume json
          */
-        $result = [];
+        if (preg_match('/^<?xml version="1.0" ?>/', $data)) {
+            new \Alaress_Probe('xml');die();
 
-        try {
-            $result = (new Legacy\Xml\Importer(
+            /* Intentionally prefill with an instance of AssessmentContext
+             * and other POST vars the Factory assumes exist
+             */
+            $postData = array_merge($this->requestPost->getArrayCopy(), [
+                'assessmentType' => AssessmentType::TYPE_QUIZ,
+                'context'        => $context,
+                /* Legacy xml only ever supported Total Mark marktype
+                 */
+                'markType'       => (string)MarkType::TYPE_TOTAL
+            ]);
+
+            /* A 4-tuple of useful things we made
+             * Will likely be empty if something snapped along the way
+             */
+            $result = [];
+
+            try {
+                $result = (new Legacy\Xml\Importer(
+                    $api,
+                    $schoolCode,
+                    $domain,
+                    $this->getDi()->get('databaseInternal'),
+                    $context,
+                    $this->getUser(),
+                    $assessmentMapperProxy,
+                    $this->quizMapper,
+                    $this->workTypeMapper,
+                    $this->markTypeMapper,
+                    $this->storageMapper
+                ))->import($data);
+
+                /* Distill anything mostly non-fatal that we found during the import process
+                 */
+                $errors = $result['errors'];
+            } catch (\DomainException $e) {
+                /* Something really important snapped and halted the import process
+                 */
+                $errors = [
+                    $e->getMessage()
+                ];
+            }
+
+            /* Display a list of errors
+             */
+            if (\count($errors) || empty($result)) {
+                $this->response = $this->responseFromTemplate('@learningQuiz/xmlImportLog.twig', [
+                    'errors' => $errors,
+                ]);
+
+                return;
+            }
+
+            $this->response = $this->redirectFound(
+                $this->routeGenerator->generate(
+                    'learningAssessment.getAssessment',
+                    ['assessmentId' => $result['assessment']->getId()]
+                )
+            );
+        } else {
+            new \Alaress_Probe('json');die();
+
+            /* There used to be stuff here that was used to convert url domains but I'm not sure we even
+             * needed them. We needed them in the xml days, but I don't think we needed them here.
+             */
+            $newInstances = (new Importer\Json\Importer(
                 $api,
                 $schoolCode,
-                $domain,
                 $this->getDi()->get('databaseInternal'),
                 $context,
                 $this->getUser(),
@@ -326,36 +381,45 @@ class Controller extends AbstractController
                 $this->quizMapper,
                 $this->workTypeMapper,
                 $this->markTypeMapper,
-                $this->storageMapper
+                $this->gradeGroupMapper,
+                $this->storageMapper,
+                $this->curriculumNodeMapper,
             ))->import($data);
 
-            /* Distill anything mostly non-fatal that we found during the import process
+            /* Check for errors: if there were any, go to a new screen to explain this.
+             * Otherwise just redirect back to the quiz you just made...its modify screen, I guess.
              */
-            $errors = $result['errors'];
-        } catch (\DomainException $e) {
-            /* Something really important snapped and halted the import process
-             */
-            $errors = [
-                $e->getMessage()
-            ];
+            if (\count($newInstances['errors'])) {
+                /* Breadcrumbs
+                 */
+                $breadcrumbs = $this->bakery->produceFromAssessment($newInstances['assessment'], $this->getUser())
+                    ->add([
+                        $newInstances['assessment']->getTitle(),
+                        $newInstances['assessment']->isImplementation() ? $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $newInstances['assessment']->getId()]) : null
+                    ])
+                    ->add(['Import', null]);
+
+                $this->response = $this->responseFromTemplate('@learnosity/importErrors.twig', [
+                    'breadcrumbs' => $breadcrumbs,
+                    'assessment' => $newInstances['assessment'],
+                    'errors' => $newInstances['errors']
+                ], 'Import errors');
+            } else {
+                $returnUrlEncoded = $this->requestPost['returnUrl'];
+
+                if ($returnUrlEncoded !== null) {
+                    /* Go back to the place from whence you came
+                     */
+                    $returnUrl = Redirect::decode($returnUrlEncoded);
+                } else {
+                    /* Otherwise redirect back to the quiz you just made...its modify screen, I guess.
+                     */
+                    $returnUrl = $this->routeGenerator->generate('learningAssessment.getUpdateAssessmentForm', ['assessmentId' => $newInstances['assessment']->getId()]);
+                }
+
+                $this->response = $this->redirectFound($returnUrl);
+            }
         }
-
-        /* Display a list of errors
-         */
-        if (\count($errors) || empty($result)) {
-            $this->response = $this->responseFromTemplate('@learningQuiz/xmlImportLog.twig', [
-                'errors' => $errors,
-            ]);
-
-            return;
-        }
-
-        $this->response = $this->redirectFound(
-            $this->routeGenerator->generate(
-                'learningAssessment.getAssessment',
-                ['assessmentId' => $result['assessment']->getId()]
-            )
-        );
     }
 
 

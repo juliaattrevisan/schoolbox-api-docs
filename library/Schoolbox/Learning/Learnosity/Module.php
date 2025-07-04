@@ -273,7 +273,6 @@ class Module extends BaseModule
         /* Export a schoolbox quiz and its learnosity content into a portable json payload
          */
         $this->register('GET', '/{assessmentId}/export/json', 'getExportToJson', $instructorPerms, $preloadAssessment);
-        $this->register('POST', "/import/{contextType:$contextTypes}/{contextId:\\d+}/json", 'postImportFromJson', $instructorPerms, $preloadContext);
     }
 
 

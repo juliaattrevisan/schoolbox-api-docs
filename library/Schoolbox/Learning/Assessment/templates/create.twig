@@ -185,7 +185,7 @@
     <div id="xmlImportModal" class="reveal-modal" data-reveal>
         <h2>Legacy XML Import</h2>
 
-        {% set xmlImportRoute = routeLookup('learningQuiz.postLegacyQuizImport', {
+        {% set xmlImportRoute = routeLookup('learningQuiz.postImport', {
             contextId: context.id,
             contextType: contextType
         }) %}
