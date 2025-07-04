@@ -688,6 +688,9 @@ class Controller extends WebController\Base
                         $feedback['scoreGiven'] = $latestFeedback->getScoreGiven();
                         $feedback['scoreMaximum'] = $latestFeedback->getScoreMaximum();
                     }
+
+                    // coalesce humanReadableInstructorMark with humanReadable if humanReadableInstructorMark wasn't set
+                    $feedback['humanReadableInstructorMark'] = $feedback['humanReadableInstructorMark'] ?? $feedback['humanReadable'];
                 }
 
                 $assessmentInfo[$assessment->getId()] = [
