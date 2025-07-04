@@ -32,7 +32,6 @@ use Schoolbox\Filter;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\User;
-use Schoolbox\UserMapper;
 
 class Module extends BaseModule
 {
@@ -53,25 +52,6 @@ class Module extends BaseModule
         // only instructors of all courses can access the publish/enter feedback routes
         $preloadCourseAssessment = function ($params) {
             return $this->buildPreloadCourseAssessment($params);
-        };
-
-        $preloadAssessmentStudent = function ($params) {
-            ['courseSpec' => $courseSpec, 'assessmentSpec' => $assessmentSpec] = $this->buildPreloadCourseAssessment($params);
-            $student = $params['student'] ?? null;
-
-            if (null === $student) {
-                if (array_key_exists('studentId', $params)) {
-                    try {
-                        /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
-                        $student = $this->getUserMapper()->findById($params['studentId']);
-                    } catch (Mapper\Exception $e) {
-                        /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
-                        throw new NotFound("No Assessment found for id: {$params['studentId']}");
-                    }
-                }
-            }
-
-            return ['student' => $student, 'courseSpec' => $courseSpec, 'assessmentSpec' => $assessmentSpec];
         };
 
         // single course level single assessment routes
@@ -246,10 +226,5 @@ class Module extends BaseModule
     private function getAccessMapper(): Access
     {
         return $this->getMapperFactory()->get(Access::class);
-    }
-
-    private function getUserMapper(): UserMapper
-    {
-        return $this->getMapperFactory()->get(UserMapper::class);
     }
 }
