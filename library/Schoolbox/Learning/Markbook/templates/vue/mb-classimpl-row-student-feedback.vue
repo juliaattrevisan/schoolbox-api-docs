@@ -1,4 +1,9 @@
 <script setup lang="ts">
+/**
+ * Please note, this component is NOT compatible with its props changing, use a :key to force a re-render
+ * This is primarily caused by some dependencies down the chain of some of our jquery plugins, which makes it difficult to keep things in the right state
+ */
+
 import { cloneDeep } from "lodash";
 import type { Ref } from "vue";
 import { useTemplateRefsList, useElementBounding } from "@vueuse/core";
@@ -127,13 +132,6 @@ function getCellInfo() {
 }
 
 const cellInfo = window.Vue.ref<ReturnType<typeof getCellInfo> | null>(getCellInfo());
-
-window.Vue.watch(
-    () => [props.classImplId, props.activityId, props.studentId],
-    () => {
-        cellInfo.value = getCellInfo();
-    },
-);
 
 /**
  * I can't figure out a way to force one particular table cell to be arbitrarily sticky
@@ -275,7 +273,6 @@ async function onFeedbackPublish(): Promise<void> {
                     <label>
                         {{ locale.grades.proper() }}
                         <mark-scheme
-                            :key="cellInfo.instructorMarkScheme.template"
                             v-model:mark="cellInfo.feedback.data.hrMarkInstructor"
                             :participant="{ user: cellInfo.student }"
                             :mark-scheme="cellInfo.instructorMarkScheme"

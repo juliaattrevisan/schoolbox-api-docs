@@ -102,6 +102,7 @@ const isFaded = window.Vue.computed(() => {
             mbStore.feedbackSelectedCell.classImplId === props.classImplId &&
             mbStore.feedbackSelectedCell.studentId === student.id
         "
+        :key="Object.values(mbStore.feedbackSelectedCell).join('-')"
         :activity-id="mbStore.feedbackSelectedCell.activityId"
         :class-impl-id="mbStore.feedbackSelectedCell.classImplId"
         :student-id="mbStore.feedbackSelectedCell.studentId"
