@@ -554,7 +554,6 @@ function onToggleSelected(): void {
                         <pop-out-menu-item
                             v-if="!cellInfo.participant.isExcluded"
                             :class="{ 'is-disabled': !routes.postFeedback }"
-                            :link="routes.updateRoute ?? undefined"
                             force-callback
                             @selected="onUpdateFeedbackSelected"
                         >
