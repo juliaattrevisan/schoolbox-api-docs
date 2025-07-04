@@ -63,9 +63,8 @@ class Item implements CacheItemInterface
      */
     public function set(mixed $value): static
     {
-        $new        = clone $this;
-        $new->value = $value;
-        return $new;
+        $this->value = $value;
+        return $this;
     }
 
     /**
@@ -74,9 +73,8 @@ class Item implements CacheItemInterface
     public function expiresAt(?DateTimeInterface $expiration): static
     {
         // Convert to TTL
-        $new      = clone $this;
-        $new->ttl = $expiration ? $expiration->getTimestamp() - time() : null;
-        return $new;
+        $this->ttl = $expiration ? $expiration->getTimestamp() - time() : null;
+        return $this;
     }
 
     /**
@@ -84,9 +82,8 @@ class Item implements CacheItemInterface
      */
     public function expiresAfter(DateInterval|int|null $time): static
     {
-        $new      = clone $this;
-        $new->ttl = $time;
-        return $new;
+        $this->ttl = $time;
+        return $this;
     }
 
     /**
