@@ -1362,7 +1362,7 @@ class ListController extends Web\Controller\Base
             'resubmissionRequired' => null,
             'rubricMarkedGrid' => null,
             'hasResponseWithKamiDocs' => null,
-            'hasFiles' => null,
+            'fileCount' => null,
             'humanReadableInstructorMark' => null,
             'completionStatus' => null,
             'scoreGiven' => null,
@@ -1375,7 +1375,7 @@ class ListController extends Web\Controller\Base
             'isSubmitted' => null,
             'isDraft' => null,
             'isSubmittedOffline' => null,
-            'hasFiles' => null,
+            'fileCount' => null,
             'isSubmittedOnTime' => null,
             'learnosityReference' => null,
             'comment' => null,
@@ -1403,7 +1403,7 @@ class ListController extends Web\Controller\Base
                     $response['isSubmitted'] = $latestResponse->isSubmitted();
                     $response['isDraft'] = $latestResponse->isDraft();
                     $response['isSubmittedOffline'] = $latestResponse->isSubmittedOffline();
-                    $response['hasFiles'] = $latestResponse->getAllFiles()->count() > 0;
+                    $response['fileCount'] = $latestResponse->getAllFiles()->count();
                 } elseif ($latestResponse instanceof TaskResponse) {
                     $response['isSubmitted'] = $latestResponse->isSubmitted();
                     $response['completionStatus'] = $latestResponse->getCompletionStatus();
@@ -1437,7 +1437,7 @@ class ListController extends Web\Controller\Base
                     $feedback['resubmissionRequired'] = $latestFeedback->getResubmissionRequired();
                     $feedback['rubricMarkedGrid'] = $latestFeedback->getRubricMarkedGrid();
                     $feedback['hasResponseWithKamiDocs'] = $latestFeedback->hasResponseWithKamiDocs();
-                    $feedback['hasFiles'] = $latestFeedback->getAllFiles()->count() > 0;
+                    $feedback['fileCount'] = $latestFeedback->getAllFiles()->count();
                     $feedback['humanReadableInstructorMark'] = $latestFeedback->getHumanReadableInstructorMark();
                 } elseif ($latestFeedback instanceof \Schoolbox\Learning\Assessment\Task\Feedback\Model) {
                     $feedback['completionStatus'] = $latestFeedback->getCompletionStatus();
