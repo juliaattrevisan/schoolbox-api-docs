@@ -98,14 +98,14 @@ function getCellInfo() {
             hrMark: window.Vue.toRef(participant.marks.draft, "hr"),
             normMark: window.Vue.toRef(participant.marks.draft, "norm"),
             comment: window.Vue.toRef(participant.marks.draft, "comment"),
-            resubmissionRequired: window.Vue.toRef(participant, "resubmissionRequired"),
+            resubmissionRequired: window.Vue.toRef(participant.marks.draft, "resubmissionRequired"),
         },
         {
             hrMarkInstructor: window.Vue.toRef(participant.marks.published, "hrInstructor"),
             hrMark: window.Vue.toRef(participant.marks.published, "hr"),
             normMark: window.Vue.toRef(participant.marks.published, "norm"),
             comment: window.Vue.toRef(participant.marks.published, "comment"),
-            resubmissionRequired: window.Vue.toRef(participant, "resubmissionRequired"),
+            resubmissionRequired: window.Vue.toRef(participant.marks.published, "resubmissionRequired"),
         },
         {
             hasSubmittedResponse: window.Vue.toRef(participant, "hasSubmittedResponse"),
@@ -116,8 +116,6 @@ function getCellInfo() {
             extraFormData,
         },
         activity.assessmentType === ACTIVITY_TYPE_QUIZ,
-        instructorMarkScheme,
-        mbStore.data.submissionErrorStates,
     );
 
     return {

@@ -202,11 +202,17 @@ class Controller extends Base
                                     $authoritativeFeedback = $participant->getAuthoritativeFeedback(true);
                                     $authoritativeFeedbackDraft = $draftMark ? $participant->getAuthoritativeFeedback(false) : null;
 
+                                    $resubmissionRequiredPublished = $authoritativeFeedback instanceof DueWork\Feedback\Model
+                                        ? $authoritativeFeedback->getResubmissionRequired()
+                                        : false;
+                                    $resubmissionRequiredDraft = $authoritativeFeedbackDraft instanceof DueWork\Feedback\Model
+                                        ? $authoritativeFeedbackDraft->getResubmissionRequired()
+                                        : false;
+
                                     return [
                                         'isExcluded'           => $participant->isExcluded(),
                                         'hasSubmittedResponse' => $participant->hasSubmittedResponse(),
                                         'hasPublishedFeedback' => $participant->hasPublishedFeedback(),
-                                        'resubmissionRequired' => $participant->isResubmissionRequired(),
                                         'progressTick'       => $progressTick,
                                         'marks' => [
                                             'published' => [
@@ -214,12 +220,14 @@ class Controller extends Base
                                                 'hr'           => $authoritativeFeedback ? $participant->getHumanReadableMark(true) : null,
                                                 'hrInstructor' => $authoritativeFeedback ? $participant->getHumanReadableInstructorMark(true) : null,
                                                 'comment'      => $this->purifier->purify($authoritativeFeedback?->getComment()),
+                                                'resubmissionRequired' => $resubmissionRequiredPublished,
                                             ],
                                             'draft' => [
                                                 'norm'         => $authoritativeFeedbackDraft ? $participant->getNormalisedMark(false) : null,
                                                 'hr'           => $authoritativeFeedbackDraft ? $participant->getHumanReadableMark(false) : null,
                                                 'hrInstructor' => $authoritativeFeedbackDraft ? $participant->getHumanReadableInstructorMark(false) : null,
                                                 'comment'      => $this->purifier->purify($authoritativeFeedbackDraft?->getComment()),
+                                                'resubmissionRequired' => $resubmissionRequiredDraft,
                                             ],
                                         ],
                                         'plan' => [

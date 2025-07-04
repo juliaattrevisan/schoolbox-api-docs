@@ -603,11 +603,16 @@ class CourseMarkbook
                     $publishedHrInstructorMark = $authPublishedFeedback instanceof DueWork\Feedback\Model
                         ? $authPublishedFeedback->getHumanReadableInstructorMark() : $publishedHrMark;
 
+                    // resubmission required is only available for due works
+                    $resubmissionRequired = $authPublishedFeedback instanceof DueWork\Feedback\Model
+                        ? $authPublishedFeedback->getResubmissionRequired() : false;
+
                     // Record the student's published mark so we can display in a table cell
                     $this->studentMarks[$courseImplId][$aId][$userId]['published']['norm'] = $publishedNormMark;
                     $this->studentMarks[$courseImplId][$aId][$userId]['published']['hr']   = $publishedHrMark;
                     $this->studentMarks[$courseImplId][$aId][$userId]['published']['hrInstructor'] = $publishedHrInstructorMark;
                     $this->studentMarks[$courseImplId][$aId][$userId]['published']['comment'] = $authPublishedFeedback->getComment();
+                    $this->studentMarks[$courseImplId][$aId][$userId]['published']['resubmissionRequired'] = $resubmissionRequired;
                 }
 
 
@@ -620,10 +625,15 @@ class CourseMarkbook
                     $authHrInstructorMark = $authAnyFeedback instanceof DueWork\Feedback\Model
                         ? $authAnyFeedback->getHumanReadableInstructorMark() : $authHrMark;
 
+                    // resubmission required is only available for due works
+                    $resubmissionRequired = $authAnyFeedback instanceof DueWork\Feedback\Model
+                        ? $authAnyFeedback->getResubmissionRequired() : false;
+
                     $this->studentMarks[$courseImplId][$aId][$userId]['draft']['norm'] = $authNormMark;
                     $this->studentMarks[$courseImplId][$aId][$userId]['draft']['hr']   = $authHrMark;
                     $this->studentMarks[$courseImplId][$aId][$userId]['draft']['hrInstructor'] = $authHrInstructorMark;
                     $this->studentMarks[$courseImplId][$aId][$userId]['draft']['comment'] = $authAnyFeedback->getComment();
+                    $this->studentMarks[$courseImplId][$aId][$userId]['draft']['resubmissionRequired'] = $resubmissionRequired;
                 }
 
 

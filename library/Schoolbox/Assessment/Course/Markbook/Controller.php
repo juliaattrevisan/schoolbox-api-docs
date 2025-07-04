@@ -336,7 +336,6 @@ class Controller extends WebController\Base
                                                 'isExcluded' => $participant->isExcluded(),
                                                 'hasSubmittedResponse' => $participant->hasSubmittedResponse(),
                                                 'hasPublishedFeedback' => $participant->hasPublishedFeedback(),
-                                                'resubmissionRequired' => $participant->isResubmissionRequired(),
                                                 'progressTick' => $progressTick,
                                                 'marks' => [
                                                     'published' => [
@@ -344,12 +343,14 @@ class Controller extends WebController\Base
                                                         'hr'           => $marks['published']['hr'],
                                                         'hrInstructor' => $marks['published']['hrInstructor'],
                                                         'comment'      => $this->purifier->purify($marks['published']['comment']),
+                                                        'resubmissionRequired' => $marks['published']['resubmissionRequired'] ?? false,
                                                     ],
                                                     'draft' => [
                                                         'norm'         => $marks['draft']['norm'],
                                                         'hr'           => $marks['draft']['hr'],
                                                         'hrInstructor' => $marks['draft']['hrInstructor'],
                                                         'comment'      => $this->purifier->purify($marks['draft']['comment']),
+                                                        'resubmissionRequired' => $marks['draft']['resubmissionRequired'] ?? false,
                                                     ],
                                                 ],
                                                 /* unused on the course markbook: */

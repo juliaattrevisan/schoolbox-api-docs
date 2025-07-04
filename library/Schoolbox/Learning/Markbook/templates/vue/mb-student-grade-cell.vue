@@ -81,7 +81,7 @@ const decorator = window.Vue.computed(() => {
 
     if (
         !participant.value.hasSubmittedResponse &&
-        !participant.value.resubmissionRequired &&
+        !participant.value.marks.published.resubmissionRequired &&
         !participant.value.hasPublishedFeedback &&
         !mbStore.hasMeaningfulMarks(participant.value.marks.draft)
     ) {
@@ -95,7 +95,8 @@ const decorator = window.Vue.computed(() => {
         };
     }
 
-    if (participant.value.resubmissionRequired) {
+    /* resubmission required won't ever show for drafts, so it's only checked on published marks */
+    if (participant.value.marks.published.resubmissionRequired) {
         return {
             indicator: "resubmit",
             notchTitle: "Resubmission Required",

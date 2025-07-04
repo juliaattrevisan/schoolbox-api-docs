@@ -296,7 +296,7 @@ export function useDynamicFeedback(
             dataDraft.hrMark.value = null;
             dataDraft.normMark.value = null;
             dataDraft.hrMarkInstructor.value = null;
-            // notable ommission of resubmissionRequired, since it's actually the same ref
+            dataDraft.resubmissionRequired.value = false;
         } catch (error) {
             console.error("Error publishing feedback:", error);
             toast.timeout({ text: "Unable to publish feedback", isSuccess: false });

@@ -32,7 +32,6 @@ export type MarkbookClassImplActivityParticipant = {
     isExcluded: boolean;
     hasSubmittedResponse: boolean;
     hasPublishedFeedback: boolean;
-    resubmissionRequired: boolean;
     progressTick: Activity["progressTick"] | null;
     marks: Record<
         "published" | "draft",
@@ -41,6 +40,7 @@ export type MarkbookClassImplActivityParticipant = {
             hr: string | null;
             hrInstructor: string | null;
             comment: string | null;
+            resubmissionRequired: boolean;
         }
     >;
     /**
