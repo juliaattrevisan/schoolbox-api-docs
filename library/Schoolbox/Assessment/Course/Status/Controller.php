@@ -609,16 +609,16 @@ class Controller extends WebController\Base
                     'isSubmittedOffline' => null,
                     'hasFiles' => null,
                     'isSubmittedOnTime' => null,
-                    'getLearnosityReference' => null,
+                    'learnosityReference' => null,
                     'comment' => null,
                     'duration' => null,
-                    'getHumanReadableMark' => null,
-                    'getNormalisedMark' => null,
-                    'getMarksAvailable' => null,
+                    'humanReadableMark' => null,
+                    'normalisedMark' => null,
+                    'marksAvailable' => null,
                     'isSelfAssessed' => null,
-                    'getCompletionStatus' => null,
-                    'getScoreGiven' => null,
-                    'getScoreMaximum' => null,
+                    'completionStatus' => null,
+                    'scoreGiven' => null,
+                    'scoreMaximum' => null,
                 ];
                 if ($latestResponse) {
                     $response['id'] = $latestResponse->getId();
@@ -633,19 +633,19 @@ class Controller extends WebController\Base
                         $response['hasFiles'] = $latestResponse->getAllFiles()->count() > 0;
                     } elseif ($latestResponse instanceof Assessment\Task\Response\Model) {
                         $response['isSubmitted'] = $latestResponse->isSubmitted();
-                        $response['getCompletionStatus'] = $latestResponse->getCompletionStatus();
+                        $response['completionStatus'] = $latestResponse->getCompletionStatus();
                         $response['isSelfAssessed'] = $latestResponse->isSelfAssessed();
                     } elseif ($latestResponse instanceof Assessment\Lti\Response\Model) {
-                        $response['getScoreGiven'] = $latestResponse->getScoreGiven();
-                        $response['getScoreMaximum'] = $latestResponse->getScoreMaximum();
+                        $response['scoreGiven'] = $latestResponse->getScoreGiven();
+                        $response['scoreMaximum'] = $latestResponse->getScoreMaximum();
                         $response['comment'] = $latestResponse->getComment();
                     } elseif ($latestResponse instanceof Assessment\Quiz\Attempt\Model) {
-                        $response['getLearnosityReference'] = $latestResponse->getLearnosityReference();
-                        $response['getMarksAvailable'] = $latestResponse->getMarksAvailable();
+                        $response['learnosityReference'] = $latestResponse->getLearnosityReference();
+                        $response['marksAvailable'] = $latestResponse->getMarksAvailable();
                         $response['duration'] = $latestResponse->getDuration();
                         $response['comment'] = $latestResponse->getComment();
-                        $response['getHumanReadableMark'] = $latestResponse->getHumanReadableMark();
-                        $response['getNormalisedMark'] = $latestResponse->getNormalisedMark();
+                        $response['humanReadableMark'] = $latestResponse->getHumanReadableMark();
+                        $response['normalisedMark'] = $latestResponse->getNormalisedMark();
                     }
                 }
 
@@ -660,10 +660,10 @@ class Controller extends WebController\Base
                     'rubricMarkedGrid' => null,
                     'hasResponseWithKamiDocs' => null,
                     'hasFiles' => null,
-                    'getHumanReadableInstructorMark' => null,
-                    'getCompletionStatus' => null,
-                    'getScoreGiven' => null,
-                    'getScoreMaximum' => null,
+                    'humanReadableInstructorMark' => null,
+                    'completionStatus' => null,
+                    'scoreGiven' => null,
+                    'scoreMaximum' => null,
                 ];
 
                 if ($latestFeedback) {
@@ -681,17 +681,16 @@ class Controller extends WebController\Base
                         $feedback['rubricMarkedGrid'] = $latestFeedback->getRubricMarkedGrid();
                         $feedback['hasResponseWithKamiDocs'] = $latestFeedback->hasResponseWithKamiDocs();
                         $feedback['hasFiles'] = $latestFeedback->getAllFiles()->count() > 0;
-                        $feedback['getHumanReadableInstructorMark'] = $latestFeedback->getHumanReadableInstructorMark();
+                        $feedback['humanReadableInstructorMark'] = $latestFeedback->getHumanReadableInstructorMark();
                     } elseif ($latestFeedback instanceof \Schoolbox\Learning\Assessment\Task\Feedback\Model) {
-                        $feedback['getCompletionStatus'] = $latestFeedback->getCompletionStatus();
+                        $feedback['completionStatus'] = $latestFeedback->getCompletionStatus();
                     } elseif ($latestFeedback instanceof \Schoolbox\Learning\Assessment\Lti\Feedback\Model) {
-                        $feedback['getScoreGiven'] = $latestFeedback->getScoreGiven();
-                        $feedback['getScoreMaximum'] = $latestFeedback->getScoreMaximum();
+                        $feedback['scoreGiven'] = $latestFeedback->getScoreGiven();
+                        $feedback['scoreMaximum'] = $latestFeedback->getScoreMaximum();
                     }
                 }
 
                 $assessmentInfo[$assessment->getId()] = [
-                    'assessmentId' => $assessment->getId(),
                     'assessmentTitle' => $assessment->getTitle(),
                     'assessmentType' => AssessmentType::objectToString($assessment),
                     'workType' => $assessment->getWorkType()->getName(),
