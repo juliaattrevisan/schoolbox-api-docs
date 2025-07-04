@@ -322,7 +322,6 @@ class Controller extends BaseController
      * @param   int $registerId
      * @return  array
      * @throws  InvalidArgumentException
-     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
     private function extractMetaFields(int $registerId): array
     {

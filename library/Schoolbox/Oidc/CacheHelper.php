@@ -103,7 +103,6 @@ class CacheHelper
      *                                  OIDC discovery URI
      * @throws InvalidArgumentException if OIDC discovery couldn't be written to
      *                                  or read from cache
-     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
     public function retrieveOidcConfig(UriInterface $issuerUri): array
     {
@@ -129,7 +128,6 @@ class CacheHelper
      *                                  OIDC discovery or JWKS URIs
      * @throws InvalidArgumentException if key set or OIDC discovery couldn't be
      *                                  written to or read from cache
-     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
     public function retrieveJsonWebKeySet(UriInterface $issuerUri): array
     {

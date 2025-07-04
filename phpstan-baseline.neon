@@ -1633,12 +1633,6 @@ parameters:
 			path: library/External/Isams/Class.php
 
 		-
-			message: '#^PHPDoc tag @throws with type JsonException\|Psr\\Http\\Client\\ClientExceptionInterface\|Psr\\SimpleCache\\InvalidArgumentException\|Schoolbox\\Mapper\\Exception\|Twig\\Error\\Error is not subtype of Throwable$#'
-			identifier: throws.notThrowable
-			count: 2
-			path: library/External/Isams/Register/Controller.php
-
-		-
 			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
