@@ -107,9 +107,14 @@
     </div>
 {% endblock participantSearchBar %}
 {% for assessment in assessments %}
-    <h4 class="subheader"><a href="/homepage/{{ assessment.getBaseContext.getFolder.id }}">{{ assessment.getBaseContext.getFolder.getTitle }}</a></h4>
+<div class="actions-small-1">
+    <div class="expander" data-collapser="collap-{{ assessment.getBaseContext.getFolder.id }}"></div>
+    <div class="small-12 card compact list-item">
+        <h3><a href="/homepage/{{ assessment.getBaseContext.getFolder.id }}">{{ assessment.getBaseContext.getFolder.getTitle }}</a></h3>
+    </div>
+</div>
     {% if assessment.allParticipants | length %}
-        <div class="row">
+        <div class="row {% if not loop.first %}hide{% endif %}" data-collapse-state="{% if loop.first %}uncollapsed{% else %}collapsed{% endif %}" data-collapsable="collap-{{ assessment.getBaseContext.getFolder.id }}">
             <div class="small-12 island">
                 <div class="empty-state hide" id="empty-filter">
                     <i class="icon-staff-students"></i>
@@ -164,6 +169,9 @@
 <script type="text/javascript" src='{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}'></script>
 <script type="text/javascript" src='{{ CDN_PREFIX }}/js/bundle/activityStatusPage.js?v={{ config.site_version }}'></script>
 <script type="text/javascript">
+    $(function () {
+        $('[data-collapser]').collapsable();
+    });
     document.dispatchEvent(new CustomEvent('ACTIVITY_STATUS_PAGE_INIT', {
         detail: {
             pageItemLimit: 25,
