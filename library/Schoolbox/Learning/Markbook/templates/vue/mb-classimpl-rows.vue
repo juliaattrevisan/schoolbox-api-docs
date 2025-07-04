@@ -108,7 +108,7 @@ const orderedClassImplStudents = window.Vue.computed(() => {
                 <a :href="`/homepage/${classImpl.folder.id}`">{{ classImpl.folder.title }}</a>
             </th>
             <th class="class-row fixed-left"></th>
-            <td v-if="mbStore.data.rank !== null"></td>
+            <td v-if="mbStore.data.rank !== null" class="class-row"></td>
             <template v-for="{ activity, aImpl } in orderedClassImplActivities" :key="activity.id">
                 <td v-if="aImpl !== null && aImpl.stats" class="class-row">
                     <a :href="aImpl._routes['learningAssessment.getStatus']">
