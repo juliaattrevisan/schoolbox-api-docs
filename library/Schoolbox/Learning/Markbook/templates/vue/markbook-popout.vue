@@ -19,7 +19,11 @@ import PopOutMenuItem from "@schoolboxVue/components/menu/pop-out-menu-item.vue"
 import PopOutMenuDivider from "@schoolboxVue/components/menu/pop-out-menu-divider.vue";
 import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
 import { useMarkbookStore } from "./store/markbookStore";
-import type { MarkbookPopoutSelectedCellInfo, MarkbookClassImplActivityParticipant } from "./types/payload";
+import type {
+    MarkbookPopoutSelectedCellInfo,
+    MarkbookClassImplActivityParticipant,
+    ActivityInfoResponsePayload,
+} from "./types/payload";
 
 const mbStore = useMarkbookStore();
 
@@ -119,7 +123,8 @@ const routes = window.Vue.computed(() => {
     const studentRoutes = cellInfo.value ? cellInfo.value.aImpl._routes.student[cellInfo.value.studentId] : undefined;
 
     return {
-        dataEndpoint: studentRoutes?.["learningAssessmentTimeline.getFullTimeline"] ?? null,
+        timelineEndpoint: studentRoutes?.["learningAssessmentTimeline.getFullTimeline"] ?? null,
+        infoEndpoint: studentRoutes?.["learningAssessment.getInfo"] ?? null,
         updateRoute: studentRoutes?.["learningDueWorkResponse.getParticularResponse"] ?? null,
         reviewRoute: studentRoutes?.["learningDueWorkResponse.getParticularResponse"] ?? null,
         publishRoute: studentRoutes?.["learningDueWorkFeedback.postPublishFeedback"] ?? null,
@@ -213,35 +218,57 @@ async function getActivity(): Promise<void> {
         throw new Error("No selected cell to fetch activity for");
     }
 
-    const route = routes.value.dataEndpoint;
-    if (route === null) {
-        throw new Error("Unable to find route for retrieving activity items");
-    }
+    const timelineRoute = routes.value.timelineEndpoint;
+    const infoRoute = routes.value.infoEndpoint;
+
+    hasLoadError.value = false;
+    isLoading.value = true;
 
     try {
-        isLoading.value = true;
-        const response = await fetch(route, {
+        if (timelineRoute === null || infoRoute === null) {
+            throw new Error("Unable to find timelineRoute/infoRoute for retrieving activity items");
+        }
+
+        const timelineResponse = await fetch(timelineRoute, {
             headers: {
                 "Content-Type": "application/json",
                 Accept: "application/json",
             },
         });
-        if (response.ok) {
-            const activityItemsResponse = (await response.json()) as ActivityItem[];
-            activityItems.value = activityItemsResponse;
-            hasLoadError.value = false;
-        } else {
-            hasLoadError.value = true;
+        if (!timelineResponse.ok) {
+            throw new Error(`Failed to fetch activity items: ${timelineResponse.statusText}`);
         }
 
-        // TODO: Also need to go and populate participant.quiz (responseId/maxMark), but that endpoint doesn't exist yet
-        if (cellInfo.value.activity.assessmentType === ACTIVITY_TYPE_QUIZ && cellInfo.value.participant) {
-            cellInfo.value.participant.quiz = {
-                responseId: null, // TODO see above...
-                maxMark: null, // TODO see above...
-            };
+        const activityItemsResponse = (await timelineResponse.json()) as ActivityItem[];
+        activityItems.value = activityItemsResponse;
+
+        /* and now fetch some additional activity data so that we can mark feedback
+         * technically this *could* be split out to be elsewhere or happen on request to actually "Update Feedback",
+         * but for now this is far more convenient and simple
+         */
+        if (
+            [ACTIVITY_TYPE_DUE_WORK, ACTIVITY_TYPE_QUIZ].includes(cellInfo.value.activity.assessmentType) &&
+            cellInfo.value.participant
+        ) {
+            const activityInfoResponse = await fetch(infoRoute, {
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                },
+            });
+
+            if (!activityInfoResponse.ok) {
+                throw new Error(`Failed to fetch extra activity info: ${activityInfoResponse.statusText}`);
+            }
+
+            /* just shove it on the participant for now, other places can deal with it */
+            const activityInfo = (await activityInfoResponse.json()) as ActivityInfoResponsePayload;
+            cellInfo.value.participant.extraInfo = activityInfo;
+
+            console.log("Activity info fetched successfully", activityInfo);
         }
     } catch (error) {
+        console.error("Error fetching activity items:", error);
         hasLoadError.value = true;
     } finally {
         isLoading.value = false;

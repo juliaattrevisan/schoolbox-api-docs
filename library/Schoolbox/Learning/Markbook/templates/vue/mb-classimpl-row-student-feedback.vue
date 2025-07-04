@@ -76,19 +76,24 @@ function getCellInfo() {
         return null;
     }
 
-    const instructorMarkScheme = cloneDeep(aImpl.instructorMarkScheme);
-    if (instructorMarkScheme.template === "TotalMarkFractional" && participant.quiz?.maxMark) {
-        // Special case for quizzes, where the total mark can change based on the participant
-        instructorMarkScheme.context.conf.totalMark = participant.quiz.maxMark;
-    }
-
     let extraFormData = {};
-    if (participant.quiz) {
-        // For quizzes, we need to include the responseId and maxMark in the extra form data
-        extraFormData = {
-            responseId: participant.quiz.responseId,
-            maxMark: participant.quiz.maxMark,
-        };
+    const instructorMarkScheme = cloneDeep(aImpl.instructorMarkScheme);
+
+    if (activity.assessmentType === ACTIVITY_TYPE_QUIZ) {
+        /** For quizzes, we need to include the responseId and maxMark in the extra form data */
+        const maxMarks = participant.extraInfo?.maxMarks ?? null;
+        const responseId = participant.extraInfo?.response.id ?? null;
+
+        extraFormData = { responseId, maxMarks };
+
+        /** Also- the mark scheme's mask is derived from the extra data too for learnosity reasons */
+        if (instructorMarkScheme.template === "TotalMarkFractional") {
+            if (maxMarks === null) {
+                throw new Error("Max marks not found in extraInfo for quiz");
+            }
+
+            instructorMarkScheme.context.conf.totalMark = maxMarks;
+        }
     }
 
     const feedback = useDynamicFeedback(
@@ -118,6 +123,23 @@ function getCellInfo() {
         activity.assessmentType === ACTIVITY_TYPE_QUIZ,
     );
 
+    /** For due work, add some extra info like the status page does */
+    const feedbackIncludes: string[] = [];
+    const feedbackIncludesLink = aImpl._routes.student[student.id]["learningDueWorkResponse.getParticularResponse"];
+    if (activity.assessmentType === ACTIVITY_TYPE_DUE_WORK && participant.extraInfo) {
+        if (participant.extraInfo.feedback.responseWithKamiDocs) {
+            feedbackIncludes.push("annotated document");
+        }
+
+        if (participant.extraInfo.feedback.rubric) {
+            feedbackIncludes.push("rubric");
+        }
+
+        if (participant.extraInfo.feedback.fileCount) {
+            feedbackIncludes.push(`file${participant.extraInfo.feedback.fileCount > 1 ? "s" : ""}`);
+        }
+    }
+
     return {
         student,
         activity,
@@ -126,6 +148,8 @@ function getCellInfo() {
         participant,
         instructorMarkScheme,
         feedback,
+        feedbackIncludes,
+        feedbackIncludesLink,
     };
 }
 
@@ -275,7 +299,9 @@ async function onFeedbackPublish(): Promise<void> {
                             :participant="{ user: cellInfo.student }"
                             :mark-scheme="cellInfo.instructorMarkScheme"
                             :submission-error-states="mbStore.data.submissionErrorStates"
-                            :limit="cellInfo.participant.quiz?.maxMark ?? undefined /** special quiz max mark chaos */"
+                            :limit="
+                                cellInfo.participant.extraInfo?.maxMarks ?? undefined /** special quiz max mark chaos */
+                            "
                         />
                     </label>
                     <resubmission-required
@@ -305,12 +331,18 @@ async function onFeedbackPublish(): Promise<void> {
                 <div class="small-12 column no-pad">
                     <div class="component-action" data-action-bar="60" data-mass-publish>
                         <section>
+                            <div v-if="cellInfo.feedbackIncludes.length" class="component-action-info">
+                                Feedback also includes
+                                <a v-if="cellInfo.feedbackIncludesLink" :href="cellInfo.feedbackIncludesLink">
+                                    {{ cellInfo.feedbackIncludes.join(", ") }}
+                                </a>
+                                <span v-else>{{ cellInfo.feedbackIncludes.join(", ") }}</span>
+                            </div>
+
                             <div>
                                 <button class="button" type="button" @click="mbStore.feedbackSelectedCell = null">
                                     Close
                                 </button>
-                                <!-- TODO: "Has Rubric"/files/etc message (see status.twig)? - will need extra payload data -->
-                                <!-- TODO: "Mark as Submitted" button? - will need extra payload data -->
                                 <button
                                     v-if="cellInfo.feedback.hasDraftMark || cellInfo.feedback.showDraftDialogue"
                                     class="button disabled"

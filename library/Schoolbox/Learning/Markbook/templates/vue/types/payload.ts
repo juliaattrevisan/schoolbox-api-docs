@@ -44,15 +44,12 @@ export type MarkbookClassImplActivityParticipant = {
         }
     >;
     /**
-     * Special quiz data to allow for feedback submission
+     * Special data to allow for feedback submission
      * this isn't sent through with the initial payload, since currently that would potentially
-     * require a lot of interaction with the Learnosity API, which most markbook loads won't need for all activities.
-     * Instead, the markbook popout will load this data when the user asks to create/edit feedback for a quiz
+     * require a lot of interaction with the Learnosity API for quizzes or other data which most markbook loads won't need for all activities.
+     * Instead, the markbook popout will load this data when the user asks to create/edit feedback for a quiz or due work
      */
-    quiz?: {
-        responseId: string | null;
-        maxMark: number | null;
-    };
+    extraInfo?: ActivityInfoResponsePayload;
     /** the following are only used the class markbook at the moment: */
     plan?: {
         isDynamic: boolean;
@@ -95,6 +92,7 @@ export type MarkbookClassImplActivity = {
                 "learningAssessment.postExclude": string | null;
                 "learningAssessment.postInclude": string | null;
                 "learningAssessment.getSummary": string | null;
+                "learningAssessment.getInfo": string | null;
                 /* this will change depending on if it's a quiz or due work */
                 postFeedback: string | null;
             }
@@ -163,6 +161,23 @@ export interface Markbook {
     availableVisibilities: number[];
     submissionErrorStates: SubmissionErrorStates;
 }
+
+/**
+ * The payload returned by the learningAssessment.getInfo endpoint
+ * This isn't fully defined yet, I have only pulled in what we actually use... there's more in the API response
+ */
+export type ActivityInfoResponsePayload = {
+    maxMarks: number | null; // Not null for Quiz
+    response: {
+        id: number | null;
+    };
+    feedback: {
+        // Not null for Due Work
+        rubric: boolean | null;
+        responseWithKamiDocs: boolean | null;
+        fileCount: number | null;
+    };
+};
 
 /** -------- other types -------- */
 

@@ -425,6 +425,15 @@ class Controller extends WebController\Base
                                                     'student' => $student,
                                                 ]
                                             ),
+                                            'learningAssessment.getInfo' => $this->getRouteIfAuthorized(
+                                                'learningAssessment.getInfo',
+                                                [
+                                                    'assessment' => $aImpl,
+                                                    'assessmentId' => $aImpl->getId(),
+                                                    'studentId' => $student->getId(),
+                                                    'student' => $student,
+                                                ]
+                                            ),
                                             /* this will change depending on if it's a quiz or due work */
                                             'postFeedback' =>
                                                 $aImpl instanceof DueWork\Model ? $this->getRouteIfAuthorized(
