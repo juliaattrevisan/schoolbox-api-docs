@@ -180,4 +180,19 @@ class Controller extends Base
         $category = $this->categoryMapper->findById($template->getCategoryId());
         $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminEditorTemplates.getList') . '?category=' . $category->getName());
     }
+
+    /**
+     * Delete a template
+     *
+     * @param TemplateModel $template
+     * @return void
+     * @throws \Aura\Router\Exception\RouteNotFound
+     */
+    public function delete(TemplateModel $template): void
+    {
+        // Soft delete the existing template
+        $template->setDeletedBy($this->getUser()->getId());
+        $this->templateMapper->save($template);
+        $this->templateMapper->delete($template);
+    }
 }

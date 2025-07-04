@@ -2,6 +2,7 @@
 /**
  * Display a list of editor templates. The page divides the templates into categories,
  * which are displayed as tabs. When a category is selected, the templates for that category are loaded.
+ * From here we can also add new templates, edit existing ones, or delete them.
  */
 
 import { isAbortError, hasErrorMessage } from "@js/util/errorUtils";
@@ -10,6 +11,8 @@ import { kebabToTitleCase } from "@js/util/stringUtils";
 import { getFromNow } from "@js/util/dateUtils";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
+import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
+import MediaArticle from "@schoolboxVue/components/media-article.vue";
 import type { Category, Template } from "../js/types/editorTemplatesTypes";
 
 interface Props {
@@ -17,8 +20,13 @@ interface Props {
     templatesEndpoint: string; // The endpoint to fetch templates from
     createTemplateEndpoint: string; // The endpoint to create a new template
     updateTemplateEndpoint: string; // The endpoint to update an existing template
+    deleteTemplateEndpoint: string; // The endpoint to delete an existing template
 }
 const props = defineProps<Props>();
+
+const currentTemplate = window.Vue.ref<Template | null>(null); // the currently selected template, used for displaying or deleting a template
+
+// #region load / display a category
 
 const currentCategory = window.Vue.ref<Category>(props.categories[0]);
 const isLoading = window.Vue.ref<boolean>(false);
@@ -97,6 +105,84 @@ window.Vue.onMounted((): void => {
     }
     void loadCategoryTemplates();
 });
+
+// #endregion
+
+// #region display the templates body
+
+const isPreviewOpen = window.Vue.ref<boolean>(false);
+
+/**
+ * Display the body of the selected template in a modal.
+ * @param template - the template that has been selected
+ */
+function onPreviewSelected(template: Template): void {
+    currentTemplate.value = template;
+    isPreviewOpen.value = true;
+}
+
+// #endregion
+
+// #region  delete the template
+
+const isDeleteOpen = window.Vue.ref<boolean>(false);
+const isDeleting = window.Vue.ref<boolean>(false);
+const deleteError = window.Vue.ref<string | null>(null);
+
+/**
+ * Display the body of the selected template in a modal.
+ * @param template - the template that has been selected
+ */
+function onDeleteSelected(template: Template): void {
+    currentTemplate.value = template;
+    isDeleteOpen.value = true;
+}
+
+/**
+ * Delete the currently selected template.
+ */
+async function onDeleteConfirmed(): Promise<void> {
+    if (isDeleting.value || props.deleteTemplateEndpoint === "" || !currentTemplate.value) {
+        return;
+    }
+    const url = props.deleteTemplateEndpoint.replace("{templateId}", currentTemplate.value.id.toString());
+    const toast = window.sbProps.toastActivate("Deleting...");
+    try {
+        isDeleting.value = true;
+        deleteError.value = null;
+        const response = await fetch(url, {
+            method: "DELETE",
+            headers: {
+                Accept: "application/json",
+            },
+        });
+        if (!response.ok) {
+            const errorMessage = await extractErrorMessage(response);
+            throw new Error(errorMessage);
+        }
+        // filter out the deleted template from the current templates
+        currentTemplates.value = currentTemplates.value.filter(
+            (template) => template.id !== (currentTemplate.value as Template).id,
+        );
+        currentTemplate.value = null; // reset the current template
+        isDeleteOpen.value = false; // close the delete modal
+        toast.timeout({ text: "Deleted" });
+    } catch (error) {
+        // ignore abort errors, as the previous request was cancelled
+        if (isAbortError(error)) {
+            return;
+        }
+        if (error instanceof Error && hasErrorMessage(error)) {
+            deleteError.value = error.message;
+        }
+        toast.timeout({ text: "Delete failed", isSuccess: false });
+        console.error(error);
+    } finally {
+        isDeleting.value = false;
+    }
+}
+
+// #endregion
 </script>
 
 <template>
@@ -130,7 +216,9 @@ window.Vue.onMounted((): void => {
                 >
                     <div class="l-flex-col l-flex--justify-center l-flex__item--1 l-gap-xs l-pad-m f-no-margins">
                         <h3>
-                            <a href="#">{{ template.title }}</a>
+                            <button class="sbx-link-button f-no-margins" @click.prevent="onPreviewSelected(template)">
+                                {{ template.title }}
+                            </button>
                         </h3>
                         <p v-if="template.description && template.description !== ''" class="f-no-margins">
                             {{ template.description }}
@@ -153,7 +241,7 @@ window.Vue.onMounted((): void => {
                             >
                         </p>
                     </div>
-                    <div>
+                    <div class="l-flex l-flex--align-start l-gap-xs">
                         <a
                             class="sbx-icon-only-button f-no-margins"
                             aria-label="Edit template"
@@ -162,6 +250,14 @@ window.Vue.onMounted((): void => {
                         >
                             <sbx-icon name="modify" />
                         </a>
+                        <button
+                            class="sbx-icon-only-button f-no-margins"
+                            aria-label="Delete template"
+                            title="Delete template"
+                            @click.prevent="onDeleteSelected(template)"
+                        >
+                            <sbx-icon name="delete" />
+                        </button>
                     </div>
                 </div>
             </div>
@@ -176,6 +272,27 @@ window.Vue.onMounted((): void => {
             </div>
         </div>
     </div>
+    <basic-modal v-model:is-open="isPreviewOpen" :has-background-click="true">
+        <media-article tag="div" :content="(currentTemplate as Template).body"></media-article>
+    </basic-modal>
+    <basic-modal v-model:is-open="isDeleteOpen" :has-background-click="true">
+        <div class="l-flex-col l-gap-s f-no-margins">
+            <h2>Please confirm</h2>
+            <p>Are you sure you want to delete this template?</p>
+            <div v-if="deleteError" class="alert-box alert">
+                Sorry, there was an error deleting the template. Please
+                <a href="" title="refresh the page"> refresh the page </a>
+                to try again and contact your support if the problem persists.<br />
+                <em>Further support info: {{ deleteError }}</em>
+            </div>
+            <div class="l-flex l-gap-xs f-no-margins">
+                <button class="button submit l-flex__item--1" @click.prevent="onDeleteConfirmed">
+                    {{ isDeleting ? "Deleting..." : "Delete" }}
+                </button>
+                <button class="button l-flex__item--1" @click.prevent="isDeleteOpen = false">Cancel</button>
+            </div>
+        </div>
+    </basic-modal>
 </template>
 
 <style scoped></style>

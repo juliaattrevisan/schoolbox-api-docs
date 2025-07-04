@@ -56,6 +56,7 @@ class Module extends BaseModule
         $this->register('POST', '/{categoryId}/create', 'postCreate', $perms, $preloadCategory);
         $this->register('GET', '/update/{templateId}', 'getUpdate', $perms, $preloadTemplate);
         $this->register('POST', '/update/{templateId}', 'postUpdate', $perms, $preloadTemplate);
+        $this->register('DELETE', '/delete/{templateId}', 'delete', $perms, $preloadTemplate);
     }
 
     /**
