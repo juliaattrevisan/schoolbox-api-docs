@@ -13,7 +13,7 @@ class FieldGroup extends GroupTypeBase
     /**
      * Getting the student fields for data output
      *
-     * @return array|mixed
+     * @return array|null
      * @throws InvalidArgumentException
      * @throws \JsonException
      */

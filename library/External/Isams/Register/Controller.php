@@ -280,7 +280,6 @@ class Controller extends BaseController
      * @param array $config   the admin approved register list
      * @return array
      * @throws InvalidArgumentException
-     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
     private function getUsersData(User $user, array $register, array $config): array
     {
