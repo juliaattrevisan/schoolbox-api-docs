@@ -88,7 +88,7 @@ class ItemPool implements CacheItemPoolInterface
      * @return CacheItemInterface
      * @throws InvalidArgumentException if `$key` isn't valid
      */
-    public function getItem($key): CacheItemInterface
+    public function getItem(string $key): CacheItemInterface
     {
         $this->assertKeyValid($key);
         if (isset($this->deferredItems[$key])) {
@@ -136,7 +136,7 @@ class ItemPool implements CacheItemPoolInterface
      * @return bool
      * @throws InvalidArgumentException if `$key` isn't valid
      */
-    public function hasItem($key): bool
+    public function hasItem(string $key): bool
     {
         $this->assertKeyValid($key);
         if (isset($this->deferredItems[$key])) {
@@ -169,7 +169,7 @@ class ItemPool implements CacheItemPoolInterface
      * @return bool
      * @throws InvalidArgumentException if `$key` isn't valid
      */
-    public function deleteItem($key): bool
+    public function deleteItem(string $key): bool
     {
         $this->assertKeyValid($key);
         if ($this->redis->del($this->keyGenerator->generateKey($key))) {
@@ -256,16 +256,13 @@ class ItemPool implements CacheItemPoolInterface
     /**
      * Asserts `$key` is valid.
      *
-     * Currently, that just means "is it a string"?
+     * Currently, that just means "is it not `self::SET_KEY`"?
      *
-     * @param mixed $key
+     * @param string $key
      * @throws InvalidArgumentException if $key isn't valid
      */
-    private function assertKeyValid($key): void
+    private function assertKeyValid(string $key): void
     {
-        if (!is_string($key)) {
-            throw new InvalidArgumentException(sprintf('Cache key must be a string: received %s', gettype($key)));
-        }
         if ($key === self::SET_KEY) {
             throw new InvalidArgumentException(sprintf('Cache key "%s" is reserved and may not be used', $key));
         }
