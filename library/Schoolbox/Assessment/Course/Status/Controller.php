@@ -650,6 +650,7 @@ class Controller extends WebController\Base
                 }
 
                 $feedback = [
+                    'id' => null,
                     'comment' => null,
                     'published' => null,
                     'normalisedMark' => null,
@@ -666,6 +667,7 @@ class Controller extends WebController\Base
                 ];
 
                 if ($latestFeedback) {
+                    $feedback['id'] = $latestFeedback->getId();
                     $feedback['comment'] = $latestFeedback->getComment();
                     $feedback['published'] = $latestFeedback->isPublished();
                     $feedback['normalisedMark'] = $latestFeedback->getNormalisedMark();
