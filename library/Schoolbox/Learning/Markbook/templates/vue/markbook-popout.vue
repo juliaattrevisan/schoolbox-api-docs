@@ -524,35 +524,43 @@ function onToggleSelected(): void {
                         {{ viewAllText }}
                     </pop-out-menu-item>
                 </template>
-                <template
-                    v-if="
-                        cellInfo.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK &&
-                        cellInfo.participant &&
-                        !cellInfo.participant.isExcluded
-                    "
-                >
-                    <pop-out-menu-divider />
-                    <pop-out-menu-item
-                        v-if="!cellInfo.participant.isExcluded"
-                        :class="{ 'is-disabled': !routes.updateRoute }"
-                        :link="routes.updateRoute ?? undefined"
-                        force-callback
-                        @selected="onUpdateFeedbackSelected"
-                    >
-                        Update Feedback
-                    </pop-out-menu-item>
-                    <pop-out-menu-item
-                        :class="{ 'is-disabled': !routes.reviewRoute || isActivityEmpty || !hasSubmissions }"
-                        :link="routes.reviewRoute ?? undefined"
-                    >
-                        Review Submission
-                    </pop-out-menu-item>
-                    <pop-out-menu-item
-                        :class="{ 'is-disabled': !routes.publishRoute || isActivityEmpty || !hasDraftFeedback }"
-                        @selected="onMenuItemSelected(routes.publishRoute, 'publish')"
-                    >
-                        Publish Feedback
-                    </pop-out-menu-item>
+                <pop-out-menu-divider />
+                <template v-if="cellInfo.participant && !cellInfo.participant.isExcluded">
+                    <template v-if="cellInfo.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK">
+                        <pop-out-menu-item
+                            v-if="!cellInfo.participant.isExcluded"
+                            :class="{ 'is-disabled': !routes.postFeedback }"
+                            :link="routes.updateRoute ?? undefined"
+                            force-callback
+                            @selected="onUpdateFeedbackSelected"
+                        >
+                            Update Feedback
+                        </pop-out-menu-item>
+                        <pop-out-menu-item
+                            :class="{ 'is-disabled': !routes.reviewRoute || isActivityEmpty || !hasSubmissions }"
+                            :link="routes.reviewRoute ?? undefined"
+                        >
+                            Review Submission
+                        </pop-out-menu-item>
+                        <!-- TODO: make this publish logic the same as the rest I guess -->
+                        <pop-out-menu-item
+                            :class="{ 'is-disabled': !routes.publishRoute || isActivityEmpty || !hasDraftFeedback }"
+                            @selected="onMenuItemSelected(routes.publishRoute, 'publish')"
+                        >
+                            Publish Feedback
+                        </pop-out-menu-item>
+                    </template>
+                    <template v-else-if="cellInfo.activity.assessmentType === ACTIVITY_TYPE_QUIZ">
+                        <pop-out-menu-item
+                            v-if="!cellInfo.participant.isExcluded"
+                            :class="{ 'is-disabled': !routes.postFeedback }"
+                            :link="routes.updateRoute ?? undefined"
+                            force-callback
+                            @selected="onUpdateFeedbackSelected"
+                        >
+                            Update Feedback
+                        </pop-out-menu-item>
+                    </template>
                 </template>
                 <pop-out-menu-item
                     v-if="cellInfo.participant && cellInfo.participant.isExcluded"

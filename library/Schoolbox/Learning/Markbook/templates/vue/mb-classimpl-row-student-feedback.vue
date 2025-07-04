@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { cloneDeep } from "lodash";
 import type { Ref } from "vue";
 import { useTemplateRefsList, useElementBounding } from "@vueuse/core";
 import locale from "@js/terminology/rosettaStone";
@@ -70,6 +71,21 @@ function getCellInfo() {
         return null;
     }
 
+    const instructorMarkScheme = cloneDeep(aImpl.instructorMarkScheme);
+    if (instructorMarkScheme.template === "TotalMarkFractional" && participant.quiz?.maxMark) {
+        // Special case for quizzes, where the total mark can change based on the participant
+        instructorMarkScheme.context.conf.totalMark = participant.quiz.maxMark;
+    }
+
+    let extraFormData = {};
+    if (participant.quiz) {
+        // For quizzes, we need to include the responseId and maxMark in the extra form data
+        extraFormData = {
+            responseId: participant.quiz.responseId,
+            maxMark: participant.quiz.maxMark,
+        };
+    }
+
     const feedback = useDynamicFeedback(
         { hrMarkInstructor: markRef, comment: commentRef, resubmissionRequired: resubmissionRequiredRef },
         {
@@ -92,10 +108,10 @@ function getCellInfo() {
         },
         {
             route: postFeedback,
-            // extraFormData: .... TODO (need extra payload data)
+            extraFormData,
         },
         activity.assessmentType === ACTIVITY_TYPE_QUIZ,
-        aImpl.instructorMarkScheme,
+        instructorMarkScheme,
         mbStore.data.submissionErrorStates,
     );
 
@@ -105,6 +121,7 @@ function getCellInfo() {
         classImpl,
         aImpl,
         participant,
+        instructorMarkScheme,
         feedback,
     };
 }
@@ -254,14 +271,14 @@ async function onFeedbackPublish(): Promise<void> {
                     clipPath: feedbackCellOffsets.clipPath,
                 }"
             >
-                <div v-if="cellInfo.aImpl.instructorMarkScheme.template.length" class="small-12 medium-3 column">
+                <div v-if="cellInfo.instructorMarkScheme.template.length" class="small-12 medium-3 column">
                     <label>
                         {{ locale.grades.proper() }}
                         <mark-scheme
-                            :key="cellInfo.aImpl.instructorMarkScheme.template"
+                            :key="cellInfo.instructorMarkScheme.template"
                             v-model:mark="cellInfo.feedback.data.hrMarkInstructor"
                             :participant="{ user: cellInfo.student }"
-                            :mark-scheme="cellInfo.aImpl.instructorMarkScheme"
+                            :mark-scheme="cellInfo.instructorMarkScheme"
                             :submission-error-states="mbStore.data.submissionErrorStates"
                             :limit="cellInfo.participant.quiz?.maxMark ?? undefined /** special quiz max mark chaos */"
                         />
@@ -273,10 +290,7 @@ async function onFeedbackPublish(): Promise<void> {
                         style="margin-top: 0.5rem"
                     />
                 </div>
-                <div
-                    class="small-12 column"
-                    :class="{ 'medium-9': cellInfo.aImpl.instructorMarkScheme.template.length }"
-                >
+                <div class="small-12 column" :class="{ 'medium-9': cellInfo.instructorMarkScheme.template.length }">
                     <comment-field
                         v-model:comment="cellInfo.feedback.data.comment"
                         :participant="{ user: cellInfo.student }"
@@ -286,7 +300,7 @@ async function onFeedbackPublish(): Promise<void> {
                     <resubmission-required
                         v-if="
                             cellInfo.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK &&
-                            cellInfo.aImpl.instructorMarkScheme.template.length === 0
+                            cellInfo.instructorMarkScheme.template.length === 0
                         "
                         v-model:resubmission-required="resubmissionRequiredRef"
                         :identifier="cellInfo.student.id"
@@ -325,6 +339,9 @@ async function onFeedbackPublish(): Promise<void> {
                                     @click.prevent="onFeedbackPublish"
                                 >
                                     <template v-if="cellInfo.feedback.isPublishInProgress">Publishing...</template>
+                                    <template v-else-if="cellInfo.activity.assessmentType === ACTIVITY_TYPE_QUIZ">
+                                        Save and Publish
+                                    </template>
                                     <template v-else>Publish</template>
                                 </button>
                             </div>
