@@ -42,7 +42,7 @@ const mbStore = useMarkbookStore();
             {{ props.classImpl.stats.weightedMean }}
         </th>
 
-        <th v-if="mbStore.data.rank !== null" class="student-grade-cell">-</th>
+        <th v-if="mbStore.data.rank !== null" class="student-grade-cell white">-</th>
         <th
             v-for="{ activity, aImpl } in mbStore.orderedClassImplActivities(props.classImpl)"
             :key="activity.id"
