@@ -1342,11 +1342,11 @@ class ListController extends Web\Controller\Base
         }
 
 
-        $maxMark = null;
+        $maxMarks = null;
         if ($assessment instanceof \Schoolbox\Learning\Assessment\Quiz\Model && $helper) {
             /** @var \Schoolbox\Learning\Assessment\Quiz\Model $assessment */
             // this exists due to the above, and we are in a loop, so i don't want to new each time...
-            $maxMark = $helper->findAvailableMarks($assessment->getLearnosityReference());
+            $maxMarks = $helper->findAvailableMarks($assessment->getLearnosityReference());
         }
 
         $participant = $assessment->getParticipantIfExtant($student);
@@ -1455,7 +1455,7 @@ class ListController extends Web\Controller\Base
             'assessmentTitle' => $assessment->getTitle(),
             'assessmentType' => AssessmentType::objectToString($assessment),
             'workType' => $assessment->getWorkType()?->getName(),
-            'maxMark' => $maxMark,
+            'maxMarks' => $maxMarks,
             'response' => $response,
             'feedback' => $feedback,
         ]);
