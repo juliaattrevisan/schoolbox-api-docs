@@ -51,3 +51,23 @@ WHERE
     `value` = ""
         OR `value` < "30"
     );
+
+
+-- The session_length max config field now has restrictions, to prevent it from being set to 0
+-- I recall a school breaking their whole instance by setting this to 0
+UPDATE `config`
+SET
+    `options` = '{"min": 30}'
+WHERE
+    `name` = "session_length";
+
+-- Restrict the value of existing configs to the new range
+UPDATE `config`
+SET
+    `value` = "30"
+WHERE
+    `name` = "session_length"
+  AND (
+    `value` = ""
+        OR `value` < "30"
+    );
