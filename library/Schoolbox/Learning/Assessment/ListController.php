@@ -55,7 +55,7 @@ use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Mapper as Folder;
 use Schoolbox\Role;
-use Schoolbox\Url\Factory;
+use Schoolbox\Url\Factory as UrlFactory;
 use Schoolbox\Url\Uri;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -106,7 +106,7 @@ class ListController extends Web\Controller\Base
      * @param UnitSpecificationMapper $unitSpecificationMapper
      * @param RosettaStone $rosettaStone
      * @param Project\ResultCache\Mapper $projectResultCacheMapper
-     * @param Factory $urlFactory
+     * @param UrlFactory $urlFactory
      * @param string $learnosityVersion
      * @param string $learnosityConsumerKey
      * @param string $learnosityConsumerSecret
@@ -117,11 +117,11 @@ class ListController extends Web\Controller\Base
         MapperProxy $assessmentMapper,
         Access $access,
         private Transactor $transactor,
-        private Participant\DataSource $participantDataSource,
-        private UnitSpecificationMapper $unitSpecificationMapper,
+        protected Participant\DataSource $participantDataSource,
+        protected UnitSpecificationMapper $unitSpecificationMapper,
         private RosettaStone $rosettaStone,
         protected \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper,
-        private \Schoolbox\Url\Factory $urlFactory,
+        private UrlFactory $urlFactory,
         private string $learnosityVersion,
         #[\SensitiveParameter] private string $learnosityConsumerKey,
         #[\SensitiveParameter] private string $learnosityConsumerSecret,

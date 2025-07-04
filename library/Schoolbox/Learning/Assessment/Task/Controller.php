@@ -100,7 +100,6 @@ class Controller extends Assessment\Controller
         string $learnosityVersion,
         #[\SensitiveParameter] string $learnosityConsumerKey,
         #[\SensitiveParameter] string $learnosityConsumerSecret,
-
     ) {
         parent::__construct(
             $userMapper,
