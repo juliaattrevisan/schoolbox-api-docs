@@ -144,12 +144,12 @@ At the bottom of `user-list.vue` w can add the `Paginate` component which will d
     <vuejs-paginate
         v-model="page"
         :page-count="pageCount"
-        :container-class="'pagination'"
-        :prev-text="'‹'"
-        :next-text="'›'"
-        :prev-link-class="'arrow'"
-        :next-link-class="'arrow'"
-        :disabled-class="'unavailable'"
+        container-class="pagination"
+        prev-text="‹"
+        next-text="›"
+        prev-link-class="arrow"
+        next-link-class="arrow"
+        disabled-class="unavailable"
         :click-handler="onPaginate"
     ></vuejs-paginate>
 </div>

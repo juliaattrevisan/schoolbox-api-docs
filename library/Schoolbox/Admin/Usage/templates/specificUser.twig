@@ -8,12 +8,12 @@
 
     <div class="admin-content">
         <div id="usage-specific-container">
-            <usage-specific 
-                :full-name="'{{ user.fullname }}'"
-                :endpoint-total-payload="'{{ routeLookupIfAuthorized('adminUsage.getSpecificUserTotalPayload', {userId: user.id}) }}'" 
-                :endpoint-system-payload="'{{ routeLookupIfAuthorized('adminUsage.getSpecificUserSystemPayload', {userId: user.id}) }}'" 
-                :endpoint-file-type-payload="'{{ routeLookupIfAuthorized('adminUsage.getSpecificUserFileTypePayload', {userId: user.id}) }}'" 
-                :endpoint-file-payload="'{{ routeLookupIfAuthorized('adminUsage.getSpecificUserFilePayload', {userId: user.id}) }}'" 
+            <usage-specific
+                full-name="{{ user.fullname }}"
+                endpoint-total-payload="{{ routeLookupIfAuthorized('adminUsage.getSpecificUserTotalPayload', {userId: user.id}) }}"
+                endpoint-system-payload="{{ routeLookupIfAuthorized('adminUsage.getSpecificUserSystemPayload', {userId: user.id}) }}"
+                endpoint-file-type-payload="{{ routeLookupIfAuthorized('adminUsage.getSpecificUserFileTypePayload', {userId: user.id}) }}"
+                endpoint-file-payload="{{ routeLookupIfAuthorized('adminUsage.getSpecificUserFilePayload', {userId: user.id}) }}"
                 :is-s3-adapter="{{ isS3Adapter ? 'true' : 'false' }}"
             />
         </div>
