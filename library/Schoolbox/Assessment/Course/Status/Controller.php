@@ -29,18 +29,15 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
-use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
-use Schoolbox\Learning\Assessment\Timeline\Full;
 use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Learning\InlineGrader\Kami\Connector;
 use Schoolbox\Learning\InlineGrader\StudentCarousel;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\Helper;
-use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Model as Quiz;
@@ -57,8 +54,8 @@ use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Learning\Course\DataModel\Specification\Model;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
-
 use Schoolbox\User;
+
 use function array_combine;
 
 class Controller extends WebController\Base
@@ -564,6 +561,7 @@ class Controller extends WebController\Base
         // hydrate participant
         $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, $student, true);
 
+        $helper = null;
         if ($assessmentSpec instanceof \Schoolbox\Learning\Assessment\Quiz\Model) {
             /* Probably inject this one day, but for now,
                  * I want to avoid dumping Yet Another Thing into the kernel
@@ -589,8 +587,9 @@ class Controller extends WebController\Base
 
         foreach ($assessments as $assessment) {
             $maxMarks = null;
-            if ($assessmentSpec instanceof \Schoolbox\Learning\Assessment\Quiz\Model) {
+            if ($assessmentSpec instanceof \Schoolbox\Learning\Assessment\Quiz\Model && $helper) {
                 /** @var \Schoolbox\Learning\Assessment\Quiz\Model $assessment */
+                // this exists due to the above, and we are in a loop, so i don't want to new each time...
                 $maxMarks = $helper->findAvailableMarks($assessment->getLearnosityReference());
             }
 
@@ -676,6 +675,7 @@ class Controller extends WebController\Base
                     // now for assessment type specific data
                     if ($latestFeedback instanceof \Schoolbox\Learning\Assessment\DueWork\Feedback\Model) {
                         /** @var \Schoolbox\Learning\Assessment\DueWork\Feedback\Model $latestFeedback  */
+                        /** @var \Schoolbox\Learning\Assessment\DueWork\Model $assessment */
                         $feedback['rubric'] = $assessment->getUseRubric();
                         $feedback['resubmissionRequired'] = $latestFeedback->getResubmissionRequired();
                         $feedback['rubricMarkedGrid'] = $latestFeedback->getRubricMarkedGrid();
