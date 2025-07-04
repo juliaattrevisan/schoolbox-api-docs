@@ -34,14 +34,15 @@ class Renderer extends Input\Renderer
     protected function getData(Config $config): array
     {
         $data = parent::getData($config);
-        $options = $this->valueSerializer->buildOptions($config->getOptions());
+        if ($config->getOptions()) {
+            $options = $this->valueSerializer->buildOptions($config->getOptions());
 
-        $data["min"] = $options["min"];
-        $data["max"] = $options["max"];
+            $data["min"] = $options["min"];
+            $data["max"] = $options["max"];
 
-        // Ensure the data is valid for the range input
-        $data['value'] = $this->valueSerializer->serializeValue($data['value'], $config);
-
+            // Ensure the data is valid for the range input
+            $data['value'] = $this->valueSerializer->serializeValue($data['value'], $config);
+        }
         return $data;
     }
 
