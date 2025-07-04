@@ -603,6 +603,7 @@ class Controller extends WebController\Base
 
                 // all things have this, even if there are no submissions...
                 $response = [
+                    'id'  => null,
                     'isSubmitted' => null,
                     'isDraft' => null,
                     'isSubmittedOffline' => null,
@@ -620,6 +621,7 @@ class Controller extends WebController\Base
                     'getScoreMaximum' => null,
                 ];
                 if ($latestResponse) {
+                    $response['id'] = $latestResponse->getId();
                     $response['isSubmitted'] = (bool)$latestResponse->getId();
                     $response['isSubmittedOnTime'] = $latestResponse->isSubmittedOnTime();
 
