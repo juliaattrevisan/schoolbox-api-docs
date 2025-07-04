@@ -21,39 +21,19 @@ use SensitiveParameter;
 class Factory
 {
     /**
-     * API Endpoint url
-     *
-     * @var string
-     */
-    private string $host;
-
-
-    /**
-     * API Endpoint access token
-     *
-     * @var string
-     */
-    private string $key;
-
-
-    /**
-     * @var bool
-     */
-    private bool $includePhoto;
-
-
-    /**
      * Factory constructor.
      *
      * @param string $host
      * @param string $key
-     * @param bool   $includePhoto
+     * @param bool $includePhoto
+     * @param string $customUserAgent
      */
-    public function __construct(string $host, #[SensitiveParameter] string $key, bool $includePhoto)
-    {
-        $this->host = $host;
-        $this->key = $key;
-        $this->includePhoto = $includePhoto;
+    public function __construct(
+        private string $host,
+        #[SensitiveParameter] private string $key,
+        private bool $includePhoto,
+        private string $customUserAgent
+    ) {
     }
 
 
@@ -80,7 +60,7 @@ class Factory
                 return new Connector\TassApi\Base\Endpoint\Status($this->host, $this->key, $this->includePhoto);
 
             case Endpoint\Factory::COMPASS:
-                return new Connector\Compass\Base\Endpoint\Status($this->host, $this->key);
+                return new Connector\Compass\Base\Endpoint\Status($this->host, $this->key, $this->customUserAgent);
 
             case Endpoint\Factory::WONDE:
                 return new Connector\Wonde\Base\Endpoint\Status($this->host, $this->key);

@@ -269,6 +269,7 @@ class Factory implements IFactory
                 $this->host,
                 $this->key,
                 Loader::getInstance()->get('photo_sis_import'),
+                Loader::getInstance()->get('guzzle_custom_user_agent'),
                 /* Profile pieces
                  */
                 UserProfile\Mapper::getInstance()->disableCache(),

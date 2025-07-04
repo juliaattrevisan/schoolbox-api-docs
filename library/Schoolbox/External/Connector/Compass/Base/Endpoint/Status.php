@@ -31,11 +31,11 @@ class Status implements IStatus
      *
      * @param string $host
      * @param string $key
-     * @throws \GuzzleHttp\Exception\InvalidArgumentException
+     * @param string $customUserAgent
      */
-    public function __construct(string $host, #[SensitiveParameter] string $key)
+    public function __construct(string $host, #[SensitiveParameter] string $key, string $customUserAgent)
     {
-        $this->api = new Api($host, $key);
+        $this->api = new Api($host, $key, $customUserAgent);
     }
 
 
