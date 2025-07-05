@@ -1,4 +1,3 @@
-import { getImagePlugins } from "@js/editor/plugin/imagePlugins";
 import { getTablePlugins } from "@js/editor/plugin/tablePlugins";
 import { getTokensPlugins } from "@js/editor/plugin/tokensPlugins";
 import { getEmojiPlugins } from "@js/editor/plugin/emojiPlugins";
@@ -14,6 +13,13 @@ import {
     GeneralHtmlSupport,
     PasteFromOffice,
     Notification,
+    ImageInline,
+    ImageBlock,
+    ImageToolbar,
+    ImageStyle,
+    ImageResize,
+    ImageUpload,
+    LinkImage,
     Heading,
     HeadingButtonsUI,
     Paragraph,
@@ -45,6 +51,7 @@ import Eqneditor5 from "@js/editor/plugin/eqnEditor/eqneditor5";
 import Resource from "@js/editor/plugin/resource/Resource";
 import UITweaks from "@js/editor/plugin/ui/UITweaks";
 import Legacy from "@js/editor/plugin/legacy/Legacy";
+import FullWidth from "@js/editor/plugin/fullWidth/FullWidth";
 import { getSpecialCharactersPlugins } from "./specialCharactersPlugins";
 
 /**
@@ -69,7 +76,14 @@ export function getPlugins(config: SbxEditorConfig): EditorConfig & { sbConfig: 
             Notification,
             PasteFromOffice,
             PasteFromOfficeEnhanced,
-            ...getImagePlugins(),
+            ImageInline,
+            ImageBlock,
+            ImageToolbar,
+            ImageStyle,
+            ImageResize,
+            ImageUpload,
+            LinkImage,
+            FullWidth,
             ...getTablePlugins(),
             ...getEmojiPlugins(),
             ...getTokensPlugins(config),
