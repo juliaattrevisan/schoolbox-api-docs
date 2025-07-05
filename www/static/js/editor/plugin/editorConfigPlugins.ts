@@ -20,6 +20,11 @@ import {
     ImageResize,
     ImageUpload,
     LinkImage,
+    Table,
+    TableToolbar,
+    TableProperties,
+    TableCellProperties,
+    TableColumnResize,
     Heading,
     HeadingButtonsUI,
     Paragraph,
@@ -52,6 +57,7 @@ import Resource from "@js/editor/plugin/resource/Resource";
 import UITweaks from "@js/editor/plugin/ui/UITweaks";
 import Legacy from "@js/editor/plugin/legacy/Legacy";
 import FullWidth from "@js/editor/plugin/fullWidth/FullWidth";
+import TableUpdates from "@js/editor/plugin/tableUpdates/TableUpdates";
 import { getSpecialCharactersPlugins } from "./specialCharactersPlugins";
 
 /**
@@ -84,7 +90,12 @@ export function getPlugins(config: SbxEditorConfig): EditorConfig & { sbConfig: 
             ImageUpload,
             LinkImage,
             FullWidth,
-            ...getTablePlugins(),
+            Table,
+            TableToolbar,
+            TableProperties,
+            TableCellProperties,
+            TableColumnResize,
+            TableUpdates,
             ...getEmojiPlugins(),
             ...getTokensPlugins(config),
             ...getSpecialCharactersPlugins(),
