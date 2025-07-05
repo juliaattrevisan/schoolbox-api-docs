@@ -10,40 +10,41 @@ declare(strict_types=1);
 
 namespace Schoolbox\Editor\Templates;
 
-use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\UserMapper;
+use Schoolbox\GenericCollection;
 
 class Helper
 {
     public function __construct(
-        private ErrorMapper $errorMapper,
         private Mapper $templateMapper,
-        private UserMapper $userMapper
+        private int $categoryId
     ) {
     }
 
     /**
-     * Get templates for a category
+     * Get templates for a category to display within the editor
+     * If nothing can be found on the id an empty array is just
+     * returned so the whole page doesn't error.
      *
-     * @param int $categoryId
      * @return array|\Schoolbox\Collection
-     * @throws \Exception
      */
-    public function getTemplatesForCategory(int $categoryId)
+    public function getTemplatesForCategory()
     {
         // Validate categoryId is positive integer
-        if ($categoryId <= 0) {
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+        if ($this->categoryId <= 0) {
+            return new GenericCollection(Model::class);
         }
         try {
-            $templates = $this->templateMapper->findByColumn('category_id', $categoryId);
-            $translator = new ModelToArray(
-                new \Schoolbox\User\Translator\Author\ModelToArray(),
-                $this->userMapper,
-            );
-            return $templates->map($translator);
+            $templates = $this->templateMapper->findByColumn('category_id', $this->categoryId);
+            return $templates->map(function (Model $template) {
+                return [
+                    'title' => $template->getTitle(),
+                    'description' => $template->getDescription(),
+                    'body' => $template->getBody(),
+                ];
+            });
         } catch (\Schoolbox\Mapper\Exception $e) {
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PROCESSING);
+            // just return an empty array if nothing found
+            return new GenericCollection(Model::class);
         }
     }
 }
