@@ -36,10 +36,6 @@ class Controller extends Base
      */
     public function getTemplates(int $categoryId): void
     {
-        // Validate categoryId is positive integer
-        if ($categoryId <= 0) {
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
-        }
         try {
             $templates = $this->templateMapper->findByColumn('category_id', $categoryId);
             $translator = new ModelToArray(

@@ -29,10 +29,6 @@ class Helper
      */
     public function getTemplatesForCategory()
     {
-        // Validate categoryId is positive integer
-        if ($this->categoryId <= 0) {
-            return new GenericCollection(Model::class);
-        }
         try {
             $templates = $this->templateMapper->findByColumn('category_id', $this->categoryId);
             return $templates->map(function (Model $template) {
