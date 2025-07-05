@@ -4,7 +4,7 @@
  */
 
 import { type EditorConfig } from "ckeditor5";
-import { getPlugins } from "@js/editor/plugin/editorConfigPlugins";
+import { getPlugins } from "@js/editor/plugin/editorPlugins";
 import { getToolbar } from "@js/editor/toolbar/editorToolbar";
 import { getLinkSettings } from "@js/editor/settings/linkSettings";
 import { getFontSettings } from "@js/editor/settings/fontSettings";
