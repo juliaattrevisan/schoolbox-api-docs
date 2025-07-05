@@ -54,7 +54,6 @@ use UnexpectedValueException;
 use Schoolbox\User;
 use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
 use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
-use Schoolbox\Admin\Editor\Templates\Category\Model as EditorTemplatesCategoryModel;
 
 use function array_keys;
 use function array_merge;
@@ -210,7 +209,7 @@ class Controller extends Base
             'returnUrl'             => $this->getExplicitReturnUrl(),
             'entityTypesData'       => $this->getEntityTypesData(),
             'mayChangeStickyStatus' => $this->validChangeStickyStatus->isSatisfiedBy($this->getUser()),
-            'editorTemplates'       => $this->getEditorTemplates(),
+            'editorTemplates'       => $this->editorTemplateHelper->getTemplatesForCategory(),
         ], "Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}", 'news');
     }
 
@@ -321,7 +320,7 @@ class Controller extends Base
             'availableEntityTypes'  => $this->getAvailableAudienceTypeStrategies(),
             'entityTypesData'       => $this->getEntityTypesData(),
             'mayChangeStickyStatus' => $this->validChangeStickyStatus->isSatisfiedBy($this->getUser()),
-            'editorTemplates'       => $this->getEditorTemplates(),
+            'editorTemplates'       => $this->editorTemplateHelper->getTemplatesForCategory()
         ], "Update {$article->getTitle()}", 'news');
     }
 
@@ -1730,17 +1729,5 @@ class Controller extends Base
         if (Access::getInstance()->getFolderAccess($this->getUser(), $folderId) === UserAccess::ACCESS_DENY) {
             throw new AccessDenied("User {$this->getUser()->getId()} does not have access to folder $folderId");
         }
-    }
-
-    /**
-     * Retrieves any pre-existing editor templates to insert into the 'Body' rich text editor
-     * @return Collection
-     * @throws MapperException
-     */
-    private function getEditorTemplates(): Collection
-    {
-        return $this->editorTemplateHelper->getTemplatesForCategory(
-            EditorTemplatesCategoryModel::NEWS
-        );
     }
 }
