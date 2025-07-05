@@ -1,6 +1,4 @@
-import { getTablePlugins } from "@js/editor/plugin/tablePlugins";
 import { getTokensPlugins } from "@js/editor/plugin/tokensPlugins";
-import { getEmojiPlugins } from "@js/editor/plugin/emojiPlugins";
 import {
     Essentials,
     Bold,
@@ -25,6 +23,8 @@ import {
     TableProperties,
     TableCellProperties,
     TableColumnResize,
+    Emoji,
+    Mention,
     Heading,
     HeadingButtonsUI,
     Paragraph,
@@ -96,7 +96,8 @@ export function getPlugins(config: SbxEditorConfig): EditorConfig & { sbConfig: 
             TableCellProperties,
             TableColumnResize,
             TableUpdates,
-            ...getEmojiPlugins(),
+            Emoji,
+            Mention,
             ...getTokensPlugins(config),
             ...getSpecialCharactersPlugins(),
             Heading,
