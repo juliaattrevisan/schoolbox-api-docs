@@ -1,4 +1,3 @@
-import { getTokensPlugins } from "@js/editor/plugin/tokensPlugins";
 import {
     Essentials,
     Bold,
@@ -98,7 +97,6 @@ export function getPlugins(config: SbxEditorConfig): EditorConfig & { sbConfig: 
             TableUpdates,
             Emoji,
             Mention,
-            ...getTokensPlugins(config),
             ...getSpecialCharactersPlugins(),
             Heading,
             Paragraph,
