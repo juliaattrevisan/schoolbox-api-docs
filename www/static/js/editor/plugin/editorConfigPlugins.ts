@@ -1,3 +1,7 @@
+/**
+ * Returns all plugins for use within the editor
+ */
+
 import {
     Essentials,
     Bold,
@@ -40,6 +44,11 @@ import {
     WordCount,
     Fullscreen,
     Bookmark,
+    SpecialCharacters,
+    SpecialCharactersArrows,
+    SpecialCharactersCurrency,
+    SpecialCharactersMathematical,
+    SpecialCharactersText,
     type EditorConfig,
 } from "ckeditor5";
 import {
@@ -57,14 +66,15 @@ import UITweaks from "@js/editor/plugin/ui/UITweaks";
 import Legacy from "@js/editor/plugin/legacy/Legacy";
 import FullWidth from "@js/editor/plugin/fullWidth/FullWidth";
 import TableUpdates from "@js/editor/plugin/tableUpdates/TableUpdates";
-import { getSpecialCharactersPlugins } from "./specialCharactersPlugins";
+import SpecialCharactersLanguages from "@js/editor/plugin/specialCharacters/SpecialCharactersLanguages";
+import SpecialCharactersExtended from "@js/editor/plugin/specialCharacters/SpecialCharactersExtended";
 
 /**
  * Return the default configuration
  * @param config - the default config
  * @returns - refer to https://ckeditor.com/docs/ckeditor5/latest/api/module_core_editor_editorconfig-EditorConfig.html
  */
-export function getPlugins(config: SbxEditorConfig): EditorConfig & { sbConfig: SbxEditorConfig } {
+export function getPlugins(config: SbxEditorConfig): Pick<EditorConfig, "plugins" | "extraPlugins"> {
     return {
         plugins: [
             // list all the plugins we'll use in the default editor
@@ -97,7 +107,13 @@ export function getPlugins(config: SbxEditorConfig): EditorConfig & { sbConfig: 
             TableUpdates,
             Emoji,
             Mention,
-            ...getSpecialCharactersPlugins(),
+            SpecialCharacters,
+            SpecialCharactersArrows,
+            SpecialCharactersCurrency,
+            SpecialCharactersMathematical,
+            SpecialCharactersText,
+            SpecialCharactersLanguages,
+            SpecialCharactersExtended,
             Heading,
             Paragraph,
             HeadingButtonsUI,
@@ -122,6 +138,7 @@ export function getPlugins(config: SbxEditorConfig): EditorConfig & { sbConfig: 
             Bookmark,
             Template,
         ],
+        // simple toolbar doesn't have image upload functionality
         extraPlugins: config.toolbar !== EditorToolbar.SIMPLE ? [UploadAdapterPlugin] : [],
     };
 }
