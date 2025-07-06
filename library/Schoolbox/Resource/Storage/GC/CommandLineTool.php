@@ -92,17 +92,16 @@ HELP;
         $thresholdDate = $this->buildDate($threshold ?? self::DEFAULT_THRESHOLD);
         $db            = $this->getDatabaseInternal();
         $gc = new GarbageCollector(
-            [
-                new Check\ExpiryDate($db, 2),
-                new Check\HardLinks($db),
-                new Check\SoftLinks($db, SQL_db, $this->getLogger()),
-            ],
             StorageMapper::getInstance(),
             $this->getLogger(),
             $limit,
             $thresholdDate,
             $this->perform(),
         );
+        $gc = $gc
+            ->addCheck(new Check\ExpiryDate($db, 2))
+            ->addCheck(new Check\HardLinks($db))
+            ->addCheck(new Check\SoftLinks($db, SQL_db, $this->getLogger()));
 
         $deleted = $gc->purge();
 

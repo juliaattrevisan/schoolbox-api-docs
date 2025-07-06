@@ -37,8 +37,6 @@ class GarbageCollector
     /**
      * Constructor
      *
-     * @param Check[]                  $checks        A list of checks to perform on storage records: the record must
-     *                                                fail all of these checks in order to be deleted.
      * @param StorageMapper            $mapper        Storage mapper: used for fetching and deleting records.
      * @param LoggerInterface          $log           Logger
      * @param int                      $limit         Maximum number of storage records to process.
@@ -48,25 +46,22 @@ class GarbageCollector
      *                                                processed time: otherwise, only output what would've been deleted.
      */
     public function __construct(
-        array $checks,
         private StorageMapper $mapper,
         private LoggerInterface $log,
         private int $limit = 200,
         private ?Alaress_Date_Format $thresholdDate = null,
         private bool $perform = false,
     ) {
-        foreach ($checks as $c) {
-            $this->addCheck($c);
-        }
-        $this->log->debug("Starting GC");
     }
 
 
     /**
+     * Add a check to the garbage collector.
+     *
      * @param Check $check
-     * @return self
+     * @return static
      */
-    public function addCheck(Check $check)
+    public function addCheck(Check $check): static
     {
         $this->checks[] = $check;
         return $this;
@@ -75,11 +70,11 @@ class GarbageCollector
 
     /**
      * Returns a list of hashes that are considered stale.
-     * Main class logic.
-     * @var string $hash       If set, target this specific hash for cleanup
-     * @return array
+     *
+     * @param string|null $hash If set, target this specific hash for cleanup.
+     * @return array<string>
      */
-    public function getStale($hash = null)
+    public function getStale(?string $hash = null): array
     {
         $query = 'SELECT `hash` FROM `storage` WHERE';
 
@@ -116,12 +111,14 @@ class GarbageCollector
 
 
     /**
-     * Delete all stale hashes
-     * @var string $hash       If set, target this specific hash for cleanup
+     * Delete all stale hashes.
+     *
+     * @param string|null $hash If set, target this specific hash for cleanup.
      * @return int
      */
-    public function purge($hash = null)
+    public function purge(?string $hash = null): int
     {
+        $this->log->debug("Starting GC");
         $purge = $this->getStale($hash);
         $this->preserve(array_diff($this->list, $purge));
 
@@ -146,9 +143,13 @@ class GarbageCollector
 
 
     /**
-     * @param array $hashes
+     * Mark this set of storage hashes as having been processed by the garbage
+     * collector, so that `$this->thresholdDate` is respected for future garbage
+     * collector runs.
+     *
+     * @param array<string> $hashes
      */
-    protected function preserve(array $hashes)
+    private function preserve(array $hashes): void
     {
         if (!$this->perform) {
             return;
@@ -163,12 +164,15 @@ class GarbageCollector
     }
 
     /**
+     * Completely delete this storage hash, from both the database and from
+     * Schoolbox's file system.
+     *
      * @param string $hash
      * @throws MapperException
-     * @throws FlysystemException if the storage file can't be deleted from the
-     *                            filesystem.
+     * @throws FlysystemException if the file could not be deleted from
+     *                            Schoolbox's file system.
      */
-    protected function removeFromStorage($hash)
+    private function removeFromStorage(string $hash): void
     {
         if ($this->perform) {
             $this->mapper->actualDelete($this->mapper->findByHash($hash));
