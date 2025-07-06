@@ -708,10 +708,6 @@ class Module extends BaseModule
                     $projectResultCacheMapper,
                     $lessonPlanTemplateMapper,
                     $lessonPlanDataModelMapper,
-                    new \Schoolbox\Url\Factory($this->getConfig()),
-                    (string)$this->getConfig()->get('learnosity_version'),
-                    (string)$this->getConfig()->get('learnosity_consumer_key'),
-                    (string)$this->getConfig()->get('learnosity_consumer_secret'),
                     MimetypeMapper::getInstance(),
                 );
 
@@ -734,10 +730,6 @@ class Module extends BaseModule
                     $projectResultCacheMapper,
                     $lessonPlanTemplateMapper,
                     $lessonPlanDataModelMapper,
-                    new \Schoolbox\Url\Factory($this->getConfig()),
-                    (string)$this->getConfig()->get('learnosity_version'),
-                    (string)$this->getConfig()->get('learnosity_consumer_key'),
-                    (string)$this->getConfig()->get('learnosity_consumer_secret'),
                 );
 
             case Assessment\Quiz\Controller::class:
@@ -791,10 +783,6 @@ class Module extends BaseModule
                     $projectResultCacheMapper,
                     $lessonPlanTemplateMapper,
                     $lessonPlanDataModelMapper,
-                    new \Schoolbox\Url\Factory($this->getConfig()),
-                    (string)$this->getConfig()->get('learnosity_version'),
-                    (string)$this->getConfig()->get('learnosity_consumer_key'),
-                    (string)$this->getConfig()->get('learnosity_consumer_secret'),
                 );
 
             case Assessment\Lti\Controller::class:
@@ -822,10 +810,6 @@ class Module extends BaseModule
                     $projectResultCacheMapper,
                     $lessonPlanTemplateMapper,
                     $lessonPlanDataModelMapper,
-                    new \Schoolbox\Url\Factory($this->getConfig()),
-                    (string)$this->getConfig()->get('learnosity_version'),
-                    (string)$this->getConfig()->get('learnosity_consumer_key'),
-                    (string)$this->getConfig()->get('learnosity_consumer_secret'),
                 );
 
             case Assessment\LessonPlan\Controller::class:
@@ -850,10 +834,6 @@ class Module extends BaseModule
                     $courseImplementationMapper,
                     $unitImplementationMapper,
                     $linkedAssessmentsMapper,
-                    new \Schoolbox\Url\Factory($this->getConfig()),
-                    (string)$this->getConfig()->get('learnosity_version'),
-                    (string)$this->getConfig()->get('learnosity_consumer_key'),
-                    (string)$this->getConfig()->get('learnosity_consumer_secret'),
                 );
 
             default:

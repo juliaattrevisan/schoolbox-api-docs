@@ -121,10 +121,10 @@ class ListController extends Web\Controller\Base
         protected UnitSpecificationMapper $unitSpecificationMapper,
         private RosettaStone $rosettaStone,
         protected \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper,
-        private UrlFactory $urlFactory,
-        private string $learnosityVersion,
-        #[\SensitiveParameter] private string $learnosityConsumerKey,
-        #[\SensitiveParameter] private string $learnosityConsumerSecret,
+        private ?UrlFactory $urlFactory = null,
+        private ?string $learnosityVersion = null,
+        #[\SensitiveParameter] private ?string $learnosityConsumerKey = null,
+        #[\SensitiveParameter] private ?string $learnosityConsumerSecret = null,
     ) {
         $this->setUserMapper($userMapper);
         $this->setErrorMapper($errorMapper);
@@ -1320,7 +1320,13 @@ class ListController extends Web\Controller\Base
         $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection($assessments, $student, true);
 
         $helper = null;
-        if ($assessment instanceof \Schoolbox\Learning\Assessment\Quiz\Model) {
+        if (
+            $assessment instanceof \Schoolbox\Learning\Assessment\Quiz\Model &&
+            $this->learnosityConsumerKey &&
+            $this->learnosityConsumerSecret &&
+            $this->learnosityVersion &&
+            $this->urlFactory instanceof UrlFactory
+        ) {
             /* Probably inject this one day, but for now,
                  * I want to avoid dumping Yet Another Thing into the kernel
                  * I don't have a convenient means to access SERVER_NAME except like this, sadly

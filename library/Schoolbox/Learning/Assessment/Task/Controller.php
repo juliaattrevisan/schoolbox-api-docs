@@ -96,10 +96,6 @@ class Controller extends Assessment\Controller
         protected Assessment\Project\ResultCache\Mapper $projectResultCacheMapper,
         protected LessonPlanTemplateMapper $lessonPlanTemplateMapper,
         protected LessonPlanDataModelMapper $lessonPlanDataModelMapper,
-        \Schoolbox\Url\Factory $urlFactory,
-        string $learnosityVersion,
-        #[\SensitiveParameter] string $learnosityConsumerKey,
-        #[\SensitiveParameter] string $learnosityConsumerSecret,
     ) {
         parent::__construct(
             $userMapper,
@@ -119,10 +115,6 @@ class Controller extends Assessment\Controller
             $projectResultCacheMapper,
             $lessonPlanTemplateMapper,
             $lessonPlanDataModelMapper,
-            $urlFactory,
-            $learnosityVersion,
-            $learnosityConsumerKey,
-            $learnosityConsumerSecret,
         );
         $this->taskResponseDataSource = $taskResponseDataSource;
     }

@@ -113,10 +113,10 @@ abstract class Controller extends ListController implements IAssessmentControlle
         protected Project\ResultCache\Mapper $projectResultCacheMapper,
         protected LessonPlanTemplateMapper $lessonPlanTemplateMapper,
         protected LessonPlanDataModelMapper $lessonPlanDataModelMapper,
-        \Schoolbox\Url\Factory $urlFactory,
-        string $learnosityVersion,
-        #[\SensitiveParameter] string $learnosityConsumerKey,
-        #[\SensitiveParameter] string $learnosityConsumerSecret,
+        ?\Schoolbox\Url\Factory $urlFactory = null,
+        ?string $learnosityVersion = null,
+        #[\SensitiveParameter] ?string $learnosityConsumerKey = null,
+        #[\SensitiveParameter] ?string $learnosityConsumerSecret = null,
         protected ?MimetypeMapper $mimetypeMapper = null,
     ) {
         parent::__construct(
