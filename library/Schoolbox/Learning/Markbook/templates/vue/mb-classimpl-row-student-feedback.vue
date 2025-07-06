@@ -80,11 +80,10 @@ function getCellInfo() {
     const instructorMarkScheme = cloneDeep(aImpl.instructorMarkScheme);
 
     if (activity.assessmentType === ACTIVITY_TYPE_QUIZ) {
-        /** For quizzes, we need to include the responseId and maxMark in the extra form data */
+        /** For quizzes, we need to include the  maxMark in the extra form data */
         const maxMarks = participant.extraInfo?.maxMarks ?? null;
-        const responseId = participant.extraInfo?.response.id ?? null;
 
-        extraFormData = { responseId, maxMarks };
+        extraFormData = { maxMarks };
 
         /** Also- the mark scheme's mask is derived from the extra data too for learnosity reasons */
         if (instructorMarkScheme.template === "TotalMarkFractional") {
@@ -104,6 +103,7 @@ function getCellInfo() {
             normMark: window.Vue.toRef(participant.marks.draft, "norm"),
             comment: window.Vue.toRef(participant.marks.draft, "comment"),
             resubmissionRequired: window.Vue.toRef(participant.marks.draft, "resubmissionRequired"),
+            responseId: window.Vue.toRef(participant.marks.draft, "responseId"),
         },
         {
             hrMarkInstructor: window.Vue.toRef(participant.marks.published, "hrInstructor"),
@@ -111,6 +111,7 @@ function getCellInfo() {
             normMark: window.Vue.toRef(participant.marks.published, "norm"),
             comment: window.Vue.toRef(participant.marks.published, "comment"),
             resubmissionRequired: window.Vue.toRef(participant.marks.published, "resubmissionRequired"),
+            responseId: window.Vue.toRef(participant.marks.published, "responseId"),
         },
         {
             hasSubmittedResponse: window.Vue.toRef(participant, "hasSubmittedResponse"),

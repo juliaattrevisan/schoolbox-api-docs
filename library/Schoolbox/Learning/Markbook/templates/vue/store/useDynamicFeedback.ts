@@ -10,6 +10,7 @@ interface DynamicFeedbackEditableData {
 interface DynamicFeedbackData extends DynamicFeedbackEditableData {
     hrMark: Ref<string | null>;
     normMark: Ref<number | null>;
+    responseId: Ref<number | null>;
 }
 
 interface DynamicFeedbackExtraData {
@@ -122,9 +123,10 @@ export function useDynamicFeedback(
      */
     function getFormData(isPublish: boolean): Record<string, unknown> {
         // If there's extra form data to send, include it
-        // This will be the case if the activity is a quiz, since it needs to include the responseId and maxMark
+        // This will be the case if the activity is a quiz, since it needs to include the maxMark
         const body = postModify.extraFormData ?? {};
 
+        body.responseId = dataDraft.responseId.value;
         body.mark = data.hrMarkInstructor.value;
         body.comment = data.comment.value;
         body.resubmissionRequired = data.resubmissionRequired.value;
@@ -175,6 +177,7 @@ export function useDynamicFeedback(
             toast.timeout({ text: "Draft saved", isSuccess: true });
 
             // persist the draft data
+            dataDraft.responseId.value = respData.id;
             dataDraft.normMark.value = respData.normalisedMark;
             dataDraft.hrMarkInstructor.value = respData.humanReadableInstructorMark;
             dataDraft.hrMark.value = respData.humanReadableMark;
@@ -281,6 +284,7 @@ export function useDynamicFeedback(
             dataExtra.hasPublishedFeedback.value = true;
 
             /* persist the published data */
+            dataPublished.responseId.value = respData.id;
             dataPublished.normMark.value = respData.normalisedMark;
             dataPublished.hrMark.value = respData.humanReadableMark;
             dataPublished.hrMarkInstructor.value = respData.humanReadableInstructorMark;
@@ -288,6 +292,7 @@ export function useDynamicFeedback(
             dataPublished.resubmissionRequired.value = window.Vue.unref(data.resubmissionRequired);
 
             /* and reset the draft data to defaults */
+            dataDraft.responseId.value = null;
             dataDraft.comment.value = null;
             dataDraft.hrMark.value = null;
             dataDraft.normMark.value = null;

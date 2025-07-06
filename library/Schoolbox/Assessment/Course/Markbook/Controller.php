@@ -339,18 +339,20 @@ class Controller extends WebController\Base
                                                 'progressTick' => $progressTick,
                                                 'marks' => [
                                                     'published' => [
-                                                        'norm'         => $marks['published']['norm'],
-                                                        'hr'           => $marks['published']['hr'],
-                                                        'hrInstructor' => $marks['published']['hrInstructor'],
-                                                        'comment'      => $this->purifier->purify($marks['published']['comment']),
+                                                        'norm'         => $marks['published']['norm'] ?? null,
+                                                        'hr'           => $marks['published']['hr'] ?? null,
+                                                        'hrInstructor' => $marks['published']['hrInstructor'] ?? null,
+                                                        'comment'      => $this->purifier->purify($marks['published']['comment'] ?? null),
                                                         'resubmissionRequired' => $marks['published']['resubmissionRequired'] ?? false,
+                                                        'responseId'   => $marks['published']['responseId'] ?? null,
                                                     ],
                                                     'draft' => [
-                                                        'norm'         => $marks['draft']['norm'],
-                                                        'hr'           => $marks['draft']['hr'],
-                                                        'hrInstructor' => $marks['draft']['hrInstructor'],
-                                                        'comment'      => $this->purifier->purify($marks['draft']['comment']),
+                                                        'norm'         => $marks['draft']['norm'] ?? null,
+                                                        'hr'           => $marks['draft']['hr'] ?? null,
+                                                        'hrInstructor' => $marks['draft']['hrInstructor'] ?? null,
+                                                        'comment'      => $this->purifier->purify($marks['draft']['comment'] ?? null),
                                                         'resubmissionRequired' => $marks['draft']['resubmissionRequired'] ?? false,
+                                                        'responseId'   => $marks['draft']['responseId'] ?? null,
                                                     ],
                                                 ],
                                                 /* unused on the course markbook: */

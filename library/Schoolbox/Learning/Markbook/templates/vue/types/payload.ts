@@ -36,6 +36,7 @@ export type MarkbookClassImplActivityParticipant = {
     marks: Record<
         "published" | "draft",
         {
+            responseId: number | null;
             norm: number | null;
             hr: string | null;
             hrInstructor: string | null;

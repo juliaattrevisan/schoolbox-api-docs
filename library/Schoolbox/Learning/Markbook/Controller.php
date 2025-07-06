@@ -204,6 +204,11 @@ class Controller extends Base
                                     $authoritativeFeedback = $participant->getAuthoritativeFeedback(true);
                                     $authoritativeFeedbackDraft = $draftMark ? $participant->getAuthoritativeFeedback(false) : null;
 
+                                    if ($authoritativeFeedbackDraft && !$authoritativeFeedbackDraft->isDraft()) {
+                                        // this isn't actually a draft (it'll be the same as $authoritativeFeedback)
+                                        $authoritativeFeedbackDraft = null;
+                                    }
+
                                     $resubmissionRequiredPublished = $authoritativeFeedback instanceof DueWork\Feedback\Model
                                         ? $authoritativeFeedback->getResubmissionRequired()
                                         : false;
@@ -223,6 +228,7 @@ class Controller extends Base
                                                 'hrInstructor' => $authoritativeFeedback ? $participant->getHumanReadableInstructorMark(true) : null,
                                                 'comment'      => $this->purifier->purify($authoritativeFeedback?->getComment()),
                                                 'resubmissionRequired' => $resubmissionRequiredPublished,
+                                                'responseId'   => $authoritativeFeedback?->getId(),
                                             ],
                                             'draft' => [
                                                 'norm'         => $authoritativeFeedbackDraft ? $participant->getNormalisedMark(false) : null,
@@ -230,6 +236,7 @@ class Controller extends Base
                                                 'hrInstructor' => $authoritativeFeedbackDraft ? $participant->getHumanReadableInstructorMark(false) : null,
                                                 'comment'      => $this->purifier->purify($authoritativeFeedbackDraft?->getComment()),
                                                 'resubmissionRequired' => $resubmissionRequiredDraft,
+                                                'responseId'   => $authoritativeFeedbackDraft?->getId(),
                                             ],
                                         ],
                                         'plan' => [
