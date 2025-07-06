@@ -134,22 +134,35 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
     }
 
     /**
-     * All activity IDs that have draft marks for any participant
+     * Determine if any activity implementations have draft marks for any participant
+     * @param aImpls - The activities to check
+     * @returns bool
      */
-    const activityDraftMarks = window.Vue.computed(() => {
+    function aImplHasDraftMarks(aImpls: MarkbookClassImplActivity[] | MarkbookClassImplActivity): boolean {
+        const activitiesList = Array.isArray(aImpls) ? aImpls : [aImpls];
+        return activitiesList.some((aImpl) =>
+            Object.values(aImpl.participants).some((p) => p && p.marks.draft.responseId !== null),
+        );
+    }
+
+    /**
+     * Determine if any activities have draft marks for any participant
+     * @param activities - The activities to check
+     * @returns bool
+     */
+    function hasDraftMarks(activities: MarkbookActivity[] | MarkbookActivity): boolean {
         if (data.value === null) {
-            return [];
+            return false;
         }
 
-        return data.value.classImpls.flatMap((classImpl) => {
-            return Object.values(classImpl.assessments)
-                .filter((aImpl) => aImpl.stats.draftMean !== null)
-                .filter((aImpl) =>
-                    Object.values(aImpl.participants).some((p) => p && p.marks.draft.responseId !== null),
-                )
-                .map((aImpl) => aImpl.id);
-        });
-    });
+        const activitiesList = Array.isArray(activities) ? activities : [activities];
+        return data.value.classImpls.some((classImpl) =>
+            activitiesList.some((activity) => {
+                const aImpl = classImpl.assessments[activity.id];
+                return aImpl && aImplHasDraftMarks(aImpl);
+            }),
+        );
+    }
 
     return {
         init,
@@ -164,6 +177,7 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
         orderedClassImplStudents,
         popoutSelectedCell,
         feedbackSelectedCell,
-        activityDraftMarks,
+        aImplHasDraftMarks,
+        hasDraftMarks,
     };
 });

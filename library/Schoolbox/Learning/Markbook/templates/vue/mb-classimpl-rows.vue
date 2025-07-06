@@ -112,7 +112,7 @@ const orderedClassImplStudents = window.Vue.computed(() => {
             <template v-for="{ activity, aImpl } in orderedClassImplActivities" :key="activity.id">
                 <td v-if="aImpl !== null && aImpl.stats" class="class-row">
                     <a :href="aImpl._routes['learningAssessment.getStatus']">
-                        <span v-if="mbStore.showDrafts && aImpl.stats.draftMean" class="meta">
+                        <span v-if="mbStore.showDrafts && mbStore.aImplHasDraftMarks(aImpl)" class="meta">
                             {{ aImpl.stats.draftMean ?? "–" }}
                         </span>
                         <span v-else>

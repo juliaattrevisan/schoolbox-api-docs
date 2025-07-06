@@ -49,8 +49,8 @@ const mbStore = useMarkbookStore();
             class="student-grade-cell white"
         >
             <span v-if="aImpl === null" class="na"></span>
-            <span v-else-if="mbStore.showDrafts && aImpl.stats.draftMean" class="meta">
-                {{ aImpl.stats.draftMean ?? "-" }}
+            <span v-else-if="mbStore.showDrafts && mbStore.aImplHasDraftMarks(aImpl)" class="meta">
+                {{ aImpl.stats.draftMean ?? "–" }}
             </span>
             <span v-else>
                 {{ aImpl.stats.mean ?? "–" }}
