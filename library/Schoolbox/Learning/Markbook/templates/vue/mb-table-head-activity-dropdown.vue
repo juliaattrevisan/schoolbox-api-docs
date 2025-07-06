@@ -200,7 +200,7 @@ async function onPublishAll(): Promise<void> {
     <!-- TODO <li>
         <a href="" class="icon-upload"> Import Feedback </a>
     </li> -->
-    <template v-if="props.activity._links?.status">
+    <template v-if="props.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK">
         <li class="separator">Bulk Actions</li>
         <li>
             <button class="icon-approve" :disabled="isAnyActivityWritable" @click.prevent="openPublishModal">
