@@ -1311,7 +1311,7 @@ class ListController extends Web\Controller\Base
      * @return void
      * @throws \JsonException
      * @throws ValidationException
-     * @api GET GET /learning/assessments/{assessmentId}/{studentId}/info
+     * @api GET /learning/assessments/{assessmentId}/{studentId}/info
      */
     public function getInfo(User $student, IAssessable $assessment): void
     {
