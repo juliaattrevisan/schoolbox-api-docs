@@ -40,5 +40,8 @@ export function getSettings(config: SbxEditorConfig): EditorConfig {
         ...getFullscreenSettings(),
         ...getSpecialCharactersSettings(),
         ...getTemplateSettings(config),
+        emoji: {
+            definitionsUrl: "cdn", // use the default CDN for emoji definitions
+        },
     };
 }
