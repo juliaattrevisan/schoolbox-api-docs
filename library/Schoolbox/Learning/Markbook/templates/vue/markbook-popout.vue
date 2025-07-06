@@ -264,8 +264,6 @@ async function getActivity(): Promise<void> {
             /* just shove it on the participant for now, other places can deal with it */
             const activityInfo = (await activityInfoResponse.json()) as ActivityInfoResponsePayload;
             cellInfo.value.participant.extraInfo = activityInfo;
-
-            console.log("Activity info fetched successfully", activityInfo);
         }
     } catch (error) {
         console.error("Error fetching activity items:", error);
