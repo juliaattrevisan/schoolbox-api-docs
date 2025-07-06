@@ -89,10 +89,10 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @param Project\ResultCache\Mapper $projectResultCacheMapper
      * @param LessonPlanTemplateMapper $lessonPlanTemplateMapper
      * @param LessonPlanDataModelMapper $lessonPlanDataModelMapper
-     * @param Factory $urlFactory
-     * @param string $learnosityVersion
-     * @param string $learnosityConsumerKey
-     * @param string $learnosityConsumerSecret
+     * @param null|Factory $urlFactory
+     * @param null|string $learnosityVersion
+     * @param null|string $learnosityConsumerKey
+     * @param null|string $learnosityConsumerSecret
      * @param MimetypeMapper|null $mimetypeMapper
      */
     public function __construct(

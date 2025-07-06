@@ -106,10 +106,10 @@ class ListController extends Web\Controller\Base
      * @param UnitSpecificationMapper $unitSpecificationMapper
      * @param RosettaStone $rosettaStone
      * @param Project\ResultCache\Mapper $projectResultCacheMapper
-     * @param UrlFactory $urlFactory
-     * @param string $learnosityVersion
-     * @param string $learnosityConsumerKey
-     * @param string $learnosityConsumerSecret
+     * @param null|UrlFactory $urlFactory
+     * @param null|string $learnosityVersion
+     * @param null|string $learnosityConsumerKey
+     * @param null|string $learnosityConsumerSecret
      */
     public function __construct(
         UserMapper $userMapper,
