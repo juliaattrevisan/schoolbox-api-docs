@@ -256,6 +256,10 @@ class Controller extends Base
                                     'learningAssessment.getStatus',
                                     [ 'assessmentId' => $aImpl->getId() ]
                                 ),
+                                'learningDueWorkFeedback.postParticipantFeedbacks' => $this->getRouteIfAuthorized(
+                                    'learningDueWorkFeedback.postParticipantFeedbacks',
+                                    [ 'assessment' => $aImpl, ]
+                                ),
                                 'student' => $markbook->getStudents()->map(fn(User $student) => [
                                     'learningAssessmentTimeline.getFullTimeline' => $this->getRouteIfAuthorized(
                                         'learningAssessmentTimeline.getFullTimeline',

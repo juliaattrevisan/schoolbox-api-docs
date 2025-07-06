@@ -84,6 +84,7 @@ export type MarkbookClassImplActivity = {
     };
     _routes: {
         "learningAssessment.getStatus": string;
+        "learningDueWorkFeedback.postParticipantFeedbacks": string | null;
         student: Record<
             UserId,
             {

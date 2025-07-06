@@ -2,7 +2,7 @@
 import { keysOf } from "@js/util/arrayUtils";
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
-import { ACTIVITY_TYPE_QUIZ } from "@schoolboxAssessment/Types/assessmentTypes";
+import { ACTIVITY_TYPE_DUE_WORK, ACTIVITY_TYPE_QUIZ } from "@schoolboxAssessment/Types/assessmentTypes";
 import type { MarkbookActivity, ParticipantId } from "./types/payload";
 import { useMarkbookStore } from "./store/markbookStore";
 
@@ -12,6 +12,15 @@ interface Props {
 
 const props = defineProps<Props>();
 const mbStore = useMarkbookStore();
+
+const isAnyActivityWritable = window.Vue.computed(() => {
+    if (mbStore.data === null) {
+        return false;
+    }
+
+    // TODO: does course markbook need the writable property? this ignores undefined atm
+    return mbStore.data.classImpls.some((classImpl) => classImpl.assessments[props.activity.id].writable !== false);
+});
 
 const participantsWithDrafts = window.Vue.computed(() => {
     if (mbStore.data === null) {
@@ -29,18 +38,15 @@ const participantsWithDrafts = window.Vue.computed(() => {
             const students = mbStore.orderedClassImplStudents(classImpl);
             const participants = students
                 .map((student) => {
-                    const participant = aImpl.participants[student.id];
-                    if (!participant) {
+                    const participant = aImpl.participants[student.id] ?? null;
+                    const responseId = participant?.marks.draft?.responseId ?? null;
+                    if (participant === null || responseId === null) {
                         return null;
                     }
 
-                    return {
-                        student,
-                        participant,
-                    };
+                    return { student, participant, responseId };
                 })
-                .filter((p) => p !== null)
-                .filter(({ participant }) => mbStore.hasMeaningfulMarks(participant.marks.draft));
+                .filter((p) => p !== null);
 
             return {
                 classImplId,
@@ -75,14 +81,58 @@ function openPublishModal(): void {
  * When the user clicks on "Publish All"
  */
 async function onPublishAll(): Promise<void> {
-    const selected = keysOf(selectedParticipants.value).filter((id) => selectedParticipants.value[id]);
-
-    // TODO
-    console.log("would have published drafts for", selected);
-
     const activity = mbStore.data?.assessments[props.activity.id] ?? null;
     if (activity === null) {
         throw new Error("Activity not found, cannot publish drafts");
+    }
+
+    const selectedParticipantIds = keysOf(selectedParticipants.value).filter((id) => selectedParticipants.value[id]);
+
+    /** For now, this is chunked by aImpl as we don't have a route to do many at once */
+    const toast = window.sbProps.toastActivate("Publishing drafts...");
+    try {
+        await Promise.all(
+            participantsWithDrafts.value.map(async ({ aImpl, participants }) => {
+                const selectedResponseIds = participants
+                    .filter((participant) => selectedParticipantIds.includes(`${participant.student.id}`))
+                    .map((participant) => participant.responseId);
+
+                if (selectedResponseIds.length === 0) {
+                    return;
+                }
+
+                const postParticipantFeedbacks =
+                    aImpl._routes["learningDueWorkFeedback.postParticipantFeedbacks"] || null;
+                if (postParticipantFeedbacks === null) {
+                    // shouldn't get here, but if you do...
+                    throw new Error(`Missing access to publish drafts for ${activity.title}`);
+                }
+
+                const resp = await fetch(postParticipantFeedbacks, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                    },
+                    body: JSON.stringify({ drafts: selectedResponseIds }),
+                });
+
+                if (!resp.ok) {
+                    throw new Error(`Failed to publish drafts for ${activity.title}`);
+                }
+            }),
+        );
+
+        toast.timeout({
+            text: "Published drafts",
+            isSuccess: true,
+        });
+    } catch (e) {
+        console.error("Failed to publish drafts:", e);
+        toast.timeout({
+            text: "Failed to publish drafts",
+            isSuccess: false,
+        });
     }
 
     /* update all marks/stats for the selected participants */
@@ -153,8 +203,9 @@ async function onPublishAll(): Promise<void> {
     <template v-if="props.activity._links?.status">
         <li class="separator">Bulk Actions</li>
         <li>
-            <!-- TODO: Disable if not writable (assuming that's the equivalent of "readonly")? -->
-            <button class="icon-approve" @click.prevent="openPublishModal">Publish Grades & Feedback</button>
+            <button class="icon-approve" :disabled="isAnyActivityWritable" @click.prevent="openPublishModal">
+                Publish Grades & Feedback
+            </button>
         </li>
     </template>
 

@@ -373,6 +373,10 @@ class Controller extends WebController\Base
                                             'learningAssessment.getStatus',
                                             ['assessmentId' => $aImpl->getId()]
                                         ),
+                                        'learningDueWorkFeedback.postParticipantFeedbacks' => $this->getRouteIfAuthorized(
+                                            'learningDueWorkFeedback.postParticipantFeedbacks',
+                                            ['assessment' => $aImpl, 'assessmentId' => $aImpl->getId()]
+                                        ),
                                         'student' => $courseMarkbook->getCourseImportStudents()[$courseImpl->getId()]->map(fn(User $student) => [
                                             'learningAssessmentTimeline.getFullTimeline' => $this->getRouteIfAuthorized(
                                                 'learningAssessmentTimeline.getFullTimeline',
