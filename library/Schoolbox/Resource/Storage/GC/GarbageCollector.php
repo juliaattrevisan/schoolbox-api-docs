@@ -1,59 +1,63 @@
 <?php
 
 /**
- *
- * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * @copyright Copyright 2025, Schoolbox Pty Ltd
+ * @link      https://schoolbox.education/
  */
 
 namespace Schoolbox\Resource\Storage\GC;
 
+use Alaress_Date_Format;
 use League\Flysystem\FilesystemException as FlysystemException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Storage\GC\Check\Check;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
+/**
+ * Garbage collector: uses a set of checks to determine if a storage record is
+ * still in use, and if it isn't will attempt to delete it.
+ */
 class GarbageCollector
 {
-    /** @var Check[] */
-    protected $checks = [];
-
-    /** @var StorageMapper */
-    protected $mapper;
-
-    /** @var LoggerInterface */
-    protected $log;
-
-    /** @var array */
-    protected $list;
-
-    /** @var int */
-    protected $limit;
-
-    /** @var bool */
-    protected $perform;
-
+    /**
+     * The list of garbage collection checks to perform.
+     *
+     * @var array<Check>
+     */
+    private array $checks = [];
 
     /**
-     * @param Check[]         $checks
-     * @param StorageMapper   $mapper
-     * @param LoggerInterface $log
-     * @param int             $limit
-     * @param bool            $perform
+     * The list of storage hashes to be checked by this garbage collector.
+     *
+     * @var array<string>
      */
-    public function __construct(array $checks, StorageMapper $mapper, LoggerInterface $log, int $limit = 200, $perform = false)
-    {
+    private array $list;
+
+    /**
+     * Constructor
+     *
+     * @param Check[]                  $checks        A list of checks to perform on storage records: the record must
+     *                                                fail all of these checks in order to be deleted.
+     * @param StorageMapper            $mapper        Storage mapper: used for fetching and deleting records.
+     * @param LoggerInterface          $log           Logger
+     * @param int                      $limit         Maximum number of storage records to process.
+     * @param Alaress_Date_Format|null $thresholdDate Do not process any storage records which were last processed more
+     *                                                recently than this date.
+     * @param bool                     $perform       If true, actually delete storage records and update the last
+     *                                                processed time: otherwise, only output what would've been deleted.
+     */
+    public function __construct(
+        array $checks,
+        private StorageMapper $mapper,
+        private LoggerInterface $log,
+        private int $limit = 200,
+        private ?Alaress_Date_Format $thresholdDate = null,
+        private bool $perform = false,
+    ) {
         foreach ($checks as $c) {
             $this->addCheck($c);
         }
-
-        $this->mapper  = $mapper;
-        $this->log     = $log;
-        $this->limit   = $limit;
-        $this->perform = $perform;
-
         $this->log->debug("Starting GC");
     }
 

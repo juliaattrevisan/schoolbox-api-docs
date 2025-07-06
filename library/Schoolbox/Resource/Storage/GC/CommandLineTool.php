@@ -18,11 +18,32 @@ use Schoolbox\Resource\Storage\Mapper as StorageMapper;
  */
 class CommandLineTool extends CliTool\App
 {
-    // -h, --help: print help
+    /**
+     * Print help
+     */
     private const OPT_SHORT_HELP = 'h';
     private const OPT_LONG_HELP  = 'help';
 
+    /**
+     * -n={limit}: attempt to garbage collect this many storage records.
+     */
     private const OPT_SHORT_LIMIT = 'n:';
+
+    /**
+     * Default number of storage records to clean up.
+     */
+    private const DEFAULT_LIMIT = 1000;
+
+    /**
+     * -t={threshold}: do not attempt to garbage collect records last checked
+     * more recently than this time ago.
+     */
+    private const OPT_SHORT_THRESHOLD = 't:';
+
+    /**
+     * Default garbage collection threshold.
+     */
+    private const DEFAULT_THRESHOLD = '2 months ago';
 
     /**
      * @inheritdoc
@@ -47,33 +68,40 @@ class CommandLineTool extends CliTool\App
      */
     public function run(): void
     {
-        $limit = $this->getOptAsInt(self::OPT_SHORT_LIMIT, 1000);
-
         if ($this->getOpt(self::OPT_LONG_HELP) || $this->getOpt(self::OPT_SHORT_HELP)) {
             echo <<<HELP
 Usage: gc-storage.php [-p] [-vvv] [-n{limit}]
 
-    -h, --help  Print this help text and exit
-    -p          perform: *without* this flag, GC will only do a dry run
-    -v[v[v]]    verbosity: how much activity will be logged
-    -n{limit}   the number of storage records to check, in ascending order of `last_accessed` defaults to 1000
+    -h, --help:     Print this help text and exit
+    -p:             perform: *without* this flag, GC will only do a dry run
+    -v[v[v]]:       verbosity: how much activity will be logged
+    -n={limit}:     the number of storage records to check, in ascending order of `last_accessed` defaults to 1000
+    -t={threshold}: threshold: do not attempt to garbage collect storage records last checked more recently than this
+                    date threshold, defaults to 2 months ago.
+                    If provided, must be supplied as one of:
+                    * a "YYYY-MM-DD HH:MM:SS" date
+                    * a timestamp
+                    * a relative date value understandable by `strtotime`
 
 HELP;
             exit;
         }
 
-        $pdo = $this->getDatabaseInternal();
-        $sm  = StorageMapper::getInstance();
-        $gc  = new GarbageCollector(
+        $limit         = $this->getOptAsInt(self::OPT_SHORT_LIMIT, self::DEFAULT_LIMIT);
+        $threshold     = $this->getOpt(self::OPT_SHORT_THRESHOLD);
+        $thresholdDate = $this->buildDate($threshold ?? self::DEFAULT_THRESHOLD);
+        $db            = $this->getDatabaseInternal();
+        $gc = new GarbageCollector(
             [
-                new Check\ExpiryDate($pdo, 2),
-                new Check\HardLinks($pdo),
-                new Check\SoftLinks($pdo, SQL_db, $this->getLogger()),
+                new Check\ExpiryDate($db, 2),
+                new Check\HardLinks($db),
+                new Check\SoftLinks($db, SQL_db, $this->getLogger()),
             ],
-            $sm,
+            StorageMapper::getInstance(),
             $this->getLogger(),
             $limit,
-            $this->perform()
+            $thresholdDate,
+            $this->perform(),
         );
 
         $deleted = $gc->purge();
