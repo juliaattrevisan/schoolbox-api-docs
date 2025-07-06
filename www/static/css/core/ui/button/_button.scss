@@ -337,6 +337,9 @@ button.submit {
     &:hover {
         background: var(--content-ui-hover);
     }
+    &:focus {
+        background: none;
+    }
 }
 
 // a button that displays similar to a link
