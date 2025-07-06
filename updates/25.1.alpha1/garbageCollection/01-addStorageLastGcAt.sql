@@ -1,0 +1,1 @@
+ALTER TABLE storage ADD COLUMN last_gc_at DATETIME NULL DEFAULT NULL AFTER last_accessed;
