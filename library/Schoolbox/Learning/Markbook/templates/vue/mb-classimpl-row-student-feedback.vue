@@ -270,15 +270,15 @@ async function onFeedbackPublish(): Promise<void> {
 
 <template>
     <tr v-if="mbStore.data !== null" ref="placeholderRef">
-        <th :ref="leftEls.set" class="fixed-left is-selected"></th>
-        <th :ref="leftEls.set" class="fixed-left is-selected"></th>
-        <th v-if="mbStore.data.rank !== null" :ref="leftEls.set" class="fixed-left is-selected"></th>
-        <td :colspan="mbStore.orderedActivities.length" class="fixed-left is-selected"></td>
+        <th class="fixed-left is-selected"></th>
+        <th class="fixed-left is-selected"></th>
+        <th v-if="mbStore.data.rank !== null" class="is-selected"></th>
+        <td :colspan="mbStore.orderedActivities.length" class="is-selected"></td>
     </tr>
     <tr v-if="mbStore.data !== null && cellInfo !== null" ref="tableRowRef">
         <th :ref="leftEls.set" class="fixed-left white"></th>
         <th :ref="leftEls.set" class="fixed-left white"></th>
-        <th v-if="mbStore.data.rank !== null" :ref="leftEls.set" class="fixed-left white"></th>
+        <th v-if="mbStore.data.rank !== null" class="white"></th>
 
         <td :colspan="mbStore.orderedActivities.length">
             <form
