@@ -228,12 +228,14 @@ class External_Tass_Timetable implements External_TimetableInterface
         // Build the timetable
         if (is_array($timetabledef['desc'])) {
             foreach ($timetabledef['desc'] as $x => $name) {
-                $timetable[$x]['periodName'] = $timetabledef['desc'][$x];
-                $timetable[$x]['periodStart'] = $timetabledef['start'][$x];
-                $timetable[$x]['periodEnd'] = $timetabledef['end'][$x];
-                $timetable[$x]['periodNumber'] = $timetabledef['number'][$x];
-                $timetable[$x]['periodSequence'] = 1;
-                $timetable[$x]['class'] = array();
+                $timetable[$x] = [
+                    'periodName' => $timetabledef['desc'][$x],
+                    'periodStart' => $timetabledef['start'][$x],
+                    'periodEnd' => $timetabledef['end'][$x],
+                    'periodNumber' => $timetabledef['number'][$x],
+                    'periodSequence' => 1,
+                    'class' => array()
+                ];
             }
 
             // Add classes into it
