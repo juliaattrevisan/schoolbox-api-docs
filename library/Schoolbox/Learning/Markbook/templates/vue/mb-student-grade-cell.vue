@@ -83,13 +83,13 @@ const decorator = window.Vue.computed(() => {
     if (
         !participant.value.hasSubmittedResponse &&
         !participant.value.marks.published.resubmissionRequired &&
-        !participant.value.hasPublishedFeedback &&
-        !mbStore.hasMeaningfulMarks(participant.value.marks.draft)
+        participant.value.marks.published.responseId === null &&
+        participant.value.marks.draft.responseId === null
     ) {
         return null;
     }
 
-    if (mbStore.showDrafts && mbStore.hasMeaningfulMarks(participant.value.marks.draft)) {
+    if (mbStore.showDrafts && participant.value.marks.draft.responseId !== null) {
         return {
             indicator: "pending",
             notchTitle: "Unpublished Draft",
@@ -206,7 +206,7 @@ const plaintextPublishedComment = window.Vue.computed(() => {
         </div>
         <template v-else>
             <span
-                v-if="mbStore.showDrafts && mbStore.hasMeaningfulMarks(participant.marks.draft)"
+                v-if="mbStore.showDrafts && participant.marks.draft.responseId !== null"
                 data-tooltip="right"
                 class="has-tip tip-right meta"
                 :class="getGradient(participant.marks.draft.norm, 100, false)"
@@ -222,7 +222,7 @@ const plaintextPublishedComment = window.Vue.computed(() => {
                 Pending
             </span>
             <span
-                v-else-if="mbStore.hasMeaningfulMarks(participant.marks.published)"
+                v-else-if="participant.marks.published.responseId !== null"
                 :title="plaintextPublishedComment"
                 :class="getGradient(participant.marks.published.norm, 100, false)"
             >

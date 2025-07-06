@@ -7,7 +7,6 @@ import type {
     MarkbookClassImplActivity,
     MarkbookPopoutSelectedCellInfo,
     MarkbookFeedbackSelectedCellInfo,
-    MarkbookClassImplActivityParticipant,
 } from "../types/payload";
 
 export const useMarkbookStore = defineStore("markbookStore", () => {
@@ -135,15 +134,6 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
     }
 
     /**
-     * Does a given mark-set have meaningful values?
-     * @param marks - The marks to check
-     * @returns bool
-     */
-    function hasMeaningfulMarks(marks: MarkbookClassImplActivityParticipant["marks"]["published" | "draft"]): boolean {
-        return Object.values(marks).some((mark) => mark !== null);
-    }
-
-    /**
      * All activity IDs that have draft marks for any participant
      */
     const activityDraftMarks = window.Vue.computed(() => {
@@ -154,12 +144,10 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
         return data.value.classImpls.flatMap((classImpl) => {
             return Object.values(classImpl.assessments)
                 .filter((aImpl) => aImpl.stats.draftMean !== null)
+                .filter((aImpl) =>
+                    Object.values(aImpl.participants).some((p) => p && p.marks.draft.responseId !== null),
+                )
                 .map((aImpl) => aImpl.id);
-            // .filter((aImpl) => {
-            //     return Object.values(aImpl.participants).some(
-            //         (participant) => participant && hasMeaningfulMarks(participant.marks.draft),
-            //     );
-            // })
         });
     });
 
@@ -177,6 +165,5 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
         popoutSelectedCell,
         feedbackSelectedCell,
         activityDraftMarks,
-        hasMeaningfulMarks,
     };
 });

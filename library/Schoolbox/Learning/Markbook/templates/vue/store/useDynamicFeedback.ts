@@ -58,27 +58,13 @@ export function useDynamicFeedback(
     isQuiz: boolean,
 ) {
     /**
-     * Is a given mark-set meaningful?
-     * @param marks - The marks to check
-     * @returns bool
-     */
-    function hasMeaningfulMarks(marks: DynamicFeedbackData): boolean {
-        return (
-            marks.hrMarkInstructor.value !== null || (marks.comment.value !== null && marks.comment.value.length > 0)
-        );
-    }
-
-    const hasDraftMark = window.Vue.computed(() => hasMeaningfulMarks(dataDraft));
-    const hasPublishedMark = window.Vue.computed(() => hasMeaningfulMarks(dataPublished));
-
-    /**
      * Figure out if there's any initial data to use, and if so - populate the data with it
      * Draft takes precedence over published if both are available
      */
     let initialData: DynamicFeedbackData | null = null;
-    if (hasDraftMark.value) {
+    if (dataDraft.responseId.value !== null) {
         initialData = dataDraft;
-    } else if (hasPublishedMark.value) {
+    } else if (dataPublished.responseId.value !== null) {
         initialData = dataPublished;
     }
 
@@ -320,8 +306,6 @@ export function useDynamicFeedback(
         data,
         dataDraft,
         dataPublished,
-        hasDraftMark,
-        hasPublishedMark,
         isDraftDirty,
         isPublishedDirty,
         isAutoSaveInProgress,
