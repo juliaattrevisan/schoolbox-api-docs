@@ -196,8 +196,6 @@ class Controller extends Base
             }
         }
 
-
-
         $this->response = $this->responseFromTemplate('@commsNews/create.twig', [
             'action'                => 'Create',
             'article'               => $article,
@@ -320,7 +318,7 @@ class Controller extends Base
             'availableEntityTypes'  => $this->getAvailableAudienceTypeStrategies(),
             'entityTypesData'       => $this->getEntityTypesData(),
             'mayChangeStickyStatus' => $this->validChangeStickyStatus->isSatisfiedBy($this->getUser()),
-            'editorTemplates'       => $this->editorTemplateHelper->getTemplatesForCategory()
+            'editorTemplates'       => $this->editorTemplateHelper->getTemplatesForCategory(),
         ], "Update {$article->getTitle()}", 'news');
     }
 
