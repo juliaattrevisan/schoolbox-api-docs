@@ -1319,9 +1319,10 @@ class ListController extends Web\Controller\Base
         $assessments = $this->getAssessmentMapper()->createCollection([$assessment]);
         $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection($assessments, $student, true);
 
-        $helper = null;
+        $maxMarks = null;
+        // If this is a quiz, we need to use the learnosity API to get the max marks
         if (
-            $assessment instanceof \Schoolbox\Learning\Assessment\Quiz\Model &&
+            $assessment instanceof Quiz &&
             $this->learnosityConsumerKey &&
             $this->learnosityConsumerSecret &&
             $this->learnosityVersion &&
@@ -1344,15 +1345,8 @@ class ListController extends Web\Controller\Base
                 $this->learnosityConsumerSecret,
                 $logger
             );
-            $helper = new Helper($api, $logger);
-        }
 
-
-        $maxMarks = null;
-        if ($assessment instanceof \Schoolbox\Learning\Assessment\Quiz\Model && $helper) {
-            /** @var \Schoolbox\Learning\Assessment\Quiz\Model $assessment */
-            // this exists due to the above, and we are in a loop, so i don't want to new each time...
-            $maxMarks = $helper->findAvailableMarks($assessment->getLearnosityReference());
+            $maxMarks = (new Helper($api, $logger))->findAvailableMarks($assessment->getLearnosityReference());
         }
 
         $participant = $assessment->getParticipantIfExtant($student);
