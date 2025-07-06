@@ -23,13 +23,16 @@ require_once __DIR__ . '/../conf/core/require.php';
 
 $app = new class extends CliTool\App
 {
-    // --help: print help
+    // -h, --help: print help
+    private const OPT_SHORT_HELP = 'h';
     private const OPT_LONG_HELP = 'help';
+
+    private const OPT_SHORT_LIMIT = 'n:';
 
     /** @inheritDoc */
     public function getShortOpts(): array
     {
-        return ['n:'];
+        return [self::OPT_SHORT_HELP, self::OPT_SHORT_LIMIT];
     }
 
     /** @inheritdoc */
@@ -45,9 +48,9 @@ $app = new class extends CliTool\App
      */
     public function run(): void
     {
-        $limit   = $this->getOptAsInt('n:', 1000);
+        $limit = $this->getOptAsInt(self::OPT_SHORT_LIMIT, 1000);
 
-        if ($this->getOpt(self::OPT_LONG_HELP)) {
+        if ($this->getOpt(self::OPT_LONG_HELP) || $this->getOpt(self::OPT_SHORT_HELP)) {
             echo <<<HELP
 Usage: gc-storage.php [-p] [-vvv] [-n{limit}]
 
