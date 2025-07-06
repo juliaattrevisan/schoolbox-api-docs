@@ -242,6 +242,12 @@ class External_Tass_Timetable implements External_TimetableInterface
                     $desc['year_grp'] = '';
                 }
                 $code = trim((string)$desc['year_grp']) . '-' . trim((string)$desc['sub_code']) . '-' . trim((string)$desc['class']);
+
+                if ($code === '--') {
+                    // PHPStan complains about the possibility of this being used as an array key if we don't exclude it.
+                    continue;
+                }
+
                 foreach ($timetable as $x => $timetablePeriod) {
                     $class = $timetablePeriod['class'];
                     if (
