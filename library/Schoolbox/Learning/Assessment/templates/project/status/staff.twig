@@ -179,6 +179,13 @@ Data:
                                                 <li><a class="icon-task" href="{{ viewGradeRoute }}" >View and {{ locale.grades }} submissions</a></li>
                                             {% endif %}
                                         {% endif %}
+                                        {% set viewCustomParticipationRoute = routeLookupIfAuthorized('learningAssessment.getAssessmentParticipationForm', {
+                                            assessmentId: assessable.id,
+                                            assessment: assessable
+                                        }) %}
+                                         {% if viewCustomParticipationRoute and assessable.isImplementation and (assessable is dueWork or assessable is quiz or assessable is task) %}
+                                            <li><a class="icon-group" href="{{ viewCustomParticipationRoute }}">Student Participation</a></li>
+                                        {% endif %}
                                         {% if assessable is dueWork and assessable.enableWorksheet and assessable.kamiWorksheetTemplate and worksheetClassView %}
                                             <li>
                                                 <a id="kamiWorksheet" class="icon-surveys" href="{{ worksheetClassView }}">Class View</a>
