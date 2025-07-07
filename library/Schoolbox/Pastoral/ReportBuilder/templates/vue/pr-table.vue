@@ -2,6 +2,8 @@
 /**
  * Displays a pastoral report in a table format.
  */
+
+import { payload } from "./tempData";
 </script>
 
 <template>

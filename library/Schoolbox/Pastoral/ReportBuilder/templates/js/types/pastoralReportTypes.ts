@@ -1,4 +1,22 @@
 /**
+ * The expected payload for a Pastoral Report Table.
+ */
+export type PastoralReportTablePayload = {
+    data: {
+        tableHeaders: PastoralReportTableHeader[];
+        totalRows: (ColumnTotalRecordsAndPoints | null)[];
+        rows: (ColumnUser | ColumnRecordsAndPoints)[][];
+    };
+    metadata: {
+        count: number;
+        cursor: {
+            current: string | null;
+            next: string | null;
+        };
+    };
+};
+
+/**
  * Base user type for students and owners
  */
 export type User = {
