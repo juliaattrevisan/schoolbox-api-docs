@@ -39,7 +39,7 @@ VALUES (
 
 INSERT INTO config (`name`, `title`, `description`, `field_id`,  `type_id`, `editable`, `hidden`, `required`, `module`, sequence)
 VALUES (
-           'openai_text_azure_deployment_id',
+           'openai_azure_deployment_id',
            'Azure OpenAI Deployment ID',
            'The deployment name you chose when you deployed the model in Azure.  Only required if using the Azure endpoint',
            (SELECT id FROM lu_config_field WHERE field = 'input'),
