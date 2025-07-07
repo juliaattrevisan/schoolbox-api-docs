@@ -27,7 +27,7 @@ const routeLookup = (route: string, params?: Record<string, any>) => {
 
     if (params) {
         Object.keys(params).forEach((key) => {
-            url = url.replace(`{${key}}`, params[key]);
+            url = url.replace(`{${key}}`, String(params[key]));
         });
     }
 
@@ -35,9 +35,11 @@ const routeLookup = (route: string, params?: Record<string, any>) => {
 };
 
 const profile = {
-    link: (user: any) => `/search/user/${user.id}`,
-    imageSquare64: (user: any) => `<img src="/portrait.php?id=${user.id}&size=square64" alt="${user.fullName}" />`,
-    imageSquare32: (user: any) => `<img src="/portrait.php?id=${user.id}&size=square32" alt="${user.fullName}" />`,
+    link: (user: { id: number }): string => `/search/user/${user.id}`,
+    imageSquare64: (user: { id: number; fullName: string }): string =>
+        `<img src="/portrait.php?id=${user.id}&size=square64" alt="${user.fullName}" />`,
+    imageSquare32: (user: { id: number; fullName: string }): string =>
+        `<img src="/portrait.php?id=${user.id}&size=square32" alt="${user.fullName}" />`,
 };
 </script>
 
@@ -110,23 +112,7 @@ const profile = {
                                     remaining
                                 </span>
                             </p>
-                            <article>
-                                <div v-if="record.bodyPublic" v-html="record.bodyPublic"></div>
 
-                                <p v-if="record.tags.length > 0" class="spaced">
-                                    <template v-for="tag in record.tags" :key="tag.id">
-                                        <a
-                                            class="neutral label hide-on-print"
-                                            :href="
-                                                routeLookup('pastoralReportBuilder.getReportTags', { tagId: tag.id })
-                                            "
-                                        >
-                                            {{ tag.name }}
-                                        </a>
-                                        <b class="show-for-print"> {{ tag.name }}</b>
-                                    </template>
-                                </p>
-                            </article>
                             <ul v-if="record.comments.length" class="information-list reply">
                                 <li
                                     v-for="comment in record.comments.filter((c) => !c.private)"
@@ -136,7 +122,7 @@ const profile = {
                                         <a
                                             :href="profile.link(comment.owner)"
                                             title="View Profile"
-                                            v-html="profile.imageSquare32(comment.owner)"
+                                            :innerHTML="profile.imageSquare32(comment.owner)"
                                         ></a>
                                         <p>
                                             {{ comment.owner.fullName }}
@@ -148,6 +134,21 @@ const profile = {
                                 </li>
                             </ul>
                         </div>
+                        <article>
+                            <p v-if="record.bodyPublic" v-html="record.bodyPublic"></p>
+
+                            <p v-if="record.tags.length > 0" class="spaced">
+                                <template v-for="tag in record.tags" :key="tag.id">
+                                    <a
+                                        class="neutral label hide-on-print"
+                                        :href="routeLookup('pastoralReportBuilder.getReportTags', { tagId: tag.id })"
+                                    >
+                                        {{ tag.name }}
+                                    </a>
+                                    <b class="show-for-print"> {{ tag.name }}</b>
+                                </template>
+                            </p>
+                        </article>
                     </li>
                 </ul>
             </section>
