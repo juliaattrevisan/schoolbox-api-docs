@@ -156,6 +156,14 @@ class Module extends RestfulModule
      */
     public function buildController(): Base
     {
+        /* Breadcrumb generator
+         */
+        $bakery = new \Schoolbox\Learning\Assessment\Breadcrumb\Factory(
+            $this->getRouter()->getGenerator(),
+            $this->getAuthorizer(),
+            $this->getMapperFactory()->get(Access::class),
+        );
+
         return new Controller(
             $this->getMapperFactory()->get(Mapper::class),
             $this->getMapperFactory()->get(ErrorMapper::class),
@@ -171,6 +179,7 @@ class Module extends RestfulModule
             $this->getMapperFactory()->get(\Schoolbox\Resource\Storage\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Curriculum\Node\Mapper::class),
+            $bakery,
             (string)$this->getConfig()->get('learnosity_version'),
             (string)$this->getConfig()->get('learnosity_consumer_key'),
             (string)$this->getConfig()->get('learnosity_consumer_secret'),

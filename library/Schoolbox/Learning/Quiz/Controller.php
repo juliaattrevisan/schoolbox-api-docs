@@ -8,7 +8,6 @@
 
 namespace Schoolbox\Learning\Quiz;
 
-use Alaress\Lumberjack\Logger;
 use Aura\Router\Exception\RouteNotFound;
 use League\Flysystem\FilesystemException;
 use LearnositySdk\Exceptions\ValidationException;
@@ -20,11 +19,13 @@ use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Alaress\Web\Controller\Exception as ControllerException;
 use Schoolbox\Learning\Assessment\AssessmentType;
+use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Learnosity\Api;
+use Schoolbox\Learning\Learnosity\Importer\Json\Importer;
 use Schoolbox\Learning\Learnosity\Importer\Legacy;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
 use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
@@ -58,6 +59,7 @@ class Controller extends AbstractController
      * @param \Schoolbox\Resource\Storage\Mapper                        $storageMapper
      * @param \Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper $gradeGroupMapper
      * @param \Schoolbox\Curriculum\Node\Mapper                         $curriculumNodeMapper
+     * @param BreadcrumbFactory                                         $bakery
      * @param string                                                    $learnosityVersion
      * @param string                                                    $learnosityConsumerKey
      * @param string                                                    $learnosityConsumerSecret
@@ -77,6 +79,7 @@ class Controller extends AbstractController
         private \Schoolbox\Resource\Storage\Mapper $storageMapper,
         private \Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper $gradeGroupMapper,
         private \Schoolbox\Curriculum\Node\Mapper $curriculumNodeMapper,
+        private BreadcrumbFactory $bakery,
         private string $learnosityVersion,
         #[\SensitiveParameter] private string $learnosityConsumerKey,
         #[\SensitiveParameter] private string $learnosityConsumerSecret,
@@ -371,7 +374,7 @@ class Controller extends AbstractController
             /* There used to be stuff here that was used to convert url domains but I'm not sure we even
              * needed them. We needed them in the xml days, but I don't think we needed them here.
              */
-            $newInstances = (new Importer\Json\Importer(
+            $newInstances = (new Importer(
                 $api,
                 $schoolCode,
                 $this->getDi()->get('databaseInternal'),
