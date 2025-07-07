@@ -31,7 +31,31 @@ function handleSort(header: PastoralReportTableHeader): void {
  */
 const hasSubTitles = props.headers.some((header) => header.subTitle && header.subTitle.length > 0);
 
-const onlyHeadersWithSubTitles = props.headers.filter((header) => header.subTitle && header.subTitle.length > 0);
+/**
+ * Groups headers by title to calculate colspan for duplicate titles
+ * @returns an array of grouped header objects with title, colspan, and original headers
+ */
+function getGroupedHeaders(): Array<{ title: string; colspan: number; headers: PastoralReportTableHeader[] }> {
+    const groups: { [key: string]: PastoralReportTableHeader[] } = {};
+    // Group headers by title
+    props.headers.forEach((header) => {
+        // if the header has a subTitle, it should be grouped
+        if (header.subTitle && header.subTitle.length > 0) {
+            // Initialize group if it doesn't exist
+            if (!groups[header.title]) {
+                groups[header.title] = [];
+            }
+            // Add header to the group
+            groups[header.title].push(header);
+        }
+    });
+    // Convert to array format with colspan
+    return Object.entries(groups).map(([title, headers]) => ({
+        title,
+        colspan: headers.length,
+        headers,
+    }));
+}
 </script>
 
 <template>
@@ -52,8 +76,8 @@ const onlyHeadersWithSubTitles = props.headers.filter((header) => header.subTitl
                 </div>
             </th>
             <template v-if="hasSubTitles">
-                <th v-for="header in onlyHeadersWithSubTitles" :key="`${header.key}-title`">
-                    {{ header.title }}
+                <th v-for="group in getGroupedHeaders()" :key="`${group.title}-title`" :colspan="group.colspan">
+                    {{ group.title }}
                 </th>
             </template>
         </tr>
