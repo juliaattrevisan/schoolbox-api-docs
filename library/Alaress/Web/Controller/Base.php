@@ -537,11 +537,12 @@ abstract class Base
      *                      `json_encode`, for memory efficiency and
      *                      compatibility with generators (`yield` statements
      *                      and callables) in `$data`.
+     * @param string|null $filename  If specified, downloads the json content as a file
      * @return ResponseInterface
      */
-    protected function responseAsJson(mixed $data, bool $buffer = false): ResponseInterface
+    protected function responseAsJson(mixed $data, bool $buffer = false, ?string $filename = null): ResponseInterface
     {
-        return $this->responseFactory->buildJson($data, $buffer);
+        return $this->responseFactory->buildJson($data, $buffer, $filename);
     }
 
     /**

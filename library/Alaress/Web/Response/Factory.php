@@ -100,18 +100,30 @@ class Factory implements ResponseFactoryInterface
      *                      `json_encode`, for memory efficiency and
      *                      compatibility with generators (`yield` statements
      *                      and callables) in `$data`.
+     * @param string|null $filename If specified, downloads the json content as a file
      * @return ResponseInterface
      */
-    public function buildJson(mixed $data, bool $buffer = false): ResponseInterface
+    public function buildJson(mixed $data, bool $buffer = false, ?string $filename = null): ResponseInterface
     {
         $body = $buffer
             ? new JsonStream(new BufferJsonEncoder($data))
             : $this->streamFactory->createStream(json_encode($data));
 
-        return $this
+        $response = $this
             ->createResponse()
             ->withHeader('content-type', 'application/json')
             ->withBody($body);
+
+        /* If a meaningful filename existed, download it as an attachment
+         * Reset whatever was here previously for content-disposition, I think:
+         * this pattern existed before I added it here
+         */
+        if ('' !== trim((string)$filename)) {
+            $response = $response->withoutHeader('Content-disposition')
+                ->withHeader('Content-disposition', "attachment; filename=\"{$filename}\"");
+        }
+
+        return $response;
     }
 
     /**
