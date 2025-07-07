@@ -764,7 +764,8 @@ class Controller extends BaseController
                     'title' => 'Create ' . $this->rosettaStone->translate('pastoral', false, true) . ' Record',
                     'url' => (
                         // Only show the 'Create pastoral record' link if the viewee is a student.
-                        // Permission rules allow creation of pastoral records on non-student users as of 25.0.5.
+                        // Note cannot use permission check to decide whether to show the link, because route
+                        // permissions allow creation of pastoral records on non-student users.
                         $viewee->getRole()->isStudent()
                         ? $urlByRouteName['pastoral.getStudentRecordInsertForm']
                         : false
