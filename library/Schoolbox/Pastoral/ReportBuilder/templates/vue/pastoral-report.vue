@@ -10,8 +10,8 @@ const props = defineProps<{
     results: PastoralRecord[];
     showSeverity?: boolean;
     severityColors: SeverityColors;
-    pastoralPointEnabled: boolean;
-    pastoralAactionEnable: boolean;
+    pastoralPointEnabled: boolean | number;
+    pastoralActionEnable: boolean | number;
     locale: LocaleConfig;
 }>();
 
@@ -96,6 +96,7 @@ const profile = {
                                     <sbx-label-pastoral-points
                                         v-if="props.pastoralPointEnabled && record.points"
                                         :points="record.points"
+                                        :title="`${record.points} Points`"
                                     ></sbx-label-pastoral-points>
                                 </h4>
                             </a>
@@ -106,7 +107,7 @@ const profile = {
                                 <a :href="`/search/user/${record.owner.id}`">{{ record.owner.fullName }}</a>
                                 {{ record.createdAt.local }}
 
-                                <span v-if="props.pastoralAactionEnable && record.uncompletedActionCount > 0">
+                                <span v-if="props.pastoralActionEnable && record.uncompletedActionCount > 0">
                                     | {{ record.uncompletedActionCount }} follow up action{{
                                         record.uncompletedActionCount === 1 ? "" : "s"
                                     }}
