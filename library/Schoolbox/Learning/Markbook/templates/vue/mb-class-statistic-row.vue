@@ -17,10 +17,7 @@ export interface Props {
         /**
          * Parameters for the fetch request to persist the change
          */
-        fetch: (
-            assessmentId: number,
-            aImpl: MarkbookClassImplActivity,
-        ) => {
+        fetch: (aImpl: MarkbookClassImplActivity) => {
             url: string;
             data: Record<string, unknown>;
         };
@@ -56,7 +53,7 @@ async function onValueChange(activityId: number, aImpl: MarkbookClassImplActivit
 
     const toast = window.sbProps.toastActivate("Updating assessment...");
 
-    const fetchInfo = props.input.fetch(activityId, aImpl);
+    const fetchInfo = props.input.fetch(aImpl);
     try {
         const response = await fetch(fetchInfo.url, {
             method: "POST",

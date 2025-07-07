@@ -28,9 +28,9 @@ const classStatisticRows: Omit<MbClassStatisticRowProps, "classImpl">[] = [
         input: {
             key: "weight",
             allowCourseManaged: false,
-            fetch: (assessmentId: number, aImpl: MarkbookClassImplActivity) => ({
-                url: `/learning/assessments/weight/${assessmentId}`,
-                data: { assessmentId, weight: aImpl.weight },
+            fetch: (aImpl: MarkbookClassImplActivity) => ({
+                url: `/learning/assessments/weight/${aImpl.id}`,
+                data: { assessmentId: aImpl.id, weight: aImpl.weight },
             }),
         },
     },
@@ -40,9 +40,9 @@ const classStatisticRows: Omit<MbClassStatisticRowProps, "classImpl">[] = [
         input: {
             key: "weight",
             allowCourseManaged: false,
-            fetch: (assessmentId: number, aImpl: MarkbookClassImplActivity) => ({
-                url: `/learning/assessments/weight/${assessmentId}`,
-                data: { assessmentId, weight: aImpl.weight },
+            fetch: (aImpl: MarkbookClassImplActivity) => ({
+                url: `/learning/assessments/weight/${aImpl.id}`,
+                data: { assessmentId: aImpl.id, weight: aImpl.weight },
             }),
         },
     },
@@ -95,9 +95,9 @@ const orderedClassImplStudents = window.Vue.computed(() => {
                 key: 'markVisibility',
                 selectOptions: markVisibilityOptions,
                 allowCourseManaged: true,
-                fetch: (assessmentId, aImpl) => ({
-                    url: `/learning/assessments/visibility/${assessmentId}`,
-                    data: { assessmentId, visibility: aImpl.markVisibility },
+                fetch: (aImpl) => ({
+                    url: `/learning/assessments/visibility/${aImpl.id}`,
+                    data: { assessmentId: aImpl.id, visibility: aImpl.markVisibility },
                 }),
             }"
         />
