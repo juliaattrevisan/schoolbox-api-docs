@@ -14,51 +14,59 @@
     {% endblock %}
 {% endmacro %}
 
-{% if isSuperuser %}
-<div class="actions-small-1 row">
-    <div class="list-item">
-        <div class="small-12 column">
+{% if linksInfo|length > 1 %}
+    <div class="actions-small-1 row">
+        <div class="list-item">
+            <div class="small-12 column">
+                {{ _self.myProfileHeading(user, nameFormat) }}
+            </div>
+        </div>
+        <nav>
+            <sbx-pop-out content-id="header-options"></sbx-pop-out>
+        </nav>
+        <ul class="f-dropdown" id="header-options" data-dropdown-content>
+            {% for linkInfo in linksInfo %}
+                <li>
+                    {% if linkInfo.disabled %}
+                        <a
+                            class="{{ linkInfo.iconClass }} menu_disabled"
+                            title="{{ linkInfo.mouseoverText }}"
+                        >{{ linkInfo.title }}</a>
+                    {% else %}
+                        <a
+                            href="{{ linkInfo.url }}"
+                            class="{{ linkInfo.iconClass }}"
+                            title="{{ linkInfo.mouseoverText }}"
+                            data-test="{{ linkInfo.dataTest }}"
+                        >{{ linkInfo.title }}</a>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% elseif linksInfo|length == 1 %}
+    <div class="row">
+        <div class="button-action small-12 columns">
+            {{ _self.myProfileHeading(user, nameFormat) }}
+            {% set linkInfo = linksInfo|first %}
+            {% if linkInfo.disabled %}
+                <a
+                    class="{{ linkInfo.iconClass }} button menu_disabled"
+                    title="Account disabled"
+                >{{ linkInfo.title }}</a>
+            {% else %}
+                <a
+                    href="{{ linkInfo.url }}"
+                    class="{{ linkInfo.iconClass }} button"
+                    title="{{ linkInfo.mouseoverText }}"
+                >{{ linkInfo.title }}</a>
+            {% endif %}
+        </div>
+    </div>
+{% else %}
+    <div class="row">
+        <div class="column small-12">
             {{ _self.myProfileHeading(user, nameFormat) }}
         </div>
     </div>
-    <nav>
-        <sbx-pop-out content-id="header-options"></sbx-pop-out>
-    </nav>
-    <ul class="f-dropdown" id="header-options" data-dropdown-content>
-        <li><a href="{{ routeLookup('adminUser.getModify', {'userId': user.id}) }}" class="icon-modify" title="Modify User" data-test="user-profile-modify">Modify User</a></li>
-        <li>
-            {% if user.enabled %}
-                <a
-                    href="{{ routeLookup('user.impersonate', {userId: user.id}) }}"
-                    class="icon-staff-students"
-                    title="Login as user"
-                    data-test="admin-user-modify-impersonate"
-                >Impersonate</a>
-            {% else %}
-                <a class="icon-staff-students menu_disabled" title="Account disabled">Impersonate</a>
-            {% endif %}
-        </li>
-    </ul>
-</div>
-{% elseif canImpersonate %}
-<div class="row">
-    <div class="button-action small-12 columns">
-        {{ _self.myProfileHeading(user, nameFormat) }}
-        {% if user.enabled %}
-            <a
-                href="{{ routeLookup('user.impersonate', {userId: user.id}) }}"
-                class="button icon-staff-students"
-                title="Login as user"
-            >Impersonate</a>
-        {% else %}
-            <a class="button icon-staff-students menu_disabled" title="Account disabled">Impersonate</a>
-        {% endif %}
-    </div>
-</div>
-{% else %}
-<div class="row">
-    <div class="column small-12">
-        {{ _self.myProfileHeading(user, nameFormat) }}
-    </div>
-</div>
 {% endif %}

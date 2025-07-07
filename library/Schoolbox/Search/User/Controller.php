@@ -22,6 +22,7 @@ use Schoolbox\Admin\Profile\Editor\Field\Mapper;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Geosnapshot\ValidPhotosAvailable;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Count\Helper as PastoralCountHelper;
 use Schoolbox\Pastoral\DataSource as PastoralDataSource;
@@ -90,7 +91,8 @@ class Controller extends BaseController
         private \Schoolbox\External\User $userRelationHydrator,
         private \Schoolbox\Admin\Profile\Editor\Field\Mapper $fieldMapper,
         private \Schoolbox\Admin\Profile\Editor\Tab\Mapper $tabMapper,
-        private Calendar_Api_Factory $calendarApiFactory
+        private Calendar_Api_Factory $calendarApiFactory,
+        private RosettaStone $rosettaStone,
     ) {
     }
 
@@ -559,8 +561,9 @@ class Controller extends BaseController
                 /* The current user session - sadly a superglobal for portability reasons
                  */
                 'session' => $_SESSION,
-
-
+                /* Links to be displayed in the 3-dot menu.
+                 */
+                'linksInfo' => $this->getProfileThreeDotMenuLinksInfo($viewer, $student),
                 /* Old implementation
                  */
                 'subjects'                 => $subjects,
@@ -634,6 +637,9 @@ class Controller extends BaseController
                 /* Decides if the Geosnapshot button could be accessed
                  */
                 'isGeosnapshotAvailable' => $isGeosnapshotAvailable,
+                /* Links to be displayed in the 3-dot menu.
+                 */
+                'linksInfo'      => $this->getProfileThreeDotMenuLinksInfo($this->getUser(), $staff),
 
                 /* Old implementation
                  */
@@ -697,6 +703,9 @@ class Controller extends BaseController
                  * custom buttons, as far as the end user is concerned
                  */
                 'buttons'  => $buttons,
+                /* Links to be displayed in the 3-dot menu.
+                 */
+                'linksInfo'      => $this->getProfileThreeDotMenuLinksInfo($this->getUser(), $parent),
 
                 /* Old implementation
                  */
@@ -708,6 +717,66 @@ class Controller extends BaseController
                 'showDetails'    => (new ValidDetailsVisible($this->externalUser, $this->getConfigLoader()))->isSatisfiedBy($parent, $this->getUser()),
                 'sharedCampuses' => $this->getUser()->getCampusCollection()->intersect($parent->getCampusCollection()),
             ]
+        );
+    }
+
+    /**
+     * Return an array containing information about the links to be displayed in the 3-dot menu at the top-right of the
+     * profile page.  Links not accessible by the user are filtered out in the returned array.
+     */
+    private function getProfileThreeDotMenuLinksInfo(User $viewer, User $viewee): array
+    {
+        // Get URLs for routes, while handling RouteNotFound exceptions.
+        $routeParamsByName = [
+            'adminUser.getModify' => ['userId' => $viewee->getId(), 'user' => $viewee],
+            'user.impersonate' => ['userId' => $viewee->getId(), 'user' => $viewee],
+            'pastoral.getStudentRecordInsertForm' => ['studentId' => $viewee->getId(), 'student' => $viewee],
+        ];
+        $urlByRouteName = [];
+        foreach ($routeParamsByName as $routeName => $routeParams) {
+            try {
+                $url = $this->getRouteIfAuthorized($routeName, $routeParams);
+            } catch (RouteNotFound) {
+                $url = false;
+            }
+            $urlByRouteName[$routeName] = $url;
+        }
+
+        return array_filter(
+            [
+                [
+                    'title' => 'Modify User',
+                    'url' => $urlByRouteName['adminUser.getModify'],
+                    'iconClass' => 'icon-modify',
+                    'disabled' => false,
+                    'mouseoverText' => 'Modify User',
+                    'dataTest' => 'user-profile-modify'
+                ],
+                [
+                    'title' => 'Impersonate',
+                    'url' => ($viewer->getId() === $viewee->getId()) ? false : $urlByRouteName['user.impersonate'],
+                    'iconClass' => 'icon-staff-students',
+                    'disabled' => $viewee->isDeleted(),
+                    'mouseoverText' => $viewee->isDeleted() ? 'Account Disabled' : 'Login as user',
+                    'dataTest' => $viewee->isDeleted() ? '' : 'admin-user-modify-impersonate'
+                ],
+                [
+                    'title' => 'Create ' . $this->rosettaStone->translate('pastoral', false, true) . ' Record',
+                    'url' => (
+                        // Only show the 'Create pastoral record' link if the viewee is a student.
+                        // Note cannot use permission check to decide whether to show the link, because route
+                        // permissions allow creation of pastoral records on non-student users.
+                        $viewee->getRole()->isStudent()
+                        ? $urlByRouteName['pastoral.getStudentRecordInsertForm']
+                        : false
+                    ),
+                    'iconClass' => 'icon-pastoral',
+                    'disabled' => false,
+                    'mouseoverText' => 'Create Pastoral Record',
+                    'dataTest' => ''
+                ]
+            ],
+            fn ($item) => $item['url'] !== false
         );
     }
 }
