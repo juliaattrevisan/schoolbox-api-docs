@@ -18,6 +18,9 @@ use Psr\Log\LoggerInterface;
  */
 class TextField implements Check
 {
+    /**
+     * Query for finding text fields to search through.
+     */
     private const SELECT_TEXT_FIELDS_QUERY = <<<SQL
         SELECT c.TABLE_NAME AS `table`,
                c.COLUMN_NAME AS `column`
@@ -28,6 +31,13 @@ class TextField implements Check
         AND   t.TABLE_TYPE = 'BASE TABLE'
         ORDER BY c.TABLE_NAME, c.COLUMN_NAME
         SQL;
+
+    /**
+     * List of text fields to never search through.
+     */
+    private const FIELD_BLACKLIST = [
+        'search_index' => ['fulltext_index'],
+    ];
 
     /**
      * Constructor
@@ -126,6 +136,13 @@ class TextField implements Check
         foreach ($query as $row) {
             $table  = $row['table'];
             $column = $row['column'];
+
+            // Exclude blacklisted fields
+            if (isset(self::FIELD_BLACKLIST[$table]) && in_array($column, self::FIELD_BLACKLIST[$table])) {
+                $this->logger->debug(sprintf('Excluding blacklisted column: %s.%s', $table, $column));
+                continue;
+            }
+
             $tableColumnList[$table] ??= [];
             $tableColumnList[$table][] = $column;
         }
