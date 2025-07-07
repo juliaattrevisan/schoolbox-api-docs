@@ -258,19 +258,20 @@ class Helper
             // continue with the little robot dude payload, and see what AI responds with...
         }
 
+        /* Log what the user tried to do if we made a vaguely-successful request
+             * and didn't somehow die long the way
+             */
+        $log = $this->logMapper->createModel()
+            ->setUser($user)
+            ->setPrompt($payload)
+            ->setModel($this->openAiModel);
+
         try {
             $openAiRequest = new Request('POST', $this->getEndpoint(self::CHAT), array_merge(
                 $this->getAuthorization(),
                 ['Content-Type' => 'application/json'],
             ), $payload);
 
-            /* Log what the user tried to do if we made a vaguely-successful request
-             * and didn't somehow die long the way
-             */
-            $log = $this->logMapper->createModel()
-                ->setUser($user)
-                ->setPrompt($payload)
-                ->setModel($this->openAiModel);
 
             $promise = $this->client->sendAsync($openAiRequest, ['stream' => true]);
 
@@ -344,6 +345,11 @@ class Helper
              */
             die();
         } catch (GuzzleException $e) {
+            $log->setReturnCode($e->getCode())
+                ->setErrorMessage($e->getMessage())
+                ->setResponse($e->getTraceAsString());
+            $this->logMapper->save($log);
+
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
         }
     }
