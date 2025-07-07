@@ -77,15 +77,18 @@ class GarbageCollector
     public function getStale(?string $hash = null): array
     {
         // Build the query
-        $pb = $this->mapper->getPredicateBuilder();
+        $this->log->info('Restricting garbage collection to:');
+        $this->log->info('  expired_at: null');
+        $pb = $this->mapper->getPredicateBuilder()
+            ->isNull('expired_at');
         if ($hash) {
-            $this->log->info(sprintf('Restricting garbage collection to hash: "%s"', $hash));
+            $this->log->info(sprintf('  hash: "%s"', $hash));
             $pb = $pb->equals('hash', $hash);
         }
         if ($this->thresholdDate) {
             $thresholdDate = $this->thresholdDate->getDatabase();
             $this->log->info(
-                sprintf('Restricting garbage collection to last_gc_at: null or before "%s"', $thresholdDate),
+                sprintf('  last_gc_at: null or before "%s"', $thresholdDate),
             );
             $pb = $pb->any(
                 $this->mapper->getPredicateBuilder()

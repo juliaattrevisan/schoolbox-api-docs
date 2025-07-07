@@ -59,10 +59,11 @@ abstract class Base implements Check
                 "SELECT COUNT(*) FROM {$this->db->getQuoter()->quoteIdentifier($table)}",
             );
             $count = (int)$countQuery->fetchColumn();
-            $this->logger->info(sprintf('Searching %d rows in table: %s', $count, $table));
             if ($count <= 0) {
+                $this->logger->info(sprintf('Skipping empty table: %s...', $table));
                 continue;
             }
+            $this->logger->info(sprintf('Searching %d rows in table: %s...', $count, $table));
             foreach ($columns as $columnData) {
                 $column = $columnData['column'];
                 if (str_starts_with($column, '_')) {
