@@ -21,8 +21,8 @@
     --ck-color-mention-text: #222222;
 
     /* resolve depth issues */
-    --ck-z-modal: var(--sbx-depth-ui-overlay);
-    --ck-z-panel: var(--sbx-depth-ui-overlay);
+    --ck-z-modal: var(--sbx-depth-pop-over);
+    --ck-z-panel: var(--sbx-depth-pop-over);
 
     /* The colours that are referenced in the overrides below */
     --sb-ck-active: #cae3fa;
