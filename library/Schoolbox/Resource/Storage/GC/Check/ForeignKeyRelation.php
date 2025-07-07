@@ -21,8 +21,8 @@ class ForeignKeyRelation extends Base
 {
     private const SELECT_FK_RELATIONS_QUERY = <<<SQL
         select
-            fks.TABLE_NAME             as foreign_table,
-            kcu.COLUMN_NAME            as foreign_column,
+            fks.TABLE_NAME             as `table`,
+            kcu.COLUMN_NAME            as `column`,
             fks.REFERENCED_TABLE_NAME  as primary_table,
             kcu.REFERENCED_COLUMN_NAME as primary_column
         from information_schema.REFERENTIAL_CONSTRAINTS fks
@@ -58,10 +58,10 @@ class ForeignKeyRelation extends Base
      * relations.
      *
      * @return array<string, array<array{
+     *      table: string,
+     *      column: string,
      *      primary_table: string,
      *      primary_column: string,
-     *      foreign_table: string,
-     *      foreign_column: string,
      * }>>
      */
     protected function buildTableColumnList(): array
@@ -71,7 +71,7 @@ class ForeignKeyRelation extends Base
 
         $tableColumnList = [];
         foreach ($query as $row) {
-            $table  = $row['foreign_table'];
+            $table = $row['table'];
             $tableColumnList[$table] ??= [];
             $tableColumnList[$table][] = $row;
         }
@@ -83,12 +83,12 @@ class ForeignKeyRelation extends Base
      * Build a query for finding usage of a hash.
      *
      * @param string $table      The table to search within.
-     * @param array  $columnData `primary_table`:  the name of the storage table
-     *                           `foreign_column`: the column on `$table` to search within
-     *                           `primary_column`: the column on `primary_table` that `foreign_column` joins on:
-     *                                             not always `hash`
-     * @return IStatement A statement which accepts a storage hash as its
-     *                    `hash` parameter.
+     * @param array $columnData `column`:         the column on `$table` to search within
+     *                          `primary_table`:  the name of the storage table
+     *                           primary_column`: the column on `primary_table` that `column` joins on:
+     *                                            not always `hash`
+     * @return IStatement A statement which accepts a storage hash as its `hash`
+     *                    parameter.
      */
     protected function buildFindHashQuery(string $table, array $columnData): IStatement
     {
@@ -98,7 +98,7 @@ class ForeignKeyRelation extends Base
                 sprintf(
                     'FK relation "%s.%s => %s.%s" does not reference %s.hash: consider updating schema',
                     $table,
-                    $columnData['foreign_column'],
+                    $columnData['column'],
                     $columnData['primary_table'],
                     $columnData['primary_column'],
                     $columnData['primary_table'],
@@ -109,7 +109,7 @@ class ForeignKeyRelation extends Base
             SELECT COUNT(*)
             FROM {$this->db->getQuoter()->quoteIdentifier($table)} f
             INNER JOIN {$this->db->getQuoter()->quoteIdentifier($columnData['primary_table'])} s
-                ON f.{$this->db->getQuoter()->quoteIdentifier($columnData['foreign_column'])}
+                ON f.{$this->db->getQuoter()->quoteIdentifier($columnData['column'])}
                    = s.{$this->db->getQuoter()->quoteIdentifier($columnData['primary_column'])}
             WHERE s.hash = :hash
         ");

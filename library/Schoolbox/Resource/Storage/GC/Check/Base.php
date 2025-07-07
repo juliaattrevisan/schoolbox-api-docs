@@ -64,7 +64,7 @@ abstract class Base implements Check
                 continue;
             }
             foreach ($columns as $columnData) {
-                $column = $columnData['foreign_column'];
+                $column = $columnData['column'];
                 if (str_starts_with($column, '_')) {
                     $this->logger->info(sprintf('. skipping deprecated column: %s.%s', $table, $column));
                     continue;
