@@ -42,7 +42,7 @@ abstract class Base implements Check
         $tableColumnList = $this->buildTableColumnList();
         $stale           = $previous;
 
-        foreach ($tableColumnList as $table => $columns) {
+        foreach ($tableColumnList as $table => $columnsData) {
             if (empty($stale)) {
                 $this->logger->info('No stale rows left to check: returning');
                 return $stale;
@@ -62,18 +62,27 @@ abstract class Base implements Check
                 continue;
             }
             $this->logger->info(sprintf('Searching %d rows in table: %s...', $count, $table));
-            foreach ($columns as $columnData) {
-                $column = $columnData['column'];
-                if (str_starts_with($column, '_')) {
-                    $this->logger->info(sprintf('. skipping deprecated column: %s.%s', $table, $column));
-                    continue;
+            foreach ($columnsData as $columnData) {
+                $columns = [];
+                foreach ($columnData['columns'] as $column) {
+                    if (str_starts_with($column, '_')) {
+                        $this->logger->info(sprintf('. skipping deprecated column: %s', $column));
+                        continue;
+                    }
+                    $columns[] = $column;
                 }
 
                 // Build query for this column, exclude non-stale
                 $query      = $this->buildFindHashQuery($table, $columnData);
                 $staleCount = count($stale);
                 $newStale   = [];
-                $this->logger->info(sprintf('. searching column %s.%s... (%d hashes)', $table, $column, $staleCount));
+                $this->logger->info(
+                    sprintf(
+                        '. searching columns (%s)... (%d hashes)',
+                        implode(',', $columns),
+                        $staleCount,
+                    )
+                );
                 foreach ($stale as $hash) {
                     $query->execute(['hash' => $hash]);
                     $count = (int)$query->fetchColumn();
@@ -87,11 +96,9 @@ abstract class Base implements Check
                 $newStaleCount = count($newStale);
                 $this->logger->info(
                     sprintf(
-                        '.. %d of %d non-stale hashes found in %s.%s: %d remaining',
+                        '.. %d of %d non-stale hashes found: %d remaining',
                         ($staleCount - $newStaleCount),
                         $staleCount,
-                        $table,
-                        $column,
                         $newStaleCount,
                     )
                 );
