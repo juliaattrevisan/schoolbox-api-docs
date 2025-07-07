@@ -63,8 +63,8 @@ export const payload = {
                     title: "Ms",
                     pronoun: "she/her",
                     _links: {
-                        avatar: "/avatars/1.png",
-                        profile: "/profile/1",
+                        avatar: "/portrait.php?id=65&size=square64",
+                        profile: "/search/user/65",
                     },
                 },
                 { records: 11, points: 22 },
@@ -86,8 +86,8 @@ export const payload = {
                     title: "Mr",
                     pronoun: "he/him",
                     _links: {
-                        avatar: "/avatars/2.png",
-                        profile: "/profile/2",
+                        avatar: "/portrait.php?id=21&size=square64",
+                        profile: "/search/user/21",
                     },
                 },
                 { records: 16, points: 32 },
@@ -109,8 +109,8 @@ export const payload = {
                     title: null,
                     pronoun: null,
                     _links: {
-                        avatar: "/avatars/3.png",
-                        profile: "/profile/3",
+                        avatar: "/portrait.php?id=20&size=square64",
+                        profile: "/search/user/20",
                     },
                 },
                 { records: 18, points: 36 },
