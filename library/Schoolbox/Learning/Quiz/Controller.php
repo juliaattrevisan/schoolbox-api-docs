@@ -56,6 +56,8 @@ class Controller extends AbstractController
      * @param \Schoolbox\Learning\Assessment\WorkType\Mapper            $workTypeMapper
      * @param MarkTypeMapper                                            $markTypeMapper
      * @param \Schoolbox\Resource\Storage\Mapper                        $storageMapper
+     * @param \Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper $gradeGroupMapper
+     * @param \Schoolbox\Curriculum\Node\Mapper                         $curriculumNodeMapper
      * @param string                                                    $learnosityVersion
      * @param string                                                    $learnosityConsumerKey
      * @param string                                                    $learnosityConsumerSecret
@@ -73,6 +75,8 @@ class Controller extends AbstractController
         private \Schoolbox\Learning\Assessment\WorkType\Mapper $workTypeMapper,
         private \Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper $markTypeMapper,
         private \Schoolbox\Resource\Storage\Mapper $storageMapper,
+        private \Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper $gradeGroupMapper,
+        private \Schoolbox\Curriculum\Node\Mapper $curriculumNodeMapper,
         private string $learnosityVersion,
         #[\SensitiveParameter] private string $learnosityConsumerKey,
         #[\SensitiveParameter] private string $learnosityConsumerSecret,
