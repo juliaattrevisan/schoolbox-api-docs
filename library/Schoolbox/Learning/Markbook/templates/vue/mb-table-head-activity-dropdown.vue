@@ -2,6 +2,7 @@
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import { ACTIVITY_TYPE_DUE_WORK, ACTIVITY_TYPE_QUIZ } from "@schoolboxAssessment/Types/assessmentTypes";
 import type { MarkbookActivity } from "./types/payload";
+import { useMarkbookStore } from "./store/markbookStore";
 import MbTableHeadActivityPublish from "./mb-table-head-activity-publish.vue";
 
 interface Props {
@@ -9,6 +10,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const mbStore = useMarkbookStore();
 </script>
 
 <template>
@@ -25,7 +27,11 @@ const props = defineProps<Props>();
         <a :href="getReturnUrl(props.activity._links.modifyContent)" class="icon-modify">Modify Content</a>
     </li>
     <li v-if="props.activity._links?.status">
-        <a :href="getReturnUrl(props.activity._links.status)" class="icon-progress">View Status</a>
+        <a
+            :href="getReturnUrl(`${props.activity._links.status}?${mbStore.data?.filtersQueryArgs}`)"
+            class="icon-progress"
+            >View Status</a
+        >
     </li>
     <!-- TODO <li>
         <a href="" class="icon-upload"> Import Feedback </a>

@@ -375,16 +375,12 @@ class Controller extends Base
                     ],
                 ]],
                 '_routes' => [
-                    'exportReport' => sprintf(
-                        "%s?%s",
-                        $this->routeGenerator->generate(
-                            'learningMarkbook.getMarkbookExportForClass',
-                            [
-                                'folder'   => $folder,
-                                'folderId' => $folder->getId(),
-                            ]
-                        ),
-                        $codec->convertSelectionsToQueryString($selectionsPerFilter),
+                    'exportReport' => $this->routeGenerator->generate(
+                        'learningMarkbook.getMarkbookExportForClass',
+                        [
+                            'folder'   => $folder,
+                            'folderId' => $folder->getId(),
+                        ]
                     ),
                     'courseImport.getImport' => null, /* not relevant on the class markbook */
                 ],
@@ -395,6 +391,7 @@ class Controller extends Base
                     'name' => $state->getDisplayAs(),
                     'normaliseAs' => $state->getNormaliseAs(),
                 ])->reindex(),
+                'filtersQueryArgs' => $codec->convertSelectionsToQueryString($selectionsPerFilter),
             ];
 
             $this->response = $this->responseAsJson([

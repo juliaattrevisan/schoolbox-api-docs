@@ -509,15 +509,11 @@ class Controller extends WebController\Base
                     ]
                 )->reIndex(),
                 '_routes' => [
-                    'exportReport' => sprintf(
-                        "%s?%s",
-                        $this->routeGenerator->generate(
-                            'courseMarkbook.getMarkbookExport',
-                            [
-                                'courseSpecId' => $courseSpec->getId(),
-                            ]
-                        ),
-                        $codec->convertSelectionsToQueryString($selectionsPerFilter),
+                    'exportReport' => $this->routeGenerator->generate(
+                        'courseMarkbook.getMarkbookExport',
+                        [
+                            'courseSpecId' => $courseSpec->getId(),
+                        ]
                     ),
                     'courseImport.getImport' => $this->routeGenerator->generate(
                         'courseImport.getImport',
@@ -535,6 +531,7 @@ class Controller extends WebController\Base
                     'name' => $state->getDisplayAs(),
                     'normaliseAs' => $state->getNormaliseAs(),
                 ])->reindex(),
+                'filtersQueryArgs' => $codec->convertSelectionsToQueryString($selectionsPerFilter),
             ];
 
             $this->response = $this->responseAsJson([

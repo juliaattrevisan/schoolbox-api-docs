@@ -61,7 +61,10 @@ const exportReportRoute = window.Vue.computed(() => {
         return null;
     }
 
-    const url = new URL(mbStore.data._routes.exportReport, window.location.origin);
+    const url = new URL(
+        `${mbStore.data._routes.exportReport}?${mbStore.data.filtersQueryArgs}`,
+        window.location.origin,
+    );
 
     if (mbStore.showDrafts) {
         url.searchParams.set(PARAM_SHOW_DRAFTS, "1");

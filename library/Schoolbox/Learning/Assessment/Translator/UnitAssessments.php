@@ -131,6 +131,28 @@ class UnitAssessments
     {
         $links = [];
         if ($this->routeGenerator) {
+            /** The status page for implementations is different to specifications */
+            $statusLink = [
+                "route" => "learningAssessment.getStatus",
+                "params" => [
+                    'assessmentId' => $assessment->getId(),
+                    'assessment'   => $assessment,
+                ],
+            ];
+
+            $baseContext = $assessment->getBaseContext();
+            if ($baseContext instanceof \Schoolbox\Learning\Course\DataModel\Specification\Unit\Model) {
+                $statusLink = [
+                    "route" => "courseStatus.getStatus",
+                    "params" => [
+                        'assessmentId' => $assessment->getId(),
+                        'assessment'   => $assessment,
+                        'courseSpecId' => $baseContext->getCourse()->getId(),
+                        'courseSpec'   => $baseContext->getCourse(),
+                    ],
+                ];
+            }
+
             $availableLinks = [
                 'summary' => ["route" => "learningAssessment.getSummary", "params" => [
                     'assessmentId' => $assessment->getId(),
@@ -138,10 +160,7 @@ class UnitAssessments
                     'studentId' => $this->student->getId(),
                     'student' => $this->student,
                 ]],
-                'status' => ["route" => "learningAssessment.getStatus", "params" => [
-                    'assessmentId' => $assessment->getId(),
-                    'assessment' => $assessment,
-                ]],
+                'status' => $statusLink,
                 'modify' => ["route" => "learningAssessment.getUpdateAssessmentForm", "params" => [
                     'assessmentId' => $assessment->getId(),
                     'assessment' => $assessment,

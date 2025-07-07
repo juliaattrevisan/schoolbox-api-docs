@@ -163,6 +163,8 @@ export interface Markbook {
     /** A list of available visibilities, currently only used on the class markbook */
     availableVisibilities: number[];
     submissionErrorStates: SubmissionErrorStates;
+    /** The query args to use for filters */
+    filtersQueryArgs: string;
 }
 
 /**
