@@ -2,6 +2,7 @@
 /**
  * Pastoral Report Tabs Component
  */
+import MediaArticle from "@schoolboxVue/components/media-article.vue";
 import type { PastoralReportTab, SeverityColors, LocaleConfig, PastoralRecord } from "../js/types/pastoralReportTypes";
 
 const props = defineProps<{
@@ -16,7 +17,7 @@ const props = defineProps<{
 
 const selectedTab = window.Vue.ref(props.tabs[0]?.type ?? "");
 
-const routeLookup = (route: string, params?: Record<string, any>) => {
+const routeLookup = (route: string, params?: Record<string, string | number>) => {
     const routes: Record<string, string> = {
         "pastoral.getStudentRecord": "/pastoral/student/{studentId}/record/{recordId}",
         "pastoralReportBuilder.getReportTags": "/pastoral/report/results/tag/{tagId}",
@@ -114,7 +115,7 @@ const profile = {
                             </p>
                         </div>
                         <article>
-                            <p v-if="record.bodyPublic" v-html="record.bodyPublic"></p>
+                            <media-article v-if="record.bodyPublic" :content="record.bodyPublic" />
 
                             <p v-if="record.tags.length > 0" class="spaced">
                                 <template v-for="tag in record.tags" :key="tag.id">
@@ -142,7 +143,7 @@ const profile = {
                                         </p>
                                     </a>
                                 </div>
-                                <article v-html="comment.body"></article>
+                                <media-article :content="comment.body" />
                             </li>
                         </ul>
                     </li>
