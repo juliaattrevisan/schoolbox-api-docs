@@ -2486,12 +2486,8 @@ class Controller extends Base
 
         $struct = (new Exporter($this->storageMapper, $this->filesystemProxy, $this->api))->generate($assessment);
 
-        $response = $this->responseAsJson($struct);
-
-        /* You actually need this separately atm
-         * $response->withHeader('Content-disposition', "attachment; filename=\"{$filename}\"");
-         */
-        header("Content-disposition: attachment; filename=\"{$filename}\"");
+        $response = $this->responseAsJson($struct)
+            ->withHeader('Content-disposition', "attachment; filename=\"{$filename}\"");
 
         $this->response = $response;
     }
