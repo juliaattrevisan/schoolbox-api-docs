@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import locale from "@js/terminology/rosettaStone";
 import { useMarkbookStore } from "./store/markbookStore";
 import MbTableHeadActivity from "./mb-table-head-activity.vue";
 import MbClassAverageHeader from "./mb-class-average-header.vue";
@@ -48,6 +49,10 @@ const mbStore = useMarkbookStore();
                 v-for="group in mbStore.activityGroups"
                 :key="group.unitSpec?.id"
                 class="unit-title"
+                :title="
+                    group.unitSpec?.title ??
+                    `These ${locale.activity.plural()} are not part of a ${locale.unit.singular()}`
+                "
                 :colspan="group.activities.length"
             >
                 {{ group.unitSpec?.title ?? "" }}
