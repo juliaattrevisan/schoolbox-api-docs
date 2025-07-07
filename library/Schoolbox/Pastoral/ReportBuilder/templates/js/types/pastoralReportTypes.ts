@@ -146,7 +146,7 @@ export type PastoralReportTableHeader = {
     key: string;
     title: string;
     subTitle?: string;
-    type: string;
+    columnType: string;
     isSortable?: boolean;
 };
 

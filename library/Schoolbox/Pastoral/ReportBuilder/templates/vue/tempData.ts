@@ -123,7 +123,7 @@ export const payload = {
     },
     metadata: {
         // standard metadata structure used to determine whether more data is available
-        count: null,
+        count: 20,
         cursor: {
             current: null,
             next: null,
