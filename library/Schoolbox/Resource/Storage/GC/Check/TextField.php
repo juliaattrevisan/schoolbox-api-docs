@@ -53,13 +53,15 @@ class TextField extends Base
     /**
      * List of text fields to never search through.
      *
-     * @var array<string, array<string>|true>
+     * @var array<string, (array<string>|true)>
      *     key:   a table name
      *     value: either a list of columns to skip, or `true` to skip all in
      *            this table
      */
     private const FIELD_BLACKLIST = [
-        'search_index' => ['fulltext_index'],
+        'search_index'      => true,
+        'storage'           => true,
+        'storage_transform' => true,
     ];
 
     /**
@@ -88,15 +90,33 @@ class TextField extends Base
         $query = $this->db->prepareQuery(self::SELECT_TEXT_FIELDS_QUERY);
         $query->execute(['schema' => $this->schema]);
 
-        $tableColumnList = [];
+        $tableColumnList   = [];
+        $blacklistedTables = [];
         foreach ($query as $row) {
             $table  = $row['table'];
             $column = $row['column'];
 
-            // Exclude blacklisted fields
-            if (isset(self::FIELD_BLACKLIST[$table]) && in_array($column, self::FIELD_BLACKLIST[$table])) {
-                $this->logger->debug(sprintf('Excluding blacklisted column: %s.%s', $table, $column));
-                continue;
+            // Exclude blacklisted tables and fields,
+            // as well as the storage table itself
+            if ($table === $this->table) {
+                if (!isset($blacklistedTables[$table])) {
+                    $this->logger->debug(sprintf('Excluding storage table: %s', $table));
+                    $blacklistedTables[$table] = true;
+                }
+            }
+            if (isset(self::FIELD_BLACKLIST[$table])) {
+                if (self::FIELD_BLACKLIST[$table] === true) {
+                    // Only output blacklisted table once
+                    if (!isset($blacklistedTables[$table])) {
+                        $this->logger->debug(sprintf('Excluding blacklisted table: %s', $table));
+                        $blacklistedTables[$table] = true;
+                    }
+                    continue;
+                }
+                if (in_array($column, self::FIELD_BLACKLIST[$table])) {
+                    $this->logger->debug(sprintf('Excluding blacklisted column: %s.%s', $table, $column));
+                    continue;
+                }
             }
 
             // Exclude fields already in a foreign key relation
