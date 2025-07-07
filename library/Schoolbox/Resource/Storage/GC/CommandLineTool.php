@@ -99,7 +99,6 @@ HELP;
             $this->perform(),
         );
         $gc = $gc
-            ->addCheck(new Check\ExpiryDate($db, 2))
             ->addCheck(new Check\HardLinks($db))
             ->addCheck(new Check\SoftLinks($db, SQL_db, $this->getLogger()));
 
