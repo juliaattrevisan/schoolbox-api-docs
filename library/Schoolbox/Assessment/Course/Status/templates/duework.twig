@@ -696,6 +696,11 @@
         <script>
             $(function() {
                 $('#importFeedbackForm').importFeedback();
+
+                /** open the Import Feedback modal when the page loads if the user has asked for it (likely come from the markbook) */
+                if (new URLSearchParams(window.location.search).has('importFeedback')) {
+                    $('#importFeedbackModal').foundation('reveal', 'open');
+                }
             });
         </script>
 

@@ -11,6 +11,13 @@ interface Props {
 
 const props = defineProps<Props>();
 const mbStore = useMarkbookStore();
+
+const viewStatusLink = window.Vue.computed(() => {
+    if (props.activity._links?.status && mbStore.data) {
+        return `${getReturnUrl(props.activity._links.status)}&${mbStore.data.filtersQueryArgs}`;
+    }
+    return null;
+});
 </script>
 
 <template>
@@ -26,16 +33,12 @@ const mbStore = useMarkbookStore();
     <li v-if="props.activity._links?.modifyContent">
         <a :href="getReturnUrl(props.activity._links.modifyContent)" class="icon-modify">Modify Content</a>
     </li>
-    <li v-if="props.activity._links?.status">
-        <a
-            :href="getReturnUrl(`${props.activity._links.status}?${mbStore.data?.filtersQueryArgs}`)"
-            class="icon-progress"
-            >View Status</a
-        >
+    <li v-if="viewStatusLink">
+        <a :href="viewStatusLink" class="icon-progress">View Status</a>
     </li>
-    <!-- TODO <li>
-        <a href="" class="icon-upload"> Import Feedback </a>
-    </li> -->
+    <li v-if="props.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK && viewStatusLink">
+        <a :href="`${viewStatusLink}&importFeedback`" class="icon-upload">Import Feedback</a>
+    </li>
     <template v-if="props.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK && activity._routes.postFeedbacks">
         <li class="separator">Bulk Actions</li>
         <li>
