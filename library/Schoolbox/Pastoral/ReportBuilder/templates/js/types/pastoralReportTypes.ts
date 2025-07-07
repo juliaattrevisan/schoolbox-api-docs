@@ -120,3 +120,33 @@ export type PastoralReportTab = {
     type: string;
     title: string;
 };
+
+/**
+ * To define the structure of each table column
+ */
+export type PastoralReportTableHeader = {
+    key: string;
+    title: string;
+    subTitle?: string;
+    type: string;
+    isSortable?: boolean;
+};
+
+/**
+ * Displays a user in the table cell
+ */
+export type ColumnUser = User;
+
+/**
+ * Displays either records or points in the table cell
+ */
+export type ColumnRecordsAndPoints = {
+    records: number;
+    points: number;
+};
+
+/**
+ * Same as ColumnRecordsAndPoints, but visually distinct totals
+ * Not sure if this type is necessary yet
+ */
+export type ColumnTotalRecordsAndPoints = ColumnRecordsAndPoints;
