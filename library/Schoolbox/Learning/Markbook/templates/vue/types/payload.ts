@@ -26,6 +26,9 @@ export type MarkbookActivity = Pick<Activity, "id" | "title" | "assessmentType">
         draftMean: string | null;
     } | null;
     _links: Pick<NonNullable<Activity["_links"]>, "status" | "summary" | "modify" | "modifyContent"> | null;
+    _routes: {
+        postFeedbacks: string | null;
+    };
 };
 
 export type MarkbookClassImplActivityParticipant = {
@@ -84,7 +87,6 @@ export type MarkbookClassImplActivity = {
     };
     _routes: {
         "learningAssessment.getStatus": string;
-        "learningDueWorkFeedback.postParticipantFeedbacks": string | null;
         student: Record<
             UserId,
             {
