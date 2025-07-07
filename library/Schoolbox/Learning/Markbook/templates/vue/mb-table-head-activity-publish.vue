@@ -171,9 +171,7 @@ async function onPublishAll(): Promise<void> {
 </script>
 
 <template>
-    <button class="icon-approve" :disabled="participantsWithDrafts.length === 0" @click.prevent="openPublishModal">
-        Publish Grades & Feedback
-    </button>
+    <button class="icon-approve" @click.prevent="openPublishModal">Publish Grades & Feedback</button>
 
     <basic-modal v-if="isPublishModalOpen" v-model:is-open="isPublishModalOpen" has-background-click>
         <h2>Publish Drafts</h2>
