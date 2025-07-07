@@ -4,10 +4,11 @@
  */
 
 import type { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
+import type { MarkScheme, SubmissionErrorStates } from "@schoolboxLibrary/Learning/MarkScheme/templates/ts/markScheme";
 
 // Types for semantic clarity when referring to them later on...
 type UserId = number;
-type ParticipantId = number;
+export type ParticipantId = number;
 
 export type MarkbookActivity = Pick<Activity, "id" | "title" | "assessmentType"> & {
     /** the readable type name of the activity, e.g. "Project", "Quiz", "Essay", "Homework", etc */
@@ -25,27 +26,35 @@ export type MarkbookActivity = Pick<Activity, "id" | "title" | "assessmentType">
         draftMean: string | null;
     } | null;
     _links: Pick<NonNullable<Activity["_links"]>, "status" | "summary" | "modify" | "modifyContent"> | null;
+    _routes: {
+        postFeedbacks: string | null;
+    };
 };
 
 export type MarkbookClassImplActivityParticipant = {
     isExcluded: boolean;
     hasSubmittedResponse: boolean;
     hasPublishedFeedback: boolean;
-    resubmissionRequired: boolean;
     progressTick: Activity["progressTick"] | null;
     marks: Record<
         "published" | "draft",
         {
+            responseId: number | null;
             norm: number | null;
             hr: string | null;
             hrInstructor: string | null;
             comment: string | null;
-        } | null
+            resubmissionRequired: boolean;
+        }
     >;
+    /**
+     * Special data to allow for feedback submission
+     * this isn't sent through with the initial payload, since currently that would potentially
+     * require a lot of interaction with the Learnosity API for quizzes or other data which most markbook loads won't need for all activities.
+     * Instead, the markbook popout will load this data when the user asks to create/edit feedback for a quiz or due work
+     */
+    extraInfo?: ActivityInfoResponsePayload;
     /** the following are only used the class markbook at the moment: */
-    isResponseRequired?: boolean;
-    isFeedbackRequired?: boolean;
-    isReviewComplete?: boolean;
     plan?: {
         isDynamic: boolean;
         name: string | null;
@@ -87,15 +96,18 @@ export type MarkbookClassImplActivity = {
                 "learningAssessment.postExclude": string | null;
                 "learningAssessment.postInclude": string | null;
                 "learningAssessment.getSummary": string | null;
+                "learningAssessment.getInfo": string | null;
+                /* this will change depending on if it's a quiz or due work */
+                postFeedback: string | null;
             }
         >;
     };
+    instructorMarkScheme: MarkScheme;
     /* currently class markbook only */
     markVisibility?: number;
     courseManaged?: boolean | null;
     writable?: boolean;
     weight: number;
-    hasDraft: Record<UserId, true>;
 };
 
 export type MarkbookClassImplStudent = {
@@ -150,13 +162,39 @@ export interface Markbook {
     canAccessPopOut: boolean;
     /** A list of available visibilities, currently only used on the class markbook */
     availableVisibilities: number[];
+    submissionErrorStates: SubmissionErrorStates;
+    /** The query args to use for filters */
+    filtersQueryArgs: string;
 }
+
+/**
+ * The payload returned by the learningAssessment.getInfo endpoint
+ * This isn't fully defined yet, I have only pulled in what we actually use... there's more in the API response
+ */
+export type ActivityInfoResponsePayload = {
+    maxMarks: number | null; // Not null for Quiz
+    response: {
+        id: number | null;
+    };
+    feedback: {
+        // Not null for Due Work
+        rubric: boolean | null;
+        responseWithKamiDocs: boolean | null;
+        fileCount: number | null;
+    };
+};
 
 /** -------- other types -------- */
 
-export type MarkbookSelectedCellInfo = {
+export type MarkbookPopoutSelectedCellInfo = {
     classImplId: number;
     studentId: UserId;
     activityId: MarkbookActivity["id"];
     referenceElement: HTMLTableCellElement;
+};
+
+export type MarkbookFeedbackSelectedCellInfo = {
+    classImplId: number;
+    studentId: UserId;
+    activityId: MarkbookActivity["id"];
 };

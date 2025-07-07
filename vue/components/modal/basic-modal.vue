@@ -68,7 +68,8 @@ function onBackgroundClick(): void {
             <div v-if="isOpen" ref="modalEl" class="modal">
                 <div v-on-click-outside="onBackgroundClick" class="modal__container">
                     <!-- @slot Reveal modal content goes into this slot -->
-                    <slot></slot>
+                    <div class="modal__container_main"><slot></slot></div>
+                    <slot name="footer"></slot>
                     <button
                         class="close-modal"
                         title="Close modal"
@@ -98,10 +99,13 @@ function onBackgroundClick(): void {
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
         margin: 0 auto;
         max-width: 62.5rem;
-        padding: var(--spacing-m);
         position: relative;
         top: 100px;
         width: 70%;
+    }
+    /* separate so that the footer can have different padding (i.e. to use component actions) */
+    &__container_main {
+        padding: var(--spacing-m);
     }
     @media (max-width: 700px) {
         &__container {

@@ -7,6 +7,10 @@
     .excluded {
         background-color: #f9f9f9;
     }
+
+    .markbook-faded .excluded {
+        background-color: unset;
+    }
 }
 
 #report_content,
@@ -105,7 +109,7 @@
             vertical-align: middle;
         }
 
-        select {
+        select:not(.letter-grade-select) {
             max-width: 3rem;
         }
 
@@ -198,6 +202,14 @@
             &:hover {
                 background-color: var(--content-ui-hover);
             }
+        }
+
+        // When filling in feedback, the non-relevant rows are faded out
+        .markbook-faded {
+            opacity: 0.3;
+        }
+        tr.markbook-faded {
+            background-color: var(--body-background);
         }
     }
 }

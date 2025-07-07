@@ -15,6 +15,7 @@ import type { PartialSbxEditorConfig } from "@js/editor/types/editorTypes";
  * @param editorConfig - the config to use when creating the editor
  * @param isMounted - whether or not we are already mounted, and to skip the onMounted hook
  * @param callback - a callback to run after the editor is created including EditorCreatedEventInfo
+ * @param syncWithRef - whether to sync the editor value with the $currentValue ref if it changes elsewhere
  * @returns - the current value of the editor input as a ref
  */
 export function useEditor(
@@ -23,6 +24,7 @@ export function useEditor(
     editorConfig: PartialSbxEditorConfig,
     isMounted: boolean = false,
     callback?: (event: EditorCreatedEventInfo) => void,
+    syncWithRef: boolean = false,
 ): Ref<string> {
     const currentValue = typeof $currentValue === "string" ? window.Vue.ref($currentValue) : $currentValue;
 
@@ -36,8 +38,28 @@ export function useEditor(
         if (currentValue.value !== null) {
             editor.setData(currentValue.value); // set the initial data
         }
+
+        let isUpdatingFromEditor = false;
+
+        // Sync from editor to ref
         editor.model.document.on("change:data", () => {
+            isUpdatingFromEditor = true;
             currentValue.value = editor.getData();
+            void window.Vue.nextTick(() => {
+                isUpdatingFromEditor = false;
+            });
+        });
+
+        // Sync from ref to editor
+        window.Vue.watch(currentValue, (newValue) => {
+            if (!syncWithRef) {
+                return;
+            }
+
+            const editorInstance = Object.values(window.sbProps.editors).find((e) => e && e.id === editor.id);
+            if (!isUpdatingFromEditor && editorInstance && editorInstance.getData() !== newValue) {
+                editorInstance.setData(newValue || "");
+            }
         });
 
         if (callback) {

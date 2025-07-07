@@ -211,4 +211,14 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
      * @return float
      */
     abstract protected function getGranularityDenominator(): float;
+
+    /**
+     * Add configured totalMark to the context
+     */
+    public function generateContext(): array
+    {
+        $context = parent::generateContext();
+        $context['conf']['totalMark'] = $this->getTotalMark();
+        return $context;
+    }
 }

@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { useMarkbookStore } from "./store/markbookStore";
+import type { MarkbookActivity } from "./types/payload";
 import MbTableHead from "./mb-table-head.vue";
 import MbClassimplRows from "./mb-classimpl-rows.vue";
+import MbTableHeadActivityDropdown from "./mb-table-head-activity-dropdown.vue";
 
 interface Props {
     type: "course" | "class";
@@ -10,9 +12,16 @@ interface Props {
 const props = defineProps<Props>();
 const mbStore = useMarkbookStore();
 
+const activityHeaderSelection = window.Vue.ref<MarkbookActivity | null>(null);
+const activityHeaderDropdownEl = window.Vue.ref<HTMLElement | null>(null);
+window.Vue.provide("activityHeaderSelection", activityHeaderSelection);
+window.Vue.provide("activityHeaderDropdownEl", activityHeaderDropdownEl);
+
 const resizeObserver = window.Vue.ref<ResizeObserver | null>(null);
-const tableContainerEl = window.Vue.ref<HTMLElement | null>(null);
+const tableContainerEl = window.Vue.useTemplateRef<HTMLElement>("tableContainerRef");
 const markbookHeightOffset = window.Vue.ref(window.innerHeight);
+
+window.Vue.provide("markbookTableContainerEl", tableContainerEl);
 
 /**
  * Updates the height of the scrollable area, such that the user is able to fit the
@@ -35,6 +44,12 @@ window.Vue.onMounted(() => {
     window.addEventListener("DOMContentLoaded", updateContainerHeight, { once: true });
 });
 
+window.Vue.onUnmounted(() => {
+    if (resizeObserver.value) {
+        resizeObserver.value.disconnect();
+    }
+});
+
 /**
  * The route for exporting the markbook as a CSV
  * Also appends a query parameter to show drafts or show display marks, if applicable
@@ -46,7 +61,10 @@ const exportReportRoute = window.Vue.computed(() => {
         return null;
     }
 
-    const url = new URL(mbStore.data._routes.exportReport, window.location.origin);
+    const url = new URL(
+        `${mbStore.data._routes.exportReport}?${mbStore.data.filtersQueryArgs}`,
+        window.location.origin,
+    );
 
     if (mbStore.showDrafts) {
         url.searchParams.set(PARAM_SHOW_DRAFTS, "1");
@@ -118,23 +136,23 @@ const exportReportRoute = window.Vue.computed(() => {
 
     <div
         v-if="mbStore.data"
-        ref="tableContainerEl"
+        ref="tableContainerRef"
         class="diagonal-headings-table-container small-12 island"
         :style="{ '--markbook-height-offset': `${markbookHeightOffset}px` }"
     >
         <table class="diagonal-headings-table marksheet">
             <mb-table-head :type="props.type" />
             <tbody>
-                <tr v-if="props.type === 'course'">
+                <tr v-if="props.type === 'course'" :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }">
                     <th class="course-row class-row-heading fixed-left">
                         Course Average
                         <span data-tooltip class="hint has-tip tip-top" title="Average student cohort mark">?</span>
                     </th>
                     <th class="course-row fixed-left"></th>
-                    <th v-if="mbStore.data.rank !== null"></th>
+                    <th v-if="mbStore.data.rank !== null" class="course-row"></th>
                     <template v-for="assessment in mbStore.orderedActivities" :key="assessment.id">
                         <td v-if="assessment.stats !== null" class="course-row">
-                            <span v-if="mbStore.showDrafts && assessment.stats.draftMean !== null" class="meta">
+                            <span v-if="mbStore.showDrafts && mbStore.hasDraftMarks(assessment)" class="meta">
                                 {{ assessment.stats.draftMean ?? "–" }}
                             </span>
                             <span v-else>
@@ -154,6 +172,10 @@ const exportReportRoute = window.Vue.computed(() => {
             </tbody>
         </table>
     </div>
+
+    <ul ref="activityHeaderDropdownEl" class="f-dropdown">
+        <mb-table-head-activity-dropdown v-if="activityHeaderSelection" :activity="activityHeaderSelection" />
+    </ul>
 </template>
 
 <style scoped>

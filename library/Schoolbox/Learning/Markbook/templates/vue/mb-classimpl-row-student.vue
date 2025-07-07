@@ -4,20 +4,40 @@ import { getGradient } from "@js/util/cssUtils";
 import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
 import { useMarkbookStore } from "./store/markbookStore";
 import MbStudentGradeCell from "./mb-student-grade-cell.vue";
+import MbClassimplRowStudentFeedback from "./mb-classimpl-row-student-feedback.vue";
 import type { MarkbookClassImplStudent } from "./types/payload";
 
 interface Props {
-    type: "course" | "class";
     classImplId: number;
     student: MarkbookClassImplStudent;
 }
 
 const props = defineProps<Props>();
 const mbStore = useMarkbookStore();
+
+/**
+ * A markbook row is faded if the selected feedback cell exists
+ * and isn't for the current row
+ */
+const isFaded = window.Vue.computed(() => {
+    if (mbStore.feedbackSelectedCell === null) {
+        return false;
+    }
+
+    return (
+        mbStore.feedbackSelectedCell.classImplId !== props.classImplId ||
+        mbStore.feedbackSelectedCell.studentId !== props.student.id
+    );
+});
 </script>
 
 <template>
-    <tr v-if="mbStore.data !== null">
+    <tr
+        v-if="mbStore.data !== null"
+        :class="{
+            'markbook-faded': isFaded,
+        }"
+    >
         <th class="profile-cell fixed-left white">
             <div class="c-card">
                 <div class="l-flex-row l-gap-m l-pad-s">
@@ -75,6 +95,18 @@ const mbStore = useMarkbookStore();
             :student-id="student.id"
         />
     </tr>
+
+    <mb-classimpl-row-student-feedback
+        v-if="
+            mbStore.feedbackSelectedCell &&
+            mbStore.feedbackSelectedCell.classImplId === props.classImplId &&
+            mbStore.feedbackSelectedCell.studentId === student.id
+        "
+        :key="Object.values(mbStore.feedbackSelectedCell).join('-')"
+        :activity-id="mbStore.feedbackSelectedCell.activityId"
+        :class-impl-id="mbStore.feedbackSelectedCell.classImplId"
+        :student-id="mbStore.feedbackSelectedCell.studentId"
+    />
 </template>
 
 <style scoped></style>

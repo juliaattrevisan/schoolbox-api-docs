@@ -9,6 +9,7 @@
 namespace Schoolbox\Learning\Markbook;
 
 use Alaress\Authorizer\Rule;
+use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
@@ -16,6 +17,7 @@ use Schoolbox\Config\ConfigMapper;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Term;
+use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
@@ -90,6 +92,8 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(Access::class),
             $this->injector->get('filters.assessmentIdFinder'),
             $this->injector->get('filters.factoryFactory'),
+            $this->getMapperFactory()->get(StateMapper::class),
+            new ScrubAdapter(),
         );
     }
 

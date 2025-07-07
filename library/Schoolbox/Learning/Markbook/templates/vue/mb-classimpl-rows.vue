@@ -103,16 +103,16 @@ const orderedClassImplStudents = window.Vue.computed(() => {
             }"
         />
 
-        <tr v-if="props.type === 'course'">
+        <tr v-if="props.type === 'course'" :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }">
             <th class="class-row class-row-heading fixed-left">
                 <a :href="`/homepage/${classImpl.folder.id}`">{{ classImpl.folder.title }}</a>
             </th>
             <th class="class-row fixed-left"></th>
-            <td v-if="mbStore.data.rank !== null"></td>
+            <td v-if="mbStore.data.rank !== null" class="class-row"></td>
             <template v-for="{ activity, aImpl } in orderedClassImplActivities" :key="activity.id">
                 <td v-if="aImpl !== null && aImpl.stats" class="class-row">
                     <a :href="aImpl._routes['learningAssessment.getStatus']">
-                        <span v-if="mbStore.showDrafts && aImpl.stats.draftMean !== null" class="meta">
+                        <span v-if="mbStore.showDrafts && mbStore.aImplHasDraftMarks(aImpl)" class="meta">
                             {{ aImpl.stats.draftMean ?? "–" }}
                         </span>
                         <span v-else>
@@ -127,7 +127,6 @@ const orderedClassImplStudents = window.Vue.computed(() => {
         <mb-classimpl-row-student
             v-for="student in orderedClassImplStudents"
             :key="student.id"
-            :type="props.type"
             :class-impl-id="props.classImplId"
             :student="student"
         />

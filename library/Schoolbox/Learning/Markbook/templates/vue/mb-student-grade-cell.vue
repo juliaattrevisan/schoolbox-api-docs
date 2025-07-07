@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import sanitizeHtml from "sanitize-html";
 import { getGradient } from "@js/util/cssUtils";
 import ProgressTick from "@schoolboxLibrary/Learning/Assessment/templates/fragments/vue/progress-tick.vue";
 import {
@@ -81,23 +82,24 @@ const decorator = window.Vue.computed(() => {
 
     if (
         !participant.value.hasSubmittedResponse &&
-        !participant.value.resubmissionRequired &&
-        !participant.value.hasPublishedFeedback &&
-        !participant.value.marks.draft
+        !participant.value.marks.published.resubmissionRequired &&
+        participant.value.marks.published.responseId === null &&
+        participant.value.marks.draft.responseId === null
     ) {
         return null;
     }
 
-    if (mbStore.showDrafts && participant.value.marks.draft !== null) {
+    if (mbStore.showDrafts && participant.value.marks.draft.responseId !== null) {
         return {
             indicator: "pending",
             notchTitle: "Unpublished Draft",
         };
     }
 
-    if (participant.value.resubmissionRequired) {
+    /* resubmission required won't ever show for drafts, so it's only checked on published marks */
+    if (participant.value.marks.published.resubmissionRequired) {
         return {
-            indicator: "pending",
+            indicator: "resubmit",
             notchTitle: "Resubmission Required",
         };
     }
@@ -123,7 +125,7 @@ const decorator = window.Vue.computed(() => {
  * @returns The formatted mark
  */
 function formatMark(mark: NonNullable<typeof participant.value>["marks"]["published" | "draft"]): string {
-    if (mark === null || mark.norm === null) {
+    if (mark.norm === null) {
         return "–";
     }
 
@@ -131,7 +133,7 @@ function formatMark(mark: NonNullable<typeof participant.value>["marks"]["publis
     return relevantMark ?? "–";
 }
 
-const cellEl = window.Vue.useTemplateRef<HTMLTableCellElement>("cellEl");
+const cellEl = window.Vue.useTemplateRef<HTMLTableCellElement>("cellRef");
 
 /**
  * When the user clicks the cell, open the pop-out menu if available, otherwise do nothing
@@ -147,21 +149,47 @@ function onClickCell(): void {
     }
 }
 
-const isSelected = window.Vue.computed(
+const isSelectedPopout = window.Vue.computed(
     () =>
         mbStore.popoutSelectedCell &&
         mbStore.popoutSelectedCell.classImplId === props.classImplId &&
         mbStore.popoutSelectedCell.studentId === props.studentId &&
         mbStore.popoutSelectedCell.activityId === props.assessmentId,
 );
+
+const isSelectedFeedback = window.Vue.computed(
+    () =>
+        mbStore.feedbackSelectedCell &&
+        mbStore.feedbackSelectedCell.classImplId === props.classImplId &&
+        mbStore.feedbackSelectedCell.studentId === props.studentId &&
+        mbStore.feedbackSelectedCell.activityId === props.assessmentId,
+);
+
+/**
+ * The comment is given to us with HTML since it's needed in a CKEditor.
+ * This strips all of the tags off and returns text instead
+ */
+const plaintextPublishedComment = window.Vue.computed(() => {
+    if (participant.value === null || participant.value.marks.published.comment === null) {
+        return undefined;
+    }
+
+    return sanitizeHtml(participant.value.marks.published.comment.replaceAll("<br />", " ").replaceAll("<br>", " "), {
+        allowedTags: [],
+        allowedAttributes: {},
+    }).trim();
+});
 </script>
 
 <template>
     <td
         v-if="mbStore.data && classImpl && assessment && student"
-        ref="cellEl"
+        ref="cellRef"
         class="student-grade-cell"
-        :class="{ excluded: !participant || participant.isExcluded, 'is-selected': isSelected }"
+        :class="{
+            excluded: !participant || participant.isExcluded,
+            'is-selected': isSelectedPopout || isSelectedFeedback,
+        }"
         :data-test="`markbook-cell-${assessment.id}-${student.id}`"
         :data-pop-out-menu="hasPopOutMenu || undefined"
         @click="onClickCell"
@@ -178,7 +206,7 @@ const isSelected = window.Vue.computed(
         </div>
         <template v-else>
             <span
-                v-if="mbStore.showDrafts && participant.marks.draft !== null"
+                v-if="mbStore.showDrafts && participant.marks.draft.responseId !== null"
                 data-tooltip="right"
                 class="has-tip tip-right meta"
                 :class="getGradient(participant.marks.draft.norm, 100, false)"
@@ -189,13 +217,13 @@ const isSelected = window.Vue.computed(
             </span>
             <span
                 v-else-if="participant.hasSubmittedResponse && !participant.hasPublishedFeedback"
-                :title="participant.marks.published?.comment ?? ''"
+                :title="plaintextPublishedComment"
             >
                 Pending
             </span>
             <span
-                v-else-if="participant.marks.published !== null"
-                :title="participant.marks.published.comment ?? ''"
+                v-else-if="participant.marks.published.responseId !== null"
+                :title="plaintextPublishedComment"
                 :class="getGradient(participant.marks.published.norm, 100, false)"
             >
                 {{ formatMark(participant.marks.published) }}

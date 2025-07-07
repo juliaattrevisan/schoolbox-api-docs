@@ -5,7 +5,8 @@ import type {
     MarkbookActivity,
     MarkbookClassImpl,
     MarkbookClassImplActivity,
-    MarkbookSelectedCellInfo,
+    MarkbookPopoutSelectedCellInfo,
+    MarkbookFeedbackSelectedCellInfo,
 } from "../types/payload";
 
 export const useMarkbookStore = defineStore("markbookStore", () => {
@@ -15,7 +16,8 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
     const showDrafts = window.Vue.ref(false);
     const showAverages = window.Vue.ref(false);
 
-    const popoutSelectedCell = window.Vue.ref<MarkbookSelectedCellInfo | null>(null);
+    const popoutSelectedCell = window.Vue.ref<MarkbookPopoutSelectedCellInfo | null>(null);
+    const feedbackSelectedCell = window.Vue.ref<MarkbookFeedbackSelectedCellInfo | null>(null);
 
     /**
      * If the markbook has more than this number of participants,
@@ -131,6 +133,37 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
         );
     }
 
+    /**
+     * Determine if any activity implementations have draft marks for any participant
+     * @param aImpls - The activities to check
+     * @returns bool
+     */
+    function aImplHasDraftMarks(aImpls: MarkbookClassImplActivity[] | MarkbookClassImplActivity): boolean {
+        const activitiesList = Array.isArray(aImpls) ? aImpls : [aImpls];
+        return activitiesList.some((aImpl) =>
+            Object.values(aImpl.participants).some((p) => p && p.marks.draft.responseId !== null),
+        );
+    }
+
+    /**
+     * Determine if any activities have draft marks for any participant
+     * @param activities - The activities to check
+     * @returns bool
+     */
+    function hasDraftMarks(activities: MarkbookActivity[] | MarkbookActivity): boolean {
+        if (data.value === null) {
+            return false;
+        }
+
+        const activitiesList = Array.isArray(activities) ? activities : [activities];
+        return data.value.classImpls.some((classImpl) =>
+            activitiesList.some((activity) => {
+                const aImpl = classImpl.assessments[activity.id];
+                return aImpl && aImplHasDraftMarks(aImpl);
+            }),
+        );
+    }
+
     return {
         init,
         data,
@@ -143,5 +176,8 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
         orderedClassImplActivities,
         orderedClassImplStudents,
         popoutSelectedCell,
+        feedbackSelectedCell,
+        aImplHasDraftMarks,
+        hasDraftMarks,
     };
 });

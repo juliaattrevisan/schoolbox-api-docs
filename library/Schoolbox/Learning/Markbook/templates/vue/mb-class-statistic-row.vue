@@ -95,7 +95,7 @@ async function onValueChange(activityId: number, aImpl: MarkbookClassImplActivit
 </script>
 
 <template>
-    <tr v-if="mbStore.data !== null" class="sub-row">
+    <tr v-if="mbStore.data !== null" class="sub-row" :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }">
         <th class="fixed-left">{{ label }}</th>
         <th class="fixed-left">&nbsp;</th>
         <td v-if="mbStore.data.rank !== null"></td>

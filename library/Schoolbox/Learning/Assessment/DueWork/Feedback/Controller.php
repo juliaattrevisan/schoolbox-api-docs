@@ -420,6 +420,10 @@ class Controller extends Base
             'success' => true,
             'message' => 'OK',
             'id'      => $feedback->getId(),
+            /* these extra fields are currently used by the Markbook to keep things responsive */
+            'normalisedMark'              => $feedback->getNormalisedMark(),
+            'humanReadableMark'           => $feedback->getHumanReadableMark(),
+            'humanReadableInstructorMark' => $feedback->getHumanReadableInstructorMark(),
         ];
 
         $this->respond('', $data);

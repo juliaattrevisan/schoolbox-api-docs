@@ -1,20 +1,41 @@
 <script setup lang="ts">
+interface Props {
+    /**
+     * To display this as a link instead of a button
+     */
+    link?: string;
+    /**
+     * Force callback over the link being followed
+     */
+    forceCallback?: boolean;
+}
+
+const props = defineProps<Props>();
+
 /**
  * A button contained within pop-out-menu-markbook
  */
-
 const emit = defineEmits(["selected"]);
 
 /**
  * Dispatch to notify of selection
+ * @param e - the event
  */
-function onSelected(): void {
+function onSelected(e: Event): void {
+    if (props.link && !props.forceCallback) {
+        return;
+    }
+
+    e.preventDefault();
     emit("selected");
 }
 </script>
 
 <template>
-    <button class="c-menu-item" @click="onSelected">
+    <a v-if="props.link" class="c-menu-item" :href="props.link" @click="onSelected">
+        <slot></slot>
+    </a>
+    <button v-else class="c-menu-item" @click="onSelected">
         <slot></slot>
     </button>
 </template>

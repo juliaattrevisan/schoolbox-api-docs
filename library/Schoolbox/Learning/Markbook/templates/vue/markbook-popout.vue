@@ -10,6 +10,7 @@ import {
     ACTIVITY_TYPE_TASK,
     ACTIVITY_TYPE_PROJECT,
     ACTIVITY_TYPE_DUE_WORK,
+    ACTIVITY_TYPE_QUIZ,
 } from "@schoolboxAssessment/Types/assessmentTypes";
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import { usePopOut } from "@schoolboxVue/composables/popOut/usePopOut";
@@ -18,7 +19,11 @@ import PopOutMenuItem from "@schoolboxVue/components/menu/pop-out-menu-item.vue"
 import PopOutMenuDivider from "@schoolboxVue/components/menu/pop-out-menu-divider.vue";
 import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
 import { useMarkbookStore } from "./store/markbookStore";
-import type { MarkbookSelectedCellInfo, MarkbookClassImplActivityParticipant } from "./types/payload";
+import type {
+    MarkbookPopoutSelectedCellInfo,
+    MarkbookClassImplActivityParticipant,
+    ActivityInfoResponsePayload,
+} from "./types/payload";
 
 const mbStore = useMarkbookStore();
 
@@ -68,7 +73,7 @@ const isExpansionDisabled = window.Vue.computed(() => activityItems.value.length
  * in case a user is interacting with a modal (i.e. exclude) or something else and it closes the popout
  * we still need to know which cell was selected to be able to perform actions on it
  */
-const selectedCell = window.Vue.ref<MarkbookSelectedCellInfo | null>(null);
+const selectedCell = window.Vue.ref<MarkbookPopoutSelectedCellInfo | null>(null);
 
 /**
  * All the data relating to the currently selected cell in the markbook
@@ -118,13 +123,15 @@ const routes = window.Vue.computed(() => {
     const studentRoutes = cellInfo.value ? cellInfo.value.aImpl._routes.student[cellInfo.value.studentId] : undefined;
 
     return {
-        dataEndpoint: studentRoutes?.["learningAssessmentTimeline.getFullTimeline"] ?? null,
+        timelineEndpoint: studentRoutes?.["learningAssessmentTimeline.getFullTimeline"] ?? null,
+        infoEndpoint: studentRoutes?.["learningAssessment.getInfo"] ?? null,
         updateRoute: studentRoutes?.["learningDueWorkResponse.getParticularResponse"] ?? null,
         reviewRoute: studentRoutes?.["learningDueWorkResponse.getParticularResponse"] ?? null,
         publishRoute: studentRoutes?.["learningDueWorkFeedback.postPublishFeedback"] ?? null,
         excludeRoute: studentRoutes?.["learningAssessment.postExclude"] ?? null,
         includeRoute: studentRoutes?.["learningAssessment.postInclude"] ?? null,
         historyRoute: studentRoutes?.["learningAssessment.getSummary"] ?? null,
+        postFeedback: studentRoutes?.postFeedback ?? null,
     };
 });
 
@@ -211,27 +218,55 @@ async function getActivity(): Promise<void> {
         throw new Error("No selected cell to fetch activity for");
     }
 
-    const route = routes.value.dataEndpoint;
-    if (route === null) {
-        throw new Error("Unable to find route for retrieving activity items");
-    }
+    const timelineRoute = routes.value.timelineEndpoint;
+    const infoRoute = routes.value.infoEndpoint;
+
+    hasLoadError.value = false;
+    isLoading.value = true;
 
     try {
-        isLoading.value = true;
-        const response = await fetch(route, {
+        if (timelineRoute === null || infoRoute === null) {
+            throw new Error("Unable to find timelineRoute/infoRoute for retrieving activity items");
+        }
+
+        const timelineResponse = await fetch(timelineRoute, {
             headers: {
                 "Content-Type": "application/json",
                 Accept: "application/json",
             },
         });
-        if (response.ok) {
-            const activityItemsResponse = (await response.json()) as ActivityItem[];
-            activityItems.value = activityItemsResponse;
-            hasLoadError.value = false;
-        } else {
-            hasLoadError.value = true;
+        if (!timelineResponse.ok) {
+            throw new Error(`Failed to fetch activity items: ${timelineResponse.statusText}`);
+        }
+
+        const activityItemsResponse = (await timelineResponse.json()) as ActivityItem[];
+        activityItems.value = activityItemsResponse;
+
+        /* and now fetch some additional activity data so that we can mark feedback
+         * technically this *could* be split out to be elsewhere or happen on request to actually "Update Feedback",
+         * but for now this is far more convenient and simple
+         */
+        if (
+            [ACTIVITY_TYPE_DUE_WORK, ACTIVITY_TYPE_QUIZ].includes(cellInfo.value.activity.assessmentType) &&
+            cellInfo.value.participant
+        ) {
+            const activityInfoResponse = await fetch(infoRoute, {
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                },
+            });
+
+            if (!activityInfoResponse.ok) {
+                throw new Error(`Failed to fetch extra activity info: ${activityInfoResponse.statusText}`);
+            }
+
+            /* just shove it on the participant for now, other places can deal with it */
+            const activityInfo = (await activityInfoResponse.json()) as ActivityInfoResponsePayload;
+            cellInfo.value.participant.extraInfo = activityInfo;
         }
     } catch (error) {
+        console.error("Error fetching activity items:", error);
         hasLoadError.value = true;
     } finally {
         isLoading.value = false;
@@ -339,6 +374,33 @@ async function onMenuItemSelected(target: string | null, action: string | null =
             reloadMarkbook();
         }
     }
+}
+
+/**
+ * Trigger the update feedback UI to appear for this cell
+ */
+function onUpdateFeedbackSelected(): void {
+    if (cellInfo.value === null) {
+        throw new Error("No selected cell to update feedback for");
+    }
+
+    // Close the popout
+    close();
+
+    // If this is already selected, then close it instead I guess
+    // TODO: Maybe when a cell is selected, any other popout click just immediately opens that relevant feedback... hmm
+    const newCell = {
+        classImplId: cellInfo.value.classImplId,
+        activityId: cellInfo.value.activityId,
+        studentId: cellInfo.value.studentId,
+    };
+
+    if (JSON.stringify(newCell) === JSON.stringify(mbStore.feedbackSelectedCell)) {
+        mbStore.feedbackSelectedCell = null;
+        return;
+    }
+
+    mbStore.feedbackSelectedCell = newCell;
 }
 
 /**
@@ -487,33 +549,42 @@ function onToggleSelected(): void {
                         {{ viewAllText }}
                     </pop-out-menu-item>
                 </template>
-                <template
-                    v-if="
-                        cellInfo.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK &&
-                        cellInfo.participant &&
-                        !cellInfo.participant.isExcluded
-                    "
-                >
-                    <pop-out-menu-divider />
-                    <pop-out-menu-item
-                        v-if="!cellInfo.participant.isExcluded"
-                        :class="{ 'is-disabled': !routes.updateRoute }"
-                        @selected="onMenuItemSelected(routes.updateRoute)"
-                    >
-                        Update Feedback
-                    </pop-out-menu-item>
-                    <pop-out-menu-item
-                        :class="{ 'is-disabled': !routes.reviewRoute || isActivityEmpty || !hasSubmissions }"
-                        @selected="onMenuItemSelected(routes.reviewRoute)"
-                    >
-                        Review Submission
-                    </pop-out-menu-item>
-                    <pop-out-menu-item
-                        :class="{ 'is-disabled': !routes.publishRoute || isActivityEmpty || !hasDraftFeedback }"
-                        @selected="onMenuItemSelected(routes.publishRoute, 'publish')"
-                    >
-                        Publish Feedback
-                    </pop-out-menu-item>
+                <pop-out-menu-divider />
+                <template v-if="cellInfo.participant && !cellInfo.participant.isExcluded">
+                    <template v-if="cellInfo.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK">
+                        <pop-out-menu-item
+                            v-if="!cellInfo.participant.isExcluded"
+                            :class="{ 'is-disabled': !routes.postFeedback }"
+                            :link="routes.updateRoute ?? undefined"
+                            force-callback
+                            @selected="onUpdateFeedbackSelected"
+                        >
+                            Update Feedback
+                        </pop-out-menu-item>
+                        <pop-out-menu-item
+                            :class="{ 'is-disabled': !routes.reviewRoute || isActivityEmpty || !hasSubmissions }"
+                            :link="routes.reviewRoute ?? undefined"
+                        >
+                            Review Submission
+                        </pop-out-menu-item>
+                        <!-- TODO: make this publish logic the same as the rest I guess -->
+                        <pop-out-menu-item
+                            :class="{ 'is-disabled': !routes.publishRoute || isActivityEmpty || !hasDraftFeedback }"
+                            @selected="onMenuItemSelected(routes.publishRoute, 'publish')"
+                        >
+                            Publish Feedback
+                        </pop-out-menu-item>
+                    </template>
+                    <template v-else-if="cellInfo.activity.assessmentType === ACTIVITY_TYPE_QUIZ">
+                        <pop-out-menu-item
+                            v-if="!cellInfo.participant.isExcluded"
+                            :class="{ 'is-disabled': !routes.postFeedback }"
+                            force-callback
+                            @selected="onUpdateFeedbackSelected"
+                        >
+                            Update Feedback
+                        </pop-out-menu-item>
+                    </template>
                 </template>
                 <pop-out-menu-item
                     v-if="cellInfo.participant && cellInfo.participant.isExcluded"
@@ -540,7 +611,7 @@ function onToggleSelected(): void {
                             cellInfo.participant.isExcluded ||
                             (isActivityEmpty && cellInfo.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK),
                     }"
-                    @selected="onMenuItemSelected(routes.historyRoute)"
+                    :link="routes.historyRoute ?? undefined"
                 >
                     {{ viewStatusText }}
                 </pop-out-menu-item>
