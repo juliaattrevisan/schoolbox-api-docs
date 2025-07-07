@@ -14,7 +14,7 @@ const props = defineProps<Props>();
 <template>
     <li class="separator">Activity</li>
     <li v-if="props.activity._links?.summary">
-        <a :href="getReturnUrl(props.activity._links.summary)" class="icon-view"> View </a>
+        <a :href="getReturnUrl(props.activity._links.summary)" class="icon-view">View</a>
     </li>
     <li v-if="props.activity._links?.modify">
         <a :href="getReturnUrl(props.activity._links.modify)" class="icon-modify">
@@ -22,10 +22,10 @@ const props = defineProps<Props>();
         </a>
     </li>
     <li v-if="props.activity._links?.modifyContent">
-        <a :href="getReturnUrl(props.activity._links.modifyContent)" class="icon-modify"> Modify Content </a>
+        <a :href="getReturnUrl(props.activity._links.modifyContent)" class="icon-modify">Modify Content</a>
     </li>
     <li v-if="props.activity._links?.status">
-        <a :href="getReturnUrl(props.activity._links.status)" class="icon-progress"> View Status </a>
+        <a :href="getReturnUrl(props.activity._links.status)" class="icon-progress">View Status</a>
     </li>
     <!-- TODO <li>
         <a href="" class="icon-upload"> Import Feedback </a>
