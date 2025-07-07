@@ -304,9 +304,7 @@ class Controller extends AbstractController
          * The presence of <?xml version="1.0" ?> denotes xml;
          * otherwise, presume json
          */
-        if (preg_match('/^<?xml version="1.0" ?>/', $data)) {
-            new \Alaress_Probe('xml');die();
-
+        if (preg_match('/^<\?xml version="1\.0" \?>/', $data)) {
             /* Intentionally prefill with an instance of AssessmentContext
              * and other POST vars the Factory assumes exist
              */
@@ -366,8 +364,6 @@ class Controller extends AbstractController
                 )
             );
         } else {
-            new \Alaress_Probe('json');die();
-
             /* There used to be stuff here that was used to convert url domains but I'm not sure we even
              * needed them. We needed them in the xml days, but I don't think we needed them here.
              */
