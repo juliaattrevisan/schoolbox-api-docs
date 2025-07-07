@@ -166,11 +166,16 @@ class GarbageCollector
             return;
         }
 
-        // update all the survivors' last-touch dates to current time
-        $stmt = $this->mapper->getDatabase()->prepare("UPDATE `storage` SET `last_accessed` = NOW() WHERE `hash` = ?");
+        // update all the survivors' last garbage collect dates to current time
+        $stmt = $this->mapper->getDatabase()->prepare("
+            UPDATE {$this->mapper->getDatabase()->getQuoter()->quoteIdentifier($this->mapper->getTable())}
+            SET `last_gc_at` = :now
+            WHERE `hash` = :hash
+        ");
 
+        $now = Alaress_Date_Format::now()->getDatabase();
         foreach ($hashes as $hash) {
-            $stmt->execute([$hash]);
+            $stmt->execute(['now' => $now, 'hash' => $hash]);
         }
     }
 
