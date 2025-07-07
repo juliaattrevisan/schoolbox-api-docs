@@ -40,11 +40,7 @@ const mbStore = useMarkbookStore();
             />
         </template>
 
-        <tr
-            v-if="props.type === 'course'"
-            class="course-headers"
-            :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }"
-        >
+        <tr class="course-headers" :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }">
             <th class="fixed-left transparent"></th>
             <th class="fixed-left white"></th>
             <th v-if="mbStore.data.rank !== null" class="white"></th>
