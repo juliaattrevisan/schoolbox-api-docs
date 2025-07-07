@@ -315,9 +315,9 @@ class Controller extends WebController\Base
 
                                 return [
                                     'id' => $aImpl->getId(),
+                                    'markVisibility' => $aImpl->getMarkVisibility(),
+                                    'courseManaged'  => $aImpl->getCourseManaged(),
                                     /* unused on the course markbook: */
-                                    // 'markVisibility' => ...,
-                                    // 'courseManaged'  => ...,
                                     // 'weight'         => ...,
                                     // 'writable'       => ...,
                                     'instructorMarkScheme' => [
@@ -373,13 +373,16 @@ class Controller extends WebController\Base
                                             ];
                                         }
                                     ),
-                                    'stats' => array_map(
-                                        /* Get the stats in the same format as returned by the class markbook */
-                                        fn($mark): string|null => $mark === null ? null : sprintf("%.2f %%", $mark),
-                                        [
-                                            'mean'      => $courseMarkbook->getAssessmentImplAverages()[$aImpl->getId()]['published'] ?? null,
-                                            'draftMean' => $courseMarkbook->getAssessmentImplAverages()[$aImpl->getId()]['any'] ?? null,
-                                        ]
+                                    'stats' => array_merge(
+                                        array_map(
+                                            /* Get the stats in the same format as returned by the class markbook */
+                                            fn($mark): string|null => $mark === null ? null : sprintf("%.2f %%", $mark),
+                                            [
+                                                'mean'      => $courseMarkbook->getAssessmentImplAverages()[$aImpl->getId()]['published'] ?? null,
+                                                'draftMean' => $courseMarkbook->getAssessmentImplAverages()[$aImpl->getId()]['any'] ?? null,
+                                            ]
+                                        ),
+                                        [ 'markVisibility' => $aImpl->getMarkVisibility() ]
                                     ),
                                     '_routes' => [
                                         'learningAssessment.getStatus' => $this->routeGenerator->generate(

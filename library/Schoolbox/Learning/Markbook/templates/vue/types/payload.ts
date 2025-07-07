@@ -83,7 +83,7 @@ export type MarkbookClassImplActivity = {
         sdNormalized: number | null;
         weightPercent?: number | null;
         projectWeightPercent?: number | null;
-        markVisibility?: number;
+        markVisibility: number;
     };
     _routes: {
         "learningAssessment.getStatus": string;
@@ -104,7 +104,7 @@ export type MarkbookClassImplActivity = {
     };
     instructorMarkScheme: MarkScheme;
     /* currently class markbook only */
-    markVisibility?: number;
+    markVisibility: number;
     courseManaged?: boolean | null;
     writable?: boolean;
     weight: number;

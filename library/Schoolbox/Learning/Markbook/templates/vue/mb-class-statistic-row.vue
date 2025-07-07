@@ -105,7 +105,7 @@ async function onValueChange(activityId: number, aImpl: MarkbookClassImplActivit
             class="student-grade-cell"
             :data-assessment="assessment.id"
         >
-            <template v-if="stat === null || aImpl === null || !aImpl.writable"></template>
+            <template v-if="stat === null || aImpl === null || aImpl.writable === false"></template>
             <template v-else-if="props.input && (props.input.allowCourseManaged || !aImpl.courseManaged)">
                 <select
                     v-if="props.input.selectOptions && assessment.assessmentType !== ACTIVITY_TYPE_TASK"

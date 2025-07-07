@@ -88,7 +88,6 @@ const orderedClassImplStudents = window.Vue.computed(() => {
         </template>
 
         <mb-class-statistic-row
-            v-if="props.type === 'class'"
             :class-impl="classImpl"
             label="Visibility"
             stats-key="markVisibility"
