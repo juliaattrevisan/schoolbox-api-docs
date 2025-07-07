@@ -42,7 +42,7 @@ export const payload = {
             },
         ],
         totalRows: [
-            null, // No total for the user column
+            "Total", // No total for the user column
             { records: 45, points: 90 }, // Total across all users
             { records: 18, points: 36 }, // Academic > Academic Honesty total
             { records: 11, points: 22 }, // Academic > Award/Achievement total

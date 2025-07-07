@@ -30,12 +30,14 @@ function handleSort(header: PastoralReportTableHeader): void {
  * otherwise the radio buttons just display on their own row
  */
 const hasSubTitles = props.headers.some((header) => header.subTitle && header.subTitle.length > 0);
+
+const onlyHeadersWithSubTitles = props.headers.filter((header) => header.subTitle && header.subTitle.length > 0);
 </script>
 
 <template>
     <thead class="pr-table-header">
         <tr>
-            <td :rowspan="hasSubTitles ? props.headers.length : 2">
+            <th :colspan="hasSubTitles ? 2 : props.headers.length">
                 <div class="checklist">
                     <ul class="option-list">
                         <li>
@@ -48,28 +50,23 @@ const hasSubTitles = props.headers.some((header) => header.subTitle && header.su
                         </li>
                     </ul>
                 </div>
-            </td>
+            </th>
+            <template v-if="hasSubTitles">
+                <th v-for="header in onlyHeadersWithSubTitles" :key="`${header.key}-title`">
+                    {{ header.title }}
+                </th>
+            </template>
         </tr>
         <tr>
-            <th
-                v-for="header in props.headers"
-                :key="header.key"
-                :class="{
-                    'pr-table-header__cell': true,
-                    'pr-table-header__cell--sortable': header.isSortable,
-                }"
-                @click="handleSort(header)"
-            >
-                <div class="pr-table-header__content">
-                    <div class="pr-table-header__title">{{ header.title }}</div>
-                    <div v-if="header.subTitle" class="pr-table-header__subtitle">
-                        {{ header.subTitle }}
-                    </div>
-                </div>
-                <div v-if="header.isSortable" class="pr-table-header__sort-icon">↕</div>
+            <th v-for="header in props.headers" :key="header.key" @click="handleSort(header)">
+                {{ header.subTitle ? header.subTitle : header.title }}
             </th>
         </tr>
     </thead>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+th {
+    border: 1px solid red;
+}
+</style>

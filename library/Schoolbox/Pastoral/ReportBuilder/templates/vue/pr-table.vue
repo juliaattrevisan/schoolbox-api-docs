@@ -35,12 +35,12 @@ const createTotalRowData = (): (ColumnUser | ColumnRecordsAndPoints)[] => {
         <pr-table-header :headers="data.data.tableHeaders" @sort="handleSort" />
         <tbody>
             <!-- Total row if totals are provided -->
-            <pr-table-row
+            <!-- <pr-table-row
                 v-if="data.data.totalRows.some((total: ColumnTotalRecordsAndPoints | null) => total !== null)"
                 :headers="data.data.tableHeaders"
                 :row-data="createTotalRowData()"
                 :is-total="true"
-            />
+            /> -->
             <!-- Data rows -->
             <pr-table-row
                 v-for="(row, index) in data.data.rows"

@@ -95,4 +95,8 @@ function isRecordsColumn(columnType: string): boolean {
     </tr>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+td {
+    border: 1px solid red;
+}
+</style>
