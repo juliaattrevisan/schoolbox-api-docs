@@ -2,6 +2,7 @@
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import { ACTIVITY_TYPE_DUE_WORK, ACTIVITY_TYPE_QUIZ } from "@schoolboxAssessment/Types/assessmentTypes";
 import type { MarkbookActivity } from "./types/payload";
+import MbTableHeadActivityPublish from "./mb-table-head-activity-publish.vue";
 
 interface Props {
     activity: MarkbookActivity;
