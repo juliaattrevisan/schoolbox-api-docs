@@ -175,11 +175,8 @@ jobs:
             type=ref,event=tag,prefix=
 
       - name: Join schoolbox-frankenphp images (latest)
-        if: github.event_name == 'push'
         working-directory: ${{ runner.temp }}/digests
         run: |
           docker buildx imagetools create $(jq -cr '.tags | map ("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
             $(printf 'alaress/schoolbox-frankenphp@sha256:%s ' *) \
             $(printf '${{ vars.SCHOOLBOX_ECR_REPO }}@sha256:%s ' *)
-
-      # Need artifact for the joined image too, or pull the just built image?
