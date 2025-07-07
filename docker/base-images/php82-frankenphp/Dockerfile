@@ -5,7 +5,7 @@
 #      otherwise, build with dev dependencies.
 ARG ENV=dev
 
-FROM dunglas/frankenphp:1.7-php8.2-bookworm
+FROM dunglas/frankenphp:1.8-php8.2-bookworm
 
 # Ensure ENV is accessible by this build step:
 # otherwise, xDebug will be installed below.
