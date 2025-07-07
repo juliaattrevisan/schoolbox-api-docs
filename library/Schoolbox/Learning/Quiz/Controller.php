@@ -394,7 +394,7 @@ class Controller extends AbstractController
             } else {
                 /* Otherwise redirect back to the quiz you just made...its modify screen, I guess.
                  */
-                $returnUrl = $this->routeGenerator->generate('learningAssessment.getUpdateAssessmentForm', ['assessmentId' => $newInstances['assessment']->getId()]);
+                $returnUrl = $this->routeGenerator->generate('learningAssessment.getUpdateAssessmentForm', ['assessmentId' => $result['assessment']->getId()]);
             }
 
             $this->response = $this->redirectFound($returnUrl);
