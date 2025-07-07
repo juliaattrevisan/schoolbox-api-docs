@@ -360,12 +360,16 @@ class Controller extends AbstractController
                 $this->storageMapper,
                 $this->curriculumNodeMapper,
             ))->import($data);
+
+            /* Distill anything mostly non-fatal that we found during the import process
+             */
+            $errors = $result['errors'];
         }
 
         /* Check for errors: if there were any, go to a new screen to explain this.
          * Otherwise just redirect back to the quiz you just made...its modify screen, I guess.
          */
-        if (\count($result['errors'])) {
+        if (\count($errors)) {
             /* Breadcrumbs
              */
             $breadcrumbs = $this->bakery->produceFromAssessment($result['assessment'], $this->getUser())
@@ -378,7 +382,7 @@ class Controller extends AbstractController
             $this->response = $this->responseFromTemplate('@learningQuiz/importLog.twig', [
                 'breadcrumbs' => $breadcrumbs,
                 'assessment' => $result['assessment'],
-                'errors' => $result['errors']
+                'errors' => $errors
             ], 'Import errors');
         } else {
             $returnUrlEncoded = $this->requestPost['returnUrl'];
