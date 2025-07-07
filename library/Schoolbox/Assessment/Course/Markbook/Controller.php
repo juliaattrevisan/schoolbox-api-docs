@@ -246,7 +246,7 @@ class Controller extends WebController\Base
 
             $data = [
                 'rank' => (bool)$this->getConfigLoader()->get('view_rank') ? $courseMarkbook->getRanking() : null,
-                'assessments' => $courseMarkbook->getCollapsedAssessments()->reindex()->map(function (IAssessable $assessment, $sequence) use ($courseMarkbook, $unitSpecs) {
+                'assessments' => $courseMarkbook->getCollapsedAssessments()->reindex()->map(function (IAssessable $assessment, $sequence) use ($courseMarkbook, $unitSpecs, $courseSpec) {
                     $unitAssessmentsTranslator = new UnitAssessments(
                         $this->routeGenerator,
                         $this->getAuthorizer(),
@@ -277,6 +277,19 @@ class Controller extends WebController\Base
                         ) : null,
                         /* only show the links for specs, for historical reasons i guess... */
                         '_links'          => $unitAssessmentsTranslator->getLinks($assessment, false),
+                        '_routes'         => [
+                            'postFeedbacks' => $assessment->isSpecification()
+                                ? $this->getRouteIfAuthorized(
+                                    'courseStatus.postPublishFeedback',
+                                    [
+                                        'assessment'   => $assessment,
+                                        'assessmentId' => $assessment->getId(),
+                                        'courseSpec'   => $courseSpec,
+                                        'courseSpecId' => $courseSpec->getId(),
+                                    ]
+                                )
+                                : null,
+                        ],
                     ];
                 })->indexByCallback(fn(array $assessment) => $assessment['id']),
                 /**
@@ -372,10 +385,6 @@ class Controller extends WebController\Base
                                         'learningAssessment.getStatus' => $this->routeGenerator->generate(
                                             'learningAssessment.getStatus',
                                             ['assessmentId' => $aImpl->getId()]
-                                        ),
-                                        'learningDueWorkFeedback.postParticipantFeedbacks' => $this->getRouteIfAuthorized(
-                                            'learningDueWorkFeedback.postParticipantFeedbacks',
-                                            ['assessment' => $aImpl, 'assessmentId' => $aImpl->getId()]
                                         ),
                                         'student' => $courseMarkbook->getCourseImportStudents()[$courseImpl->getId()]->map(fn(User $student) => [
                                             'learningAssessmentTimeline.getFullTimeline' => $this->getRouteIfAuthorized(

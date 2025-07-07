@@ -30,7 +30,7 @@ const props = defineProps<Props>();
     <!-- TODO <li>
         <a href="" class="icon-upload"> Import Feedback </a>
     </li> -->
-    <template v-if="props.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK">
+    <template v-if="props.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK && activity._routes.postFeedbacks">
         <li class="separator">Bulk Actions</li>
         <li>
             <mb-table-head-activity-publish :activity="props.activity" />

@@ -149,6 +149,12 @@ class Controller extends Base
                         'isSpecification' => $assessment->isSpecification(),
                         'stats'           => null,
                         '_links'          => $unitAssessmentsTranslator->getLinks($assessment, false),
+                        '_routes'         => [
+                            'postFeedbacks' => $this->getRouteIfAuthorized(
+                                'learningDueWorkFeedback.postParticipantFeedbacks',
+                                ['assessment' => $assessment, 'assessmentId' => $assessment->getId()]
+                            ),
+                        ],
                     ];
                 })->indexByCallback(fn(array $assessment) => $assessment['id']),
                 /**
@@ -255,10 +261,6 @@ class Controller extends Base
                                 'learningAssessment.getStatus' => $this->routeGenerator->generate(
                                     'learningAssessment.getStatus',
                                     [ 'assessmentId' => $aImpl->getId() ]
-                                ),
-                                'learningDueWorkFeedback.postParticipantFeedbacks' => $this->getRouteIfAuthorized(
-                                    'learningDueWorkFeedback.postParticipantFeedbacks',
-                                    [ 'assessment' => $aImpl, ]
                                 ),
                                 'student' => $markbook->getStudents()->map(fn(User $student) => [
                                     'learningAssessmentTimeline.getFullTimeline' => $this->getRouteIfAuthorized(

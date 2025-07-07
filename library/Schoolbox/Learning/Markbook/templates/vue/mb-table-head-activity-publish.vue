@@ -76,6 +76,7 @@ async function onPublishAll(): Promise<void> {
         return;
     }
 
+    // Retrieve the activity from the store, as we can't modify props directly
     const activity = mbStore.data?.assessments[props.activity.id] ?? null;
     if (activity === null) {
         throw new Error("Activity not found, cannot publish drafts");
@@ -83,41 +84,36 @@ async function onPublishAll(): Promise<void> {
 
     const selectedParticipantIds = keysOf(selectedParticipants.value).filter((id) => selectedParticipants.value[id]);
 
-    /** For now, this is chunked by aImpl as we don't have a route to do many at once */
+    const selectedResponseIds = participantsWithDrafts.value.flatMap(({ participants }) => {
+        return participants
+            .filter((participant) => selectedParticipantIds.includes(`${participant.student.id}`))
+            .map((participant) => participant.responseId);
+    });
+
+    if (selectedResponseIds.length === 0) {
+        return;
+    }
+
     const toast = window.sbProps.toastActivate("Publishing drafts...");
     isPublishing.value = true;
     try {
-        await Promise.all(
-            participantsWithDrafts.value.map(async ({ aImpl, participants }) => {
-                const selectedResponseIds = participants
-                    .filter((participant) => selectedParticipantIds.includes(`${participant.student.id}`))
-                    .map((participant) => participant.responseId);
+        if (activity._routes.postFeedbacks === null) {
+            // shouldn't get here, but if you do...
+            throw new Error(`Missing access to publish drafts for ${activity.title}`);
+        }
 
-                if (selectedResponseIds.length === 0) {
-                    return;
-                }
+        const resp = await fetch(activity._routes.postFeedbacks, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify({ drafts: selectedResponseIds }),
+        });
 
-                const postParticipantFeedbacks =
-                    aImpl._routes["learningDueWorkFeedback.postParticipantFeedbacks"] || null;
-                if (postParticipantFeedbacks === null) {
-                    // shouldn't get here, but if you do...
-                    throw new Error(`Missing access to publish drafts for ${activity.title}`);
-                }
-
-                const resp = await fetch(postParticipantFeedbacks, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Accept: "application/json",
-                    },
-                    body: JSON.stringify({ drafts: selectedResponseIds }),
-                });
-
-                if (!resp.ok) {
-                    throw new Error(`Failed to publish drafts for ${activity.title}`);
-                }
-            }),
-        );
+        if (!resp.ok) {
+            throw new Error(`Failed to publish drafts for ${activity.title}`);
+        }
 
         toast.timeout({
             text: "Published drafts",
@@ -150,12 +146,14 @@ async function onPublishAll(): Promise<void> {
             dataPublished.hr = dataDraft.hr;
             dataPublished.hrInstructor = dataDraft.hrInstructor;
             dataPublished.norm = dataDraft.norm;
+            dataPublished.responseId = dataDraft.responseId;
 
             /* and reset the draft data to defaults */
             dataDraft.comment = null;
             dataDraft.hr = null;
             dataDraft.hrInstructor = null;
             dataDraft.norm = null;
+            dataDraft.responseId = null;
         });
 
         // TODO: handle partial updates (not all participants selected)
@@ -212,7 +210,13 @@ async function onPublishAll(): Promise<void> {
             <div class="component-action">
                 <section>
                     <button class="button" :disabled="isPublishing" @click="isPublishModalOpen = false">Cancel</button>
-                    <button class="button" :disabled="isPublishing" type="submit" @click.prevent="onPublishAll">
+                    <button
+                        v-if="participantsWithDrafts.length > 0"
+                        class="button"
+                        :disabled="isPublishing"
+                        type="submit"
+                        @click.prevent="onPublishAll"
+                    >
                         {{ isPublishing ? "Publishing..." : "Publish All" }}
                     </button>
                 </section>
