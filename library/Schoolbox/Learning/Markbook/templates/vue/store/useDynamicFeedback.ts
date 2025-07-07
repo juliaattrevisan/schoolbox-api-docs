@@ -79,9 +79,9 @@ export function useDynamicFeedback(
      */
     const isDraftDirty = window.Vue.computed(
         (): boolean =>
-            data.hrMarkInstructor.value !== dataDraft.hrMarkInstructor.value ||
-            data.comment.value !== dataDraft.comment.value ||
-            data.resubmissionRequired.value !== dataDraft.resubmissionRequired.value,
+            (data.hrMarkInstructor.value ?? null) !== (dataDraft.hrMarkInstructor.value ?? null) ||
+            (data.comment.value || null) !== (dataDraft.comment.value || null) ||
+            (data.resubmissionRequired.value ?? null) !== (dataDraft.resubmissionRequired.value ?? null),
     );
 
     /**
@@ -89,9 +89,9 @@ export function useDynamicFeedback(
      */
     const isPublishedDirty = window.Vue.computed(
         (): boolean =>
-            data.hrMarkInstructor.value !== dataPublished.hrMarkInstructor.value ||
-            data.comment.value !== dataPublished.comment.value ||
-            data.resubmissionRequired.value !== dataPublished.resubmissionRequired.value,
+            (data.hrMarkInstructor.value ?? null) !== (dataPublished.hrMarkInstructor.value ?? null) ||
+            (data.comment.value || null) !== (dataPublished.comment.value || null) ||
+            (data.resubmissionRequired.value ?? null) !== (dataPublished.resubmissionRequired.value ?? null),
     );
 
     const isPublishInProgress = window.Vue.ref(false);
