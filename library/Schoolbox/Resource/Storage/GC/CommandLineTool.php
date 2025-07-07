@@ -102,8 +102,9 @@ HELP;
         $gc = $gc
             ->addCheck(new Check\ForeignKeyRelation($db, SQL_db, $mapper->getTable(), $this->getLogger()))
             ->addCheck(new Check\CharacterField($db, $this->getLogger()))
+            ->addCheck(new Check\TextField($db, SQL_db, $this->getLogger()))
 //            ->addCheck(new Check\HardLinks($db))
-            ->addCheck(new Check\SoftLinks($db, SQL_db, $this->getLogger()))
+//            ->addCheck(new Check\SoftLinks($db, SQL_db, $this->getLogger()))
         ;
 
         $deleted = $gc->purge();
