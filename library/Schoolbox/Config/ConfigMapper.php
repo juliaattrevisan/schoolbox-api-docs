@@ -360,11 +360,11 @@ class ConfigMapper extends Mapper
 
     /* OpenAI
      */
-    public const NAME_OPENAI_ENDPOINT = 'openai_endpoint';
-    public const NAME_OPENAI_KEY = 'openai_key';
-    public const NAME_OPENAI_RESOURCE_NAME = 'openai_azure_resource_name';
-    public const NAME_OPENAI_DEPLOYMENT_ID = 'openai_azure_deployment_id';
-    public const NAME_OPENAI_MODEL = 'openai_model';
+    public const NAME_OPENAI_TEXT_ENDPOINT = 'openai_text_endpoint';
+    public const NAME_OPENAI_TEXT_KEY = 'openai_text_key';
+    public const NAME_OPENAI_TEXT_RESOURCE_NAME = 'openai_text_azure_resource_name';
+    public const NAME_OPENAI_TEXT_DEPLOYMENT_ID = 'openai_text_azure_deployment_id';
+    public const NAME_OPENAI_TEXT_MODEL = 'openai_text_model';
 
 
     public const NAME_DATASET_INSTANCE = 'dataset_instance';

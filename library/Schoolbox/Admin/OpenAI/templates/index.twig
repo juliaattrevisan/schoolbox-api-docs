@@ -15,11 +15,11 @@
                 const PROVIDER_OPENAI = '{{ models.openai }}';
                 const PROVIDER_AZURE = '{{ models.azure }}';
 
-                let provider = $('#openai_endpoint-field');
-                let key = $('#openai_key-field').parent('div');
-                let model = $('#openai_model-field').parent('div');
-                let azureResourceName = $('#openai_azure_resource_name-field').parent('div');
-                let azureDeploymentId = $('#openai_azure_deployment_id-field').parent('div');
+                let provider = $('#openai_text_endpoint-field');
+                let key = $('#openai_text_key-field').parent('div');
+                let model = $('#openai_text_model-field').parent('div');
+                let azureResourceName = $('#openai_text_azure_resource_name-field').parent('div');
+                let azureDeploymentId = $('#openai_text_azure_deployment_id-field').parent('div');
 
                 provider.on('change', function(event) {
                     event.preventDefault();
