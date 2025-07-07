@@ -24,10 +24,32 @@ function handleSort(header: PastoralReportTableHeader): void {
         emit("sort", header.key);
     }
 }
+
+/**
+ * If we have sub titles, it means the titles need to be displayed on the same row as the records/points radio buttons,
+ * otherwise the radio buttons just display on their own row
+ */
+const hasSubTitles = props.headers.some((header) => header.subTitle && header.subTitle.length > 0);
 </script>
 
 <template>
     <thead class="pr-table-header">
+        <tr>
+            <td :rowspan="hasSubTitles ? props.headers.length : 2">
+                <div class="checklist">
+                    <ul class="option-list">
+                        <li>
+                            <input id="records" type="radio" value="records" />
+                            <label for="records">Records</label>
+                        </li>
+                        <li>
+                            <input id="points" type="radio" value="points" />
+                            <label for="points">Points</label>
+                        </li>
+                    </ul>
+                </div>
+            </td>
+        </tr>
         <tr>
             <th
                 v-for="header in props.headers"

@@ -16,21 +16,21 @@ export const payload = {
             {
                 key: "subtype-22", // When a subtype, the id is of the subtype
                 title: "Academic",
-                subtitle: "Academic Honesty",
+                subTitle: "Academic Honesty",
                 columnType: "ColumnRecordsAndPoints",
                 isSortable: true,
             },
             {
                 key: "subtype-1",
                 title: "Academic",
-                subtitle: "Award/Achievement",
+                subTitle: "Award/Achievement",
                 columnType: "ColumnRecordsAndPoints",
                 isSortable: true,
             },
             {
                 key: "subtype-3",
                 title: "Wellbeing",
-                subtitle: "Award Achievement",
+                subTitle: "Award Achievement",
                 columnType: "ColumnRecordsAndPoints",
                 isSortable: true,
             },
