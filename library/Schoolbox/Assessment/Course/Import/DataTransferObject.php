@@ -49,7 +49,7 @@ class DataTransferObject
      * 2. Both AssessmentSpec + AssessmentImpl => UnitSpec imported and AssessmentSpec imported. Spec may be deleted.
      * 3. Just an AssessmentImpl               => Assessment was created directly in UnitImpl. Impl cannot be deleted.
      *
-     * @var GenericCollection
+     * @var GenericCollection<int, GenericCollection<AssessmentPair>>
      *      IAssessable[][][]|AssessmentPair[][] $unitSpecAssessments
      *      IAssessable|null                     $unitSpecAssessments [unitSpec.id][]['spec']
      *      IAssessable|null                     $unitSpecAssessments [unitSpec.id][]['impl']
@@ -461,7 +461,7 @@ class DataTransferObject
      * Outer set indexed by UnitSpec.id
      * Inner set unordered
      *
-     * @return GenericCollection
+     * @return GenericCollection<int, GenericCollection<AssessmentPair>>
      *         IAssessable[][][]|AssessmentPair[][]|GenericCollection[]|GenericCollection Sets of sets of IAssessable pairs
      *         (the more specific type above might not be quite right - was causing PHPStan errors)
      */
