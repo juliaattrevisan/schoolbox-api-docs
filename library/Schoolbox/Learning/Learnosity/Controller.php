@@ -2486,15 +2486,14 @@ class Controller extends Base
 
         $struct = (new Exporter($this->storageMapper, $this->filesystemProxy, $this->api))->generate($assessment);
 
-        header('Cache-Control: private');
-        header('Content-type: application/json');
+        $response = $this->responseAsJson($struct);
+
+        /* You actually need this separately atm
+         * $response->withHeader('Content-disposition', "attachment; filename=\"{$filename}\"");
+         */
         header("Content-disposition: attachment; filename=\"{$filename}\"");
 
-        $output = fopen('php://output', 'rw');
-
-        fputs($output, $struct);
-
-        fclose($output);
+        $this->response = $response;
     }
 
 

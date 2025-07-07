@@ -430,8 +430,20 @@ class Exporter
             unset($activity['tags']);
 
             foreach ($activity['data']['items'] as &$item) {
-                $item['id'] = $itemReplacementRefs[$item['reference']];
-                $item['reference'] = $itemReplacementRefs[$item['reference']];
+                /* Due to learnosity behaviour https://help.learnosity.com/hc/en-us/requests/23258
+                 * we have to accommodate $itemReference being a string (lol) as well as an array (lol)
+                 */
+                if (is_array($item)) {
+                    $item['id'] = $itemReplacementRefs[$item['reference']];
+                    $item['reference'] = $itemReplacementRefs[$item['reference']];
+                } else {
+                    $ref = $item;
+
+                    $item = [
+                        'id' => $itemReplacementRefs[$ref],
+                        'reference' => $itemReplacementRefs[$ref],
+                    ];
+                }
             }
 
             unset($item);
