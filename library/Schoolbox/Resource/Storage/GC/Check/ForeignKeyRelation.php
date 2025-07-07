@@ -40,9 +40,9 @@ class ForeignKeyRelation extends Base
      * Constructor
      *
      * @param IConnector      $db     Database connection
+     * @param LoggerInterface $logger Logger
      * @param string          $schema The database schema which `$db` uses: required for building list of foreign keys.
      * @param string          $table  The table which stores storage records.
-     * @param LoggerInterface $logger Logger
      */
     public function __construct(
         IConnector $db,
