@@ -258,15 +258,13 @@ class Helper
             // continue with the little robot dude payload, and see what AI responds with...
         }
 
-        $headers = array_merge(
-            $this->getAuthorization(),
-            [
-                'Content-Type' => 'application/json',
-            ],
-        );
-
         try {
-            $openAiRequest = new Request('POST', $this->getEndpoint(self::CHAT), $headers, $payload);
+            $openAiRequest = new Request('POST', $this->getEndpoint(self::CHAT), array_merge(
+                $this->getAuthorization(),
+                [
+                    'Content-Type' => 'application/json',
+                ],
+            ), $payload);
         } catch (\Exception $e) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
         }
