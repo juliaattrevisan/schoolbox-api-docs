@@ -17,6 +17,10 @@ use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 /**
  * Garbage collector: uses a set of checks to determine if a storage record is
  * still in use, and if it isn't will attempt to delete it.
+ *
+ * The garbage collector does not attempt to clean up rows which expire on their
+ * own: see `\Schoolbox\Resource\Storage\Cli\ExpiryTool` for a tool which does
+ * that.
  */
 class GarbageCollector
 {
