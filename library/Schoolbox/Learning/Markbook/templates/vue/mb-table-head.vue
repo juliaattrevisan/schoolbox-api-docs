@@ -31,16 +31,6 @@ const mbStore = useMarkbookStore();
             />
         </tr>
 
-        <template v-if="props.type === 'class'">
-            <!-- NB; This won't look correct if there are multiple classImpls.
-              -- Currently that will never happen since this is restricted to the class markbook -->
-            <mb-class-average-header
-                v-for="(classImpl, classImplId) in mbStore.data.classImpls"
-                :key="classImplId"
-                :class-impl="classImpl"
-            />
-        </template>
-
         <tr class="course-headers" :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }">
             <th class="fixed-left transparent"></th>
             <th class="fixed-left white"></th>
@@ -58,6 +48,16 @@ const mbStore = useMarkbookStore();
                 {{ group.unitSpec?.title ?? "" }}
             </th>
         </tr>
+
+        <template v-if="props.type === 'class'">
+            <!-- NB; This won't look correct if there are multiple classImpls.
+              -- Currently that will never happen since this is restricted to the class markbook -->
+            <mb-class-average-header
+                v-for="(classImpl, classImplId) in mbStore.data.classImpls"
+                :key="classImplId"
+                :class-impl="classImpl"
+            />
+        </template>
     </thead>
 </template>
 
