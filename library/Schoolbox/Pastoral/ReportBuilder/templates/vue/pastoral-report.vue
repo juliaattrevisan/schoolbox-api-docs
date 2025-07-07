@@ -112,27 +112,6 @@ const profile = {
                                     remaining
                                 </span>
                             </p>
-
-                            <ul v-if="record.comments.length" class="information-list reply">
-                                <li
-                                    v-for="comment in record.comments.filter((c) => !c.private)"
-                                    :key="comment.owner.id"
-                                >
-                                    <div class="card compact small-12">
-                                        <a
-                                            :href="profile.link(comment.owner)"
-                                            title="View Profile"
-                                            :innerHTML="profile.imageSquare32(comment.owner)"
-                                        ></a>
-                                        <p>
-                                            {{ comment.owner.fullName }}
-                                            <span class="pipe meta">{{ comment.createdAt.short }}</span>
-                                        </p>
-                                    </div>
-                                    comment
-                                    <article v-html="comment.body"></article>
-                                </li>
-                            </ul>
                         </div>
                         <article>
                             <p v-if="record.bodyPublic" v-html="record.bodyPublic"></p>
@@ -149,6 +128,23 @@ const profile = {
                                 </template>
                             </p>
                         </article>
+                        <ul v-if="record.comments.length" class="information-list reply">
+                            <li v-for="comment in record.comments.filter((c) => !c.private)" :key="comment.owner.id">
+                                <div class="card compact small-12">
+                                    <a :href="profile.link(comment.owner)" title="View Profile">
+                                        <img
+                                            :src="`/portrait.php?id=${comment.owner.id}&size=square32`"
+                                            :alt="comment.owner.fullName"
+                                        />
+                                        <p>
+                                            {{ comment.owner.fullName }}
+                                            <span class="pipe meta">{{ comment.createdAt }}</span>
+                                        </p>
+                                    </a>
+                                </div>
+                                <article v-html="comment.body"></article>
+                            </li>
+                        </ul>
                     </li>
                 </ul>
             </section>
