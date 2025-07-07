@@ -102,7 +102,7 @@ HELP;
         $gc = $gc
             ->addCheck(new Check\ForeignKeyRelation($db, $this->getLogger(), SQL_db, $mapper->getTable()))
             ->addCheck(new Check\CharacterField($db, $this->getLogger()))
-            ->addCheck(new Check\TextField($db, $this->getLogger(), SQL_db))
+            ->addCheck(new Check\TextField($db, $this->getLogger(), SQL_db, $mapper->getTable()))
         ;
 
         $deleted = $gc->purge();
