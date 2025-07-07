@@ -199,7 +199,7 @@ class GarbageCollector
     private function removeFromStorage(string $hash): void
     {
         if ($this->perform) {
-            $this->mapper->actualDelete($this->mapper->findByHash($hash));
+            $this->mapper->hardDelete($this->mapper->findByHash($hash));
             $this->log->debug("Deleted $hash");
         } else {
             $this->log->debug("Would have deleted $hash");
