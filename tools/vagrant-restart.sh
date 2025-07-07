@@ -28,6 +28,7 @@ then
     sleep 5 && service schoolbox-cloud-socketd restart &
     sleep 5 && service schoolbox-cloud-digestd@vagrantx restart &
     sleep 5 && service schoolbox-cloud-scheduled@vagrantx restart &
+    sleep 5 && service schoolbox-cloud-mobiled@vagrantx restart &
 else
     echo "Unable to locate: $SITE_ROOT/tools/notif/syscheck.php";
 fi
