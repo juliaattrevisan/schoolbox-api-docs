@@ -239,6 +239,11 @@ $alert-default-background: css-darken($body-bg, 10%);
         right: 1rem;
         transform: translateY(0);
         opacity: 1;
+
+        /* only animate while the toast is active to avoid constant re-paints */
+        &::before {
+            animation: pulse 1.5s infinite;
+        }
     }
 
     &::before {
@@ -249,7 +254,6 @@ $alert-default-background: css-darken($body-bg, 10%);
         height: 0.75rem;
         margin-right: 0.5rem;
         width: 0.75rem;
-        animation: pulse 1.5s infinite;
     }
 
     &.success::before {
