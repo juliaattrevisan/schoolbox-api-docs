@@ -49,6 +49,7 @@ const participantsWithDrafts = window.Vue.computed(() => {
 });
 
 const isPublishModalOpen = window.Vue.ref(false);
+const isPublishing = window.Vue.ref(false);
 const selectedParticipants = window.Vue.ref<Record<ParticipantId, boolean>>({});
 
 /**
@@ -70,6 +71,11 @@ function openPublishModal(): void {
  * When the user clicks on "Publish All"
  */
 async function onPublishAll(): Promise<void> {
+    if (isPublishing.value) {
+        // already publishing, ignore
+        return;
+    }
+
     const activity = mbStore.data?.assessments[props.activity.id] ?? null;
     if (activity === null) {
         throw new Error("Activity not found, cannot publish drafts");
@@ -79,6 +85,7 @@ async function onPublishAll(): Promise<void> {
 
     /** For now, this is chunked by aImpl as we don't have a route to do many at once */
     const toast = window.sbProps.toastActivate("Publishing drafts...");
+    isPublishing.value = true;
     try {
         await Promise.all(
             participantsWithDrafts.value.map(async ({ aImpl, participants }) => {
@@ -166,6 +173,7 @@ async function onPublishAll(): Promise<void> {
         activity.stats.draftMean = null;
     }
 
+    isPublishing.value = false;
     isPublishModalOpen.value = false;
 }
 </script>
@@ -203,8 +211,10 @@ async function onPublishAll(): Promise<void> {
         <template #footer>
             <div class="component-action">
                 <section>
-                    <button class="button" @click="isPublishModalOpen = false">Cancel</button>
-                    <button class="button" type="submit" @click.prevent="onPublishAll">Publish All</button>
+                    <button class="button" :disabled="isPublishing" @click="isPublishModalOpen = false">Cancel</button>
+                    <button class="button" :disabled="isPublishing" type="submit" @click.prevent="onPublishAll">
+                        {{ isPublishing ? "Publishing..." : "Publish All" }}
+                    </button>
                 </section>
             </div>
         </template>
