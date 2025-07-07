@@ -359,6 +359,8 @@ class Module extends BaseModule
         // exclude user from assessment
         $this->register('POST', "$assRoute/$studentParam/exclude", 'postExclude', $canModify, $preloadParticipant);
 
+        $this->register('GET', "$assRoute/$studentParam/info", 'getInfo', $canModify, $preloadParticipant);
+
         // Due work: Teacher interactive worksheet view
         $this->register(self::METHOD_GET, "$assRoute/worksheet", 'getWorksheet', $canModifyWorksheet, $preloadAssessment);
     }
@@ -657,7 +659,11 @@ class Module extends BaseModule
                     $participantDataSource,
                     $this->getUnitSpecificationMapper(),
                     $this->injector->get('l10n'),
-                    $projectResultCacheMapper
+                    $projectResultCacheMapper,
+                    new \Schoolbox\Url\Factory($this->getConfig()),
+                    (string)$this->getConfig()->get('learnosity_version'),
+                    (string)$this->getConfig()->get('learnosity_consumer_key'),
+                    (string)$this->getConfig()->get('learnosity_consumer_secret'),
                 );
 
             case Assessment\DueWork\Controller::class:
@@ -723,7 +729,7 @@ class Module extends BaseModule
                     $viewLatestMapper,
                     $projectResultCacheMapper,
                     $lessonPlanTemplateMapper,
-                    $lessonPlanDataModelMapper
+                    $lessonPlanDataModelMapper,
                 );
 
             case Assessment\Quiz\Controller::class:
@@ -776,7 +782,7 @@ class Module extends BaseModule
                     $viewLatestMapper,
                     $projectResultCacheMapper,
                     $lessonPlanTemplateMapper,
-                    $lessonPlanDataModelMapper
+                    $lessonPlanDataModelMapper,
                 );
 
             case Assessment\Lti\Controller::class:
@@ -803,7 +809,7 @@ class Module extends BaseModule
                     $viewLatestMapper,
                     $projectResultCacheMapper,
                     $lessonPlanTemplateMapper,
-                    $lessonPlanDataModelMapper
+                    $lessonPlanDataModelMapper,
                 );
 
             case Assessment\LessonPlan\Controller::class:
@@ -827,7 +833,7 @@ class Module extends BaseModule
                     $lessonPlanDataModelMapper,
                     $courseImplementationMapper,
                     $unitImplementationMapper,
-                    $linkedAssessmentsMapper
+                    $linkedAssessmentsMapper,
                 );
 
             default:

@@ -58,8 +58,6 @@ class Module extends BaseModule
         $this->register('GET', '/{courseSpecId:\d+}/assessment/{assessmentId:\d+}/status', 'getStatus', $canSeeCourseMarkbook, $preloadCourseAssessment);
         // publish feedback for a single assessment
         $this->register('POST', '/{courseSpecId:\d+}/assessment/{assessmentId:\d+}/publish', 'postPublishFeedback', $canSeeCourseMarkbook, $preloadCourseAssessment);
-        // quiz create feedback needs the learnosity endpoint's maxmarks
-        $this->register('GET', '/{courseSpecId:\d+}/assessment/{assessmentId:\d+}/maxMarks', 'getMaxMarks', $canSeeCourseMarkbook, $preloadCourseAssessment);
     }
 
     /**

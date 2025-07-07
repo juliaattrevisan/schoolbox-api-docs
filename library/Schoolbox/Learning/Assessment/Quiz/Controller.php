@@ -147,7 +147,11 @@ class Controller extends Assessment\Controller
             $latestViewMapper,
             $this->projectResultCacheMapper,
             $lessonPlanTemplateMapper,
-            $lessonPlanDataModelMapper
+            $lessonPlanDataModelMapper,
+            $urlFactory,
+            $learnosityVersion,
+            $learnosityConsumerKey,
+            $learnosityConsumerSecret,
         );
     }
 

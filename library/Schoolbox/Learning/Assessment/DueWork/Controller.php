@@ -207,7 +207,11 @@ class Controller extends Assessment\Controller
             $this->projectResultCacheMapper,
             $lessonPlanTemplateMapper,
             $lessonPlanDataModelMapper,
-            $this->mimeTypeMapper,
+            null,
+            null,
+            null,
+            null,
+            $mimeTypeMapper,
         );
     }
 

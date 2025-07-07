@@ -63,7 +63,7 @@ class Controller extends Assessment\Controller
         LatestViewMapper $latestViewMapper,
         protected Project\ResultCache\Mapper $projectResultCacheMapper,
         protected LessonPlanTemplateMapper $lessonPlanTemplateMapper,
-        protected LessonPlanDataModelMapper $lessonPlanDataModelMapper
+        protected LessonPlanDataModelMapper $lessonPlanDataModelMapper,
     ) {
         parent::__construct(
             $userMapper,
@@ -82,7 +82,7 @@ class Controller extends Assessment\Controller
             $latestViewMapper,
             $this->projectResultCacheMapper,
             $lessonPlanTemplateMapper,
-            $lessonPlanDataModelMapper
+            $lessonPlanDataModelMapper,
         );
     }
 
