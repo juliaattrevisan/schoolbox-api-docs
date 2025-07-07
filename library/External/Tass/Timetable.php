@@ -243,10 +243,9 @@ class External_Tass_Timetable implements External_TimetableInterface
                 }
                 $code = trim((string)$desc['year_grp']) . '-' . trim((string)$desc['sub_code']) . '-' . trim((string)$desc['class']);
                 foreach ($timetable as $x => $timetablePeriod) {
-                    $class = $timetablePeriod['class'];
                     if (
                         $desc['prd_code'] == $timetablePeriod['periodNumber']
-                        && !isset($class[$code])
+                        && !isset($timetablePeriod['class'][$code])
                     ) {
                         $timetable[$x]['class'][$code] = array(
                             'description' => $desc['sub_desc'],
