@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import sanitizeHtml from "sanitize-html";
+import { keysOf } from "@js/util/arrayUtils";
 import { getGradient } from "@js/util/cssUtils";
 import ProgressTick from "@schoolboxLibrary/Learning/Assessment/templates/fragments/vue/progress-tick.vue";
 import {
@@ -169,15 +170,32 @@ const isSelectedFeedback = window.Vue.computed(
  * The comment is given to us with HTML since it's needed in a CKEditor.
  * This strips all of the tags off and returns text instead
  */
-const plaintextPublishedComment = window.Vue.computed(() => {
-    if (participant.value === null || participant.value.marks.published.comment === null) {
+const plaintextComments = window.Vue.computed(() => {
+    if (participant.value === null) {
         return undefined;
     }
 
-    return sanitizeHtml(participant.value.marks.published.comment.replaceAll("<br />", " ").replaceAll("<br>", " "), {
-        allowedTags: [],
-        allowedAttributes: {},
-    }).trim();
+    const comments = {
+        published: participant.value.marks.published.comment,
+        draft: participant.value.marks.draft.comment,
+    };
+
+    keysOf(comments).forEach((key) => {
+        if (comments[key] === null) {
+            return;
+        }
+
+        /** replace <br>'s so that it doesn't loose an effective space */
+        comments[key] = comments[key].replaceAll("<br />", " ").replaceAll("<br>", " ");
+
+        /** then strip all the tags */
+        comments[key] = sanitizeHtml(comments[key], {
+            allowedTags: [],
+            allowedAttributes: {},
+        }).trim();
+    });
+
+    return comments;
 });
 </script>
 
@@ -207,23 +225,20 @@ const plaintextPublishedComment = window.Vue.computed(() => {
         <template v-else>
             <span
                 v-if="mbStore.showDrafts && participant.marks.draft.responseId !== null"
-                data-tooltip="right"
-                class="has-tip tip-right meta"
-                :class="getGradient(participant.marks.draft.norm, 100, false)"
-                data-width="105"
-                title="Draft Mark"
+                :title="plaintextComments?.draft ?? undefined"
+                class="meta"
             >
                 {{ formatMark(participant.marks.draft) }}
             </span>
             <span
                 v-else-if="participant.hasSubmittedResponse && !participant.hasPublishedFeedback"
-                :title="plaintextPublishedComment"
+                :title="plaintextComments?.published ?? undefined"
             >
                 Pending
             </span>
             <span
                 v-else-if="participant.marks.published.responseId !== null"
-                :title="plaintextPublishedComment"
+                :title="plaintextComments?.published ?? undefined"
                 :class="getGradient(participant.marks.published.norm, 100, false)"
             >
                 {{ formatMark(participant.marks.published) }}
