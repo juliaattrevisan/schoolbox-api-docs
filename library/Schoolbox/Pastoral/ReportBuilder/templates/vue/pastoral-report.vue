@@ -17,7 +17,7 @@ const props = defineProps<{
 
 const selectedTab = window.Vue.ref(props.tabs[0]?.type ?? "");
 
-const routeLookup = (route: string, params?: Record<string, string | number>) => {
+const routeLookup = (route: string, params?: Record<string, string | number>): string => {
     const routes: Record<string, string> = {
         "pastoral.getStudentRecord": "/pastoral/student/{studentId}/record/{recordId}",
         "pastoralReportBuilder.getReportTags": "/pastoral/report/results/tag/{tagId}",
