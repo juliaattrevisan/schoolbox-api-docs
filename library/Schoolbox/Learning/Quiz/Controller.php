@@ -342,28 +342,11 @@ class Controller extends AbstractController
                     $e->getMessage()
                 ];
             }
-
-            /* Display a list of errors
-             */
-            if (\count($errors) || empty($result)) {
-                $this->response = $this->responseFromTemplate('@learningQuiz/xmlImportLog.twig', [
-                    'errors' => $errors,
-                ]);
-
-                return;
-            }
-
-            $this->response = $this->redirectFound(
-                $this->routeGenerator->generate(
-                    'learningAssessment.getAssessment',
-                    ['assessmentId' => $result['assessment']->getId()]
-                )
-            );
         } else {
             /* There used to be stuff here that was used to convert url domains but I'm not sure we even
              * needed them. We needed them in the xml days, but I don't think we needed them here.
              */
-            $newInstances = (new Importer(
+            $result = (new Importer(
                 $api,
                 $schoolCode,
                 $this->getDi()->get('databaseInternal'),
@@ -377,40 +360,40 @@ class Controller extends AbstractController
                 $this->storageMapper,
                 $this->curriculumNodeMapper,
             ))->import($data);
+        }
 
-            /* Check for errors: if there were any, go to a new screen to explain this.
-             * Otherwise just redirect back to the quiz you just made...its modify screen, I guess.
+        /* Check for errors: if there were any, go to a new screen to explain this.
+         * Otherwise just redirect back to the quiz you just made...its modify screen, I guess.
+         */
+        if (\count($result['errors'])) {
+            /* Breadcrumbs
              */
-            if (\count($newInstances['errors'])) {
-                /* Breadcrumbs
+            $breadcrumbs = $this->bakery->produceFromAssessment($result['assessment'], $this->getUser())
+                ->add([
+                    $result['assessment']->getTitle(),
+                    $result['assessment']->isImplementation() ? $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $result['assessment']->getId()]) : null
+                ])
+                ->add(['Import', null]);
+
+            $this->response = $this->responseFromTemplate('@learningQuiz/importLog.twig', [
+                'breadcrumbs' => $breadcrumbs,
+                'assessment' => $result['assessment'],
+                'errors' => $result['errors']
+            ], 'Import errors');
+        } else {
+            $returnUrlEncoded = $this->requestPost['returnUrl'];
+
+            if ($returnUrlEncoded !== null) {
+                /* Go back to the place from whence you came
                  */
-                $breadcrumbs = $this->bakery->produceFromAssessment($newInstances['assessment'], $this->getUser())
-                    ->add([
-                        $newInstances['assessment']->getTitle(),
-                        $newInstances['assessment']->isImplementation() ? $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $newInstances['assessment']->getId()]) : null
-                    ])
-                    ->add(['Import', null]);
-
-                $this->response = $this->responseFromTemplate('@learnosity/importErrors.twig', [
-                    'breadcrumbs' => $breadcrumbs,
-                    'assessment' => $newInstances['assessment'],
-                    'errors' => $newInstances['errors']
-                ], 'Import errors');
+                $returnUrl = Redirect::decode($returnUrlEncoded);
             } else {
-                $returnUrlEncoded = $this->requestPost['returnUrl'];
-
-                if ($returnUrlEncoded !== null) {
-                    /* Go back to the place from whence you came
-                     */
-                    $returnUrl = Redirect::decode($returnUrlEncoded);
-                } else {
-                    /* Otherwise redirect back to the quiz you just made...its modify screen, I guess.
-                     */
-                    $returnUrl = $this->routeGenerator->generate('learningAssessment.getUpdateAssessmentForm', ['assessmentId' => $newInstances['assessment']->getId()]);
-                }
-
-                $this->response = $this->redirectFound($returnUrl);
+                /* Otherwise redirect back to the quiz you just made...its modify screen, I guess.
+                 */
+                $returnUrl = $this->routeGenerator->generate('learningAssessment.getUpdateAssessmentForm', ['assessmentId' => $newInstances['assessment']->getId()]);
             }
+
+            $this->response = $this->redirectFound($returnUrl);
         }
     }
 
