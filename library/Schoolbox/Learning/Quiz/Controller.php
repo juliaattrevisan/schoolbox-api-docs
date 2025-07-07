@@ -312,17 +312,6 @@ class Controller extends AbstractController
          * otherwise, presume json
          */
         if (preg_match('/^<\?xml version="1\.0" \?>/', $data)) {
-            /* Intentionally prefill with an instance of AssessmentContext
-             * and other POST vars the Factory assumes exist
-             */
-            $postData = array_merge($this->requestPost->getArrayCopy(), [
-                'assessmentType' => AssessmentType::TYPE_QUIZ,
-                'context'        => $context,
-                /* Legacy xml only ever supported Total Mark marktype
-                 */
-                'markType'       => (string)MarkType::TYPE_TOTAL
-            ]);
-
             /* A 4-tuple of useful things we made
              * Will likely be empty if something snapped along the way
              */
