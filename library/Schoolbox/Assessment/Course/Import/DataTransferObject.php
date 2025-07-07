@@ -50,10 +50,6 @@ class DataTransferObject
      * 3. Just an AssessmentImpl               => Assessment was created directly in UnitImpl. Impl cannot be deleted.
      *
      * @var GenericCollection<int, GenericCollection<AssessmentPair>>
-     *      IAssessable[][][]|AssessmentPair[][] $unitSpecAssessments
-     *      IAssessable|null                     $unitSpecAssessments [unitSpec.id][]['spec']
-     *      IAssessable|null                     $unitSpecAssessments [unitSpec.id][]['impl']
-     *      (the more specific types above might not be quite correct - they were causing PHPStan errors)
      */
     private $unitSpecAssessments;
 
@@ -462,8 +458,6 @@ class DataTransferObject
      * Inner set unordered
      *
      * @return GenericCollection<int, GenericCollection<AssessmentPair>>
-     *         IAssessable[][][]|AssessmentPair[][]|GenericCollection[]|GenericCollection Sets of sets of IAssessable pairs
-     *         (the more specific type above might not be quite right - was causing PHPStan errors)
      */
     public function getAssessmentPairs()
     {
