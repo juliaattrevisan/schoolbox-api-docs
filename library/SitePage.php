@@ -692,26 +692,21 @@ class SitePage
     }
 
     /**
-     * Forces a redirect to the login page, by throwing an unauthenticated
-     * exception.
+     * Forces a redirect to the login page.
      *
      * @throws Unauthenticated
      */
     public function goLoginPage()
     {
-        try {
-            throw new Unauthenticated();
-        } catch (NotFoundExceptionInterface | ContainerExceptionInterface | RuntimeException $e) {
-            $parts = parse_url($_SERVER['REQUEST_URI']);
-            if (!($parts['path'] == '/login/' || $parts['path'] == '/login')) {
-                if ($parts['path'] != '/') {
-                    $this->localRedir('/login/?page=' . rawurlencode($_SERVER['REQUEST_URI']));
-                } else {
-                    $this->localRedir('/login/');
-                }
+        $parts = parse_url($_SERVER['REQUEST_URI']);
+        if (!($parts['path'] == '/login/' || $parts['path'] == '/login')) {
+            if ($parts['path'] != '/') {
+                $this->localRedir('/login/?page=' . rawurlencode($_SERVER['REQUEST_URI']));
+            } else {
+                $this->localRedir('/login/');
             }
-            exit;
         }
+        exit;
     }
 
     /**

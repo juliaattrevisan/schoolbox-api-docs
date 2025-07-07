@@ -308,10 +308,7 @@ class External_Isams_Timetable implements External_TimetableInterface
         }
 
         // Sort the timetable appropriately
-
-        if (is_array($timetable)) {
-            usort($timetable, array($this, 'sortTimetable'));
-        }
+        usort($timetable, array($this, 'sortTimetable'));
 
         return $timetable;
     }
@@ -407,10 +404,8 @@ class External_Isams_Timetable implements External_TimetableInterface
         }
 
         // Sort the timetable appropriately
+        usort($timetable, array($this, 'sortTimetable'));
 
-        if (is_array($timetable)) {
-            usort($timetable, array($this, 'sortTimetable'));
-        }
         return $timetable;
     }
 

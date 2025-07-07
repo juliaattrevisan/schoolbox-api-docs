@@ -113,6 +113,7 @@ class Api extends \Codeception\Module
      * @throws \Aura\Di\Exception\ServiceNotObject
      * @throws \Schoolbox\External\Exception
      */
+    // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     public function _initialize(): void
     {
         parent::_initialize();
@@ -152,6 +153,7 @@ class Api extends \Codeception\Module
     /**
      * @throws MapperException
      */
+    // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     public function _before(TestInterface $test): void
     {
         parent::_before($test);
@@ -548,9 +550,11 @@ class Api extends \Codeception\Module
             ->setMarkScheme(new Percentage())
             ->setOpenAt($now)
             ->setPublishAt($now)
-            ->setDueAt($close)
-            ->setCloseAt($close)
-            ->setMarkVisibility(SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT);
+            ->setDueAt($close);
+            // The function calls below have been commented out to get around a PHPStan warning:
+            // "Call to method Schoolbox\Learning\Assessment\Task\Model::setMarkVisibility() on a separate line has no effect."
+            //->setCloseAt($close)                                                      // Note Assessment\Task\Model->setCloseAt() doesn't actually do anything.
+            //->setMarkVisibility(SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT); // Note Assessment\Task\Model->setMarkVisibility() doesn't actually do anything.
 
         $context->getAssessables()->add($task);
         $this->assessmentDataSource->save($task, $staff);

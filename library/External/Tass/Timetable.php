@@ -245,7 +245,9 @@ class External_Tass_Timetable implements External_TimetableInterface
                 foreach ($timetable as $x => $timetablePeriod) {
                     if (
                         $desc['prd_code'] == $timetablePeriod['periodNumber']
-                        && !isset($timetable[$x]['class'][$code])
+                        // Prevent $timetablePeriod['class'][$code] from being overwritten if a $code is repeated.
+                        // @phpstan-ignore-next-line (Offset non-falsy-string on array{} in isset() does not exist).
+                        && !isset($timetablePeriod['class'][$code])
                     ) {
                         $timetable[$x]['class'][$code] = array(
                             'description' => $desc['sub_desc'],

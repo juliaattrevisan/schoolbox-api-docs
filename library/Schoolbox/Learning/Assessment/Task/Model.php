@@ -465,7 +465,7 @@ class Model extends AbstractAssessment
 
     /**
      * @param Alaress_Date_Format|null $closeAt
-     * @return static
+     * @return $this
      */
     public function setCloseAt(?Alaress_Date_Format $closeAt): self
     {
