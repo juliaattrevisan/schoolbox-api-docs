@@ -89,27 +89,28 @@ class ForeignKeyRelation extends Base
      * @return IStatement A statement which accepts a storage hash as its `hash`
      *                    parameter.
      */
-    protected function buildFindHashQuery(string $table, array $columnData): IStatement
+    protected function buildFindHashQuery(string $table, array $columns, ?array $extra): IStatement
     {
+        [$column] = $columns;
         // Notice if foreign key doesn't join onto storage.hash
-        if ($columnData['primary_column'] !== 'hash') {
+        if ($extra['primary_column'] !== 'hash') {
             $this->logger->notice(
                 sprintf(
                     'FK relation "%s.%s => %s.%s" does not reference %s.hash: consider updating schema',
                     $table,
-                    $columnData['column'],
-                    $columnData['primary_table'],
-                    $columnData['primary_column'],
-                    $columnData['primary_table'],
+                    $column,
+                    $extra['primary_table'],
+                    $extra['primary_column'],
+                    $extra['primary_table'],
                 ),
             );
         }
         return $this->db->prepareQuery("
             SELECT COUNT(*)
             FROM {$this->db->getQuoter()->quoteIdentifier($table)} f
-            INNER JOIN {$this->db->getQuoter()->quoteIdentifier($columnData['primary_table'])} s
-                ON f.{$this->db->getQuoter()->quoteIdentifier($columnData['column'])}
-                   = s.{$this->db->getQuoter()->quoteIdentifier($columnData['primary_column'])}
+            INNER JOIN {$this->db->getQuoter()->quoteIdentifier($extra['primary_table'])} s
+                ON f.{$this->db->getQuoter()->quoteIdentifier($column)}
+                   = s.{$this->db->getQuoter()->quoteIdentifier($extra['primary_column'])}
             WHERE s.hash = :hash
         ");
     }

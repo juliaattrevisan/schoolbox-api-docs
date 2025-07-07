@@ -66,12 +66,19 @@ class CharacterField extends Base
      * @return IStatement A statement which accepts a storage hash as its `hash`
      *                    parameter.
      */
-    protected function buildFindHashQuery(string $table, array $columnData): IStatement
+    protected function buildFindHashQuery(string $table, array $columns, ?array $extra): IStatement
     {
+        // Build an AND statement for each column
+        $whereParts = [];
+        foreach ($columns as $column) {
+            $whereParts[] = "INSTR({$this->db->getQuoter()->quoteIdentifier($column)}, :hash) > 0";
+        }
+        $wherePart = implode(' OR ', $whereParts);
+
         return $this->db->prepareQuery("
             SELECT COUNT(*)
             FROM {$this->db->getQuoter()->quoteIdentifier($table)} t
-            WHERE INSTR({$this->db->getQuoter()->quoteIdentifier($columnData['column'])}, :hash) > 0
+            WHERE {$wherePart}
         ");
     }
 }

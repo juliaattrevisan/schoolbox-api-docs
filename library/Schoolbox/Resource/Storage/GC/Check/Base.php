@@ -73,7 +73,7 @@ abstract class Base implements Check
                 }
 
                 // Build query for this column, exclude non-stale
-                $query      = $this->buildFindHashQuery($table, $columnData);
+                $query      = $this->buildFindHashQuery($table, $columns, $columnData['extra'] ?? null);
                 $staleCount = count($stale);
                 $newStale   = [];
                 $this->logger->info(
@@ -125,13 +125,12 @@ abstract class Base implements Check
     /**
      * Build a query which finds usages of a hash.
      *
-     * @param string $table      The table to search within.
-     * @param array  $columnData Any information about the relation of the table
-     *                           to the hash which may be relevant.
-     *                           Usually this will just contain a column name,
-     *                           but may contain anything.
+     * @param string     $table   The table to search within.
+     * @param array      $columns The columns to search within.
+     * @param array|null $extra   Any information about the relation of the
+     *                            table to the hash which may be relevant.
      * @return IStatement A statement which accepts a storage hash as its `hash`
      *                    parameter.
      */
-    abstract protected function buildFindHashQuery(string $table, array $columnData): IStatement;
+    abstract protected function buildFindHashQuery(string $table, array $columns, ?array $extra): IStatement;
 }
