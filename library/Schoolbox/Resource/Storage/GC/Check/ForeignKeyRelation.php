@@ -56,13 +56,6 @@ class ForeignKeyRelation extends Base
     /**
      * Builds a list of tables and columns which represent foreign key
      * relations.
-     *
-     * @return array<string, array<array{
-     *      table: string,
-     *      column: string,
-     *      primary_table: string,
-     *      primary_column: string,
-     * }>>
      */
     protected function buildTableColumnList(): array
     {
@@ -73,7 +66,13 @@ class ForeignKeyRelation extends Base
         foreach ($query as $row) {
             $table = $row['table'];
             $tableColumnList[$table] ??= [];
-            $tableColumnList[$table][] = $row;
+            $tableColumnList[$table][] = [
+                'columns' => [$row['column']],
+                'extra'   => [
+                    'primary_table'  => $row['primary_table'],
+                    'primary_column' => $row['primary_column'],
+                ],
+            ];
         }
 
         return $tableColumnList;

@@ -15,8 +15,6 @@ use Psr\Log\LoggerInterface;
 
 /**
  * Base check for garbage-collectable storage rows.
- *
- *
  */
 abstract class Base implements Check
 {
@@ -107,13 +105,13 @@ abstract class Base implements Check
      * Builds a list of tables and column data, which references a table and
      * column within which a storage hash may be found.
      *
-     * @return array<string, array<array{column: string}>>
+     * @return array<string, array<array{columns: array<string>, extra?: array}>>
      *     key:   table name
      *     value: a list of column data sets, each to be passed to
      *            `buildFindHashQuery`.
-     *            Must contain at least `column` (the column in `table` to
-     *            search within), but otherwise may contain any other
-     *            information required to build a query.
+     *            Each must contain at least `columns` (the columns in `table`
+     *            to search within), and may contain any supplementary
+     *            information required to build a query in `extra`.
      */
     abstract protected function buildTableColumnList(): array;
 

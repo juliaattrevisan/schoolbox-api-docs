@@ -28,32 +28,30 @@ class CharacterField extends Base
         // Notes:
         // * any field which contains `hash` should maybe be a FK?
         // * any field which contains `url` or `link` should be checked?
-        'blog_image_backup'            => [['column' => 'hash']],
-        'bookmarks'                    => [['column' => 'url']],
-        'component_config_definition'  => [['column' => 'default_value']],
-        'component_config_instance'    => [['column' => 'value']],
-        'link'                         => [['column' => 'url']],
-        'menu_side'                    => [['column' => 'url']],
-        'menu_top'                     => [['column' => 'url']],
-        'profile_button'               => [['column' => 'url']],
-        'rubric_descriptor'            => [['column' => 'description']],
-        'sis_user_profile'             => [['column' => 'portrait_hash']],
-        'socialstream_post'            => [['column' => 'thumbnail'], ['column' => 'url']],
-        'sportsfixtures_division'      => [['column' => 'url']],
-        'sportsfixtures_import_errors' => [['column' => 'hash']],
-        'sportsfixtures_sport'         => [['column' => 'url']],
-        'sportsfixtures_team'          => [['column' => 'url']],
-        'summative_report'             => [['column' => 'footer']],
-        'task'                         => [['column' => 'link']],
-        'tile'                         => [['column' => 'link']],
-        'ups_log'                      => [['column' => 'hash']],
+        'blog_image_backup'            => [['columns' => ['hash']]],
+        'bookmarks'                    => [['columns' => ['url']]],
+        'component_config_definition'  => [['columns' => ['default_value']]],
+        'component_config_instance'    => [['columns' => ['value']]],
+        'link'                         => [['columns' => ['url']]],
+        'menu_side'                    => [['columns' => ['url']]],
+        'menu_top'                     => [['columns' => ['url']]],
+        'profile_button'               => [['columns' => ['url']]],
+        'rubric_descriptor'            => [['columns' => ['description']]],
+        'sis_user_profile'             => [['columns' => ['portrait_hash']]],
+        'socialstream_post'            => [['columns' => ['thumbnail'], ['column' => 'url']]],
+        'sportsfixtures_division'      => [['columns' => ['url']]],
+        'sportsfixtures_import_errors' => [['columns' => ['hash']]],
+        'sportsfixtures_sport'         => [['columns' => ['url']]],
+        'sportsfixtures_team'          => [['columns' => ['url']]],
+        'summative_report'             => [['columns' => ['footer']]],
+        'task'                         => [['columns' => ['link']]],
+        'tile'                         => [['columns' => ['link']]],
+        'ups_log'                      => [['columns' => ['hash']]],
     ];
 
     /**
      * Builds a list of tables and columns which represent character field
      * relations.
-     *
-     * @return array<string, array<array{column: string}>>
      */
     protected function buildTableColumnList(): array
     {

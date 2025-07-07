@@ -82,8 +82,6 @@ class TextField extends Base
 
     /**
      * Builds a list of tables and columns which represent text fields.
-     *
-     * @return array<string, array<array{column: string}>>
      */
     protected function buildTableColumnList(): array
     {
@@ -101,8 +99,12 @@ class TextField extends Base
                 continue;
             }
 
-            $tableColumnList[$table] ??= [];
-            $tableColumnList[$table][] = $row;
+            // Exclude fields already in a foreign key relation
+
+            $tableColumnList[$table][0] ??= [
+                'columns' => [],
+            ];
+            $tableColumnList[$table][0]['columns'][] = $row;
         }
 
         return $tableColumnList;
