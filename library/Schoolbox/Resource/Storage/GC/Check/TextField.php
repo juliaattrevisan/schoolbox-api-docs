@@ -45,9 +45,9 @@ class TextField extends Base
             and fks.CONSTRAINT_NAME   = kcu.CONSTRAINT_NAME
         where fks.CONSTRAINT_SCHEMA        = :schema
           and fks.UNIQUE_CONSTRAINT_SCHEMA = :schema
-          and fks.REFERENCED_TABLE_NAME    = :table
-          AND kcu.REFERENCED_COLUMN_NAME   = :column
-        order by fks.TABLE_NAME, kcu.COLUMN_NAME
+          and fks.REFERENCED_TABLE_NAME    = :primaryTable
+          AND fks.TABLE_NAME               = :foreignTable
+          AND kcu.COLUMN_NAME              = :foreignColumn
         SQL;
 
     /**
@@ -87,12 +87,13 @@ class TextField extends Base
      */
     protected function buildTableColumnList(): array
     {
-        $query = $this->db->prepareQuery(self::SELECT_TEXT_FIELDS_QUERY);
-        $query->execute(['schema' => $this->schema]);
+        $columnsQuery = $this->db->prepareQuery(self::SELECT_TEXT_FIELDS_QUERY);
+        $columnsQuery->execute(['schema' => $this->schema]);
 
         $tableColumnList   = [];
         $blacklistedTables = [];
-        foreach ($query as $row) {
+        $foreignKeysQuery  = $this->db->prepareQuery(self::SELECT_FK_RELATION_QUERY);
+        foreach ($columnsQuery as $row) {
             $table  = $row['table'];
             $column = $row['column'];
 
@@ -120,6 +121,17 @@ class TextField extends Base
             }
 
             // Exclude fields already in a foreign key relation
+            $foreignKeysQuery->execute([
+                'schema'        => $this->schema,
+                'primaryTable'  => $this->table,
+                'foreignTable'  => $table,
+                'foreignColumn' => $column,
+            ]);
+            $foreignKeysCount = (int)$foreignKeysQuery->fetchColumn();
+            if ($foreignKeysCount > 0) {
+                $this->logger->debug(sprintf('Excluding foreign key column: %s.%s', $table, $column));
+                continue;
+            }
 
             $tableColumnList[$table][0] ??= [
                 'columns' => [],
