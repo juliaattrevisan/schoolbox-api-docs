@@ -85,8 +85,8 @@ class TextField extends Base
     /**
      * Build a query for finding usage of a hash.
      *
-     * @param string $table
-     * @param array $columnData
+     * @param string $table      The table to search within.
+     * @param array  $columnData `column`: the column to search within
      * @return IStatement A statement which accepts a storage hash as its `hash`
      *                    parameter.
      */

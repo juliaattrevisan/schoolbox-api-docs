@@ -106,10 +106,13 @@ abstract class Base implements Check
      * Builds a list of tables and column data, which references a table and
      * column within which a storage hash may be found.
      *
-     * @return array<string, array<array>>
+     * @return array<string, array<array{column: string}>>
      *     key:   table name
      *     value: a list of column data sets, each to be passed to
      *            `buildFindHashQuery`.
+     *            Must contain at least `column` (the column in `table` to
+     *            search within), but otherwise may contain any other
+     *            information required to build a query.
      */
     abstract protected function buildTableColumnList(): array;
 
