@@ -76,26 +76,37 @@ class GarbageCollector
      */
     public function getStale(?string $hash = null): array
     {
-        $query = 'SELECT `hash` FROM `storage` WHERE';
-
+        // Build the query
+        $pb = $this->mapper->getPredicateBuilder();
         if ($hash) {
-            $query .= ' `hash` = :hash';
-            $statement = $this->mapper->getDatabase()->prepare($query);
-            $statement->bindValue(':hash', $hash);
-        } else {
-            $query .= ' `expired_at` IS NULL ORDER BY `last_accessed` ASC LIMIT 0, :limit';
-            $statement = $this->mapper->getDatabase()->prepare($query);
-            $statement->bindValue(':limit', $this->limit, \PDO::PARAM_INT);
+            $this->log->info(sprintf('Restricting garbage collection to hash: "%s"', $hash));
+            $pb = $pb->equals('hash', $hash);
+        }
+        if ($this->thresholdDate) {
+            $thresholdDate = $this->thresholdDate->getDatabase();
+            $this->log->info(
+                sprintf('Restricting garbage collection to last_gc_at: null or before "%s"', $thresholdDate),
+            );
+            $pb = $pb->any(
+                $this->mapper->getPredicateBuilder()
+                    ->isNull('last_gc_at')
+                    ->lessThanOrEqualTo('last_gc_at', $thresholdDate)
+            );
         }
 
-        $statement->execute();
-
-        $this->list = [];
-
-        // start by populating with all hashes
-        while ($hash = $statement->fetchColumn()) {
-            $this->list[] = $hash;
-        }
+        // Find the records
+        $this->list = $this->mapper->findScalarByPredicates(
+            'hash',
+            $pb,
+            [
+                'order'  => [
+                    'last_gc_at' => 'asc',
+                    'hash'       => 'asc',
+                ],
+                'limit'  => $this->limit,
+                'offset' => 0,
+            ]
+        );
 
         $this->log->info('Starting with ' . count($this->list) . ' files');
 
