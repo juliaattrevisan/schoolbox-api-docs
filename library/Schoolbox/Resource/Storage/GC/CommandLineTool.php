@@ -91,16 +91,19 @@ HELP;
         $threshold     = $this->getOpt(self::OPT_SHORT_THRESHOLD);
         $thresholdDate = $this->buildDate($threshold ?? self::DEFAULT_THRESHOLD);
         $db            = $this->getDatabaseInternal();
+        $mapper        = StorageMapper::getInstance();
         $gc = new GarbageCollector(
-            StorageMapper::getInstance(),
+            $mapper,
             $this->getLogger(),
             $limit,
             $thresholdDate,
             $this->perform(),
         );
         $gc = $gc
+            ->addCheck(new Check\ForeignKeyRelation($db, SQL_db, $mapper->getTable(), $this->getLogger()))
             ->addCheck(new Check\HardLinks($db))
-            ->addCheck(new Check\SoftLinks($db, SQL_db, $this->getLogger()));
+            ->addCheck(new Check\SoftLinks($db, SQL_db, $this->getLogger()))
+        ;
 
         $deleted = $gc->purge();
 
