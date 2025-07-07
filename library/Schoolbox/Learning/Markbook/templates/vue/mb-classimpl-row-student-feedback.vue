@@ -345,7 +345,10 @@ async function onFeedbackPublish(): Promise<void> {
                                     Close
                                 </button>
                                 <button
-                                    v-if="cellInfo.feedback.dataDraft.responseId !== null || cellInfo.feedback.showDraftDialogue"
+                                    v-if="
+                                        cellInfo.feedback.dataDraft.responseId !== null ||
+                                        cellInfo.feedback.showDraftDialogue
+                                    "
                                     class="button disabled"
                                     :class="{ 'saving-error': cellInfo.feedback.hasAutoSaveError }"
                                     title="You can discard this draft from the Grading Overview screen"
