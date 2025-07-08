@@ -258,100 +258,98 @@ class Helper
             // continue with the little robot dude payload, and see what AI responds with...
         }
 
+        $headers = array_merge(
+            $this->getAuthorization(),
+            [
+                'Content-Type' => 'application/json',
+            ],
+        );
+
+        try {
+            $openAiRequest = new Request('POST', $this->getEndpoint(self::CHAT), $headers, $payload);
+        } catch (\Exception $e) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
+        }
+
         /* Log what the user tried to do if we made a vaguely-successful request
-             * and didn't somehow die long the way
-             */
+         * and didn't somehow die long the way
+         */
         $log = $this->logMapper->createModel()
             ->setUser($user)
             ->setPrompt($payload)
             ->setModel($this->openAiModel);
 
-        try {
-            $openAiRequest = new Request('POST', $this->getEndpoint(self::CHAT), array_merge(
-                $this->getAuthorization(),
-                ['Content-Type' => 'application/json'],
-            ), $payload);
+        $promise = $this->client->sendAsync($openAiRequest);
 
+        // Handle the response when it arrives
+        /* The two anonymous functions represent what happens when we succeed
+         * and when we didn't.
+         */
+        $promise->then(
+            function ($response) use ($log): void {
+                /* Set up presumed success conditions
+                 */
+                $returnCode = 200;
 
-            $promise = $this->client->sendAsync($openAiRequest, ['stream' => true]);
+                http_response_code($returnCode);
 
-            // Handle the response when it arrives
-            /* The two anonymous functions represent what happens when we succeed
-             * and when we didn't.
-             */
-            $promise->then(
-                function ($response) use ($log): void {
-                    /* Set up presumed success conditions
-                     */
-                    $returnCode = 200;
+                $log->setReturnCode($returnCode)
+                    ->setErrorMessage('');
 
-                    http_response_code($returnCode);
+                /* Remove preformatted insanity by encoding it all away
+                 * https://stackoverflow.com/questions/23859713/remove-all-unnecessary-whitespaces-from-json-string-in-php
+                 */
+                //header('X-Accel-Buffering: no');
+                header('Content-Type: application/json');
+                header('Content-Encoding: none');
 
-                    $log->setReturnCode($returnCode)
-                        ->setErrorMessage('');
+                ob_implicit_flush(true);
+                ob_end_flush();
 
-                    /* Remove preformatted insanity by encoding it all away
-                     * https://stackoverflow.com/questions/23859713/remove-all-unnecessary-whitespaces-from-json-string-in-php
-                     */
-                    //header('X-Accel-Buffering: no');
-                    header('Content-Type: application/json');
-                    header('Content-Encoding: none');
+                $stream = $response->getBody();
 
-                    ob_implicit_flush(true);
-                    ob_end_flush();
+                // store a section of the response (end of the stream)
+                $output = '';
 
-                    $stream = $response->getBody();
-
-                    // store a section of the response (end of the stream)
-                    $output = '';
-
-                    while (!$stream->eof()) {
-                        $tmp = $stream->read(1024);
-                        echo $tmp;
-                        $output .= $tmp;
-                    }
-
-                    //store the last of the output and the model (if it exists
-                    $aiStats = $this->extractStats($output);
-                    $log->setResponse($output)
-                        ->setModel($aiStats['model'])
-                        ->setInputTokens($aiStats['input_tokens'])
-                        ->setOutputTokens($aiStats['output_tokens']);
-                },
-                function ($reason) use ($log): void {
-                    $returnCode = $reason->getCode();
-
-                    /* @var ClientException $reason */
-                    http_response_code($returnCode);
-
-                    /* FIXME This probably needs to be in a standardised json error struct
-                     *  The last time we did this was in profile editor
-                     */
-                    echo $reason->getMessage();
-
-                    /* We died; log the status code and epitaph
-                     */
-                    $log->setReturnCode($returnCode)
-                        ->setErrorMessage($reason->getMessage())
-                        ->setResponse($reason->getResponse()->getBody()->getContents());
+                while (!$stream->eof()) {
+                    $tmp = $stream->read(1024);
+                    echo $tmp;
+                    $output .= $tmp;
                 }
-            );
 
-            $promise->wait();
+                //store the last of the output and the model (if it exists
+                $aiStats = $this->extractStats($output);
+                $log->setResponse($output)
+                    ->setModel($aiStats['model'])
+                    ->setInputTokens($aiStats['input_tokens'])
+                    ->setOutputTokens($aiStats['output_tokens']);
+            },
+            function ($reason) use ($log): void {
+                $returnCode = $reason->getCode();
 
-            $this->logMapper->save($log);
+                /* @var ClientException $reason */
+                http_response_code($returnCode);
 
-            /* Intentionally die
-             */
-            die();
-        } catch (GuzzleException $e) {
-            $log->setReturnCode($e->getCode())
-                ->setErrorMessage($e->getMessage())
-                ->setResponse($e->getTraceAsString());
-            $this->logMapper->save($log);
+                /* FIXME This probably needs to be in a standardised json error struct
+                 *  The last time we did this was in profile editor
+                 */
+                echo $reason->getMessage();
 
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
-        }
+                /* We died; log the status code and epitaph
+                 */
+                $log->setReturnCode($returnCode)
+                    ->setErrorMessage($reason->getMessage())
+                    ->setResponse($reason->getResponse()->getBody()->getContents());
+            }
+        );
+
+        $promise->wait();
+
+        $this->logMapper->save($log);
+
+        /* Intentionally die
+         */
+        die();
     }
 
 
