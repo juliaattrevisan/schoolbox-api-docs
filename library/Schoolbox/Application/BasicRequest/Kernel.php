@@ -62,6 +62,7 @@ use Sentry\SentrySdk;
 use Sentry\Tracing\SpanStatus;
 use Sentry\Tracing\TransactionSource;
 use SitePage;
+use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Psr16Cache;
 use Twig\Environment;
 use Alaress\Twig\Method as TwigMethod;
@@ -309,10 +310,9 @@ class Kernel extends WebKernelAbstract
             $di->lazy(
                 function () use ($di) {
                     return new Psr16Cache(
-                        new ItemPool(
+                        new RedisAdapter(
                             $di->get('redis.cache'),
-                            new \Alaress\Codec\StringValue\Base64(),
-                            new KeyGenerator('httpClient', INSTANCE_ID),
+                            'httpClient.' . INSTANCE_ID,
                         )
                     );
                 }
@@ -528,10 +528,9 @@ class Kernel extends WebKernelAbstract
             $di->lazy(
                 function () use ($di) {
                     return new Psr16Cache(
-                        new ItemPool(
+                        new RedisAdapter(
                             $di->get('redis.cache'),
-                            new Base64(),
-                            new KeyGenerator(CacheHelper::BASE_CLIENT_KEY, INSTANCE_ID),
+                            CacheHelper::BASE_CLIENT_KEY . '.' . INSTANCE_ID,
                         )
                     );
                 }
@@ -544,10 +543,9 @@ class Kernel extends WebKernelAbstract
             $di->lazy(
                 function () use ($di) {
                     return new Psr16Cache(
-                        new ItemPool(
+                        new RedisAdapter(
                             $di->get('redis.cache'),
-                            new Base64(),
-                            new KeyGenerator('component.homepage.clickview', INSTANCE_ID),
+                            'component.homepage.clickview.' . INSTANCE_ID,
                         )
                     );
                 }
@@ -559,10 +557,9 @@ class Kernel extends WebKernelAbstract
             $di->lazy(
                 function () use ($di) {
                     return new Psr16Cache(
-                        new ItemPool(
+                        new RedisAdapter(
                             $di->get('redis.cache'),
-                            new Base64(),
-                            new KeyGenerator('paperly', INSTANCE_ID),
+                            'paperly.' . INSTANCE_ID,
                         )
                     );
                 }
