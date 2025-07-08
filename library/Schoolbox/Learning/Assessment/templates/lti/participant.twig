@@ -1,3 +1,4 @@
+{% import '@learning/macro/urgency.twig' as urgency %}
 {% set latestFeedback    = participant.findMostRecentInstructorGivenFeedback %}
     {% set latestResponse    = participant.findMostRecentSubmittedResponse %}
     {% set multipleResponses = participant.allResponses | length > 1 %}
