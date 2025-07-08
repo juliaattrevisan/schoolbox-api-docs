@@ -2,13 +2,9 @@
 /**
  * Pastoral Report Tabs Component
  */
-<<<<<<< HEAD
 import MediaArticle from "@schoolboxVue/components/media-article.vue";
 import type { PastoralReportTab, SeverityColors, PastoralRecord } from "../js/types/pastoralReportTypes";
-=======
-import type { PastoralReportTab, SeverityColors, LocaleConfig, PastoralRecord } from "../js/types/pastoralReportTypes";
 import PrTable from "./pr-table.vue";
->>>>>>> 38d2af497bc (Add in pr-table, disabling rest for testing for now [SA-19672])
 
 const props = defineProps<{
     tabs: PastoralReportTab[];
