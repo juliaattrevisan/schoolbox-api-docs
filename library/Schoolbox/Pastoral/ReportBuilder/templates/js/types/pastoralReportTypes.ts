@@ -43,13 +43,22 @@ export type Routes = {
 };
 
 /**
+ * Defines the type of table headers used in the Pastoral Report Table,
+ * which defines what will be displayed in each column of the table.
+ */
+export enum TableHeaderType {
+    USER = "User",
+    RECORDS_AND_POINTS = "RecordsAndPoints",
+}
+
+/**
  * To define the structure of each table column
  */
 export type TableHeader = {
     key: string;
     title: string;
     subTitle?: string;
-    type: string;
+    type: string | TableHeaderType;
     isSortable?: boolean;
 };
 

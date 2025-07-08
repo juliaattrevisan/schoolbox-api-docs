@@ -5,6 +5,7 @@
  */
 
 import type { User } from "@schoolboxLibrary/types/User";
+import { TableHeaderType } from "../js/types/pastoralReportTypes";
 import type { TableHeader, RowOptions, RecordsAndPoints } from "../js/types/pastoralReportTypes";
 
 type Props = {
@@ -18,10 +19,10 @@ const props = defineProps<Props>();
 <template>
     <tr>
         <td v-for="(data, index) in props.rowData" :key="props.headers[index]?.key || index">
-            <template v-if="props.headers[index].type == 'User'">
+            <template v-if="props.headers[index].type == TableHeaderType.USER">
                 {{ (data as User).fullName }}
             </template>
-            <template v-else-if="props.headers[index].type == 'RecordsAndPoints'">
+            <template v-else-if="props.headers[index].type == TableHeaderType.RECORDS_AND_POINTS">
                 <!-- Change data based on current radio button selection -->
                 <template v-if="props.recordsOrPoints === 'Records'">
                     {{ (data as RecordsAndPoints).records }}
