@@ -132,7 +132,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
         $this->setupDatabase();
 
-        $this->htmlConverter = new Html2Text();
+        $this->htmlConverter = new Html2Text('', ['width' => 0]); // Set width to 0 to disable line-wrapping.
 
         $externalPing = new External_Ping();
 
@@ -1544,6 +1544,10 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         $this->htmlConverter->setHtml($pastoral->getBodyPrivate());
         $bodyPrivateText = $this->htmlConverter->getText();
 
+        // Synergetic will ignore Unix-style line endings, so must convert to Dos-style before exporting.
+        $bodyPublicText = $this->convertLineEndingsUnixToDos($bodyPublicText);
+        $bodyPrivateText = $this->convertLineEndingsUnixToDos($bodyPrivateText);
+
         // Return an array containing the parameters for the insert/update query
 
         $params = [
@@ -1749,5 +1753,19 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             ];
         }
         return $exDocClassLookup;
+    }
+
+    /**
+     * Convert a string containing a mixture of Unix and Dos style line endings (LF or CRLF) to Dos style only (CRLF).
+     * @param string $string
+     * @return string
+     */
+    private function convertLineEndingsUnixToDos(string $string): string
+    {
+        // First convert all CRLF and CR to LF.
+        $string = str_replace(["\r\n", "\r"], "\n", $string);
+
+        // Then convert all LF to CRLF.
+        return str_replace("\n", "\r\n", $string);
     }
 }
