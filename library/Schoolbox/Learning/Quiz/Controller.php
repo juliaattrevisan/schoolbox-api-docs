@@ -258,33 +258,26 @@ class Controller extends AbstractController
     {
         $postData = $this->requestPost->getArrayCopy();
 
-        new \Alaress_Probe($_FILES, $postData, $this->requestPost);
-die();
         /* No upload? No trabajo
          */
-        if (!isset($postData['attachment'])) {
+        if (!isset($_FILES['attachment'])) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_IMPORT_FILE_NOT_FOUND);
         }
 
         /* An unusual outcome where the key might exist, but nothing else is in
          * the way we thought - probably our mistake
          */
-        if (!is_array($postData['attachment'])) {
+        if (!is_array($_FILES['attachment'])) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_IMPORT_FILE_NOT_FOUND);
         }
 
         /* Milk out some of the assessment settings from the xml itself
          */
-        try {
-            /** @var \Schoolbox\Resource\Storage\Model $file */
-            $file = (new CollectorFactory())->build($postData['attachment'] ?: [])->getFirst();
+        $data = file_get_contents($_FILES['attachment']['tmp_name']);
 
-            /** @var \Schoolbox\Resource\Storage\FilesystemProxy $filesystemProxy */
-            $filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
-            $data            = $filesystemProxy->read($file);
-        } catch (\Schoolbox\Resource\Exception $e) {
-            /* Something went wrong reading the file's contents
-             */
+        /* Something went wrong reading the file's contents
+         */
+        if (false === $data) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_IMPORT_FILE_NOT_FOUND);
         }
 
