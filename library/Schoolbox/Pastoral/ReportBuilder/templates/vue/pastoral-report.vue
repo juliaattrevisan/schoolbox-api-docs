@@ -19,9 +19,9 @@ const props = defineProps<{
     severityColors: SeverityColors;
 }>();
 
-const selectedTab = window.Vue.ref(props.tabs[0]?.type ?? "");
-const recordsAndPoints = window.Vue.ref(["Records", "Points"]);
-const recordsOrPoints = window.Vue.ref("Records");
+const selectedTab = window.Vue.ref(props.tabs[0]?.type ?? ""); // the currently selected tab, defaulting to the first tab type
+const recordsAndPoints = window.Vue.ref(["Records", "Points"]); // to toggle the tables between records and points
+const recordsOrPoints = window.Vue.ref("Records"); // the current records/points selection
 
 const isTemporaryTesting = window.Vue.ref(true); // Temporary flag for testing purposes
 </script>

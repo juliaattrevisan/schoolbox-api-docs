@@ -49,7 +49,7 @@ export type TableHeader = {
     key: string;
     title: string;
     subTitle?: string;
-    columnType: string;
+    type: string;
     isSortable?: boolean;
 };
 
