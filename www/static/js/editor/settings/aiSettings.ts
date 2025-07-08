@@ -5,6 +5,10 @@ interface SbxAIAssistantConfig {
         openAI: {
             apiUrl: string;
             requestParameters: {
+                max_tokens: number;
+                temperature: number;
+                top_p: number;
+                stream: boolean;
                 model: string | undefined;
             };
         };
