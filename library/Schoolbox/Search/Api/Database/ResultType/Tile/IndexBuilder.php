@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\Tile;
 
 use Alaress_Date_Format;
+use Component_Config_Componentname;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 use Schoolbox\Search\Api\Database\Index\BuildType;
@@ -79,21 +80,43 @@ class IndexBuilder extends BaseBuilder
         // * Check the related query in buildDeletes() after making changes to this query.
         $queryString = "
             SELECT
-                t.id,
-                t.title_text,
-                t.link,
-                t.modified_at,
-                tlf.folder_id
-            FROM tile t
-            JOIN tile_layout tl ON tl.id=t.tile_layout_id
-            JOIN tile_layout_for_folder tlf ON tlf.tile_layout_id=tl.id
-            JOIN folder f ON tlf.folder_id=f.id
-            WHERE t.deleted_at IS NULL
-            AND tl.deleted_at IS NULL
+            CONCAT(t.id, '-', ci.id, '-', f.id) AS id,
+            t.title_text,
+            t.link,
+            t.modified_at,
+            f.id AS folder_id
+            FROM component_definition cd
+            JOIN component_instance ci ON ci.component_definition_id = cd.id
+            JOIN folder f ON f.id = ci.identifier
+            JOIN component_config_definition ccd_layoutId ON (
+                ccd_layoutId.component_definition_id = cd.id AND
+                ccd_layoutId.key = :homepageComponentKey
+            )
+            LEFT JOIN component_config_instance cci_layoutId ON (
+                cci_layoutId.component_config_definition_id = ccd_layoutId.id AND
+                cci_layoutId.component_instance_id = ci.id
+            )
+            JOIN tile_layout tl ON (CAST(tl.id AS NCHAR) = cci_layoutId.value)
+            JOIN tile t ON t.tile_layout_id = tl.id
+            JOIN component_config_definition ccd_componentname ON (
+                ccd_componentname.component_definition_id = cd.id AND
+                ccd_componentname.key = :componentConfigComponentNameKey
+            )
+            LEFT JOIN component_config_instance cci_componentname ON (
+                cci_componentname.component_config_definition_id = ccd_componentname.id AND
+                cci_componentname.component_instance_id = ci.id
+            )
+            WHERE cd.`class` = :componentClass
             AND f.deleted_at IS NULL
+            AND tl.deleted_at IS NULL
+            AND t.deleted_at IS NULL
             AND t.title_text<>''
         ";
-        $params = [];
+        $params = [
+            'homepageComponentKey'            => Tile\Layout\Mapper::HOMEPAGE_COMPONENT_KEY,
+            'componentConfigComponentNameKey' => Component_Config_Componentname::KEY,
+            'componentClass'                  => self::getComponentClass(),
+        ];
         if ($fromDate) {
             $queryString .= ' AND t.modified_at >= :fromDate';
             $params['fromDate'] = $fromDate->getDatabase();
@@ -134,11 +157,10 @@ class IndexBuilder extends BaseBuilder
     {
         // What database updates could cause a tile that was included
         // in the buildUpdates() query to be excluded from that query?
-        //  * tl  row could be deleted or updated so it no longer links -+- No need to consider these cases because rows
-        //  * tlf row could be deleted or updated so it no longer links  |  from these tables are never hard-deleted by
-        //  * f   row could be deleted or updated so it no longer links /   the application or updated in such a way
-        //  * tile.deleted_at        could be set to non-null               that would break the links.
-        //  * tile_layout.deleted_at could be set to non-null
+        //  * tlf row could be deleted or updated so it no longer links -+- No need to consider these cases because rows
+        //  * f   row could be deleted or updated so it no longer links /   from these tables are never hard-deleted by
+        //  * tile.deleted_at        could be set to non-null               the application or updated in such a way
+        //  * tile_layout.deleted_at could be set to non-null               that would break the links.
         //  * folder.deleted_at      could be set to non-null
         //  * tile.title_text        could be set to blank
         $queryString = "
@@ -199,5 +221,15 @@ class IndexBuilder extends BaseBuilder
                 null,
             );
         }
+    }
+
+    /**
+     * Retrieve and trim the homepage component class name, for use in queries.
+     *
+     * @return string
+     */
+    private static function getComponentClass(): string
+    {
+        return trim(Tile\Component\HomepageTileController::class, '\\');
     }
 }
