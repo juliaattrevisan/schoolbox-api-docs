@@ -107,7 +107,7 @@ export type MarkbookClassImplActivity = {
     courseManaged: boolean | null;
     /* currently class markbook only */
     writable?: boolean;
-    weight: number;
+    weight?: number;
 };
 
 export type MarkbookClassImplStudent = {
