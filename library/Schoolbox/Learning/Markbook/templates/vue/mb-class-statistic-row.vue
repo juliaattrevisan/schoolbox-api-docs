@@ -17,10 +17,7 @@ export interface Props {
         /**
          * Parameters for the fetch request to persist the change
          */
-        fetch: (
-            assessmentId: number,
-            aImpl: MarkbookClassImplActivity,
-        ) => {
+        fetch: (aImpl: MarkbookClassImplActivity) => {
             url: string;
             data: Record<string, unknown>;
         };
@@ -56,7 +53,7 @@ async function onValueChange(activityId: number, aImpl: MarkbookClassImplActivit
 
     const toast = window.sbProps.toastActivate("Updating assessment...");
 
-    const fetchInfo = props.input.fetch(activityId, aImpl);
+    const fetchInfo = props.input.fetch(aImpl);
     try {
         const response = await fetch(fetchInfo.url, {
             method: "POST",
@@ -105,7 +102,7 @@ async function onValueChange(activityId: number, aImpl: MarkbookClassImplActivit
             class="student-grade-cell"
             :data-assessment="assessment.id"
         >
-            <template v-if="stat === null || aImpl === null || !aImpl.writable"></template>
+            <template v-if="stat === null || aImpl === null || aImpl.writable === false"></template>
             <template v-else-if="props.input && (props.input.allowCourseManaged || !aImpl.courseManaged)">
                 <select
                     v-if="props.input.selectOptions && assessment.assessmentType !== ACTIVITY_TYPE_TASK"

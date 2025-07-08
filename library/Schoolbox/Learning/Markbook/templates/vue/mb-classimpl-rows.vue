@@ -28,9 +28,9 @@ const classStatisticRows: Omit<MbClassStatisticRowProps, "classImpl">[] = [
         input: {
             key: "weight",
             allowCourseManaged: false,
-            fetch: (assessmentId: number, aImpl: MarkbookClassImplActivity) => ({
-                url: `/learning/assessments/weight/${assessmentId}`,
-                data: { assessmentId, weight: aImpl.weight },
+            fetch: (aImpl: MarkbookClassImplActivity) => ({
+                url: `/learning/assessments/weight/${aImpl.id}`,
+                data: { assessmentId: aImpl.id, weight: aImpl.weight },
             }),
         },
     },
@@ -40,9 +40,9 @@ const classStatisticRows: Omit<MbClassStatisticRowProps, "classImpl">[] = [
         input: {
             key: "weight",
             allowCourseManaged: false,
-            fetch: (assessmentId: number, aImpl: MarkbookClassImplActivity) => ({
-                url: `/learning/assessments/weight/${assessmentId}`,
-                data: { assessmentId, weight: aImpl.weight },
+            fetch: (aImpl: MarkbookClassImplActivity) => ({
+                url: `/learning/assessments/weight/${aImpl.id}`,
+                data: { assessmentId: aImpl.id, weight: aImpl.weight },
             }),
         },
     },
@@ -75,34 +75,6 @@ const orderedClassImplStudents = window.Vue.computed(() => {
 
 <template>
     <template v-if="mbStore.data !== null && classImpl !== null">
-        <template v-if="props.type === 'class' && mbStore.showAverages">
-            <mb-class-statistic-row
-                v-for="row in classStatisticRows"
-                :key="row.statsKey"
-                :class-impl="classImpl"
-                :label="row.label"
-                :stats-key="row.statsKey"
-                :input="'input' in row ? row.input : undefined"
-                :round="'round' in row ? row.round : undefined"
-            />
-        </template>
-
-        <mb-class-statistic-row
-            v-if="props.type === 'class'"
-            :class-impl="classImpl"
-            label="Visibility"
-            stats-key="markVisibility"
-            :input="{
-                key: 'markVisibility',
-                selectOptions: markVisibilityOptions,
-                allowCourseManaged: true,
-                fetch: (assessmentId, aImpl) => ({
-                    url: `/learning/assessments/visibility/${assessmentId}`,
-                    data: { assessmentId, visibility: aImpl.markVisibility },
-                }),
-            }"
-        />
-
         <tr v-if="props.type === 'course'" :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }">
             <th class="class-row class-row-heading fixed-left">
                 <a :href="`/homepage/${classImpl.folder.id}`">{{ classImpl.folder.title }}</a>
@@ -123,6 +95,33 @@ const orderedClassImplStudents = window.Vue.computed(() => {
                 <td v-else class="class-row na"></td>
             </template>
         </tr>
+
+        <template v-if="props.type === 'class' && mbStore.showAverages">
+            <mb-class-statistic-row
+                v-for="row in classStatisticRows"
+                :key="row.statsKey"
+                :class-impl="classImpl"
+                :label="row.label"
+                :stats-key="row.statsKey"
+                :input="'input' in row ? row.input : undefined"
+                :round="'round' in row ? row.round : undefined"
+            />
+        </template>
+
+        <mb-class-statistic-row
+            :class-impl="classImpl"
+            label="Visibility"
+            stats-key="markVisibility"
+            :input="{
+                key: 'markVisibility',
+                selectOptions: markVisibilityOptions,
+                allowCourseManaged: true,
+                fetch: (aImpl) => ({
+                    url: `/learning/assessments/visibility/${aImpl.id}`,
+                    data: { assessmentId: aImpl.id, visibility: aImpl.markVisibility },
+                }),
+            }"
+        />
 
         <mb-classimpl-row-student
             v-for="student in orderedClassImplStudents"
