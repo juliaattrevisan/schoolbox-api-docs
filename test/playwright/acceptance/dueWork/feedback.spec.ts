@@ -55,7 +55,7 @@ test.describe("Feedback Tests", () => {
         tester.isGoingTo("Go to submit page");
         await assessmentNotificationLouisa.getByText(dueworkTitle1).click();
         await page.getByTestId(SELECTOR_ASSESSMENT_SUMMARY_CREATE_BUTTON).click();
-        await expect(page.locator("#assessment-status h1").first()).toHaveText(dueworkTitle1);
+        await expect(page.locator("[data-assessment-status] h1").first()).toHaveText(dueworkTitle1);
 
         tester.isGoingTo("create submission");
         const submitForm = new SubmitForm(tester, page);
@@ -135,7 +135,7 @@ test.describe("Feedback Tests", () => {
         tester.isGoingTo("Go to the submit page");
         await assessmentNotificationLouisa.getByText(dueworkTitle2).click();
         await page.getByTestId(SELECTOR_ASSESSMENT_SUMMARY_CREATE_BUTTON).click();
-        await expect(page.locator("#assessment-status h1").first()).toHaveText(dueworkTitle2);
+        await expect(page.locator("[data-assessment-status] h1").first()).toHaveText(dueworkTitle2);
 
         tester.isGoingTo("create submission");
         const submitForm = new SubmitForm(tester, page);

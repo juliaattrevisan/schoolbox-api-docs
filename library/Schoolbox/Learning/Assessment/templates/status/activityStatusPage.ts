@@ -18,25 +18,35 @@ type ParticipantRow = {
     editor: SbxEditor | null;
 };
 
-let participantRows: ParticipantRow[] = [];
-let participantTabGroups: ParticipantRow[][] = [];
+const participantGroups: {
+    rows: ParticipantRow[];
+    tabGroups: ParticipantRow[][];
+}[] = [
+    {
+        rows: [],
+        tabGroups: [],
+    },
+];
 
 // The page config as specified when initialising the page using the event
 let pageConfig: {
     pageItemLimit: number;
     pageItemLimitOffset: number;
     elements: {
-        paginator: {
-            wrapper: HTMLElement;
-            ul: HTMLUListElement;
-        } | null; // null if no pagination
-        filterEmptyState: HTMLElement;
-        filterReset: HTMLElement;
-        participantLoader: HTMLElement;
-        participantContainer: HTMLElement;
         participantSearchInput: HTMLInputElement | null;
         participantFilters: HTMLInputElement[];
-        participantRows: HTMLElement[];
+        participantGroups: {
+            group: HTMLElement;
+            filterEmptyState: HTMLElement;
+            filterReset: HTMLElement;
+            loader: HTMLElement;
+            container: HTMLElement;
+            rows: HTMLElement[];
+            paginator: {
+                wrapper: HTMLElement;
+                ul: HTMLUListElement;
+            } | null; // null if no pagination
+        }[];
     };
 };
 
@@ -130,12 +140,13 @@ async function applyParticipantVisibility(
 
 /**
  * Create a page tab element
+ * @param groupId - The index of the participant group this tab belongs to
  * @param label - The label to display on the tab, string for arrows, number for page number
  * @param targetTab - The index of the tab to switch to when clicked
  * @param activeTab - The index of the currently active tab
  * @returns The created tab element
  */
-function createPageTab(label: string | number, targetTab: number, activeTab: number): HTMLLIElement {
+function createPageTab(groupId: number, label: string | number, targetTab: number, activeTab: number): HTMLLIElement {
     const tabLi = document.createElement("li");
     // When the label is a string, it's an arrow
     if (typeof label === "string") {
@@ -146,7 +157,7 @@ function createPageTab(label: string | number, targetTab: number, activeTab: num
         tabLi.classList.add("active");
     }
     // If the target is out of bounds, make it unavailable
-    const isUnavailable = targetTab < 0 || targetTab >= participantTabGroups.length;
+    const isUnavailable = targetTab < 0 || targetTab >= participantGroups[groupId].tabGroups.length;
     if (isUnavailable) {
         tabLi.classList.add("unavailable");
     }
@@ -159,16 +170,17 @@ function createPageTab(label: string | number, targetTab: number, activeTab: num
         e.preventDefault(); // always prevent default even if unavailable
         if (!isUnavailable && targetTab !== activeTab) {
             // Scroll to the top of the page and show the loader
-            pageConfig.elements.participantLoader.classList.remove("hide");
-            pageConfig.elements.participantContainer.classList.add("hide");
-            if (pageConfig.elements.paginator) {
-                pageConfig.elements.paginator.wrapper.style.display = "none";
+            const groupConfig = pageConfig.elements.participantGroups[groupId];
+            groupConfig.loader.classList.remove("hide");
+            groupConfig.container.classList.add("hide");
+            if (groupConfig.paginator) {
+                groupConfig.paginator.wrapper.style.display = "none";
             }
             document.querySelector("#header")?.scrollIntoView();
             // A slight delay to allow the scroll to start before the tab change hangs the page
             setTimeout(() => {
                 // eslint-disable-next-line @typescript-eslint/no-use-before-define -- intentional recursion for now
-                void changeTab(targetTab, false);
+                void changeTab(groupId, targetTab, false);
             }, 100);
         }
     });
@@ -178,41 +190,43 @@ function createPageTab(label: string | number, targetTab: number, activeTab: num
 
 /**
  * When the selected tab is changed, show the correct participants
+ * @param groupId - The index of the participant group to change
  * @param activeTab - The index of the tab to show
  * @param animate - Whether to animate the change (slideUp/slideDown), use this for filters
  */
-async function onSelectedTabChange(activeTab: number, animate: boolean): Promise<void> {
+async function onSelectedTabChange(groupId: number, activeTab: number, animate: boolean): Promise<void> {
     if (pageConfig === undefined) throw new Error("Activity status page config missing");
+    const groupConfig = pageConfig.elements.participantGroups[groupId];
 
     // Should we paginate?
-    if (pageConfig.elements.paginator !== null) {
-        const { wrapper, ul } = pageConfig.elements.paginator;
+    if (groupConfig.paginator !== null) {
+        const { wrapper, ul } = groupConfig.paginator;
         // Show paginator only if more than one tab exists
-        wrapper.style.display = participantTabGroups.length > 1 ? "" : "none";
+        wrapper.style.display = participantGroups[groupId].tabGroups.length > 1 ? "" : "none";
 
         // Create the tabs
-        if (participantTabGroups.length > 1) {
+        if (participantGroups[groupId].tabGroups.length > 1) {
             ul.innerHTML = "";
-            ul.appendChild(createPageTab("‹", activeTab - 1, activeTab));
-            participantTabGroups.forEach((_, i) => {
-                ul.appendChild(createPageTab(i + 1, i, activeTab));
+            ul.appendChild(createPageTab(groupId, "‹", activeTab - 1, activeTab));
+            participantGroups[groupId].tabGroups.forEach((_, i) => {
+                ul.appendChild(createPageTab(groupId, i + 1, i, activeTab));
             });
-            ul.appendChild(createPageTab("›", activeTab + 1, activeTab));
+            ul.appendChild(createPageTab(groupId, "›", activeTab + 1, activeTab));
         }
     }
 
-    if (participantTabGroups.length === 0) {
+    if (participantGroups[groupId].tabGroups.length === 0) {
         // everything was filtered out, so show the empty state
-        pageConfig.elements.filterEmptyState.dataset.display = "block"; // need this otherwise slideDown keeps it as none?
-        void slideDown(pageConfig.elements.filterEmptyState);
+        groupConfig.filterEmptyState.dataset.display = "block"; // need this otherwise slideDown keeps it as none?
+        void slideDown(groupConfig.filterEmptyState);
     } else {
-        void slideUp(pageConfig.elements.filterEmptyState);
+        void slideUp(groupConfig.filterEmptyState);
     }
 
-    const activeGroup = participantTabGroups[activeTab]; // could be null if no groups
+    const activeGroup = participantGroups[groupId].tabGroups[activeTab]; // could be null if no groups
     const editorsToCreate: ParticipantRow[] = [];
     await Promise.all(
-        participantRows.map(async (participantRow) => {
+        participantGroups[groupId].rows.map(async (participantRow) => {
             const isActive = activeGroup && activeGroup.includes(participantRow);
             const activeEditor = participantRow.editor;
 
@@ -234,24 +248,26 @@ async function onSelectedTabChange(activeTab: number, animate: boolean): Promise
     await createEditorForParticipants(editorsToCreate);
 
     // Remove the loader and show the participants
-    pageConfig.elements.participantLoader.classList.add("hide");
-    pageConfig.elements.participantContainer.classList.remove("hide");
+    groupConfig.loader.classList.add("hide");
+    groupConfig.container.classList.remove("hide");
 }
 
+// All groups share the same lock
 let changeTabLock: Promise<void> | null = null;
 let changeTabNext: (() => Promise<void>) | null = null;
 
 /**
  * To change the selected tab
  * This ensures that only one call of onSelectedTabChange is running at a time to avoid concurrent editor creation/destruction
+ * @param groupId - The index of the participant group to change
  * @param activeTab - The index of the tab to show
  * @param animate - Whether to animate the change (slideUp/slideDown), use this for filters
  */
-async function changeTab(activeTab: number, animate: boolean): Promise<void> {
+async function changeTab(groupId: number, activeTab: number, animate: boolean): Promise<void> {
     // If there is a call in progress, set this as the next call to make after it
     if (changeTabLock !== null) {
         changeTabNext = async (): Promise<void> => {
-            await changeTab(activeTab, animate);
+            await changeTab(groupId, activeTab, animate);
         };
         return;
     }
@@ -260,7 +276,7 @@ async function changeTab(activeTab: number, animate: boolean): Promise<void> {
     changeTabNext = null;
 
     // Now change the tab
-    changeTabLock = onSelectedTabChange(activeTab, animate);
+    changeTabLock = onSelectedTabChange(groupId, activeTab, animate);
     try {
         await changeTabLock;
     } finally {
@@ -286,63 +302,56 @@ async function onParticipantFilterChange(): Promise<void> {
         .filter((el) => el.checked)
         .map((el) => el.dataset.status);
 
-    const filteredParticipantRows = participantRows.filter((participantRow) => {
-        // If there is a search, and it doesn't match the name, don't show
-        if (searchTerm.length && !participantRow.name.toLowerCase().includes(searchTerm)) {
-            return false;
-        }
-
-        // If the status of the participant doesn't match the active filters, don't show
-        if (!activeFilters.includes(participantRow.el.dataset.status)) {
-            return false;
-        }
-
-        return true;
-    });
-
-    // should we paginate?
-    participantTabGroups = [];
-    if (
-        pageConfig.elements.paginator !== null &&
-        filteredParticipantRows.length > pageConfig.pageItemLimit + pageConfig.pageItemLimitOffset
-    ) {
-        let currentGroup: ParticipantRow[] = [];
-
-        filteredParticipantRows.forEach((participantRow) => {
-            currentGroup.push(participantRow);
-            if (currentGroup.length >= pageConfig.pageItemLimit) {
-                participantTabGroups.push(currentGroup);
-                currentGroup = [];
+    participantGroups.forEach((group, i) => {
+        const filteredParticipantRows = group.rows.filter((participantRow) => {
+            // If there is a search, and it doesn't match the name, don't show
+            if (searchTerm.length && !participantRow.name.toLowerCase().includes(searchTerm)) {
+                return false;
             }
+
+            // If the status of the participant doesn't match the active filters, don't show
+            if (!activeFilters.includes(participantRow.el.dataset.status)) {
+                return false;
+            }
+
+            return true;
         });
 
-        if (currentGroup.length) {
-            participantTabGroups.push(currentGroup);
-        }
-    } else if (filteredParticipantRows.length) {
-        participantTabGroups.push(filteredParticipantRows);
-    }
+        // should we paginate?
+        group.tabGroups = [];
+        if (
+            pageConfig.elements.participantGroups[i].paginator !== null &&
+            filteredParticipantRows.length > pageConfig.pageItemLimit + pageConfig.pageItemLimitOffset
+        ) {
+            let currentGroup: ParticipantRow[] = [];
 
-    await changeTab(0, true); // reset to first page
+            filteredParticipantRows.forEach((participantRow) => {
+                currentGroup.push(participantRow);
+                if (currentGroup.length >= pageConfig.pageItemLimit) {
+                    group.tabGroups.push(currentGroup);
+                    currentGroup = [];
+                }
+            });
+
+            if (currentGroup.length) {
+                group.tabGroups.push(currentGroup);
+            }
+        } else if (filteredParticipantRows.length) {
+            group.tabGroups.push(filteredParticipantRows);
+        }
+    });
+
+    // reset all groups to the first page
+    await Promise.all(participantGroups.flatMap((_, i) => changeTab(i, 0, true)));
 }
 
 document.addEventListener(ACTIVITY_STATUS_PAGE_INIT, (event) => {
     // parse the event detail and validate the elements exist
-    const filterEmptyState = document.querySelector(event.detail.selectors.filterEmptyState);
-    if (!(filterEmptyState instanceof HTMLElement)) {
-        throw new Error("Unable to find filter empty state element");
-    }
-    const filterReset = document.querySelector(event.detail.selectors.filterReset);
-    if (!(filterReset instanceof HTMLElement)) {
-        throw new Error("Unable to find filter reset element");
-    }
-    const participantLoader = document.querySelector(event.detail.selectors.participantLoader);
-    if (!(participantLoader instanceof HTMLElement)) {
-        throw new Error("Unable to find participant loader element");
-    }
-    const participantContainer = document.querySelector(event.detail.selectors.participantContainer);
-    if (!(participantContainer instanceof HTMLElement)) {
-        throw new Error("Unable to find participant container element");
+    const participantGroupEls = Array.from(
+        document.querySelectorAll<HTMLElement>(event.detail.selectors.participantGroup.groupSelector),
+    );
+    if (participantGroupEls.length === 0) {
+        throw new Error("Unable to find participant group elements");
     }
     // We don't require a participant search input for every page
     const participantSearchInput = event.detail.selectors.participantSearchInput
@@ -355,51 +364,87 @@ document.addEventListener(ACTIVITY_STATUS_PAGE_INIT, (event) => {
         pageItemLimit: event.detail.pageItemLimit,
         pageItemLimitOffset: event.detail.pageItemLimitOffset,
         elements: {
-            paginator: null, // to be set below if enabled
-            filterEmptyState,
-            filterReset,
-            participantLoader,
-            participantContainer,
+            participantGroups: participantGroupEls.map((group) => {
+                const groupSelectors = event.detail.selectors.participantGroup;
+                const filterEmptyState = group.querySelector(groupSelectors.filterEmptyState);
+                if (!(filterEmptyState instanceof HTMLElement)) {
+                    throw new Error("Unable to find participant group empty state element");
+                }
+                const filterReset = group.querySelector(groupSelectors.filterReset);
+                if (!(filterReset instanceof HTMLElement)) {
+                    throw new Error("Unable to find filter reset element");
+                }
+                const loader = group.querySelector(groupSelectors.loader);
+                if (!(loader instanceof HTMLElement)) {
+                    throw new Error("Unable to find participant group loader element");
+                }
+                const container = group.querySelector(groupSelectors.container);
+                if (!(container instanceof HTMLElement)) {
+                    throw new Error("Unable to find participant group container element");
+                }
+                const rows = Array.from(group.querySelectorAll<HTMLElement>(groupSelectors.rows));
+
+                // pagination is only used on some view status pages (wherever editors need to be spawned)
+                // if a selector was provided but no element found, disable pagination (avoids needing extra twig blocks)
+                const paginatorWrapper = groupSelectors.paginator
+                    ? group.querySelector(groupSelectors.paginator)
+                    : null;
+
+                let paginator: null | { wrapper: HTMLElement; ul: HTMLUListElement } = null;
+                if (paginatorWrapper instanceof HTMLElement) {
+                    const paginatorUl = paginatorWrapper.querySelector("ul[class=pagination]");
+                    if (!(paginatorUl instanceof HTMLUListElement)) {
+                        throw new Error("Unable to find paginator list element");
+                    }
+                    paginator = {
+                        wrapper: paginatorWrapper,
+                        ul: paginatorUl,
+                    };
+                }
+
+                return {
+                    group,
+                    filterEmptyState,
+                    filterReset,
+                    loader,
+                    container,
+                    rows,
+                    paginator,
+                };
+            }),
             participantSearchInput,
             participantFilters: Array.from(
                 document.querySelectorAll<HTMLInputElement>(event.detail.selectors.participantFilters),
             ),
-            participantRows: Array.from(document.querySelectorAll<HTMLElement>(event.detail.selectors.participantRows)),
         },
     };
 
-    // pagination is only used on some view status pages (wherever editors need to be spawned)
-    // if a selector was provided but no element found, disable pagination (avoids needing extra twig blocks)
-    const paginatorWrapper = event.detail.selectors.paginator
-        ? document.querySelector(event.detail.selectors.paginator)
-        : null;
-    if (paginatorWrapper instanceof HTMLElement) {
-        const paginatorUl = paginatorWrapper.querySelector("ul[class=pagination]");
-        if (!(paginatorUl instanceof HTMLUListElement)) {
-            throw new Error("Unable to find paginator list element");
-        }
-        pageConfig.elements.paginator = {
-            wrapper: paginatorWrapper,
-            ul: paginatorUl,
+    pageConfig.elements.participantGroups.forEach((group, i) => {
+        participantGroups[i] = {
+            rows: [],
+            tabGroups: [],
         };
-    }
 
-    participantRows = pageConfig.elements.participantRows.map((el) => {
-        const participantName = el.querySelector(event.detail.selectors.participantRowName);
-        if (!(participantName instanceof HTMLElement)) {
-            throw new Error("Unable to find participant name element");
-        }
-        // We don't require a comment textarea for every participant row (e.g. tasks don't have comments)
-        const participantCommentTextarea = el.querySelector(event.detail.selectors.participantRowCommentTextarea);
-        if (participantCommentTextarea !== null && !(participantCommentTextarea instanceof HTMLTextAreaElement)) {
-            throw new Error("Unable to find participant comment textarea element");
-        }
-        return {
-            el,
-            textarea: participantCommentTextarea,
-            name: participantName.innerText,
-            editor: null,
-        };
+        participantGroups[i].rows = group.rows.map((el) => {
+            const participantName = el.querySelector(event.detail.selectors.participantGroup.rowName);
+            if (!(participantName instanceof HTMLElement)) {
+                throw new Error("Unable to find participant name element");
+            }
+            // We don't require a comment textarea for every participant row (e.g. tasks don't have comments)
+            const participantCommentTextarea = el.querySelector(
+                event.detail.selectors.participantGroup.rowCommentTextarea,
+            );
+            if (participantCommentTextarea !== null && !(participantCommentTextarea instanceof HTMLTextAreaElement)) {
+                throw new Error("Unable to find participant comment textarea element");
+            }
+
+            return {
+                el,
+                textarea: participantCommentTextarea,
+                name: participantName.innerText,
+                editor: null,
+            };
+        });
     });
 
     // Add event listeners for when search/filters change
@@ -414,16 +459,18 @@ document.addEventListener(ACTIVITY_STATUS_PAGE_INIT, (event) => {
     });
 
     // Allow the user to reset the search/filters when the empty state is shown
-    pageConfig.elements.filterReset.addEventListener("click", (e) => {
-        e.preventDefault();
-        if (pageConfig.elements.participantSearchInput !== null) {
-            pageConfig.elements.participantSearchInput.value = "";
-        }
-        pageConfig.elements.participantFilters.forEach((el) => {
-            el.checked = true;
-        });
-        void onParticipantFilterChange();
-    });
+    pageConfig.elements.participantGroups.forEach((group) =>
+        group.filterReset.addEventListener("click", (e) => {
+            e.preventDefault();
+            if (pageConfig.elements.participantSearchInput !== null) {
+                pageConfig.elements.participantSearchInput.value = "";
+            }
+            pageConfig.elements.participantFilters.forEach((el) => {
+                el.checked = true;
+            });
+            void onParticipantFilterChange();
+        }),
+    );
 
     // trigger initial filter and pagination (if needed)
     void onParticipantFilterChange();

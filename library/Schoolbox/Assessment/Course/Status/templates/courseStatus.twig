@@ -107,7 +107,7 @@
     </div>
 {% endblock participantSearchBar %}
 {% for assessment in assessments %}
-<div class="component-container">
+<div class="component-container" data-participant-group>
     <div class="row">
         <div class="small-12 columns">
             <div class="component-titlebar">
@@ -134,17 +134,17 @@
     {% if assessment.allParticipants | length %}
         <div class="row" data-collapse-state="uncollapsed" data-collapsable="collap-{{ assessment.getBaseContext.getFolder.id }}">
             <div class="small-12 island">
-                <div class="empty-state hide" id="empty-filter">
+                <div class="empty-state hide" data-empty-filter>
                     <i class="icon-staff-students"></i>
                     <p>
                         No students match the current filters.
-                        Add another filter or <a id="filter-show-all">show everything</a>.
+                        Add another filter or <a data-filter-show-all>show everything</a>.
                     </p>
                 </div>
-                <section class="content" id="participant-loader" data-assessment="{{ assessment.id }}">
+                <section class="content" data-participant-loader data-assessment="{{ assessment.id }}">
                     <div class="loader"></div>
                 </section>
-                <section id="assessment-status" data-assessment-status data-assessment="{{ assessment.id }}" class="hide">
+                <section data-assessment-status data-assessment-status data-assessment="{{ assessment.id }}" class="hide">
                     <ul class="information-list {{ listClass }}">
                         {% for participant in assessment.allParticipants | filter(participant => not participant.isExcluded ) %}
 
@@ -163,7 +163,7 @@
             </div>
         </div>
         {% block participantPaginator %}
-            <div class="row" data-participant-paginator style="display: none">
+            <div class="row l-pad-m--top" data-participant-paginator style="display: none">
                 <div class="small-12 column">
                     <ul class="pagination">
                     </ul>
@@ -196,16 +196,19 @@
             pageItemLimit: 25,
             pageItemLimitOffset: 5,
             selectors: {
-                paginator: '[data-participant-paginator]',
-                filterEmptyState: '#empty-filter',
-                filterReset: '#filter-show-all',
                 participantSearchInput: 'input[data-participant-search]',
                 participantFilters: '[data-participant-filters] input[data-status]',
-                participantLoader: '#participant-loader',
-                participantContainer: '#assessment-status',
-                participantRows: '#assessment-status [data-participant]',
-                participantRowName: '[data-participant-name]',
-                participantRowCommentTextarea: '[data-feedback-comment]',
+                participantGroup: {
+                    groupSelector: '[data-participant-group]',
+                    filterEmptyState: '[data-empty-filter]',
+                    filterReset: '[data-filter-show-all]',
+                    paginator: '[data-participant-paginator]',
+                    loader: '[data-participant-loader]',
+                    container: '[data-assessment-status]',
+                    rows: '[data-assessment-status] [data-participant]',
+                    rowName: '[data-participant-name]',
+                    rowCommentTextarea: '[data-feedback-comment]',
+                },
             }
         }
     }));

@@ -166,7 +166,7 @@ Usage:
         {% endblock %}
 
         {# Grading logic and structure #}
-        <div class="row mark-scheme" id="assessment-status" data-participant="{{ participant.user.id }}">
+        <div class="row mark-scheme" data-assessment-status data-participant="{{ participant.user.id }}">
             <div class="small-12 island">
                 <form method="post" data-feedback-form="{{ participant.user.id }}" action="{{ routeLookupIfAuthorized('learningDueWorkFeedback.postResponseFeedback', {
                     assessmentId: assessment.id,

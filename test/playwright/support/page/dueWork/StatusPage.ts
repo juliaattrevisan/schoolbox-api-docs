@@ -46,7 +46,7 @@ export default class StatusPage {
      * @returns - The generated selector
      */
     static getStatusSelector(studentId: number, fieldSelector: string): string {
-        return `#assessment-status li[data-participant="${studentId}"] ${fieldSelector}`;
+        return `[data-assessment-status] li[data-participant="${studentId}"] ${fieldSelector}`;
     }
 
     /**

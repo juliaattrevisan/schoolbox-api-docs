@@ -154,7 +154,7 @@
     <script type="text/javascript" src='{{ CDN_PREFIX }}/js/submissions/jquery.dynamic-feedback.js'></script>
     <script type="text/javascript">
         $(function() {
-            var $participantList  = $('#assessment-status');
+            var $participantList  = $('[data-assessment-status]');
 
             /**
             * Currently quiz does not support a draft state, so any changes to grade/comment is published when a 'Save and Publish' button is selected instead.
