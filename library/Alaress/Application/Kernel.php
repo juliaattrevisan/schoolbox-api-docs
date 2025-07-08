@@ -10,6 +10,7 @@ namespace Alaress\Application;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
+use Alaress\Codec\MarshallerAdapter;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Connector\NullConnector;
 use Alaress\Database\Exception as AlaressDatabaseException;
@@ -2165,24 +2166,17 @@ abstract class Kernel
         $di->set(
             'lti.accessTokenCache',
             $di->lazy(function () use ($di) {
+                /** @var Predis\ClientInterface $redis */
+                $redis = $di->get('redis.storage');
+                /** @var RegistrationRepositoryInterface $registrationRepository */
+                $registrationRepository = $di->get('lti.registrations');
+
                 return new RedisAdapter(
-                    $di->get('redis.cache'),
+                    $redis,
                     'accessToken.' . INSTANCE_ID,
+                    0,
+                    new MarshallerAdapter(new Codec(new ClientRepository($registrationRepository))),
                 );
-//                /** @var Predis\ClientInterface $redis */
-//                $redis = $di->get('redis.storage');
-//                /** @var RegistrationRepositoryInterface $registrationRepository */
-//                $registrationRepository = $di->get('lti.registrations');
-//
-//                return new RedisAdapter(
-//                    $di->get('redis.cache'),
-//                    'accessToken:' . INSTANCE_ID,
-//                );
-//                return new ItemPool(
-//                    $redis,
-//                    new Codec(new ClientRepository($registrationRepository)),
-//                    new KeyGenerator('accessToken', INSTANCE_ID),
-//                );
             })
         );
 
