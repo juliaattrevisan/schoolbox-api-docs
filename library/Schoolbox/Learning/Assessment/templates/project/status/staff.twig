@@ -4,7 +4,10 @@ Data:
     'baseContext'       AssessmentContext
     'assessment'        IAssessable
     'assessmentStats'   Assessment\Statistics[] Indexed by assessment.id
-    'participantStats'  ParticipantStatistics[] Indexed by user.id
+    'aImpls'            [
+        'assessment'       IAssessable
+        'participantStats' ParticipantStatistics[] Indexed by user.id
+    ][]
     'returnUrl'         string
 #}
 

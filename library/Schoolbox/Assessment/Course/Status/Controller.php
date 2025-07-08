@@ -181,7 +181,6 @@ class Controller extends WebController\Base
 
             // class assessment specific data
             $twigData['aImpls'] = [];
-            $twigData['participantStats'] = [];
 
             /** @var Project $assessment */
             foreach ($assessments as $assessment) {
