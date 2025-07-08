@@ -4,44 +4,44 @@ export const payload = {
             {
                 key: "user", // The key will be passed to the backend to sort by this column
                 title: "Name",
-                columnType: "ColumnUser",
+                columnType: "User",
                 isSortable: true,
             },
             {
                 key: "total",
                 title: "Total",
-                columnType: "ColumnTotalRecordsAndPoints",
+                columnType: "RecordsAndPoints",
                 isSortable: true,
             },
             {
                 key: "subtype-22", // When a subtype, the id is of the subtype
                 title: "Academic",
                 subTitle: "Academic Honesty",
-                columnType: "ColumnRecordsAndPoints",
+                columnType: "RecordsAndPoints",
                 isSortable: true,
             },
             {
                 key: "subtype-1",
                 title: "Academic",
                 subTitle: "Award/Achievement",
-                columnType: "ColumnRecordsAndPoints",
+                columnType: "RecordsAndPoints",
                 isSortable: true,
             },
             {
                 key: "subtype-3",
                 title: "Wellbeing",
                 subTitle: "Award Achievement",
-                columnType: "ColumnRecordsAndPoints",
+                columnType: "RecordsAndPoints",
                 isSortable: true,
             },
             {
                 key: "type-8", // When type with no subtype, the id is of the type
                 title: "Reporting",
-                columnType: "ColumnRecordsAndPoints",
+                columnType: "RecordsAndPoints",
                 isSortable: true,
             },
         ],
-        totalRows: [
+        totalRow: [
             "Total", // No total for the user column
             { records: 45, points: 90 }, // Total across all users
             { records: 18, points: 36 }, // Academic > Academic Honesty total

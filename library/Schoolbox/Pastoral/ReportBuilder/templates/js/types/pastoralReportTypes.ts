@@ -1,11 +1,35 @@
 /**
+ * To define the structure of each table column
+ */
+export type PastoralReportTableHeader = {
+    key: string;
+    title: string;
+    subTitle?: string;
+    columnType: string;
+    isSortable?: boolean;
+};
+
+/**
+ * Displays either records or points in the table cell
+ */
+export type RecordsAndPoints = {
+    records: number;
+    points: number;
+};
+
+/**
+ * The options for a row in the Pastoral Report Table.
+ */
+export type RowOptions = string | User | RecordsAndPoints;
+
+/**
  * The expected payload for a Pastoral Report Table.
  */
 export type PastoralReportTablePayload = {
     data: {
         tableHeaders: PastoralReportTableHeader[];
-        totalRows: (ColumnTotalRecordsAndPoints | null)[];
-        rows: (ColumnUser | ColumnRecordsAndPoints)[][];
+        totalRow: RowOptions[];
+        rows: RowOptions[][];
     };
     metadata: {
         count: number;
@@ -138,33 +162,3 @@ export type PastoralReportTab = {
     type: string;
     title: string;
 };
-
-/**
- * To define the structure of each table column
- */
-export type PastoralReportTableHeader = {
-    key: string;
-    title: string;
-    subTitle?: string;
-    columnType: string;
-    isSortable?: boolean;
-};
-
-/**
- * Displays a user in the table cell
- */
-export type ColumnUser = User;
-
-/**
- * Displays either records or points in the table cell
- */
-export type ColumnRecordsAndPoints = {
-    records: number;
-    points: number;
-};
-
-/**
- * Same as ColumnRecordsAndPoints, but visually distinct totals
- * Not sure if this type is necessary yet
- */
-export type ColumnTotalRecordsAndPoints = ColumnRecordsAndPoints;
