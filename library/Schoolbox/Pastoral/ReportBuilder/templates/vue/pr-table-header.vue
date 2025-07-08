@@ -8,8 +8,11 @@ import type { PastoralReportTableHeader } from "../js/types/pastoralReportTypes"
 
 type Props = {
     headers: PastoralReportTableHeader[];
+    recordsAndPoints: string[];
 };
 const props = defineProps<Props>();
+
+const recordsOrPoints = defineModel<string>("records-or-points");
 
 const emit = defineEmits<{
     sort: [key: string];
@@ -64,13 +67,9 @@ function getGroupedHeaders(): Array<{ title: string; colspan: number; headers: P
             <th :colspan="hasSubTitles ? 2 : props.headers.length">
                 <div class="checklist">
                     <ul class="option-list">
-                        <li>
-                            <input id="records" type="radio" value="records" />
-                            <label for="records">Records</label>
-                        </li>
-                        <li>
-                            <input id="points" type="radio" value="points" />
-                            <label for="points">Points</label>
+                        <li v-for="(option, index) in props.recordsAndPoints" :key="`option-${index}`">
+                            <input :id="option" v-model="recordsOrPoints" type="radio" :value="option" />
+                            <label :for="option">{{ option }}</label>
                         </li>
                     </ul>
                 </div>

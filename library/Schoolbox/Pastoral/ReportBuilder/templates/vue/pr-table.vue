@@ -9,6 +9,13 @@ import PrTableHeader from "./pr-table-header.vue";
 import PrTableTotalRow from "./pr-table-total-row.vue";
 import PrTableRow from "./pr-table-row.vue";
 
+type Props = {
+    recordsAndPoints: string[];
+};
+const props = defineProps<Props>();
+
+const recordsOrPoints = defineModel<string>("records-or-points");
+
 const payloadData = window.Vue.ref<PastoralReportTablePayload>(payload);
 
 const handleSort = (key: string): void => {
@@ -20,7 +27,12 @@ const handleSort = (key: string): void => {
 
 <template>
     <table class="pr-table">
-        <pr-table-header :headers="payloadData.data.tableHeaders" @sort="handleSort" />
+        <pr-table-header
+            v-model:records-or-points="recordsOrPoints"
+            :headers="payloadData.data.tableHeaders"
+            :records-and-points="props.recordsAndPoints"
+            @sort="handleSort"
+        />
         <tbody>
             <!-- Total row -->
             <pr-table-total-row :headers="payloadData.data.tableHeaders" :row-data="payloadData.data.totalRow" />

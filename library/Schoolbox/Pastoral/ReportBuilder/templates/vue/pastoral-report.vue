@@ -58,10 +58,13 @@ function getDateFormatted(date: string): string {
 }
 
 const isTemporaryTesting = window.Vue.ref(true); // Temporary flag for testing purposes
+
+const recordsAndPoints = window.Vue.ref(["Records", "Points"]);
+const recordsOrPoints = window.Vue.ref("Records");
 </script>
 
 <template>
-    <pr-table v-if="isTemporaryTesting" />
+    <pr-table v-if="isTemporaryTesting" :records-and-points="recordsAndPoints" :records-or-points="recordsOrPoints" />
     <template v-else>
         <dl v-if="props.tabs.length > 1" class="tabs">
             <dd
