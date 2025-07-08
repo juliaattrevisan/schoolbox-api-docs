@@ -109,4 +109,15 @@ HELP;
         // if nothing was deleted, consider that an error case?
         exit($deleted ? CliKernelAbstract::EXIT_STATUS_OK : CliKernelAbstract::EXIT_STATUS_KERNEL_ERROR);
     }
+
+    /**
+     * This process must be run as `www-data`, because it may delete files from
+     * the file system.
+     *
+     * @return string|null
+     */
+    public function getRequiredProcessUser(): ?string
+    {
+        return self::WEB_PROCESS_USER;
+    }
 }
