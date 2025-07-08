@@ -186,7 +186,7 @@
                 <p class="text-center">Uploading quiz...</p>
             </div>
 
-            <form id='importForm' method="post" action="{{ importRoute }}">
+            <form id='importForm' method="post" action="{{ importRoute }}" enctype="multipart/form-data">
                 <input type="hidden" name="contextId" value="{{ context.id }}" />
                 <input type="hidden" name="contextType" value="{{ contextType }}" />
                 <input type="hidden" name="returnUrl" value="{{ returnUrl }}" />
@@ -194,6 +194,7 @@
                 <section>
                     <fieldset class="no-pad">
                         <div class="small-12 columns no-pad">
+                            <input type="file" name="attachment" accept="text/xml, application/xml, application/json" />
                         </div>
                     </fieldset>
                 </section>

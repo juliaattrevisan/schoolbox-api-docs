@@ -258,6 +258,8 @@ class Controller extends AbstractController
     {
         $postData = $this->requestPost->getArrayCopy();
 
+        new \Alaress_Probe($_FILES, $postData, $this->requestPost);
+die();
         /* No upload? No trabajo
          */
         if (!isset($postData['attachment'])) {
