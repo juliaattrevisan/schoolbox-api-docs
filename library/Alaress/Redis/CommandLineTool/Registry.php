@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Alaress\Redis\CommandLineTool;
 
 use Alaress\Redis;
+use External\Isams\Register\CacheHelper as IsamsCacheHelper;
 use Schoolbox\Oidc\CacheHelper;
 
 class Registry
@@ -57,23 +58,23 @@ class Registry
             // OIDC client cache, used for caching:
             // * OpenID configuration and JWKS responses from the configured
             //   oAuth/OIDC provider
-            CacheHelper::BASE_CLIENT_KEY . ':' . self::INSTANCE_ID_MATCH . ':isams_registers',
-            CacheHelper::BASE_CLIENT_KEY . ':' . self::INSTANCE_ID_MATCH . ':' . Redis\Cache\ItemPool::SET_KEY,
-            CacheHelper::BASE_CLIENT_KEY . ':' . self::INSTANCE_ID_MATCH . ':',
+            CacheHelper::BASE_CLIENT_KEY . '.' . self::INSTANCE_ID_MATCH . ':' . IsamsCacheHelper::REGISTERS_CACHE_KEY,
+            CacheHelper::BASE_CLIENT_KEY . '.' . self::INSTANCE_ID_MATCH . ':' . Redis\Cache\ItemPool::SET_KEY,
+            CacheHelper::BASE_CLIENT_KEY . '.' . self::INSTANCE_ID_MATCH . ':',
 
             // ClickView (Homepage Component) cache
-            'component.homepage.clickview:' . self::INSTANCE_ID_MATCH . ':',
+            'component.homepage.clickview.' . self::INSTANCE_ID_MATCH . ':',
 
             // Paperly cache
-            'paperly' . ':' . self::INSTANCE_ID_MATCH . ':paperly_dashboard_user',
-            'paperly' . ':' . self::INSTANCE_ID_MATCH . ':' . Redis\Cache\ItemPool::SET_KEY,
+            'paperly.' . self::INSTANCE_ID_MATCH . ':paperly_dashboard_user',
+            'paperly.' . self::INSTANCE_ID_MATCH . ':' . Redis\Cache\ItemPool::SET_KEY,
 
             // Storage cache
             '^fc:' . self::INSTANCE_ID_MATCH . ':system_usage_',
 
             // HTTP client cache
-            'httpClient:' . self::INSTANCE_ID_MATCH . ':' . Redis\Cache\ItemPool::SET_KEY,
-            'httpClient:' . self::INSTANCE_ID_MATCH . ':',
+            'httpClient.' . self::INSTANCE_ID_MATCH . ':' . Redis\Cache\ItemPool::SET_KEY,
+            'httpClient.' . self::INSTANCE_ID_MATCH . ':',
         ],
         // Storage-only patterns go here
         Redis::INSTANCE_STORAGE => [
@@ -114,7 +115,7 @@ class Registry
             "^schedule:" . self::INSTANCE_ID_MATCH . ":[0-9a-f]{40}",
 
             // Access tokens for LTI assessments
-            '^accessToken:' . self::INSTANCE_ID_MATCH . ':.+',
+            '^accessToken.' . self::INSTANCE_ID_MATCH . ':.+',
 
             // Etherpad patterns
             '^pad:g\.',
@@ -137,8 +138,8 @@ class Registry
             // * access tokens
             // * nonces
             // * refresh tokens
-            CacheHelper::BASE_SERVER_KEY . ':' . self::INSTANCE_ID_MATCH . ':' . Redis\Cache\ItemPool::SET_KEY,
-            CacheHelper::BASE_SERVER_KEY . ':' . self::INSTANCE_ID_MATCH . ':',
+            CacheHelper::BASE_SERVER_KEY . '.' . self::INSTANCE_ID_MATCH . ':' . Redis\Cache\ItemPool::SET_KEY,
+            CacheHelper::BASE_SERVER_KEY . '.' . self::INSTANCE_ID_MATCH . ':',
         ],
         // Queue patterns go here
         // (Note that queue is the same instance as cache, so it's not an issue
