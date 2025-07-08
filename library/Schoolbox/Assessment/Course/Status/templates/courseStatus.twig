@@ -161,15 +161,13 @@
                     </ul>
                 </section>
             </div>
-        </div>
-        {% block participantPaginator %}
-            <div class="row l-pad-m--top" data-participant-paginator style="display: none">
-                <div class="small-12 column">
+            {% block participantPaginator %}
+                <div class="small-12 column l-pad-m--top" data-participant-paginator style="display: none">
                     <ul class="pagination">
                     </ul>
                 </div>
-            </div>
-        {% endblock participantPaginator %}
+            {% endblock participantPaginator %}
+        </div>
     {% else %}
         <div class="row">
             <div class="small-12 column">
