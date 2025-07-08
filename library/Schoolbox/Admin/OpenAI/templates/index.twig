@@ -64,7 +64,7 @@
                  */
                 function init(container,provider, key, model, azureResourceName, azureDeploymentId)
                 {
-                    if ('' === provider.val()) {
+                    if ('Off' === provider.val() || '' === provider.val()) {
                         key.hide();
                         model.hide();
                         azureResourceName.hide();

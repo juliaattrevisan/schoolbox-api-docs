@@ -18,6 +18,11 @@ SET name = 'openai_text_endpoint',
 WHERE name = 'openai_endpoint'
 LIMIT 1;
 
+-- Force default "Off" if this was never activated
+UPDATE config
+SET value = 'Off'
+WHERE name = 'openai_text_endpoint' AND value IS NULL;
+
 -- openai key
 UPDATE config
 SET name = 'openai_text_key',

@@ -1,6 +1,7 @@
-INSERT INTO config (`name`, `title`, `description`, `field_id`,  `type_id`, `options`, `editable`, `hidden`, `required`, `module`, sequence)
+INSERT INTO config (`name`, `value`, `title`, `description`, `field_id`,  `type_id`, `options`, `editable`, `hidden`, `required`, `module`, sequence)
 VALUES (
     'openai_image_endpoint',
+    'Off',
     'OpenAI Image Endpoint Provider',
     'Select which provider you will use for conducting AI image queries',
     (SELECT id FROM lu_config_field WHERE field = 'select'),
