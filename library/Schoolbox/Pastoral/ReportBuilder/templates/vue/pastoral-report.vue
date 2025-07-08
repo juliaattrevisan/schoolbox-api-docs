@@ -4,6 +4,7 @@
  */
 
 import type { PastoralRecord } from "@schoolboxLibrary/Pastoral/types/PastoralRecord";
+import { TabType } from "../js/types/pastoralReportTypes";
 import type { Tab, Config, SeverityColors } from "../js/types/pastoralReportTypes";
 import PrList from "./pr-list.vue";
 import PrTable from "./pr-table.vue";
@@ -37,7 +38,7 @@ const isTemporaryTesting = window.Vue.ref(true); // Temporary flag for testing p
         </dd>
     </dl>
     <pr-list
-        v-if="selectedTab === 'list'"
+        v-if="selectedTab === TabType.LIST"
         :results="props.results"
         :show-severity="props.showSeverity"
         :severity-colors="props.severityColors"

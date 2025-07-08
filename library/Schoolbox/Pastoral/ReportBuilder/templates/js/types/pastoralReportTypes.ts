@@ -1,10 +1,18 @@
 import type { User } from "@schoolboxLibrary/types/User";
 
 /**
+ * Pastoral report tab types
+ */
+export enum TabType {
+    LIST = "list",
+    TABLE = "table",
+}
+
+/**
  * Pastoral report tab type (from your Vue component)
  */
 export type Tab = {
-    type: string;
+    type: TabType;
     title: string;
 };
 
