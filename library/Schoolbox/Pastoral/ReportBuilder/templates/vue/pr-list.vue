@@ -25,9 +25,10 @@ const props = defineProps<{
                 <ul class="information-list threaded">
                     <li :class="{ faded: record.isArchived }">
                         <div :id="`record${record.id}`" class="small-12 card wrap-down">
-                            <a :href="record.student._links?.profile">
+                            <a v-if="record.student._links?.profile" :href="record.student._links.profile">
                                 <img :src="record.student._links?.avatar" :alt="record.student.fullName" />
                             </a>
+                            <img v-else :src="record.student._links?.avatar" :alt="record.student.fullName" />
                             <a
                                 :href="
                                     props.routes.getStudentRecord
@@ -91,7 +92,14 @@ const props = defineProps<{
                         <ul v-if="record.comments.length" class="information-list reply">
                             <li v-for="comment in record.comments.filter((c) => !c.private)" :key="comment.owner.id">
                                 <div class="card compact small-12">
-                                    <a :href="comment.owner._links?.profile" title="View Profile">
+                                    <component
+                                        :is="comment.owner._links?.profile ? 'a' : 'div'"
+                                        v-bind="
+                                            comment.owner._links?.profile
+                                                ? { href: comment.owner._links.profile, title: 'View Profile' }
+                                                : {}
+                                        "
+                                    >
                                         <img
                                             :src="`/portrait.php?id=${comment.owner.id}&size=square32`"
                                             :alt="comment.owner.fullName"
@@ -100,7 +108,7 @@ const props = defineProps<{
                                             {{ comment.owner.fullName }}
                                             <span class="pipe meta">{{ getDayjsDatetime(comment.createdAt) }}</span>
                                         </p>
-                                    </a>
+                                    </component>
                                 </div>
                                 <media-article :content="comment.body" />
                             </li>
