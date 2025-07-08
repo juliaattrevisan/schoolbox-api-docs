@@ -176,7 +176,7 @@ function createPageTab(groupId: number, label: string | number, targetTab: numbe
             if (groupConfig.paginator) {
                 groupConfig.paginator.wrapper.style.display = "none";
             }
-            document.querySelector("#header")?.scrollIntoView();
+            groupConfig.group.scrollIntoView();
             // A slight delay to allow the scroll to start before the tab change hangs the page
             setTimeout(() => {
                 // eslint-disable-next-line @typescript-eslint/no-use-before-define -- intentional recursion for now
