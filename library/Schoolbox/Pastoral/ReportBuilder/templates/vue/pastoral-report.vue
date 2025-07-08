@@ -42,6 +42,15 @@ const profile = {
     imageSquare32: (user: { id: number; fullName: string }): string =>
         `<img src="/portrait.php?id=${user.id}&size=square32" alt="${user.fullName}" />`,
 };
+
+/**
+ * Formats a date string using Day.js
+ * @param date - The date to format
+ * @returns - The formatted date
+ */
+function getDateFormatted(date: string): string {
+    return window.dayjs(date).format(window.dateDisplayFormats.dayjsDatetime);
+}
 </script>
 
 <template>
@@ -105,7 +114,7 @@ const profile = {
                                 <span v-if="record.subType.name">({{ record.subType.name }})</span>
                                 | Created by
                                 <a :href="`/search/user/${record.owner.id}`">{{ record.owner.fullName }}</a>
-                                {{ record.createdAt.local }}
+                                {{ record.createdAt.short }}
 
                                 <span v-if="props.pastoralActionEnable && record.uncompletedActionCount > 0">
                                     | {{ record.uncompletedActionCount }} follow up action{{
@@ -144,7 +153,7 @@ const profile = {
                                         />
                                         <p>
                                             {{ comment.owner.fullName }}
-                                            <span class="pipe meta">{{ comment.createdAt }}</span>
+                                            <span class="pipe meta">{{ getDateFormatted(comment.createdAt) }}</span>
                                         </p>
                                     </a>
                                 </div>

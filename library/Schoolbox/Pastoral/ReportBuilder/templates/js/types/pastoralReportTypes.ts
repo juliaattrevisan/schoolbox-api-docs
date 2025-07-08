@@ -63,7 +63,7 @@ export type PastoralTag = {
  */
 export type PastoralComment = {
     owner: Owner;
-    createdAt: PastoralDate;
+    createdAt: string;
     body: string;
     private: boolean;
 };

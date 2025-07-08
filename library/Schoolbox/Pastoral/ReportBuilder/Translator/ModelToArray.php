@@ -82,7 +82,9 @@ class ModelToArray
             ),
             // Ownership, last modifying user and time
             'owner' => $this->translateUser($model->getOwner()),
-            'createdAt' => $model->getRecordDate(),
+            'createdAt' => [
+                'short' => $model->getRecordDate()->getShort(),
+            ],
             'updatedBy' => $this->translateUser($model->getModifiedBy()),
             'updatedAt' => $model->getUpdatedAtDisplay(),
 
