@@ -31,7 +31,8 @@ class ModelToArray
         protected Authorizer $authorizer,
         protected User $currentUser,
         private ScrubAdapter $scrubAdapter,
-    ) {}
+    ) {
+    }
 
     public function __invoke(Model $model): array
     {
