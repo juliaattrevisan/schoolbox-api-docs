@@ -197,12 +197,30 @@ Data:
     <div class="small-12 large-6 island">
         <h2 class="subheader">Students</h2>
         {% for assessment in assessments %}
-            <div class="actions-small-1">
-                <div class="expander" data-collapser="collap-{{ assessment.getBaseContext.getFolder.id }}"></div>
-                <div class="small-12 card compact list-item">
-                    <h3><a href="/homepage/{{ assessment.getBaseContext.getFolder.id }}">{{ assessment.getBaseContext.getFolder.getTitle }}</a></h3>
+            <div class="component-container">
+                <div class="row">
+                    <div class="small-12 columns">
+                        <div class="component-titlebar">
+                            <div class="actions-small-1">
+                                <div class="list-item">
+                                    <h2>
+                                        <a href="/homepage/{{ assessment.getBaseContext.getFolder.id }}">
+                                            {{ assessment.getBaseContext.getFolder.getTitle }}
+                                        </a>
+                                    </h2>
+                                </div>
+                                <nav>
+                                    <a
+                                        data-collapser="collap-{{ assessment.getBaseContext.getFolder.id }}"
+                                        href="#"
+                                        class="icon-up-arrow collapse"
+                                        title="Expand/collapse content"
+                                    ></a>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
                 {% if assessment.allParticipants | length %}
                     <section class="{% if not loop.first %}hide{% endif %}" data-collapse-state="{% if loop.first %}uncollapsed{% else %}collapsed{% endif %}" data-collapsable="collap-{{ assessment.getBaseContext.getFolder.id }}">
                         <ul class="information-list">
@@ -243,6 +261,7 @@ Data:
                         <p>As you <a href="{{ createRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">add {{ locale.activity.plural }}</a>, the participating students will appear here. </p>
                     </div>
                 {% endif %}
+            </div>
         {% endfor %}
     </div>
 </div>
