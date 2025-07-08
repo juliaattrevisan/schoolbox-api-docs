@@ -41,20 +41,12 @@ class Exporter
 
 
     /**
-     * Create a JSON representation of the quiz $assessment
+     * Create an array representation of the quiz $assessment. This is fed into buildJson() which will
+     * do the encoding for us; despite what this class might imply, it actually generates a struct
+     * that could be json-encoded, rather than a json string specifically.
      *
-     * @param QuizDomainObject $assessment
-     * @return string
-     * @throws FilesystemException
-     */
-    public function generate(QuizDomainObject $assessment): string
-    {
-        return json_encode($this->generateArray($assessment));
-    }
-
-
-    /**
-     * Create an array representation of the quiz $assessment
+     * To maybe shortcut this you could provide generateJson() which returns json_encode($this->>generate())
+     * and saves people having to do that manually.
      *
      * @param QuizDomainObject $assessment
      * @return array
@@ -62,7 +54,7 @@ class Exporter
      * @throws ValidationException
      * @throws \JsonException
      */
-    private function generateArray(QuizDomainObject $assessment): array
+    public function generate(QuizDomainObject $assessment): array
     {
         /* Not all curriculum nodes were assigned a uuid which, if it existed, would have been conclusive.
          * Using just the curric code means the destination might have multiple matches since there's no
