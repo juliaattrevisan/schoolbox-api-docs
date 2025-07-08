@@ -204,10 +204,6 @@ class Controller extends Base
      * @param UserMapper $userMapper
      * @param StateMapper $stateMapper
      * @param \Schoolbox\Resource\Storage\Mapper $storageMapper
-     * @param MarkTypeMapper $markTypeMapper
-     * @param \Schoolbox\Learning\Assessment\WorkType\Mapper $workTypeMapper
-     * @param \Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper $gradeGroupMapper
-     * @param \Schoolbox\Curriculum\Node\Mapper $curriculumNodeMapper
      * @param FilesystemProxy $filesystemProxy
      * @param Psr17Factory $httpFactory for creating HTTP requests
      * @param MessageFactory $messageFactory for creating messages to send to taskd
@@ -229,10 +225,6 @@ class Controller extends Base
         private \Schoolbox\UserMapper $userMapper,
         private StateMapper $stateMapper,
         private \Schoolbox\Resource\Storage\Mapper $storageMapper,
-        private \Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper $markTypeMapper,
-        private \Schoolbox\Learning\Assessment\WorkType\Mapper $workTypeMapper,
-        private \Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper $gradeGroupMapper,
-        private \Schoolbox\Curriculum\Node\Mapper $curriculumNodeMapper,
         private FilesystemProxy $filesystemProxy,
         private Psr17Factory $httpFactory,
         private MessageFactory $messageFactory,
