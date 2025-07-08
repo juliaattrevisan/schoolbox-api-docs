@@ -33,14 +33,6 @@ const routeLookup = (route: string, params?: Record<string, string | number>): s
     return url;
 };
 
-const profile = {
-    link: (user: { id: number }): string => `/search/user/${user.id}`,
-    imageSquare64: (user: { id: number; fullName: string }): string =>
-        `<img src="/portrait.php?id=${user.id}&size=square64" alt="${user.fullName}" />`,
-    imageSquare32: (user: { id: number; fullName: string }): string =>
-        `<img src="/portrait.php?id=${user.id}&size=square32" alt="${user.fullName}" />`,
-};
-
 /**
  * Formats a date string using Day.js
  * @param date - The date to format
@@ -58,11 +50,8 @@ function getDateFormatted(date: string): string {
                 <ul class="information-list threaded">
                     <li :class="{ faded: record.isArchived }">
                         <div :id="`record${record.id}`" class="small-12 card wrap-down">
-                            <a :href="profile.link(record.student)">
-                                <img
-                                    :src="`/portrait.php?id=${record.student.id}&size=square64`"
-                                    :alt="record.student.fullName"
-                                />
+                            <a :href="record.student._links?.profile">
+                                <img :src="record.student._links?.avatar" :alt="record.student.fullName" />
                             </a>
                             <a
                                 :href="
@@ -103,7 +92,6 @@ function getDateFormatted(date: string): string {
                                 | Created by
                                 <a :href="`/search/user/${record.owner.id}`">{{ record.owner.fullName }}</a>
                                 {{ record.createdAt.short }}
-
                                 <span v-if="props.config.pastoralActionEnable && record.uncompletedActionCount > 0">
                                     | {{ record.uncompletedActionCount }} follow up action{{
                                         record.uncompletedActionCount === 1 ? "" : "s"
@@ -114,7 +102,6 @@ function getDateFormatted(date: string): string {
                         </div>
                         <article>
                             <media-article v-if="record.bodyPublic" :content="record.bodyPublic" />
-
                             <p v-if="record.tags.length > 0" class="spaced">
                                 <template v-for="tag in record.tags" :key="tag.id">
                                     <a
@@ -134,7 +121,7 @@ function getDateFormatted(date: string): string {
                         <ul v-if="record.comments.length" class="information-list reply">
                             <li v-for="comment in record.comments.filter((c) => !c.private)" :key="comment.owner.id">
                                 <div class="card compact small-12">
-                                    <a :href="profile.link(comment.owner)" title="View Profile">
+                                    <a :href="comment.owner._links?.profile" title="View Profile">
                                         <img
                                             :src="`/portrait.php?id=${comment.owner.id}&size=square32`"
                                             :alt="comment.owner.fullName"
