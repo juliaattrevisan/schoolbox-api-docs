@@ -4,6 +4,7 @@
  */
 
 import MediaArticle from "@schoolboxVue/components/media-article.vue";
+import { getDayjsDatetime } from "@js/util/dateUtils";
 import type { PastoralRecord } from "@schoolboxLibrary/Pastoral/types/PastoralRecord";
 import type { Config, Routes, SeverityColors } from "../js/types/pastoralReportTypes";
 
@@ -15,15 +16,6 @@ const props = defineProps<{
     showSeverity: boolean;
     severityColors: SeverityColors;
 }>();
-
-/**
- * Formats a date string using Day.js
- * @param date - The date to format
- * @returns - The formatted date
- */
-function getDateFormatted(date: string): string {
-    return window.dayjs(date).format(window.dateDisplayFormats.dayjsDatetime);
-}
 </script>
 
 <template>
@@ -106,7 +98,7 @@ function getDateFormatted(date: string): string {
                                         />
                                         <p>
                                             {{ comment.owner.fullName }}
-                                            <span class="pipe meta">{{ getDateFormatted(comment.createdAt) }}</span>
+                                            <span class="pipe meta">{{ getDayjsDatetime(comment.createdAt) }}</span>
                                         </p>
                                     </a>
                                 </div>

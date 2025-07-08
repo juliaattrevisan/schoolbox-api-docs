@@ -12,3 +12,13 @@
 export function getFromNow(unixTimestamp: number): string {
     return window.dayjs.unix(unixTimestamp).fromNow();
 }
+
+/**
+ * Formats a date string using Day.js in the format configured in
+ * config.date_local and config.date_time
+ * @param date - The date to format
+ * @returns - The formatted date
+ */
+export function getDayjsDatetime(date: string): string {
+    return window.dayjs(date).format(window.dateDisplayFormats.dayjsDatetime);
+}
