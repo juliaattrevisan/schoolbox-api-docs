@@ -27,6 +27,7 @@ use Schoolbox\Oidc\Server\RelyingParty\Mapper;
 use Schoolbox\Oidc\Server\Repository\Scope;
 use Schoolbox\Url\Factory;
 use Schoolbox\UserMapper;
+use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Psr16Cache;
 
 /**
@@ -84,11 +85,15 @@ class Module extends BaseModule
         // Cache server-related data in storage:
         // auth codes, access tokens, etc. should be somewhat persistent
         $cache = new Psr16Cache(
-            new ItemPool(
+            new RedisAdapter(
                 $this->injector->get('redis.storage'),
-                new Base64(),
-                new KeyGenerator(CacheHelper::BASE_SERVER_KEY, INSTANCE_ID),
+                CacheHelper::BASE_SERVER_KEY. ':' . INSTANCE_ID,
             )
+//            new ItemPool(
+//                $this->injector->get('redis.storage'),
+//                new Base64(),
+//                new KeyGenerator(CacheHelper::BASE_SERVER_KEY, INSTANCE_ID),
+//            )
         );
 
         // Get stuff out of the request

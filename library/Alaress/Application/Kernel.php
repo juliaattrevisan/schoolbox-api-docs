@@ -190,6 +190,7 @@ use Schoolbox\Weather\WeatherstackClient;
 use Scrub;
 use Sentry\SentrySdk;
 use SitePage;
+use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Psr16Cache;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\RedisStore;
@@ -1789,11 +1790,17 @@ abstract class Kernel
             'httpClient.internalCache',
             $di->lazy(
                 function () use ($di) {
+//                    return new Psr16Cache(
+//                        new ItemPool(
+//                            $di->get('redis.cache'),
+//                            new \Alaress\Codec\StringValue\Base64(),
+//                            new KeyGenerator('httpClient', INSTANCE_ID),
+//                        )
+//                    );
                     return new Psr16Cache(
-                        new ItemPool(
+                        new RedisAdapter(
                             $di->get('redis.cache'),
-                            new \Alaress\Codec\StringValue\Base64(),
-                            new KeyGenerator('httpClient', INSTANCE_ID),
+                            'httpClient.' . INSTANCE_ID,
                         )
                     );
                 }
@@ -2166,15 +2173,24 @@ abstract class Kernel
         $di->set(
             'lti.accessTokenCache',
             $di->lazy(function () use ($di) {
-                /** @var Predis\ClientInterface $redis */
-                $redis = $di->get('redis.storage');
-                /** @var RegistrationRepositoryInterface $registrationRepository */
-                $registrationRepository = $di->get('lti.registrations');
-                return new ItemPool(
-                    $redis,
-                    new Codec(new ClientRepository($registrationRepository)),
-                    new KeyGenerator('accessToken', INSTANCE_ID),
+                return new RedisAdapter(
+                    $di->get('redis.cache'),
+                    'accessToken.' . INSTANCE_ID,
                 );
+//                /** @var Predis\ClientInterface $redis */
+//                $redis = $di->get('redis.storage');
+//                /** @var RegistrationRepositoryInterface $registrationRepository */
+//                $registrationRepository = $di->get('lti.registrations');
+//
+//                return new RedisAdapter(
+//                    $di->get('redis.cache'),
+//                    'accessToken:' . INSTANCE_ID,
+//                );
+//                return new ItemPool(
+//                    $redis,
+//                    new Codec(new ClientRepository($registrationRepository)),
+//                    new KeyGenerator('accessToken', INSTANCE_ID),
+//                );
             })
         );
 
@@ -2185,11 +2201,17 @@ abstract class Kernel
             'oidc.cache',
             $di->lazy(
                 function () use ($di) {
+//                    return new Psr16Cache(
+//                        new ItemPool(
+//                            $di->get('redis.cache'),
+//                            new Base64(),
+//                            new KeyGenerator(CacheHelper::BASE_CLIENT_KEY, INSTANCE_ID),
+//                        )
+//                    );
                     return new Psr16Cache(
-                        new ItemPool(
+                        new RedisAdapter(
                             $di->get('redis.cache'),
-                            new Base64(),
-                            new KeyGenerator(CacheHelper::BASE_CLIENT_KEY, INSTANCE_ID),
+                            CacheHelper::BASE_CLIENT_KEY . '.' . INSTANCE_ID,
                         )
                     );
                 }
@@ -2202,12 +2224,18 @@ abstract class Kernel
             $di->lazy(
                 function () use ($di) {
                     return new Psr16Cache(
-                        new ItemPool(
+                        new RedisAdapter(
                             $di->get('redis.cache'),
-                            new Base64(),
-                            new KeyGenerator('component.homepage.clickview', INSTANCE_ID),
+                            'component.homepage.clickview:' . INSTANCE_ID,
                         )
                     );
+//                    return new Psr16Cache(
+//                        new ItemPool(
+//                            $di->get('redis.cache'),
+//                            new Base64(),
+//                            new KeyGenerator('component.homepage.clickview', INSTANCE_ID),
+//                        )
+//                    );
                 }
             )
         );
@@ -2217,12 +2245,18 @@ abstract class Kernel
             $di->lazy(
                 function () use ($di) {
                     return new Psr16Cache(
-                        new ItemPool(
+                        new RedisAdapter(
                             $di->get('redis.cache'),
-                            new Base64(),
-                            new KeyGenerator('paperly', INSTANCE_ID),
+                            'paperly:' . INSTANCE_ID,
                         )
                     );
+//                    return new Psr16Cache(
+//                        new ItemPool(
+//                            $di->get('redis.cache'),
+//                            new Base64(),
+//                            new KeyGenerator('paperly', INSTANCE_ID),
+//                        )
+//                    );
                 }
             )
         );
