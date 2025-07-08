@@ -20,8 +20,6 @@ use Alaress\Module\Cache as ModuleCache;
 use Alaress\Module\Loader as ModuleLoader;
 use Alaress\Module\Registry;
 use Alaress\Redis;
-use Alaress\Redis\Cache\ItemPool;
-use Alaress\Redis\Cache\KeyGenerator;
 use Alaress\Sentry\Tracing\GuzzleTracingMiddleware;
 use Alaress\Sentry\Tracing\Tracer;
 use Alaress\Session\Factory;

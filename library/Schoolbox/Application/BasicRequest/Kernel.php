@@ -8,12 +8,9 @@
 
 namespace Schoolbox\Application\BasicRequest;
 
-use Alaress\Codec\Json\Base64;
 use Alaress\Database\Connector\IConnector;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Image\ProcessorFactory;
-use Alaress\Redis\Cache\ItemPool;
-use Alaress\Redis\Cache\KeyGenerator;
 use Alaress\Sentry\Tracing\GuzzleTracingMiddleware;
 use Alaress\Sentry\Tracing\Tracer;
 use enshrined\svgSanitize\Sanitizer as BaseSvgSanitizer;
@@ -33,7 +30,6 @@ use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Database\Factory as SchoolboxDatabaseFactory;
-use Alaress\Database\Factory as AlaressDatabaseFactory;
 use Alaress\Redis;
 use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Instance;
@@ -59,8 +55,6 @@ use Schoolbox\User\Token\Mapper as TokenMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Version\Version;
 use Sentry\SentrySdk;
-use Sentry\Tracing\SpanStatus;
-use Sentry\Tracing\TransactionSource;
 use SitePage;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Psr16Cache;
