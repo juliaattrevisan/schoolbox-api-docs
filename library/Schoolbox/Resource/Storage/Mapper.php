@@ -62,6 +62,7 @@ class Mapper extends BaseMapper implements IReceiver
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'preventExpiredAtDecrement']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'postSave']);
+        $this->registerCallback(self::CALLBACK_PREDELETE, [$this, 'deleteStorageTransforms']);
         $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'deleteStorage']);
     }
 
@@ -98,6 +99,20 @@ class Mapper extends BaseMapper implements IReceiver
                 }
             }
         }
+        return true;
+    }
+
+    /**
+     * Pre-delete callback: delete any storage transform rows, before deleting
+     * the storage record itself.
+     *
+     * @param Model $storage
+     * @return true
+     */
+    public function deleteStorageTransforms(Model $storage): bool
+    {
+        $transformMapper = Transform\Mapper::getInstance();
+        $transformMapper->deleteByColumn('hash', $storage->getHash());
         return true;
     }
 
