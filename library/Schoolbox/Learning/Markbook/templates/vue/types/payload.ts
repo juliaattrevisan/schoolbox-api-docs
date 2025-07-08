@@ -103,9 +103,9 @@ export type MarkbookClassImplActivity = {
         >;
     };
     instructorMarkScheme: MarkScheme;
-    /* currently class markbook only */
     markVisibility: number;
-    courseManaged?: boolean | null;
+    courseManaged: boolean | null;
+    /* currently class markbook only */
     writable?: boolean;
     weight: number;
 };
