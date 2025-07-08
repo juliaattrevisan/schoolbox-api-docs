@@ -33,7 +33,6 @@ class MarshallerAdapter implements MarshallerInterface
     {
         $marshalled = [];
         foreach ($values as $key => $value) {
-            $marshalled[$key] = $this->codec->encode($value);
             try {
                 $marshalled[$key] = $this->codec->encode($value);
             } catch (Throwable $e) {
