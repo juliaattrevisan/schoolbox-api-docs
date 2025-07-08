@@ -170,12 +170,22 @@ class Controller extends Assessment\Controller
             $participantStats[$participant->getUser()->getId()] = new Assessment\ParticipantStatistics($participant);
         }
 
+        $aImpls = [];
+        /* for this endpoint, only show participants if the assessment is not a specification
+         * courseStatus.getStatus exists instead for specs */
+        if (!$assessment->isSpecification()) {
+            $aImpls[$assessment->getId()] = [
+                'assessment' => $assessment,
+                'participantStats' => $participantStats,
+            ];
+        }
+
         $twigData = [
             'breadcrumbs'      => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]),
             'baseContext'      => $assessment->getBaseContext(),
             'assessment'       => $assessment,
+            'aImpls'           => $aImpls,
             'assessmentStats'  => $assessmentStats,
-            'participantStats' => $participantStats,
             'returnUrl'        =>
             $this->requestQuery->get(Redirect::RETURN_URL)
                 ? Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL))

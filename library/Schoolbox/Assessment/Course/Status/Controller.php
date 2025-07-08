@@ -157,17 +157,65 @@ class Controller extends WebController\Base
 
         // init the twig data
         $twigData = [
-            'type' => AssessmentType::objectToString($assessmentSpec),
             'breadcrumbs' => $this->bakery->produceFromAssessment($assessmentSpec, $this->getUser())->add([ $assessmentSpec->getTitle(), '' ]),
-            'assessments' => $assessments,
-            'assessmentSpec'  => $assessmentSpec,
-            'courseSpec' => $courseSpec,
+
             /* Need this suffix so we can return to the status screen after
              * finishing the modification of le quiz or project
              */
             'returnUrl' => Redirect::encode($baseUrl),
             'returnUrlSuffix' => $returnUrlSuffix,
         ];
+
+        /** project uses the normal page */
+        if ($assessmentSpec instanceof Project) {
+            $twigData['baseContext'] = $assessmentSpec->getBaseContext();
+            $twigData['assessment'] = $assessmentSpec;
+
+            $assessmentStats = new GenericCollection(Assessment\Statistics::class);
+            $assessmentStats[$assessmentSpec->getId()] = new Assessment\Statistics($assessmentSpec);
+            foreach ($assessmentSpec->getAssessables() as $subAssessable) {
+                $assessmentStats[$subAssessable->getId()] = new Assessment\Statistics($subAssessable);
+            }
+
+            $twigData['assessmentStats'] = $assessmentStats;
+
+            // class assessment specific data
+            $twigData['aImpls'] = [];
+            $twigData['participantStats'] = [];
+
+            /** @var Project $assessment */
+            foreach ($assessments as $assessment) {
+                // Calculate summary totals for display purposes
+                $participants = $assessment->getAllParticipants();
+
+                $participantStats = new GenericCollection(Assessment\ParticipantStatistics::class);
+                foreach ($participants as $participant) {
+                    $participantStats[$participant->getUser()->getId()] = new Assessment\ParticipantStatistics($participant);
+                }
+
+                $twigData['participantStats'][$assessment->getId()] = $participantStats;
+                $twigData['aImpls'][$assessment->getId()] = [
+                    'assessment' => $assessment,
+                    'participantStats' => $participantStats,
+                ];
+            }
+
+            $template = '@learningAssessment/project/status/staff.twig';
+            $this->response = $this->responseFromTemplate(
+                $template,
+                $twigData,
+                "Status of {$assessmentSpec->getTitle()}",
+                'submission'
+            );
+
+            return;
+        }
+
+        /** everything else uses a custom page  */
+        $twigData['type'] = AssessmentType::objectToString($assessmentSpec);
+        $twigData['assessments'] = $assessments;
+        $twigData['assessmentSpec'] = $assessmentSpec;
+        $twigData['courseSpec'] = $courseSpec;
 
         // switch based on which assessment type
         if ($assessmentSpec instanceof \Schoolbox\Learning\Assessment\DueWork\Model) {
@@ -321,31 +369,6 @@ class Controller extends WebController\Base
 
             $template = '@courseStatus/quiz.twig';
             // project doesn't have a status page yet
-        } elseif ($assessmentSpec instanceof \Schoolbox\Learning\Assessment\Project) {
-            $twigData['assessmentStats'] = [];
-            $twigData['participantStats'] = [];
-            $twigData['baseContext'] = $assessmentSpec->getBaseContext();
-            // class assessment specific data
-            /** @var \Schoolbox\Learning\Assessment\Project $assessment */
-            foreach ($assessments as $assessment) {
-                // Calculate summary totals for display purposes
-                $participants = $assessment->getAllParticipants();
-
-                $assessmentStats = new GenericCollection(Assessment\Statistics::class);
-                $assessmentStats[$assessment->getId()] = new Assessment\Statistics($assessment);
-                foreach ($assessment->getAssessables() as $subAssessable) {
-                    $assessmentStats[$subAssessable->getId()] = new Assessment\Statistics($subAssessable);
-                }
-
-                $participantStats = new GenericCollection(Assessment\ParticipantStatistics::class);
-                foreach ($participants as $participant) {
-                    $participantStats[$participant->getUser()->getId()] = new Assessment\ParticipantStatistics($participant);
-                }
-
-                $twigData['assessmentStats'][$assessment->getId()] = $assessmentStats;
-                $twigData['participantStats'][$assessment->getId()] = $participantStats;
-            }
-            $template = '@courseStatus/project.twig';
         } else {
             throw new NotFound('Unsupported assessment type: ' . AssessmentType::objectToString($assessmentSpec));
         }
