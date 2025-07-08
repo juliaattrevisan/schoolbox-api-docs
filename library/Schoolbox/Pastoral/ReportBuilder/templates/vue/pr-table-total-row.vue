@@ -21,7 +21,7 @@ const props = defineProps<Props>();
             <template v-if="index === 0">
                 <b>{{ data }}</b>
             </template>
-            <template v-else-if="props.headers[index].columnType == 'RecordsAndPoints'">
+            <template v-else-if="props.headers[index].type == 'RecordsAndPoints'">
                 <!-- Change data based on current radio button selection -->
                 <template v-if="props.recordsOrPoints === 'Records'">
                     {{ (data as RecordsAndPoints).records }}

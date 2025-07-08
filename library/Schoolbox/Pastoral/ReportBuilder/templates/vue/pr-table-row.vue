@@ -18,10 +18,10 @@ const props = defineProps<Props>();
 <template>
     <tr>
         <td v-for="(data, index) in props.rowData" :key="props.headers[index]?.key || index">
-            <template v-if="props.headers[index].columnType == 'User'">
+            <template v-if="props.headers[index].type == 'User'">
                 {{ (data as User).fullName }}
             </template>
-            <template v-else-if="props.headers[index].columnType == 'RecordsAndPoints'">
+            <template v-else-if="props.headers[index].type == 'RecordsAndPoints'">
                 <!-- Change data based on current radio button selection -->
                 <template v-if="props.recordsOrPoints === 'Records'">
                     {{ (data as RecordsAndPoints).records }}

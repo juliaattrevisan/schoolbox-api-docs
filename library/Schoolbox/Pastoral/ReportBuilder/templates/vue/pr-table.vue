@@ -4,7 +4,7 @@
  */
 
 import { payload } from "./tempData";
-import type { PastoralReportTablePayload } from "../js/types/pastoralReportTypes";
+import type { TablePayload } from "../js/types/pastoralReportTypes";
 import PrTableHeader from "./pr-table-header.vue";
 import PrTableTotalRow from "./pr-table-total-row.vue";
 import PrTableRow from "./pr-table-row.vue";
@@ -16,7 +16,7 @@ const props = defineProps<Props>();
 
 const recordsOrPoints = defineModel<string>("records-or-points", { default: "Records" });
 
-const payloadData = window.Vue.ref<PastoralReportTablePayload>(payload);
+const payloadData = window.Vue.ref<TablePayload>(payload);
 
 const handleSort = (key: string): void => {
     // TODO: Implement sorting logic
