@@ -2205,7 +2205,7 @@ abstract class Kernel
                     return new Psr16Cache(
                         new RedisAdapter(
                             $di->get('redis.cache'),
-                            'component.homepage.clickview:' . INSTANCE_ID,
+                            'component.homepage.clickview.' . INSTANCE_ID,
                         )
                     );
                 }
@@ -2219,7 +2219,7 @@ abstract class Kernel
                     return new Psr16Cache(
                         new RedisAdapter(
                             $di->get('redis.cache'),
-                            'paperly:' . INSTANCE_ID,
+                            'paperly.' . INSTANCE_ID,
                         )
                     );
                 }
