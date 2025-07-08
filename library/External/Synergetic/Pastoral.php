@@ -1762,8 +1762,8 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
      */
     private function convertLineEndingsUnixToDos(string $string): string
     {
-        // First strip CR characters.
-        $string = str_replace("\n", "\r\n", $string);
+        // First convert all CRLF and CR to LF.
+        $string = str_replace(["\r\n", "\r"], "\n", $string);
 
         // Then convert all LF to CRLF.
         return str_replace("\n", "\r\n", $string);
