@@ -3,7 +3,7 @@
  * Pastoral Report Tabs Component
  */
 import MediaArticle from "@schoolboxVue/components/media-article.vue";
-import type { PastoralReportTab, SeverityColors, LocaleConfig, PastoralRecord } from "../js/types/pastoralReportTypes";
+import type { PastoralReportTab, SeverityColors, PastoralRecord } from "../js/types/pastoralReportTypes";
 
 const props = defineProps<{
     tabs: PastoralReportTab[];
@@ -12,7 +12,7 @@ const props = defineProps<{
     severityColors: SeverityColors;
     pastoralPointEnabled: boolean | number;
     pastoralActionEnable: boolean | number;
-    locale: LocaleConfig;
+    localePastoral: string;
 }>();
 
 const selectedTab = window.Vue.ref(props.tabs[0]?.type ?? "");
@@ -168,7 +168,7 @@ function getDateFormatted(date: string): string {
             <section>
                 <div class="empty-state f-no-margins">
                     <i class="icon-pastoral"></i>
-                    <p>No {{ props.locale.pastoral }} records matched your report criteria.</p>
+                    <p>No {{ props.localePastoral }} records matched your report criteria.</p>
                     <a :href="routeLookup('pastoralReportBuilder.getIndex')"> Select Another Report </a>
                 </div>
             </section>

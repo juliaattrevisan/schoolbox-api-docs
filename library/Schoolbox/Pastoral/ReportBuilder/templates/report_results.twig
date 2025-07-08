@@ -27,13 +27,13 @@
     <div class="small-12 island">
         <div id="pastoral-report-container">
             <pastoral-report
-                :tabs='{{ tabs|json_encode}}'
-                :results='{{ results|json_encode}}'
+                :tabs="{{ tabs|json_encode}}"
+                :results="{{ results|json_encode}}"
                 :pastoral-point-enabled="{{ config.pastoral_point_enabled }}"
                 :pastoral-action-enable="{{ config.pastoral_action_enable }}"
-                :locale='{{ locale|json_encode }}'
-                :show-severity={{ showSeverity ? 'true' : 'false' }}
-                :severity-colors='{{ severityColors|json_encode}}'
+                locale-pastoral="{{ locale.pastoral.proper }}"
+                :show-severity="{{ showSeverity ? 'true' : 'false' }}"
+                :severity-colors="{{ severityColors|json_encode }}"
             />
         </div>
     </div>
