@@ -5,10 +5,10 @@ VALUES (
     'Select which provider you will use for conducting AI image queries',
     (SELECT id FROM lu_config_field WHERE field = 'select'),
     (SELECT id FROM lu_config_type WHERE type = 'AI'),
-    'OpenAI:Azure',
+    'Off:OpenAI:Azure',
     'true',
     'false',
-    'false',
+    'true',
     'openai-image',
     6
 );

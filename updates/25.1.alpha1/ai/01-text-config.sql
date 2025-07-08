@@ -12,7 +12,9 @@ alter table config
 UPDATE config
 SET name = 'openai_text_endpoint',
     title = 'OpenAI Text Endpoint Provider',
-    module = 'openai-text'
+    module = 'openai-text',
+    options = 'Off:OpenAI:Azure',
+    required = 'true'
 WHERE name = 'openai_endpoint'
 LIMIT 1;
 
