@@ -47,8 +47,14 @@ class Controller extends ConfigController
      */
     public function getIndex(): void
     {
-        $configContext = $this->buildConfigContext(
-            $this->buildConfigPredicate(),
+        $textConfigContext = $this->buildConfigContext(
+            $this->buildTextConfigPredicate(),
+            $this->routeGenerator->generate('adminOpenAi.postOpenAiOptions'),
+            [ModuleConfig::CONTEXT_USE_BOTTOM_DRAWER => false],
+        );
+
+        $imageConfigContext = $this->buildConfigContext(
+            $this->buildImageConfigPredicate(),
             $this->routeGenerator->generate('adminOpenAi.postOpenAiOptions'),
             [ModuleConfig::CONTEXT_USE_BOTTOM_DRAWER => false],
         );
@@ -56,7 +62,8 @@ class Controller extends ConfigController
         $this->response = $this->responseFromTemplate('@adminOpenAi/index.twig', [
             'pageCurrent' => $this->routeGenerator->generate('adminOpenAi.getIndex'),
             'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex')),
-            'configContext' => $configContext,
+            'textConfigContext' => $textConfigContext,
+            'imageConfigContext' => $imageConfigContext,
             'models' => [
                 'openai' => Helper::ENDPOINT_TYPE_OPENAI,
                 'azure' => Helper::ENDPOINT_TYPE_AZURE,
@@ -78,14 +85,14 @@ class Controller extends ConfigController
 
         /* Save it
          */
-        /* TODO save image and text configs in two calls (probably)
-         */
-        $this->updateConfig($postData, $this->buildConfigPredicate());
+        $this->updateConfig($postData, $this->buildTextConfigPredicate());
+        $this->updateConfig($postData, $this->buildImageConfigPredicate());
 
         /* Go back to the place from whence you came
          */
         $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminOpenAi.getIndex'));
     }
+
 
     /**
      *
@@ -94,8 +101,21 @@ class Controller extends ConfigController
      * @return Builder
      * @throws InvalidColumnException
      */
-    private function buildConfigPredicate(): Builder
+    private function buildTextConfigPredicate(): Builder
     {
         return $this->getConfigMapper()->getPredicateBuilder()->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_OPENAI_TEXT);
+    }
+
+
+    /**
+     *
+     * Returns a predicate builder for finding all custom config for this module
+     *
+     * @return Builder
+     * @throws InvalidColumnException
+     */
+    private function buildImageConfigPredicate(): Builder
+    {
+        return $this->getConfigMapper()->getPredicateBuilder()->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_OPENAI_IMAGE);
     }
 }

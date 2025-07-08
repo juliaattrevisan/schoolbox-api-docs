@@ -6,8 +6,20 @@
     {{ renderAdminNavigation(pageCurrent) }}
 
     <div class="admin-content">
-        <div id="settingsContainer" style="display:none">
-            {% include '@settings/moduleConfig.twig' with configContext only %}
+        <div class="small-12 columns">
+            <h2 class="subheader">Text Generation</h2>
+        </div>
+
+        <div id="textSettingsContainer" style="display:none">
+            {% include '@settings/moduleConfig.twig' with textConfigContext only %}
+        </div>
+
+        <div class="small-12 columns">
+            <h2 class="subheader">Image Generation</h2>
+        </div>
+
+        <div id="imageSettingsContainer" style="display:none">
+            {% include '@settings/moduleConfig.twig' with imageConfigContext only %}
         </div>
 
         <script>
@@ -17,6 +29,7 @@
 
                 /* Text credentials
                  */
+                let textContainer = $('#textSettingsContainer');
                 let textProvider = $('#openai_text_endpoint-field');
                 let textKey = $('#openai_text_key-field').parent('div');
                 let textModel = $('#openai_text_model-field').parent('div');
@@ -25,13 +38,14 @@
 
                 textProvider.on('change', function(event) {
                     event.preventDefault();
-                    init(textProvider, textKey, textModel, textAzureResourceName, textAzureDeploymentId);
+                    init(textContainer, textProvider, textKey, textModel, textAzureResourceName, textAzureDeploymentId);
                 });
 
-                init(textProvider, textKey, textModel, textAzureResourceName, textAzureDeploymentId);
+                init(textContainer, textProvider, textKey, textModel, textAzureResourceName, textAzureDeploymentId);
 
                 /* Image credentials
                  */
+                let imageContainer = $('#imageSettingsContainer');
                 let imageProvider = $('#openai_image_endpoint-field');
                 let imageKey = $('#openai_image_key-field').parent('div');
                 let imageModel = $('#openai_image_model-field').parent('div');
@@ -40,15 +54,15 @@
 
                 imageProvider.on('change', function(event) {
                     event.preventDefault();
-                    init(imageProvider, imageKey, imageModel, imageAzureResourceName, imageAzureDeploymentId);
+                    init(imageContainer, imageProvider, imageKey, imageModel, imageAzureResourceName, imageAzureDeploymentId);
                 });
 
-                init(imageProvider, imageKey, imageModel, imageAzureResourceName, imageAzureDeploymentId);
+                init(imageContainer, imageProvider, imageKey, imageModel, imageAzureResourceName, imageAzureDeploymentId);
 
                 /**
                  *  Hide everything if you haven't chosen a provider yet
                  */
-                function init(provider, key, model, azureResourceName, azureDeploymentId)
+                function init(container,provider, key, model, azureResourceName, azureDeploymentId)
                 {
                     if ('' === provider.val()) {
                         key.hide();
@@ -67,7 +81,7 @@
                         azureDeploymentId.show();
                     }
 
-                    $('#settingsContainer').show();
+                    container.show();
                 }
             });
         </script>
