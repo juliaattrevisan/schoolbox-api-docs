@@ -79,13 +79,11 @@ test.describe("Participant Tests", () => {
         await markbookPage.open(classId);
         await markbookPage.canSeeParticipant("Coles, Jack");
         await markbookPage.canSeeAssessment("Cest One");
+        const assessmentId = await markbookPage.getAssessmentId("Cest One");
 
         tester.isGoingTo("exclude Jack Coles from the due work participants list");
-        await page.locator(`a:has-text("Cest One")`).click();
-        await expect(page.locator(`h1:has-text("Status of Cest One")`)).toBeVisible();
-        await page.waitForTimeout(2000);
-        await statusPage.clickJellyTot();
-        await statusPage.clickJellyTotOption("modify");
+        await markbookPage.openAssessmentDropdown(assessmentId);
+        await markbookPage.clickAssessmentDropdownItem(assessmentId, "modify");
         await expect(page.locator(`h1:has-text("Update Cest One")`)).toBeVisible();
         await expect(page.getByTestId("assessment-form-button-submit-Update")).toBeEnabled();
         await page.waitForTimeout(2000);
@@ -105,11 +103,8 @@ test.describe("Participant Tests", () => {
         await markbookPage.canSeeParticipant("Smith, Louisa");
 
         tester.isGoingTo("exclude a student (Louisa Smith) from the due work participants list");
-        await page.locator(`a:has-text("Cest One")`).click();
-        await expect(page.locator(`h1:has-text("Status of Cest One")`)).toBeVisible();
-        await page.waitForTimeout(2000);
-        await statusPage.clickJellyTot();
-        await statusPage.clickJellyTotOption("modify");
+        await markbookPage.openAssessmentDropdown(assessmentId);
+        await markbookPage.clickAssessmentDropdownItem(assessmentId, "modify");
         await expect(page.locator(`h1:has-text("Update Cest One")`)).toBeVisible();
         await expect(page.getByTestId("assessment-form-button-submit-Update")).toBeEnabled();
         await dueworkForm.modifyParticipation(studentId, false, false);

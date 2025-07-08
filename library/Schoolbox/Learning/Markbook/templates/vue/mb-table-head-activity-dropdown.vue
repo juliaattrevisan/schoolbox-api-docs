@@ -22,26 +22,32 @@ const viewStatusLink = window.Vue.computed(() => {
 
 <template>
     <li class="separator">Activity</li>
-    <li v-if="props.activity._links?.summary">
+    <li v-if="props.activity._links?.summary" :data-test="`markbook-assessment-dropdown-${props.activity.id}-view`">
         <a :href="getReturnUrl(props.activity._links.summary)" class="icon-view">View</a>
     </li>
-    <li v-if="props.activity._links?.modify">
+    <li v-if="props.activity._links?.modify" :data-test="`markbook-assessment-dropdown-${props.activity.id}-modify`">
         <a :href="getReturnUrl(props.activity._links.modify)" class="icon-modify">
             {{ props.activity.assessmentType === ACTIVITY_TYPE_QUIZ ? "Modify Settings" : "Modify" }}
         </a>
     </li>
-    <li v-if="props.activity._links?.modifyContent">
+    <li
+        v-if="props.activity._links?.modifyContent"
+        :data-test="`markbook-assessment-dropdown-${props.activity.id}-modify-content`"
+    >
         <a :href="getReturnUrl(props.activity._links.modifyContent)" class="icon-modify">Modify Content</a>
     </li>
-    <li v-if="viewStatusLink">
+    <li v-if="viewStatusLink" :data-test="`markbook-assessment-dropdown-${props.activity.id}-view-status`">
         <a :href="viewStatusLink" class="icon-progress">View Status</a>
     </li>
-    <li v-if="props.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK && viewStatusLink">
+    <li
+        v-if="props.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK && viewStatusLink"
+        :data-test="`markbook-assessment-dropdown-${props.activity.id}-import-feedback`"
+    >
         <a :href="`${viewStatusLink}&importFeedback`" class="icon-upload">Import Feedback</a>
     </li>
     <template v-if="props.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK && activity._routes.postFeedbacks">
         <li class="separator">Bulk Actions</li>
-        <li>
+        <li :data-test="`markbook-assessment-dropdown-${props.activity.id}-publish`">
             <mb-table-head-activity-publish :activity="props.activity" />
         </li>
     </template>
