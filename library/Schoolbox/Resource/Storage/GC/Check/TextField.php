@@ -11,6 +11,7 @@ namespace Schoolbox\Resource\Storage\GC\Check;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Statement\IStatement;
+use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -148,16 +149,15 @@ class TextField extends Base
     }
 
     /**
-     * Build a query for finding usage of a hash.
-     *
-     * @param string $table      The table to search within.
-     * @param array  $columnData `column`: the column to search within
-     * @return IStatement A statement which accepts a storage hash as its `hash`
-     *                    parameter.
+     * @inheritdoc
      */
     protected function buildFindHashQuery(string $table, array $columns, ?array $extra): IStatement
     {
-        // Build an AND statement for each column
+        if (empty($columns)) {
+            throw new InvalidArgumentException('$columns is empty');
+        }
+
+        // Build a search within each column for the hash's value.
         $whereParts = [];
         foreach ($columns as $column) {
             $whereParts[] = "INSTR({$this->db->getQuoter()->quoteIdentifier($column)}, :hash) > 0";

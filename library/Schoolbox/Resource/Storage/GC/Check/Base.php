@@ -11,6 +11,7 @@ namespace Schoolbox\Resource\Storage\GC\Check;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Statement\IStatement;
+use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -73,7 +74,12 @@ abstract class Base implements Check
                 }
 
                 // Build query for this column, exclude non-stale
-                $query      = $this->buildFindHashQuery($table, $columns, $columnData['extra'] ?? null);
+                try {
+                    $query = $this->buildFindHashQuery($table, $columns, $columnData['extra'] ?? null);
+                } catch (InvalidArgumentException $e) {
+                    $this->logger->warning(sprintf('. could not build query (message: %s): skipping', $e->getMessage()));
+                    continue;
+                }
                 $staleCount = count($stale);
                 $newStale   = [];
                 $this->logger->info(
@@ -125,12 +131,13 @@ abstract class Base implements Check
     /**
      * Build a query which finds usages of a hash.
      *
-     * @param string     $table   The table to search within.
-     * @param array      $columns The columns to search within.
-     * @param array|null $extra   Any information about the relation of the
-     *                            table to the hash which may be relevant.
+     * @param string                 $table   The table to search within.
+     * @param non-empty-list<string> $columns The columns to search within.
+     * @param array|null             $extra   Any information about the relation of the table to the hash which may be
+     *                                        relevant for building the query.
      * @return IStatement A statement which accepts a storage hash as its `hash`
      *                    parameter.
+     * @throws InvalidArgumentException if the query cannot be built, due to a malformed `$column` or `$extra` value
      */
     abstract protected function buildFindHashQuery(string $table, array $columns, ?array $extra): IStatement;
 }

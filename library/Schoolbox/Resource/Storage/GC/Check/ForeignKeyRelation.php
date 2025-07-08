@@ -11,6 +11,7 @@ namespace Schoolbox\Resource\Storage\GC\Check;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Statement\IStatement;
+use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -19,6 +20,18 @@ use Psr\Log\LoggerInterface;
  */
 class ForeignKeyRelation extends Base
 {
+    /**
+     * Query for fetching foreign key relations to the `storage` table.
+     *
+     * Returns these rows:
+     * * `table`: the table which joins onto `storage`
+     * * `column`: the column in `table` which joins onto `storage`
+     * * `primary_table`: the table which the foreign key joins onto
+     *    (should always be `storage`)
+     * * `primary_column`: the column in `primary_table` which the foreign key
+     *    joins onto
+     *    (should always be `hash`, but is not guaranteed to be)
+     */
     private const SELECT_FK_RELATIONS_QUERY = <<<SQL
         select
             fks.TABLE_NAME             as `table`,
@@ -81,18 +94,29 @@ class ForeignKeyRelation extends Base
     /**
      * Build a query for finding usage of a hash.
      *
-     * @param string $table      The table to search within.
-     * @param array $columnData `column`:         the column on `$table` to search within
-     *                          `primary_table`:  the name of the storage table
-     *                           primary_column`: the column on `primary_table` that `column` joins on:
-     *                                            not always `hash`
-     * @return IStatement A statement which accepts a storage hash as its `hash`
-     *                    parameter.
+     * @param array{primary_table: string, primary_column: string}|null $extra
      */
     protected function buildFindHashQuery(string $table, array $columns, ?array $extra): IStatement
     {
+        // Use the first column only:
+        // if there's more than one column, cannot build the query
+        if (count($columns) !== 1) {
+            throw new InvalidArgumentException(
+                sprintf('$columns expects exactly one column: %d given', count($columns)),
+            );
+        }
         [$column] = $columns;
-        // Notice if foreign key doesn't join onto storage.hash
+
+        // Both `primary_table` and `primary_column` must be set:
+        // otherwise, cannot build the query
+        if (!isset($extra['primary_table'], $extra['primary_column'])) {
+            throw new InvalidArgumentException(
+                '`buildTableColumnList` did not set `primary_table` and `primary_column`',
+            );
+        }
+
+        // Notice if foreign key doesn't join onto storage.hash:
+        // this is a schema change which could be made
         if ($extra['primary_column'] !== 'hash') {
             $this->logger->notice(
                 sprintf(
