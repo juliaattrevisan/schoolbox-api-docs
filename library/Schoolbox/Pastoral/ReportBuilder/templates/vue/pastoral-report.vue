@@ -5,17 +5,18 @@
 
 import type { PastoralRecord } from "@schoolboxLibrary/Pastoral/types/PastoralRecord";
 import { TabType } from "../js/types/pastoralReportTypes";
-import type { Tab, Config, SeverityColors } from "../js/types/pastoralReportTypes";
+import type { Tab, Config, Routes, SeverityColors } from "../js/types/pastoralReportTypes";
 import PrList from "./pr-list.vue";
 import PrTable from "./pr-table.vue";
 
 const props = defineProps<{
     tabs: Tab[];
     results: PastoralRecord[];
+    config: Config;
+    routes: Routes;
+    localePastoral: string;
     showSeverity: boolean;
     severityColors: SeverityColors;
-    config: Config;
-    localePastoral: string;
 }>();
 
 const selectedTab = window.Vue.ref(props.tabs[0]?.type ?? "");
@@ -40,10 +41,11 @@ const isTemporaryTesting = window.Vue.ref(true); // Temporary flag for testing p
     <pr-list
         v-if="selectedTab === TabType.LIST"
         :results="props.results"
+        :config="props.config"
+        :routes="props.routes"
+        :locale-pastoral="props.localePastoral"
         :show-severity="props.showSeverity"
         :severity-colors="props.severityColors"
-        :config="props.config"
-        :locale-pastoral="props.localePastoral"
     />
     <pr-table v-else :records-and-points="recordsAndPoints" :records-or-points="recordsOrPoints" />
 </template>

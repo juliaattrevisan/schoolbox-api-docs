@@ -27,12 +27,17 @@
     <div class="small-12 island">
         <div id="pastoral-report-container">
             <pastoral-report
-                :tabs="{{ tabs|json_encode}}"
-                :results="{{ results|json_encode}}"
-                :config='{{ {
+                :tabs="{{ tabs|json_encode }}"
+                :results="{{ results|json_encode }}"
+                :config="{{ {
                     pastoralPointEnabled: config.pastoral_point_enabled,
                     pastoralActionEnable: config.pastoral_action_enable
-                }|json_encode|raw }}'
+                }|json_encode }}"
+                :routes="{{ {
+                    getStudentRecord: routeLookup('pastoral.getStudentRecord'),
+                    getReportTags: routeLookup('pastoralReportBuilder.getReportTags'),
+                    getIndex: routeLookup('pastoralReportBuilder.getIndex')
+                }|json_encode }}"
                 locale-pastoral="{{ locale.pastoral.proper|lower }}"
                 :show-severity="{{ showSeverity ? 'true' : 'false' }}"
                 :severity-colors="{{ severityColors|json_encode }}"

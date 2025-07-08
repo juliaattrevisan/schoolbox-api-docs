@@ -34,6 +34,15 @@ export type Config = {
 };
 
 /**
+ * Routes for the Pastoral Report Builder
+ */
+export type Routes = {
+    getStudentRecord: string;
+    getReportTags: string;
+    getIndex: string;
+};
+
+/**
  * To define the structure of each table column
  */
 export type TableHeader = {

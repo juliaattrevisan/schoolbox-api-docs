@@ -5,33 +5,16 @@
 
 import MediaArticle from "@schoolboxVue/components/media-article.vue";
 import type { PastoralRecord } from "@schoolboxLibrary/Pastoral/types/PastoralRecord";
-import type { Config, SeverityColors } from "../js/types/pastoralReportTypes";
+import type { Config, Routes, SeverityColors } from "../js/types/pastoralReportTypes";
 
 const props = defineProps<{
     results: PastoralRecord[];
+    config: Config;
+    routes: Routes;
+    localePastoral: string;
     showSeverity: boolean;
     severityColors: SeverityColors;
-    config: Config;
-    localePastoral: string;
 }>();
-
-const routeLookup = (route: string, params?: Record<string, string | number>): string => {
-    const routes: Record<string, string> = {
-        "pastoral.getStudentRecord": "/pastoral/student/{studentId}/record/{recordId}",
-        "pastoralReportBuilder.getReportTags": "/pastoral/report/results/tag/{tagId}",
-        "pastoralReportBuilder.getIndex": "/pastoral/report",
-    };
-
-    let url = routes[route] || "#";
-
-    if (params) {
-        Object.keys(params).forEach((key) => {
-            url = url.replace(`{${key}}`, String(params[key]));
-        });
-    }
-
-    return url;
-};
 
 /**
  * Formats a date string using Day.js
@@ -55,10 +38,9 @@ function getDateFormatted(date: string): string {
                             </a>
                             <a
                                 :href="
-                                    routeLookup('pastoral.getStudentRecord', {
-                                        studentId: record.student.id,
-                                        recordId: record.id,
-                                    })
+                                    props.routes.getStudentRecord
+                                        .replace('{studentId}', record.student.id.toString())
+                                        .replace('{recordId}', record.id.toString())
                                 "
                             >
                                 <h4 class="l-flex l-flex--align-center l-gap-s">
@@ -106,11 +88,7 @@ function getDateFormatted(date: string): string {
                                 <template v-for="tag in record.tags" :key="tag.id">
                                     <a
                                         class="neutral label hide-on-print"
-                                        :href="
-                                            routeLookup('pastoralReportBuilder.getReportTags', {
-                                                tagId: tag.id,
-                                            })
-                                        "
+                                        :href="props.routes.getReportTags.replace('{tagId}', tag.id.toString())"
                                     >
                                         {{ tag.name }}
                                     </a>
@@ -144,7 +122,7 @@ function getDateFormatted(date: string): string {
                 <div class="empty-state f-no-margins">
                     <i class="icon-pastoral"></i>
                     <p>No {{ props.localePastoral }} records matched your report criteria.</p>
-                    <a :href="routeLookup('pastoralReportBuilder.getIndex')"> Select Another Report </a>
+                    <a :href="props.routes.getIndex"> Select Another Report </a>
                 </div>
             </section>
         </div>
