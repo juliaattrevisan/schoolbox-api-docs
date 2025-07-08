@@ -11,7 +11,6 @@ alter table config
 
 UPDATE config
 SET name = 'openai_text_endpoint',
-    title = 'OpenAI Text Endpoint Provider',
     module = 'openai-text',
     options = 'Off:OpenAI:Azure',
     required = 'true'
@@ -26,7 +25,6 @@ WHERE name = 'openai_text_endpoint' AND value IS NULL;
 -- openai key
 UPDATE config
 SET name = 'openai_text_key',
-    title = 'OpenAI Text Key',
     module = 'openai-text'
 WHERE name = 'openai_key'
 LIMIT 1;
@@ -34,7 +32,6 @@ LIMIT 1;
 -- openai model
 UPDATE config
 SET name = 'openai_text_model',
-    title = 'OpenAI Text Model',
     module = 'openai-text'
 WHERE name = 'openai_model'
 LIMIT 1;
@@ -42,7 +39,6 @@ LIMIT 1;
 -- azure deployment id
 UPDATE config
 SET name = 'openai_text_azure_deployment_id',
-    title = 'Azure OpenAI Text Deployment ID',
     module = 'openai-text'
 WHERE name = 'openai_azure_deployment_id'
 LIMIT 1;
@@ -50,7 +46,6 @@ LIMIT 1;
 -- azure resource name
 UPDATE config
 SET name = 'openai_text_azure_resource_name',
-    title = 'Azure OpenAI Text Resource Name',
     module = 'openai-text'
 WHERE name = 'openai_azure_resource_name'
 LIMIT 1;
