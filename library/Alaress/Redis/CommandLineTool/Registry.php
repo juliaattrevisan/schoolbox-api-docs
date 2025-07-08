@@ -78,7 +78,7 @@ class Registry
         // Storage-only patterns go here
         Redis::INSTANCE_STORAGE => [
             // Sessions
-            '^PHPREDIS_SESSION:',
+            '^PHPREDIS_SESSION:' . self::INSTANCE_ID_MATCH . ':',
 
             // Old and new remember me
             "^[0-9a-f]{40}$",
