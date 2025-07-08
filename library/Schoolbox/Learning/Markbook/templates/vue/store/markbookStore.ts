@@ -45,6 +45,8 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
      * @param markbook - The markbook data
      */
     function onMarkbookLoaded(markbook: Markbook): void {
+        popoutSelectedCell.value = null;
+        feedbackSelectedCell.value = null;
         data.value = markbook;
     }
 
