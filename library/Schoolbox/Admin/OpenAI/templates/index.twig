@@ -7,7 +7,7 @@
 
     <div class="admin-content">
         <div class="small-12 columns">
-            <h2 class="subheader">Text Generation</h2>
+            <h2 class="subheader" style="display:none" data-subheader>Text Generation</h2>
         </div>
 
         <div id="textSettingsContainer" style="display:none">
@@ -15,7 +15,7 @@
         </div>
 
         <div class="small-12 columns">
-            <h2 class="subheader">Image Generation</h2>
+            <h2 class="subheader" style="display:none" data-subheader>Image Generation</h2>
         </div>
 
         <div id="imageSettingsContainer" style="display:none">
@@ -38,10 +38,10 @@
 
                 textProvider.on('change', function(event) {
                     event.preventDefault();
-                    init(textContainer, textProvider, textKey, textModel, textAzureResourceName, textAzureDeploymentId);
+                    init(textContainer, textProvider, textKey, textModel, textAzureResourceName, textAzureDeploymentId, null);
                 });
 
-                init(textContainer, textProvider, textKey, textModel, textAzureResourceName, textAzureDeploymentId);
+                init(textContainer, textProvider, textKey, textModel, textAzureResourceName, textAzureDeploymentId, null);
 
                 /* Image credentials
                  */
@@ -51,36 +51,50 @@
                 let imageModel = $('#openai_image_model-field').parent('div');
                 let imageAzureResourceName = $('#openai_image_azure_resource_name-field').parent('div');
                 let imageAzureDeploymentId = $('#openai_image_azure_deployment_id-field').parent('div');
+                let imageSystemPrompt = $('#openai_image_system_prompt-field').parent('div');
 
                 imageProvider.on('change', function(event) {
                     event.preventDefault();
-                    init(imageContainer, imageProvider, imageKey, imageModel, imageAzureResourceName, imageAzureDeploymentId);
+                    init(imageContainer, imageProvider, imageKey, imageModel, imageAzureResourceName, imageAzureDeploymentId, imageSystemPrompt);
                 });
 
-                init(imageContainer, imageProvider, imageKey, imageModel, imageAzureResourceName, imageAzureDeploymentId);
+                init(imageContainer, imageProvider, imageKey, imageModel, imageAzureResourceName, imageAzureDeploymentId, imageSystemPrompt);
 
                 /**
                  *  Hide everything if you haven't chosen a provider yet
                  */
-                function init(container,provider, key, model, azureResourceName, azureDeploymentId)
+                function init(container,provider, key, model, azureResourceName, azureDeploymentId, systemPrompt)
                 {
                     if ('Off' === provider.val() || '' === provider.val()) {
                         key.hide();
                         model.hide();
                         azureResourceName.hide();
                         azureDeploymentId.hide();
+
+                        if (null !== systemPrompt) {
+                            systemPrompt.hide();
+                        }
                     } else if (PROVIDER_OPENAI === provider.val()) {
                         key.show();
                         model.show();
                         azureResourceName.hide();
                         azureDeploymentId.hide();
+
+                        if (null !== systemPrompt) {
+                            systemPrompt.show();
+                        }
                     } else if (PROVIDER_AZURE === provider.val()) {
                         key.show();
                         model.hide();
                         azureResourceName.show();
                         azureDeploymentId.show();
+
+                        if (null !== systemPrompt) {
+                            systemPrompt.show();
+                        }
                     }
 
+                    $('[data-subheader]').show();
                     container.show();
                 }
             });
