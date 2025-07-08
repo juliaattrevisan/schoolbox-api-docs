@@ -113,8 +113,10 @@ class TextField extends Base
             }
 
             // Is this table or field blacklisted?
-            if (isset(self::FIELD_BLACKLIST[$table])) {
-                if (self::FIELD_BLACKLIST[$table] === true) {
+            /** @var array|true|null $blacklist - required for PHPStan */
+            $blacklist = self::FIELD_BLACKLIST[$table] ?? null;
+            if (isset($blacklist)) {
+                if ($blacklist === true) {
                     // Only output blacklisted table once
                     if (!isset($blacklistedTables[$table])) {
                         $this->logger->debug(sprintf('Excluding blacklisted table: %s', $table));
@@ -122,7 +124,7 @@ class TextField extends Base
                     }
                     continue;
                 }
-                if (in_array($column, self::FIELD_BLACKLIST[$table])) {
+                if (in_array($column, $blacklist)) {
                     $this->logger->debug(sprintf('Excluding blacklisted column: %s.%s', $table, $column));
                     continue;
                 }
