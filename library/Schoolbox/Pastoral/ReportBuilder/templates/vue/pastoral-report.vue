@@ -3,17 +3,17 @@
  * Pastoral Report Tabs Component
  */
 
-import type { PastoralReportTab, SeverityColors, PastoralRecord } from "../js/types/pastoralReportTypes";
+import type { PastoralRecord } from "@schoolboxLibrary/Pastoral/types/PastoralRecord";
+import type { Tab, Config, SeverityColors } from "../js/types/pastoralReportTypes";
 import PrList from "./pr-list.vue";
 import PrTable from "./pr-table.vue";
 
 const props = defineProps<{
-    tabs: PastoralReportTab[];
+    tabs: Tab[];
     results: PastoralRecord[];
     showSeverity: boolean;
     severityColors: SeverityColors;
-    pastoralPointEnabled: boolean | number;
-    pastoralActionEnable: boolean | number;
+    config: Config;
     localePastoral: string;
 }>();
 
@@ -41,8 +41,7 @@ const isTemporaryTesting = window.Vue.ref(true); // Temporary flag for testing p
         :results="props.results"
         :show-severity="props.showSeverity"
         :severity-colors="props.severityColors"
-        :pastoral-point-enabled="props.pastoralPointEnabled"
-        :pastoral-action-enable="props.pastoralActionEnable"
+        :config="props.config"
         :locale-pastoral="props.localePastoral"
     />
     <pr-table v-else :records-and-points="recordsAndPoints" :records-or-points="recordsOrPoints" />

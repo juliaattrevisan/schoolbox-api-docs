@@ -4,14 +4,14 @@
  */
 
 import MediaArticle from "@schoolboxVue/components/media-article.vue";
-import type { SeverityColors, PastoralRecord } from "../js/types/pastoralReportTypes";
+import type { PastoralRecord } from "@schoolboxLibrary/Pastoral/types/PastoralRecord";
+import type { Config, SeverityColors } from "../js/types/pastoralReportTypes";
 
 const props = defineProps<{
     results: PastoralRecord[];
     showSeverity: boolean;
     severityColors: SeverityColors;
-    pastoralPointEnabled: boolean | number;
-    pastoralActionEnable: boolean | number;
+    config: Config;
     localePastoral: string;
 }>();
 
@@ -91,7 +91,7 @@ function getDateFormatted(date: string): string {
                                         :title="`Record archived - ${record.expiresAt}`"
                                     ></sbx-icon>
                                     <sbx-label-pastoral-points
-                                        v-if="props.pastoralPointEnabled && record.points"
+                                        v-if="props.config.pastoralPointEnabled && record.points"
                                         :points="record.points"
                                         :title="`${record.points} Points`"
                                     ></sbx-label-pastoral-points>
@@ -104,7 +104,7 @@ function getDateFormatted(date: string): string {
                                 <a :href="`/search/user/${record.owner.id}`">{{ record.owner.fullName }}</a>
                                 {{ record.createdAt.short }}
 
-                                <span v-if="props.pastoralActionEnable && record.uncompletedActionCount > 0">
+                                <span v-if="props.config.pastoralActionEnable && record.uncompletedActionCount > 0">
                                     | {{ record.uncompletedActionCount }} follow up action{{
                                         record.uncompletedActionCount === 1 ? "" : "s"
                                     }}

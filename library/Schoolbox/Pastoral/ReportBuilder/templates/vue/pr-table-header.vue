@@ -4,10 +4,10 @@
  * Renders headers with optional sorting functionality.
  */
 
-import type { PastoralReportTableHeader } from "../js/types/pastoralReportTypes";
+import type { TableHeader } from "../js/types/pastoralReportTypes";
 
 type Props = {
-    headers: PastoralReportTableHeader[];
+    headers: TableHeader[];
     recordsAndPoints: string[];
 };
 const props = defineProps<Props>();
@@ -22,7 +22,7 @@ const emit = defineEmits<{
  * Handles the sort action when a sortable header is clicked
  * @param header - the header object that was clicked
  */
-function handleSort(header: PastoralReportTableHeader): void {
+function handleSort(header: TableHeader): void {
     if (header.isSortable) {
         emit("sort", header.key);
     }
@@ -38,8 +38,8 @@ const hasSubTitles = props.headers.some((header) => header.subTitle && header.su
  * Groups headers by title to calculate colspan for duplicate titles
  * @returns an array of grouped header objects with title, colspan, and original headers
  */
-function getGroupedHeaders(): Array<{ title: string; colspan: number; headers: PastoralReportTableHeader[] }> {
-    const groups: { [key: string]: PastoralReportTableHeader[] } = {};
+function getGroupedHeaders(): Array<{ title: string; colspan: number; headers: TableHeader[] }> {
+    const groups: { [key: string]: TableHeader[] } = {};
     // Group headers by title
     props.headers.forEach((header) => {
         // if the header has a subTitle, it should be grouped

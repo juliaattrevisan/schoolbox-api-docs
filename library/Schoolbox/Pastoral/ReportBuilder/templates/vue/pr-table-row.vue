@@ -5,10 +5,10 @@
  */
 
 import type { User } from "@schoolboxLibrary/types/User";
-import type { PastoralReportTableHeader, RowOptions, RecordsAndPoints } from "../js/types/pastoralReportTypes";
+import type { TableHeader, RowOptions, RecordsAndPoints } from "../js/types/pastoralReportTypes";
 
 type Props = {
-    headers: PastoralReportTableHeader[];
+    headers: TableHeader[];
     rowData: RowOptions[];
     recordsOrPoints: string;
 };

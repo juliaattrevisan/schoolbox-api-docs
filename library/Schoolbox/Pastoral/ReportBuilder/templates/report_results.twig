@@ -29,8 +29,10 @@
             <pastoral-report
                 :tabs="{{ tabs|json_encode}}"
                 :results="{{ results|json_encode}}"
-                :pastoral-point-enabled="{{ config.pastoral_point_enabled }}"
-                :pastoral-action-enable="{{ config.pastoral_action_enable }}"
+                :config='{{ {
+                    pastoralPointEnabled: config.pastoral_point_enabled,
+                    pastoralActionEnable: config.pastoral_action_enable
+                }|json_encode|raw }}'
                 locale-pastoral="{{ locale.pastoral.proper|lower }}"
                 :show-severity="{{ showSeverity ? 'true' : 'false' }}"
                 :severity-colors="{{ severityColors|json_encode }}"
