@@ -31,7 +31,7 @@
                 :results="{{ results|json_encode}}"
                 :pastoral-point-enabled="{{ config.pastoral_point_enabled }}"
                 :pastoral-action-enable="{{ config.pastoral_action_enable }}"
-                locale-pastoral="{{ locale.pastoral.proper }}"
+                locale-pastoral="{{ locale.pastoral.proper|lower }}"
                 :show-severity="{{ showSeverity ? 'true' : 'false' }}"
                 :severity-colors="{{ severityColors|json_encode }}"
             />
