@@ -87,7 +87,7 @@ class Module extends BaseModule
         $cache = new Psr16Cache(
             new RedisAdapter(
                 $this->injector->get('redis.storage'),
-                CacheHelper::BASE_SERVER_KEY. ':' . INSTANCE_ID,
+                CacheHelper::BASE_SERVER_KEY. '.' . INSTANCE_ID,
             )
 //            new ItemPool(
 //                $this->injector->get('redis.storage'),
