@@ -59,7 +59,6 @@ class Registry
             // * OpenID configuration and JWKS responses from the configured
             //   oAuth/OIDC provider
             CacheHelper::BASE_CLIENT_KEY . '.' . self::INSTANCE_ID_MATCH . ':' . IsamsCacheHelper::REGISTERS_CACHE_KEY,
-            CacheHelper::BASE_CLIENT_KEY . '.' . self::INSTANCE_ID_MATCH . ':' . Redis\Cache\ItemPool::SET_KEY,
             CacheHelper::BASE_CLIENT_KEY . '.' . self::INSTANCE_ID_MATCH . ':',
 
             // ClickView (Homepage Component) cache
@@ -67,13 +66,11 @@ class Registry
 
             // Paperly cache
             'paperly.' . self::INSTANCE_ID_MATCH . ':paperly_dashboard_user',
-            'paperly.' . self::INSTANCE_ID_MATCH . ':' . Redis\Cache\ItemPool::SET_KEY,
 
             // Storage cache
             '^fc:' . self::INSTANCE_ID_MATCH . ':system_usage_',
 
             // HTTP client cache
-            'httpClient.' . self::INSTANCE_ID_MATCH . ':' . Redis\Cache\ItemPool::SET_KEY,
             'httpClient.' . self::INSTANCE_ID_MATCH . ':',
         ],
         // Storage-only patterns go here
@@ -138,7 +135,6 @@ class Registry
             // * access tokens
             // * nonces
             // * refresh tokens
-            CacheHelper::BASE_SERVER_KEY . '.' . self::INSTANCE_ID_MATCH . ':' . Redis\Cache\ItemPool::SET_KEY,
             CacheHelper::BASE_SERVER_KEY . '.' . self::INSTANCE_ID_MATCH . ':',
         ],
         // Queue patterns go here
