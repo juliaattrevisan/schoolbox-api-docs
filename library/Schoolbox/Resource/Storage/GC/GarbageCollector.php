@@ -52,7 +52,7 @@ class GarbageCollector
     public function __construct(
         private StorageMapper $mapper,
         private LoggerInterface $log,
-        private int $limit = 200,
+        private int $limit,
         private ?Alaress_Date_Format $thresholdDate = null,
         private bool $perform = false,
     ) {
@@ -82,6 +82,7 @@ class GarbageCollector
     {
         // Build the query
         $this->log->info('Restricting garbage collection to:');
+        $this->log->info(sprintf('  limit: %d', $this->limit));
         $this->log->info('  expired_at: null');
         $pb = $this->mapper->getPredicateBuilder()
             ->isNull('expired_at');
