@@ -157,13 +157,11 @@ const profile = {
         </div>
         <div v-else class="small-12 column">
             <section>
-                <div class="empty-state">
+                <div class="empty-state f-no-margins">
                     <i class="icon-pastoral"></i>
                     <p>No {{ props.locale.pastoral }} records matched your report criteria.</p>
+                    <a :href="routeLookup('pastoralReportBuilder.getIndex')"> Select Another Report </a>
                 </div>
-                <a class="button submit" :href="routeLookup('pastoralReportBuilder.getIndex')">
-                    Select Another Report
-                </a>
             </section>
         </div>
     </div>
