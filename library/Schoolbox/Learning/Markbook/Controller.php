@@ -25,6 +25,7 @@ use Schoolbox\Learning\Assessment\Feedback\Visibility;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\Quiz;
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Task;
 use Schoolbox\Learning\Assessment\Translator\UnitAssessments;
 use Schoolbox\Learning\MarkScheme\Factory;
@@ -222,6 +223,23 @@ class Controller extends Base
                                         ? $authoritativeFeedbackDraft->getResubmissionRequired()
                                         : false;
 
+                                    $responseIdPublished = $authoritativeFeedback?->getId() ?? null;
+                                    $responseIdDraft = $authoritativeFeedbackDraft?->getId() ?? null;
+
+                                    $authNormMarkPublished = $authoritativeFeedback || $aImpl instanceof Project ? $participant->getNormalisedMark(true) : null;
+                                    $authNormMarkDraft = $authoritativeFeedbackDraft || $aImpl instanceof Project ? $participant->getNormalisedMark(false) : null;
+
+                                    /** the markbook uses responseId !== null to determine if this mark actually exists, so jank a -1 here for projects */
+                                    if ($aImpl instanceof Project) {
+                                        if ($authNormMarkPublished) {
+                                            $responseIdPublished = -1;
+                                        }
+
+                                        if ($authNormMarkDraft) {
+                                            $responseIdDraft = -1;
+                                        }
+                                    }
+
                                     return [
                                         'isExcluded'           => $participant->isExcluded(),
                                         'hasSubmittedResponse' => $participant->hasSubmittedResponse(),
@@ -229,20 +247,20 @@ class Controller extends Base
                                         'progressTick'       => $progressTick,
                                         'marks' => [
                                             'published' => [
-                                                'norm'         => $authoritativeFeedback ? $participant->getNormalisedMark(true) : null,
-                                                'hr'           => $authoritativeFeedback ? $participant->getHumanReadableMark(true) : null,
-                                                'hrInstructor' => $authoritativeFeedback ? $participant->getHumanReadableInstructorMark(true) : null,
+                                                'norm'         => $authNormMarkPublished,
+                                                'hr'           => $authoritativeFeedback || $aImpl instanceof Project ? $participant->getHumanReadableMark(true) : null,
+                                                'hrInstructor' => $authoritativeFeedback || $aImpl instanceof Project ? $participant->getHumanReadableInstructorMark(true) : null,
                                                 'comment'      => $this->purifier->purify($authoritativeFeedback?->getComment()),
                                                 'resubmissionRequired' => $resubmissionRequiredPublished,
-                                                'responseId'   => $authoritativeFeedback?->getId(),
+                                                'responseId'   => $responseIdPublished,
                                             ],
                                             'draft' => [
-                                                'norm'         => $authoritativeFeedbackDraft ? $participant->getNormalisedMark(false) : null,
-                                                'hr'           => $authoritativeFeedbackDraft ? $participant->getHumanReadableMark(false) : null,
-                                                'hrInstructor' => $authoritativeFeedbackDraft ? $participant->getHumanReadableInstructorMark(false) : null,
+                                                'norm'         => $authNormMarkDraft,
+                                                'hr'           => $authoritativeFeedbackDraft || $aImpl instanceof Project ? $participant->getHumanReadableMark(false) : null,
+                                                'hrInstructor' => $authoritativeFeedbackDraft || $aImpl instanceof Project ? $participant->getHumanReadableInstructorMark(false) : null,
                                                 'comment'      => $this->purifier->purify($authoritativeFeedbackDraft?->getComment()),
                                                 'resubmissionRequired' => $resubmissionRequiredDraft,
-                                                'responseId'   => $authoritativeFeedbackDraft?->getId(),
+                                                'responseId'   => $responseIdDraft
                                             ],
                                         ],
                                         'plan' => [
