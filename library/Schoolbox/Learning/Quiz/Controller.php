@@ -341,20 +341,24 @@ class Controller extends AbstractController
             /* There used to be stuff here that was used to convert url domains but I'm not sure we even
              * needed them. We needed them in the xml days, but I don't think we needed them here.
              */
-            $result = (new Importer(
-                $api,
-                $schoolCode,
-                $this->getDi()->get('databaseInternal'),
-                $context,
-                $this->getUser(),
-                $assessmentMapperProxy,
-                $this->quizMapper,
-                $this->workTypeMapper,
-                $this->markTypeMapper,
-                $this->gradeGroupMapper,
-                $this->storageMapper,
-                $this->curriculumNodeMapper,
-            ))->import($data);
+            try {
+                $result = (new Importer(
+                    $api,
+                    $schoolCode,
+                    $this->getDi()->get('databaseInternal'),
+                    $context,
+                    $this->getUser(),
+                    $assessmentMapperProxy,
+                    $this->quizMapper,
+                    $this->workTypeMapper,
+                    $this->markTypeMapper,
+                    $this->gradeGroupMapper,
+                    $this->storageMapper,
+                    $this->curriculumNodeMapper,
+                ))->import($data);
+            } catch (\RuntimeException $e) {
+                throw $this->errorMapper->generateException(ErrorMapper::ERROR_PROCESSING, $e, $e->getMessage());
+            }
 
             /* Distill anything mostly non-fatal that we found during the import process
              */
