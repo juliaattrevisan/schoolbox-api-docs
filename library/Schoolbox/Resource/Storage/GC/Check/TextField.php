@@ -111,6 +111,8 @@ class TextField extends Base
                     $blacklistedTables[$table] = true;
                 }
             }
+
+            // Is this table or field blacklisted?
             if (isset(self::FIELD_BLACKLIST[$table])) {
                 if (self::FIELD_BLACKLIST[$table] === true) {
                     // Only output blacklisted table once

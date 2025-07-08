@@ -50,6 +50,20 @@ class ForeignKeyRelation extends Base
         SQL;
 
     /**
+     * List of foreign key relations to never query.
+     *
+     * Currently this contains only `storage_transform.hash`: this table's data
+     * is wholly reliant on the data in `storage`.
+     *
+     * @var array<string, array<string>>
+     *     key:   a table name
+     *     value: a list of columns to skip
+     */
+    private const FIELD_BLACKLIST = [
+        'storage_transform' => ['hash'],
+    ];
+
+    /**
      * Constructor
      *
      * @param IConnector      $db     Database connection
@@ -77,10 +91,18 @@ class ForeignKeyRelation extends Base
 
         $tableColumnList = [];
         foreach ($query as $row) {
-            $table = $row['table'];
+            $table  = $row['table'];
+            $column = $row['column'];
+
+            // Exclude blacklisted foreign keys
+            if (isset(self::FIELD_BLACKLIST[$table]) && in_array($column, self::FIELD_BLACKLIST[$table])) {
+                $this->logger->debug(sprintf('Excluding blacklisted foreign key: %s.%s', $table, $column));
+                continue;
+            }
+
             $tableColumnList[$table] ??= [];
             $tableColumnList[$table][] = [
-                'columns' => [$row['column']],
+                'columns' => [$column],
                 'extra'   => [
                     'primary_table'  => $row['primary_table'],
                     'primary_column' => $row['primary_column'],
