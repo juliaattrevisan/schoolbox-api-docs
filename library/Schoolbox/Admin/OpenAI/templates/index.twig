@@ -15,18 +15,35 @@
                 const PROVIDER_OPENAI = '{{ models.openai }}';
                 const PROVIDER_AZURE = '{{ models.azure }}';
 
-                let provider = $('#openai_text_endpoint-field');
-                let key = $('#openai_text_key-field').parent('div');
-                let model = $('#openai_text_model-field').parent('div');
-                let azureResourceName = $('#openai_text_azure_resource_name-field').parent('div');
-                let azureDeploymentId = $('#openai_text_azure_deployment_id-field').parent('div');
+                /* Text credentials
+                 */
+                let textProvider = $('#openai_text_endpoint-field');
+                let textKey = $('#openai_text_key-field').parent('div');
+                let textModel = $('#openai_text_model-field').parent('div');
+                let textAzureResourceName = $('#openai_text_azure_resource_name-field').parent('div');
+                let textAzureDeploymentId = $('#openai_text_azure_deployment_id-field').parent('div');
 
-                provider.on('change', function(event) {
+                textProvider.on('change', function(event) {
                     event.preventDefault();
-                    init(provider, key, model, azureResourceName, azureDeploymentId);
+                    init(textProvider, textKey, textModel, textAzureResourceName, textAzureDeploymentId);
                 });
 
-                init(provider, key, model, azureResourceName, azureDeploymentId);
+                init(textProvider, textKey, textModel, textAzureResourceName, textAzureDeploymentId);
+
+                /* Image credentials
+                 */
+                let imageProvider = $('#openai_image_endpoint-field');
+                let imageKey = $('#openai_image_key-field').parent('div');
+                let imageModel = $('#openai_image_model-field').parent('div');
+                let imageAzureResourceName = $('#openai_image_azure_resource_name-field').parent('div');
+                let imageAzureDeploymentId = $('#openai_image_azure_deployment_id-field').parent('div');
+
+                imageProvider.on('change', function(event) {
+                    event.preventDefault();
+                    init(imageProvider, imageKey, imageModel, imageAzureResourceName, imageAzureDeploymentId);
+                });
+
+                init(imageProvider, imageKey, imageModel, imageAzureResourceName, imageAzureDeploymentId);
 
                 /**
                  *  Hide everything if you haven't chosen a provider yet
