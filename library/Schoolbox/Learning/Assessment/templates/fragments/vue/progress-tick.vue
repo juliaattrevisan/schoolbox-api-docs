@@ -9,11 +9,11 @@ import type { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
  * Transitions
  * key: old status => value: new status
  */
-const TRANSITIONS = {
+const TRANSITIONS_DEFAULT: Record<keyof typeof STATUS_VALUES, keyof typeof STATUS_VALUES> = {
     incomplete: "teacherAssessed",
     selfAssessed: "teacherAssessed",
     teacherAssessed: "incomplete",
-} as const;
+};
 
 /**
  * Form submit/return values for each config type
@@ -28,7 +28,7 @@ const STATUS_VALUES = {
  * Convert a transition status to a progress class
  * This is mainly here since props.progressTick only gives us a class
  */
-const STATUS_TO_CLASS: Record<keyof typeof TRANSITIONS, typeof progressClass.value> = {
+const STATUS_TO_CLASS: Record<keyof typeof TRANSITIONS_DEFAULT, typeof progressClass.value> = {
     incomplete: "incomplete",
     selfAssessed: "pending",
     teacherAssessed: "reviewed",
@@ -51,12 +51,17 @@ interface Props {
      * To turn off the margin created by progress-tick-form, defaults to false
      */
     noMargin?: boolean;
+    /**
+     * Transitions map
+     */
+    transitions?: typeof TRANSITIONS_DEFAULT;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     canModify: true,
     isSelfAssessable: false,
     noMargin: false,
+    transitions: undefined,
 });
 
 const emit = defineEmits<{
@@ -129,7 +134,9 @@ async function onTickClicked(): Promise<void> {
 
     isSubmitting.value = true;
 
-    const nextStatus = TRANSITIONS[progressTickStatus.value];
+    const transitions = props.transitions ?? TRANSITIONS_DEFAULT;
+    const nextStatus = transitions[progressTickStatus.value];
+
     const response = await fetch(postRouteUrl.value, {
         method: "POST",
         headers: {

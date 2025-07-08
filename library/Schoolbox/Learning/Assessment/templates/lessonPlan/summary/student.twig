@@ -11,20 +11,6 @@
  # @param bool              $isInstructor           A bool for whether currently logged in user is instructor (they see staff-only fields)
  #}
 
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/task/jquery.progressTickForm.js?v={{ config.site_version }}"></script>
-<script type="text/javascript">
-    $(function () {
-        $('form[data-progress-tick-form]').progressTickForm({
-            disabledSelector: 'form:not([data-progress-tick-form="selfAssessed"])',
-            transitions: {
-                incomplete:      'selfAssessed',
-                selfAssessed:    'incomplete',
-                teacherAssessed: 'incomplete'
-            }
-        });
-    });
-</script>
-
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 {% import '@learningAssessment/project/macro/icon.twig' as icon %}
