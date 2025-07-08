@@ -9,7 +9,7 @@ VALUES (
     'true',
     'false',
     'false',
-    'openai',
+    'openai-image',
     6
 );
 
@@ -23,7 +23,7 @@ VALUES (
     'true',
     'false',
     'false',
-    'openai',
+    'openai-image',
     7
 );
 
@@ -37,7 +37,7 @@ VALUES (
     'true',
     'false',
     'false',
-    'openai',
+    'openai-image',
     8
 );
 
@@ -51,6 +51,6 @@ VALUES (
     'true',
     'false',
     'false',
-    'openai',
+    'openai-image',
     9
 );

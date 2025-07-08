@@ -54,3 +54,8 @@ UPDATE config
 SET title = 'Azure OpenAI Text Resource Name'
 WHERE name = 'openai_text_azure_resource_name'
 LIMIT 1;
+
+-- Split text configs from their image counterparts
+UPDATE config
+SET module = 'openai-text'
+WHERE module = 'openai'

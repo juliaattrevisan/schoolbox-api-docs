@@ -78,6 +78,8 @@ class Controller extends ConfigController
 
         /* Save it
          */
+        /* TODO save image and text configs in two calls (probably)
+         */
         $this->updateConfig($postData, $this->buildConfigPredicate());
 
         /* Go back to the place from whence you came
@@ -94,6 +96,6 @@ class Controller extends ConfigController
      */
     private function buildConfigPredicate(): Builder
     {
-        return $this->getConfigMapper()->getPredicateBuilder()->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_OPENAI);
+        return $this->getConfigMapper()->getPredicateBuilder()->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_OPENAI_TEXT);
     }
 }
