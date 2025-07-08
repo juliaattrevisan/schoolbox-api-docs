@@ -10,7 +10,6 @@ namespace Alaress\Application;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
-use Alaress\Codec\Json\Base64;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Connector\NullConnector;
 use Alaress\Database\Exception as AlaressDatabaseException;
@@ -1790,13 +1789,6 @@ abstract class Kernel
             'httpClient.internalCache',
             $di->lazy(
                 function () use ($di) {
-//                    return new Psr16Cache(
-//                        new ItemPool(
-//                            $di->get('redis.cache'),
-//                            new \Alaress\Codec\StringValue\Base64(),
-//                            new KeyGenerator('httpClient', INSTANCE_ID),
-//                        )
-//                    );
                     return new Psr16Cache(
                         new RedisAdapter(
                             $di->get('redis.cache'),
@@ -2201,13 +2193,6 @@ abstract class Kernel
             'oidc.cache',
             $di->lazy(
                 function () use ($di) {
-//                    return new Psr16Cache(
-//                        new ItemPool(
-//                            $di->get('redis.cache'),
-//                            new Base64(),
-//                            new KeyGenerator(CacheHelper::BASE_CLIENT_KEY, INSTANCE_ID),
-//                        )
-//                    );
                     return new Psr16Cache(
                         new RedisAdapter(
                             $di->get('redis.cache'),
@@ -2229,13 +2214,6 @@ abstract class Kernel
                             'component.homepage.clickview:' . INSTANCE_ID,
                         )
                     );
-//                    return new Psr16Cache(
-//                        new ItemPool(
-//                            $di->get('redis.cache'),
-//                            new Base64(),
-//                            new KeyGenerator('component.homepage.clickview', INSTANCE_ID),
-//                        )
-//                    );
                 }
             )
         );
@@ -2250,13 +2228,6 @@ abstract class Kernel
                             'paperly:' . INSTANCE_ID,
                         )
                     );
-//                    return new Psr16Cache(
-//                        new ItemPool(
-//                            $di->get('redis.cache'),
-//                            new Base64(),
-//                            new KeyGenerator('paperly', INSTANCE_ID),
-//                        )
-//                    );
                 }
             )
         );
