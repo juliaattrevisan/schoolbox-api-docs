@@ -21,6 +21,7 @@ declare global {
         dayjs: typeof dayjs;
         dateDisplayFormats: {
             dayjs: string;
+            dayjsDatetime: string;
         };
         iframely: {
             load: (containerElement: Element, url?: string) => void;

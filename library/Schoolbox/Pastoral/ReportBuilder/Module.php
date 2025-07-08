@@ -13,11 +13,13 @@ namespace Schoolbox\Pastoral\ReportBuilder;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule;
 use Alaress\Authorizer\Rule\HasServicePermission;
+use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
 use HouseMapper;
 use Schoolbox\CampusMapper;
+use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -32,6 +34,8 @@ use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\Pastoral\ReportBuilder\Translator\ModelToArray as PastoralTranslator;
+use Schoolbox\Pastoral\Comment\Translator\ModelToArray as PastoralCommentTranslator;
 
 // These mappers are injected into controllers where required
 
@@ -111,6 +115,14 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
+        $commentTranslator = new PastoralCommentTranslator(
+            new User\Translator\Author\ModelToArray(),
+            $this->injector->get('router.generator'),
+            $this->injector->get('authorizer'),
+            $this->injector->get('user'),
+            new ScrubAdapter(),
+        );
+
         return new Controller(
             $this->getMapperFactory()->get(\Schoolbox\Error\Mapper::class),
             $this->injector->get('pastoralDataSource'),
@@ -131,6 +143,14 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(RoleMapper::class),
             $this->getMapperFactory()->get(UserAccessMapper::class),
             $this->injector->get('l10n'),
+            new PastoralTranslator(
+                new User\Translator\Author\ModelToArray(),
+                $commentTranslator,
+                $this->getRouter()->getGenerator(),
+                $this->injector->get('authorizer'),
+                $this->injector->get('user'),
+                new ScrubAdapter(),
+            ),
         );
     }
 

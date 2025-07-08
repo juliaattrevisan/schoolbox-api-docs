@@ -35,6 +35,7 @@ use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Tag\Model as PastoralTag;
 use Schoolbox\Pastoral\Action\Mapper as ActionMapper;
+use Schoolbox\Pastoral\ReportBuilder\Translator\ModelToArray;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
 use Schoolbox\Permission\Access\UserAccess;
@@ -91,6 +92,7 @@ class Controller extends Base
         private RoleMapper $roleMapper,
         private UserAccessMapper $userAccessMapper,
         private RosettaStone $l10n,
+        private ModelToArray $pastoralTranslator,
     ) {
     }
 
@@ -318,6 +320,14 @@ class Controller extends Base
         $showSeverity   = $this->getConfigLoader()->get('pastoral_severity');
         $severityColors = $showSeverity ? $this->getSeverityColors() : [];
 
+        $defaultSummaryOptions = [
+            ['title' => 'List', 'type' => 'list']
+        ];
+
+        $tabs = array_merge(
+            $defaultSummaryOptions,
+        );
+
         // And spit this thing out
 
         $this->response = $this->responseFromTemplate(
@@ -325,9 +335,12 @@ class Controller extends Base
             [
                 'title'          => "Records By Tag - {$tag->getName()}",
                 'export'         => false,
-                'results'        => $records,
+                'results'        => $records->map($this->pastoralTranslator),
                 'showSeverity'   => $showSeverity,
                 'severityColors' => $severityColors,
+                /* Summary tables tabs
+                 */
+                'tabs'           => $tabs,
             ],
             'Pastoral Tag Report',
         );
@@ -385,7 +398,7 @@ class Controller extends Base
             [
                 'title'          => $report->getName(),
                 'export'         => true,
-                'results'        => $records,
+                'results'        => $records->map($this->pastoralTranslator),
                 'report'         => $report,
                 'showSeverity'   => $showSeverity,
                 'severityColors' => $severityColors,
