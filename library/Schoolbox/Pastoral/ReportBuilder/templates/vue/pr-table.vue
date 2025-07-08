@@ -14,7 +14,7 @@ type Props = {
 };
 const props = defineProps<Props>();
 
-const recordsOrPoints = defineModel<string>("records-or-points");
+const recordsOrPoints = defineModel<string>("records-or-points", { default: "Records" });
 
 const payloadData = window.Vue.ref<PastoralReportTablePayload>(payload);
 
@@ -35,13 +35,18 @@ const handleSort = (key: string): void => {
         />
         <tbody>
             <!-- Total row -->
-            <pr-table-total-row :headers="payloadData.data.tableHeaders" :row-data="payloadData.data.totalRow" />
+            <pr-table-total-row
+                :headers="payloadData.data.tableHeaders"
+                :row-data="payloadData.data.totalRow"
+                :records-or-points="recordsOrPoints"
+            />
             <!-- All other rows -->
             <pr-table-row
                 v-for="(row, index) in payloadData.data.rows"
                 :key="`row-${index}`"
                 :headers="payloadData.data.tableHeaders"
                 :row-data="row"
+                :records-or-points="recordsOrPoints"
             />
         </tbody>
     </table>

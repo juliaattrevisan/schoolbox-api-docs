@@ -12,7 +12,7 @@ type Props = {
 };
 const props = defineProps<Props>();
 
-const recordsOrPoints = defineModel<string>("records-or-points");
+const recordsOrPoints = defineModel<string>("records-or-points", { default: "Records" });
 
 const emit = defineEmits<{
     sort: [key: string];

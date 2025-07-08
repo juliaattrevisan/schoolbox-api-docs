@@ -10,6 +10,7 @@ import type { PastoralReportTableHeader, RowOptions, RecordsAndPoints } from "..
 type Props = {
     headers: PastoralReportTableHeader[];
     rowData: RowOptions[];
+    recordsOrPoints: string;
 };
 const props = defineProps<Props>();
 </script>
@@ -21,7 +22,13 @@ const props = defineProps<Props>();
                 {{ (data as User).fullName }}
             </template>
             <template v-else-if="props.headers[index].columnType == 'RecordsAndPoints'">
-                {{ (data as RecordsAndPoints).records }}
+                <!-- Change data based on current radio button selection -->
+                <template v-if="props.recordsOrPoints === 'Records'">
+                    {{ (data as RecordsAndPoints).records }}
+                </template>
+                <template v-else>
+                    {{ (data as RecordsAndPoints).points }}
+                </template>
             </template>
             <template v-else>
                 {{ data }}
