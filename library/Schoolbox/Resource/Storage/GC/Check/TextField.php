@@ -14,7 +14,12 @@ use Alaress\Database\Statement\IStatement;
 use Psr\Log\LoggerInterface;
 
 /**
- * Check for whether the storage hash is contained within any `TEXT` field.
+ * Check for whether the storage hash is contained within any `TEXT`, `CHAR` or
+ * `VARCHAR` field, with sensible exclusions:
+ * * the `storage` and `storage_transform` tables themselves
+ * * fields which already have a foreign key relation to `storage`
+ *   (these are processed by `ForeignKeyRelation`)
+ * * ephemeral tables (e.g. `search_index`)
  */
 class TextField extends Base
 {
