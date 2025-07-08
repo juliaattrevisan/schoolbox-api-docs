@@ -132,7 +132,7 @@
         </div>
     </div>
     {% if assessment.allParticipants | length %}
-        <div class="row {% if not loop.first %}hide{% endif %}" data-collapse-state="{% if loop.first %}uncollapsed{% else %}collapsed{% endif %}" data-collapsable="collap-{{ assessment.getBaseContext.getFolder.id }}">
+        <div class="row" data-collapse-state="uncollapsed" data-collapsable="collap-{{ assessment.getBaseContext.getFolder.id }}">
             <div class="small-12 island">
                 <div class="empty-state hide" id="empty-filter">
                     <i class="icon-staff-students"></i>

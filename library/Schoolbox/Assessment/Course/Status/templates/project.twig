@@ -222,7 +222,7 @@ Data:
                     </div>
                 </div>
                 {% if assessment.allParticipants | length %}
-                    <section class="{% if not loop.first %}hide{% endif %}" data-collapse-state="{% if loop.first %}uncollapsed{% else %}collapsed{% endif %}" data-collapsable="collap-{{ assessment.getBaseContext.getFolder.id }}">
+                    <section data-collapse-state="uncollapsed" data-collapsable="collap-{{ assessment.getBaseContext.getFolder.id }}">
                         <ul class="information-list">
                             {% for participant in assessment.allParticipants %}
                                 <li>
