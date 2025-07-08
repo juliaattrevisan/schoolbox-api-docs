@@ -65,9 +65,17 @@ class TextField extends Base
      *            this table
      */
     private const FIELD_BLACKLIST = [
-        'search_index'      => true,
+        // storage and storage_transform will never be considered usages of a
+        // storage row themselves.
         'storage'           => true,
         'storage_transform' => true,
+
+        // Nor will video transcodes in video_queue
+        'video_queue' => true,
+
+        // search_index is derived from other data:
+        // if the other data is deleted, then search_index will pick up on that.
+        'search_index' => true,
     ];
 
     /**

@@ -52,15 +52,16 @@ class ForeignKeyRelation extends Base
     /**
      * List of foreign key relations to never query.
      *
-     * Currently this contains only `storage_transform.hash`: this table's data
-     * is wholly reliant on the data in `storage`.
-     *
      * @var array<string, array<string>>
      *     key:   a table name
      *     value: a list of columns to skip
      */
     private const FIELD_BLACKLIST = [
+        // These table's data are wholly reliant on the data in `storage`:
+        // if the storage row is deleted, the deletion should cascade to these
+        // joins.
         'storage_transform' => ['hash'],
+        'video_queue'       => ['hash'],
     ];
 
     /**
