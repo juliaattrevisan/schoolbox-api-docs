@@ -6,6 +6,7 @@
 import { payload } from "./tempData";
 import type { PastoralReportTablePayload } from "../js/types/pastoralReportTypes";
 import PrTableHeader from "./pr-table-header.vue";
+import PrTableTotalRow from "./pr-table-total-row.vue";
 import PrTableRow from "./pr-table-row.vue";
 
 const payloadData = window.Vue.ref<PastoralReportTablePayload>(payload);
@@ -22,7 +23,7 @@ const handleSort = (key: string): void => {
         <pr-table-header :headers="payloadData.data.tableHeaders" @sort="handleSort" />
         <tbody>
             <!-- Total row -->
-            <pr-table-row :headers="payloadData.data.tableHeaders" :row-data="payloadData.data.totalRow" />
+            <pr-table-total-row :headers="payloadData.data.tableHeaders" :row-data="payloadData.data.totalRow" />
             <!-- All other rows -->
             <pr-table-row
                 v-for="(row, index) in payloadData.data.rows"
