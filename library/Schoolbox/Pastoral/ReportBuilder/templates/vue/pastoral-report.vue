@@ -122,7 +122,11 @@ const profile = {
                                 <template v-for="tag in record.tags" :key="tag.id">
                                     <a
                                         class="neutral label hide-on-print"
-                                        :href="routeLookup('pastoralReportBuilder.getReportTags', { tagId: tag.id })"
+                                        :href="
+                                            routeLookup('pastoralReportBuilder.getReportTags', {
+                                                tagId: tag.id,
+                                            })
+                                        "
                                     >
                                         {{ tag.name }}
                                     </a>
@@ -150,17 +154,17 @@ const profile = {
                     </li>
                 </ul>
             </section>
-
-            <div v-if="props.results.length === 0" class="small-12 column">
+        </div>
+        <div v-else class="small-12 column">
+            <section>
                 <div class="empty-state">
                     <i class="icon-pastoral"></i>
                     <p>No {{ props.locale.pastoral }} records matched your report criteria.</p>
                 </div>
-
                 <a class="button submit" :href="routeLookup('pastoralReportBuilder.getIndex')">
                     Select Another Report
                 </a>
-            </div>
+            </section>
         </div>
     </div>
 </template>

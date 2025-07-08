@@ -24,18 +24,20 @@
 </div>
 
 <div class="row">
-    <div id="pastoral-report-container">
-    <pastoral-report
-        :tabs='{{ tabs|json_encode}}'
-        :results='{{ results|json_encode}}'
-        :pastoral-point-enabled="{{ config.pastoral_point_enabled }}"
-        :pastoral-action-enable="{{ config.pastoral_action_enable }}"
-        :locale='{{ locale|json_encode }}'
-        :show-severity={{ showSeverity ? 'true' : 'false' }}
-        :severity-colors='{{ severityColors|json_encode}}'/>
+    <div class="small-12 island">
+        <div id="pastoral-report-container">
+            <pastoral-report
+                :tabs='{{ tabs|json_encode}}'
+                :results='{{ results|json_encode}}'
+                :pastoral-point-enabled="{{ config.pastoral_point_enabled }}"
+                :pastoral-action-enable="{{ config.pastoral_action_enable }}"
+                :locale='{{ locale|json_encode }}'
+                :show-severity={{ showSeverity ? 'true' : 'false' }}
+                :severity-colors='{{ severityColors|json_encode}}'
+            />
+        </div>
     </div>
 </div>
-
 <script src="{{ CDN_PREFIX }}/js/bundle/pastoralReport.js?v={{ config.site_version }}"></script>
 
 <script>
