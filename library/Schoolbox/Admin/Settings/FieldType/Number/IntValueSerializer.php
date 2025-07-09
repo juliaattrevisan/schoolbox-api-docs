@@ -16,6 +16,9 @@ class IntValueSerializer implements IFieldValueSerializer
     {
         $options = $this->buildOptions($config->getOptions() ?? '');
 
+        // normalise the value to an int (so we can test correctly)
+        $value = (int) $value;
+
         // If invalid, return the correct value based on the options
         if (!$this->isValueValid($value, $options)) {
             if (isset($options['min']) && $value < $options['min']) {
@@ -26,7 +29,8 @@ class IntValueSerializer implements IFieldValueSerializer
             }
         }
 
-        return $value;
+        // we need to cast back to a string, as thats what we are saving it as...
+        return (string)$value;
     }
 
     /**
@@ -46,11 +50,11 @@ class IntValueSerializer implements IFieldValueSerializer
     /**
      * Returns whether the current value is valid because it matches the range options
      *
-     * @param string|null $value
+     * @param int|null $value
      * @param ?array{min:int,max:int} $options
      * @return bool
      */
-    protected function isValueValid(?string $value, ?array $options): bool
+    protected function isValueValid(?int $value, ?array $options): bool
     {
         // no options, just exit
         if (null === $options) {
