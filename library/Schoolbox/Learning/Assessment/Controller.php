@@ -255,6 +255,28 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         $data = $this->getAssessmentAsTwigArray($context, $assessment);
 
+        /* Loading the data of the source/parent assessment
+         */
+        $originalAssessmentId = $this->requestQuery->get('customisedFor');
+        if (null !== $originalAssessmentId) {
+            $student = json_decode($this->requestQuery->get('student', ''), true);
+            $originalAssessment = $this->getAssessmentMapper()->findById($originalAssessmentId);
+            $originalAssessment = $this->participantDataSource->loadParticipationIntoAssessment($originalAssessment);
+
+            $data['participants'] = $originalAssessment
+                ->getAllParticipants()
+                ->filter(fn($participant) => in_array($participant->getUser()->getId(), array_column($student, 'id')))
+                ->map(function (Participant $participant) {
+                    $student = $participant->getUser();
+                    return [
+                        'id'         => $student->getId(),
+                        'fullName'   => $participant->getUser()->getFullName(),
+                        'excludedAt' => $participant->getExcludedAt(),
+                        'user'       => $student,
+                        'plan'       => $participant->getPlan(),
+                    ];
+                });
+        }
         /* When creating a new assessment, no curriculum nodes are selected by default
          *
          * At a future point, we may want to "suggest" nodes to select based on the context,

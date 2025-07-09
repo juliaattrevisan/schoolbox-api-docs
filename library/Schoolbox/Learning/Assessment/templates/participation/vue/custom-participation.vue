@@ -14,6 +14,8 @@ interface Props {
     getStudentsPastoralCountsUrl: string;
     getLearningPlanNewUrl: string;
     getAssessmentParticipation: string;
+    getAssessmentParticipationNewActivity: string;
+    assessmentId: number;
 }
 const props = defineProps<Props>();
 
@@ -331,7 +333,14 @@ window.Vue.onMounted(() => {
                                     </li>
                                     <li class="separator">Create</li>
                                     <li><a class="icon-copy">Copy Activity</a></li>
-                                    <li><a class="icon-submissions">New Activity</a></li>
+                                    <li>
+                                        <a
+                                            class="icon-submissions"
+                                            :href="`${getAssessmentParticipationNewActivity}?student=${participant.user.id}&original=${assessmentId}&${getReturnUrl()}`"
+                                        >
+                                            New Activity
+                                        </a>
+                                    </li>
                                 </template>
                             </ul>
                         </div>
@@ -371,7 +380,14 @@ window.Vue.onMounted(() => {
                             Modify
                         </a>
                     </div>
-                    <div class="l-flex__item--1"><a class="icon-submissions submit">New Activity</a></div>
+                    <div class="l-flex__item--1">
+                        <a
+                            class="icon-submissions submit"
+                            :href="`${getAssessmentParticipationNewActivity}?student=${selectedList.join(',')}&original=${assessmentId}&${getReturnUrl()}`"
+                        >
+                            New Activity
+                        </a>
+                    </div>
                 </template>
             </div>
         </bottom-drawer>

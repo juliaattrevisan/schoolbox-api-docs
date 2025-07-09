@@ -24,6 +24,12 @@
         assessmentId: assessment.id,
         assessment: assessment
     }) }}"
+    get-assessment-participation-new-activity="{{ routeLookupIfAuthorized('learningAssessment.getCreateAssessmentForm', {
+        contextType: 'units',
+        contextId: assessment.context.id,
+        context: assessment.context
+    }) }}"
+    assessment-id="{{ assessment.id }}"
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/customParticipation.js?v={{ config.site_version }}"></script>
