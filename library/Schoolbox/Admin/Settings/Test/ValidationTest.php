@@ -83,6 +83,22 @@ class ValidationTest extends TestCase
                 ],
                 '30'  // if outside of the range, it should return the minimum value
             ],
+            'no options - pi' => [
+                [
+                    'config' => null,
+                    'value' => '3.14'
+                ],
+                '3.14'  // if outside of the range, it should return the minimum value
+            ],
+            'min 3 - pi' => [
+                [
+                    'config' => [
+                        'min' => 3
+                    ],
+                    'value' => '3.14'
+                ],
+                '3.14'  // if outside of the range, it should return the minimum value
+            ],
         ];
     }
 

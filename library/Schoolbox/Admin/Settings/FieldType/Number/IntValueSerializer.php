@@ -9,6 +9,7 @@ use Schoolbox\Admin\Settings\IFieldValueSerializer;
 class IntValueSerializer implements IFieldValueSerializer
 {
     /**
+     * values are stored in the db as string (so we are casting things as string)
      * @inheritdoc
      */
     public function serializeValue($value, $config): string
