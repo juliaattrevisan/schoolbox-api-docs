@@ -5953,12 +5953,6 @@ parameters:
 			path: library/Schoolbox/Resource/Log.php
 
 		-
-			message: '#^PHPDoc tag @var above a method has no effect\.$#'
-			identifier: varTag.misplaced
-			count: 2
-			path: library/Schoolbox/Resource/Storage/GC/GarbageCollector.php
-
-		-
 			message: '#^Method Schoolbox\\Resource\\Storage\\Model\:\:setBasename\(\) should return \$this\(Schoolbox\\Resource\\Storage\\Model\) but returns Schoolbox\\Resource\\Storage\\Model\.$#'
 			identifier: return.type
 			count: 1
