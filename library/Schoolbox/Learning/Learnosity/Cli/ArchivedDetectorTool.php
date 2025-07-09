@@ -100,18 +100,19 @@ HELP;
         /* Start detecting all the living schoolbox quizzes
          */
         $manifest = $this->findManifest();
-        $n = count($manifest);
 
         $this->getLogger()->info('');
         $this->getLogger()->info('');
 
-        /* No quizzes? No trabajo
+        /* No living quizzes? No trabajo
          */
-        if (!$n) {
+        if (!count($manifest)) {
             $this->getLogger()->info('');
             return;
         }
 
+        /* No archived-in-learnosity quizzes? No trabajo
+         */
         $currentStatusLookup = $this->findCurrentStatus($manifest);
 
         /* Learnosity died
@@ -122,78 +123,78 @@ HELP;
             return;
         }
 
-        print_r($currentStatusLookup);
+        /* The number of archived-in-learnosity quizzes that we need to repair
+         */
+        $n = count($currentStatusLookup);
 
         /* For access to the restore() mechanism
          */
         $helper = (new Helper($this->api, $this->getLogger()));
 
+        /* Start inspecting each quiz to find out what it's doing
+         */
+        $i = 0;
 
-        //
-//        /* Start inspecting each quiz to find out what it's doing
-//         */
-//        $i = 0;
-//
-//        foreach ($manifest as $data) {
-//            $quizStatus = $currentStatusLookup[$data['learnosity_reference']];
-//
-//            $this->getLogger()->info(sprintf(
-//                '[%s/%s] "%s" in homepage "%s" /homepage/%s',
-//                ++$i,
-//                $n,
-//                $data['assessment_title'],
-//                $data['folder_name'],
-//                $data['folder_id']
-//            ));
-//
-//            $this->getLogger()->info(sprintf(
-//                '    Assessment url: /learning/assessments/%s',
-//                $data['assessment_id']
-//            ));
-//
-//            $this->getLogger()->info(sprintf(
-//                '    Learnosity reference: %s',
-//                $data['learnosity_reference'],
-//            ));
-//
-//            $this->getLogger()->info(sprintf(
-//                '    Current status: %s',
-//                $quizStatus
-//            ));
-//
-//            /* Perform mode actually does the restoration, but only for Archived quizzes.
-//             * Quizzes in any other state will be left untouched
-//             */
-//            if ($this->perform()) {
-//                if (Helper::LEARNOSITY_ITEM_STATUS_ARCHIVED === $quizStatus) {
-//                    $this->getLogger()->info('        Restoring via learnosity...');
-//
-//                    $helper->restore($data['learnosity_reference']);
-//
-//                    /* Log status of the ones we just changed, requesting their current state
-//                     * from learnosity as a confirmation
-//                     */
-//                    try {
-//                        $confirmation = $this->api->dataGetRequest('/itembank/activities', [
-//                            'references' => [
-//                                $data['learnosity_reference']
-//                            ]
-//                        ]);
-//                    } catch (JsonException | ValidationException $e) {
-//                        $this->getLogger()->error('Request to /itembank/activities failed.  ' . $e->getMessage());
-//
-//                        return;
-//                    }
-//
-//                    $this->getLogger()->info(sprintf(
-//                        '        Updated status: %s',
-//                        $confirmation['data'][0]['status'] ?? 'unknown'
-//                    ));
-//                }
-//            }
-//
-//            $this->getLogger()->info('');
-//        }
+        foreach ($currentStatusLookup as $archivedLearnosityReference => $quizStatus) {
+            $data = $manifest[$archivedLearnosityReference];
+
+            $this->getLogger()->info(sprintf(
+                '[%s/%s] "%s" in homepage "%s" /homepage/%s',
+                ++$i,
+                $n,
+                $data['assessment_title'],
+                $data['folder_name'],
+                $data['folder_id']
+            ));
+
+            $this->getLogger()->info(sprintf(
+                '    Assessment url: /learning/assessments/%s',
+                $data['assessment_id']
+            ));
+
+            $this->getLogger()->info(sprintf(
+                '    Learnosity reference: %s',
+                $data['learnosity_reference'],
+            ));
+
+            /* "archived" should be the only possibility here, the way we've rebuilt this
+             */
+            $this->getLogger()->info(sprintf(
+                '    Current status: %s',
+                $quizStatus
+            ));
+
+            /* Perform mode actually does the restoration, but only for Archived quizzes.
+             * Quizzes in any other state will be left untouched
+             */
+            if ($this->perform()) {
+                $this->getLogger()->info('        Restoring via learnosity...');
+
+                $helper->restore($data['learnosity_reference']);
+
+                /* Log status of the ones we just changed, requesting their current state
+                 * from learnosity as a confirmation
+                 */
+                try {
+                    $confirmation = $this->api->dataGetRequest('/itembank/activities', [
+                        'references' => [
+                            $data['learnosity_reference']
+                        ]
+                    ]);
+                } catch (JsonException | ValidationException $e) {
+                    $this->getLogger()->error('Request to /itembank/activities failed.  ' . $e->getMessage());
+
+                    return;
+                }
+
+                $this->getLogger()->info(sprintf(
+                    '        Updated status: %s',
+                    $confirmation['data'][0]['status'] ?? 'unknown'
+                ));
+            }
+
+            $this->getLogger()->info('');
+        }
 
         /* Announce conclusion
          */
