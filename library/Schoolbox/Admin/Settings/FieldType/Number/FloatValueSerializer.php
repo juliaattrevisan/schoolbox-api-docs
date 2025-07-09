@@ -6,7 +6,7 @@ namespace Schoolbox\Admin\Settings\FieldType\Number;
 
 use Schoolbox\Admin\Settings\IFieldValueSerializer;
 
-class ValueSerializer implements IFieldValueSerializer
+class FloatValueSerializer implements IFieldValueSerializer
 {
     /**
      * @inheritdoc
