@@ -110,7 +110,6 @@ class UserMapper extends Mapper
         $this->uses('lastname', self::TYPE_STRING);
         $this->uses('local_email', self::TYPE_BOOLEAN);
         $this->uses('alt_email', self::TYPE_STRING);
-        $this->uses('hash', self::TYPE_STRING);
         $this->uses('position_title', self::TYPE_STRING);
         $this->uses('key', self::TYPE_STRING);
         $this->uses('synergy_id', self::TYPE_STRING, null, 'externalId');
@@ -157,7 +156,6 @@ class UserMapper extends Mapper
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidInternalMail']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidEportfolioEnabled']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'updateKey']);
-        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'updateHash']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'undoAlaressUserModification']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidCalendarView']);
 
@@ -299,22 +297,6 @@ class UserMapper extends Mapper
         }
         return true;
     }
-
-
-    /**
-     * Pre-save hook: Set hash if password has changed.
-     *
-     * @param User $model
-     * @return bool Always true
-     */
-    public function updateHash(User $model)
-    {
-        if ($model->getRetrievablePassword()) {
-            $model->setHash(md5($model->getUsername() . ':' . $this->getConfigLoader()->get('site_school_code') . ':' . $model->getRetrievablePassword()));
-        }
-        return true;
-    }
-
 
     /**
      * Finds a user by their email address.
@@ -1087,20 +1069,6 @@ class UserMapper extends Mapper
         $query = "UPDATE {$this->table} SET calendar_view = :calendarView WHERE id = :userId";
         $this->database->query($query, ['userId' => $userId, 'calendarView' => $calendarView]);
         return true;
-    }
-
-    /**
-     * The hash is a function of the password, we use this to store the password when the user logs in
-     * This is dangerous and a security risk and will likely need to be removed in the future
-     *
-     * @param User   $user
-     * @param string $hash
-     * @return void
-     */
-    public function storeHash(User $user, string $hash): void
-    {
-        $query = "UPDATE {$this->table} SET hash = :hash WHERE id = :userId";
-        $this->database->query($query, ['userId' => $user->getId(), 'hash' => $hash]);
     }
 
     /**

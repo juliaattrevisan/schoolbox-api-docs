@@ -250,11 +250,6 @@ class Session
             throw new SchoolboxAccessDeniedException();
         }
 
-        // Store password as hash for DAV authentication later
-        if (Config::get('webdav_auth_type') === 'digest') {
-            $userMapper->storeHash($user, md5($username . ':' . Config::get('site_school_code') . ':' . $password));
-        }
-
         // ensure a key is set on login
         if (!$user->getKey()) {
             $user->setKey(substr(md5(uniqid() . time()), 0, 25));

@@ -6,7 +6,6 @@ parameters:
         processTimeout: 300.0
     paths:
         - conf
-        - dav
         - library
         - tools
         - test/codeception
