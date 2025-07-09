@@ -237,12 +237,11 @@ HELP;
         $statement = $this->db->prepare($query);
         $statement->execute();
 
-        $stack = $statement->fetchAll(\PDO::FETCH_ASSOC);
         $output = [];
 
         /* Index by learnosity reference
          */
-        foreach ($stack as $row) {
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $output[$row['learnosity_reference']] = $row;
         }
 
