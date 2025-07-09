@@ -58,7 +58,7 @@ class ArchivedDetectorTool extends CliTool\App
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
-Learnosity Activity Status
+Learnosity Activity Status and Mass Restoration
 
 In Planning mode, this will tell you the status of all the quizzes that have learnosity references.
 This is used to interrogate learnosity for quizzes that should have been in Published state, but are 
@@ -74,7 +74,7 @@ verbose mode -vvv you'll get a breakdown of all the items it changed as well. Th
 to the Restore tool 
 
 
-Usage: archive-mass-restore.php [--course]  [--perform] -vvv
+Usage: archive-mass-restore.php [--perform] -vvv
 
 
 HELP;
