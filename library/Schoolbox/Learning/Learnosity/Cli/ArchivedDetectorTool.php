@@ -111,11 +111,11 @@ HELP;
             return;
         }
 
-        /* No archived-in-learnosity quizzes? No trabajo
+        /* The archived-in-learnosity quizzes that we need to repair
          */
         $currentStatusLookup = $this->findCurrentStatus($manifest);
 
-        /* The number of archived-in-learnosity quizzes that we need to repair
+        /* No archived-in-learnosity quizzes? No trabajo
          */
         $n = count($currentStatusLookup);
 
