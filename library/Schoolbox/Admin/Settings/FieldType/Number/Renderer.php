@@ -16,16 +16,16 @@ use Schoolbox\Admin\Settings\FieldType\Input;
 class Renderer extends Input\Renderer
 {
     /**
-     * @var FloatValueSerializer
+     * @var IntValueSerializer
      */
-    private FloatValueSerializer $valueSerializer;
+    private IntValueSerializer $valueSerializer;
 
     /**
      * Create a range value serializer on construct so we can use it in the renderer
      */
     public function __construct()
     {
-        $this->valueSerializer = new FloatValueSerializer();
+        $this->valueSerializer = new IntValueSerializer();
     }
 
     /**

@@ -6,7 +6,7 @@ namespace Schoolbox\Admin\Settings\FieldType\Number;
 
 use Schoolbox\Admin\Settings\IFieldValueSerializer;
 
-class FloatValueSerializer implements IFieldValueSerializer
+class IntValueSerializer implements IFieldValueSerializer
 {
     /**
      * @inheritdoc
@@ -31,11 +31,11 @@ class FloatValueSerializer implements IFieldValueSerializer
     /**
      * Converts a string representation of options into an array form
      * The options for a range are a JSON object with the following keys:
-     * - min: float - The minimum value
-     * - max: float - The maximum value
+     * - min: int - The minimum value
+     * - max: int - The maximum value
      *
      * @param string $optionsString
-     * @return ?array{min:float,max:float}
+     * @return ?array{min:int,max:int}
      */
     public function buildOptions(string $optionsString): ?array
     {
@@ -46,7 +46,7 @@ class FloatValueSerializer implements IFieldValueSerializer
      * Returns whether the current value is valid because it matches the range options
      *
      * @param string|null $value
-     * @param ?array{min:float,max:float} $options
+     * @param ?array{min:int,max:int} $options
      * @return bool
      */
     protected function isValueValid(?string $value, ?array $options): bool
@@ -56,12 +56,12 @@ class FloatValueSerializer implements IFieldValueSerializer
             return true;
         }
 
-        // Can the value be cast to a float?
+        // Can the value be cast to a int?
         if (!is_numeric($value)) {
             return false;
         }
 
-        $value = (float) $value;
+        $value = (int) $value;
 
         // Is the value within the range?
         if (isset($options['min']) && $value < $options['min']) {
