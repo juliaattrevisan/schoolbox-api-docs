@@ -115,14 +115,6 @@ HELP;
          */
         $currentStatusLookup = $this->findCurrentStatus($manifest);
 
-        /* Learnosity died
-         */
-        if (!$currentStatusLookup) {
-            $this->getLogger()->warning('Learnosity died trying to fetch current statuses; their service might be down.');
-
-            return;
-        }
-
         /* The number of archived-in-learnosity quizzes that we need to repair
          */
         $n = count($currentStatusLookup);
