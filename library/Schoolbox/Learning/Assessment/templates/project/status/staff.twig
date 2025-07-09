@@ -4,7 +4,10 @@ Data:
     'baseContext'       AssessmentContext
     'assessment'        IAssessable
     'assessmentStats'   Assessment\Statistics[] Indexed by assessment.id
-    'participantStats'  ParticipantStatistics[] Indexed by user.id
+    'aImpls'            [
+        'assessment'       IAssessable
+        'participantStats' ParticipantStatistics[] Indexed by user.id
+    ][]
     'returnUrl'         string
 #}
 
@@ -109,11 +112,7 @@ Data:
 </div>
 
 <div class="row">
-    {% if assessment.baseContext is unitSpecification %}
-    <div class="small-12 island">
-    {% else %}
-    <div class="small-12 large-6 island">
-        {% endif %}
+    <div class="small-12 {% if aImpls | length %}large-6 {% endif %}island">
         <h2 class="subheader">{{ locale.activity.properPlural }}</h2>
 
         {% if assessment.assessables | length %}
@@ -228,49 +227,95 @@ Data:
             <p>This {{ locale.project }} currently has no {{ locale.activity.plural }}.<br />To start assessing students you should <a href="{{ createRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">create an {{ locale.activity }}</a> next.</p>
         </div>
     </div>
-    {% if assessment.baseContext is not unitSpecification %}
+    {% if aImpls | length %}
     <div class="small-12 large-6 island">
         <h2 class="subheader">Students</h2>
+        {% set showGroups = assessment.baseContext is unitSpecification %}
 
-        {% if assessment.allParticipants | length %}
-            <section>
-                <ul class="information-list">
-                    {% for participant in assessment.allParticipants %}
-                        <li>
-                            <div class="flex-grade">
-                                <div class="small-12 compact card columns">
-                                    {# cache to prevent repeated traversals #}
-                                    <a href="{{ routeLookup('learningAssessment.getSummary', { assessmentId: assessment.id, studentId: participant.user.id}) }}">
-                                        {% include 'include/portrait.twig' with {user: participant.user} only %}
-                                        <p>
-                                            {{ participant.user.formatName }}
-                                            <span class="pipe meta">
-                                                {% set stats = participantStats[participant.user.id] %}
-                                                {{ stats.countAssessments - stats.countResponseRequired }}/{{ stats.countAssessments }} activities completed
-                                            </span>
-                                        </p>
-                                    </a>
+        {% for aImpl in aImpls %}
+            {% if showGroups %}
+            <div class="component-container">
+                <div class="row">
+                    <div class="small-12 columns">
+                        <div class="component-titlebar">
+                            <div class="actions-small-1">
+                                <div class="list-item">
+                                    <h2>
+                                        <a href="/homepage/{{ aImpl.assessment.getBaseContext.getFolder.id }}">
+                                            {{ aImpl.assessment.getBaseContext.getFolder.getTitle }}
+                                        </a>
+                                    </h2>
                                 </div>
-
-                                {% set publishedHumanReadableMark = participant.humanReadableMark(true) ?? null %}
-
-                                {% if publishedHumanReadableMark is not null %}
-                                    <div class="grade {{ urgency.marks( participant.normalisedMark(true)) }}-bg">
-                                        <span>{{ publishedHumanReadableMark }}</span>
-                                    </div>
-                                {% endif %}
+                                <nav>
+                                    <a
+                                        data-collapser="collap-{{ aImpl.assessment.getBaseContext.getFolder.id }}"
+                                        href="#"
+                                        class="icon-up-arrow collapse"
+                                        title="Expand/collapse content"
+                                    ></a>
+                                </nav>
                             </div>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </section>
-        {% else %}
-            {% set createRoute = routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'projects', contextId: assessment.id, context: assessment }) %}
-            <div class="empty-state">
-                <i class="icon-group"></i>
-                <p>There are no students currently undertaking this {{ locale.project }}.</p>
-                <p>As you <a href="{{ createRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">add {{ locale.activity.plural }}</a>, the participating students will appear here. </p>
-            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if aImpl.assessment.allParticipants | length %}
+                <section
+                    {% if showGroups %}
+                    data-collapse-state="uncollapsed"
+                    data-collapsable="collap-{{ assessment.getBaseContext.getFolder.id }}"
+                    {% endif %}
+                >
+                    <ul class="information-list">
+                        {% for participant in aImpl.assessment.allParticipants %}
+                            <li>
+                                <div class="flex-grade">
+                                    <div class="small-12 compact card columns">
+                                        {# cache to prevent repeated traversals #}
+                                        <a href="{{ routeLookup('learningAssessment.getSummary', { assessmentId: aImpl.assessment.id, studentId: participant.user.id}) }}">
+                                            {% include 'include/portrait.twig' with {user: participant.user} only %}
+                                            <p>
+                                                {{ participant.user.formatName }}
+                                                <span class="pipe meta">
+                                                    {% set stats = aImpl.participantStats[participant.user.id] %}
+                                                    {{ stats.countAssessments - stats.countResponseRequired }}/{{ stats.countAssessments }} activities completed
+                                                </span>
+                                            </p>
+                                        </a>
+                                    </div>
+
+                                    {% set publishedHumanReadableMark = participant.humanReadableMark(true) ?? null %}
+
+                                    {% if publishedHumanReadableMark is not null %}
+                                        <div class="grade {{ urgency.marks( participant.normalisedMark(true)) }}-bg">
+                                            <span>{{ publishedHumanReadableMark }}</span>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </section>
+            {% else %}
+                {% set createRoute = routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'projects', contextId: aImpl.assessment.id, context: aImpl.assessment }) %}
+                <div class="empty-state">
+                    <i class="icon-group"></i>
+                    <p>There are no students currently undertaking this {{ locale.project }}.</p>
+                    <p>As you <a href="{{ createRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">add {{ locale.activity.plural }}</a>, the participating students will appear here. </p>
+                </div>
+            {% endif %}
+            {% if showGroups %}
+                </div>
+            {% endif %}
+        {% endfor %}
+
+        {% if showGroups %}
+            <script type="text/javascript">
+                $(function () {
+                    $('[data-collapser]').collapsable();
+                });
+            </script>
         {% endif %}
     </div>
     {% endif %}

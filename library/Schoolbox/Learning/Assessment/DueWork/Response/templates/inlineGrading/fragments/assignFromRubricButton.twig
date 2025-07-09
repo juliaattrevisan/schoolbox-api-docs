@@ -9,7 +9,7 @@
     $(function () {
 
         // cache this stuff, it doesn't change
-        var $status                 = $('#assessment-status'),
+        var $status                 = $('[data-assessment-status]'),
             markInputSelector       = '[data-mark-input]',
             $assignFromRubricButton = $('#use-rubric-value'),
             $rb                     = $('#rb-{{ rubricId }}'),

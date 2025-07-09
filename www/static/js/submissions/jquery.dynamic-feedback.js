@@ -71,7 +71,7 @@
 
                 /* A list of all the people who have publishable rows
                  */
-                assessmentList: $("#assessment-status"),
+                assessmentList: $("[data-assessment-status]"),
 
                 /* Buttons which control which rows are visible
                  */
