@@ -76,6 +76,33 @@ class TextField extends Base
         // search_index is derived from other data:
         // if the other data is deleted, then search_index will pick up on that.
         'search_index' => true,
+
+        // The following tables are never expected to contain storage hashes.
+        'assess_luQuestionType'       => true,
+        'component_config_definition' => true,
+        'component_config_instance'   => true,
+        'error'                       => true,
+        'msg_source'                  => true,
+        'dropbox'                     => true,
+        'etherpad_pad'                => true,
+        'user_assume_log'             => true,
+        'submission_mark_type'        => true,
+        'luCampus'                    => true,
+        'luResidentialHouse'          => true,
+        'lu_resource_moderation_type' => true,
+        'eotc_status'                 => true,
+        'eotc_config'                 => true,
+        'plagscan_document'           => true,
+        'rubric_descriptor'           => true,
+        'assess_question_category'    => true,
+        'calendar_connector'          => true,
+        'course_builder_config'       => true,
+        'lu_pastoral_type'            => true,
+        'lu_pastoral_severity'        => true,
+        'pastoral_access'             => true,
+        'pastoral_tags'               => true,
+        'term'                        => true,
+        'user_password_reset_request' => true,
     ];
 
     /**
