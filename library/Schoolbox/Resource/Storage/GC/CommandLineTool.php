@@ -50,7 +50,7 @@ class CommandLineTool extends CliTool\App
      */
     public function getShortOpts(): array
     {
-        return [self::OPT_SHORT_HELP, self::OPT_SHORT_LIMIT];
+        return [self::OPT_SHORT_HELP, self::OPT_SHORT_LIMIT, self::OPT_SHORT_THRESHOLD];
     }
 
     /**
