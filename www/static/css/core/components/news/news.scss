@@ -3,7 +3,11 @@
     .card {
         padding: 1rem;
         img {
-            margin: 0 1rem 0 0 !important;
+            margin: 0 1rem 0 1rem !important;
+        }
+        p > img,
+        p > a > img {
+            float: none;
         }
         > a:not([data-plugin]) > img {
             margin: 0 1rem 0 0;
