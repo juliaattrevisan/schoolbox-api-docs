@@ -561,21 +561,23 @@ class ListController extends Web\Controller\Base
 
         $participants = $this->requestQuery->get('student');
 
-        /* Only duework, task and quiz can have customised activities
-         */
-        if (!isset($participants)) {
+        if ($participants) {
             /* Get participant information
-             */
+               */
             $data['participants'] = $this->userMapper
-                ->findByColumn('id', explode(',', $participants ?? ''))
+                ->findByColumn('id', explode(',', $participants))
                 ->map(fn($participant) => [
-                    'id' =>  $participant->getId(),
+                    'id'       => $participant->getId(),
                     'fullName' => $participant->getFullName(),
                 ]);
             /* Get the source/parent assessment id
              */
             $data['customisedFor'] = $this->requestQuery->get('original');
+        }
 
+        /* Only duework, task and quiz can have customised activities
+         */
+        if (!isset($participants)) {
 
             if ($this->getConfigLoader()->get('lti_assessments_enable')) {
                 $data['types'][] = [
