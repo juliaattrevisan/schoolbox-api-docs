@@ -20,6 +20,8 @@ export default class MarkbookPage {
 
     static readonly DATA_TEST_MARKBOOK_CELL_INPUT_MARK = "markbook-instructor-mark";
 
+    static readonly DATA_TEST_MARKBOOK_ASSESSMENT_DROPDOWN = "markbook-assessment-dropdown-[ASSESSMENT_ID]-[ITEM]"; // Replace [ASSESSMENT_ID] with the actual ID and [ITEM] with the item in the list
+
     constructor(page: Page) {
         this.page = page;
     }
@@ -102,6 +104,35 @@ export default class MarkbookPage {
             MarkbookPage.DATA_TEST_MARKBOOK_ASSESSMENT.replace("[ASSESSMENT_ID]", ""),
             "",
         );
+    }
+
+    /**
+     * Open the assessment title dropdown for a given assessment
+     * @param assessmentId - The ID of the assessment
+     */
+    async openAssessmentDropdown(assessmentId: string | number): Promise<void> {
+        const assessment = this.page.getByTestId(
+            MarkbookPage.DATA_TEST_MARKBOOK_ASSESSMENT.replace("[ASSESSMENT_ID]", assessmentId.toString()),
+        );
+        await assessment.locator("a").click();
+    }
+
+    /**
+     * Click an item in the assessment dropdown
+     * @param assessmentId - The ID of the assessment
+     * @param item - The item to click
+     */
+    async clickAssessmentDropdownItem(
+        assessmentId: string | number,
+        item: "view" | "modify" | "modify-content" | "view-status" | "import-feedback" | "publish",
+    ): Promise<void> {
+        const dataTestId = MarkbookPage.DATA_TEST_MARKBOOK_ASSESSMENT_DROPDOWN.replace(
+            "[ASSESSMENT_ID]",
+            assessmentId.toString(),
+        ).replace("[ITEM]", item);
+
+        const dropdownItem = this.page.getByTestId(dataTestId);
+        await dropdownItem.locator("a").click();
     }
 
     /**
