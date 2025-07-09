@@ -119,6 +119,12 @@ HELP;
          */
         $n = count($currentStatusLookup);
 
+        if (!$n) {
+            $this->getLogger()->info('No quizzes to update in learnosity.');
+
+            return;
+        }
+
         /* For access to the restore() mechanism
          */
         $helper = (new Helper($this->api, $this->getLogger()));
