@@ -65,7 +65,6 @@ class Config
                 exit(CliKernelAbstract::EXIT_STATUS_OK);
             }
 
-            /** @phpstan-ignore-next-line  */
             $this->logger->error("No Instance Registry API_KEY and instance ({$siteType}) is not development.");
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
         }
