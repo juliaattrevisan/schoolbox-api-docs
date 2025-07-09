@@ -545,6 +545,8 @@ class CourseMarkbook
                             $this->studentMarks[$courseImplId][$aId][$userId]['draft']['norm'] = $authNormMark;
                             $this->studentMarks[$courseImplId][$aId][$userId]['draft']['hr']   = $authHrMark;
                             $this->studentMarks[$courseImplId][$aId][$userId]['draft']['hrInstructor']   = $authHrInstructorMark;
+                            /** the markbook uses responseId !== null to determine if this mark actually exists, so jank a -1 here for projects */
+                            $this->studentMarks[$courseImplId][$aId][$userId]['draft']['responseId'] = -1;
 
                             $assessmentImplMarkContainsDrafts[$aImplId] = true;
                         }
@@ -571,6 +573,8 @@ class CourseMarkbook
                         $this->studentMarks[$courseImplId][$aId][$userId]['published']['norm'] = $publishedNormMark;
                         $this->studentMarks[$courseImplId][$aId][$userId]['published']['hr']   = $publishedHrMark;
                         $this->studentMarks[$courseImplId][$aId][$userId]['published']['hrInstructor']   = $publishedHrInstructorMark;
+                            /** the markbook uses responseId !== null to determine if this mark actually exists, so jank a -1 here for projects */
+                        $this->studentMarks[$courseImplId][$aId][$userId]['published']['responseId'] = -1;
                         if ($aSpec) {
                             $specMarks[$aSpec->getId()]['published'][] = $publishedNormMark;
                         }

@@ -183,7 +183,8 @@ $inline-list-default-float-list-margin: rem-calc($base-font-size);
             margin-top: 0.5rem;
         }
     }
-    form {
+    form,
+    .progress-tick-form {
         margin: 0;
     }
     nav a:not(.progress-tick):hover {

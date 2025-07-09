@@ -91,6 +91,12 @@ const activityLink = window.Vue.computed(() => {
             :progress-tick="activity.progressTick"
             :can-modify="true"
             :is-self-assessable="activity.isSelfAssessableTask"
+            :transitions="{
+                incomplete: 'selfAssessed',
+                selfAssessed: 'incomplete',
+                teacherAssessed: 'incomplete',
+            }"
+            @update:class="(newClass) => (activity.progressTick!.progressClass = newClass)"
         />
     </nav>
 </template>
