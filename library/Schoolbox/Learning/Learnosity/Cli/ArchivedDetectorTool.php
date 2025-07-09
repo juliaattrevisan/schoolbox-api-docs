@@ -112,7 +112,7 @@ HELP;
             return;
         }
 
-        $currentStatusLookup = $this->findCurrentStatus(array_column($manifest, 'learnosity_reference'));
+        $currentStatusLookup = $this->findCurrentStatus($manifest);
 
         /* Learnosity died
          */
@@ -238,22 +238,31 @@ HELP;
         $statement = $this->db->prepare($query);
         $statement->execute();
 
-        return $statement->fetchAll(\PDO::FETCH_ASSOC);
+        $stack = $statement->fetchAll(\PDO::FETCH_ASSOC);
+        $output = [];
+
+        /* Index by learnosity reference
+         */
+        foreach ($stack as $row) {
+            $output[$row['learnosity_reference']] = $row;
+        }
+
+        return $output;
     }
 
 
     /**
-     * Find out whether
+     * Find out whether anything in the $manifest was archived in learnosity, but shouldn't be
      *
-     * @param array $learnosityReferences
+     * @param array $manifest
      * @return array|null
      */
-    private function findCurrentStatus(array $learnosityReferences): ?array
+    private function findCurrentStatus(array $manifest): ?array
     {
         $result = null;
         $stack = [];
 
-        $chunks = array_chunk($learnosityReferences, self::PAYLOAD_ITEM_LIMIT);
+        $chunks = array_chunk(array_keys($manifest), self::PAYLOAD_ITEM_LIMIT);
 
         foreach ($chunks as $chunk) {
             try {
@@ -269,14 +278,16 @@ HELP;
             foreach ($result['data'] as $activity) {
                 if (Helper::LEARNOSITY_ITEM_STATUS_ARCHIVED === $activity['status']) {
                     $this->getLogger()->debug(sprintf(
-                        'Quiz with learnosity reference %s was archived in learnosity: adding to stack',
+                        'Quiz "%s" with learnosity reference %s was archived in learnosity: adding to stack',
+                        $manifest[$activity['reference']]['assessment_title'],
                         $activity['reference']
                     ));
 
                     $stack[$activity['reference']] = $activity['status'];
                 } else {
                     $this->getLogger()->debug(sprintf(
-                        'Quiz with learnosity reference %s is already published in learnosity: skipping',
+                        'Quiz "%s" with learnosity reference %s is already published in learnosity: skipping',
+                        $manifest[$activity['reference']]['assessment_title'],
                         $activity['reference']
                     ));
                 }
