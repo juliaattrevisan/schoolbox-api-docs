@@ -157,9 +157,10 @@ class FieldStrategyFactory
             case ConfigMapper::FIELD_COLOUR:
             case ConfigMapper::FIELD_PASSWORD:
             case ConfigMapper::FIELD_TIME_PICKER:
-            case ConfigMapper::FIELD_NUMBER:
             case ConfigMapper::FIELD_SELECT_DATE:
                 return new FieldValueSerializerBase();
+            case ConfigMapper::FIELD_NUMBER:
+                return new FieldType\Number\IntValueSerializer();
             case ConfigMapper::FIELD_SELECT_MULTI:
                 return new FieldType\SelectMulti\ValueSerializer();
             case ConfigMapper::FIELD_URI:
