@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * Table row component for pastoral reports.
+ * Table row component for pastoral reports tables.
  * Renders a single row with cells based on column types.
  */
 

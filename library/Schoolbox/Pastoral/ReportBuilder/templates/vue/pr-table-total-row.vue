@@ -1,9 +1,10 @@
 <script setup lang="ts">
 /**
- * Table row component for pastoral reports.
+ * Table row component for pastoral report tables.
  * Renders a single total row with cells based on column types.
  */
 
+import { TableHeaderType } from "../js/types/pastoralReportTypes";
 import type { TableHeader, RowOptions, RecordsAndPoints } from "../js/types/pastoralReportTypes";
 
 type Props = {
@@ -21,7 +22,7 @@ const props = defineProps<Props>();
             <template v-if="index === 0">
                 <b>{{ data }}</b>
             </template>
-            <template v-else-if="props.headers[index].type == 'RecordsAndPoints'">
+            <template v-else-if="props.headers[index].type == TableHeaderType.RECORDS_AND_POINTS">
                 <!-- Change data based on current radio button selection -->
                 <template v-if="props.recordsOrPoints === 'Records'">
                     {{ (data as RecordsAndPoints).records }}
