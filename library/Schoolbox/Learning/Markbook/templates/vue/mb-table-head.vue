@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import locale from "@js/terminology/rosettaStone";
 import { useMarkbookStore } from "./store/markbookStore";
 import MbTableHeadActivity from "./mb-table-head-activity.vue";
 import MbClassAverageHeader from "./mb-class-average-header.vue";
@@ -30,6 +31,24 @@ const mbStore = useMarkbookStore();
             />
         </tr>
 
+        <tr class="course-headers" :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }">
+            <th class="fixed-left transparent"></th>
+            <th class="fixed-left white"></th>
+            <th v-if="mbStore.data.rank !== null" class="white"></th>
+            <th
+                v-for="group in mbStore.activityGroups"
+                :key="group.unitSpec?.id"
+                class="unit-title"
+                :title="
+                    group.unitSpec?.title ??
+                    `These ${locale.activity.plural()} are not part of a ${locale.unit.singular()}`
+                "
+                :colspan="group.activities.length"
+            >
+                {{ group.unitSpec?.title ?? "" }}
+            </th>
+        </tr>
+
         <template v-if="props.type === 'class'">
             <!-- NB; This won't look correct if there are multiple classImpls.
               -- Currently that will never happen since this is restricted to the class markbook -->
@@ -39,24 +58,6 @@ const mbStore = useMarkbookStore();
                 :class-impl="classImpl"
             />
         </template>
-
-        <tr
-            v-if="props.type === 'course'"
-            class="course-headers"
-            :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }"
-        >
-            <th class="fixed-left transparent"></th>
-            <th class="fixed-left white"></th>
-            <th v-if="mbStore.data.rank !== null" class="white"></th>
-            <th
-                v-for="group in mbStore.activityGroups"
-                :key="group.unitSpec?.id"
-                class="unit-title"
-                :colspan="group.activities.length"
-            >
-                {{ group.unitSpec?.title ?? "" }}
-            </th>
-        </tr>
     </thead>
 </template>
 

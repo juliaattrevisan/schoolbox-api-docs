@@ -13,11 +13,11 @@ export type ParticipantId = number;
 export type MarkbookActivity = Pick<Activity, "id" | "title" | "assessmentType"> & {
     /** the readable type name of the activity, e.g. "Project", "Quiz", "Essay", "Homework", etc */
     typeName: string;
-    /** for rendering the unit bars at the top of the page, course markbook only */
-    unitSpec?: {
+    /** for rendering the unit bars at the top of the page */
+    unitSpec: {
         id: number;
         title: string;
-    };
+    } | null;
     sequence: number;
     /** stats and the summary link are currently only relevant for specs */
     isSpecification: boolean;

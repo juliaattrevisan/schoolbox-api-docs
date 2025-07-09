@@ -120,6 +120,20 @@ class Controller extends Base
             $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters, $this->getUser());
             $markbook      = $this->buildMarkbook($assessmentIds, $folder);
 
+            $unitSpecs = $markbook->getAssessments()->map(function (IAssessable $assessment) {
+                $base = $assessment->getBaseContext();
+                if ($base instanceof \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model) {
+                    // Implementation
+                    return $base->getSpecification();
+                } elseif ($base instanceof \Schoolbox\Learning\Course\DataModel\Specification\Unit\Model) {
+                    // Specification
+                    return $base;
+                }
+
+                // no unit spec, return null
+                return null;
+            });
+
             /**
              * need to get an list of the students by id, with their ranking
              */
@@ -137,14 +151,24 @@ class Controller extends Base
                         $this->getUser(),
                     );
 
+                    $unitSpec = null;
+                    $base = $assessment->getBaseContext();
+                    if ($base instanceof \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model) {
+                        // Implementation
+                        $unitSpec = $base->getSpecification();
+                    }
+
                     return [
                         'id'              => $assessment->getId(),
                         'title'           => $assessment->getTitle(),
                         'typeName'        => $assessment->getTypeName(),
                         'assessmentType'  => $assessment->getFamilyName(),
                         'sequence'        => $sequence,
-                        /* unused on the class markbook: */
-                        // 'unitSpec' => ...,
+                        'unitSpec'        => $unitSpec !== null ? [
+                            /* for rendering the unit bars at the top of the page */
+                            'id'    => $unitSpec->getId(),
+                            'title' => $unitSpec->getTitle(),
+                        ] : null,
                         /* the class markbook doesn't need any of the below, as this is always an implementation */
                         'isSpecification' => $assessment->isSpecification(),
                         'stats'           => null,

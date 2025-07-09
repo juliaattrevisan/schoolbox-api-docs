@@ -78,7 +78,7 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
         });
 
         const groups: {
-            unitSpec?: MarkbookActivity["unitSpec"];
+            unitSpec: MarkbookActivity["unitSpec"];
             activities: MarkbookActivity[];
         }[] = [];
 
