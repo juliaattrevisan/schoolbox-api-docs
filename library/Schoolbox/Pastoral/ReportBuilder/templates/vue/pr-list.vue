@@ -63,7 +63,7 @@ const props = defineProps<{
                             </a>
                             <p class="meta">
                                 {{ record.type.name }}
-                                <span v-if="record.subType.name">({{ record.subType.name }})</span>
+                                <span v-if="record.subType && record.subType.name">({{ record.subType.name }})</span>
                                 | Created by
                                 <a :href="`/search/user/${record.owner.id}`">{{ record.owner.fullName }}</a>
                                 {{ record.createdAt.short }}

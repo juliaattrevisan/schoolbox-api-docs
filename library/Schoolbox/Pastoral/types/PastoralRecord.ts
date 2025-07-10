@@ -60,7 +60,7 @@ export type PastoralRecord = {
     severity?: Severity;
     points?: number;
     type: PastoralType;
-    subType: PastoralSubtype;
+    subType?: PastoralSubtype;
     owner: User;
     createdAt: PastoralDate;
     uncompletedActionCount: number;
