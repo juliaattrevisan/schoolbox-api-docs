@@ -15,6 +15,7 @@ use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
 use DomainException;
 use InvalidArgumentException;
+use Schoolbox\Learning\Assessment\Translator\ParticipationPlans;
 use Schoolbox\Learning\Assessment\Translator\Participations;
 use LearnositySdk\Utils\Uuid;
 use LogicException;
@@ -1021,11 +1022,22 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         $data['studentsPastoralCountsUrl'] = $this->getRouteIfAuthorized('pastoral.getStudentsCount');
 
-        $participationModelToArray = new Participations(
+        /* Load customisation to the participant
+         */
+        $customisedAssessments = $this->getAssessmentMapper()->findAllCustomisedAssessment($assessment);
+        $planTranslator = new ParticipationPlans(
             $this->getRouteGenerator(),
             $this->getAuthorizer(),
             $this->getUser(),
         );
+        $participationModelToArray = new Participations(
+            $this->getRouteGenerator(),
+            $this->getAuthorizer(),
+            $this->getUser(),
+            $planTranslator,
+            $customisedAssessments,
+        );
+
         $data['allParticipants'] = $assessment->getAllParticipants()->map($participationModelToArray)->reindex();
         $data['learningPlanNew'] = $this->getRouteIfAuthorized('learningAssessment.getAssessmentParticipationLearningPlan', [
             'assessment' => $assessment,

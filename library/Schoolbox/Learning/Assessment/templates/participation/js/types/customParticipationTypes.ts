@@ -14,7 +14,16 @@ export type Plan = {
     openDate: string | null;
     publishDate: string | null;
     updatedAt: string;
+    assessable: Assessable;
 };
+
+export type Assessable = {
+    id: number;
+    title: string;
+    _links: {
+        modify: string;
+    }
+}
 
 /**
  * The expected payload for a participant in the system
@@ -26,6 +35,7 @@ export type Participant = {
     plan: Plan;
     updatedAt: string;
     user: User;
+    customisedPlan: Plan;
     _links: {
         exclude: string;
         include: string;
