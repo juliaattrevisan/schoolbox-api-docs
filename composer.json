@@ -145,13 +145,15 @@
         "codeception/module-cli": "^2.0",
         "codeception/module-rest": "^3.4",
         "codeception/module-phpbrowser": "^3.0",
-        "rector/rector": "^2.0.7"
+        "rector/rector": "^2.0.7",
+        "cweagans/composer-patches": "^2.0.0-beta2"
     },
     "config": {
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true,
             "ramsey/composer-repl": true,
-            "php-http/discovery": true
+            "php-http/discovery": true,
+            "cweagans/composer-patches": true
         }
     }
 }
