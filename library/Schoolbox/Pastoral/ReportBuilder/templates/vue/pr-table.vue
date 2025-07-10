@@ -3,9 +3,10 @@
  * Displays a pastoral report in a table format.
  */
 
-import { payload } from "./tempData";
+import { payload as tempPayload } from "./tempData";
 import type { Tab, TablePayload } from "../js/types/pastoralReportTypes";
 import { TabType } from "../js/types/pastoralReportTypes";
+import { useLoadPrTable } from "./composable/useLoadPrTable";
 import PrTableHeader from "./pr-table-header.vue";
 import PrTableTotalRow from "./pr-table-total-row.vue";
 import PrTableRow from "./pr-table-row.vue";
@@ -17,7 +18,10 @@ const props = defineProps<{
 
 const recordsOrPoints = defineModel<string>("records-or-points", { default: "Records" });
 
-const payloadData = window.Vue.ref<TablePayload>(payload);
+const payloadData = window.Vue.ref<TablePayload>(tempPayload);
+const currentEndpoint = window.Vue.ref<string>(props.selectedTab.endpoint || ""); // the current endpoint to load data from
+
+const { isLoading, payload, isEmpty, loadError } = useLoadPrTable(currentEndpoint);
 
 /**
  * when the endpoint changes trigger a new load
@@ -36,6 +40,7 @@ window.Vue.watch(
  */
 function onSortSelected(): void {
     // Implement sorting logic here
+    // tweak the endpoint to include sorting parameters so a new load is triggered
 }
 </script>
 

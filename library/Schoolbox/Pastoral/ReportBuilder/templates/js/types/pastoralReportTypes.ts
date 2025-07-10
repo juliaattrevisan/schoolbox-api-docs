@@ -14,6 +14,7 @@ export enum TabType {
 export type Tab = {
     type: TabType;
     title: string;
+    endpoint: string;
 };
 
 /**
