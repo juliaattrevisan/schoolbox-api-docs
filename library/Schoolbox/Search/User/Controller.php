@@ -502,6 +502,67 @@ class Controller extends BaseController
         // scope (e.g. search results, grades).
         $sharedCampuses = $this->getUser()->getCampusCollection()->intersect($student->getCampusCollection());
 
+
+        /* Further restrict access to profile tabs more than just by availability and visibility (which is what $tabs is right now)
+         */
+        $hasEmergencyContacts = count($externalUser['data']['roleTypes']['tabs']['emergencyContacts']) > 0;
+
+        /* (For all role types) If any of these fail, the tab should never exist */
+        $tabConstraintsBase = [
+            /* unless the tab is known in this list, it should not be shown */
+            '_default'     => false,
+            'activity'     => $this->getConfigLoader()->get('learning_moments_enabled') && $student->getLearningMomentsEnabled()
+                || $this->getConfigLoader()->get('badges_enabled')
+                || $this->getConfigLoader()->get('grades_enabled'),
+            'goals'        => $this->getConfigLoader()->get('badges_enabled'),
+            'achievements' => $this->getConfigLoader()->get('badges_enabled'),
+            'classes'      => $student->isShowTimetable(),
+            /**
+             * TODO: Check this for if it actually should differ between role types
+             * (from the twig) contacts: users must have showContacts truthy and have at least one contact
+             * or the viewer is a primary carer and the viewee has at least one
+             * emergency contact. This is really particular.
+             *
+             * See tabConstraintsRoleType
+             */
+            'contacts'     => true,
+        ];
+
+        /* (For specific role types) If any of these fail, the tab should never exist */
+        $tabConstraintsRoleType = [
+            'student' => [
+                /* only a student can view their own profile tabs, this is checked by $tabs already so fall back to true */
+                '_default' => true,
+                'contacts' => (($student->isShowContacts() || $isPrimaryCarer) && (count($contacts) > 0 || $hasEmergencyContacts)),
+            ],
+            'parent'  => [
+                /* only parents of a student can view the contacts tab, this is checked by $tabs already so fall back to true */
+                '_default' => true,
+                'contacts' => (($student->isShowContacts() || $isPrimaryCarer) && (count($contacts) > 0 || $hasEmergencyContacts)),
+            ],
+            'staff'   => [
+                /* staff can view a student's profile tabs if their role has viewStudentProfile enabled */
+                '_default' => $this->getUser()->getRole()->getViewStudentProfile(),
+                'contacts' => $this->getUser()->getRole()->getViewStudentProfile()
+                    && (($student->isShowContacts() && count($contacts) > 0) || ($isPrimaryCarer && $hasEmergencyContacts)),
+            ],
+        ];
+
+        /* deactivate any tab if it doesn't meet the additional constraints above */
+        $tabs = $tabs->filter(function ($tab) use ($tabConstraintsBase, $tabConstraintsRoleType) {
+            $roleTypeConstraints = $tabConstraintsRoleType[$this->getUser()->getRole()->getType()];
+
+            if (($roleTypeConstraints[$tab->getTab()] ?? $roleTypeConstraints['_default']) === false) {
+                return false;
+            }
+
+            if (($tabConstraintsBase[$tab->getTab()] ?? $tabConstraintsBase['_default']) === false) {
+                return false;
+            }
+
+            return true;
+        });
+
         $this->response = $this->responseFromTemplate(
             'user/student.twig',
             [
@@ -533,7 +594,7 @@ class Controller extends BaseController
                  * custom buttons, as far as the end user is concerned
                  */
                 'buttons' => $buttons,
-                /* A sequenced list of tabs
+                /* A sequenced list of tabs that the user can see
                  */
                 'possibleTabs' => $tabs,
                 /* Retain this old check

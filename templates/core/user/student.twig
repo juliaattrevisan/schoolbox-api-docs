@@ -326,55 +326,14 @@
             });
         </script>
 
-        {# These are all the possible tabs that could exist
-         # and the booleans which determine if they're currently available
-         #
-         # The first tab in the list is always selected by default
-         # activeTab setting will override it later if appropriate to do so
-         # based on the anchor in the url via javascript
-         #
-         # contacts: users must have showContacts truthy and have at least one contact
-         #           or the viewer is a primary carer and the viewee has at least one
-         #           emergency contact. This is really particular.
-         #}
-        {% set additionalConstraints = {
-            'student': {
-                '_default': true,
-                'activity': (config.learning_moments_enabled and user.learningMomentsEnabled) or config.badges_enabled or config.grades_enabled,
-                'goals': config.badges_enabled,
-                'achievements': config.badges_enabled,
-                'classes': user.isShowTimetable,
-                'contacts': (user.showContacts or isPrimaryCarer) and (contacts|length or hasEmergencyContacts)
-            },
-            'parent': {
-                '_default': true,
-                'activity': (config.learning_moments_enabled and user.learningMomentsEnabled) or config.badges_enabled or config.grades_enabled,
-                'goals': config.badges_enabled,
-                'achievements': config.badges_enabled,
-                'classes': user.isShowTimetable,
-                'contacts': (user.showContacts or isPrimaryCarer) and (contacts|length or hasEmergencyContacts)
-            },
-            'staff': {
-                '_default': USER.role.viewStudentProfile,
-                'activity': USER.role.viewStudentProfile and ((config.learning_moments_enabled and user.learningMomentsEnabled) or config.badges_enabled or config.grades_enabled),
-                'goals': USER.role.viewStudentProfile and config.badges_enabled,
-                'achievements': USER.role.viewStudentProfile and config.badges_enabled,
-                'classes': USER.role.viewStudentProfile and user.isShowTimetable,
-                'contacts': USER.role.viewStudentProfile and ((user.showContacts and contacts|length) or (isPrimaryCarer and hasEmergencyContacts))
-            },
-        } %}
-
         {# Out of all the tabs that could possibly exist here, figure out
          # which one is currently active by default and remember it
          #}
         {% set activeTab = null %}
 
         {% for tab in possibleTabs %}
-            {# Check additionalConstraints to really know if this tab should be on-screen #}
-            {% if additionalConstraints[USER.role.type][tab.tab] ?? additionalConstraints[USER.role.type]['_default'] %}
-                {% if not activeTab %}
-                    {% set activeTab = 'tab-' ~ tab.tab %}
-                {% endif %}
+            {% if not activeTab %}
+                {% set activeTab = 'tab-' ~ tab.tab %}
             {% endif %}
         {%  endfor %}
 
@@ -394,18 +353,16 @@
                 {% set defaultCss = 'active' %}
 
                 {% for tab in possibleTabs %}
-                    {% if additionalConstraints[USER.role.type][tab.tab] ?? additionalConstraints[USER.role.type]['_default'] %}
-                        <dd class="{{ defaultCss }}"><a href="#tab-{{ tab.tab }}">{{ tab.displayAs }}</a></dd>
+                    <dd class="{{ defaultCss }}"><a href="#tab-{{ tab.tab }}">{{ tab.displayAs }}</a></dd>
 
-                        {# All subsequent tabs are not active by default #}
-                        {% set defaultCss = '' %}
-                    {% endif %}
+                    {# All subsequent tabs are not active by default #}
+                    {% set defaultCss = '' %}
                 {% endfor %}
             </dl>
         {% endif %}
 
         <div class="profile-tabs tabs-content">
-            {% if additionalConstraints[USER.role.type]['activity'] ?? additionalConstraints[USER.role.type]['_default'] %}
+            {% if 'activity' in possibleTabs|column('tab') %}
                 <div class="content no-pad {% if activeTab == 'activity' %}active{% endif %}" id="tab-activity">
                     <div id="activity-feed">
                         <activity-feed
@@ -420,7 +377,7 @@
                 </div>
             {% endif %}
 
-            {% if additionalConstraints[USER.role.type]['goals'] ?? additionalConstraints[USER.role.type]['_default'] %}
+            {% if 'goals' in possibleTabs|column('tab') %}
                 <div class="content no-pad {% if activeTab == 'goals' %}active{% endif %}" id="tab-goals">
                     <div id="goal-feed" class="goals-achievements">
                         <goal-feed
@@ -431,7 +388,7 @@
                 </div>
             {% endif %}
 
-            {% if additionalConstraints[USER.role.type]['achievements'] ?? additionalConstraints[USER.role.type]['_default'] %}
+            {% if 'achievements' in possibleTabs|column('tab') %}
                 <div class="content no-pad {% if activeTab == 'achievements' %}active{% endif %}" id="tab-achievements">
                     <div id="achievement-feed" class="goals-achievements">
                         <achievement-feed
@@ -492,7 +449,7 @@
             {% endautoescape %}
             <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/userProfileFeeds.js?v={{ config.site_version }}"></script>
 
-            {% if additionalConstraints[USER.role.type]['classes'] ?? additionalConstraints[USER.role.type]['_default'] %}
+            {% if 'classes' in possibleTabs|column('tab') %}
                 {% if subjects|length %}
                     <div class="content no-pad {% if activeTab == 'classes' %}active{% endif %}" id="tab-classes">
                     <section>
@@ -654,7 +611,7 @@
                 {% endif %}
             {% endif %}
 
-            {% if additionalConstraints[USER.role.type]['groups'] ?? additionalConstraints[USER.role.type]['_default'] %}
+            {% if 'groups' in possibleTabs|column('tab') %}
                 {% if groups|length %}
                     <div class="content no-pad {% if activeTab == 'groups' %}active{% endif %}" id="tab-groups">
                         <section>
@@ -750,7 +707,7 @@
                 {% endif %}
             {% endif %}
 
-            {% if additionalConstraints[USER.role.type]['contacts'] ?? additionalConstraints[USER.role.type]['_default'] %}
+            {% if 'contacts' in possibleTabs|column('tab') %}
                 {# Only show this tab if there's any content here:
                  # Viewee must allow you to see their main contacts,
                  # or they have emergency contacts
