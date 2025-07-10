@@ -246,6 +246,12 @@ class Factory
                 $this->useFolder,
                 $this->defaultFolderId,
             ),
+            Filesystem\ImagegeneratorController::class => new Filesystem\ImagegeneratorController(
+                $this->multi,
+                $this->mime,
+                $this->useFolder,
+                $this->defaultFolderId,
+            ),
             default => throw new OutOfRangeException('Controller does not implement ControllerInterface'),
         };
     }

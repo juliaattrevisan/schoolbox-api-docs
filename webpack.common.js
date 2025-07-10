@@ -192,6 +192,9 @@ module.exports = {
         // Record Media Modal
         recordMediaModal: "./templates/core/resources/filesystem/vue/recordMediaModal.ts",
 
+        // Image Generator
+        imageGenerator: "./templates/core/resources/filesystem/vue/imageGenerator/imageGenerator.ts",
+
         // Class
         classList: "./library/Schoolbox/Learning/vue/classList.ts",
         classSelector: "./library/Schoolbox/Assessment/Course/templates/vue/classSelector/classSelector.ts",
