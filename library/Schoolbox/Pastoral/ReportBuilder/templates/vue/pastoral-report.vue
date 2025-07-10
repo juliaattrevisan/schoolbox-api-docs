@@ -27,7 +27,6 @@ const isTemporaryTesting = window.Vue.ref(true); // Temporary flag for testing p
 </script>
 
 <template>
-    <!-- <pr-table v-if="isTemporaryTesting" :records-and-points="recordsAndPoints" :records-or-points="recordsOrPoints" /> -->
     <dl v-if="props.tabs.length > 1" class="tabs">
         <dd
             v-for="tab in props.tabs"
@@ -38,7 +37,8 @@ const isTemporaryTesting = window.Vue.ref(true); // Temporary flag for testing p
             <a>{{ tab.title }}</a>
         </dd>
     </dl>
-    <pr-list
+    <pr-table v-if="isTemporaryTesting" :records-and-points="recordsAndPoints" :records-or-points="recordsOrPoints" />
+    <!-- <pr-list
         v-if="selectedTab === TabType.LIST"
         :results="props.results"
         :config="props.config"
@@ -47,7 +47,7 @@ const isTemporaryTesting = window.Vue.ref(true); // Temporary flag for testing p
         :show-severity="props.showSeverity"
         :severity-colors="props.severityColors"
     />
-    <pr-table v-else :records-and-points="recordsAndPoints" :records-or-points="recordsOrPoints" />
+    <pr-table v-else :records-and-points="recordsAndPoints" :records-or-points="recordsOrPoints" />  -->
 </template>
 
 <style scoped></style>

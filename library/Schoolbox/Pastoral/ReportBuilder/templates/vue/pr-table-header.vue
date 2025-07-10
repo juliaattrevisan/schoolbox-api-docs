@@ -64,24 +64,34 @@ function getGroupedHeaders(): Array<{ title: string; colspan: number; headers: T
 <template>
     <thead class="pr-table-header">
         <tr>
-            <th :colspan="hasSubTitles ? 2 : props.headers.length">
+            <th :colspan="hasSubTitles ? 2 : props.headers.length" class="u-border-right">
                 <div class="checklist">
-                    <ul class="option-list">
+                    <ul class="option-list l-flex l-gap-m f-no-margins">
                         <li v-for="(option, index) in props.recordsAndPoints" :key="`option-${index}`">
                             <input :id="option" v-model="recordsOrPoints" type="radio" :value="option" />
-                            <label :for="option">{{ option }}</label>
+                            <label :for="option" class="f-no-margins">{{ option }}</label>
                         </li>
                     </ul>
                 </div>
             </th>
             <template v-if="hasSubTitles">
-                <th v-for="group in getGroupedHeaders()" :key="`${group.title}-title`" :colspan="group.colspan">
+                <th
+                    v-for="group in getGroupedHeaders()"
+                    :key="`${group.title}-title`"
+                    :colspan="group.colspan"
+                    class="u-border-right"
+                >
                     {{ group.title }}
                 </th>
             </template>
         </tr>
         <tr>
-            <th v-for="header in props.headers" :key="header.key" @click="handleSort(header)">
+            <th
+                v-for="header in props.headers"
+                :key="header.key"
+                :class="`u-border-right ${header.key === 'total' ? 'total-cell' : ''}`"
+                @click="handleSort(header)"
+            >
                 {{ header.subTitle ? header.subTitle : header.title }}
             </th>
         </tr>
@@ -89,7 +99,7 @@ function getGroupedHeaders(): Array<{ title: string; colspan: number; headers: T
 </template>
 
 <style scoped lang="scss">
-th {
-    border: 1px solid red;
+.total-cell {
+    background: lightgray;
 }
 </style>

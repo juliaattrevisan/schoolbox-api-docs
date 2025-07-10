@@ -17,7 +17,7 @@ const props = defineProps<Props>();
 
 <template>
     <tr>
-        <td v-for="(data, index) in props.rowData" :key="props.headers[index]?.key || index">
+        <td v-for="(data, index) in props.rowData" :key="props.headers[index]?.key || index" class="u-border-right">
             <!-- The first cell is always just 'Total' text -->
             <template v-if="index === 0">
                 <b>{{ data }}</b>
@@ -41,6 +41,5 @@ const props = defineProps<Props>();
 <style scoped lang="scss">
 td {
     background: lightgray;
-    border: 1px solid red;
 }
 </style>

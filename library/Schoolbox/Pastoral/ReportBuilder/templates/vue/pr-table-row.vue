@@ -18,7 +18,11 @@ const props = defineProps<Props>();
 
 <template>
     <tr>
-        <td v-for="(data, index) in props.rowData" :key="props.headers[index]?.key || index">
+        <td
+            v-for="(data, index) in props.rowData"
+            :key="props.headers[index]?.key || index"
+            :class="`u-border-right ${props.headers[index].key === 'total' ? 'total-cell' : ''}`"
+        >
             <template v-if="props.headers[index].type == TableHeaderType.USER">
                 {{ (data as User).fullName }}
             </template>
@@ -39,7 +43,7 @@ const props = defineProps<Props>();
 </template>
 
 <style scoped lang="scss">
-td {
-    border: 1px solid red;
+.total-cell {
+    background: lightgray;
 }
 </style>
