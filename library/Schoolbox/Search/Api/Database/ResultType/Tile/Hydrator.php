@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\ResultType\Tile;
 
+use Component_Config_Collapse;
+use Component_Config_ShowComponentTitle;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -73,7 +75,7 @@ class Hydrator extends BaseHydrator
         $tiles = $this->tileMapper->findByColumn('id', $tileIds);
 
         // Get config info for each component instance for later lookup.
-        //$configByComponentInstanceId = $this->getConfigByComponentInstanceId($componentInstanceIds);
+        $configByComponentInstanceId = $this->getConfigByComponentInstanceId($componentInstanceIds);
 
         // Get tileLayouts, indexed by tileLayoutId.  This is necessary because tileLayout info is not hydrated in $tiles.
         // By getting this info here we avoid having to run many queries inside the loop.
@@ -84,12 +86,21 @@ class Hydrator extends BaseHydrator
         foreach ($acceptedMatches as $key => $match) {
             [$tileId, $componentInstanceId, $folderId] = self::explodeTileInstanceId($match->id);
 
+            if ($componentInstanceId === null) {
+                // This tile is not used in any homepage component, so it is of no interest.
+                continue;
+            }
+
             $tile = $tiles->getBy('id', $tileId);
             if (!($tile instanceof TileModel)) {
                 continue;
             }
 
             $tileLayout = $tileLayoutById[$tile->getTileLayout()->getId()];
+
+            // The folderId from the tileLayout should always match the folderId from $match->id (from the search_index
+            // table), because the search_index table should always be up to date.  But the folderId from the tileLayout
+            // is the authoritative value.
             $folderId = $tileLayout->getFolder()->getId();
 
             if ($folderId === null) {
@@ -97,16 +108,21 @@ class Hydrator extends BaseHydrator
                 continue;
             }
 
+            // Check if the user has access to the tile's folder.
             try {
-                // Check if the user has access to the tile's folder.
                 $tileAccess = $this->access->getFolderAccess($viewer, $folderId);
-                if ($tileAccess < UserAccess::ACCESS_READ) {
-                    continue;
-                }
+            } catch (MapperException) {
+                $tileAccess = UserAccess::ACCESS_DENY;
+            }
 
+            if ($tileAccess < UserAccess::ACCESS_READ) {
+                continue;
+            }
+
+            try {
                 $tileFolder = $this->folderMapper->findById($folderId);
             } catch (MapperException $e) {
-                // Tile folder could not be found for some reason.
+                // The tile's folder could not be found for some reason.
                 // This is a slightly different situation to situation where tile is not linked to folder.
                 // In this case the result might be of interest, so return a result but with tileFolder null.
                 $tileFolder = null;
@@ -116,6 +132,24 @@ class Hydrator extends BaseHydrator
 
             if ($titleText === '') {
                 // Tiles without a title should not appear in search results (AC for SA-8841).
+                continue;
+            }
+
+            // $componentConfig (if not null) will be an array with the following optional keys:
+            //  * Component_Config_Collapse::KEY,
+            //  * Component_Config_ShowComponentTitle::KEY
+            $componentConfig = $configByComponentInstanceId[$componentInstanceId] ?? null;
+
+            // Get relevant component config values.
+            // Note Component_Config_ShowComponentTitle is poorly named.  The UI makes clear that this option applies
+            // only to read-only users.  To confirm, go to a homepage, and edit the configuration of a tile component.
+            // The checkbox label is 'Show Title to Read-Only Users'.
+            $componentIsCollapsed = boolval($componentConfig[Component_Config_Collapse::KEY] ?? 0); // Default is not collapsed.
+            $showTitleToReadOnlyUsers = boolval($componentConfig[Component_Config_ShowComponentTitle::KEY] ?? 1); // Default is to show title.
+
+            // Tiles that have been hidden to read-only users (by having title hidden and body collapsed)
+            // should appear in search results only for users with write access.
+            if (!$showTitleToReadOnlyUsers && $componentIsCollapsed && $tileAccess < UserAccess::ACCESS_WRITE) {
                 continue;
             }
 
@@ -168,5 +202,40 @@ class Hydrator extends BaseHydrator
             $tokens[1], // componentInstanceId,
             $tokens[2]  // folderId.
         ];
+    }
+
+    /**
+     * @param array $componentInstanceIds
+     * @return array
+     */
+    private function getConfigByComponentInstanceId(array $componentInstanceIds): array
+    {
+        $db = $this->tileMapper->getDatabase();
+
+        $rows = $db->executeQuery(
+            'SELECT cci.component_instance_id, ccd.key, cci.value
+            FROM component_config_instance cci
+            LEFT JOIN component_config_definition ccd ON ccd.id=cci.component_config_definition_id
+            WHERE cci.component_instance_id IN (' . implode(',', array_map('intval', $componentInstanceIds)) . ')
+            AND ccd.key IN (:configCollapseKey, :showComponentTitleKey)',
+            [
+                ':configCollapseKey' => Component_Config_Collapse::KEY,
+                ':showComponentTitleKey' => Component_Config_ShowComponentTitle::KEY,
+            ]
+        )->fetchAll();
+
+        $configByComponentInstanceId = [];
+
+        foreach ($rows as $row) {
+            $componentInstanceId = $row['component_instance_id'];
+
+            if (!array_key_exists($componentInstanceId, $configByComponentInstanceId)) {
+                $configByComponentInstanceId[$componentInstanceId] = [];
+            }
+
+            $configByComponentInstanceId[$componentInstanceId][$row['key']] = $row['value'];
+        }
+
+        return $configByComponentInstanceId;
     }
 }
