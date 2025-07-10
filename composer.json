@@ -158,6 +158,8 @@
     },
     "extra": {
         "composer-patches": {
+            "enable_root_patches": true,
+            "enable_root_patches_file": true,
             "enable_dependency_patches": true
         }
     }

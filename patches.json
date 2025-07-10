@@ -1,5 +1,7 @@
 {
-    "violet/streaming-json-encoder": {
-        "psr/http-message 2.0": "patches/violet/streaming-json-encoder/psr-http-message-2.0.patch"
+    "patches": {
+        "violet/streaming-json-encoder": {
+          "psr/http-message 2.0": "./patches/violet/streaming-json-encoder/psr-http-message-2.0.patch"
+        }
     }
 }
