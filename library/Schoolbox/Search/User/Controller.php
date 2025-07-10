@@ -511,7 +511,7 @@ class Controller extends BaseController
         $tabConstraintsBase = [
             /* unless the tab is known in this list, it should not be shown */
             '_default'     => false,
-            'activity'     => $this->getConfigLoader()->get('learning_moments_enabled') && $student->getLearningMomentsEnabled()
+            'activity'     => ($this->getConfigLoader()->get('learning_moments_enabled') && $student->getLearningMomentsEnabled())
                 || $this->getConfigLoader()->get('badges_enabled')
                 || $this->getConfigLoader()->get('grades_enabled'),
             'goals'        => $this->getConfigLoader()->get('badges_enabled'),
