@@ -5,6 +5,7 @@
  */
 
 import type { User } from "@schoolboxLibrary/types/User";
+import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
 import { TableHeaderType } from "../js/types/pastoralReportTypes";
 import type { TableHeader, RowOptions, RecordsAndPoints } from "../js/types/pastoralReportTypes";
 
@@ -14,6 +15,15 @@ type Props = {
     recordsOrPoints: string;
 };
 const props = defineProps<Props>();
+
+/**
+ * To cast the row data to a User type
+ * @param data - the row data to check
+ * @returns true if the data is a User, false otherwise
+ */
+function isUser(data: RowOptions): data is User {
+    return (data as User).firstname !== undefined && (data as User).lastname !== undefined;
+}
 </script>
 
 <template>
@@ -23,8 +33,20 @@ const props = defineProps<Props>();
             :key="props.headers[index]?.key || index"
             :class="`u-border-right ${props.headers[index].key === 'total' ? 'total-cell' : ''}`"
         >
-            <template v-if="props.headers[index].type == TableHeaderType.USER">
-                {{ (data as User).fullName }}
+            <template v-if="props.headers[index].type == TableHeaderType.USER && isUser(data)">
+                <div class="c-card">
+                    <div class="l-flex-row l-gap-m">
+                        <user-photo :user="data" render="small" rounded-corners />
+                        <div class="l-flex-col l-flex--justify-center f-no-margins">
+                            <a v-if="data._links?.profile" :href="data._links.profile" title="View Profile">
+                                {{ data.lastname }}, {{ data.preferredName || data.firstname }}
+                            </a>
+                            <template v-else>
+                                {{ data.lastname }}, {{ data.preferredName || data.firstname }}
+                            </template>
+                        </div>
+                    </div>
+                </div>
             </template>
             <template v-else-if="props.headers[index].type == TableHeaderType.RECORDS_AND_POINTS">
                 <!-- Change data based on current radio button selection -->

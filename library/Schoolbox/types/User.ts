@@ -10,13 +10,13 @@ type UserLinks = {
  * The start of a SBX User type
  */
 export type User = {
-    externalId: number;
+    externalId?: number;
     firstname: string;
     fullName: string;
     givenName: string;
     id: number;
     lastname: string;
-    preferredName: string | null;
+    preferredName?: string | null;
     title: string | null;
     pronoun: string | null;
     _links?: UserLinks;

@@ -52,9 +52,8 @@ export const payload = {
         rows: [
             [
                 {
-                    id: 1,
+                    id: 13,
                     name: "Jana Reed",
-                    externalId: 1001,
                     firstname: "Jana",
                     fullName: "Jana Reed",
                     givenName: "Jana",
@@ -63,8 +62,8 @@ export const payload = {
                     title: "Ms",
                     pronoun: "she/her",
                     _links: {
-                        avatar: "/portrait.php?id=65&size=square64",
-                        profile: "/search/user/65",
+                        avatar: "/portrait.php?id=13&size=square64",
+                        profile: "/search/user/13",
                     },
                 },
                 { records: 11, points: 22 },
@@ -75,19 +74,18 @@ export const payload = {
             ],
             [
                 {
-                    id: 2,
-                    name: "John Doe",
-                    externalId: 1002,
-                    firstname: "John",
-                    fullName: "John Doe",
-                    givenName: "John",
-                    lastname: "Doe",
-                    preferredName: "Johnny",
+                    id: 17,
+                    name: "Mario Izzo",
+                    firstname: "Mario",
+                    fullName: "Mario Izzo",
+                    givenName: "Mario",
+                    lastname: "Izzo",
+                    preferredName: "Moe",
                     title: "Mr",
                     pronoun: "he/him",
                     _links: {
-                        avatar: "/portrait.php?id=21&size=square64",
-                        profile: "/search/user/21",
+                        avatar: "/portrait.php?id=17&size=square64",
+                        profile: "/search/user/17",
                     },
                 },
                 { records: 16, points: 32 },
@@ -98,14 +96,13 @@ export const payload = {
             ],
             [
                 {
-                    id: 3,
-                    name: "Jane Smith",
+                    id: 20,
+                    name: "Moshe Appleton",
                     externalId: 1003,
-                    firstname: "Jane",
-                    fullName: "Jane Smith",
-                    givenName: "Jane",
-                    lastname: "Smith",
-                    preferredName: null,
+                    firstname: "Moshe",
+                    fullName: "Moshe Appleton",
+                    givenName: "Moshe",
+                    lastname: "Appleton",
                     title: null,
                     pronoun: null,
                     _links: {
