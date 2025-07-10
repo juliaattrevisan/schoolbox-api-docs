@@ -18,7 +18,19 @@ const props = defineProps<{
 
 const recordsOrPoints = defineModel<string>("records-or-points", { default: "Records" });
 
-const payloadData = window.Vue.ref<TablePayload>(tempPayload);
+const payloadData = window.Vue.ref<TablePayload>({
+    ...tempPayload,
+    data: {
+        ...tempPayload.data,
+        rows: Array(10)
+            .fill(null)
+            .flatMap(() => tempPayload.data.rows),
+    },
+    metadata: {
+        ...tempPayload.metadata,
+        count: tempPayload.data.rows.length * 10,
+    },
+});
 const currentEndpoint = window.Vue.ref<string>(props.selectedTab.endpoint || ""); // the current endpoint to load data from
 const sortBy = window.Vue.ref<string>("user"); // the current sort by field - this should update when payload is loaded
 const sortOrder = window.Vue.ref<"asc" | "desc">("asc"); // the current sort order
