@@ -33,27 +33,9 @@ class TextField extends Base
         FROM information_schema.COLUMNS c
         INNER JOIN information_schema.TABLES t ON c.TABLE_NAME = t.TABLE_NAME
         WHERE c.TABLE_SCHEMA = :schema
-        AND   (INSTR(c.DATA_TYPE, 'text') OR INSTR(c.DATA_TYPE, 'char'))
+        AND   INSTR(c.DATA_TYPE, 'text')
         AND   t.TABLE_TYPE = 'BASE TABLE'
         ORDER BY c.TABLE_NAME, c.COLUMN_NAME
-        SQL;
-
-    /**
-     * Query for finding a foreign key relation onto the `storage` table for
-     * a given column.
-     */
-    private const SELECT_FK_RELATION_QUERY = <<<SQL
-        select COUNT(*)
-        from information_schema.REFERENTIAL_CONSTRAINTS fks
-        inner join information_schema.KEY_COLUMN_USAGE kcu
-            on  fks.CONSTRAINT_SCHEMA = kcu.TABLE_SCHEMA
-            and fks.TABLE_NAME        = kcu.TABLE_NAME
-            and fks.CONSTRAINT_NAME   = kcu.CONSTRAINT_NAME
-        where fks.CONSTRAINT_SCHEMA        = :schema
-          and fks.UNIQUE_CONSTRAINT_SCHEMA = :schema
-          and fks.REFERENCED_TABLE_NAME    = :primaryTable
-          AND fks.TABLE_NAME               = :foreignTable
-          AND kcu.COLUMN_NAME              = :foreignColumn
         SQL;
 
     /**
@@ -133,7 +115,6 @@ class TextField extends Base
 
         $tableColumnList   = [];
         $blacklistedTables = [];
-        $foreignKeysQuery  = $this->db->prepareQuery(self::SELECT_FK_RELATION_QUERY);
         foreach ($columnsQuery as $row) {
             $table  = $row['table'];
             $column = $row['column'];
@@ -163,19 +144,6 @@ class TextField extends Base
                     $this->logger->debug(sprintf('Excluding blacklisted column: %s.%s', $table, $column));
                     continue;
                 }
-            }
-
-            // Exclude fields already in a foreign key relation
-            $foreignKeysQuery->execute([
-                'schema'        => $this->schema,
-                'primaryTable'  => $this->table,
-                'foreignTable'  => $table,
-                'foreignColumn' => $column,
-            ]);
-            $foreignKeysCount = (int)$foreignKeysQuery->fetchColumn();
-            if ($foreignKeysCount > 0) {
-                $this->logger->debug(sprintf('Excluding foreign key column: %s.%s', $table, $column));
-                continue;
             }
 
             $tableColumnList[$table][0] ??= [
