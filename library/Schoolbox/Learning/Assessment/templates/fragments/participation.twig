@@ -1,7 +1,7 @@
-{% if participants is defined %}
+{% if participants is defined and customisedFor is defined %}
     {% for participation in assessment.allParticipants  %}
         {% set user = participation.user %}
-        {% set userInclude = participation.user.id in (participants | keys) %}
+        {% set userInclude = participation.user.id in (participants | keys) and not participation.excluded %}
         <input type="hidden" name="participant-include[{{ user.id }}]" id="participant-include-{{ user.id }}" value="{{ userInclude ? 1 : 0 }}" />
         <input type="hidden" name="participant-plan[{{ user.id }}]" id="participant-plan-{{ user.id }}" value="0" />
     {% endfor %}

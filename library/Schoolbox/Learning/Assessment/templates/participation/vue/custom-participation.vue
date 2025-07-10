@@ -339,7 +339,13 @@ window.Vue.onMounted(() => {
                                         </button>
                                     </li>
                                     <li class="separator">Create</li>
-                                    <li><a class="icon-copy">Copy Activity</a></li>
+                                    <li>
+                                        <a
+                                            class="icon-copy"
+                                        >
+                                            Copy Activity
+                                        </a>
+                                    </li>
                                     <li>
                                         <a
                                             class="icon-submissions"

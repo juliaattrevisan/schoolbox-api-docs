@@ -263,7 +263,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $student = json_decode($this->requestQuery->get('student', ''), true);
             $originalAssessment = $this->getAssessmentMapper()->findById($originalAssessmentId);
             $originalAssessment = $this->participantDataSource->loadParticipationIntoAssessment($originalAssessment);
-
+            $data['customisedFor'] = $originalAssessmentId;
             $data['participants'] = $originalAssessment
                 ->getAllParticipants()
                 ->filter(fn($participant) => in_array($participant->getUser()->getId(), array_column($student, 'id')))
@@ -277,6 +277,14 @@ abstract class Controller extends ListController implements IAssessmentControlle
                         'plan'       => $participant->getPlan(),
                     ];
                 });
+        } else {
+            $data['participants'] = $assessment->getAllParticipants()->map(function (Participant $participant) {
+                $student = $participant->getUser();
+                return [
+                    'id'         => $student->getId(),
+                    'fullName'   => $participant->getUser()->getFullName(),
+                ];
+            });
         }
         /* When creating a new assessment, no curriculum nodes are selected by default
          *
@@ -613,9 +621,17 @@ abstract class Controller extends ListController implements IAssessmentControlle
             }
             $data['attachzoneWorksheet'] = $zone->getTwigContext();
         }
+        $data['participants'] = $assessment
+            ->getAllParticipants()
+            ->filter(fn($participant) => !$participant->isExcluded())
+            ->map(
+                fn($participant) => [
+                    'id' => $participant->getUser()->getId(),
+                    'fullName' => $participant->getUser()->getFullName(),
+                ]
+            );
         $this->response = $this->responseFromTemplate("@learningAssessment/update.twig", $data);
     }
-
 
     /**
      * Save the data when creating a specific kind of Assessment

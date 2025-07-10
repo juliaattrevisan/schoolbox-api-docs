@@ -165,7 +165,7 @@
                     {% include 'sub/userListMetadata.twig'
                         with {
                         users:    participants,
-                        message: 'Creating copy for '
+                        message: customisedFor is defined ? 'Creating copy for ' : 'Creating for '
                     } only
                     %}
                 </li>

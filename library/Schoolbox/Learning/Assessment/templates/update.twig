@@ -203,6 +203,23 @@
     {% endif %}
 </div>
 
+{% if participants ?? [] is not empty %}
+    <div class="row">
+        <div class="small-12 column">
+            <ul class="meta">
+                <li>
+                    {% include 'sub/userListMetadata.twig'
+                        with {
+                        users:    participants,
+                        message: 'Updating for '
+                    } only
+                    %}
+                </li>
+            </ul>
+        </div>
+    </div>
+{% endif %}
+
 <div class="row">
     <div class="small-12 columns island">
         <form action="{{ routeLookup('learningAssessment.postUpdateAssessment', {assessmentId: assessment.id, assessment: assessment}) }}" class="mage" id="assessmentForm" data-test="assessment-form" method="post">
