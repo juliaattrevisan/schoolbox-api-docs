@@ -20,6 +20,8 @@ const recordsOrPoints = defineModel<string>("records-or-points", { default: "Rec
 
 const payloadData = window.Vue.ref<TablePayload>(tempPayload);
 const currentEndpoint = window.Vue.ref<string>(props.selectedTab.endpoint || ""); // the current endpoint to load data from
+const sortBy = window.Vue.ref<string>(""); // the current sort by field
+const sortOrder = window.Vue.ref<"asc" | "desc">("asc"); // the current sort order
 
 const isLoading = window.Vue.ref<boolean>(false);
 const loadError = window.Vue.ref<string | null>(null);
@@ -39,10 +41,20 @@ window.Vue.watch(
 
 /**
  * Handle sort button click
+ * @param headerKey - the key of the header that was clicked for sorting
  */
-function onSortSelected(): void {
-    // Implement sorting logic here
-    // tweak the endpoint to include sorting parameters so a new load is triggered
+function onSortSelected(headerKey: string): void {
+    // If clicking the same header, toggle sort order
+    if (sortBy.value === headerKey) {
+        sortOrder.value = sortOrder.value === "asc" ? "desc" : "asc";
+    } else {
+        // New header selected, set to ascending and update sortBy
+        sortBy.value = headerKey;
+        sortOrder.value = "asc";
+    }
+    // TODO: Implement actual sorting logic here
+    // This could trigger a new data load with sorting parameters
+    // or sort the existing data in payloadData
 }
 </script>
 
@@ -66,6 +78,8 @@ function onSortSelected(): void {
                 v-model:records-or-points="recordsOrPoints"
                 :headers="payloadData.data.tableHeaders"
                 :records-and-points="props.recordsAndPoints"
+                :sort-by="sortBy"
+                :sort-order="sortOrder"
                 @sort="onSortSelected"
             />
             <tbody>

@@ -6,11 +6,12 @@
 
 import type { TableHeader } from "../js/types/pastoralReportTypes";
 
-type Props = {
+const props = defineProps<{
     headers: TableHeader[];
     recordsAndPoints: string[];
-};
-const props = defineProps<Props>();
+    sortBy: string;
+    sortOrder: "asc" | "desc";
+}>();
 
 const recordsOrPoints = defineModel<string>("records-or-points", { default: "Records" });
 
@@ -89,10 +90,14 @@ function getGroupedHeaders(): Array<{ title: string; colspan: number; headers: T
             <th
                 v-for="header in props.headers"
                 :key="header.key"
-                :class="`u-border-right title-cell ${header.key === 'total' ? 'total-cell' : ''}`"
+                :class="`u-border-right title-cell ${header.key === 'total' ? 'total-cell' : ''} ${props.sortBy === header.key ? 'sorted' : ''}`"
             >
                 <button class="title-button f-always-show" @click="onSortSelected(header)">
-                    {{ header.subTitle ? header.subTitle : header.title }}
+                    <span>{{ header.subTitle ? header.subTitle : header.title }}</span>
+                    <span v-if="header.isSortable && props.sortBy === header.key" class="sort-indicator">
+                        {{ props.sortOrder === "asc" ? "↑" : "↓" }}
+                    </span>
+                    <span v-else-if="header.isSortable" class="sort-indicator sort-indicator--inactive"> ↕ </span>
                 </button>
             </th>
         </tr>
@@ -105,6 +110,9 @@ function getGroupedHeaders(): Array<{ title: string; colspan: number; headers: T
     &:has(.title-button) {
         padding: 0; // padding is handled by the button instead
     }
+    &.sorted {
+        background-color: var(--accent-background-light, #f0f0f0);
+    }
 }
 
 .total-cell {
@@ -114,6 +122,8 @@ function getGroupedHeaders(): Array<{ title: string; colspan: number; headers: T
 .title-button {
     background: none;
     display: flex; // to align the text to the top left
+    justify-content: space-between;
+    align-items: center;
     height: 100%;
     margin: 0;
     padding: 0.625rem;
@@ -121,6 +131,14 @@ function getGroupedHeaders(): Array<{ title: string; colspan: number; headers: T
     width: 100%;
     &:hover {
         background: var(--accent-background);
+    }
+}
+
+.sort-indicator {
+    margin-left: 0.5rem;
+    font-weight: bold;
+    &--inactive {
+        opacity: 0.3;
     }
 }
 </style>
