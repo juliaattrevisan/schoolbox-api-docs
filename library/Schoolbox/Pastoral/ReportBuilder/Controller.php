@@ -384,11 +384,16 @@ class Controller extends Base
 
         $mappedOptions = [];
         foreach ($selectedSummaryOptions as $key => $option) {
+            $endpoint = $option['endpoint'] ?? null;
+            // Replace {reportId} placeholder with actual report ID if endpoint exists
+            if ($endpoint && str_contains($endpoint, '{reportId}')) {
+                $endpoint = str_replace('{reportId}', (string)$report->getId(), $endpoint);
+            }
             $mappedOptions[] = [
                 'title' => $option['label'],
                 'type' => $option['type'],
                 'key' => $key,
-                'endpoint' => $option['endpoint'] ?? null
+                'endpoint' => $endpoint
             ];
         }
 
