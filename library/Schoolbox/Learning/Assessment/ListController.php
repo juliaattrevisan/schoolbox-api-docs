@@ -578,7 +578,6 @@ class ListController extends Web\Controller\Base
         /* Only duework, task and quiz can have customised activities
          */
         if (!isset($participants)) {
-
             if ($this->getConfigLoader()->get('lti_assessments_enable')) {
                 $data['types'][] = [
                     'id'    => 'lti',
