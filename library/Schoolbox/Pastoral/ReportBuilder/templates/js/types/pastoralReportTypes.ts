@@ -14,6 +14,7 @@ export enum TabType {
 export type Tab = {
     type: TabType;
     title: string;
+    key: string; // Unique key for the tab, used for routing
     endpoint: string;
 };
 

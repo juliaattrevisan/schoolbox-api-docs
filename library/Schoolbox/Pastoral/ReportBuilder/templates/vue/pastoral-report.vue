@@ -25,6 +25,7 @@ const props = defineProps<{
 const selectedTab = window.Vue.ref(props.tabs[0]); // the currently selected tab, defaulting to the first tab type
 const recordsAndPoints = window.Vue.ref(["Records", "Points"]); // to toggle the tables between records and points
 const recordsOrPoints = window.Vue.ref("Records"); // the current records/points selection
+const tabParamName = "tab"; // URL parameter name for the selected tab
 
 const isTemporaryTesting = window.Vue.ref(true); // Temporary flag for testing purposes
 
@@ -34,6 +35,35 @@ const isTemporaryTesting = window.Vue.ref(true); // Temporary flag for testing p
 function onPrintSelected(): void {
     window.print();
 }
+
+/**
+ * Handle tab selection and update URL without adding to browser history
+ * @param tab - the tab that has been selected
+ */
+function onTabSelected(tab: Tab): void {
+    selectedTab.value = tab;
+    // Update URL without adding to browser history
+    const url = new URL(window.location.href);
+    url.searchParams.set(tabParamName, tab.key);
+    window.history.replaceState(null, "", url.toString());
+}
+
+/**
+ * Load the first tab when the component is mounted,
+ * also checking the URL for a tab type.
+ */
+window.Vue.onMounted((): void => {
+    // Check if there's a tab in the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabParam = urlParams.get(tabParamName);
+    // and if so update the current tab if available
+    if (tabParam) {
+        const foundTab = props.tabs.find((tab) => tab.key === tabParam);
+        if (foundTab) {
+            selectedTab.value = foundTab;
+        }
+    }
+});
 </script>
 
 <template>
@@ -61,7 +91,7 @@ function onPrintSelected(): void {
                     v-for="tab in props.tabs"
                     :key="tab.type"
                     :class="{ active: selectedTab.title === tab.title }"
-                    @click="selectedTab = tab"
+                    @click="onTabSelected(tab)"
                 >
                     <a>{{ tab.title }}</a>
                 </dd>

@@ -369,28 +369,29 @@ class Controller extends Base
         $severityColors = $showSeverity ? $this->getSeverityColors() : [];
 
         $defaultSummaryOptions = [
-            ['title' => 'List', 'type' => 'list']
+            ['title' => 'List', 'type' => 'list', 'key' => 'list']
         ];
 
         /* Find the selected list of options
          */
-        $selectedSummaryOptions = array_values(
-            array_filter(
-                PastoralReport::SUMMARY_TABLES_OPTIONS,
-                function ($key) use ($report) {
-                    return in_array($key, explode(',', $report->getSummaryTables() ?? ''));
-                },
-                ARRAY_FILTER_USE_KEY
-            )
+        $selectedSummaryOptions = array_filter(
+            PastoralReport::SUMMARY_TABLES_OPTIONS,
+            function ($key) use ($report) {
+                return in_array($key, explode(',', $report->getSummaryTables() ?? ''));
+            },
+            ARRAY_FILTER_USE_KEY
         );
 
-        $tabs = array_merge(
-            $defaultSummaryOptions,
-            array_map(
-                fn($option) => ['title' => $option['label'], 'type' => $option['type']],
-                $selectedSummaryOptions
-            )
-        );
+        $mappedOptions = [];
+        foreach ($selectedSummaryOptions as $key => $option) {
+            $mappedOptions[] = [
+                'title' => $option['label'],
+                'type' => $option['type'],
+                'key' => $key
+            ];
+        }
+
+        $tabs = array_merge($defaultSummaryOptions, $mappedOptions);
         // And spit this thing out
 
         $this->response = $this->responseFromTemplate(
