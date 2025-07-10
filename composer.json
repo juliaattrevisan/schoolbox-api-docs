@@ -155,5 +155,10 @@
             "php-http/discovery": true,
             "cweagans/composer-patches": true
         }
+    },
+    "extra": {
+        "composer-patches": {
+            "enable_dependency_patches": true
+        }
     }
 }
