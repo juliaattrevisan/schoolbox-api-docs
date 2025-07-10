@@ -293,6 +293,7 @@ window.Vue.onMounted(() => {
                                 <sbx-pop-out
                                     :content-id="`participant-${participant.user.id}`"
                                     move-to="#pop-out-container"
+                                    is-close-on-content-click
                                 ></sbx-pop-out>
                             </nav>
                             <ul :id="`participant-${participant.user.id}`" data-dropdown-content="" class="f-dropdown">
