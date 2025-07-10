@@ -517,6 +517,7 @@ class Controller extends BaseController
             'goals'        => $this->getConfigLoader()->get('badges_enabled'),
             'achievements' => $this->getConfigLoader()->get('badges_enabled'),
             'classes'      => $student->isShowTimetable(),
+            'groups'       => true,
             /**
              * TODO: Check this for if it actually should differ between role types
              * (from the twig) contacts: users must have showContacts truthy and have at least one contact
