@@ -288,9 +288,7 @@ window.Vue.onMounted(() => {
                                     {{ participant.customisedPlan.assessable.title }}
                                 </a>
                             </span>
-                            <span v-else>
-                                Excluded
-                            </span>
+                            <span v-else> Excluded </span>
                         </template>
                         <span v-else-if="participant.plan.name !== null">
                             <a :href="`${getAssessmentParticipation}/${participant.plan.id}/modify?${getReturnUrl()}`">

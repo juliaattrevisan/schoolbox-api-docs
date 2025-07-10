@@ -22,8 +22,8 @@ export type Assessable = {
     title: string;
     _links: {
         modify: string;
-    }
-}
+    };
+};
 
 /**
  * The expected payload for a participant in the system
