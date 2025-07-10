@@ -24,12 +24,16 @@ const props = defineProps<Props>();
             </template>
             <template v-else-if="props.headers[index].type == TableHeaderType.RECORDS_AND_POINTS">
                 <!-- Change data based on current radio button selection -->
-                <template v-if="props.recordsOrPoints === 'Records'">
-                    {{ (data as RecordsAndPoints).records }}
-                </template>
-                <template v-else>
-                    {{ (data as RecordsAndPoints).points }}
-                </template>
+                <Transition name="fade" mode="out-in">
+                    <span :key="`${props.recordsOrPoints}-${index}`">
+                        <template v-if="props.recordsOrPoints === 'Records'">
+                            {{ (data as RecordsAndPoints).records }}
+                        </template>
+                        <template v-else>
+                            {{ (data as RecordsAndPoints).points }}
+                        </template>
+                    </span>
+                </Transition>
             </template>
             <template v-else>
                 {{ data }}

@@ -42,7 +42,7 @@ const hasSubTitles = props.headers.some((header) => header.subTitle && header.su
 function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: boolean }> {
     const result: Array<{ title: string; colspan: number; isEmpty: boolean }> = [];
 
-    // Skip the first 2 headers (Name and Total) as they're covered by radio buttons
+    // Skip the first 2 headers (Name and Total) as they're always covered by radio buttons
     let i = 2;
 
     while (i < props.headers.length) {
