@@ -20,7 +20,7 @@ const recordsOrPoints = defineModel<string>("records-or-points", { default: "Rec
 
 const payloadData = window.Vue.ref<TablePayload>(tempPayload);
 const currentEndpoint = window.Vue.ref<string>(props.selectedTab.endpoint || ""); // the current endpoint to load data from
-const sortBy = window.Vue.ref<string>(""); // the current sort by field
+const sortBy = window.Vue.ref<string>("user"); // the current sort by field - this should update when payload is loaded
 const sortOrder = window.Vue.ref<"asc" | "desc">("asc"); // the current sort order
 
 const isLoading = window.Vue.ref<boolean>(false);
