@@ -426,9 +426,58 @@ class Controller extends Base
      */
     public function getReportStudentByType(PastoralReport $report): void
     {
+        $records = $this->getReportData($report);
+
+        // Extract unique types and subtypes from the records
+        $types = [];
+        $subtypes = [];
+        $typesWithSubtypes = [];
+
+        /** @var PastoralRecord $record */
+        foreach ($records as $record) {
+            $type = $record->getType();
+            if ($type && !isset($types[$type->getId()])) {
+                $types[$type->getId()] = $type;
+            }
+
+            $subtype = $record->getSubType();
+            if ($subtype && !isset($subtypes[$subtype->getId()])) {
+                $subtypes[$subtype->getId()] = $subtype;
+                // Track which types have subtypes
+                $typesWithSubtypes[$subtype->getPastoralType()->getId()] = true;
+            }
+        }
+
+        // Build tempTypes array with the required structure
+        $tempTypes = [];
+
+        // Add subtypes
+        foreach ($subtypes as $subtype) {
+            $tempTypes[] = [
+                'key' => 'subtype-' . $subtype->getId(),
+                'title' => $subtype->getPastoralType()->getName(),
+                'subTitle' => $subtype->getName(),
+                'type' => 'RecordsAndPoints',
+                'isSortable' => true,
+            ];
+        }
+
+        // Add types that don't have subtypes
+        foreach ($types as $type) {
+            if (!isset($typesWithSubtypes[$type->getId()])) {
+                $tempTypes[] = [
+                    'key' => 'type-' . $type->getId(),
+                    'title' => $type->getName(),
+                    'type' => 'RecordsAndPoints',
+                    'isSortable' => true,
+                ];
+            }
+        }
+
         // Dummy data matching the structure from tempData.ts
         $payload = [
             'data' => [
+                'tempTypes' => $tempTypes,
                 'tableHeaders' => [
                     [
                         'key' => 'user',
