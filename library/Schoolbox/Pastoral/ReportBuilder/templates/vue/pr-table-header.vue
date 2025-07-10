@@ -36,29 +36,49 @@ function onSortSelected(header: TableHeader): void {
 const hasSubTitles = props.headers.some((header) => header.subTitle && header.subTitle.length > 0);
 
 /**
- * Groups headers by title to calculate colspan for duplicate titles
- * @returns an array of grouped header objects with title, colspan, and original headers
+ * Creates an array representing what should appear in the first header row after the radio buttons
+ * @returns an array of objects representing what should appear in the first header row
  */
-function getGroupedHeaders(): Array<{ title: string; colspan: number; headers: TableHeader[] }> {
-    const groups: { [key: string]: TableHeader[] } = {};
-    // Group headers by title
-    props.headers.forEach((header) => {
-        // if the header has a subTitle, it should be grouped
+function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: boolean }> {
+    const result: Array<{ title: string; colspan: number; isEmpty: boolean }> = [];
+
+    // Skip the first 2 headers (Name and Total) as they're covered by radio buttons
+    let i = 2;
+
+    while (i < props.headers.length) {
+        const header = props.headers[i];
+
         if (header.subTitle && header.subTitle.length > 0) {
-            // Initialize group if it doesn't exist
-            if (!groups[header.title]) {
-                groups[header.title] = [];
+            // Count consecutive headers with the same title that have subtitles
+            let count = 1;
+            while (
+                i + count < props.headers.length &&
+                props.headers[i + count].title === header.title &&
+                props.headers[i + count].subTitle &&
+                props.headers[i + count].subTitle!.length > 0
+            ) {
+                count += 1;
             }
-            // Add header to the group
-            groups[header.title].push(header);
+
+            result.push({
+                title: header.title,
+                colspan: count,
+                isEmpty: false,
+            });
+
+            i += count;
+        } else {
+            // Header without subtitle - add empty cell
+            result.push({
+                title: "",
+                colspan: 1,
+                isEmpty: true,
+            });
+            i += 1;
         }
-    });
-    // Convert to array format with colspan
-    return Object.entries(groups).map(([title, headers]) => ({
-        title,
-        colspan: headers.length,
-        headers,
-    }));
+    }
+
+    return result;
 }
 </script>
 
@@ -77,12 +97,12 @@ function getGroupedHeaders(): Array<{ title: string; colspan: number; headers: T
             </th>
             <template v-if="hasSubTitles">
                 <th
-                    v-for="group in getGroupedHeaders()"
-                    :key="`${group.title}-title`"
-                    :colspan="group.colspan"
+                    v-for="(headerCell, index) in getFirstRowHeaders()"
+                    :key="`first-row-${index}`"
+                    :colspan="headerCell.colspan"
                     class="u-border-right"
                 >
-                    {{ group.title }}
+                    {{ headerCell.isEmpty ? "" : headerCell.title }}
                 </th>
             </template>
         </tr>
