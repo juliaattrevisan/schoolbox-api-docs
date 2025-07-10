@@ -359,10 +359,10 @@
                     {% set defaultCss = '' %}
                 {% endfor %}
             </dl>
-        {% endif %}
 
-        <div class="profile-tabs tabs-content">
-            {% if 'activity' in possibleTabs|column('tab') %}
+            {% set possibleTabNames = possibleTabs|column('tab') %}
+            <div class="profile-tabs tabs-content">
+            {% if 'activity' in possibleTabNames %}
                 <div class="content no-pad {% if activeTab == 'activity' %}active{% endif %}" id="tab-activity">
                     <div id="activity-feed">
                         <activity-feed
@@ -377,7 +377,7 @@
                 </div>
             {% endif %}
 
-            {% if 'goals' in possibleTabs|column('tab') %}
+            {% if 'goals' in possibleTabNames %}
                 <div class="content no-pad {% if activeTab == 'goals' %}active{% endif %}" id="tab-goals">
                     <div id="goal-feed" class="goals-achievements">
                         <goal-feed
@@ -388,7 +388,7 @@
                 </div>
             {% endif %}
 
-            {% if 'achievements' in possibleTabs|column('tab') %}
+            {% if 'achievements' in possibleTabNames %}
                 <div class="content no-pad {% if activeTab == 'achievements' %}active{% endif %}" id="tab-achievements">
                     <div id="achievement-feed" class="goals-achievements">
                         <achievement-feed
@@ -449,7 +449,7 @@
             {% endautoescape %}
             <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/userProfileFeeds.js?v={{ config.site_version }}"></script>
 
-            {% if 'classes' in possibleTabs|column('tab') %}
+            {% if 'classes' in possibleTabNames %}
                 {% if subjects|length %}
                     <div class="content no-pad {% if activeTab == 'classes' %}active{% endif %}" id="tab-classes">
                     <section>
@@ -611,7 +611,7 @@
                 {% endif %}
             {% endif %}
 
-            {% if 'groups' in possibleTabs|column('tab') %}
+            {% if 'groups' in possibleTabNames %}
                 {% if groups|length %}
                     <div class="content no-pad {% if activeTab == 'groups' %}active{% endif %}" id="tab-groups">
                         <section>
@@ -707,7 +707,7 @@
                 {% endif %}
             {% endif %}
 
-            {% if 'contacts' in possibleTabs|column('tab') %}
+            {% if 'contacts' in possibleTabNames %}
                 {# Only show this tab if there's any content here:
                  # Viewee must allow you to see their main contacts,
                  # or they have emergency contacts
@@ -926,7 +926,8 @@
                     </section>
                 </div>
             {% endif %}
-        </div>
+            </div>
+        {% endif %}
     </div>
 </div>
 
