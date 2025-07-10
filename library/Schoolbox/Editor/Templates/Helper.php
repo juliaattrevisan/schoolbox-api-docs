@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Editor\Templates;
 
 use Schoolbox\GenericCollection;
+use Schoolbox\Collection;
 
 class Helper
 {
@@ -25,9 +26,9 @@ class Helper
      * If nothing can be found on the id an empty array is just
      * returned so the whole page doesn't error.
      *
-     * @return GenericCollection|Model[]
+     * @return Collection<Model>
      */
-    public function getTemplatesForCategory(): GenericCollection
+    public function getTemplatesForCategory(): Collection
     {
         try {
             $templates = $this->templateMapper->findByColumn('category_id', $this->categoryId);
