@@ -968,6 +968,12 @@ export const Default: Story = {
                 </div>
                 <p>upload</p>
             </div>
+             <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <sbx-icon name="veracross"></sbx-icon>
+                </div>
+                <p>veracross</p>
+            </div>
             <div class="box-icon-wrapper">
                 <div class="box-icon">
                     <sbx-icon name="video"></sbx-icon>
