@@ -116,7 +116,8 @@
                         selfAssessment: selfAssess,
                         selfReflection: selfReflect,
                         blindMode:      false,
-                        isRichText: false
+                        isRichText: false,
+                        prefix:         assessment.id,
                     } only %}
                     {% set inputNo = inputNo + 1 %}
                     {% if '' == assessment.instructorMarkScheme.template %}
