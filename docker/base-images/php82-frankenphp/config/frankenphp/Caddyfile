@@ -52,7 +52,7 @@
     }
 
     handle_path /health {
-        php {
+        php_server {
             root /usr/share/schoolbox/www
             try_files health.php
         }

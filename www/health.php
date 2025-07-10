@@ -22,7 +22,7 @@ foreach ($requiredFiles as $file) {
         'exists' => $exists,
         'readable' => $exists ? is_readable($file) : false
     ];
-    
+
     if (!$exists) {
         $allFilesExist = false;
         $status = 'unhealthy';
@@ -32,8 +32,7 @@ foreach ($requiredFiles as $file) {
 $response = [
     'status' => $status,
     'timestamp' => date('c'),
-    'checks' => $checks
 ];
 
 http_response_code($allFilesExist ? 200 : 503);
-echo json_encode($response, JSON_PRETTY_PRINT);
+echo json_encode($response);
