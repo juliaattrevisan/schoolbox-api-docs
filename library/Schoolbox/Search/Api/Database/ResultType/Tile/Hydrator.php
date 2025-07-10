@@ -53,16 +53,27 @@ class Hydrator extends BaseHydrator
      */
     public function hydrate(string $keyword, SearchFilter\DataObject $filter, array $matches, User $viewer): array
     {
-        // Find all links that match $matches.
+        // Find all tiles that match $matches.
         $acceptedMatches = array_filter($matches, [$this, 'accepts']);
 
-        $ids = array_map(fn (RawResult $match) => $match->id, $acceptedMatches);
-        if (empty($ids)) {
+        if (count($acceptedMatches) === 0) {
             return [];
         }
 
+        // Get arrays of tileIds and componentInstanceIds.
+        $tileIds = [];
+        $componentInstanceIds = [];
+        foreach ($acceptedMatches as $match) {
+            [$tileId, $componentInstanceId, $folderId] = self::explodeTileInstanceId($match->id);
+            $tileIds[] = $tileId;
+            $componentInstanceIds[] = $componentInstanceId;
+        }
+
         // Find the matching tiles.
-        $tiles = $this->tileMapper->findByColumn('id', $ids);
+        $tiles = $this->tileMapper->findByColumn('id', $tileIds);
+
+        // Get config info for each component instance for later lookup.
+        $configByComponentInstanceId = $this->getConfigByComponentInstanceId($componentInstanceIds);
 
         // Get tileLayouts, indexed by tileLayoutId.  This is necessary because tileLayout info is not hydrated in $tiles.
         // By getting this info here we avoid having to run many queries inside the loop.
@@ -71,7 +82,9 @@ class Hydrator extends BaseHydrator
         // And map to a full result.
         $fullResults = array_map(
             function (RawResult $match) use ($tiles, $viewer, $tileLayoutById) {
-                $tile = $tiles->getBy('id', $match->id);
+                [$tileId, $componentInstanceId, $folderId] = self::explodeTileInstanceId($match->id);
+
+                $tile = $tiles->getBy('id', $tileId);
                 if (!($tile instanceof TileModel)) {
                     return null;
                 }
@@ -130,5 +143,33 @@ class Hydrator extends BaseHydrator
 
         // Filter out anything missing.
         return array_filter($fullResults, fn (?FullResult $x) => isset($x));
+    }
+
+    /**
+     * @param string $tileInstanceId - Expected to be a string like "$tileId-$componentInstanceId-$folderId".
+     * @return array
+     */
+    private static function explodeTileInstanceId(string $tileInstanceId): array
+    {
+        $tokens = explode('-', $tileInstanceId);
+
+        if (count($tokens) !== 3) {
+            throw new InvalidArgumentException('String $tileInstanceId is in unexpected format.');
+        }
+
+        // Convert strings to integer or null.
+        for ($i = 0; $i < count($tokens); ++$i) {
+            if ($tokens[$i] === '') {
+                $tokens[$i] = null;
+            } else {
+                $tokens[$i] = intval($tokens[$i]);
+            }
+        }
+
+        return [
+            $tokens[0], // tileId,
+            $tokens[1], // componentInstanceId,
+            $tokens[2]  // folderId.
+        ];
     }
 }
