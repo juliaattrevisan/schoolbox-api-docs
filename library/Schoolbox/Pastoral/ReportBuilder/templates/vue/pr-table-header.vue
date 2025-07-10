@@ -22,7 +22,7 @@ const emit = defineEmits<{
  * Handles the sort action when a sortable header is clicked
  * @param header - the header object that was clicked
  */
-function handleSort(header: TableHeader): void {
+function onSortSelected(header: TableHeader): void {
     if (header.isSortable) {
         emit("sort", header.key);
     }
@@ -89,17 +89,38 @@ function getGroupedHeaders(): Array<{ title: string; colspan: number; headers: T
             <th
                 v-for="header in props.headers"
                 :key="header.key"
-                :class="`u-border-right ${header.key === 'total' ? 'total-cell' : ''}`"
-                @click="handleSort(header)"
+                :class="`u-border-right title-cell ${header.key === 'total' ? 'total-cell' : ''}`"
             >
-                {{ header.subTitle ? header.subTitle : header.title }}
+                <button class="title-button f-always-show" @click="onSortSelected(header)">
+                    {{ header.subTitle ? header.subTitle : header.title }}
+                </button>
             </th>
         </tr>
     </thead>
 </template>
 
 <style scoped lang="scss">
+.title-cell {
+    position: relative;
+    &:has(.title-button) {
+        padding: 0; // padding is handled by the button instead
+    }
+}
+
 .total-cell {
     background: lightgray;
+}
+
+.title-button {
+    background: none;
+    display: flex; // to align the text to the top left
+    height: 100%;
+    margin: 0;
+    padding: 0.625rem;
+    text-align: left;
+    width: 100%;
+    &:hover {
+        background: var(--accent-background);
+    }
 }
 </style>
