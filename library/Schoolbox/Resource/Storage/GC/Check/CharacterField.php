@@ -22,7 +22,7 @@ class CharacterField extends Base
      * * key: table name
      * * value: list of column names
      *
-     * @var array<string, array<array{column: string}>>
+     * @var array<string, array<array{columns: array<string>}>>
      */
     private const FIELDS = [
         // Notes:
