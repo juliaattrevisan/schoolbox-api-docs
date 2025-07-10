@@ -22,7 +22,7 @@ const props = defineProps<{
     severityColors: SeverityColors;
 }>();
 
-const selectedTab = window.Vue.ref(props.tabs[0]?.type ?? ""); // the currently selected tab, defaulting to the first tab type
+const selectedTab = window.Vue.ref(props.tabs[0]); // the currently selected tab, defaulting to the first tab type
 const recordsAndPoints = window.Vue.ref(["Records", "Points"]); // to toggle the tables between records and points
 const recordsOrPoints = window.Vue.ref("Records"); // the current records/points selection
 
@@ -31,7 +31,7 @@ const isTemporaryTesting = window.Vue.ref(true); // Temporary flag for testing p
 /**
  * Handle print button click
  */
-function handlePrint(): void {
+function onPrintSelected(): void {
     window.print();
 }
 </script>
@@ -50,7 +50,7 @@ function handlePrint(): void {
                     :href="props.routes.getReportResultsExport.replace('{reportId}', props.reportId.toString())"
                     class="icon-download"
                 ></a>
-                <a href="#" class="icon-print" title="Print Report Results" @click.prevent="handlePrint"></a>
+                <a href="#" class="icon-print" title="Print Report Results" @click.prevent="onPrintSelected"></a>
             </template>
         </nav>
     </div>
@@ -60,27 +60,33 @@ function handlePrint(): void {
                 <dd
                     v-for="tab in props.tabs"
                     :key="tab.type"
-                    :class="{ active: selectedTab === tab.type }"
-                    @click="selectedTab = tab.type"
+                    :class="{ active: selectedTab.title === tab.title }"
+                    @click="selectedTab = tab"
                 >
                     <a>{{ tab.title }}</a>
                 </dd>
             </dl>
-            <pr-table
+            <!-- <pr-table
                 v-if="isTemporaryTesting"
+                v-model:records-or-points="recordsOrPoints"
                 :records-and-points="recordsAndPoints"
-                :records-or-points="recordsOrPoints"
+                :selected-tab="selectedTab"
+            /> -->
+            <pr-list
+                v-if="selectedTab.type === TabType.LIST"
+                :results="props.results"
+                :config="props.config"
+                :routes="props.routes"
+                :locale-pastoral="props.localePastoral"
+                :show-severity="props.showSeverity"
+                :severity-colors="props.severityColors"
             />
-            <!-- <pr-list
-        v-if="selectedTab === TabType.LIST"
-        :results="props.results"
-        :config="props.config"
-        :routes="props.routes"
-        :locale-pastoral="props.localePastoral"
-        :show-severity="props.showSeverity"
-        :severity-colors="props.severityColors"
-    />
-    <pr-table v-else :records-and-points="recordsAndPoints" :records-or-points="recordsOrPoints" />  -->
+            <pr-table
+                v-else
+                v-model:records-or-points="recordsOrPoints"
+                :records-and-points="recordsAndPoints"
+                :selected-tab="selectedTab"
+            />
         </div>
     </div>
 </template>

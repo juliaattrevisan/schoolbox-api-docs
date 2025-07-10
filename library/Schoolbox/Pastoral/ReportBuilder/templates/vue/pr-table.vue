@@ -4,25 +4,39 @@
  */
 
 import { payload } from "./tempData";
-import type { TablePayload } from "../js/types/pastoralReportTypes";
+import type { Tab, TablePayload } from "../js/types/pastoralReportTypes";
+import { TabType } from "../js/types/pastoralReportTypes";
 import PrTableHeader from "./pr-table-header.vue";
 import PrTableTotalRow from "./pr-table-total-row.vue";
 import PrTableRow from "./pr-table-row.vue";
 
-type Props = {
+const props = defineProps<{
+    selectedTab: Tab;
     recordsAndPoints: string[];
-};
-const props = defineProps<Props>();
+}>();
 
 const recordsOrPoints = defineModel<string>("records-or-points", { default: "Records" });
 
 const payloadData = window.Vue.ref<TablePayload>(payload);
 
-const handleSort = (key: string): void => {
-    // TODO: Implement sorting logic
-    // Sort data by the provided key: ${key}
-    void key; // Suppress unused variable warning
-};
+/**
+ * when the endpoint changes trigger a new load
+ */
+window.Vue.watch(
+    () => props.selectedTab,
+    (newTab) => {
+        if (newTab.type === TabType.TABLE) {
+            // endpoint change
+        }
+    },
+);
+
+/**
+ * Handle sort button click
+ */
+function onSortSelected(): void {
+    // Implement sorting logic here
+}
 </script>
 
 <template>
@@ -31,7 +45,7 @@ const handleSort = (key: string): void => {
             v-model:records-or-points="recordsOrPoints"
             :headers="payloadData.data.tableHeaders"
             :records-and-points="props.recordsAndPoints"
-            @sort="handleSort"
+            @sort="onSortSelected"
         />
         <tbody>
             <!-- Total row -->
