@@ -74,7 +74,7 @@ const mark = defineModel<string | null>("mark", { required: true });
          Select No Grade. Otherwise we need to find out whether the humanReadableMark exists
          in one of the other places that might match
          -->
-        <option :value="null" disabled>(no grade)</option>
+        <option :value="null" disabled :selected="mark === null">(no grade)</option>
 
         <optgroup
             v-if="props.markScheme.context.conf.length === 0"
@@ -103,7 +103,7 @@ const mark = defineModel<string | null>("mark", { required: true });
             <option
                 v-for="state in props.submissionErrorStates"
                 :key="state.id"
-                :value="state"
+                :value="state.name"
                 :selected="mark === state.name"
             >
                 {{ state.name }}
