@@ -1,0 +1,17 @@
+{
+    "_hash": "f2ea36087e7747c428548d99a1772256cd004dfc793583a27baa080101402987",
+    "patches": {
+        "violet/streaming-json-encoder": [
+            {
+                "package": "violet/streaming-json-encoder",
+                "description": "psr/http-message 2.0",
+                "url": "./patches/violet/streaming-json-encoder/psr-http-message-2.0.patch",
+                "sha256": "56d59693a656191f46503338074177280e7a9189aa6da482b36df3d120b181f8",
+                "depth": 1,
+                "extra": {
+                    "provenance": "patches-file:patches.json"
+                }
+            }
+        ]
+    }
+}
