@@ -52,7 +52,7 @@ const props = defineProps<{
                                         v-if="record.isArchived"
                                         name="archive"
                                         size="0.75rem"
-                                        :title="`Record archived - ${record.expiresAt}`"
+                                        :title="`Record archived - ${record.expiresAt?.short}`"
                                     ></sbx-icon>
                                     <sbx-label-pastoral-points
                                         v-if="props.config.pastoralPointEnabled && record.points"

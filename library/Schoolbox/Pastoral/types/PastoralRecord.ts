@@ -23,11 +23,10 @@ type PastoralSubtype = {
 };
 
 /**
- * Date type with short format
+ * Date type with short format, the only date used for now
  */
 type PastoralDate = {
     short: string;
-    local: string;
 };
 
 /**
@@ -56,7 +55,7 @@ export type PastoralRecord = {
     student: User;
     heading: string;
     isArchived: boolean;
-    expiresAt?: string;
+    expiresAt?: PastoralDate;
     severity?: Severity;
     points?: number;
     type: PastoralType;

@@ -41,6 +41,10 @@ class ModelToArray
             'externalId' => $model->getExternalId(),
             'student'    => $this->translateUser($model->getStudent()),
             'isArchived' => $model->isArchived(),
+            'expiresAt'  => $model->getExpiresAt()
+                ? [
+                    'short' => $model->getExpiresAt()->getShort(),
+                ] : null,
             'heading'    => $model->getHeading(),
             'type'               => $model->getType()
                 ? [
