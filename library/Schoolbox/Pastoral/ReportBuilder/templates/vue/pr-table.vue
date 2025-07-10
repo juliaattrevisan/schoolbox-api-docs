@@ -3,10 +3,11 @@
  * Displays a pastoral report in a table format.
  */
 
+import { useTemplateRef } from "vue";
 import { payload as tempPayload } from "./tempData";
 import type { Tab, TablePayload } from "../js/types/pastoralReportTypes";
 import { TabType } from "../js/types/pastoralReportTypes";
-import { useLoadPrTable } from "./composable/useLoadPrTable";
+// import { useLoadPrTable } from "./composable/useLoadPrTable";
 import PrTableHeader from "./pr-table-header.vue";
 import PrTableTotalRow from "./pr-table-total-row.vue";
 import PrTableRow from "./pr-table-row.vue";
@@ -31,13 +32,37 @@ const payloadData = window.Vue.ref<TablePayload>({
         count: tempPayload.data.rows.length * 10,
     },
 });
-const currentEndpoint = window.Vue.ref<string>(props.selectedTab.endpoint || ""); // the current endpoint to load data from
 const sortBy = window.Vue.ref<string>("user"); // the current sort by field - this should update when payload is loaded
 const sortOrder = window.Vue.ref<"asc" | "desc">("asc"); // the current sort order
 
 const isLoading = window.Vue.ref<boolean>(false);
 const loadError = window.Vue.ref<string | null>(null);
 // const { isLoading, payload, isEmpty, loadError } = useLoadPrTable(currentEndpoint);
+
+// #region scrollable height
+
+const scrollableEl = useTemplateRef<HTMLDivElement>("scrollableEl");
+const maxScrollableHeight = window.Vue.ref<string>(`${window.innerHeight - 200}px`); // 200px chosen to give breathing room for header and metadata
+
+/**
+ * Set the max height to allow the thead to use sticky position
+ * and to incrementally display large row lists on scroll
+ */
+function setScrollableHeight(): void {
+    maxScrollableHeight.value = `${window.innerHeight - 200}px`;
+}
+
+/**
+ * Start setting the scrollable height on any window resize change
+ */
+window.Vue.onMounted(() => {
+    setScrollableHeight();
+    window.addEventListener("resize", () => {
+        setScrollableHeight();
+    });
+});
+
+// #endregion
 
 /**
  * when the endpoint changes trigger a new load
@@ -85,32 +110,39 @@ function onSortSelected(headerKey: string): void {
         </div>
     </div>
     <template v-else>
-        <table class="pr-table">
-            <pr-table-header
-                v-model:records-or-points="recordsOrPoints"
-                :headers="payloadData.data.tableHeaders"
-                :records-and-points="props.recordsAndPoints"
-                :sort-by="sortBy"
-                :sort-order="sortOrder"
-                @sort="onSortSelected"
-            />
-            <tbody>
-                <!-- Total row -->
-                <pr-table-total-row
+        <div
+            ref="scrollableEl"
+            class="table-container scrollable"
+            :style="{ maxHeight: maxScrollableHeight }"
+            data-test="pr-table"
+        >
+            <table class="pr-table">
+                <pr-table-header
+                    v-model:records-or-points="recordsOrPoints"
                     :headers="payloadData.data.tableHeaders"
-                    :row-data="payloadData.data.totalRow"
-                    :records-or-points="recordsOrPoints"
+                    :records-and-points="props.recordsAndPoints"
+                    :sort-by="sortBy"
+                    :sort-order="sortOrder"
+                    @sort="onSortSelected"
                 />
-                <!-- All other rows -->
-                <pr-table-row
-                    v-for="(row, index) in payloadData.data.rows"
-                    :key="`row-${index}`"
-                    :headers="payloadData.data.tableHeaders"
-                    :row-data="row"
-                    :records-or-points="recordsOrPoints"
-                />
-            </tbody>
-        </table>
+                <tbody>
+                    <!-- Total row -->
+                    <pr-table-total-row
+                        :headers="payloadData.data.tableHeaders"
+                        :row-data="payloadData.data.totalRow"
+                        :records-or-points="recordsOrPoints"
+                    />
+                    <!-- All other rows -->
+                    <pr-table-row
+                        v-for="(row, index) in payloadData.data.rows"
+                        :key="`row-${index}`"
+                        :headers="payloadData.data.tableHeaders"
+                        :row-data="row"
+                        :records-or-points="recordsOrPoints"
+                    />
+                </tbody>
+            </table>
+        </div>
         <!-- Table metadata -->
         <div class="pr-table-metadata">
             <div class="pr-table-metadata__count">
@@ -120,4 +152,32 @@ function onSortSelected(headerKey: string): void {
     </template>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.scrollable {
+    overflow-y: auto;
+}
+
+.pr-table {
+    width: 100%;
+
+    thead {
+        /* fix the head to stay at the top when scrolling */
+        position: sticky;
+        top: 0;
+        z-index: var(--sbx-depth-ui-sticky);
+        background: #ffffff; /* Ensure the header has a background to prevent transparency */
+    }
+}
+
+.pr-table-metadata {
+    margin-top: 1rem;
+    padding: 0.5rem;
+    border-top: 1px solid #e0e0e0;
+    background-color: #f9f9f9;
+
+    &__count {
+        font-size: 0.9rem;
+        color: #666;
+    }
+}
+</style>
