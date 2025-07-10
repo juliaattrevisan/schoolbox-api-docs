@@ -98,6 +98,7 @@ class Model implements ISoftDeletable
         'studentByType' => [
             'label' => 'Student by Type/Sub-Type',
             'type' => 'table',
+            'endpoint' => 'pastoral/report/results/{reportId}/studentByType/',
         ],
         //TODO: future updates for SA-19333
 //        'TypeByMonth' => [

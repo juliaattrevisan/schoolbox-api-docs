@@ -369,7 +369,7 @@ class Controller extends Base
         $severityColors = $showSeverity ? $this->getSeverityColors() : [];
 
         $defaultSummaryOptions = [
-            ['title' => 'List', 'type' => 'list', 'key' => 'list']
+            ['title' => 'List', 'type' => 'list', 'key' => 'list', 'endpoint' => 'list']
         ];
 
         /* Find the selected list of options
@@ -387,7 +387,8 @@ class Controller extends Base
             $mappedOptions[] = [
                 'title' => $option['label'],
                 'type' => $option['type'],
-                'key' => $key
+                'key' => $key,
+                'endpoint' => $option['endpoint'] ?? null
             ];
         }
 
