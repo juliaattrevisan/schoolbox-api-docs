@@ -99,47 +99,34 @@ class ValidationTest extends TestCase
                 ],
                 '3'  // if outside of the range, it should return the minimum value
             ],
-        ];
-    }
-
-
-    /**
-     * You should also test for error states that your code may raise.
-     * Use the `
-     * you expect your code to raise.
-     *
-     * @dataProvider getTestErrorRaisedData
-     *
-     */
-    #[DataProvider('getTestErrorRaisedData')]
-    public function testErrorRaised($input): void
-    {
-        $this->expectException(\TypeError::class);
-
-        // Substitute this with the method call that is supposed to fail.
-        $test = static function (int $b) {
-            return $b + 1;
-        };
-
-        $test($input);
-    }
-
-
-    /**
-     * Data provider for `testErrorRaised`.
-     *
-     * @return array
-     */
-    public static function getTestErrorRaisedData(): array
-    {
-        return [
-            [1.5],
-            [null],
-            ['a string'],
-            ['1.5'],
-            [new \stdClass()],
-            [[]],
-            [STDOUT]
+            'random text' => [
+                [
+                    'config' => [
+                        'min' => 1,
+                        'max' => 100
+                    ],
+                    'value' => 'random text'
+                ],    // goes into testValidExample() as $input
+                '1'  // if outside of the range, it should return the minimum value
+            ],
+            'bigger than' => [
+                [
+                    'config' => [
+                        'max' => 100
+                    ],
+                    'value' => '101'
+                ],    // goes into testValidExample() as $input
+                '100'  // if outside of the range, it should return the maximum value
+            ],
+            'text but max only' => [
+                [
+                    'config' => [
+                        'max' => 100
+                    ],
+                    'value' => 'random text'
+                ],    // goes into testValidExample() as $input
+                '100'  // if outside of the range, it should return the maximum value
+            ],
         ];
     }
 }
