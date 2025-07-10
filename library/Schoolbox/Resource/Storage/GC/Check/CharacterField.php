@@ -38,7 +38,7 @@ class CharacterField extends Base
         'profile_button'               => [['columns' => ['url']]],
         'rubric_descriptor'            => [['columns' => ['description']]],
         'sis_user_profile'             => [['columns' => ['portrait_hash']]],
-        'socialstream_post'            => [['columns' => ['thumbnail'], ['column' => 'url']]],
+        'socialstream_post'            => [['columns' => ['thumbnail', 'url']]],
         'sportsfixtures_division'      => [['columns' => ['url']]],
         'sportsfixtures_import_errors' => [['columns' => ['hash']]],
         'sportsfixtures_sport'         => [['columns' => ['url']]],
