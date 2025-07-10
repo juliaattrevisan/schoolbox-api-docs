@@ -147,9 +147,6 @@ class Controller extends WebController\Base
         // hydrate participants
         $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, null, true);
 
-        $baseUrl = $this->getRouteIfAuthorized('courseStatus.getStatus', ['assessmentId' => $assessmentSpec->getId(), 'assessmentSpec' => $assessmentSpec, 'courseSpecId' => $courseSpec->getId(), 'courseSpec' => $courseSpec]);
-        $returnUrlSuffix = Redirect::queryString($baseUrl);
-
         // Injectables...
         $rubricIndicatorMarkMapper = RubricIndicatorMarkMapper::getInstance();
         $termMapper = Term\Mapper::getInstance();
