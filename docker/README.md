@@ -34,6 +34,10 @@ within a self-contained development environment.
   sudo docker compose -f docker/deploy.docker-compose.yaml down
   sudo docker compose -f docker/prod.docker-compose.yaml down
 
+  # currently, the `php82-bookworm` image must be built locally before
+  # everything else:
+  sudo docker compose build php82-bookworm
+
   # start default environment:
   # this has Schoolbox's code folder mounted as a local mount, thus changes made
   # locally are available immediately within the container.
