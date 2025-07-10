@@ -50,8 +50,8 @@ class CharacterField extends Base
     ];
 
     /**
-     * Builds a list of tables and columns which represent character field
-     * relations.
+     * Builds a list of tables and columns which represent character fields
+     * which may contain storage hashes, but are not foreign keys.
      */
     protected function buildTableColumnList(): array
     {
@@ -59,12 +59,7 @@ class CharacterField extends Base
     }
 
     /**
-     * Build a query for finding usage of a hash.
-     *
-     * @param string $table      The table to search within.
-     * @param array  $columnData `column`: the column to search within
-     * @return IStatement A statement which accepts a storage hash as its `hash`
-     *                    parameter.
+     * @inheritdoc
      */
     protected function buildFindHashQuery(string $table, array $columns, ?array $extra): IStatement
     {
