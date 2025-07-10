@@ -11,6 +11,7 @@ namespace Schoolbox\Search\Api\Database\ResultType\Tile;
 
 use Component_Config_Collapse;
 use Component_Config_ShowComponentTitle;
+use InvalidArgumentException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
