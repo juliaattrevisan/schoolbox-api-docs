@@ -74,12 +74,11 @@ export function useLoadPrTable(endpoint: Ref<string>): {
     /**
      * when the endpoint changes trigger a new load
      */
-    window.Vue.watch(
-        () => endpoint,
-        () => {
+    window.Vue.watch(endpoint, () => {
+        if (endpoint.value !== "") {
             void load();
-        },
-    );
+        }
+    });
 
     return {
         isLoading,

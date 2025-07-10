@@ -4,10 +4,10 @@
  */
 
 import { useTemplateRef } from "vue";
-import { payload as tempPayload } from "./tempData";
-import type { Tab, TablePayload } from "../js/types/pastoralReportTypes";
+// import { payload as tempPayload } from "./tempData";
+import type { Tab, TablePayload, Routes } from "../js/types/pastoralReportTypes";
 import { TabType } from "../js/types/pastoralReportTypes";
-// import { useLoadPrTable } from "./composable/useLoadPrTable";
+import { useLoadPrTable } from "./composable/useLoadPrTable";
 import PrTableHeader from "./pr-table-header.vue";
 import PrTableTotalRow from "./pr-table-total-row.vue";
 import PrTableRow from "./pr-table-row.vue";
@@ -15,29 +15,16 @@ import PrTableRow from "./pr-table-row.vue";
 const props = defineProps<{
     selectedTab: Tab;
     recordsAndPoints: string[];
+    routes: Routes;
+    localePastoral: string;
 }>();
 
 const recordsOrPoints = defineModel<string>("records-or-points", { default: "Records" });
 
-const payloadData = window.Vue.ref<TablePayload>({
-    ...tempPayload,
-    data: {
-        ...tempPayload.data,
-        rows: Array(10)
-            .fill(null)
-            .flatMap(() => tempPayload.data.rows),
-    },
-    metadata: {
-        ...tempPayload.metadata,
-        count: tempPayload.data.rows.length * 10,
-    },
-});
 const sortBy = window.Vue.ref<string>("user"); // the current sort by field - this should update when payload is loaded
 const sortOrder = window.Vue.ref<"asc" | "desc">("asc"); // the current sort order
-
-const isLoading = window.Vue.ref<boolean>(false);
-const loadError = window.Vue.ref<string | null>(null);
-// const { isLoading, payload, isEmpty, loadError } = useLoadPrTable(currentEndpoint);
+const currentEndpoint = window.Vue.ref("");
+const { isLoading, payload, isEmpty, loadError } = useLoadPrTable(currentEndpoint);
 
 // #region scrollable height
 
@@ -60,6 +47,8 @@ window.Vue.onMounted(() => {
     window.addEventListener("resize", () => {
         setScrollableHeight();
     });
+    // Set initial endpoint based on selected tab, which will trigger the load in useLoadPrTable
+    currentEndpoint.value = props.selectedTab.endpoint;
 });
 
 // #endregion
@@ -109,6 +98,11 @@ function onSortSelected(headerKey: string): void {
             >
         </div>
     </div>
+    <div v-else-if="isEmpty" class="empty-state-flex-centered">
+        <i class="icon-pastoral"></i>
+        <p>No {{ props.localePastoral }} records matched your report criteria.</p>
+        <a :href="props.routes.getIndex"> Select Another Report </a>
+    </div>
     <template v-else>
         <div
             ref="scrollableEl"
@@ -119,7 +113,7 @@ function onSortSelected(headerKey: string): void {
             <table class="pr-table">
                 <pr-table-header
                     v-model:records-or-points="recordsOrPoints"
-                    :headers="payloadData.data.tableHeaders"
+                    :headers="(payload as TablePayload).data.tableHeaders"
                     :records-and-points="props.recordsAndPoints"
                     :sort-by="sortBy"
                     :sort-order="sortOrder"
@@ -128,15 +122,15 @@ function onSortSelected(headerKey: string): void {
                 <tbody>
                     <!-- Total row -->
                     <pr-table-total-row
-                        :headers="payloadData.data.tableHeaders"
-                        :row-data="payloadData.data.totalRow"
+                        :headers="(payload as TablePayload).data.tableHeaders"
+                        :row-data="(payload as TablePayload).data.totalRow"
                         :records-or-points="recordsOrPoints"
                     />
                     <!-- All other rows -->
                     <pr-table-row
-                        v-for="(row, index) in payloadData.data.rows"
+                        v-for="(row, index) in (payload as TablePayload).data.rows"
                         :key="`row-${index}`"
-                        :headers="payloadData.data.tableHeaders"
+                        :headers="(payload as TablePayload).data.tableHeaders"
                         :row-data="row"
                         :records-or-points="recordsOrPoints"
                     />
@@ -146,7 +140,8 @@ function onSortSelected(headerKey: string): void {
         <!-- Table metadata -->
         <div class="pr-table-metadata">
             <div class="pr-table-metadata__count">
-                Showing {{ payloadData.data.rows.length }} of {{ payloadData.metadata.count }} records
+                Showing {{ (payload as TablePayload).data.rows.length }} of
+                {{ (payload as TablePayload).metadata.count }} records
             </div>
         </div>
     </template>
@@ -159,7 +154,6 @@ function onSortSelected(headerKey: string): void {
 
 .pr-table {
     width: 100%;
-
     thead {
         /* fix the head to stay at the top when scrolling */
         position: sticky;
@@ -174,7 +168,6 @@ function onSortSelected(headerKey: string): void {
     padding: 0.5rem;
     border-top: 1px solid #e0e0e0;
     background-color: #f9f9f9;
-
     &__count {
         font-size: 0.9rem;
         color: #666;

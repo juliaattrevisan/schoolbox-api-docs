@@ -27,8 +27,6 @@ const recordsAndPoints = window.Vue.ref(["Records", "Points"]); // to toggle the
 const recordsOrPoints = window.Vue.ref("Records"); // the current records/points selection
 const tabParamName = "tab"; // URL parameter name for the selected tab
 
-const isTemporaryTesting = window.Vue.ref(true); // Temporary flag for testing purposes
-
 /**
  * Handle print button click
  */
@@ -110,6 +108,8 @@ window.Vue.onMounted((): void => {
                 v-model:records-or-points="recordsOrPoints"
                 :records-and-points="recordsAndPoints"
                 :selected-tab="selectedTab"
+                :routes="props.routes"
+                :locale-pastoral="props.localePastoral"
             />
         </div>
     </div>
