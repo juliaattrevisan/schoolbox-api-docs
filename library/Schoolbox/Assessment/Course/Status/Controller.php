@@ -155,18 +155,17 @@ class Controller extends WebController\Base
         // init the twig data
         $twigData = [
             'breadcrumbs' => $this->bakery->produceFromAssessment($assessmentSpec, $this->getUser())->add([ $assessmentSpec->getTitle(), '' ]),
-
-            /* Need this suffix so we can return to the status screen after
-             * finishing the modification of le quiz or project
-             */
-            'returnUrl' => Redirect::encode($baseUrl),
-            'returnUrlSuffix' => $returnUrlSuffix,
         ];
 
         /** project uses the normal page */
         if ($assessmentSpec instanceof Project) {
             $twigData['baseContext'] = $assessmentSpec->getBaseContext();
             $twigData['assessment'] = $assessmentSpec;
+
+            $twigData['returnUrl'] =
+            $this->requestQuery->get(Redirect::RETURN_URL)
+                ? Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL))
+                : $this->getSession()->getHistory();
 
             $assessmentStats = new GenericCollection(Assessment\Statistics::class);
             $assessmentStats[$assessmentSpec->getId()] = new Assessment\Statistics($assessmentSpec);
