@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Simple healthcheck endpoint that verifies essential configuration files exist
  * Does not load the Schoolbox kernel for performance and reliability
@@ -22,7 +23,6 @@ foreach ($requiredFiles as $file) {
         'exists' => $exists,
         'readable' => $exists ? is_readable($file) : false
     ];
-
     if (!$exists) {
         $allFilesExist = false;
         $status = 'unhealthy';
