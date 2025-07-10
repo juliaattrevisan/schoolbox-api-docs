@@ -40,6 +40,7 @@ export type Routes = {
     getStudentRecord: string;
     getReportTags: string;
     getIndex: string;
+    getReportResultsExport: string;
 };
 
 /**
