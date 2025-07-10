@@ -96,12 +96,6 @@ window.Vue.onMounted((): void => {
                     <a>{{ tab.title }}</a>
                 </dd>
             </dl>
-            <!-- <pr-table
-                v-if="isTemporaryTesting"
-                v-model:records-or-points="recordsOrPoints"
-                :records-and-points="recordsAndPoints"
-                :selected-tab="selectedTab"
-            /> -->
             <pr-list
                 v-if="selectedTab.type === TabType.LIST"
                 :results="props.results"
