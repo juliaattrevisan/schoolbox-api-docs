@@ -672,6 +672,11 @@ class Controller extends Base
             $studentRows[] = $row;
         }
 
+        // Sort student rows by last name
+        usort($studentRows, function($a, $b) {
+            return strcmp($a[0]['lastname'], $b[0]['lastname']);
+        });
+
         // Build tableHeaders starting with user and total, then adding tempTypes
         $tableHeaders = [
             [
