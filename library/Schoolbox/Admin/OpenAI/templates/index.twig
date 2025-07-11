@@ -29,12 +29,12 @@
 
                 /* Text credentials
                  */
-                let textContainer = $('#textSettingsContainer');
-                let textProvider = $('#openai_text_endpoint-field');
-                let textKey = $('#openai_text_key-field').parent('div');
-                let textModel = $('#openai_text_model-field').parent('div');
-                let textAzureResourceName = $('#openai_text_azure_resource_name-field').parent('div');
-                let textAzureDeploymentId = $('#openai_text_azure_deployment_id-field').parent('div');
+                const textContainer = $('#textSettingsContainer');
+                const textProvider = $('#openai_text_endpoint-field');
+                const textKey = $('#openai_text_key-field').parent('div');
+                const textModel = $('#openai_text_model-field').parent('div');
+                const textAzureResourceName = $('#openai_text_azure_resource_name-field').parent('div');
+                const textAzureDeploymentId = $('#openai_text_azure_deployment_id-field').parent('div');
 
                 textProvider.on('change', function(event) {
                     event.preventDefault();
@@ -45,13 +45,13 @@
 
                 /* Image credentials
                  */
-                let imageContainer = $('#imageSettingsContainer');
-                let imageProvider = $('#openai_image_endpoint-field');
-                let imageKey = $('#openai_image_key-field').parent('div');
-                let imageModel = $('#openai_image_model-field').parent('div');
-                let imageAzureResourceName = $('#openai_image_azure_resource_name-field').parent('div');
-                let imageAzureDeploymentId = $('#openai_image_azure_deployment_id-field').parent('div');
-                let imageSystemPrompt = $('#openai_image_system_prompt-field').parent('div');
+                const imageContainer = $('#imageSettingsContainer');
+                const imageProvider = $('#openai_image_endpoint-field');
+                const imageKey = $('#openai_image_key-field').parent('div');
+                const imageModel = $('#openai_image_model-field').parent('div');
+                const imageAzureResourceName = $('#openai_image_azure_resource_name-field').parent('div');
+                const imageAzureDeploymentId = $('#openai_image_azure_deployment_id-field').parent('div');
+                const imageSystemPrompt = $('#openai_image_system_prompt-field').parent('div');
 
                 imageProvider.on('change', function(event) {
                     event.preventDefault();
