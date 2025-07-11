@@ -23,6 +23,16 @@ SET value = 'Off'
 WHERE name = 'openai_text_endpoint'
 AND (`value` IS NULL OR `value` = '');
 
+-- Force default "Off" if the OpenAI key was meaningless
+UPDATE config
+SET value = CASE WHEN (SELECT COUNT(*) AS num
+                       FROM config
+                       WHERE name = 'openai_key' AND (`value` IS NULL OR `value` = '')) = 1
+                 THEN 'Off'
+                 ELSE `value`
+                 END
+WHERE name = 'openai_text_endpoint';
+
 -- openai key
 UPDATE config
 SET name = 'openai_text_key',
