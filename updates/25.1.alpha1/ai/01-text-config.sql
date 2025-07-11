@@ -13,7 +13,8 @@ UPDATE config
 SET name = 'openai_text_endpoint',
     module = 'openai-text',
     options = 'Off:OpenAI:Azure',
-    required = 'true'
+    required = 'true',
+    description = 'Select which provider you will use for conducting AI text queries; choose "Off" to disable this feature.'
 WHERE name = 'openai_endpoint'
 LIMIT 1;
 

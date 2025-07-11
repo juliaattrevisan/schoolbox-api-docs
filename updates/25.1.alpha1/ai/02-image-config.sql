@@ -3,7 +3,7 @@ VALUES (
     'openai_image_endpoint',
     'Off',
     'Image Generation Endpoint',
-    'Select which provider you will use for conducting AI image queries',
+    'Select which provider you will use for conducting AI image queries; choose "Off" to disable this feature.',
     (SELECT id FROM lu_config_field WHERE field = 'select'),
     (SELECT id FROM lu_config_type WHERE type = 'AI'),
     'Off:OpenAI:Azure',
