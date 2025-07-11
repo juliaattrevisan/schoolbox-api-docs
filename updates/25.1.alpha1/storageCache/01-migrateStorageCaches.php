@@ -9,15 +9,19 @@ declare(strict_types=1);
 
 use Alaress\Codec\ICodec;
 use Alaress\Codec\Json\Base64;
+use Monolog\Level;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\ClientRepository;
 use Predis\ClientInterface;
 use Psr\SimpleCache\CacheInterface;
+use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 use Schoolbox\LTI\AccessToken\Codec as LtiAccessTokenCodec;
 use Schoolbox\Oidc\CacheHelper;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Psr16Cache;
+
+require_once __DIR__ . '/../../../conf/core/require.php';
 
 /**
  * CLI tool for migrating all values which were stored using the old Redis cache
@@ -30,7 +34,10 @@ use Symfony\Component\Cache\Psr16Cache;
  */
 $app = new class extends CliTool\App {
     /**
+     * Set key, as used by the old Redis cache.
      *
+     * This is intended to store all keys within the namespace of the cache, so
+     * that they may be easily iterated.
      */
     private const SET_KEY = '__set';
 
@@ -93,7 +100,7 @@ $app = new class extends CliTool\App {
                     $migration['newNamespace'],
                 ),
             );
-            $keys = $redisClient->smembers($migration['oldNamespace'] . ':__set');
+            $keys = $redisClient->smembers($migration['oldNamespace'] . ':' . self::SET_KEY);
             $this->getLogger()->info(
                 sprintf(
                     '. %d keys found in %s:__set',
@@ -104,25 +111,27 @@ $app = new class extends CliTool\App {
 
             // Set each key, for whatever its remaining TTL is
             foreach ($keys as $key) {
-                $value = $redisClient->get($migration['oldNamespace'] . ':' . $key);
-                $ttl   = $redisClient->ttl($migration['oldNamespace'] . ':' . $key);
+                $value  = $redisClient->get($key);
+                $ttl    = $redisClient->ttl($key);
                 if (!isset($value)) {
                     $this->getLogger()->warning(
-                        sprintf(
-                            'Cache key %s:%s value does not exist: skipping',
-                            $migration['oldNamespace'],
-                            $key,
-                        )
+                        sprintf('Cache key %s value does not exist: skipping', $key)
                     );
                     continue;
                 }
 
+                // Remove the old namespace from the key, then set its value
+                $newKey       = str_replace($migration['oldNamespace'] . ':', '', $key);
                 $decodedValue = $migration['codec']->decode($value);
-                $migration['cache']->set($key, $decodedValue, $ttl);
+                $migration['cache']->set($newKey, $decodedValue, $ttl);
+
+                // TODO delete from old cache
             }
+
+            // TODO if deleting from old cache, delete set as well
         }
     }
 };
 
 /** @noinspection PhpUnhandledExceptionInspection */
-(new CliTool\Kernel($app, [], true))->runApp();
+(new CliTool\Kernel($app, [CliKernelAbstract::OPTION_LEVEL => Level::Debug], true))->runApp();
