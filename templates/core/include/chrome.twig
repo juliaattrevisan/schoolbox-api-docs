@@ -126,7 +126,7 @@
         window.sbProps.colourDefaults["skinUnique"] = uniqueSkinColours;
         window.sbProps.colourDefaults["swatches"] = [...chosenSkinColours, ...window.sbProps.colourDefaults["constant"]];
 
-        {% if user.current.role.staff and config.openai_text_endpoint == 'Off' %}
+        {% if user.current.role.staff and config.openai_text_endpoint != 'Off' %}
         // to display the AI features around the site
         window.sbProps.hasAIFeatures = true;
         window.sbProps.openAIModel = "{{ config.openai_text_model }}";
