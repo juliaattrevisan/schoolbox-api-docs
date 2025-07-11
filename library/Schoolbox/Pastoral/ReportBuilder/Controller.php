@@ -451,6 +451,7 @@ class Controller extends Base
         // Build tempTypes array with the required structure
         $tempTypes = [];
         $tempTotalRow = [];
+        $tempRows = [];
 
         // Calculate record counts and points for subtypes
         $subtypeCounts = [];
@@ -494,6 +495,55 @@ class Controller extends Base
             }
         }
 
+        // Group records by student and calculate per-student counts
+        $studentRecords = [];
+        foreach ($records as $record) {
+            $student = $record->getStudent();
+            $studentId = $student->getId();
+
+            if (!isset($studentRecords[$studentId])) {
+                $studentRecords[$studentId] = [
+                    'student' => $student,
+                    'subtypeCounts' => [],
+                    'subtypePoints' => [],
+                    'typeCounts' => [],
+                    'typePoints' => [],
+                ];
+            }
+
+            // Count subtypes for this student
+            $subtype = $record->getSubType();
+            if ($subtype) {
+                $subtypeId = $subtype->getId();
+                if (!isset($studentRecords[$studentId]['subtypeCounts'][$subtypeId])) {
+                    $studentRecords[$studentId]['subtypeCounts'][$subtypeId] = 0;
+                    $studentRecords[$studentId]['subtypePoints'][$subtypeId] = 0;
+                }
+                $studentRecords[$studentId]['subtypeCounts'][$subtypeId]++;
+
+                $points = $record->getPoints();
+                if ($points !== null && $points !== '') {
+                    $studentRecords[$studentId]['subtypePoints'][$subtypeId] += (int)$points;
+                }
+            }
+
+            // Count types for this student (only those without subtypes)
+            $type = $record->getType();
+            if ($type && !isset($typesWithSubtypes[$type->getId()])) {
+                $typeId = $type->getId();
+                if (!isset($studentRecords[$studentId]['typeCounts'][$typeId])) {
+                    $studentRecords[$studentId]['typeCounts'][$typeId] = 0;
+                    $studentRecords[$studentId]['typePoints'][$typeId] = 0;
+                }
+                $studentRecords[$studentId]['typeCounts'][$typeId]++;
+
+                $points = $record->getPoints();
+                if ($points !== null && $points !== '') {
+                    $studentRecords[$studentId]['typePoints'][$typeId] += (int)$points;
+                }
+            }
+        }
+
         // Add subtypes
         foreach ($subtypes as $subtype) {
             $subtypeId = $subtype->getId();
@@ -527,11 +577,58 @@ class Controller extends Base
             }
         }
 
+        // Build tempRows with student data
+        foreach ($studentRecords as $studentData) {
+            $student = $studentData['student'];
+            $row = [];
+
+            // Add user object as first element
+            $row[] = [
+                'id' => $student->getId(),
+                'name' => $student->getFullName(),
+                'externalId' => $student->getExternalId(),
+                'firstname' => $student->getFirstname(),
+                'fullName' => $student->getFullName(),
+                'givenName' => $student->getGivenName(),
+                'lastname' => $student->getLastname(),
+                'preferredName' => $student->getPreferredName(),
+                'title' => $student->getTitle(),
+                'pronoun' => $student->getPronoun(),
+                '_links' => [
+                    'avatar' => '/portrait.php?id=' . $student->getId() . '&size=square64',
+                    'profile' => '/search/user/' . $student->getId(),
+                ],
+            ];
+
+            // Add data for each subtype
+            foreach ($subtypes as $subtype) {
+                $subtypeId = $subtype->getId();
+                $row[] = [
+                    'records' => $studentData['subtypeCounts'][$subtypeId] ?? 0,
+                    'points' => $studentData['subtypePoints'][$subtypeId] ?? 0,
+                ];
+            }
+
+            // Add data for each type (without subtypes)
+            foreach ($types as $type) {
+                if (!isset($typesWithSubtypes[$type->getId()])) {
+                    $typeId = $type->getId();
+                    $row[] = [
+                        'records' => $studentData['typeCounts'][$typeId] ?? 0,
+                        'points' => $studentData['typePoints'][$typeId] ?? 0,
+                    ];
+                }
+            }
+
+            $tempRows[] = $row;
+        }
+
         // Dummy data matching the structure from tempData.ts
         $payload = [
             'data' => [
                 'tempTypes' => $tempTypes,
                 'tempTotalRow' => $tempTotalRow,
+                'tempRows' => $tempRows,
                 'tableHeaders' => [
                     [
                         'key' => 'user',
