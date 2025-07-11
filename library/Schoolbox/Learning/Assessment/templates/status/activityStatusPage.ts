@@ -252,39 +252,39 @@ async function onSelectedTabChange(groupId: number, activeTab: number, animate: 
     groupConfig.container.classList.remove("hide");
 }
 
-// All groups share the same lock
-let changeTabLock: Promise<void> | null = null;
-let changeTabNext: (() => Promise<void>) | null = null;
+// Each group has its own lock
+const changeTabLocks = new Map<number, Promise<void> | null>();
+const changeTabNexts = new Map<number, (() => Promise<void>) | null>();
 
 /**
  * To change the selected tab
- * This ensures that only one call of onSelectedTabChange is running at a time to avoid concurrent editor creation/destruction
+ * This ensures that only one call of onSelectedTabChange is running at a time per group to avoid concurrent editor creation/destruction
  * @param groupId - The index of the participant group to change
  * @param activeTab - The index of the tab to show
  * @param animate - Whether to animate the change (slideUp/slideDown), use this for filters
  */
 async function changeTab(groupId: number, activeTab: number, animate: boolean): Promise<void> {
-    // If there is a call in progress, set this as the next call to make after it
-    if (changeTabLock !== null) {
-        changeTabNext = async (): Promise<void> => {
+    // If there is a call in progress for this group, set this as the next call to make after it
+    if (changeTabLocks.get(groupId)) {
+        changeTabNexts.set(groupId, async (): Promise<void> => {
             await changeTab(groupId, activeTab, animate);
-        };
+        });
         return;
     }
 
     // Before we start a call, clear any queued calls (which is probably what called this)
-    changeTabNext = null;
+    changeTabNexts.set(groupId, null);
 
     // Now change the tab
-    changeTabLock = onSelectedTabChange(groupId, activeTab, animate);
+    changeTabLocks.set(groupId, onSelectedTabChange(groupId, activeTab, animate));
     try {
-        await changeTabLock;
+        await changeTabLocks.get(groupId);
     } finally {
-        changeTabLock = null;
+        changeTabLocks.set(groupId, null);
         // If there is a queued call, start it now
-        if (typeof changeTabNext === "function") {
-            // @ts-expect-error: TS doesn't seem to understand that changeTabNext may have changed during the await
-            await changeTabNext();
+        if (typeof changeTabNexts.get(groupId) === "function") {
+            // @ts-expect-error: TS doesn't seem to understand that changeTabNexts may have changed during the await
+            await changeTabNexts.get(groupId)();
         }
     }
 }

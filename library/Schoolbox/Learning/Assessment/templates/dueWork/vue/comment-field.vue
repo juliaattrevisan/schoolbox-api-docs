@@ -20,6 +20,8 @@ interface Props {
     selfReflection?: boolean;
     blindMode?: boolean;
     isRichText?: boolean;
+    /** optional prefix for the textarea ID, `comment-[prefix]-[participant.user.id]` */
+    prefix?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -30,6 +32,7 @@ const props = withDefaults(defineProps<Props>(), {
     selfReflection: false,
     blindMode: false,
     isRichText: false,
+    prefix: "",
 });
 
 /* Allow the ref to be nullable for easier usage, but useEditor requires a string - null will be converted to an empty string */
@@ -67,6 +70,11 @@ async function initEditor(): Promise<void> {
     });
 }
 
+const textareaId = window.Vue.computed(() => {
+    const prefix = props.prefix ? `${props.prefix}-` : "";
+    return `comment-${prefix}${props.participant.user.id}`;
+});
+
 const placeholder = window.Vue.computed(() => {
     if (props.selfAssessment) {
         return `Your ${locale.selfAssessment.singular()}`;
@@ -90,7 +98,7 @@ window.Vue.onMounted(async () => {
 });
 
 window.Vue.onUnmounted(async () => {
-    const editor = window.sbProps.editors[`comment-${props.participant.user.id}`];
+    const editor = window.sbProps.editors[textareaId.value];
     if (editor) {
         await editor.destroy();
     }
@@ -101,7 +109,7 @@ window.Vue.onUnmounted(async () => {
     <label>
         Comment
         <textarea
-            :id="`comment-${participant.user.id}`"
+            :id="textareaId"
             ref="textareaRef"
             name="comment"
             :data-test="`assessment-feedback-comment-textarea-${participant.user.id}`"

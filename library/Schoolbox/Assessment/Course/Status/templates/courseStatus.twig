@@ -121,7 +121,7 @@
                     </div>
                     <nav>
                         <a
-                            data-collapser="collap-{{ assessment.getBaseContext.getFolder.id }}"
+                            data-collapser="collap-{{ assessment.id }}"
                             href="#"
                             class="icon-up-arrow collapse"
                             title="Expand/collapse content"
@@ -132,7 +132,7 @@
         </div>
     </div>
     {% if assessment.allParticipants | length %}
-        <div class="row" data-collapse-state="uncollapsed" data-collapsable="collap-{{ assessment.getBaseContext.getFolder.id }}">
+        <div class="row" data-collapse-state="uncollapsed" data-collapsable="collap-{{ assessment.id }}">
             <div class="small-12 island">
                 <div class="empty-state hide" data-empty-filter>
                     <i class="icon-staff-students"></i>

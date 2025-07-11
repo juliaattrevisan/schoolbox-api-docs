@@ -257,7 +257,8 @@
                     {% include '@learningAssessment/quiz/comment.twig' with {
                         feedback:       latestFeedback,
                         participant:    participant,
-                        tabIndex:       loop.index0 + inputNo
+                        tabIndex:       loop.index0 + inputNo,
+                        prefix:         assessment.id,
                     } only %}
                     {% set inputNo = inputNo + 1 %}
                 </div>
