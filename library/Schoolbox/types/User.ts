@@ -11,11 +11,13 @@ type UserLinks = {
  */
 export type User = {
     externalId?: number;
-    firstName: string;
+    firstname: string;
+    firstName: string; // there's currently a mix of `firstname` and `firstName` in the codebase...
     fullName: string;
     givenName: string;
     id: number;
-    lastName: string;
+    lastname: string;
+    lastName: string; // there's currently a mix of `lastname` and `lastName` in the codebase...
     preferredName?: string | null;
     title: string | null;
     pronoun: string | null;

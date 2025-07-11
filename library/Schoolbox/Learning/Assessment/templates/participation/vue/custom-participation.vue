@@ -238,17 +238,17 @@ window.Vue.onMounted(() => {
                     <td>
                         <img
                             :src="`/portrait.php?id=${participant.user.id}&size=square64`"
-                            :alt="participant.user.lastName + ', ' + participant.user.firstName"
+                            :alt="participant.user.lastname + ', ' + participant.user.firstname"
                         />
                     </td>
                     <td>
                         <div class="l-flex-col l-gap-s">
                             <template v-if="participant.user.id">
                                 <a :href="`/search/user/${participant.user.id}`">
-                                    {{ participant.user.lastName + ", " + participant.user.firstName }}
+                                    {{ participant.user.lastname + ", " + participant.user.firstname }}
                                     {{
                                         participant.user.preferredName &&
-                                        participant.user.preferredName !== participant.user.firstName
+                                        participant.user.preferredName !== participant.user.firstname
                                             ? "‘" + participant.user.preferredName + "’"
                                             : ""
                                     }}
@@ -256,10 +256,10 @@ window.Vue.onMounted(() => {
                                 </a>
                             </template>
                             <template v-else>
-                                {{ participant.user.lastName + ", " + participant.user.firstName }}
+                                {{ participant.user.lastname + ", " + participant.user.firstname }}
                                 {{
                                     participant.user.preferredName &&
-                                    participant.user.preferredName !== participant.user.firstName
+                                    participant.user.preferredName !== participant.user.firstname
                                         ? "‘" + participant.user.preferredName + "’"
                                         : ""
                                 }}
