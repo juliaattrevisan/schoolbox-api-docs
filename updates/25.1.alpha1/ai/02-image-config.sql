@@ -18,7 +18,7 @@ INSERT INTO config (`name`, `title`, `description`, `field_id`,  `type_id`, `edi
 VALUES (
     'openai_image_key',
     'Image Generation API Key',
-    'This key allows GPT based AI assistant services to be provided when creating content. The key can be created at https://openai.com/',
+    'This key allows GPT based AI assistant services to be provided when creating content. The key can be created at https://openai.com/ or in Azure',
     (SELECT id FROM lu_config_field WHERE field = 'input'),
     (SELECT id FROM lu_config_type WHERE type = 'AI'),
     'true',
