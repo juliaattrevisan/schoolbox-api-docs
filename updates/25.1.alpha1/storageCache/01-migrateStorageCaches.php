@@ -152,6 +152,8 @@ $app = new class extends CliTool\App {
                 }
 
                 // TODO delete from old cache? Alternately just allow to expire
+                //      In accordance with deprecation rules, I've chosen to
+                //      leave the old data here for one release.
             }
         }
     }
