@@ -63,25 +63,21 @@ const imageStyle = window.Vue.ref<(typeof AVAILABLE_STYLES)[number]["value"] | n
 
     /* unique small selects in this area */
     select {
+        height: 1.5rem;
+        min-height: 1.5rem;
         margin: 0.5rem;
-        min-height: 2rem;
         width: 25%;
-        height: 2rem;
     }
 
-    nav {
-        margin: 0.25rem;
+    /* a custom icon that isn't from the sbx font for now hence these are some rather specific margins
+     * to align the icon, we should probably just add it to our actual icons... */
+    .icon-send {
+        height: 2.5rem;
 
-        /* a custom icon that isn't from the sbx font for now hence these are some rather specific margins
-         * to align the icon, we should probably just add it to our actual icons... */
-        .icon-send {
-            height: 2.5rem;
-
-            &::before {
-                content: "➤";
-                font-size: 1.5rem;
-                line-height: 2.25rem;
-            }
+        &::before {
+            content: "➤";
+            font-size: 1.5rem;
+            line-height: 2.25rem;
         }
     }
 }
