@@ -32,6 +32,7 @@ class MarshallerAdapter implements MarshallerInterface
     public function marshall(array $values, ?array &$failed): array
     {
         $marshalled = [];
+        $failed     = [];
         foreach ($values as $key => $value) {
             try {
                 $marshalled[$key] = $this->codec->encode($value);
