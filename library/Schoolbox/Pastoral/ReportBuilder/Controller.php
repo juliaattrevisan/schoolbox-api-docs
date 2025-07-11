@@ -448,8 +448,9 @@ class Controller extends Base
             }
         }
 
-        // Build tempTypes array with the required structure
-        $tempTypes = [];
+        // Build tableColumns array - defines dynamic table columns for types/subtypes
+        // Each element represents a column header with its properties for the frontend table
+        $tableColumns = [];
         $tempTotalRow = [];
         $tempRows = [];
 
@@ -547,7 +548,7 @@ class Controller extends Base
         // Add subtypes
         foreach ($subtypes as $subtype) {
             $subtypeId = $subtype->getId();
-            $tempTypes[] = [
+            $tableColumns[] = [
                 'key' => 'subtype-' . $subtypeId,
                 'title' => $subtype->getPastoralType()->getName(),
                 'subTitle' => $subtype->getName(),
@@ -564,7 +565,7 @@ class Controller extends Base
         foreach ($types as $type) {
             if (!isset($typesWithSubtypes[$type->getId()])) {
                 $typeId = $type->getId();
-                $tempTypes[] = [
+                $tableColumns[] = [
                     'key' => 'type-' . $typeId,
                     'title' => $type->getName(),
                     'type' => 'RecordsAndPoints',
@@ -623,53 +624,31 @@ class Controller extends Base
             $tempRows[] = $row;
         }
 
+        // Build tableHeaders starting with user and total, then adding tempTypes
+        $tableHeaders = [
+            [
+                'key' => 'user',
+                'title' => 'Name',
+                'type' => 'User',
+                'isSortable' => true,
+            ],
+            [
+                'key' => 'total',
+                'title' => 'Total',
+                'type' => 'RecordsAndPoints',
+                'isSortable' => true,
+            ],
+        ];
+
+        // Add all dynamic table columns to tableHeaders
+        $tableHeaders = array_merge($tableHeaders, $tableColumns);
+
         // Dummy data matching the structure from tempData.ts
         $payload = [
             'data' => [
-                'tempTypes' => $tempTypes,
                 'tempTotalRow' => $tempTotalRow,
                 'tempRows' => $tempRows,
-                'tableHeaders' => [
-                    [
-                        'key' => 'user',
-                        'title' => 'Name',
-                        'type' => 'User',
-                        'isSortable' => true,
-                    ],
-                    [
-                        'key' => 'total',
-                        'title' => 'Total',
-                        'type' => 'RecordsAndPoints',
-                        'isSortable' => true,
-                    ],
-                    [
-                        'key' => 'subtype-22',
-                        'title' => 'Academic',
-                        'subTitle' => 'Academic Honesty',
-                        'type' => 'RecordsAndPoints',
-                        'isSortable' => true,
-                    ],
-                    [
-                        'key' => 'subtype-1',
-                        'title' => 'Academic',
-                        'subTitle' => 'Award/Achievement',
-                        'type' => 'RecordsAndPoints',
-                        'isSortable' => true,
-                    ],
-                    [
-                        'key' => 'subtype-3',
-                        'title' => 'Wellbeing',
-                        'subTitle' => 'Award Achievement',
-                        'type' => 'RecordsAndPoints',
-                        'isSortable' => true,
-                    ],
-                    [
-                        'key' => 'type-8',
-                        'title' => 'Reporting',
-                        'type' => 'RecordsAndPoints',
-                        'isSortable' => true,
-                    ],
-                ],
+                'tableHeaders' => $tableHeaders,
                 'totalRow' => [
                     'Total',
                     ['records' => 45, 'points' => 90],
