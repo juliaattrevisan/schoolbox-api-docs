@@ -261,93 +261,91 @@ class Helper
         try {
             $openAiRequest = new Request('POST', $this->getEndpoint(self::CHAT), array_merge(
                 $this->getAuthorization(),
-                [
-                    'Content-Type' => 'application/json',
-                ],
+                ['Content-Type' => 'application/json'],
             ), $payload);
-        } catch (\Exception $e) {
+
+            /* Log what the user tried to do if we made a vaguely-successful request
+             * and didn't somehow die long the way
+             */
+            $log = $this->logMapper->createModel()
+                ->setUser($user)
+                ->setPrompt($payload)
+                ->setModel($this->openAiModel);
+
+            $promise = $this->client->sendAsync($openAiRequest, ['stream' => true]);
+
+            // Handle the response when it arrives
+            /* The two anonymous functions represent what happens when we succeed
+             * and when we didn't.
+             */
+            $promise->then(
+                function ($response) use ($log): void {
+                    /* Set up presumed success conditions
+                     */
+                    $returnCode = 200;
+
+                    http_response_code($returnCode);
+
+                    $log->setReturnCode($returnCode)
+                        ->setErrorMessage('');
+
+                    /* Remove preformatted insanity by encoding it all away
+                     * https://stackoverflow.com/questions/23859713/remove-all-unnecessary-whitespaces-from-json-string-in-php
+                     */
+                    //header('X-Accel-Buffering: no');
+                    header('Content-Type: application/json');
+                    header('Content-Encoding: none');
+
+                    ob_implicit_flush(true);
+                    ob_end_flush();
+
+                    $stream = $response->getBody();
+
+                    // store a section of the response (end of the stream)
+                    $output = '';
+
+                    while (!$stream->eof()) {
+                        $tmp = $stream->read(1024);
+                        echo $tmp;
+                        $output .= $tmp;
+                    }
+
+                    //store the last of the output and the model (if it exists
+                    $aiStats = $this->extractStats($output);
+                    $log->setResponse($output)
+                        ->setModel($aiStats['model'])
+                        ->setInputTokens($aiStats['input_tokens'])
+                        ->setOutputTokens($aiStats['output_tokens']);
+                },
+                function ($reason) use ($log): void {
+                    $returnCode = $reason->getCode();
+
+                    /* @var ClientException $reason */
+                    http_response_code($returnCode);
+
+                    /* FIXME This probably needs to be in a standardised json error struct
+                     *  The last time we did this was in profile editor
+                     */
+                    echo $reason->getMessage();
+
+                    /* We died; log the status code and epitaph
+                     */
+                    $log->setReturnCode($returnCode)
+                        ->setErrorMessage($reason->getMessage())
+                        ->setResponse($reason->getResponse()->getBody()->getContents());
+                }
+            );
+
+            $promise->wait();
+
+            $this->logMapper->save($log);
+
+            /* Intentionally die
+             */
+            die();
+        } catch (GuzzleException $e) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
         }
-
-        /* Log what the user tried to do if we made a vaguely-successful request
-         * and didn't somehow die long the way
-         */
-        $log = $this->logMapper->createModel()
-            ->setUser($user)
-            ->setPrompt($payload)
-            ->setModel($this->openAiModel);
-
-        $promise = $this->client->sendAsync($openAiRequest);
-
-        // Handle the response when it arrives
-        /* The two anonymous functions represent what happens when we succeed
-         * and when we didn't.
-         */
-        $promise->then(
-            function ($response) use ($log): void {
-                /* Set up presumed success conditions
-                 */
-                $returnCode = 200;
-
-                http_response_code($returnCode);
-
-                $log->setReturnCode($returnCode)
-                    ->setErrorMessage('');
-
-                /* Remove preformatted insanity by encoding it all away
-                 * https://stackoverflow.com/questions/23859713/remove-all-unnecessary-whitespaces-from-json-string-in-php
-                 */
-                //header('X-Accel-Buffering: no');
-                header('Content-Type: application/json');
-                header('Content-Encoding: none');
-
-                ob_implicit_flush(true);
-                ob_end_flush();
-
-                $stream = $response->getBody();
-
-                // store a section of the response (end of the stream)
-                $output = '';
-
-                while (!$stream->eof()) {
-                    $tmp = $stream->read(1024);
-                    echo $tmp;
-                    $output .= $tmp;
-                }
-
-                //store the last of the output and the model (if it exists
-                $aiStats = $this->extractStats($output);
-                $log->setResponse($output)
-                    ->setModel($aiStats['model'])
-                    ->setInputTokens($aiStats['input_tokens'])
-                    ->setOutputTokens($aiStats['output_tokens']);
-            },
-            function ($reason) use ($log): void {
-                $returnCode = $reason->getCode();
-
-                /* @var ClientException $reason */
-                http_response_code($returnCode);
-
-                /* FIXME This probably needs to be in a standardised json error struct
-                 *  The last time we did this was in profile editor
-                 */
-                echo $reason->getMessage();
-
-                /* We died; log the status code and epitaph
-                 */
-                $log->setReturnCode($returnCode)
-                    ->setErrorMessage($reason->getMessage())
-                    ->setResponse($reason->getResponse()->getBody()->getContents());
-            }
-        );
-
-        $promise->wait();
-
-        $this->logMapper->save($log);
-
-        /* Intentionally die
-         */
-        die();
     }
 
 
