@@ -152,6 +152,7 @@ class Module extends BaseModule
                 $this->injector->get('user'),
                 new ScrubAdapter(),
             ),
+            new User\Translator\Author\ModelToArray(),
         );
     }
 

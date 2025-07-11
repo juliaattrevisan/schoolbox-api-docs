@@ -44,6 +44,7 @@ use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
+use Schoolbox\User\Translator\Author\ModelToArray as UserTranslator;
 use Schoolbox\UserMapper;
 use Schoolbox\YearLevel;
 
@@ -71,6 +72,8 @@ class Controller extends Base
      * @param RoleMapper                    $roleMapper
      * @param UserAccessMapper              $userAccessMapper
      * @param RosettaStone                  $l10n
+     * @param ModelToArray                  $pastoralTranslator
+     * @param UserTranslator                $userTranslator
      */
     public function __construct(
         private ErrorMapper $errorMapper,
@@ -93,6 +96,7 @@ class Controller extends Base
         private UserAccessMapper $userAccessMapper,
         private RosettaStone $l10n,
         private ModelToArray $pastoralTranslator,
+        private UserTranslator $userTranslator,
     ) {
     }
 
@@ -579,30 +583,16 @@ class Controller extends Base
                 'isSortable' => true,
             ],
         ];
-        $tableHeaders = array_merge($tableHeaders, $tableColumns);
-
-        // Build student rows with data matching the column order
+        $tableHeaders = array_merge($tableHeaders, $tableColumns);        // Build student rows with data matching the column order
         $studentRows = [];
         foreach ($studentRecords as $studentData) {
             $student = $studentData['student'];
 
-            // Start with user data
-            $row = [[
-                'id' => $student->getId(),
-                'name' => $student->getFullName(),
-                'externalId' => $student->getExternalId(),
-                'firstname' => $student->getFirstname(),
-                'fullName' => $student->getFullName(),
-                'givenName' => $student->getGivenName(),
-                'lastname' => $student->getLastname(),
-                'preferredName' => $student->getPreferredName(),
-                'title' => $student->getTitle(),
-                'pronoun' => $student->getPronoun(),
-                '_links' => [
-                    'avatar' => '/portrait.php?id=' . $student->getId() . '&size=square64',
-                    'profile' => '/search/user/' . $student->getId(),
-                ],
-            ]];
+            // Use the user translator to get standardized user data
+            $userData = call_user_func($this->userTranslator, $student);
+
+            // Start with user data from translator
+            $row = [$userData];
 
             // Calculate and add total column
             $totalRecords = array_sum($studentData['subtypeCounts']) + array_sum($studentData['typeCounts']);
@@ -648,7 +638,7 @@ class Controller extends Base
 
         // Sort student rows alphabetically by last name
         usort($studentRows, function($a, $b) {
-            return strcmp($a[0]['lastname'], $b[0]['lastname']);
+            return strcmp($a[0]['lastName'], $b[0]['lastName']);
         });
 
         // Calculate grand totals for the summary row
