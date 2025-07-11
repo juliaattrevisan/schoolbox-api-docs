@@ -6,7 +6,7 @@ VALUES (
     'Select which provider you will use for conducting AI image queries; choose "Off" to disable this feature.',
     (SELECT id FROM lu_config_field WHERE field = 'select'),
     (SELECT id FROM lu_config_type WHERE type = 'AI'),
-    'Off:OpenAI:Azure',
+    'Off:OpenAI',
     'true',
     'false',
     'true',
