@@ -473,7 +473,7 @@ class Report extends CliTool\App
         });
 
 
-        // Column totals: exclude for JSON output
+        // Column totals and number formatting: exclude for JSON output
         $countRows = count($aggregated);
         if (!$jsonOutput) {
             foreach (array_keys($aggregated[0] ?? []) as $idx => $columnTitle) {
@@ -486,13 +486,12 @@ class Report extends CliTool\App
                 }
                 $aggregated[$countRows][$columnTitle] = $columnValue;
             }
-        }
 
-        // Format numbers
-        foreach ($aggregated as $rowId => $row) {
-            foreach ($row as $colId => $val) {
-                if (is_numeric($val)) {
-                    $aggregated[$rowId][$colId] = number_format($val);
+            foreach ($aggregated as $rowId => $row) {
+                foreach ($row as $colId => $val) {
+                    if (is_numeric($val)) {
+                        $aggregated[$rowId][$colId] = number_format($val);
+                    }
                 }
             }
         }
