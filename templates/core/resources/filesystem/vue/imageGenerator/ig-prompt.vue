@@ -33,7 +33,7 @@ const imageStyle = window.Vue.ref<(typeof AVAILABLE_STYLES)[number]["value"] | n
             style="resize: vertical; margin-bottom: 0"
         ></textarea>
     </label>
-    <div class="ig-prompt-actions">
+    <div class="ig-prompt-actions actions-small-1">
         <select v-model="imageSize" name="image-size">
             <option :value="null" style="font-style: italic">Size</option>
             <option v-for="size in AVAILABLE_SIZES" :key="size.value" :value="size.value">
@@ -46,6 +46,9 @@ const imageStyle = window.Vue.ref<(typeof AVAILABLE_STYLES)[number]["value"] | n
                 {{ style.label }}
             </option>
         </select>
+        <nav>
+            <a class="icon-send no-text" href="#" title="Modify"></a>
+        </nav>
     </div>
 </template>
 
@@ -64,6 +67,22 @@ const imageStyle = window.Vue.ref<(typeof AVAILABLE_STYLES)[number]["value"] | n
         min-height: 2rem;
         width: 25%;
         height: 2rem;
+    }
+
+    nav {
+        margin: 0.25rem;
+
+        /* a custom icon that isn't from the sbx font for now hence these are some rather specific margins
+         * to align the icon, we should probably just add it to our actual icons... */
+        .icon-send {
+            height: 2.5rem;
+
+            &::before {
+                content: "➤";
+                font-size: 1.5rem;
+                line-height: 2.25rem;
+            }
+        }
     }
 }
 </style>
