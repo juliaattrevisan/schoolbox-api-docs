@@ -19,6 +19,15 @@ export enum EditorToolbar {
 }
 
 /**
+ * To add predefined templates to the editor
+ */
+export type Template = {
+    title: string; // the title of the template
+    body: string; // the data to insert into the content
+    description?: string; // a longer description of the template
+};
+
+/**
  * The config object for the editor
  */
 export interface SbxEditorConfig {
@@ -35,6 +44,7 @@ export interface SbxEditorConfig {
     showWordCount?: boolean; // whether or not to show the word count
     fileBrowserCategoryId?: number; // to traverse directly to a specific folder in the Resources section of the resource modal
     mirrorChangeEvents?: boolean; // whether or not to mirror the change events back to the source element
+    templates?: Template[]; // the list of templates to use for the editor
 }
 
 /**

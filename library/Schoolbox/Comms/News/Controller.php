@@ -53,6 +53,7 @@ use UnderflowException;
 use UnexpectedValueException;
 use Schoolbox\User;
 use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 
 use function array_keys;
 use function array_merge;
@@ -86,6 +87,7 @@ class Controller extends Base
      * @param File\Mapper                      $fileMapper
      * @param ValidChangeStickyStatus          $validChangeStickyStatus Spec pattern for if sticky status may be changed
      * @param RosettaStone                     $l10n
+     * @param EditorTemplateHelper             $editorTemplateHelper
      */
     public function __construct(
         private Mapper $newsMapper,
@@ -104,6 +106,7 @@ class Controller extends Base
         private File\Mapper $fileMapper,
         private ValidChangeStickyStatus $validChangeStickyStatus,
         private RosettaStone $l10n,
+        private EditorTemplateHelper $editorTemplateHelper,
     ) {
     }
 
@@ -204,6 +207,7 @@ class Controller extends Base
             'returnUrl'             => $this->getExplicitReturnUrl(),
             'entityTypesData'       => $this->getEntityTypesData(),
             'mayChangeStickyStatus' => $this->validChangeStickyStatus->isSatisfiedBy($this->getUser()),
+            'editorTemplates'       => $this->editorTemplateHelper->getTemplatesForCategory(),
         ], "Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}", 'news');
     }
 
@@ -314,6 +318,7 @@ class Controller extends Base
             'availableEntityTypes'  => $this->getAvailableAudienceTypeStrategies(),
             'entityTypesData'       => $this->getEntityTypesData(),
             'mayChangeStickyStatus' => $this->validChangeStickyStatus->isSatisfiedBy($this->getUser()),
+            'editorTemplates'       => $this->editorTemplateHelper->getTemplatesForCategory(),
         ], "Update {$article->getTitle()}", 'news');
     }
 

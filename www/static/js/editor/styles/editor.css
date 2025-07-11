@@ -430,3 +430,16 @@ turned on */
     padding: 1rem;
     width: 100%;
 }
+
+/**
+ * Remove the image that sits alongside template options as we don't use them
+ */
+
+.ck.ck-template-form > .ck-search__results > .ck.ck-list.ck-template-list > .ck.ck-list__item > .ck.ck-button {
+    grid-template-areas: "ck-template-content";
+    grid-template-columns: 1fr;
+}
+
+.ck-template-button .ck-button__icon {
+    display: none;
+}

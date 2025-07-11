@@ -32,6 +32,9 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\Url\Uri;
 use Schoolbox\User;
 use Schoolbox\Comms\News\Audience\Segment\Strategy;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
+use Schoolbox\Editor\Templates\Mapper as EditorTemplateMapper;
+use Schoolbox\Admin\Editor\Templates\Category\Model as EditorTemplatesCategoryModel;
 
 class Module extends BaseModule
 {
@@ -247,6 +250,10 @@ class Module extends BaseModule
                 $this->getConfig()->get(ConfigMapper::COMMS_STICKY_ENABLED),
             ),
             $this->injector->get('l10n'),
+            new EditorTemplateHelper(
+                $this->getMapperFactory()->get(EditorTemplateMapper::class),
+                EditorTemplatesCategoryModel::NEWS
+            )
         );
     }
 

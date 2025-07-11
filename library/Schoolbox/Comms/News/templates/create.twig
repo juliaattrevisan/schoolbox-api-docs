@@ -7,6 +7,7 @@
     availableEntityTypes  string[]         The set of entity types that can be audienced by the current user
     entityTypesData       array
     mayChangeStickyStatus bool
+    editorTemplates       array            Retrieve any pre-existing editor templates to insert into the 'Body' rich text editor
 #}
 
 {% import '@commsNews/macro/indicator.twig' as indicator %}
@@ -114,6 +115,9 @@
             detail: {
                 maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
                 targetElements: ["#createForm textarea[name=body]"],
+                {% if editorTemplates %}
+                templates: {{ editorTemplates|json_encode|raw }},
+                {% endif %}
             }
         }));
 

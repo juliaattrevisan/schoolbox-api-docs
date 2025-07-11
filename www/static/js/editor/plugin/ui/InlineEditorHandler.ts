@@ -1,6 +1,7 @@
 /**
  * The InlineEditor type is not currently handled by CKEditor5, so we need to create a custom editor handler
  * that extends the AbstractEditorHandler class and overrides the defaultOnEnter method to move the editor
+ * into fullscreen mode when toggled
  * For further details refer to:
  * https://github.com/ckeditor/ckeditor5/blob/eb368c23848a56ccfe42fd32f9f30c139a1570bb/packages/ckeditor5-fullscreen/src/fullscreencommand.ts
  *
