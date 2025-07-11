@@ -12,19 +12,12 @@ export const allParticipants = [
             givenName: "Moshe",
             lastname: "Appleton",
             fullName: "Moshe Appleton",
-            customisedPlan: null,
         },
         plan: {
             id: 744,
-            assessable: {
-                id: 30,
-                title: "Final Assessment",
-                _links: {
-                    modify: "",
-                }
-            }
         },
         excludedAt: "2025-05-26T09:32:03+10:00",
+        customisedPlan: null,
     },
     {
         id: 294,
@@ -35,20 +28,13 @@ export const allParticipants = [
             givenName: "Edwin",
             lastname: "Barnham",
             fullName: "Edwin Barnham",
-            customisedPlan: null,
         },
         plan: {
             id: 745,
             name: "Edwin's Plan",
-            assessable: {
-                id: 30,
-                title: "Final Assessment",
-                _links: {
-                    modify: "",
-                }
-            }
         },
         excludedAt: "2025-05-26T09:32:03+10:00",
+        customisedPlan: null,
     },
     {
         id: 293,
@@ -59,19 +45,37 @@ export const allParticipants = [
             givenName: "Mario",
             lastname: "Izzo",
             fullName: "Mario Izzo",
-            customisedPlan: null,
         },
         plan: {
             id: 744,
+        },
+        excludedAt: null,
+        customisedPlan: null,
+    },
+    {
+        id: 295,
+        user: {
+            id: 21,
+            externalId: "208",
+            firstname: "Joffery",
+            givenName: "Joffery",
+            lastname: "Buckner",
+            fullName: "Joffery Buckner",
+        },
+        plan: {
+            id: 744,
+        },
+        excludedAt: "2025-05-26T09:32:03+10:00",
+        customisedPlan: {
+            id: 788,
             assessable: {
-                id: 30,
-                title: "Final Assessment",
+                id: 50,
+                title: "Final Assessment (Joffery)",
                 _links: {
-                    modify: "",
+                    modify: "/learning/assessments/50/modify"
                 }
             }
         },
-        excludedAt: null,
     },
     {
         id: 291,
@@ -82,18 +86,11 @@ export const allParticipants = [
             givenName: "Jana",
             lastname: "Reed",
             fullName: "Jana Reed",
-            customisedPlan: null,
         },
         plan: {
             id: 744,
-            assessable: {
-                id: 30,
-                title: "Final Assessment",
-                _links: {
-                    modify: "",
-                }
-            }
         },
         excludedAt: null,
+        customisedPlan: null,
     },
 ];
