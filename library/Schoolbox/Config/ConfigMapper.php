@@ -53,6 +53,10 @@ class ConfigMapper extends Mapper
     public const MODULE_OPENAI_TEXT = 'openai-text';
     public const MODULE_OPENAI_IMAGE = 'openai-image';
 
+    /* A special case for search
+     */
+    public const MODULE_OPENAI_AI_SERVICES = 'ai-services';
+
     // Field enum (kinda)
     public const FIELD_INPUT         =  1;
     public const FIELD_TEXT_AREA     =  2;
