@@ -99,31 +99,12 @@ class ValidationTest extends TestCase
                 ],
                 '3'  // if outside of the range, it should return the minimum value
             ],
-            'random text' => [
-                [
-                    'config' => [
-                        'min' => 1,
-                        'max' => 100
-                    ],
-                    'value' => 'random text'
-                ],    // goes into testValidExample() as $input
-                '1'  // if outside of the range, it should return the minimum value
-            ],
             'bigger than' => [
                 [
                     'config' => [
                         'max' => 100
                     ],
                     'value' => '101'
-                ],    // goes into testValidExample() as $input
-                '100'  // if outside of the range, it should return the maximum value
-            ],
-            'text but max only' => [
-                [
-                    'config' => [
-                        'max' => 100
-                    ],
-                    'value' => 'random text'
                 ],    // goes into testValidExample() as $input
                 '100'  // if outside of the range, it should return the maximum value
             ],

@@ -159,7 +159,7 @@ class FieldStrategyFactory
             case ConfigMapper::FIELD_TIME_PICKER:
             case ConfigMapper::FIELD_SELECT_DATE:
                 return new FieldValueSerializerBase();
-            case ConfigMapper::FIELD_NUMBER:
+            case ConfigMapper::FIELD_NUMBER: //this is only numbers, confirm int, and save (as string, as we do with all config values)
                 return new FieldType\Number\IntValueSerializer();
             case ConfigMapper::FIELD_SELECT_MULTI:
                 return new FieldType\SelectMulti\ValueSerializer();
