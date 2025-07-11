@@ -7,6 +7,12 @@ import IgPrompt from "./ig-prompt.vue";
 
 <template>
     <h2>Generate an Image</h2>
+    <p>
+        A good prompt will contain information on the format, style, subject, mood, light, colours, artistic style and
+        framing. See more information on these on
+        <!-- TODO: Add help link -->
+        <a href="/help/sso/send?returnUrl=TBC" target="_blank">Schoolbox Help</a>
+    </p>
     <ig-prompt />
 </template>
 
