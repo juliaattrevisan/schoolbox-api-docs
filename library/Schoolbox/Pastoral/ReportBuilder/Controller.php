@@ -451,7 +451,7 @@ class Controller extends Base
         // Build tableColumns array - defines dynamic table columns for types/subtypes
         // Each element represents a column header with its properties for the frontend table
         $tableColumns = [];
-        $tempTotalRow = [];
+        $totalRowData = [];
         $tempRows = [];
 
         // Calculate record counts and points for subtypes
@@ -555,7 +555,7 @@ class Controller extends Base
                 'type' => 'RecordsAndPoints',
                 'isSortable' => true,
             ];
-            $tempTotalRow[] = [
+            $totalRowData[] = [
                 'records' => $subtypeCounts[$subtypeId] ?? 0,
                 'points' => $subtypePoints[$subtypeId] ?? 0,
             ];
@@ -571,7 +571,7 @@ class Controller extends Base
                     'type' => 'RecordsAndPoints',
                     'isSortable' => true,
                 ];
-                $tempTotalRow[] = [
+                $totalRowData[] = [
                     'records' => $typeCounts[$typeId] ?? 0,
                     'points' => $typePoints[$typeId] ?? 0,
                 ];
@@ -643,20 +643,16 @@ class Controller extends Base
         // Add all dynamic table columns to tableHeaders
         $tableHeaders = array_merge($tableHeaders, $tableColumns);
 
+        // Build totalRow with actual calculated data
+        $totalRow = ['Total'];
+        $totalRow = array_merge($totalRow, $totalRowData);
+
         // Dummy data matching the structure from tempData.ts
         $payload = [
             'data' => [
-                'tempTotalRow' => $tempTotalRow,
                 'tempRows' => $tempRows,
                 'tableHeaders' => $tableHeaders,
-                'totalRow' => [
-                    'Total',
-                    ['records' => 45, 'points' => 90],
-                    ['records' => 18, 'points' => 36],
-                    ['records' => 11, 'points' => 22],
-                    ['records' => 9, 'points' => 18],
-                    ['records' => 6, 'points' => 12],
-                ],
+                'totalRow' => $totalRow,
                 'rows' => [
                     [
                         [
