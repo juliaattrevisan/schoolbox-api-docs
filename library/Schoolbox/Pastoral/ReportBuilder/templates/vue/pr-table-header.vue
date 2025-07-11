@@ -112,13 +112,14 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
                 :key="header.key"
                 :class="`u-border-right title-cell ${header.key === 'total' ? 'total-cell' : ''} ${props.sortBy === header.key ? 'sorted' : ''}`"
             >
-                <button class="title-button f-always-show" @click="onSortSelected(header)">
+                <!-- <button class="title-button f-always-show" @click="onSortSelected(header)">
                     <span>{{ header.subTitle ? header.subTitle : header.title }}</span>
                     <span v-if="header.isSortable && props.sortBy === header.key" class="sort-indicator">
                         {{ props.sortOrder === "asc" ? "↑" : "↓" }}
                     </span>
                     <span v-else-if="header.isSortable" class="sort-indicator sort-indicator--inactive"> ↕ </span>
-                </button>
+                </button> -->
+                {{ header.subTitle ? header.subTitle : header.title }}
             </th>
         </tr>
     </thead>
