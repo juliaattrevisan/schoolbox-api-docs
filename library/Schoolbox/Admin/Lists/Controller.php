@@ -1531,6 +1531,15 @@ class Controller extends Base
             'popOutList' => 'displayOptions',
         ];
 
+        $return['year-levels']['fields']['learningMomentModeration'] = [
+            'caption'    => 'Learning Moment Moderation',
+            'tooltip'    => 'If toggled to ‘ON’, a student’s learning moment will require moderation before it appears on the activity feed for parents.',
+            'checkbox'   => true,
+            'mandatory'  => true,
+            'default'    => false,
+            'popOutList' => 'displayOptions',
+        ];
+
         $return['evidence-tag'] = [
             'title'             => 'Learning Moments',
             'mapper'            => LearningMomentEvidenceTag::class,
