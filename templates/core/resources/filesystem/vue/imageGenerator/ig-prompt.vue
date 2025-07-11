@@ -18,9 +18,41 @@ const AVAILABLE_STYLES = [
     { value: "vector_art", label: "Vector Art" },
 ] as const;
 
-const prompt = window.Vue.ref<string>("test");
+const prompt = window.Vue.ref<string>("Sketch an image of a snake with a bowtie and top hat");
 const imageSize = window.Vue.ref<(typeof AVAILABLE_SIZES)[number]["value"] | null>(null);
 const imageStyle = window.Vue.ref<(typeof AVAILABLE_STYLES)[number]["value"] | null>(null);
+
+/**
+ * Temp function to test the prompt
+ */
+async function sendRequest(): Promise<void> {
+    const payload = {
+        prompt: prompt.value,
+        imageSize: imageSize.value,
+        imageStyle: imageStyle.value,
+    };
+
+    const toast = window.sbProps.toastActivate("Generating image...");
+
+    const resp = await fetch("/openai/image", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+        },
+        body: JSON.stringify(payload),
+    });
+
+    if (!resp.ok) {
+        toast.timeout({ text: "Failed to generate image", isSuccess: false });
+        console.error("Failed to send request", resp);
+        return;
+    }
+
+    const data = await resp.json();
+    toast.timeout({ text: "Image generated successfully", isSuccess: true });
+    console.log("Response data:", data);
+}
 </script>
 
 <template>
@@ -33,7 +65,7 @@ const imageStyle = window.Vue.ref<(typeof AVAILABLE_STYLES)[number]["value"] | n
             style="resize: vertical; margin-bottom: 0"
         ></textarea>
     </label>
-    <div class="ig-prompt-actions actions-small-1">
+    <div class="ig-prompt-actions actions-small-1 l-mar-m--bottom">
         <div class="list-item">
             <select v-model="imageSize" name="image-size">
                 <option :value="null" style="font-style: italic">Size</option>
@@ -49,7 +81,7 @@ const imageStyle = window.Vue.ref<(typeof AVAILABLE_STYLES)[number]["value"] | n
             </select>
         </div>
         <nav>
-            <a class="icon-send no-text" href="#" title="Modify"></a>
+            <a class="icon-send no-text" href="#" title="Generate Image" @click.prevent="sendRequest"></a>
         </nav>
     </div>
 </template>
@@ -61,7 +93,6 @@ const imageStyle = window.Vue.ref<(typeof AVAILABLE_STYLES)[number]["value"] | n
     border-width: 0.0625rem;
     border-color: var(--form-border-color);
     border-top: 0;
-    margin-bottom: 1rem;
 
     .list-item {
         display: flex;

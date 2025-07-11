@@ -193,6 +193,75 @@ class Controller extends Base
 
 
     /**
+     * Generates an image as part of a conversation
+     *
+     * @return void
+     * @throws Exception
+     * @throws \JsonException
+     */
+    public function postImage(): void
+    {
+        try {
+            $helper = new Helper(
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_ENDPOINT)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_KEY)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_RESOURCE_NAME)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_DEPLOYMENT_ID)),
+                Payload\ImageGeneration::OPENAI_IMAGE_MODEL,
+                $this->client,
+                $this->errorMapper,
+                $this->logMapper,
+            );
+
+            $payloadGenerator = (new Payload\ImageGeneration(
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_SYSTEM_PROMPT)),
+            ));
+
+            $payload = $payloadGenerator->generate(
+                $this->requestPost->get('prompt'),
+                $this->requestPost->get('previousResponseId') ?? null,
+            );
+
+            try {
+                /* Send it and decode the result (if any: sometimes it returns null)
+                 * and dodge around all its weird encoding business with a double-decode,
+                 * and ditching all its training markdown (lol) that it loves to use
+                 *
+                 * https://community.openai.com/t/json-returning-with-json/584818/6
+                 */
+                $data = $helper->request($this->getUser(), $payload);
+            } catch (SchoolboxException $e) {
+                $problem = (new ApiProblem($e->getMessage()))
+                    ->setStatus($e->getCode())
+                    ->asArray();
+
+                $this->response = $this->responseAsJson($problem)
+                    ->withStatus($e->getCode());
+
+                return;
+            }
+
+
+            $this->response = $this->responseAsJson($data);
+            return;
+        } catch (\DomainException $e) {
+            /* Not configured? Not found
+             */
+            $returnCode = 404;
+
+            $problem = (new ApiProblem($e->getMessage()))
+                ->setStatus($returnCode)
+                ->asArray();
+
+            $this->response = $this->responseAsJson($problem)
+                ->withStatus($returnCode);
+
+            return;
+        }
+    }
+
+
+    /**
      * This is used by ckeditor's Little Robot Dude ai assistant which posts
      * to /openai route via some direct javascript thing
      *
