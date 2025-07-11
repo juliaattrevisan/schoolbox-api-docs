@@ -253,9 +253,9 @@ HELP;
      * Find out whether anything in the $manifest was archived in learnosity, but shouldn't be
      *
      * @param array $manifest
-     * @return array|null
+     * @return array
      */
-    private function findCurrentStatus(array $manifest): ?array
+    private function findCurrentStatus(array $manifest): array
     {
         $result = null;
         $stack = [];
