@@ -37,6 +37,13 @@ class Helper
 
 
     /**
+     * This is the value of text and image endpoint providers if a school
+     * turned off these features.
+     */
+    private const ENDPOINT_OFF = 'Off';
+
+
+    /**
      * Structured Outputs is only supported in certain models
      * Note that we intentionally don't support gippity 3.5
      */
@@ -96,6 +103,12 @@ class Helper
      */
     public function request(User $user, string $payload): array
     {
+        /* Check that we have activated this endpoint
+         */
+        if (self::ENDPOINT_OFF === $this->openAiEndpoint) {
+            throw new \DomainException('OpenAI request queries are disabled. Choose an endpoint provider.');
+        }
+
         /* Assert that we're configured correctly
          */
         if (!$this->openAiKey) {
@@ -242,6 +255,12 @@ class Helper
      */
     public function aiAssistantChat(User $user, string $payload): void
     {
+        /* Check that we have activated this endpoint
+         */
+        if (self::ENDPOINT_OFF === $this->openAiEndpoint) {
+            throw new \DomainException('OpenAI chat queries are disabled. Choose an endpoint provider.');
+        }
+
         /* Assert that we're configured correctly
          */
         if (!$this->openAiKey) {
