@@ -40,7 +40,7 @@ class Helper
      * This is the value of text and image endpoint providers if a school
      * turned off these features.
      */
-    private const ENDPOINT_OFF = 'Off';
+    private const ENDPOINT_TYPE_OFF = 'Off';
 
 
     /**
@@ -105,7 +105,7 @@ class Helper
     {
         /* Check that we have activated this endpoint
          */
-        if (self::ENDPOINT_OFF === $this->openAiEndpoint) {
+        if (self::ENDPOINT_TYPE_OFF === $this->openAiEndpoint) {
             throw new \DomainException('OpenAI request queries are disabled. Choose an endpoint provider.');
         }
 
@@ -257,7 +257,7 @@ class Helper
     {
         /* Check that we have activated this endpoint
          */
-        if (self::ENDPOINT_OFF === $this->openAiEndpoint) {
+        if (self::ENDPOINT_TYPE_OFF === $this->openAiEndpoint) {
             throw new \DomainException('OpenAI chat queries are disabled. Choose an endpoint provider.');
         }
 
