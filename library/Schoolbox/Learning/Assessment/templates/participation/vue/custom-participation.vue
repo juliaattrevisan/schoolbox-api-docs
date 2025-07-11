@@ -340,11 +340,7 @@ window.Vue.onMounted(() => {
                                     </li>
                                     <li class="separator">Create</li>
                                     <li>
-                                        <a
-                                            class="icon-copy"
-                                        >
-                                            Copy Activity
-                                        </a>
+                                        <a class="icon-copy"> Copy Activity </a>
                                     </li>
                                     <li>
                                         <a

@@ -72,9 +72,9 @@ export const allParticipants = [
                 id: 50,
                 title: "Final Assessment (Joffery)",
                 _links: {
-                    modify: "/learning/assessments/50/modify"
-                }
-            }
+                    modify: "/learning/assessments/50/modify",
+                },
+            },
         },
     },
     {
