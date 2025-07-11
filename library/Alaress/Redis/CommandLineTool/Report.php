@@ -421,6 +421,8 @@ class Report extends CliTool\App
      */
     private function aggregateData(array $rawData, bool $jsonOutput): array
     {
+        // Don't replace null values with - characters in JSON report
+        $nullReplacement = $jsonOutput ? null : '-';
         $aggregated = [];
         foreach ($rawData as $pattern => $patternData) {
             foreach ($patternData as $payload => $matches) {
@@ -452,9 +454,11 @@ class Report extends CliTool\App
                     self::COLUMN_TOTAL_COUNT    => count($matches),
                     self::COLUMN_NO_TTL_COUNT   => $countNoTtl,
                     self::COLUMN_WITH_TTL_COUNT => $countHasTtl,
-                    self::COLUMN_MIN_TTL        => $minTtl ?? '-',
-                    self::COLUMN_MAX_TTL        => $maxTtl ?? '-',
-                    self::COLUMN_AVERAGE_TTL    => $countHasTtl === 0 ? '-' : (int)($sumTtl / $countHasTtl),
+                    self::COLUMN_MIN_TTL        => $minTtl ?? $nullReplacement,
+                    self::COLUMN_MAX_TTL        => $maxTtl ?? $nullReplacement,
+                    self::COLUMN_AVERAGE_TTL    => $countHasTtl === 0
+                        ? $nullReplacement
+                        : (int)($sumTtl / $countHasTtl),
                     self::COLUMN_DATA_SIZE      => $sumLength,
                 ];
             }
