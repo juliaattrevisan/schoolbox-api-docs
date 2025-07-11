@@ -17,7 +17,11 @@ const props = defineProps<Props>();
 
 <template>
     <tr>
-        <td v-for="(data, index) in props.rowData" :key="props.headers[index]?.key || index" class="u-border-right">
+        <td
+            v-for="(data, index) in props.rowData"
+            :key="props.headers[index]?.key || index"
+            :class="`u-border-right ${props.headers[index].key === 'user' ? 'u-sticky-left u-sticky-left--row' : ''}`"
+        >
             <!-- The first cell is always just 'Total' text -->
             <template v-if="index === 0">
                 <b>{{ data }}</b>

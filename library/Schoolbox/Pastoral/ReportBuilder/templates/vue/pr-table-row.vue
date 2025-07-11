@@ -31,7 +31,7 @@ function isUser(data: RowOptions): data is User {
         <td
             v-for="(data, index) in props.rowData"
             :key="props.headers[index]?.key || index"
-            :class="`u-border-right ${props.headers[index].key === 'total' ? 'total-cell' : ''}`"
+            :class="`u-border-right ${props.headers[index].key === 'user' ? 'u-sticky-left u-sticky-left--row' : ''} ${props.headers[index].key === 'total' ? 'total-cell' : ''}`"
         >
             <template v-if="props.headers[index].type == TableHeaderType.USER && isUser(data)">
                 <div class="c-card">

@@ -36,7 +36,7 @@ const maxScrollableHeight = window.Vue.ref<string>(`${window.innerHeight - 200}p
  * and to incrementally display large row lists on scroll
  */
 function setScrollableHeight(): void {
-    maxScrollableHeight.value = `${window.innerHeight - 200}px`;
+    maxScrollableHeight.value = `${window.innerHeight - 300}px`;
 }
 
 /**

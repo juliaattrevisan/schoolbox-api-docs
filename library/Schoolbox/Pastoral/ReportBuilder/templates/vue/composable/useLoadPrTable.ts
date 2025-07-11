@@ -57,7 +57,6 @@ export function useLoadPrTable(endpoint: Ref<string>): {
                 throw new Error("Unexpected response format");
             }
             payload.value = responseJson;
-            console.warn(responseJson);
         } catch (error) {
             // ignore abort errors, as the previous request was cancelled
             if (isAbortError(error)) {

@@ -85,7 +85,7 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
 <template>
     <thead class="pr-table-header">
         <tr>
-            <th :colspan="hasSubTitles ? 2 : props.headers.length" class="u-border-right">
+            <th :colspan="hasSubTitles ? 1 : props.headers.length" class="u-border-right u-sticky-left">
                 <div class="checklist">
                     <ul class="option-list l-flex l-gap-m f-no-margins">
                         <li v-for="(option, index) in props.recordsAndPoints" :key="`option-${index}`">
@@ -95,6 +95,7 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
                     </ul>
                 </div>
             </th>
+            <td class="u-border-right">&nbsp;</td>
             <template v-if="hasSubTitles">
                 <th
                     v-for="(headerCell, index) in getFirstRowHeaders()"
@@ -110,8 +111,9 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
             <th
                 v-for="header in props.headers"
                 :key="header.key"
-                :class="`u-border-right title-cell ${header.key === 'total' ? 'total-cell' : ''} ${props.sortBy === header.key ? 'sorted' : ''}`"
+                :class="`u-border-right title-cell ${header.key === 'user' ? 'u-sticky-left user-cell' : ''} ${header.key === 'total' ? 'total-cell' : ''}`"
             >
+                <!-- active sort class - ${props.sortBy === header.key ? 'sorted' : ''} -->
                 <!-- <button class="title-button f-always-show" @click="onSortSelected(header)">
                     <span>{{ header.subTitle ? header.subTitle : header.title }}</span>
                     <span v-if="header.isSortable && props.sortBy === header.key" class="sort-indicator">
@@ -127,13 +129,18 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
 
 <style scoped lang="scss">
 .title-cell {
-    position: relative;
+    min-width: 100px;
+    // position: relative;
     &:has(.title-button) {
         padding: 0; // padding is handled by the button instead
     }
     &.sorted {
         background-color: var(--accent-background-light, #f0f0f0);
     }
+}
+
+.user-cell {
+    min-width: 250px;
 }
 
 .total-cell {

@@ -490,3 +490,16 @@ table.attempts-table {
 .u-border-right {
     border-right: 1px solid var(--body-background);
 }
+
+/* make a table <th> sticky */
+.u-sticky-left {
+    background: #ffffff; /* Also needs a background to prevent the sticky from being transparent */
+    left: 0;
+    position: sticky;
+    z-index: var(--sbx-depth-ui-sticky);
+}
+
+/* make a table <td> sticky, minus 1 z-index so it scrolls underneath the <th> */
+.u-sticky-left--row {
+    z-index: calc(var(--sbx-depth-ui-sticky) - 1);
+}
