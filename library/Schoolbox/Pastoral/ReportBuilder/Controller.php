@@ -450,26 +450,79 @@ class Controller extends Base
 
         // Build tempTypes array with the required structure
         $tempTypes = [];
+        $tempTotalRow = [];
+
+        // Calculate record counts and points for subtypes
+        $subtypeCounts = [];
+        $subtypePoints = [];
+        foreach ($records as $record) {
+            $subtype = $record->getSubType();
+            if ($subtype) {
+                $subtypeId = $subtype->getId();
+                if (!isset($subtypeCounts[$subtypeId])) {
+                    $subtypeCounts[$subtypeId] = 0;
+                    $subtypePoints[$subtypeId] = 0;
+                }
+                $subtypeCounts[$subtypeId]++;
+
+                // Add points if they exist
+                $points = $record->getPoints();
+                if ($points !== null && $points !== '') {
+                    $subtypePoints[$subtypeId] += (int)$points;
+                }
+            }
+        }
+
+        // Calculate record counts and points for types (only those without subtypes)
+        $typeCounts = [];
+        $typePoints = [];
+        foreach ($records as $record) {
+            $type = $record->getType();
+            if ($type && !isset($typesWithSubtypes[$type->getId()])) {
+                $typeId = $type->getId();
+                if (!isset($typeCounts[$typeId])) {
+                    $typeCounts[$typeId] = 0;
+                    $typePoints[$typeId] = 0;
+                }
+                $typeCounts[$typeId]++;
+
+                // Add points if they exist
+                $points = $record->getPoints();
+                if ($points !== null && $points !== '') {
+                    $typePoints[$typeId] += (int)$points;
+                }
+            }
+        }
 
         // Add subtypes
         foreach ($subtypes as $subtype) {
+            $subtypeId = $subtype->getId();
             $tempTypes[] = [
-                'key' => 'subtype-' . $subtype->getId(),
+                'key' => 'subtype-' . $subtypeId,
                 'title' => $subtype->getPastoralType()->getName(),
                 'subTitle' => $subtype->getName(),
                 'type' => 'RecordsAndPoints',
                 'isSortable' => true,
+            ];
+            $tempTotalRow[] = [
+                'records' => $subtypeCounts[$subtypeId] ?? 0,
+                'points' => $subtypePoints[$subtypeId] ?? 0,
             ];
         }
 
         // Add types that don't have subtypes
         foreach ($types as $type) {
             if (!isset($typesWithSubtypes[$type->getId()])) {
+                $typeId = $type->getId();
                 $tempTypes[] = [
-                    'key' => 'type-' . $type->getId(),
+                    'key' => 'type-' . $typeId,
                     'title' => $type->getName(),
                     'type' => 'RecordsAndPoints',
                     'isSortable' => true,
+                ];
+                $tempTotalRow[] = [
+                    'records' => $typeCounts[$typeId] ?? 0,
+                    'points' => $typePoints[$typeId] ?? 0,
                 ];
             }
         }
@@ -478,6 +531,7 @@ class Controller extends Base
         $payload = [
             'data' => [
                 'tempTypes' => $tempTypes,
+                'tempTotalRow' => $tempTotalRow,
                 'tableHeaders' => [
                     [
                         'key' => 'user',
