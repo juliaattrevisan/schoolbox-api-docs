@@ -452,7 +452,7 @@ class Controller extends Base
         // Each element represents a column header with its properties for the frontend table
         $tableColumns = [];
         $totalRowData = [];
-        $tempRows = [];
+        $studentRows = [];
 
         // Calculate record counts and points for subtypes
         $subtypeCounts = [];
@@ -621,7 +621,7 @@ class Controller extends Base
                 }
             }
 
-            $tempRows[] = $row;
+            $studentRows[] = $row;
         }
 
         // Build tableHeaders starting with user and total, then adding tempTypes
@@ -647,80 +647,12 @@ class Controller extends Base
         $totalRow = ['Total'];
         $totalRow = array_merge($totalRow, $totalRowData);
 
-        // Dummy data matching the structure from tempData.ts
+        // Data payload with calculated values
         $payload = [
             'data' => [
-                'tempRows' => $tempRows,
                 'tableHeaders' => $tableHeaders,
                 'totalRow' => $totalRow,
-                'rows' => [
-                    [
-                        [
-                            'id' => 20,
-                            'name' => 'Moshe Appleton',
-                            'externalId' => 1003,
-                            'firstname' => 'Moshe',
-                            'fullName' => 'Moshe Appleton',
-                            'givenName' => 'Moshe',
-                            'lastname' => 'Appleton',
-                            'title' => null,
-                            'pronoun' => null,
-                            '_links' => [
-                                'avatar' => '/portrait.php?id=20&size=square64',
-                                'profile' => '/search/user/20',
-                            ],
-                        ],
-                        ['records' => 18, 'points' => 36],
-                        ['records' => 6, 'points' => 12],
-                        ['records' => 5, 'points' => 10],
-                        ['records' => 4, 'points' => 8],
-                        ['records' => 3, 'points' => 6],
-                    ],
-                    [
-                        [
-                            'id' => 17,
-                            'name' => 'Mario Izzo',
-                            'firstname' => 'Mario',
-                            'fullName' => 'Mario Izzo',
-                            'givenName' => 'Mario',
-                            'lastname' => 'Izzo',
-                            'preferredName' => 'Moe',
-                            'title' => 'Mr',
-                            'pronoun' => 'he/him',
-                            '_links' => [
-                                'avatar' => '/portrait.php?id=17&size=square64',
-                                'profile' => '/search/user/17',
-                            ],
-                        ],
-                        ['records' => 16, 'points' => 32],
-                        ['records' => 7, 'points' => 14],
-                        ['records' => 4, 'points' => 8],
-                        ['records' => 3, 'points' => 6],
-                        ['records' => 2, 'points' => 4],
-                    ],
-                    [
-                        [
-                            'id' => 13,
-                            'name' => 'Jana Reed',
-                            'firstname' => 'Jana',
-                            'fullName' => 'Jana Reed',
-                            'givenName' => 'Jana',
-                            'lastname' => 'Reed',
-                            'preferredName' => null,
-                            'title' => 'Ms',
-                            'pronoun' => 'she/her',
-                            '_links' => [
-                                'avatar' => '/portrait.php?id=13&size=square64',
-                                'profile' => '/search/user/13',
-                            ],
-                        ],
-                        ['records' => 11, 'points' => 22],
-                        ['records' => 5, 'points' => 10],
-                        ['records' => 3, 'points' => 6],
-                        ['records' => 2, 'points' => 4],
-                        ['records' => 1, 'points' => 2],
-                    ],
-                ],
+                'rows' => $studentRows,
             ],
             'metadata' => [
                 'count' => 20,
