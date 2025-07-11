@@ -663,6 +663,24 @@ class ListController extends Web\Controller\Base
 
         try {
             $db->beginTransaction();
+
+            if ($postData['customisedFor']) {
+                $sourceAssessment = $this->getAssessmentMapper()->findById($postData['customisedFor']);
+
+                if (0 === strcasecmp($sourceAssessment->getTitle(), $postData['title'])) {
+                    throw new \InvalidArgumentException('The activity can not have the same name as the original activity.');
+                }
+
+                /* Excluding the participant from the original assessment when assigned to another assessment
+                 */
+                if (isset($postData['original-participant-exclude'])) {
+                    $planMapper = $this->participantDataSource->getPlanMapper();
+                    $plans = $planMapper->findByColumn('id', $postData['original-participant-plan']);
+                    $this->saveParticipationData($sourceAssessment, $plans, $postData['original-participant-exclude'], $postData['original-participant-plan']);
+                }
+            }
+
+
             // Create a notifier proxy so that I may notify about assessment changes
             $notifier = $this->assessmentMapper->getNotifier();
             $before   = $notifier->dehydrate($assessment);
@@ -706,14 +724,6 @@ class ListController extends Web\Controller\Base
 
             $this->saveParticipationData($assessment, $plans, $postData['participant-include'] ?? [], $postData['participant-plan'] ?? []);
 
-            /* Excluding the participant from the original assessment when assigned to another assessment
-             */
-            if (isset($postData['original-participant-exclude'])) {
-                $planMapper = $this->participantDataSource->getPlanMapper();
-                $sourceAssessment = $this->getAssessmentMapper()->findById($postData['customisedFor']);
-                $plans = $planMapper->findByColumn('id', $postData['original-participant-plan']);
-                $this->saveParticipationData($sourceAssessment, $plans, $postData['original-participant-exclude'], $postData['original-participant-plan']);
-            }
         } catch (\InvalidArgumentException $e) {
             $db->rollBack();
             /* InvalidArgumentException is thrown when a valid context is missing
