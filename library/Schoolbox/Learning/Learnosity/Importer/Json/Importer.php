@@ -130,6 +130,12 @@ class Importer
             throw new \RuntimeException('Could not decode this json data; could be corrupted or otherwise malformed.');
         }
 
+        /* Check the three canonical nodes exist: if they don't, it's probably not a quiz json
+         */
+        if (!array_key_exists('settings', $json) || !array_key_exists('assets', $json)) {
+            throw new \RuntimeException('Could not decode this json data; invalid data structure for quizzes.');
+        }
+
         /* Produce IAssessable and quiz subobject instances into an array for convenience
          * (these are already persisted in the db)
          */
