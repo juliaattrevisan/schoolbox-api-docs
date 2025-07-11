@@ -138,12 +138,12 @@ function onSortSelected(headerKey: string): void {
             </table>
         </div>
         <!-- Table metadata -->
-        <div class="pr-table-metadata">
+        <!-- <div class="pr-table-metadata">
             <div class="pr-table-metadata__count">
                 Showing {{ (payload as TablePayload).data.rows.length }} of
                 {{ (payload as TablePayload).metadata.count }} records
             </div>
-        </div>
+        </div> -->
     </template>
 </template>
 
