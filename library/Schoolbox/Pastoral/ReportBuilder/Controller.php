@@ -463,8 +463,10 @@ class Controller extends Base
         // Calculate counts and points for all types/subtypes and group by student in a single pass
         $subtypeCounts = [];
         $subtypePoints = [];
+        $subtypeHasPoints = []; // Track if any records for this subtype have points set
         $typeCounts = [];
         $typePoints = [];
+        $typeHasPoints = []; // Track if any records for this type have points set
         $studentRecords = [];
 
         foreach ($records as $record) {
@@ -479,8 +481,10 @@ class Controller extends Base
                     'student' => $student,
                     'subtypeCounts' => [],
                     'subtypePoints' => [],
+                    'subtypeHasPoints' => [], // Track if any records for this student/subtype have points set
                     'typeCounts' => [],
                     'typePoints' => [],
+                    'typeHasPoints' => [], // Track if any records for this student/type have points set
                 ];
             }
 
@@ -488,32 +492,46 @@ class Controller extends Base
             $subtype = $record->getSubType();
             if ($subtype) {
                 $subtypeId = $subtype->getId();
+                $hasPoints = ($points !== null && $points !== '');
 
                 // Increment global counts
                 $subtypeCounts[$subtypeId] = ($subtypeCounts[$subtypeId] ?? 0) + 1;
                 $subtypePoints[$subtypeId] = ($subtypePoints[$subtypeId] ?? 0) + $pointsValue;
+                if ($hasPoints) {
+                    $subtypeHasPoints[$subtypeId] = true;
+                }
 
                 // Increment student counts
                 $studentRecords[$studentId]['subtypeCounts'][$subtypeId] =
                     ($studentRecords[$studentId]['subtypeCounts'][$subtypeId] ?? 0) + 1;
                 $studentRecords[$studentId]['subtypePoints'][$subtypeId] =
                     ($studentRecords[$studentId]['subtypePoints'][$subtypeId] ?? 0) + $pointsValue;
+                if ($hasPoints) {
+                    $studentRecords[$studentId]['subtypeHasPoints'][$subtypeId] = true;
+                }
             }
 
             // Process types (only those without subtypes)
             $type = $record->getType();
             if ($type && !isset($typesWithSubtypes[$type->getId()])) {
                 $typeId = $type->getId();
+                $hasPoints = ($points !== null && $points !== '');
 
                 // Increment global counts
                 $typeCounts[$typeId] = ($typeCounts[$typeId] ?? 0) + 1;
                 $typePoints[$typeId] = ($typePoints[$typeId] ?? 0) + $pointsValue;
+                if ($hasPoints) {
+                    $typeHasPoints[$typeId] = true;
+                }
 
                 // Increment student counts
                 $studentRecords[$studentId]['typeCounts'][$typeId] =
                     ($studentRecords[$studentId]['typeCounts'][$typeId] ?? 0) + 1;
                 $studentRecords[$studentId]['typePoints'][$typeId] =
                     ($studentRecords[$studentId]['typePoints'][$typeId] ?? 0) + $pointsValue;
+                if ($hasPoints) {
+                    $studentRecords[$studentId]['typeHasPoints'][$typeId] = true;
+                }
             }
         }
 
@@ -550,10 +568,12 @@ class Controller extends Base
                         'type' => 'RecordsAndPoints',
                         'isSortable' => true,
                     ];
-                    $totalRowData[] = [
-                        'records' => $subtypeCounts[$subtypeId] ?? 0,
-                        'points' => $subtypePoints[$subtypeId] ?? 0,
-                    ];
+
+                    $totalRowItem = ['records' => $subtypeCounts[$subtypeId] ?? 0];
+                    if (isset($subtypeHasPoints[$subtypeId])) {
+                        $totalRowItem['points'] = $subtypePoints[$subtypeId] ?? 0;
+                    }
+                    $totalRowData[] = $totalRowItem;
                 }
             } else {
                 // This type has no subtypes - add the type itself
@@ -563,10 +583,12 @@ class Controller extends Base
                     'type' => 'RecordsAndPoints',
                     'isSortable' => true,
                 ];
-                $totalRowData[] = [
-                    'records' => $typeCounts[$typeId] ?? 0,
-                    'points' => $typePoints[$typeId] ?? 0,
-                ];
+
+                $totalRowItem = ['records' => $typeCounts[$typeId] ?? 0];
+                if (isset($typeHasPoints[$typeId])) {
+                    $totalRowItem['points'] = $typePoints[$typeId] ?? 0;
+                }
+                $totalRowData[] = $totalRowItem;
             }
         }
 
@@ -594,11 +616,14 @@ class Controller extends Base
         // Build total row structure
         $totalRow = [
             'Total', // Sits in first column along with User
-            [
-                'records' => $grandTotalRecords,
-                'points' => $grandTotalPoints,
-            ]
         ];
+
+        $grandTotalItem = ['records' => $grandTotalRecords];
+        if (!empty($subtypeHasPoints) || !empty($typeHasPoints)) {
+            $grandTotalItem['points'] = $grandTotalPoints;
+        }
+        $totalRow[] = $grandTotalItem;
+
         $totalRow = array_merge($totalRow, $totalRowData);
 
         // Build student rows with data matching the column order
@@ -616,10 +641,11 @@ class Controller extends Base
             $totalRecords = array_sum($studentData['subtypeCounts']) + array_sum($studentData['typeCounts']);
             $totalPoints = array_sum($studentData['subtypePoints']) + array_sum($studentData['typePoints']);
 
-            $row[] = [
-                'records' => $totalRecords,
-                'points' => $totalPoints,
-            ];
+            $totalItem = ['records' => $totalRecords];
+            if (!empty($studentData['subtypeHasPoints']) || !empty($studentData['typeHasPoints'])) {
+                $totalItem['points'] = $totalPoints;
+            }
+            $row[] = $totalItem;
 
             // Add data for each column in the same order as tableColumns
             foreach ($typesSorted as $type) {
@@ -637,17 +663,19 @@ class Controller extends Base
 
                     foreach ($typeSubtypes as $subtype) {
                         $subtypeId = $subtype->getId();
-                        $row[] = [
-                            'records' => $studentData['subtypeCounts'][$subtypeId] ?? 0,
-                            'points' => $studentData['subtypePoints'][$subtypeId] ?? 0,
-                        ];
+                        $studentSubtypeItem = ['records' => $studentData['subtypeCounts'][$subtypeId] ?? 0];
+                        if (isset($studentData['subtypeHasPoints'][$subtypeId])) {
+                            $studentSubtypeItem['points'] = $studentData['subtypePoints'][$subtypeId] ?? 0;
+                        }
+                        $row[] = $studentSubtypeItem;
                     }
                 } else {
                     // Add data for standalone type
-                    $row[] = [
-                        'records' => $studentData['typeCounts'][$typeId] ?? 0,
-                        'points' => $studentData['typePoints'][$typeId] ?? 0,
-                    ];
+                    $studentTypeItem = ['records' => $studentData['typeCounts'][$typeId] ?? 0];
+                    if (isset($studentData['typeHasPoints'][$typeId])) {
+                        $studentTypeItem['points'] = $studentData['typePoints'][$typeId] ?? 0;
+                    }
+                    $row[] = $studentTypeItem;
                 }
             }
 
