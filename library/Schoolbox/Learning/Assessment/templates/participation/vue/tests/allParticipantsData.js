@@ -12,9 +12,17 @@ export const allParticipants = [
             givenName: "Moshe",
             lastname: "Appleton",
             fullName: "Moshe Appleton",
+            customisedPlan: null,
         },
         plan: {
             id: 744,
+            assessable: {
+                id: 30,
+                title: "Final Assessment",
+                _links: {
+                    modify: "",
+                }
+            }
         },
         excludedAt: "2025-05-26T09:32:03+10:00",
     },
@@ -27,10 +35,18 @@ export const allParticipants = [
             givenName: "Edwin",
             lastname: "Barnham",
             fullName: "Edwin Barnham",
+            customisedPlan: null,
         },
         plan: {
             id: 745,
             name: "Edwin's Plan",
+            assessable: {
+                id: 30,
+                title: "Final Assessment",
+                _links: {
+                    modify: "",
+                }
+            }
         },
         excludedAt: "2025-05-26T09:32:03+10:00",
     },
@@ -43,9 +59,17 @@ export const allParticipants = [
             givenName: "Mario",
             lastname: "Izzo",
             fullName: "Mario Izzo",
+            customisedPlan: null,
         },
         plan: {
             id: 744,
+            assessable: {
+                id: 30,
+                title: "Final Assessment",
+                _links: {
+                    modify: "",
+                }
+            }
         },
         excludedAt: null,
     },
@@ -58,9 +82,17 @@ export const allParticipants = [
             givenName: "Jana",
             lastname: "Reed",
             fullName: "Jana Reed",
+            customisedPlan: null,
         },
         plan: {
             id: 744,
+            assessable: {
+                id: 30,
+                title: "Final Assessment",
+                _links: {
+                    modify: "",
+                }
+            }
         },
         excludedAt: null,
     },

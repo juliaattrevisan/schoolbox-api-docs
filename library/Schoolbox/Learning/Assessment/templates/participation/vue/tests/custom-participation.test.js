@@ -83,7 +83,7 @@ test("When two students are selected, and one is excluded, the Remove Customisat
     expect(wrapper.find('[data-test="custom-participation-remove-customisation"]').exists()).toBe(true);
 });
 
-test("If a student is excluded, Excluded is visible in their row", async () => {
+test("If a student is excluded and doesn't have a customised activity, Excluded is visible in their row", async () => {
     const wrapper = mount(CustomParticipation, {
         props: {
             allParticipants,
