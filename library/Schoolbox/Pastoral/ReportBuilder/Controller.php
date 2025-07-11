@@ -442,6 +442,7 @@ class Controller extends Base
             $type = $record->getType();
             if ($type) {
                 $typeId = $type->getId();
+                // add type to the list if it doesn't already exist
                 if (!isset($types[$typeId])) {
                     $types[$typeId] = $type;
                 }
@@ -450,6 +451,7 @@ class Controller extends Base
             $subtype = $record->getSubType();
             if ($subtype) {
                 $subtypeId = $subtype->getId();
+                // add subtype to the list if it doesn't already exist
                 if (!isset($subtypes[$subtypeId])) {
                     $subtypes[$subtypeId] = $subtype;
                     // Track which types have subtypes for later processing
@@ -568,8 +570,8 @@ class Controller extends Base
             }
         }
 
-         // Build table headers structure
-         $tableHeaders = [
+        // Build table headers structure
+        $tableHeaders = [
             [
                 'key' => 'user',
                 'title' => 'Name',
@@ -583,7 +585,23 @@ class Controller extends Base
                 'isSortable' => true,
             ],
         ];
-        $tableHeaders = array_merge($tableHeaders, $tableColumns);        // Build student rows with data matching the column order
+        $tableHeaders = array_merge($tableHeaders, $tableColumns);
+
+        // Calculate grand totals for the summary row
+        $grandTotalRecords = array_sum($subtypeCounts) + array_sum($typeCounts);
+        $grandTotalPoints = array_sum($subtypePoints) + array_sum($typePoints);
+
+        // Build total row structure
+        $totalRow = [
+            'Total', // Sits in first column along with User
+            [
+                'records' => $grandTotalRecords,
+                'points' => $grandTotalPoints,
+            ]
+        ];
+        $totalRow = array_merge($totalRow, $totalRowData);
+
+        // Build student rows with data matching the column order
         $studentRows = [];
         foreach ($studentRecords as $studentData) {
             $student = $studentData['student'];
@@ -591,10 +609,10 @@ class Controller extends Base
             // Use the user translator to get standardized user data
             $userData = call_user_func($this->userTranslator, $student);
 
-            // Start with user data from translator
+            // First column user data from translator
             $row = [$userData];
 
-            // Calculate and add total column
+            // Next, add total column
             $totalRecords = array_sum($studentData['subtypeCounts']) + array_sum($studentData['typeCounts']);
             $totalPoints = array_sum($studentData['subtypePoints']) + array_sum($studentData['typePoints']);
 
@@ -640,20 +658,6 @@ class Controller extends Base
         usort($studentRows, function($a, $b) {
             return strcmp($a[0]['lastName'], $b[0]['lastName']);
         });
-
-        // Calculate grand totals for the summary row
-        $grandTotalRecords = array_sum($subtypeCounts) + array_sum($typeCounts);
-        $grandTotalPoints = array_sum($subtypePoints) + array_sum($typePoints);
-
-        // Build total row structure
-        $totalRow = [
-            'Total', // User column
-            [ // Total column
-                'records' => $grandTotalRecords,
-                'points' => $grandTotalPoints,
-            ]
-        ];
-        $totalRow = array_merge($totalRow, $totalRowData);
 
         // Data payload with calculated values
         $payload = [
