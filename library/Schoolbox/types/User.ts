@@ -11,11 +11,11 @@ type UserLinks = {
  */
 export type User = {
     externalId?: number;
-    firstname: string;
+    firstName: string;
     fullName: string;
     givenName: string;
     id: number;
-    lastname: string;
+    lastName: string;
     preferredName?: string | null;
     title: string | null;
     pronoun: string | null;

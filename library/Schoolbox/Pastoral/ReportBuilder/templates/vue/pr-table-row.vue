@@ -22,7 +22,7 @@ const props = defineProps<Props>();
  * @returns true if the data is a User, false otherwise
  */
 function isUser(data: RowOptions): data is User {
-    return (data as User).firstname !== undefined && (data as User).lastname !== undefined;
+    return (data as User).firstName !== undefined && (data as User).lastName !== undefined;
 }
 </script>
 
@@ -39,10 +39,10 @@ function isUser(data: RowOptions): data is User {
                         <user-photo :user="data" render="small" rounded-corners />
                         <div class="l-flex-col l-flex--justify-center f-no-margins">
                             <a v-if="data._links?.profile" :href="data._links.profile" title="View Profile">
-                                {{ data.lastname }}, {{ data.preferredName || data.firstname }}
+                                {{ data.lastName }}, {{ data.preferredName || data.firstName }}
                             </a>
                             <template v-else>
-                                {{ data.lastname }}, {{ data.preferredName || data.firstname }}
+                                {{ data.lastName }}, {{ data.preferredName || data.firstName }}
                             </template>
                         </div>
                     </div>
