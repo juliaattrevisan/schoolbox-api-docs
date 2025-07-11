@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 use Alaress\Codec\ICodec;
 use Alaress\Codec\Json\Base64;
-use Monolog\Level;
+use Monolog\Logger;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\ClientRepository;
 use Predis\ClientInterface;
@@ -111,6 +111,7 @@ $app = new class extends CliTool\App {
 
             // Set each key, for whatever its remaining TTL is
             foreach ($keys as $key) {
+                $this->getLogger()->debug('Migrating cache key: ' . $key);
                 $value  = $redisClient->get($key);
                 $ttl    = $redisClient->ttl($key);
                 if (!isset($value)) {
@@ -123,6 +124,11 @@ $app = new class extends CliTool\App {
                 // Remove the old namespace from the key, then set its value
                 $newKey       = str_replace($migration['oldNamespace'] . ':', '', $key);
                 $decodedValue = $migration['codec']->decode($value);
+
+                // Don't expire if the cached item was never set to expire
+                if ($ttl < 0) {
+                    $ttl = null;
+                }
                 $migration['cache']->set($newKey, $decodedValue, $ttl);
 
                 // TODO delete from old cache
@@ -134,4 +140,4 @@ $app = new class extends CliTool\App {
 };
 
 /** @noinspection PhpUnhandledExceptionInspection */
-(new CliTool\Kernel($app, [CliKernelAbstract::OPTION_LEVEL => Level::Debug], true))->runApp();
+(new CliTool\Kernel($app, [CliKernelAbstract::OPTION_LEVEL => Logger::DEBUG], true))->runApp();
