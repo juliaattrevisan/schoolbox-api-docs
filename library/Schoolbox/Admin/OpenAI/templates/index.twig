@@ -6,8 +6,20 @@
     {{ renderAdminNavigation(pageCurrent) }}
 
     <div class="admin-content">
-        <div id="settingsContainer" style="display:none">
-            {% include '@settings/moduleConfig.twig' with configContext only %}
+        <div class="small-12 columns">
+            <h2 class="subheader" style="display:none" data-subheader>Text Generation</h2>
+        </div>
+
+        <div id="textSettingsContainer" style="display:none">
+            {% include '@settings/moduleConfig.twig' with textConfigContext only %}
+        </div>
+
+        <div class="small-12 columns">
+            <h2 class="subheader" style="display:none" data-subheader>Image Generation</h2>
+        </div>
+
+        <div id="imageSettingsContainer" style="display:none">
+            {% include '@settings/moduleConfig.twig' with imageConfigContext only %}
         </div>
 
         <script>
@@ -15,42 +27,75 @@
                 const PROVIDER_OPENAI = '{{ models.openai }}';
                 const PROVIDER_AZURE = '{{ models.azure }}';
 
-                let provider = $('#openai_endpoint-field');
-                let key = $('#openai_key-field').parent('div');
-                let model = $('#openai_model-field').parent('div');
-                let azureResourceName = $('#openai_azure_resource_name-field').parent('div');
-                let azureDeploymentId = $('#openai_azure_deployment_id-field').parent('div');
+                /* Text credentials
+                 */
+                const textContainer = $('#textSettingsContainer');
+                const textProvider = $('#openai_text_endpoint-field');
+                const textKey = $('#openai_text_key-field').parent('div');
+                const textModel = $('#openai_text_model-field').parent('div');
+                const textAzureResourceName = $('#openai_text_azure_resource_name-field').parent('div');
+                const textAzureDeploymentId = $('#openai_text_azure_deployment_id-field').parent('div');
 
-                provider.on('change', function(event) {
+                textProvider.on('change', function(event) {
                     event.preventDefault();
-                    init(provider, key, model, azureResourceName, azureDeploymentId);
+                    init(textContainer, textProvider, textKey, textModel, textAzureResourceName, textAzureDeploymentId, null);
                 });
 
-                init(provider, key, model, azureResourceName, azureDeploymentId);
+                init(textContainer, textProvider, textKey, textModel, textAzureResourceName, textAzureDeploymentId, null);
+
+                /* Image credentials
+                 */
+                const imageContainer = $('#imageSettingsContainer');
+                const imageProvider = $('#openai_image_endpoint-field');
+                const imageKey = $('#openai_image_key-field').parent('div');
+                const imageModel = $('#openai_image_model-field').parent('div');
+                const imageAzureResourceName = $('#openai_image_azure_resource_name-field').parent('div');
+                const imageAzureDeploymentId = $('#openai_image_azure_deployment_id-field').parent('div');
+                const imageSystemPrompt = $('#openai_image_system_prompt-field').parent('div');
+
+                imageProvider.on('change', function(event) {
+                    event.preventDefault();
+                    init(imageContainer, imageProvider, imageKey, imageModel, imageAzureResourceName, imageAzureDeploymentId, imageSystemPrompt);
+                });
+
+                init(imageContainer, imageProvider, imageKey, imageModel, imageAzureResourceName, imageAzureDeploymentId, imageSystemPrompt);
 
                 /**
                  *  Hide everything if you haven't chosen a provider yet
                  */
-                function init(provider, key, model, azureResourceName, azureDeploymentId)
+                function init(container,provider, key, model, azureResourceName, azureDeploymentId, systemPrompt)
                 {
-                    if ('' === provider.val()) {
+                    if ('{{ endpointTypeOff }}' === provider.val() || '' === provider.val()) {
                         key.hide();
                         model.hide();
                         azureResourceName.hide();
                         azureDeploymentId.hide();
+
+                        if (null !== systemPrompt) {
+                            systemPrompt.hide();
+                        }
                     } else if (PROVIDER_OPENAI === provider.val()) {
                         key.show();
                         model.show();
                         azureResourceName.hide();
                         azureDeploymentId.hide();
+
+                        if (null !== systemPrompt) {
+                            systemPrompt.show();
+                        }
                     } else if (PROVIDER_AZURE === provider.val()) {
                         key.show();
                         model.hide();
                         azureResourceName.show();
                         azureDeploymentId.show();
+
+                        if (null !== systemPrompt) {
+                            systemPrompt.show();
+                        }
                     }
 
-                    $('#settingsContainer').show();
+                    $('[data-subheader]').show();
+                    container.show();
                 }
             });
         </script>

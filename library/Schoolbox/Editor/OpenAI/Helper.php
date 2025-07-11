@@ -37,6 +37,13 @@ class Helper
 
 
     /**
+     * This is the value of text and image endpoint providers if a school
+     * turned off these features.
+     */
+    public const ENDPOINT_TYPE_OFF = 'Off';
+
+
+    /**
      * Structured Outputs is only supported in certain models
      * Note that we intentionally don't support gippity 3.5
      */
@@ -96,6 +103,12 @@ class Helper
      */
     public function request(User $user, string $payload): array
     {
+        /* Check that we have activated this endpoint
+         */
+        if (self::ENDPOINT_TYPE_OFF === $this->openAiEndpoint) {
+            throw new \DomainException('OpenAI request queries are disabled. Choose an endpoint provider.');
+        }
+
         /* Assert that we're configured correctly
          */
         if (!$this->openAiKey) {
@@ -242,6 +255,12 @@ class Helper
      */
     public function aiAssistantChat(User $user, string $payload): void
     {
+        /* Check that we have activated this endpoint
+         */
+        if (self::ENDPOINT_TYPE_OFF === $this->openAiEndpoint) {
+            throw new \DomainException('OpenAI chat queries are disabled. Choose an endpoint provider.');
+        }
+
         /* Assert that we're configured correctly
          */
         if (!$this->openAiKey) {
@@ -258,20 +277,19 @@ class Helper
             // continue with the little robot dude payload, and see what AI responds with...
         }
 
-        /* Log what the user tried to do if we made a vaguely-successful request
-             * and didn't somehow die long the way
-             */
-        $log = $this->logMapper->createModel()
-            ->setUser($user)
-            ->setPrompt($payload)
-            ->setModel($this->openAiModel);
-
         try {
             $openAiRequest = new Request('POST', $this->getEndpoint(self::CHAT), array_merge(
                 $this->getAuthorization(),
                 ['Content-Type' => 'application/json'],
             ), $payload);
 
+            /* Log what the user tried to do if we made a vaguely-successful request
+             * and didn't somehow die long the way
+             */
+            $log = $this->logMapper->createModel()
+                ->setUser($user)
+                ->setPrompt($payload)
+                ->setModel($this->openAiModel);
 
             $promise = $this->client->sendAsync($openAiRequest, ['stream' => true]);
 
@@ -345,11 +363,6 @@ class Helper
              */
             die();
         } catch (GuzzleException $e) {
-            $log->setReturnCode($e->getCode())
-                ->setErrorMessage($e->getMessage())
-                ->setResponse($e->getTraceAsString());
-            $this->logMapper->save($log);
-
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
         }
     }

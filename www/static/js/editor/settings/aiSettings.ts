@@ -5,6 +5,10 @@ interface SbxAIAssistantConfig {
         openAI: {
             apiUrl: string;
             requestParameters: {
+                max_tokens: number;
+                temperature: number;
+                top_p: number;
+                stream: boolean;
                 model: string | undefined;
             };
         };
@@ -24,6 +28,10 @@ export function getAISettings(model: string | undefined): SbxAIAssistantConfig {
             openAI: {
                 apiUrl: "/openai",
                 requestParameters: {
+                    max_tokens: 2000,
+                    temperature: 1,
+                    top_p: 1,
+                    stream: true,
                     model,
                 },
             },

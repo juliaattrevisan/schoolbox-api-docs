@@ -46,7 +46,16 @@ class ConfigMapper extends Mapper
     public const MODULE_LTI        = 'lti';
     public const MODULE_REPORT_EXPORT = 'summative-report';
     public const MODULE_FEATURE_TOURS = 'feature-tours';
-    public const MODULE_OPENAI = 'openai';
+
+    /* Logically group each set of ai credentials based purely on the purpose they serve
+     * since the settings controllers group by module
+     */
+    public const MODULE_OPENAI_TEXT = 'openai-text';
+    public const MODULE_OPENAI_IMAGE = 'openai-image';
+
+    /* A special case for search
+     */
+    public const MODULE_OPENAI_AI_SERVICES = 'ai-services';
 
     // Field enum (kinda)
     public const FIELD_INPUT         =  1;
@@ -360,11 +369,11 @@ class ConfigMapper extends Mapper
 
     /* OpenAI
      */
-    public const NAME_OPENAI_ENDPOINT = 'openai_endpoint';
-    public const NAME_OPENAI_KEY = 'openai_key';
-    public const NAME_OPENAI_RESOURCE_NAME = 'openai_azure_resource_name';
-    public const NAME_OPENAI_DEPLOYMENT_ID = 'openai_azure_deployment_id';
-    public const NAME_OPENAI_MODEL = 'openai_model';
+    public const NAME_OPENAI_TEXT_ENDPOINT = 'openai_text_endpoint';
+    public const NAME_OPENAI_TEXT_KEY = 'openai_text_key';
+    public const NAME_OPENAI_TEXT_RESOURCE_NAME = 'openai_text_azure_resource_name';
+    public const NAME_OPENAI_TEXT_DEPLOYMENT_ID = 'openai_text_azure_deployment_id';
+    public const NAME_OPENAI_TEXT_MODEL = 'openai_text_model';
 
 
     public const NAME_DATASET_INSTANCE = 'dataset_instance';
@@ -506,7 +515,8 @@ class ConfigMapper extends Mapper
                 self::MODULE_LTI,
                 self::MODULE_REPORT_EXPORT,
                 self::MODULE_FEATURE_TOURS,
-                self::MODULE_OPENAI,
+                self::MODULE_OPENAI_TEXT,
+                self::MODULE_OPENAI_IMAGE,
             ]
         );
         $this->joins(self::COL_TYPE, Type\Mapper::class, 'id', self::TYPE_MODEL, null, 'type', 'type');

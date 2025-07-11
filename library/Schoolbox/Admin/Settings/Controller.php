@@ -132,10 +132,17 @@ class Controller extends ConfigController
            ->notEquals('module', 'custom');
         $foundConfig = $this->getConfigMapper()->findByPredicates($pb);
 
+        /** @var Config $config */
         foreach ($foundConfig as $config) {
-            /** @var Config $config */
-
             $module = $config->getModule();
+
+            /* Special case for OpenAI settings since they have their own module
+             * based on them being for Text AI and Image AI
+             */
+            if (in_array($module, [ConfigMapper::MODULE_OPENAI_TEXT, ConfigMapper::MODULE_OPENAI_IMAGE])) {
+                $module = ConfigMapper::MODULE_OPENAI_AI_SERVICES;
+            }
+
             $type = $config->getType() ? $config->getType()->getType() : '';
             $url = $this->getSettingsPageUrl($module, $type);
 

@@ -41,7 +41,8 @@ class Module extends BaseModule
         );
 
         $this->register('GET', '', 'getIndex', $perms);
-        $this->register('POST', '', 'postOpenAiOptions', $perms);
+        $this->register('POST', '/text', 'postTextOptions', $perms);
+        $this->register('POST', '/image', 'postImageOptions', $perms);
     }
 
 

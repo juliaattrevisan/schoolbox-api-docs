@@ -55,20 +55,20 @@ class Controller extends Base
     {
         try {
             $helper = new Helper(
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_ENDPOINT)),
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_KEY)),
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_RESOURCE_NAME)),
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_DEPLOYMENT_ID)),
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_MODEL)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_ENDPOINT)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_KEY)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_RESOURCE_NAME)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_DEPLOYMENT_ID)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_MODEL)),
                 $this->client,
                 $this->errorMapper,
                 $this->logMapper,
             );
 
             $payloadGenerator = (new Payload\LessonPlan(
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_ENDPOINT)),
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_MODEL)),
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_DEPLOYMENT_ID)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_ENDPOINT)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_MODEL)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_DEPLOYMENT_ID)),
                 trim((string)$this->getConfigLoader()->get('spellcheck_language')),
                 $this->curriculumNodeMapper
             ));
@@ -204,11 +204,11 @@ class Controller extends Base
     {
         try {
             (new Helper(
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_ENDPOINT)),
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_KEY)),
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_RESOURCE_NAME)),
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_DEPLOYMENT_ID)),
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_MODEL)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_ENDPOINT)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_KEY)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_RESOURCE_NAME)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_DEPLOYMENT_ID)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_MODEL)),
                 $this->client,
                 $this->errorMapper,
                 $this->logMapper,
