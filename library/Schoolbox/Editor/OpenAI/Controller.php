@@ -220,7 +220,7 @@ class Controller extends Base
             ));
 
             $payload = $payloadGenerator->generate(
-                $this->requestPost->get('prompt'),
+                $this->requestPost->get('userPrompt'),
                 $this->requestPost->get('previousResponseId') ?? null,
             );
 
