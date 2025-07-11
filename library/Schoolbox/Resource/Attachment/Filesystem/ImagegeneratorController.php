@@ -13,6 +13,7 @@ use OutOfRangeException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Attachment\AbstractController;
+use Schoolbox\Editor\OpenAI;
 use Scrub;
 use SitePage;
 
@@ -32,15 +33,25 @@ class ImagegeneratorController extends AbstractController
     /**
      * @param bool   $multi
      * @param string $mimeFilter
+     * @param IConfigLoader $conf
      * @param bool   $useFolder
      * @param int    $defaultFolderId
      * @throws OutOfRangeException
      */
-    public function __construct($multi, $mimeFilter = null, $useFolder = true, $defaultFolderId = 0)
+    public function __construct($multi, $mimeFilter = null, private ?IConfigLoader $conf = null, $useFolder = true, $defaultFolderId = 0)
     {
-        if (!$this->allowsImage($mimeFilter)) {
+        /* when $mimeFilter is null, it's valid */
+        if ($mimeFilter !== null && !$this->allowsImage($mimeFilter)) {
             throw new OutOfRangeException("mimeType is not an image.");
         }
+
+        /* is AI image generation enabled? */
+        $endpoint = $this->conf->get(ConfigMapper::NAME_OPENAI_IMAGE_ENDPOINT);
+        if (OpenAI\Helper::ENDPOINT_TYPE_OFF === $endpoint) {
+            throw new OutOfRangeException("Image generation is not enabled.");
+        }
+
+        parent::__construct($multi, $mimeFilter, $useFolder, $defaultFolderId);
     }
 
     /**
@@ -71,12 +82,10 @@ class ImagegeneratorController extends AbstractController
             $mime = "'" . Scrub::text($this->mimeFilter) . "'";
         }
 
-        /** @var IConfigLoader $config */
-        $config = $page->getDi()->get('config');
         $page->setVar(
             array(
                 'MAX_FILES'      => self::MAX_FILES,
-                'MAX_FILE_SIZE'  => $config->get(ConfigMapper::NAME_MAX_FILE_SIZE),
+                'MAX_FILE_SIZE'  => $this->conf->get(ConfigMapper::NAME_MAX_FILE_SIZE),
                 'ACCEPTED_FILES' => $mime
             )
         );

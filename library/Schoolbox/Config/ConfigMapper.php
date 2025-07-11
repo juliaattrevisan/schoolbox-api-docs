@@ -377,6 +377,8 @@ class ConfigMapper extends Mapper
     public const NAME_OPENAI_TEXT_DEPLOYMENT_ID = 'openai_text_azure_deployment_id';
     public const NAME_OPENAI_TEXT_MODEL = 'openai_text_model';
 
+    public const NAME_OPENAI_IMAGE_ENDPOINT = 'openai_image_endpoint';
+
 
     public const NAME_DATASET_INSTANCE = 'dataset_instance';
     /**

@@ -35,6 +35,8 @@ class Helper
     private const ENDPOINT_HOST_AZURE_CHAT = 'https://%s.openai.azure.com/openai/deployments/%s/chat/completions?api-version=2023-12-01-preview';
     private const ENDPOINT_HOST_AZURE_REQUEST = 'https://%s.openai.azure.com/openai/responses?api-version=2025-03-01-preview';
 
+    /** The endpoint config can be "Off" to disable AI */
+    public const ENDPOINT_TYPE_OFF = 'Off';
 
     /**
      * This is the value of text and image endpoint providers if a school

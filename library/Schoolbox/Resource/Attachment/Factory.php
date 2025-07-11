@@ -249,6 +249,7 @@ class Factory
             Filesystem\ImagegeneratorController::class => new Filesystem\ImagegeneratorController(
                 $this->multi,
                 $this->mime,
+                $this->conf,
                 $this->useFolder,
                 $this->defaultFolderId,
             ),
