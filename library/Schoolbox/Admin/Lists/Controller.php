@@ -1508,6 +1508,14 @@ class Controller extends Base
                     'default'    => false,
                     'popOutList' => 'displayOptions',
                 ],
+                'learningMomentModeration' => [
+                    'caption'    => 'Learning Moment Moderation',
+                    'tooltip'    => 'If toggled to ‘ON’, a student’s learning moment will require moderation before it appears on the activity feed for parents.',
+                    'checkbox'   => true,
+                    'mandatory'  => true,
+                    'default'    => false,
+                    'popOutList' => 'displayOptions',
+                ],
             ],
         ];
         if ($this->getConfigLoader()->get(ConfigMapper::NAME_QR_LOGIN_ENABLED)) {
@@ -1525,15 +1533,6 @@ class Controller extends Base
         $return['year-levels']['fields']['birthdayCelebrationEnabled'] = [
             'caption'    => 'Birthday Celebration Enabled',
             'tooltip'    => 'If toggled \'ON\', displays a celebration on the users\' Birthday.',
-            'checkbox'   => true,
-            'mandatory'  => true,
-            'default'    => false,
-            'popOutList' => 'displayOptions',
-        ];
-
-        $return['year-levels']['fields']['learningMomentModeration'] = [
-            'caption'    => 'Learning Moment Moderation',
-            'tooltip'    => 'If toggled to ‘ON’, a student’s learning moment will require moderation before it appears on the activity feed for parents.',
             'checkbox'   => true,
             'mandatory'  => true,
             'default'    => false,
