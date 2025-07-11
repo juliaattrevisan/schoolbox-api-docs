@@ -110,26 +110,48 @@ $app = new class extends CliTool\App {
             );
 
             // Set each key, for whatever its remaining TTL is
-            foreach ($keys as $key) {
-                $this->getLogger()->debug('Migrating cache key: ' . $key);
-                $value  = $redisClient->get($key);
-                $ttl    = $redisClient->ttl($key);
+            foreach ($keys as $oldKey) {
+                $this->getLogger()->debug('.. migrating cache key: ' . $oldKey);
+                $value = $redisClient->get($oldKey);
                 if (!isset($value)) {
                     $this->getLogger()->warning(
-                        sprintf('Cache key %s value does not exist: skipping', $key)
+                        sprintf('... cache key %s value does not exist: skipping', $oldKey)
+                    );
+                    continue;
+                }
+
+                // Don't expire if the cached item was never set to expire
+                $ttl = $redisClient->ttl($oldKey);
+                if ($ttl < 0) {
+                    $ttl = null;
+                    $this->getLogger()->debug('... key found (no ttl)');
+                } else {
+                    $this->getLogger()->debug(sprintf('... key found (ttl: %d)', $ttl));
+                }
+
+                // Decode the value: if that fails, something went wrong
+                try {
+                    $decodedValue = $migration['codec']->decode($value);
+                } catch (Throwable $e) {
+                    $this->getLogger()->warning(
+                        sprintf(
+                            '... cache key %s failed to decode (message: %s): skipping',
+                            $oldKey,
+                            $e->getMessage(),
+                        ),
                     );
                     continue;
                 }
 
                 // Remove the old namespace from the key, then set its value
-                $newKey       = str_replace($migration['oldNamespace'] . ':', '', $key);
-                $decodedValue = $migration['codec']->decode($value);
-
-                // Don't expire if the cached item was never set to expire
-                if ($ttl < 0) {
-                    $ttl = null;
+                $newKey = str_replace($migration['oldNamespace'] . ':', '', $oldKey);
+                if ($migration['cache']->set($newKey, $decodedValue, $ttl)) {
+                    $this->getLogger()->debug('... key migrated');
+                } else {
+                    $this->getLogger()->warning(
+                        sprintf('... cache key %s failed to migrate', $oldKey)
+                    );
                 }
-                $migration['cache']->set($newKey, $decodedValue, $ttl);
 
                 // TODO delete from old cache
             }
@@ -140,4 +162,4 @@ $app = new class extends CliTool\App {
 };
 
 /** @noinspection PhpUnhandledExceptionInspection */
-(new CliTool\Kernel($app, [CliKernelAbstract::OPTION_LEVEL => Logger::DEBUG], true))->runApp();
+(new CliTool\Kernel($app, [CliKernelAbstract::OPTION_LEVEL => Logger::INFO], true))->runApp();
