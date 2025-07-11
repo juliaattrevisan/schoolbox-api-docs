@@ -27,7 +27,13 @@ class MarshallerAdapter implements MarshallerInterface
     }
 
     /**
-     * @inheritdoc
+     * Serializes `$values` using `$this->codec`.
+     *
+     * @param array      $values Values to serialize.
+     * @param array|null $failed A list of keys which have failed to serialize,
+     *                           passed by reference.
+     * @param-out array  $failed this will always be set to an array
+     * @return array
      */
     public function marshall(array $values, ?array &$failed): array
     {
