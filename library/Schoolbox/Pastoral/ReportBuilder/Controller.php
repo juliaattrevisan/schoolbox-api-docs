@@ -617,6 +617,28 @@ class Controller extends Base
                 ],
             ];
 
+            // Calculate total records and points for this student
+            $totalRecords = 0;
+            $totalPoints = 0;
+            foreach ($studentData['subtypeCounts'] as $count) {
+                $totalRecords += $count;
+            }
+            foreach ($studentData['typeCounts'] as $count) {
+                $totalRecords += $count;
+            }
+            foreach ($studentData['subtypePoints'] as $points) {
+                $totalPoints += $points;
+            }
+            foreach ($studentData['typePoints'] as $points) {
+                $totalPoints += $points;
+            }
+
+            // Add total column (matches the "Total" header)
+            $row[] = [
+                'records' => $totalRecords,
+                'points' => $totalPoints,
+            ];
+
             // Add data in the same order as tableColumns - grouped by type, sorted by type sequence, then subtype sequence
             foreach ($typesSorted as $type) {
                 $typeId = $type->getId();
@@ -669,8 +691,22 @@ class Controller extends Base
         // Add all dynamic table columns to tableHeaders
         $tableHeaders = array_merge($tableHeaders, $tableColumns);
 
+        // Calculate grand totals for the total row
+        $grandTotalRecords = 0;
+        $grandTotalPoints = 0;
+        foreach ($totalRowData as $columnData) {
+            $grandTotalRecords += $columnData['records'];
+            $grandTotalPoints += $columnData['points'];
+        }
+
         // Build totalRow with actual calculated data
-        $totalRow = ['Total'];
+        $totalRow = [
+            'Total', // User column
+            [ // Total column
+                'records' => $grandTotalRecords,
+                'points' => $grandTotalPoints,
+            ]
+        ];
         $totalRow = array_merge($totalRow, $totalRowData);
 
         // Data payload with calculated values
