@@ -2,7 +2,7 @@ INSERT INTO config (`name`, `value`, `title`, `description`, `field_id`,  `type_
 VALUES (
     'openai_image_endpoint',
     'Off',
-    'OpenAI Endpoint Provider',
+    'Image Generation Endpoint',
     'Select which provider you will use for conducting AI image queries',
     (SELECT id FROM lu_config_field WHERE field = 'select'),
     (SELECT id FROM lu_config_type WHERE type = 'AI'),
@@ -17,7 +17,7 @@ VALUES (
 INSERT INTO config (`name`, `title`, `description`, `field_id`,  `type_id`, `editable`, `hidden`, `required`, `module`, sequence)
 VALUES (
     'openai_image_key',
-    'OpenAI Key',
+    'Image Generation API Key',
     'This key allows GPT based AI assistant services to be provided when creating content. The key can be created at https://openai.com/',
     (SELECT id FROM lu_config_field WHERE field = 'input'),
     (SELECT id FROM lu_config_type WHERE type = 'AI'),
@@ -31,7 +31,7 @@ VALUES (
 INSERT INTO config (`name`, `title`, `description`, `field_id`,  `type_id`, `editable`, `hidden`, `required`, `module`, sequence)
 VALUES (
     'openai_image_azure_resource_name',
-    'Azure OpenAI Resource Name',
+    'Image Generation Azure Resource Name',
     'The name of your Azure OpenAI Resource. Only required if using the Azure endpoint',
     (SELECT id FROM lu_config_field WHERE field = 'input'),
     (SELECT id FROM lu_config_type WHERE type = 'AI'),
@@ -45,7 +45,7 @@ VALUES (
 INSERT INTO config (`name`, `title`, `description`, `field_id`,  `type_id`, `editable`, `hidden`, `required`, `module`, sequence)
 VALUES (
     'openai_image_azure_deployment_id',
-    'Azure OpenAI Deployment ID',
+    'Image Generation Azure Deployment ID',
     'The deployment name you chose when you deployed the model in Azure. Only required if using the Azure endpoint',
     (SELECT id FROM lu_config_field WHERE field = 'input'),
     (SELECT id FROM lu_config_type WHERE type = 'AI'),
@@ -61,7 +61,7 @@ VALUES (
 INSERT INTO config (`name`, `title`, `description`, `field_id`,  `type_id`, `editable`, `hidden`, `required`, `module`, sequence)
 VALUES (
     'openai_image_system_prompt',
-    'OpenAI Image Generation System Prompt',
+    'Image Generation System Prompt',
     'Provide some additional instructions to shape what the AI service generates for all image generation requests.',
     (SELECT id FROM lu_config_field WHERE field = 'textarea'),
     (SELECT id FROM lu_config_type WHERE type = 'AI'),
