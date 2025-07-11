@@ -428,7 +428,7 @@ class Controller extends Base
     {
         $records = $this->getReportData($report);
 
-        // Extract unique types and subtypes from the records
+        // Extract unique types and subtypes from the records in a single pass
         $types = [];
         $subtypes = [];
         $typesWithSubtypes = [];
@@ -436,72 +436,38 @@ class Controller extends Base
         /** @var PastoralRecord $record */
         foreach ($records as $record) {
             $type = $record->getType();
-            if ($type && !isset($types[$type->getId()])) {
-                $types[$type->getId()] = $type;
+            if ($type) {
+                $typeId = $type->getId();
+                if (!isset($types[$typeId])) {
+                    $types[$typeId] = $type;
+                }
             }
 
-            $subtype = $record->getSubType();
-            if ($subtype && !isset($subtypes[$subtype->getId()])) {
-                $subtypes[$subtype->getId()] = $subtype;
-                // Track which types have subtypes
-                $typesWithSubtypes[$subtype->getPastoralType()->getId()] = true;
-            }
-        }
-
-        // Build tableColumns array - defines dynamic table columns for types/subtypes
-        // Each element represents a column header with its properties for the frontend table
-        $tableColumns = [];
-        $totalRowData = [];
-        $studentRows = [];
-
-        // Calculate record counts and points for subtypes
-        $subtypeCounts = [];
-        $subtypePoints = [];
-        foreach ($records as $record) {
             $subtype = $record->getSubType();
             if ($subtype) {
                 $subtypeId = $subtype->getId();
-                if (!isset($subtypeCounts[$subtypeId])) {
-                    $subtypeCounts[$subtypeId] = 0;
-                    $subtypePoints[$subtypeId] = 0;
-                }
-                $subtypeCounts[$subtypeId]++;
-
-                // Add points if they exist
-                $points = $record->getPoints();
-                if ($points !== null && $points !== '') {
-                    $subtypePoints[$subtypeId] += (int)$points;
+                if (!isset($subtypes[$subtypeId])) {
+                    $subtypes[$subtypeId] = $subtype;
+                    // Track which types have subtypes for later processing
+                    $typesWithSubtypes[$subtype->getPastoralType()->getId()] = true;
                 }
             }
         }
 
-        // Calculate record counts and points for types (only those without subtypes)
+        // Calculate counts and points for all types/subtypes and group by student in a single pass
+        $subtypeCounts = [];
+        $subtypePoints = [];
         $typeCounts = [];
         $typePoints = [];
-        foreach ($records as $record) {
-            $type = $record->getType();
-            if ($type && !isset($typesWithSubtypes[$type->getId()])) {
-                $typeId = $type->getId();
-                if (!isset($typeCounts[$typeId])) {
-                    $typeCounts[$typeId] = 0;
-                    $typePoints[$typeId] = 0;
-                }
-                $typeCounts[$typeId]++;
-
-                // Add points if they exist
-                $points = $record->getPoints();
-                if ($points !== null && $points !== '') {
-                    $typePoints[$typeId] += (int)$points;
-                }
-            }
-        }
-
-        // Group records by student and calculate per-student counts
         $studentRecords = [];
+
         foreach ($records as $record) {
             $student = $record->getStudent();
             $studentId = $student->getId();
+            $points = $record->getPoints();
+            $pointsValue = ($points !== null && $points !== '') ? (int)$points : 0;
 
+            // Initialize student record if not exists
             if (!isset($studentRecords[$studentId])) {
                 $studentRecords[$studentId] = [
                     'student' => $student,
@@ -512,58 +478,62 @@ class Controller extends Base
                 ];
             }
 
-            // Count subtypes for this student
+            // Process subtypes
             $subtype = $record->getSubType();
             if ($subtype) {
                 $subtypeId = $subtype->getId();
-                if (!isset($studentRecords[$studentId]['subtypeCounts'][$subtypeId])) {
-                    $studentRecords[$studentId]['subtypeCounts'][$subtypeId] = 0;
-                    $studentRecords[$studentId]['subtypePoints'][$subtypeId] = 0;
-                }
-                $studentRecords[$studentId]['subtypeCounts'][$subtypeId]++;
 
-                $points = $record->getPoints();
-                if ($points !== null && $points !== '') {
-                    $studentRecords[$studentId]['subtypePoints'][$subtypeId] += (int)$points;
-                }
+                // Increment global counts
+                $subtypeCounts[$subtypeId] = ($subtypeCounts[$subtypeId] ?? 0) + 1;
+                $subtypePoints[$subtypeId] = ($subtypePoints[$subtypeId] ?? 0) + $pointsValue;
+
+                // Increment student counts
+                $studentRecords[$studentId]['subtypeCounts'][$subtypeId] =
+                    ($studentRecords[$studentId]['subtypeCounts'][$subtypeId] ?? 0) + 1;
+                $studentRecords[$studentId]['subtypePoints'][$subtypeId] =
+                    ($studentRecords[$studentId]['subtypePoints'][$subtypeId] ?? 0) + $pointsValue;
             }
 
-            // Count types for this student (only those without subtypes)
+            // Process types (only those without subtypes)
             $type = $record->getType();
             if ($type && !isset($typesWithSubtypes[$type->getId()])) {
                 $typeId = $type->getId();
-                if (!isset($studentRecords[$studentId]['typeCounts'][$typeId])) {
-                    $studentRecords[$studentId]['typeCounts'][$typeId] = 0;
-                    $studentRecords[$studentId]['typePoints'][$typeId] = 0;
-                }
-                $studentRecords[$studentId]['typeCounts'][$typeId]++;
 
-                $points = $record->getPoints();
-                if ($points !== null && $points !== '') {
-                    $studentRecords[$studentId]['typePoints'][$typeId] += (int)$points;
-                }
+                // Increment global counts
+                $typeCounts[$typeId] = ($typeCounts[$typeId] ?? 0) + 1;
+                $typePoints[$typeId] = ($typePoints[$typeId] ?? 0) + $pointsValue;
+
+                // Increment student counts
+                $studentRecords[$studentId]['typeCounts'][$typeId] =
+                    ($studentRecords[$studentId]['typeCounts'][$typeId] ?? 0) + 1;
+                $studentRecords[$studentId]['typePoints'][$typeId] =
+                    ($studentRecords[$studentId]['typePoints'][$typeId] ?? 0) + $pointsValue;
             }
         }
 
-        // Add subtypes grouped by type, and standalone types - sorted by type sequence, then subtype sequence
+        // Sort types by sequence and build table columns in the correct order
         $typesSorted = [];
         foreach ($types as $type) {
             $typesSorted[$type->getSequence()] = $type;
         }
-        ksort($typesSorted); // Sort types by sequence
+        ksort($typesSorted);
+
+        // Build table columns and total row data arrays
+        $tableColumns = [];
+        $totalRowData = [];
 
         foreach ($typesSorted as $type) {
             $typeId = $type->getId();
 
             if (isset($typesWithSubtypes[$typeId])) {
-                // This type has subtypes - add all subtypes for this type
+                // This type has subtypes - sort and add all subtypes for this type
                 $typeSubtypes = [];
                 foreach ($subtypes as $subtype) {
                     if ($subtype->getPastoralType()->getId() === $typeId) {
                         $typeSubtypes[$subtype->getSequence()] = $subtype;
                     }
                 }
-                ksort($typeSubtypes); // Sort subtypes by sequence
+                ksort($typeSubtypes);
 
                 foreach ($typeSubtypes as $subtype) {
                     $subtypeId = $subtype->getId();
@@ -594,13 +564,13 @@ class Controller extends Base
             }
         }
 
-        // Build tempRows with student data
+        // Build student rows with data matching the column order
+        $studentRows = [];
         foreach ($studentRecords as $studentData) {
             $student = $studentData['student'];
-            $row = [];
 
-            // Add user object as first element
-            $row[] = [
+            // Start with user data
+            $row = [[
                 'id' => $student->getId(),
                 'name' => $student->getFullName(),
                 'externalId' => $student->getExternalId(),
@@ -615,43 +585,30 @@ class Controller extends Base
                     'avatar' => '/portrait.php?id=' . $student->getId() . '&size=square64',
                     'profile' => '/search/user/' . $student->getId(),
                 ],
-            ];
+            ]];
 
-            // Calculate total records and points for this student
-            $totalRecords = 0;
-            $totalPoints = 0;
-            foreach ($studentData['subtypeCounts'] as $count) {
-                $totalRecords += $count;
-            }
-            foreach ($studentData['typeCounts'] as $count) {
-                $totalRecords += $count;
-            }
-            foreach ($studentData['subtypePoints'] as $points) {
-                $totalPoints += $points;
-            }
-            foreach ($studentData['typePoints'] as $points) {
-                $totalPoints += $points;
-            }
+            // Calculate and add total column
+            $totalRecords = array_sum($studentData['subtypeCounts']) + array_sum($studentData['typeCounts']);
+            $totalPoints = array_sum($studentData['subtypePoints']) + array_sum($studentData['typePoints']);
 
-            // Add total column (matches the "Total" header)
             $row[] = [
                 'records' => $totalRecords,
                 'points' => $totalPoints,
             ];
 
-            // Add data in the same order as tableColumns - grouped by type, sorted by type sequence, then subtype sequence
+            // Add data for each column in the same order as tableColumns
             foreach ($typesSorted as $type) {
                 $typeId = $type->getId();
 
                 if (isset($typesWithSubtypes[$typeId])) {
-                    // This type has subtypes - add all subtypes for this type
+                    // Add subtypes for this type in sequence order
                     $typeSubtypes = [];
                     foreach ($subtypes as $subtype) {
                         if ($subtype->getPastoralType()->getId() === $typeId) {
                             $typeSubtypes[$subtype->getSequence()] = $subtype;
                         }
                     }
-                    ksort($typeSubtypes); // Sort subtypes by sequence
+                    ksort($typeSubtypes);
 
                     foreach ($typeSubtypes as $subtype) {
                         $subtypeId = $subtype->getId();
@@ -661,7 +618,7 @@ class Controller extends Base
                         ];
                     }
                 } else {
-                    // This type has no subtypes - add the type itself
+                    // Add data for standalone type
                     $row[] = [
                         'records' => $studentData['typeCounts'][$typeId] ?? 0,
                         'points' => $studentData['typePoints'][$typeId] ?? 0,
@@ -672,12 +629,12 @@ class Controller extends Base
             $studentRows[] = $row;
         }
 
-        // Sort student rows by last name
+        // Sort student rows alphabetically by last name
         usort($studentRows, function($a, $b) {
             return strcmp($a[0]['lastname'], $b[0]['lastname']);
         });
 
-        // Build tableHeaders starting with user and total, then adding tempTypes
+        // Build table headers structure
         $tableHeaders = [
             [
                 'key' => 'user',
@@ -692,19 +649,13 @@ class Controller extends Base
                 'isSortable' => true,
             ],
         ];
-
-        // Add all dynamic table columns to tableHeaders
         $tableHeaders = array_merge($tableHeaders, $tableColumns);
 
-        // Calculate grand totals for the total row
-        $grandTotalRecords = 0;
-        $grandTotalPoints = 0;
-        foreach ($totalRowData as $columnData) {
-            $grandTotalRecords += $columnData['records'];
-            $grandTotalPoints += $columnData['points'];
-        }
+        // Calculate grand totals for the summary row
+        $grandTotalRecords = array_sum($subtypeCounts) + array_sum($typeCounts);
+        $grandTotalPoints = array_sum($subtypePoints) + array_sum($typePoints);
 
-        // Build totalRow with actual calculated data
+        // Build total row structure
         $totalRow = [
             'Total', // User column
             [ // Total column
