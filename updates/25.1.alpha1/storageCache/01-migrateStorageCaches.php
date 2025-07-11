@@ -19,18 +19,38 @@ use Schoolbox\Oidc\CacheHelper;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Psr16Cache;
 
+/**
+ * CLI tool for migrating all values which were stored using the old Redis cache
+ * library in the storage instance, to keys and values which are recognised by
+ * the Symfony cache library's Redis adapter.
+ *
+ * This includes:
+ * * LTI access tokens
+ * * OIDC auth codes and access/refresh/ID tokens
+ */
 $app = new class extends CliTool\App {
+    /**
+     *
+     */
+    private const SET_KEY = '__set';
+
+    /**
+     * Run the tool
+     *
+     * @return void
+     */
     public function run(): void
     {
         /** @var ClientInterface $redisClient */
         $redisClient = $this->getDi()->get('redis.storage');
 
-        // Find all keys in the old cache (oldCache:__set), and codec them
         /** @var RegistrationRepositoryInterface $registrationRepository */
         $registrationRepository = $this->getDi()->get('lti.registrations');
         $ltiAccessTokenCodec    = new LtiAccessTokenCodec(new ClientRepository($registrationRepository));
 
         /**
+         * Migrations included in this script.
+         *
          * @var array<array{
          *      name:         string,
          *      oldNamespace: string,
@@ -61,6 +81,9 @@ $app = new class extends CliTool\App {
             ],
         ];
 
+        // Find all keys in the old cache, and migrate to the new cache.
+        // TODO consider a keyspace scan instead of the set?
+        // TODO consider whether old sets need to be removed?
         foreach ($migrations as $migration) {
             $this->getLogger()->info(
                 sprintf(
@@ -71,6 +94,15 @@ $app = new class extends CliTool\App {
                 ),
             );
             $keys = $redisClient->smembers($migration['oldNamespace'] . ':__set');
+            $this->getLogger()->info(
+                sprintf(
+                    '. %d keys found in %s:__set',
+                    count($keys),
+                    $migration['oldNamespace'],
+                ),
+            );
+
+            // Set each key, for whatever its remaining TTL is
             foreach ($keys as $key) {
                 $value = $redisClient->get($migration['oldNamespace'] . ':' . $key);
                 if (!isset($value)) {
