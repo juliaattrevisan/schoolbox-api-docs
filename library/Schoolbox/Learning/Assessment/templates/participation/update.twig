@@ -30,6 +30,7 @@
         context: assessment.context
     }) }}"
     :assessment-id="{{ assessment.id }}"
+    :customisations="{{ (customisations ?? []) | json_encode }}"
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/customParticipation.js?v={{ config.site_version }}"></script>

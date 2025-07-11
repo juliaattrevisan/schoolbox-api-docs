@@ -7,7 +7,7 @@ import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
 import type { StudentPastoralCountBadge } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
-import type { Participant } from "../js/types/customParticipationTypes";
+import type { Participant, Plan } from "../js/types/customParticipationTypes";
 
 interface Props {
     allParticipants: Participant[];
@@ -16,6 +16,7 @@ interface Props {
     getAssessmentParticipation: string;
     getAssessmentParticipationNewActivity: string;
     assessmentId: number;
+    customisations: Plan[];
 }
 const props = defineProps<Props>();
 
