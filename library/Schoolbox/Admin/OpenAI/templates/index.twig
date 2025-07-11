@@ -65,7 +65,7 @@
                  */
                 function init(container,provider, key, model, azureResourceName, azureDeploymentId, systemPrompt)
                 {
-                    if ('Off' === provider.val() || '' === provider.val()) {
+                    if ('{{ endpointTypeOff }}' === provider.val() || '' === provider.val()) {
                         key.hide();
                         model.hide();
                         azureResourceName.hide();

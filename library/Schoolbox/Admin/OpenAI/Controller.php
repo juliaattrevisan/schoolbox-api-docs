@@ -64,6 +64,7 @@ class Controller extends ConfigController
             'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex')),
             'textConfigContext' => $textConfigContext,
             'imageConfigContext' => $imageConfigContext,
+            'endpointTypeOff' => Helper::ENDPOINT_TYPE_OFF,
             'models' => [
                 'openai' => Helper::ENDPOINT_TYPE_OPENAI,
                 'azure' => Helper::ENDPOINT_TYPE_AZURE,

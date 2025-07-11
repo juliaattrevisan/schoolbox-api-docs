@@ -40,7 +40,7 @@ class Helper
      * This is the value of text and image endpoint providers if a school
      * turned off these features.
      */
-    private const ENDPOINT_TYPE_OFF = 'Off';
+    public const ENDPOINT_TYPE_OFF = 'Off';
 
 
     /**
