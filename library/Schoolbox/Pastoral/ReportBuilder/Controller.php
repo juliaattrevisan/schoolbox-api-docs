@@ -683,7 +683,7 @@ class Controller extends Base
         }
 
         // Sort student rows alphabetically by last name
-        usort($studentRows, function($a, $b) {
+        usort($studentRows, function ($a, $b) {
             return strcmp($a[0]['lastName'], $b[0]['lastName']);
         });
 
