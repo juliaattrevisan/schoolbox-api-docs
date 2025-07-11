@@ -564,6 +564,23 @@ class Controller extends Base
             }
         }
 
+         // Build table headers structure
+         $tableHeaders = [
+            [
+                'key' => 'user',
+                'title' => 'Name',
+                'type' => 'User',
+                'isSortable' => true,
+            ],
+            [
+                'key' => 'total',
+                'title' => 'Total',
+                'type' => 'RecordsAndPoints',
+                'isSortable' => true,
+            ],
+        ];
+        $tableHeaders = array_merge($tableHeaders, $tableColumns);
+
         // Build student rows with data matching the column order
         $studentRows = [];
         foreach ($studentRecords as $studentData) {
@@ -633,23 +650,6 @@ class Controller extends Base
         usort($studentRows, function($a, $b) {
             return strcmp($a[0]['lastname'], $b[0]['lastname']);
         });
-
-        // Build table headers structure
-        $tableHeaders = [
-            [
-                'key' => 'user',
-                'title' => 'Name',
-                'type' => 'User',
-                'isSortable' => true,
-            ],
-            [
-                'key' => 'total',
-                'title' => 'Total',
-                'type' => 'RecordsAndPoints',
-                'isSortable' => true,
-            ],
-        ];
-        $tableHeaders = array_merge($tableHeaders, $tableColumns);
 
         // Calculate grand totals for the summary row
         $grandTotalRecords = array_sum($subtypeCounts) + array_sum($typeCounts);
