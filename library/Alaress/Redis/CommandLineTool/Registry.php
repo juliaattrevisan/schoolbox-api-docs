@@ -34,22 +34,17 @@ class Registry
     public const KEY_PATTERNS = [
         // Cache-only patterns go here
         Redis::INSTANCE_CACHE   => [
-            // Old and new scrub
-            '^scrub.html:',
-            '^scrub.htmlAbsoluteUri:',
+            // Ccrub
             '^fc:' . self::INSTANCE_ID_MATCH . ':scrub.html:',
             '^fc:' . self::INSTANCE_ID_MATCH . ':scrub.htmlAbsoluteUri:',
 
-            // Old and new Verso API
-            '^verso_api',
+            // Verso API
             '^fc:' . self::INSTANCE_ID_MATCH . ':verso_api:',
 
-            // Old and new external
-            "^External_.+",
+            // External
             '^fc:' . self::INSTANCE_ID_MATCH . ':External_',
 
-            // Old and new vCal cache
-            "^vcal.[0-9a-f]{64}",
+            // vCal cache
             "^vcal:" . self::INSTANCE_ID_MATCH . ":[0-9a-f]{64}",
 
             // Locks
@@ -98,8 +93,7 @@ class Registry
             // Sessions
             '^PHPREDIS_SESSION:' . self::INSTANCE_ID_MATCH . ':',
 
-            // Old and new remember me
-            "^[0-9a-f]{40}$",
+            // Remember me
             "^remember:" . self::INSTANCE_ID_MATCH . ":[0-9a-f]{40}$",
 
             // Message instance, detailing the content of a message
