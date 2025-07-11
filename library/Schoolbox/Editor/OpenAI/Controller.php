@@ -207,13 +207,15 @@ class Controller extends Base
                 trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_KEY)),
                 trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_RESOURCE_NAME)),
                 trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_DEPLOYMENT_ID)),
-                Payload\ImageGeneration::OPENAI_IMAGE_MODEL,
+                // TODO: need an image-specific text model here
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_MODEL)),
                 $this->client,
                 $this->errorMapper,
                 $this->logMapper,
             );
 
             $payloadGenerator = (new Payload\ImageGeneration(
+                $helper->getModel(),
                 trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_SYSTEM_PROMPT)),
             ));
 

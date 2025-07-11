@@ -94,6 +94,21 @@ class Helper
 
 
     /**
+     * Retrieve the model to use in requests
+     * OpenAI lets us choose the model (from config),
+     * Azure has the model linked to the deployment ID when you set it up over there, so we can't choose it
+     */
+    public function getModel(): string
+    {
+        if (Helper::ENDPOINT_TYPE_AZURE === $this->openAiEndpoint) {
+            return $this->openAiAzureDeploymentId;
+        }
+
+        return $this->openAiModel;
+    }
+
+
+    /**
      * request (no streaming, returns full json payload)
      * hits openAI and returns the string response (you need to json decode yourself...)
      *

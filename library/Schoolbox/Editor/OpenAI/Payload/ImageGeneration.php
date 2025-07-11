@@ -28,10 +28,13 @@ class ImageGeneration
     /**
      * Constructor.
      *
+     * @param string $textModel
      * @param string $systemPrompt
      */
-    public function __construct(private string $systemPrompt)
-    {
+    public function __construct(
+        private string $textModel,
+        private string $systemPrompt
+    ) {
     }
 
 
@@ -69,11 +72,11 @@ class ImageGeneration
         $payload = [
             /* An ordered list of instructions for OpenAi
              */
-            "input" => [],
-            /* Which variant of OpenAI to use
-             * TODO: This model might actually need to be the text-based one based on the API docs, let's find out
+            'input' => [],
+            /* Which variant of OpenAI to use (text model)
+             * This is different to the image model, since we also need a text model to do responses
              */
-            "model" => self::OPENAI_IMAGE_MODEL,
+            'model' => $this->textModel,
             /* Make the image generation tool available and force it to be used
              */
             'tool_choice' => [
