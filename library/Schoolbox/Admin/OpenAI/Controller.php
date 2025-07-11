@@ -59,6 +59,11 @@ class Controller extends ConfigController
             [ModuleConfig::CONTEXT_USE_BOTTOM_DRAWER => false],
         );
 
+        /* Make islands independent of each other for validation reasons
+         */
+        $textConfigContext['formId'] = 'textSettings';
+        $imageConfigContext['formId'] = 'imageSettings';
+
         $this->response = $this->responseFromTemplate('@adminOpenAi/index.twig', [
             'pageCurrent' => $this->routeGenerator->generate('adminOpenAi.getIndex'),
             'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex')),

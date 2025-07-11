@@ -6,13 +6,14 @@
     hasTimePicker:            bool        - Does this set of config options include an editable timepicker?
     isEditable                bool        - Is the form editable?
     postRoute:                string      - Where to post form to
+    formId:                   string      - The id of the settings form ("settings" by default)
 #}
 <script type="text/javascript" src="{{CDN_PREFIX}}/js/bundle/colourPicker.js?v={{ config.site_version }}"></script>
 <script src="{{CDN_PREFIX}}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 {% include '@settings/fragments/moduleConfigHighlight.twig' %}
 <script type="text/javascript">
     $(function() {
-        let settingsForm = $('#settings');
+        let settingsForm = $('#{{ formId ?? 'settings' }}');
 
         {% if hasColourPicker %}
         document.querySelectorAll("[data-colour-picker]").forEach((el) => {
@@ -99,7 +100,7 @@
 {% endif %}
 
 <div class="small-12 island">
-    <form data-action="saveSettings" id="settings" method="post" action="{{ postRoute }}">
+    <form data-action="saveSettings" id="{{ formId ?? 'settings' }}" method="post" action="{{ postRoute }}">
         <section>
             <fieldset class="content">
                 {# Remember if we encountered a dropzone here somewhere
