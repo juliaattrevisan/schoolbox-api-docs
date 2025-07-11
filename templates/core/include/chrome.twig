@@ -128,6 +128,8 @@
 
         {# TODO Rethink this idea, because we have separate text and image ideas now
          # How we decide which feature is active and which isn't...needs some revisiting
+         # To avoid dealing with this Off const we can just pass the provider(s) values
+         # and let each feature decide when it's off and when it's on.
          #}
         {% if user.current.role.staff and config.openai_text_endpoint != 'Off' %}
         // to display the AI features around the site
