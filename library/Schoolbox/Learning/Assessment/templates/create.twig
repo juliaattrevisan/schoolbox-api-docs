@@ -173,7 +173,9 @@
     </script>
 
     <div id="importModal" class="reveal-modal" data-reveal>
-        <h2>Upload quiz</h2>
+        <h2>Import quiz</h2>
+
+        <p>This importer accepts the legacy xml files from the old quiz system as well as the newer json-based files.</p>
 
         {% set importRoute = routeLookup('learningQuiz.postImport', {
             contextId: context.id,
@@ -183,7 +185,7 @@
         {% if importRoute %}
             <div id="import-loader" style="display:none">
                 <div class="loader"></div>
-                <p class="text-center">Uploading quiz...</p>
+                <p class="text-center">Importing quiz...</p>
             </div>
 
             <form id='importForm' method="post" action="{{ importRoute }}" enctype="multipart/form-data">
