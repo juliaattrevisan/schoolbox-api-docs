@@ -29,6 +29,8 @@ const isGenerating = window.Vue.ref<boolean>(false);
 const generateError = window.Vue.ref<string | null>(null);
 
 type ImageResult = {
+    /* the openai response ID so we can reference it in the next chat */
+    previousResponseId: string;
     /* the prompt used to generate it */
     prompt: string;
     /* the image URL */
@@ -56,6 +58,7 @@ async function sendRequest(): Promise<void> {
         userPrompt: prompt.value,
         imageSize: imageSize.value,
         imageStyle: imageStyle.value,
+        previousResponseId: imageResult.value?.previousResponseId ?? null,
     });
 
     isGenerating.value = false;
@@ -74,6 +77,7 @@ async function sendRequest(): Promise<void> {
 
     // TODO: Handle the response data properly in the backend instead of here
     imageResult.value = {
+        previousResponseId: response.data.id,
         prompt: prompt.value,
         src: `data:image/png;base64,${image.result}`,
         message: messageContent ? messageContent.text.trim() : "",
