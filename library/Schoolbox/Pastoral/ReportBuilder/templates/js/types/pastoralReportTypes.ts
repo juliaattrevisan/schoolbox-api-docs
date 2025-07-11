@@ -70,7 +70,7 @@ export type TableHeader = {
  */
 export type RecordsAndPoints = {
     records: number;
-    points: number;
+    points: number | undefined; // Points can be undefined if none have been applied within the records
 };
 
 /**

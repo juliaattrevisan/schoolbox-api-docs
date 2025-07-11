@@ -56,7 +56,7 @@ function isUser(data: RowOptions): data is User {
                             {{ (data as RecordsAndPoints).records > 0 ? (data as RecordsAndPoints).records : "" }}
                         </template>
                         <template v-else>
-                            {{ (data as RecordsAndPoints).points }}
+                            {{ (data as RecordsAndPoints).records > 0 ? (data as RecordsAndPoints).points : "" }}
                         </template>
                     </span>
                 </Transition>
