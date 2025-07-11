@@ -545,26 +545,42 @@ class Controller extends Base
             }
         }
 
-        // Add subtypes
-        foreach ($subtypes as $subtype) {
-            $subtypeId = $subtype->getId();
-            $tableColumns[] = [
-                'key' => 'subtype-' . $subtypeId,
-                'title' => $subtype->getPastoralType()->getName(),
-                'subTitle' => $subtype->getName(),
-                'type' => 'RecordsAndPoints',
-                'isSortable' => true,
-            ];
-            $totalRowData[] = [
-                'records' => $subtypeCounts[$subtypeId] ?? 0,
-                'points' => $subtypePoints[$subtypeId] ?? 0,
-            ];
-        }
-
-        // Add types that don't have subtypes
+        // Add subtypes grouped by type, and standalone types - sorted by type sequence, then subtype sequence
+        $typesSorted = [];
         foreach ($types as $type) {
-            if (!isset($typesWithSubtypes[$type->getId()])) {
-                $typeId = $type->getId();
+            $typesSorted[$type->getSequence()] = $type;
+        }
+        ksort($typesSorted); // Sort types by sequence
+
+        foreach ($typesSorted as $type) {
+            $typeId = $type->getId();
+
+            if (isset($typesWithSubtypes[$typeId])) {
+                // This type has subtypes - add all subtypes for this type
+                $typeSubtypes = [];
+                foreach ($subtypes as $subtype) {
+                    if ($subtype->getPastoralType()->getId() === $typeId) {
+                        $typeSubtypes[$subtype->getSequence()] = $subtype;
+                    }
+                }
+                ksort($typeSubtypes); // Sort subtypes by sequence
+
+                foreach ($typeSubtypes as $subtype) {
+                    $subtypeId = $subtype->getId();
+                    $tableColumns[] = [
+                        'key' => 'subtype-' . $subtypeId,
+                        'title' => $subtype->getPastoralType()->getName(),
+                        'subTitle' => $subtype->getName(),
+                        'type' => 'RecordsAndPoints',
+                        'isSortable' => true,
+                    ];
+                    $totalRowData[] = [
+                        'records' => $subtypeCounts[$subtypeId] ?? 0,
+                        'points' => $subtypePoints[$subtypeId] ?? 0,
+                    ];
+                }
+            } else {
+                // This type has no subtypes - add the type itself
                 $tableColumns[] = [
                     'key' => 'type-' . $typeId,
                     'title' => $type->getName(),
@@ -601,19 +617,29 @@ class Controller extends Base
                 ],
             ];
 
-            // Add data for each subtype
-            foreach ($subtypes as $subtype) {
-                $subtypeId = $subtype->getId();
-                $row[] = [
-                    'records' => $studentData['subtypeCounts'][$subtypeId] ?? 0,
-                    'points' => $studentData['subtypePoints'][$subtypeId] ?? 0,
-                ];
-            }
+            // Add data in the same order as tableColumns - grouped by type, sorted by type sequence, then subtype sequence
+            foreach ($typesSorted as $type) {
+                $typeId = $type->getId();
 
-            // Add data for each type (without subtypes)
-            foreach ($types as $type) {
-                if (!isset($typesWithSubtypes[$type->getId()])) {
-                    $typeId = $type->getId();
+                if (isset($typesWithSubtypes[$typeId])) {
+                    // This type has subtypes - add all subtypes for this type
+                    $typeSubtypes = [];
+                    foreach ($subtypes as $subtype) {
+                        if ($subtype->getPastoralType()->getId() === $typeId) {
+                            $typeSubtypes[$subtype->getSequence()] = $subtype;
+                        }
+                    }
+                    ksort($typeSubtypes); // Sort subtypes by sequence
+
+                    foreach ($typeSubtypes as $subtype) {
+                        $subtypeId = $subtype->getId();
+                        $row[] = [
+                            'records' => $studentData['subtypeCounts'][$subtypeId] ?? 0,
+                            'points' => $studentData['subtypePoints'][$subtypeId] ?? 0,
+                        ];
+                    }
+                } else {
+                    // This type has no subtypes - add the type itself
                     $row[] = [
                         'records' => $studentData['typeCounts'][$typeId] ?? 0,
                         'points' => $studentData['typePoints'][$typeId] ?? 0,
