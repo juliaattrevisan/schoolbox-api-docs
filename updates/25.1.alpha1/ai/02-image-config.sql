@@ -23,7 +23,7 @@ VALUES (
     (SELECT id FROM lu_config_type WHERE type = 'AI'),
     'true',
     'false',
-    'false',
+    'true',
     'openai-image',
     7
 );
@@ -37,7 +37,7 @@ VALUES (
     (SELECT id FROM lu_config_type WHERE type = 'AI'),
     'true',
     'false',
-    'false',
+    'true',
     'openai-image',
     8
 );
@@ -51,9 +51,24 @@ VALUES (
     (SELECT id FROM lu_config_type WHERE type = 'AI'),
     'true',
     'false',
-    'false',
+    'true',
     'openai-image',
     9
+);
+
+INSERT INTO config (`name`, `title`, `description`, `field_id`,  `type_id`, `options`, `editable`, `hidden`, `required`, `module`, sequence)
+VALUES (
+    'openai_image_model',
+    'Image Generation Model',
+    'Select which model you wish to use for your OpenAI service.',
+    (SELECT id FROM lu_config_field WHERE field = 'select'),
+    (SELECT id FROM lu_config_type WHERE type = 'AI'),
+    'gpt-4o:gpt-4o-mini:gpt-4.1:gpt-4.1-mini',
+    'true',
+    'false',
+    'true',
+    'openai-image',
+    10
 );
 
 -- Special system prompt thing
@@ -69,5 +84,5 @@ VALUES (
     'false',
     'false',
     'openai-image',
-    10
+    11
 );
