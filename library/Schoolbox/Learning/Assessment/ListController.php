@@ -723,7 +723,6 @@ class ListController extends Web\Controller\Base
             $plans = $this->savePlanData($assessment, $postData['plans'] ?? []);
 
             $this->saveParticipationData($assessment, $plans, $postData['participant-include'] ?? [], $postData['participant-plan'] ?? []);
-
         } catch (\InvalidArgumentException $e) {
             $db->rollBack();
             /* InvalidArgumentException is thrown when a valid context is missing
