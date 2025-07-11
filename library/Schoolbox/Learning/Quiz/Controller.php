@@ -371,16 +371,11 @@ class Controller extends AbstractController
         if (\count($errors)) {
             /* Breadcrumbs
              */
-            $breadcrumbs = $this->bakery->produceFromAssessment($result['assessment'], $this->getUser())
-                ->add([
-                    $result['assessment']->getTitle(),
-                    $result['assessment']->isImplementation() ? $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $result['assessment']->getId()]) : null
-                ])
+            $breadcrumbs = $this->bakery->produceFromContext($context, null, $this->getUser())
                 ->add(['Import', null]);
 
             $this->response = $this->responseFromTemplate('@learningQuiz/importLog.twig', [
                 'breadcrumbs' => $breadcrumbs,
-                'assessment' => $result['assessment'],
                 'errors' => $errors
             ], 'Import errors');
         } else {
