@@ -10,7 +10,9 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\Tile;
 
 use Alaress_Date_Format;
+use Component_Config;
 use Component_Config_Componentname;
+use Component_Instance;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 use Schoolbox\Search\Api\Database\Index\BuildType;
@@ -153,73 +155,103 @@ class IndexBuilder extends BaseBuilder
     /**
      * @inheritdoc
      */
-    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
-    {
-        // What database updates could cause a tile that was included
-        // in the buildUpdates() query to be excluded from that query?
-        //  * tlf row could be deleted or updated so it no longer links -+- No need to consider these cases because rows
-        //  * f   row could be deleted or updated so it no longer links /   from these tables are never hard-deleted by
-        //  * tile.deleted_at        could be set to non-null               the application or updated in such a way
-        //  * tile_layout.deleted_at could be set to non-null               that would break the links.
-        //  * folder.deleted_at      could be set to non-null
-        //  * tile.title_text        could be set to blank
-        $queryString = "
-            SELECT t.id
-            FROM tile t
-            JOIN tile_layout tl ON tl.id=t.tile_layout_id
-            JOIN tile_layout_for_folder tlf ON tlf.tile_layout_id=tl.id
-            JOIN folder f ON tlf.folder_id=f.id
-            WHERE (COALESCE(t.deleted_at, tl.deleted_at, f.deleted_at) IS NOT NULL OR t.title_text='')
+    public function buildDeletes(
+        ?Alaress_Date_Format $fromDate,
+        ?Alaress_Date_Format $toDate,
+        ?object $subject
+    ): iterable {
+        // Examine and clean up every search index for tiles.
+        $searchIndexQueryString = "
+            SELECT identifier
+            FROM search_index
+            WHERE type = :type
         ";
-        $params = [];
-        if ($fromDate && $toDate) {
-            $queryString .= (
-                ' AND (
-                    t.deleted_at BETWEEN :fromDate AND :toDate OR
-                    tl.deleted_at BETWEEN :fromDate AND :toDate OR
-                    f.deleted_at BETWEEN :fromDate AND :toDate
-                )'
-            );
-            $params['fromDate'] = $fromDate->getDatabase();
-            $params['toDate'] = $toDate->getDatabase();
-        } elseif ($fromDate) {
-            $queryString .= (
-                ' AND (
-                    t.deleted_at >= :fromDate OR
-                    tl.deleted_at >= :fromDate OR
-                    f.deleted_at >= :fromDate
-                )'
-            );
-            $params['fromDate'] = $fromDate->getDatabase();
-        } elseif ($toDate) {
-            $queryString .= (
-                ' AND (
-                    t.deleted_at <= :toDate OR
-                    tl.deleted_at <= :toDate OR
-                    f.deleted_at <= :toDate
-                )'
-            );
-            $params['toDate'] = $toDate->getDatabase();
+        $searchIndexParams = ['type' => Hydrator::BASE_TYPE];
+
+        // Also add subject filters here, in a convoluted way.
+        if ($subject instanceof Tile\Model) {
+            $searchIndexQueryString .= ' AND identifier LIKE :tileIdentifier';
+            $searchIndexParams['tileIdentifier'] = $subject->getId() . '-%';
+        } elseif ($subject instanceof Component_Instance) {
+            $searchIndexQueryString .= ' AND identifier LIKE :componentIdentifier';
+            $searchIndexParams['componentIdentifier'] = '%-' . $subject->getId() . '-%';
+        } elseif ($subject instanceof Component_Config) {
+            $searchIndexQueryString .= ' AND identifier LIKE :componentIdentifier';
+            $searchIndexParams['componentIdentifier'] = '%-' . $subject->getInstanceId() . '-%';
         }
-        if ($subject) {
-            if (!$this->accepts($subject, BuildType::DELETE)) {
-                return;
+        $searchIndexQuery = $this->connector->prepareQuery($searchIndexQueryString);
+
+        // Set up getTileLayoutId and componentExists queries.
+        $tileLayoutIdByTileId = $this->connector->executeQuery(
+            "SELECT t.id AS tileId, tl.id AS tileLayoutId
+            FROM tile t
+            JOIN tile_layout tl ON tl.id = t.tile_layout_id
+            WHERE t.deleted_at IS NULL
+            AND tl.deleted_at IS NULL"
+        )->fetchColumnArray('tileLayoutId', 'tileId');
+
+        $componentExistsQuery = $this->connector->prepareQuery(
+            "SELECT cci.component_instance_id
+            FROM component_config_instance cci
+            INNER JOIN component_config_definition ccd ON cci.component_config_definition_id = ccd.id
+            WHERE cci.value = :tileLayoutId
+            AND   ccd.key   = :key"
+        );
+        $componentExistsCache = [];
+
+        $searchIndexQuery->execute($searchIndexParams);
+        $this->logger->info("Examining and cleaning up {$searchIndexQuery->rowCount()} tile search indices");
+        foreach ($searchIndexQuery->fetchColumnArray('identifier') as $identifier) {
+            $removeIndex = false;
+            [$tileId, $componentId] = explode('-', $identifier);
+
+            // Check if this tile/tile_layout exists.  If not, delete its index.
+            if (!isset($tileLayoutIdByTileId[$tileId])) {
+                $this->logger->debug("Tile '$identifier' or its linked tile_layout no longer exists. removing index.");
+                $removeIndex = true;
+            } else {
+                $tileLayoutId = $tileLayoutIdByTileId[$tileId];
+
+                // Does this index have an associated component?
+                if (!isset($componentExistsCache[$tileId])) {
+                    $componentExistsQuery->execute([
+                        'tileLayoutId' => $tileLayoutId,
+                        'key' => Tile\Layout\Mapper::HOMEPAGE_COMPONENT_KEY,
+                    ]);
+                    $componentExistsCache[$tileId] = (
+                        $componentExistsQuery->fetchColumnArray('component_instance_id')
+                    );
+                }
+                if ($componentId === '') {
+                    // This index has no component.  Remove it if any components exist for this tile.
+                    if (!empty($componentExistsCache[$tileId])) {
+                        $this->logger->debug(
+                            "Tile '$identifier' is associated with a component.  Removing componentless index."
+                        );
+                        $removeIndex = true;
+                    }
+                } else {
+                    // This index does have a component.  Remove it if it is not associated with that component.
+                    if (!in_array($componentId, $componentExistsCache[$tileId])) {
+                        $this->logger->debug(
+                            "Tile '$identifier' is no longer associated with component $componentId.  Removing index."
+                        );
+                        $removeIndex = true;
+                    }
+                }
             }
-            [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::DELETE, $queryString, $params);
-        }
-        $query = $this->connector->prepareQuery($queryString);
-        $query->execute($params);
-        $this->logger->info(sprintf('Deleting search indices for %d tiles', $query->rowCount()));
-        foreach ($query as $row) {
-            yield $this->buildIndex(
-                (string)$row['id'],
-                null,
-                Hydrator::BASE_TYPE,
-                null,
-                true,
-                null,
-                null,
-            );
+
+            if ($removeIndex) {
+                yield $this->buildIndex(
+                    $identifier,
+                    null,
+                    Hydrator::BASE_TYPE,
+                    null,
+                    true,
+                    null,
+                    null,
+                );
+            }
         }
     }
 

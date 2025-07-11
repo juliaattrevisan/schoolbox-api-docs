@@ -19,7 +19,6 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Tile\Model as TileModel;
 use Schoolbox\Tile\Mapper as TileMapper;
 use Schoolbox\Tile\Layout\Mapper as TileLayoutMapper;
-use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Hydrator\BaseHydrator;
 use Schoolbox\Search\Api\Hydrator\FullResult;
 use Schoolbox\Search\Api\SearchFilter;
