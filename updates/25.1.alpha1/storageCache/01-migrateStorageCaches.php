@@ -89,8 +89,6 @@ $app = new class extends CliTool\App {
         ];
 
         // Find all keys in the old cache, and migrate to the new cache.
-        // TODO consider a keyspace scan instead of the set?
-        // TODO consider whether old sets need to be removed?
         foreach ($migrations as $migration) {
             $this->getLogger()->info(
                 sprintf(
@@ -153,10 +151,8 @@ $app = new class extends CliTool\App {
                     );
                 }
 
-                // TODO delete from old cache
+                // TODO delete from old cache? Alternately just allow to expire
             }
-
-            // TODO if deleting from old cache, delete set as well
         }
     }
 };
