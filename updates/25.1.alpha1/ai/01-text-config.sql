@@ -37,7 +37,7 @@ WHERE name = 'openai_text_endpoint';
 UPDATE config
 SET name = 'openai_text_key',
     module = 'openai-text',
-    required = 'true'
+    required = 'false'
 WHERE name = 'openai_key'
 LIMIT 1;
 
@@ -45,7 +45,7 @@ LIMIT 1;
 UPDATE config
 SET name = 'openai_text_model',
     module = 'openai-text',
-    required = 'true'
+    required = 'false'
 WHERE name = 'openai_model'
 LIMIT 1;
 
@@ -53,7 +53,7 @@ LIMIT 1;
 UPDATE config
 SET name = 'openai_text_azure_deployment_id',
     module = 'openai-text',
-    required = 'true'
+    required = 'false'
 WHERE name = 'openai_azure_deployment_id'
 LIMIT 1;
 
@@ -61,6 +61,6 @@ LIMIT 1;
 UPDATE config
 SET name = 'openai_text_azure_resource_name',
     module = 'openai-text',
-    required = 'true'
+    required = 'false'
 WHERE name = 'openai_azure_resource_name'
 LIMIT 1;

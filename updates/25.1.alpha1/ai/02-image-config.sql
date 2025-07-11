@@ -23,7 +23,7 @@ VALUES (
     (SELECT id FROM lu_config_type WHERE type = 'AI'),
     'true',
     'false',
-    'true',
+    'false',
     'openai-image',
     7
 );
@@ -37,7 +37,7 @@ VALUES (
     (SELECT id FROM lu_config_type WHERE type = 'AI'),
     'true',
     'false',
-    'true',
+    'false',
     'openai-image',
     8
 );
@@ -51,7 +51,7 @@ VALUES (
     (SELECT id FROM lu_config_type WHERE type = 'AI'),
     'true',
     'false',
-    'true',
+    'false',
     'openai-image',
     9
 );
@@ -66,7 +66,7 @@ VALUES (
     'gpt-4o:gpt-4o-mini:gpt-4.1:gpt-4.1-mini',
     'true',
     'false',
-    'true',
+    'false',
     'openai-image',
     10
 );
