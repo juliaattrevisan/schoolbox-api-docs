@@ -105,6 +105,7 @@ $app = new class extends CliTool\App {
             // Set each key, for whatever its remaining TTL is
             foreach ($keys as $key) {
                 $value = $redisClient->get($migration['oldNamespace'] . ':' . $key);
+                $ttl   = $redisClient->ttl($migration['oldNamespace'] . ':' . $key);
                 if (!isset($value)) {
                     $this->getLogger()->warning(
                         sprintf(
@@ -117,7 +118,7 @@ $app = new class extends CliTool\App {
                 }
 
                 $decodedValue = $migration['codec']->decode($value);
-                $migration['cache']->set($key, $decodedValue);
+                $migration['cache']->set($key, $decodedValue, $ttl);
             }
         }
     }
