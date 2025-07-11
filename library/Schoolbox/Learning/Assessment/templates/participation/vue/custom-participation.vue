@@ -202,9 +202,7 @@ async function includeParticipantInExistingPlan(participant: Participant): Promi
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                students: [
-                    participant.user.id
-                ],
+                students: [participant.user.id],
                 planId: 1305, // TODO: plan id of the plan to include the student
                 assessmentId: 1576, // TODO: assessment id of the plan (ie plan.assessable.id)
             }),
@@ -212,7 +210,6 @@ async function includeParticipantInExistingPlan(participant: Participant): Promi
         if (response.ok) {
             toast.timeout({ text: "Customisation added successfully" });
         }
-
     } catch (error) {
         toast.timeout({ text: "Error adding Customisation" });
     }
