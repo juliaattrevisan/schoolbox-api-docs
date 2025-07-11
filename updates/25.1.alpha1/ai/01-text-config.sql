@@ -20,7 +20,8 @@ LIMIT 1;
 -- Force default "Off" if this was never activated
 UPDATE config
 SET value = 'Off'
-WHERE name = 'openai_text_endpoint' AND value IS NULL;
+WHERE name = 'openai_text_endpoint'
+AND (`value` IS NULL OR `value` = '');
 
 -- openai key
 UPDATE config
