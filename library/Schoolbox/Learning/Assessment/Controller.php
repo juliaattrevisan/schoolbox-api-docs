@@ -1061,6 +1061,10 @@ abstract class Controller extends ListController implements IAssessmentControlle
         ]);
         $data['assessment'] = $assessment;
 
+        $context = $assessment->getContext();
+
+        $data['contextType'] = AssessmentContextType::objectToString($context) . 's';
+
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/participation/update.twig',
             $data

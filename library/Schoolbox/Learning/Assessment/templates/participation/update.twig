@@ -25,7 +25,7 @@
         assessment: assessment
     }) }}"
     get-assessment-participation-new-activity="{{ routeLookupIfAuthorized('learningAssessment.getCreateAssessmentForm', {
-        contextType: 'units',
+        contextType: contextType,
         contextId: assessment.context.id,
         context: assessment.context
     }) }}"
