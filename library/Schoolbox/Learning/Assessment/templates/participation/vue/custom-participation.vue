@@ -283,7 +283,7 @@ window.Vue.onMounted(() => {
                     </td>
                     <td>
                         <template v-if="participant.excludedAt !== null">
-                            <span v-if="null !== participant.customisedPlan">
+                            <span v-if="participant.customisedPlan !== null">
                                 <a :href="`${participant.customisedPlan.assessable._links.modify}`">
                                     {{ participant.customisedPlan.assessable.title }}
                                 </a>
