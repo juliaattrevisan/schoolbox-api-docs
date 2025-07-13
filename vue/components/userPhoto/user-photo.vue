@@ -24,6 +24,7 @@ interface Props {
     roundedCorners?: boolean;
     appendQueryParam?: string;
     class?: string;
+    dimensions?: { width: number; height: number };
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -35,6 +36,7 @@ const props = withDefaults(defineProps<Props>(), {
     roundedCorners: false,
     appendQueryParam: "",
     class: "",
+    dimensions: undefined,
 });
 
 const resolvedUserId = window.Vue.computed(() => {
@@ -95,6 +97,9 @@ const renderRoundClassMap = {
 };
 
 const dimensions = window.Vue.computed(() => {
+    if (props.dimensions !== undefined) {
+        return props.dimensions;
+    }
     if (props.render === "menuMobile") {
         return { width: 72, height: 72 };
     }

@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
 import type { ImageRequest } from "./imageGeneratorTypes";
 
 interface Props {
@@ -11,13 +12,20 @@ const props = defineProps<Props>();
 <template>
     <div class="ig-feed-request snow">
         <p class="l-mar-s">{{ props.message.prompt }}</p>
+        <user-photo :user="props.message.user" render="small" :dimensions="{ width: 48, height: 48 }" />
     </div>
 </template>
 
 <style scoped lang="scss">
 .ig-feed-request {
+    align-items: flex-start;
     border: 1px solid #b3b3b3;
+    display: flex;
     margin-left: 20%;
     width: 80%;
+
+    p {
+        flex-grow: 1;
+    }
 }
 </style>
