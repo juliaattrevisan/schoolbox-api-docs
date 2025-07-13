@@ -12,7 +12,7 @@ const props = defineProps<Props>();
 <template>
     <div class="ig-feed-request snow">
         <p class="l-mar-s">{{ props.message.prompt }}</p>
-        <user-photo :user="props.message.user" render="small" :dimensions="{ width: 48, height: 48 }" />
+        <user-photo :user="props.message.user" render="xsmall" />
     </div>
 </template>
 
