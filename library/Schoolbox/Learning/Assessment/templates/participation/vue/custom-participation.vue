@@ -186,6 +186,32 @@ async function includeSelected(): Promise<void> {
     selectedList.value = [];
 }
 
+
+/**
+ * Placeholder function for testing endpoint
+ * Use this as sample of how it will work
+ */
+async function includeParticipantInExistingPlan(participant: Participant): Promise<void> {
+    const toast = window.sbProps.toastActivate("Adding to customisation...");
+    try {
+        const response = await fetch(participant._links.includeInExistingCustomisation, {
+            method: "POST",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                "planId": 1306, //TODO: plan id of the plan to include the student
+                "assessmentId": 39, //TODO: assessment id of the plan (ie plan.assessable.id)
+            }),
+        });
+        toast.timeout({ text: "Customisation added successfully" });
+
+    } catch (error) {
+        console.log();
+        toast.timeout({ text: "Error adding Customisation" });
+    }
+}
 /**
  * Load the student pastoral counts when the component is mounted.
  */
@@ -338,6 +364,14 @@ window.Vue.onMounted(() => {
                                             @click.prevent="excludeParticipant(participant)"
                                         >
                                             Exclude
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button
+                                            class="icon-staff-students"
+                                            @click.prevent="includeParticipantInExistingPlan(participant)"
+                                            >
+                                            Test
                                         </button>
                                     </li>
                                     <li class="separator">Create</li>

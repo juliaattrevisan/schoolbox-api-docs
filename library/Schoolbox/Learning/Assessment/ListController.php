@@ -1603,4 +1603,49 @@ class ListController extends Web\Controller\Base
 
         $this->response = $this->redirectAfterPost($returnUrl ? Redirect::decode($returnUrl) : $this->getSession()->getHistory());
     }
+
+    /**
+     * To allow the participant to be added to the existing customisation
+     *
+     * @param IAssessable $assessment
+     * @param User        $student
+     * @return void
+     * @throws Deleted
+     * @throws MapperException
+     * @api   POST /learning/assessments/:assessmentId/participation/customisation/:userId/include
+     *
+     */
+    public function postExistingCustomisationInclude(IAssessable $assessment, User $student): void
+    {
+        $post = $this->requestPost;
+        $assessmentId = $post->get('assessmentId');
+
+        try {
+            $assessmentDataModel = $this->assessmentMapper->translateToDataModel($assessment);
+            $participationHelper = (new Participant\ParticipationHelper($assessmentDataModel, $this->participantDataSource, $this->getUserMapper()));
+
+            if ($assessmentId !== $assessment->getId()) {
+                $customisedAssessment          = $this->getAssessmentMapper()->findById($assessmentId);
+                $customisedAssessmentDataModel = $this->assessmentMapper->translateToDataModel(($customisedAssessment));
+                $customisedParticipationHelper = (new Participant\ParticipationHelper($customisedAssessmentDataModel, $this->participantDataSource, $this->getUserMapper()));
+                $customisedParticipationHelper->include($student->getId(), $customisedAssessment->getDynamicPlan());
+
+                /* If it's new/cloned activity make sure we exclude it from the source assessment
+                 */
+                $participationHelper->exclude($student->getId(), null);
+            } else {
+                /** @var PlanModel $plan */
+                $plan = $this->participantDataSource->getPlanMapper()->findById($post['planId']);
+                $participationHelper->include($student->getId(), $plan);
+            }
+
+            $this->response = $this->responseEmpty(201);
+        } catch (Exception $e) {
+            $problem = new ApiProblem($e->getMessage());
+            $problem->setStatus($e->getCode());
+            $this->response = $this->responseAsJson($problem->asArray());
+        }
+
+
+    }
 }
