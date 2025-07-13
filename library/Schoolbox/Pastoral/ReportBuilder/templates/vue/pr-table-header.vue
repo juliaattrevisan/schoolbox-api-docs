@@ -15,19 +15,19 @@ const props = defineProps<{
 
 const recordsOrPoints = defineModel<string>("records-or-points", { default: "Records" });
 
-const emit = defineEmits<{
-    sort: [key: string];
-}>();
+// const emit = defineEmits<{
+//     sort: [key: string];
+// }>();
 
 /**
  * Handles the sort action when a sortable header is clicked
  * @param header - the header object that was clicked
  */
-function onSortSelected(header: TableHeader): void {
-    if (header.isSortable) {
-        emit("sort", header.key);
-    }
-}
+// function onSortSelected(header: TableHeader): void {
+//     if (header.isSortable) {
+//         emit("sort", header.key);
+//     }
+// }
 
 /**
  * If we have sub titles, it means the titles need to be displayed on the same row as the records/points radio buttons,
