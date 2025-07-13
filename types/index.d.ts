@@ -63,6 +63,7 @@ declare global {
         };
         schoolboxUser: {
             id: number;
+            externalId: string | null;
             name: string;
             impersonated: boolean;
         };

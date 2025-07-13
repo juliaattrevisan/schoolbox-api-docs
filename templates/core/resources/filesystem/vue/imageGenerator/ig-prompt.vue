@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { generateImage } from "./imageGeneratorPayload";
+import { useImageGeneratorStore } from "./store/imageGeneratorStore";
 
 // TODO: Pull in these sizes/styles from somewhere configurable?
 const AVAILABLE_SIZES = [
@@ -20,85 +20,35 @@ const AVAILABLE_STYLES = [
     { value: "vector_art", label: "Vector Art" },
 ] as const;
 
+const igStore = useImageGeneratorStore();
+
 const prompt = window.Vue.ref<string>("");
 const imageSize = window.Vue.ref<(typeof AVAILABLE_SIZES)[number]["value"] | null>(null);
 const imageStyle = window.Vue.ref<(typeof AVAILABLE_STYLES)[number]["value"] | null>(null);
-
-// TODO: All this should be moved elsewhere, this is just a test for now
-const isGenerating = window.Vue.ref<boolean>(false);
-const generateError = window.Vue.ref<string | null>(null);
-
-type ImageResult = {
-    /* the openai response ID so we can reference it in the next chat */
-    previousResponseId: string;
-    /* the prompt used to generate it */
-    prompt: string;
-    /* the image URL */
-    src: string;
-    /* a message from the AI, if any */
-    message: string;
-};
-
-const imageResult = window.Vue.ref<ImageResult | null>(null);
 
 /**
  * Temp function to test the prompt
  */
 async function sendRequest(): Promise<void> {
-    if (isGenerating.value) {
-        return;
-    }
-
-    isGenerating.value = true;
-    generateError.value = null;
-    const toast = window.sbProps.toastActivate("Generating image...");
-
-    // TODO: Pass thru route
-    const response = await generateImage("/openai/image", {
+    const isSuccess = await igStore.sendRequest({
         userPrompt: prompt.value,
         imageSize: imageSize.value,
         imageStyle: imageStyle.value,
-        previousResponseId: imageResult.value?.previousResponseId ?? null,
+        previousResponseId: igStore.getPreviousResponseId(),
     });
 
-    isGenerating.value = false;
-    if (response.success === false) {
-        toast.timeout({ text: "Image generation failed", isSuccess: false });
-        generateError.value = response.message;
-        return;
+    if (isSuccess) {
+        /* clear the prompt but not the other settings on success */
+        prompt.value = "";
     }
-
-    toast.timeout({ text: "Image generated successfully", isSuccess: true });
-    console.warn("Response data:", response.data);
-
-    const image = response.data.output.find((item) => item.type === "image_generation_call");
-    const message = response.data.output.find((item) => item.type === "message");
-    const messageContent = message ? message.content.find((c) => c.type === "output_text") : null;
-
-    // TODO: Handle the response data properly in the backend instead of here
-    imageResult.value = {
-        previousResponseId: response.data.id,
-        prompt: prompt.value,
-        src: `data:image/png;base64,${image.result}`,
-        message: messageContent ? messageContent.text.trim() : "",
-    };
-
-    /* clear the prompt but not the other settings */
-    prompt.value = "";
 }
 </script>
 
 <template>
-    <!-- TODO: this shouldn't be in this file, but for quick testing its here atm... -->
-    <div v-if="imageResult" class="l-mar-m--bottom l-pad-s ig-feed-entry">
-        <img :src="imageResult.src" :alt="imageResult.prompt" style="max-width: 200px; max-height: 200px" />
-        <p v-if="imageResult.message" class="l-mar--0-bottom l-mar-s--top">{{ imageResult.message }}</p>
-    </div>
-
-    <div v-if="isGenerating" class="loader"></div>
-    <div v-if="generateError" class="alert-box alert">
+    <div v-if="igStore.isGenerating" class="loader"></div>
+    <div v-if="igStore.generateError" class="alert-box alert">
         <b>There was a problem generating the image.</b>
-        {{ generateError }}
+        {{ igStore.generateError }}
     </div>
 
     <label>
@@ -108,18 +58,18 @@ async function sendRequest(): Promise<void> {
             rows="3"
             placeholder="Describe or refine the image you want to generate"
             style="resize: vertical; margin-bottom: 0"
-            :disabled="isGenerating || undefined"
+            :disabled="igStore.isGenerating || undefined"
         ></textarea>
     </label>
     <div class="ig-prompt-actions actions-small-1 l-mar-m--bottom">
         <div class="list-item">
-            <select v-model="imageSize" name="image-size" :disabled="isGenerating || undefined">
+            <select v-model="imageSize" name="image-size" :disabled="igStore.isGenerating || undefined">
                 <option :value="null" style="font-style: italic">Size</option>
                 <option v-for="size in AVAILABLE_SIZES" :key="size.value" :value="size.value">
                     {{ size.label }}
                 </option>
             </select>
-            <select v-model="imageStyle" name="image-style" :disabled="isGenerating || undefined">
+            <select v-model="imageStyle" name="image-style" :disabled="igStore.isGenerating || undefined">
                 <option :value="null" style="font-style: italic">Style</option>
                 <option v-for="style in AVAILABLE_STYLES" :key="style.value" :value="style.value">
                     {{ style.label }}
@@ -131,7 +81,7 @@ async function sendRequest(): Promise<void> {
                 class="icon-send"
                 href="#"
                 title="Generate Image"
-                :disabled="isGenerating || undefined"
+                :disabled="igStore.isGenerating || undefined"
                 @click.prevent="sendRequest"
             ></a>
         </nav>
@@ -139,10 +89,6 @@ async function sendRequest(): Promise<void> {
 </template>
 
 <style scoped lang="scss">
-.ig-feed-entry {
-    border: 1px solid #b3b3b3;
-}
-
 .ig-prompt-actions {
     /* mimic the style if this were an input */
     border-style: solid;

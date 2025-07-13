@@ -3,6 +3,7 @@
  * AI Image Generator used inside the resource picker modal
  */
 import IgPrompt from "./ig-prompt.vue";
+import igFeed from "./ig-feed.vue";
 </script>
 
 <template>
@@ -13,6 +14,7 @@ import IgPrompt from "./ig-prompt.vue";
         <!-- TODO: Add help link -->
         <a href="/help/sso/send?returnUrl=TBC" target="_blank">Schoolbox Help</a>
     </p>
+    <ig-feed />
     <ig-prompt />
 </template>
 

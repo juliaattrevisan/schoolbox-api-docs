@@ -15,7 +15,7 @@ type ImageGeneratorResponseFailure = {
  */
 type ImageGeneratorApiResponse = ImageGeneratorResponseSuccess | ImageGeneratorResponseFailure;
 
-type ImageGeneratorApiPayload = {
+export type ImageGeneratorApiPayload = {
     userPrompt: string;
     imageSize: string | null;
     imageStyle: string | null;
