@@ -186,7 +186,6 @@ async function includeSelected(): Promise<void> {
     selectedList.value = [];
 }
 
-
 /**
  * Placeholder function for testing endpoint
  * Use this as sample of how it will work
@@ -201,12 +200,11 @@ async function includeParticipantInExistingPlan(participant: Participant): Promi
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                "planId": 1306, //TODO: plan id of the plan to include the student
-                "assessmentId": 39, //TODO: assessment id of the plan (ie plan.assessable.id)
+                planId: 1306, //TODO: plan id of the plan to include the student
+                assessmentId: 39, //TODO: assessment id of the plan (ie plan.assessable.id)
             }),
         });
         toast.timeout({ text: "Customisation added successfully" });
-
     } catch (error) {
         console.log();
         toast.timeout({ text: "Error adding Customisation" });
@@ -370,7 +368,7 @@ window.Vue.onMounted(() => {
                                         <button
                                             class="icon-staff-students"
                                             @click.prevent="includeParticipantInExistingPlan(participant)"
-                                            >
+                                        >
                                             Test
                                         </button>
                                     </li>
