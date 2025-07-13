@@ -2,11 +2,6 @@
 
 namespace Schoolbox\Editor\OpenAI\Payload;
 
-use Schoolbox\Curriculum\Node\Mapper;
-use Schoolbox\Editor\OpenAI\Helper;
-use Schoolbox\GenericCollection;
-use Schoolbox\Mapper\Exception;
-
 class ImageGeneration
 {
     /**
