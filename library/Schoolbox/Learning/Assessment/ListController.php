@@ -664,7 +664,7 @@ class ListController extends Web\Controller\Base
         try {
             $db->beginTransaction();
 
-            if ($postData['customisedFor']) {
+            if (isset($postData['customisedFor'])) {
                 $sourceAssessment = $this->getAssessmentMapper()->findById($postData['customisedFor']);
 
                 if (0 === strcasecmp($sourceAssessment->getTitle(), $postData['title'])) {
