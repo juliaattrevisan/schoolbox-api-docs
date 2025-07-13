@@ -77,9 +77,12 @@ class Hydrator extends BaseHydrator
         // Get config info for each component instance for later lookup.
         $configByComponentInstanceId = $this->getConfigByComponentInstanceId($componentInstanceIds);
 
-        // Get tileLayouts, indexed by tileLayoutId.  This is necessary because tileLayout info is not hydrated in $tiles.
-        // By getting this info here we avoid having to run many queries inside the loop.
-        $tileLayoutById = $this->tileLayoutMapper->findByColumn('id', $tiles->map(fn ($tile) => $tile->getTileLayout()->getId()));
+        // Get tileLayouts, indexed by tileLayoutId.  This is necessary because tileLayout info is not hydrated in
+        // $tiles.  By getting this info here we avoid having to run many queries inside the loop.
+        $tileLayoutById = $this->tileLayoutMapper->findByColumn(
+            'id',
+            $tiles->map(fn ($tile) => $tile->getTileLayout()->getId())
+        );
 
         $fullResults = [];
 
@@ -98,9 +101,9 @@ class Hydrator extends BaseHydrator
 
             $tileLayout = $tileLayoutById[$tile->getTileLayout()->getId()];
 
-            // The folderId from the tileLayout should always match the folderId from $match->id (from the search_index
-            // table), because the search_index table should always be up to date.  But the folderId from the tileLayout
-            // is the authoritative value.
+            // The folderId from the tileLayout should always match the folderId obtained via $match->id above (from
+            // the search_index table), because the search_index table should always be up to date.  But the folderId
+            // from the tileLayout is the authoritative value.
             $folderId = $tileLayout->getFolder()->getId();
 
             if ($folderId === null) {
@@ -164,7 +167,11 @@ class Hydrator extends BaseHydrator
                 $tile->getModifiedAt(),
                 $tileFolder,
                 null,
-                $tile->getBackgroundImage() ? $this->buildStorageImageUrl($tile->getBackgroundImage())->__toString() : null,
+                (
+                    $tile->getBackgroundImage()
+                    ? $this->buildStorageImageUrl($tile->getBackgroundImage())->__toString()
+                    : null
+                ),
                 'tiles',
                 null,
                 null,

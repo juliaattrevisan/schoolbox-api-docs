@@ -200,7 +200,7 @@ class IndexBuilder extends BaseBuilder
         $componentExistsCache = [];
 
         $searchIndexQuery->execute($searchIndexParams);
-        $this->logger->info("Examining and cleaning up {$searchIndexQuery->rowCount()} tile search indices");
+        $this->logger->info("Examining and cleaning up {$searchIndexQuery->rowCount()} tile search indices.");
         foreach ($searchIndexQuery->fetchColumnArray('identifier') as $identifier) {
             $removeIndex = false;
             [$tileId, $componentId] = explode('-', $identifier);
