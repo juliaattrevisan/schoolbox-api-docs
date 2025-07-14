@@ -377,7 +377,7 @@ class Controller extends WebController\Base
     }
 
     /**
-     * publish feedback for all assessments imported from a course level assessment (whilst matching filters in the post)
+     * publish feedback for all assessments imported from a course level assessment
      *
      * @param Model $courseSpec
      * @param IAssessable $assessmentSpec
