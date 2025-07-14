@@ -51,6 +51,13 @@
         respond "{err.status_code} {err.status_text}"
     }
 
+    handle_path /health {
+        php_server {
+            root /usr/share/schoolbox/www
+            try_files health.php
+        }
+    }
+
     handle_path /websocket {
         reverse_proxy schoolbox-socketd:9081
     }

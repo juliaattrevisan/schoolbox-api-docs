@@ -11,7 +11,7 @@ ARG ARCH=amd64
 # Image size: alpine 355MB, bookworm 653MB.
 # Attempting to `apt install` required packages and only copy compiled
 # extensions actually bloats the bookworm image to 743MB.
-FROM --platform=linux/${ARCH} dunglas/frankenphp:1.6-php8.2-bookworm
+FROM --platform=linux/${ARCH} dunglas/frankenphp:1.8-php8.2-bookworm
 
 # Ensure ENV is accessible by this build step:
 # otherwise, xDebug will be installed below.
@@ -19,7 +19,8 @@ ARG ENV
 
 # Install additional extensions
 # (not in https://github.com/shinsenter/php?tab=readme-ov-file#pre-installed-php-extensions)
-RUN install-php-extensions \
+RUN apt-get update && apt-get upgrade -y && \
+    install-php-extensions \
     imagick \
     pdo_mysql \
     pdo_sqlsrv \
@@ -45,7 +46,9 @@ RUN install-php-extensions \
     zlib \
     fileinfo \
     libxml \
-    opcache
+    opcache && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install XDebug on non-production, also copy base config
 RUN <<EOF
