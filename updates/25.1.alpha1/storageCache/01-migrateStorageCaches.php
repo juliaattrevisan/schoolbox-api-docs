@@ -42,6 +42,14 @@ $app = new class extends CliTool\App {
     private const SET_KEY = '__set';
 
     /**
+     * Maximum TTL for keys in the old cache which have been migrated into the
+     * new cache: for now, set this to 90 days.
+     *
+     * This prevents data in the old cache from hanging around forever.
+     */
+    private const OLD_CACHE_MAX_TTL = 60 * 60 * 24 * 90;
+
+    /**
      * Run the tool
      *
      * @return void
@@ -151,9 +159,17 @@ $app = new class extends CliTool\App {
                     );
                 }
 
-                // TODO delete from old cache? Alternately just allow to expire
-                //      In accordance with deprecation rules, I've chosen to
-                //      leave the old data here for one release.
+                // Allow old data to expire of its own accord:
+                // set an upper limit on TTL though.
+                if (!isset($ttl) || $ttl > self::OLD_CACHE_MAX_TTL) {
+                    $this->getLogger()->debug(
+                        sprintf(
+                            '... old key expiry greater than max allowed %d seconds: setting to this value',
+                            self::OLD_CACHE_MAX_TTL,
+                        ),
+                    );
+                    $redisClient->expire($oldKey, self::OLD_CACHE_MAX_TTL);
+                }
             }
         }
     }
