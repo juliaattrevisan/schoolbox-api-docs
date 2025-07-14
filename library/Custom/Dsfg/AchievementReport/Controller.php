@@ -654,7 +654,7 @@ $allYears = [2022, 2023, 2024];
      */
     public function getNcea(IConnector $db, User $user, array $externalUser, ?int $year): void
     {
-$externalUser = ['StudentID' => 201]; // 201 is jreed's user.synergy_id.
+$externalUser = ['StudentID' => 507]; // 507 is jreed's user.synergy_id in the sales dataset.
         $footer = new NCEA\Footer($user, $externalUser, $db, null);
 
         $literacyNumeracyCheckbox = new NCEA\LiteracyNumeracyCheckbox($user, $externalUser, $db, $year);
