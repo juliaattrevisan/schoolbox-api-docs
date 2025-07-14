@@ -117,6 +117,18 @@ abstract class Base extends AchievementReportBase
                 Term DESC,
                 StrippedResult DESC
         ";
+return [
+    [
+        'classCode' => 'CLASSCODECURR',
+        'StudentYearLevel' => '11',
+        'Fileyear' => '2025',
+        'CourseName' => 'English',
+        'AssessAreaHeading' => '1.1',
+        'Term' => '1',
+        'Result' => 'A',
+        'StrippedResult' => 'A',
+    ]
+];
 
         return $this->db->executeQuery($query, $params)->fetchAll();
     }
@@ -164,6 +176,18 @@ abstract class Base extends AchievementReportBase
                 Term DESC,
                 StrippedResult DESC
         ";
+return [
+    [
+        'classCode' => 'CLASSCODEPREV',
+        'StudentYearLevel' => '10',
+        'Fileyear' => '2024',
+        'CourseName' => 'English',
+        'AssessAreaHeading' => '1.1',
+        'Term' => '1',
+        'Result' => 'B',
+        'StrippedResult' => 'B',
+    ]
+];
 
         return $this->db->executeQuery($query, $params)->fetchAll();
     }
@@ -174,6 +198,7 @@ abstract class Base extends AchievementReportBase
      */
     protected function explorerReporting()
     {
+return [];
         $explorer = $this->db->executeQuery("
             SELECT TOP 5 *
             FROM dbo.uvSchoolBoxSchoolGradeResults

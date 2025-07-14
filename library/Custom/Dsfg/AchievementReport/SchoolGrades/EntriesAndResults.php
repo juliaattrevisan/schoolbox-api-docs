@@ -160,6 +160,34 @@ class EntriesAndResults extends Base
                 CourseName,
                 AssessAreaHeading
         ";
+return [
+    [
+        'Fileyear' => '2025',
+        'CourseName' => 'English',
+        'AssessAreaHeading' => 'Grammar',
+        'Term' => '2',
+        'Result' => 'C',
+        'ClassTeacher1' => 'Mrs Smith',
+        'ClassTeacher1Email' => 'mrs.smith@school.com',
+        'ClassTeacher2' => 'Mrs Smithy',
+        'ClassTeacher2Email' => 'mrs.smithy@school.com',
+        'ClassTeacher3' => '',
+        'ClassTeacher3Email' => ''
+    ],
+    [
+        'Fileyear' => '2024',
+        'CourseName' => 'English',
+        'AssessAreaHeading' => 'Grammar',
+        'Term' => '2',
+        'Result' => 'C',
+        'ClassTeacher1' => 'Mrs Smith',
+        'ClassTeacher1Email' => 'mrs.smith@school.com',
+        'ClassTeacher2' => 'Mrs Smithy',
+        'ClassTeacher2Email' => 'mrs.smithy@school.com',
+        'ClassTeacher3' => '',
+        'ClassTeacher3Email' => ''
+    ]
+];
 
         return $this->db->executeQuery($query, $params)->fetchAll();
     }
