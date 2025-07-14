@@ -1508,6 +1508,14 @@ class Controller extends Base
                     'default'    => false,
                     'popOutList' => 'displayOptions',
                 ],
+                'learningMomentsModeration' => [
+                    'caption'    => 'Learning Moments Moderation',
+                    'tooltip'    => 'If toggled to ‘ON’, a student’s learning moments will require moderation before it appears on the activity feed for parents.',
+                    'checkbox'   => true,
+                    'mandatory'  => true,
+                    'default'    => false,
+                    'popOutList' => 'displayOptions',
+                ],
             ],
         ];
         if ($this->getConfigLoader()->get(ConfigMapper::NAME_QR_LOGIN_ENABLED)) {
