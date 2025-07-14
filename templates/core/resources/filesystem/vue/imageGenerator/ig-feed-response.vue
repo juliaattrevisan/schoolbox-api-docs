@@ -37,7 +37,12 @@ const radioId = window.Vue.computed(() => {
                 {{ props.message.message }}
             </div>
             <template v-else>
-                <img :src="props.message.src" />
+                <div class="actions-small-1">
+                    <nav>
+                        <a :href="props.message.src" class="icon-download" title="Download" download></a>
+                    </nav>
+                    <img :src="props.message.src" />
+                </div>
                 <p v-if="props.message.message" class="l-mar--0-bottom l-mar-s--top">{{ props.message.message }}</p>
             </template>
         </label>
@@ -51,6 +56,20 @@ const radioId = window.Vue.computed(() => {
     img {
         max-width: 200px;
         max-height: 200px;
+    }
+
+    .actions-small-1 {
+        width: fit-content;
+
+        .icon-download {
+            opacity: 0;
+        }
+
+        &:hover .icon-download {
+            opacity: 1;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.6);
+        }
     }
 }
 </style>
