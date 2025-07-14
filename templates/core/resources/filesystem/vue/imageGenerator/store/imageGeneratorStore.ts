@@ -34,7 +34,6 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
 
         isGenerating.value = true;
         generateError.value = null;
-        const toast = window.sbProps.toastActivate("Generating image...");
 
         feed.value.push({
             type: "request",
@@ -51,8 +50,6 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
 
         isGenerating.value = false;
         if (response.success === false) {
-            toast.timeout({ text: "Image generation failed", isSuccess: false });
-
             feed.value.push({
                 type: "response",
                 status: "error",
@@ -62,9 +59,6 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
             });
             return false;
         }
-
-        toast.timeout({ text: "Image generated successfully", isSuccess: true });
-        console.warn("Response data:", response.data);
 
         feed.value.push({
             type: "request",
