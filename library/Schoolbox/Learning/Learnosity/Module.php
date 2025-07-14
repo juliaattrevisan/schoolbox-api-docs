@@ -273,7 +273,6 @@ class Module extends BaseModule
         /* Export a schoolbox quiz and its learnosity content into a portable json payload
          */
         $this->register('GET', '/{assessmentId}/export/json', 'getExportToJson', $instructorPerms, $preloadAssessment);
-        $this->register('POST', "/import/{contextType:$contextTypes}/{contextId:\\d+}/json", 'postImportFromJson', $instructorPerms, $preloadContext);
     }
 
 
@@ -813,10 +812,6 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(UserMapper::class),
             $this->getMapperFactory()->get(StateMapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Resource\Storage\Mapper::class),
-            $this->getMapperFactory()->get(\Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper::class),
-            $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\WorkType\Mapper::class),
-            $this->getMapperFactory()->get(\Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper::class),
-            $this->getMapperFactory()->get(\Schoolbox\Curriculum\Node\Mapper::class),
             $this->injector->get('filesystem.storageProxy'),
             $this->injector->get('httpFactory'),
             $this->injector->get('taskd.httpRequestMessageFactory'),

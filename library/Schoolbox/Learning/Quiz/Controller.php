@@ -8,7 +8,6 @@
 
 namespace Schoolbox\Learning\Quiz;
 
-use Alaress\Lumberjack\Logger;
 use Aura\Router\Exception\RouteNotFound;
 use League\Flysystem\FilesystemException;
 use LearnositySdk\Exceptions\ValidationException;
@@ -20,11 +19,13 @@ use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Alaress\Web\Controller\Exception as ControllerException;
 use Schoolbox\Learning\Assessment\AssessmentType;
+use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Learnosity\Api;
+use Schoolbox\Learning\Learnosity\Importer\Json\Importer;
 use Schoolbox\Learning\Learnosity\Importer\Legacy;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
 use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
@@ -56,6 +57,9 @@ class Controller extends AbstractController
      * @param \Schoolbox\Learning\Assessment\WorkType\Mapper            $workTypeMapper
      * @param MarkTypeMapper                                            $markTypeMapper
      * @param \Schoolbox\Resource\Storage\Mapper                        $storageMapper
+     * @param \Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper $gradeGroupMapper
+     * @param \Schoolbox\Curriculum\Node\Mapper                         $curriculumNodeMapper
+     * @param BreadcrumbFactory                                         $bakery
      * @param string                                                    $learnosityVersion
      * @param string                                                    $learnosityConsumerKey
      * @param string                                                    $learnosityConsumerSecret
@@ -73,6 +77,9 @@ class Controller extends AbstractController
         private \Schoolbox\Learning\Assessment\WorkType\Mapper $workTypeMapper,
         private \Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper $markTypeMapper,
         private \Schoolbox\Resource\Storage\Mapper $storageMapper,
+        private \Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper $gradeGroupMapper,
+        private \Schoolbox\Curriculum\Node\Mapper $curriculumNodeMapper,
+        private BreadcrumbFactory $bakery,
         private string $learnosityVersion,
         #[\SensitiveParameter] private string $learnosityConsumerKey,
         #[\SensitiveParameter] private string $learnosityConsumerSecret,
@@ -247,44 +254,30 @@ class Controller extends AbstractController
      * @throws ValidationException
      * @throws Error
      */
-    public function postLegacyQuizImport(AssessmentContext $context): void
+    public function postImport(AssessmentContext $context): void
     {
-        /* Intentionally prefill with an instance of AssessmentContext
-         * and other POST vars the Factory assumes exist
-         */
-        $postData = array_merge($this->requestPost->getArrayCopy(), [
-            'assessmentType' => AssessmentType::TYPE_QUIZ,
-            'context'        => $context,
-            /* Legacy xml only ever supported Total Mark marktype
-             */
-            'markType'       => (string)MarkType::TYPE_TOTAL
-        ]);
+        $postData = $this->requestPost->getArrayCopy();
 
         /* No upload? No trabajo
          */
-        if (!isset($postData['attachment'])) {
+        if (!isset($_FILES['attachment'])) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_IMPORT_FILE_NOT_FOUND);
         }
 
         /* An unusual outcome where the key might exist, but nothing else is in
          * the way we thought - probably our mistake
          */
-        if (!is_array($postData['attachment'])) {
+        if (!is_array($_FILES['attachment'])) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_IMPORT_FILE_NOT_FOUND);
         }
 
         /* Milk out some of the assessment settings from the xml itself
          */
-        try {
-            /** @var \Schoolbox\Resource\Storage\Model $file */
-            $file = (new CollectorFactory())->build($postData['attachment'] ?: [])->getFirst();
+        $data = file_get_contents($_FILES['attachment']['tmp_name']);
 
-            /** @var \Schoolbox\Resource\Storage\FilesystemProxy $filesystemProxy */
-            $filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
-            $data            = $filesystemProxy->read($file);
-        } catch (\Schoolbox\Resource\Exception $e) {
-            /* Something went wrong reading the file's contents
-             */
+        /* Something went wrong reading the file's contents
+         */
+        if (false === $data) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_IMPORT_FILE_NOT_FOUND);
         }
 
@@ -309,53 +302,97 @@ class Controller extends AbstractController
             null
         );
 
-        /* A 4-tuple of useful things we made
-         * Will likely be empty if something snapped along the way
+        /* Detect whether this is a json or xml file
+         * The presence of <?xml version="1.0" ?> denotes xml;
+         * otherwise, presume json
          */
-        $result = [];
+        if (preg_match('/^<\?xml version="1\.0" \?>/', $data)) {
+            /* A 4-tuple of useful things we made
+             * Will likely be empty if something snapped along the way
+             */
+            $result = [];
 
-        try {
-            $result = (new Legacy\Xml\Importer(
-                $api,
-                $schoolCode,
-                $domain,
-                $this->getDi()->get('databaseInternal'),
-                $context,
-                $this->getUser(),
-                $assessmentMapperProxy,
-                $this->quizMapper,
-                $this->workTypeMapper,
-                $this->markTypeMapper,
-                $this->storageMapper
-            ))->import($data);
+            try {
+                $result = (new Legacy\Xml\Importer(
+                    $api,
+                    $schoolCode,
+                    $domain,
+                    $this->getDi()->get('databaseInternal'),
+                    $context,
+                    $this->getUser(),
+                    $assessmentMapperProxy,
+                    $this->quizMapper,
+                    $this->workTypeMapper,
+                    $this->markTypeMapper,
+                    $this->storageMapper
+                ))->import($data);
+
+                /* Distill anything mostly non-fatal that we found during the import process
+                 */
+                $errors = $result['errors'];
+            } catch (\DomainException $e) {
+                /* Something really important snapped and halted the import process
+                 */
+                $errors = [
+                    $e->getMessage()
+                ];
+            }
+        } else {
+            /* There used to be stuff here that was used to convert url domains but I'm not sure we even
+             * needed them. We needed them in the xml days, but I don't think we needed them here.
+             */
+            try {
+                $result = (new Importer(
+                    $api,
+                    $schoolCode,
+                    $this->getDi()->get('databaseInternal'),
+                    $context,
+                    $this->getUser(),
+                    $assessmentMapperProxy,
+                    $this->quizMapper,
+                    $this->workTypeMapper,
+                    $this->markTypeMapper,
+                    $this->gradeGroupMapper,
+                    $this->storageMapper,
+                    $this->curriculumNodeMapper,
+                ))->import($data);
+            } catch (\RuntimeException $e) {
+                throw $this->errorMapper->generateException(ErrorMapper::ERROR_PROCESSING, $e, $e->getMessage());
+            }
 
             /* Distill anything mostly non-fatal that we found during the import process
              */
             $errors = $result['errors'];
-        } catch (\DomainException $e) {
-            /* Something really important snapped and halted the import process
-             */
-            $errors = [
-                $e->getMessage()
-            ];
         }
 
-        /* Display a list of errors
+        /* Check for errors: if there were any, go to a new screen to explain this.
+         * Otherwise just redirect back to the quiz you just made...its modify screen, I guess.
          */
-        if (\count($errors) || empty($result)) {
-            $this->response = $this->responseFromTemplate('@learningQuiz/xmlImportLog.twig', [
-                'errors' => $errors,
-            ]);
+        if (\count($errors)) {
+            /* Breadcrumbs
+             */
+            $breadcrumbs = $this->bakery->produceFromContext($context, null, $this->getUser())
+                ->add(['Import', null]);
 
-            return;
+            $this->response = $this->responseFromTemplate('@learningQuiz/importLog.twig', [
+                'breadcrumbs' => $breadcrumbs,
+                'errors' => $errors
+            ], 'Import errors');
+        } else {
+            $returnUrlEncoded = $this->requestPost['returnUrl'];
+
+            if ($returnUrlEncoded !== null) {
+                /* Go back to the place from whence you came
+                 */
+                $returnUrl = Redirect::decode($returnUrlEncoded);
+            } else {
+                /* Otherwise redirect back to the quiz you just made...its modify screen, I guess.
+                 */
+                $returnUrl = $this->routeGenerator->generate('learningAssessment.getUpdateAssessmentForm', ['assessmentId' => $result['assessment']->getId()]);
+            }
+
+            $this->response = $this->redirectFound($returnUrl);
         }
-
-        $this->response = $this->redirectFound(
-            $this->routeGenerator->generate(
-                'learningAssessment.getAssessment',
-                ['assessmentId' => $result['assessment']->getId()]
-            )
-        );
     }
 
 

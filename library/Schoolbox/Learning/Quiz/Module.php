@@ -117,7 +117,7 @@ class Module extends RestfulModule
         $this->register('POST', "/quiz/attempts/delete", 'postAttemptDelete', $canWrite);
         $this->register('GET', "/quiz/summary/{assessmentId}", 'getQuizSummary', $canModify, $preloadAssessment);
 //        $this->register('GET', "/quiz/{assessmentId}/attempts/export", 'getExportAttempts', $canModify, $preloadAssessment);
-        $this->register('POST', "/quiz/legacyQuizImport/{contextType:$contextTypes}/{contextId:\\d+}", 'postLegacyQuizImport', $canWrite, $preloadContext);
+        $this->register('POST', "/quiz/import/{contextType:$contextTypes}/{contextId:\\d+}", 'postImport', $canWrite, $preloadContext);
     }
 
 
@@ -156,6 +156,14 @@ class Module extends RestfulModule
      */
     public function buildController(): Base
     {
+        /* Breadcrumb generator
+         */
+        $bakery = new \Schoolbox\Learning\Assessment\Breadcrumb\Factory(
+            $this->getRouter()->getGenerator(),
+            $this->getAuthorizer(),
+            $this->getMapperFactory()->get(Access::class),
+        );
+
         return new Controller(
             $this->getMapperFactory()->get(Mapper::class),
             $this->getMapperFactory()->get(ErrorMapper::class),
@@ -169,6 +177,9 @@ class Module extends RestfulModule
             $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\WorkType\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Resource\Storage\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Curriculum\Node\Mapper::class),
+            $bakery,
             (string)$this->getConfig()->get('learnosity_version'),
             (string)$this->getConfig()->get('learnosity_consumer_key'),
             (string)$this->getConfig()->get('learnosity_consumer_secret'),

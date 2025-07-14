@@ -148,10 +148,7 @@
      </nav>
      <ul id="header-options" class="f-dropdown" data-dropdown-content="" aria-hidden="true">
          <li>
-             <a class="icon-import" title="Import legacy XML" data-reveal-id="xmlImportModal" />Import Legacy XML</a>
-         </li>
-         <li>
-             <a class="icon-upload" title="Import a quiz and its contents from a file you uploaded" data-reveal-id="jsonImportModal" />Import quiz</a>
+             <a class="icon-upload" title="Import a quiz and its contents from a file you uploaded" data-reveal-id="importModal">Import quiz</a>
          </li>
      </ul>
      {% endif %}
@@ -165,74 +162,33 @@
     <script type="text/javascript" src="{{CDN_PREFIX}}/js/resource/jquery.resourceAttach.js?v={SITE_VERSION}"></script>
     <script>
         $(function() {
-            $('[data-import-legacy]').on('click', function(event) {
+            $('[data-import]').on('click', function(event) {
                 event.preventDefault();
 
-                $('#xmlImportForm').submit().hide();
-                $('#xml-import-actions').hide();
-                $('#xml-loader').show();
-            });
-
-            $('[data-import-json]').on('click', function(event) {
-                event.preventDefault();
-
-                $('#jsonImportForm').submit().hide();
-                $('#json-import-actions').hide();
-                $('#json-loader').show();
+                $('#importForm').submit().hide();
+                $('#import-actions').hide();
+                $('#import-loader').show();
             });
         });
     </script>
-    <div id="xmlImportModal" class="reveal-modal" data-reveal>
-        <h2>Legacy XML Import</h2>
 
-        {% set xmlImportRoute = routeLookup('learningQuiz.postLegacyQuizImport', {
+    <div id="importModal" class="reveal-modal" data-reveal>
+        <h2>Import a {{ config.title }} quiz</h2>
+
+        <p>Select a file that has been exported from {{ config.title }} to create a duplicate version of the quiz for modification.</p>
+
+        {% set importRoute = routeLookup('learningQuiz.postImport', {
             contextId: context.id,
             contextType: contextType
         }) %}
 
-        {% if xmlImportRoute %}
-        <div id="xml-loader" style="display:none">
-            <div class="loader"></div>
-            <p class="text-center">Importing legacy quiz xml...</p>
-        </div>
-
-        <form id='xmlImportForm' method="post" action="{{ xmlImportRoute }}">
-            <input type="hidden" name="contextId" value="{{ context.id }}" />
-            <input type="hidden" name="contextType" value="{{ contextType }}" />
-
-            <section>
-                <fieldset class="no-pad">
-                    <div class="small-12 columns no-pad">
-                        {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
-                    </div>
-                </fieldset>
-            </section>
-        </form>
-        <div id='xml-import-actions' class="component-action">
-            <section>
-                <a class="button" data-import-legacy>
-                    Import
-                </a>
-            </section>
-        </div>
-        {% endif %}
-        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-    </div>
-    <div id="jsonImportModal" class="reveal-modal" data-reveal>
-        <h2>Upload quiz</h2>
-
-        {% set jsonImportRoute = routeLookup('learnosity.postImportFromJson', {
-            contextId: context.id,
-            contextType: contextType
-        }) %}
-
-        {% if jsonImportRoute %}
-            <div id="json-loader" style="display:none">
+        {% if importRoute %}
+            <div id="import-loader" style="display:none">
                 <div class="loader"></div>
-                <p class="text-center">Uploading quiz...</p>
+                <p class="text-center">Importing quiz...</p>
             </div>
 
-            <form id='jsonImportForm' method="post" action="{{ jsonImportRoute }}">
+            <form id='importForm' method="post" action="{{ importRoute }}" enctype="multipart/form-data">
                 <input type="hidden" name="contextId" value="{{ context.id }}" />
                 <input type="hidden" name="contextType" value="{{ contextType }}" />
                 <input type="hidden" name="returnUrl" value="{{ returnUrl }}" />
@@ -240,14 +196,15 @@
                 <section>
                     <fieldset class="no-pad">
                         <div class="small-12 columns no-pad">
-                            {% include 'sub/attachzone.twig' with {attachzone: jsonAttachzone} %}
+                            {# $('input[name=attachment]')[0].files[0].name #}
+                            <input type="file" name="attachment" accept="text/xml, application/xml, application/json" />
                         </div>
                     </fieldset>
                 </section>
             </form>
-            <div id='json-import-actions' class="component-action">
+            <div id='import-actions' class="component-action">
                 <section>
-                    <a class="button" data-import-json>
+                    <a class="button" data-import>
                         Upload
                     </a>
                 </section>
