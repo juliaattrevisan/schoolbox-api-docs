@@ -849,14 +849,14 @@ class Controller extends Base
                     'allDay' => ($event->getAllDay() === 1), // Convert from int to boolean.
                     'efficacy' => $efficacy,
                     'title' => $event->getTitle(),
-                    'startDate' => $event->getStartDateTime()->getJson(),
-                    'endDate' => $event->getEndDateTime()->getJson(),
+                    'startDate' => $event->getStartDateTime()->toRfc3339String(),
+                    'endDate' => $event->getEndDateTime()->toRfc3339String(),
                     'repeat' => $repeat,
-                    'repeat_until' => $untilDate->getJson(),
+                    'repeat_until' => $untilDate->toRfc3339String(),
                     'type' => $event->getType(),
                     'location' => $event->getLocation(),
                     'detail' => $event->getDetail(),
-                    'publishDate' => $event->getPublishDateTime()->getJson(),
+                    'publishDate' => $event->getPublishDateTime()->toRfc3339String(),
                     'level' => $accessLevel,
                     'roles' => $this->translateRoleModelsToArrays(
                         $this->roleMapper->findByColumn('id', $event->getRoleCollection())
