@@ -9,6 +9,8 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
     const isGenerating = window.Vue.ref<boolean>(false);
     const generateError = window.Vue.ref<string | null>(null);
 
+    const selectedFeedEntry = window.Vue.ref<AiFeedMessage["entryKey"] | null>(null);
+
     /**
      * @returns The previous response ID from the feed if it exists
      */
@@ -87,6 +89,8 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
             message: messageContent ? messageContent.text.trim() : "",
         });
 
+        selectedFeedEntry.value = feed.value[feed.value.length - 1].entryKey;
+
         return true;
     }
 
@@ -96,5 +100,6 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
         generateError,
         getPreviousResponseId,
         sendRequest,
+        selectedFeedEntry,
     };
 });

@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { useImageGeneratorStore } from "./store/imageGeneratorStore";
 import type { ImageResponse } from "./imageGeneratorTypes";
 
 interface Props {
@@ -9,6 +10,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const igStore = useImageGeneratorStore();
 </script>
 
 <template>
@@ -21,10 +23,19 @@ const props = defineProps<Props>();
             <b>There was a problem generating the image.</b>
             {{ props.message.message }}
         </div>
-        <template v-else>
-            <img :src="props.message.src" />
-            <p v-if="props.message.message" class="l-mar--0-bottom l-mar-s--top">{{ props.message.message }}</p>
-        </template>
+        <div v-else class="radiolist">
+            <input
+                :id="`ig-feed-response-${props.message.entryKey}`"
+                v-model="igStore.selectedFeedEntry"
+                type="radio"
+                :name="`ig-feed-response-${props.message.entryKey}`"
+                :value="props.message.entryKey"
+            />
+            <label :for="`ig-feed-response-${props.message.entryKey}`">
+                <img :src="props.message.src" />
+                <p v-if="props.message.message" class="l-mar--0-bottom l-mar-s--top">{{ props.message.message }}</p>
+            </label>
+        </div>
     </div>
 </template>
 
