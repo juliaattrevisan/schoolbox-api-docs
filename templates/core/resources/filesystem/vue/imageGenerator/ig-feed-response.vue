@@ -27,31 +27,31 @@ const radioId = window.Vue.computed(() => {
             :value="props.message?.entryKey ?? null"
             :disabled="props.message?.status !== 'success' || undefined"
         />
-        <label :for="radioId">
-            <template v-if="props.message === null">
-                <div class="c-card c-card--loading" style="width: 200px; height: 120px"></div>
-                <p class="l-mar--0-bottom l-mar-s--top">Generating image... Please wait</p>
-            </template>
-            <div v-else-if="props.message.status === 'error'" class="alert-box alert l-mar--0">
-                <b>There was a problem generating the image.</b>
-                {{ props.message.message }}
+        <label :for="radioId"> </label>
+        <div v-if="props.message === null">
+            <div class="c-card c-card--loading" style="width: 200px; height: 120px"></div>
+            <p class="l-mar--0-bottom l-mar-s--top">Generating image... Please wait</p>
+        </div>
+        <div v-else-if="props.message.status === 'error'" class="alert-box alert l-mar--0">
+            <b>There was a problem generating the image.</b>
+            {{ props.message.message }}
+        </div>
+        <div v-else>
+            <div class="actions-small-1">
+                <nav>
+                    <a :href="props.message.src" class="icon-download" title="Download" download></a>
+                </nav>
+                <img :src="props.message.src" />
             </div>
-            <template v-else>
-                <div class="actions-small-1">
-                    <nav>
-                        <a :href="props.message.src" class="icon-download" title="Download" download></a>
-                    </nav>
-                    <img :src="props.message.src" />
-                </div>
-                <p v-if="props.message.message" class="l-mar--0-bottom l-mar-s--top">{{ props.message.message }}</p>
-            </template>
-        </label>
+            <p v-if="props.message.message" class="l-mar--0-bottom l-mar-s--top">{{ props.message.message }}</p>
+        </div>
     </div>
 </template>
 
 <style scoped lang="scss">
 .ig-feed-response {
     width: 80%;
+    display: flex;
 
     img {
         max-width: 200px;
