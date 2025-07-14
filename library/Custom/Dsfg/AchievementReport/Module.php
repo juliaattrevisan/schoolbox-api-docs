@@ -66,6 +66,7 @@ class Module extends BaseModule
         $this->register('GET', '/standardisedTests/{externalUserId}{/year}', 'getStandardisedTests', $getPerms, $preload);
         $this->register('GET', '/coCurricular/{externalUserId}{/year}', 'getCoCurricular', $getPerms, $preload);
         $this->register('GET', '/myp/{externalUserId}{/year}', 'getMyp', $getPerms, $preload);
+        $this->register('GET', '/dbViewTests/{externalUserId}{/year}', 'getDbViewTests', $getPerms, $preload);
     }
 
 

@@ -901,4 +901,55 @@ $_SESSION['loggedInUserIdForDebuggingPurposes'] = $this->getUser()->getId();
             ],
         );
     }
+
+    public function getDbViewTests(IConnector $db, User $user, array $externalUser, ?int $year): void
+    {
+        $viewNames = [
+            'dbo.uvSchoolBoxSchoolGradeResults', // Used in School Grades page.
+            'dbo.uvSchoolBoxNCEAResultsforDataRefreshV2_Year11', // To be used in Year 11 page.
+        ];
+
+        $rowsByViewName = [];
+
+        foreach ($viewNames as $viewName) {
+            try {
+                $rowsByViewName[$viewName] = $db->executeQuery("SELECT * FROM $viewName LIMIT 5", [])->fetchAll();
+            } catch (\Exception) {
+                $rowsByViewName[$viewName] = null;
+            }
+        }
+
+        foreach ($rowsByViewName as $viewName => $rows) {
+            echo "<h2>View name: $viewName</h2>\n";
+
+            if ($rows === null) {
+                echo "Could not get data from table.\n";
+                continue;
+            }
+
+            if (count($rows) === 0) {
+                echo "Table empty.\n";
+                continue;
+            }
+
+            echo "<table>\n";
+            echo " <thead>\n";
+            echo "  <tr>\n";
+            foreach (array_keys($rows[0]) as $colHeading) {
+                echo "  <th>$colHeading</th>\n";
+            }
+            echo "  </tr>\n";
+            echo " </thead>\n";
+            echo " <tbody>\n";
+            foreach ($rows as $row) {
+                echo "  <tr>\n";
+                foreach ($row as $key => $value) {
+                    echo "   <td>$value</td>\n";
+                }
+                echo "  </tr>\n";
+            }
+            echo " </tbody>\n";
+            echo "</table>\n";
+        }
+    }
 }

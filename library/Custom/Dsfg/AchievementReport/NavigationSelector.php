@@ -247,6 +247,13 @@ $externalUser = ['StudentID' => 507]; // 507 is jreed's user.synergy_id in the s
             ];
         }
 
+        $availableNavigation[self::COCURRICULAR_KEY] = [
+            'url' => $this->routeGenerator->generate('achievementreport.getDbViewTests', [
+                'externalUserId' => $this->externalUser['StudentID'],
+            ]),
+            'label' => 'DB View Tests'
+        ];
+
         $this->availableNavigation = $availableNavigation;
     }
 
