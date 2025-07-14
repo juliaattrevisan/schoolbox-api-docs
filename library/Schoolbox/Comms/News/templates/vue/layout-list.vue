@@ -24,7 +24,7 @@ export default {
         "articles-loading",
         "current-articles",
     ],
-    components: { RelativeTime, MediaArticle, },
+    components: { RelativeTime, MediaArticle },
     data() {
         return {};
     },
