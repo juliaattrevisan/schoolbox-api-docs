@@ -397,27 +397,9 @@ class Controller extends WebController\Base
         $results = [];
         $projectCache = (new Project\ResultCache\ResultCache($this->projectResultCacheMapper));
 
-//        $queryArgs = $this->requestQuery->getArrayCopy();
-//        [$filters,] = $this->convertRequestToFilters($courseSpec, $queryArgs, false);
-
-        $request = $this->requestPost['filter_selection'] ?: [];
-
-        /**
-         * @var null[]|Collection[]        $filters
-         * @var Filter\Codec               $codec
-         * @var Filter\Selection\Model[][] $selectionsPerFilter
-         */
-        // TODO add some intelligence around which filter settings to save (eg AssessmentType but not units)
-        [$filters, $codec, $selectionsPerFilter] = $this->convertRequestToFilters($courseSpec, $request, false);
-
-        $assessmentIds  = $this->assessmentIdFinder->findIdsByFilters($filters, $this->getUser());
-
         // Fetch assessments
-        $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds)->indexBy('id');
-        // filter to only the assessment we are looking for
-        $assessments = $assessments->filter(static function (IAssessable $assessment) use ($assessmentSpec) {
-            return $assessment->getSpecificationAssessment()?->getId() === $assessmentSpec->getId();
-        });
+        $assessments = $this->assessmentMapperProxy->findAllImplementationsBySpecificationId($assessmentSpec->getId())->indexBy('id');
+
         // hydrate participants
         $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, null, true);
 
