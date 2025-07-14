@@ -128,7 +128,7 @@ class TwigCallbackStream implements StreamInterface
     /**
      * @inheritdoc
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->internalStream->__toString();
     }
@@ -136,7 +136,7 @@ class TwigCallbackStream implements StreamInterface
     /**
      * @inheritdoc
      */
-    public function close()
+    public function close(): void
     {
         $this->internalStream->close();
     }
@@ -152,7 +152,7 @@ class TwigCallbackStream implements StreamInterface
     /**
      * @inheritdoc
      */
-    public function getSize()
+    public function getSize(): ?int
     {
         return $this->internalStream->getSize();
     }
@@ -160,7 +160,7 @@ class TwigCallbackStream implements StreamInterface
     /**
      * @inheritdoc
      */
-    public function tell()
+    public function tell(): int
     {
         return $this->internalStream->tell();
     }
@@ -168,7 +168,7 @@ class TwigCallbackStream implements StreamInterface
     /**
      * @inheritdoc
      */
-    public function eof()
+    public function eof(): bool
     {
         return $this->internalStream->eof();
     }
@@ -176,7 +176,7 @@ class TwigCallbackStream implements StreamInterface
     /**
      * @inheritdoc
      */
-    public function isSeekable()
+    public function isSeekable(): bool
     {
         return $this->internalStream->isSeekable();
     }
@@ -184,7 +184,7 @@ class TwigCallbackStream implements StreamInterface
     /**
      * @inheritdoc
      */
-    public function seek(int $offset, int $whence = SEEK_SET)
+    public function seek(int $offset, int $whence = SEEK_SET): void
     {
         $this->internalStream->seek($offset, $whence);
     }
@@ -192,7 +192,7 @@ class TwigCallbackStream implements StreamInterface
     /**
      * @inheritdoc
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->internalStream->rewind();
     }
@@ -200,7 +200,7 @@ class TwigCallbackStream implements StreamInterface
     /**
      * @inheritdoc
      */
-    public function isWritable()
+    public function isWritable(): bool
     {
         return $this->internalStream->isWritable();
     }
@@ -208,7 +208,7 @@ class TwigCallbackStream implements StreamInterface
     /**
      * @inheritdoc
      */
-    public function write(string $string)
+    public function write(string $string): int
     {
         return $this->internalStream->write($string);
     }
@@ -216,7 +216,7 @@ class TwigCallbackStream implements StreamInterface
     /**
      * @inheritdoc
      */
-    public function isReadable()
+    public function isReadable(): bool
     {
         return $this->internalStream->isReadable();
     }
@@ -224,7 +224,7 @@ class TwigCallbackStream implements StreamInterface
     /**
      * @inheritdoc
      */
-    public function read(int $length)
+    public function read(int $length): string
     {
         return $this->internalStream->read($length);
     }
@@ -232,7 +232,7 @@ class TwigCallbackStream implements StreamInterface
     /**
      * @inheritdoc
      */
-    public function getContents()
+    public function getContents(): string
     {
         return $this->internalStream->getContents();
     }
