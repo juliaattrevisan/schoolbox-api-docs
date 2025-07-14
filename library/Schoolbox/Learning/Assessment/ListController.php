@@ -47,6 +47,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecific
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\Helper;
+use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use Schoolbox\Mapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Assessment\Participant\Plan\Model as PlanModel;
@@ -1319,6 +1320,8 @@ class ListController extends Web\Controller\Base
         $assessments = $this->getAssessmentMapper()->createCollection([$assessment]);
         $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection($assessments, $student, true);
 
+        $participant = $assessment->getParticipantIfExtant($student);
+
         $maxMarks = null;
         // If this is a quiz, we need to use the learnosity API to get the max marks
         if (
@@ -1328,28 +1331,55 @@ class ListController extends Web\Controller\Base
             $this->learnosityVersion &&
             $this->urlFactory instanceof UrlFactory
         ) {
-            /* Probably inject this one day, but for now,
-                 * I want to avoid dumping Yet Another Thing into the kernel
-                 * I don't have a convenient means to access SERVER_NAME except like this, sadly
+            if ($participant && $assessment->getMarkScheme() instanceof TotalMarkFractional) {
+                /* Ask learnosity to find out how much their attempt *would* be worth
+                 * based on the current set of questions if any of the following occurs:
+                 *
+                 *     - this participant never made an attempt.
+                 *     - this participant's attempt is still in progress (db row won't exist yet).
+                 *     - most recent response's marksAvailable is zero.
+                 *         this occurs when you spawn an arbitrary attempt with a Letter Grade,
+                 *         then changed it to Total Mark; we never asked or recorded what the
+                 *         quantitative total actually was. Deeper in the andyland part of the
+                 *         swamp is a series of floatval() calls that cast nulls to zero.
+                 *         TODO maybe find out the breadth of this idea and undo it to support null
                  */
-            $logger = new Logger(STDOUT, STDOUT, \Monolog\Level::Debug, [], true, 'learnosity');
+                /** @var QuizAttempt $mostRecentResponse */
+                $mostRecentResponse = $participant->findMostRecentResponse();
 
-            /* TODO Derive from learnosity atm
-             *   Consider caching locally the standing maximum available marks for the assessment in the absence of an attempt.
-             *   This only matters when it's a Total Mark markscheme: everything else is out of 100
-             */
-            $api = new Api(
-                $this->urlFactory->buildFullyQualified()->getHost(),
-                $this->learnosityVersion,
-                $this->learnosityConsumerKey,
-                $this->learnosityConsumerSecret,
-                $logger
-            );
+                if (!$mostRecentResponse) {
+                    $maxMarks = null;
+                } elseif (!$mostRecentResponse->isSubmitted()) {
+                    $maxMarks = null;
+                } else {
+                    $maxMarks = $mostRecentResponse->getMarksAvailable();
+                }
+            }
 
-            $maxMarks = (new Helper($api, $logger))->findAvailableMarks($assessment->getLearnosityReference());
+            /* Only need to fetch from Learnosity if we didn't find it above */
+            if ($maxMarks === null) {
+                /* Probably inject this one day, but for now,
+                     * I want to avoid dumping Yet Another Thing into the kernel
+                     * I don't have a convenient means to access SERVER_NAME except like this, sadly
+                     */
+                $logger = new Logger(STDOUT, STDOUT, \Monolog\Level::Debug, [], true, 'learnosity');
+
+                /* TODO Derive from learnosity atm
+                 *   Consider caching locally the standing maximum available marks for the assessment in the absence of an attempt.
+                 *   This only matters when it's a Total Mark markscheme: everything else is out of 100
+                 */
+                $api = new Api(
+                    $this->urlFactory->buildFullyQualified()->getHost(),
+                    $this->learnosityVersion,
+                    $this->learnosityConsumerKey,
+                    $this->learnosityConsumerSecret,
+                    $logger
+                );
+
+                $maxMarks = (new Helper($api, $logger))->findAvailableMarks($assessment->getLearnosityReference());
+            }
         }
 
-        $participant = $assessment->getParticipantIfExtant($student);
         /* A list of Responses and Floating Feedbacks, as per the Submission History
         */
         $feedback = [

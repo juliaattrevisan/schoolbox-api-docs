@@ -195,6 +195,12 @@
         function getCommentBoxId($participant) {
             const participantId = $participant.data("participant");
             const assessmentId = $participant.closest("[data-assessment]").data("assessment");
+
+            // is there an assessmentId? If not, we assume the comment box only has a participantId
+            if (!assessmentId) {
+                return `comment-${participantId}`;
+            }
+
             return `comment-${assessmentId}-${participantId}`;
         }
 

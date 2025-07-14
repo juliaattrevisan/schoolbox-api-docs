@@ -248,7 +248,7 @@ Data:
                                 </div>
                                 <nav>
                                     <a
-                                        data-collapser="collap-{{ aImpl.assessment.getBaseContext.getFolder.id }}"
+                                        data-collapser="collap-{{ aImpl.assessment.id }}"
                                         href="#"
                                         class="icon-up-arrow collapse"
                                         title="Expand/collapse content"
@@ -264,7 +264,7 @@ Data:
                 <section
                     {% if showGroups %}
                     data-collapse-state="uncollapsed"
-                    data-collapsable="collap-{{ assessment.getBaseContext.getFolder.id }}"
+                    data-collapsable="collap-{{ aImpl.assessment.id }}"
                     {% endif %}
                 >
                     <ul class="information-list">
