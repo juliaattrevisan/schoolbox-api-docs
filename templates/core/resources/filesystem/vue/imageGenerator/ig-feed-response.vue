@@ -9,14 +9,6 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits(["ready"]);
-
-window.Vue.onMounted(() => {
-    /** If this isn't in a state to load an image, immediately emit ready to make it scroll */
-    if (props.message === null || props.message.status === "error") {
-        emit("ready");
-    }
-});
 </script>
 
 <template>
@@ -30,7 +22,7 @@ window.Vue.onMounted(() => {
             {{ props.message.message }}
         </div>
         <template v-else>
-            <img :src="props.message.src" @load="emit('ready')" />
+            <img :src="props.message.src" />
             <p v-if="props.message.message" class="l-mar--0-bottom l-mar-s--top">{{ props.message.message }}</p>
         </template>
     </div>

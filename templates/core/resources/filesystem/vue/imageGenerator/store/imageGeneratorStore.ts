@@ -36,6 +36,7 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
 
         feed.value.push({
             type: "request",
+            entryKey: feed.value.length + 1,
             user: window.schoolboxUser,
             prompt: payload.userPrompt,
             imageSize: payload.imageSize,
@@ -53,6 +54,7 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
             feed.value.push({
                 type: "response",
                 status: "error",
+                entryKey: feed.value.length + 1,
                 responseId: response.responseId,
                 message: response.message,
             });
@@ -79,6 +81,7 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
         feed.value.push({
             type: "response",
             status: "success",
+            entryKey: feed.value.length + 1,
             responseId: response.data.id,
             src: `data:image/png;base64,${image.result}`,
             message: messageContent ? messageContent.text.trim() : "",

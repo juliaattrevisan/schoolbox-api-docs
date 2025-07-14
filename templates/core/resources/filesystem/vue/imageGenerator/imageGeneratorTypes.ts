@@ -1,5 +1,6 @@
 export type ImageRequest = {
     type: "request";
+    entryKey: number;
     user: Pick<typeof window.schoolboxUser, "id" | "externalId" | "name">;
     prompt: string;
     imageSize: string | null;
@@ -10,6 +11,7 @@ export type ImageRequest = {
 type ImageResponseSuccess = {
     type: "response";
     status: "success";
+    entryKey: number;
     /* the openai response ID so we can reference it in the next chat */
     responseId: string;
     /* the image URL */
@@ -21,6 +23,7 @@ type ImageResponseSuccess = {
 type ImageResponseError = {
     type: "response";
     status: "error";
+    entryKey: number;
     responseId: string | null;
     message: string;
 };
