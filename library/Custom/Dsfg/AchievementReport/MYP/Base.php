@@ -104,6 +104,7 @@ return [
                 'C' => 'Producing text',
                 'D' => 'Using language'
             ],
+            'isShortCourse' => 0
         ],
         'D:FDT' => [
             'subjectName'   => 'Design: Food Design Technology',
@@ -119,7 +120,8 @@ return [
                 'B' => 'Developing ideas',
                 'C' => 'Creating the solution',
                 'D' => 'Evaluating'
-            ]
+            ],
+            'isShortCourse' => 1
         ]
     ]
 ];
