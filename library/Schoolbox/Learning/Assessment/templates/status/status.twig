@@ -124,7 +124,7 @@
         <section class="content" data-participant-loader>
             <div class="loader"></div>
         </section>
-        <section data-assessment-status class="hide">
+        <section data-assessment-status data-assessment="{{ assessment.id }}" class="hide">
             <ul class="information-list {{ listClass }}">
             {% for participant in assessment.allParticipants | filter(participant => not participant.isExcluded ) %}
 
