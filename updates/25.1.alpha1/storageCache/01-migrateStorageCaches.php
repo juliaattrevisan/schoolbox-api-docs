@@ -120,14 +120,16 @@ $app = new class extends CliTool\App {
             foreach ($keys as $oldKey) {
                 $this->getLogger()->debug('.. migrating cache key: ' . $oldKey);
                 $value = $redisClient->get($oldKey);
+
+                // Value doesn't exist? It might have expired of its own accord
                 if (!isset($value)) {
-                    $this->getLogger()->warning(
+                    $this->getLogger()->debug(
                         sprintf('... cache key %s value does not exist: skipping', $oldKey)
                     );
                     continue;
                 }
 
-                // Don't expire if the cached item was never set to expire
+                // Ensure the new key doesn't expire if the old one didn't
                 $ttl = $redisClient->ttl($oldKey);
                 if ($ttl < 0) {
                     $ttl = null;
