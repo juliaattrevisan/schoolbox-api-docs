@@ -26,12 +26,20 @@ async function scrollToEnd(): Promise<void> {
 </script>
 
 <template>
-    <div ref="feedRef" class="l-mar-m--bottom l-pad-s ig-feed">
-        <template v-for="(message, index) in igStore.feed" :key="index">
+    <div
+        v-if="igStore.isGenerating || igStore.generateError || igStore.feed.length > 0"
+        ref="feedRef"
+        class="l-mar-m--bottom l-pad-s ig-feed"
+    >
+        <template v-if="igStore.isGenerating">
+            <ig-feed-response :message="null" @ready="scrollToEnd" />
+            <br />
+        </template>
+
             <br v-if="index > 0" />
 
             <ig-feed-request v-if="message.type === 'request'" :message="message" />
-            <ig-feed-response v-else-if="message.type === 'response'" :message="message" @loaded="scrollToEnd" />
+            <ig-feed-response v-else-if="message.type === 'response'" :message="message" @ready="scrollToEnd" />
         </template>
     </div>
 </template>

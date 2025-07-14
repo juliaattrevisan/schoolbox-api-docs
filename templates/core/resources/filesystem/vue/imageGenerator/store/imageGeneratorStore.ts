@@ -34,13 +34,28 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
         generateError.value = null;
         const toast = window.sbProps.toastActivate("Generating image...");
 
+        feed.value.push({
+            type: "request",
+            user: window.schoolboxUser,
+            prompt: payload.userPrompt,
+            imageSize: payload.imageSize,
+            imageStyle: payload.imageStyle,
+            previousResponseId: payload.previousResponseId,
+        });
+
         // TODO: Pass thru route
         const response = await generateImage("/openai/image", payload);
 
         isGenerating.value = false;
         if (response.success === false) {
             toast.timeout({ text: "Image generation failed", isSuccess: false });
-            generateError.value = response.message;
+
+            feed.value.push({
+                type: "response",
+                status: "error",
+                responseId: response.responseId,
+                message: response.message,
+            });
             return false;
         }
 
@@ -63,6 +78,7 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
         // TODO: Handle the response data properly in the backend instead of here
         feed.value.push({
             type: "response",
+            status: "success",
             responseId: response.data.id,
             src: `data:image/png;base64,${image.result}`,
             message: messageContent ? messageContent.text.trim() : "",

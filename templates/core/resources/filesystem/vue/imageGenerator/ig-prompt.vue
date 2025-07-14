@@ -45,12 +45,6 @@ async function sendRequest(): Promise<void> {
 </script>
 
 <template>
-    <div v-if="igStore.isGenerating" class="loader"></div>
-    <div v-if="igStore.generateError" class="alert-box alert">
-        <b>There was a problem generating the image.</b>
-        {{ igStore.generateError }}
-    </div>
-
     <label>
         <textarea
             v-model="prompt"

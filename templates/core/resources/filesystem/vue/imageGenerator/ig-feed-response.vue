@@ -2,17 +2,37 @@
 import type { ImageResponse } from "./imageGeneratorTypes";
 
 interface Props {
-    message: ImageResponse;
+    /**
+     * The message to display, null to show the loading state
+     */
+    message: ImageResponse | null;
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits(["loaded"]);
+const emit = defineEmits(["ready"]);
+
+window.Vue.onMounted(() => {
+    /** If this isn't in a state to load an image, immediately emit ready to make it scroll */
+    if (props.message === null || props.message.status === "error") {
+        emit("ready");
+    }
+});
 </script>
 
 <template>
     <div class="ig-feed-response">
-        <img :src="props.message.src" @load="emit('loaded')" />
-        <p v-if="props.message.message" class="l-mar--0-bottom l-mar-s--top">{{ props.message.message }}</p>
+        <template v-if="props.message === null">
+            <div class="c-card c-card--loading" style="width: 200px; height: 120px"></div>
+            <p class="l-mar--0-bottom l-mar-s--top">Generating image... Please wait</p>
+        </template>
+        <div v-else-if="props.message.status === 'error'" class="alert-box alert l-mar--0">
+            <b>There was a problem generating the image.</b>
+            {{ props.message.message }}
+        </div>
+        <template v-else>
+            <img :src="props.message.src" @load="emit('ready')" />
+            <p v-if="props.message.message" class="l-mar--0-bottom l-mar-s--top">{{ props.message.message }}</p>
+        </template>
     </div>
 </template>
 

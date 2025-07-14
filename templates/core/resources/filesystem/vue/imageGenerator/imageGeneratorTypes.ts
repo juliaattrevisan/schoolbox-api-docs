@@ -7,8 +7,9 @@ export type ImageRequest = {
     previousResponseId: string | null;
 };
 
-export type ImageResponse = {
+type ImageResponseSuccess = {
     type: "response";
+    status: "success";
     /* the openai response ID so we can reference it in the next chat */
     responseId: string;
     /* the image URL */
@@ -16,5 +17,14 @@ export type ImageResponse = {
     /* a message from the AI, if any */
     message: string;
 };
+
+type ImageResponseError = {
+    type: "response";
+    status: "error";
+    responseId: string | null;
+    message: string;
+};
+
+export type ImageResponse = ImageResponseSuccess | ImageResponseError;
 
 export type AiFeedMessage = ImageRequest | ImageResponse;

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import locale from "@js/terminology/rosettaStone";
-import loadingCards from "@schoolboxVue/components/loading/loading-cards.vue";
+import LoadingCards from "@schoolboxVue/components/loading/loading-cards.vue";
 import { useLessonPlannerStore } from "./store/lessonPlannerStore";
 
 const lpStore = useLessonPlannerStore();
