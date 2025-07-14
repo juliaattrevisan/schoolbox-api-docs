@@ -43,12 +43,6 @@ parameters:
 			path: library/Alaress/Async/Notification/Cloud/Google/GCM.php
 
 		-
-			message: '#^Comparison operation "\=\=" between \(array\|float\|int\) and 0 results in an error\.$#'
-			identifier: equal.invalid
-			count: 1
-			path: library/Alaress/Async/Notification/Cloud/Google/Response.php
-
-		-
 			message: '#^PHPDoc tag @throws with type PHPUnit_Framework_AssertionFailedError is not subtype of Throwable$#'
 			identifier: throws.notThrowable
 			count: 1
