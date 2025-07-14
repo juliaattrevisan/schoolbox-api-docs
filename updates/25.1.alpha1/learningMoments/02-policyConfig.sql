@@ -22,10 +22,10 @@ INSERT INTO
     `sequence`
 )
 VALUES (
-       'learning_moment_moderation_enabled',
+       'learning_moments_moderation_enabled',
        '0',
-       'Enable Learning Moment Moderation',
-       'If toggled to ‘ON’, the instance will use learning moment moderation based upon the year level configuration. Students without a year level will require moderation.', (
+       'Enable Learning Moments Moderation',
+       'If toggled to ‘ON’, the instance will use learning moments moderation based upon the year level configuration. Students without a year level will require moderation.', (
            SELECT `id`
            FROM
                `lu_config_field`
