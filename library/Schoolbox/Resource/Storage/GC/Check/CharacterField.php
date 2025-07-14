@@ -28,7 +28,6 @@ class CharacterField extends Base
         // Notes:
         // * any field which contains `hash` should maybe be a FK?
         // * any field which contains `url` or `link` should be checked?
-        'blog_image_backup'            => [['columns' => ['hash']]],
         'bookmarks'                    => [['columns' => ['url']]],
         'component_config_definition'  => [['columns' => ['default_value']]],
         'component_config_instance'    => [['columns' => ['value']]],
