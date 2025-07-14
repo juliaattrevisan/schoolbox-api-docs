@@ -67,7 +67,7 @@ class Controller extends Base
                     'offset' => $this->paginator->getOffset($page),
                     'order'  => ['name' => 'asc',],
                 )
-            )->filter(fn ($cat) => $this->itemMapper->searchCount('', $this->getUser(), $cat->getId()));
+            );
         }
 
         $this->response = $this->responseFromTemplate(
