@@ -207,8 +207,7 @@ class Controller extends Base
                 trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_KEY)),
                 trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_RESOURCE_NAME)),
                 trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_DEPLOYMENT_ID)),
-                // TODO: need an image-specific text model here
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_MODEL)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_MODEL)),
                 $this->client,
                 $this->errorMapper,
                 $this->logMapper,
