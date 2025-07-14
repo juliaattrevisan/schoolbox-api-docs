@@ -189,6 +189,6 @@ class Replicator
         if (!($source instanceof DueWork && $destination instanceof DueWork)) {
             return;
         }
-        $this->rubricMapper->copyRubric($source->getId(), $assessmentContext, $destination->getId());
+        $this->rubricMapper->copyRubric($source->getId(), $assessmentContext, $destination->getId(), $destination->getContext());
     }
 }
