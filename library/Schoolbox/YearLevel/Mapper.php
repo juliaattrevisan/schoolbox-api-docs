@@ -42,7 +42,7 @@ class Mapper extends Schoolbox\Mapper
     public const COL_LEARNING_MOMENTS_ENABLED  = 'learning_moments_enabled';
     public const COL_QRCODE_ENABLED            = 'qrcode_enabled';
     public const COL_BIRTHDAY_ENABLED          = 'birthday_celebration_enabled';
-    public const COL_LEARNING_MOMENTS_MODERATION_ENABLED = 'learning_moment_moderation';
+    public const COL_LEARNING_MOMENTS_MODERATION_ENABLED = 'learning_moments_moderation';
     public const COL_SEQUENCE                  = 'sequence';
     public const COL_CREATED_AT                = 'created_at';
     public const COL_UPDATED_AT                = 'updated_at';

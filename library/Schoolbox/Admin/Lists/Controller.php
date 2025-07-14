@@ -1508,9 +1508,9 @@ class Controller extends Base
                     'default'    => false,
                     'popOutList' => 'displayOptions',
                 ],
-                'learningMomentModeration' => [
-                    'caption'    => 'Learning Moment Moderation',
-                    'tooltip'    => 'If toggled to ‘ON’, a student’s learning moment will require moderation before it appears on the activity feed for parents.',
+                'learningMomentsModeration' => [
+                    'caption'    => 'Learning Moments Moderation',
+                    'tooltip'    => 'If toggled to ‘ON’, a student’s learning moments will require moderation before it appears on the activity feed for parents.',
                     'checkbox'   => true,
                     'mandatory'  => true,
                     'default'    => false,

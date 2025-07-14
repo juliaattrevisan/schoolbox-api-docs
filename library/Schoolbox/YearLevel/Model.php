@@ -99,7 +99,7 @@ class Model implements ISoftDeletable, Sequential, ValueLabelInterface
      */
     private bool $birthdayCelebrationEnabled = false;
 
-    private bool $learningMomentModeration = false;
+    private bool $learningMomentsModeration = false;
 
     /**
      * @return string
@@ -359,18 +359,18 @@ class Model implements ISoftDeletable, Sequential, ValueLabelInterface
     /**
      * @return bool
      */
-    public function getLearningMomentModeration(): bool
+    public function getLearningMomentsModeration(): bool
     {
-        return $this->learningMomentModeration;
+        return $this->learningMomentsModeration;
     }
 
     /**
-     * @param bool $learningMomentModeration
+     * @param bool $learningMomentsModeration
      * @return static
      */
-    public function setLearningMomentModeration(bool $learningMomentModeration): self
+    public function setLearningMomentsModeration(bool $learningMomentsModeration): self
     {
-        $this->learningMomentModeration = $learningMomentModeration;
+        $this->learningMomentsModeration = $learningMomentsModeration;
         return $this;
     }
 
