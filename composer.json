@@ -122,7 +122,8 @@
         "ext-fileinfo": "*",
         "ext-libxml": "*",
         "ext-imap": "*",
-        "ext-sockets": "*"
+        "ext-sockets": "*",
+        "psr/http-message": "2.0 as 1.1"
     },
     "autoload-dev": {
       "psr-4": {
