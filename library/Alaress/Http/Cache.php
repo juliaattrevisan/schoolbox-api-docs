@@ -166,15 +166,6 @@ class Cache
             $this->internalCache->delete($lockKey);
         }
         $responseBody = $response->getBody()->getContents();
-
-        // If somehow response isn't a string: cast it to one
-        if (!is_string($responseBody)) {
-            trigger_error(
-                'HTTP client returned a non-string value: casting to string',
-                E_USER_WARNING,
-            );
-            $responseBody = (string)$result;
-        }
         try {
             $this->internalCache->set($key, $responseBody, $ttl ?? $this->defaultLifetime);
         } catch (\TypeError $e) {
