@@ -87,7 +87,9 @@ class ImagegeneratorController extends AbstractController
                 'MAX_FILES'      => self::MAX_FILES,
                 'MAX_FILE_SIZE'  => $this->conf->get(ConfigMapper::NAME_MAX_FILE_SIZE),
                 'ACCEPTED_FILES' => $mime,
-                'PROMPT_ATTRIBUTES' => Scrub::text(json_encode(OpenAI\Payload\ImageGeneration::getAttributes()))),
+                'PROMPT_ATTRIBUTES' => Scrub::text(json_encode(OpenAI\Payload\ImageGeneration::getAttributes())),
+                'GENERATE_ROUTE'    => '/openai/image',
+            ),
         );
     }
 

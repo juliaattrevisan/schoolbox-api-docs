@@ -5,8 +5,10 @@
 import IgPrompt from "./ig-prompt.vue";
 import igFeed from "./ig-feed.vue";
 import type { ImagePromptAttribute } from "./imageGeneratorTypes";
+import { useImageGeneratorStore } from "./store/imageGeneratorStore";
 
 interface Props {
+    generateRoute: string;
     /**
      * The extra attributes to show in the prompt (dropdowns)
      */
@@ -14,6 +16,11 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const igStore = useImageGeneratorStore();
+
+window.Vue.onMounted(() => {
+    igStore.init(props.generateRoute);
+});
 </script>
 
 <template>

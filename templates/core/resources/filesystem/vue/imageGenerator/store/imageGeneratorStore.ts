@@ -5,11 +5,20 @@ import type { ImageGeneratorApiPayload } from "./imageGeneratorPayload";
 
 export const useImageGeneratorStore = defineStore("imageGenerator", () => {
     const feed = window.Vue.ref<AiFeedMessage[]>([]);
+    const generateRoute = window.Vue.ref<string | null>(null);
 
     const isGenerating = window.Vue.ref<boolean>(false);
     const generateError = window.Vue.ref<string | null>(null);
 
     const selectedFeedEntry = window.Vue.ref<AiFeedMessage["entryKey"] | null>(null);
+
+    /**
+     * Initialise the store
+     * @param $generateRoute - The route to use for generating images
+     */
+    function init($generateRoute: string): void {
+        generateRoute.value = $generateRoute;
+    }
 
     /**
      * @returns The previous response ID from the feed if it exists
@@ -32,6 +41,10 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
             return false;
         }
 
+        if (generateRoute.value === null) {
+            throw new Error("generateRoute is not set");
+        }
+
         isGenerating.value = true;
         generateError.value = null;
 
@@ -44,8 +57,7 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
             previousResponseId: payload.previousResponseId,
         });
 
-        // TODO: Pass thru route
-        const response = await generateImage("/openai/image", payload);
+        const response = await generateImage(generateRoute.value, payload);
 
         isGenerating.value = false;
         if (response.success === false) {
@@ -72,6 +84,7 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
     }
 
     return {
+        init,
         feed,
         isGenerating,
         generateError,

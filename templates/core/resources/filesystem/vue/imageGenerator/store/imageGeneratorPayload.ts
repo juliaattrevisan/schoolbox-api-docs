@@ -81,7 +81,6 @@ export async function generateImage(
             return responseData;
         }
 
-        // TODO: just dump the data for now
         responseData = { success: true, data: responseJson as ImageGeneratorResponseSuccess["data"] };
     } catch (e) {
         responseData = { success: false, message: (e as Error).message };
