@@ -1,30 +1,25 @@
 <script lang="ts" setup>
 import { useImageGeneratorStore } from "./store/imageGeneratorStore";
+import type { ImagePromptAttribute } from "./imageGeneratorTypes";
 
-// TODO: Pull in these sizes/styles from somewhere configurable?
-const AVAILABLE_SIZES = [
-    { value: "square", label: "Square (1x1)" },
-    { value: "landscape", label: "Landscape (3x2)" },
-    { value: "portrait", label: "Portrait (2x3)" },
-] as const;
+interface Props {
+    /**
+     * The extra attributes to show in the prompt (dropdowns)
+     */
+    promptAttributes: ImagePromptAttribute[];
+}
 
-const AVAILABLE_STYLES = [
-    { value: "background", label: "Background" },
-    { value: "cartoon", label: "Cartoon" },
-    { value: "oil_painting", label: "Oil Painting" },
-    { value: "photo_realistic", label: "Photorealistic" },
-    { value: "pop_art", label: "Pop Art" },
-    { value: "sketch", label: "Sketch" },
-    { value: "surrealism", label: "Surrealism" },
-    { value: "wide_angle", label: "Wide Angle" },
-    { value: "vector_art", label: "Vector Art" },
-] as const;
-
+const props = defineProps<Props>();
 const igStore = useImageGeneratorStore();
 
 const prompt = window.Vue.ref<string>("");
-const imageSize = window.Vue.ref<(typeof AVAILABLE_SIZES)[number]["value"] | null>(null);
-const imageStyle = window.Vue.ref<(typeof AVAILABLE_STYLES)[number]["value"] | null>(null);
+const attributes = window.Vue.ref<Record<string, string>>({});
+
+window.Vue.onMounted(() => {
+    props.promptAttributes.forEach((attr) => {
+        attributes.value[attr.id] = ""; // defaults
+    });
+});
 
 /**
  * Temp function to test the prompt
@@ -32,8 +27,7 @@ const imageStyle = window.Vue.ref<(typeof AVAILABLE_STYLES)[number]["value"] | n
 async function sendRequest(): Promise<void> {
     const isSuccess = await igStore.sendRequest({
         userPrompt: prompt.value,
-        imageSize: imageSize.value,
-        imageStyle: imageStyle.value,
+        attributes: attributes.value,
         previousResponseId: igStore.getPreviousResponseId(),
     });
 
@@ -57,16 +51,24 @@ async function sendRequest(): Promise<void> {
     </label>
     <div class="ig-prompt-actions actions-small-1 l-mar-m--bottom">
         <div class="list-item">
-            <select v-model="imageSize" name="image-size" :disabled="igStore.isGenerating || undefined">
-                <option :value="null" style="font-style: italic">Size</option>
-                <option v-for="size in AVAILABLE_SIZES" :key="size.value" :value="size.value">
-                    {{ size.label }}
+            <select
+                v-for="(attr, index) in props.promptAttributes"
+                :key="index"
+                v-model="attributes[attr.id]"
+                :name="attr.id"
+                :disabled="igStore.isGenerating || undefined"
+                :required="attr.required || undefined"
+            >
+                <option
+                    value=""
+                    style="font-style: italic"
+                    :disabled="attr.required || undefined"
+                    :selected="attributes[attr.id] === null"
+                >
+                    {{ attr.title }}
                 </option>
-            </select>
-            <select v-model="imageStyle" name="image-style" :disabled="igStore.isGenerating || undefined">
-                <option :value="null" style="font-style: italic">Style</option>
-                <option v-for="style in AVAILABLE_STYLES" :key="style.value" :value="style.value">
-                    {{ style.label }}
+                <option v-for="(label, value) in attr.options" :key="value" :value="value">
+                    {{ label }}
                 </option>
             </select>
         </div>

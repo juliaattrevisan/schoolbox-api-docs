@@ -21,8 +21,7 @@ type ImageGeneratorApiResponse = ImageGeneratorResponseSuccess | ImageGeneratorR
 
 export type ImageGeneratorApiPayload = {
     userPrompt: string;
-    imageSize: string | null;
-    imageStyle: string | null;
+    attributes: Record<string, string | null>;
     previousResponseId: string | null;
 };
 

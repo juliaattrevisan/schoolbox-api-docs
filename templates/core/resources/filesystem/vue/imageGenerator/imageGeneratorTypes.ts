@@ -3,8 +3,7 @@ export type ImageRequest = {
     entryKey: number;
     user: Pick<typeof window.schoolboxUser, "id" | "externalId" | "name">;
     prompt: string;
-    imageSize: string | null;
-    imageStyle: string | null;
+    attributes: Record<string, string | null>;
     previousResponseId: string | null;
 };
 
@@ -31,3 +30,10 @@ type ImageResponseError = {
 export type ImageResponse = ImageResponseSuccess | ImageResponseError;
 
 export type AiFeedMessage = ImageRequest | ImageResponse;
+
+export type ImagePromptAttribute = {
+    id: string;
+    title: string;
+    options: Record<string, string>;
+    required: boolean;
+};

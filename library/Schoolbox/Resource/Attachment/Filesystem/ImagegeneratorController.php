@@ -86,8 +86,8 @@ class ImagegeneratorController extends AbstractController
             array(
                 'MAX_FILES'      => self::MAX_FILES,
                 'MAX_FILE_SIZE'  => $this->conf->get(ConfigMapper::NAME_MAX_FILE_SIZE),
-                'ACCEPTED_FILES' => $mime
-            )
+                'ACCEPTED_FILES' => $mime,
+                'PROMPT_ATTRIBUTES' => Scrub::text(json_encode(OpenAI\Payload\ImageGeneration::getAttributes()))),
         );
     }
 

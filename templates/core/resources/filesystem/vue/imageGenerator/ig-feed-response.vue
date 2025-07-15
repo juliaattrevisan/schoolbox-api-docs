@@ -30,7 +30,7 @@ const radioId = window.Vue.computed(() => {
         <label :for="radioId"> </label>
 
         <div v-if="props.message === null">
-            <div style="width: 200px; height: 120px">
+            <div style="width: 200px">
                 <div class="loader"></div>
             </div>
             <p class="l-mar--0-bottom l-mar-s--top">Generating image... Please wait</p>

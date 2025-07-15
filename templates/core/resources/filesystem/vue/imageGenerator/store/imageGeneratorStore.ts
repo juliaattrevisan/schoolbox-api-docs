@@ -40,8 +40,7 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
             entryKey: feed.value.length + 1,
             user: window.schoolboxUser,
             prompt: payload.userPrompt,
-            imageSize: payload.imageSize,
-            imageStyle: payload.imageStyle,
+            attributes: payload.attributes,
             previousResponseId: payload.previousResponseId,
         });
 

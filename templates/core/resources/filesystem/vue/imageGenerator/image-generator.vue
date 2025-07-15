@@ -4,6 +4,16 @@
  */
 import IgPrompt from "./ig-prompt.vue";
 import igFeed from "./ig-feed.vue";
+import type { ImagePromptAttribute } from "./imageGeneratorTypes";
+
+interface Props {
+    /**
+     * The extra attributes to show in the prompt (dropdowns)
+     */
+    promptAttributes: ImagePromptAttribute[];
+}
+
+const props = defineProps<Props>();
 </script>
 
 <template>
@@ -15,7 +25,7 @@ import igFeed from "./ig-feed.vue";
         <a href="/help/sso/send?returnUrl=TBC" target="_blank">Schoolbox Help</a>
     </p>
     <ig-feed />
-    <ig-prompt />
+    <ig-prompt :prompt-attributes="props.promptAttributes" />
 </template>
 
 <style scoped lang="scss">
