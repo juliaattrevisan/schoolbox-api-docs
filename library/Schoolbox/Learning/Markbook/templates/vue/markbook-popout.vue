@@ -211,6 +211,32 @@ const viewStatusText = window.Vue.computed(() => {
 });
 
 /**
+ * To update the extraInfo and marks for a given activity
+ * @param infoRoute - The route to fetch the extra info from
+ * @param participant - The participant to update the extra info for
+ */
+async function updateExtraInfo(infoRoute: string, participant: MarkbookClassImplActivityParticipant): Promise<void> {
+    const activityInfoResponse = await fetch(infoRoute, {
+        headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+        },
+    });
+
+    if (!activityInfoResponse.ok) {
+        throw new Error(`Failed to fetch extra activity info: ${activityInfoResponse.statusText}`);
+    }
+
+    /* just shove it on the participant for now, other places can deal with it */
+    const activityInfo = (await activityInfoResponse.json()) as ActivityInfoResponsePayload;
+    participant.extraInfo = activityInfo;
+
+    /* also update the marks since they might have changed */
+    Object.assign(participant.marks.draft, participant.extraInfo.marks.draft);
+    Object.assign(participant.marks.published, participant.extraInfo.marks.published);
+}
+
+/**
  *  Fetches an array from the dataEndpoint, which should return a
  *  an array of items corresponding to recent activity events.
  */
@@ -251,20 +277,7 @@ async function getActivity(): Promise<void> {
             [ACTIVITY_TYPE_DUE_WORK, ACTIVITY_TYPE_QUIZ].includes(cellInfo.value.activity.assessmentType) &&
             cellInfo.value.participant
         ) {
-            const activityInfoResponse = await fetch(infoRoute, {
-                headers: {
-                    "Content-Type": "application/json",
-                    Accept: "application/json",
-                },
-            });
-
-            if (!activityInfoResponse.ok) {
-                throw new Error(`Failed to fetch extra activity info: ${activityInfoResponse.statusText}`);
-            }
-
-            /* just shove it on the participant for now, other places can deal with it */
-            const activityInfo = (await activityInfoResponse.json()) as ActivityInfoResponsePayload;
-            cellInfo.value.participant.extraInfo = activityInfo;
+            await updateExtraInfo(infoRoute, cellInfo.value.participant);
         }
     } catch (error) {
         console.error("Error fetching activity items:", error);
@@ -353,7 +366,7 @@ async function onMenuItemSelected(target: string | null, action: string | null =
             }
 
             // If including student reload the activity list
-            if (activity.assessmentType === ACTIVITY_TYPE_DUE_WORK) {
+            if ([ACTIVITY_TYPE_DUE_WORK, ACTIVITY_TYPE_QUIZ].includes(activity.assessmentType)) {
                 await getActivity();
             } else {
                 activityItems.value = [];
