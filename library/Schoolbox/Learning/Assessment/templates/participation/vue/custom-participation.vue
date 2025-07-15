@@ -7,6 +7,7 @@ import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
 import type { StudentPastoralCountBadge } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
+import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import type { Participant, Plan } from "../js/types/customParticipationTypes";
 
 interface Props {
@@ -66,11 +67,7 @@ async function getStudentPastoralCounts(): Promise<void> {
         allParticipants.value.map((participant) => participant.user.id).join(","),
     );
     try {
-        const response = await fetch(url, {
-            headers: {
-                Accept: "application/json",
-            },
-        });
+        const response = await fetch(url, { headers: { Accept: "application/json" } });
         if (!response.ok) {
             const errorMessage = await extractErrorMessage(response);
             throw new Error(errorMessage);
@@ -107,10 +104,7 @@ async function excludeParticipant(participant: Participant): Promise<void> {
     try {
         const response = await fetch(participant._links.exclude, {
             method: "POST",
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-            },
+            headers: { Accept: "application/json", "Content-Type": "application/json" },
         });
         if (!response.ok) {
             const errorMessage = await extractErrorMessage(response);
@@ -137,10 +131,7 @@ async function includeParticipant(participant: Participant): Promise<void> {
     try {
         const response = await fetch(participant._links.include, {
             method: "POST",
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-            },
+            headers: { Accept: "application/json", "Content-Type": "application/json" },
         });
         if (!response.ok) {
             const errorMessage = await extractErrorMessage(response);
@@ -197,10 +188,7 @@ async function includeParticipantInExistingPlan(participant: Participant): Promi
     try {
         const response = await fetch(props.includeInExistingCustomisation, {
             method: "POST",
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-            },
+            headers: { Accept: "application/json", "Content-Type": "application/json" },
             body: JSON.stringify({
                 students: [participant.user.id],
                 planId: 1305, // TODO: plan id of the plan to include the student
@@ -214,12 +202,26 @@ async function includeParticipantInExistingPlan(participant: Participant): Promi
         toast.timeout({ text: "Error adding Customisation" });
     }
 }
+
 /**
  * Load the student pastoral counts when the component is mounted.
  */
 window.Vue.onMounted(() => {
     void getStudentPastoralCounts();
 });
+const isIncludeOpen = window.Vue.ref(false);
+const currentParticipant = window.Vue.ref<Participant | null>(null);
+const selectedActivity = window.Vue.ref<number | "">("");
+
+/**
+ * Opens the modal to include a participant in an existing customisation.
+ * @param participant - The participant to be included.
+ */
+function openIncludeModal(participant: Participant): void {
+    currentParticipant.value = participant;
+    selectedActivity.value = "";
+    isIncludeOpen.value = true;
+}
 </script>
 
 <template>
@@ -369,11 +371,8 @@ window.Vue.onMounted(() => {
                                         </button>
                                     </li>
                                     <li>
-                                        <button
-                                            class="icon-staff-students"
-                                            @click.prevent="includeParticipantInExistingPlan(participant)"
-                                        >
-                                            Test
+                                        <button class="icon-list" @click.prevent="openIncludeModal(participant)">
+                                            Include In Existing Customisation
                                         </button>
                                     </li>
                                     <li class="separator">Create</li>
@@ -439,6 +438,36 @@ window.Vue.onMounted(() => {
             </div>
         </bottom-drawer>
     </div>
+    <basic-modal v-model:is-open="isIncludeOpen" :has-background-click="true">
+        <div class="l-flex-col l-gap-s f-no-margins">
+            <h2>Include in existing customisation</h2>
+            <p v-if="currentParticipant">
+                Modifying participation for:
+                {{ currentParticipant.user.lastname }}, {{ currentParticipant.user.firstname }}
+            </p>
+            <select
+                id="activitySelect"
+                v-model="selectedActivity"
+                class="w-full border border-gray-300 rounded-md p-2 mb-4"
+            >
+                <option disabled value="">-- Please choose --</option>
+                <option v-for="customisation in customisations" :key="customisation.id" :value="customisation.id">
+                    {{ customisation.name }}
+                </option>
+            </select>
+
+            <div class="l-flex l-gap-xs f-no-margins">
+                <button class="button l-flex__item--1" @click.prevent="isIncludeOpen = false">Cancel</button>
+                <button
+                    class="button submit l-flex__item--1"
+                    :disabled="!selectedActivity"
+                    @click.prevent="includeParticipantInExistingPlan(currentParticipant)"
+                >
+                    Confirm
+                </button>
+            </div>
+        </div>
+    </basic-modal>
 </template>
 
 <style scoped>
