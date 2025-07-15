@@ -823,6 +823,8 @@ class Controller extends Base
             ],
             'publishAt',
             'viewedAt',
+            'status',
+            'statusDate',
             'topics' => [
                 'name',
                 'slug',
