@@ -66,7 +66,7 @@ WHERE
 -- Restrict the value of existing configs to the new range
 UPDATE `config`
 SET
-    `value` = "3600"
+    `value` = "7200"
 WHERE
     `name` = "session_length"
   AND (
