@@ -6,6 +6,7 @@
 
 import { until } from "@vueuse/core";
 import type { Ref } from "vue";
+import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import {
     ACTIVITY_TYPE_TASK,
     ACTIVITY_TYPE_PROJECT,
@@ -323,8 +324,7 @@ async function onMenuItemSelected(target: string | null, action: string | null =
     // No specific action, just redirect
     if (action === null) {
         // we should append the returnUrl, for all calls, so we can get back to the markbook on save.
-        const returnUrl = `?returnUrl=${btoa(window.location.pathname)}`;
-        window.location.href = target + returnUrl;
+        window.location.href = getReturnUrl(target);
         return;
     }
 
@@ -555,7 +555,7 @@ function onToggleSelected(): void {
                         <pop-out-menu-item
                             v-if="!cellInfo.participant.isExcluded"
                             :class="{ 'is-disabled': !routes.postFeedback }"
-                            :link="routes.updateRoute ?? undefined"
+                            :link="routes.updateRoute ? getReturnUrl(routes.updateRoute) : undefined"
                             force-callback
                             @selected="onUpdateFeedbackSelected"
                         >
@@ -563,7 +563,7 @@ function onToggleSelected(): void {
                         </pop-out-menu-item>
                         <pop-out-menu-item
                             :class="{ 'is-disabled': !routes.reviewRoute || isActivityEmpty || !hasSubmissions }"
-                            :link="routes.reviewRoute ?? undefined"
+                            :link="routes.reviewRoute ? getReturnUrl(routes.reviewRoute) : undefined"
                         >
                             Review Submission
                         </pop-out-menu-item>
@@ -611,7 +611,7 @@ function onToggleSelected(): void {
                             cellInfo.participant.isExcluded ||
                             (isActivityEmpty && cellInfo.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK),
                     }"
-                    :link="routes.historyRoute ?? undefined"
+                    :link="routes.historyRoute ? getReturnUrl(routes.historyRoute) : undefined"
                 >
                     {{ viewStatusText }}
                 </pop-out-menu-item>
