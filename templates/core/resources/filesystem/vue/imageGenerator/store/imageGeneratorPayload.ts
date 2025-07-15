@@ -1,6 +1,10 @@
 type ImageGeneratorResponseSuccess = {
     success: true;
-    data: unknown; // TODO
+    data: {
+        responseId: string;
+        src: string;
+        message: string | null;
+    };
 };
 
 type ImageGeneratorResponseFailure = {
@@ -79,7 +83,7 @@ export async function generateImage(
         }
 
         // TODO: just dump the data for now
-        responseData = { success: true, data: responseJson };
+        responseData = { success: true, data: responseJson as ImageGeneratorResponseSuccess["data"] };
     } catch (e) {
         responseData = { success: false, message: (e as Error).message };
     }

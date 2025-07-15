@@ -17,7 +17,7 @@ type ImageResponseSuccess = {
     /* the image URL */
     src: string;
     /* a message from the AI, if any */
-    message: string;
+    message: string | null;
 };
 
 type ImageResponseError = {

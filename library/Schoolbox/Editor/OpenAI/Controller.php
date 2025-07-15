@@ -242,8 +242,21 @@ class Controller extends Base
                 return;
             }
 
+            /* Find the image call/message in the response
+             * since we aren't streaming, there should only be one of these at the moment
+             */
+            $outputImage = array_filter($data['output'], fn($item) => $item['type'] === 'image_generation_call')[0] ?? null;
+            $outputMessage = array_filter($data['output'], fn($item) => $item['type'] === 'message')[0] ?? null;
 
-            $this->response = $this->responseAsJson($data);
+            $outputMessageContent = $outputMessage
+                ? array_filter($outputMessage['content'], fn($item) => $item['type'] === 'output_text')[0]['text'] ?? null
+                : null;
+
+            $this->response = $this->responseAsJson([
+                'responseId' => $data['id'],
+                'src' => sprintf("data:image/png;base64,%s", $outputImage['result']),
+                'message' => $outputMessageContent,
+            ]);
             return;
         } catch (\DomainException $e) {
             /* Not configured? Not found

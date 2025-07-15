@@ -15,7 +15,7 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
      * @returns The previous response ID from the feed if it exists
      */
     function getPreviousResponseId(): string | null {
-        const responses = feed.value.filter((item) => item.type === "response");
+        const responses = feed.value.filter((item) => "responseId" in item).filter((item) => item.responseId !== null);
         if (responses.length === 0) {
             return null;
         }
@@ -54,33 +54,17 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
                 type: "response",
                 status: "error",
                 entryKey: feed.value.length + 1,
-                responseId: response.responseId,
+                responseId: null,
                 message: response.message,
             });
             return false;
         }
 
         feed.value.push({
-            type: "request",
-            user: window.schoolboxUser,
-            prompt: payload.userPrompt,
-            imageSize: payload.imageSize,
-            imageStyle: payload.imageStyle,
-            previousResponseId: payload.previousResponseId,
-        });
-
-        const image = response.data.output.find((item) => item.type === "image_generation_call");
-        const message = response.data.output.find((item) => item.type === "message");
-        const messageContent = message ? message.content.find((c) => c.type === "output_text") : null;
-
-        // TODO: Handle the response data properly in the backend instead of here
-        feed.value.push({
             type: "response",
             status: "success",
             entryKey: feed.value.length + 1,
-            responseId: response.data.id,
-            src: `data:image/png;base64,${image.result}`,
-            message: messageContent ? messageContent.text.trim() : "",
+            ...response.data,
         });
 
         selectedFeedEntry.value = feed.value[feed.value.length - 1].entryKey;
