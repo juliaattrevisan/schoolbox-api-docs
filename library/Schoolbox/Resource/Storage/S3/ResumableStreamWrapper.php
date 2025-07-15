@@ -13,12 +13,9 @@ use Aws\LruArrayCache;
 use Aws\S3\StreamWrapper;
 use Aws\S3\S3ClientInterface;
 use Aws\CacheInterface;
+
 class ResumableStreamWrapper extends StreamWrapper
-
 {
-    /** @var bool */
-    private static $useV2Existence = false;
-
     /** @var int */
     private int $position = 0;
 
@@ -96,7 +93,6 @@ class ResumableStreamWrapper extends StreamWrapper
             }
 
             if ($this->stream_eof() && $this->position < $this->fileSize) {
-
                 if ($data !== '') {
                     $this->dataBuffer = $data;
                 }
@@ -107,7 +103,6 @@ class ResumableStreamWrapper extends StreamWrapper
             }
 
             return $data;
-
         } catch (\Exception $e) {
             if ($this->resumeFromPosition()) {
                 return $this->stream_read($count);
@@ -174,7 +169,6 @@ class ResumableStreamWrapper extends StreamWrapper
 
             $opened_path = '';
             return parent::stream_open($this->originalPath, $this->originalMode, 0, $opened_path);
-
         } catch (\Exception $e) {
             return false;
         }
@@ -210,7 +204,6 @@ class ResumableStreamWrapper extends StreamWrapper
         ?CacheInterface $cache = null,
         $v2Existence = false
     ) {
-        self::$useV2Existence = $v2Existence;
         if (in_array($protocol, stream_get_wrappers(), true)) {
             stream_wrapper_unregister($protocol);
         }
