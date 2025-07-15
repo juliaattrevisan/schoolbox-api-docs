@@ -28,14 +28,19 @@ const radioId = window.Vue.computed(() => {
             :disabled="props.message?.status !== 'success' || undefined"
         />
         <label :for="radioId"> </label>
+
         <div v-if="props.message === null">
-            <div class="c-card c-card--loading" style="width: 200px; height: 120px"></div>
+            <div style="width: 200px; height: 120px">
+                <div class="loader"></div>
+            </div>
             <p class="l-mar--0-bottom l-mar-s--top">Generating image... Please wait</p>
         </div>
+
         <div v-else-if="props.message.status === 'error'" class="alert-box alert l-mar--0">
             <b>There was a problem generating the image.</b>
             {{ props.message.message }}
         </div>
+
         <div v-else>
             <div class="actions-small-1">
                 <nav>
