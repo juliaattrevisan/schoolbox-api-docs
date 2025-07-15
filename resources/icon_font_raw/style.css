@@ -1,9 +1,9 @@
 @font-face {
   font-family: 'schoolbox';
   src:
-    url('fonts/schoolbox.ttf?42p0o2') format('truetype'),
-    url('fonts/schoolbox.woff?42p0o2') format('woff'),
-    url('fonts/schoolbox.svg?42p0o2#schoolbox') format('svg');
+    url('fonts/schoolbox.ttf?fb3flg') format('truetype'),
+    url('fonts/schoolbox.woff?fb3flg') format('woff'),
+    url('fonts/schoolbox.svg?fb3flg#schoolbox') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -656,6 +656,9 @@
 }
 .icon-upload:before {
   content: "\e673";
+}
+.icon-veracross:before {
+  content: "\e934";
 }
 .icon-video:before {
   content: "\e674";
