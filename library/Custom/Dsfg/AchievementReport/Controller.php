@@ -904,6 +904,11 @@ $_SESSION['loggedInUserIdForDebuggingPurposes'] = $this->getUser()->getId();
 
     public function getDbViewTests(IConnector $db, User $user, array $externalUser, ?int $year): void
     {
+        if ($_SESSION['username'] !== 'alaress') {
+            echo "Not authorised\n";
+            die;
+        }
+
         $viewNames = [
             'dbo.uvSchoolBoxSchoolGradeResults', // Used in School Grades page.
             'dbo.uvSchoolBoxNCEAResultsforDataRefreshV2_Year11', // To be used in Year 11 page.
