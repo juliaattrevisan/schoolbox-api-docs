@@ -190,9 +190,9 @@ async function includeParticipantInExistingPlan(participant: Participant): Promi
             method: "POST",
             headers: { Accept: "application/json", "Content-Type": "application/json" },
             body: JSON.stringify({
-                students: [participant.user.id],
-                planId: 1305, // TODO: plan id of the plan to include the student
-                assessmentId: 1576, // TODO: assessment id of the plan (ie plan.assessable.id)
+                students: [13, 65],
+                planId: selectedCustomisation.value.id, //TODO: plan id of the plan to include the student
+                assessmentId: electedCustomisation.value.assessable.id, //TODO: assessment id of the plan (ie plan.assessable.id)
             }),
         });
         if (response.ok) {
@@ -371,7 +371,11 @@ function openIncludeModal(participant: Participant): void {
                                         </button>
                                     </li>
                                     <li>
-                                        <button class="icon-list" @click.prevent="openIncludeModal(participant)">
+                                        <button
+                                            v-if="customisations.length > 0"
+                                            class="icon-list"
+                                            @click.prevent="openIncludeModal(participant)"
+                                        >
                                             Include In Existing Customisation
                                         </button>
                                     </li>
