@@ -309,6 +309,8 @@ class ConfigMapper extends Mapper
      */
     public const NAME_IMAGE_SLIDESHOW_MAX = 'image_slideshow_max';
 
+    public const NAME_ADVANCED_SEARCH_RESULT_BATCH_SIZE = 'advanced_search_result_batch_size';
+
     /**
      * Skin Config Fields
      */

@@ -14,6 +14,7 @@ use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use LogicException;
 use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Resource\Folder;
@@ -29,11 +30,6 @@ use Schoolbox\UserMapper;
  */
 class Controller extends Base
 {
-    /**
-     * Maximum number of search results to return per call.
-     */
-    private const MAX_RESULT_LIMIT = 20;
-
     /**
      * Minimum number of characters required to complete a search
      */
@@ -75,7 +71,10 @@ class Controller extends Base
         $keyword = trim((string)$this->requestQuery->get('keyword', ''));
         $dataObjectFactory = new SearchFilter\DataObjectFactory($this->userMapper);
         $filter = $dataObjectFactory->build($this->requestQuery->get('filter'), null);
-        $limit = (int)($this->requestQuery->get('limit', self::MAX_RESULT_LIMIT));
+        $limit = (int)$this->requestQuery->get(
+            'limit',
+            $this->getConfigLoader()->get(ConfigMapper::NAME_ADVANCED_SEARCH_RESULT_BATCH_SIZE)
+        );
         $cursor = null;
 
         if (mb_strlen($keyword) >= self::MIN_CHARACTER_LIMIT) {
@@ -243,7 +242,10 @@ class Controller extends Base
         $keyword = trim($this->requestQuery->get('keyword', ''));
         $dataObjectFactory = new SearchFilter\DataObjectFactory($this->userMapper);
         $filter = $dataObjectFactory->build($this->requestQuery->get('filter'), $folder);
-        $limit = (int)($this->requestQuery->get('limit', self::MAX_RESULT_LIMIT));
+        $limit = (int)$this->requestQuery->getInt(
+            'limit',
+            $this->getConfigLoader()->get(ConfigMapper::NAME_ADVANCED_SEARCH_RESULT_BATCH_SIZE)
+        );
 
         if (mb_strlen($keyword) >= 2) {
             ['results' => $results, 'nextCursor' => $nextCursor] = $this->populateResultSet(
