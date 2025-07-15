@@ -8,7 +8,7 @@ WHERE
 -- Restrict the value of existing configs to the new range
 UPDATE `config`
 SET
-    `value` = "30"
+    `value` = "3600"
 WHERE
     `name` = "xml_cache_timeout"
   AND (
@@ -26,7 +26,7 @@ WHERE
 -- Restrict the value of existing configs to the new range
 UPDATE `config`
 SET
-    `value` = "30"
+    `value` = "1200"
 WHERE
     `name` = "external_cache_timeout"
   AND (
@@ -46,7 +46,7 @@ WHERE
 UPDATE `config`
 SET
     `field_id` = (SELECT `id` from lu_config_field where `field` = 'number'),
-    `value` = "30"
+    `value` = "10800"
 WHERE
     `name` = "schooldata_import_timeout"
   AND (
@@ -66,7 +66,7 @@ WHERE
 -- Restrict the value of existing configs to the new range
 UPDATE `config`
 SET
-    `value` = "30"
+    `value` = "3600"
 WHERE
     `name` = "session_length"
   AND (
