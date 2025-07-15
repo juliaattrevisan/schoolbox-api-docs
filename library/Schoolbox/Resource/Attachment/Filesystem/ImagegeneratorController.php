@@ -14,6 +14,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Attachment\AbstractController;
 use Schoolbox\Editor\OpenAI;
+use Schoolbox\User;
 use Scrub;
 use SitePage;
 
@@ -33,13 +34,20 @@ class ImagegeneratorController extends AbstractController
     /**
      * @param bool   $multi
      * @param string $mimeFilter
-     * @param IConfigLoader $conf
+     * @param ?IConfigLoader $conf
+     * @param ?User   $user
      * @param bool   $useFolder
      * @param int    $defaultFolderId
      * @throws OutOfRangeException
      */
-    public function __construct($multi, $mimeFilter = null, private ?IConfigLoader $conf = null, $useFolder = true, $defaultFolderId = 0)
-    {
+    public function __construct(
+        $multi,
+        $mimeFilter = null,
+        private ?IConfigLoader $conf = null,
+        private ?User $user = null,
+        $useFolder = true,
+        $defaultFolderId = 0
+    ) {
         /* when $mimeFilter is null, it's valid */
         if ($mimeFilter !== null && !$this->allowsImage($mimeFilter)) {
             throw new OutOfRangeException("mimeType is not an image.");
@@ -49,6 +57,11 @@ class ImagegeneratorController extends AbstractController
         $endpoint = $this->conf->get(ConfigMapper::NAME_OPENAI_IMAGE_ENDPOINT);
         if (OpenAI\Helper::ENDPOINT_TYPE_OFF === $endpoint) {
             throw new OutOfRangeException("Image generation is not enabled.");
+        }
+
+        /* only staff can access this */
+        if (!$this->user || !$user->getRole()->isStaff()) {
+            throw new OutOfRangeException("Image generation is not available for this user.");
         }
 
         parent::__construct($multi, $mimeFilter, $useFolder, $defaultFolderId);

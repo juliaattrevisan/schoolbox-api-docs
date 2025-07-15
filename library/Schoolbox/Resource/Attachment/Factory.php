@@ -250,6 +250,7 @@ class Factory
                 $this->multi,
                 $this->mime,
                 $this->conf,
+                $this->user,
                 $this->useFolder,
                 $this->defaultFolderId,
             ),
