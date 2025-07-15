@@ -187,9 +187,9 @@ async function onPublishAll(): Promise<void> {
         </p>
         <p v-else>The following drafts can be published:</p>
 
-        <template v-for="({ classImpl, participants, classImplId }, i) in participantsWithDrafts" :key="classImplId">
-            <h5 :class="{ 'l-pad-s--top': i > 0 }">{{ classImpl.folder.title }}</h5>
-            <section class="checklist">
+        <!-- <h5 :class="{ 'l-pad-s--top': i > 0 }">{{ classImpl.folder.title }}</h5> -->
+        <section class="checklist">
+            <template v-for="{ participants, classImplId } in participantsWithDrafts" :key="classImplId">
                 <div v-for="participant in participants" :key="participant.student.id">
                     <input
                         :id="`mb-table-head-activity-publish-${props.activity.id}-${participant.student.id}`"
@@ -203,8 +203,8 @@ async function onPublishAll(): Promise<void> {
                         {{ participant.student.givenName }} {{ participant.student.lastName }}
                     </label>
                 </div>
-            </section>
-        </template>
+            </template>
+        </section>
 
         <template #footer>
             <div class="component-action">
