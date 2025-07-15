@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { useTemplateRefsList } from "@vueuse/core";
 import { useImageGeneratorStore } from "./store/imageGeneratorStore";
 import type { ImagePromptAttribute } from "./imageGeneratorTypes";
 
@@ -13,7 +14,9 @@ const props = defineProps<Props>();
 const igStore = useImageGeneratorStore();
 
 const prompt = window.Vue.ref<string>("");
+const promptEl = window.Vue.useTemplateRef<HTMLTextAreaElement>("promptRef");
 const attributes = window.Vue.ref<Record<string, string>>({});
+const attributeEls = useTemplateRefsList<HTMLSelectElement>();
 
 window.Vue.onMounted(() => {
     props.promptAttributes.forEach((attr) => {
@@ -25,6 +28,14 @@ window.Vue.onMounted(() => {
  * Temp function to test the prompt
  */
 async function sendRequest(): Promise<void> {
+    if (!promptEl.value?.reportValidity()) {
+        return; // prompt is required, can't send the request
+    }
+
+    if (attributeEls.value.some((el) => !el.reportValidity())) {
+        return; // some attributes are required and not set yet, can't send the request
+    }
+
     const isSuccess = await igStore.sendRequest({
         userPrompt: prompt.value,
         attributes: attributes.value,
@@ -41,12 +52,14 @@ async function sendRequest(): Promise<void> {
 <template>
     <label>
         <textarea
+            ref="promptRef"
             v-model="prompt"
             name="prompt"
             rows="3"
             placeholder="Describe or refine the image you want to generate"
             style="resize: vertical; margin-bottom: 0"
             :disabled="igStore.isGenerating || undefined"
+            required
         ></textarea>
     </label>
     <div class="ig-prompt-actions actions-small-1 l-mar-m--bottom">
@@ -54,6 +67,7 @@ async function sendRequest(): Promise<void> {
             <select
                 v-for="(attr, index) in props.promptAttributes"
                 :key="index"
+                :ref="attributeEls.set"
                 v-model="attributes[attr.id]"
                 :name="attr.id"
                 :disabled="igStore.isGenerating || undefined"
