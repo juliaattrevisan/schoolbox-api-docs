@@ -225,4 +225,9 @@ async function onPublishAll(): Promise<void> {
     </basic-modal>
 </template>
 
-<style scoped></style>
+<style scoped>
+.checklist {
+    max-height: 50vh;
+    overflow-y: auto;
+}
+</style>
