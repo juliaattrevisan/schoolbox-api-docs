@@ -14,6 +14,23 @@ use Aws\S3\StreamWrapper;
 use Aws\S3\S3ClientInterface;
 use Aws\CacheInterface;
 
+/**
+ * S3 Stream Wrapper with resume capability for handling premature connection termination
+ *
+ * This class extends AWS S3 StreamWrapper to address a specific issue where Cloudflare
+ * terminates connections prematurely when streaming large files from S3, causing EOF
+ * to be reached before the entire file has been read.
+ *
+ * The wrapper implements the following workaround mechanisms:
+ * - Automatic retry with exponential backoff (max 3 attempts)
+ * - Position tracking to resume from the exact byte where the stream was interrupted
+ * - Buffering of partial reads to prevent data loss during interruptions
+ * - Range request support to resume downloads from a specific byte position
+ *
+ * When a premature EOF is detected (stream reports EOF but position < file size),
+ * the wrapper automatically reopens the stream with a Range header to continue
+ * from the last successfully read position.
+ */
 class ResumableStreamWrapper extends StreamWrapper
 {
     /** @var int */
@@ -40,6 +57,7 @@ class ResumableStreamWrapper extends StreamWrapper
     /** @var string  */
     private string $dataBuffer = '';
 
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
     public function stream_open($path, $mode, $options, &$opened_path)
     {
         $this->position = 0;
@@ -62,6 +80,7 @@ class ResumableStreamWrapper extends StreamWrapper
         return $result;
     }
 
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
     public function stream_read($count)
     {
         if ($this->dataBuffer !== '') {
@@ -108,10 +127,12 @@ class ResumableStreamWrapper extends StreamWrapper
                 return $this->stream_read($count);
             }
 
+            $this->triggerError("Stream read failed: " . $e->getMessage());
             return false;
         }
     }
 
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
     public function stream_seek($offset, $whence = SEEK_SET)
     {
         $targetPosition = $this->position;
@@ -143,6 +164,7 @@ class ResumableStreamWrapper extends StreamWrapper
         return $this->reopenFromPosition($targetPosition);
     }
 
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
     public function stream_tell()
     {
         return $this->position;
@@ -170,6 +192,7 @@ class ResumableStreamWrapper extends StreamWrapper
             $opened_path = '';
             return parent::stream_open($this->originalPath, $this->originalMode, 0, $opened_path);
         } catch (\Exception $e) {
+            $this->triggerError("Failed to reopen stream from position {$position}: " . $e->getMessage());
             return false;
         }
     }
@@ -193,6 +216,14 @@ class ResumableStreamWrapper extends StreamWrapper
         }
 
         return false;
+    }
+
+    /**
+     * Trigger an error for the stream wrapper
+     */
+    private function triggerError(string $message): void
+    {
+        trigger_error($message, E_USER_WARNING);
     }
 
     /**
