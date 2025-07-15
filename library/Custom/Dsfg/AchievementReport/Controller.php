@@ -919,16 +919,16 @@ $_SESSION['loggedInUserIdForDebuggingPurposes'] = $this->getUser()->getId();
         foreach ($viewNames as $viewName) {
             try {
                 $rowsByViewName[$viewName] = $db->executeQuery("SELECT * FROM $viewName LIMIT 5", [])->fetchAll();
-            } catch (\Exception) {
-                $rowsByViewName[$viewName] = null;
+            } catch (\Exception $e) {
+                $rowsByViewName[$viewName] = $e->getMessage();
             }
         }
 
         foreach ($rowsByViewName as $viewName => $rows) {
             echo "<h2>View name: $viewName</h2>\n";
 
-            if ($rows === null) {
-                echo "Could not get data from table.\n";
+            if (is_string($rows)) {
+                echo "<p>" . htmlentities($rows) . "</p>\n";
                 continue;
             }
 
@@ -937,7 +937,16 @@ $_SESSION['loggedInUserIdForDebuggingPurposes'] = $this->getUser()->getId();
                 continue;
             }
 
-            echo "<table>\n";
+            echo "<style>\n";
+            echo "table.dbview-table {border-collapse: collapse;}\n";
+            echo "table.dbview-table th,\n";
+            echo "table.dbview-table td\n";
+            echo "{\n";
+            echo "    border: 1px solid black;\n";
+            echo "    padding: 2px;\n";
+            echo "}\n";
+            echo "</style>\n";
+            echo "<table class='dbview-table'>\n";
             echo " <thead>\n";
             echo "  <tr>\n";
             foreach (array_keys($rows[0]) as $colHeading) {
