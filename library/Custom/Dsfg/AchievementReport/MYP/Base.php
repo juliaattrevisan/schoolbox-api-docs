@@ -34,10 +34,6 @@ class Base extends AchievementReportBase
      */
     private function findMYPResults(): array
     {
-if ($_SESSION['loggedInUserIdForDebuggingPurposes'] ?? null === 1) {
-    // Dump debugging info.
-}
-
         $externalUserHandler = new External_User();
         $currentYear = date('Y');
         $currentSemester = $externalUserHandler->getCurrentSemester($this->getExternalUserId());
