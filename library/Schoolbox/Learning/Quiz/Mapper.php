@@ -61,12 +61,10 @@ class Mapper extends BaseMapper
     protected $learnosityHelper = null;
 
     /**
-     * Override parent constructor so $this->learnosityHelper can be added.
+     * Post-setup: set up $this->learnosityHelper.
      */
-    public function __construct()
+    public function postSetup()
     {
-        parent::__construct();
-
         $api = new Api(
             (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified()->getHost(),
             $this->getConfigLoader()->get(Schoolbox\Config\ConfigMapper::NAME_LEARNOSITY_VERSION),
