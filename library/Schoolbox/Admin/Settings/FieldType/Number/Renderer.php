@@ -37,10 +37,14 @@ class Renderer extends Input\Renderer
         if ($config->getOptions()) {
             $options = $this->valueSerializer->buildOptions($config->getOptions());
 
-            $data["min"] = $options["min"];
-            $data["max"] = $options["max"];
+            if (isset($options["min"])) {
+                $data["min"] = $options["min"];
+            }
+            if (isset($options["max"])) {
+                $data["max"] = $options["max"];
+            }
 
-            // Ensure the data is valid for the range input
+            // if the value is not set or outside the range, set it to the minimum
             $data['value'] = $this->valueSerializer->serializeValue($data['value'], $config);
         }
         return $data;
