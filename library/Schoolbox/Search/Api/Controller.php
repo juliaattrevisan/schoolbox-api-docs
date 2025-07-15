@@ -71,9 +71,9 @@ class Controller extends Base
         $keyword = trim((string)$this->requestQuery->get('keyword', ''));
         $dataObjectFactory = new SearchFilter\DataObjectFactory($this->userMapper);
         $filter = $dataObjectFactory->build($this->requestQuery->get('filter'), null);
-        $limit = (int)$this->requestQuery->get(
+        $limit = $this->requestQuery->getInt(
             'limit',
-            $this->getConfigLoader()->get(ConfigMapper::NAME_ADVANCED_SEARCH_RESULT_BATCH_SIZE)
+            (int)$this->getConfigLoader()->get(ConfigMapper::NAME_ADVANCED_SEARCH_RESULT_PAGE_SIZE)
         );
         $cursor = null;
 
@@ -242,9 +242,9 @@ class Controller extends Base
         $keyword = trim($this->requestQuery->get('keyword', ''));
         $dataObjectFactory = new SearchFilter\DataObjectFactory($this->userMapper);
         $filter = $dataObjectFactory->build($this->requestQuery->get('filter'), $folder);
-        $limit = (int)$this->requestQuery->getInt(
+        $limit = $this->requestQuery->getInt(
             'limit',
-            $this->getConfigLoader()->get(ConfigMapper::NAME_ADVANCED_SEARCH_RESULT_BATCH_SIZE)
+            (int)$this->getConfigLoader()->get(ConfigMapper::NAME_ADVANCED_SEARCH_RESULT_PAGE_SIZE)
         );
 
         if (mb_strlen($keyword) >= 2) {
@@ -374,7 +374,7 @@ class Controller extends Base
             $this->source,
             $keyword,
             $filter,
-            $limit * 10,
+            $limit * (int)$this->getConfigLoader()->get(ConfigMapper::NAME_ADVANCED_SEARCH_RESULT_PAGES_PER_BATCH)
         );
 
         // Fetch results from cursor and hydrate
