@@ -203,18 +203,24 @@ class ImageGeneration
         $parsed = [];
 
         foreach (self::getAttributes() as $attribute) {
+            $parsed[$attribute['id']] = null;
             $value = trim((string)($userAttributes[$attribute['id']] ?? ''));
 
             if ('' === $value) {
                 $value = null;
             }
 
-            if (null === $value && $attribute['required']) {
+            if (null === $value) {
+                if (!$attribute['required']) {
+                    continue;
+                }
+
                 throw new \InvalidArgumentException("Attribute '{$attribute['id']}' is required");
             }
 
+
             if (!array_key_exists($value, $attribute['options'])) {
-                throw new \InvalidArgumentException("Attribute '{$attribute['id']}' has invalid value: {$value}");
+                throw new \InvalidArgumentException("Attribute '{$attribute['id']}' has an invalid value: {$value}");
             }
 
             $parsed[$attribute['id']] = $value;
