@@ -20,6 +20,7 @@ use League\Flysystem\Visibility;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Storage\S3\Adapter;
+use Schoolbox\Resource\Storage\S3\ResumableStreamWrapper;
 use UnexpectedValueException;
 
 use function trim;
@@ -162,7 +163,7 @@ class FilesystemFactory
 
         // Register the S3 stream wrapper, so that the S3 filesystem adapter
         // may use it
-        $client->registerStreamWrapper();
+        ResumableStreamWrapper::register($client);
 
         $visibility = self::buildDefaultVisibility(self::FILE_SYSTEM_ADAPTER_AWS_S3);
         $bucket = !empty($otfs_s3_alt_host) && !empty($otfs_s3_alt_bucket) ? $otfs_s3_alt_bucket : $otfs_s3_bucket;
