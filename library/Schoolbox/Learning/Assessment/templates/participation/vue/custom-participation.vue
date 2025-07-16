@@ -197,7 +197,9 @@ const selectedActivity = window.Vue.computed(
  * @param participant - The participant to be included in the plan.
  * @param plan - The plan to include the participant in.
  */
-async function includeParticipantInExistingPlan(participant: Participant, plan: Plan): Promise<void> {
+async function includeParticipantInExistingPlan(plan: Plan): Promise<void> {
+    if (!plan) return;
+
     const toast = window.sbProps.toastActivate("Adding to customisation...");
     try {
         const response = await fetch(props.includeInExistingCustomisation, {
@@ -209,9 +211,7 @@ async function includeParticipantInExistingPlan(participant: Participant, plan: 
                 assessmentId: electedCustomisation.value.assessable.id, //TODO: assessment id of the plan (ie plan.assessable.id)
             }),
         });
-
-        participant.plan.name = plan.name;
-        participant.plan.id = plan.id;
+        const participantsToInclude = allParticipants.value.filter((p) => selectedList.value.includes(p.user.id));
 
         toast.timeout({ text: "Customisation added successfully", isSuccess: true });
 
@@ -228,8 +228,10 @@ async function includeParticipantInExistingPlan(participant: Participant, plan: 
 function openIncludeModal(participant: Participant): void {
     currentParticipant.value = participant;
     selectedActivityId.value = null;
+    if (!selectedList.value.includes(participant.user.id)) {
+        selectedList.value = [participant.user.id];
+    }
     isIncludeOpen.value = true;
-    selectedList.value = [participant.user.id];
 }
 </script>
 
@@ -483,11 +485,7 @@ function openIncludeModal(participant: Participant): void {
                 <button
                     class="button submit l-flex__item--1"
                     :disabled="!selectedActivity"
-                    @click.prevent="
-                        currentParticipant &&
-                        selectedActivity &&
-                        includeParticipantInExistingPlan(currentParticipant, selectedActivity)
-                    "
+                    @click.prevent="selectedActivity && includeParticipantInExistingPlan(selectedActivity)"
                 >
                     Confirm
                 </button>
