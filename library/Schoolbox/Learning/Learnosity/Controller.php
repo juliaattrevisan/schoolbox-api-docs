@@ -1850,6 +1850,17 @@ class Controller extends Base
         try {
             $lock = $this->acquireLock($logger, Helper::LEARNOSITY_ACTIVITY_RESTORE_TOOL_NAME, Helper::LEARNOSITY_ACTIVITY_RESTORE_LOCK_TTL);
         } catch (\RuntimeException $e) {
+            /* taskd interprets http 202 as "not yet ready" and gets ready to try it again later.
+             * This is implemented in taskd HttpRequest:114
+             *
+               if ($responseCode === 202) {
+                   // Not yet ready: wait a little longer
+             *
+             * Getting locked is essentially "not yet ready" because some other quiz is currently
+             * being propagated. This was the cause of SA-20163 where a quiz will randomly never
+             * be ready until a cron repairs a pending task.
+             */
+            $this->response = $this->responseEmpty(202);
             return;
         }
 
