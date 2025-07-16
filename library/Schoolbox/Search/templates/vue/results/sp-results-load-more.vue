@@ -12,7 +12,7 @@ import { useLoadMoreResultsStore } from "./store/spLoadMoreResultsStore";
 const store = useStore();
 const resultsStore = useResultsStore();
 const loadMoreResultsStore = useLoadMoreResultsStore();
-let deeperSearchInterruptRequested = false;
+let autoClickInterruptRequested = false;
 
 /**
  * To show the load more button when appropriate
@@ -52,13 +52,12 @@ window.Vue.watch(
             !newVal.hasLoadError
         ) {
             // We don't yet have a full page of results, and more results exist.
-            if (deeperSearchInterruptRequested) {
-                // Do not simulate a click the 'Load more results' button,
-                // but reset the interrupt value and note we are no longer searching deeper.
-                deeperSearchInterruptRequested = false;
+            if (autoClickInterruptRequested) {
+                // Do not simulate a click the 'Load more results' button, but reset autoClickInterruptRequested.
+                autoClickInterruptRequested = false;
             } else {
-                // Simulate a click the 'Load more results' button, and note we are now searching deeper.
-                loadMoreResultsStore.isSearchingDeeper = true;
+                // Simulate a click the 'Load more results' button, and note we are now auto-clicking 'Load more results'.
+                loadMoreResultsStore.autoClickLoadMoreResults = true;
                 void onLoadMoreSelected();
             }
         }
@@ -67,22 +66,22 @@ window.Vue.watch(
 );
 
 /**
- * Interrupt a deeper search so that there will be no more automatic clicks on the 'Load more results' button.
+ * Interrupt auto-clicking so that there will be no more automatic clicks on the 'Load more results' button.
  */
-function onDeeperSearchInterruptRequested(): void {
-    deeperSearchInterruptRequested = true;
-    loadMoreResultsStore.isSearchingDeeper = false;
+function onAutoClickInterruptRequested(): void {
+    autoClickInterruptRequested = true;
+    loadMoreResultsStore.autoClickLoadMoreResults = false;
 }
 </script>
 
 <template>
     <loading-cards v-if="loadMoreResultsStore.isLoading" :rows="2" />
-    <div v-if="loadMoreResultsStore.isSearchingDeeper" class="deeper-search-interrupt">
+    <div v-if="loadMoreResultsStore.autoClickLoadMoreResults">
         <button
             title="This just means automatically clicking 'Load more results' until either a full page of results has been found, or all records have been searched."
-            @click.prevent="onDeeperSearchInterruptRequested"
+            @click.prevent="onAutoClickInterruptRequested"
         >
-            Searching deeper... (Click to cancel)
+            Searching for more results... (Click to cancel)
         </button>
     </div>
     <sp-results-error v-else-if="loadMoreResultsStore.hasLoadError" />
