@@ -1362,14 +1362,13 @@ class DataSource
      * * Usages are copied from srcBox + srcIndicator to dstBox + dstIndicator
      *
      * @param int $sourceAssessmentId
-     * @param AssessmentContext $sourceContext
      * @param int $destinationAssessmentId
      * @param AssessmentContext $destinationContext
      * @return bool Whether a new Rubric was created.
      * @throws MapperException
      * @throws Deleted
      */
-    public function copyRubric($sourceAssessmentId, AssessmentContext $sourceContext, $destinationAssessmentId, AssessmentContext $destinationContext)
+    public function copyRubric($sourceAssessmentId, $destinationAssessmentId, AssessmentContext $destinationContext)
     {
         // TODO extract this entire monstrosity elsewhere
 
