@@ -55,7 +55,7 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Delete all Teams associated with this Division
+     * Delete all Teams and its players associated with this Division
      * when it's being deleted
      *
      * @param Model $division
