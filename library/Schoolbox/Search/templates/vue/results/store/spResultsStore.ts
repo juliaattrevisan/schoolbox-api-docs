@@ -20,7 +20,7 @@ export const useResultsStore = defineStore("spResults", () => {
      * @returns {boolean}
      */
     const hasResults = window.Vue.computed(() => {
-        return allResults.value.length > 0;
+        return allResults.value.length > 0 || latestResults.value.metadata.cursor.next !== null;
     });
 
     /**
@@ -28,7 +28,7 @@ export const useResultsStore = defineStore("spResults", () => {
      * @returns {boolean}
      */
     const hasNoResults = window.Vue.computed(() => {
-        return allResults.value.length === 0;
+        return allResults.value.length === 0 && latestResults.value.metadata.cursor.next === null;
     });
 
     /**
