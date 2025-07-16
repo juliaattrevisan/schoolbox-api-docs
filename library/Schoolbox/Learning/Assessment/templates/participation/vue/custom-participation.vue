@@ -210,6 +210,9 @@ async function includeParticipantInExistingPlan(participant: Participant, plan: 
             }),
         });
 
+        participant.plan.name = plan.name;
+        participant.plan.id = plan.id;
+
         toast.timeout({ text: "Customisation added successfully", isSuccess: true });
 
         isIncludeOpen.value = false;
@@ -226,6 +229,7 @@ function openIncludeModal(participant: Participant): void {
     currentParticipant.value = participant;
     selectedActivityId.value = null;
     isIncludeOpen.value = true;
+    selectedList.value = [participant.user.id];
 }
 </script>
 
@@ -455,9 +459,13 @@ function openIncludeModal(participant: Participant): void {
     <basic-modal v-model:is-open="isIncludeOpen" :has-background-click="true">
         <div class="l-flex-col l-gap-s f-no-margins">
             <h2>Include in existing customisation</h2>
-            <p v-if="currentParticipant">
+            <p class="meta">
                 Modifying participation for:
-                {{ currentParticipant.user.lastname }}, {{ currentParticipant.user.firstname }}
+                <span v-for="(id, index) in selectedList" :key="id">
+                    {{ allParticipants.find((p) => p.user.id === id)?.user.lastname }},
+                    {{ allParticipants.find((p) => p.user.id === id)?.user.firstname }}
+                    <span v-if="index < selectedList.length - 1">and </span>
+                </span>
             </p>
             <select
                 id="activitySelect"
