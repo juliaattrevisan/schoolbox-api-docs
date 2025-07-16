@@ -33,30 +33,70 @@ use Aws\CacheInterface;
  */
 class ResumableStreamWrapper extends StreamWrapper
 {
-    /** @var int */
+    /**
+     * The current position of the stream pointer.
+     *
+     * @var int
+     */
     private int $position = 0;
 
-    /** @var int */
+    /**
+     * Where should the stream pointer be reopened to, if it is closed
+     * prematurely and reopened?
+     *
+     * @var int
+     */
     private int $streamStartPosition = 0;
 
-    /** @var int|null  */
+    /**
+     * The size of the stream, as reported on opening.
+     *
+     * @var int|null
+     */
     private ?int $fileSize = null;
 
-    /** @var int */
+    /**
+     * How many times should stream reopen be attempted if it closes
+     * prematurely?
+     *
+     * @var int
+     */
     private int $maxRetries = 3;
 
-    /** @var int  */
+    /**
+     * Current reopen attempt.
+     *
+     * @var int
+     */
     private int $retryAttempt = 0;
 
-    /** @var string  */
+    /**
+     * The original path requested, when opening the stream: used when reopening
+     * it.
+     *
+     * @var string
+     */
     private string $originalPath = '';
 
-    /** @var string  */
+    /**
+     * The original file mode requested, when opening the stream: used when
+     * reopening it.
+     *
+     * @var string
+     */
     private string $originalMode = '';
 
-    /** @var string  */
+    /**
+     * Internal buffer, will be written to when reading and flushed if the
+     * previous read closed the stream.
+     *
+     * @var string
+     */
     private string $dataBuffer = '';
 
+    /**
+     * @see stream_wrapper_register
+     */
     // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
     public function stream_open($path, $mode, $options, &$opened_path)
     {
@@ -80,6 +120,9 @@ class ResumableStreamWrapper extends StreamWrapper
         return $result;
     }
 
+    /**
+     * @see stream_wrapper_register
+     */
     // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
     public function stream_read($count)
     {
@@ -132,6 +175,9 @@ class ResumableStreamWrapper extends StreamWrapper
         }
     }
 
+    /**
+     * @see stream_wrapper_register
+     */
     // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
     public function stream_seek($offset, $whence = SEEK_SET)
     {
@@ -164,12 +210,21 @@ class ResumableStreamWrapper extends StreamWrapper
         return $this->reopenFromPosition($targetPosition);
     }
 
+    /**
+     * @see stream_wrapper_register
+     */
     // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
     public function stream_tell()
     {
         return $this->position;
     }
 
+    /**
+     * Reopen a closed stream from `$position`.
+     *
+     * @param $position
+     * @return array|bool
+     */
     private function reopenFromPosition($position): array|bool
     {
         try {
@@ -197,6 +252,11 @@ class ResumableStreamWrapper extends StreamWrapper
         }
     }
 
+    /**
+     * Resume a stream from `$this->position`.
+     *
+     * @return bool
+     */
     private function resumeFromPosition(): bool
     {
         if ($this->retryAttempt >= $this->maxRetries) {
