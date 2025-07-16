@@ -5,9 +5,11 @@
 
 import LoadingCards from "@schoolboxVue/components/loading/loading-cards.vue";
 import SpResultsError from "./sp-results-error.vue";
+import { useStore } from "../store/searchPageStore";
 import { useResultsStore } from "./store/spResultsStore";
 import { useLoadMoreResultsStore } from "./store/spLoadMoreResultsStore";
 
+const store = useStore();
 const resultsStore = useResultsStore();
 const loadMoreResultsStore = useLoadMoreResultsStore();
 
@@ -28,6 +30,33 @@ async function onLoadMoreSelected(): Promise<void> {
     }
     await loadMoreResultsStore.loadMore();
 }
+
+/**
+ * Watch for conditions under which more results should be fetched automatically.
+ * If those conditions are met, fetch more results by simulating a click on the 'Load more results' button.
+ */
+window.Vue.watch(
+    () => ({
+        allResultsLength: resultsStore.allResults.length,
+        resultPageSize: store.resultPageSize,
+        hasMoreResults: resultsStore.hasMoreResults,
+        isLoading: loadMoreResultsStore.isLoading,
+        hasLoadError: loadMoreResultsStore.hasLoadError,
+    }),
+    (newVal) => {
+        if (
+            newVal.allResultsLength < newVal.resultPageSize &&
+            newVal.hasMoreResults &&
+            !newVal.isLoading &&
+            !newVal.hasLoadError
+        ) {
+            // We don't yet have a full page of results, but more results exist.
+            // So simulate a click on the 'Load more results' button.
+            void onLoadMoreSelected();
+        }
+    },
+    { immediate: true },
+);
 </script>
 
 <template>
