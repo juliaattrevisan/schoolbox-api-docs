@@ -74,8 +74,10 @@ class Mapper extends BaseMapper
 
     /**
      * Delete all Matchups associated with this Division when it's being deleted
+     *
+     * @param Model $division
      */
-    public function deleteMatches(Model $division)
+    public function deleteMatches(Model $division): void
     {
         $allMatches = MatchMapper::getInstance()->findByColumn('division_id', $division->getId());
 
