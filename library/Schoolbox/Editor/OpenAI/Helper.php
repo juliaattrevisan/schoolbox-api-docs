@@ -177,12 +177,14 @@ class Helper
         if ($data["error"] ?? null) {
             $returnCode = 500;
 
+            $error_message = $data["error"]["message"] ?? '';
+
             $log->setReturnCode($returnCode)
-                ->setErrorMessage($data["error"]["message"]);
+                ->setErrorMessage($error_message);
             $this->logMapper->save($log);
 
             throw new SchoolboxException(
-                $data["error"]["message"],
+                $error_message,
                 $returnCode
             );
         }
