@@ -177,13 +177,27 @@ async function includeSelected(): Promise<void> {
     await Promise.all(participantsToInclude.map((participant) => includeParticipant(participant)));
     selectedList.value = [];
 }
+/**
+ * Load the student pastoral counts when the component is mounted.
+ */
+const isIncludeOpen = window.Vue.ref(false);
+window.Vue.onMounted(() => {
+    void getStudentPastoralCounts();
+});
+const currentParticipant = window.Vue.ref<Participant | null>(null);
+const selectedActivityId = window.Vue.ref<number | null>(null);
+
+const selectedActivity = window.Vue.computed(
+    () => props.customisations.find((plan) => plan.id === selectedActivityId.value) ?? null,
+);
 
 /**
  * Placeholder function for testing endpoint
  * Use this as sample of how it will work
- * @param participant - The participant to include
+ * @param participant - The participant to be included in the plan.
+ * @param plan - The plan to include the participant in.
  */
-async function includeParticipantInExistingPlan(participant: Participant): Promise<void> {
+async function includeParticipantInExistingPlan(participant: Participant, plan: Plan): Promise<void> {
     const toast = window.sbProps.toastActivate("Adding to customisation...");
     try {
         const response = await fetch(props.includeInExistingCustomisation, {
@@ -195,23 +209,14 @@ async function includeParticipantInExistingPlan(participant: Participant): Promi
                 assessmentId: electedCustomisation.value.assessable.id, //TODO: assessment id of the plan (ie plan.assessable.id)
             }),
         });
-        if (response.ok) {
-            toast.timeout({ text: "Customisation added successfully" });
-        }
+
+        toast.timeout({ text: "Customisation added successfully", isSuccess: true });
+
+        isIncludeOpen.value = false;
     } catch (error) {
-        toast.timeout({ text: "Error adding Customisation" });
+        toast.timeout({ text: "Error adding Customisation", isSuccess: false });
     }
 }
-
-/**
- * Load the student pastoral counts when the component is mounted.
- */
-window.Vue.onMounted(() => {
-    void getStudentPastoralCounts();
-});
-const isIncludeOpen = window.Vue.ref(false);
-const currentParticipant = window.Vue.ref<Participant | null>(null);
-const selectedActivity = window.Vue.ref<number | "">("");
 
 /**
  * Opens the modal to include a participant in an existing customisation.
@@ -219,7 +224,7 @@ const selectedActivity = window.Vue.ref<number | "">("");
  */
 function openIncludeModal(participant: Participant): void {
     currentParticipant.value = participant;
-    selectedActivity.value = "";
+    selectedActivityId.value = null;
     isIncludeOpen.value = true;
 }
 </script>
@@ -427,7 +432,7 @@ function openIncludeModal(participant: Participant): void {
                     <div class="l-flex__item--1">
                         <button class="icon-staff-students submit" @click.prevent="excludeSelected">Exclude</button>
                     </div>
-                    <div class="l-flex__item--1" v-if="customisations.length > 0">
+                    <div v-if="customisations.length > 0" class="l-flex__item--1">
                         <button class="icon-list submit" @click.prevent="isIncludeOpen = true">
                             Include In Existing Customisation
                         </button>
@@ -456,7 +461,7 @@ function openIncludeModal(participant: Participant): void {
             </p>
             <select
                 id="activitySelect"
-                v-model="selectedActivity"
+                v-model="selectedActivityId"
                 class="w-full border border-gray-300 rounded-md p-2 mb-4"
             >
                 <option disabled value="">-- Please choose --</option>
@@ -470,7 +475,11 @@ function openIncludeModal(participant: Participant): void {
                 <button
                     class="button submit l-flex__item--1"
                     :disabled="!selectedActivity"
-                    @click.prevent="includeParticipantInExistingPlan(currentParticipant)"
+                    @click.prevent="
+                        currentParticipant &&
+                        selectedActivity &&
+                        includeParticipantInExistingPlan(currentParticipant, selectedActivity)
+                    "
                 >
                     Confirm
                 </button>
