@@ -417,18 +417,23 @@ function openIncludeModal(participant: Participant): void {
                 </template>
                 <template v-else>
                     <div class="l-flex__item--1">
-                        <a class="icon-copy submit" data-test="custom-participation-copy-activity">Copy Activity</a>
-                    </div>
-                    <div class="l-flex__item--1">
-                        <button class="icon-staff-students submit" @click.prevent="excludeSelected">Exclude</button>
-                    </div>
-                    <div class="l-flex__item--1">
                         <a
                             class="icon-modify submit"
                             :href="`${getLearningPlanNewUrl}?student=${selectedList.join(',')}&${getReturnUrl()}`"
                         >
                             Modify
                         </a>
+                    </div>
+                    <div class="l-flex__item--1">
+                        <button class="icon-staff-students submit" @click.prevent="excludeSelected">Exclude</button>
+                    </div>
+                    <div class="l-flex__item--1" v-if="customisations.length > 0">
+                        <button class="icon-list submit" @click.prevent="isIncludeOpen = true">
+                            Include In Existing Customisation
+                        </button>
+                    </div>
+                    <div class="l-flex__item--1">
+                        <a class="icon-copy submit" data-test="custom-participation-copy-activity">Copy Activity</a>
                     </div>
                     <div class="l-flex__item--1">
                         <a
