@@ -12,6 +12,7 @@ import { useLoadMoreResultsStore } from "./store/spLoadMoreResultsStore";
 const store = useStore();
 const resultsStore = useResultsStore();
 const loadMoreResultsStore = useLoadMoreResultsStore();
+let deeperSearchInterruptRequested = false;
 
 /**
  * To show the load more button when appropriate
@@ -51,16 +52,39 @@ window.Vue.watch(
             !newVal.hasLoadError
         ) {
             // We don't yet have a full page of results, and more results exist.
-            // So simulate a click on the 'Load more results' button.
-            void onLoadMoreSelected();
+            if (deeperSearchInterruptRequested) {
+                // Do not simulate a click the 'Load more results' button,
+                // but reset the interrupt value and note we are no longer searching deeper.
+                deeperSearchInterruptRequested = false;
+            } else {
+                // Simulate a click the 'Load more results' button, and note we are now searching deeper.
+                loadMoreResultsStore.isSearchingDeeper = true;
+                void onLoadMoreSelected();
+            }
         }
     },
     { immediate: true },
 );
+
+/**
+ * Interrupt a deeper search so that there will be no more automatic clicks on the 'Load more results' button.
+ */
+function onDeeperSearchInterruptRequested(): void {
+    deeperSearchInterruptRequested = true;
+    loadMoreResultsStore.isSearchingDeeper = false;
+}
 </script>
 
 <template>
     <loading-cards v-if="loadMoreResultsStore.isLoading" :rows="2" />
+    <div v-if="loadMoreResultsStore.isSearchingDeeper" class="deeper-search-interrupt">
+        <button
+            title="This just means automatically clicking 'Load more results' until either a full page of results has been found, or all records have been searched."
+            @click.prevent="onDeeperSearchInterruptRequested"
+        >
+            Searching deeper... (Click to cancel)
+        </button>
+    </div>
     <sp-results-error v-else-if="loadMoreResultsStore.hasLoadError" />
     <button v-else-if="showLoadMore" data-test="sp-results-load-more-button" @click.prevent="onLoadMoreSelected">
         Load more results

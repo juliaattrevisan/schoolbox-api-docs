@@ -14,6 +14,11 @@ export const useLoadMoreResultsStore = defineStore("spLoadMoreResults", () => {
     const isLoading = window.Vue.ref(false);
     const hasLoadError = window.Vue.ref(false);
 
+    // To 'search deeper' means to look for more records when the previous result set was empty.
+    // Searching deeper is necessary to find all search results if the first result set was empty due to all results
+    // having been filtered out due to permission checks.
+    const isSearchingDeeper = window.Vue.ref(false);
+
     /**
      * load more results
      */
@@ -30,13 +35,16 @@ export const useLoadMoreResultsStore = defineStore("spLoadMoreResults", () => {
                 },
             });
             const moreResults = (await response.json()) as Results;
-            if (moreResults.data.length === 0 && moreResults.metadata.cursor.next === null) {
+
+            resultsStore.setMoreResults(moreResults);
+
+            if (moreResults.metadata.cursor.next === null) {
                 resultsStore.hasLoadedAllResults = true;
-            } else {
-                resultsStore.setMoreResults(moreResults);
+                isSearchingDeeper.value = false;
             }
         } catch (error) {
             hasLoadError.value = true;
+            isSearchingDeeper.value = false;
         } finally {
             isLoading.value = false;
         }
@@ -46,5 +54,6 @@ export const useLoadMoreResultsStore = defineStore("spLoadMoreResults", () => {
         isLoading,
         hasLoadError,
         loadMore,
+        isSearchingDeeper,
     };
 });
