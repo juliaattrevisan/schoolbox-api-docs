@@ -50,7 +50,7 @@ window.Vue.watch(
             !newVal.isLoading &&
             !newVal.hasLoadError
         ) {
-            // We don't yet have a full page of results, but more results exist.
+            // We don't yet have a full page of results, and more results exist.
             // So simulate a click on the 'Load more results' button.
             void onLoadMoreSelected();
         }
