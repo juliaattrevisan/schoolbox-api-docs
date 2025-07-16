@@ -1481,6 +1481,45 @@ class ListController extends Web\Controller\Base
             }
         }
 
+        /** Build all the mark information so the markbook can figure out the latest state */
+        $authoritativeFeedback = $participant?->getAuthoritativeFeedback(true);
+        $authoritativeFeedbackDraft = $participant?->getAuthoritativeFeedback(false);
+
+        if ($authoritativeFeedbackDraft && !$authoritativeFeedbackDraft->isDraft()) {
+            // this isn't actually a draft (it'll be the same as $authoritativeFeedback)
+            $authoritativeFeedbackDraft = null;
+        }
+
+        $resubmissionRequiredPublished = $authoritativeFeedback instanceof \Schoolbox\Learning\Assessment\DueWork\Feedback\Model
+            ? $authoritativeFeedback->getResubmissionRequired()
+            : false;
+        $resubmissionRequiredDraft = $authoritativeFeedbackDraft instanceof \Schoolbox\Learning\Assessment\DueWork\Feedback\Model
+            ? $authoritativeFeedbackDraft->getResubmissionRequired()
+            : false;
+
+        $authNormMarkPublished = $authoritativeFeedback ? $participant->getNormalisedMark(true) : null;
+        $authNormMarkDraft = $authoritativeFeedbackDraft ? $participant->getNormalisedMark(false) : null;
+
+        $marks = [
+            'published' => [
+                'norm'         => $authNormMarkPublished,
+                'hr'           => $authoritativeFeedback ? $participant->getHumanReadableMark(true) : null,
+                'hrInstructor' => $authoritativeFeedback ? $participant->getHumanReadableInstructorMark(true) : null,
+                'comment'      => \Scrub::html($authoritativeFeedback?->getComment()),
+                'resubmissionRequired' => $resubmissionRequiredPublished,
+                'responseId'   => $authoritativeFeedback?->getId() ?? null,
+            ],
+            'draft' => [
+                'norm'         => $authNormMarkDraft,
+                'hr'           => $authoritativeFeedbackDraft ? $participant->getHumanReadableMark(false) : null,
+                'hrInstructor' => $authoritativeFeedbackDraft ? $participant->getHumanReadableInstructorMark(false) : null,
+                'comment'      => \Scrub::html($authoritativeFeedbackDraft?->getComment()),
+                'resubmissionRequired' => $resubmissionRequiredDraft,
+                'responseId'   => $authoritativeFeedbackDraft?->getId() ?? null,
+            ],
+        ];
+
+
         $this->response = $this->responseAsJson([
             'assessmentTitle' => $assessment->getTitle(),
             'assessmentType' => AssessmentType::objectToString($assessment),
@@ -1488,6 +1527,7 @@ class ListController extends Web\Controller\Base
             'maxMarks' => $maxMarks,
             'response' => $response,
             'feedback' => $feedback,
+            'marks'    => $marks,
         ]);
     }
 

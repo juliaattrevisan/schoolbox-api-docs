@@ -31,22 +31,24 @@ export type MarkbookActivity = Pick<Activity, "id" | "title" | "assessmentType">
     };
 };
 
+type MarkInfo = Record<
+    "published" | "draft",
+    {
+        responseId: number | null;
+        norm: number | null;
+        hr: string | null;
+        hrInstructor: string | null;
+        comment: string | null;
+        resubmissionRequired: boolean;
+    }
+>;
+
 export type MarkbookClassImplActivityParticipant = {
     isExcluded: boolean;
     hasSubmittedResponse: boolean;
     hasPublishedFeedback: boolean;
     progressTick: Activity["progressTick"] | null;
-    marks: Record<
-        "published" | "draft",
-        {
-            responseId: number | null;
-            norm: number | null;
-            hr: string | null;
-            hrInstructor: string | null;
-            comment: string | null;
-            resubmissionRequired: boolean;
-        }
-    >;
+    marks: MarkInfo;
     /**
      * Special data to allow for feedback submission
      * this isn't sent through with the initial payload, since currently that would potentially
@@ -182,6 +184,7 @@ export type ActivityInfoResponsePayload = {
         responseWithKamiDocs: boolean | null;
         fileCount: number | null;
     };
+    marks: MarkInfo;
 };
 
 /** -------- other types -------- */
