@@ -30,7 +30,7 @@ export const useLoadMoreResultsStore = defineStore("spLoadMoreResults", () => {
                 },
             });
             const moreResults = (await response.json()) as Results;
-            if (moreResults.metadata.cursor.next === null) {
+            if (moreResults.data.length === 0 && moreResults.metadata.cursor.next === null) {
                 resultsStore.hasLoadedAllResults = true;
             } else {
                 resultsStore.setMoreResults(moreResults);
