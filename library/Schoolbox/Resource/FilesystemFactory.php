@@ -20,6 +20,7 @@ use League\Flysystem\Visibility;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Storage\S3\Adapter;
+use Schoolbox\Resource\Storage\S3\ResumableStreamWrapper;
 use UnexpectedValueException;
 
 use function trim;
@@ -158,11 +159,19 @@ class FilesystemFactory
             $cfg['credentials']['secret'] = $s3AltSecretAccessKey;
             $cfg['region'] = $s3AltRegion;
         }
+
+        // Add chaos middleware for testing if enabled
+        if (getenv('SCHOOLBOX_S3_CHAOS_TESTING') === 'true') {
+            $chaosChance = (int)(getenv('SCHOOLBOX_S3_CHAOS_CHANCE') ?: 50);
+            $chaosMinBytes = (int)(getenv('SCHOOLBOX_S3_CHAOS_MIN_BYTES') ?: 1024);
+            $cfg['http_handler'] = new \Schoolbox\Resource\Storage\S3\ChaosGuzzleMiddleware($chaosChance, $chaosMinBytes);
+        }
+
         $client = new S3Client($cfg);
 
         // Register the S3 stream wrapper, so that the S3 filesystem adapter
         // may use it
-        $client->registerStreamWrapper();
+        ResumableStreamWrapper::register($client);
 
         $visibility = self::buildDefaultVisibility(self::FILE_SYSTEM_ADAPTER_AWS_S3);
         $bucket = !empty($otfs_s3_alt_host) && !empty($otfs_s3_alt_bucket) ? $otfs_s3_alt_bucket : $otfs_s3_bucket;

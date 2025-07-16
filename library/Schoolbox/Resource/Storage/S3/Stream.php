@@ -70,7 +70,7 @@ class Stream
         }
         $client = new S3Client($cfg);
 
-        $client->registerStreamWrapper();
+        ResumableStreamWrapper::register($client);
 
         $context = stream_context_create([
             's3' => ['seekable' => true],
