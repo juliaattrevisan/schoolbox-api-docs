@@ -7,7 +7,7 @@ import type { Results } from "../../../js/types/Results";
 import type { Result } from "../../../js/types/Result";
 import { useHasMoreResults } from "../composable/useHasMoreResults";
 
-const EMPTY_RESULTS = { data: [], metadata: { cursor: { next: "" } } }; // empty results to initialise the store
+const EMPTY_RESULTS = { data: [], metadata: { cursor: { next: null } } }; // empty results to initialise the store
 
 export const useResultsStore = defineStore("spResults", () => {
     const allResults = window.Vue.ref<Result[]>([]); // all returned search results
