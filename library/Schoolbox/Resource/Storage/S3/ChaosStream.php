@@ -101,7 +101,7 @@ class ChaosStream implements StreamInterface
 
     public function seek($offset, $whence = SEEK_SET): void
     {
-        $result = $this->innerStream->seek($offset, $whence);
+        $this->innerStream->seek($offset, $whence);
         $this->bytesRead = $this->innerStream->tell();
     }
 
