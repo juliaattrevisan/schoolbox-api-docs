@@ -62,6 +62,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecifi
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\User;
@@ -1361,14 +1362,13 @@ class DataSource
      * * Usages are copied from srcBox + srcIndicator to dstBox + dstIndicator
      *
      * @param int $sourceAssessmentId
-     * @param AssessmentContext $assessmentContext
      * @param int $destinationAssessmentId
-     *
+     * @param AssessmentContext $destinationContext
      * @return bool Whether a new Rubric was created.
      * @throws MapperException
-     * @throws MapperException\Deleted
+     * @throws Deleted
      */
-    public function copyRubric($sourceAssessmentId, AssessmentContext $assessmentContext, $destinationAssessmentId)
+    public function copyRubric($sourceAssessmentId, $destinationAssessmentId, AssessmentContext $destinationContext)
     {
         // TODO extract this entire monstrosity elsewhere
 
@@ -1393,7 +1393,7 @@ class DataSource
         }
 
         $dstBox = $boxMapper->findOneByColumn('assessment_id', $destinationAssessmentId);
-        $dstBox->getAssessmentModel()->setContextFolder($assessmentContext->getFolder());
+        $dstBox->getAssessmentModel()->setContextFolder($destinationContext->getFolder());
 
         $dstFolder = $dstBox->getAssessmentModel()->getContextFolder();
 
