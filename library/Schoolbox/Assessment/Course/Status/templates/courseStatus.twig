@@ -131,7 +131,8 @@
             </div>
         </div>
     </div>
-    {% if assessment.allParticipants | length %}
+    {% set includedParticipants = assessment.allParticipants | filter(participant => not participant.isExcluded) %}
+    {% if includedParticipants | length %}
         <div class="row" data-collapse-state="uncollapsed" data-collapsable="collap-{{ assessment.id }}" data-participant-group>
             <div class="small-12 island">
                 <div class="empty-state hide" data-empty-filter>
@@ -146,7 +147,7 @@
                 </section>
                 <section data-assessment-status data-assessment="{{ assessment.id }}" class="hide">
                     <ul class="information-list {{ listClass }}">
-                        {% for participant in assessment.allParticipants | filter(participant => not participant.isExcluded ) %}
+                        {% for participant in includedParticipants %}
 
                             {# Construct that represents a participant #}
                             {% set routeArgs = {
