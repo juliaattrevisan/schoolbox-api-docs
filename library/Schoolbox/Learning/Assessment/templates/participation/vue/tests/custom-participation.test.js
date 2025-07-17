@@ -93,7 +93,17 @@ test("If a student is excluded and doesn't have a customised activity, Excluded 
     expect(row.text()).toContain("Excluded");
 });
 
-test("If a student is excluded and is part of a customised activity, Customised activity name is visible in their row", async () => {
+test("If a student is excluded and is part of a modified plan (.plan), modified plan name is visible in their row", async () => {
+    const wrapper = mount(CustomParticipation, {
+        props: {
+            ...defaultProps,
+        },
+    });
+    const row = wrapper.find(`[data-test="custom-participation-row-${allParticipants[1].user.id}"]`);
+    expect(row.text()).toContain("Edwin's Plan");
+});
+
+test("If a student is excluded and is part of a customised plan (.customisedPlan), customised plan name is visible in their row", async () => {
     const wrapper = mount(CustomParticipation, {
         props: {
             ...defaultProps,
