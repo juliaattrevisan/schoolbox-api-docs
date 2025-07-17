@@ -190,6 +190,7 @@ async function includeSelected(): Promise<void> {
 /**
  * Placeholder function for testing endpoint
  * Use this as sample of how it will work
+ * @param participant - The participant to include
  */
 async function includeParticipantInExistingPlan(participant: Participant): Promise<void> {
     const toast = window.sbProps.toastActivate("Adding to customisation...");
@@ -202,16 +203,17 @@ async function includeParticipantInExistingPlan(participant: Participant): Promi
             },
             body: JSON.stringify({
                 students: [
-                    13,
-                    65
+                    participant.user.id
                 ],
-                planId: 1305, //TODO: plan id of the plan to include the student
-                assessmentId: 1576, //TODO: assessment id of the plan (ie plan.assessable.id)
+                planId: 1305, // TODO: plan id of the plan to include the student
+                assessmentId: 1576, // TODO: assessment id of the plan (ie plan.assessable.id)
             }),
         });
-        toast.timeout({ text: "Customisation added successfully" });
+        if (response.ok) {
+            toast.timeout({ text: "Customisation added successfully" });
+        }
+
     } catch (error) {
-        console.log();
         toast.timeout({ text: "Error adding Customisation" });
     }
 }
