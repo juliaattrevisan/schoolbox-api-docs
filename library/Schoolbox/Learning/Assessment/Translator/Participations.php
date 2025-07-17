@@ -73,6 +73,8 @@ class Participations
             'createdAt'  => $participation->getCreatedAt()?->toRfc3339String(),
             'updatedAt'  => $participation->getUpdatedAt()?->toRfc3339String(),
             'excludedAt' => $participation->getExcludedAt()?->toRfc3339String(),
+            /* Plan of the customised assessment which are created from the original assessment
+             */
             'customisedPlan' => $customisedPlan,
             '_links'     => [
                 'exclude' => $this->getRouteIfAuthorized('learningAssessment.postExclude', [
