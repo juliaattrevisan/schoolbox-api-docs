@@ -34,7 +34,7 @@ class ValidationTest extends TestCase
         $intValueSerializer = new \Schoolbox\Admin\Settings\FieldType\Number\IntValueSerializer();
 
         $config = $this->createMock(Config::class);
-        $config->method('getOptions')->willReturn(json_encode($input['config']));
+        $config->method('getOptions')->willReturn($input['config']);
 
         $outcome = $intValueSerializer->serializeValue($input['value'], $config);
 
@@ -56,19 +56,14 @@ class ValidationTest extends TestCase
              */
             'Valid Example 1' => [
                 [
-                    'config' => [
-                        'min' => 1,
-                        'max' => 100
-                    ],
+                    'config' => '{"min": 1,"max": 100}',
                     'value' => '50'
                 ],    // goes into testValidExample() as $input
                 true  // goes into testValidExample() as $expected
             ],
             'Valid Example 2' => [
                 [
-                    'config' => [
-                        'min' => 30,
-                    ],
+                    'config' => '{"min":30}',
                     'value' => '600'
                 ],    // goes into testValidExample() as $input
                 '600'  // goes into testValidExample() as $expected
@@ -76,9 +71,7 @@ class ValidationTest extends TestCase
 
             'inValid Example 3' => [
                 [
-                    'config' => [
-                        'min' => 30
-                    ],
+                    'config' => '{"min":30}',
                     'value' => '10'
                 ],
                 '30'  // if outside of the range, it should return the minimum value
@@ -92,18 +85,14 @@ class ValidationTest extends TestCase
             ],
             'min 3 - pi' => [
                 [
-                    'config' => [
-                        'min' => 3
-                    ],
+                    'config' => '{"min":3}',
                     'value' => '3.14'
                 ],
                 '3'  // if outside of the range, it should return the minimum value
             ],
             'bigger than' => [
                 [
-                    'config' => [
-                        'max' => 100
-                    ],
+                    'config' => '{"max":100}',
                     'value' => '101'
                 ],    // goes into testValidExample() as $input
                 '100'  // if outside of the range, it should return the maximum value
