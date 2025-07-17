@@ -29,7 +29,7 @@ async function onLoadMoreSelected(): Promise<void> {
     if (loadMoreResultsStore.isLoading) {
         return;
     }
-    await loadMoreResultsStore.loadMore();
+    await loadMoreResultsStore.loadMore(null);
 }
 
 /**
@@ -44,7 +44,7 @@ window.Vue.watch(
         isLoading: loadMoreResultsStore.isLoading,
         hasLoadError: loadMoreResultsStore.hasLoadError,
     }),
-    (newVal) => {
+    async (newVal) => {
         if (
             newVal.allResultsLength < newVal.resultPageSize &&
             newVal.hasMoreResults &&
@@ -58,7 +58,10 @@ window.Vue.watch(
             } else {
                 // Simulate a click the 'Load more results' button, and note we are now auto-clicking 'Load more results'.
                 loadMoreResultsStore.autoClickLoadMoreResults = true;
-                void onLoadMoreSelected();
+                if (loadMoreResultsStore.isLoading) {
+                    return;
+                }
+                await loadMoreResultsStore.loadMore(newVal.resultPageSize - newVal.allResultsLength);
             }
         }
     },

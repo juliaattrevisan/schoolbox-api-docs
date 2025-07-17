@@ -19,13 +19,13 @@ export const useLoadMoreResultsStore = defineStore("spLoadMoreResults", () => {
     /**
      * load more results
      */
-    async function loadMore(): Promise<void> {
+    async function loadMore(limit: number | null): Promise<void> {
         const resultsStore = useResultsStore();
         url.value = `${useStore().getEndpointWithParams()}&cursor=${resultsStore.latestResults.metadata.cursor.next}`;
         try {
             isLoading.value = true;
             hasLoadError.value = false;
-            const response = await fetch(url.value, {
+            const response = await fetch(url.value + (limit ? `&limit=${limit}` : ""), {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
