@@ -378,10 +378,11 @@ class Controller extends Base
 
         /* Find the selected list of options
          */
+        $checkedSummaryOptions = explode(',', $report->getSummaryTables() ?? '');
         $selectedSummaryOptions = array_filter(
             PastoralReport::SUMMARY_TABLES_OPTIONS,
-            function ($key) use ($report) {
-                return in_array($key, explode(',', $report->getSummaryTables() ?? ''));
+            function ($key) use ($report, $checkedSummaryOptions) {
+                return in_array($key, $checkedSummaryOptions);
             },
             ARRAY_FILTER_USE_KEY
         );
