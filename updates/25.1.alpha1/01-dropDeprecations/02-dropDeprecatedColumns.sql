@@ -1,4 +1,17 @@
+ALTER TABLE allowedFileTypes DROP COLUMN _inline;
 ALTER TABLE assess_attempt DROP COLUMN _comment;
+ALTER TABLE curriculum_node DROP COLUMN _curriculum_learning_area_id;
+ALTER TABLE curriculum_node DROP COLUMN _curriculum_learning_level_id;
+ALTER TABLE forumPost DROP COLUMN _deleted;
+ALTER TABLE forumThread DROP COLUMN _deleted;
 ALTER TABLE lti_assessment_score DROP COLUMN _comment;
+ALTER TABLE submission_box DROP COLUMN _category;
+ALTER TABLE submission_box DROP COLUMN _date;
 ALTER TABLE submission_box DROP COLUMN _description;
+ALTER TABLE submission_box DROP COLUMN _late_date;
+ALTER TABLE submission_box DROP COLUMN _name;
+ALTER TABLE submission_box DROP COLUMN _open_date;
+ALTER TABLE submission_box DROP COLUMN _publish_date;
+ALTER TABLE submission_box DROP COLUMN _type_deprecated;
+ALTER TABLE submission_box DROP COLUMN _weight;
 ALTER TABLE submission_return DROP COLUMN _comment;
