@@ -1,14 +1,18 @@
 #!/usr/bin/env bash
 # Provisions the Docker environment
-echo 'b'
-exit;
-
-
 # * Executed after puppet provisioner has set up host
 # * Installs the vagrantx instance into this host, then invokes puppet again to configure the host for this instance
 
 # Global constants and functions
 source /usr/share/schoolbox/tools/vagrant-consts.sh # Cannot derive this, because it is copied by vagrant to /tmp in guest
+
+# Global vars: consider reading from YAML directly, instead of from args.
+# Also consider using an .env or .ini file?
+source docker.default.ini
+if [ -f docker.ini ]; then
+  source docker.ini
+fi
+exit;
 
 # Global vars
 # Defaults
