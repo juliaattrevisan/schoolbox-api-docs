@@ -186,7 +186,7 @@ async function includeSelected(): Promise<void> {
 }
 
 const isIncludeOpen = window.Vue.ref(false);
-const currentParticipant = window.Vue.ref<Participant | null>(null);
+const selectedParticipants = window.Vue.ref<Participant[]>([]);
 const selectedActivityId = window.Vue.ref<number | null>(null);
 const selectedActivity = window.Vue.computed(
     () => props.customisations.find((plan) => plan.id === selectedActivityId.value) ?? null,
@@ -198,15 +198,18 @@ const selectedActivity = window.Vue.computed(
  */
 async function includeParticipantInExistingPlan(): Promise<void> {
     if (!selectedActivity.value) return;
-
+    // if the array is empty, it means that we are including participants via the bottom drawer,
+    // otherwise the single participant is being included via the pop-out menu
+    if (selectedParticipants.value.length === 0) {
+        selectedParticipants.value = allParticipants.value.filter((p) => selectedList.value.includes(p.user.id));
+    }
     const toast = window.sbProps.toastActivate("Adding to customisation...");
     try {
-        const participantsToInclude = allParticipants.value.filter((p) => selectedList.value.includes(p.user.id));
         const response = await fetch(props.includeInExistingCustomisation, {
             method: "POST",
             headers: { Accept: "application/json", "Content-Type": "application/json" },
             body: JSON.stringify({
-                students: participantsToInclude.map((p) => p.user.id),
+                students: selectedParticipants.value.map((p) => p.user.id),
                 planId: selectedActivity.value.id,
                 assessmentId: selectedActivity.value.assessable.id,
             }),
@@ -232,11 +235,8 @@ async function includeParticipantInExistingPlan(): Promise<void> {
  * @param participant - The participant to be included.
  */
 function openIncludeModal(participant: Participant): void {
-    currentParticipant.value = participant;
+    selectedParticipants.value.push(participant);
     selectedActivityId.value = null;
-    if (!selectedList.value.includes(participant.user.id)) {
-        selectedList.value = [participant.user.id];
-    }
     isIncludeOpen.value = true;
 }
 
