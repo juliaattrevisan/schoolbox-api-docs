@@ -27,10 +27,13 @@ RUN \
   apt-get autoremove -y && \
   apt-get clean -y
 
-# Install AWS CLI
+# Install AWS CLI (dev only)
 RUN \
    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
    unzip awscliv2.zip && \
-   sudo ./aws/install
+   ./aws/install
+
+# Install Composer (dev only)
+COPY --from=composer:2.8 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /usr/share/schoolbox
