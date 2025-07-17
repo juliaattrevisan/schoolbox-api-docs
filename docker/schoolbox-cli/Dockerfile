@@ -7,7 +7,9 @@ FROM --platform=linux/${ARCH} php82-bookworm
 # since keys are publicly accessible on that page, I'm not counting them as
 # private information.
 # Also, install tools required by cron tasks and CLI:
-# git, mariadb client, ffmpeg, imagemagick, aws
+# * git, mariadb client, ffmpeg, imagemagick
+# dev also requires:
+# * aws, zip (for extracting AWS CLI), pv (for tracking load of dataset)
 RUN \
   apt-get update && \
   apt-get install -y gnupg && \
@@ -22,7 +24,8 @@ RUN \
     mariadb-client \
     ffmpeg \
     imagemagick \
-    zip && \
+    zip \
+    pv && \
   apt-get remove -y gnupg && \
   apt-get autoremove -y && \
   apt-get clean -y
