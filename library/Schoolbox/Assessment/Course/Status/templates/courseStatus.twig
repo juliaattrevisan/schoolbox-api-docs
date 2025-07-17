@@ -107,7 +107,7 @@
     </div>
 {% endblock participantSearchBar %}
 {% for assessment in assessments %}
-<div class="component-container" data-participant-group>
+<div class="component-container">
     <div class="row">
         <div class="small-12 columns">
             <div class="component-titlebar">
@@ -132,7 +132,7 @@
         </div>
     </div>
     {% if assessment.allParticipants | length %}
-        <div class="row" data-collapse-state="uncollapsed" data-collapsable="collap-{{ assessment.id }}">
+        <div class="row" data-collapse-state="uncollapsed" data-collapsable="collap-{{ assessment.id }}" data-participant-group>
             <div class="small-12 island">
                 <div class="empty-state hide" data-empty-filter>
                     <i class="icon-staff-students"></i>
