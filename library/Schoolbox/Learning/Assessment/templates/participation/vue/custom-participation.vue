@@ -95,6 +95,13 @@ async function getStudentPastoralCounts(): Promise<void> {
 }
 
 /**
+ * Load the student pastoral counts when the component is mounted.
+ */
+window.Vue.onMounted(() => {
+    void getStudentPastoralCounts();
+});
+
+/**
  * Excludes a participant.
  * @param participant - The participant to exclude.
  * @returns A promise that resolves when the operation is complete.
@@ -178,17 +185,9 @@ async function includeSelected(): Promise<void> {
     selectedList.value = [];
 }
 
-/**
- * Load the student pastoral counts when the component is mounted.
- */
-window.Vue.onMounted(() => {
-    void getStudentPastoralCounts();
-});
-
 const isIncludeOpen = window.Vue.ref(false);
 const currentParticipant = window.Vue.ref<Participant | null>(null);
 const selectedActivityId = window.Vue.ref<number | null>(null);
-
 const selectedActivity = window.Vue.computed(
     () => props.customisations.find((plan) => plan.id === selectedActivityId.value) ?? null,
 );
@@ -218,9 +217,12 @@ async function includeParticipantInExistingPlan(): Promise<void> {
         }
         const participants = await response.json();
         toast.timeout({ text: "Customisation added successfully", isSuccess: true });
-
         isIncludeOpen.value = false;
     } catch (error) {
+        if (error instanceof Error && hasErrorMessage(error)) {
+            loadError.value = error.message;
+        }
+        console.error("Error adding Customisation:", error);
         toast.timeout({ text: "Error adding Customisation", isSuccess: false });
     }
 }
