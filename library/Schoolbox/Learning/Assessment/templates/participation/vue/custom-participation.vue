@@ -7,7 +7,7 @@ import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
 import type { StudentPastoralCountBadge } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
-import type { Participant } from "../js/types/customParticipationTypes";
+import type { Participant, Plan } from "../js/types/customParticipationTypes";
 
 interface Props {
     allParticipants: Participant[];
@@ -16,6 +16,8 @@ interface Props {
     getAssessmentParticipation: string;
     getAssessmentParticipationNewActivity: string;
     assessmentId: number;
+    customisations: Plan[];
+    includeInExistingCustomisation: string;
 }
 const props = defineProps<Props>();
 
@@ -186,6 +188,36 @@ async function includeSelected(): Promise<void> {
 }
 
 /**
+ * Placeholder function for testing endpoint
+ * Use this as sample of how it will work
+ * @param participant - The participant to include
+ */
+async function includeParticipantInExistingPlan(participant: Participant): Promise<void> {
+    const toast = window.sbProps.toastActivate("Adding to customisation...");
+    try {
+        const response = await fetch(props.includeInExistingCustomisation, {
+            method: "POST",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                students: [
+                    participant.user.id
+                ],
+                planId: 1305, // TODO: plan id of the plan to include the student
+                assessmentId: 1576, // TODO: assessment id of the plan (ie plan.assessable.id)
+            }),
+        });
+        if (response.ok) {
+            toast.timeout({ text: "Customisation added successfully" });
+        }
+
+    } catch (error) {
+        toast.timeout({ text: "Error adding Customisation" });
+    }
+}
+/**
  * Load the student pastoral counts when the component is mounted.
  */
 window.Vue.onMounted(() => {
@@ -337,6 +369,14 @@ window.Vue.onMounted(() => {
                                             @click.prevent="excludeParticipant(participant)"
                                         >
                                             Exclude
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button
+                                            class="icon-staff-students"
+                                            @click.prevent="includeParticipantInExistingPlan(participant)"
+                                        >
+                                            Test
                                         </button>
                                     </li>
                                     <li class="separator">Create</li>

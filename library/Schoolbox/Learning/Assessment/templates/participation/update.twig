@@ -30,6 +30,11 @@
         context: assessment.context
     }) }}"
     :assessment-id="{{ assessment.id }}"
+    :customisations="{{ (customisations ?? []) | json_encode }}"
+    include-in-existing-customisation="{{ routeLookupIfAuthorized('learningAssessment.postExistingCustomisationInclude', {
+        assessmentId: assessment.id,
+        assessment: assessment,
+    }) }}"
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/customParticipation.js?v={{ config.site_version }}"></script>

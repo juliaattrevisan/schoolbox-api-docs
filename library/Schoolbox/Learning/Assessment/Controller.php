@@ -15,6 +15,7 @@ use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
 use DomainException;
 use InvalidArgumentException;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Translator\ParticipationPlans;
 use Schoolbox\Learning\Assessment\Translator\Participations;
 use LearnositySdk\Utils\Uuid;
@@ -1034,6 +1035,10 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $context = $assessment->getContext();
 
         $data['contextType'] = AssessmentContextType::objectToString($context) . 's';
+        /* Getting all existing customisations
+         */
+        $customisationPlans = $customisedAssessments->map(fn(IAssessable $customised) => call_user_func($planTranslator, $customised->getPlans()->first()));
+        $data['customisations'] = $customisationPlans->merge($assessment->getPlans()->filter(fn(Plan $plan) => !$plan->getIsDynamic())->map($planTranslator));
 
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/participation/update.twig',
