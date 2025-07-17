@@ -491,28 +491,23 @@ function getCustomisationLabel(plan: Plan): string {
             </div>
         </bottom-drawer>
     </div>
-    <basic-modal v-model:is-open="isIncludeOpen" :has-background-click="true">
+    <basic-modal v-model:is-open="isIncludeOpen">
         <div class="l-flex-col l-gap-s f-no-margins">
             <h2>Include in existing customisation</h2>
             <p class="meta">
                 Modifying participation for:
-                <span v-for="(participant, index) in selectedList" :key="participant.user.id">
-                    {{ participant.user.lastname }},
-                    {{ participant.user.firstname }}
-                    <span v-if="index < selectedList.length - 1">and </span>
-                </span>
+                <template v-for="(participant, index) in selectedList" :key="participant.user.id">
+                    {{ participant.user.preferredName ? participant.user.preferredName : participant.user.firstname }}
+                    {{ participant.user.lastname }}<template v-if="index < selectedList.length - 2">, </template
+                    ><template v-if="index === selectedList.length - 2"> and </template>
+                </template>
             </p>
-            <select
-                id="activitySelect"
-                v-model="selectedActivityId"
-                class="w-full border border-gray-300 rounded-md p-2 mb-4"
-            >
+            <select id="activitySelect" v-model="selectedActivityId">
                 <option disabled value="">-- Please choose --</option>
                 <option v-for="customisation in customisations" :key="customisation.id" :value="customisation.id">
                     {{ getCustomisationLabel(customisation) }}
                 </option>
             </select>
-
             <div class="l-flex l-gap-xs f-no-margins">
                 <button class="button l-flex__item--1" @click.prevent="isIncludeOpen = false">Cancel</button>
                 <button
