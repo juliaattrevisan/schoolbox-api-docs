@@ -38,15 +38,13 @@ async function onLoadMoreSelected(): Promise<void> {
  */
 window.Vue.watch(
     () => ({
-        allResultsLength: resultsStore.allResults.length,
-        resultPageSize: store.resultPageSize,
         hasMoreResults: resultsStore.hasMoreResults,
         isLoading: loadMoreResultsStore.isLoading,
         hasLoadError: loadMoreResultsStore.hasLoadError,
     }),
     async (newVal) => {
         if (
-            newVal.allResultsLength < newVal.resultPageSize &&
+            resultsStore.allResults.length < store.resultPageSize &&
             newVal.hasMoreResults &&
             !newVal.isLoading &&
             !newVal.hasLoadError
@@ -62,7 +60,7 @@ window.Vue.watch(
                     return;
                 }
                 // Limit the number of records searched for to the number needed to fill the page.
-                await loadMoreResultsStore.loadMore(newVal.resultPageSize - newVal.allResultsLength);
+                await loadMoreResultsStore.loadMore(store.resultPageSize - resultsStore.allResults.length);
             }
         }
     },
