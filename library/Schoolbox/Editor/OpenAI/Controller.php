@@ -246,11 +246,11 @@ class Controller extends Base
             /* Find the image call/message in the response
              * since we aren't streaming, there should only be one of these at the moment
              */
-            $outputImage = array_filter($data['output'], fn($item) => $item['type'] === 'image_generation_call')[0] ?? null;
-            $outputMessage = array_filter($data['output'], fn($item) => $item['type'] === 'message')[0] ?? null;
+            $outputImage = array_values(array_filter($data['output'], fn($item) => $item['type'] === 'image_generation_call'))[0] ?? null;
+            $outputMessage = array_values(array_filter($data['output'], fn($item) => $item['type'] === 'message'))[0] ?? null;
 
             $outputMessageContent = $outputMessage
-                ? array_filter($outputMessage['content'], fn($item) => $item['type'] === 'output_text')[0]['text'] ?? null
+                ? (array_values(array_filter($outputMessage['content'], fn($item) => $item['type'] === 'output_text'))[0]['text'] ?? null)
                 : null;
 
             $this->response = $this->responseAsJson([
