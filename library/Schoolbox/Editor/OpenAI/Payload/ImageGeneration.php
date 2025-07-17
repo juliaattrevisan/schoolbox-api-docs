@@ -206,6 +206,7 @@ class ImageGeneration
             $parsed[$attribute['id']] = null;
             $value = trim((string)($userAttributes[$attribute['id']] ?? ''));
 
+            /* Force values to always be either null or a meaningful string at the end */
             if ('' === $value) {
                 $value = null;
             }
