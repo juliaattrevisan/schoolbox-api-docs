@@ -45,7 +45,10 @@ const isIndeterminate = window.Vue.computed(() => {
 
 // Function to check if any selected participants has and customisation, whether excluded or assigned a different activity
 const hasCustomisedInSelection = window.Vue.computed(() => {
-    return selectedList.value.some((participant) => participant.excludedAt !== null || participant.plan.name !== null);
+    return selectedList.value.some(
+        (participant) =>
+            participant.excludedAt !== null || participant.plan.name !== null || participant.customisedPlan !== null,
+    );
 });
 
 const loadError = window.Vue.ref<string | null>(null);
@@ -142,6 +145,7 @@ async function includeParticipant(participant: Participant): Promise<void> {
         }
         participant.excludedAt = null; // Resetting the exclusion timestamp
         participant.plan.name = null; // Resetting the plan
+        participant.customisedPlan = null; // Resetting the customised plan
         toast.timeout({ text: "Customisation removed successfully" });
     } catch (error) {
         if (error instanceof Error && hasErrorMessage(error)) {
@@ -208,8 +212,8 @@ async function includeParticipantInExistingPlan(): Promise<void> {
             headers: { Accept: "application/json", "Content-Type": "application/json" },
             body: JSON.stringify({
                 students: selectedParticipants.value.map((p) => p.user.id),
-                ...(activity.name !== null ? { planId: activity.id } : {}),
                 ...("assessable" in activity ? { assessmentId: activity.assessable.id } : {}),
+                ...(activity.name !== null ? { planId: activity.id } : {}),
             }),
         });
         if (!response.ok) {
@@ -219,14 +223,15 @@ async function includeParticipantInExistingPlan(): Promise<void> {
         // add the activity to each participant
         selectedParticipants.value.forEach((participant) => {
             if ("assessable" in activity) {
-                participant.plan = activity as Plan;
+                participant.customisedPlan = activity;
             } else {
-                participant.customisedPlan = activity as CustomisedPlan;
+                participant.plan = activity;
             }
         });
         toast.timeout({ text: "Customisation added successfully", isSuccess: true });
         isIncludeOpen.value = false;
         selectedParticipants.value = [];
+        selectedList.value = [];
     } catch (error) {
         if (error instanceof Error && hasErrorMessage(error)) {
             loadError.value = error.message;
@@ -351,19 +356,17 @@ function getCustomisationLabel(plan: Plan | CustomisedPlan): string {
                         </div>
                     </td>
                     <td>
-                        <template v-if="participant.excludedAt !== null">
-                            <span v-if="participant.customisedPlan !== null">
-                                <a :href="`${participant.customisedPlan.assessable._links.modify}`">
-                                    {{ participant.customisedPlan.assessable.title }}
-                                </a>
-                            </span>
-                            <span v-else> Excluded </span>
+                        <template v-if="participant.customisedPlan !== null">
+                            <a :href="`${participant.customisedPlan.assessable._links.modify}`">
+                                {{ participant.customisedPlan.assessable.title }}
+                            </a>
                         </template>
-                        <span v-else-if="participant.plan.name !== null">
+                        <template v-else-if="participant.plan.name !== null">
                             <a :href="`${getAssessmentParticipation}/${participant.plan.id}/modify?${getReturnUrl()}`">
                                 {{ participant.plan.name }}
                             </a>
-                        </span>
+                        </template>
+                        <template v-else-if="participant.excludedAt !== null">Excluded</template>
                     </td>
                     <td class="no-pad">
                         <div v-if="participant.user.id" class="actions-small-1">
@@ -497,7 +500,6 @@ function getCustomisationLabel(plan: Plan | CustomisedPlan): string {
                 </template>
             </p>
             <select id="activitySelect" v-model="selectedActivityId">
-                <option disabled value="">-- Please choose --</option>
                 <option v-for="customisation in customisations" :key="customisation.id" :value="customisation.id">
                     {{ getCustomisationLabel(customisation) }}
                 </option>

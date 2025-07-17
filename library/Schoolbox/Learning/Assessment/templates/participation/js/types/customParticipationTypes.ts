@@ -48,7 +48,7 @@ export type Participant = {
     plan: Plan;
     updatedAt: string;
     user: User;
-    customisedPlan: CustomisedPlan;
+    customisedPlan: CustomisedPlan | null;
     _links: {
         exclude: string;
         include: string;
