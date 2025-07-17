@@ -371,8 +371,8 @@ function validate_config() {
 function fetch_dataset_and_extract_database(){
   local instance_data_dir=$1
   log "Fetching dataset '$dataset'..."
-  rm -fR "$instance_data_dir";
-  mkdir -p "$instance_data_dir";
+#  rm -fR "$instance_data_dir";
+#  mkdir -p "$instance_data_dir";
 
   # Need to support local-only datasets that are already in the cache dir.
   # In this case, try to fetch from S3, but if not found, only an error if not in cache dir
