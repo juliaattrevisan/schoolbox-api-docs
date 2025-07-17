@@ -15,6 +15,7 @@ export const allParticipants = [
         },
         plan: {
             id: 744,
+            name: null,
         },
         excludedAt: "2025-05-26T09:32:03+10:00",
         customisedPlan: null,
@@ -48,6 +49,7 @@ export const allParticipants = [
         },
         plan: {
             id: 744,
+            name: null,
         },
         excludedAt: null,
         customisedPlan: null,
@@ -64,6 +66,7 @@ export const allParticipants = [
         },
         plan: {
             id: 744,
+            name: null,
         },
         excludedAt: "2025-05-26T09:32:03+10:00",
         customisedPlan: {
@@ -89,6 +92,7 @@ export const allParticipants = [
         },
         plan: {
             id: 744,
+            name: null,
         },
         excludedAt: null,
         customisedPlan: null,
