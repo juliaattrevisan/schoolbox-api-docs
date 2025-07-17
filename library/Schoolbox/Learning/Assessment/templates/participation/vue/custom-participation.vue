@@ -177,13 +177,15 @@ async function includeSelected(): Promise<void> {
     await Promise.all(participantsToInclude.map((participant) => includeParticipant(participant)));
     selectedList.value = [];
 }
+
 /**
  * Load the student pastoral counts when the component is mounted.
  */
-const isIncludeOpen = window.Vue.ref(false);
 window.Vue.onMounted(() => {
     void getStudentPastoralCounts();
 });
+
+const isIncludeOpen = window.Vue.ref(false);
 const currentParticipant = window.Vue.ref<Participant | null>(null);
 const selectedActivityId = window.Vue.ref<number | null>(null);
 
@@ -194,24 +196,27 @@ const selectedActivity = window.Vue.computed(
 /**
  * Placeholder function for testing endpoint
  * Use this as sample of how it will work
- * @param plan - The plan to include participants in.
  */
-async function includeParticipantInExistingPlan(plan: Plan): Promise<void> {
-    if (!plan) return;
+async function includeParticipantInExistingPlan(): Promise<void> {
+    if (!selectedActivity.value) return;
 
     const toast = window.sbProps.toastActivate("Adding to customisation...");
     try {
+        const participantsToInclude = allParticipants.value.filter((p) => selectedList.value.includes(p.user.id));
         const response = await fetch(props.includeInExistingCustomisation, {
             method: "POST",
             headers: { Accept: "application/json", "Content-Type": "application/json" },
             body: JSON.stringify({
-                students: [13, 65],
-                planId: selectedCustomisation.value.id, //TODO: plan id of the plan to include the student
-                assessmentId: electedCustomisation.value.assessable.id, //TODO: assessment id of the plan (ie plan.assessable.id)
+                students: participantsToInclude.map((p) => p.user.id),
+                planId: selectedActivity.value.id,
+                assessmentId: selectedActivity.value.assessable.id,
             }),
         });
-        const participantsToInclude = allParticipants.value.filter((p) => selectedList.value.includes(p.user.id));
-
+        if (!response.ok) {
+            const errorMessage = await extractErrorMessage(response);
+            throw new Error(errorMessage);
+        }
+        const participants = await response.json();
         toast.timeout({ text: "Customisation added successfully", isSuccess: true });
 
         isIncludeOpen.value = false;
@@ -495,7 +500,7 @@ function getCustomisationLabel(plan: Plan): string {
                 <button
                     class="button submit l-flex__item--1"
                     :disabled="!selectedActivity"
-                    @click.prevent="selectedActivity && includeParticipantInExistingPlan(selectedActivity)"
+                    @click.prevent="includeParticipantInExistingPlan()"
                 >
                     Confirm
                 </button>
