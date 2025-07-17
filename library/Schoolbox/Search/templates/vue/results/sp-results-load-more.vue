@@ -82,10 +82,10 @@ function onAutoClickInterruptRequested(): void {
     <loading-cards v-if="loadMoreResultsStore.isLoading" :rows="2" />
     <div v-if="loadMoreResultsStore.autoClickLoadMoreResults">
         <button
-            title="This just means automatically clicking 'Load more results' until either a full page of results has been found, or all records have been searched."
+            title="The search will continue until the page is full or all items are found."
             @click.prevent="onAutoClickInterruptRequested"
         >
-            Searching for more results... (Click to cancel)
+            Cancel ongoing search
         </button>
     </div>
     <sp-results-error v-else-if="loadMoreResultsStore.hasLoadError" />
