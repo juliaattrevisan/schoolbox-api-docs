@@ -12,8 +12,7 @@ SET
 WHERE
     `name` = "xml_cache_timeout"
   AND (
-    `value` = ""
-        OR `value` < "30"
+    `value` = '' OR `value` IS NULL OR `value` < 30
     );
 
 -- The external_cache_timeout max config field now has restrictions, to prevent it from being set to 0
@@ -30,8 +29,7 @@ SET
 WHERE
     `name` = "external_cache_timeout"
   AND (
-    `value` = ""
-        OR `value` < "30"
+    `value` = '' OR `value` IS NULL OR `value` < 30
     );
 
 -- The schooldata_import_timeout max config field now has restrictions, to prevent it from being set to 0
@@ -50,8 +48,7 @@ SET
 WHERE
     `name` = "schooldata_import_timeout"
   AND (
-    `value` = ""
-        OR `value` < "30"
+    `value` = '' OR `value` IS NULL OR `value` < 30
     );
 
 
@@ -70,6 +67,5 @@ SET
 WHERE
     `name` = "session_length"
   AND (
-    `value` = ""
-        OR `value` < "30"
+    `value` = '' OR `value` IS NULL OR `value` < 30
     );
