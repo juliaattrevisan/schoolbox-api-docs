@@ -169,6 +169,13 @@ class IntValueSerializerTest extends TestCase
                 ],
                 '30'
             ],
+            'null null' => [ // if the value is null and no config, it should return 0 (int null)
+                [
+                    'config' => null,
+                    'value' => null
+                ],
+                0
+            ],
         ];
     }
 }
