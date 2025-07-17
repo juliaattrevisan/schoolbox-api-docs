@@ -8,69 +8,60 @@ source /usr/share/schoolbox/tools/vagrant-consts.sh # Cannot derive this, becaus
 
 # Global vars: consider reading from YAML directly, instead of from args.
 # Also consider using an .env or .ini file?
-source docker.default.ini
-if [ -f docker.ini ]; then
-  source docker.ini
+source "${SITE_ROOT}/docker.default.ini"
+if [ -f "${SITE_ROOT}/docker.ini" ]; then
+  source "${SITE_ROOT}/docker.ini"
 fi
-exit;
 
 # Global vars
 # Defaults
-external_db="synergetic";
-external_db_host="172.31.15.10";
-external_db_db="Synergetic_AUVIC_ALARESS_PRD";
-enable_xdebug="true";
-force_upgrade=0
-instance_registry_url="https://manage.schoolbox.cloud"
-node_version="20"
-declare phpversion_supported                                # Must be specified via script arg
 
-if [[ $# -ne 12 ]]; then
-  error "Script requires 12 params, found $#"
-  exit 1
-fi
-
-# Get options
-if [ ! -z $1 ]; then data_source=$1; else echo "Please provide data_source"; exit 1; fi;
-if [ ! -z $2 ]; then
-    data_filename=$2;
-else
-    echo "Please provide data_filename";
-    exit 1;
-fi;
-if [ ! -z $3 ]; then external_db=$3; fi;
-if [ ! -z $4 ]; then external_db_host=$4; fi;
-if [ ! -z $5 ]; then external_db_db=$5; fi;
-if [ ! -z $6 ]; then enable_xdebug=$6; fi;
-if [ ! -z $7 ]; then instance_id_env_var=$7; fi;
-if [ -n "$8" ] && [[ "$8" != '0' ]] && [[ "$8" != 'false' ]]; then force_upgrade=1; fi;
-if [ -n "$9" ]; then instance_registry_url="$9"; fi;
-extra_hostname=${10}
-phpversion_supported="${11}"
-if [[ -z $phpversion_supported ]]; then
-  echo "You must declare desired PHP major version via script arg" >&2
-  exit 1
-fi
-taskd_build_from_local="${12}";  # Valid values: ['0'|'1']
-if [[ $taskd_build_from_local != "0" ]] && [[ $taskd_build_from_local != "1" ]]; then
-  error " Invalid 'taskd_build_from_local' value. Expected ['0','1']. Found: $taskd_build_from_local";
-  exit 1
-fi
-
-if ! which nvm; then
-  echo "[SB][$(date +%Y-%m-%d\ %X)] Installing nvm"
-  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-  sudo -u vagrant bash -c 'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash'
-fi
-sudo -u vagrant bash -c "source /home/vagrant/.nvm/nvm.sh && nvm install ${node_version} && nvm use ${node_version}"
-source /root/.nvm/nvm.sh && nvm install ${node_version} && nvm use ${node_version}
-# Does this environment use the systemd-wrapped taskd service?
-declare taskd_systemd_service_installed
-if [[ $taskd_build_from_local == "0" ]];then
-  taskd_systemd_service_installed="1"
-else
-  taskd_systemd_service_installed="0"
-fi
+#if [[ $# -ne 12 ]]; then
+#  error "Script requires 12 params, found $#"
+#  exit 1
+#fi
+#
+## Get options
+#if [ ! -z $1 ]; then data_source=$1; else echo "Please provide data_source"; exit 1; fi;
+#if [ ! -z $2 ]; then
+#    data_filename=$2;
+#else
+#    echo "Please provide data_filename";
+#    exit 1;
+#fi;
+#if [ ! -z $3 ]; then external_db=$3; fi;
+#if [ ! -z $4 ]; then external_db_host=$4; fi;
+#if [ ! -z $5 ]; then external_db_db=$5; fi;
+#if [ ! -z $6 ]; then enable_xdebug=$6; fi;
+#if [ ! -z $7 ]; then instance_id_env_var=$7; fi;
+#if [ -n "$8" ] && [[ "$8" != '0' ]] && [[ "$8" != 'false' ]]; then force_upgrade=1; fi;
+#if [ -n "$9" ]; then instance_registry_url="$9"; fi;
+#extra_hostname=${10}
+#phpversion_supported="${11}"
+#if [[ -z $phpversion_supported ]]; then
+#  echo "You must declare desired PHP major version via script arg" >&2
+#  exit 1
+#fi
+#taskd_build_from_local="${12}";  # Valid values: ['0'|'1']
+#if [[ $taskd_build_from_local != "0" ]] && [[ $taskd_build_from_local != "1" ]]; then
+#  error " Invalid 'taskd_build_from_local' value. Expected ['0','1']. Found: $taskd_build_from_local";
+#  exit 1
+#fi
+#
+#if ! which nvm; then
+#  echo "[SB][$(date +%Y-%m-%d\ %X)] Installing nvm"
+#  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+#  sudo -u vagrant bash -c 'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash'
+#fi
+#sudo -u vagrant bash -c "source /home/vagrant/.nvm/nvm.sh && nvm install ${node_version} && nvm use ${node_version}"
+#source /root/.nvm/nvm.sh && nvm install ${node_version} && nvm use ${node_version}
+## Does this environment use the systemd-wrapped taskd service?
+#declare taskd_systemd_service_installed
+#if [[ $taskd_build_from_local == "0" ]];then
+#  taskd_systemd_service_installed="1"
+#else
+#  taskd_systemd_service_installed="0"
+#fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Setting up vagrant with options:";
 echo "[SB][`date +%Y-%m-%d\ %X`] Data Source: $data_source";
@@ -79,16 +70,16 @@ echo "[SB][`date +%Y-%m-%d\ %X`] External DB: $external_db";
 echo "[SB][`date +%Y-%m-%d\ %X`] External DB Host: $external_db_host";
 echo "[SB][`date +%Y-%m-%d\ %X`] External DB Name: $external_db_db";
 
-phpversion_current=`php -v | head -n1 | awk '{print $2}' | cut -c1-3`;
-echo "[SB][`date +%Y-%m-%d\ %X`] Checking for correct PHP version - current: $phpversion_current, supported: $phpversion_supported";
-if [ "$phpversion_current" != "$phpversion_supported" ]; then
-  error " Current and supported PHP versions do not match. Check 'ubuntu-1804-php${phpversion_supported/./}.vagrant.yaml' in puppet repo";
-  exit 1
-fi
+#phpversion_current=`php -v | head -n1 | awk '{print $2}' | cut -c1-3`;
+#echo "[SB][`date +%Y-%m-%d\ %X`] Checking for correct PHP version - current: $phpversion_current, supported: $phpversion_supported";
+#if [ "$phpversion_current" != "$phpversion_supported" ]; then
+#  error " Current and supported PHP versions do not match. Check 'ubuntu-1804-php${phpversion_supported/./}.vagrant.yaml' in puppet repo";
+#  exit 1
+#fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Retrieving latest Data files";
 echo "[SB][`date +%Y-%m-%d\ %X`] Cleaning up zero byte files";
-find $cachedir -type f -empty -delete;
+find "${cachedir}" -type f -empty -delete;
 
 # Download some files from S3
 if ! $SITE_ROOT/tools/download-s3-file.sh --data-source "$data_source"  --file-name "vagrant-secrets.sql" --cache-dir "$cachedir"; then
@@ -99,6 +90,7 @@ if ! $SITE_ROOT/tools/download-s3-file.sh --data-source "$data_source" --file-na
   echo "Error: Unable to download s3 file: 'vagrant-cleanup-secrets.sql'";
   exit 1;
 fi
+exit;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Updating timezone data";
 mysql_tzinfo_to_sql /usr/share/zoneinfo 2>/dev/null | mysql --defaults-extra-file=/root/.my.cnf mysql 2>/dev/null;
