@@ -1,19 +1,14 @@
 <?php
 
-/**
- * ValidationTest
- *
- * See SD-10 for usages
- *
- * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+/*
+ * @copyright   Copyright 2025, Schoolbox Pty Ltd
+ * @link        https://schoolbox.education/
  */
 
 // All new classes should use strict typing.
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\Settings\Test;
+namespace Schoolbox\Admin\Settings\FieldType\Number\Test;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -22,14 +17,14 @@ use Schoolbox\Config\Config;
 /**
  * Validation test
  */
-class ValidationTest extends TestCase
+class IntValueSerializerTest extends TestCase
 {
     /**
      * @param mixed $input
      * @param int   $expected
      */
-    #[DataProvider('providerValidExample')]
-    public function testValidExample($input, $expected)
+    #[DataProvider('testData')]
+    public function testIntValueSerializer($input, $expected)
     {
         $intValueSerializer = new \Schoolbox\Admin\Settings\FieldType\Number\IntValueSerializer();
 
@@ -48,7 +43,7 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public static function providerValidExample(): array
+    public static function testData(): array
     {
         return [
 
