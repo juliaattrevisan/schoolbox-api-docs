@@ -1,7 +1,8 @@
 import type { User } from "@schoolboxLibrary/types/User";
+
 /**
  * The expected payload for a plan associated with a participant
- * this will be related to the original activity
+ * this will be related to the original activity, and whether it's been modified
  */
 export type Plan = {
     closeDate: string | null;
@@ -17,6 +18,10 @@ export type Plan = {
     updatedAt: string;
 };
 
+/**
+ * The expected payload for an assessable item, which is the link to
+ * a new or copied activity that will be used in the customised plan
+ */
 export type Assessable = {
     id: number;
     title: string;
@@ -34,7 +39,7 @@ export type CustomisedPlan = Plan & {
 };
 
 /**
- * The expected payload for a participant in the system
+ * The expected payload for each participant in the activity
  */
 export type Participant = {
     id: number;

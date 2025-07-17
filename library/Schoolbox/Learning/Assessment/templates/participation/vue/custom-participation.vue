@@ -8,7 +8,7 @@ import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
 import type { StudentPastoralCountBadge } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
-import type { Participant, Plan } from "../js/types/customParticipationTypes";
+import type { Participant, Plan, CustomisedPlan } from "../js/types/customParticipationTypes";
 
 interface Props {
     allParticipants: Participant[];
@@ -17,7 +17,7 @@ interface Props {
     getAssessmentParticipation: string;
     getAssessmentParticipationNewActivity: string;
     assessmentId: number;
-    customisations: Plan[];
+    customisations: (Plan | CustomisedPlan)[];
     includeInExistingCustomisation: string;
 }
 const props = defineProps<Props>();
@@ -186,16 +186,8 @@ const selectedActivityId = window.Vue.ref<number | null>(null);
 /**
  * The current selected activity for inclusion.
  */
-const selectedActivity = window.Vue.computed(
-    () => props.customisations.find((plan) => plan.id === selectedActivityId.value) ?? null,
-);
-
-/**
- * Checks if the selected activity is a 'Modify activity' type.
- * Which helps determine how to treat the selected activity in the UI.
- */
-const isSelectedActivityModify = window.Vue.computed(() => {
-    return selectedActivity.value?.name !== null;
+const selectedActivity = window.Vue.computed<Plan | CustomisedPlan | null>(() => {
+    return props.customisations.find((plan) => plan.id === selectedActivityId.value) ?? null;
 });
 
 /**
@@ -203,7 +195,7 @@ const isSelectedActivityModify = window.Vue.computed(() => {
  */
 async function includeParticipantInExistingPlan(): Promise<void> {
     if (selectedActivity.value === null) return;
-    const activity = selectedActivity.value;
+    const activity: Plan | CustomisedPlan = selectedActivity.value;
     // if the array is empty, it means that we are including participants via the bottom drawer,
     // otherwise the single participant is being included via the pop-out menu
     if (selectedParticipants.value.length === 0) {
@@ -216,19 +208,20 @@ async function includeParticipantInExistingPlan(): Promise<void> {
             headers: { Accept: "application/json", "Content-Type": "application/json" },
             body: JSON.stringify({
                 students: selectedParticipants.value.map((p) => p.user.id),
-                planId: activity.id,
-                assessmentId: activity.assessable.id,
+                ...(activity.name !== null ? { planId: activity.id } : {}),
+                ...("assessable" in activity ? { assessmentId: activity.assessable.id } : {}),
             }),
         });
         if (!response.ok) {
             const errorMessage = await extractErrorMessage(response);
             throw new Error(errorMessage);
         }
+        // add the activity to each participant
         selectedParticipants.value.forEach((participant) => {
-            if (isSelectedActivityModify.value) {
-                participant.plan = activity;
+            if ("assessable" in activity) {
+                participant.plan = activity as Plan;
             } else {
-                participant.customisedPlan = activity;
+                participant.customisedPlan = activity as CustomisedPlan;
             }
         });
         toast.timeout({ text: "Customisation added successfully", isSuccess: true });
@@ -261,10 +254,11 @@ function openIncludeModal(participant: Participant): void {
  * @param plan - The customisation plan to generate the label for.
  * @returns The label for the customisation plan.
  */
-function getCustomisationLabel(plan: Plan): string {
-    const isDefault = !plan.name;
-    const assessableTitle = plan.assessable?.title;
-    return isDefault ? (assessableTitle ?? "") : (plan.name ?? "");
+function getCustomisationLabel(plan: Plan | CustomisedPlan): string {
+    if ("assessable" in plan && plan.assessable !== null) {
+        return plan.assessable.title || "";
+    }
+    return plan.name || "";
 }
 </script>
 
