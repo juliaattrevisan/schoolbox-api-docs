@@ -724,10 +724,10 @@ function main(){
   validate_args
   export_sql_credentials
   derive_puppet_certname
-  if [[ $skip_bucket_copy == 0 ]]; then
-    derive_ir_api_key
-    derive_ir_api_url
-  fi
+#  if [[ $skip_bucket_copy == 0 ]]; then
+#    derive_ir_api_key
+#    derive_ir_api_url
+#  fi
   fetch_old_su_password
   fetch_existing_config
   validate_config
@@ -750,9 +750,9 @@ function main(){
   get_data_dirs_defaults_config
   create_data_dirs "$instance_data_dir"
   set_log_dir
-  if [[ $skip_bucket_copy == 0 ]]; then
-    copy_bucket_contents
-  fi
+#  if [[ $skip_bucket_copy == 0 ]]; then
+#    copy_bucket_contents
+#  fi
 
   extract_all_dataset_files "$instance_data_dir"
   set_ownership_and_permissions
