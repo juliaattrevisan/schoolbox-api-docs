@@ -55,7 +55,7 @@ async function sendRequest(): Promise<void> {
             ref="promptRef"
             v-model="prompt"
             name="prompt"
-            rows="3"
+            rows="1"
             placeholder="Describe or refine the image you want to generate"
             style="resize: vertical; margin-bottom: 0"
             :disabled="igStore.isGenerating || undefined"
