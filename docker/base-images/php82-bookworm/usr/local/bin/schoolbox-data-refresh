@@ -279,28 +279,28 @@ export_sql_credentials(){
 }
 
 
-# Derive this host's puppet certname
-function derive_puppet_certname(){
-  if ! puppet_certname=$($READ_IR_CONF --puppet-cert); then
-    exit 1;
-  fi
-}
-
-
-# Fetch this host's IR api key
-function derive_ir_api_key(){
-  if ! ir_api_key=$($READ_IR_CONF --api-key); then
-    exit 1;
-  fi
-}
-
-
-# Check if this host has an IR URL override (eg vagrant can be configured to point at a local development IR environment)
-function derive_ir_api_url(){
-  if ! ir_api_url=$($READ_IR_CONF --url); then
-    exit 1;
-  fi
-}
+## Derive this host's puppet certname
+#function derive_puppet_certname(){
+#  if ! puppet_certname=$($READ_IR_CONF --puppet-cert); then
+#    exit 1;
+#  fi
+#}
+#
+#
+## Fetch this host's IR api key
+#function derive_ir_api_key(){
+#  if ! ir_api_key=$($READ_IR_CONF --api-key); then
+#    exit 1;
+#  fi
+#}
+#
+#
+## Check if this host has an IR URL override (eg vagrant can be configured to point at a local development IR environment)
+#function derive_ir_api_url(){
+#  if ! ir_api_url=$($READ_IR_CONF --url); then
+#    exit 1;
+#  fi
+#}
 
 
 # Fetch current SU password if one exists
@@ -489,38 +489,38 @@ function import_dataset(){
 }
 
 
-# Copy's S3 bucket contents from dataset bucket to this instance's bucket
-function copy_bucket_contents(){
-  local bucket_dataset;
-  bucket_dataset=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -ss -e "SELECT value FROM config WHERE name = 'otfs_s3_bucket'")
-
-  if [[ -z $bucket_dataset ]]; then
-    log "Dataset does not have an S3 bucket configured, skipping bucket copy"
-    return
-  fi
-
-  local bucket_instance=${config[otfs_s3_bucket]};
-  bucket_instance=${bucket_instance//\'/}
-  log "Copying contents of source S3 bucket '${bucket_dataset}' to instance S3 bucket '${bucket_instance}'"
-
-  local post_data;
-  post_data="$(jq -c -n --arg from "${bucket_dataset}" --arg to "${bucket_instance}" '{from:$from,to:$to}')"
-
-  local response;
-  if ! response=$(curl -X POST "$ir_api_url"/api/host/"$puppet_certname"/bucket-copy -H "Authorization: Bearer $ir_api_key" -H "Content-Type: application/json" -d "$post_data"); then
-    error "Curl failed. Unable to copy contents of source bucket '${bucket_dataset}' to instance bucket '${bucket_instance}'"
-    exit 1;
-  fi
-
-  echo -e "Response:\n";
-  echo "$response" | jq .
-  echo -e "\n";
-
-  if [[ "$(echo "$response" | jq .status | sed 's/"//g')" != 'ok' ]]; then
-    error "S3 bucket copy appeared to fail"
-    exit 1;
-  fi
-}
+## Copy's S3 bucket contents from dataset bucket to this instance's bucket
+#function copy_bucket_contents(){
+#  local bucket_dataset;
+#  bucket_dataset=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -ss -e "SELECT value FROM config WHERE name = 'otfs_s3_bucket'")
+#
+#  if [[ -z $bucket_dataset ]]; then
+#    log "Dataset does not have an S3 bucket configured, skipping bucket copy"
+#    return
+#  fi
+#
+#  local bucket_instance=${config[otfs_s3_bucket]};
+#  bucket_instance=${bucket_instance//\'/}
+#  log "Copying contents of source S3 bucket '${bucket_dataset}' to instance S3 bucket '${bucket_instance}'"
+#
+#  local post_data;
+#  post_data="$(jq -c -n --arg from "${bucket_dataset}" --arg to "${bucket_instance}" '{from:$from,to:$to}')"
+#
+#  local response;
+#  if ! response=$(curl -X POST "$ir_api_url"/api/host/"$puppet_certname"/bucket-copy -H "Authorization: Bearer $ir_api_key" -H "Content-Type: application/json" -d "$post_data"); then
+#    error "Curl failed. Unable to copy contents of source bucket '${bucket_dataset}' to instance bucket '${bucket_instance}'"
+#    exit 1;
+#  fi
+#
+#  echo -e "Response:\n";
+#  echo "$response" | jq .
+#  echo -e "\n";
+#
+#  if [[ "$(echo "$response" | jq .status | sed 's/"//g')" != 'ok' ]]; then
+#    error "S3 bucket copy appeared to fail"
+#    exit 1;
+#  fi
+#}
 
 
 # Localise the database config table.
@@ -723,7 +723,7 @@ function main(){
   parse_sql_from_conf
   validate_args
   export_sql_credentials
-  derive_puppet_certname
+#  derive_puppet_certname
 #  if [[ $skip_bucket_copy == 0 ]]; then
 #    derive_ir_api_key
 #    derive_ir_api_url
