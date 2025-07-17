@@ -193,6 +193,90 @@ class Controller extends Base
 
 
     /**
+     * Generates an image as part of a conversation
+     *
+     * @return void
+     * @throws Exception
+     * @throws \JsonException
+     */
+    public function postImage(): void
+    {
+        try {
+            $helper = new Helper(
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_ENDPOINT)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_KEY)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_RESOURCE_NAME)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_DEPLOYMENT_ID)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_MODEL)),
+                $this->client,
+                $this->errorMapper,
+                $this->logMapper,
+            );
+
+            $payloadGenerator = (new Payload\ImageGeneration(
+                $helper->getModel(),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_SYSTEM_PROMPT)),
+            ));
+
+            $payload = $payloadGenerator->generate(
+                $this->requestPost->get('userPrompt'),
+                $this->requestPost->get('attributes') ?? [],
+                $this->requestPost->get('previousResponseId') ?? null,
+            );
+
+            try {
+                /* Send it and decode the result (if any: sometimes it returns null)
+                 * and dodge around all its weird encoding business with a double-decode,
+                 * and ditching all its training markdown (lol) that it loves to use
+                 *
+                 * https://community.openai.com/t/json-returning-with-json/584818/6
+                 */
+                $data = $helper->request($this->getUser(), $payload);
+            } catch (SchoolboxException $e) {
+                $problem = (new ApiProblem($e->getMessage()))
+                    ->setStatus($e->getCode())
+                    ->asArray();
+
+                $this->response = $this->responseAsJson($problem)
+                    ->withStatus($e->getCode());
+
+                return;
+            }
+
+            /* Find the image call/message in the response
+             * since we aren't streaming, there should only be one of these at the moment
+             */
+            $outputImage = array_values(array_filter($data['output'], fn($item) => $item['type'] === 'image_generation_call'))[0] ?? null;
+            $outputMessage = array_values(array_filter($data['output'], fn($item) => $item['type'] === 'message'))[0] ?? null;
+
+            $outputMessageContent = $outputMessage
+                ? (array_values(array_filter($outputMessage['content'], fn($item) => $item['type'] === 'output_text'))[0]['text'] ?? null)
+                : null;
+
+            $this->response = $this->responseAsJson([
+                'responseId' => $data['id'],
+                'src' => sprintf("data:image/png;base64,%s", $outputImage['result']),
+                'message' => $outputMessageContent,
+            ]);
+            return;
+        } catch (\DomainException $e) {
+            /* Not configured? Not found
+             */
+            $returnCode = 404;
+
+            $problem = (new ApiProblem($e->getMessage()))
+                ->setStatus($returnCode)
+                ->asArray();
+
+            $this->response = $this->responseAsJson($problem)
+                ->withStatus($returnCode);
+
+            return;
+        }
+    }
+
+
+    /**
      * This is used by ckeditor's Little Robot Dude ai assistant which posts
      * to /openai route via some direct javascript thing
      *

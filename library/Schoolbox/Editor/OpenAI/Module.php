@@ -34,6 +34,10 @@ class Module extends BaseModule
         /* Lesson Plan field generators
          */
         $this->register('POST', '/lesson-plan', 'postLessonPlan', $isStaff);
+
+        /* Image generation
+         */
+        $this->register('POST', '/image', 'postImage', $isStaff);
     }
 
     public function buildController(): Base

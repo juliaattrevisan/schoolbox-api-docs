@@ -19,7 +19,6 @@ use Schoolbox\Resource\Attachment\Filesystem;
  */
 class Factory
 {
-
     /**
      * Provide this set of controllers by default
      */
@@ -45,6 +44,7 @@ class Factory
             'webdav'    => Filesystem\WebdavController::class,
             'google'    => Filesystem\GoogleController::class,
             'office'    => Filesystem\Office365Controller::class,
+            'imagegen'  => Filesystem\ImagegeneratorController::class,
         ],
 
         /* Controllers for the Link modal
@@ -78,6 +78,7 @@ class Factory
             'webdav'    => Filesystem\WebdavController::class,
             'google'    => Filesystem\GoogleController::class,
             'office'    => Filesystem\Office365Controller::class,
+            'imagegen'  => Filesystem\ImagegeneratorController::class,
         ],
 
         /* Removes the Recording option for contexts where you only wanted images
@@ -90,6 +91,7 @@ class Factory
             'webdav'    => Filesystem\WebdavController::class,
             'google'    => Filesystem\GoogleController::class,
             'office'    => Filesystem\Office365Controller::class,
+            'imagegen'  => Filesystem\ImagegeneratorController::class,
         ],
 
         /* Learning/Tasks

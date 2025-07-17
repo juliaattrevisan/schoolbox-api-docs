@@ -35,7 +35,6 @@ class Helper
     private const ENDPOINT_HOST_AZURE_CHAT = 'https://%s.openai.azure.com/openai/deployments/%s/chat/completions?api-version=2023-12-01-preview';
     private const ENDPOINT_HOST_AZURE_REQUEST = 'https://%s.openai.azure.com/openai/responses?api-version=2025-03-01-preview';
 
-
     /**
      * This is the value of text and image endpoint providers if a school
      * turned off these features.
@@ -88,6 +87,21 @@ class Helper
         private \Schoolbox\Error\Mapper $errorMapper,
         private Log\Mapper $logMapper,
     ) {
+    }
+
+
+    /**
+     * Retrieve the model to use in requests
+     * OpenAI lets us choose the model (from config),
+     * Azure has the model linked to the deployment ID when you set it up over there, so we can't choose it
+     */
+    public function getModel(): string
+    {
+        if (Helper::ENDPOINT_TYPE_AZURE === $this->openAiEndpoint) {
+            return $this->openAiAzureDeploymentId;
+        }
+
+        return $this->openAiModel;
     }
 
 
