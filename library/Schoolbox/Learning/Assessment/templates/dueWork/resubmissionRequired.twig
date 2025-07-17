@@ -5,16 +5,19 @@
         participant:        Participant
         feedback:           IFeedback
         tabIndex:           int
+        prefix:             string
     ]
 #}
+
+{% set prefix = prefix is defined ? prefix ~ '-' : '' %}
+{% set inputId = 'resubmissionRequired-' ~ prefix ~ participant.user.id %}
 
 <input type="checkbox"
        value="1"
        tabindex="{{ tabIndex }}"
-       id="resubmissionRequired-{{ participant.user.id }}"
+       id="{{ inputId }}"
        name="resubmissionRequired"
        {% if readonly %}readonly{% endif %}
        {% if feedback.resubmissionRequired ?? false %}checked{% endif %}
 />
-<label for="resubmissionRequired-{{ participant.user.id }}"
-       class="checkbox-label">Resubmission required</label>
+<label for="{{ inputId }}" class="checkbox-label">Resubmission required</label>
