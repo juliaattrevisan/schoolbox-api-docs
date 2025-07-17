@@ -48,6 +48,5 @@ export type Participant = {
         exclude: string;
         include: string;
         learningPlanNew: string;
-        includeInExistingCustomisation: string;
     };
 };

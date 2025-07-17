@@ -88,13 +88,7 @@ class Participations
                     'assessmentId' => $assess->getId(),
                     'student' => $participant,
                     'studentId'    => $participant->getId(),
-                ]),
-                'includeInExistingCustomisation' => $this->getRouteIfAuthorized('learningAssessment.postExistingCustomisationInclude', [
-                    'assessment' => $assess,
-                    'assessmentId' => $assess->getId(),
-                    'student' => $participant,
-                    'studentId'    => $participant->getId(),
-                ]),
+                ])
             ]
         ];
     }
