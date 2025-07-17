@@ -15,6 +15,7 @@ use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
 use DomainException;
 use InvalidArgumentException;
+use Schoolbox\Learning\Assessment\Translator\ParticipationPlans;
 use Schoolbox\Learning\Assessment\Translator\Participations;
 use LearnositySdk\Utils\Uuid;
 use LogicException;
@@ -255,6 +256,36 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         $data = $this->getAssessmentAsTwigArray($context, $assessment);
 
+        /* Loading the data of the source/parent assessment
+         */
+        $originalAssessmentId = $this->requestQuery->get('customisedFor');
+        if (null !== $originalAssessmentId) {
+            $student = json_decode($this->requestQuery->get('student', ''), true);
+            $originalAssessment = $this->getAssessmentMapper()->findById($originalAssessmentId);
+            $originalAssessment = $this->participantDataSource->loadParticipationIntoAssessment($originalAssessment);
+            $data['customisedFor'] = $originalAssessmentId;
+            $data['participants'] = $originalAssessment
+                ->getAllParticipants()
+                ->filter(fn($participant) => in_array($participant->getUser()->getId(), array_column($student, 'id')))
+                ->map(function (Participant $participant) {
+                    $student = $participant->getUser();
+                    return [
+                        'id'         => $student->getId(),
+                        'fullName'   => $participant->getUser()->getFullName(),
+                        'excludedAt' => $participant->getExcludedAt(),
+                        'user'       => $student,
+                        'plan'       => $participant->getPlan(),
+                    ];
+                });
+        } else {
+            $data['participants'] = $assessment->getAllParticipants()->map(function (Participant $participant) {
+                $student = $participant->getUser();
+                return [
+                    'id'         => $student->getId(),
+                    'fullName'   => $participant->getUser()->getFullName(),
+                ];
+            });
+        }
         /* When creating a new assessment, no curriculum nodes are selected by default
          *
          * At a future point, we may want to "suggest" nodes to select based on the context,
@@ -560,9 +591,17 @@ abstract class Controller extends ListController implements IAssessmentControlle
             }
             $data['attachzoneWorksheet'] = $zone->getTwigContext();
         }
+        $data['participants'] = $assessment
+            ->getAllParticipants()
+            ->filter(fn($participant) => !$participant->isExcluded())
+            ->map(
+                fn($participant) => [
+                    'id' => $participant->getUser()->getId(),
+                    'fullName' => $participant->getUser()->getFullName(),
+                ]
+            );
         $this->response = $this->responseFromTemplate("@learningAssessment/update.twig", $data);
     }
-
 
     /**
      * Save the data when creating a specific kind of Assessment
@@ -969,17 +1008,32 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         $data['studentsPastoralCountsUrl'] = $this->getRouteIfAuthorized('pastoral.getStudentsCount');
 
-        $participationModelToArray = new Participations(
+        /* Load customisation to the participant
+         */
+        $customisedAssessments = $this->getAssessmentMapper()->findAllCustomisedAssessment($assessment);
+        $planTranslator = new ParticipationPlans(
             $this->getRouteGenerator(),
             $this->getAuthorizer(),
             $this->getUser(),
         );
+        $participationModelToArray = new Participations(
+            $this->getRouteGenerator(),
+            $this->getAuthorizer(),
+            $this->getUser(),
+            $planTranslator,
+            $customisedAssessments,
+        );
+
         $data['allParticipants'] = $assessment->getAllParticipants()->map($participationModelToArray)->reindex();
         $data['learningPlanNew'] = $this->getRouteIfAuthorized('learningAssessment.getAssessmentParticipationLearningPlan', [
             'assessment' => $assessment,
             'assessmentId' => $assessment->getId(),
         ]);
         $data['assessment'] = $assessment;
+
+        $context = $assessment->getContext();
+
+        $data['contextType'] = AssessmentContextType::objectToString($context) . 's';
 
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/participation/update.twig',

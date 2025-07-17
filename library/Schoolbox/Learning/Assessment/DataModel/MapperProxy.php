@@ -1720,6 +1720,21 @@ class MapperProxy
         }
     }
 
+    /**
+     * Find all assessments that are customised and are based on this assessment
+     *
+     * @param IAssessable $assessable
+     * @param array       $options
+     * @return Collection|IAssessable[]
+     */
+    public function findAllCustomisedAssessment(IAssessable $assessable, array $options = []): Collection|IAssessable
+    {
+        $assessments = $this->translateToDomainModelCollection(
+            $this->baseMapper->findByColumn('original_assessment_id', $assessable->getId(), $options)
+        );
+        return $assessments->map(fn($assessment) => $this->participantDataSource->loadParticipationIntoAssessment($assessment));
+    }
+
 
     /**
      * Helper function for converting a list of options into a predicate builder.

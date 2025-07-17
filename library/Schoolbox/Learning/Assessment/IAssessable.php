@@ -729,6 +729,17 @@ interface IAssessable extends ISoftDeletable
      */
     public function setSebEnabled(?bool $sebEnabled): self;
 
+    /**
+     * @return int|null
+     */
+    public function getOriginalAssessmentId(): ?int;
+
+    /**
+     * @param int|null $originalAssessmentId
+     * @return self
+     */
+    public function setOriginalAssessmentId(?int $originalAssessmentId): self;
+
 
     /**
      * Get the weight

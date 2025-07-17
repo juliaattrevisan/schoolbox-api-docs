@@ -17,6 +17,7 @@ export const allParticipants = [
             id: 744,
         },
         excludedAt: "2025-05-26T09:32:03+10:00",
+        customisedPlan: null,
     },
     {
         id: 294,
@@ -33,6 +34,7 @@ export const allParticipants = [
             name: "Edwin's Plan",
         },
         excludedAt: "2025-05-26T09:32:03+10:00",
+        customisedPlan: null,
     },
     {
         id: 293,
@@ -48,6 +50,32 @@ export const allParticipants = [
             id: 744,
         },
         excludedAt: null,
+        customisedPlan: null,
+    },
+    {
+        id: 295,
+        user: {
+            id: 21,
+            externalId: "208",
+            firstname: "Joffery",
+            givenName: "Joffery",
+            lastname: "Buckner",
+            fullName: "Joffery Buckner",
+        },
+        plan: {
+            id: 744,
+        },
+        excludedAt: "2025-05-26T09:32:03+10:00",
+        customisedPlan: {
+            id: 788,
+            assessable: {
+                id: 50,
+                title: "Final Assessment (Joffery)",
+                _links: {
+                    modify: "/learning/assessments/50/modify",
+                },
+            },
+        },
     },
     {
         id: 291,
@@ -63,5 +91,6 @@ export const allParticipants = [
             id: 744,
         },
         excludedAt: null,
+        customisedPlan: null,
     },
 ];

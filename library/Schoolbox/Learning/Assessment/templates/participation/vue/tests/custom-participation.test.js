@@ -5,14 +5,14 @@ import { allParticipants } from "./allParticipantsData";
 
 beforeEach(() => {});
 
-test("all four participants are visible", () => {
+test("all five participants are visible", () => {
     const wrapper = mount(CustomParticipation, {
         props: {
             allParticipants,
             getStudentsPastoralCountsUrl: "",
         },
     });
-    expect(wrapper.findAll('[data-test^="custom-participation-row-"]')).toHaveLength(4);
+    expect(wrapper.findAll('[data-test^="custom-participation-row-"]')).toHaveLength(5);
 });
 
 test("select all check box is not visible when only one participant", () => {
@@ -83,7 +83,7 @@ test("When two students are selected, and one is excluded, the Remove Customisat
     expect(wrapper.find('[data-test="custom-participation-remove-customisation"]').exists()).toBe(true);
 });
 
-test("If a student is excluded, Excluded is visible in their row", async () => {
+test("If a student is excluded and doesn't have a customised activity, Excluded is visible in their row", async () => {
     const wrapper = mount(CustomParticipation, {
         props: {
             allParticipants,
@@ -93,6 +93,18 @@ test("If a student is excluded, Excluded is visible in their row", async () => {
 
     const row = wrapper.find(`[data-test="custom-participation-row-${allParticipants[0].user.id}"]`);
     expect(row.text()).toContain("Excluded");
+});
+
+test("If a student is excluded and is part of a customised activity, Customised activity name is visible in their row", async () => {
+    const wrapper = mount(CustomParticipation, {
+        props: {
+            allParticipants,
+            getStudentsPastoralCountsUrl: "",
+        },
+    });
+
+    const row = wrapper.find(`[data-test="custom-participation-row-${allParticipants[3].user.id}"]`);
+    expect(row.text()).toContain("Final Assessment (Joffery)");
 });
 
 test("If a participant's user id is not set, their name is not wrapped in an <a> tag", async () => {

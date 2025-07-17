@@ -559,39 +559,60 @@ class ListController extends Web\Controller\Base
                 'title' => 'Ask a series of questions with automatic marking',
             ],
         ];
-        if ($this->getConfigLoader()->get('lti_assessments_enable')) {
-            $data['types'][] = [
-                'id'    => 'lti',
-                'value' => AssessmentType::TYPE_LTI_ASSESSMENT,
-                'label' => LtiAssessment::getDefaultTypeName(),
-                'icon'  => 'lti',
-                'title' => 'Connect an assessment provided by an LTI tool',
-            ];
+
+        $participants = $this->requestQuery->get('student');
+
+        if ($participants) {
+            /* Get participant information
+               */
+            $data['participants'] = $this->userMapper
+                ->findByColumn('id', explode(',', $participants))
+                ->map(fn($participant) => [
+                    'id'       => $participant->getId(),
+                    'fullName' => $participant->getFullName(),
+                ]);
+            /* Get the source/parent assessment id
+             */
+            $data['customisedFor'] = $this->requestQuery->get('original');
         }
-        /* The tooltip for Lesson Plans came from the slack channel
-         * https://alaress.slack.com/archives/C04R588EKPS/p1678336098480059
+
+        /* Only duework, task and quiz can have customised activities
          */
-        $data['types'][] = [
-            'id'    => 'lesson-plan',
-            'value' => AssessmentType::TYPE_LESSON_PLAN,
-            'label' => $this->rosettaStone->translate('lessonPlan', false, true),
-            'icon'  => 'lesson-plan',
-            'title' => 'A detailed guide that outlines a lesson\'s purpose and activities',
-        ];
-
-        // TODO, 'types' should just be the 3 objects, and twig should do the rest
-        // TODO (see icon macro for 'id', assessment.typeName for 'label', types.objectToString($assessment) for 'value')
-
-        // Ensure we don't provide an option to spawn a Project inside a Project context
-        if (!$context instanceof Project) {
-            $item = [
-                'id'    => 'project',
-                'value' => AssessmentType::TYPE_PROJECT,
-                'label' => $this->rosettaStone->translate('project', false, true),
-                'icon'  => 'project',
-                'title' => 'Setup a container for multiple activities that are related',
+        if (!isset($participants)) {
+            if ($this->getConfigLoader()->get('lti_assessments_enable')) {
+                $data['types'][] = [
+                    'id'    => 'lti',
+                    'value' => AssessmentType::TYPE_LTI_ASSESSMENT,
+                    'label' => LtiAssessment::getDefaultTypeName(),
+                    'icon'  => 'lti',
+                    'title' => 'Connect an assessment provided by an LTI tool',
+                ];
+            }
+            /* The tooltip for Lesson Plans came from the slack channel
+             * https://alaress.slack.com/archives/C04R588EKPS/p1678336098480059
+             */
+            $data['types'][] = [
+                'id'    => 'lesson-plan',
+                'value' => AssessmentType::TYPE_LESSON_PLAN,
+                'label' => $this->rosettaStone->translate('lessonPlan', false, true),
+                'icon'  => 'lesson-plan',
+                'title' => 'A detailed guide that outlines a lesson\'s purpose and activities',
             ];
-            array_unshift($data['types'], $item);
+
+            // TODO, 'types' should just be the 3 objects, and twig should do the rest
+            // TODO (see icon macro for 'id', assessment.typeName for 'label', types.objectToString($assessment) for 'value')
+
+            // Ensure we don't provide an option to spawn a Project inside a Project context
+            if (!$context instanceof Project) {
+                $item = [
+                    'id'    => 'project',
+                    'value' => AssessmentType::TYPE_PROJECT,
+                    'label' => $this->rosettaStone->translate('project', false, true),
+                    'icon'  => 'project',
+                    'title' => 'Setup a container for multiple activities that are related',
+                ];
+                array_unshift($data['types'], $item);
+            }
         }
 
         $data['contextType'] = AssessmentContextType::objectToString($context) . 's';
@@ -643,6 +664,24 @@ class ListController extends Web\Controller\Base
 
         try {
             $db->beginTransaction();
+
+            if (isset($postData['customisedFor'])) {
+                $sourceAssessment = $this->getAssessmentMapper()->findById($postData['customisedFor']);
+
+                if (0 === strcasecmp($sourceAssessment->getTitle(), $postData['title'])) {
+                    throw new \InvalidArgumentException('The activity can not have the same name as the original activity.');
+                }
+
+                /* Excluding the participant from the original assessment when assigned to another assessment
+                 */
+                if (isset($postData['original-participant-exclude'])) {
+                    $planMapper = $this->participantDataSource->getPlanMapper();
+                    $plans = $planMapper->findByColumn('id', $postData['original-participant-plan']);
+                    $this->saveParticipationData($sourceAssessment, $plans, $postData['original-participant-exclude'], $postData['original-participant-plan']);
+                }
+            }
+
+
             // Create a notifier proxy so that I may notify about assessment changes
             $notifier = $this->assessmentMapper->getNotifier();
             $before   = $notifier->dehydrate($assessment);

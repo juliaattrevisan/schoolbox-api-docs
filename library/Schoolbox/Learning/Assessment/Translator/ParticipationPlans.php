@@ -9,20 +9,33 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\Translator;
 
+use Alaress\Authorizer\Authorizer;
+use Alaress\Authorizer\GetRouteIfAuthorized;
+use Aura\Router\Generator;
 use Schoolbox\Learning\Assessment\Plan;
+use Schoolbox\User;
 
 /**
  * Translator for translating a Participant Plan model into an array.
  */
 class ParticipationPlans
 {
+    use GetRouteIfAuthorized;
+
+    public function __construct(
+        protected Generator $routeGenerator,
+        protected Authorizer $authorizer,
+        protected User $currentUser,
+    ) {
+    }
+
     /**
      * @param Plan $plan
      * @return ?array
      */
     public function __invoke(Plan $plan): array|null
     {
-        return [
+        $return = [
             'id' => $plan->getId(),
             'name' => $plan->getName(),
             'description' => $plan->getDescription(),
@@ -35,5 +48,27 @@ class ParticipationPlans
             'updatedAt' => $plan->getUpdatedAt()?->toRfc3339String(),
             'deletedAt' => $plan->getDeletedAt()?->toRfc3339String(),
         ];
+
+        /* This will only be attached if the assessment is a customised assessment, we are making the assumption that
+         * customised assessments can't have customisations for the fear of inception
+         */
+        if (null === $plan->getName()) {
+            $assessable = $plan->getAssessable();
+            $return['assessable'] = [
+                'id' => $assessable->getId(),
+                'title' => $assessable->getTitle(),
+                '_links' => [
+                    'modify' => $this->getRouteIfAuthorized(
+                        'learningAssessment.getUpdateAssessmentForm',
+                        [
+                            'assessment' => $assessable,
+                            'assessmentId' => $assessable->getId(),
+                        ]
+                    )
+                ]
+            ];
+        }
+
+        return $return;
     }
 }
