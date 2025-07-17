@@ -1,6 +1,5 @@
-INSERT INTO lu_config_type SET type = 'Advanced Search', sequence = 23;
-
-SET @configTypeIdAdvancedSearch = (SELECT id FROM lu_config_type WHERE type = 'Advanced Search');
+/* Policy was chosen here because other advanced search settings already exist with type 'Policy'. */
+SET @configTypeIdPolicy = (SELECT id FROM lu_config_type WHERE type = 'Policy');
 
 INSERT INTO config SET
 `name` = 'advanced_search_result_page_size',
@@ -9,7 +8,7 @@ INSERT INTO config SET
 `description` = 'The maximum number of search results to return in a single page.',
 `field_id` = 1,
 `options` = NULL,
-`type_id` = @configTypeIdAdvancedSearch,
+`type_id` = @configTypeIdPolicy,
 `editable` = 'false',
 `hidden` = 'true',
 `required` = 'false',
@@ -23,7 +22,7 @@ INSERT INTO config SET
 `description` = 'The maximum number of pages of potential search results to fetch in a single batch.  Potential search results are search results matching the search query, not considering user permissions.',
 `field_id` = 1,
 `options` = NULL,
-`type_id` = @configTypeIdAdvancedSearch,
+`type_id` = @configTypeIdPolicy,
 `editable` = 'false',
 `hidden` = 'true',
 `required` = 'false',
