@@ -1634,8 +1634,6 @@ class ListController extends Web\Controller\Base
                      */
                     $participationHelper->exclude($student->getId(), null);
                 }
-
-
             } else {
                 /** @var PlanModel $plan */
                 $plan = $this->participantDataSource->getPlanMapper()->findById($post['planId']);
@@ -1645,12 +1643,10 @@ class ListController extends Web\Controller\Base
             }
 
             $this->response = $this->responseEmpty(201);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $problem = new ApiProblem($e->getMessage());
             $problem->setStatus($e->getCode());
             $this->response = $this->responseAsJson($problem->asArray());
         }
-
-
     }
 }
