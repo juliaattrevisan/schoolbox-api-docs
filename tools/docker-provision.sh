@@ -125,19 +125,21 @@ if ! $SITE_ROOT/tools/download-s3-file.sh --data-source "$data_source" --file-na
   exit 1;
 fi
 
-# Current stop is here
-exit;
+# Timezone data: should be run in mariadb container on setup
+#echo "[SB][`date +%Y-%m-%d\ %X`] Updating timezone data";
+#mysql_tzinfo_to_sql /usr/share/zoneinfo 2>/dev/null | mysql --defaults-extra-file=/root/.my.cnf mysql 2>/dev/null;
+
+echo "[SB][`date +%Y-%m-%d\ %X`] Creating Schoolbox MariaDB schema and user";
+mariadb -h mariadb -u root < "${SITE_ROOT}/docker/schoolbox/sql/setup.sql"
+#mysql --defaults-extra-file=/root/.my.cnf -e "CREATE DATABASE schoolbox CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';";
+#
+#echo "[SB][`date +%Y-%m-%d\ %X`] Creating Schoolbox MySQL user";
+#mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "CREATE USER 'schoolboxvagrant'@'localhost' IDENTIFIED BY 'abc123'";
+#mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "GRANT ALL ON schoolbox.* to 'schoolboxvagrant'@'localhost'";
 
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Updating timezone data";
-mysql_tzinfo_to_sql /usr/share/zoneinfo 2>/dev/null | mysql --defaults-extra-file=/root/.my.cnf mysql 2>/dev/null;
-
-echo "[SB][`date +%Y-%m-%d\ %X`] Creating Schoolbox MySQL schema";
-mysql --defaults-extra-file=/root/.my.cnf -e "CREATE DATABASE schoolbox CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';";
-
-echo "[SB][`date +%Y-%m-%d\ %X`] Creating Schoolbox MySQL user";
-mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "CREATE USER 'schoolboxvagrant'@'localhost' IDENTIFIED BY 'abc123'";
-mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "GRANT ALL ON schoolbox.* to 'schoolboxvagrant'@'localhost'";
+echo "[SB][`date +%Y-%m-%d\ %X`] Setting Schoolbox dir ${SITE_ROOT} as safe for Git";
+git config --global --add safe.directory "${SITE_ROOT}"
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Installing vendor submodules with composer";
 cd $cachedir || exit;
@@ -225,13 +227,19 @@ fi
 cd "$SITE_ROOT" || exit;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Updating composer autoload";
-su -s /bin/bash -c "cd $SITE_ROOT && composer dump-autoload -o --no-interaction" vagrant
+composer dump-autoload -o --no-interaction
+#su -s /bin/bash -c "cd $SITE_ROOT && composer dump-autoload -o --no-interaction" vagrant
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Installing instance via 'schoolbox-data-refresh.sh'";
 
-if [[ $force_upgrade == 1 ]]; then
-  export SB_FORCE_UPGRADE=1 # Allow unsafe upgrade from really old datasets
-fi
+#if [[ $force_upgrade == 1 ]]; then
+#  export SB_FORCE_UPGRADE=1 # Allow unsafe upgrade from really old datasets
+#fi
+
+
+# Current stop is here
+exit;
+
 
 # Note schoolbox-data-refresh.sh creates the database and then applies the schoolbox/updates SQL and PHP scripts.  It
 # is the responsibility of schoolbox-data-refresh.sh to enable and disable maintenance mode as appropriate during its
