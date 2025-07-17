@@ -19,6 +19,7 @@ use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
+use Schoolbox\Pastoral\ReportBuilder\Factory;
 use Schoolbox\Pastoral\SubType as PastoralSubType;
 use Schoolbox\Pastoral\Severity\Model as PastoralSeverity;
 use Schoolbox\Pastoral\Tag as PastoralTag;
@@ -95,28 +96,27 @@ class Model implements ISoftDeletable
 
     // Mapping for the summary table options
     public const SUMMARY_TABLES_OPTIONS = [
-        'studentByType' => [
+        Factory::STUDENT_BY_TYPE => [
             'label' => 'Student by Type/Sub-Type',
             'type' => 'table',
-            'endpoint' => '/pastoral/report/results/{reportId}/studentByType/',
         ],
         //TODO: future updates for SA-19333
-//        'TypeByMonth' => [
+//        Factory::TYPE_BY_MONTH => [
 //            'label' => 'Type/Sub-Type by Month',
 //            'tooltip' => 'This table will display a maximum of 12 months of past data, counting back from the most recent record\'s date',
 //            'type' => 'table',
 //        ],
-//        'TypeByWeek' => [
+//        Factory::TYPE_BY_WEEK => [
 //            'label' => 'Type/Sub-Type by Week',
 //            'tooltip' => 'This table will display a maximum of 10 weeks of past data, counting back from the most recent record\'s date',
 //            'type' => 'table',
 //        ],
-//        'studentByMonth' => [
+//        Factory::STUDENT_BY_MONTH => [
 //            'label' => 'Student by Month',
 //            'tooltip' => 'This table will display a maximum of 12 months of past data, counting back from the most recent record\'s date',
 //            'type' => 'table',
 //        ],
-//        'studentByWeek' => [
+//        Factory::STUDENT_BY_WEEK => [
 //            'label' => 'Student by Week',
 //            'tooltip' => 'This table will display a maximum of 10 weeks of past data, counting back from the most recent record\'s date',
 //            'type' => 'table',
