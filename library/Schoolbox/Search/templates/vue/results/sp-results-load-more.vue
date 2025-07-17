@@ -61,6 +61,7 @@ window.Vue.watch(
                 if (loadMoreResultsStore.isLoading) {
                     return;
                 }
+                // Limit the number of records searched for to the number needed to fill the page.
                 await loadMoreResultsStore.loadMore(newVal.resultPageSize - newVal.allResultsLength);
             }
         }
