@@ -48,7 +48,9 @@ const radioId = window.Vue.computed(() => {
                 </nav>
                 <img :src="props.message.src" />
             </div>
-            <p v-if="props.message.message" class="l-mar--0-bottom l-mar-s--top">{{ props.message.message }}</p>
+            <p v-if="props.message.message" class="l-mar--0-bottom l-mar-s--top ig-feed-message-content">
+                {{ props.message.message }}
+            </p>
         </div>
     </div>
 </template>
@@ -75,6 +77,10 @@ const radioId = window.Vue.computed(() => {
             color: white;
             background-color: rgba(0, 0, 0, 0.6);
         }
+    }
+
+    .ig-feed-message-content {
+        white-space: pre-wrap;
     }
 }
 </style>
