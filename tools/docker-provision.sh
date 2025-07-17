@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
-# Provisions the Docker environment
-# * Executed after puppet provisioner has set up host
-# * Installs the vagrantx instance into this host, then invokes puppet again to configure the host for this instance
+# Provisions the Docker environment: port of `vagrant-provision.sh`
 
 # Global constants and functions
 source /usr/share/schoolbox/tools/vagrant-consts.sh # Cannot derive this, because it is copied by vagrant to /tmp in guest
@@ -12,6 +10,42 @@ source "${SITE_ROOT}/docker.default.ini"
 if [ -f "${SITE_ROOT}/docker.ini" ]; then
   source "${SITE_ROOT}/docker.ini"
 fi
+
+# TODO verify presence of args
+
+# Setup AWS CLI: copied from `vagrant-provision-pre-puppet.sh`
+function version_gte() {
+  echo -e "$1\n$2" | sort -rCV
+}
+function setup_aws_sso() {
+  if [ -f ~/.aws/credentials ]; then
+    if grep -q 'default' ~/.aws/credentials; then
+      echo "[SB][`date +%Y-%m-%d\ %X`] AWS SSO already set up";
+      return
+    fi
+  fi
+  echo "[SB][`date +%Y-%m-%d\ %X`] Setting up AWS SSO";
+  mkdir -p ~/.aws
+  echo "[default]
+  sso_session = docker
+  sso_account_id = ${aws_account_id}
+  sso_role_name = ${aws_role_name}
+  region = ap-southeast-2
+
+  [sso-session docker]
+  sso_region = ap-southeast-2
+  sso_start_url = ${aws_start_url}" > ~/.aws/config
+  params=()
+  params+=(--no-browser)
+  aws_version=$(aws --version 2>&1 | cut -d " " -f1 | cut -d "/" -f2)
+  if version_gte "$aws_version" "2.22.0"; then
+    params+=(--use-device-code)
+  fi
+  if ! aws configure list > /dev/null; then
+    aws sso login "${params[@]}"
+  fi
+}
+setup_aws_sso
 
 # Global vars
 # Defaults
@@ -90,7 +124,10 @@ if ! $SITE_ROOT/tools/download-s3-file.sh --data-source "$data_source" --file-na
   echo "Error: Unable to download s3 file: 'vagrant-cleanup-secrets.sql'";
   exit 1;
 fi
+
+# Current stop is here
 exit;
+
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Updating timezone data";
 mysql_tzinfo_to_sql /usr/share/zoneinfo 2>/dev/null | mysql --defaults-extra-file=/root/.my.cnf mysql 2>/dev/null;
