@@ -18,6 +18,7 @@ export const useLoadMoreResultsStore = defineStore("spLoadMoreResults", () => {
 
     /**
      * load more results
+     * @param limit - Maximum number of records to fetch from server.
      */
     async function loadMore(limit: number | null): Promise<void> {
         const resultsStore = useResultsStore();
