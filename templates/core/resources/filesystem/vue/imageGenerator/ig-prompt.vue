@@ -60,6 +60,7 @@ async function sendRequest(): Promise<void> {
             style="resize: vertical; margin-bottom: 0"
             :disabled="igStore.isGenerating || undefined"
             required
+            @keydown.enter.exact.prevent="sendRequest"
         ></textarea>
     </label>
     <div class="ig-prompt-actions actions-small-1 l-mar-m--bottom">
