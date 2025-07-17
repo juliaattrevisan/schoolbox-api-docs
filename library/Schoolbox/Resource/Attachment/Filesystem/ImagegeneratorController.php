@@ -32,6 +32,13 @@ class ImagegeneratorController extends AbstractController
 
 
     /**
+     * The route for image generation
+     * Avoiding passing through the route generator here
+     */
+    private const IMAGE_GENERATION_ROUTE = '/openai/image';
+
+
+    /**
      * @param bool   $multi
      * @param string $mimeFilter
      * @param ?IConfigLoader $conf
@@ -101,7 +108,7 @@ class ImagegeneratorController extends AbstractController
                 'MAX_FILE_SIZE'  => $this->conf->get(ConfigMapper::NAME_MAX_FILE_SIZE),
                 'ACCEPTED_FILES' => $mime,
                 'PROMPT_ATTRIBUTES' => Scrub::text(json_encode(OpenAI\Payload\ImageGeneration::getAttributes())),
-                'GENERATE_ROUTE'    => '/openai/image',
+                'GENERATE_ROUTE'    => self::IMAGE_GENERATION_ROUTE,
             ),
         );
     }
