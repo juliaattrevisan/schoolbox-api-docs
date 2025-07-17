@@ -194,8 +194,7 @@ const selectedActivity = window.Vue.computed(
 /**
  * Placeholder function for testing endpoint
  * Use this as sample of how it will work
- * @param participant - The participant to be included in the plan.
- * @param plan - The plan to include the participant in.
+ * @param plan - The plan to include participants in.
  */
 async function includeParticipantInExistingPlan(plan: Plan): Promise<void> {
     if (!plan) return;
@@ -232,6 +231,17 @@ function openIncludeModal(participant: Participant): void {
         selectedList.value = [participant.user.id];
     }
     isIncludeOpen.value = true;
+}
+
+/**
+ * Generates a label for a given customisation plan.
+ * @param plan - The customisation plan to generate the label for.
+ * @returns The label for the customisation plan.
+ */
+function getCustomisationLabel(plan: Plan): string {
+    const isDefault = !plan.name;
+    const assessableTitle = plan.assessable?.title;
+    return isDefault ? (assessableTitle ?? "") : (plan.name ?? "");
 }
 </script>
 
@@ -476,7 +486,7 @@ function openIncludeModal(participant: Participant): void {
             >
                 <option disabled value="">-- Please choose --</option>
                 <option v-for="customisation in customisations" :key="customisation.id" :value="customisation.id">
-                    {{ customisation.name }}
+                    {{ getCustomisationLabel(customisation) }}
                 </option>
             </select>
 
