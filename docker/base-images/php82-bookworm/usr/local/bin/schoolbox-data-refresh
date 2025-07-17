@@ -1,0 +1,776 @@
+#!/bin/bash
+# Refresh a instance using an S3 dataset
+#
+# This should only be invoked on the primary node in a cluster.
+#
+# This script has two main use cases:
+# 1. Installing a new instance, and
+# 2. Refreshing an existing instance
+#
+# 1. Install:
+#   In this case, the instances.ini file won't yet contain an entry for this instance.
+#   * SQL credentials must be provided as CLI args. We will pass them to PHP scripts.
+#
+# 2. Refresh
+#   * instances.ini will have an entry for the instance, we can read SQL credentials from that.
+#   * will preserves the SU user's password hash.
+#
+# To support both cases, we cannot rely on instances.ini, and thus must required SQL credentials
+# and pass these to any PHP scripts as ENV vars.
+#
+# Usage:
+#        INSTANCE_ID=[INSTANCE_ID] tools/cloud/data-refresh.sh \
+#         --dataset [sales.tar.gz] \
+#         --plan [PLAN_NAME] \
+#         --config [CONFIG_NAME] [CONFIG_VALUE] \
+#         --config [CONFIG_NAME] '[CONFIG_VALUE]'
+#         ...
+# Example - new install (need to provide SQL credentials + rabbitmq config)
+#       INSTANCE_ID=vagrantx /usr/share/schoolbox/tools/cloud/data-refresh.sh \
+#         --dataset initial.tar.gz \
+#         --plan elite \
+#         --sql-host localhost --sql-schema schoolbox --sql-user schoolboxvagrant --sql-pass abc123
+#         --config  site_hostname "'demo'" \
+#         --config  amqp_host     "NULL"
+#
+# Example - refresh (no need for SQL credentials or rabbitmq config, do need to purge redis)
+#       INSTANCE_ID=vagrantx /usr/share/schoolbox/tools/cloud/data-refresh.sh \
+#         --dataset initial.tar.gz \
+#         --plan elite \
+#         --purge-redis
+#         --config  site_hostname "'demo'" \
+
+# Global const
+readonly LOG=/usr/bin/alaress-logger
+readonly READ_IR_CONF=/usr/local/bin/schoolbox-instance-registry
+readonly L_INFO=200;
+readonly L_WARN=300;
+readonly L_ERROR=400;
+readonly ARG_DATASET='dataset'
+readonly ARG_CONFIG='config'
+readonly ARG_SITE_ROOT='site-root'
+readonly ARG_SQL_HOST='sql-host'
+readonly ARG_SQL_SCHEMA='sql-schema'
+readonly ARG_SQL_USER='sql-user'
+readonly ARG_SQL_PASS='sql-pass'
+readonly ARG_PURGE_REDIS='purge-redis'
+readonly ARG_SKIP_BUCKET_COPY='skip-bucket-copy'
+readonly ARG_INCREMENT_DATES='increment-dates'
+readonly ARG_CACHE_DIR='cache-dir'
+readonly ARG_DATA_SOURCE='data-source'
+readonly DATA_SOURCE_DEFAULT='https://s3-ap-southeast-2.amazonaws.com/schoolbox-data';
+readonly ARG_S3_REFERER='s3-referer'
+readonly ARG_IAM_ACCESS_KEY='iam-access-key'
+readonly ARG_IAM_SECRET_KEY='iam-secret-key'
+readonly ARG_NO_LOCAL_STORAGE='no-local-storage'
+readonly ARG_PLAN='plan'
+# This is a list of data dir config names over a range of SB versions.
+readonly FALLBACK_DATA_DIR_CONFIG='backup_dir:files;dropbox_dir:dropbox;file_dir:files;logs_dir:cache/logs;minify_dir:cache/minify;myfile_dir:myFiles;myfiles_cache_dir:cache/myfiles;portrait_dir:cache/portrait;purifier_cache_dir:purifier;returns_dir:returns;storage_dir:storage;stream_dir:cache/stream;submission_dir:submissions;submission_upload_tmp_dir:cache/submission_upload;thumbnail_dir:thumbnails;twig_cache_dir:twig;video_dir:video;weather_dir:cache/weather;xml_dir:cache/xml;zip_dir:cache/zip';
+readonly SITE_VERSION_LOGS_DIR_REMOVED="21.1.4" # In this version, the 'logs_dir' data dir config was removed
+readonly PLAN_CUSTOM='custom';
+readonly SITE_PLANS_VALID=("$PLAN_CUSTOM" portal portalplus wellbeing basic pro elite canvasplus canvas)
+
+# Global vars and defaults
+declare dataset;            # eg 'sales.tar.gz?versionId=abc'
+declare file_name_short;    # The name we use on local disk, eg 'sales.tar.gz'
+declare sql_user;           # Puppet may not yet have provisioned instances.ini for this instance (eg install via IR)
+declare sql_passwd;
+declare sql_host;
+declare sql_schema;
+declare su_password_hash;   # Needs to be preserved during refresh, ignored on new install
+declare purge_redis=0;      # Should we purge redis data ? (install=>no, refresh=>yes)
+declare skip_bucket_copy=0; # Should we skip the AWS S3 bucket copy ? (vagrant-provision=>yes, otherwise=>no)
+declare increment_dates=0;  # Should we increment dates on refresh?
+declare -A config;          # All the config we will set
+declare cache_dir='/tmp'    # Default cache directory to work in
+declare data_source="$DATA_SOURCE_DEFAULT"
+declare s3_referer;
+declare iam_access_key
+declare iam_secret_key
+declare puppet_certname;    # This host's puppet cert name
+declare ir_api_key;         # This host's api key for calling the Instance Registry
+declare ir_api_url;         # This host's IR endpoint
+declare data_dirs_config;   # Configured data dir defaults. eg 'backup_dir:files;dropbox_dir:dropbox,storage_dir:storage...'
+declare dataset_is_url;     # Is the dataset a URL?
+declare plan
+
+# Assume these are always required. (if we wish to override this assumption, add a new flag to support that)
+declare required_config=(amqp_host amqp_user amqp_pass amqp_vhost redis_url site_hostname site_domain title site_school_code)
+
+# These are required if copying the bucket
+declare required_config_if_bucket_copy=(otfs_s3_bucket otfs_s3_cred_key otfs_s3_cred_secret)
+
+# Attempt to preserve these if they already exist (eg on refresh), but respect CLI if provided
+declare config_to_preserve=(amqp_host amqp_user amqp_pass amqp_vhost redis_ephemeral_url taskd_redis_url otfs_s3_alt_host otfs_s3_alt_bucket otfs_s3_alt_region otfs_s3_alt_bucket otfs_s3_alt_access_key otfs_s3_alt_secret_key)
+
+function log(){
+  $LOG $L_INFO "$1"
+}
+
+function warn(){
+  $LOG $L_WARN "$1"
+}
+
+function error(){
+  $LOG $L_ERROR "$1"
+}
+
+# Check scrips is running as root.
+function check_run_as_root(){
+  if [[ $EUID -ne 0 ]]; then
+    error "This script must be run as root"
+    exit 1
+  fi
+}
+
+# Ensure an INSTANCE_ID env var is available
+function check_instance_id(){
+  if [[ -z "$INSTANCE_ID" ]]; then
+    error "You must set an INSTANCE_ID as environment var"
+    exit 1
+  fi
+}
+
+# checks if argument is a URL
+function is_url(){
+  if [[ "$1" =~ ^https?:// ]]; then
+    dataset_is_url=true
+  else
+    dataset_is_url=false
+  fi
+}
+
+
+# Parse ENV + CLI flags
+function parse_args(){
+  local errors='0'
+
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+      --"$ARG_PURGE_REDIS")
+        purge_redis="1"; shift;
+        ;;
+      --"$ARG_SKIP_BUCKET_COPY")
+        skip_bucket_copy="1"; shift;
+        ;;
+      --"$ARG_INCREMENT_DATES")
+        increment_dates="1"; shift;
+        ;;
+      --"$ARG_DATA_SOURCE")
+        data_source="$2"; shift; shift;
+        ;;
+      --"$ARG_S3_REFERER")
+        s3_referer="$2"; shift; shift;
+        ;;
+      --"$ARG_IAM_ACCESS_KEY")
+        iam_access_key="$2"; shift; shift;
+        ;;
+      --"$ARG_IAM_SECRET_KEY")
+        iam_secret_key="$2"; shift; shift;
+        ;;
+      --"$ARG_DATASET")
+        dataset="$2"; shift; shift;
+        is_url "$dataset";
+        if [[ "$dataset_is_url" == false ]]; then
+          file_name_short=$(echo "$dataset" | cut -d'?' -f1); # Strip off any '?versionId=abc' trailing part
+        else
+          file_name_short=$(basename "$dataset" | cut -d'?' -f1); # Strip off any '?versionId=abc' trailing part
+        fi
+        ;;
+      --"$ARG_CACHE_DIR")
+        cache_dir=${2%/}; shift; shift; # trim trailing slashes
+        ;;
+      --"$ARG_SITE_ROOT")
+        warn "'--$ARG_SITE_ROOT' is no longer required and has no effect"
+        shift; shift;
+        ;;
+      --"$ARG_SQL_HOST")
+        sql_host="$2"; shift; shift;
+        ;;
+      --"$ARG_SQL_SCHEMA")
+        sql_schema="$2"; shift; shift;
+        ;;
+      --"$ARG_SQL_USER")
+        sql_user="$2"; shift; shift;
+        ;;
+      --"$ARG_SQL_PASS")
+        sql_passwd="$2"; shift; shift;
+        ;;
+      --"$ARG_NO_LOCAL_STORAGE")
+        no_local_storage="1"; shift;
+        ;;
+      --"$ARG_PLAN")
+        plan="$2"; shift; shift;
+        ;;
+      --"$ARG_CONFIG")
+        config["$2"]="$3"; shift; shift; shift;
+        ;;
+      *)
+        error "Unrecognised option: '$1'"
+        shift # past argument
+        errors="1"
+        ;;
+    esac
+  done
+  if [[ $errors == "1" ]]; then
+    exit 1
+  fi
+}
+
+# Attempt to read SQL from conf file using INSTANCE_ID
+# This will not work during new install because SQL credentials will not yet have been deployed to instances.ini
+# For new installs, SQL credentials must be passed as CLI args
+function parse_sql_from_conf(){
+  if [[ -z $sql_user ]]; then
+    sql_user=$(schoolbox-read-instances --option SQL_user);
+  fi
+  if [[ -z $sql_passwd ]]; then
+    sql_passwd=$(schoolbox-read-instances --option SQL_passwd);
+  fi
+  if [[ -z $sql_host ]]; then
+    sql_host=$(schoolbox-read-instances --option SQL_host);
+  fi
+  if [[ -z $sql_schema ]]; then
+    sql_schema=$(schoolbox-read-instances --option SQL_db);
+  fi
+}
+
+# Checks the CLI flags we passed are valid
+function validate_args(){
+  local errors='0'
+
+  if [[ -z $dataset ]]; then
+    error "You must specify a dataset using the '--$ARG_DATASET' flag"
+    errors="1"
+  fi
+  if [[ -z $sql_host ]]; then
+    error "Unable to derive SQL host. You must provide one using the '--$ARG_SQL_HOST' flag"
+    errors="1"
+  fi
+  if [[ -z $sql_schema ]]; then
+    error "Unable to derive SQL schema. You must provide one using the '--$ARG_SQL_SCHEMA' flag"
+    errors="1"
+  fi
+  if [[ -z $sql_user ]]; then
+    error "Unable to derive SQL user. You must provide one using the '--$ARG_SQL_USER' flag"
+    errors="1"
+  fi
+  if [[ -z $sql_passwd ]]; then
+    error "Unable to derive SQL password. You must provide one using the '--$ARG_SQL_PASS' flag"
+    errors="1"
+  fi
+  if [[ -n "$plan" ]] && [[ ! " ${SITE_PLANS_VALID[*]} " =~ $plan ]]; then
+    error "Invalid plan. Expected one of (${SITE_PLANS_VALID[*]}), found: '$plan'"
+    errors="1"
+  fi
+
+  if [[ $errors == "1" ]]; then
+    exit 1
+  fi
+}
+
+
+# Export SQL credentials to be used by subsequent scripts prior to instances.ini update.
+export_sql_credentials(){
+  export SQL_USER="$sql_user"
+  export SQL_PASS="$sql_passwd"
+  export SQL_HOST="$sql_host"
+  export SQL_SCHEMA="$sql_schema"
+}
+
+
+# Derive this host's puppet certname
+function derive_puppet_certname(){
+  if ! puppet_certname=$($READ_IR_CONF --puppet-cert); then
+    exit 1;
+  fi
+}
+
+
+# Fetch this host's IR api key
+function derive_ir_api_key(){
+  if ! ir_api_key=$($READ_IR_CONF --api-key); then
+    exit 1;
+  fi
+}
+
+
+# Check if this host has an IR URL override (eg vagrant can be configured to point at a local development IR environment)
+function derive_ir_api_url(){
+  if ! ir_api_url=$($READ_IR_CONF --url); then
+    exit 1;
+  fi
+}
+
+
+# Fetch current SU password if one exists
+function fetch_old_su_password() {
+  # If a new install, this table won't exist.
+  local table_count;
+  table_count=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_passwd" -ss -e "SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = '$sql_schema' AND TABLE_NAME = 'user'")
+
+  # If table exists, fetch password hash
+  if [[ $table_count == 1 ]]; then
+    su_password_hash=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -ss -e 'SELECT password FROM user WHERE username = "alaress" LIMIT 1')
+  fi
+}
+
+# Attempt to fetch existing config if doing a refresh, but don't clobber CLI flags which have precendence
+function fetch_existing_config() {
+  # If a new install, this table won't exist.
+  local table_count;
+  table_count=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_passwd" -ss -e "SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = '$sql_schema' AND TABLE_NAME = 'config'")
+
+  # If table exists, fetch existing config
+  if [[ $table_count == 1 ]]; then
+    local config_value;
+    for config_name in "${config_to_preserve[@]}"; do
+      # Only fetch from DB if not already provided as CLI arg
+      if [[ ! -v "config[$config_name]" ]]; then
+        # Need to distinguish NULL and 'NULL' (string)
+        config_value_and_isnull=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -ss -e "SELECT value, value IS NULL FROM config WHERE name = '$config_name' LIMIT 1")
+        IFS=$'\t' read -r -a array <<< "$config_value_and_isnull"
+        config_value=${array[0]}
+        is_null=${array[1]}
+        if [[ $is_null == "1" ]]; then
+          config[$config_name]="$config_value"
+        else
+          config[$config_name]="'$config_value'"
+        fi
+      fi
+    done
+  fi
+}
+
+function validate_config() {
+  local errors='0'
+  for key in "${required_config[@]}"; do
+    if [[ ! -v "config[$key]" ]]; then
+      error "You must declare a config value using the --$key flag or have it available from current instance on refresh"
+      errors="1"
+    fi
+  done
+
+  if [[ $skip_bucket_copy == 0 ]]; then
+    for key in "${required_config_if_bucket_copy[@]}"; do
+      if [[ ! -v "config[$key]" ]]; then
+        error "You must declare a config value using the --$key flag or have it available from current instance on refresh when copying the S3 bucket"
+        errors="1"
+      fi
+    done
+  fi
+
+  if [[ $errors == "1" ]]; then
+    error "Validation errors occurred"
+    exit 1
+  fi
+}
+
+
+# Download dataset from provided location and extract SQL file
+function fetch_dataset_and_extract_database(){
+  local instance_data_dir=$1
+  log "Fetching dataset '$dataset'..."
+  rm -fR "$instance_data_dir";
+  mkdir -p "$instance_data_dir";
+
+  # Need to support local-only datasets that are already in the cache dir.
+  # In this case, try to fetch from S3, but if not found, only an error if not in cache dir
+  local download_s3_file_output;
+  local download_s3_file_command;
+
+  if [[ "$dataset_is_url" == true ]]; then
+    download_s3_file_command="wget -O $cache_dir/$file_name_short $dataset";
+  else
+    local script=/usr/share/schoolbox/tools/download-s3-file.sh
+
+    # TODO, remove once all schoolbox packages upgrade past 22.0.2 (at which point these args became required)
+    local extra_args=()
+    if $script --help 2>/dev/null | grep -q iam-access-key; then
+      extra_args+=( --iam-access-key "$iam_access_key" )
+      extra_args+=( --iam-secret-key "$iam_secret_key" )
+    fi
+    if [[ -n $s3_referer  ]]; then
+      extra_args+=( --s3-referer "$s3_referer" )
+    fi
+    download_s3_file_command="$script --data-source $data_source --file-name $dataset ${extra_args[*]} --cache-dir $cache_dir";
+  fi
+  if ! download_s3_file_output=$($download_s3_file_command 2>&1); then
+    if [[ -f "$cache_dir"/"$file_name_short" ]]; then
+      log "dataset file found in cache but not S3, using cached version"
+    else
+      echo "$download_s3_file_output";
+      error "Unable to fetch dataset"
+      exit 1
+    fi
+  fi
+
+  if ! tar -C "$instance_data_dir" -xzf "$cache_dir"/"$file_name_short" data/schoolbox.sql --strip-components=1; then
+    error "Unable to extract database"
+    exit 1
+  fi
+}
+
+# Extracts the dataset's file, optionally excluding the 'storage_dir' directory
+function extract_all_dataset_files(){
+  local instance_data_dir=$1
+  log "Extracting data dirs from tarball to '$instance_data_dir'"
+
+  # No need to re-extract SQL file. Did caller request to also exclude the storage dir?
+  local exclude_options=(--exclude schoolbox.sql)
+  if [[ "$no_local_storage" == 1 ]]; then
+    local storage_dir_value
+    IFS=';' read -r -a array <<< "$data_dirs_config"
+    for element in "${array[@]}"; do
+      IFS=':' read -r -a sub_array <<< "$element"
+      if [[ ${sub_array[0]} == "storage_dir" ]]; then
+        storage_dir_value=${sub_array[1]}
+        break
+      fi
+    done
+    log "Excluding storage dir '${storage_dir_value}'"
+    exclude_options+=(--exclude "${storage_dir_value}")
+  fi
+
+  if ! tar -C "$instance_data_dir" -xzf "$cache_dir"/"$file_name_short" data --strip-components=1 "${exclude_options[@]}"; then
+    error "Unable to extract data dirs from dataset"
+    exit 1
+  fi
+}
+
+# Returns whether the site version we are deploying to still requires a 'logs_dir' data dir
+# Returns:
+#   0 if still required (ie < 21.1.4)
+#   1 if not required (ie 21.1.4+)
+requires_logs_data_dir(){
+  local target_site_version;
+  target_site_version=$(find /usr/share/schoolbox/updates/ -mindepth 1 -maxdepth 1 -type d -printf "%f\n" | sort -V | tail -n 1)
+  log "Deploying to site_version: '$target_site_version'"
+  if [[ $(echo -e "$SITE_VERSION_LOGS_DIR_REMOVED\n$target_site_version" | sort -V | head -n 1) == "$SITE_VERSION_LOGS_DIR_REMOVED" ]]; then
+    return 1
+  fi
+  return 0
+}
+
+set_ownership_and_permissions(){
+  if ! /usr/share/schoolbox/tools/set-config-data-dirs-perms.sh --owner www-data --group www-data --verbose; then
+    error "Unable to set data dir ownership and perms"
+    exit 1;
+  fi
+}
+
+# Drop all database views and tables
+function empty_schema(){
+  log "Dropping all database views..."
+  for db_view in $(mysql -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -ss -e 'SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE LIKE "VIEW"'); do
+    if ! mysql -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -e "SET MAX_STATEMENT_TIME=0; DROP view $db_view"; then
+      error "Unable to drop database view: $db_view"
+      error 1;
+    fi
+  done
+
+  log "Dropping all database tables..."
+  if ! mysqldump --single-transaction --no-tablespaces --add-drop-table --no-data -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" | grep -e '^DROP \| FOREIGN_KEY_CHECKS' | mysql -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema"; then
+    error "Unable to drop database tables"
+    exit 1;
+  fi
+}
+
+
+# Import the SQL dump file into the schema
+function import_dataset(){
+  local instance_data_dir=$1
+  log "Loading dataset into database schema '$sql_schema'..."
+  if ! (echo "SET MAX_STATEMENT_TIME=0; "; pv "$instance_data_dir"/schoolbox.sql) | sed -E "s/^\/\*\!50013 DEFINER=.+\*\//\/\* Fallback to default DEFINER \*\//g" | mysql -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema"; then
+    error "Unable to import database"
+    exit 1;
+  fi
+  rm "$instance_data_dir"/schoolbox.sql
+}
+
+
+# Copy's S3 bucket contents from dataset bucket to this instance's bucket
+function copy_bucket_contents(){
+  local bucket_dataset;
+  bucket_dataset=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -ss -e "SELECT value FROM config WHERE name = 'otfs_s3_bucket'")
+
+  if [[ -z $bucket_dataset ]]; then
+    log "Dataset does not have an S3 bucket configured, skipping bucket copy"
+    return
+  fi
+
+  local bucket_instance=${config[otfs_s3_bucket]};
+  bucket_instance=${bucket_instance//\'/}
+  log "Copying contents of source S3 bucket '${bucket_dataset}' to instance S3 bucket '${bucket_instance}'"
+
+  local post_data;
+  post_data="$(jq -c -n --arg from "${bucket_dataset}" --arg to "${bucket_instance}" '{from:$from,to:$to}')"
+
+  local response;
+  if ! response=$(curl -X POST "$ir_api_url"/api/host/"$puppet_certname"/bucket-copy -H "Authorization: Bearer $ir_api_key" -H "Content-Type: application/json" -d "$post_data"); then
+    error "Curl failed. Unable to copy contents of source bucket '${bucket_dataset}' to instance bucket '${bucket_instance}'"
+    exit 1;
+  fi
+
+  echo -e "Response:\n";
+  echo "$response" | jq .
+  echo -e "\n";
+
+  if [[ "$(echo "$response" | jq .status | sed 's/"//g')" != 'ok' ]]; then
+    error "S3 bucket copy appeared to fail"
+    exit 1;
+  fi
+}
+
+
+# Localise the database config table.
+# This needs to run:
+# 1. After initial data import to ensure update scripts can function in this environment
+# 2. After update scripts have finished to populate any new config that did not exist in an old dataset
+function localise_database_config(){
+  for key in "${!config[@]}"; do
+    if ! mysql -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -e "UPDATE config SET value=${config[$key]} WHERE name='$key'"; then
+      error "Unable to set config '$key' to ${config[$key]}"
+      exit 1;
+    fi
+  done
+}
+
+
+# Restore the SU password hash we captured earlier
+function restore_su_password() {
+  if [[ -n $su_password_hash ]]; then
+    if mysql -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -e "UPDATE user SET password = '$su_password_hash' WHERE username = 'alaress'"; then
+      log "Password hash for 'alaress' user restored to '$su_password_hash'"
+    else
+      error "Error. Unable to restore alaress user password hash to '$su_password_hash'"
+    fi
+  fi
+}
+
+
+# We need to place data dirs from inside the dataset into their canonical instance-specific locations
+# This will create data dirs for the imported SQL which may be at an older version that the code on this host.
+# If the update scripts change data dirs, it is their responsibility to manage the primary host's file-system.
+# Puppet will periodically run on non-primary hosts and ensure the data dirs in the schema are created on the host.
+function create_data_dirs(){
+  local instance_data_dir=$1
+  # We don't care if this is schoolbox/dev, because we put the instance_id in the path.
+
+  local -A data_dir_map=(); # Maps config name to default relative dir, eg 'twig_cache_dir:twig;backup_dir:files;zip_dir:cache/zip'
+
+  IFS=';' read -r -a array <<< "$data_dirs_config"
+  for element in "${array[@]}"; do
+    IFS=':' read -r -a sub_array <<< "$element"
+    data_dir_map[${sub_array[0]}]="${sub_array[1]}"
+  done
+
+  # We will just blindly assume the dataset had all data dirs in their default relative locations.
+  # TODO enforce this https://schoolbox.atlassian.net/browse/IST-404
+  # We need to update the database's pointers to their new location on disk.
+
+  local sql_cmd
+  for data_dir_name in "${!data_dir_map[@]}"; do
+
+    # If we are deploying to a 21.1.4+ product, we can ignore log dir, as all logs are being moved to /var/log/schoolbox/$INSTANCE_ID
+    # TODO remove once all clients upgrade past 21.1.4
+    if [[ $data_dir_name == "logs_dir" ]]; then
+      local target_site_version;
+      target_site_version=$(find /usr/share/schoolbox/updates/ -mindepth 1 -maxdepth 1 -type d -printf "%f\n" | sort -V | tail -n 1)
+      if ! requires_logs_data_dir; then
+        log "Skipping 'logs_dir', no longer required in $SITE_VERSION_LOGS_DIR_REMOVED+"
+        continue
+      else
+        log "Retaining 'logs_dir', still used by versions <$SITE_VERSION_LOGS_DIR_REMOVED"
+      fi
+    fi
+
+    local data_dir_value="${instance_data_dir}/${data_dir_map[$data_dir_name]}"
+    log "Setting data_dir '$data_dir_name' => '$data_dir_value'"
+    sql_cmd="UPDATE config SET value = '$data_dir_value' WHERE name = '$data_dir_name'"
+    if ! mysql -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -ss -e "$sql_cmd"; then
+      error "Unable to set '$data_dir_value' to '$data_dir_name'"
+      exit 1
+    fi
+    mkdir -vp "$data_dir_value"
+  done
+}
+
+# TODO remove this once all sites using this have upgraded past 21.1.5 (where it was moved prior to SQL short-circuit)
+set_site_package(){
+  local package_version
+  if dpkg -l | grep -qE "\sschoolbox\s"; then
+    package_version=$(dpkg -s schoolbox | grep Version | awk '{print $2}')
+  fi
+  log "Setting 'site_package' to '$package_version'"
+  mysql -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -e "UPDATE config SET value = '$package_version' WHERE name = 'site_package';"
+}
+
+
+# Upgrade SQL
+function upgrade_sql(){
+  if INSTANCE_ID="$INSTANCE_ID" /usr/share/schoolbox/tools/maintenance/site_down.sh -eq 0 ; then
+    log "Maintenance mode enabled on instance '$INSTANCE_ID'."
+  else
+    log "Could not enable maintenance mode on instance '$INSTANCE_ID'.  Exiting."
+    exit 1;
+  fi
+
+  # We need to set the SQL credentials as env vars as we are invoking PHP and instances.ini may not yet have this instance
+  if ! SQL_HOST="$sql_host" SQL_SCHEMA="$sql_schema" SQL_USER="$sql_user" SQL_PASS="$sql_passwd" /usr/share/schoolbox/tools/update-sql.sh; then
+    error "Unable to update SQL"
+    exit 1;
+  fi
+
+  if INSTANCE_ID="$INSTANCE_ID" /usr/share/schoolbox/tools/maintenance/site_up.sh -eq 0 ; then
+    log "Maintenance mode disabled on instance '$INSTANCE_ID'."
+  else
+    log "Could not disable maintenance mode on instance '$INSTANCE_ID'.  Continuing."
+  fi
+}
+
+
+function set_plan(){
+  if [[ -z $plan ]]; then
+    log "Plan arg not provided, resetting to current plan"
+    /usr/share/schoolbox/tools/set-plan.php --reset
+  elif [[ $plan == "$PLAN_CUSTOM" ]]; then
+    log "Plan is '$PLAN_CUSTOM', skipping set-plan.php"
+  else
+    log "setting plan to '$plan'"
+    /usr/share/schoolbox/tools/set-plan.php --plan "$plan"
+  fi
+}
+
+
+# Wipe messages from redis
+function empty_redis(){
+  local redis_url;
+  redis_url=$(echo "${config[redis_url]}" | sed "s/'//g" | sed -E "s/^[a-z]+:\/\///")
+  local redis_host;
+  local redis_port;
+  redis_host=$(echo "$redis_url" | cut -d ":" -f 1)
+  redis_port=$(echo "$redis_url" | cut -d ":" -f 2)
+  if [[ -z $redis_port ]]; then
+    redis_port=6379
+  fi
+  log "Resetting redis. (Host: $redis_host, Port: $redis_port)"
+  redis-cli -h "$redis_host" -p $redis_port KEYS "*:$INSTANCE_ID:*" | xargs redis-cli -h "$redis_host" -p $redis_port DEL;
+}
+
+function refresh_module_route_cache(){
+  local script=/usr/share/schoolbox/tools/module/refresh-cache.php
+  # Check we are installing a version that actually has this feature.
+  if [[ -f $script ]]; then
+    log "Loading route+module cache...";
+    SQL_HOST="$sql_host" SQL_SCHEMA="$sql_schema" SQL_USER="$sql_user" SQL_PASS="$sql_passwd" $script;
+  fi
+}
+
+# Refresh binding cache, write it to redis, and signal daemons to reload.
+# TODO confirm this works for new installs. The daemons that use this cache wont yet exist. Do they pick it up correctly when created by puppet?
+function refresh_binding_cache(){
+  # Always refresh binding cache (provide SQL credentials to support new installs)
+  SQL_HOST="$sql_host" SQL_SCHEMA="$sql_schema" SQL_USER="$sql_user" SQL_PASS="$sql_passwd" php /usr/share/schoolbox/tools/notif/route/refresh-binding-cache.php -vv
+}
+
+
+# Fetch 'data_dirs_defaults' from config table, falling back to sane values if not found
+function get_data_dirs_defaults_config(){
+  data_dirs_config=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -ss -e "SELECT value from config WHERE name = 'data_dirs_defaults'")
+  if [[ -z $data_dirs_config ]]; then
+    local sql_version;
+    sql_version=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -ss -e "SELECT value from config WHERE name = 'site_version'")
+    local message="Data dir default config not found or empty. SQL version: $sql_version"
+    if [[ "$(echo -e "20.1.7\n${sql_version}" | sort -V | head -n 1)" == "20.1.7" ]]; then
+      error "$message"
+      exit 1;
+    else
+      warn "$message. Falling back to fuzzy list"
+      data_dirs_config="$FALLBACK_DATA_DIR_CONFIG"
+    fi
+  fi
+}
+
+set_log_dir(){
+  if requires_logs_data_dir; then
+    log "Skipping log dir modification. Product update script will do this..."
+    return
+  fi
+
+  local log_dir_value="/var/log/schoolbox/${INSTANCE_ID}"
+  mkdir -pv "$log_dir_value"
+  chown -c www-data:www-data "$log_dir_value"
+  log "Setting logging directory => '$log_dir_value'"
+  sql_cmd="UPDATE config SET value = '$log_dir_value' WHERE name = 'logs_dir'"
+  if ! mysql -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -ss -e "$sql_cmd"; then
+    error "Unable to set 'logs_dir' to '$log_dir_value'"
+    exit 1
+  fi
+}
+
+increment_dates(){
+  log "Launching product date-increment script..."
+  /usr/share/schoolbox/tools/increment-instance-dates.php
+}
+
+# Main logic flow
+function main(){
+  PATH='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games';
+  check_run_as_root
+  check_instance_id
+  parse_args "$@"
+  parse_sql_from_conf
+  validate_args
+  export_sql_credentials
+  derive_puppet_certname
+  if [[ $skip_bucket_copy == 0 ]]; then
+    derive_ir_api_key
+    derive_ir_api_url
+  fi
+  fetch_old_su_password
+  fetch_existing_config
+  validate_config
+
+
+  # We don't care if this is schoolbox/dev, because we put the instance_id in the path.
+  local instance_data_dir="/var/lib/schoolbox/$INSTANCE_ID"
+
+  # fetch dataset from S3 into cache directory and only extract the database for now
+  fetch_dataset_and_extract_database "$instance_data_dir"
+
+  # Clear transient data (prior to blowing away the config that points to it)
+  if [[ $purge_redis == '1' ]]; then
+    empty_redis
+  fi
+
+  # Import dataset SQL and upgrade to current version
+  empty_schema
+  import_dataset "$instance_data_dir"
+  get_data_dirs_defaults_config
+  create_data_dirs "$instance_data_dir"
+  set_log_dir
+  if [[ $skip_bucket_copy == 0 ]]; then
+    copy_bucket_contents
+  fi
+
+  extract_all_dataset_files "$instance_data_dir"
+  set_ownership_and_permissions
+  localise_database_config
+  restore_su_password
+  set_site_package
+  upgrade_sql
+  set_plan
+  # Intentionally apply config after plan so that 'cloud refresh' configs take precedence over plan defaults.
+  localise_database_config
+  refresh_module_route_cache
+  refresh_binding_cache
+
+  if [[ $increment_dates == 1 ]]; then
+      increment_dates
+  fi
+
+  log "Data refresh complete."
+}
+
+main "$@"
