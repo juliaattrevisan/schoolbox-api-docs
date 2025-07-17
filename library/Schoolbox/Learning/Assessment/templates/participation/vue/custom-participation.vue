@@ -188,16 +188,28 @@ async function includeSelected(): Promise<void> {
 const isIncludeOpen = window.Vue.ref(false);
 const selectedParticipants = window.Vue.ref<Participant[]>([]);
 const selectedActivityId = window.Vue.ref<number | null>(null);
+
+/**
+ * The current selected activity for inclusion.
+ */
 const selectedActivity = window.Vue.computed(
     () => props.customisations.find((plan) => plan.id === selectedActivityId.value) ?? null,
 );
 
 /**
- * Placeholder function for testing endpoint
- * Use this as sample of how it will work
+ * Checks if the selected activity is a 'Modify activity' type.
+ * Which helps determine how to treat the selected activity in the UI.
+ */
+const isSelectedActivityModify = window.Vue.computed(() => {
+    return selectedActivity.value?.name !== null;
+});
+
+/**
+ * Add all the selected participants to an existing customisation plan.
  */
 async function includeParticipantInExistingPlan(): Promise<void> {
-    if (!selectedActivity.value) return;
+    if (selectedActivity.value === null) return;
+    const activity = selectedActivity.value;
     // if the array is empty, it means that we are including participants via the bottom drawer,
     // otherwise the single participant is being included via the pop-out menu
     if (selectedParticipants.value.length === 0) {
@@ -210,15 +222,21 @@ async function includeParticipantInExistingPlan(): Promise<void> {
             headers: { Accept: "application/json", "Content-Type": "application/json" },
             body: JSON.stringify({
                 students: selectedParticipants.value.map((p) => p.user.id),
-                planId: selectedActivity.value.id,
-                assessmentId: selectedActivity.value.assessable.id,
+                planId: activity.id,
+                assessmentId: activity.assessable.id,
             }),
         });
         if (!response.ok) {
             const errorMessage = await extractErrorMessage(response);
             throw new Error(errorMessage);
         }
-        const participants = await response.json();
+        selectedParticipants.value.forEach((participant) => {
+            if (isSelectedActivityModify.value) {
+                participant.plan = activity;
+            } else {
+                participant.customisedPlan = activity;
+            }
+        });
         toast.timeout({ text: "Customisation added successfully", isSuccess: true });
         isIncludeOpen.value = false;
         selectedParticipants.value = [];
