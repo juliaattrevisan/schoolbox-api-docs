@@ -17,6 +17,7 @@ interface Props {
     getAssessmentParticipationNewActivity: string;
     assessmentId: number;
     customisations: Plan[];
+    includeInExistingCustomisation: string;
 }
 const props = defineProps<Props>();
 
@@ -193,15 +194,19 @@ async function includeSelected(): Promise<void> {
 async function includeParticipantInExistingPlan(participant: Participant): Promise<void> {
     const toast = window.sbProps.toastActivate("Adding to customisation...");
     try {
-        const response = await fetch(participant._links.includeInExistingCustomisation, {
+        const response = await fetch(props.includeInExistingCustomisation, {
             method: "POST",
             headers: {
                 Accept: "application/json",
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                planId: 1306, //TODO: plan id of the plan to include the student
-                assessmentId: 39, //TODO: assessment id of the plan (ie plan.assessable.id)
+                students: [
+                    13,
+                    65
+                ],
+                planId: 1305, //TODO: plan id of the plan to include the student
+                assessmentId: 1576, //TODO: assessment id of the plan (ie plan.assessable.id)
             }),
         });
         toast.timeout({ text: "Customisation added successfully" });
