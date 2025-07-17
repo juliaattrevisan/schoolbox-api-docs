@@ -236,38 +236,35 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Installing instance via 'schoolbox-data-refresh
 #  export SB_FORCE_UPGRADE=1 # Allow unsafe upgrade from really old datasets
 #fi
 
-
-# Current stop is here
-exit;
-
-
 # Note schoolbox-data-refresh.sh creates the database and then applies the schoolbox/updates SQL and PHP scripts.  It
 # is the responsibility of schoolbox-data-refresh.sh to enable and disable maintenance mode as appropriate during its
 # execution (by making calls to site_down.sh/site_up.sh).  (The site_down.sh/site_up.sh scripts update the database, so
 # site_down.sh cannot be run until the database has been created.)
-if ! INSTANCE_ID=vagrantx schoolbox-data-refresh.sh \
+if ! INSTANCE_ID=docker schoolbox-data-refresh.sh \
 --data-source "$data_source" \
 --dataset "$data_filename" \
 --skip-bucket-copy \
---sql-host 'localhost' \
+--sql-host 'mariadb' \
 --sql-schema 'schoolbox' \
---sql-user 'schoolboxvagrant' \
+--sql-user 'schoolboxdocker' \
 --sql-pass 'abc123' \
 --cache-dir "$SITE_ROOT/vagrantcache" \
---config amqp_host "'localhost'" \
+--config amqp_host "'rabbitmq'" \
 --config amqp_user "'guest'" \
 --config amqp_pass "'guest'" \
 --config amqp_vhost "'/'" \
 --config debug_show_stack_trace "'1'" \
 --config debug_templates "'1'" \
 --config eotc_enabled "'1'" \
+--config etherpad_host "'http://schoolbox-etherpad:9001'" \
+--config etherpad_api_token "'test'" \
 --config external_type "'$external_db'" \
 --config external_db_db "'$external_db_db'" \
 --config external_db_host "'$external_db_host'" \
 --config external_db_user "'schoolbox'" \
 --config external_portal "'https://portal.synergetic.dev.schoolbox.cloud'" \
 --config fixtures_enabled "'1'" \
---config gotenberg_host "'http://localhost:3000'" \
+--config gotenberg_host "'http://schoolbox-gotenberg:3000'" \
 --config instance_registry_url "'$instance_registry_url'" \
 --config ldap_enable "'0'" \
 --config mail_enable "'1'" \
@@ -279,29 +276,34 @@ if ! INSTANCE_ID=vagrantx schoolbox-data-refresh.sh \
 --config office365_tenant_id "'9a9eb3a6-27e2-43bf-8831-37e8d0cc2265'" \
 --config pastoral_enabled "'1'" \
 --config qr_login_enabled "'1'" \
---config redis_url "'tcp://127.0.0.1:6379'" \
---config redis_ephemeral_url "'tcp://127.0.0.1:6380'" \
+--config redis_url "'tcp://redis-storage:6379'" \
+--config redis_ephemeral_url "'tcp://redis-cache:6379'" \
+--config taskd_redis_url "'tcp://redis-storage:6379'" \
 --config resource_booking_enabled "'1'" \
 --config site_domain "'dev.schoolbox.cloud'" \
---config site_hostname "'vagrant'" \
---config site_school_code "'vagrant'" \
+--config site_hostname "'docker'" \
+--config site_school_code "'docker'" \
 --config site_environment "'client-hosted'" \
 --config site_type "'dev'" \
 --config strict_templates "'1'" \
 --config summative_report_enabled "'1'" \
---config title "'Schoolbox [vagrant]'" \
+--config title "'Schoolbox [docker]'" \
 --config ups_groups_enabled "'1'"; then
   error "Unable to install instance. Exiting."
   exit 1
 fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Putting system in maintenance mode";
-if INSTANCE_ID=vagrantx "$SITE_ROOT"/tools/maintenance/site_down.sh -eq 0 ; then
-  echo "[SB][`date +%Y-%m-%d\ %X`] Maintenance mode enabled on instance 'vagrantx'."
+if INSTANCE_ID=docker "$SITE_ROOT"/tools/maintenance/site_down.sh -eq 0 ; then
+  echo "[SB][`date +%Y-%m-%d\ %X`] Maintenance mode enabled on instance 'docker'."
 else
-  echo "[SB][`date +%Y-%m-%d\ %X`] Could not enable maintenance mode on instance 'vagrantx'.  Exiting."
+  echo "[SB][`date +%Y-%m-%d\ %X`] Could not enable maintenance mode on instance 'docker'.  Exiting."
   exit 1;
 fi
+
+
+# Finish here now
+exit
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Applying vagrant SQL fixes";
 mysql --defaults-extra-file=/root/.my.cnf schoolbox < "$SITE_ROOT"/sql/vagrant.sql
