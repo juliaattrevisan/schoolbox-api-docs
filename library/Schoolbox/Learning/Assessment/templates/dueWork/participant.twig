@@ -100,7 +100,8 @@
                             feedback:    participant.findMostRecentInstructorGivenFeedback,
                             participant: participant,
                             tabIndex:    (loop.index0 * inputsPerFeedback) + inputNo,
-                            readonly:    readonly
+                            readonly:    readonly,
+                            prefix:      assessment.id,
                         } only %}
                         {% set inputNo = inputNo + 1 %}
                     </div>
@@ -116,7 +117,7 @@
                         selfAssessment: selfAssess,
                         selfReflection: selfReflect,
                         blindMode:      false,
-                        isRichText: false,
+                        isRichText:     false,
                         prefix:         assessment.id,
                     } only %}
                     {% set inputNo = inputNo + 1 %}
@@ -125,7 +126,8 @@
                             feedback:    participant.findMostRecentInstructorGivenFeedback,
                             participant: participant,
                             tabIndex:    (loop.index0 * inputsPerFeedback) + inputNo,
-                            readonly:    readonly
+                            readonly:    readonly,
+                            prefix:      assessment.id,
                         } only %}
                         {% set inputNo = inputNo + 1 %}
                     {% endif %}
