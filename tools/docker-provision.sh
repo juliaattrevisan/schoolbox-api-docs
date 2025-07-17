@@ -331,12 +331,12 @@ for config_name in "${!env_vars[@]}"; do
   fi
 done
 
-# Set up the host for the newly-installed instance
-echo "[SB][`date +%Y-%m-%d\ %X`] Invoking puppet to configure host for newly-installed instance";
-FACTER_vagrant_extra_hostname="$extra_hostname" \
-    FACTER_primary_php_majver="$phpversion_supported" \
-    FACTER_taskd_systemd_service_installed="$taskd_systemd_service_installed" \
-    "$SITE_ROOT"/puppet-apply.sh
+## Set up the host for the newly-installed instance
+#echo "[SB][`date +%Y-%m-%d\ %X`] Invoking puppet to configure host for newly-installed instance";
+#FACTER_vagrant_extra_hostname="$extra_hostname" \
+#    FACTER_primary_php_majver="$phpversion_supported" \
+#    FACTER_taskd_systemd_service_installed="$taskd_systemd_service_installed" \
+#    "$SITE_ROOT"/puppet-apply.sh
 
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Applying vagrant SQL fixes (post version upgrade)";
@@ -441,59 +441,59 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Loading all demo data complete";
 ffmpegver=`dpkg -l schoolbox-ffmpeg | tail -n1 | awk {'print $3'}`;
 echo "[SB][`date +%Y-%m-%d\ %X`] schoolbox-ffmpeg installed: $ffmpegver";
 
-if [ "$enable_xdebug" == "true" ];
-then
-    echo "[SB][`date +%Y-%m-%d\ %X`] Enabling xdebug";
-    if [ -f "$SITE_ROOT"/tools/xdebug.ini ]; then
-        echo "[SB][`date +%Y-%m-%d\ %X`] Using custom xdebug: tools/xdebug.ini";
-        cp -f "$SITE_ROOT"/tools/xdebug.ini /etc/php/"$phpversion_supported"/mods-available/xdebug.ini;
-    else
-        echo "[SB][`date +%Y-%m-%d\ %X`] Using default xdebug: tools/xdebug.default.ini";
-        cp -f "$SITE_ROOT"/tools/xdebug.default.ini /etc/php/"$phpversion_supported"/mods-available/xdebug.ini;
-    fi
-
-    ln -sf /etc/php/"$phpversion_supported"/mods-available/xdebug.ini   /etc/php/"$phpversion_supported"/fpm/conf.d/20-xdebug.ini
-    ln -sf /etc/php/"$phpversion_supported"/mods-available/tideways.ini /etc/php/"$phpversion_supported"/fpm/conf.d/20-tideways.ini
-    ln -sf /etc/php/"$phpversion_supported"/mods-available/xdebug.ini   /etc/php/"$phpversion_supported"/cli/conf.d/20-xdebug.ini
-    ln -sf /etc/php/"$phpversion_supported"/mods-available/tideways.ini /etc/php/"$phpversion_supported"/cli/conf.d/20-tideways.ini
-
-
-    # If not yet configured, add XDEBUG_CONFIG and PHP_IDE_CONFIG environment vars for 'vagrant' and 'root' users
-    for bashrcFile in /home/vagrant/.bashrc /root/.bashrc; do
-        if [[ -z `grep -E '^export\s+XDEBUG_CONFIG\s*=\s*"idekey=[^"]+"' ${bashrcFile}` ]];
-        then
-            echo "export XDEBUG_CONFIG=\"idekey=PHPSTORM\"" >> ${bashrcFile};
-        fi
-
-        if [[ -z `grep -E '^export\s+PHP_IDE_CONFIG\s*=\s*"serverName=[^"]+"' ${bashrcFile}` ]];
-        then
-            # Requires PHPStorm to have a server configured with Name: "10.0.2.15" (this is the default)
-            # See "Settings > Languages & Frameworks > PHP > Servers"
-            # Technically this is redundant for 'vagrant' sessions, but it required for vagrant sudo and root session
-            echo "export PHP_IDE_CONFIG=\"serverName=10.0.2.15\"" >> ${bashrcFile};
-        fi
-    done
-
-    # Need to preserve these ENV vars for vagrant's sudo session
-    for envVar in XDEBUG_CONFIG PHP_IDE_CONFIG; do
-        if [[ -z `grep -E "^Defaults\s+env_keep\s*\+=\s*\".*$envVar" /etc/sudoers.d/vagrant` ]];
-        then
-            chmod a+w /etc/sudoers.d/vagrant;
-            echo "Defaults env_keep += \"$envVar\"" >> /etc/sudoers.d/vagrant;
-            chmod a-w /etc/sudoers.d/vagrant;
-        fi
-    done
-
-else
-    echo "[SB][`date +%Y-%m-%d\ %X`] Disabling xdebug";
-    rm -f /etc/php/"$phpversion_supported"/cli/conf.d/20-xdebug.ini;
-    rm -f /etc/php/"$phpversion_supported"/cli/conf.d/20-tideways.ini;
-    rm -f /etc/php/"$phpversion_supported"/fpm/conf.d/20-xdebug.ini;
-    rm -f /etc/php/"$phpversion_supported"/fpm/conf.d/20-tideways.ini;
-fi
-
-echo "[SB][`date +%Y-%m-%d\ %X`] Ensure all services are running";
-service caddy restart;
+#if [ "$enable_xdebug" == "true" ];
+#then
+#    echo "[SB][`date +%Y-%m-%d\ %X`] Enabling xdebug";
+#    if [ -f "$SITE_ROOT"/tools/xdebug.ini ]; then
+#        echo "[SB][`date +%Y-%m-%d\ %X`] Using custom xdebug: tools/xdebug.ini";
+#        cp -f "$SITE_ROOT"/tools/xdebug.ini /etc/php/"$phpversion_supported"/mods-available/xdebug.ini;
+#    else
+#        echo "[SB][`date +%Y-%m-%d\ %X`] Using default xdebug: tools/xdebug.default.ini";
+#        cp -f "$SITE_ROOT"/tools/xdebug.default.ini /etc/php/"$phpversion_supported"/mods-available/xdebug.ini;
+#    fi
+#
+#    ln -sf /etc/php/"$phpversion_supported"/mods-available/xdebug.ini   /etc/php/"$phpversion_supported"/fpm/conf.d/20-xdebug.ini
+#    ln -sf /etc/php/"$phpversion_supported"/mods-available/tideways.ini /etc/php/"$phpversion_supported"/fpm/conf.d/20-tideways.ini
+#    ln -sf /etc/php/"$phpversion_supported"/mods-available/xdebug.ini   /etc/php/"$phpversion_supported"/cli/conf.d/20-xdebug.ini
+#    ln -sf /etc/php/"$phpversion_supported"/mods-available/tideways.ini /etc/php/"$phpversion_supported"/cli/conf.d/20-tideways.ini
+#
+#
+#    # If not yet configured, add XDEBUG_CONFIG and PHP_IDE_CONFIG environment vars for 'vagrant' and 'root' users
+#    for bashrcFile in /home/vagrant/.bashrc /root/.bashrc; do
+#        if [[ -z `grep -E '^export\s+XDEBUG_CONFIG\s*=\s*"idekey=[^"]+"' ${bashrcFile}` ]];
+#        then
+#            echo "export XDEBUG_CONFIG=\"idekey=PHPSTORM\"" >> ${bashrcFile};
+#        fi
+#
+#        if [[ -z `grep -E '^export\s+PHP_IDE_CONFIG\s*=\s*"serverName=[^"]+"' ${bashrcFile}` ]];
+#        then
+#            # Requires PHPStorm to have a server configured with Name: "10.0.2.15" (this is the default)
+#            # See "Settings > Languages & Frameworks > PHP > Servers"
+#            # Technically this is redundant for 'vagrant' sessions, but it required for vagrant sudo and root session
+#            echo "export PHP_IDE_CONFIG=\"serverName=10.0.2.15\"" >> ${bashrcFile};
+#        fi
+#    done
+#
+#    # Need to preserve these ENV vars for vagrant's sudo session
+#    for envVar in XDEBUG_CONFIG PHP_IDE_CONFIG; do
+#        if [[ -z `grep -E "^Defaults\s+env_keep\s*\+=\s*\".*$envVar" /etc/sudoers.d/vagrant` ]];
+#        then
+#            chmod a+w /etc/sudoers.d/vagrant;
+#            echo "Defaults env_keep += \"$envVar\"" >> /etc/sudoers.d/vagrant;
+#            chmod a-w /etc/sudoers.d/vagrant;
+#        fi
+#    done
+#
+#else
+#    echo "[SB][`date +%Y-%m-%d\ %X`] Disabling xdebug";
+#    rm -f /etc/php/"$phpversion_supported"/cli/conf.d/20-xdebug.ini;
+#    rm -f /etc/php/"$phpversion_supported"/cli/conf.d/20-tideways.ini;
+#    rm -f /etc/php/"$phpversion_supported"/fpm/conf.d/20-xdebug.ini;
+#    rm -f /etc/php/"$phpversion_supported"/fpm/conf.d/20-tideways.ini;
+#fi
+#
+#echo "[SB][`date +%Y-%m-%d\ %X`] Ensure all services are running";
+#service caddy restart;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Removing system maintenance mode";
 if INSTANCE_ID=vagrantx "$SITE_ROOT"/tools/maintenance/site_up.sh -eq 0 ; then
