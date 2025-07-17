@@ -28,13 +28,13 @@ const allParticipants = window.Vue.ref<Participant[]>(props.allParticipants);
 const showCheckboxes = window.Vue.computed(() => allParticipants.value.length > 1);
 
 // selectedList is the items that are currently selected
-const selectedList = window.Vue.ref<number[]>([]);
+const selectedList = window.Vue.ref<Participant[]>([]);
 
 // Computed property to check if all are selected
 const allSelected = window.Vue.computed({
-    get: () => allParticipants.value.every((participant) => selectedList.value.includes(participant.user.id)),
+    get: () => allParticipants.value.every((participant) => selectedList.value.includes(participant)),
     set: (value) => {
-        selectedList.value = value ? allParticipants.value.map((participant) => participant.user.id) : [];
+        selectedList.value = value ? allParticipants.value : [];
     },
 });
 
@@ -45,11 +45,7 @@ const isIndeterminate = window.Vue.computed(() => {
 
 // Function to check if any selected participants has and customisation, whether excluded or assigned a different activity
 const hasCustomisedInSelection = window.Vue.computed(() => {
-    return allParticipants.value.some(
-        (participant) =>
-            selectedList.value.includes(participant.user.id) &&
-            (participant.excludedAt !== null || participant.plan.name !== null),
-    );
+    return selectedList.value.some((participant) => participant.excludedAt !== null || participant.plan.name !== null);
 });
 
 const loadError = window.Vue.ref<string | null>(null);
@@ -163,8 +159,7 @@ async function includeParticipant(participant: Participant): Promise<void> {
  */
 async function excludeSelected(): Promise<void> {
     try {
-        const participantsToExclude = allParticipants.value.filter((p) => selectedList.value.includes(p.user.id));
-        await Promise.all(participantsToExclude.map((participant) => excludeParticipant(participant)));
+        await Promise.all(selectedList.value.map((participant) => excludeParticipant(participant)));
         selectedList.value = [];
     } catch (error) {
         if (error instanceof Error && hasErrorMessage(error)) {
@@ -180,8 +175,7 @@ async function excludeSelected(): Promise<void> {
  * @returns A promise that resolves when all inclusions are complete.
  */
 async function includeSelected(): Promise<void> {
-    const participantsToInclude = allParticipants.value.filter((p) => selectedList.value.includes(p.user.id));
-    await Promise.all(participantsToInclude.map((participant) => includeParticipant(participant)));
+    await Promise.all(selectedList.value.map((participant) => includeParticipant(participant)));
     selectedList.value = [];
 }
 
@@ -213,7 +207,7 @@ async function includeParticipantInExistingPlan(): Promise<void> {
     // if the array is empty, it means that we are including participants via the bottom drawer,
     // otherwise the single participant is being included via the pop-out menu
     if (selectedParticipants.value.length === 0) {
-        selectedParticipants.value = allParticipants.value.filter((p) => selectedList.value.includes(p.user.id));
+        selectedParticipants.value = selectedList.value;
     }
     const toast = window.sbProps.toastActivate("Adding to customisation...");
     try {
@@ -256,6 +250,9 @@ async function includeParticipantInExistingPlan(): Promise<void> {
 function openIncludeModal(participant: Participant): void {
     selectedParticipants.value = [participant];
     selectedActivityId.value = null;
+    if (!selectedList.value.includes(participant)) {
+        selectedList.value = [participant];
+    }
     isIncludeOpen.value = true;
 }
 
@@ -310,7 +307,7 @@ function getCustomisationLabel(plan: Plan): string {
                             :id="`id-${participant.user.id}`"
                             v-model="selectedList"
                             type="checkbox"
-                            :value="participant.user.id"
+                            :value="participant"
                             :data-test="`custom-participation-checkbox-${participant.user.id}`"
                         />
                         <label :for="`id-${participant.user.id}`" class="checkbox-label"></label>
@@ -466,7 +463,7 @@ function getCustomisationLabel(plan: Plan): string {
                     <div class="l-flex__item--1">
                         <a
                             class="icon-modify submit"
-                            :href="`${getLearningPlanNewUrl}?student=${selectedList.join(',')}&${getReturnUrl()}`"
+                            :href="`${getLearningPlanNewUrl}?student=${selectedList.map((p) => p.user.id).join(',')}&${getReturnUrl()}`"
                         >
                             Modify
                         </a>
@@ -485,7 +482,7 @@ function getCustomisationLabel(plan: Plan): string {
                     <div class="l-flex__item--1">
                         <a
                             class="icon-submissions submit"
-                            :href="`${getAssessmentParticipationNewActivity}?student=${selectedList.join(',')}&original=${assessmentId}&${getReturnUrl()}`"
+                            :href="`${getAssessmentParticipationNewActivity}?student=${selectedList.map((p) => p.user.id).join(',')}&original=${assessmentId}&${getReturnUrl()}`"
                         >
                             New Activity
                         </a>
@@ -499,9 +496,9 @@ function getCustomisationLabel(plan: Plan): string {
             <h2>Include in existing customisation</h2>
             <p class="meta">
                 Modifying participation for:
-                <span v-for="(id, index) in selectedList" :key="id">
-                    {{ allParticipants.find((p) => p.user.id === id)?.user.lastname }},
-                    {{ allParticipants.find((p) => p.user.id === id)?.user.firstname }}
+                <span v-for="(participant, index) in selectedList" :key="participant.user.id">
+                    {{ participant.user.lastname }},
+                    {{ participant.user.firstname }}
                     <span v-if="index < selectedList.length - 1">and </span>
                 </span>
             </p>
