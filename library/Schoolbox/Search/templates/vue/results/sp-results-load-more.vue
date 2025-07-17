@@ -23,32 +23,25 @@ const showLoadMore = window.Vue.computed(() => {
 });
 
 /**
- * Load more results
+ * This determines whether more results should be fetched automatically.
  */
-async function onLoadMoreSelected(): Promise<void> {
-    if (loadMoreResultsStore.isLoading) {
-        return;
-    }
-    await loadMoreResultsStore.loadMore(null);
-}
+const shouldAutoLoad = window.Vue.computed(() => {
+    return (
+        resultsStore.allResults.length < store.resultPageSize &&
+        resultsStore.hasMoreResults &&
+        !loadMoreResultsStore.isLoading &&
+        !loadMoreResultsStore.hasLoadError
+    );
+});
 
 /**
  * Watch for conditions under which more results should be fetched automatically.
  * If those conditions are met, fetch more results by simulating a click on the 'Load more results' button.
  */
 window.Vue.watch(
-    () => ({
-        hasMoreResults: resultsStore.hasMoreResults,
-        isLoading: loadMoreResultsStore.isLoading,
-        hasLoadError: loadMoreResultsStore.hasLoadError,
-    }),
+    shouldAutoLoad,
     async (newVal) => {
-        if (
-            resultsStore.allResults.length < store.resultPageSize &&
-            newVal.hasMoreResults &&
-            !newVal.isLoading &&
-            !newVal.hasLoadError
-        ) {
+        if (newVal) {
             // We don't yet have a full page of results, and more results exist.
             if (autoClickInterruptRequested) {
                 // Do not simulate a click the 'Load more results' button, but reset autoClickInterruptRequested.
@@ -66,6 +59,16 @@ window.Vue.watch(
     },
     { immediate: true },
 );
+
+/**
+ * Load more results
+ */
+async function onLoadMoreSelected(): Promise<void> {
+    if (loadMoreResultsStore.isLoading) {
+        return;
+    }
+    await loadMoreResultsStore.loadMore(null);
+}
 
 /**
  * Interrupt auto-clicking so that there will be no more automatic clicks on the 'Load more results' button.
