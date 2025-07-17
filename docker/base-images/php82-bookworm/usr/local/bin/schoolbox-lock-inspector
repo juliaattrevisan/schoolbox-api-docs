@@ -1,0 +1,118 @@
+#! /bin/bash
+# Detects if a specified lockfile is created and if not creates it
+# Usage: schoolbox-lock-inspector --lockfile <lockfile> [--include-args] [--help] [--rm]
+# @copyright   Copyright 2022, Schoolbox Pty Ltd
+# @link        https://schoolbox.com.au/
+#
+
+readonly LOG=/usr/bin/alaress-logger
+readonly L_INFO=200
+readonly L_WARN=300
+readonly L_ERROR=400
+readonly ARG_LOCKFILE="--lockfile"
+readonly ARG_REMOVE="--rm"
+readonly ARG_HELP="--help"
+readonly ARG_INCLUDE_ARGS="--include-args"
+
+declare lockfile
+declare remove=false
+declare includeArgs=false
+
+function log(){
+  $LOG $L_INFO "$1"
+}
+
+function warn(){
+  $LOG $L_WARN "$1"
+}
+
+function error(){
+  $LOG $L_ERROR "$1"
+}
+
+function parse_args() {
+    while [[ $# -gt 0 ]]; do
+        key="$1"
+        case $key in
+            "$ARG_LOCKFILE")
+                lockfile="$2"
+                shift
+                shift
+                ;;
+            "$ARG_REMOVE")
+                remove=true
+                shift
+                ;;
+            "$ARG_HELP")
+                help
+                exit 0
+                ;;
+            "$ARG_INCLUDE_ARGS")
+                includeArgs=true
+                shift
+                ;;
+            *)
+                error "Unknown argument: $key"
+                help
+                exit 1
+                ;;
+        esac
+    done
+}
+
+function validate_args() {
+    if [[ -z "$lockfile" ]]; then
+        error "Lockfile not specified"
+        help
+        exit 1
+    fi
+}
+
+# If we are including args, need to modify the lock file with a hash/digest of these args to avoid collisions on file name
+function modify_lockfile_with_arg_hash(){
+  if [[  "$includeArgs" == "true" ]]; then
+    hash=$(ps -f -o cmd= $PPID | md5sum | awk '{print $1}')
+    lockfile="${lockfile}.${hash}"
+  fi
+}
+
+function help() {
+    echo "Usage: $0 $ARG_LOCKFILE <lockfile> [$ARG_INCLUDE_ARGS] [$ARG_REMOVE] [$ARG_HELP]"
+    echo "  $ARG_LOCKFILE <lockfile>  The lockfile to create"
+    echo "  $ARG_INCLUDE_ARGS         Include the arguments passed to the script in the lockfile."
+    echo "                         If present, lock file will be suffixed with a hash of args"
+    echo "                         If you pass this to lock creation, you must also pass this for lock removal"
+    echo "  $ARG_REMOVE                   Remove the lockfile if it exists"
+    echo "  $ARG_HELP                 Print this help message"
+}
+
+function check_and_create_lockfile() {
+  if [[  "$includeArgs" == "false" ]]; then
+    # shellcheck disable=SC2009
+    scriptName=$(ps -f -o cmd= $PPID | awk '{print $1}' | grep -o '[^/]*$')
+  else
+    scriptName=$(ps -f -o cmd= $PPID)
+  fi
+  if [[ -f $lockfile ]]; then
+      read -r pid < "$lockfile"
+      if [[ -d /proc/$pid ]] && pgrep --full "$scriptName" | grep -qE "^$pid$"; then
+        error "Lockfile $lockfile is already in use by $scriptName"
+        exit 1
+      fi
+  fi
+  echo $PPID > "$lockfile"
+}
+
+function main() {
+  parse_args "$@"
+  validate_args
+  modify_lockfile_with_arg_hash "$@"
+  if [[ "$remove" == true ]]; then
+      rm -f "$lockfile"
+  else
+      check_and_create_lockfile
+  fi
+  exit 0
+}
+
+main "$@"
