@@ -221,6 +221,7 @@ async function includeParticipantInExistingPlan(): Promise<void> {
         const participants = await response.json();
         toast.timeout({ text: "Customisation added successfully", isSuccess: true });
         isIncludeOpen.value = false;
+        selectedParticipants.value = [];
     } catch (error) {
         if (error instanceof Error && hasErrorMessage(error)) {
             loadError.value = error.message;
@@ -235,7 +236,7 @@ async function includeParticipantInExistingPlan(): Promise<void> {
  * @param participant - The participant to be included.
  */
 function openIncludeModal(participant: Participant): void {
-    selectedParticipants.value.push(participant);
+    selectedParticipants.value = [participant];
     selectedActivityId.value = null;
     isIncludeOpen.value = true;
 }
