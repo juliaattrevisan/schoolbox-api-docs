@@ -7,7 +7,8 @@ import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
 import type { StudentPastoralCountBadge } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
-import type { Participant, Plan } from "../js/types/customParticipationTypes";
+import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
+import type { Participant, Plan, CustomisedPlan } from "../js/types/customParticipationTypes";
 
 interface Props {
     allParticipants: Participant[];
@@ -16,7 +17,7 @@ interface Props {
     getAssessmentParticipation: string;
     getAssessmentParticipationNewActivity: string;
     assessmentId: number;
-    customisations: Plan[];
+    customisations: (Plan | CustomisedPlan)[];
     includeInExistingCustomisation: string;
 }
 const props = defineProps<Props>();
@@ -27,13 +28,13 @@ const allParticipants = window.Vue.ref<Participant[]>(props.allParticipants);
 const showCheckboxes = window.Vue.computed(() => allParticipants.value.length > 1);
 
 // selectedList is the items that are currently selected
-const selectedList = window.Vue.ref<number[]>([]);
+const selectedList = window.Vue.ref<Participant[]>([]);
 
 // Computed property to check if all are selected
 const allSelected = window.Vue.computed({
-    get: () => allParticipants.value.every((participant) => selectedList.value.includes(participant.user.id)),
+    get: () => allParticipants.value.every((participant) => selectedList.value.includes(participant)),
     set: (value) => {
-        selectedList.value = value ? allParticipants.value.map((participant) => participant.user.id) : [];
+        selectedList.value = value ? allParticipants.value : [];
     },
 });
 
@@ -44,10 +45,9 @@ const isIndeterminate = window.Vue.computed(() => {
 
 // Function to check if any selected participants has and customisation, whether excluded or assigned a different activity
 const hasCustomisedInSelection = window.Vue.computed(() => {
-    return allParticipants.value.some(
+    return selectedList.value.some(
         (participant) =>
-            selectedList.value.includes(participant.user.id) &&
-            (participant.excludedAt !== null || participant.plan.name !== null),
+            participant.excludedAt !== null || participant.plan.name !== null || participant.customisedPlan !== null,
     );
 });
 
@@ -66,11 +66,7 @@ async function getStudentPastoralCounts(): Promise<void> {
         allParticipants.value.map((participant) => participant.user.id).join(","),
     );
     try {
-        const response = await fetch(url, {
-            headers: {
-                Accept: "application/json",
-            },
-        });
+        const response = await fetch(url, { headers: { Accept: "application/json" } });
         if (!response.ok) {
             const errorMessage = await extractErrorMessage(response);
             throw new Error(errorMessage);
@@ -98,6 +94,13 @@ async function getStudentPastoralCounts(): Promise<void> {
 }
 
 /**
+ * Load the student pastoral counts when the component is mounted.
+ */
+window.Vue.onMounted(() => {
+    void getStudentPastoralCounts();
+});
+
+/**
  * Excludes a participant.
  * @param participant - The participant to exclude.
  * @returns A promise that resolves when the operation is complete.
@@ -107,10 +110,7 @@ async function excludeParticipant(participant: Participant): Promise<void> {
     try {
         const response = await fetch(participant._links.exclude, {
             method: "POST",
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-            },
+            headers: { Accept: "application/json", "Content-Type": "application/json" },
         });
         if (!response.ok) {
             const errorMessage = await extractErrorMessage(response);
@@ -137,10 +137,7 @@ async function includeParticipant(participant: Participant): Promise<void> {
     try {
         const response = await fetch(participant._links.include, {
             method: "POST",
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-            },
+            headers: { Accept: "application/json", "Content-Type": "application/json" },
         });
         if (!response.ok) {
             const errorMessage = await extractErrorMessage(response);
@@ -148,6 +145,7 @@ async function includeParticipant(participant: Participant): Promise<void> {
         }
         participant.excludedAt = null; // Resetting the exclusion timestamp
         participant.plan.name = null; // Resetting the plan
+        participant.customisedPlan = null; // Resetting the customised plan
         toast.timeout({ text: "Customisation removed successfully" });
     } catch (error) {
         if (error instanceof Error && hasErrorMessage(error)) {
@@ -165,8 +163,7 @@ async function includeParticipant(participant: Participant): Promise<void> {
  */
 async function excludeSelected(): Promise<void> {
     try {
-        const participantsToExclude = allParticipants.value.filter((p) => selectedList.value.includes(p.user.id));
-        await Promise.all(participantsToExclude.map((participant) => excludeParticipant(participant)));
+        await Promise.all(selectedList.value.map((participant) => excludeParticipant(participant)));
         selectedList.value = [];
     } catch (error) {
         if (error instanceof Error && hasErrorMessage(error)) {
@@ -182,47 +179,92 @@ async function excludeSelected(): Promise<void> {
  * @returns A promise that resolves when all inclusions are complete.
  */
 async function includeSelected(): Promise<void> {
-    const participantsToInclude = allParticipants.value.filter((p) => selectedList.value.includes(p.user.id));
-    await Promise.all(participantsToInclude.map((participant) => includeParticipant(participant)));
+    await Promise.all(selectedList.value.map((participant) => includeParticipant(participant)));
     selectedList.value = [];
 }
 
+const isIncludeOpen = window.Vue.ref(false);
+const selectedParticipants = window.Vue.ref<Participant[]>([]);
+const selectedActivityId = window.Vue.ref<number | null>(null);
+
 /**
- * Placeholder function for testing endpoint
- * Use this as sample of how it will work
- * @param participant - The participant to include
+ * The current selected activity for inclusion.
  */
-async function includeParticipantInExistingPlan(participant: Participant): Promise<void> {
+const selectedActivity = window.Vue.computed<Plan | CustomisedPlan | null>(() => {
+    return props.customisations.find((plan) => plan.id === selectedActivityId.value) ?? null;
+});
+
+/**
+ * Add all the selected participants to an existing customisation plan.
+ */
+async function includeParticipantInExistingPlan(): Promise<void> {
+    if (selectedActivity.value === null) return;
+    const activity: Plan | CustomisedPlan = selectedActivity.value;
+    // if the array is empty, it means that we are including participants via the bottom drawer,
+    // otherwise the single participant is being included via the pop-out menu
+    if (selectedParticipants.value.length === 0) {
+        selectedParticipants.value = selectedList.value;
+    }
     const toast = window.sbProps.toastActivate("Adding to customisation...");
     try {
         const response = await fetch(props.includeInExistingCustomisation, {
             method: "POST",
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-            },
+            headers: { Accept: "application/json", "Content-Type": "application/json" },
             body: JSON.stringify({
-                students: [
-                    participant.user.id
-                ],
-                planId: 1305, // TODO: plan id of the plan to include the student
-                assessmentId: 1576, // TODO: assessment id of the plan (ie plan.assessable.id)
+                students: selectedParticipants.value.map((p) => p.user.id),
+                ...("assessable" in activity ? { assessmentId: activity.assessable.id } : {}),
+                ...(activity.name !== null ? { planId: activity.id } : {}),
             }),
         });
-        if (response.ok) {
-            toast.timeout({ text: "Customisation added successfully" });
+        if (!response.ok) {
+            const errorMessage = await extractErrorMessage(response);
+            throw new Error(errorMessage);
         }
-
+        // add the activity to each participant
+        selectedParticipants.value.forEach((participant) => {
+            if ("assessable" in activity) {
+                participant.customisedPlan = activity;
+            } else {
+                participant.plan = activity;
+            }
+        });
+        toast.timeout({ text: "Customisation added successfully", isSuccess: true });
+        isIncludeOpen.value = false;
+        selectedParticipants.value = [];
+        selectedList.value = [];
     } catch (error) {
-        toast.timeout({ text: "Error adding Customisation" });
+        if (error instanceof Error && hasErrorMessage(error)) {
+            loadError.value = error.message;
+        }
+        console.error("Error adding Customisation:", error);
+        toast.timeout({ text: "Error adding Customisation", isSuccess: false });
     }
 }
+
 /**
- * Load the student pastoral counts when the component is mounted.
+ * Opens the modal to include a participant in an existing customisation.
+ * @param participant - The participant to be included.
  */
-window.Vue.onMounted(() => {
-    void getStudentPastoralCounts();
-});
+function openIncludeModal(participant: Participant): void {
+    selectedParticipants.value = [participant];
+    selectedActivityId.value = null;
+    if (!selectedList.value.includes(participant)) {
+        selectedList.value = [participant];
+    }
+    isIncludeOpen.value = true;
+}
+
+/**
+ * Generates a label for a given customisation plan.
+ * @param plan - The customisation plan to generate the label for.
+ * @returns The label for the customisation plan.
+ */
+function getCustomisationLabel(plan: Plan | CustomisedPlan): string {
+    if ("assessable" in plan && plan.assessable !== null) {
+        return plan.assessable.title || "";
+    }
+    return plan.name || "";
+}
 </script>
 
 <template>
@@ -264,7 +306,7 @@ window.Vue.onMounted(() => {
                             :id="`id-${participant.user.id}`"
                             v-model="selectedList"
                             type="checkbox"
-                            :value="participant.user.id"
+                            :value="participant"
                             :data-test="`custom-participation-checkbox-${participant.user.id}`"
                         />
                         <label :for="`id-${participant.user.id}`" class="checkbox-label"></label>
@@ -314,19 +356,17 @@ window.Vue.onMounted(() => {
                         </div>
                     </td>
                     <td>
-                        <template v-if="participant.excludedAt !== null">
-                            <span v-if="participant.customisedPlan !== null">
-                                <a :href="`${participant.customisedPlan.assessable._links.modify}`">
-                                    {{ participant.customisedPlan.assessable.title }}
-                                </a>
-                            </span>
-                            <span v-else> Excluded </span>
+                        <template v-if="participant.customisedPlan !== null">
+                            <a :href="`${participant.customisedPlan.assessable._links.modify}`">
+                                {{ participant.customisedPlan.assessable.title }}
+                            </a>
                         </template>
-                        <span v-else-if="participant.plan.name !== null">
+                        <template v-else-if="participant.plan.name !== null">
                             <a :href="`${getAssessmentParticipation}/${participant.plan.id}/modify?${getReturnUrl()}`">
                                 {{ participant.plan.name }}
                             </a>
-                        </span>
+                        </template>
+                        <template v-else-if="participant.excludedAt !== null">Excluded</template>
                     </td>
                     <td class="no-pad">
                         <div v-if="participant.user.id" class="actions-small-1">
@@ -373,10 +413,11 @@ window.Vue.onMounted(() => {
                                     </li>
                                     <li>
                                         <button
-                                            class="icon-staff-students"
-                                            @click.prevent="includeParticipantInExistingPlan(participant)"
+                                            v-if="customisations.length > 0"
+                                            class="icon-list"
+                                            @click.prevent="openIncludeModal(participant)"
                                         >
-                                            Test
+                                            Include In Existing Customisation
                                         </button>
                                     </li>
                                     <li class="separator">Create</li>
@@ -417,23 +458,28 @@ window.Vue.onMounted(() => {
                 </template>
                 <template v-else>
                     <div class="l-flex__item--1">
-                        <a class="icon-copy submit" data-test="custom-participation-copy-activity">Copy Activity</a>
-                    </div>
-                    <div class="l-flex__item--1">
-                        <button class="icon-staff-students submit" @click.prevent="excludeSelected">Exclude</button>
-                    </div>
-                    <div class="l-flex__item--1">
                         <a
                             class="icon-modify submit"
-                            :href="`${getLearningPlanNewUrl}?student=${selectedList.join(',')}&${getReturnUrl()}`"
+                            :href="`${getLearningPlanNewUrl}?student=${selectedList.map((p) => p.user.id).join(',')}&${getReturnUrl()}`"
                         >
                             Modify
                         </a>
                     </div>
                     <div class="l-flex__item--1">
+                        <button class="icon-staff-students submit" @click.prevent="excludeSelected">Exclude</button>
+                    </div>
+                    <div v-if="customisations.length > 0" class="l-flex__item--1">
+                        <button class="icon-list submit" @click.prevent="isIncludeOpen = true">
+                            Include In Existing Customisation
+                        </button>
+                    </div>
+                    <div class="l-flex__item--1">
+                        <a class="icon-copy submit" data-test="custom-participation-copy-activity">Copy Activity</a>
+                    </div>
+                    <div class="l-flex__item--1">
                         <a
                             class="icon-submissions submit"
-                            :href="`${getAssessmentParticipationNewActivity}?student=${selectedList.join(',')}&original=${assessmentId}&${getReturnUrl()}`"
+                            :href="`${getAssessmentParticipationNewActivity}?student=${selectedList.map((p) => p.user.id).join(',')}&original=${assessmentId}&${getReturnUrl()}`"
                         >
                             New Activity
                         </a>
@@ -442,6 +488,34 @@ window.Vue.onMounted(() => {
             </div>
         </bottom-drawer>
     </div>
+    <basic-modal v-model:is-open="isIncludeOpen">
+        <div class="l-flex-col l-gap-s f-no-margins">
+            <h2>Include in existing customisation</h2>
+            <p class="meta">
+                Modifying participation for:
+                <template v-for="(participant, index) in selectedList" :key="participant.user.id">
+                    {{ participant.user.preferredName ? participant.user.preferredName : participant.user.firstname }}
+                    {{ participant.user.lastname }}<template v-if="index < selectedList.length - 2">, </template
+                    ><template v-if="index === selectedList.length - 2"> and </template>
+                </template>
+            </p>
+            <select id="activitySelect" v-model="selectedActivityId">
+                <option v-for="customisation in customisations" :key="customisation.id" :value="customisation.id">
+                    {{ getCustomisationLabel(customisation) }}
+                </option>
+            </select>
+            <div class="l-flex l-gap-xs f-no-margins">
+                <button class="button l-flex__item--1" @click.prevent="isIncludeOpen = false">Cancel</button>
+                <button
+                    class="button submit l-flex__item--1"
+                    :disabled="!selectedActivity"
+                    @click.prevent="includeParticipantInExistingPlan()"
+                >
+                    Confirm
+                </button>
+            </div>
+        </div>
+    </basic-modal>
 </template>
 
 <style scoped>

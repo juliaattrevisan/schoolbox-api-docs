@@ -1624,7 +1624,7 @@ class ListController extends Web\Controller\Base
             $assessmentDataModel = $this->assessmentMapper->translateToDataModel($assessment);
             $participationHelper = (new Participant\ParticipationHelper($assessmentDataModel, $this->participantDataSource, $this->getUserMapper()));
 
-            if ($assessmentId !== $assessment->getId()) {
+            if (null !== $assessmentId) {
                 $customisedAssessment          = $this->getAssessmentMapper()->findById($assessmentId);
                 $customisedAssessmentDataModel = $this->assessmentMapper->translateToDataModel(($customisedAssessment));
                 $customisedParticipationHelper = (new Participant\ParticipationHelper($customisedAssessmentDataModel, $this->participantDataSource, $this->getUserMapper()));

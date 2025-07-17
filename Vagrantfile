@@ -140,7 +140,6 @@ end
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
-  config.vagrant.plugins = "vagrant-vbguest"
   if puppet_sync_type != 'none'
     config.trigger.before :provision do |sync|
       sync.name = "Syncing Puppet"
