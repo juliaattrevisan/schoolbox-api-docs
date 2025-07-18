@@ -24,10 +24,18 @@ test("do not show load more button when no more results to load", async () => {
 test("show load more button when more results to load", async () => {
     const resultsStore = useResultsStore();
     await resultsStore.$patch({
-        // Patch simulates the situation where a search response has been returned (with no results),
+        // This patch simulates the situation where a search response has been returned (with no results),
         // but possibly more results exist (indicated by the non-null cursor value).
-        data: [],
-        metadata: { cursor: { next: "non-null cursor value" } },
+        hasResults: true,
+        hasMoreResults: true,
+        allResults: {
+            data: [],
+            metadata: { count: null, cursor: { next: "non-null cursor value" } },
+        },
+        latestResults: {
+            data: [],
+            metadata: { count: null, cursor: { next: "non-null cursor value" } },
+        },
     });
     expect(wrapper.find('[data-test="sp-results-load-more-button"]').exists()).toBe(true);
 });
