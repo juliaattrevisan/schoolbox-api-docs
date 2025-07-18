@@ -41,21 +41,25 @@ const shouldAutoLoad = window.Vue.computed(() => {
 window.Vue.watch(
     shouldAutoLoad,
     async (newVal) => {
-        if (newVal) {
-            // We don't yet have a full page of results, and more results exist.
-            if (autoClickInterruptRequested) {
-                // Do not simulate a click the 'Load more results' button, but reset autoClickInterruptRequested.
-                autoClickInterruptRequested = false;
-            } else {
-                // Simulate a click the 'Load more results' button, and note we are now auto-clicking 'Load more results'.
-                loadMoreResultsStore.autoClickLoadMoreResults = true;
-                if (loadMoreResultsStore.isLoading) {
-                    return;
-                }
-                // Limit the number of records searched for to the number needed to fill the page.
-                await loadMoreResultsStore.loadMore(store.resultPageSize - resultsStore.allResults.length);
-            }
+        if (!newVal) {
+            return;
         }
+
+        // The shouldAutoLoad condition has been met, so we don't yet have a full page of results, and more results exist.
+
+        if (autoClickInterruptRequested) {
+            // Do not simulate a click the 'Load more results' button, but reset autoClickInterruptRequested.
+            autoClickInterruptRequested = false;
+            return;
+        }
+
+        // Simulate a click the 'Load more results' button, and note we are now auto-clicking 'Load more results'.
+        loadMoreResultsStore.autoClickLoadMoreResults = true;
+        if (loadMoreResultsStore.isLoading) {
+            return;
+        }
+        // Limit the number of records searched for to the number needed to fill the page.
+        await loadMoreResultsStore.loadMore(store.resultPageSize - resultsStore.allResults.length);
     },
     { immediate: true },
 );
