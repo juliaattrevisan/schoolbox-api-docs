@@ -302,20 +302,19 @@ else
   exit 1;
 fi
 
-
-# Finish here now
-exit
+## Finish here now
+#exit
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Applying vagrant SQL fixes";
-mysql --defaults-extra-file=/root/.my.cnf schoolbox < "$SITE_ROOT"/sql/vagrant.sql
-mysql --defaults-extra-file=/root/.my.cnf schoolbox < $cachedir/vagrant-secrets.sql
+mariadb -h mariadb -u root -D schoolbox < "${SITE_ROOT}/sql/vagrant.sql"
+mariadb -h mariadb -u root -D schoolbox < "${cachedir}/vagrant-secrets.sql"
 
 # Set ENV VARs for root + vagrant users from vagrant.yaml params
 declare -A env_vars=(
   [INSTANCE_ID]="$instance_id_env_var"
-  [FACTER_primary_php_majver]="$phpversion_supported"
-  [FACTER_vagrant_extra_hostname]="$extra_hostname"
-  [FACTER_taskd_systemd_service_installed]="$taskd_systemd_service_installed"
+#  [FACTER_primary_php_majver]="$phpversion_supported"
+#  [FACTER_vagrant_extra_hostname]="$extra_hostname"
+#  [FACTER_taskd_systemd_service_installed]="$taskd_systemd_service_installed"
 )
 for config_name in "${!env_vars[@]}"; do
   config_value=${env_vars[$config_name]}
@@ -341,8 +340,10 @@ done
 
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Applying vagrant SQL fixes (post version upgrade)";
-cat "$SITE_ROOT"/sql/vagrant.sql | mysql --defaults-extra-file=/root/.my.cnf schoolbox
-cat $cachedir/vagrant-secrets.sql | mysql --defaults-extra-file=/root/.my.cnf schoolbox
+mariadb -h mariadb -u root -D schoolbox < "${SITE_ROOT}/sql/vagrant.sql"
+mariadb -h mariadb -u root -D schoolbox < "${cachedir}/vagrant-secrets.sql"
+#cat "$SITE_ROOT"/sql/vagrant.sql | mysql --defaults-extra-file=/root/.my.cnf schoolbox
+#cat $cachedir/vagrant-secrets.sql | mysql --defaults-extra-file=/root/.my.cnf schoolbox
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Building NPM";
 cd $cachedir;
@@ -497,10 +498,10 @@ echo "[SB][`date +%Y-%m-%d\ %X`] schoolbox-ffmpeg installed: $ffmpegver";
 #service caddy restart;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Removing system maintenance mode";
-if INSTANCE_ID=vagrantx "$SITE_ROOT"/tools/maintenance/site_up.sh -eq 0 ; then
-  echo "[SB][`date +%Y-%m-%d\ %X`] Maintenance mode disabled on instance 'vagrantx'."
+if INSTANCE_ID=docker "$SITE_ROOT"/tools/maintenance/site_up.sh -eq 0 ; then
+  echo "[SB][`date +%Y-%m-%d\ %X`] Maintenance mode disabled on instance 'docker'."
 else
-  echo "[SB][`date +%Y-%m-%d\ %X`] Could not disable maintenance mode on instance 'vagrantx'.  Continuing."
+  echo "[SB][`date +%Y-%m-%d\ %X`] Could not disable maintenance mode on instance 'docker'.  Continuing."
 fi
 
 # call custom provisioning
