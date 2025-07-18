@@ -32,6 +32,42 @@ export const useResultsStore = defineStore("spResults", () => {
     });
 
     /**
+     * Return the total number of results.
+     * Note that allResults.length will give you the total number of parent folders of results.
+     * This is because results are grouped by parent folder before being passed to the client.
+     * @returns {number}
+     */
+    const totalResultsCount = window.Vue.computed(() => {
+        let n = 0;
+
+        for (let i = 0; i < allResults.value.length; i += 1) {
+            const result = allResults.value[i];
+
+            // Note on the subtleties involved in counting search results
+            // ----------------------------------------------------------
+            // There is a subtlety here that prevents us from counting results in the same way as the server does.
+            // At the server, a set of results is fetched (some of which may be folders).  This is the original set of results.
+            // Then for each non-folder result, that result's parent folder is fetched.
+            // Then all non-folder results are grouped under their parent folders before being sent to the client.  So
+            // at the client, each result is either a lone folder, or a parent folder with sub-results.
+            //
+            // It follows that when counting results at the client:
+            //  * if we count the parent folders as results, we might end up with more results than we started with
+            //    (if one or more folders were fetched after the original set of results).
+            //  * if we don't count the parent folders as results, we might end up with fewer results than we started with
+            //    (if some of the original parent results ended up being parent folders of other results).
+            //
+            // We choose to count parent folders as results here, so we end up with a count that is equal to or greater
+            // than the original server count.  Since this count is used to determine whether more results should be
+            // automatically fetched in order to make a full page of results, this choice prevents unneeded requests to
+            // 'load more results'.
+            n += (result._subResults?.data.length ?? 0) + 1; // +1 ensures the parent folder counts as a result.
+        }
+
+        return n;
+    });
+
+    /**
      * To show that there are more results that can be loaded
      * @returns {boolean}
      */
@@ -90,6 +126,7 @@ export const useResultsStore = defineStore("spResults", () => {
 
     return {
         allResults,
+        totalResultsCount,
         latestResults,
         hasLoadedAllResults,
         hasResults,
