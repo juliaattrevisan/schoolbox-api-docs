@@ -304,7 +304,16 @@ class ProfileHandler
                 } else if ($mapping[$property]['hydrator'] instanceof Date) {
                     $params[$property] = $newObject->$getter()->getDatabase();
                 } else {
-                    $params[$property] = $newObject->$getter();
+                    $val = $newObject->$getter();
+
+                    /* Co-erce bools to ints universally: our orm uses bools,
+                     * but we persist them as int 1 or int 0 in the db schema.
+                     */
+                    if (is_bool($val)) {
+                        $val = $val ? 1 : 0;
+                    }
+
+                    $params[$property] = $val;
                 }
             }
         }
