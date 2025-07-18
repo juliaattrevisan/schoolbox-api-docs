@@ -2,7 +2,9 @@
 
 namespace Schoolbox\Pastoral\ReportBuilder\TabType;
 
+use Schoolbox\Collection;
+
 interface TabTypeInterface
 {
-    public function process($records);
+    public function process(Collection $records);
 }

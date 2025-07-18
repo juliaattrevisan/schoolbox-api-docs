@@ -9,8 +9,7 @@ class StudentByType implements TabTypeInterface
 {
     public function __construct(
         private ModelToArray $userTranslator,
-    )
-    {
+    ) {
     }
 
     public function process($records)
@@ -270,6 +269,10 @@ class StudentByType implements TabTypeInterface
             return strcmp($a[0]['lastName'], $b[0]['lastName']);
         });
 
+        /**
+         * TODO this is temporary and should create a cursor to return the data properly with pagination
+         * it will be done later in the epic
+         */
         // Data payload with calculated values
         return [
             'data' => [
