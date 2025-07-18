@@ -87,7 +87,7 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
     <thead class="pr-table-header">
         <tr>
             <th :colspan="hasSubTitles ? 1 : props.headers.length" class="u-border-right u-sticky-left">
-                <div class="checklist">
+                <div v-if="props.config.pastoralPointEnabled" class="checklist">
                     <ul class="option-list l-flex l-gap-m f-no-margins">
                         <li v-for="(option, index) in props.recordsAndPoints" :key="`option-${index}`">
                             <input :id="option" v-model="recordsOrPoints" type="radio" :value="option" />
