@@ -901,30 +901,57 @@ $allYears = [2022, 2023, 2024];
         );
     }
 
+    /**
+     * Gather and display information about the database views used by various reports.
+     *
+     * @param IConnector $db
+     * @param User       $user
+     * @param array      $externalUser
+     * @param int|null   $year
+     * @return void
+     */
     public function getDbViewTests(IConnector $db, User $user, array $externalUser, ?int $year): void
     {
-        if ($_SESSION['username'] !== 'alaress') {
-            echo "Not authorised\n";
+        if (!in_array($_SESSION['username'], ['alaress', 'psingh'])) {
+            echo "Not authorised";
             die;
         }
 
         $viewNames = [
+            // Columns: ID,Title,Given1,Given2,Preferred,PreferredFormal,Surname,NameExternal,NameInternal,MailNamePrimary,Fileyear,StudentYearlevel,filetype,classyear,classsemester,classcampus,classcode,AreaSeq,ResultType,HdgAbbrev1,HdgAbbrev2,Term,CourseName,AssessAreaHeading,Result,StrippedResult,ClassTeacher1,ClassTeacher1Email,ClassTeacher1ID,ClassTeacher2,ClassTeacher2Email,ClassTeacher2ID,ClassTeacher3,ClassTeacher3Email,ClassTeacher3ID
             'dbo.uvSchoolBoxSchoolGradeResults', // Used in School Grades page.
+
+            // Columns: id,Title,Given1,Given2,Preferred,PreferredFormal,Surname,NameExternal,NameInternal,MailNamePrimary,StudentYear,ClassCode,FileSemester,CourseDescription,Endorsement,NCEAStandardNumber,InternalorExternalAssessment,StandardType,StandardTitle,EnteredCredits,Level,Result,StrippedResult,ResultClassification,ResultCredits,WithdrawnFlag,NCEALevel1Description,NCEALevel2Description,NCEALevel3Description,UELiteracyMet,UENumeracyMet,Level1LiteracyMet,Level1NumeracyMet,Lit,Num,ClassTeacher1,ClassTeacher1Email,ClassTeacher1ID,ClassTeacher2,ClassTeacher2Email,ClassTeacher2ID,ClassTeacher3,ClassTeacher3Email,ClassTeacher3ID
+            'dbo.uvSchoolBoxNCEAResults', // Used in NCEA page.
+
+            // Columns: id,Title,Given1,Given2,Preferred,PreferredFormal,Surname,NameExternal,NameInternal,MailNamePrimary,StudentYear,ClassCode,FileSemester,CourseDescription,Endorsement,NCEAStandardNumber,InternalorExternalAssessment,StandardType,StandardTitle,EnteredCredits,Level,Result,StrippedResult,ResultClassification,ResultCredits,WithdrawnFlag,NCEALevel1Description,NCEALevel2Description,NCEALevel3Description,UELiteracyMet,UENumeracyMet,Level1LiteracyMet,Level1NumeracyMet,Lit,Num,ClassTeacher1,ClassTeacher1Email,ClassTeacher1ID,ClassTeacher2,ClassTeacher2Email,ClassTeacher2ID,ClassTeacher3,ClassTeacher3Email,ClassTeacher3ID
             'dbo.uvSchoolBoxNCEAResultsforDataRefreshV2_Year11', // To be used in Year 11 page.
         ];
 
         $rowsByViewName = [];
+        $queryByViewName = [];
+        $queryTimeSecondsByViewName = [];
 
         foreach ($viewNames as $viewName) {
+            $query = "SELECT TOP 1 * FROM $viewName";
+
+            $t0 = microtime(true);
             try {
-                $rowsByViewName[$viewName] = $db->executeQuery("SELECT * FROM $viewName LIMIT 5", [])->fetchAll();
+                $rowsByViewName[$viewName] = $db->executeQuery($query, [])->fetchAll();
             } catch (\Exception $e) {
                 $rowsByViewName[$viewName] = $e->getMessage();
             }
+            $t1 = microtime(true);
+
+            $queryByViewName[$viewName] = $query;
+            $queryTimeSecondsByViewName[$viewName] = ($t1 - $t0);
         }
 
         foreach ($rowsByViewName as $viewName => $rows) {
             echo "<h2>View name: $viewName</h2>\n";
+
+            echo "<pre>" . htmlentities($queryByViewName[$viewName]) . "</pre>\n";
+            echo "<p>Query time: " . htmlentities(round($queryTimeSecondsByViewName[$viewName], 2)) . " seconds</p>\n";
 
             if (is_string($rows)) {
                 echo "<p>" . htmlentities($rows) . "</p>\n";
