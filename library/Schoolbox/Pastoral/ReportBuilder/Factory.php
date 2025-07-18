@@ -8,8 +8,8 @@ use Schoolbox\User\Translator\Author\ModelToArray;
 class Factory
 {
     public const STUDENT_BY_TYPE  = 'studentByType';
-//    public const TYPE_BY_MONTH    = 'TypeByMonth';
-//    public const TYPE_BY_WEEK     = 'TypeByWeek';
+//    public const TYPE_BY_MONTH    = 'typeByMonth';
+//    public const TYPE_BY_WEEK     = 'typeByWeek';
 //    public const STUDENT_BY_MONTH = 'studentByMonth';
 //    public const STUDENT_BY_WEEK  = 'studentByWeek';
 
