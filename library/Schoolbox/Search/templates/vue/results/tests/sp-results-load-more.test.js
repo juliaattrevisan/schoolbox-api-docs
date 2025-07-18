@@ -21,6 +21,17 @@ test("do not show load more button when no more results to load", async () => {
     expect(wrapper.find('[data-test="sp-results-load-more-button"]').exists()).toBe(false);
 });
 
+test("show load more button when more results to load", async () => {
+    const resultsStore = useResultsStore();
+    await resultsStore.$patch({
+        // Patch simulates the situation where a search response has been returned (with no results),
+        // but possibly more results exist (indicated by the non-null cursor value).
+        data: [],
+        metadata: { cursor: { next: "non-null cursor value" } },
+    });
+    expect(wrapper.find('[data-test="sp-results-load-more-button"]').exists()).toBe(true);
+});
+
 test("show all results loaded when all results have been loaded", async () => {
     const resultsStore = useResultsStore();
     await resultsStore.$patch({ hasLoadedAllResults: true });
