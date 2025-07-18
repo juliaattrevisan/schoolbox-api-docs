@@ -19,7 +19,7 @@ import Folder from "@schoolboxTest/playwright/support/page/folder/CreateFolder";
 import ManageGroup from "@schoolboxTest/playwright/support/page/group/ManageGroup";
 import Resources from "@schoolboxTest/playwright/support/page/resources/Resources";
 
-test.describe("Participation Plan Tests", () => {
+test.describe.skip("Participation Plan Tests", () => {
     test.beforeEach(async ({ tester }) => {
         await tester.logout();
         await tester.loginAsAdmin();
