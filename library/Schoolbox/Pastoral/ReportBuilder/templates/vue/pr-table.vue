@@ -5,7 +5,7 @@
 
 import { useTemplateRef } from "vue";
 // import { payload as tempPayload } from "./tempData";
-import type { Tab, TablePayload, Routes } from "../js/types/pastoralReportTypes";
+import type { Tab, TablePayload, Config, Routes } from "../js/types/pastoralReportTypes";
 import { TabType } from "../js/types/pastoralReportTypes";
 import { useLoadPrTable } from "./composable/useLoadPrTable";
 import PrTableHeader from "./pr-table-header.vue";
@@ -14,8 +14,9 @@ import PrTableRow from "./pr-table-row.vue";
 
 const props = defineProps<{
     selectedTab: Tab;
-    recordsAndPoints: string[];
+    config: Config;
     routes: Routes;
+    recordsAndPoints: string[];
     localePastoral: string;
 }>();
 
@@ -114,6 +115,7 @@ function onSortSelected(headerKey: string): void {
                 <pr-table-header
                     v-model:records-or-points="recordsOrPoints"
                     :headers="(payload as TablePayload).data.tableHeaders"
+                    :config="props.config"
                     :records-and-points="props.recordsAndPoints"
                     :sort-by="sortBy"
                     :sort-order="sortOrder"

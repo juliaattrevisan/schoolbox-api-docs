@@ -108,6 +108,7 @@ window.Vue.onMounted((): void => {
                 v-model:records-or-points="recordsOrPoints"
                 :records-and-points="recordsAndPoints"
                 :selected-tab="selectedTab"
+                :config="props.config"
                 :routes="props.routes"
                 :locale-pastoral="props.localePastoral"
             />

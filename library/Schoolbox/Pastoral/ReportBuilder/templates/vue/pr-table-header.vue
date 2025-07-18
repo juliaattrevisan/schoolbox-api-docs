@@ -4,10 +4,11 @@
  * Renders headers with optional sorting functionality.
  */
 
-import type { TableHeader } from "../js/types/pastoralReportTypes";
+import type { TableHeader, Config } from "../js/types/pastoralReportTypes";
 
 const props = defineProps<{
     headers: TableHeader[];
+    config: Config;
     recordsAndPoints: string[];
     sortBy: string;
     sortOrder: "asc" | "desc";
