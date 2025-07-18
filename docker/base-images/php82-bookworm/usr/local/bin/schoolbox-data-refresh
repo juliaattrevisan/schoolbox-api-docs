@@ -453,7 +453,7 @@ requires_logs_data_dir(){
 }
 
 set_ownership_and_permissions(){
-  if ! /usr/share/schoolbox/tools/set-config-data-dirs-perms.sh --owner www-data --group www-data --verbose; then
+  if ! /usr/share/schoolbox/tools/set-config-data-dirs-perms.sh --owner www-data --group www-data --verbose --no-lock; then
     error "Unable to set data dir ownership and perms"
     exit 1;
   fi
