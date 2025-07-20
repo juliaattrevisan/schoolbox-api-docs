@@ -32,6 +32,7 @@ use Schoolbox\Pastoral\Report\Dashboard\Mapper as PastoralReportDashboardMapper;
 use Schoolbox\Pastoral\Report\Dashboard\Model as PastoralReportDashboard;
 use Schoolbox\Pastoral\Report\Mapper as PastoralReportMapper;
 use Schoolbox\Pastoral\Report\Model as PastoralReport;
+use Schoolbox\Pastoral\ReportBuilder\TabType\TabTypeInterface;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Tag\Model as PastoralTag;
@@ -443,7 +444,15 @@ class Controller extends Base
                 throw new MapperException("Invalid type: $tabType has been given.");
             }
 
-            $records = $this->getReportData($report);
+            $records1 = $this->getReportData($report);
+
+            $cursor = new Cursor(
+                $factory,
+                $report,
+                Cursor::LIMIT_MAX
+            );
+
+            $records = $cursor->retrieveResults(null);
 
             $payload = $factory->process($records);
 

@@ -2,14 +2,168 @@
 
 namespace Schoolbox\Pastoral\ReportBuilder\TabType;
 
+use Schoolbox\Collection;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Pastoral\Mapper;
 use Schoolbox\Pastoral\Model as PastoralRecord;
+use Schoolbox\Pastoral\Report\Model as PastoralReport;
+use Schoolbox\Pastoral\SubType\Model;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Role;
 use Schoolbox\User\Translator\Author\ModelToArray;
+use Alaress_Date_Format;
 
 class StudentByType implements TabTypeInterface
 {
     public function __construct(
         private ModelToArray $userTranslator,
     ) {
+    }
+
+    public function getResults(PastoralReport $report)
+    {
+        $pastoralMapper = Mapper::getInstance();
+        $termMapper = \Schoolbox\Assessment\Term\Mapper::getInstance();
+
+        $db = $pastoralMapper->getDatabase();
+
+        $whereTypes = $report->getTypes()->diff(
+            $report->getSubTypes()?->map(
+                fn(Model $subType) => $subType->getPastoralType()
+            )
+        );
+
+        $whereTypes = implode(',', Collection::arrayColumn($whereTypes, 'id'));
+
+        $whereSubTypes = implode(',', Collection::arrayColumn($report->getSubTypes(), 'id'));
+
+        // Special case for the current term relative date, which is not a strtotime-able thingy
+        if (!$report->getUsesRelativeDate()) {
+            $beforeDate = $report->getBeforeDate();
+            $afterDate  = $report->getAfterDate();
+        } elseif ($report->getRelativeDateString() === PastoralReport::THIS_TERM) {
+            $currentTerm = $termMapper->findForToday();
+            $beforeDate  = $currentTerm->getActualFinish();
+            $afterDate   = $currentTerm->getStart();
+        } elseif ($report->getRelativeDateString() === PastoralReport::THIS_YEAR) {
+            $now        = Alaress_Date_Format::now();
+            $beforeDate = (clone $now)->endOfYear();
+            $afterDate  = (clone $now)->startOfYear();
+        } elseif ($report->getRelativeDateString() === PastoralReport::THIS_SCHOOL_YEAR) {
+            $now        = Alaress_Date_Format::now();
+            $beforeDate = (clone $now)->endOfSchoolYear();
+            $afterDate  = (clone $now)->getStartOfSchoolYear();
+        } else {
+            $beforeDate = Alaress_Date_Format::now();
+            $afterDate  = Alaress_Date_Format::newFromTimestamp(strtotime($report->getRelativeDateString()));
+        }
+
+        $countQuery = implode(
+            ', ',
+            $report->getSubTypes()->map(
+                fn(Model $subType) => "COUNT(CASE WHEN p.subtype_id = {$subType->getId()} THEN 1 END) AS count_{$subType->getId()}"
+            )->getAll()
+        );
+
+        $result = $db->executeQuery(
+            "SELECT p.student_id, {$countQuery}
+            FROM {$pastoralMapper->getTable()} p
+            WHERE
+                (p.type_id IN ({$whereTypes}) OR p.subtype_id IN ({$whereSubTypes})) AND
+                (COALESCE(`p`.`occurred_on`, `p`.`created_at`) <= :beforeDate) AND
+                (COALESCE(`p`.`occurred_on`, `p`.`created_at`) >= :afterDate)
+            GROUP BY p.student_id
+           ;",
+            [
+                'beforeDate' => $beforeDate->endOfDay()->toIso8601String(),
+                'afterDate'  => $afterDate->endOfDay()->toIso8601String(),
+            ]
+        );
+
+        $test2 = $result->rowCount();
+        $test3 = $result->fetchAll();
+        return new Collection($test3);
+//        return new Collection($result->fetchAll(\PDO::FETCH_ASSOC));
+    }
+    public function getResults1(PastoralReport $report)
+    {
+        $pastoralMapper = Mapper::getInstance();
+
+        $userAccessMapper = UserAccessMapper::getInstance();
+
+        $termMapper = \Schoolbox\Assessment\Term\Mapper::getInstance();
+//
+//        $db = $pastoralMapper->getDatabase();
+//
+//        $test = $db->executeQuery("
+//            SELECT *
+//            FROM {$pastoralMapper->getTable()}
+//        ");
+//
+//        $test3 = $test->fetchAll(\PDO::FETCH_ASSOC);
+//
+//        $test2 = array_map(
+//            fn ($record) => [
+//                'id' => $record['id'],
+//            ],
+//            $test3
+//        );
+
+        $pb = $pastoralMapper->getPredicateBuilder();
+
+        $whereTypes = $report->getTypes()->diff(
+            $report->getSubTypes()?->map(
+                fn(Model $subType) => $subType->getPastoralType()
+            )
+        );
+
+        $whereSubTypes = $report->getSubTypes();
+
+        $pb->any(
+            $pastoralMapper->getPredicateBuilder()
+                           ->in('type_id', Collection::arrayColumn($whereTypes, 'id'))
+                           ->in('subtype_id', Collection::arrayColumn($whereSubTypes, 'id'))
+        );
+
+        $years = $report->getYears();
+        $pb->in('s.year_id', Collection::arrayColumn($years, 'id'));
+
+        // Special case for the current term relative date, which is not a strtotime-able thingy
+        if (!$report->getUsesRelativeDate()) {
+            $beforeDate = $report->getBeforeDate();
+            $afterDate  = $report->getAfterDate();
+        } elseif ($report->getRelativeDateString() === PastoralReport::THIS_TERM) {
+            $currentTerm = $termMapper->findForToday();
+            $beforeDate  = $currentTerm->getActualFinish();
+            $afterDate   = $currentTerm->getStart();
+        } elseif ($report->getRelativeDateString() === PastoralReport::THIS_YEAR) {
+            $now        = Alaress_Date_Format::now();
+            $beforeDate = (clone $now)->endOfYear();
+            $afterDate  = (clone $now)->startOfYear();
+        } elseif ($report->getRelativeDateString() === PastoralReport::THIS_SCHOOL_YEAR) {
+            $now        = Alaress_Date_Format::now();
+            $beforeDate = (clone $now)->endOfSchoolYear();
+            $afterDate  = (clone $now)->getStartOfSchoolYear();
+        } else {
+            $beforeDate = Alaress_Date_Format::now();
+            $afterDate  = Alaress_Date_Format::newFromTimestamp(strtotime($report->getRelativeDateString()));
+        }
+
+        $pb->rawWhere(
+            '(COALESCE(`pastoral`.`occurred_on`, `pastoral`.`created_at`) <= :beforeDate)',
+            [':beforeDate' => $beforeDate->endOfDay()->toIso8601String()]
+        );
+
+        $pb->rawWhere(
+            '(COALESCE(`pastoral`.`occurred_on`, `pastoral`.`created_at`) >= :afterDate)',
+            [':afterDate' => $afterDate->endOfDay()->toIso8601String()]
+        );
+
+        $result = $pastoralMapper->findByPredicates($pb);
+
+        return $result;
+//        return new Collection();
     }
 
     public function process($records)
