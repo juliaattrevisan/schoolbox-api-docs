@@ -76,6 +76,7 @@ class Controller extends Base
             (int)$this->getConfigLoader()->get(ConfigMapper::NAME_ADVANCED_SEARCH_RESULT_PAGE_SIZE)
         );
         $cursor = null;
+        $resultsCount = 0;
 
         if (mb_strlen($keyword) >= self::MIN_CHARACTER_LIMIT) {
             ['results' => $results, 'nextCursor' => $nextCursor] = $this->populateResultSet(
@@ -84,6 +85,7 @@ class Controller extends Base
                 $limit,
                 $this->requestQuery->get('cursor')
             );
+            $resultsCount = count($results); // Get the count now before grouping by parent folder below.
 
             $translatedResults = [];
             foreach ($results as $result) {
@@ -215,7 +217,7 @@ class Controller extends Base
                 [
                     'data'     => $translatedResults,
                     'metadata' => [
-                        'count'  => null,
+                        'count'  => $resultsCount,
                         'cursor' => [
                             'current' => null,
                             'next'    => $nextCursor,
@@ -260,7 +262,7 @@ class Controller extends Base
                 [
                     'data'     => array_map($this->fullResultTranslator, $results),
                     'metadata' => [
-                        'count'  => null,
+                        'count'  => count($results),
                         'cursor' => [
                             'current' => null,
                             'next'    => $nextCursor,
