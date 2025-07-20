@@ -27,7 +27,7 @@ const showLoadMore = window.Vue.computed(() => {
  */
 const shouldAutoLoad = window.Vue.computed(() => {
     return (
-        resultsStore.totalResultsCount < store.resultPageSize &&
+        resultsStore.numberOfResultsInMainThread < store.resultPageSize &&
         resultsStore.hasMoreResults &&
         !loadMoreResultsStore.isLoading &&
         !loadMoreResultsStore.hasLoadError
@@ -59,7 +59,7 @@ window.Vue.watch(
             return;
         }
         // Limit the number of records searched for to the number needed to fill the page.
-        await loadMoreResultsStore.loadMore(store.resultPageSize - resultsStore.totalResultsCount);
+        await loadMoreResultsStore.loadMore(store.resultPageSize - resultsStore.numberOfResultsInMainThread);
     },
     { immediate: true },
 );

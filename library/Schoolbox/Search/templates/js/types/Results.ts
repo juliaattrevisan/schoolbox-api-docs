@@ -6,6 +6,7 @@ import type { Result } from "./Result";
 export type Results = {
     data: Result[];
     metadata: {
+        count: number;
         cursor: {
             next: string | null;
         };
