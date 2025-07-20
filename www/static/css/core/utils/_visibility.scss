@@ -746,3 +746,23 @@ $visibility-breakpoint-queries:
 .invisible {
     visibility: hidden;
 }
+
+/*
+    A generic fade in/out that is used within Vue components
+    to switch visibility between two or more elements
+    Search for  <Transition name="fade" mode="out-in">
+*/
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.2s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+
+.fade-enter-to,
+.fade-leave-from {
+    opacity: 1;
+}

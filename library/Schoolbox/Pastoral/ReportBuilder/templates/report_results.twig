@@ -7,46 +7,30 @@
     <li class="active"><span>{{ title }}</span></li>
 </ul>
 
-<div class="row actions-small-1">
-    <div class="list-item">
-        <div class="small-12 columns">
-            <h1>{{ title }}</h1>
-        </div>
-    </div>
-    <nav>
-        {% if results | length %}
-            {% if export %}
-            <a href="{{ routeLookupIfAuthorized('pastoralReportBuilder.getReportResultsExport', {reportId: report.id}) }}" class="icon-download"></a>
-            {% endif %}
-            <a href="#" data-print class="icon-print" title="Print Report Results"></a>
-        {% endif %}
-    </nav>
-</div>
-
-<div class="row">
-    <div class="small-12 island">
-        <div id="pastoral-report-container">
-            <pastoral-report
-                :tabs="{{ tabs|json_encode}}"
-                :results="{{ results|json_encode}}"
-                :pastoral-point-enabled="{{ config.pastoral_point_enabled }}"
-                :pastoral-action-enable="{{ config.pastoral_action_enable }}"
-                locale-pastoral="{{ locale.pastoral.proper|lower }}"
-                :show-severity="{{ showSeverity ? 'true' : 'false' }}"
-                :severity-colors="{{ severityColors|json_encode }}"
-            />
-        </div>
-    </div>
+<div id="pastoral-report-container">
+    <pastoral-report
+        title="{{ title }}"
+        :export="{{ export ? 'true' : 'false' }}"
+        :report-id="{{ report.id }}"
+        :tabs="{{ tabs|json_encode }}"
+        :results="{{ results|json_encode }}"
+        :config="{{ {
+            pastoralPointEnabled: config.pastoral_point_enabled,
+            pastoralActionEnable: config.pastoral_action_enable
+        }|json_encode }}"
+        :routes="{{ {
+            getStudentRecord: routeLookup('pastoral.getStudentRecord'),
+            getReportTags: routeLookup('pastoralReportBuilder.getReportTags'),
+            getIndex: routeLookup('pastoralReportBuilder.getIndex'),
+            getReportResultsExport: routeLookupIfAuthorized('pastoralReportBuilder.getReportResultsExport', {reportId: report.id})
+        }|json_encode }}"
+        locale-pastoral="{{ locale.pastoral.proper|lower }}"
+        :show-severity="{{ showSeverity ? 'true' : 'false' }}"
+        :severity-colors="{{ severityColors|json_encode }}"
+    />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/pastoralReport.js?v={{ config.site_version }}"></script>
 
-<script>
-    $(function () {
-        $('[data-print]').click(function () {
-            window.print();
-        });
-    })
-</script>
 <script>
     //Search for the record in the report to highlight
     function checkForRecordHighlight()

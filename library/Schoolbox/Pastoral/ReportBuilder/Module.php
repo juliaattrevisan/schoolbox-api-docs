@@ -92,13 +92,14 @@ class Module extends BaseModule
         $this->registerRoutesArray(
             [
                 'GET'  => [
-                    ''                               => ['getIndex' => $permissionStaff],
-                    '/insert'                        => ['getReportInsert' => $permissionStaff],
-                    '/update/{reportId:\d+}'         => ['getReportUpdate' => $permissionModifyReport],
-                    '/results/{reportId:\d+}'        => ['getReportResults' => $permissionReadReport],
-                    '/results/tag/{tagId:\d+}'       => ['getReportTags' => $permissionStaff],
-                    '/results/{reportId:\d+}/print'  => ['getReportResultsPrint' => $permissionReadReport],
-                    '/results/{reportId:\d+}/export' => ['getReportResultsExport' => $permissionReadReport],
+                    ''                                          => ['getIndex' => $permissionStaff],
+                    '/insert'                                   => ['getReportInsert' => $permissionStaff],
+                    '/update/{reportId:\d+}'                    => ['getReportUpdate' => $permissionModifyReport],
+                    '/results/{reportId:\d+}'                   => ['getReportResults' => $permissionReadReport],
+                    '/results/tag/{tagId:\d+}'                  => ['getReportTags' => $permissionStaff],
+                    '/results/{reportId:\d+}/{tabType}'         => ['getReportByTabType' => $permissionStaff],
+                    '/results/{reportId:\d+}/print'             => ['getReportResultsPrint' => $permissionReadReport],
+                    '/results/{reportId:\d+}/export'            => ['getReportResultsExport' => $permissionReadReport],
                 ],
                 'POST' => [
                     '/create'                => ['postReportCreate' => $permissionStaff],
@@ -151,6 +152,7 @@ class Module extends BaseModule
                 $this->injector->get('user'),
                 new ScrubAdapter(),
             ),
+            new User\Translator\Author\ModelToArray(),
         );
     }
 

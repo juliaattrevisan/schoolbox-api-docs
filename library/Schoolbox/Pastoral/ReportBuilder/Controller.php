@@ -12,6 +12,7 @@ namespace Schoolbox\Pastoral\ReportBuilder;
 
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
+use Crell\ApiProblem\ApiProblem;
 use HouseMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\CampusMapper;
@@ -44,6 +45,7 @@ use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
+use Schoolbox\User\Translator\Author\ModelToArray as UserTranslator;
 use Schoolbox\UserMapper;
 use Schoolbox\YearLevel;
 
@@ -71,6 +73,8 @@ class Controller extends Base
      * @param RoleMapper                    $roleMapper
      * @param UserAccessMapper              $userAccessMapper
      * @param RosettaStone                  $l10n
+     * @param ModelToArray                  $pastoralTranslator
+     * @param UserTranslator                $userTranslator
      */
     public function __construct(
         private ErrorMapper $errorMapper,
@@ -93,6 +97,7 @@ class Controller extends Base
         private UserAccessMapper $userAccessMapper,
         private RosettaStone $l10n,
         private ModelToArray $pastoralTranslator,
+        private UserTranslator $userTranslator,
     ) {
     }
 
@@ -369,28 +374,38 @@ class Controller extends Base
         $severityColors = $showSeverity ? $this->getSeverityColors() : [];
 
         $defaultSummaryOptions = [
-            ['title' => 'List', 'type' => 'list']
+            ['title' => 'List', 'type' => 'list', 'key' => 'list', 'endpoint' => 'list']
         ];
 
         /* Find the selected list of options
          */
-        $selectedSummaryOptions = array_values(
-            array_filter(
-                PastoralReport::SUMMARY_TABLES_OPTIONS,
-                function ($key) use ($report) {
-                    return in_array($key, explode(',', $report->getSummaryTables() ?? ''));
-                },
-                ARRAY_FILTER_USE_KEY
-            )
+        $checkedSummaryOptions = explode(',', $report->getSummaryTables() ?? '');
+        $selectedSummaryOptions = array_filter(
+            PastoralReport::SUMMARY_TABLES_OPTIONS,
+            function ($key) use ($checkedSummaryOptions) {
+                return in_array($key, $checkedSummaryOptions);
+            },
+            ARRAY_FILTER_USE_KEY
         );
 
-        $tabs = array_merge(
-            $defaultSummaryOptions,
-            array_map(
-                fn($option) => ['title' => $option['label'], 'type' => $option['type']],
-                $selectedSummaryOptions
-            )
-        );
+        $mappedOptions = [];
+        foreach ($selectedSummaryOptions as $key => $option) {
+            $mappedOptions[] = [
+                'title' => $option['label'],
+                'type' => $option['type'],
+                'key' => $key,
+                'endpoint' => $this->getRouteIfAuthorized(
+                    'pastoralReportBuilder.getReportByTabType',
+                    [
+                        'reportId' => $report->getId(),
+                        'report' => $report,
+                        'tabType' => $key,
+                    ]
+                )
+            ];
+        }
+
+        $tabs = array_merge($defaultSummaryOptions, $mappedOptions);
         // And spit this thing out
 
         $this->response = $this->responseFromTemplate(
@@ -408,6 +423,36 @@ class Controller extends Base
             ],
             $report->getName(),
         );
+    }
+
+    /**
+     * Retrieve report of all pastoral records with the selected type
+     * to display in a table format
+     *
+     * @param PastoralReport $report
+     * @throws MapperException
+     */
+    public function getReportByTabType(string $tabType, PastoralReport $report): void
+    {
+        try {
+            $factory = (new Factory(
+                $this->userTranslator
+            ))->produce($tabType);
+
+            if (null === $factory) {
+                throw new MapperException("Invalid type: $tabType has been given.");
+            }
+
+            $records = $this->getReportData($report);
+
+            $payload = $factory->process($records);
+
+            $this->response = $this->responseAsJson($payload);
+        } catch (\Exception $e) {
+            $problem = new ApiProblem($e->getMessage());
+            $problem->setStatus($e->getCode());
+            $this->response = $this->responseAsJson($problem->asArray());
+        }
     }
 
     /**

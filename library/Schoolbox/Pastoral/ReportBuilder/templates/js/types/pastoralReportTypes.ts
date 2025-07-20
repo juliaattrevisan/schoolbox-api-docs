@@ -1,92 +1,21 @@
-/**
- * Base user type for students and owners
- */
-export type User = {
-    id: number;
-    fullName: string;
-};
+import type { User } from "@schoolboxLibrary/types/User";
 
 /**
- * Student type extending User
+ * Pastoral report tab types
  */
-export type Student = User & {
-    // Additional student-specific properties can be added here
-};
+export enum TabType {
+    LIST = "list",
+    TABLE = "table",
+}
 
 /**
- * Pastoral record owner type extending User
+ * Pastoral report tab type (from your Vue component)
  */
-export type Owner = User & {
-    // Additional owner-specific properties can be added here
-};
-
-/**
- * Date type with short format
- */
-export type PastoralDate = {
-    short: string;
-    local: string;
-};
-
-/**
- * Pastoral event severity
- */
-export type Severity = {
-    id: number;
-    name: string;
-};
-
-/**
- * Pastoral event type
- */
-export type PastoralType = {
-    name: string;
-};
-
-/**
- * Pastoral event subtype
- */
-export type PastoralSubtype = {
-    name?: string;
-};
-
-/**
- * Pastoral tag
- */
-export type PastoralTag = {
-    id: number;
-    name: string;
-};
-
-/**
- * Pastoral comment
- */
-export type PastoralComment = {
-    owner: Owner;
-    createdAt: string;
-    body: string;
-    private: boolean;
-};
-
-/**
- * Main pastoral record type
- */
-export type PastoralRecord = {
-    id: number;
-    student: Student;
-    heading: string;
-    isArchived: boolean;
-    expiresAt?: string;
-    severity?: Severity;
-    points?: number;
-    type: PastoralType;
-    subType: PastoralSubtype;
-    owner: Owner;
-    createdAt: PastoralDate;
-    uncompletedActionCount: number;
-    bodyPublic?: string;
-    tags: PastoralTag[];
-    comments: PastoralComment[];
+export type Tab = {
+    type: TabType;
+    title: string;
+    key: string; // Unique key for the tab, used for routing
+    endpoint: string;
 };
 
 /**
@@ -101,22 +30,68 @@ export type SeverityColors = {
 /**
  * Configuration object for pastoral settings
  */
-export type PastoralConfig = {
-    pastoral_point_enabled: boolean;
-    pastoral_action_enable: boolean;
+export type Config = {
+    pastoralPointEnabled: boolean;
+    pastoralActionEnable: boolean;
 };
 
 /**
- * Locale configuration
+ * Routes for the Pastoral Report Builder
  */
-export type LocaleConfig = {
-    pastoral: string;
+export type Routes = {
+    getStudentRecord: string;
+    getReportTags: string;
+    getIndex: string;
+    getReportResultsExport: string;
 };
 
 /**
- * Pastoral report tab type (from your Vue component)
+ * Defines the type of table headers used in the Pastoral Report Table,
+ * which defines what will be displayed in each column of the table.
  */
-export type PastoralReportTab = {
-    type: string;
+export enum TableHeaderType {
+    USER = "User",
+    RECORDS_AND_POINTS = "RecordsAndPoints",
+}
+
+/**
+ * To define the structure of each table column
+ */
+export type TableHeader = {
+    key: string;
     title: string;
+    subTitle?: string;
+    type: string | TableHeaderType;
+    isSortable?: boolean;
+};
+
+/**
+ * Displays either records or points in the table cell
+ */
+export type RecordsAndPoints = {
+    records: number;
+    points: number | undefined; // Points can be undefined if none have been applied within the records
+};
+
+/**
+ * The options for a row in the Pastoral Report Table.
+ */
+export type RowOptions = string | User | RecordsAndPoints;
+
+/**
+ * The expected payload for a Pastoral Report Table.
+ */
+export type TablePayload = {
+    data: {
+        tableHeaders: TableHeader[];
+        totalRow: RowOptions[];
+        rows: RowOptions[][];
+    };
+    metadata: {
+        count: number;
+        cursor: {
+            current: string | null;
+            next: string | null;
+        };
+    };
 };
