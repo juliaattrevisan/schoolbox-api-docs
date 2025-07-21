@@ -160,6 +160,7 @@ class Helper
             header('Content-Type: text/event-stream');
             header('Cache-Control: no-cache');
             header('Connection: keep-alive');
+            header('Content-Encoding: none');
 
             ob_implicit_flush(true);
             ob_end_flush();
@@ -348,20 +349,16 @@ class Helper
              */
             $promise->then(
                 function ($response) use ($log): void {
-                    /* Set up presumed success conditions
-                     */
-                    $returnCode = 200;
+                    $returnCode = $response->getStatusCode();
 
                     http_response_code($returnCode);
 
                     $log->setReturnCode($returnCode)
                         ->setErrorMessage('');
 
-                    /* Remove preformatted insanity by encoding it all away
-                     * https://stackoverflow.com/questions/23859713/remove-all-unnecessary-whitespaces-from-json-string-in-php
-                     */
-                    //header('X-Accel-Buffering: no');
-                    header('Content-Type: application/json');
+                    header('Content-Type: text/event-stream');
+                    header('Cache-Control: no-cache');
+                    header('Connection: keep-alive');
                     header('Content-Encoding: none');
 
                     ob_implicit_flush(true);
