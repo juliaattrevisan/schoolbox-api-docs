@@ -433,6 +433,9 @@ class Model implements ISoftDeletable, IThreadLocation
      */
     public function isPublished(): bool
     {
+        /* Arguably submittedAt and submittedBy could/should(?) be null, but then
+         * you'd lose info about when a student submitted a thing. Does it matter?
+         */
         return $this->getSubmittedAt() !== null &&
             $this->getSubmittedBy() !== null &&
             $this->getPublishedAt() !== null &&
