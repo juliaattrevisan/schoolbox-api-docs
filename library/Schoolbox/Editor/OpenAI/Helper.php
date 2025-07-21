@@ -42,11 +42,6 @@ class Helper
     public const ENDPOINT_TYPE_OFF = 'Off';
 
     /**
-     * Buffer for accumulating partial chunks in streaming responses
-     */
-    private string $chunkBuffer = '';
-
-    /**
      * Structured Outputs is only supported in certain models
      * Note that we intentionally don't support gippity 3.5
      */
@@ -110,6 +105,33 @@ class Helper
 
 
     /**
+     * Parse a chunk received from the SSE stream
+     *
+     * @param string $chunk The raw chunk data from the stream
+     * @return array{type:string|null,data:array}
+     */
+    private function parseChunk(string $chunk): array
+    {
+        $type = null;
+        $data = [];
+        $lines = explode("\n", $chunk);
+        foreach ($lines as $line) {
+            if (str_starts_with($line, 'event: ')) {
+                $type = trim(substr($line, 7));
+            } elseif (str_starts_with($line, 'data: ')) {
+                $data[] = json_decode(trim(substr($line, 6)), true, 512, JSON_THROW_ON_ERROR);
+            } else {
+                throw new \InvalidArgumentException(sprintf('Unknown line format: %s', $line));
+            }
+        }
+
+        return [
+            'type' => $type,
+            'data' => $data,
+        ];
+    }
+
+    /**
      * Read a chunked stream response from OpenAI and echo it once each full chunk is received
      *
      * @param \Psr\Http\Message\StreamInterface $stream
@@ -117,24 +139,43 @@ class Helper
      */
     public function readStream(\Psr\Http\Message\StreamInterface $stream): string
     {
-        // store a section of the response (end of the stream)
         $output = '';
+        $chunkBuffer = '';
+
+        $isGeneratingImage = false;
 
         while (!$stream->eof()) {
+            // Read larger chunks if in the middle of generating an image (as we're about to recieve a lot of data)
+            $readSize = $isGeneratingImage ? 8192 : 128;
+            $data = $stream->read($readSize);
+            if ('' === $data) {
+                usleep(100000);
+                continue;
+            }
+
             // Normalise CRLF to LF
-            $data = $stream->read(128);
-            $data = str_replace("\r\n", "\n", $data);
-            $data = str_replace("\r", "\n", $data);
-            $this->chunkBuffer .= $data;
+            if (false !== strpos($data, "\r")) {
+                $data = strtr($data, ["\r\n" => "\n", "\r" => "\n"]);
+            }
+
+            $chunkBuffer .= $data;
 
             // while there's at least one full chunk in the buffer, process it
-            while (false !== ($pos = strpos($this->chunkBuffer, "\n\n"))) {
-                $chunk = substr($this->chunkBuffer, 0, $pos);
-                $this->chunkBuffer = substr($this->chunkBuffer, $pos + 2);
+            while (false !== ($pos = strpos($chunkBuffer, "\n\n"))) {
+                $chunk = substr($chunkBuffer, 0, $pos);
+                $chunkBuffer = substr($chunkBuffer, $pos + 2);
 
                 // TODO: process the chunk so it can be saved to the log
-                echo $chunk . "\n\n";
+                echo "{$chunk}\n\n";
                 $output .= $chunk;
+                $event = $this->parseChunk($chunk);
+
+                // Keep track of whether we're generating an image
+                if ($event['type'] === 'response.image_generation_call.generating') {
+                    $isGeneratingImage = true;
+                } else if ($event['type'] === 'response.image_generation_call.completed') {
+                    $isGeneratingImage = false;
+                }
 
                 // flush PHP buffers
                 if (ob_get_length()) {
@@ -145,13 +186,12 @@ class Helper
         }
 
         // If we have any remaining data in the buffer, process it
-        if (strlen(trim($this->chunkBuffer)) > 0) {
+        if (strlen(trim($chunkBuffer)) > 0) {
             // TODO: process the probably incomplete chunk
-            echo $this->chunkBuffer;
-            $output .= $this->chunkBuffer;
+            echo $chunkBuffer;
+            $output .= $chunkBuffer;
         }
 
-        $this->chunkBuffer = '';
         return $output;
     }
 
