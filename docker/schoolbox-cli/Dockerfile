@@ -56,12 +56,12 @@ case "$ENV" in
     ./aws/install
     rm awscliv2.zip
     rm -rf ./aws
-    ;;
 
     # NPM install
-    curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/v${NVM_VERSION}/install.sh" | bash
-    source /root/.nvm/nvm.sh
-    nvm install ${NODE_VERSION}
+    curl "https://raw.githubusercontent.com/nvm-sh/nvm/v${NVM_VERSION}/install.sh" -o nvm-install
+    chmod +x nvm-install
+    bash -c "./nvm-install && source /root/.nvm/nvm.sh && nvm install ${NODE_VERSION}"
+    ;;
 esac
 EOF
 
