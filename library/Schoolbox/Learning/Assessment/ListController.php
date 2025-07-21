@@ -319,7 +319,8 @@ class ListController extends Web\Controller\Base
                     $explicitReturnUrl,
                     $assessmentInfo[Redirect::RETURN_URL],
                     $assessmentInfo['relocated'],
-                    true
+                    true,
+                    $post['toParticipation'] ?? false
                 )
             );
         } catch (InvalidArgumentException $e) {
