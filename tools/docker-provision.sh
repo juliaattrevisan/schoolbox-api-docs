@@ -226,8 +226,10 @@ then
 fi
 cd "$SITE_ROOT" || exit;
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Updating composer autoload";
-composer dump-autoload -o --no-interaction
+# Composer autoload needs to apply patches as well:
+# just use composer install for that
+echo "[SB][`date +%Y-%m-%d\ %X`] Updating composer autoload and patches";
+composer install -o --no-interaction
 #su -s /bin/bash -c "cd $SITE_ROOT && composer dump-autoload -o --no-interaction" vagrant
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Installing instance via 'schoolbox-data-refresh.sh'";
