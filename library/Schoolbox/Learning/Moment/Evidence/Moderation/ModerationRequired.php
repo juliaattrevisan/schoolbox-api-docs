@@ -17,6 +17,14 @@ class ModerationRequired
      */
     public function isSatisfiedBy(bool $globalModeration, ?YearLevel\Model $yearLevel): bool
     {
-        return $globalModeration || $yearLevel->getLearningMomentsModeration();
+        /* If the $yearLevel is meaningful, use its setting
+         */
+        if (null !== $yearLevel) {
+            return $yearLevel->getLearningMomentsModeration();
+        }
+
+        /* Otherwise fall back to whatever the global config says
+         */
+        return $globalModeration;
     }
 }
