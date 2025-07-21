@@ -26,18 +26,6 @@ class StudentByType implements TabTypeInterface
         $pastoralMapper = Mapper::getInstance();
         $termMapper = \Schoolbox\Assessment\Term\Mapper::getInstance();
 
-        $db = $pastoralMapper->getDatabase();
-
-        $whereTypes = $report->getTypes()->diff(
-            $report->getSubTypes()?->map(
-                fn(Model $subType) => $subType->getPastoralType()
-            )
-        );
-
-        $whereTypes = implode(',', Collection::arrayColumn($whereTypes, 'id'));
-
-        $whereSubTypes = implode(',', Collection::arrayColumn($report->getSubTypes(), 'id'));
-
         // Special case for the current term relative date, which is not a strtotime-able thingy
         if (!$report->getUsesRelativeDate()) {
             $beforeDate = $report->getBeforeDate();
@@ -59,32 +47,85 @@ class StudentByType implements TabTypeInterface
             $afterDate  = Alaress_Date_Format::newFromTimestamp(strtotime($report->getRelativeDateString()));
         }
 
-        $countQuery = implode(
-            ', ',
-            $report->getSubTypes()->map(
-                fn(Model $subType) => "COUNT(CASE WHEN p.subtype_id = {$subType->getId()} THEN 1 END) AS count_{$subType->getId()}"
-            )->getAll()
+        $db = $pastoralMapper->getDatabase();
+
+        $whereInTypeSubTypeQuery = [];
+
+        $whereTypes = $report->getTypes()->diff(
+            $report->getSubTypes()?->map(
+                fn(Model $subType) => $subType->getPastoralType()
+            )
         );
 
-        $result = $db->executeQuery(
+        if ($whereTypes->count() > 0) {
+            $whereTypeIds = implode(',', Collection::arrayColumn($whereTypes, 'id'));
+            $countTypeQuery = implode(
+                ', ',
+                $whereTypes->map(
+                    fn(\Schoolbox\Pastoral\Type\Model $type) => "COUNT(CASE WHEN p.type_id = {$type->getId()} THEN 1 END) AS count_type_{$type->getId()}"
+                )->getAll()
+            );
+            $whereInTypeSubTypeQuery[] = "p.type_id IN ({$whereTypeIds})";
+        }
+
+        $whereSubTypes = $report->getSubTypes() ?? [];
+        if (!empty($whereSubTypes)) {
+            $whereSubTypeIds   = implode(',', Collection::arrayColumn($report->getSubTypes(), 'id'));
+            $countSubTypeQuery = implode(
+                ', ',
+                $report->getSubTypes()->map(
+                    fn(Model $subType) => "COUNT(CASE WHEN p.subtype_id = {$subType->getId()} THEN 1 END) AS count_subtype_{$subType->getId()}"
+                )->getAll()
+            );
+            $whereInTypeSubTypeQuery[] = "p.subtype_id IN ({$whereSubTypeIds})";
+        }
+
+        $countQuery = implode(', ', array_filter([$countTypeQuery ?? '', $countSubTypeQuery ?? '']));
+
+        $whereTypeSubTypeQuery = implode(" OR ", $whereInTypeSubTypeQuery);
+
+        $countQuery =
             "SELECT p.student_id, {$countQuery}
             FROM {$pastoralMapper->getTable()} p
             WHERE
-                (p.type_id IN ({$whereTypes}) OR p.subtype_id IN ({$whereSubTypes})) AND
+                ({$whereTypeSubTypeQuery}) AND
                 (COALESCE(`p`.`occurred_on`, `p`.`created_at`) <= :beforeDate) AND
                 (COALESCE(`p`.`occurred_on`, `p`.`created_at`) >= :afterDate)
             GROUP BY p.student_id
-           ;",
+           ";
+
+        $typeKeys = implode(
+            ' + ',
+            $whereTypes->map(
+                fn(\Schoolbox\Pastoral\Type\Model $type) => "count_type_{$type->getId()}"
+            )->getAll()
+        );
+
+        $subTypeKeys = implode(
+            ' + ',
+            $report->getSubTypes()->map(
+                fn(Model $subType) => "count_subtype_{$subType->getId()}"
+            )->getAll()
+        );
+
+        $totalCount = "SUM(" . implode(' + ', array_filter([$typeKeys, $subTypeKeys])) . ") as TotalCount";
+
+        $totalQuery = "
+            SELECT *, {$totalCount}
+            FROM ($countQuery) countData
+            GROUP BY countData.student_id
+        ";
+
+        $result =  $db->executeQuery(
+            $totalQuery,
             [
                 'beforeDate' => $beforeDate->endOfDay()->toIso8601String(),
-                'afterDate'  => $afterDate->endOfDay()->toIso8601String(),
+                'afterDate'  => $afterDate->startOfDay()->toIso8601String(),
             ]
         );
 
-        $test2 = $result->rowCount();
-        $test3 = $result->fetchAll();
-        return new Collection($test3);
-//        return new Collection($result->fetchAll(\PDO::FETCH_ASSOC));
+        $data = $result->fetchAll(\PDO::FETCH_ASSOC);
+        return new Collection($data);
     }
     public function getResults1(PastoralReport $report)
     {

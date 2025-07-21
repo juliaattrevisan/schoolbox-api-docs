@@ -430,8 +430,8 @@ class Controller extends Base
      * Retrieve report of all pastoral records with the selected type
      * to display in a table format
      *
+     * @param string         $tabType
      * @param PastoralReport $report
-     * @throws MapperException
      */
     public function getReportByTabType(string $tabType, PastoralReport $report): void
     {
@@ -444,7 +444,9 @@ class Controller extends Base
                 throw new MapperException("Invalid type: $tabType has been given.");
             }
 
-            $records1 = $this->getReportData($report);
+//            $records1 = $this->getReportData($report);
+//            $payload = $factory->process($records1);
+//            $this->response = $this->responseAsJson($payload);
 
             $cursor = new Cursor(
                 $factory,
@@ -453,10 +455,7 @@ class Controller extends Base
             );
 
             $records = $cursor->retrieveResults(null);
-
-            $payload = $factory->process($records);
-
-            $this->response = $this->responseAsJson($payload);
+            $this->response = $this->responseAsJson($records);
         } catch (\Exception $e) {
             $problem = new ApiProblem($e->getMessage());
             $problem->setStatus($e->getCode());
