@@ -181,6 +181,8 @@ class StudentLists
         $studentSisRecord['learningMomentsEnabled'] = $user->getLearningMomentsEnabled();
         $studentSisRecord['routes']                 = [];
         $studentSisRecord['classCodes']             = [];
+        $studentSisRecord['yearlevel']              = $user->getYear()?->getName();  // use schoolbox information first
+        $studentSisRecord['house']                  = $user->getSchoolHouse()?->getHouse();
 
         //Won't even try to check for upcoming assessments or grades, if LMS is disabled
         if ($this->lmsIsEnabled) {
