@@ -39,6 +39,7 @@ case "$ENV" in
   prod | production)
     ;;
   *)
+    # AWS CLI install
     apt-get install -y zip pv wget
     case "$ARCH" in
       arm64)
@@ -54,6 +55,11 @@ case "$ENV" in
     rm awscliv2.zip
     rm -rf ./aws
     ;;
+
+    # NPM install
+    curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/v${NVM_VERSION}/install.sh" | bash
+    source /root/.nvm/nvm.sh
+    nvm install ${NODE_VERSION}
 esac
 EOF
 
