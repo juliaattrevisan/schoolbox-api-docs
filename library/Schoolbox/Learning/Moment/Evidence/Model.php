@@ -407,11 +407,57 @@ class Model implements ISoftDeletable, IThreadLocation
 
     /* Convenient bools
      */
+
+    /**
+     * This moment is submitted;
+     * it isn't published, nor rejected
+     *
+     * @return bool
+     */
     public function isSubmitted(): bool
     {
-        return $this->getSubmittedAt() !== null && $this->getSubmittedBy() !== null;
+        return $this->getSubmittedAt() !== null &&
+            $this->getSubmittedBy() !== null &&
+            $this->getPublishedAt() === null &&
+            $this->getPublishedBy() === null &&
+            $this->getRejectedAt() === null &&
+            $this->getRejectedBy() === null;
     }
 
+
+    /**
+     * This moment is published;
+     * it isn't rejected, but we know when it was submitted
+     *
+     * @return bool
+     */
+    public function isPublished(): bool
+    {
+        return $this->getSubmittedAt() !== null &&
+            $this->getSubmittedBy() !== null &&
+            $this->getPublishedAt() !== null &&
+            $this->getPublishedBy() !== null &&
+            $this->getRejectedAt() === null &&
+            $this->getRejectedBy() === null;
+    }
+
+
+    /**
+     * This moment is rejected;
+     * it's not published and we treat this like it was never submitted,
+     * forcing the user to go back and revise their content
+     *
+     * @return bool
+     */
+    public function isRejected(): bool
+    {
+        return $this->getSubmittedAt() === null &&
+            $this->getSubmittedBy() === null &&
+            $this->getPublishedAt() === null &&
+            $this->getPublishedBy() === null &&
+            $this->getRejectedAt() !== null &&
+            $this->getRejectedBy() !== null;
+    }
 
 
     /* Getters/Setters
