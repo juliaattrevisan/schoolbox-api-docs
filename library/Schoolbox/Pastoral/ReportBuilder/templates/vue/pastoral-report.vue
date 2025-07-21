@@ -116,4 +116,8 @@ window.Vue.onMounted((): void => {
     </div>
 </template>
 
-<style scoped></style>
+<style>
+:root {
+    --sbx-pr-table-total-cell-colour: #eee;
+}
+</style>

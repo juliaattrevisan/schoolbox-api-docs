@@ -146,7 +146,7 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
 }
 
 .total-cell {
-    background: #eee;
+    background: var(--sbx-pr-table-total-cell-colour);
 }
 
 .title-button {

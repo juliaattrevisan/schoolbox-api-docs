@@ -84,6 +84,6 @@ function isUser(data: RowOptions): data is User {
 
 <style scoped lang="scss">
 .total-cell {
-    background: #eee;
+    background: var(--sbx-pr-table-total-cell-colour);
 }
 </style>

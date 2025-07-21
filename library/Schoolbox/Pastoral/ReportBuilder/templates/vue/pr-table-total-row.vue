@@ -48,6 +48,6 @@ const props = defineProps<Props>();
 
 <style scoped lang="scss">
 td {
-    background: #eee;
+    background: var(--sbx-pr-table-total-cell-colour);
 }
 </style>
