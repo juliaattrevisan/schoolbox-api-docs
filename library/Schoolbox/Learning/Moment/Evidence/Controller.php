@@ -16,6 +16,7 @@ use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Collection;
 use Schoolbox\Discussion\Comment;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Moment\Evidence\Moderation\ModerationEnabled;
 use Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Factory;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
@@ -104,12 +105,23 @@ class Controller extends Base
         // * upload
         $momentType = $this->requestQuery->get('momentType') ?: Model::MOMENT_TYPE_TEXT;
         $template   = $this->getTemplateFromType($momentType);
+
+        /* Students get their learning moment moderation requirement tested;
+         * parents and teachers bypass this check
+         */
+        $moderationEnabled = false;
+
+        if ($this->getUser()->getRole()->isStudent()) {
+            $moderationEnabled = (new ModerationEnabled())->isSatisfiedBy($this->getConfigLoader()->get('learning_moments_moderation_enabled'), $this->getUser()->getYear());
+        }
+
         $params = [
             'users'                    => $users,
             'userIds'                  => $users->getPropertyValues('id'),
             'otherUsers'               => $otherUsers,
             'sharingForSelf'           => $sharingForSelf,
             'curriculumTaggingEnabled' => $this->curriculumTaggingEnabled(),
+            'moderationEnabled'        => $moderationEnabled,
             'isCreate'                 => true,
             'momentType'               => $momentType,
             'zone'                     => $this->buildAttachzone($momentType)->getTwigContext()
