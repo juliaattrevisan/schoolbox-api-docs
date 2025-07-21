@@ -438,23 +438,18 @@ class Controller extends Base
         try {
             $factory = (new Factory(
                 $this->userTranslator
-            ))->produce($tabType);
+            ))->produce($report, $tabType);
 
             if (null === $factory) {
                 throw new MapperException("Invalid type: $tabType has been given.");
             }
 
 //            $records1 = $this->getReportData($report);
-//            $payload = $factory->process($records1);
+//            $payload = $factory->process2($records1);
 //            $this->response = $this->responseAsJson($payload);
 
-            $cursor = new Cursor(
-                $factory,
-                $report,
-                Cursor::LIMIT_MAX
-            );
-
-            $records = $cursor->retrieveResults(null);
+            $records = $factory->retrieveResults(null);
+            $records = $factory->process($records);
             $this->response = $this->responseAsJson($records);
         } catch (\Exception $e) {
             $problem = new ApiProblem($e->getMessage());

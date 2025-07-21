@@ -2,6 +2,7 @@
 
 namespace Schoolbox\Pastoral\ReportBuilder;
 
+use Schoolbox\Pastoral\Report\Model as PastoralReport;
 use Schoolbox\Pastoral\ReportBuilder\TabType\StudentByType;
 use Schoolbox\User\Translator\Author\ModelToArray;
 
@@ -19,10 +20,11 @@ class Factory
     }
 
     public function produce(
+        PastoralReport $report,
         string $type,
     ) {
         return match ($type) {
-            self::STUDENT_BY_TYPE => new StudentByType($this->userTranslator),
+            self::STUDENT_BY_TYPE => new StudentByType($report, $this->userTranslator),
             default => null
         };
     }

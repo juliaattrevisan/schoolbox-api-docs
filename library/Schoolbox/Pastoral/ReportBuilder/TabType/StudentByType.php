@@ -7,18 +7,107 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Mapper;
 use Schoolbox\Pastoral\Model as PastoralRecord;
 use Schoolbox\Pastoral\Report\Model as PastoralReport;
-use Schoolbox\Pastoral\SubType\Model;
+use Schoolbox\Pastoral\ReportBuilder\Cursor;
+use Schoolbox\Pastoral\SubType\Model as SubType;
+use Schoolbox\Pastoral\Type\Model as Type;
+use Schoolbox\Pastoral\Type\TypeAbstract;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Role;
 use Schoolbox\User\Translator\Author\ModelToArray;
 use Alaress_Date_Format;
+use Schoolbox\UserMapper;
 
-class StudentByType implements TabTypeInterface
+class StudentByType extends Cursor implements TabTypeInterface
 {
-    public function __construct(
-        private ModelToArray $userTranslator,
-    ) {
+    public function retrieveResults(?string $encodedCursor): Collection
+    {
+        return  $this->getResults($this->report);
+    }
+
+    private function getTableHeaders()
+    {
+        $types = $this->report->getTypes()->diff(
+            $this->report->getSubTypes()?->map(
+                fn(SubType $subType) => $subType->getPastoralType()
+            )
+        );
+
+        $tableHeaders = [
+            [
+                'key' => 'user',
+                'title' => 'Name',
+                'type' => 'User',
+                'isSortable' => true,
+            ],
+            [
+                'key' => 'total',
+                'title' => 'Total',
+                'type' => 'RecordsAndPoints',
+                'isSortable' => true,
+            ]
+        ];
+
+        foreach ($types as $type) {
+            $tableHeaders[] = [
+                'key' => "count_type_{$type->getId()}",
+                'title' => $type->getName(),
+                'type' => 'RecordsAndPoints',
+                'isSortable' => true,
+            ];
+        }
+
+        foreach ($this->report->getSubTypes() as $subType) {
+            if ($subType instanceof SubType) {
+                $tableHeaders[] = [
+                    'key'   => "count_subtype_{$subType->getId()}",
+                    'title' => $subType->getPastoralType()->getName(),
+                    'subTitle' => $subType->getName(),
+                    'type' => 'RecordsAndPoints',
+                    'isSortable' => true,
+                ];
+            }
+        }
+
+        return $tableHeaders;
+    }
+
+
+    public function process(Collection $records)
+    {
+        $tableHeader = $this->getTableHeaders();
+
+        $userMapper = UserMapper::getInstance();
+
+        $students = $userMapper->findByColumn('id', array_column($records->getAll(), 'student_id'));
+
+        $keys = array_keys($records->first());
+        array_shift($keys);
+
+        return [
+            'data' => [
+                'tableHeaders' => $tableHeader,
+                'totalRow' =>
+                    array_merge(
+                        ['Total'],
+                        array_map(fn($key) => ['records' => array_sum(array_column($records->getAll(), $key))], $keys)
+                    ),
+                'rows' => $records->map(
+                    function (array $record) use ($students) {
+                        $row[] = call_user_func($this->userTranslator, $students->getBy('id', $record['student_id']));
+                        unset($record['student_id']);
+                        return array_merge($row, array_map(fn($value) => ['records' => (int)$value], array_values($record)));
+                    }
+                )
+            ],
+            'metadata' => [
+                'count' => $this->retrieveResultCount(),
+                'cursor' => [
+                    'current' => $this->current($records),
+                    'next' => $this->next($records) ?? null,
+                ]
+            ]
+        ];
     }
 
     public function getResults(PastoralReport $report)
@@ -50,10 +139,11 @@ class StudentByType implements TabTypeInterface
         $db = $pastoralMapper->getDatabase();
 
         $whereInTypeSubTypeQuery = [];
+        $selectCountTypeQuery = [];
 
         $whereTypes = $report->getTypes()->diff(
             $report->getSubTypes()?->map(
-                fn(Model $subType) => $subType->getPastoralType()
+                fn(SubType $subType) => $subType->getPastoralType()
             )
         );
 
@@ -62,10 +152,16 @@ class StudentByType implements TabTypeInterface
             $countTypeQuery = implode(
                 ', ',
                 $whereTypes->map(
-                    fn(\Schoolbox\Pastoral\Type\Model $type) => "COUNT(CASE WHEN p.type_id = {$type->getId()} THEN 1 END) AS count_type_{$type->getId()}"
+                    fn(Type $type) => "COUNT(CASE WHEN p.type_id = {$type->getId()} THEN 1 END) AS count_type_{$type->getId()}"
                 )->getAll()
             );
             $whereInTypeSubTypeQuery[] = "p.type_id IN ({$whereTypeIds})";
+            $selectCountTypeQuery[] = implode(
+                ', ',
+                $whereTypes->map(
+                    fn(Type $type) => "count_type_{$type->getId()}"
+                )->getAll()
+            );
         }
 
         $whereSubTypes = $report->getSubTypes() ?? [];
@@ -74,10 +170,16 @@ class StudentByType implements TabTypeInterface
             $countSubTypeQuery = implode(
                 ', ',
                 $report->getSubTypes()->map(
-                    fn(Model $subType) => "COUNT(CASE WHEN p.subtype_id = {$subType->getId()} THEN 1 END) AS count_subtype_{$subType->getId()}"
+                    fn(SubType $subType) => "COUNT(CASE WHEN p.subtype_id = {$subType->getId()} THEN 1 END) AS count_subtype_{$subType->getId()}"
                 )->getAll()
             );
             $whereInTypeSubTypeQuery[] = "p.subtype_id IN ({$whereSubTypeIds})";
+            $selectCountTypeQuery[] = implode(
+                ', ',
+                $whereSubTypes->map(
+                    fn(SubType $subtype) => "count_subtype_{$subtype->getId()}"
+                )->getAll()
+            );
         }
 
         $countQuery = implode(', ', array_filter([$countTypeQuery ?? '', $countSubTypeQuery ?? '']));
@@ -92,26 +194,28 @@ class StudentByType implements TabTypeInterface
                 (COALESCE(`p`.`occurred_on`, `p`.`created_at`) <= :beforeDate) AND
                 (COALESCE(`p`.`occurred_on`, `p`.`created_at`) >= :afterDate)
             GROUP BY p.student_id
+            LIMIT :limit
            ";
 
         $typeKeys = implode(
             ' + ',
             $whereTypes->map(
-                fn(\Schoolbox\Pastoral\Type\Model $type) => "count_type_{$type->getId()}"
+                fn(Type $type) => "count_type_{$type->getId()}"
             )->getAll()
         );
 
         $subTypeKeys = implode(
             ' + ',
             $report->getSubTypes()->map(
-                fn(Model $subType) => "count_subtype_{$subType->getId()}"
+                fn(SubType $subType) => "count_subtype_{$subType->getId()}"
             )->getAll()
         );
 
         $totalCount = "SUM(" . implode(' + ', array_filter([$typeKeys, $subTypeKeys])) . ") as TotalCount";
 
+        $selectQuery = implode(', ', array_filter($selectCountTypeQuery ?? []));
         $totalQuery = "
-            SELECT *, {$totalCount}
+            SELECT countData.student_id, {$totalCount}, {$selectQuery}
             FROM ($countQuery) countData
             GROUP BY countData.student_id
         ";
@@ -121,12 +225,14 @@ class StudentByType implements TabTypeInterface
             [
                 'beforeDate' => $beforeDate->endOfDay()->toIso8601String(),
                 'afterDate'  => $afterDate->startOfDay()->toIso8601String(),
+                'limit' => $this->limit,
             ]
         );
 
         $data = $result->fetchAll(\PDO::FETCH_ASSOC);
         return new Collection($data);
     }
+
     public function getResults1(PastoralReport $report)
     {
         $pastoralMapper = Mapper::getInstance();
@@ -155,7 +261,7 @@ class StudentByType implements TabTypeInterface
 
         $whereTypes = $report->getTypes()->diff(
             $report->getSubTypes()?->map(
-                fn(Model $subType) => $subType->getPastoralType()
+                fn(SubType $subType) => $subType->getPastoralType()
             )
         );
 
@@ -204,10 +310,9 @@ class StudentByType implements TabTypeInterface
         $result = $pastoralMapper->findByPredicates($pb);
 
         return $result;
-//        return new Collection();
     }
 
-    public function process($records)
+    public function process2($records)
     {
         // Extract unique types and subtypes from the records in a single pass
         $types = [];
