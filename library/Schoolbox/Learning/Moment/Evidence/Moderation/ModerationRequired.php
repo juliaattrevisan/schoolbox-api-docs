@@ -12,10 +12,10 @@ class ModerationRequired
      * decide whether Learning Moment Moderation is required
      *
      * @param bool $globalModeration
-     * @param Model $yearLevel
+     * @param Model|null $yearLevel
      * @return bool
      */
-    public function isSatisfiedBy(bool $globalModeration, YearLevel\Model $yearLevel): bool
+    public function isSatisfiedBy(bool $globalModeration, ?YearLevel\Model $yearLevel): bool
     {
         return $globalModeration || $yearLevel->getLearningMomentsModeration();
     }

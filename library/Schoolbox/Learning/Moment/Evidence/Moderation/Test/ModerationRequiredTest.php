@@ -27,11 +27,11 @@ class ModerationRequiredTest extends TestCase
 {
     /**
      * @param bool $globalConfig
-     * @param Model $yearLevel
+     * @param Model|null $yearLevel
      * @param int $expected
      */
     #[DataProvider('providerModerationRequired')]
-    public function testModerationRequired(bool $globalConfig, \Schoolbox\YearLevel\Model $yearLevel, $expected)
+    public function testModerationRequired(bool $globalConfig, ?\Schoolbox\YearLevel\Model $yearLevel, $expected)
     {
         $outcome = (new ModerationRequired())->isSatisfiedBy($globalConfig, $yearLevel);
 
@@ -58,10 +58,10 @@ class ModerationRequiredTest extends TestCase
             ->setLearningMomentsModeration(false);
 
         return [
-            'Global config enabled, year level config disabled' => [
+            'Global config enabled, Year level config disabled' => [
                 true,
                 $yearLevelDisabled,
-                true
+                false
             ],
 
             'Global config disabled, Year Level config enabled' => [
@@ -81,6 +81,20 @@ class ModerationRequiredTest extends TestCase
                 $yearLevelDisabled,
                 false
             ],
+
+            /* When the user doesn't have a year level, rely on the global config
+             */
+            'Global config enabled, null year level' => [
+                true,
+                null,
+                true
+            ],
+
+            'Global config disabled, null year level' => [
+                false,
+                null,
+                false
+            ]
         ];
     }
 }
