@@ -23,20 +23,34 @@ RUN \
     git \
     mariadb-client \
     ffmpeg \
-    imagemagick \
-    zip \
-    pv && \
+    imagemagick
+
+# Install added requirements for non-production instances:
+# * AWS CLI
+# * zip (for extracting AWS CLI)
+# * pv (for tracking load of dataset)
+# * wget
+RUN <<EOF
+case "$ENV" in
+  prod | production)
+    ;;
+  *)
+    apt-get install -y zip pv wget
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+    unzip awscliv2.zip
+    ./aws/install
+    rm awscliv2.zip
+    ;;
+esac
+EOF
+
+# Install Composer (dev only?)
+COPY --from=composer:2.8 /usr/bin/composer /usr/bin/composer
+
+# Cleanup
+RUN \
   apt-get remove -y gnupg && \
   apt-get autoremove -y && \
   apt-get clean -y
-
-# Install AWS CLI (dev only)
-RUN \
-   curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
-   unzip awscliv2.zip && \
-   ./aws/install
-
-# Install Composer (dev only)
-COPY --from=composer:2.8 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /usr/share/schoolbox
