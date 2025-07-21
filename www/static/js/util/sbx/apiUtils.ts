@@ -2,6 +2,8 @@
  * Utilities for accessing API endpoints and recieving fully typed responses
  */
 
+import { parseSseEvent } from "./fetchUtils";
+
 /** The base response type returned by the api tools, not necessarily the API itself */
 type BaseResponseData = Record<string, unknown>;
 
@@ -45,6 +47,18 @@ interface ApiRequestOptions<TBody extends ApiRequestBodyBase | undefined = undef
      * For a GET request, this is transformed into query parameters where possible
      */
     body?: TBody;
+}
+
+export type SseMessageCallback<TMessageData extends BaseResponseData> = (data: ApiBaseResponse<TMessageData>) => void;
+
+interface SseApiRequestOptions<
+    TMessageData extends BaseResponseData,
+    TBody extends ApiRequestBodyBase | undefined = undefined,
+> extends ApiRequestOptions<TBody> {
+    /**
+     * The callback to handle each message from the server
+     */
+    onMessage: SseMessageCallback<TMessageData>;
 }
 
 /**
@@ -216,4 +230,108 @@ export async function apiRequest<
     const responseJSON = parseResponse<TResponseData>(responseBody, response.status, contentType);
 
     return responseJSON;
+}
+
+/**
+ * Generic function to make an API request to the server
+ * Validates that the response matches our expected format
+ * API errors should follow RFC 9457 "API Problem"
+ * Requires the final message to be a "complete" event which will terminate the stream
+ * @template TMessageData - The type of the response from the server for each message
+ * @template TResponseData - The type of the response from the server for the final message
+ * @template TBody - The type of the request body
+ * @param options - Options for the API request
+ * @returns - A typed response from the server including a success state
+ */
+export async function sseApiRequest<
+    TMessageData extends BaseResponseData,
+    TResponseData extends BaseResponseData,
+    TBody extends ApiRequestBodyBase | undefined = undefined,
+>(options: SseApiRequestOptions<TMessageData, TBody>): Promise<ApiBaseResponse<TResponseData>> {
+    const request = buildRequest("text/event-stream", options);
+
+    let response: Response;
+    try {
+        response = await request;
+    } catch (e) {
+        console.error("Failed to make API request", e, options);
+        const failureResponse: ApiBaseResponseUnknownFailure = {
+            success: false,
+            responseStatus: 0,
+            message: e instanceof Error ? e.message : "An unexpected error occurred",
+            detail: e,
+        };
+        return failureResponse;
+    }
+
+    // If the response is a 200 and HTML, then we probably got given the offline page, return a more meaningful message instead
+    // If there's no body (which can happen in some edge cases), return an unknown failure
+    const contentType = response.headers.get("Content-Type") || "";
+    if (!response.body || (response.status === 200 && contentType.includes("text/html"))) {
+        return parseResponse<TResponseData>("", response.status, contentType);
+    }
+
+    // If the content type is json, handle as a normal request (it likely errored early)
+    // depending on where the error was, the server may have provided a proper json-formatted error
+    // otherwise, we'll just return an unknown failure like we usually do
+    if (response.headers.get("content-type")?.includes("application/json")) {
+        const text = await response.text();
+        return parseResponse<TResponseData>(text, response.status);
+    }
+
+    // Parse the text/event-stream response as it comes in until it's closed or errors
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder("utf-8");
+
+    let buffer = "";
+    let finalResponseData: string | undefined;
+    while (finalResponseData === undefined) {
+        // eslint-disable-next-line no-await-in-loop -- Must handle chunks sequentially
+        const { done, value } = await reader.read();
+
+        // If the stream ended normally
+        if (done) {
+            break;
+        }
+
+        // Decode the chunk into text and split it into individual events (always by \n\n)
+        buffer += decoder.decode(value, { stream: true });
+        const events = buffer.split("\n\n");
+
+        // Process all complete events except possibly the last partial
+        for (let i = 0; i < events.length - 1; i += 1) {
+            const rawEvent = events[i].trim();
+            if (rawEvent) {
+                const { eventName, data } = parseSseEvent(rawEvent);
+
+                if (eventName === "complete") {
+                    // If the server sends a "complete" event, close the stream
+                    finalResponseData = data;
+                    break;
+                }
+
+                const parsedData = parseResponse<TMessageData>(data, response.status);
+                options.onMessage(parsedData);
+            }
+        }
+
+        // Keep the last (possibly incomplete) chunk in the buffer for next iteration
+        buffer = events[events.length - 1];
+    }
+
+    // If the stream ended as "done" but we didn't get a "complete" event,
+    // something went wrong and we should return an unknown failure
+    if (finalResponseData === undefined) {
+        const failureResponse: ApiBaseResponseUnknownFailure = {
+            success: false,
+            responseStatus: response.status,
+            detail: buffer,
+            message: "Response stream ended unexpectedly",
+        };
+        return failureResponse;
+    }
+
+    // Otherwise, we got a "complete" event, so stop reading and return it
+    await reader.cancel();
+    return parseResponse<TResponseData>(finalResponseData, response.status);
 }
