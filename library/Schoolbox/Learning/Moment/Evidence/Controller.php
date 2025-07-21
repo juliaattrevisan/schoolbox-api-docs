@@ -16,7 +16,7 @@ use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Collection;
 use Schoolbox\Discussion\Comment;
 use Schoolbox\Learning\Assessment\Redirect;
-use Schoolbox\Learning\Moment\Evidence\Moderation\ModerationEnabled;
+use Schoolbox\Learning\Moment\Evidence\Moderation\ModerationRequired;
 use Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Factory;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
@@ -109,10 +109,10 @@ class Controller extends Base
         /* Students get their learning moment moderation requirement tested;
          * parents and teachers bypass this check
          */
-        $moderationEnabled = false;
+        $moderationRequired = false;
 
         if ($this->getUser()->getRole()->isStudent()) {
-            $moderationEnabled = (new ModerationEnabled())->isSatisfiedBy($this->getConfigLoader()->get('learning_moments_moderation_enabled'), $this->getUser()->getYear());
+            $moderationRequired = (new ModerationRequired())->isSatisfiedBy($this->getConfigLoader()->get('learning_moments_moderation_enabled'), $this->getUser()->getYear());
         }
 
         $params = [
@@ -121,7 +121,7 @@ class Controller extends Base
             'otherUsers'               => $otherUsers,
             'sharingForSelf'           => $sharingForSelf,
             'curriculumTaggingEnabled' => $this->curriculumTaggingEnabled(),
-            'moderationEnabled'        => $moderationEnabled,
+            'moderationRequired'       => $moderationRequired,
             'isCreate'                 => true,
             'momentType'               => $momentType,
             'zone'                     => $this->buildAttachzone($momentType)->getTwigContext()
@@ -260,7 +260,7 @@ class Controller extends Base
          * submit and publish immediately whilst some end up in a moderation queue.
          */
         $globalConfig = (bool)$this->getConfigLoader()->get('learning_moments_moderation_enabled');
-        $moderationRequired = new ModerationEnabled();
+        $moderationRequired = new ModerationRequired();
 
         $requestBody = $this->request->getParsedBody();
 

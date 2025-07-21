@@ -1,7 +1,7 @@
 {##
  # Share a Learning Moment
  #
- # @param bool $moderationEnabled  Decide if the current user's post requires  moderation
+ # @param bool $moderationRequired  Decide if the current user's post requires moderation
  #}
 
 {% import 'sub/breadcrumbs.twig' as bread %}
@@ -79,7 +79,7 @@
 
             {% set submitText = 'Submit' %}
 
-            {% if moderationEnabled %}
+            {% if moderationRequired %}
                 {% set submitText = 'Submit for approval' %}
             {% endif %}
 

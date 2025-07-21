@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ValidationModerationEnabledTest
+ * ModerationRequiredTest
  *
  * See SD-10 for usages
  *
@@ -17,23 +17,23 @@ namespace Schoolbox\Learning\Moment\Evidence\Moderation\Test;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Schoolbox\Learning\Moment\Evidence\Moderation\ModerationEnabled;
+use Schoolbox\Learning\Moment\Evidence\Moderation\ModerationRequired;
 use Schoolbox\YearLevel\Model;
 
 /**
- * Validation test
+ * ModerationRequiredTest
  */
-class ModerationEnabledTest extends TestCase
+class ModerationRequiredTest extends TestCase
 {
     /**
      * @param bool $globalConfig
      * @param Model $yearLevel
      * @param int $expected
      */
-    #[DataProvider('providerModerationEnabled')]
-    public function testModerationEnabled(bool $globalConfig, \Schoolbox\YearLevel\Model $yearLevel, $expected)
+    #[DataProvider('providerModerationRequired')]
+    public function testModerationRequired(bool $globalConfig, \Schoolbox\YearLevel\Model $yearLevel, $expected)
     {
-        $outcome = (new ModerationEnabled())->isSatisfiedBy($globalConfig, $yearLevel);
+        $outcome = (new ModerationRequired())->isSatisfiedBy($globalConfig, $yearLevel);
 
         /* There are other assertions that you can try (ctrl-click to follow)
          */
@@ -41,7 +41,7 @@ class ModerationEnabledTest extends TestCase
     }
 
     /**
-     * Data provider for testModerationEnabled
+     * Data provider for testModerationRequired
      *
      * "The moderation ON state is defined as:
      * Learning moment moderation is enabled for students year level
@@ -49,7 +49,7 @@ class ModerationEnabledTest extends TestCase
      *
      * @return array
      */
-    public static function providerModerationEnabled(): array
+    public static function providerModerationRequired(): array
     {
         $yearLevelEnabled = (new \Schoolbox\YearLevel\Model())
             ->setLearningMomentsModeration(true);

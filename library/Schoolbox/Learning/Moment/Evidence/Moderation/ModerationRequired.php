@@ -5,11 +5,11 @@ namespace Schoolbox\Learning\Moment\Evidence\Moderation;
 use Schoolbox\YearLevel;
 use Schoolbox\YearLevel\Model;
 
-class ModerationEnabled
+class ModerationRequired
 {
     /**
      * Using the global schoolbox config and a fully hydrated YearLevel instance,
-     * decide whether Learning Moment Moderation is enabled
+     * decide whether Learning Moment Moderation is required
      *
      * @param bool $globalModeration
      * @param Model $yearLevel
