@@ -103,6 +103,43 @@ class Model implements ISoftDeletable, IThreadLocation
 
 
     /**
+     * @var \Alaress_Date_Format|null
+     */
+    private ?\Alaress_Date_Format $submittedAt = null;
+
+
+    /**
+     * @var User|null
+     */
+    private ?User $submittedBy = null;
+
+
+    /**
+     * @var \Alaress_Date_Format|null
+     */
+
+    private ?\Alaress_Date_Format $publishedAt = null;
+
+
+    /**
+     * @var User|null
+     */
+    private ?User $publishedBy = null;
+
+
+    /**
+     * @var \Alaress_Date_Format|null
+     */
+    private ?\Alaress_Date_Format $rejectedAt = null;
+
+
+    /**
+     * @var User|null
+     */
+    private ?User $rejectedBy = null;
+
+
+    /**
      * @return IStorage|null
      */
     public function getStorage(): ?IStorage
@@ -303,5 +340,125 @@ class Model implements ISoftDeletable, IThreadLocation
     public function getCommentNotifier(): ?string
     {
         return Discussion\Comment\Notifier::class;
+    }
+
+
+    /**
+     * @return \Alaress_Date_Format|null
+     */
+    public function getSubmittedAt(): ?\Alaress_Date_Format
+    {
+        return $this->submittedAt;
+    }
+
+
+    /**
+     * @param \Alaress_Date_Format|null $submittedAt
+     * @return $this
+     */
+    public function setSubmittedAt(?\Alaress_Date_Format $submittedAt): self
+    {
+        $this->submittedAt = $submittedAt;
+        return $this;
+    }
+
+
+    /**
+     * @return \Alaress_Date_Format|null
+     */
+    public function getPublishedAt(): ?\Alaress_Date_Format
+    {
+        return $this->publishedAt;
+    }
+
+
+    /**
+     * @param \Alaress_Date_Format|null $publishedAt
+     * @return $this
+     */
+    public function setPublishedAt(?\Alaress_Date_Format $publishedAt): self
+    {
+        $this->publishedAt = $publishedAt;
+        return $this;
+    }
+
+
+    /**
+     * @return \Alaress_Date_Format|null
+     */
+    public function getRejectedAt(): ?\Alaress_Date_Format
+    {
+        return $this->rejectedAt;
+    }
+
+
+    /**
+     * @param \Alaress_Date_Format|null $rejectedAt
+     * @return $this
+     */
+    public function setRejectedAt(?\Alaress_Date_Format $rejectedAt): self
+    {
+        $this->rejectedAt = $rejectedAt;
+        return $this;
+    }
+
+
+    /**
+     * @return User|null
+     */
+    public function getSubmittedBy(): ?User
+    {
+        return $this->submittedBy;
+    }
+
+
+    /**
+     * @param User|null $submittedBy
+     * @return $this
+     */
+    public function setSubmittedBy(?User $submittedBy): self
+    {
+        $this->submittedBy = $submittedBy;
+        return $this;
+    }
+
+
+    /**
+     * @return User|null
+     */
+    public function getPublishedBy(): ?User
+    {
+        return $this->publishedBy;
+    }
+
+
+    /**
+     * @param User|null $publishedBy
+     * @return $this
+     */
+    public function setPublishedBy(?User $publishedBy): self
+    {
+        $this->publishedBy = $publishedBy;
+        return $this;
+    }
+
+
+    /**
+     * @return User|null
+     */
+    public function getRejectedBy(): ?User
+    {
+        return $this->rejectedBy;
+    }
+
+
+    /**
+     * @param User|null $rejectedBy
+     * @return $this
+     */
+    public function setRejectedBy(?User $rejectedBy): self
+    {
+        $this->rejectedBy = $rejectedBy;
+        return $this;
     }
 }

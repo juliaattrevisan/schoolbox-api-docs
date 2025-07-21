@@ -42,6 +42,16 @@ class Mapper extends BaseMapper
         $this->joins('discussion_thread_id', ThreadMapper::class, 'id', null, null, 'discussionThread');
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'recipient', 'recipient');
         $this->uses('type', self::TYPE_STRING);
+        /* For moderation workflow
+         */
+        $this->joins('submitted_by', UserMapper::class, 'id', null, null, 'submittedBy', 'submittedBy');
+        $this->uses('submitted_at', self::TYPE_DATETIME);
+        $this->joins('published_by', UserMapper::class, 'id', null, null, 'publishedBy', 'publishedBy');
+        $this->uses('published_at', self::TYPE_DATETIME);
+        $this->joins('rejected_by', UserMapper::class, 'id', null, null, 'rejectedBy', 'rejectedBy');
+        $this->uses('rejected_at', self::TYPE_DATETIME);
+        /* Standard timestamps and authoring details
+         */
         $this->joins('created_by', UserMapper::class, 'id', null, null, 'creator', 'creator');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
