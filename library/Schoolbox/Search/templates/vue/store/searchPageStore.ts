@@ -16,6 +16,7 @@ const SINGLE_COLUMN_BREAKPOINT = 800;
 
 export const useStore = defineStore("searchPage", () => {
     let endpoint = ""; // the endpoint to use for searching
+    const resultPageSize = window.Vue.ref(0); // Maximum number of search results per page.  The value will come from the server.
 
     const isSingleColumn = window.Vue.ref(true); // whether to use a single column layout
     const filterCreatorsStore = useFilterCreatorsStore();
@@ -29,6 +30,7 @@ export const useStore = defineStore("searchPage", () => {
      * @param $creator - the selected creator
      * @param $filterTypesAvailable - the available filter types
      * @param $filterTypesSelected - the selected filter types
+     * @param $resultPageSize - the maximum number of results per page
      */
     function init(
         $endpoint: string,
@@ -36,8 +38,10 @@ export const useStore = defineStore("searchPage", () => {
         $creator: Creator | null,
         $filterTypesAvailable: FilterType[],
         $filterTypesSelected: string[],
+        $resultPageSize: number,
     ): void {
         endpoint = $endpoint;
+        resultPageSize.value = $resultPageSize;
 
         if ($creator !== null) {
             filterCreatorsStore.creator = [$creator];
@@ -107,5 +111,6 @@ export const useStore = defineStore("searchPage", () => {
         getEndpointWithParams,
         containerWidthChange,
         isSingleColumn,
+        resultPageSize,
     };
 });

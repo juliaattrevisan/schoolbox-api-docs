@@ -25,6 +25,7 @@ interface Props {
     filterTypesSelected: string[]; // The selected filter types.
     filterDateRange: FilterDateRange; // The default date range for the date filter.
     filterCreator: object | null; // The selected user - object {id: number, name: string}
+    resultPageSize: number;
 }
 const props = defineProps<Props>();
 
@@ -35,6 +36,7 @@ store.init(
     props.filterCreator as Creator,
     props.filterTypesAvailable,
     props.filterTypesSelected,
+    props.resultPageSize,
 ); // initialise the store
 
 const searchStore = useSearchStore();

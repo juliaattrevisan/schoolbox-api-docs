@@ -106,7 +106,10 @@ class Controller extends Base
                     ($filterFromUrl->types === null)
                     ? []
                     : $filterFromUrl->types
-                )
+                ),
+                'resultPageSize' => (
+                    (int)$this->getConfigLoader()->get(ConfigMapper::NAME_ADVANCED_SEARCH_RESULT_PAGE_SIZE)
+                ),
             ]
         );
     }

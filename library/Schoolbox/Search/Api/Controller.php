@@ -14,6 +14,7 @@ use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use LogicException;
 use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Resource\Folder;
@@ -29,11 +30,6 @@ use Schoolbox\UserMapper;
  */
 class Controller extends Base
 {
-    /**
-     * Maximum number of search results to return per call.
-     */
-    private const MAX_RESULT_LIMIT = 20;
-
     /**
      * Minimum number of characters required to complete a search
      */
@@ -75,8 +71,12 @@ class Controller extends Base
         $keyword = trim((string)$this->requestQuery->get('keyword', ''));
         $dataObjectFactory = new SearchFilter\DataObjectFactory($this->userMapper);
         $filter = $dataObjectFactory->build($this->requestQuery->get('filter'), null);
-        $limit = (int)($this->requestQuery->get('limit', self::MAX_RESULT_LIMIT));
+        $limit = $this->requestQuery->getInt(
+            'limit',
+            (int)$this->getConfigLoader()->get(ConfigMapper::NAME_ADVANCED_SEARCH_RESULT_PAGE_SIZE)
+        );
         $cursor = null;
+        $resultsCount = 0;
 
         if (mb_strlen($keyword) >= self::MIN_CHARACTER_LIMIT) {
             ['results' => $results, 'nextCursor' => $nextCursor] = $this->populateResultSet(
@@ -85,6 +85,7 @@ class Controller extends Base
                 $limit,
                 $this->requestQuery->get('cursor')
             );
+            $resultsCount = count($results); // Get the count now before grouping by parent folder below.
 
             $translatedResults = [];
             foreach ($results as $result) {
@@ -216,7 +217,7 @@ class Controller extends Base
                 [
                     'data'     => $translatedResults,
                     'metadata' => [
-                        'count'  => null,
+                        'count'  => $resultsCount,
                         'cursor' => [
                             'current' => null,
                             'next'    => $nextCursor,
@@ -243,7 +244,10 @@ class Controller extends Base
         $keyword = trim($this->requestQuery->get('keyword', ''));
         $dataObjectFactory = new SearchFilter\DataObjectFactory($this->userMapper);
         $filter = $dataObjectFactory->build($this->requestQuery->get('filter'), $folder);
-        $limit = (int)($this->requestQuery->get('limit', self::MAX_RESULT_LIMIT));
+        $limit = $this->requestQuery->getInt(
+            'limit',
+            (int)$this->getConfigLoader()->get(ConfigMapper::NAME_ADVANCED_SEARCH_RESULT_PAGE_SIZE)
+        );
 
         if (mb_strlen($keyword) >= 2) {
             ['results' => $results, 'nextCursor' => $nextCursor] = $this->populateResultSet(
@@ -258,7 +262,7 @@ class Controller extends Base
                 [
                     'data'     => array_map($this->fullResultTranslator, $results),
                     'metadata' => [
-                        'count'  => null,
+                        'count'  => count($results),
                         'cursor' => [
                             'current' => null,
                             'next'    => $nextCursor,
@@ -372,7 +376,7 @@ class Controller extends Base
             $this->source,
             $keyword,
             $filter,
-            $limit * 10,
+            $limit * (int)$this->getConfigLoader()->get(ConfigMapper::NAME_ADVANCED_SEARCH_RESULT_PAGES_PER_BATCH)
         );
 
         // Fetch results from cursor and hydrate
