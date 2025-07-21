@@ -306,29 +306,38 @@ class Helper
         /* Minimum requirements met: let's send it and see what AI overlords think of our payload
          */
         try {
-            // Enable streaming in the payload
-            $payloadArr = json_decode($payload, true, 512, JSON_THROW_ON_ERROR);
-            $payloadArr['stream'] = true;
-            $payload = json_encode($payloadArr, JSON_THROW_ON_ERROR);
+            // Is streaming enabled?
+            $stream = json_decode($payload, true, 512, JSON_THROW_ON_ERROR)['stream'] ?? false;
 
             $openAiRequest = new Request('POST', $this->getEndpoint(), array_merge(
                 $this->getAuthorization(),
                 ['Content-Type' => 'application/json'],
             ), $payload);
 
-            $response = $this->client->send($openAiRequest, ['stream' => true]);
+            $response = $this->client->send($openAiRequest, [
+                \GuzzleHttp\RequestOptions::ALLOW_REDIRECTS => false,
+                \GuzzleHttp\RequestOptions::HTTP_ERRORS => false,
+                \GuzzleHttp\RequestOptions::STREAM => $stream,
+            ]);
 
-            http_response_code($response->getStatusCode());
-            header('Content-Type: text/event-stream');
-            header('Cache-Control: no-cache');
-            header('Connection: keep-alive');
-            header('Content-Encoding: none');
+            /* We'll either recieve a text/event-stream or json response depending on if it errored
+             * If it is a text/event-stream, handle as so - otherwise assume json
+             */
+            if (strpos($response->getHeaderLine('Content-Type'), 'text/event-stream') !== false) {
+                http_response_code($response->getStatusCode());
+                header('Content-Type: text/event-stream');
+                header('Cache-Control: no-cache');
+                header('Connection: keep-alive');
+                header('Content-Encoding: none');
 
-            ob_implicit_flush(true);
-            ob_end_flush();
+                ob_implicit_flush(true);
+                ob_end_flush();
 
-            $stream = $response->getBody();
-            $data = $this->readStream($stream, $log);
+                $stream = $response->getBody();
+                $data = $this->readStream($stream, $log);
+            } else {
+                $data = json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
+            }
         } catch (GuzzleException $e) {
             $log->setReturnCode($e->getCode())
                 ->setErrorMessage($e->getMessage());
