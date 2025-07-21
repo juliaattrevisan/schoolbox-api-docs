@@ -948,10 +948,11 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @param string      $defaultReturnUrl
      * @param bool        $relocated
      * @param bool        $isCreate
+     * @param bool        $toParticipation
      * @return string
      * @throws RouteNotFound
      */
-    public function determineRedirect(IAssessable $assessment, $postReturnUrl = null, $defaultReturnUrl = '', bool $relocated = false, bool $isCreate = false): string
+    public function determineRedirect(IAssessable $assessment, $postReturnUrl = null, $defaultReturnUrl = '', bool $relocated = false, bool $isCreate = false, bool $toParticipation = false): string
     {
         /**
          * First priority is a the post return URL
