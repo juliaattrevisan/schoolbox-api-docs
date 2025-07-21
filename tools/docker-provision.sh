@@ -444,8 +444,10 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Building JS/CSS files";
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Loading all demo data complete";
 
-ffmpegver=`dpkg -l schoolbox-ffmpeg | tail -n1 | awk {'print $3'}`;
-echo "[SB][`date +%Y-%m-%d\ %X`] schoolbox-ffmpeg installed: $ffmpegver";
+# Vagrant uses a non-standard ffmpeg, installed via Schoolbox's package repo:
+# that does not seem to be needed here.
+ffmpegver=`dpkg -l ffmpeg | tail -n1 | awk {'print $3'}`;
+echo "[SB][`date +%Y-%m-%d\ %X`] ffmpeg installed: $ffmpegver";
 
 #if [ "$enable_xdebug" == "true" ];
 #then

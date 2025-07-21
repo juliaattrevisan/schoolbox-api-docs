@@ -13,8 +13,6 @@ ARG NODE_VERSION=20
 # private information.
 # Also, install tools required by cron tasks and CLI:
 # * git, mariadb client, ffmpeg, imagemagick, sudo
-# dev also requires:
-# * aws, zip (for extracting AWS CLI), pv (for tracking load of dataset)
 RUN \
   apt-get update && \
   apt-get install -y gnupg && \
