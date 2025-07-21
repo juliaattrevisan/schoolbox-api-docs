@@ -48,6 +48,6 @@ const props = defineProps<Props>();
 
 <style scoped lang="scss">
 td {
-    background: lightgray;
+    background: #eee;
 }
 </style>
