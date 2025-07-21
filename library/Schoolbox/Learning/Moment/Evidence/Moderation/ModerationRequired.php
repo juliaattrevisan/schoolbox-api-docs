@@ -11,6 +11,9 @@ class ModerationRequired
      * Using the global schoolbox config and a fully hydrated YearLevel instance,
      * decide whether Learning Moment Moderation is required
      *
+     * Note that choosing "Not set" in user modify screen causes $yearLevel to be null,
+     * at which point it falls back to the global admin config setting's...setting.
+     *
      * @param bool $globalModeration
      * @param Model|null $yearLevel
      * @return bool
