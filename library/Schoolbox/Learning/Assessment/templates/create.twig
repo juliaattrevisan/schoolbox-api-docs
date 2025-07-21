@@ -286,6 +286,11 @@
                     <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
                     {% endif %}
 
+                    {% if assessmentType is defined and assessmentType|length and customisedFor is not defined %}
+                    <!-- To show the update participation prompt when creating a new activity that is not a customised new activity -->
+                    <input type="hidden" name="showParticipationPrompt" value="true" />
+                    {% endif %}
+
                     <div class="small-12 columns {% if assessmentType is not defined or not assessmentType|length %}hide{% endif %}" data-mage-collapsed data-assessment-details>
                         {% if assessmentType is defined and assessmentType|length %}
                             {% if assessmentType == 'lessonPlan' and lessonPlanMeta.template is not defined %}
