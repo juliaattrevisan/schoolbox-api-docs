@@ -74,6 +74,12 @@ class Helper
 
 
     /**
+     * When an image is omitted from the request/response, we replace the base64 data with this const
+     */
+    private const IMAGE_DATA_OMITTED = 'omitted';
+
+
+    /**
      * Controller constructor.
      */
     public function __construct(
@@ -106,43 +112,100 @@ class Helper
 
     /**
      * Parse a chunk received from the SSE stream
+     * The 'output' key is the original chunk data excluding large base64 image data to avoid it ending up in the log
      *
      * @param string $chunk The raw chunk data from the stream
-     * @return array{type:string|null,data:array}
+     * @return array{type:string|null,data:array,output:string}
      */
     private function parseChunk(string $chunk): array
     {
         $type = null;
         $data = [];
         $lines = explode("\n", $chunk);
+        $output = '';
         foreach ($lines as $line) {
             if (str_starts_with($line, 'event: ')) {
                 $type = trim(substr($line, 7));
+                $output .= "{$line}\n";
             } elseif (str_starts_with($line, 'data: ')) {
-                $data[] = json_decode(trim(substr($line, 6)), true, 512, JSON_THROW_ON_ERROR);
-            } else {
-                throw new \InvalidArgumentException(sprintf('Unknown line format: %s', $line));
+                try {
+                    $item = json_decode(trim(substr($line, 6)), true, 512, JSON_THROW_ON_ERROR);
+                    $data[] = $item;
+
+                    // Omit the actual image data from the output
+                    $itemType = $item['type'] ?? null;
+                    if ($itemType === 'response.image_generation_call.partial_image' && isset($item['partial_image_b64'])) {
+                        $item['partial_image_b64'] = self::IMAGE_DATA_OMITTED;
+                    }
+
+                    $output .= sprintf("data: %s\n", json_encode($item, JSON_THROW_ON_ERROR));
+                } catch (\JsonException $e) {
+                    // If it's not JSON, still save the raw data
+                    $output .= "{$line}\n";
+                }
             }
         }
 
         return [
             'type' => $type,
             'data' => $data,
+            'output' => $output,
         ];
     }
+
+
+    /**
+     * Append a chunk's output / metrics to the log
+     *
+     * @param array $chunkData - from parseChunk()
+     * @param Log\Model $log
+     * @param ?string $type
+     */
+    private function appendChunkToLog(array $chunkData, Log\Model $log, ?string $type = null): void
+    {
+        $log->setResponse(($log->getResponse() ?? '') . $chunkData['output']);
+
+        foreach ($chunkData['data'] as $item) {
+            $model = null;
+            $inputTokens = null;
+            $outputTokens = null;
+
+            if ($type === self::CHAT) {
+                $model = $item['model'] ?? null;
+                $inputTokens = $item['usage']['prompt_tokens'] ?? null;
+                $outputTokens = $item['usage']['completion_tokens'] ?? null;
+            } else {
+                $model = $item['response']['model'] ?? null;
+                $inputTokens = $item['response']['usage']['input_tokens'] ?? null;
+                $outputTokens = $item['response']['usage']['output_tokens'] ?? null;
+            }
+
+            if ($model) {
+                $log->setModel($model);
+            }
+            if ($inputTokens) {
+                $log->setInputTokens($inputTokens);
+            }
+            if ($outputTokens) {
+                $log->setOutputTokens($outputTokens);
+            }
+        }
+    }
+
 
     /**
      * Read a chunked stream response from OpenAI and echo it once each full chunk is received
      *
      * @param \Psr\Http\Message\StreamInterface $stream
-     * @return string
+     * @param Log\Model $log
+     * @param ?string $type
+     * @return ?array The final "response.completed" chunk, or null if it was never found
      */
-    public function readStream(\Psr\Http\Message\StreamInterface $stream): string
+    public function readStream(\Psr\Http\Message\StreamInterface $stream, Log\Model $log, ?string $type = null): ?array
     {
-        $output = '';
         $chunkBuffer = '';
-
         $isGeneratingImage = false;
+        $completedEvent = null;
 
         while (!$stream->eof()) {
             // Read larger chunks if in the middle of generating an image (as we're about to recieve a lot of data)
@@ -165,10 +228,14 @@ class Helper
                 $chunk = substr($chunkBuffer, 0, $pos);
                 $chunkBuffer = substr($chunkBuffer, $pos + 2);
 
-                // TODO: process the chunk so it can be saved to the log
                 echo "{$chunk}\n\n";
-                $output .= $chunk;
                 $event = $this->parseChunk($chunk);
+                $this->appendChunkToLog($event, $log, $type);
+
+                // Is this the final event?
+                if ($event['type'] === 'response.completed') {
+                    $completedEvent = $event['data'][0]['response'];
+                }
 
                 // Keep track of whether we're generating an image
                 if ($event['type'] === 'response.image_generation_call.generating') {
@@ -187,12 +254,16 @@ class Helper
 
         // If we have any remaining data in the buffer, process it
         if (strlen(trim($chunkBuffer)) > 0) {
-            // TODO: process the probably incomplete chunk
             echo $chunkBuffer;
-            $output .= $chunkBuffer;
+            $event = $this->parseChunk($chunkBuffer);
+            $this->appendChunkToLog($event, $log, $type);
+
+            if ($event['type'] === 'response.completed') {
+                $completedEvent = $event['data'][0]['response'];
+            }
         }
 
-        return $output;
+        return $completedEvent;
     }
 
 
@@ -257,18 +328,7 @@ class Helper
             ob_end_flush();
 
             $stream = $response->getBody();
-            $output = $this->readStream($stream);
-
-            $log->setResponse($output);
-            $data = json_decode($output, true, 512, JSON_THROW_ON_ERROR);
-
-//
-//            if ($response->getStatusCode() !== 200) {
-//                // store error in log
-//                $log->setReturnCode($response->getStatusCode())
-//                    ->setErrorMessage($response->getReasonPhrase());
-//                $this->logMapper->save($log);
-//            }
+            $data = $this->readStream($stream, $log);
         } catch (GuzzleException $e) {
             $log->setReturnCode($e->getCode())
                 ->setErrorMessage($e->getMessage());
@@ -436,14 +496,7 @@ class Helper
                     ob_end_flush();
 
                     $stream = $response->getBody();
-                    $output = $this->readStream($stream);
-
-                    //store the last of the output and the model (if it exists
-                    $aiStats = $this->extractStats($output);
-                    $log->setResponse($output)
-                        ->setModel($aiStats['model'])
-                        ->setInputTokens($aiStats['input_tokens'])
-                        ->setOutputTokens($aiStats['output_tokens']);
+                    $this->readStream($stream, $log, self::CHAT);
                 },
                 function ($reason) use ($log): void {
                     $returnCode = $reason->getCode();
@@ -546,47 +599,5 @@ class Helper
         }
 
         throw new \UnexpectedValueException('Endpoint must be configured');
-    }
-
-    /**
-     * Little Robot Dude:
-     * Extracts the model from the OpenAI API response payload.
-     *
-     * @param string $payload The response payload from the OpenAI API.
-     * @return array {model: string|null, input_tokens: int|null, output_tokens: int|null}
-     */
-    private function extractStats(string $payload): array
-    {
-        $payload = explode("\n", $payload);
-
-        $stats = [
-            'model' => null,
-            'input_tokens' => null,
-            'output_tokens' => null,
-        ];
-        foreach ($payload as $line) {
-            if (str_starts_with($line, 'data:')) {
-                try {
-                    $json = json_decode(substr($line, 5), true, 512, JSON_THROW_ON_ERROR);
-                } catch (\JsonException $e) {
-                    continue;
-                }
-                if (isset($json['model'])) {
-                    $stats['model'] = $json['model'];
-                }
-                if (isset($json['usage']['prompt_tokens'])) {
-                    $stats['input_tokens'] = $json['usage']['prompt_tokens'];
-                }
-                if (isset($json['usage']['completion_tokens'])) {
-                    $stats['output_tokens'] = $json['usage']['completion_tokens'];
-                }
-                if ($stats['model'] && $stats['input_tokens'] && $stats['output_tokens']) {
-                    // found all the things, exit early
-                    return $stats;
-                }
-            }
-        }
-
-        return $stats;
     }
 }

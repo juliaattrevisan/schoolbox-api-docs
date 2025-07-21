@@ -119,9 +119,7 @@ class ImageGeneration
              */
             "temperature" => self::TEMPERATURE,
             "top_p" => self::TOP_P,
-            /* For futureproofing: never really used atm
-             */
-            "stream" => false,
+            "stream" => true,
             'text' => [
                 'format' => [
                     'type' => 'text',
