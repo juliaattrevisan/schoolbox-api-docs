@@ -41,6 +41,10 @@ class Helper
      */
     public const ENDPOINT_TYPE_OFF = 'Off';
 
+    /**
+     * Buffer for accumulating partial chunks in streaming responses
+     */
+    private string $chunkBuffer = '';
 
     /**
      * Structured Outputs is only supported in certain models
@@ -106,6 +110,53 @@ class Helper
 
 
     /**
+     * Read a chunked stream response from OpenAI and echo it once each full chunk is received
+     *
+     * @param \Psr\Http\Message\StreamInterface $stream
+     * @return string
+     */
+    public function readStream(\Psr\Http\Message\StreamInterface $stream): string
+    {
+        // store a section of the response (end of the stream)
+        $output = '';
+
+        while (!$stream->eof()) {
+            // Normalise CRLF to LF
+            $data = $stream->read(128);
+            $data = str_replace("\r\n", "\n", $data);
+            $data = str_replace("\r", "\n", $data);
+            $this->chunkBuffer .= $data;
+
+            // while there's at least one full chunk in the buffer, process it
+            while (false !== ($pos = strpos($this->chunkBuffer, "\n\n"))) {
+                $chunk = substr($this->chunkBuffer, 0, $pos);
+                $this->chunkBuffer = substr($this->chunkBuffer, $pos + 2);
+
+                // TODO: process the chunk so it can be saved to the log
+                echo $chunk . "\n\n";
+                $output .= $chunk;
+
+                // flush PHP buffers
+                if (ob_get_length()) {
+                    @ob_flush();
+                }
+                @flush();
+            }
+        }
+
+        // If we have any remaining data in the buffer, process it
+        if (strlen(trim($this->chunkBuffer)) > 0) {
+            // TODO: process the probably incomplete chunk
+            echo $this->chunkBuffer;
+            $output .= $this->chunkBuffer;
+        }
+
+        $this->chunkBuffer = '';
+        return $output;
+    }
+
+
+    /**
      * request (no streaming, returns full json payload)
      * hits openAI and returns the string response (you need to json decode yourself...)
      *
@@ -166,30 +217,10 @@ class Helper
             ob_end_flush();
 
             $stream = $response->getBody();
-            $result = '';
+            $output = $this->readStream($stream);
 
-            while (!$stream->eof()) {
-                $chunk = $stream->read(1024);
-                if ($chunk === '') {
-                    usleep(100000); // no data yet
-                    continue;
-                }
-
-                // TODO: save to openai log incrementally so we don't die with memory chaos
-
-                // OpenAI already responds in the format of an event stream (“data: {...}\n\n”)
-                echo $chunk;
-                $result .= $chunk;
-
-                // flush PHP buffers
-                if (ob_get_length()) {
-                    @ob_flush();
-                }
-                @flush();
-            }
-
-            $log->setResponse($result);
-            $data = json_decode($result, true, 512, JSON_THROW_ON_ERROR);
+            $log->setResponse($output);
+            $data = json_decode($output, true, 512, JSON_THROW_ON_ERROR);
 
 //
 //            if ($response->getStatusCode() !== 200) {
@@ -365,15 +396,7 @@ class Helper
                     ob_end_flush();
 
                     $stream = $response->getBody();
-
-                    // store a section of the response (end of the stream)
-                    $output = '';
-
-                    while (!$stream->eof()) {
-                        $tmp = $stream->read(1);
-                        echo $tmp;
-                        $output .= $tmp;
-                    }
+                    $output = $this->readStream($stream);
 
                     //store the last of the output and the model (if it exists
                     $aiStats = $this->extractStats($output);
