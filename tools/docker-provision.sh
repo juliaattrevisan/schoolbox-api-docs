@@ -320,17 +320,19 @@ declare -A env_vars=(
 )
 for config_name in "${!env_vars[@]}"; do
   config_value=${env_vars[$config_name]}
-  for bashrcFile in /home/vagrant/.bashrc /root/.bashrc; do
+  for bashrcFile in /root/.bashrc; do
+#  for bashrcFile in /home/vagrant/.bashrc /root/.bashrc; do
     # Remove the config if it exists, then insert it
     sed -i -E "/^export\s+$config_name\s*=.+/d" ${bashrcFile}
     echo "export $config_name=\"$config_value\"" >> ${bashrcFile};
   done
-  # Need to preserve these ENV vars for vagrant's sudo session
-  if ! grep -qE "^Defaults\s+env_keep\s*\+=\s*\".*$config_name" /etc/sudoers.d/vagrant; then
-    chmod a+w /etc/sudoers.d/vagrant;
-    echo "Defaults env_keep += \"$config_name\"" >> /etc/sudoers.d/vagrant;
-    chmod a-w /etc/sudoers.d/vagrant;
-  fi
+
+#  # Need to preserve these ENV vars for vagrant's sudo session
+#  if ! grep -qE "^Defaults\s+env_keep\s*\+=\s*\".*$config_name" /etc/sudoers.d/vagrant; then
+#    chmod a+w /etc/sudoers.d/vagrant;
+#    echo "Defaults env_keep += \"$config_name\"" >> /etc/sudoers.d/vagrant;
+#    chmod a-w /etc/sudoers.d/vagrant;
+#  fi
 done
 
 ## Set up the host for the newly-installed instance
