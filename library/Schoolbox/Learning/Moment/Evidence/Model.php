@@ -326,9 +326,15 @@ class Model implements ISoftDeletable, IThreadLocation
      */
     public function submit(User $effector, \Alaress_Date_Format $now = null): self
     {
-        // setSubmittedBy($effector)
-        // if ($now) setSubmittedAt($now)
-        // else setSubmittedAt(\Alaress_Date_Format::now())
+        $this->setSubmittedBy($effector);
+
+        /* Use the current datetime if one wasn't explicitly provided
+         */
+        if ($now) {
+            $this->setSubmittedAt($now);
+        } else {
+            $this->setSubmittedAt(\Alaress_Date_Format::now());
+        }
 
         // Treat as never being published
         $this->publishedAt = null;
@@ -351,9 +357,15 @@ class Model implements ISoftDeletable, IThreadLocation
      */
     public function publish(User $effector, \Alaress_Date_Format $now = null): self
     {
-        // setPublishedBy($effector)
-        // if ($now) setPublishedAt($now)
-        // else setPublishedAt(\Alaress_Date_Format::now())
+        $this->setPublishedBy($effector);
+
+        /* Use the current datetime if one wasn't explicitly provided
+         */
+        if ($now) {
+            $this->setPublishedAt($now);
+        } else {
+            $this->setPublishedAt(\Alaress_Date_Format::now());
+        }
 
         // Treat as never being rejected
         $this->rejectedAt = null;
@@ -372,9 +384,15 @@ class Model implements ISoftDeletable, IThreadLocation
      */
     public function reject(User $effector, \Alaress_Date_Format $now = null): self
     {
-        // setRejectedBy($effector)
-        // if ($now) setRejectedAt($now)
-        // else setRejectedAt(\Alaress_Date_Format::now())
+        $this->setRejectedBy($effector);
+
+        /* Use the current datetime if one wasn't explicitly provided
+         */
+        if ($now) {
+            $this->setRejectedAt($now);
+        } else {
+            $this->setRejectedAt(\Alaress_Date_Format::now());
+        }
 
         // Treat as never being published
         $this->publishedAt = null;
