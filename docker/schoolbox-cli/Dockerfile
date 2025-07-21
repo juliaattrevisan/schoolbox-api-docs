@@ -40,7 +40,15 @@ case "$ENV" in
     ;;
   *)
     apt-get install -y zip pv wget
-    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${AWS_CLI_VERSION}.zip" -o "awscliv2.zip"
+    case "$ARCH" in
+      arm64)
+        export AWS_CLI_ARCH='aarch64'
+        ;;
+      *)
+        export AWS_CLI_ARCH='x86_64'
+        ;;
+    esac
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-${AWS_CLI_ARCH}-${AWS_CLI_VERSION}.zip" -o "awscliv2.zip"
     unzip awscliv2.zip
     ./aws/install
     rm awscliv2.zip
