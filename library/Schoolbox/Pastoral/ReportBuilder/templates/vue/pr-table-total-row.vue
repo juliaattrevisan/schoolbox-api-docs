@@ -24,7 +24,7 @@ const props = defineProps<Props>();
         >
             <!-- The first cell is always just 'Total' text -->
             <template v-if="header.key === props.headers[0].key">
-                <b>{{ props.rowData[header.key] }}</b>
+                <b>{{ props.rowData[header.key] }} {{ props.recordsOrPoints }}</b>
             </template>
             <template v-else-if="header.type == TableHeaderType.RECORDS_AND_POINTS">
                 <!-- Change data based on current radio button selection -->
