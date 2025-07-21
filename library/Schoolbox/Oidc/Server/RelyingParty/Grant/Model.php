@@ -11,6 +11,7 @@ namespace Schoolbox\Oidc\Server\RelyingParty\Grant;
 
 use Alaress_Date_Format;
 use Schoolbox\GenericCollection;
+use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
@@ -22,7 +23,7 @@ use Schoolbox\User;
  * Model representation of the permission a user has granted to an OIDC relying
  * party.
  */
-class Model
+class Model implements ISoftDeletable
 {
     use Id;
     use CreatedAtDate;
