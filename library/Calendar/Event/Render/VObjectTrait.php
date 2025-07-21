@@ -25,7 +25,6 @@ use Alaress\Html;
  */
 trait VObjectTrait
 {
-
     /**
      * @var VCalendar|null
      */
