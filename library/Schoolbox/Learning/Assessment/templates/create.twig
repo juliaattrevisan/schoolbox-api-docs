@@ -41,15 +41,15 @@
                         confirmLabel: "Yes",
                         confirmEvent: () => {
                             // add a new hidden field to the formData to indicate that the user wants to edit participation
-                            const targetForm = form[0];
-                            if (targetForm) {
+                            const targetFieldSet = document.querySelector('[data-mage="part-2"]');
+                            if (targetFieldSet) {
                                 const hiddenInput = document.createElement("input");
                                 hiddenInput.type = "hidden";
                                 hiddenInput.name = "editParticipation";
                                 hiddenInput.value = "true";
-                                targetForm.appendChild(hiddenInput);
+                                targetFieldSet.appendChild(hiddenInput);
                             }
-                            debugger;
+                            resolve();
                         },
                     });
                 });
