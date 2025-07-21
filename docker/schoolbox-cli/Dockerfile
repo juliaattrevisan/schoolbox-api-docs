@@ -12,7 +12,7 @@ ARG NODE_VERSION=20
 # since keys are publicly accessible on that page, I'm not counting them as
 # private information.
 # Also, install tools required by cron tasks and CLI:
-# * git, mariadb client, ffmpeg, imagemagick
+# * git, mariadb client, ffmpeg, imagemagick, sudo
 # dev also requires:
 # * aws, zip (for extracting AWS CLI), pv (for tracking load of dataset)
 RUN \
@@ -28,7 +28,8 @@ RUN \
     git \
     mariadb-client \
     ffmpeg \
-    imagemagick
+    imagemagick \
+    sudo
 
 # Install added requirements for non-production instances:
 # * AWS CLI
