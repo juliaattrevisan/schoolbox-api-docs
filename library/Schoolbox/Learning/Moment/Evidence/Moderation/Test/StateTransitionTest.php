@@ -120,15 +120,48 @@ class StateTransitionTest extends TestCase
     {
         $jana = (new \Schoolbox\User())->setId(13)->setFirstname('jana')->setLastname('reed');
 
-        $moment = (new \Schoolbox\Learning\Moment\Evidence\Model())
-            ->setCreator($jana)
-            ->setType('text')
-            ->setRecipient($jana)
-            ->setSubmittedBy($jana);
-
         return [
-            'full process, default datetime' => [
-                $moment,
+            /* The usual starting pint
+             */
+            'normal process' => [
+                (new \Schoolbox\Learning\Moment\Evidence\Model())
+                    ->setCreator($jana)
+                    ->setType('text')
+                    ->setRecipient($jana)
+            ],
+
+            /* All fields configured; an illegal state normally
+             * This might occur if you manually construct this scenario somehow
+             * either by choice or by mistake
+             */
+            'everything was preset' => [
+                (new \Schoolbox\Learning\Moment\Evidence\Model())
+                    ->setCreator($jana)
+                    ->setType('text')
+                    ->setRecipient($jana)
+                    ->setSubmittedBy($jana)
+                    ->setSubmittedAt(\Alaress_Date_Format::now())
+                    ->setPublishedBy($jana)
+                    ->setPublishedAt(\Alaress_Date_Format::now())
+                    ->setRejectedBy($jana)
+                    ->setRejectedAt(\Alaress_Date_Format::now())
+            ],
+
+            /* A half-set thing in an illegal state normally
+             * This might occur if you manually construct this scenario somehow
+             * either by choice or by mistake
+             */
+            'half was preset' => [
+                (new \Schoolbox\Learning\Moment\Evidence\Model())
+                    ->setCreator($jana)
+                    ->setType('text')
+                    ->setRecipient($jana)
+                    ->setSubmittedBy(null)
+                    ->setSubmittedAt(\Alaress_Date_Format::now())
+                    ->setPublishedBy($jana)
+                    ->setPublishedAt(null)
+                    ->setRejectedBy($jana)
+                    ->setRejectedAt(\Alaress_Date_Format::now())
             ],
         ];
     }
