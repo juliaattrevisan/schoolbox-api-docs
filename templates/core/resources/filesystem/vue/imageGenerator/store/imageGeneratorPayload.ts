@@ -1,23 +1,12 @@
-type ImageGeneratorResponseSuccess = {
-    success: true;
-    data: {
-        responseId: string;
-        src: string;
-        message: string | null;
-    };
-};
+import { apiRequest } from "@js/util/sbx/apiUtils";
+import type { ApiBaseResponse } from "@js/util/sbx/apiUtils";
 
-type ImageGeneratorResponseFailure = {
-    success: false;
-    message: string;
+/** The success response we expect to receive from the API */
+type ImageGeneratorApiResponse = {
+    responseId: string;
+    src: string;
+    message: string | null;
 };
-
-/**
- * This is the final response output from the generateImage function, after parsing and validation has occured.
- * It is not necessarily the same format as the response from the server,
- * instead, this allows checking for a success or failure state in a typed/reliable manner.
- */
-type ImageGeneratorApiResponse = ImageGeneratorResponseSuccess | ImageGeneratorResponseFailure;
 
 export type ImageGeneratorApiPayload = {
     userPrompt: string;
@@ -26,70 +15,20 @@ export type ImageGeneratorApiPayload = {
 };
 
 /**
- * Generate each field's new body content from the AI for the lesson plan
- * @param endpoint - The endpoint to fetch
+ * Generate an image using the image generation API
+ * @param url - The endpoint to fetch
  * @param payload - The data to send in the request
  * @returns The response from the fetch
  */
 export async function generateImage(
-    endpoint: string,
+    url: string,
     payload: ImageGeneratorApiPayload,
-): Promise<ImageGeneratorApiResponse> {
-    let responseData: ImageGeneratorApiResponse = { success: false, message: "An unknown error occurred" };
+): Promise<ApiBaseResponse<ImageGeneratorApiResponse>> {
+    const response = await apiRequest<ImageGeneratorApiResponse, ImageGeneratorApiPayload>({
+        url,
+        method: "POST",
+        body: payload,
+    });
 
-    try {
-        const response = await fetch(endpoint, {
-            method: "POST",
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(payload),
-        });
-
-        // If the response is a 200 and HTML, then we probably got given the offline page, return a more meaningful message instead.
-        const contentType = response.headers.get("Content-Type") || "";
-        if (response.status === 200 && contentType.includes("text/html")) {
-            responseData.message = "You appear to be offline, check your internet connection and try again.";
-            return responseData;
-        }
-
-        const responseText = await response.text();
-
-        // Safely parse the response as JSON, we don't necessarily know what it will be in advance
-        let responseJson: unknown = null;
-        try {
-            responseJson = JSON.parse(responseText);
-        } catch {
-            // If it fails to parse, we'll just leave it as null for the next check
-        }
-
-        // The response must be an object
-        if (typeof responseJson !== "object" || responseJson === null || Array.isArray(responseJson)) {
-            throw new Error("Invalid response");
-        }
-
-        // If we didn't get a 200 response, then handle as per RFC 9457 "API Problem"
-        if (response.status !== 200) {
-            responseData.success = false;
-            if ("title" in responseJson && typeof responseJson.title === "string") {
-                responseData.message = responseJson.title;
-            }
-            if ("detail" in responseJson && typeof responseJson.detail === "string") {
-                responseData.message += `: ${responseJson.detail}`;
-            }
-            return responseData;
-        }
-
-        responseData = { success: true, data: responseJson as ImageGeneratorResponseSuccess["data"] };
-    } catch (e) {
-        responseData = { success: false, message: (e as Error).message };
-    }
-
-    // If the response was unsuccessful and had no message, set a default message
-    if (responseData.success === false && responseData.message === "") {
-        responseData.message = "An unknown error occurred";
-    }
-
-    return responseData;
+    return response;
 }
