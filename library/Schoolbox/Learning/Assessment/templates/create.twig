@@ -17,6 +17,50 @@
         });
 
         /**
+         * Before submitting the form, intercept the submission
+         * and show a confirmation dialog to check if the user wants to edit participation.
+         * If not just continue with the submission
+         * If so add a hidden field to the formData to that will be used in the backend
+         * to redirect to the student participation page.
+         * @returns {Promise}
+         */
+        function formWillSubmit() {
+            const formData = this;
+            // find the showParticipationPrompt in the formData
+            const showParticipationPrompt = formData.find((item) => item.name === "showParticipationPrompt");
+            if (showParticipationPrompt) {
+                return new Promise(function(resolve, reject) {
+                    $("body").confirmDialog({
+                        header: "Student Participation",
+                        text: "Would you like to edit the student participation for this activity now?",
+                        flipButtons: true,
+                        cancelLabel: "Later",
+                        cancelEvent: () => {
+                            resolve();
+                        },
+                        confirmLabel: "Yes",
+                        confirmEvent: () => {
+                            // add a new hidden field to the formData to indicate that the user wants to edit participation
+                            const targetForm = form[0];
+                            if (targetForm) {
+                                const hiddenInput = document.createElement("input");
+                                hiddenInput.type = "hidden";
+                                hiddenInput.name = "editParticipation";
+                                hiddenInput.value = "true";
+                                targetForm.appendChild(hiddenInput);
+                            }
+                            debugger;
+                        },
+                    });
+                });
+            } else {
+                return new Promise(function(resolve, reject) {
+                    resolve();
+                });
+            }
+        }
+
+        /**
          * When you finish configuring a non-project assessment
          */
         function setupAssessmentEnd(assessmentType) {
@@ -24,6 +68,7 @@
             $('input[data-mage-next="end"]').mage({
                 validateOptions: validateOptions,
                 beforeAttemptingSubmit: beforeAttemptingSubmit,
+                formWillSubmit: formWillSubmit,
                 onXhrDone: function (data) {
                     if('string' == typeof data.returnUrl){
                         window.location.href = data.returnUrl;
