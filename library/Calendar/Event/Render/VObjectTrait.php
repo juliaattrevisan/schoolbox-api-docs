@@ -61,6 +61,8 @@ trait VObjectTrait
         // Generate a UID based on $this->getEvent()->getEventId()
         // Only if getEventId is not negative (Google Calendar doesn't like it)
         if ((!empty($event->getEventId()) && is_string($event->getEventId())) || (is_int($event->getEventId()) && $event->getEventId() > 0)) {
+            // Swap out the UID if it already exists
+            $vEvent->remove('UID');
             $vEvent->add('UID', $event->getEventId() . '/' . $event->getConnectorId());
         }
         $vEvent->add('CATEGORIES', $this->getCategories());
