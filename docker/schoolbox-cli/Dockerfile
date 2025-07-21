@@ -1,4 +1,7 @@
 ARG ARCH=amd64
+ARG NVM_VERSION=0.40.3
+ARG AWS_CLI_VERSION=2.27.55
+ARG NODE_VERSION=20
 
 FROM --platform=linux/${ARCH} php82-bookworm
 
@@ -30,13 +33,14 @@ RUN \
 # * zip (for extracting AWS CLI)
 # * pv (for tracking load of dataset)
 # * wget
+# * npm
 RUN <<EOF
 case "$ENV" in
   prod | production)
     ;;
   *)
     apt-get install -y zip pv wget
-    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${AWS_CLI_VERSION}.zip" -o "awscliv2.zip"
     unzip awscliv2.zip
     ./aws/install
     rm awscliv2.zip
