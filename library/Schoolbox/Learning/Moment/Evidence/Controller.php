@@ -254,6 +254,14 @@ class Controller extends Base
      */
     public function postMomentForUsers(Collection $users): void
     {
+        /* Since this is a collection of users, each of whom might have a unique
+         * configuration (e.g. some year levels require moderation, some don't)
+         * you'll end up with an $evidenceCollection of mixed results; some will
+         * submit and publish immediately whilst some end up in a moderation queue.
+         */
+        $globalConfig = (bool)$this->getConfigLoader()->get('learning_moments_moderation_enabled');
+        $moderationRequired = new ModerationEnabled();
+
         $requestBody = $this->request->getParsedBody();
 
         //unless there are mapper errors (and those will change it to 500 as required
@@ -269,6 +277,19 @@ class Controller extends Base
             $evidenceModel = $evidenceModel
                 ->setRecipient($user)
                 ->setBody($tokenReplacer->replace($evidenceModel->getBody(), $user));
+
+            /* Accelerate into the next state based on configs and year level settings
+             */
+            if ($moderationRequired->isSatisfiedBy($globalConfig, $user->getYear())) {
+                /* Requires moderation and; needs a human to progress to Published state
+                 */
+                $evidenceModel->submit($this->getUser());
+            } else {
+                /* Does not require moderation; just send it into the world
+                 */
+                $evidenceModel->publish($this->getUser());
+            }
+
             $evidenceCollection->add($evidenceModel);
         }
         $this->mapper->save($evidenceCollection);
