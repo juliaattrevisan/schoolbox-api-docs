@@ -40,6 +40,7 @@ case "$ENV" in
     unzip awscliv2.zip
     ./aws/install
     rm awscliv2.zip
+    rm -rf ./aws
     ;;
 esac
 EOF
