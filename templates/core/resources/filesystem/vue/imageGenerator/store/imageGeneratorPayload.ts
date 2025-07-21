@@ -1,7 +1,13 @@
-import { apiRequest } from "@js/util/sbx/apiUtils";
+import { sseApiRequest } from "@js/util/sbx/apiUtils";
 import type { ApiBaseResponse } from "@js/util/sbx/apiUtils";
 
-/** The success response we expect to receive from the API */
+type ImageGeneratorApiMessage = {
+    responseId: string;
+    src: string;
+    message: string | null;
+};
+
+/** The "complete" response we expect to receive at the very end from the API */
 type ImageGeneratorApiResponse = {
     responseId: string;
     src: string;
@@ -17,18 +23,19 @@ export type ImageGeneratorApiPayload = {
 /**
  * Generate an image using the image generation API
  * @param url - The endpoint to fetch
- * @param payload - The data to send in the request
+ * @param body - The data to send in the request
+ * @param onMessage - The callback to handle each message from the server
  * @returns The response from the fetch
  */
 export async function generateImage(
     url: string,
-    payload: ImageGeneratorApiPayload,
+    body: ImageGeneratorApiPayload,
+    onMessage: (response: ApiBaseResponse<ImageGeneratorApiMessage>) => void,
 ): Promise<ApiBaseResponse<ImageGeneratorApiResponse>> {
-    const response = await apiRequest<ImageGeneratorApiResponse, ImageGeneratorApiPayload>({
+    return sseApiRequest<ImageGeneratorApiMessage, ImageGeneratorApiResponse, ImageGeneratorApiPayload>({
         url,
         method: "POST",
-        body: payload,
+        body,
+        onMessage,
     });
-
-    return response;
 }

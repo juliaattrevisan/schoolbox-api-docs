@@ -144,16 +144,49 @@ class Helper
         /* Minimum requirements met: let's send it and see what AI overlords think of our payload
          */
         try {
+            // Enable streaming in the payload
+            $payloadArr = json_decode($payload, true, 512, JSON_THROW_ON_ERROR);
+            $payloadArr['stream'] = true;
+            $payload = json_encode($payloadArr, JSON_THROW_ON_ERROR);
+
             $openAiRequest = new Request('POST', $this->getEndpoint(), array_merge(
                 $this->getAuthorization(),
                 ['Content-Type' => 'application/json'],
             ), $payload);
 
-            $response = $this->client->sendRequest($openAiRequest);
+            $response = $this->client->send($openAiRequest, ['stream' => true]);
 
             http_response_code($response->getStatusCode());
+            header('Content-Type: text/event-stream');
+            header('Cache-Control: no-cache');
+            header('Connection: keep-alive');
 
-            $result = $response->getBody()->getContents();
+            ob_implicit_flush(true);
+            ob_end_flush();
+
+            $stream = $response->getBody();
+            $result = '';
+
+            while (!$stream->eof()) {
+                $chunk = $stream->read(1024);
+                if ($chunk === '') {
+                    usleep(100000); // no data yet
+                    continue;
+                }
+
+                // TODO: save to openai log incrementally so we don't die with memory chaos
+
+                // OpenAI already responds in the format of an event stream (“data: {...}\n\n”)
+                echo $chunk;
+                $result .= $chunk;
+
+                // flush PHP buffers
+                if (ob_get_length()) {
+                    @ob_flush();
+                }
+                @flush();
+            }
+
             $log->setResponse($result);
             $data = json_decode($result, true, 512, JSON_THROW_ON_ERROR);
 

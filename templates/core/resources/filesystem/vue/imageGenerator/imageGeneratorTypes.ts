@@ -7,7 +7,7 @@ export type ImageRequest = {
     previousResponseId: string | null;
 };
 
-type ImageResponseSuccess = {
+export type ImageResponseSuccess = {
     type: "response";
     status: "success";
     entryKey: number;

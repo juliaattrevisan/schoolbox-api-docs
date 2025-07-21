@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import type { AiFeedMessage } from "../imageGeneratorTypes";
+import type { AiFeedMessage, ImageResponseSuccess } from "../imageGeneratorTypes";
 import { generateImage } from "./imageGeneratorPayload";
 import type { ImageGeneratorApiPayload } from "./imageGeneratorPayload";
 
@@ -8,7 +8,6 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
     const generateRoute = window.Vue.ref<string | null>(null);
 
     const isGenerating = window.Vue.ref<boolean>(false);
-    const generateError = window.Vue.ref<string | null>(null);
 
     const selectedFeedEntry = window.Vue.ref<AiFeedMessage["entryKey"] | null>(null);
 
@@ -32,6 +31,17 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
     }
 
     /**
+     * @returns The next entry key for adding a new item to the feed
+     */
+    function getNextEntryKey(): number {
+        const responses = feed.value.filter((item) => "entryKey" in item).filter((item) => item.entryKey !== null);
+        if (responses.length === 0) {
+            return 1;
+        }
+        return responses[responses.length - 1].entryKey + 1;
+    }
+
+    /**
      * Request a new image from the AI
      * @param payload - The payload to send to the AI
      * @returns whether the request was sent successfully or not
@@ -46,25 +56,86 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
         }
 
         isGenerating.value = true;
-        generateError.value = null;
 
         feed.value.push({
             type: "request",
-            entryKey: feed.value.length + 1,
+            entryKey: getNextEntryKey(),
             user: window.schoolboxUser,
             prompt: payload.userPrompt,
             attributes: payload.attributes,
             previousResponseId: payload.previousResponseId,
         });
 
-        const response = await generateImage(generateRoute.value, payload);
+        let responseEntry: ImageResponseSuccess | null = null;
+
+        const response = await generateImage(generateRoute.value, payload, (message) => {
+            if (message.success === false) {
+                // TODO
+                console.error(message);
+                isGenerating.value = false;
+                return;
+            }
+
+            if (message.data.type === "response.image_generation_call.partial_image") {
+                const newSrc = `data:image/png;base64,${message.data.partial_image_b64}`;
+
+                if (responseEntry === null) {
+                    const newResponseEntry: ImageResponseSuccess = {
+                        type: "response",
+                        status: "success",
+                        entryKey: getNextEntryKey(),
+                        responseId: message.data.item_id,
+                        src: newSrc,
+                        message: "",
+                    };
+
+                    responseEntry = newResponseEntry;
+                    feed.value.push(newResponseEntry);
+                } else {
+                    const newResponseEntry = {
+                        ...responseEntry,
+                        entryKey: getNextEntryKey(),
+                        src: newSrc,
+                    };
+
+                    responseEntry = newResponseEntry;
+                    feed.value.pop();
+                    feed.value.push(newResponseEntry);
+                }
+
+                return;
+            }
+
+            if (message.data.type === "response.output_text.delta") {
+                if (responseEntry === null || responseEntry.message === null) {
+                    // TODO
+                    throw new Error("no response entry yet");
+                }
+
+                const newResponseEntry = {
+                    ...responseEntry,
+                    entryKey: getNextEntryKey(),
+                    message: `${responseEntry.message}${message.data.delta}`,
+                };
+
+                responseEntry = newResponseEntry;
+                feed.value.pop();
+                feed.value.push(newResponseEntry);
+                return;
+            }
+
+            // TODO
+            console.log(message.data.type, message, message.data?.delta);
+        });
+
+        // const response = await generateImage(generateRoute.value, payload);
 
         isGenerating.value = false;
         if (response.success === false) {
             feed.value.push({
                 type: "response",
                 status: "error",
-                entryKey: feed.value.length + 1,
+                entryKey: getNextEntryKey(),
                 responseId: null,
                 message: response.message,
             });
@@ -74,7 +145,7 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
         feed.value.push({
             type: "response",
             status: "success",
-            entryKey: feed.value.length + 1,
+            entryKey: getNextEntryKey(),
             ...response.data,
         });
 
@@ -87,7 +158,6 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
         init,
         feed,
         isGenerating,
-        generateError,
         getPreviousResponseId,
         sendRequest,
         selectedFeedEntry,
