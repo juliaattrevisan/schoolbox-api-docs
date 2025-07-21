@@ -350,16 +350,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.349.3",
+            "version": "3.351.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "b2d4718786398f47626add9c29840fc416175ef2"
+                "reference": "b418b41ceee47103f364e709c5f3a58a4bcf0894"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/b2d4718786398f47626add9c29840fc416175ef2",
-                "reference": "b2d4718786398f47626add9c29840fc416175ef2",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/b418b41ceee47103f364e709c5f3a58a4bcf0894",
+                "reference": "b418b41ceee47103f364e709c5f3a58a4bcf0894",
                 "shasum": ""
             },
             "require": {
@@ -441,9 +441,9 @@
             "support": {
                 "forum": "https://github.com/aws/aws-sdk-php/discussions",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.349.3"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.351.2"
             },
-            "time": "2025-07-09T18:10:17+00:00"
+            "time": "2025-07-18T18:06:44+00:00"
         },
         {
             "name": "beste/clock",
@@ -2145,16 +2145,16 @@
         },
         {
             "name": "google/cloud-core",
-            "version": "v1.63.0",
+            "version": "v1.64.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/googleapis/google-cloud-php-core.git",
-                "reference": "14461f7b53b261caeed7174f9d704d10881b02c2"
+                "reference": "000a7957f2cf6d7d04d47f8d3ef981777d38b6f9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/googleapis/google-cloud-php-core/zipball/14461f7b53b261caeed7174f9d704d10881b02c2",
-                "reference": "14461f7b53b261caeed7174f9d704d10881b02c2",
+                "url": "https://api.github.com/repos/googleapis/google-cloud-php-core/zipball/000a7957f2cf6d7d04d47f8d3ef981777d38b6f9",
+                "reference": "000a7957f2cf6d7d04d47f8d3ef981777d38b6f9",
                 "shasum": ""
             },
             "require": {
@@ -2164,7 +2164,7 @@
                 "guzzlehttp/promises": "^1.4||^2.0",
                 "guzzlehttp/psr7": "^2.6",
                 "monolog/monolog": "^2.9||^3.0",
-                "php": "^8.0",
+                "php": "^8.1",
                 "psr/http-message": "^1.0||^2.0",
                 "rize/uri-template": "~0.3||~0.4"
             },
@@ -2205,27 +2205,27 @@
             ],
             "description": "Google Cloud PHP shared dependency, providing functionality useful to all components.",
             "support": {
-                "source": "https://github.com/googleapis/google-cloud-php-core/tree/v1.63.0"
+                "source": "https://github.com/googleapis/google-cloud-php-core/tree/v1.64.1"
             },
-            "time": "2025-06-13T20:36:13+00:00"
+            "time": "2025-07-18T20:06:03+00:00"
         },
         {
             "name": "google/cloud-storage",
-            "version": "v1.48.1",
+            "version": "v1.48.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/googleapis/google-cloud-php-storage.git",
-                "reference": "509b095c3ea44db92c9e62a94b5773563c831821"
+                "reference": "729daea71dc30549d8e331dcde35825fe3bc4474"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/googleapis/google-cloud-php-storage/zipball/509b095c3ea44db92c9e62a94b5773563c831821",
-                "reference": "509b095c3ea44db92c9e62a94b5773563c831821",
+                "url": "https://api.github.com/repos/googleapis/google-cloud-php-storage/zipball/729daea71dc30549d8e331dcde35825fe3bc4474",
+                "reference": "729daea71dc30549d8e331dcde35825fe3bc4474",
                 "shasum": ""
             },
             "require": {
                 "google/cloud-core": "^1.57",
-                "php": "^8.0",
+                "php": "^8.1",
                 "ramsey/uuid": "^4.2.3"
             },
             "require-dev": {
@@ -2262,27 +2262,27 @@
             ],
             "description": "Cloud Storage Client for PHP",
             "support": {
-                "source": "https://github.com/googleapis/google-cloud-php-storage/tree/v1.48.1"
+                "source": "https://github.com/googleapis/google-cloud-php-storage/tree/v1.48.2"
             },
-            "time": "2025-05-20T19:49:54+00:00"
+            "time": "2025-07-18T20:06:03+00:00"
         },
         {
             "name": "google/common-protos",
-            "version": "4.12.1",
+            "version": "4.12.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/googleapis/common-protos-php.git",
-                "reference": "70c4eb1abab5484a23c17a43b0d455259f5d8c1b"
+                "reference": "0a399e6f39576e39ae9b66d3c704ae294afab1dc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/googleapis/common-protos-php/zipball/70c4eb1abab5484a23c17a43b0d455259f5d8c1b",
-                "reference": "70c4eb1abab5484a23c17a43b0d455259f5d8c1b",
+                "url": "https://api.github.com/repos/googleapis/common-protos-php/zipball/0a399e6f39576e39ae9b66d3c704ae294afab1dc",
+                "reference": "0a399e6f39576e39ae9b66d3c704ae294afab1dc",
                 "shasum": ""
             },
             "require": {
                 "google/protobuf": "^v3.25.3||^4.26.1",
-                "php": "^8.0"
+                "php": "^8.1"
             },
             "require-dev": {
                 "phpunit/phpunit": "^9.6"
@@ -2321,9 +2321,9 @@
                 "google"
             ],
             "support": {
-                "source": "https://github.com/googleapis/common-protos-php/tree/v4.12.1"
+                "source": "https://github.com/googleapis/common-protos-php/tree/v4.12.2"
             },
-            "time": "2025-05-20T19:49:54+00:00"
+            "time": "2025-07-18T20:06:03+00:00"
         },
         {
             "name": "google/gax",
@@ -3565,16 +3565,16 @@
         },
         {
             "name": "league/commonmark",
-            "version": "2.7.0",
+            "version": "2.7.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/commonmark.git",
-                "reference": "6fbb36d44824ed4091adbcf4c7d4a3923cdb3405"
+                "reference": "10732241927d3971d28e7ea7b5712721fa2296ca"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/commonmark/zipball/6fbb36d44824ed4091adbcf4c7d4a3923cdb3405",
-                "reference": "6fbb36d44824ed4091adbcf4c7d4a3923cdb3405",
+                "url": "https://api.github.com/repos/thephpleague/commonmark/zipball/10732241927d3971d28e7ea7b5712721fa2296ca",
+                "reference": "10732241927d3971d28e7ea7b5712721fa2296ca",
                 "shasum": ""
             },
             "require": {
@@ -3603,7 +3603,7 @@
                 "symfony/process": "^5.4 | ^6.0 | ^7.0",
                 "symfony/yaml": "^2.3 | ^3.0 | ^4.0 | ^5.0 | ^6.0 | ^7.0",
                 "unleashedtech/php-coding-standard": "^3.1.1",
-                "vimeo/psalm": "^4.24.0 || ^5.0.0"
+                "vimeo/psalm": "^4.24.0 || ^5.0.0 || ^6.0.0"
             },
             "suggest": {
                 "symfony/yaml": "v2.3+ required if using the Front Matter extension"
@@ -3668,7 +3668,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-05-05T12:20:28+00:00"
+            "time": "2025-07-20T12:47:49+00:00"
         },
         {
             "name": "league/config",
@@ -5195,23 +5195,23 @@
         },
         {
             "name": "oat-sa/lib-lti1p3-ags",
-            "version": "2.0.3",
+            "version": "2.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oat-sa/lib-lti1p3-ags.git",
-                "reference": "97e082a18531f808cfc04184d51c6eb83ab70d03"
+                "reference": "25a0973cdb3fa6073a7a5366471bdca93a00d35c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oat-sa/lib-lti1p3-ags/zipball/97e082a18531f808cfc04184d51c6eb83ab70d03",
-                "reference": "97e082a18531f808cfc04184d51c6eb83ab70d03",
+                "url": "https://api.github.com/repos/oat-sa/lib-lti1p3-ags/zipball/25a0973cdb3fa6073a7a5366471bdca93a00d35c",
+                "reference": "25a0973cdb3fa6073a7a5366471bdca93a00d35c",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "nesbot/carbon": "^2.72 || ^3.0",
                 "nyholm/psr7": "^1.8",
-                "oat-sa/lib-lti1p3-core": "7.2.2",
+                "oat-sa/lib-lti1p3-core": "^7.0",
                 "php": ">=8.0.0",
                 "psr/http-message": "^1.1 || ^2.0"
             },
@@ -5233,22 +5233,22 @@
             "description": "OAT LTI 1.3 Advantage AGS Library",
             "support": {
                 "issues": "https://github.com/oat-sa/lib-lti1p3-ags/issues",
-                "source": "https://github.com/oat-sa/lib-lti1p3-ags/tree/2.0.3"
+                "source": "https://github.com/oat-sa/lib-lti1p3-ags/tree/2.0.4"
             },
-            "time": "2025-06-24T09:56:26+00:00"
+            "time": "2025-07-17T14:24:27+00:00"
         },
         {
             "name": "oat-sa/lib-lti1p3-core",
-            "version": "7.2.2",
+            "version": "7.2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oat-sa/lib-lti1p3-core.git",
-                "reference": "9ab7abc1e86987d457b3c7f5143173c9d40a0dd7"
+                "reference": "84d596855889970278d1c9a0ff1a6246db1de1ab"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oat-sa/lib-lti1p3-core/zipball/9ab7abc1e86987d457b3c7f5143173c9d40a0dd7",
-                "reference": "9ab7abc1e86987d457b3c7f5143173c9d40a0dd7",
+                "url": "https://api.github.com/repos/oat-sa/lib-lti1p3-core/zipball/84d596855889970278d1c9a0ff1a6246db1de1ab",
+                "reference": "84d596855889970278d1c9a0ff1a6246db1de1ab",
                 "shasum": ""
             },
             "require": {
@@ -5256,7 +5256,7 @@
                 "ext-json": "*",
                 "ext-openssl": "*",
                 "guzzlehttp/guzzle": "^7.8",
-                "lcobucci/jwt": "^4.3",
+                "lcobucci/jwt": "^4.3 || ^5.0",
                 "league/oauth2-server": "^8.5 || ^9.2",
                 "nesbot/carbon": "^2.72 || ^3.0",
                 "nyholm/psr7": "^1.8",
@@ -5288,27 +5288,27 @@
             "description": "OAT LTI 1.3 Core Library",
             "support": {
                 "issues": "https://github.com/oat-sa/lib-lti1p3-core/issues",
-                "source": "https://github.com/oat-sa/lib-lti1p3-core/tree/7.2.2"
+                "source": "https://github.com/oat-sa/lib-lti1p3-core/tree/7.2.3"
             },
-            "time": "2025-06-24T09:03:17+00:00"
+            "time": "2025-07-18T12:30:08+00:00"
         },
         {
             "name": "oat-sa/lib-lti1p3-deep-linking",
-            "version": "4.1.1",
+            "version": "4.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oat-sa/lib-lti1p3-deep-linking.git",
-                "reference": "cf72793cf6412eef0457df768b6feab49adb3ef0"
+                "reference": "71df6274c20868341517327d5fdfcf08f68aea22"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oat-sa/lib-lti1p3-deep-linking/zipball/cf72793cf6412eef0457df768b6feab49adb3ef0",
-                "reference": "cf72793cf6412eef0457df768b6feab49adb3ef0",
+                "url": "https://api.github.com/repos/oat-sa/lib-lti1p3-deep-linking/zipball/71df6274c20868341517327d5fdfcf08f68aea22",
+                "reference": "71df6274c20868341517327d5fdfcf08f68aea22",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
-                "oat-sa/lib-lti1p3-core": "7.2.2",
+                "oat-sa/lib-lti1p3-core": "^7.0",
                 "php": ">=8.0.0"
             },
             "require-dev": {
@@ -5329,28 +5329,28 @@
             "description": "OAT LTI 1.3 Deep Linking Library",
             "support": {
                 "issues": "https://github.com/oat-sa/lib-lti1p3-deep-linking/issues",
-                "source": "https://github.com/oat-sa/lib-lti1p3-deep-linking/tree/4.1.1"
+                "source": "https://github.com/oat-sa/lib-lti1p3-deep-linking/tree/4.1.2"
             },
-            "time": "2025-06-24T09:15:29+00:00"
+            "time": "2025-07-17T14:24:21+00:00"
         },
         {
             "name": "oat-sa/lib-lti1p3-nrps",
-            "version": "8.0.3",
+            "version": "8.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oat-sa/lib-lti1p3-nrps.git",
-                "reference": "890073c0a92eb72c3755d7d191765e862488b8e6"
+                "reference": "65a0527c88da0e1244377d2e812f76153668dbaa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oat-sa/lib-lti1p3-nrps/zipball/890073c0a92eb72c3755d7d191765e862488b8e6",
-                "reference": "890073c0a92eb72c3755d7d191765e862488b8e6",
+                "url": "https://api.github.com/repos/oat-sa/lib-lti1p3-nrps/zipball/65a0527c88da0e1244377d2e812f76153668dbaa",
+                "reference": "65a0527c88da0e1244377d2e812f76153668dbaa",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "nyholm/psr7": "^1.8",
-                "oat-sa/lib-lti1p3-core": "7.2.2",
+                "oat-sa/lib-lti1p3-core": "^7.0",
                 "php": ">=8.0.0",
                 "psr/http-message": "^1.1 || ^2.0"
             },
@@ -5375,9 +5375,9 @@
             "description": "OAT LTI 1.3 Advantage NRPS Library",
             "support": {
                 "issues": "https://github.com/oat-sa/lib-lti1p3-nrps/issues",
-                "source": "https://github.com/oat-sa/lib-lti1p3-nrps/tree/8.0.3"
+                "source": "https://github.com/oat-sa/lib-lti1p3-nrps/tree/8.0.4"
             },
-            "time": "2025-06-24T09:48:06+00:00"
+            "time": "2025-07-17T14:24:35+00:00"
         },
         {
             "name": "onelogin/php-saml",
@@ -6187,16 +6187,16 @@
         },
         {
             "name": "psr/cache",
-            "version": "2.0.0",
+            "version": "3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/cache.git",
-                "reference": "213f9dbc5b9bfbc4f8db86d2838dc968752ce13b"
+                "reference": "aa5030cfa5405eccfdcb1083ce040c2cb8d253bf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/cache/zipball/213f9dbc5b9bfbc4f8db86d2838dc968752ce13b",
-                "reference": "213f9dbc5b9bfbc4f8db86d2838dc968752ce13b",
+                "url": "https://api.github.com/repos/php-fig/cache/zipball/aa5030cfa5405eccfdcb1083ce040c2cb8d253bf",
+                "reference": "aa5030cfa5405eccfdcb1083ce040c2cb8d253bf",
                 "shasum": ""
             },
             "require": {
@@ -6230,9 +6230,9 @@
                 "psr-6"
             ],
             "support": {
-                "source": "https://github.com/php-fig/cache/tree/2.0.0"
+                "source": "https://github.com/php-fig/cache/tree/3.0.0"
             },
-            "time": "2021-02-03T23:23:37+00:00"
+            "time": "2021-02-03T23:26:27+00:00"
         },
         {
             "name": "psr/clock",
@@ -8522,23 +8522,23 @@
         },
         {
             "name": "symfony/cache",
-            "version": "v7.2.8",
+            "version": "v7.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/cache.git",
-                "reference": "7bc97a8d8cae01605e551773e72f5647e2337ae4"
+                "reference": "a7c6caa9d6113cebfb3020b427bcb021ebfdfc9e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/cache/zipball/7bc97a8d8cae01605e551773e72f5647e2337ae4",
-                "reference": "7bc97a8d8cae01605e551773e72f5647e2337ae4",
+                "url": "https://api.github.com/repos/symfony/cache/zipball/a7c6caa9d6113cebfb3020b427bcb021ebfdfc9e",
+                "reference": "a7c6caa9d6113cebfb3020b427bcb021ebfdfc9e",
                 "shasum": ""
             },
             "require": {
                 "php": ">=8.2",
                 "psr/cache": "^2.0|^3.0",
                 "psr/log": "^1.1|^2|^3",
-                "symfony/cache-contracts": "^2.5|^3",
+                "symfony/cache-contracts": "^3.6",
                 "symfony/deprecation-contracts": "^2.5|^3.0",
                 "symfony/service-contracts": "^2.5|^3",
                 "symfony/var-exporter": "^6.4|^7.0"
@@ -8600,7 +8600,7 @@
                 "psr6"
             ],
             "support": {
-                "source": "https://github.com/symfony/cache/tree/v7.2.8"
+                "source": "https://github.com/symfony/cache/tree/v7.3.1"
             },
             "funding": [
                 {
@@ -8616,28 +8616,25 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-06-27T19:53:16+00:00"
+            "time": "2025-06-27T19:55:54+00:00"
         },
         {
             "name": "symfony/cache-contracts",
-            "version": "v2.5.4",
+            "version": "v3.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/cache-contracts.git",
-                "reference": "517c3a3619dadfa6952c4651767fcadffb4df65e"
+                "reference": "5d68a57d66910405e5c0b63d6f0af941e66fc868"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/cache-contracts/zipball/517c3a3619dadfa6952c4651767fcadffb4df65e",
-                "reference": "517c3a3619dadfa6952c4651767fcadffb4df65e",
+                "url": "https://api.github.com/repos/symfony/cache-contracts/zipball/5d68a57d66910405e5c0b63d6f0af941e66fc868",
+                "reference": "5d68a57d66910405e5c0b63d6f0af941e66fc868",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.2.5",
-                "psr/cache": "^1.0|^2.0|^3.0"
-            },
-            "suggest": {
-                "symfony/cache-implementation": ""
+                "php": ">=8.1",
+                "psr/cache": "^3.0"
             },
             "type": "library",
             "extra": {
@@ -8646,7 +8643,7 @@
                     "name": "symfony/contracts"
                 },
                 "branch-alias": {
-                    "dev-main": "2.5-dev"
+                    "dev-main": "3.6-dev"
                 }
             },
             "autoload": {
@@ -8679,7 +8676,7 @@
                 "standards"
             ],
             "support": {
-                "source": "https://github.com/symfony/cache-contracts/tree/v2.5.4"
+                "source": "https://github.com/symfony/cache-contracts/tree/v3.6.0"
             },
             "funding": [
                 {
@@ -8695,7 +8692,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-09-25T14:11:13+00:00"
+            "time": "2025-03-13T15:25:07+00:00"
         },
         {
             "name": "symfony/clock",
@@ -11752,16 +11749,16 @@
         },
         {
             "name": "dealerdirect/phpcodesniffer-composer-installer",
-            "version": "v1.1.1",
+            "version": "v1.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPCSStandards/composer-installer.git",
-                "reference": "6e0fa428497bf560152ee73ffbb8af5c6a56b0dd"
+                "reference": "e9cf5e4bbf7eeaf9ef5db34938942602838fc2b1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPCSStandards/composer-installer/zipball/6e0fa428497bf560152ee73ffbb8af5c6a56b0dd",
-                "reference": "6e0fa428497bf560152ee73ffbb8af5c6a56b0dd",
+                "url": "https://api.github.com/repos/PHPCSStandards/composer-installer/zipball/e9cf5e4bbf7eeaf9ef5db34938942602838fc2b1",
+                "reference": "e9cf5e4bbf7eeaf9ef5db34938942602838fc2b1",
                 "shasum": ""
             },
             "require": {
@@ -11844,7 +11841,7 @@
                     "type": "thanks_dev"
                 }
             ],
-            "time": "2025-06-27T17:24:01+00:00"
+            "time": "2025-07-17T20:45:56+00:00"
         },
         {
             "name": "fakerphp/faker",
@@ -12551,16 +12548,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "2.1.17",
+            "version": "2.1.18",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "89b5ef665716fa2a52ecd2633f21007a6a349053"
+                "reference": "ee1f390b7a70cdf74a2b737e554f68afea885db7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/89b5ef665716fa2a52ecd2633f21007a6a349053",
-                "reference": "89b5ef665716fa2a52ecd2633f21007a6a349053",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/ee1f390b7a70cdf74a2b737e554f68afea885db7",
+                "reference": "ee1f390b7a70cdf74a2b737e554f68afea885db7",
                 "shasum": ""
             },
             "require": {
@@ -12605,7 +12602,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-05-21T20:55:28+00:00"
+            "time": "2025-07-17T17:22:31+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -13132,21 +13129,21 @@
         },
         {
             "name": "rector/rector",
-            "version": "2.1.1",
+            "version": "2.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rectorphp/rector.git",
-                "reference": "d0917c069bb0d9bb06ed111cf052510f609015a4"
+                "reference": "40a71441dd73fa150a66102f5ca1364c44fc8fff"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rectorphp/rector/zipball/d0917c069bb0d9bb06ed111cf052510f609015a4",
-                "reference": "d0917c069bb0d9bb06ed111cf052510f609015a4",
+                "url": "https://api.github.com/repos/rectorphp/rector/zipball/40a71441dd73fa150a66102f5ca1364c44fc8fff",
+                "reference": "40a71441dd73fa150a66102f5ca1364c44fc8fff",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.4|^8.0",
-                "phpstan/phpstan": "^2.1.17"
+                "phpstan/phpstan": "^2.1.18"
             },
             "conflict": {
                 "rector/rector-doctrine": "*",
@@ -13180,7 +13177,7 @@
             ],
             "support": {
                 "issues": "https://github.com/rectorphp/rector/issues",
-                "source": "https://github.com/rectorphp/rector/tree/2.1.1"
+                "source": "https://github.com/rectorphp/rector/tree/2.1.2"
             },
             "funding": [
                 {
@@ -13188,7 +13185,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-07-10T11:31:31+00:00"
+            "time": "2025-07-17T19:30:06+00:00"
         },
         {
             "name": "roave/security-advisories",
@@ -13196,12 +13193,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Roave/SecurityAdvisories.git",
-                "reference": "56a0a5fbffe6faa8e85eb4d027a3eaf704adc288"
+                "reference": "2976f12cdae3501980aabb46810cf807f7fdec44"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/56a0a5fbffe6faa8e85eb4d027a3eaf704adc288",
-                "reference": "56a0a5fbffe6faa8e85eb4d027a3eaf704adc288",
+                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/2976f12cdae3501980aabb46810cf807f7fdec44",
+                "reference": "2976f12cdae3501980aabb46810cf807f7fdec44",
                 "shasum": ""
             },
             "conflict": {
@@ -13272,6 +13269,7 @@
                 "bednee/cooluri": "<1.0.30",
                 "bigfork/silverstripe-form-capture": ">=3,<3.1.1",
                 "billz/raspap-webgui": "<3.3.6",
+                "binarytorch/larecipe": "<2.8.1",
                 "bk2k/bootstrap-package": ">=7.1,<7.1.2|>=8,<8.0.8|>=9,<9.0.4|>=9.1,<9.1.3|>=10,<10.0.10|>=11,<11.0.3",
                 "blueimp/jquery-file-upload": "==6.4.4",
                 "bmarshall511/wordpress_zero_spam": "<5.2.13",
@@ -13600,7 +13598,7 @@
                 "lightsaml/lightsaml": "<1.3.5",
                 "limesurvey/limesurvey": "<6.5.12",
                 "livehelperchat/livehelperchat": "<=3.91",
-                "livewire/livewire": "<2.12.7|>=3.0.0.0-beta1,<3.5.2",
+                "livewire/livewire": "<2.12.7|>=3.0.0.0-beta1,<3.6.4",
                 "livewire/volt": "<1.7",
                 "lms/routes": "<2.1.1",
                 "localizationteam/l10nmgr": "<7.4|>=8,<8.7|>=9,<9.2",
@@ -13850,6 +13848,7 @@
                 "silverstripe/taxonomy": ">=1.3,<1.3.1|>=2,<2.0.1",
                 "silverstripe/userforms": "<3|>=5,<5.4.2",
                 "silverstripe/versioned-admin": ">=1,<1.11.1",
+                "simogeo/filemanager": "<=2.5",
                 "simple-updates/phpwhois": "<=1",
                 "simplesamlphp/saml2": "<=4.16.15|>=5.0.0.0-alpha1,<=5.0.0.0-alpha19",
                 "simplesamlphp/saml2-legacy": "<=4.16.15",
@@ -14144,7 +14143,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-07-11T23:05:27+00:00"
+            "time": "2025-07-20T17:05:09+00:00"
         },
         {
             "name": "sebastian/cli-parser",
