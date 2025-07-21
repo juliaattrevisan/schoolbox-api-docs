@@ -370,7 +370,7 @@ class Helper
                     $output = '';
 
                     while (!$stream->eof()) {
-                        $tmp = $stream->read(1024);
+                        $tmp = $stream->read(1);
                         echo $tmp;
                         $output .= $tmp;
                     }
