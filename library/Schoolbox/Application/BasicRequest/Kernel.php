@@ -8,15 +8,11 @@
 
 namespace Schoolbox\Application\BasicRequest;
 
-use Alaress\Codec\Json\Base64;
 use Alaress\Database\Connector\IConnector;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Image\ProcessorFactory;
-use Alaress\Redis\Cache\ItemPool;
-use Alaress\Redis\Cache\KeyGenerator;
 use Alaress\Sentry\Tracing\GuzzleTracingMiddleware;
 use Alaress\Sentry\Tracing\Tracer;
-use Cache\Bridge\SimpleCache\SimpleCacheBridge;
 use enshrined\svgSanitize\Sanitizer as BaseSvgSanitizer;
 use GuzzleHttp;
 use Http\Discovery\Psr17Factory;
@@ -34,7 +30,6 @@ use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Database\Factory as SchoolboxDatabaseFactory;
-use Alaress\Database\Factory as AlaressDatabaseFactory;
 use Alaress\Redis;
 use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Instance;
@@ -60,9 +55,9 @@ use Schoolbox\User\Token\Mapper as TokenMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Version\Version;
 use Sentry\SentrySdk;
-use Sentry\Tracing\SpanStatus;
-use Sentry\Tracing\TransactionSource;
 use SitePage;
+use Symfony\Component\Cache\Adapter\RedisAdapter;
+use Symfony\Component\Cache\Psr16Cache;
 use Twig\Environment;
 use Alaress\Twig\Method as TwigMethod;
 use Twig\Extension\DebugExtension;
@@ -308,11 +303,10 @@ class Kernel extends WebKernelAbstract
             'httpClient.internalCache',
             $di->lazy(
                 function () use ($di) {
-                    return new SimpleCacheBridge(
-                        new ItemPool(
+                    return new Psr16Cache(
+                        new RedisAdapter(
                             $di->get('redis.cache'),
-                            new \Alaress\Codec\StringValue\Base64(),
-                            new KeyGenerator('httpClient', INSTANCE_ID),
+                            'httpClient.' . INSTANCE_ID,
                         )
                     );
                 }
@@ -527,11 +521,10 @@ class Kernel extends WebKernelAbstract
             'oidc.cache',
             $di->lazy(
                 function () use ($di) {
-                    return new SimpleCacheBridge(
-                        new ItemPool(
+                    return new Psr16Cache(
+                        new RedisAdapter(
                             $di->get('redis.cache'),
-                            new Base64(),
-                            new KeyGenerator(CacheHelper::BASE_CLIENT_KEY, INSTANCE_ID),
+                            CacheHelper::BASE_CLIENT_KEY . '.' . INSTANCE_ID,
                         )
                     );
                 }
@@ -543,11 +536,10 @@ class Kernel extends WebKernelAbstract
             'component.homepage.clickview.cache',
             $di->lazy(
                 function () use ($di) {
-                    return new SimpleCacheBridge(
-                        new ItemPool(
+                    return new Psr16Cache(
+                        new RedisAdapter(
                             $di->get('redis.cache'),
-                            new Base64(),
-                            new KeyGenerator('component.homepage.clickview', INSTANCE_ID),
+                            'component.homepage.clickview.' . INSTANCE_ID,
                         )
                     );
                 }
@@ -558,11 +550,10 @@ class Kernel extends WebKernelAbstract
             'paperly.cache',
             $di->lazy(
                 function () use ($di) {
-                    return new SimpleCacheBridge(
-                        new ItemPool(
+                    return new Psr16Cache(
+                        new RedisAdapter(
                             $di->get('redis.cache'),
-                            new Base64(),
-                            new KeyGenerator('paperly', INSTANCE_ID),
+                            'paperly.' . INSTANCE_ID,
                         )
                     );
                 }

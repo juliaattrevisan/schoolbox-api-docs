@@ -10,7 +10,7 @@ namespace Alaress\Application;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
-use Alaress\Codec\Json\Base64;
+use Alaress\Codec\MarshallerAdapter;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Connector\NullConnector;
 use Alaress\Database\Exception as AlaressDatabaseException;
@@ -20,8 +20,6 @@ use Alaress\Module\Cache as ModuleCache;
 use Alaress\Module\Loader as ModuleLoader;
 use Alaress\Module\Registry;
 use Alaress\Redis;
-use Alaress\Redis\Cache\ItemPool;
-use Alaress\Redis\Cache\KeyGenerator;
 use Alaress\Sentry\Tracing\GuzzleTracingMiddleware;
 use Alaress\Sentry\Tracing\Tracer;
 use Alaress\Session\Factory;
@@ -39,7 +37,6 @@ use Aura\Di;
 use Aura\Router\Generator;
 use Aura\Router\Map;
 use Aura\Router\RouterContainer;
-use Cache\Bridge\SimpleCache\SimpleCacheBridge;
 use Calendar\Api\ModuleChecker;
 use Calendar_Api_Factory;
 use Crell\ApiProblem\ApiProblem;
@@ -191,6 +188,8 @@ use Schoolbox\Weather\WeatherstackClient;
 use Scrub;
 use Sentry\SentrySdk;
 use SitePage;
+use Symfony\Component\Cache\Adapter\RedisAdapter;
+use Symfony\Component\Cache\Psr16Cache;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\RedisStore;
 use Throwable;
@@ -1789,11 +1788,10 @@ abstract class Kernel
             'httpClient.internalCache',
             $di->lazy(
                 function () use ($di) {
-                    return new SimpleCacheBridge(
-                        new ItemPool(
+                    return new Psr16Cache(
+                        new RedisAdapter(
                             $di->get('redis.cache'),
-                            new \Alaress\Codec\StringValue\Base64(),
-                            new KeyGenerator('httpClient', INSTANCE_ID),
+                            'httpClient.' . INSTANCE_ID,
                         )
                     );
                 }
@@ -2170,10 +2168,12 @@ abstract class Kernel
                 $redis = $di->get('redis.storage');
                 /** @var RegistrationRepositoryInterface $registrationRepository */
                 $registrationRepository = $di->get('lti.registrations');
-                return new ItemPool(
+
+                return new RedisAdapter(
                     $redis,
-                    new Codec(new ClientRepository($registrationRepository)),
-                    new KeyGenerator('accessToken', INSTANCE_ID),
+                    'accessToken.' . INSTANCE_ID,
+                    0,
+                    new MarshallerAdapter(new Codec(new ClientRepository($registrationRepository))),
                 );
             })
         );
@@ -2185,11 +2185,10 @@ abstract class Kernel
             'oidc.cache',
             $di->lazy(
                 function () use ($di) {
-                    return new SimpleCacheBridge(
-                        new ItemPool(
+                    return new Psr16Cache(
+                        new RedisAdapter(
                             $di->get('redis.cache'),
-                            new Base64(),
-                            new KeyGenerator(CacheHelper::BASE_CLIENT_KEY, INSTANCE_ID),
+                            CacheHelper::BASE_CLIENT_KEY . '.' . INSTANCE_ID,
                         )
                     );
                 }
@@ -2201,11 +2200,10 @@ abstract class Kernel
             'component.homepage.clickview.cache',
             $di->lazy(
                 function () use ($di) {
-                    return new SimpleCacheBridge(
-                        new ItemPool(
+                    return new Psr16Cache(
+                        new RedisAdapter(
                             $di->get('redis.cache'),
-                            new Base64(),
-                            new KeyGenerator('component.homepage.clickview', INSTANCE_ID),
+                            'component.homepage.clickview.' . INSTANCE_ID,
                         )
                     );
                 }
@@ -2216,11 +2214,10 @@ abstract class Kernel
             'paperly.cache',
             $di->lazy(
                 function () use ($di) {
-                    return new SimpleCacheBridge(
-                        new ItemPool(
+                    return new Psr16Cache(
+                        new RedisAdapter(
                             $di->get('redis.cache'),
-                            new Base64(),
-                            new KeyGenerator('paperly', INSTANCE_ID),
+                            'paperly.' . INSTANCE_ID,
                         )
                     );
                 }

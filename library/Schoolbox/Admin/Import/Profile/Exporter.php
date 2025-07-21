@@ -170,10 +170,10 @@ class Exporter
      * @param array  $columnSpec
      * @param Mapper $mapper    One of student/staff/parent/relationship mappers
      * @return false|string
+     * @phpstan-ignore-next-line - stream_get_contents can return false
      */
     private function exportProfile(string $type, array $columnSpec, Mapper $mapper)
     {
-
         /* Header row
          */
         $headings = array_keys($columnSpec);
@@ -198,13 +198,13 @@ class Exporter
 
             foreach ($columnSpec as $heading => $column) {
                 $method = null;
-                $value = '';
+                $value  = '';
 
                 /* Try getting the column value from the extension
                  */
                 try {
                     $method = $mapper->getGetMethodName($mapper->getPropertyFromColumn($column));
-                    $value = $profile->$method();
+                    $value  = $profile->$method();
                 } catch (\InvalidArgumentException $e) {
                     // noop: set as null
                 }
@@ -213,7 +213,7 @@ class Exporter
                  */
                 try {
                     $method = $this->baseProfileMapper->getGetMethodName($this->baseProfileMapper->getPropertyFromColumn($column));
-                    $value = $profile->getBaseProfile()->$method();
+                    $value  = $profile->getBaseProfile()->$method();
                 } catch (\InvalidArgumentException $e) {
                     // noop: set as null
                 }

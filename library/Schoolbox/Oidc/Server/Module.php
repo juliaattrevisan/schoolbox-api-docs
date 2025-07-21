@@ -15,7 +15,6 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Redis\Cache\ItemPool;
 use Alaress\Redis\Cache\KeyGenerator;
 use Alaress\Twig\Loader\IChainLoader;
-use Cache\Bridge\SimpleCache\SimpleCacheBridge;
 use DateInterval;
 use League\OAuth2\Server;
 use OpenIDConnectServer\ClaimExtractor;
@@ -28,6 +27,8 @@ use Schoolbox\Oidc\Server\RelyingParty\Mapper;
 use Schoolbox\Oidc\Server\Repository\Scope;
 use Schoolbox\Url\Factory;
 use Schoolbox\UserMapper;
+use Symfony\Component\Cache\Adapter\RedisAdapter;
+use Symfony\Component\Cache\Psr16Cache;
 
 /**
  * Module for OpenID Connect identity provision.
@@ -83,11 +84,10 @@ class Module extends BaseModule
 
         // Cache server-related data in storage:
         // auth codes, access tokens, etc. should be somewhat persistent
-        $cache = new SimpleCacheBridge(
-            new ItemPool(
+        $cache = new Psr16Cache(
+            new RedisAdapter(
                 $this->injector->get('redis.storage'),
-                new Base64(),
-                new KeyGenerator(CacheHelper::BASE_SERVER_KEY, INSTANCE_ID),
+                CacheHelper::BASE_SERVER_KEY . '.' . INSTANCE_ID,
             )
         );
 

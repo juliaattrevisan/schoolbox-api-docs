@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\API\Token\JwtParser\Test;
 
-use Cache\Adapter\PHPArray\ArrayCachePool;
 use Firebase\JWT\JWT;
 use GuzzleHttp\Client;
 use PHPUnit\Framework\TestCase;
@@ -18,7 +17,8 @@ use Schoolbox\API\Token\JwtParser\OauthProviderIssued;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Config\ArrayLoader;
 use Schoolbox\UserMapper;
-use SensitiveParameter;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\Psr16Cache;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\API\Token\JwtParser\OauthProviderIssued::class)]
 class OauthProviderIssuedTest extends TestCase
@@ -195,7 +195,7 @@ class OauthProviderIssuedTest extends TestCase
             $this->createMock(UserMapper::class),
             new ArrayLoader($config),
             $this->createMock(Client::class),
-            new ArrayCachePool(null),
+            new Psr16Cache(new ArrayAdapter()),
         );
     }
 

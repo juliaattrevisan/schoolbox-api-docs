@@ -99,7 +99,6 @@ class CacheHelper
      * @return string
      * @throws InvalidArgumentException if key set or OIDC discovery couldn't be
      *                                  written to or read from cache
-     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
     public function getToken(): string
     {
@@ -133,7 +132,6 @@ class CacheHelper
      * @return ?array [register,adminConfig]
      * @throws InvalidArgumentException if key set or OIDC discovery couldn't be
      *                                  written to or read from cache
-     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
     public function getRegisters(?string $registerCode = null, ?array $registersConfig = null): ?array
     {
@@ -186,7 +184,6 @@ class CacheHelper
      * @param string|null $reportingKey RecordCollection.reportingKey (optional)
      * @return array|null
      * @throws InvalidArgumentException
-     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
     public function getRecordCollections(int $registerId, ?string $reportingKey = null): ?array
     {
@@ -233,7 +230,6 @@ class CacheHelper
      * @return array|mixed
      * @throws InvalidArgumentException if key set or OIDC discovery couldn't be
      *                                  written to or read from cache
-     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
     public function getMetadataFields(int $registerId): mixed
     {
@@ -264,7 +260,6 @@ class CacheHelper
      * @return array|mixed
      * @throws InvalidArgumentException if key set or OIDC discovery couldn't be
      *                                  written to or read from cache
-     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
     public function getStudentDateRanges(int $registerId, string $externalId): mixed
     {
@@ -295,7 +290,6 @@ class CacheHelper
      * @return array|mixed
      * @throws InvalidArgumentException if key set or OIDC discovery couldn't be
      *                                  written to or read from cache
-     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
     public function getStudentFields(int $registerId, string $externalId): mixed
     {
@@ -325,7 +319,6 @@ class CacheHelper
      * @throws InvalidArgumentException if key set or OIDC discovery couldn't be
      *                                  written to or read from cache
      * @see                      self::getMetadataFields
-     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
     public function getDataSource(string $dataSourceUrl): mixed
     {
@@ -360,7 +353,6 @@ class CacheHelper
      * @return array|mixed
      * @throws InvalidArgumentException if key set or OIDC discovery couldn't be
      *                                  written to or read from cache
-     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
     public function getRecordCollectionsRecords(int $registerId, string $externalId, int $collectionId)
     {

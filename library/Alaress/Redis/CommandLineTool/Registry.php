@@ -10,10 +10,18 @@ declare(strict_types=1);
 namespace Alaress\Redis\CommandLineTool;
 
 use Alaress\Redis;
+use External\Isams\Register\CacheHelper as IsamsCacheHelper;
 use Schoolbox\Oidc\CacheHelper;
 
 class Registry
 {
+    /**
+     * Set key for old cache
+     *
+     * @deprecated This will eventually be removed
+     */
+    private const SET_KEY = '__set';
+
     /**
      * Template var for instance ID: this will match any instance ID in a Redis
      * key.
@@ -26,22 +34,17 @@ class Registry
     public const KEY_PATTERNS = [
         // Cache-only patterns go here
         Redis::INSTANCE_CACHE   => [
-            // Old and new scrub
-            '^scrub.html:',
-            '^scrub.htmlAbsoluteUri:',
+            // Ccrub
             '^fc:' . self::INSTANCE_ID_MATCH . ':scrub.html:',
             '^fc:' . self::INSTANCE_ID_MATCH . ':scrub.htmlAbsoluteUri:',
 
-            // Old and new Verso API
-            '^verso_api',
+            // Verso API
             '^fc:' . self::INSTANCE_ID_MATCH . ':verso_api:',
 
-            // Old and new external
-            "^External_.+",
+            // External
             '^fc:' . self::INSTANCE_ID_MATCH . ':External_',
 
-            // Old and new vCal cache
-            "^vcal.[0-9a-f]{64}",
+            // vCal cache
             "^vcal:" . self::INSTANCE_ID_MATCH . ":[0-9a-f]{64}",
 
             // Locks
@@ -57,22 +60,32 @@ class Registry
             // OIDC client cache, used for caching:
             // * OpenID configuration and JWKS responses from the configured
             //   oAuth/OIDC provider
+            CacheHelper::BASE_CLIENT_KEY . '\\.' . self::INSTANCE_ID_MATCH . ':' . IsamsCacheHelper::REGISTERS_CACHE_KEY,
+            CacheHelper::BASE_CLIENT_KEY . '\\.' . self::INSTANCE_ID_MATCH . ':',
+            // Old keys: will eventually be removed
             CacheHelper::BASE_CLIENT_KEY . ':' . self::INSTANCE_ID_MATCH . ':isams_registers',
-            CacheHelper::BASE_CLIENT_KEY . ':' . self::INSTANCE_ID_MATCH . ':' . Redis\Cache\ItemPool::SET_KEY,
+            CacheHelper::BASE_CLIENT_KEY . ':' . self::INSTANCE_ID_MATCH . ':' . self::SET_KEY,
             CacheHelper::BASE_CLIENT_KEY . ':' . self::INSTANCE_ID_MATCH . ':',
 
             // ClickView (Homepage Component) cache
+            'component\\.homepage\\.clickview\\.' . self::INSTANCE_ID_MATCH . ':',
+            // Old key
+            'component.homepage.clickview:' . self::INSTANCE_ID_MATCH . ':' . self::SET_KEY,
             'component.homepage.clickview:' . self::INSTANCE_ID_MATCH . ':',
 
             // Paperly cache
+            'paperly\\.' . self::INSTANCE_ID_MATCH . ':paperly_dashboard_user',
+            // Old key
             'paperly' . ':' . self::INSTANCE_ID_MATCH . ':paperly_dashboard_user',
-            'paperly' . ':' . self::INSTANCE_ID_MATCH . ':' . Redis\Cache\ItemPool::SET_KEY,
+            'paperly' . ':' . self::INSTANCE_ID_MATCH . ':' . self::SET_KEY,
 
             // Storage cache
             '^fc:' . self::INSTANCE_ID_MATCH . ':system_usage_',
 
             // HTTP client cache
-            'httpClient:' . self::INSTANCE_ID_MATCH . ':' . Redis\Cache\ItemPool::SET_KEY,
+            'httpClient\\.' . self::INSTANCE_ID_MATCH . ':',
+            // Old key
+            'httpClient:' . self::INSTANCE_ID_MATCH . ':' . self::SET_KEY,
             'httpClient:' . self::INSTANCE_ID_MATCH . ':',
         ],
         // Storage-only patterns go here
@@ -80,8 +93,7 @@ class Registry
             // Sessions
             '^PHPREDIS_SESSION:' . self::INSTANCE_ID_MATCH . ':',
 
-            // Old and new remember me
-            "^[0-9a-f]{40}$",
+            // Remember me
             "^remember:" . self::INSTANCE_ID_MATCH . ":[0-9a-f]{40}$",
 
             // Message instance, detailing the content of a message
@@ -114,6 +126,9 @@ class Registry
             "^schedule:" . self::INSTANCE_ID_MATCH . ":[0-9a-f]{40}",
 
             // Access tokens for LTI assessments
+            '^accessToken\\.' . self::INSTANCE_ID_MATCH . ':.+',
+            // Old key
+            '^accessToken:' . self::INSTANCE_ID_MATCH . ':' . self::SET_KEY,
             '^accessToken:' . self::INSTANCE_ID_MATCH . ':.+',
 
             // Etherpad patterns
@@ -137,7 +152,9 @@ class Registry
             // * access tokens
             // * nonces
             // * refresh tokens
-            CacheHelper::BASE_SERVER_KEY . ':' . self::INSTANCE_ID_MATCH . ':' . Redis\Cache\ItemPool::SET_KEY,
+            CacheHelper::BASE_SERVER_KEY . '\\.' . self::INSTANCE_ID_MATCH . ':',
+            // Old keys
+            CacheHelper::BASE_SERVER_KEY . ':' . self::INSTANCE_ID_MATCH . ':' . self::SET_KEY,
             CacheHelper::BASE_SERVER_KEY . ':' . self::INSTANCE_ID_MATCH . ':',
         ],
         // Queue patterns go here
