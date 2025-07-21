@@ -314,6 +314,79 @@ class Model implements ISoftDeletable, IThreadLocation
             }
         );
     }
+
+
+    /**
+     * Set a learning moment to Submitted status, along with its effector,
+     * ready for the next state transition to Published or Rejected
+     *
+     * @param User $effector
+     * @param \Alaress_Date_Format|null $now
+     * @return $this
+     */
+    public function submit(User $effector, \Alaress_Date_Format $now = null): self
+    {
+        // setSubmittedBy($effector)
+        // if ($now) setSubmittedAt($now)
+        // else setSubmittedAt(\Alaress_Date_Format::now())
+
+        // Treat as never being published
+        $this->publishedAt = null;
+        $this->publishedBy = null;
+
+        // Treat as never being rejected
+        $this->rejectedAt = null;
+        $this->rejectedBy = null;
+
+        return $this;
+    }
+
+
+    /**
+     * Set a learning moment to Published status, along with its effector
+     *
+     * @param User $effector
+     * @param \Alaress_Date_Format|null $now
+     * @return $this
+     */
+    public function publish(User $effector, \Alaress_Date_Format $now = null): self
+    {
+        // setPublishedBy($effector)
+        // if ($now) setPublishedAt($now)
+        // else setPublishedAt(\Alaress_Date_Format::now())
+
+        // Treat as never being rejected
+        $this->rejectedAt = null;
+        $this->rejectedBy = null;
+
+        return $this;
+    }
+
+
+    /**
+     * Set a learning moment to Rejected status, along with its effector
+     *
+     * @param User $effector
+     * @param \Alaress_Date_Format|null $now
+     * @return $this
+     */
+    public function reject(User $effector, \Alaress_Date_Format $now = null): self
+    {
+        // setRejectedBy($effector)
+        // if ($now) setRejectedAt($now)
+        // else setRejectedAt(\Alaress_Date_Format::now())
+
+        // Treat as never being published
+        $this->publishedAt = null;
+        $this->publishedBy = null;
+
+        return $this;
+    }
+
+
+    /* Getters/Setters
+     */
+
     /**
      * @return GenericCollection|null
      */
