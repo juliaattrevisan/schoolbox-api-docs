@@ -38,8 +38,8 @@ class StateTransitionTest extends TestCase
          */
         $moment->submit($jana, new \Alaress_Date_Format('2025-07-20 11:22:33', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        $this->assertEquals('2025-07-20 11:22:33', $moment->getSubmittedAt()->getDatabase());
-        $this->assertEquals($jana->getId(), $moment->getSubmittedBy()->getId());
+        $this->assertEquals('2025-07-20 11:22:33', $moment->getSubmittedAt()?->getDatabase());
+        $this->assertEquals($jana->getId(), $moment->getSubmittedBy()?->getId());
         $this->assertEquals(null, $moment->getPublishedAt());
         $this->assertEquals(null, $moment->getPublishedBy());
         $this->assertEquals(null, $moment->getRejectedAt());
@@ -49,10 +49,10 @@ class StateTransitionTest extends TestCase
          */
         $moment->publish($coles, new \Alaress_Date_Format('2025-07-21 22:33:44', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        $this->assertEquals('2025-07-20 11:22:33', $moment->getSubmittedAt()->getDatabase());
-        $this->assertEquals($jana->getId(), $moment->getSubmittedBy()->getId());
-        $this->assertEquals('2025-07-21 22:33:44', $moment->getPublishedAt()->getDatabase());
-        $this->assertEquals($coles->getId(), $moment->getPublishedBy()->getId());
+        $this->assertEquals('2025-07-20 11:22:33', $moment->getSubmittedAt()?->getDatabase());
+        $this->assertEquals($jana->getId(), $moment->getSubmittedBy()?->getId());
+        $this->assertEquals('2025-07-21 22:33:44', $moment->getPublishedAt()?->getDatabase());
+        $this->assertEquals($coles->getId(), $moment->getPublishedBy()?->getId());
         $this->assertEquals(null, $moment->getRejectedAt());
         $this->assertEquals(null, $moment->getRejectedBy());
 
@@ -60,20 +60,31 @@ class StateTransitionTest extends TestCase
          */
         $moment->reject($admin, new \Alaress_Date_Format('2025-07-23 01:04:27', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        $this->assertEquals('2025-07-20 11:22:33', $moment->getSubmittedAt()->getDatabase());
-        $this->assertEquals($jana->getId(), $moment->getSubmittedBy()->getId());
+        $this->assertEquals(null, $moment->getSubmittedAt()?->getDatabase());
+        $this->assertEquals(null, $moment->getSubmittedBy()?->getId());
         $this->assertEquals(null, $moment->getPublishedAt());
         $this->assertEquals(null, $moment->getPublishedBy()?->getId());
-        $this->assertEquals('2025-07-23 01:04:27', $moment->getRejectedAt()->getDatabase());
+        $this->assertEquals('2025-07-23 01:04:27', $moment->getRejectedAt()?->getDatabase());
         $this->assertEquals($admin->getId(), $moment->getRejectedBy()?->getId());
+
+        /* Resubmit it; thanks jana
+         */
+        $moment->submit($jana, new \Alaress_Date_Format('2025-07-24 01:02:09', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $this->assertEquals('2025-07-24 01:02:09', $moment->getSubmittedAt()?->getDatabase());
+        $this->assertEquals($jana->getId(), $moment->getSubmittedBy()?->getId());
+        $this->assertEquals(null, $moment->getPublishedAt());
+        $this->assertEquals(null, $moment->getPublishedBy());
+        $this->assertEquals(null, $moment->getRejectedAt());
+        $this->assertEquals(null, $moment->getRejectedBy());
 
         /* Publish it again by some other person
          */
         $moment->publish($jenni, new \Alaress_Date_Format('2025-07-24 13:13:13', \Alaress_Date_Format::DATABASE_FORMAT));
-        $this->assertEquals('2025-07-20 11:22:33', $moment->getSubmittedAt()->getDatabase());
-        $this->assertEquals($jana->getId(), $moment->getSubmittedBy()->getId());
-        $this->assertEquals('2025-07-24 13:13:13', $moment->getPublishedAt()->getDatabase());
-        $this->assertEquals($jenni->getId(), $moment->getPublishedBy()->getId());
+        $this->assertEquals('2025-07-24 01:02:09', $moment->getSubmittedAt()?->getDatabase());
+        $this->assertEquals($jana->getId(), $moment->getSubmittedBy()?->getId());
+        $this->assertEquals('2025-07-24 13:13:13', $moment->getPublishedAt()?->getDatabase());
+        $this->assertEquals($jenni->getId(), $moment->getPublishedBy()?->getId());
         $this->assertEquals(null, $moment->getRejectedAt());
         $this->assertEquals(null, $moment->getRejectedBy());
     }

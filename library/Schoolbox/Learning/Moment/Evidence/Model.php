@@ -394,12 +394,24 @@ class Model implements ISoftDeletable, IThreadLocation
             $this->setRejectedAt(\Alaress_Date_Format::now());
         }
 
+        // Treat as never being submitted (back to author to rework it)
+        $this->submittedAt = null;
+        $this->submittedBy = null;
+
         // Treat as never being published
         $this->publishedAt = null;
         $this->publishedBy = null;
 
         return $this;
     }
+
+    /* Convenient bools
+     */
+    public function isSubmitted(): bool
+    {
+        return $this->getSubmittedAt() !== null && $this->getSubmittedBy() !== null;
+    }
+
 
 
     /* Getters/Setters
