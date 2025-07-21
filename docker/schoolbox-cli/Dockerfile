@@ -1,9 +1,11 @@
 ARG ARCH=amd64
-ARG NVM_VERSION=0.40.3
-ARG AWS_CLI_VERSION=2.27.55
-ARG NODE_VERSION=20
 
 FROM --platform=linux/${ARCH} php82-bookworm
+
+ARG ARCH
+ARG NVM_VERSION='0.40.3'
+ARG AWS_CLI_VERSION='2.27.55'
+ARG NODE_VERSION=20
 
 # Install Intellischool CLI client, as per instructions on
 # https://docs.intellischool.co/guides/cli-quickstart#install-debian-ubuntu:
