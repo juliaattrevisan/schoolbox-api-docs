@@ -268,8 +268,9 @@ class Helper
 
 
     /**
-     * request (no streaming, returns full json payload)
-     * hits openAI and returns the string response (you need to json decode yourself...)
+     * Request hits OpenAI and returns the parsed response data
+     * Uses streaming if the payload has 'stream' set to true
+     * Will return the final json response for both streaming and non-streaming requests
      *
      * @param User $user // user to log the request against
      * @param string $payload // use this payload instead of generating one

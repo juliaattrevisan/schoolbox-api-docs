@@ -231,6 +231,12 @@ class Controller extends Base
                     ->setStatus($e->getCode())
                     ->asArray();
 
+                // If we've indicated that this is a streaming request, send it in the right format
+                if (headers_sent()) {
+                    echo sprintf("event: error\ndata: %s\n\n", json_encode($problem));
+                    return;
+                }
+
                 $this->response = $this->responseAsJson($problem)
                     ->withStatus($e->getCode());
 
