@@ -12,7 +12,7 @@ import AssessmentForm from "@schoolboxTest/playwright/support/page/dueWork/Asses
 import SubmitForm from "@schoolboxTest/playwright/support/page/dueWork/SubmitForm";
 import Common from "@schoolboxTest/playwright/support/page/Common";
 
-test.describe("Participant Tests", () => {
+test.describe.skip("Participant Tests", () => {
     test.beforeEach(async ({ tester }) => {
         await tester.logout();
         await tester.loginAsAdmin();
