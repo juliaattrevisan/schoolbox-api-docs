@@ -39,5 +39,7 @@ const feed = window.Vue.computed(() => {
 
     display: flex;
     flex-direction: column-reverse;
+    /* To prevent the list from scrolling if you click an input */
+    position: relative;
 }
 </style>
