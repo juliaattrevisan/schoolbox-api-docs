@@ -92,6 +92,7 @@ if ($_SESSION['communityLogin'] ?? false) {
     preg_match('/id="__EVENTVALIDATION" value="(.*?)"/', $login, $eventValidation);
     preg_match('/id="__VIEWSTATEGENERATOR" value="(.*?)"/', $login, $viewStateGenerator);
     preg_match('/id="__VIEWSTATEENCRYPTED" value="(.*?)"/', $login, $viewStateEncrypted);
+    preg_match('/name="__RequestVerificationToken" value="(.*?)"/', $login, $requestVerificationToken); // the AntiForgeryToken check was added in CommPortal version 71.62
     preg_match('/name="(.*?)" value="Login"/', $login, $loginButton);
     preg_match('/name="(.*?)" type="text"/', $login, $loginUsername);
     preg_match('/name="(.*?)" type="password"/', $login, $loginPassword);
@@ -116,6 +117,7 @@ if ($_SESSION['communityLogin'] ?? false) {
     $formArray['__LASTFOCUS'] = '';
     $formArray['__VIEWSTATEGENERATOR'] = $viewStateGenerator[1] ?? '';
     $formArray['__VIEWSTATEENCRYPTED'] = $viewStateEncrypted[1] ?? '';
+    $formArray['__RequestVerificationToken'] = $requestVerificationToken[1] ?? ''; // the AntiForgeryToken check was added in CommPortal version 71.62
     $formArray[$loginButton[1]] = 'Login';
     $formArray[$loginUsername[1]] = $user->getUsername();
     $formArray[$loginPassword[1]] = $password;
