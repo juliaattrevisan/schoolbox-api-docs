@@ -1,3 +1,9 @@
+type Image = {
+    b64: string;
+    name: string;
+    mime: "image/png"; // currently always PNG, but here if we want to support other formats in the future
+};
+
 export type ImageRequest = {
     type: "request";
     entryKey: number;
@@ -13,8 +19,8 @@ export type ImageResponseSuccess = {
     entryKey: number;
     /* the openai response ID so we can reference it in the next chat */
     responseId: string;
-    /* the image URL */
-    src: string;
+    /* the base64-encoded image */
+    image: Image | null;
     /* a message from the AI, if any */
     message: string;
 };
@@ -32,7 +38,7 @@ export type ImageResponseInProgress = {
     status: "in_progress";
     entryKey: `loading-${number}`;
     responseId: string | null;
-    src: string | null;
+    image: Image | null;
     message: string;
 };
 

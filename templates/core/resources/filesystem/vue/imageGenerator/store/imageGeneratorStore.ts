@@ -70,7 +70,7 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
             status: "in_progress",
             entryKey: `loading-${getNextEntryKey()}`,
             responseId: null,
-            src: null,
+            image: null,
             message: "",
         };
 
@@ -96,7 +96,11 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
             if (message.data.type === "response.created") {
                 activeGeneration.value.responseId = message.data.response.id;
             } else if (message.data.type === "response.image_generation_call.partial_image") {
-                activeGeneration.value.src = `data:image/png;base64,${message.data.partial_image_b64}`;
+                activeGeneration.value.image = {
+                    b64: message.data.partial_image_b64,
+                    name: "partial.png",
+                    mime: "image/png",
+                };
             } else if (message.data.type === "response.output_text.delta") {
                 activeGeneration.value.message += message.data.delta;
             }
@@ -149,7 +153,13 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
             status: "success",
             entryKey: getNextEntryKey(),
             responseId: response.data.response.id,
-            src: `data:image/png;base64,${outputImage.result}`,
+            image: outputImage.result
+                ? {
+                      b64: outputImage.result,
+                      name: "image.png",
+                      mime: "image/png",
+                  }
+                : null,
             message: outputContent.text,
         });
 
