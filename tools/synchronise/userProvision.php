@@ -137,6 +137,7 @@ $cleanup = function ($signo) use ($kernel) {
     exit;
 };
 pcntl_signal(SIGINT, $cleanup);
+/** @phpstan-ignore-next-line deadCode.unreachable */
 pcntl_signal(SIGTERM, $cleanup);
 pcntl_signal(SIGQUIT, $cleanup);
 $kernel->registerExceptionCallback($cleanup);
