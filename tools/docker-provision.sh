@@ -16,12 +16,14 @@ declare external_db_host
 declare external_db_db
 declare instance_registry_url
 declare default_instance_id
+declare artifact_source
 declare REQUIRED_CONFIGS=(\
   aws_account_id aws_role_name aws_start_url aws_bucket \
   data_source data_filename \
   external_db external_db_host external_db_db \
   instance_registry_url \
   default_instance_id \
+  artifact_source \
 )
 
 function verify_args() {
@@ -175,16 +177,18 @@ function init_composer_dependencies() {
       if [ $check -gt 0 ];
       then
           # Woo - we've located a matching cache file
+          log "Found matching vendor cache file '$vendorfile'";
           vendorfile=`grep $composerlocksha vendor.cache 2>/dev/null | head -n1 | cut -d' ' -f2-100`;
       else
           # No cache files match - boo hoo - check to see if there are new versions
+          log "No matching vendor cache file found: downloading";
           for branch in develop master;
           do
               # Check if we've already found a matching file
               if [ "$vendorfile" == '' ];
               then
                   local etag;
-                  etag=$(curl -I https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-vendor-php-dev.tar.gz 2>/dev/null | grep ETag | cut -d'"' -f2);
+                  etag=$(curl -I "https://${artifact_source}/$branch-vendor-php-dev.tar.gz" 2>/dev/null | grep ETag | cut -d'"' -f2);
                   if [ $? -eq 0 ];
                   then
                       local checketag;
@@ -192,8 +196,8 @@ function init_composer_dependencies() {
                       if [ $checketag -eq 0 ];
                       then
                           # New/updated version available - download it
-                          log "Downloading latest vendor build: $branch-vendor-php-dev.tar.gz";
-                          wget --no-verbose https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-vendor-php-dev.tar.gz -O $branch-vendor-php-dev.tar.gz 2>&1;
+                          log "Downloading latest vendor build artifact: $branch-vendor-php-dev.tar.gz";
+                          wget --no-verbose "https://${artifact_source}/$branch-vendor-php-dev.tar.gz" -O $branch-vendor-php-dev.tar.gz 2>&1;
                           if [ $? -eq 0 ];
                           then
                               # This is a new file, so remove old references
@@ -227,7 +231,7 @@ function init_composer_dependencies() {
           if [ -f "${cachedir}"/$vendorfile ];
           then
               # Extract content
-              log "Found matching vendor cache file '$vendorfile', now extracting";
+              log "Extracting vendor cache file '$vendorfile'";
               rm -fR "$SITE_ROOT"/vendor 2>/dev/null;
               tar xzf "${cachedir}"/$vendorfile;
           else
