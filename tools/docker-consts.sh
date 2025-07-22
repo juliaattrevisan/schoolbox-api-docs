@@ -7,6 +7,9 @@ readonly LOG=/usr/bin/alaress-logger
 readonly L_INFO=200;
 readonly L_WARN=300;
 readonly L_ERROR=400;
+
+# Currently this cache is shared between Docker and Vagrant:
+# keep using the Vagrant cache dir for now
 readonly cachedir="$SITE_ROOT"/vagrantcache;
 
 function log(){
