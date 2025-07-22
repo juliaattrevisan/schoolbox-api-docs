@@ -285,7 +285,7 @@ class IndexBuilder extends BaseBuilder
         } elseif ($subject instanceof Component_Config) {
             $searchIndexQueryString .= ' AND identifier LIKE :componentIdentifier';
             $searchIndexParams['componentIdentifier'] = '%-' . $subject->getInstanceId() . '-%';
-        } else {
+        } elseif ($subject !== null) {
             return;
         }
         $searchIndexQuery = $this->connector->prepareQuery($searchIndexQueryString);
@@ -308,9 +308,10 @@ class IndexBuilder extends BaseBuilder
             AND   ccd.key   = :key
         ");
         $componentExistsCache = [];
+        $nIndicesRemoved = 0;
 
         $searchIndexQuery->execute($searchIndexParams);
-        $this->logger->info(sprintf('Examining and cleaning up %d text box search indices', $searchIndexQuery->rowCount()));
+        $this->logger->info(sprintf('Examining %d text box search indices', $searchIndexQuery->rowCount()));
         foreach ($searchIndexQuery->fetchColumnArray('identifier') as $identifier) {
             $removeIndex = false;
             [$textboxId, $componentId] = explode('-', $identifier);
@@ -373,8 +374,11 @@ class IndexBuilder extends BaseBuilder
                     null,
                     null,
                 );
+                $nIndicesRemoved++;
             }
         }
+
+        $this->logger->info("Deleting search indices for $nIndicesRemoved textboxes");
     }
 
     /**
