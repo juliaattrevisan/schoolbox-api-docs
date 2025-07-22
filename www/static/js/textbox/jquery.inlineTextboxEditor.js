@@ -223,7 +223,7 @@
                     maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
                     targetElements: ["#" + editorInstanceId],
                     fileBrowserCategoryId: self.fileBrowserCategoryId,
-                    templates: self.editorTemplates,
+                    ...(self.editorTemplates && { templates: self.editorTemplates }),
                 },
             }),
         );
