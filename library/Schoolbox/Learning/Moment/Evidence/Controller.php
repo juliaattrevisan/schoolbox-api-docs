@@ -320,12 +320,23 @@ class Controller extends Base
         // * upload
         $momentType = $evidence->getType();
         $template   = $this->getTemplateFromType($momentType);
+
+        /* Students get their learning moment moderation requirement tested;
+         * parents and teachers bypass this check
+         */
+        $moderationRequired = false;
+
+        if ($this->getUser()->getRole()->isStudent()) {
+            $moderationRequired = (new ModerationRequired())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED), $this->getUser()->getYear());
+        }
+
         $params     = [
             'users'                    => $evidence->getRecipient(),
             'userIds'                  => $evidence->getRecipient()->getId(),
             'otherUsers'               => [],
             'sharingForSelf'           => $this->getUser() === $evidence->getRecipient(),
             'curriculumTaggingEnabled' => $this->curriculumTaggingEnabled(),
+            'moderationRequired'       => $moderationRequired,
             'isCreate'                 => false,
             'momentType'               => $momentType,
             'curriculumCodes'          => $evidence->getViewableCurriculumNodes()?->reindex(),
