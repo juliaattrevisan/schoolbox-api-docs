@@ -4,39 +4,46 @@ import type { ImageResponse } from "./imageGeneratorTypes";
 
 interface Props {
     /**
-     * The message to display, null to show the loading state
+     * The message to display
      */
-    message: ImageResponse | null;
+    message: ImageResponse;
 }
 
 const props = defineProps<Props>();
 const igStore = useImageGeneratorStore();
 
 const radioId = window.Vue.computed(() => {
-    return `ig-feed-response-${props.message ? props.message.entryKey : "loading"}`;
+    return `ig-feed-response-${props.message.entryKey}`;
 });
 </script>
 
 <template>
-    <div class="ig-feed-response radiolist">
+    <div v-if="props.message.status === 'in_progress'" class="ig-feed-response">
+        <div class="loader"></div>
+        <div>
+            <img v-if="props.message.src" :src="props.message.src" />
+
+            <p
+                class="l-mar--0-bottom ig-feed-message-content"
+                :class="{ 'ig-feed-message-loading': !props.message.src, 'l-mar-s--top': props.message.src }"
+            >
+                {{ props.message.message.length === 0 ? "Generating... Please wait" : props.message.message }}
+            </p>
+        </div>
+    </div>
+
+    <div v-else class="ig-feed-response radiolist">
         <input
             :id="radioId"
             v-model="igStore.selectedFeedEntry"
             type="radio"
             :name="radioId"
-            :value="props.message?.entryKey ?? null"
-            :disabled="props.message?.status !== 'success' || undefined"
+            :value="props.message.entryKey"
+            :disabled="props.message.status !== 'success' || undefined"
         />
         <label :for="radioId"> </label>
 
-        <div v-if="props.message === null">
-            <div style="width: 200px">
-                <div class="loader"></div>
-            </div>
-            <p class="l-mar--0-bottom l-mar-s--top">Generating image... Please wait</p>
-        </div>
-
-        <div v-else-if="props.message.status === 'error'" class="alert-box alert l-mar--0">
+        <div v-if="props.message.status === 'error'" class="alert-box alert l-mar--0">
             <b>There was a problem generating the image.</b>
             {{ props.message.message }}
         </div>
@@ -48,7 +55,7 @@ const radioId = window.Vue.computed(() => {
                 </nav>
                 <img :src="props.message.src" />
             </div>
-            <p v-if="props.message.message" class="l-mar--0-bottom l-mar-s--top ig-feed-message-content">
+            <p class="l-mar--0-bottom l-mar-s--top ig-feed-message-content">
                 {{ props.message.message }}
             </p>
         </div>
@@ -77,6 +84,16 @@ const radioId = window.Vue.computed(() => {
             color: white;
             background-color: rgba(0, 0, 0, 0.6);
         }
+    }
+
+    .loader {
+        width: 1.5rem;
+        height: 1.5rem;
+        margin: 0 0.5rem 0 0;
+    }
+
+    .ig-feed-message-loading {
+        margin-top: 0.125rem;
     }
 
     .ig-feed-message-content {

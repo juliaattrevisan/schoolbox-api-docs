@@ -9,10 +9,9 @@ const feed = window.Vue.computed(() => {
     /** To get scrolling to happen automatically, we must use flex-direction: column-reverse and reverse the list here */
     const reversedFeed = igStore.feed.slice().reverse();
 
-    /** Is it generating? Add an empty entry */
-    if (igStore.isGenerating) {
-        const loadingEntry = { type: "loading", entryKey: reversedFeed.length + 1 } as const;
-        return [loadingEntry, ...reversedFeed];
+    /** Is it generating? Add the partial entry to the bottom of the feed */
+    if (igStore.activeGeneration !== null) {
+        return [igStore.activeGeneration, ...reversedFeed];
     }
 
     return reversedFeed;
@@ -25,8 +24,7 @@ const feed = window.Vue.computed(() => {
             <br v-if="index > 0" />
 
             <ig-feed-request v-if="message.type === 'request'" :message="message" />
-            <ig-feed-response v-else-if="message.type === 'response'" :message="message" />
-            <ig-feed-response v-else-if="message.type === 'loading'" :message="null" />
+            <ig-feed-response v-else :message="message" />
         </template>
     </div>
 </template>

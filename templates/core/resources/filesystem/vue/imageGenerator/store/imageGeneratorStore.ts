@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import type { AiFeedMessage, ImageResponseSuccess } from "../imageGeneratorTypes";
+import type { AiFeedMessage, ImageResponseInProgress } from "../imageGeneratorTypes";
 import { generateImage } from "./imageGeneratorPayload";
 import type { ImageGeneratorApiPayload } from "./imageGeneratorPayload";
 
@@ -7,7 +7,7 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
     const feed = window.Vue.ref<AiFeedMessage[]>([]);
     const generateRoute = window.Vue.ref<string | null>(null);
 
-    const isGenerating = window.Vue.ref<boolean>(false);
+    const activeGeneration = window.Vue.ref<ImageResponseInProgress | null>(null);
 
     const selectedFeedEntry = window.Vue.ref<AiFeedMessage["entryKey"] | null>(null);
 
@@ -30,15 +30,16 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
         return responses[responses.length - 1].responseId;
     }
 
+    const currentEntryKey = window.Vue.ref<number>(0);
+
     /**
-     * @returns The next entry key for adding a new item to the feed
+     * Any new entry in the feed must have a unique entry key
+     * This ensures that Vue can keep track of each individual entry correctly
+     * @returns The next entry key
      */
     function getNextEntryKey(): number {
-        const responses = feed.value.filter((item) => "entryKey" in item).filter((item) => item.entryKey !== null);
-        if (responses.length === 0) {
-            return 1;
-        }
-        return responses[responses.length - 1].entryKey + 1;
+        currentEntryKey.value += 1;
+        return currentEntryKey.value;
     }
 
     /**
@@ -47,15 +48,13 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
      * @returns whether the request was sent successfully or not
      */
     async function sendRequest(payload: ImageGeneratorApiPayload): Promise<boolean> {
-        if (isGenerating.value) {
+        if (activeGeneration.value !== null) {
             return false;
         }
 
         if (generateRoute.value === null) {
             throw new Error("generateRoute is not set");
         }
-
-        isGenerating.value = true;
 
         feed.value.push({
             type: "request",
@@ -66,61 +65,48 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
             previousResponseId: payload.previousResponseId,
         });
 
-        let responseEntry: ImageResponseSuccess | null = null;
+        activeGeneration.value = {
+            type: "response",
+            status: "in_progress",
+            entryKey: `loading-${getNextEntryKey()}`,
+            responseId: null,
+            src: null,
+            message: "",
+        };
 
+        let hasErrored = false;
         const response = await generateImage(generateRoute.value, payload, (message) => {
             if (message.success === false) {
-                // TODO
-                console.error(message);
-                isGenerating.value = false;
+                hasErrored = true;
+                activeGeneration.value = null;
+                feed.value.push({
+                    type: "response",
+                    status: "error",
+                    entryKey: getNextEntryKey(),
+                    responseId: null,
+                    message: message.message,
+                });
+                return;
+            }
+
+            if (activeGeneration.value === null) {
                 return;
             }
 
             if (message.data.type === "response.image_generation_call.partial_image") {
-                const newSrc = `data:image/png;base64,${message.data.partial_image_b64}`;
-
-                if (responseEntry === null) {
-                    const newResponseEntry: ImageResponseSuccess = {
-                        type: "response",
-                        status: "success",
-                        entryKey: getNextEntryKey(),
-                        responseId: message.data.item_id,
-                        src: newSrc,
-                        message: "",
-                    };
-
-                    responseEntry = newResponseEntry;
-                    feed.value.push(newResponseEntry);
-                } else {
-                    const newResponseEntry = {
-                        ...responseEntry,
-                        entryKey: getNextEntryKey(),
-                        src: newSrc,
-                    };
-
-                    responseEntry = newResponseEntry;
-                    feed.value.pop();
-                    feed.value.push(newResponseEntry);
-                }
+                activeGeneration.value.src = `data:image/png;base64,${message.data.partial_image_b64}`;
             } else if (message.data.type === "response.output_text.delta") {
-                if (responseEntry === null || responseEntry.message === null) {
-                    // TODO
-                    throw new Error("no response entry yet");
-                }
-
-                const newResponseEntry = {
-                    ...responseEntry,
-                    entryKey: getNextEntryKey(),
-                    message: `${responseEntry.message}${message.data.delta}`,
-                };
-
-                responseEntry = newResponseEntry;
-                feed.value.pop();
-                feed.value.push(newResponseEntry);
+                activeGeneration.value.message += message.data.delta;
             }
         });
 
-        isGenerating.value = false;
+        activeGeneration.value = null;
+
+        if (hasErrored) {
+            // Already handled in the onMessage callback
+            return false;
+        }
+
         if (response.success === false) {
             feed.value.push({
                 type: "response",
@@ -172,7 +158,7 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
     return {
         init,
         feed,
-        isGenerating,
+        activeGeneration,
         getPreviousResponseId,
         sendRequest,
         selectedFeedEntry,
