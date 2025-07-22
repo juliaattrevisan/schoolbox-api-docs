@@ -1,17 +1,55 @@
 #!/usr/bin/env bash
 # Provisions the Docker environment: port of `vagrant-provision.sh`
 
-# Global constants and functions
-source /usr/share/schoolbox/tools/docker-consts.sh
+function verify_args() {
+  ((return=0))
+  for var in "$@"; do
+    if [[ -v ${var} ]]; then
+      log "${var}: ${!var}";
+    else
+      warn "${var} is not defined"
+      return=1
+    fi
+  done
+  return $return
+}
 
-# Global vars: consider reading from YAML directly, instead of from args.
-# Also consider using an .env or .ini file?
-source "${SITE_ROOT}/docker.default.ini"
-if [ -f "${SITE_ROOT}/docker.ini" ]; then
-  source "${SITE_ROOT}/docker.ini"
-fi
+function load_consts() {
+  # Load global constants and functions
+  source /usr/share/schoolbox/tools/docker-consts.sh
 
-# TODO verify presence of args
+  log "Verifying constants:"
+  verify_args SITE_ROOT cachedir
+  return $?
+}
+
+function load_config() {
+  # Global vars: load from .ini files
+  source "${SITE_ROOT}/docker.default.ini"
+  if [ -f "${SITE_ROOT}/docker.ini" ]; then
+    source "${SITE_ROOT}/docker.ini"
+  fi
+
+  log "Verifying configuration:"
+  verify_args aws_account_id aws_role_name aws_start_url aws_bucket
+
+  log "Verifying data source configuration:"
+  verify_args data_source data_filename
+
+  log "Verifying external DB configuration:"
+  verify_args external_db external_db_host external_db_db
+
+  log "Verifying instance registry configuration:"
+  verify_args instance_registry_url
+
+  log "Verifying default instance configuration:"
+  verify_args default_instance_id
+}
+
+load_consts
+load_config
+exit
+
 
 # Setup AWS CLI: copied from `vagrant-provision-pre-puppet.sh`
 function version_gte() {
@@ -47,55 +85,6 @@ function setup_aws_sso() {
 }
 setup_aws_sso
 
-# Global vars
-# Defaults
-
-#if [[ $# -ne 12 ]]; then
-#  error "Script requires 12 params, found $#"
-#  exit 1
-#fi
-#
-## Get options
-#if [ ! -z $1 ]; then data_source=$1; else echo "Please provide data_source"; exit 1; fi;
-#if [ ! -z $2 ]; then
-#    data_filename=$2;
-#else
-#    echo "Please provide data_filename";
-#    exit 1;
-#fi;
-#if [ ! -z $3 ]; then external_db=$3; fi;
-#if [ ! -z $4 ]; then external_db_host=$4; fi;
-#if [ ! -z $5 ]; then external_db_db=$5; fi;
-#if [ ! -z $6 ]; then enable_xdebug=$6; fi;
-#if [ ! -z $7 ]; then instance_id_env_var=$7; fi;
-#if [ -n "$8" ] && [[ "$8" != '0' ]] && [[ "$8" != 'false' ]]; then force_upgrade=1; fi;
-#if [ -n "$9" ]; then instance_registry_url="$9"; fi;
-#extra_hostname=${10}
-#phpversion_supported="${11}"
-#if [[ -z $phpversion_supported ]]; then
-#  echo "You must declare desired PHP major version via script arg" >&2
-#  exit 1
-#fi
-#taskd_build_from_local="${12}";  # Valid values: ['0'|'1']
-#if [[ $taskd_build_from_local != "0" ]] && [[ $taskd_build_from_local != "1" ]]; then
-#  error " Invalid 'taskd_build_from_local' value. Expected ['0','1']. Found: $taskd_build_from_local";
-#  exit 1
-#fi
-#
-#if ! which nvm; then
-#  echo "[SB][$(date +%Y-%m-%d\ %X)] Installing nvm"
-#  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-#  sudo -u vagrant bash -c 'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash'
-#fi
-#sudo -u vagrant bash -c "source /home/vagrant/.nvm/nvm.sh && nvm install ${node_version} && nvm use ${node_version}"
-#source /root/.nvm/nvm.sh && nvm install ${node_version} && nvm use ${node_version}
-## Does this environment use the systemd-wrapped taskd service?
-#declare taskd_systemd_service_installed
-#if [[ $taskd_build_from_local == "0" ]];then
-#  taskd_systemd_service_installed="1"
-#else
-#  taskd_systemd_service_installed="0"
-#fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Setting up Docker environment with options:";
 echo "[SB][`date +%Y-%m-%d\ %X`] Data Source: $data_source";
@@ -226,7 +215,7 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Installing instance via 'schoolbox-data-refresh
 # execution (by making calls to site_down.sh/site_up.sh).
 # (The site_down.sh/site_up.sh scripts update the database, so site_down.sh cannot be run until the database has been
 #  created.)
-if ! INSTANCE_ID=docker schoolbox-data-refresh \
+if ! INSTANCE_ID="${default_instance_id}" schoolbox-data-refresh \
 --data-source "$data_source" \
 --dataset "$data_filename" \
 --skip-bucket-copy \
@@ -280,7 +269,7 @@ if ! INSTANCE_ID=docker schoolbox-data-refresh \
 fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Putting system in maintenance mode";
-if INSTANCE_ID=docker "$SITE_ROOT"/tools/maintenance/site_down.sh -eq 0 ; then
+if INSTANCE_ID="${default_instance_id}" "$SITE_ROOT"/tools/maintenance/site_down.sh -eq 0 ; then
   echo "[SB][`date +%Y-%m-%d\ %X`] Maintenance mode enabled on instance 'docker'."
 else
   echo "[SB][`date +%Y-%m-%d\ %X`] Could not enable maintenance mode on instance 'docker'.  Exiting."
@@ -293,7 +282,7 @@ mariadb -h mariadb -u root -D schoolbox < "${cachedir}/vagrant-secrets.sql"
 
 # Set ENV VARs for root + vagrant users from vagrant.yaml params
 declare -A env_vars=(
-  [INSTANCE_ID]="$instance_id_env_var"
+  [INSTANCE_ID]="${default_instance_id}"
 )
 for config_name in "${!env_vars[@]}"; do
   config_value=${env_vars[$config_name]}
