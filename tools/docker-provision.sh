@@ -1,7 +1,28 @@
 #!/usr/bin/env bash
 # Provisions the Docker environment: port of `vagrant-provision.sh`
 
-REQUIRED_CONSTS=(SITE_ROOT cachedir)
+declare SITE_ROOT
+declare cachedir
+declare REQUIRED_CONSTS=(SITE_ROOT cachedir)
+
+declare aws_account_id
+declare aws_role_name
+declare aws_start_url
+declare aws_bucket
+declare data_source
+declare data_filename
+declare external_db
+declare external_db_host
+declare external_db_db
+declare instance_registry_url
+declare default_instance_id
+declare REQUIRED_CONFIGS=(\
+  aws_account_id aws_role_name aws_start_url aws_bucket \
+  data_source data_filename \
+  external_db external_db_host external_db_db \
+  instance_registry_url \
+  default_instance_id \
+)
 
 function verify_args() {
   local return=1
@@ -57,27 +78,7 @@ function load_config() {
   local return=1
 
   log "Verifying configuration:"
-  verify_args aws_account_id aws_role_name aws_start_url aws_bucket
-  if [ $? -eq 0 ]; then return=0; fi;
-  echo ""
-
-  log "Verifying data source configuration:"
-  verify_args data_source data_filename
-  if [ $? -eq 0 ]; then return=0; fi;
-  echo ""
-
-  log "Verifying external DB configuration:"
-  verify_args external_db external_db_host external_db_db
-  if [ $? -eq 0 ]; then return=0; fi;
-  echo ""
-
-  log "Verifying instance registry configuration:"
-  verify_args instance_registry_url
-  if [ $? -eq 0 ]; then return=0; fi;
-  echo ""
-
-  log "Verifying default instance configuration:"
-  verify_args default_instance_id
+  verify_args "${REQUIRED_CONFIGS[@]}"
   if [ $? -eq 0 ]; then return=0; fi;
   echo ""
 
@@ -119,8 +120,6 @@ function setup_aws_sso() {
 }
 
 function main() {
-  log "Setting up Docker environment...";
-
   load_consts
   if [ $? -eq 0 ]; then
     error "Not all required consts defined: exiting"
