@@ -14,6 +14,7 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\API\Translator\ModelToArray\Composite;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Discussion\Comment;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Moment\Evidence\Moderation\ModerationRequired;
@@ -112,7 +113,7 @@ class Controller extends Base
         $moderationRequired = false;
 
         if ($this->getUser()->getRole()->isStudent()) {
-            $moderationRequired = (new ModerationRequired())->isSatisfiedBy($this->getConfigLoader()->get('learning_moments_moderation_enabled'), $this->getUser()->getYear());
+            $moderationRequired = (new ModerationRequired())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED), $this->getUser()->getYear());
         }
 
         $params = [
@@ -259,7 +260,7 @@ class Controller extends Base
          * you'll end up with an $evidenceCollection of mixed results; some will
          * submit and publish immediately whilst some end up in a moderation queue.
          */
-        $globalConfig = (bool)$this->getConfigLoader()->get('learning_moments_moderation_enabled');
+        $globalConfig = (bool)$this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED);
         $moderationRequired = new ModerationRequired();
 
         $requestBody = $this->request->getParsedBody();
