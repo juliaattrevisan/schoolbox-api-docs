@@ -327,11 +327,11 @@ class ListController extends Web\Controller\Base
             if ($context instanceof \Schoolbox\ISoftDeletable && $context->isDeleted()) {
                 $this->sendError('Course and/or units were invalid; they might have been deleted.', [], 400, $e->getCode());
             } else {
-                $this->sendError('Could not save assessment. ', [$e->getMessage()], 400, $e->getCode());
+                $this->sendError('Could not save activity. ', [$e->getMessage()], 400, $e->getCode());
             }
             return;
         } catch (DomainException $e) {
-            $this->sendError('Could not save assessment. ', [$e->getMessage()], 400, $e->getCode());
+            $this->sendError('Could not save activity. ', [$e->getMessage()], 400, $e->getCode());
             return;
         }
     }
@@ -669,7 +669,7 @@ class ListController extends Web\Controller\Base
                 $sourceAssessment = $this->getAssessmentMapper()->findById($postData['customisedFor']);
 
                 if (0 === strcasecmp($sourceAssessment->getTitle(), $postData['title'])) {
-                    throw new \InvalidArgumentException('The activity can not have the same name as the original activity.');
+                    throw new \InvalidArgumentException('The activity can not have the same title as the original activity');
                 }
 
                 /* Excluding the participant from the original assessment when assigned to another assessment
