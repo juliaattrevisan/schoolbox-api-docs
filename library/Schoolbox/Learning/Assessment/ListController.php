@@ -326,11 +326,11 @@ class ListController extends Web\Controller\Base
             if ($context instanceof \Schoolbox\ISoftDeletable && $context->isDeleted()) {
                 $this->sendError('Course and/or units were invalid; they might have been deleted.', [], 400, $e->getCode());
             } else {
-                $this->sendError('Could not save assessment. ', [$e->getMessage()], 400, $e->getCode());
+                $this->sendError('Could not save activity. ', [$e->getMessage()], 400, $e->getCode());
             }
             return;
         } catch (DomainException $e) {
-            $this->sendError('Could not save assessment. ', [$e->getMessage()], 400, $e->getCode());
+            $this->sendError('Could not save activity. ', [$e->getMessage()], 400, $e->getCode());
             return;
         }
     }

@@ -674,7 +674,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 $assessment
             );
         } catch (DomainException | InvalidArgumentException $e) {
-            $this->sendError('Could not save assessment. ', [$e->getMessage()]);
+            $this->sendError('Could not save activity. ', [$e->getMessage()]);
 
             /* Return Early to let mage deal with error messages
              */
