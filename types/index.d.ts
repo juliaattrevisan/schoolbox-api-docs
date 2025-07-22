@@ -15,6 +15,11 @@ import type { injectScriptsIfNotLoaded } from "@js/util/domUtils";
 import type { Toast } from "@schoolboxVue/components/toast/sbxToastTypes";
 import type { SbxGlobalDocumentEventHandlerMap, SbxGlobalElementEventHandlerMap } from "./sbxEvents";
 
+type Dropzone = {
+    addFile(file: File): void;
+    isValidFile(file: File, acceptedFiles: string): boolean;
+};
+
 declare global {
     interface Window {
         cdnPrefix: string;
@@ -29,6 +34,7 @@ declare global {
             on: (eventName: "click", callback: (href: string) => void) => void;
         };
         jQuery: JQueryStatic;
+        Dropzone: Dropzone;
         sbProps: {
             ckeditor5LicenseKey: string;
             iframelyLicenseKey: string;
@@ -104,9 +110,7 @@ declare global {
          * From jquery.resourceAttach.js
          */
         data(key: "plugin_resourceAttach"): {
-            dropzone: {
-                addFile(file: File): void;
-            };
+            dropzone: Dropzone;
         };
     }
 

@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { useTemplateRefsList } from "@vueuse/core";
+import FileDrop from "@js/resource/file-drop.vue";
 import { useImageGeneratorStore } from "./store/imageGeneratorStore";
 import type { ImagePromptAttribute } from "./imageGeneratorTypes";
 
@@ -50,6 +51,18 @@ async function sendRequest(): Promise<void> {
 </script>
 
 <template>
+    <file-drop
+        id="ig-prompt-file-drop"
+        placeholder="Click or drag here to add an image prompt"
+        accept="image/*"
+        :file-handler="
+            (file) => {
+                console.log('File dropped:', file);
+                return true;
+            }
+        "
+    />
+
     <label>
         <textarea
             ref="promptRef"
