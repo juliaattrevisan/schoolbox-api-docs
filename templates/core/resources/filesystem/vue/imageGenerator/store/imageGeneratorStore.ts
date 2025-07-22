@@ -120,8 +120,6 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
             }
         });
 
-        // const response = await generateImage(generateRoute.value, payload);
-
         isGenerating.value = false;
         if (response.success === false) {
             feed.value.push({
@@ -134,11 +132,36 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
             return false;
         }
 
+        const outputImage = response.data.response.output.filter((item) => item.type === "image_generation_call")[0];
+        const outputMessage = response.data.response.output.filter((item) => item.type === "message")[0];
+        const outputContent = outputMessage?.content[0] ?? null;
+
+        if (outputImage === null) {
+            throw new Error("No output image found in response");
+        }
+
+        if (outputContent === null) {
+            throw new Error("No output content found in response");
+        }
+
+        if (outputContent.type === "refusal") {
+            feed.value.push({
+                type: "response",
+                status: "error",
+                entryKey: getNextEntryKey(),
+                responseId: response.data.response.id,
+                message: outputContent.refusal,
+            });
+            return false;
+        }
+
         feed.value.push({
             type: "response",
             status: "success",
             entryKey: getNextEntryKey(),
-            ...response.data,
+            responseId: response.data.response.id,
+            src: `data:image/png;base64,${outputImage.result}`,
+            message: outputContent.text,
         });
 
         selectedFeedEntry.value = feed.value[feed.value.length - 1].entryKey;

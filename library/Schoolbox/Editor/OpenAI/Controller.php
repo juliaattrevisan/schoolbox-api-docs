@@ -225,7 +225,7 @@ class Controller extends Base
             );
 
             try {
-                $data = $helper->request($this->getUser(), $payload);
+                $helper->request($this->getUser(), $payload);
             } catch (SchoolboxException $e) {
                 $problem = (new ApiProblem($e->getMessage()))
                     ->setStatus($e->getCode())
@@ -243,20 +243,6 @@ class Controller extends Base
                 return;
             }
 
-            /* Find the final image call/message data in the response
-             */
-            $outputImage = array_values(array_filter($data['output'], fn($item) => $item['type'] === 'image_generation_call'))[0] ?? null;
-            $outputMessage = array_values(array_filter($data['output'], fn($item) => $item['type'] === 'message'))[0] ?? null;
-
-            $outputMessageContent = $outputMessage
-                ? (array_values(array_filter($outputMessage['content'], fn($item) => $item['type'] === 'output_text'))[0]['text'] ?? null)
-                : null;
-
-            echo sprintf("event: complete\ndata: %s\n\n", json_encode([
-                'responseId' => $data['id'],
-                'src' => sprintf("data:image/png;base64,%s", $outputImage['result']),
-                'message' => $outputMessageContent,
-            ]));
             return;
         } catch (\DomainException $e) {
             /* Not configured? Not found

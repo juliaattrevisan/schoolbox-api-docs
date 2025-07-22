@@ -54,6 +54,13 @@ interface SseApiRequestOptions<TMessageData, TBody extends ApiRequestBodyBase | 
      * The callback to handle each message from the server
      */
     onMessage: SseMessageCallback<TMessageData>;
+    /**
+     * The expected type of the final response
+     * This will determine when the stream terminates and should have the final response included
+     * If the request terminates without this, an error will be returned
+     * @default "complete"
+     */
+    finalEventName?: string;
 }
 
 /**
@@ -230,7 +237,7 @@ export async function apiRequest<TResponseData, TBody extends ApiRequestBodyBase
  * Generic function to make an API request to the server
  * Validates that the response matches our expected format
  * API errors should follow RFC 9457 "API Problem"
- * Requires the final message to be a "complete" event which will terminate the stream
+ * Requires the final message to match options.finalEventName, which will terminate the stream
  * @template TMessageData - The type of the response from the server for each message
  * @template TResponseData - The type of the response from the server for the final message
  * @template TBody - The type of the request body
@@ -298,8 +305,8 @@ export async function sseApiRequest<
             if (rawEvent) {
                 const { eventName, data } = parseSseEvent(rawEvent);
 
-                if (eventName === "complete") {
-                    // If the server sends a "complete" event, close the stream
+                if (eventName === (options.finalEventName ?? "complete")) {
+                    // If the server sends the final event, close the stream
                     finalResponseData = data;
                     break;
                 }
@@ -313,7 +320,7 @@ export async function sseApiRequest<
         buffer = events[events.length - 1];
     }
 
-    // If the stream ended as "done" but we didn't get a "complete" event,
+    // If the stream ended as "done" but we didn't get the final event,
     // something went wrong and we should return an unknown failure
     if (finalResponseData === undefined) {
         const failureResponse: ApiBaseResponseUnknownFailure = {
@@ -325,7 +332,7 @@ export async function sseApiRequest<
         return failureResponse;
     }
 
-    // Otherwise, we got a "complete" event, so stop reading and return it
+    // Otherwise, we got the final event, so stop reading and return it
     await reader.cancel();
     return parseResponse<TResponseData>(finalResponseData, response.status);
 }

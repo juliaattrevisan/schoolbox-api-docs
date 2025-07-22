@@ -1,14 +1,9 @@
-import type { ResponseStreamEvent } from "openai/resources/responses/responses";
+import type { ResponseStreamEvent, ResponseCompletedEvent } from "openai/resources/responses/responses";
 import { sseApiRequest } from "@js/util/sbx/apiUtils";
 import type { ApiBaseResponse } from "@js/util/sbx/apiUtils";
 
-
-/** The "complete" response we expect to receive at the very end from the API */
-type ImageGeneratorApiResponse = {
-    responseId: string;
-    src: string;
-    message: string | null;
-};
+/** The final event that we should recieve in the SSE stream to indicate that the request finished */
+const finalEventName: ResponseCompletedEvent["type"] = "response.completed";
 
 export type ImageGeneratorApiPayload = {
     userPrompt: string;
@@ -27,11 +22,12 @@ export async function generateImage(
     url: string,
     body: ImageGeneratorApiPayload,
     onMessage: (response: ApiBaseResponse<ResponseStreamEvent>) => void,
-): Promise<ApiBaseResponse<ImageGeneratorApiResponse>> {
-    return sseApiRequest<ResponseStreamEvent, ImageGeneratorApiResponse, ImageGeneratorApiPayload>({
+): Promise<ApiBaseResponse<ResponseCompletedEvent>> {
+    return sseApiRequest<ResponseStreamEvent, ResponseCompletedEvent, ImageGeneratorApiPayload>({
         url,
         method: "POST",
         body,
         onMessage,
+        finalEventName,
     });
 }
