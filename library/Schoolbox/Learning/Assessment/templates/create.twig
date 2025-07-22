@@ -8,7 +8,6 @@
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/jquery-validation/dist/additional-methods.min.js?v={{ config.site_version }}"></script>
 <script src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
 <script src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
-<script src="{{ CDN_PREFIX }}/js/assessment/participation.js?v={{ config.site_version }}"></script>
 <script>
     $(function () {
         // the mage plugin is applied to the submit buttons: setup a basic mage on all the buttons
@@ -345,6 +344,3 @@
         </form>
     </div>
 </div>
-
-{# Participation modal w/ form. Must live outside of main form as per above #}
-{#{% include '@learningAssessment/fragments/participationModal.twig' %}#}

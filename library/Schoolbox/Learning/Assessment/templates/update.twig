@@ -6,7 +6,6 @@
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/jquery-validation/dist/additional-methods.min.js?v={{ config.site_version }}"></script>
 <script src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
 <script src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
-<script src="{{ CDN_PREFIX }}/js/assessment/participation.js?v={{ config.site_version }}"></script>
 
 {% autoescape 'js' %}
 <script>
@@ -239,6 +238,3 @@
 </div>
 
 <div id="toast" class="toast"></div>
-
-{# Participation modal w/ form. Must live outside of main form #}
-{% include '@learningAssessment/fragments/participationModal.twig' %}
