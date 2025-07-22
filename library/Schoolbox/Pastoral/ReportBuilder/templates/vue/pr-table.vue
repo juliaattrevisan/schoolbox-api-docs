@@ -127,13 +127,13 @@ function onSortSelected(headerKey: string): void {
                         :records-or-points="recordsOrPoints"
                     />
                     <!-- All other rows -->
-                    <pr-table-row
+                    <!-- <pr-table-row
                         v-for="(row, index) in (payload as TablePayload).data.rows"
                         :key="`row-${index}`"
                         :headers="(payload as TablePayload).data.tableHeaders"
                         :row-data="row"
                         :records-or-points="recordsOrPoints"
-                    />
+                    /> -->
                 </tbody>
             </table>
         </div>

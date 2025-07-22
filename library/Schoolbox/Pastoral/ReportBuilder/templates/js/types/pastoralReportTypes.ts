@@ -84,8 +84,8 @@ export type RowOptions = string | User | RecordsAndPoints;
 export type TablePayload = {
     data: {
         tableHeaders: TableHeader[];
-        totalRow: RowOptions[];
-        rows: RowOptions[][];
+        totalRow: { [key: string]: RowOptions };
+        rows: { [key: string]: RowOptions }[];
     };
     metadata: {
         count: number;
