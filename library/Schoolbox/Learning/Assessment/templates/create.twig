@@ -28,8 +28,8 @@
             const formData = this;
             // find the showParticipationPrompt in the formData
             const showParticipationPrompt = formData.find((item) => item.name === "showParticipationPrompt");
-            if (showParticipationPrompt) {
-                return new Promise(function(resolve, reject) {
+            return new Promise(function(resolve, reject) {
+                if (showParticipationPrompt) {
                     $("body").confirmDialog({
                         header: "Student Participation",
                         text: "Would you like to edit the student participation for this activity now?",
@@ -52,12 +52,10 @@
                             resolve();
                         },
                     });
-                });
-            } else {
-                return new Promise(function(resolve, reject) {
+                } else {
                     resolve();
-                });
-            }
+                }
+            });
         }
 
         /**
