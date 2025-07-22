@@ -84,19 +84,21 @@ class StudentByType extends Cursor implements TabTypeInterface
         $keys = array_keys($records->first());
         array_shift($keys);
 
+        $totalRow['user'] = 'Total';
+
+        foreach($keys as $key) {
+            $totalRow[$key] = ['records' => array_sum(array_column($records->getAll(), $key))];
+        }
+
         return [
             'data' => [
                 'tableHeaders' => $tableHeader,
-                'totalRow' =>
-                    array_merge(
-                        ['Total'],
-                        array_map(fn($key) => ['records' => array_sum(array_column($records->getAll(), $key))], $keys)
-                    ),
+                'totalRow' => $totalRow,
                 'rows' => $records->map(
                     function (array $record) use ($students) {
-                        $row[] = call_user_func($this->userTranslator, $students->getBy('id', $record['student_id']));
+                        $row['user'] = call_user_func($this->userTranslator, $students->getBy('id', $record['student_id']));
                         unset($record['student_id']);
-                        return array_merge($row, array_map(fn($value) => ['records' => (int)$value], array_values($record)));
+                        return array_merge($row, array_map(fn($value) => ['records' => (int)$value], ($record)));
                     }
                 )
             ],
@@ -211,7 +213,7 @@ class StudentByType extends Cursor implements TabTypeInterface
             )->getAll()
         );
 
-        $totalCount = "SUM(" . implode(' + ', array_filter([$typeKeys, $subTypeKeys])) . ") as TotalCount";
+        $totalCount = "SUM(" . implode(' + ', array_filter([$typeKeys, $subTypeKeys])) . ") as total";
 
         $selectQuery = implode(', ', array_filter($selectCountTypeQuery ?? []));
         $totalQuery = "
