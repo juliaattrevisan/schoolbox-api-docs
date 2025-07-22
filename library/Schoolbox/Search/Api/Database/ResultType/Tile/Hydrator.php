@@ -195,19 +195,10 @@ class Hydrator extends BaseHydrator
             throw new InvalidArgumentException('String $tileInstanceId is in unexpected format.');
         }
 
-        // Convert strings to integer or null.
-        for ($i = 0; $i < count($tokens); ++$i) {
-            if ($tokens[$i] === '') {
-                $tokens[$i] = null;
-            } else {
-                $tokens[$i] = intval($tokens[$i]);
-            }
-        }
-
         return [
-            $tokens[0], // tileId,
-            $tokens[1], // componentInstanceId,
-            $tokens[2]  // folderId.
+            '' === $tokens[0] ? null : (int)$tokens[1], // tileId,
+            '' === $tokens[1] ? null : (int)$tokens[2], // componentInstanceId,
+            '' === $tokens[2] ? null : (int)$tokens[3]  // folderId.
         ];
     }
 
