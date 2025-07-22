@@ -94,10 +94,18 @@
                     </fieldset>
                 </section>
 
+            {# Staff and students share this area, but their buttons are differently described #}
             {% set submitText = 'Submit' %}
 
-            {% if moderationRequired %}
-                {% set submitText = 'Submit for approval' %}
+            {% if USER.role.isStudent %}
+                {% if moderationRequired %}
+                    {% set submitText = 'Submit for approval' %}
+                {% endif %}
+            {% elseif USER.role.isStaff %}
+                {% if evidence.isSubmitted %}
+                    {# If the moment is in Submitted state, this acts as the transition to Published #}
+                    {% set submitText = 'Approve' %}
+                {% endif %}
             {% endif %}
 
             <input type="submit" id="evidence-submit" data-test="learning-moment-evidence-form-submit" value="{{ submitText }}" />
