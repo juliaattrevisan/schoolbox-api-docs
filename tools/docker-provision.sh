@@ -188,7 +188,7 @@ function init_composer_dependencies() {
               if [ "$vendorfile" == '' ];
               then
                   local etag;
-                  etag=$(curl -I "https://${artifact_source}/$branch-vendor-php-dev.tar.gz" 2>/dev/null | grep ETag | cut -d'"' -f2);
+                  etag=$(curl -I "${artifact_source}/$branch-vendor-php-dev.tar.gz" 2>/dev/null | grep ETag | cut -d'"' -f2);
                   if [ $? -eq 0 ];
                   then
                       local checketag;
@@ -197,7 +197,7 @@ function init_composer_dependencies() {
                       then
                           # New/updated version available - download it
                           log "Downloading latest vendor build artifact: $branch-vendor-php-dev.tar.gz";
-                          wget --no-verbose "https://${artifact_source}/$branch-vendor-php-dev.tar.gz" -O $branch-vendor-php-dev.tar.gz 2>&1;
+                          wget --no-verbose "${artifact_source}/$branch-vendor-php-dev.tar.gz" -O $branch-vendor-php-dev.tar.gz 2>&1;
                           if [ $? -eq 0 ];
                           then
                               # This is a new file, so remove old references
@@ -253,27 +253,7 @@ function init_composer_dependencies() {
   composer install -o --no-interaction
 }
 
-function main() {
-  load_consts
-  if [ $? -eq 0 ]; then
-    error "Not all required consts defined: exiting"
-    exit 1
-  fi
-
-  load_config
-  if [ $? -eq 0 ]; then
-    error "Not all required configs defined: exiting"
-    exit 1
-  fi
-  setup_aws_sso
-
-  cleanup_cache_dir
-  download_secrets
-  mark_safe_for_git
-
-  init_database
-  init_composer_dependencies
-
+function install_instance() {
   log "Installing instance via 'schoolbox-data-refresh.sh'";
 
   # Note schoolbox-data-refresh creates the database and then applies the schoolbox/updates SQL and PHP scripts.
@@ -334,6 +314,10 @@ function main() {
     exit 1
   fi
 
+  log "Applying development environment SQL fixes";
+  mariadb -h mariadb -u root -D schoolbox < "${SITE_ROOT}/sql/vagrant.sql"
+  mariadb -h mariadb -u root -D schoolbox < "${cachedir}/vagrant-secrets.sql"
+
   log "Putting system in maintenance mode";
   if INSTANCE_ID="${default_instance_id}" "$SITE_ROOT"/tools/maintenance/site_down.sh -eq 0 ; then
     log "Maintenance mode enabled on instance 'docker'."
@@ -341,46 +325,23 @@ function main() {
     log "Could not enable maintenance mode on instance 'docker'.  Exiting."
     exit 1;
   fi
+}
 
-  log "Applying vagrant SQL fixes";
-  mariadb -h mariadb -u root -D schoolbox < "${SITE_ROOT}/sql/vagrant.sql"
-  mariadb -h mariadb -u root -D schoolbox < "${cachedir}/vagrant-secrets.sql"
-
-  # Set ENV VARs for root + vagrant users from vagrant.yaml params
-  declare -A env_vars=(
-    [INSTANCE_ID]="${default_instance_id}"
-  )
-  for config_name in "${!env_vars[@]}"; do
-    config_value=${env_vars[$config_name]}
-    for bashrcFile in /root/.bashrc; do
-  #  for bashrcFile in /home/vagrant/.bashrc /root/.bashrc; do
-      # Remove the config if it exists, then insert it
-      sed -i -E "/^export\s+$config_name\s*=.+/d" ${bashrcFile}
-      echo "export $config_name=\"$config_value\"" >> ${bashrcFile};
-    done
-
-  #  # Need to preserve these ENV vars for vagrant's sudo session
-  #  if ! grep -qE "^Defaults\s+env_keep\s*\+=\s*\".*$config_name" /etc/sudoers.d/vagrant; then
-  #    chmod a+w /etc/sudoers.d/vagrant;
-  #    echo "Defaults env_keep += \"$config_name\"" >> /etc/sudoers.d/vagrant;
-  #    chmod a-w /etc/sudoers.d/vagrant;
-  #  fi
-  done
-
-  log "Applying vagrant SQL fixes (post version upgrade)";
-  mariadb -h mariadb -u root -D schoolbox < "${SITE_ROOT}/sql/vagrant.sql"
-  mariadb -h mariadb -u root -D schoolbox < "${cachedir}/vagrant-secrets.sql"
-
+function init_npm_dependencies() {
   # Ensure nvm.sh is run before building NPM stuff,
   # so the npm versions it installed are available
   source ~/.nvm/nvm.sh
 
+  # TODO this is very similar to the Composer download: should attempt to reuse
+
   log "Building NPM";
-  cd $cachedir;
-  npmfile='';
+  cd "$cachedir" || exit 1;
+  local npmfile='';
+  local npmlocksha;
   npmlocksha=`sha1sum "$SITE_ROOT"/npm-shrinkwrap.json 2>/dev/null | awk '{print $1}'`;
   if [ -f "$SITE_ROOT"/node_modules/npm.shrinkwrap.checksum ];
   then
+      local currentnpmsha;
       currentnpmsha=`awk '{print $1}' "$SITE_ROOT"/node_modules/npm.shrinkwrap.checksum`;
       if [ "$currentnpmsha" == "$npmlocksha" ];
       then
@@ -392,10 +353,12 @@ function main() {
   if [ "$npmfile" != 'ignore' ];
   then
       log "NPM build not correct or missing ($npmlocksha)";
+      local check;
       check=`grep $npmlocksha npm.cache 2>/dev/null | wc -l`;
       if [ $check -gt 0 ];
       then
           # Woo - we've located a matching cache file
+          local npmfile;
           npmfile=`grep $npmlocksha npm.cache 2>/dev/null | head -n1 | cut -d' ' -f2-100`;
       else
           # No cache files match - boo hoo - check to see if there are new versions
@@ -404,15 +367,16 @@ function main() {
               # Check if we've already found a matching file
               if [ "$npmfile" == '' ];
               then
-                  etag=$(curl -I https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-npm.tar.gz 2>/dev/null | grep ETag | cut -d'"' -f2);
+                  etag=$(curl -I "${artifact_source}/$branch-npm.tar.gz" 2>/dev/null | grep ETag | cut -d'"' -f2);
                   if [ $? -eq 0 ];
                   then
+                      local checketag;
                       checketag=`grep $etag npm.etag.cache 2>/dev/null | wc -l`;
                       if [ $checketag -eq 0 ];
                       then
                           # New/updated version available - download it
                           log "Downloading latest NPM build: $branch-npm.tar.gz";
-                          wget --no-verbose https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-npm.tar.gz -O $branch-npm.tar.gz 2>&1;
+                          wget --no-verbose "${artifact_source}/$branch-npm.tar.gz" -O $branch-npm.tar.gz 2>&1;
                           if [ $? -eq 0 ];
                           then
                               # This is a new file, so remove old references
@@ -424,6 +388,7 @@ function main() {
                               rm -fR "${cachedir}"/node_modules 2>/dev/null;
                               # Extract checksum
                               tar xzf $branch-npm.tar.gz node_modules/npm.shrinkwrap.checksum;
+                              local npmchecksum;
                               npmchecksum=`awk '{print $1}' node_modules/npm.shrinkwrap.checksum`;
                               rm -fR "${cachedir}"/node_modules 2>/dev/null;
                               # Add new file to NPM cache
@@ -467,13 +432,60 @@ function main() {
 
   log "Building JS/CSS files";
   "$SITE_ROOT"/tools/pkg-build-css-js.sh
+}
+
+function main() {
+  load_consts
+  if [ $? -eq 0 ]; then
+    error "Not all required consts defined: exiting"
+    exit 1
+  fi
+
+  load_config
+  if [ $? -eq 0 ]; then
+    error "Not all required configs defined: exiting"
+    exit 1
+  fi
+  setup_aws_sso
+
+  cleanup_cache_dir
+  download_secrets
+  mark_safe_for_git
+
+  init_database
+  init_composer_dependencies
+
+  install_instance
+
+  # Set ENV VARs for root + vagrant users from vagrant.yaml params
+  declare -A env_vars=(
+    [INSTANCE_ID]="${default_instance_id}"
+  )
+  for config_name in "${!env_vars[@]}"; do
+    config_value=${env_vars[$config_name]}
+    for bashrcFile in /root/.bashrc; do
+  #  for bashrcFile in /home/vagrant/.bashrc /root/.bashrc; do
+      # Remove the config if it exists, then insert it
+      sed -i -E "/^export\s+$config_name\s*=.+/d" ${bashrcFile}
+      echo "export $config_name=\"$config_value\"" >> ${bashrcFile};
+    done
+
+  #  # Need to preserve these ENV vars for vagrant's sudo session
+  #  if ! grep -qE "^Defaults\s+env_keep\s*\+=\s*\".*$config_name" /etc/sudoers.d/vagrant; then
+  #    chmod a+w /etc/sudoers.d/vagrant;
+  #    echo "Defaults env_keep += \"$config_name\"" >> /etc/sudoers.d/vagrant;
+  #    chmod a-w /etc/sudoers.d/vagrant;
+  #  fi
+  done
+
+  init_npm_dependencies
 
   log "Loading all demo data complete";
 
-  # Vagrant uses a non-standard ffmpeg, installed via Schoolbox's package repo:
-  # that does not seem to be needed here.
-  ffmpegver=`dpkg -l ffmpeg | tail -n1 | awk {'print $3'}`;
-  log "ffmpeg installed: $ffmpegver";
+#  # Vagrant uses a non-standard ffmpeg, installed via Schoolbox's package repo:
+#  # that does not seem to be needed here.
+#  ffmpegver=`dpkg -l ffmpeg | tail -n1 | awk {'print $3'}`;
+#  log "ffmpeg installed: $ffmpegver";
 
   log "Removing system maintenance mode";
   if INSTANCE_ID=docker "$SITE_ROOT"/tools/maintenance/site_up.sh -eq 0 ; then
