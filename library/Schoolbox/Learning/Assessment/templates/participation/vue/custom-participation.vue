@@ -319,7 +319,7 @@ function getCustomisationLabel(plan: Plan | CustomisedPlan): string {
                     </td>
                     <td>
                         <div class="l-flex-col l-gap-s">
-                            <template v-if="participant.user.id">
+                            <div v-if="participant.user.id">
                                 <a :href="`/search/user/${participant.user.id}`">
                                     {{ participant.user.lastname + ", " + participant.user.firstname }}
                                     {{
@@ -330,7 +330,7 @@ function getCustomisationLabel(plan: Plan | CustomisedPlan): string {
                                     }}
                                     {{ participant.user.pronoun }}
                                 </a>
-                            </template>
+                            </div>
                             <template v-else>
                                 {{ participant.user.lastname + ", " + participant.user.firstname }}
                                 {{
