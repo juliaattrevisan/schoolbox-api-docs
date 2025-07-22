@@ -64,18 +64,6 @@ function load_config() {
   return $return
 }
 
-load_consts
-if [ $? -eq 0 ]; then
-  error "Not all required consts defined: exiting"
-  exit 1
-fi
-
-load_config
-if [ $? -eq 0 ]; then
-  error "Not all required configs defined: exiting"
-  exit 1
-fi
-
 # Setup AWS CLI: copied from `vagrant-provision-pre-puppet.sh`
 function version_gte() {
   echo -e "$1\n$2" | sort -rCV
@@ -108,348 +96,364 @@ function setup_aws_sso() {
     aws sso login "${params[@]}"
   fi
 }
-setup_aws_sso
+
+function main() {
+  load_consts
+  if [ $? -eq 0 ]; then
+    error "Not all required consts defined: exiting"
+    exit 1
+  fi
+
+  load_config
+  if [ $? -eq 0 ]; then
+    error "Not all required configs defined: exiting"
+    exit 1
+  fi
+  setup_aws_sso
 
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Setting up Docker environment with options:";
-echo "[SB][`date +%Y-%m-%d\ %X`] Data Source: $data_source";
-echo "[SB][`date +%Y-%m-%d\ %X`] Data Filename: $data_filename";
-echo "[SB][`date +%Y-%m-%d\ %X`] External DB: $external_db";
-echo "[SB][`date +%Y-%m-%d\ %X`] External DB Host: $external_db_host";
-echo "[SB][`date +%Y-%m-%d\ %X`] External DB Name: $external_db_db";
-echo "[SB][`date +%Y-%m-%d\ %X`] Retrieving latest Data files";
-echo "[SB][`date +%Y-%m-%d\ %X`] Cleaning up zero byte files";
-find "${cachedir}" -type f -empty -delete;
+  echo "[SB][`date +%Y-%m-%d\ %X`] Setting up Docker environment with options:";
+  echo "[SB][`date +%Y-%m-%d\ %X`] Data Source: $data_source";
+  echo "[SB][`date +%Y-%m-%d\ %X`] Data Filename: $data_filename";
+  echo "[SB][`date +%Y-%m-%d\ %X`] External DB: $external_db";
+  echo "[SB][`date +%Y-%m-%d\ %X`] External DB Host: $external_db_host";
+  echo "[SB][`date +%Y-%m-%d\ %X`] External DB Name: $external_db_db";
+  echo "[SB][`date +%Y-%m-%d\ %X`] Retrieving latest Data files";
+  echo "[SB][`date +%Y-%m-%d\ %X`] Cleaning up zero byte files";
+  find "${cachedir}" -type f -empty -delete;
 
-# Download some files from S3
-# Note these still use the Vagrant names
-if ! $SITE_ROOT/tools/download-s3-file.sh --data-source "$data_source"  --file-name "vagrant-secrets.sql" --cache-dir "$cachedir"; then
-  echo "Error: Unable to download s3 file: 'vagrant-secrets.sql'";
-  exit 1;
-fi
-if ! $SITE_ROOT/tools/download-s3-file.sh --data-source "$data_source" --file-name "vagrant-cleanup-secrets.sql" --cache-dir "$cachedir"; then
-  echo "Error: Unable to download s3 file: 'vagrant-cleanup-secrets.sql'";
-  exit 1;
-fi
+  # Download some files from S3
+  # Note these still use the Vagrant names
+  if ! $SITE_ROOT/tools/download-s3-file.sh --data-source "$data_source"  --file-name "vagrant-secrets.sql" --cache-dir "$cachedir"; then
+    echo "Error: Unable to download s3 file: 'vagrant-secrets.sql'";
+    exit 1;
+  fi
+  if ! $SITE_ROOT/tools/download-s3-file.sh --data-source "$data_source" --file-name "vagrant-cleanup-secrets.sql" --cache-dir "$cachedir"; then
+    echo "Error: Unable to download s3 file: 'vagrant-cleanup-secrets.sql'";
+    exit 1;
+  fi
 
-# Timezone data: should be run in mariadb container on setup
-#echo "[SB][`date +%Y-%m-%d\ %X`] Updating timezone data";
-#mysql_tzinfo_to_sql /usr/share/zoneinfo 2>/dev/null | mysql --defaults-extra-file=/root/.my.cnf mysql 2>/dev/null;
+  # Timezone data: should be run in mariadb container on setup
+  #echo "[SB][`date +%Y-%m-%d\ %X`] Updating timezone data";
+  #mysql_tzinfo_to_sql /usr/share/zoneinfo 2>/dev/null | mysql --defaults-extra-file=/root/.my.cnf mysql 2>/dev/null;
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Creating Schoolbox MariaDB schema and user";
-mariadb -h mariadb -u root < "${SITE_ROOT}/docker/schoolbox/sql/setup.sql"
+  echo "[SB][`date +%Y-%m-%d\ %X`] Creating Schoolbox MariaDB schema and user";
+  mariadb -h mariadb -u root < "${SITE_ROOT}/docker/schoolbox/sql/setup.sql"
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Setting Schoolbox dir ${SITE_ROOT} as safe for Git";
-git config --global --add safe.directory "${SITE_ROOT}"
+  echo "[SB][`date +%Y-%m-%d\ %X`] Setting Schoolbox dir ${SITE_ROOT} as safe for Git";
+  git config --global --add safe.directory "${SITE_ROOT}"
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Installing vendor submodules with composer";
-cd $cachedir || exit;
-vendorfile='';
-composerlocksha=`sha1sum ../composer.lock 2>/dev/null | awk '{print $1}'`;
-if [ -f "$SITE_ROOT"/vendor/composer.lock.checksum ];
-then
-    currentvendorsha=`awk '{print $1}' "$SITE_ROOT"/vendor/composer.lock.checksum`;
-    if [ "$currentvendorsha" == "$composerlocksha" ];
-    then
-        echo "[SB][`date +%Y-%m-%d\ %X`] Vendor build up to date, nothing to change";
-        vendorfile='ignore';
-    fi
-fi
+  echo "[SB][`date +%Y-%m-%d\ %X`] Installing vendor submodules with composer";
+  cd $cachedir || exit;
+  vendorfile='';
+  composerlocksha=`sha1sum ../composer.lock 2>/dev/null | awk '{print $1}'`;
+  if [ -f "$SITE_ROOT"/vendor/composer.lock.checksum ];
+  then
+      currentvendorsha=`awk '{print $1}' "$SITE_ROOT"/vendor/composer.lock.checksum`;
+      if [ "$currentvendorsha" == "$composerlocksha" ];
+      then
+          echo "[SB][`date +%Y-%m-%d\ %X`] Vendor build up to date, nothing to change";
+          vendorfile='ignore';
+      fi
+  fi
 
-if [ "$vendorfile" != 'ignore' ];
-then
-    check=`grep $composerlocksha vendor.cache 2>/dev/null | wc -l`;
-    if [ $check -gt 0 ];
-    then
-        # Woo - we've located a matching cache file
-        vendorfile=`grep $composerlocksha vendor.cache 2>/dev/null | head -n1 | cut -d' ' -f2-100`;
-    else
-        # No cache files match - boo hoo - check to see if there are new versions
-        for branch in develop master;
-        do
-            # Check if we've already found a matching file
-            if [ "$vendorfile" == '' ];
-            then
-                etag=$(curl -I https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-vendor-php-dev.tar.gz 2>/dev/null | grep ETag | cut -d'"' -f2);
-                if [ $? -eq 0 ];
-                then
-                    checketag=`grep $etag vendor.etag.cache 2>/dev/null | wc -l`;
-                    if [ $checketag -eq 0 ];
-                    then
-                        # New/updated version available - download it
-                        echo "[SB][`date +%Y-%m-%d\ %X`] Downloading latest vendor build: $branch-vendor-php-dev.tar.gz";
-                        wget --no-verbose https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-vendor-php-dev.tar.gz -O $branch-vendor-php-dev.tar.gz 2>&1;
-                        if [ $? -eq 0 ];
-                        then
-                            # This is a new file, so remove old references
-                            sed -i "/$branch-vendor-php-dev.tar.gz/d" vendor.etag.cache 2>/dev/null;
-                            sed -i "/$branch-vendor-php-dev.tar.gz/d" vendor.cache 2>/dev/null;
-                            # Add new file to etag cache
-                            echo "$etag $branch-vendor-php-dev.tar.gz" >> vendor.etag.cache;
-                            # Cleanup for purity
-                            rm -fR "${cachedir}"/vendor 2>/dev/null;
-                            # Extract checksum
-                            tar xzf $branch-vendor-php-dev.tar.gz vendor/composer.lock.checksum;
-                            vendorchecksum=`awk '{print $1}' vendor/composer.lock.checksum`;
-                            rm -fR "${cachedir}"/vendor 2>/dev/null;
-                            # Add new file to vendor cache
-                            echo "$vendorchecksum $branch-vendor-php-dev.tar.gz" >> vendor.cache;
-                            # Check if this is file we need
-                            if [ "$vendorchecksum" == "$composerlocksha" ];
-                            then
-                                vendorfile="$branch-vendor-php-dev.tar.gz";
-                            fi
-                        fi
-                    fi
-                fi
-            fi
-        done
-    fi
-    cd "$SITE_ROOT" || exit;
-    if [ "$vendorfile" != '' ];
-    then
-        if [ -f "${cachedir}"/$vendorfile ];
-        then
-            # Extract content
-            echo "[SB][`date +%Y-%m-%d\ %X`] Found matching vendor cache file '$vendorfile', now extracting";
-            rm -fR "$SITE_ROOT"/vendor 2>/dev/null;
-            tar xzf "${cachedir}"/$vendorfile;
-        else
-            # Still no luck, build from scratch with composer
-            echo "[SB][`date +%Y-%m-%d\ %X`] No matching vendor cache found. Building with composer";
-            "$SITE_ROOT"/tools/composer.sh
-        fi
-    else
-        # Still no luck, build from scratch with composer
-        echo "[SB][`date +%Y-%m-%d\ %X`] No matching vendor cache found. Building with composer";
-        "$SITE_ROOT"/tools/composer.sh
-    fi
-fi
-cd "$SITE_ROOT" || exit;
+  if [ "$vendorfile" != 'ignore' ];
+  then
+      check=`grep $composerlocksha vendor.cache 2>/dev/null | wc -l`;
+      if [ $check -gt 0 ];
+      then
+          # Woo - we've located a matching cache file
+          vendorfile=`grep $composerlocksha vendor.cache 2>/dev/null | head -n1 | cut -d' ' -f2-100`;
+      else
+          # No cache files match - boo hoo - check to see if there are new versions
+          for branch in develop master;
+          do
+              # Check if we've already found a matching file
+              if [ "$vendorfile" == '' ];
+              then
+                  etag=$(curl -I https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-vendor-php-dev.tar.gz 2>/dev/null | grep ETag | cut -d'"' -f2);
+                  if [ $? -eq 0 ];
+                  then
+                      checketag=`grep $etag vendor.etag.cache 2>/dev/null | wc -l`;
+                      if [ $checketag -eq 0 ];
+                      then
+                          # New/updated version available - download it
+                          echo "[SB][`date +%Y-%m-%d\ %X`] Downloading latest vendor build: $branch-vendor-php-dev.tar.gz";
+                          wget --no-verbose https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-vendor-php-dev.tar.gz -O $branch-vendor-php-dev.tar.gz 2>&1;
+                          if [ $? -eq 0 ];
+                          then
+                              # This is a new file, so remove old references
+                              sed -i "/$branch-vendor-php-dev.tar.gz/d" vendor.etag.cache 2>/dev/null;
+                              sed -i "/$branch-vendor-php-dev.tar.gz/d" vendor.cache 2>/dev/null;
+                              # Add new file to etag cache
+                              echo "$etag $branch-vendor-php-dev.tar.gz" >> vendor.etag.cache;
+                              # Cleanup for purity
+                              rm -fR "${cachedir}"/vendor 2>/dev/null;
+                              # Extract checksum
+                              tar xzf $branch-vendor-php-dev.tar.gz vendor/composer.lock.checksum;
+                              vendorchecksum=`awk '{print $1}' vendor/composer.lock.checksum`;
+                              rm -fR "${cachedir}"/vendor 2>/dev/null;
+                              # Add new file to vendor cache
+                              echo "$vendorchecksum $branch-vendor-php-dev.tar.gz" >> vendor.cache;
+                              # Check if this is file we need
+                              if [ "$vendorchecksum" == "$composerlocksha" ];
+                              then
+                                  vendorfile="$branch-vendor-php-dev.tar.gz";
+                              fi
+                          fi
+                      fi
+                  fi
+              fi
+          done
+      fi
+      cd "$SITE_ROOT" || exit;
+      if [ "$vendorfile" != '' ];
+      then
+          if [ -f "${cachedir}"/$vendorfile ];
+          then
+              # Extract content
+              echo "[SB][`date +%Y-%m-%d\ %X`] Found matching vendor cache file '$vendorfile', now extracting";
+              rm -fR "$SITE_ROOT"/vendor 2>/dev/null;
+              tar xzf "${cachedir}"/$vendorfile;
+          else
+              # Still no luck, build from scratch with composer
+              echo "[SB][`date +%Y-%m-%d\ %X`] No matching vendor cache found. Building with composer";
+              "$SITE_ROOT"/tools/composer.sh
+          fi
+      else
+          # Still no luck, build from scratch with composer
+          echo "[SB][`date +%Y-%m-%d\ %X`] No matching vendor cache found. Building with composer";
+          "$SITE_ROOT"/tools/composer.sh
+      fi
+  fi
+  cd "$SITE_ROOT" || exit;
 
-# Composer autoload needs to apply patches as well:
-# just use composer install for that
-echo "[SB][`date +%Y-%m-%d\ %X`] Updating composer autoload and patches";
-composer install -o --no-interaction
-#su -s /bin/bash -c "cd $SITE_ROOT && composer dump-autoload -o --no-interaction" vagrant
+  # Composer autoload needs to apply patches as well:
+  # just use composer install for that
+  echo "[SB][`date +%Y-%m-%d\ %X`] Updating composer autoload and patches";
+  composer install -o --no-interaction
+  #su -s /bin/bash -c "cd $SITE_ROOT && composer dump-autoload -o --no-interaction" vagrant
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Installing instance via 'schoolbox-data-refresh.sh'";
+  echo "[SB][`date +%Y-%m-%d\ %X`] Installing instance via 'schoolbox-data-refresh.sh'";
 
-# Note schoolbox-data-refresh creates the database and then applies the schoolbox/updates SQL and PHP scripts.
-# It is the responsibility of schoolbox-data-refresh to enable and disable maintenance mode as appropriate during its
-# execution (by making calls to site_down.sh/site_up.sh).
-# (The site_down.sh/site_up.sh scripts update the database, so site_down.sh cannot be run until the database has been
-#  created.)
-if ! INSTANCE_ID="${default_instance_id}" schoolbox-data-refresh \
---data-source "$data_source" \
---dataset "$data_filename" \
---skip-bucket-copy \
---sql-host 'mariadb' \
---sql-schema 'schoolbox' \
---sql-user 'schoolboxdocker' \
---sql-pass 'abc123' \
---cache-dir "${cachedir}" \
---config amqp_host "'rabbitmq'" \
---config amqp_user "'guest'" \
---config amqp_pass "'guest'" \
---config amqp_vhost "'/'" \
---config debug_show_stack_trace "'1'" \
---config debug_templates "'1'" \
---config eotc_enabled "'1'" \
---config etherpad_host "'http://schoolbox-etherpad:9001'" \
---config etherpad_api_token "'test'" \
---config external_type "'$external_db'" \
---config external_db_db "'$external_db_db'" \
---config external_db_host "'$external_db_host'" \
---config external_db_user "'schoolbox'" \
---config external_portal "'https://portal.synergetic.dev.schoolbox.cloud'" \
---config fixtures_enabled "'1'" \
---config gotenberg_host "'http://schoolbox-gotenberg:3000'" \
---config instance_registry_url "'$instance_registry_url'" \
---config ldap_enable "'0'" \
---config mail_enable "'1'" \
---config mail_smtp_host "'127.0.0.1'" \
---config mail_smtp_port "'1025'" \
---config office365_client "'85671866-2f6b-4ec3-9940-1f39ecc05e50'" \
---config office365_immersive_reader_name "'schoolbox-test'" \
---config office365_tenant "'alaressteam'" \
---config office365_tenant_id "'9a9eb3a6-27e2-43bf-8831-37e8d0cc2265'" \
---config pastoral_enabled "'1'" \
---config qr_login_enabled "'1'" \
---config redis_url "'tcp://redis-storage:6379'" \
---config redis_ephemeral_url "'tcp://redis-cache:6379'" \
---config taskd_redis_url "'tcp://redis-storage:6379'" \
---config resource_booking_enabled "'1'" \
---config site_domain "'dev.schoolbox.cloud'" \
---config site_hostname "'docker'" \
---config site_school_code "'docker'" \
---config site_environment "'client-hosted'" \
---config site_type "'dev'" \
---config strict_templates "'1'" \
---config summative_report_enabled "'1'" \
---config title "'Schoolbox [docker]'" \
---config ups_groups_enabled "'1'"; then
-  error "Unable to install instance. Exiting."
-  exit 1
-fi
+  # Note schoolbox-data-refresh creates the database and then applies the schoolbox/updates SQL and PHP scripts.
+  # It is the responsibility of schoolbox-data-refresh to enable and disable maintenance mode as appropriate during its
+  # execution (by making calls to site_down.sh/site_up.sh).
+  # (The site_down.sh/site_up.sh scripts update the database, so site_down.sh cannot be run until the database has been
+  #  created.)
+  if ! INSTANCE_ID="${default_instance_id}" schoolbox-data-refresh \
+  --data-source "$data_source" \
+  --dataset "$data_filename" \
+  --skip-bucket-copy \
+  --sql-host 'mariadb' \
+  --sql-schema 'schoolbox' \
+  --sql-user 'schoolboxdocker' \
+  --sql-pass 'abc123' \
+  --cache-dir "${cachedir}" \
+  --config amqp_host "'rabbitmq'" \
+  --config amqp_user "'guest'" \
+  --config amqp_pass "'guest'" \
+  --config amqp_vhost "'/'" \
+  --config debug_show_stack_trace "'1'" \
+  --config debug_templates "'1'" \
+  --config eotc_enabled "'1'" \
+  --config etherpad_host "'http://schoolbox-etherpad:9001'" \
+  --config etherpad_api_token "'test'" \
+  --config external_type "'$external_db'" \
+  --config external_db_db "'$external_db_db'" \
+  --config external_db_host "'$external_db_host'" \
+  --config external_db_user "'schoolbox'" \
+  --config external_portal "'https://portal.synergetic.dev.schoolbox.cloud'" \
+  --config fixtures_enabled "'1'" \
+  --config gotenberg_host "'http://schoolbox-gotenberg:3000'" \
+  --config instance_registry_url "'$instance_registry_url'" \
+  --config ldap_enable "'0'" \
+  --config mail_enable "'1'" \
+  --config mail_smtp_host "'127.0.0.1'" \
+  --config mail_smtp_port "'1025'" \
+  --config office365_client "'85671866-2f6b-4ec3-9940-1f39ecc05e50'" \
+  --config office365_immersive_reader_name "'schoolbox-test'" \
+  --config office365_tenant "'alaressteam'" \
+  --config office365_tenant_id "'9a9eb3a6-27e2-43bf-8831-37e8d0cc2265'" \
+  --config pastoral_enabled "'1'" \
+  --config qr_login_enabled "'1'" \
+  --config redis_url "'tcp://redis-storage:6379'" \
+  --config redis_ephemeral_url "'tcp://redis-cache:6379'" \
+  --config taskd_redis_url "'tcp://redis-storage:6379'" \
+  --config resource_booking_enabled "'1'" \
+  --config site_domain "'dev.schoolbox.cloud'" \
+  --config site_hostname "'docker'" \
+  --config site_school_code "'docker'" \
+  --config site_environment "'client-hosted'" \
+  --config site_type "'dev'" \
+  --config strict_templates "'1'" \
+  --config summative_report_enabled "'1'" \
+  --config title "'Schoolbox [docker]'" \
+  --config ups_groups_enabled "'1'"; then
+    error "Unable to install instance. Exiting."
+    exit 1
+  fi
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Putting system in maintenance mode";
-if INSTANCE_ID="${default_instance_id}" "$SITE_ROOT"/tools/maintenance/site_down.sh -eq 0 ; then
-  echo "[SB][`date +%Y-%m-%d\ %X`] Maintenance mode enabled on instance 'docker'."
-else
-  echo "[SB][`date +%Y-%m-%d\ %X`] Could not enable maintenance mode on instance 'docker'.  Exiting."
-  exit 1;
-fi
+  echo "[SB][`date +%Y-%m-%d\ %X`] Putting system in maintenance mode";
+  if INSTANCE_ID="${default_instance_id}" "$SITE_ROOT"/tools/maintenance/site_down.sh -eq 0 ; then
+    echo "[SB][`date +%Y-%m-%d\ %X`] Maintenance mode enabled on instance 'docker'."
+  else
+    echo "[SB][`date +%Y-%m-%d\ %X`] Could not enable maintenance mode on instance 'docker'.  Exiting."
+    exit 1;
+  fi
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Applying vagrant SQL fixes";
-mariadb -h mariadb -u root -D schoolbox < "${SITE_ROOT}/sql/vagrant.sql"
-mariadb -h mariadb -u root -D schoolbox < "${cachedir}/vagrant-secrets.sql"
+  echo "[SB][`date +%Y-%m-%d\ %X`] Applying vagrant SQL fixes";
+  mariadb -h mariadb -u root -D schoolbox < "${SITE_ROOT}/sql/vagrant.sql"
+  mariadb -h mariadb -u root -D schoolbox < "${cachedir}/vagrant-secrets.sql"
 
-# Set ENV VARs for root + vagrant users from vagrant.yaml params
-declare -A env_vars=(
-  [INSTANCE_ID]="${default_instance_id}"
-)
-for config_name in "${!env_vars[@]}"; do
-  config_value=${env_vars[$config_name]}
-  for bashrcFile in /root/.bashrc; do
-#  for bashrcFile in /home/vagrant/.bashrc /root/.bashrc; do
-    # Remove the config if it exists, then insert it
-    sed -i -E "/^export\s+$config_name\s*=.+/d" ${bashrcFile}
-    echo "export $config_name=\"$config_value\"" >> ${bashrcFile};
+  # Set ENV VARs for root + vagrant users from vagrant.yaml params
+  declare -A env_vars=(
+    [INSTANCE_ID]="${default_instance_id}"
+  )
+  for config_name in "${!env_vars[@]}"; do
+    config_value=${env_vars[$config_name]}
+    for bashrcFile in /root/.bashrc; do
+  #  for bashrcFile in /home/vagrant/.bashrc /root/.bashrc; do
+      # Remove the config if it exists, then insert it
+      sed -i -E "/^export\s+$config_name\s*=.+/d" ${bashrcFile}
+      echo "export $config_name=\"$config_value\"" >> ${bashrcFile};
+    done
+
+  #  # Need to preserve these ENV vars for vagrant's sudo session
+  #  if ! grep -qE "^Defaults\s+env_keep\s*\+=\s*\".*$config_name" /etc/sudoers.d/vagrant; then
+  #    chmod a+w /etc/sudoers.d/vagrant;
+  #    echo "Defaults env_keep += \"$config_name\"" >> /etc/sudoers.d/vagrant;
+  #    chmod a-w /etc/sudoers.d/vagrant;
+  #  fi
   done
 
-#  # Need to preserve these ENV vars for vagrant's sudo session
-#  if ! grep -qE "^Defaults\s+env_keep\s*\+=\s*\".*$config_name" /etc/sudoers.d/vagrant; then
-#    chmod a+w /etc/sudoers.d/vagrant;
-#    echo "Defaults env_keep += \"$config_name\"" >> /etc/sudoers.d/vagrant;
-#    chmod a-w /etc/sudoers.d/vagrant;
-#  fi
-done
+  echo "[SB][`date +%Y-%m-%d\ %X`] Applying vagrant SQL fixes (post version upgrade)";
+  mariadb -h mariadb -u root -D schoolbox < "${SITE_ROOT}/sql/vagrant.sql"
+  mariadb -h mariadb -u root -D schoolbox < "${cachedir}/vagrant-secrets.sql"
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Applying vagrant SQL fixes (post version upgrade)";
-mariadb -h mariadb -u root -D schoolbox < "${SITE_ROOT}/sql/vagrant.sql"
-mariadb -h mariadb -u root -D schoolbox < "${cachedir}/vagrant-secrets.sql"
+  # Ensure nvm.sh is run before building NPM stuff,
+  # so the npm versions it installed are available
+  source ~/.nvm/nvm.sh
 
-# Ensure nvm.sh is run before building NPM stuff,
-# so the npm versions it installed are available
-source ~/.nvm/nvm.sh
+  echo "[SB][`date +%Y-%m-%d\ %X`] Building NPM";
+  cd $cachedir;
+  npmfile='';
+  npmlocksha=`sha1sum "$SITE_ROOT"/npm-shrinkwrap.json 2>/dev/null | awk '{print $1}'`;
+  if [ -f "$SITE_ROOT"/node_modules/npm.shrinkwrap.checksum ];
+  then
+      currentnpmsha=`awk '{print $1}' "$SITE_ROOT"/node_modules/npm.shrinkwrap.checksum`;
+      if [ "$currentnpmsha" == "$npmlocksha" ];
+      then
+          echo "[SB][`date +%Y-%m-%d\ %X`] NPM build up to date, nothing to change ($npmlocksha)";
+          npmfile='ignore';
+      fi
+  fi
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Building NPM";
-cd $cachedir;
-npmfile='';
-npmlocksha=`sha1sum "$SITE_ROOT"/npm-shrinkwrap.json 2>/dev/null | awk '{print $1}'`;
-if [ -f "$SITE_ROOT"/node_modules/npm.shrinkwrap.checksum ];
-then
-    currentnpmsha=`awk '{print $1}' "$SITE_ROOT"/node_modules/npm.shrinkwrap.checksum`;
-    if [ "$currentnpmsha" == "$npmlocksha" ];
-    then
-        echo "[SB][`date +%Y-%m-%d\ %X`] NPM build up to date, nothing to change ($npmlocksha)";
-        npmfile='ignore';
-    fi
-fi
+  if [ "$npmfile" != 'ignore' ];
+  then
+      echo "[SB][`date +%Y-%m-%d\ %X`] NPM build not correct or missing ($npmlocksha)";
+      check=`grep $npmlocksha npm.cache 2>/dev/null | wc -l`;
+      if [ $check -gt 0 ];
+      then
+          # Woo - we've located a matching cache file
+          npmfile=`grep $npmlocksha npm.cache 2>/dev/null | head -n1 | cut -d' ' -f2-100`;
+      else
+          # No cache files match - boo hoo - check to see if there are new versions
+          for branch in develop master;
+          do
+              # Check if we've already found a matching file
+              if [ "$npmfile" == '' ];
+              then
+                  etag=$(curl -I https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-npm.tar.gz 2>/dev/null | grep ETag | cut -d'"' -f2);
+                  if [ $? -eq 0 ];
+                  then
+                      checketag=`grep $etag npm.etag.cache 2>/dev/null | wc -l`;
+                      if [ $checketag -eq 0 ];
+                      then
+                          # New/updated version available - download it
+                          echo "[SB][`date +%Y-%m-%d\ %X`] Downloading latest NPM build: $branch-npm.tar.gz";
+                          wget --no-verbose https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-npm.tar.gz -O $branch-npm.tar.gz 2>&1;
+                          if [ $? -eq 0 ];
+                          then
+                              # This is a new file, so remove old references
+                              sed -i "/$branch-npm.tar.gz/d" npm.etag.cache 2>/dev/null;
+                              sed -i "/$branch-npm.tar.gz/d" npm.cache 2>/dev/null;
+                              # Add new file to etag cache
+                              echo "$etag $branch-npm.tar.gz" >> npm.etag.cache;
+                              # Cleanup for purity
+                              rm -fR "${cachedir}"/node_modules 2>/dev/null;
+                              # Extract checksum
+                              tar xzf $branch-npm.tar.gz node_modules/npm.shrinkwrap.checksum;
+                              npmchecksum=`awk '{print $1}' node_modules/npm.shrinkwrap.checksum`;
+                              rm -fR "${cachedir}"/node_modules 2>/dev/null;
+                              # Add new file to NPM cache
+                              echo "$npmchecksum $branch-npm.tar.gz" >> npm.cache;
+                              # Check if this is file we need
+                              if [ "$npmchecksum" == "$npmlocksha" ];
+                              then
+                                  npmfile="$branch-npm.tar.gz";
+                              fi
+                          fi
+                      fi
+                  fi
+              fi
+          done
+      fi
+      cd "$SITE_ROOT" || exit 1;
+      if [ "$npmfile" != '' ];
+      then
+          if [ -f "${cachedir}"/$npmfile ];
+          then
+              # Extract content
+              echo "[SB][`date +%Y-%m-%d\ %X`] Found matching NPM cache file ($npmlocksha) '$npmfile', now extracting";
+              rm -fR "$SITE_ROOT"/node_modules 2>/dev/null;
+              tar xzf "${cachedir}"/$npmfile;
+          else
+              # Still no luck, build from scratch with npm
+              echo "[SB][`date +%Y-%m-%d\ %X`] Cache content:";
+              cat "${cachedir}"/npm.cache;
+              echo "[SB][`date +%Y-%m-%d\ %X`] No matching NPM cache found. Building with npm";
+              "$SITE_ROOT"/tools/pkg-build-npm.sh 2>&1;
+          fi
+      else
+          # Still no luck, build from scratch with npm
+          echo "[SB][`date +%Y-%m-%d\ %X`] Cache content:";
+          cat "${cachedir}"/npm.cache;
+          echo "[SB][`date +%Y-%m-%d\ %X`] No matching NPM cache found. Building with npm";
+          "$SITE_ROOT"/tools/pkg-build-npm.sh 2>&1;
+      fi
+  fi
+  cd "$SITE_ROOT" || exit 1;
 
-if [ "$npmfile" != 'ignore' ];
-then
-    echo "[SB][`date +%Y-%m-%d\ %X`] NPM build not correct or missing ($npmlocksha)";
-    check=`grep $npmlocksha npm.cache 2>/dev/null | wc -l`;
-    if [ $check -gt 0 ];
-    then
-        # Woo - we've located a matching cache file
-        npmfile=`grep $npmlocksha npm.cache 2>/dev/null | head -n1 | cut -d' ' -f2-100`;
-    else
-        # No cache files match - boo hoo - check to see if there are new versions
-        for branch in develop master;
-        do
-            # Check if we've already found a matching file
-            if [ "$npmfile" == '' ];
-            then
-                etag=$(curl -I https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-npm.tar.gz 2>/dev/null | grep ETag | cut -d'"' -f2);
-                if [ $? -eq 0 ];
-                then
-                    checketag=`grep $etag npm.etag.cache 2>/dev/null | wc -l`;
-                    if [ $checketag -eq 0 ];
-                    then
-                        # New/updated version available - download it
-                        echo "[SB][`date +%Y-%m-%d\ %X`] Downloading latest NPM build: $branch-npm.tar.gz";
-                        wget --no-verbose https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-npm.tar.gz -O $branch-npm.tar.gz 2>&1;
-                        if [ $? -eq 0 ];
-                        then
-                            # This is a new file, so remove old references
-                            sed -i "/$branch-npm.tar.gz/d" npm.etag.cache 2>/dev/null;
-                            sed -i "/$branch-npm.tar.gz/d" npm.cache 2>/dev/null;
-                            # Add new file to etag cache
-                            echo "$etag $branch-npm.tar.gz" >> npm.etag.cache;
-                            # Cleanup for purity
-                            rm -fR "${cachedir}"/node_modules 2>/dev/null;
-                            # Extract checksum
-                            tar xzf $branch-npm.tar.gz node_modules/npm.shrinkwrap.checksum;
-                            npmchecksum=`awk '{print $1}' node_modules/npm.shrinkwrap.checksum`;
-                            rm -fR "${cachedir}"/node_modules 2>/dev/null;
-                            # Add new file to NPM cache
-                            echo "$npmchecksum $branch-npm.tar.gz" >> npm.cache;
-                            # Check if this is file we need
-                            if [ "$npmchecksum" == "$npmlocksha" ];
-                            then
-                                npmfile="$branch-npm.tar.gz";
-                            fi
-                        fi
-                    fi
-                fi
-            fi
-        done
-    fi
-    cd "$SITE_ROOT" || exit 1;
-    if [ "$npmfile" != '' ];
-    then
-        if [ -f "${cachedir}"/$npmfile ];
-        then
-            # Extract content
-            echo "[SB][`date +%Y-%m-%d\ %X`] Found matching NPM cache file ($npmlocksha) '$npmfile', now extracting";
-            rm -fR "$SITE_ROOT"/node_modules 2>/dev/null;
-            tar xzf "${cachedir}"/$npmfile;
-        else
-            # Still no luck, build from scratch with npm
-            echo "[SB][`date +%Y-%m-%d\ %X`] Cache content:";
-            cat "${cachedir}"/npm.cache;
-            echo "[SB][`date +%Y-%m-%d\ %X`] No matching NPM cache found. Building with npm";
-            "$SITE_ROOT"/tools/pkg-build-npm.sh 2>&1;
-        fi
-    else
-        # Still no luck, build from scratch with npm
-        echo "[SB][`date +%Y-%m-%d\ %X`] Cache content:";
-        cat "${cachedir}"/npm.cache;
-        echo "[SB][`date +%Y-%m-%d\ %X`] No matching NPM cache found. Building with npm";
-        "$SITE_ROOT"/tools/pkg-build-npm.sh 2>&1;
-    fi
-fi
-cd "$SITE_ROOT" || exit 1;
+  echo "[SB][`date +%Y-%m-%d\ %X`] Building JS/CSS files";
+  "$SITE_ROOT"/tools/pkg-build-css-js.sh
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Building JS/CSS files";
-"$SITE_ROOT"/tools/pkg-build-css-js.sh
+  echo "[SB][`date +%Y-%m-%d\ %X`] Loading all demo data complete";
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Loading all demo data complete";
+  # Vagrant uses a non-standard ffmpeg, installed via Schoolbox's package repo:
+  # that does not seem to be needed here.
+  ffmpegver=`dpkg -l ffmpeg | tail -n1 | awk {'print $3'}`;
+  echo "[SB][`date +%Y-%m-%d\ %X`] ffmpeg installed: $ffmpegver";
 
-# Vagrant uses a non-standard ffmpeg, installed via Schoolbox's package repo:
-# that does not seem to be needed here.
-ffmpegver=`dpkg -l ffmpeg | tail -n1 | awk {'print $3'}`;
-echo "[SB][`date +%Y-%m-%d\ %X`] ffmpeg installed: $ffmpegver";
+  echo "[SB][`date +%Y-%m-%d\ %X`] Removing system maintenance mode";
+  if INSTANCE_ID=docker "$SITE_ROOT"/tools/maintenance/site_up.sh -eq 0 ; then
+    echo "[SB][`date +%Y-%m-%d\ %X`] Maintenance mode disabled on instance 'docker'."
+  else
+    echo "[SB][`date +%Y-%m-%d\ %X`] Could not disable maintenance mode on instance 'docker'.  Continuing."
+  fi
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Removing system maintenance mode";
-if INSTANCE_ID=docker "$SITE_ROOT"/tools/maintenance/site_up.sh -eq 0 ; then
-  echo "[SB][`date +%Y-%m-%d\ %X`] Maintenance mode disabled on instance 'docker'."
-else
-  echo "[SB][`date +%Y-%m-%d\ %X`] Could not disable maintenance mode on instance 'docker'.  Continuing."
-fi
+  # call custom provisioning
+  if [ -f "$SITE_ROOT"/post-provision.sh ];
+  then
+      echo "[SB][`date +%Y-%m-%d\ %X`] Running custom post provisioning";
+      "$SITE_ROOT"/post-provision.sh;
+  fi
 
-# call custom provisioning
-if [ -f "$SITE_ROOT"/post-provision.sh ];
-then
-    echo "[SB][`date +%Y-%m-%d\ %X`] Running custom post provisioning";
-    "$SITE_ROOT"/post-provision.sh;
-fi
+  # update all dates to current time
+  "$SITE_ROOT"/tools/increment-instance-dates.php;
 
-# update all dates to current time
-"$SITE_ROOT"/tools/increment-instance-dates.php;
+  # Clean up vcal cache
+  "$SITE_ROOT"/tools/redis/removeVcalCache.php -p;
+}
 
-# Clean up vcal cache
-"$SITE_ROOT"/tools/redis/removeVcalCache.php -p;
+main "$@"
