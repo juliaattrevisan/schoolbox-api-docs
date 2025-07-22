@@ -3,6 +3,7 @@
  #
  # @param \Schoolbox\Resource\Folder\Model $folder         The folder whose textboxes are shown
  # @param array                            $allBreadcrumbs Breadcrumbs to show on this page
+ # @param \Schoolbox\Editor\Templates\Model[] $editorTemplates Templates for the editor
  #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
@@ -23,6 +24,7 @@
                           post-changes-endpoint="{{ routeLookupIfAuthorized('textbox.postRename', {folderId: folder.id, folder: folder}) }}"
                           return-url="{{ RETURN_URL.previous.decoded ?? ('/homepage/' ~ folder.id) }}"
                           :folder-id="Number('{{ folder.id }}')"
+                          :editor-templates="{{ editorTemplates|json_encode }}"
             >
             </textbox-list>
         </div>

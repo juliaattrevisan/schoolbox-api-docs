@@ -15,6 +15,7 @@ use Component_ConfigMapper;
 use Component_Instance;
 use Schoolbox\GenericCollection;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 
 /**
  * Controller for textbox actions.
@@ -43,8 +44,9 @@ class Controller extends Base
      *
      * @param Mapper                 $mapper
      * @param Component_ConfigMapper $componentConfigMapper
+     * @param EditorTemplateHelper   $editorTemplateHelper
      */
-    public function __construct(Mapper $mapper, Component_ConfigMapper $componentConfigMapper)
+    public function __construct(Mapper $mapper, Component_ConfigMapper $componentConfigMapper, private EditorTemplateHelper $editorTemplateHelper)
     {
         $this->mapper                = $mapper;
         $this->componentConfigMapper = $componentConfigMapper;
@@ -175,8 +177,9 @@ class Controller extends Base
         ];
 
         $this->response = $this->responseFromTemplate('@textbox/index.twig', [
-            'folder'         => $folder,
-            'allBreadcrumbs' => $allBreadcrumbs,
+            'folder'          => $folder,
+            'allBreadcrumbs'  => $allBreadcrumbs,
+            'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
         ]);
     }
 
