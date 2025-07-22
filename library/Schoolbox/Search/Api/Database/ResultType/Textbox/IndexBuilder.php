@@ -27,6 +27,10 @@ use Schoolbox\Search\Api\Database\Index\BuildType;
  */
 class IndexBuilder extends BaseBuilder
 {
+    /**
+     * This is a cache, so repeated calls to accepts() do not cause repeated database queries to look up the value.
+     * @var int|null
+     */
     private ?int $textboxComponentConfigDefinitionId = null;
 
     /**
@@ -54,8 +58,7 @@ class IndexBuilder extends BaseBuilder
         }
 
         if ($subject instanceof Component_Config) {
-            // Need to lookup component config definition,
-            // to determine if it is actually a textbox.
+            // Need to look up the component config definition to determine if $subject is actually a textbox.
             $this->textboxComponentConfigDefinitionId ??= $this->getTextboxComponentConfigDefinitionId();
             return $this->textboxComponentConfigDefinitionId === $subject->getConfigDefinitionId();
         }
