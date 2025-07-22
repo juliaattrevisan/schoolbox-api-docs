@@ -35,7 +35,7 @@ class Module extends BaseModule
         /* Staff only, for moderation workflow
          * Staff members must have the Learning Moments role permission though.
          */
-        $staffOnlyRule = new Rule\LazyCallback(function() {
+        $staffOnlyRule = new Rule\LazyCallback(function () {
             return new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\HasRolePermission(Role::PERMISSION_ACCESS_EVIDENCE, Role::STAFF),
