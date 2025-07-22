@@ -4,6 +4,7 @@
  # context:   \Schoolbox\Resource\Folder\Model|null                     this component's context, if any
  # returnUrl: string                                                    encoded return url
  # writable:  bool                                                      Is this component's content writable?
+ # editorTemplates: \Schoolbox\Editor\Templates\Model[]                 List of editor templates available for this component
  #}
 
 {% if writable %}
@@ -12,6 +13,7 @@
         textbox:   textbox,
         context:   context,
         returnUrl: returnUrl,
+        editorTemplates: editorTemplates
     } only %}
 {% else %}
     {% include '@textbox/component/homepage/readonly.twig' with {
