@@ -55,7 +55,7 @@ export type PastoralRecord = {
     student: User;
     heading: string;
     isArchived: boolean;
-    expiresAt?: PastoralDate;
+    expiresAt?: string;
     severity?: Severity;
     points?: number;
     type: PastoralType;
