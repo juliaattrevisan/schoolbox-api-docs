@@ -52,7 +52,11 @@ class Controller extends Base
         /* Soft-delete all the comments associated with this learning moment
          */
         if ($payload['deleteComments'] ?? false) {
-            $this->commentMapper->deleteByColumn('discussion_thread_id', $evidence->getDiscussionThread()->getId());
+            /* Learning moments might not even have a discussion thread yet
+             */
+            if ($evidence->getDiscussionThread()) {
+                $this->commentMapper->deleteByColumn('discussion_thread_id', $evidence->getDiscussionThread()->getId());
+            }
         }
 
         /* Publish it to the world
