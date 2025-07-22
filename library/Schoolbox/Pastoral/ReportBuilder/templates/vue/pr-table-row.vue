@@ -11,7 +11,7 @@ import type { TableHeader, RowOptions, RecordsAndPoints } from "../js/types/past
 
 type Props = {
     headers: TableHeader[];
-    rowData: RowOptions[];
+    rowData: { [key: string]: RowOptions };
     recordsOrPoints: string;
 };
 const props = defineProps<Props>();
@@ -29,41 +29,54 @@ function isUser(data: RowOptions): data is User {
 <template>
     <tr>
         <td
-            v-for="(data, index) in props.rowData"
-            :key="props.headers[index]?.key || index"
-            :class="`u-border-right ${props.headers[index].key === 'user' ? 'u-sticky-left u-sticky-left--row' : ''} ${props.headers[index].key === 'total' ? 'total-cell' : ''}`"
+            v-for="header in props.headers"
+            :key="header.key"
+            :class="`u-border-right ${header.key === 'user' ? 'u-sticky-left u-sticky-left--row' : ''} ${header.key === 'total' ? 'total-cell' : ''}`"
         >
-            <template v-if="props.headers[index].type == TableHeaderType.USER && isUser(data)">
+            <template v-if="header.type == TableHeaderType.USER && isUser(props.rowData[header.key])">
                 <div class="c-card">
                     <div class="l-flex-row l-gap-m">
-                        <user-photo :user="data" render="small" rounded-corners />
+                        <user-photo :user="props.rowData[header.key] as User" render="small" rounded-corners />
                         <div class="l-flex-col l-flex--justify-center f-no-margins">
-                            <a v-if="data._links?.profile" :href="data._links.profile" title="View Profile">
-                                {{ data.lastName }}, {{ data.preferredName || data.firstName }}
-                            </a>
-                            <template v-else>
-                                {{ data.lastName }}, {{ data.preferredName || data.firstName }}
+                            <template v-if="isUser(props.rowData[header.key])">
+                                <a
+                                    v-if="(props.rowData[header.key] as User)._links?.profile"
+                                    :href="(props.rowData[header.key] as User)._links!.profile"
+                                    title="View Profile"
+                                >
+                                    {{ (props.rowData[header.key] as User).lastName }},
+                                    {{
+                                        (props.rowData[header.key] as User).preferredName ||
+                                        (props.rowData[header.key] as User).firstName
+                                    }}
+                                </a>
+                                <template v-else>
+                                    {{ (props.rowData[header.key] as User).lastName }},
+                                    {{
+                                        (props.rowData[header.key] as User).preferredName ||
+                                        (props.rowData[header.key] as User).firstName
+                                    }}
+                                </template>
                             </template>
                         </div>
                     </div>
                 </div>
             </template>
-            <template v-else-if="props.headers[index].type == TableHeaderType.RECORDS_AND_POINTS">
+            <template v-else-if="header.type == TableHeaderType.RECORDS_AND_POINTS">
                 <!-- Change data based on current radio button selection -->
                 <Transition name="fade" mode="out-in">
-                    <span :key="`${props.recordsOrPoints}-${index}`">
+                    <span :key="`${props.recordsOrPoints}-${header.key}`">
                         <template v-if="props.recordsOrPoints === 'Records'">
-<!--                            {{ (data as RecordsAndPoints).records > 0 ? (data as RecordsAndPoints).records : "" }}-->
-                            {{ (data as RecordsAndPoints).records }}
+                            {{ (props.rowData[header.key] as RecordsAndPoints).records }}
                         </template>
                         <template v-else>
-                            {{ (data as RecordsAndPoints).records > 0 ? (data as RecordsAndPoints).points : "" }}
+                            {{ (props.rowData[header.key] as RecordsAndPoints).points }}
                         </template>
                     </span>
                 </Transition>
             </template>
             <template v-else>
-                {{ data }}
+                {{ props.rowData[header.key] }}
             </template>
         </td>
     </tr>
