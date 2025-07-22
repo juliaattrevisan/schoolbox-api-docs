@@ -106,7 +106,9 @@
                 saveButton:            '[data-action="save"]',
                 editorInstance:        '[data-content]',
                 fileBrowserCategoryId: Number("{{ context.id }}"),
+                {% if editorTemplates and USER.role.staff %}
                 editorTemplates:       {{ editorTemplates | json_encode | raw }},
+                {% endif %}
             });
 
             //to start the Text Box editor automatically after creating a Text Box,
