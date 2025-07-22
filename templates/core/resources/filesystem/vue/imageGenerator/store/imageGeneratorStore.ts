@@ -78,14 +78,14 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
         const response = await generateImage(generateRoute.value, payload, (message) => {
             if (message.success === false) {
                 hasErrored = true;
-                activeGeneration.value = null;
                 feed.value.push({
                     type: "response",
                     status: "error",
                     entryKey: getNextEntryKey(),
-                    responseId: null,
+                    responseId: activeGeneration.value?.responseId ?? null,
                     message: message.message,
                 });
+                activeGeneration.value = null;
                 return;
             }
 
@@ -93,13 +93,16 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
                 return;
             }
 
-            if (message.data.type === "response.image_generation_call.partial_image") {
+            if (message.data.type === "response.created") {
+                activeGeneration.value.responseId = message.data.response.id;
+            } else if (message.data.type === "response.image_generation_call.partial_image") {
                 activeGeneration.value.src = `data:image/png;base64,${message.data.partial_image_b64}`;
             } else if (message.data.type === "response.output_text.delta") {
                 activeGeneration.value.message += message.data.delta;
             }
         });
 
+        const responseId = activeGeneration.value?.responseId ?? null;
         activeGeneration.value = null;
 
         if (hasErrored) {
@@ -112,7 +115,7 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
                 type: "response",
                 status: "error",
                 entryKey: getNextEntryKey(),
-                responseId: null,
+                responseId,
                 message: response.message,
             });
             return false;
