@@ -25,9 +25,11 @@
          * @returns {Promise}
          */
         function formWillSubmit() {
-            const formData = this;
-            // find the showParticipationPrompt in the formData
-            const showParticipationPrompt = formData.find((item) => item.name === "showParticipationPrompt");
+            {% if assessmentType is defined and assessmentType|length and customisedFor is not defined %}
+            const showParticipationPrompt = true;
+            {% else %}
+            const showParticipationPrompt = false;
+            {% endif %}
             return new Promise(function(resolve, reject) {
                 if (showParticipationPrompt) {
                     $("body").confirmDialog({
@@ -327,11 +329,6 @@
 
                     {% if assessmentType is defined and assessmentType|length %}
                     <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
-                    {% endif %}
-
-                    {% if assessmentType is defined and assessmentType|length and customisedFor is not defined %}
-                    <!-- To show the update participation prompt when creating a new activity that is not a customised new activity -->
-                    <input type="hidden" name="showParticipationPrompt" value="true" />
                     {% endif %}
 
                     <div class="small-12 columns {% if assessmentType is not defined or not assessmentType|length %}hide{% endif %}" data-mage-collapsed data-assessment-details>
