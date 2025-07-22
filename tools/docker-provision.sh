@@ -299,7 +299,7 @@ function init_composer_dependencies() {
       if [ $check -gt 0 ];
       then
           # Woo - we've located a matching cache file
-          log "Found matching vendor cache file '$vendorfile'";
+#          log "Found matching vendor cache file '$vendorfile'";
           vendorfile=`grep $composerlocksha vendor.cache 2>/dev/null | head -n1 | cut -d' ' -f2-100`;
       else
           # No cache files match - boo hoo - check to see if there are new versions
@@ -496,7 +496,7 @@ function init_npm_dependencies() {
       if [ $check -gt 0 ];
       then
           # Woo - we've located a matching cache file
-          local npmfile;
+#          local npmfile;
           npmfile=`grep $npmlocksha npm.cache 2>/dev/null | head -n1 | cut -d' ' -f2-100`;
       else
           # No cache files match - boo hoo - check to see if there are new versions
