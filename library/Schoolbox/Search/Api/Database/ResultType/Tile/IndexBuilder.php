@@ -75,6 +75,10 @@ class IndexBuilder extends BaseBuilder
      */
     public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
+        if ($subject !== null && !$this->accepts($subject, BuildType::UPDATE)) {
+            return;
+        }
+
         // Notes:
         // * Tiles without a title should not appear in search results (AC for SA-8841)
         // * Only tiles in homepages should be included in the index (not dashboards, not templates)
@@ -128,9 +132,6 @@ class IndexBuilder extends BaseBuilder
             $params['toDate'] = $toDate->getDatabase();
         }
         if ($subject) {
-            if (!$this->accepts($subject, BuildType::UPDATE)) {
-                return;
-            }
             [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::UPDATE, $queryString, $params);
         }
         $query = $this->connector->prepareQuery($queryString);
@@ -160,6 +161,10 @@ class IndexBuilder extends BaseBuilder
         ?Alaress_Date_Format $toDate,
         ?object $subject
     ): iterable {
+        if ($subject !== null && !$this->accepts($subject, BuildType::DELETE)) {
+            return;
+        }
+
         // Examine and clean up every search index for tiles.
         $searchIndexQueryString = "
             SELECT identifier
