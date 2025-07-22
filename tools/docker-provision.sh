@@ -318,12 +318,24 @@ function install_instance() {
   mariadb -h mariadb -u root -D schoolbox < "${SITE_ROOT}/sql/vagrant.sql"
   mariadb -h mariadb -u root -D schoolbox < "${cachedir}/vagrant-secrets.sql"
 
+}
+
+function site_down() {
   log "Putting system in maintenance mode";
   if INSTANCE_ID="${default_instance_id}" "$SITE_ROOT"/tools/maintenance/site_down.sh -eq 0 ; then
-    log "Maintenance mode enabled on instance 'docker'."
+    log "Maintenance mode enabled on instance '${default_instance_id}'"
   else
-    log "Could not enable maintenance mode on instance 'docker'.  Exiting."
+    error "Could not enable maintenance mode on instance '${default_instance_id}': exiting"
     exit 1;
+  fi
+}
+
+function site_up() {
+  log "Removing system maintenance mode";
+  if INSTANCE_ID="${default_instance_id}" "$SITE_ROOT"/tools/maintenance/site_up.sh -eq 0 ; then
+    log "Maintenance mode disabled on instance '${default_instance_id}'"
+  else
+    warn "Could not disable maintenance mode on instance 'docker': continuing"
   fi
 }
 
@@ -456,6 +468,7 @@ function main() {
   init_composer_dependencies
 
   install_instance
+  site_down
 
   # Set ENV VARs for root + vagrant users from vagrant.yaml params
   declare -A env_vars=(
@@ -487,12 +500,7 @@ function main() {
 #  ffmpegver=`dpkg -l ffmpeg | tail -n1 | awk {'print $3'}`;
 #  log "ffmpeg installed: $ffmpegver";
 
-  log "Removing system maintenance mode";
-  if INSTANCE_ID=docker "$SITE_ROOT"/tools/maintenance/site_up.sh -eq 0 ; then
-    log "Maintenance mode disabled on instance 'docker'."
-  else
-    log "Could not disable maintenance mode on instance 'docker'.  Continuing."
-  fi
+  site_up
 
   # call custom provisioning
   if [ -f "$SITE_ROOT"/post-provision.sh ];
