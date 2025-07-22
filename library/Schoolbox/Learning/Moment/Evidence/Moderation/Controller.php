@@ -39,12 +39,12 @@ class Controller extends Base
     /**
      * Persists any staff-made changes to a Moment and sets it in the published state
      *
-     * @api   POST /learning/evidence/{id}/publish
+     * @api   PUT /learning/evidence/{id}/publish
      * @param Model $evidence
      * @return void
      * @throws MapperException
      */
-    public function postPublish(Model $evidence): void
+    public function putPublish(Model $evidence): void
     {
         $requestTranslator = new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
         $requestTranslator->setCurriculumTaggingEnabled($this->curriculumTaggingEnabled());

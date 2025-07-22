@@ -12,7 +12,6 @@ namespace Schoolbox\Learning\Moment\Evidence\Moderation;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
-use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Closure;
 use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
@@ -37,7 +36,7 @@ class Module extends BaseModule
          * Staff members must have the Learning Moments role permission though.
          */
         $staffOnlyRule = new Rule\LazyCallback(function() {
-            new Rule\Any(
+            return new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\HasRolePermission(Role::PERMISSION_ACCESS_EVIDENCE, Role::STAFF),
             );
@@ -46,9 +45,9 @@ class Module extends BaseModule
         /* Publish a Learning Moment
          */
         $this->register(
-            self::METHOD_POST,
+            self::METHOD_PUT,
             '/{evidenceId}/publish',
-            'postPublish',
+            'putPublish',
             $staffOnlyRule,
             Closure::fromCallable([$this, 'preloadEvidence']),
         );

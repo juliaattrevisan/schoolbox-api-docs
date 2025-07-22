@@ -25,7 +25,7 @@
      # Otherwise, presume updating the Moment's contents as a student
      #}
     {% if USER.role.isStaff and USER.role.accessEvidence and evidence.isSubmitted %}
-        {% set formAction = routeLookup('learningMomentModeration.postPublish', {evidenceId: evidence.id}) %}
+        {% set formAction = routeLookup('learningMomentModeration.putPublish', {evidenceId: evidence.id}) %}
     {% else %}
         {% set formAction = routeLookup('learningMomentEvidence.putEvidence', {evidenceId: evidence.id}) %}
     {% endif %}
