@@ -240,7 +240,7 @@ class Controller extends Base
                 // If we've indicated that this is a streaming request, send it in the right format
                 if (headers_sent()) {
                     echo sprintf("event: error\ndata: %s\n\n", json_encode($problem));
-                    return;
+                    die();
                 }
 
                 $this->response = $this->responseAsJson($problem)
@@ -258,6 +258,12 @@ class Controller extends Base
             $problem = (new ApiProblem($e->getMessage()))
                 ->setStatus($returnCode)
                 ->asArray();
+
+            // If we've indicated that this is a streaming request, send it in the right format
+            if (headers_sent()) {
+                echo sprintf("event: error\ndata: %s\n\n", json_encode($problem));
+                die();
+            }
 
             $this->response = $this->responseAsJson($problem)
                 ->withStatus($returnCode);
