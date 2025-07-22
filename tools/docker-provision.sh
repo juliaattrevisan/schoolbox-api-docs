@@ -192,9 +192,8 @@ function download_artifact() {
   # Location to extract to
   local extract_dir=$4
 
-  cd "$cachedir" || exit 1;
   local lock_checksum;
-  lock_checksum=`sha1sum "../${lock_file}" 2>/dev/null | awk '{print $1}'`;
+  lock_checksum=`sha1sum "${cachedir}/${lock_file}" 2>/dev/null | awk '{print $1}'`;
 
   local artifact_file='';
   local current_checksum;
@@ -208,8 +207,8 @@ function download_artifact() {
 
   local cache_file;
   local etag_file;
-  cache_file="$artifact_name.cache"
-  etag_file="$artifact_name.etag.cache"
+  cache_file="${cachedir}/$artifact_name.cache"
+  etag_file="${cachedir}/$artifact_name.etag.cache"
 
   if [ "$artifact_file" != 'ignore' ]; then
       # download files
@@ -239,7 +238,7 @@ function download_artifact() {
                           local version_artifact_name;
                           version_artifact_name="${branch}-${artifact_name}"
                           log "Downloading latest artifact: ${version_artifact_name}";
-                          wget --no-verbose "${artifact_source}/${version_artifact_name}" -O "${version_artifact_name}" 2>&1;
+                          wget --no-verbose "${artifact_source}/${version_artifact_name}" -O "${cachedir}/${version_artifact_name}" 2>&1;
                           if [ $? -eq 0 ]; then
                               # This is a new file, so remove old references
                               sed -i "/${version_artifact_name}/d" "$etag_file" 2>/dev/null;
@@ -251,9 +250,9 @@ function download_artifact() {
                               rm -fR "${cachedir}/${extract_dir:?}" 2> /dev/null;
 
                               # Extract checksum
-                              tar xzf "${version_artifact_name}" "${checksum_file}";
+                              tar xzf "${cachedir}/${version_artifact_name}" "${extract_dir}/${checksum_file}";
                               local version_artifact_checksum
-                              version_artifact_checksum=`awk '{print $1}' "${checksum_file}"`;
+                              version_artifact_checksum=`awk '{print $1}' "${extract_dir}/${checksum_file}"`;
 
                               # Cleanup again
                               rm -fR "${cachedir}/${extract_dir:?}" 2> /dev/null;
@@ -261,7 +260,7 @@ function download_artifact() {
                               # Add new file to vendor cache
                               echo "$version_artifact_checksum ${version_artifact_name}" >> "$cache_file";
                               # Check if this is file we need
-                              if [ "$version_artifact_checksum" == "$composerlocksha" ]; then
+                              if [ "$version_artifact_checksum" == "$lock_checksum" ]; then
                                   artifact_file="${version_artifact_name}";
                               fi
                           fi
