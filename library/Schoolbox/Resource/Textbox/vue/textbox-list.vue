@@ -66,7 +66,7 @@ export default {
 
         /**
          * Editor templates to use in the CKEditor instances.
-         * This is an array of objects with `name` and `template` properties.
+         * Can refer to www/static/js/editor/types/editorTypes.ts:Template
          */
         editorTemplates: {
             type: Array,
