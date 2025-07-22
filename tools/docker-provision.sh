@@ -119,26 +119,14 @@ function setup_aws_sso() {
   fi
 }
 
-function main() {
-  load_consts
-  if [ $? -eq 0 ]; then
-    error "Not all required consts defined: exiting"
-    exit 1
-  fi
-
-  load_config
-  if [ $? -eq 0 ]; then
-    error "Not all required configs defined: exiting"
-    exit 1
-  fi
-  setup_aws_sso
-
-  log "Retrieving latest data files";
+function cleanup_cache_dir() {
   log "Cleaning up zero byte files";
   find "${cachedir}" -type f -empty -delete;
+}
 
-  # Download some files from S3
-  # Note these still use the Vagrant names
+function download_secrets() {
+  log "Retrieving latest secrets";
+  # Download some files from S3: note these still use the Vagrant names
   if ! $SITE_ROOT/tools/download-s3-file.sh --data-source "$data_source"  --file-name "vagrant-secrets.sql" --cache-dir "$cachedir"; then
     error "Unable to download s3 file: 'vagrant-secrets.sql': exiting";
     exit 1;
@@ -147,21 +135,28 @@ function main() {
     error "Unable to download s3 file: 'vagrant-cleanup-secrets.sql': exiting";
     exit 1;
   fi
+}
 
+function mark_safe_for_git() {
+  log "Adding Schoolbox dir ${SITE_ROOT} as safe for Git";
+  git config --global --add safe.directory "${SITE_ROOT}"
+}
+
+function init_database() {
   # Timezone data: should be run in mariadb container on setup
   #echo "[SB][`date +%Y-%m-%d\ %X`] Updating timezone data";
   #mysql_tzinfo_to_sql /usr/share/zoneinfo 2>/dev/null | mysql --defaults-extra-file=/root/.my.cnf mysql 2>/dev/null;
 
   log "Creating Schoolbox MariaDB schema and user";
   mariadb -h mariadb -u root < "${SITE_ROOT}/docker/schoolbox/sql/setup.sql"
+}
 
-  log "Adding Schoolbox dir ${SITE_ROOT} as safe for Git";
-  git config --global --add safe.directory "${SITE_ROOT}"
+function init_composer_dependencies() {
+  log "Installing vendor dependencies with composer";
+  cd "$cachedir" || exit 1;
+  local vendorfile='';
+  local composerlocksha=`sha1sum ../composer.lock 2>/dev/null | awk '{print $1}'`;
 
-  log "Installing vendor submodules with composer";
-  cd $cachedir || exit;
-  vendorfile='';
-  composerlocksha=`sha1sum ../composer.lock 2>/dev/null | awk '{print $1}'`;
   if [ -f "$SITE_ROOT"/vendor/composer.lock.checksum ];
   then
       currentvendorsha=`awk '{print $1}' "$SITE_ROOT"/vendor/composer.lock.checksum`;
@@ -174,7 +169,7 @@ function main() {
 
   if [ "$vendorfile" != 'ignore' ];
   then
-      check=`grep $composerlocksha vendor.cache 2>/dev/null | wc -l`;
+      local check=`grep $composerlocksha vendor.cache 2>/dev/null | wc -l`;
       if [ $check -gt 0 ];
       then
           # Woo - we've located a matching cache file
@@ -186,9 +181,11 @@ function main() {
               # Check if we've already found a matching file
               if [ "$vendorfile" == '' ];
               then
+                  local etag;
                   etag=$(curl -I https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-vendor-php-dev.tar.gz 2>/dev/null | grep ETag | cut -d'"' -f2);
                   if [ $? -eq 0 ];
                   then
+                      local checketag;
                       checketag=`grep $etag vendor.etag.cache 2>/dev/null | wc -l`;
                       if [ $checketag -eq 0 ];
                       then
@@ -206,6 +203,7 @@ function main() {
                               rm -fR "${cachedir}"/vendor 2>/dev/null;
                               # Extract checksum
                               tar xzf $branch-vendor-php-dev.tar.gz vendor/composer.lock.checksum;
+                              local vendorchecksum
                               vendorchecksum=`awk '{print $1}' vendor/composer.lock.checksum`;
                               rm -fR "${cachedir}"/vendor 2>/dev/null;
                               # Add new file to vendor cache
@@ -221,7 +219,7 @@ function main() {
               fi
           done
       fi
-      cd "$SITE_ROOT" || exit;
+      cd "$SITE_ROOT" || exit 1;
       if [ "$vendorfile" != '' ];
       then
           if [ -f "${cachedir}"/$vendorfile ];
@@ -244,10 +242,31 @@ function main() {
   cd "$SITE_ROOT" || exit;
 
   # Composer autoload needs to apply patches as well:
-  # just use composer install for that
-  echo "[SB][`date +%Y-%m-%d\ %X`] Updating composer autoload and patches";
+  # just use composer install for that, rather than dump-autoload
+  log "Updating composer autoload and patches";
   composer install -o --no-interaction
-  #su -s /bin/bash -c "cd $SITE_ROOT && composer dump-autoload -o --no-interaction" vagrant
+}
+
+function main() {
+  load_consts
+  if [ $? -eq 0 ]; then
+    error "Not all required consts defined: exiting"
+    exit 1
+  fi
+
+  load_config
+  if [ $? -eq 0 ]; then
+    error "Not all required configs defined: exiting"
+    exit 1
+  fi
+  setup_aws_sso
+
+  cleanup_cache_dir
+  download_secrets
+  mark_safe_for_git
+
+  init_database
+  init_composer_dependencies
 
   echo "[SB][`date +%Y-%m-%d\ %X`] Installing instance via 'schoolbox-data-refresh.sh'";
 
