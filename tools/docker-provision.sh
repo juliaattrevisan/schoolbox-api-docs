@@ -2,7 +2,7 @@
 # Provisions the Docker environment: port of `vagrant-provision.sh`
 
 # Global constants and functions
-source /usr/share/schoolbox/tools/vagrant-consts.sh # Cannot derive this, because it is copied by vagrant to /tmp in guest
+source /usr/share/schoolbox/tools/docker-consts.sh
 
 # Global vars: consider reading from YAML directly, instead of from args.
 # Also consider using an .env or .ini file?
@@ -97,7 +97,7 @@ setup_aws_sso
 #  taskd_systemd_service_installed="0"
 #fi
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Setting up vagrant with options:";
+echo "[SB][`date +%Y-%m-%d\ %X`] Setting up Docker environment with options:";
 echo "[SB][`date +%Y-%m-%d\ %X`] Data Source: $data_source";
 echo "[SB][`date +%Y-%m-%d\ %X`] Data Filename: $data_filename";
 echo "[SB][`date +%Y-%m-%d\ %X`] External DB: $external_db";
@@ -116,6 +116,7 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Cleaning up zero byte files";
 find "${cachedir}" -type f -empty -delete;
 
 # Download some files from S3
+# These still use the Vagrant names
 if ! $SITE_ROOT/tools/download-s3-file.sh --data-source "$data_source"  --file-name "vagrant-secrets.sql" --cache-dir "$cachedir"; then
   echo "Error: Unable to download s3 file: 'vagrant-secrets.sql'";
   exit 1;
@@ -216,12 +217,12 @@ then
         else
             # Still no luck, build from scratch with composer
             echo "[SB][`date +%Y-%m-%d\ %X`] No matching vendor cache found. Building with composer";
-            su -s /bin/bash -c "cd $SITE_ROOT && tools/composer.sh" vagrant 2>&1
+            "$SITE_ROOT"/tools/composer.sh
         fi
     else
         # Still no luck, build from scratch with composer
         echo "[SB][`date +%Y-%m-%d\ %X`] No matching vendor cache found. Building with composer";
-        su -s /bin/bash -c "cd $SITE_ROOT && tools/composer.sh" vagrant 2>&1
+        "$SITE_ROOT"/tools/composer.sh
     fi
 fi
 cd "$SITE_ROOT" || exit;
