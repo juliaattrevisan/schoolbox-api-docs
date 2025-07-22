@@ -512,9 +512,9 @@ function getCustomisationLabel(plan: Plan | CustomisedPlan): string {
                 </select>
             </div>
             <div class="l-flex l-gap-xs f-no-margins">
-                <button class="button l-flex__item--1-auto" @click.prevent="isIncludeOpen = false">Cancel</button>
+                <button class="button l-flex__item--1" @click.prevent="isIncludeOpen = false">Cancel</button>
                 <button
-                    class="button submit l-flex__item--1-auto"
+                    class="button submit l-flex__item--1"
                     :disabled="!selectedActivity"
                     @click.prevent="includeParticipantInExistingPlan()"
                 >
