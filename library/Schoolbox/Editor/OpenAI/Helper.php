@@ -233,8 +233,10 @@ class Helper
                 $this->appendChunkToLog($event, $log, $type);
 
                 // Is this the final event?
-                if ($event['type'] === 'response.completed') {
+                // There are 3 possible events that indicate the end of a response (see https://platform.openai.com/docs/api-reference/responses-streaming/response)
+                if (in_array($event['type'], ['response.completed', 'response.failed', 'response.incomplete'])) {
                     $completedEvent = $event['data'][0]['response'];
+                    // Keep reading the stream as there *might* be more later that we can still log to debug issues
                 }
 
                 // Keep track of whether we're generating an image
