@@ -195,13 +195,8 @@ class Transmit
 
             $this->changeState(
                 $model,
-                sprintf(
-                    'Report %s: Student Submission File %s %s has an invalid mime type; setting status [%s]',
-                    $model->getId(),
-                    $ssf->getId(),
-                    $ssf->getBasename(),
-                    Turnitin\File\Model::STATUS_ERROR
-                ),
+                "Report {$model->getId()}: Student Submission File {$ssf->getId()} {$ssf->getBasename()}" .
+                " has an invalid mime type; setting status [" . Turnitin\File\Model::STATUS_ERROR . ']',
                 Turnitin\File\Model::STATUS_ERROR
             );
 
