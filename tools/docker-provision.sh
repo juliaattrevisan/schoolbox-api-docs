@@ -179,6 +179,102 @@ function init_database() {
   mariadb -h mariadb -u root < "${SITE_ROOT}/docker/schoolbox/sql/setup.sql"
 }
 
+function download_artifact() {
+  # Name of the artifact to download
+  local artifact_name=$1
+
+  # Location of the lock file to check
+  local lock_file=$2
+
+  # Location of the checksum
+  local checksum_file=$3
+
+  # Location to extract to
+  local extract_dir=$4
+
+  cd "$cachedir" || exit 1;
+  local lock_checksum;
+  lock_checksum=`sha1sum "../${lock_file}" 2>/dev/null | awk '{print $1}'`;
+
+  local artifact_file='';
+  local current_checksum;
+  if [ -f "$SITE_ROOT/${checksum_file}" ]; then
+      current_checksum=`awk '{print $1}' "$SITE_ROOT/${checksum_file}"`;
+      if [ "$lock_checksum" == "$current_checksum" ]; then
+          log "Artifact $artifact_name up to date, nothing to change";
+          artifact_file='ignore';
+      fi
+  fi
+
+  local cache_file;
+  local etag_file;
+  cache_file="$artifact_name.cache"
+  etag_file="$artifact_name.etag.cache"
+
+  if [ "$artifact_file" != 'ignore' ]; then
+      # download files
+      local check;
+      check=`grep "$lock_checksum" "$cache_file" 2>/dev/null | wc -l`;
+      if [ $check -gt 0 ]; then
+          # We've located a matching cached file
+          artifact_file=`grep "$lock_checksum" "$cache_file" 2>/dev/null | head -n1 | cut -d' ' -f2-100`;
+      else
+          # No cached files match: check to see if there are new versions
+          log "No matching cached artifact file found: downloading";
+
+          for branch in develop master;
+          do
+              # Check if we've already found a matching file
+              if [ "$artifact_file" == '' ];
+              then
+                  local etag;
+                  etag=$(curl -I "${artifact_source}/$branch-${artifact_name}" 2>/dev/null | grep ETag | cut -d'"' -f2);
+                  if [ $? -eq 0 ];
+                  then
+                      local check_etag;
+                      check_etag=`grep $etag $etag_file 2>/dev/null | wc -l`;
+                      if [ $check_etag -eq 0 ];
+                      then
+                          # New/updated version available - download it
+                          local version_artifact_name;
+                          version_artifact_name="${branch}-${artifact_name}"
+                          log "Downloading latest artifact: ${version_artifact_name}";
+                          wget --no-verbose "${artifact_source}/${version_artifact_name}" -O "${version_artifact_name}" 2>&1;
+                          if [ $? -eq 0 ]; then
+                              # This is a new file, so remove old references
+                              sed -i "/${version_artifact_name}/d" "$etag_file" 2>/dev/null;
+                              sed -i "/${version_artifact_name}/d" "$cache_file" 2>/dev/null;
+                              # Add new file to etag cache
+                              echo "$etag ${version_artifact_name}" >> "$etag_file";
+
+                              # Cleanup for purity?
+                              rm -fR "${cachedir}/${extract_dir:?}" 2> /dev/null;
+
+                              # Extract checksum
+                              tar xzf "${version_artifact_name}" "${checksum_file}";
+                              local version_artifact_checksum
+                              version_artifact_checksum=`awk '{print $1}' "${checksum_file}"`;
+
+                              # Cleanup again
+                              rm -fR "${cachedir}/${extract_dir:?}" 2> /dev/null;
+
+                              # Add new file to vendor cache
+                              echo "$version_artifact_checksum ${version_artifact_name}" >> "$cache_file";
+                              # Check if this is file we need
+                              if [ "$version_artifact_checksum" == "$composerlocksha" ]; then
+                                  artifact_file="${version_artifact_name}";
+                              fi
+                          fi
+                      fi
+                  fi
+              fi
+          done
+      fi
+  fi
+
+  return "$artifact_file"
+}
+
 function init_composer_dependencies() {
   log "Installing vendor dependencies with composer";
   cd "$cachedir" || exit 1;
