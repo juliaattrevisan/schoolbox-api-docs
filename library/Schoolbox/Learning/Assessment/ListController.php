@@ -668,7 +668,7 @@ class ListController extends Web\Controller\Base
                 $sourceAssessment = $this->getAssessmentMapper()->findById($postData['customisedFor']);
 
                 if (0 === strcasecmp($sourceAssessment->getTitle(), $postData['title'])) {
-                    throw new \InvalidArgumentException('The activity can not have the same name as the original activity.');
+                    throw new \InvalidArgumentException('The activity can not have the same title as the original activity');
                 }
 
                 /* Excluding the participant from the original assessment when assigned to another assessment
