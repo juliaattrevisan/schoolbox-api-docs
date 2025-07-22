@@ -53,21 +53,27 @@ function verify_folders() {
 }
 
 function load_consts() {
-  # Load global constants and functions
-  source /usr/share/schoolbox/tools/docker-consts.sh
+  # Load global constants and functions:
+  # SITE_ROOT is not yet defined, so assume this script is running in what will
+  # eventually be SITE_ROOT
+  source ./tools/docker-consts.sh
 
   log "Verifying constants:"
   local return=1
   verify_args "${REQUIRED_CONSTS[@]}"
-  return=$?
+  if [ $? -eq 0 ]; then
+    error "Not all required consts defined: exiting"
+    exit 1
+  fi
   echo ""
 
   log "Verifying constants are folders:"
   verify_folders "${REQUIRED_CONSTS[@]}"
-  if [ $? -eq 0 ]; then return=0; fi;
+  if [ $? -eq 0 ]; then
+    error "Not all required consts are folders: exiting"
+    exit 1
+  fi
   echo ""
-
-  return $return
 }
 
 function load_config() {
@@ -77,14 +83,12 @@ function load_config() {
     source "${SITE_ROOT}/docker.ini"
   fi
 
-  local return=1
-
   log "Verifying configuration:"
   verify_args "${REQUIRED_CONFIGS[@]}"
-  if [ $? -eq 0 ]; then return=0; fi;
-  echo ""
-
-  return $return
+  if [ $? -eq 0 ]; then
+    error "Not all required configs defined: exiting"
+    exit 1
+  fi
 }
 
 # Setup AWS CLI: copied from `vagrant-provision-pre-puppet.sh`
@@ -475,16 +479,7 @@ function init_npm_dependencies() {
 
 function main() {
   load_consts
-  if [ $? -eq 0 ]; then
-    error "Not all required consts defined: exiting"
-    exit 1
-  fi
-
   load_config
-  if [ $? -eq 0 ]; then
-    error "Not all required configs defined: exiting"
-    exit 1
-  fi
   setup_aws_sso
 
   cleanup_cache_dir
