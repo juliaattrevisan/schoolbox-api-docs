@@ -58,7 +58,7 @@ class IndexBuilder extends BaseBuilder
         }
 
         if ($subject instanceof Component_Config) {
-            // Need to look up the component config definition to determine if $subject is actually a textbox.
+            // Need to look up the component config definition to determine if $subject is relevant.
             $this->textboxComponentConfigDefinitionId ??= $this->getTextboxComponentConfigDefinitionId();
             return $this->textboxComponentConfigDefinitionId === $subject->getConfigDefinitionId();
         }
