@@ -285,7 +285,7 @@ class IndexBuilder extends BaseBuilder
         } elseif ($subject instanceof Component_Config) {
             $searchIndexQueryString .= ' AND identifier LIKE :componentIdentifier';
             $searchIndexParams['componentIdentifier'] = '%-' . $subject->getInstanceId() . '-%';
-        } elseif ($subject !== null) {
+        } elseif ($subject !== null) { // Note $subject will be null when this is run from tools/search/buildIndex.php
             return;
         }
         $searchIndexQuery = $this->connector->prepareQuery($searchIndexQueryString);
