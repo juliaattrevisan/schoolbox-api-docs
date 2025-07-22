@@ -10,16 +10,12 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Moment\Evidence\Moderation;
 
-use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Web\Controller\Base;
-use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Discussion\Comment;
 use Schoolbox\Learning\Moment\Evidence\Model;
 use Schoolbox\Learning\Moment\Evidence\Translator;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
-use Schoolbox\Resource\Storage;
-use Schoolbox\User;
 
 class Controller extends Base
 {
@@ -49,32 +45,21 @@ class Controller extends Base
         $requestTranslator = new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
         $requestTranslator->setCurriculumTaggingEnabled($this->curriculumTaggingEnabled());
 
-        /* Publish it to the world
-         */
-        $evidence->publish($this->getUser());
-
         /* Secret-squirrel access to PUT payload...
          */
         $payload = $this->request->getParsedBody();
 
+        /* Soft-delete all the comments associated with this learning moment
+         */
         if ($payload['deleteComments'] ?? false) {
-            echo 'delete';
-        } else {
-            echo 'preserve';
+            $this->commentMapper->deleteByColumn('discussion_thread_id', $evidence->getDiscussionThread()->getId());
         }
 
-//        $this->mapper->save($evidence);
-
-        /* TODO delete comments, if specified
+        /* Publish it to the world
          */
+        $evidence->publish($this->getUser());
 
-        $responseTranslator = new Translator\ModelToArray\Base(
-            new User\Translator\Author\ModelToArray(),
-            new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfigLoader())),
-            new ScrubAdapter(),
-        );
-
-//        $this->response = $this->responseAsJson($responseTranslator($evidence));
+        $this->mapper->save($evidence);
     }
 
     /**
