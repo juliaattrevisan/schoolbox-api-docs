@@ -53,6 +53,9 @@ class Controller extends Base
      */
     public function postLessonPlan(): void
     {
+        // No BTTF in this space
+        $this->setAllowBackToTheFuture(false);
+
         try {
             $helper = new Helper(
                 trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_ENDPOINT)),
@@ -201,6 +204,9 @@ class Controller extends Base
      */
     public function postImage(): void
     {
+        // No BTTF in this space
+        $this->setAllowBackToTheFuture(false);
+
         try {
             $helper = new Helper(
                 trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_ENDPOINT)),
@@ -271,6 +277,9 @@ class Controller extends Base
      */
     public function postAiAssistant(): void
     {
+        // No BTTF in this space
+        $this->setAllowBackToTheFuture(false);
+
         try {
             (new Helper(
                 trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_ENDPOINT)),
