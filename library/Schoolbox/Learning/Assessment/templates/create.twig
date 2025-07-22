@@ -16,6 +16,28 @@
         });
 
         /**
+         * Check if the participation prompt should be shown based on hidden input field values
+         * @returns {boolean}
+         */
+        function showParticipationPrompt() {
+            // Check if assessmentType is either 'dueWork' or 'task'
+            const assessmentTypeInput = document.querySelector('input[name="assessmentType"]');
+            const assessmentType = assessmentTypeInput ? assessmentTypeInput.value : null;
+            const validAssessmentType = assessmentType && (assessmentType === 'dueWork' || assessmentType === 'task');
+
+            // Check if contextType is either 'units' or 'projects'
+            const contextTypeInput = document.querySelector('input[name="contextType"]');
+            const contextType = contextTypeInput ? contextTypeInput.value : null;
+            const validContextType = contextType && (contextType === 'units' || contextType === 'projects');
+
+            // Check that customisedFor hidden input field doesn't exist
+            const customisedForInput = document.querySelector('input[name="customisedFor"]');
+            const isNotCustomised = !customisedForInput;
+
+            return validAssessmentType && validContextType && isNotCustomised;
+        }
+
+        /**
          * Before submitting the form, intercept the submission
          * and show a confirmation dialog to check if the user wants to edit participation.
          * If not just continue with the submission
@@ -24,13 +46,8 @@
          * @returns {Promise}
          */
         function formWillSubmit() {
-            {% if assessmentType is defined and assessmentType in ['dueWork', 'task'] and contextType is defined and contextType in ['units', 'projects'] and customisedFor is not defined %}
-            const showParticipationPrompt = true;
-            {% else %}
-            const showParticipationPrompt = false;
-            {% endif %}
             return new Promise(function(resolve, reject) {
-                if (showParticipationPrompt) {
+                if (showParticipationPrompt()) {
                     $("body").confirmDialog({
                         header: "Activity created",
                         text: "Would you like to edit the student participation for this activity now?",
