@@ -58,7 +58,7 @@ async function sendRequest(): Promise<void> {
             rows="1"
             placeholder="Describe or refine the image you want to generate"
             style="resize: vertical; margin-bottom: 0"
-            :disabled="igStore.isGenerating || undefined"
+            :disabled="igStore.activeGeneration !== null || undefined"
             required
             @keydown.enter.exact.prevent="sendRequest"
         ></textarea>
@@ -71,7 +71,7 @@ async function sendRequest(): Promise<void> {
                 :ref="attributeEls.set"
                 v-model="attributes[attr.id]"
                 :name="attr.id"
-                :disabled="igStore.isGenerating || undefined"
+                :disabled="igStore.activeGeneration !== null || undefined"
                 :required="attr.required || undefined"
             >
                 <option
@@ -92,7 +92,7 @@ async function sendRequest(): Promise<void> {
                 class="icon-send"
                 href="#"
                 title="Generate Image"
-                :disabled="igStore.isGenerating || undefined"
+                :disabled="igStore.activeGeneration !== null || undefined"
                 @click.prevent="sendRequest"
             ></a>
         </nav>

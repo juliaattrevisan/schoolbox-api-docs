@@ -41,7 +41,6 @@ class Helper
      */
     public const ENDPOINT_TYPE_OFF = 'Off';
 
-
     /**
      * Structured Outputs is only supported in certain models
      * Note that we intentionally don't support gippity 3.5
@@ -72,6 +71,12 @@ class Helper
      * Use the conversational chatgippity variant
      */
     private const CHAT = 'chat';
+
+
+    /**
+     * When an image is omitted from the request/response, we replace the base64 data with this const
+     */
+    private const IMAGE_DATA_OMITTED = 'omitted';
 
 
     /**
@@ -106,8 +111,166 @@ class Helper
 
 
     /**
-     * request (no streaming, returns full json payload)
-     * hits openAI and returns the string response (you need to json decode yourself...)
+     * Parse a chunk received from the SSE stream
+     * The 'output' key is the original chunk data excluding large base64 image data to avoid it ending up in the log
+     *
+     * @param string $chunk The raw chunk data from the stream
+     * @return array{type:string|null,data:array,output:string}
+     */
+    private function parseChunk(string $chunk): array
+    {
+        $type = null;
+        $data = [];
+        $lines = explode("\n", $chunk);
+        $output = '';
+        foreach ($lines as $line) {
+            if (str_starts_with($line, 'event: ')) {
+                $type = trim(substr($line, 7));
+                $output .= "{$line}\n";
+            } elseif (str_starts_with($line, 'data: ')) {
+                try {
+                    $item = json_decode(trim(substr($line, 6)), true, 512, JSON_THROW_ON_ERROR);
+                    $data[] = $item;
+
+                    // Omit the actual image data from the output
+                    $itemType = $item['type'] ?? null;
+                    if ($itemType === 'response.image_generation_call.partial_image' && isset($item['partial_image_b64'])) {
+                        $item['partial_image_b64'] = self::IMAGE_DATA_OMITTED;
+                    }
+
+                    $output .= sprintf("data: %s\n", json_encode($item, JSON_THROW_ON_ERROR));
+                } catch (\JsonException $e) {
+                    // If it's not JSON, still save the raw data
+                    $output .= "{$line}\n";
+                }
+            }
+        }
+
+        return [
+            'type' => $type,
+            'data' => $data,
+            'output' => $output,
+        ];
+    }
+
+
+    /**
+     * Append a chunk's output / metrics to the log
+     *
+     * @param array $chunkData - from parseChunk()
+     * @param Log\Model $log
+     * @param ?string $type
+     */
+    private function appendChunkToLog(array $chunkData, Log\Model $log, ?string $type = null): void
+    {
+        $log->setResponse(($log->getResponse() ?? '') . $chunkData['output']);
+
+        foreach ($chunkData['data'] as $item) {
+            $model = null;
+            $inputTokens = null;
+            $outputTokens = null;
+
+            if ($type === self::CHAT) {
+                $model = $item['model'] ?? null;
+                $inputTokens = $item['usage']['prompt_tokens'] ?? null;
+                $outputTokens = $item['usage']['completion_tokens'] ?? null;
+            } else {
+                $model = $item['response']['model'] ?? null;
+                $inputTokens = $item['response']['usage']['input_tokens'] ?? null;
+                $outputTokens = $item['response']['usage']['output_tokens'] ?? null;
+            }
+
+            if ($model) {
+                $log->setModel($model);
+            }
+            if ($inputTokens) {
+                $log->setInputTokens($inputTokens);
+            }
+            if ($outputTokens) {
+                $log->setOutputTokens($outputTokens);
+            }
+        }
+    }
+
+
+    /**
+     * Read a chunked stream response from OpenAI and echo it once each full chunk is received
+     *
+     * @param \Psr\Http\Message\StreamInterface $stream
+     * @param Log\Model $log
+     * @param ?string $type
+     * @return ?array The final "response.completed" chunk, or null if it was never found
+     */
+    public function readStream(\Psr\Http\Message\StreamInterface $stream, Log\Model $log, ?string $type = null): ?array
+    {
+        $chunkBuffer = '';
+        $isGeneratingImage = false;
+        $completedEvent = null;
+
+        while (!$stream->eof()) {
+            // Read larger chunks if in the middle of generating an image (as we're about to recieve a lot of data)
+            $readSize = $isGeneratingImage ? 8192 : 128;
+            $data = $stream->read($readSize);
+            if ('' === $data) {
+                usleep(100000);
+                continue;
+            }
+
+            // Normalise CRLF to LF
+            if (false !== strpos($data, "\r")) {
+                $data = strtr($data, ["\r\n" => "\n", "\r" => "\n"]);
+            }
+
+            $chunkBuffer .= $data;
+
+            // while there's at least one full chunk in the buffer, process it
+            while (false !== ($pos = strpos($chunkBuffer, "\n\n"))) {
+                $chunk = substr($chunkBuffer, 0, $pos);
+                $chunkBuffer = substr($chunkBuffer, $pos + 2);
+
+                echo "{$chunk}\n\n";
+                $event = $this->parseChunk($chunk);
+                $this->appendChunkToLog($event, $log, $type);
+
+                // Is this the final event?
+                if ($event['type'] === 'response.completed') {
+                    $completedEvent = $event['data'][0]['response'];
+                }
+
+                // Keep track of whether we're generating an image
+                if ($event['type'] === 'response.image_generation_call.generating') {
+                    $isGeneratingImage = true;
+                } else if ($event['type'] === 'response.image_generation_call.completed') {
+                    $isGeneratingImage = false;
+                }
+
+                // flush PHP buffers
+                if (ob_get_length()) {
+                    @ob_flush();
+                }
+                @flush();
+            }
+        }
+
+        // If we have any remaining data in the buffer, process it
+        if (strlen(trim($chunkBuffer)) > 0) {
+            echo $chunkBuffer;
+            $event = $this->parseChunk($chunkBuffer);
+            $this->appendChunkToLog($event, $log, $type);
+
+            if ($event['type'] === 'response.completed') {
+                $completedEvent = $event['data'][0]['response'];
+            }
+        }
+
+        return $completedEvent;
+    }
+
+
+    /**
+     * Request hits OpenAI and returns the parsed response data
+     * Uses streaming if the payload has 'stream' set to true
+     * Will return the final json response for both streaming and non-streaming requests
      *
      * @param User $user // user to log the request against
      * @param string $payload // use this payload instead of generating one
@@ -144,26 +307,38 @@ class Helper
         /* Minimum requirements met: let's send it and see what AI overlords think of our payload
          */
         try {
+            // Is streaming enabled?
+            $stream = json_decode($payload, true, 512, JSON_THROW_ON_ERROR)['stream'] ?? false;
+
             $openAiRequest = new Request('POST', $this->getEndpoint(), array_merge(
                 $this->getAuthorization(),
                 ['Content-Type' => 'application/json'],
             ), $payload);
 
-            $response = $this->client->sendRequest($openAiRequest);
+            $response = $this->client->send($openAiRequest, [
+                \GuzzleHttp\RequestOptions::ALLOW_REDIRECTS => false,
+                \GuzzleHttp\RequestOptions::HTTP_ERRORS => false,
+                \GuzzleHttp\RequestOptions::STREAM => $stream,
+            ]);
 
-            http_response_code($response->getStatusCode());
+            /* We'll either recieve a text/event-stream or json response depending on if it errored
+             * If it is a text/event-stream, handle as so - otherwise assume json
+             */
+            if (strpos($response->getHeaderLine('Content-Type'), 'text/event-stream') !== false) {
+                http_response_code($response->getStatusCode());
+                header('Content-Type: text/event-stream');
+                header('Cache-Control: no-cache');
+                header('Connection: keep-alive');
+                header('Content-Encoding: none');
 
-            $result = $response->getBody()->getContents();
-            $log->setResponse($result);
-            $data = json_decode($result, true, 512, JSON_THROW_ON_ERROR);
+                ob_implicit_flush(true);
+                ob_end_flush();
 
-//
-//            if ($response->getStatusCode() !== 200) {
-//                // store error in log
-//                $log->setReturnCode($response->getStatusCode())
-//                    ->setErrorMessage($response->getReasonPhrase());
-//                $this->logMapper->save($log);
-//            }
+                $stream = $response->getBody();
+                $data = $this->readStream($stream, $log);
+            } else {
+                $data = json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
+            }
         } catch (GuzzleException $e) {
             $log->setReturnCode($e->getCode())
                 ->setErrorMessage($e->getMessage());
@@ -315,42 +490,23 @@ class Helper
              */
             $promise->then(
                 function ($response) use ($log): void {
-                    /* Set up presumed success conditions
-                     */
-                    $returnCode = 200;
+                    $returnCode = $response->getStatusCode();
 
                     http_response_code($returnCode);
 
                     $log->setReturnCode($returnCode)
                         ->setErrorMessage('');
 
-                    /* Remove preformatted insanity by encoding it all away
-                     * https://stackoverflow.com/questions/23859713/remove-all-unnecessary-whitespaces-from-json-string-in-php
-                     */
-                    //header('X-Accel-Buffering: no');
-                    header('Content-Type: application/json');
+                    header('Content-Type: text/event-stream');
+                    header('Cache-Control: no-cache');
+                    header('Connection: keep-alive');
                     header('Content-Encoding: none');
 
                     ob_implicit_flush(true);
                     ob_end_flush();
 
                     $stream = $response->getBody();
-
-                    // store a section of the response (end of the stream)
-                    $output = '';
-
-                    while (!$stream->eof()) {
-                        $tmp = $stream->read(1024);
-                        echo $tmp;
-                        $output .= $tmp;
-                    }
-
-                    //store the last of the output and the model (if it exists
-                    $aiStats = $this->extractStats($output);
-                    $log->setResponse($output)
-                        ->setModel($aiStats['model'])
-                        ->setInputTokens($aiStats['input_tokens'])
-                        ->setOutputTokens($aiStats['output_tokens']);
+                    $this->readStream($stream, $log, self::CHAT);
                 },
                 function ($reason) use ($log): void {
                     $returnCode = $reason->getCode();
@@ -453,47 +609,5 @@ class Helper
         }
 
         throw new \UnexpectedValueException('Endpoint must be configured');
-    }
-
-    /**
-     * Little Robot Dude:
-     * Extracts the model from the OpenAI API response payload.
-     *
-     * @param string $payload The response payload from the OpenAI API.
-     * @return array {model: string|null, input_tokens: int|null, output_tokens: int|null}
-     */
-    private function extractStats(string $payload): array
-    {
-        $payload = explode("\n", $payload);
-
-        $stats = [
-            'model' => null,
-            'input_tokens' => null,
-            'output_tokens' => null,
-        ];
-        foreach ($payload as $line) {
-            if (str_starts_with($line, 'data:')) {
-                try {
-                    $json = json_decode(substr($line, 5), true, 512, JSON_THROW_ON_ERROR);
-                } catch (\JsonException $e) {
-                    continue;
-                }
-                if (isset($json['model'])) {
-                    $stats['model'] = $json['model'];
-                }
-                if (isset($json['usage']['prompt_tokens'])) {
-                    $stats['input_tokens'] = $json['usage']['prompt_tokens'];
-                }
-                if (isset($json['usage']['completion_tokens'])) {
-                    $stats['output_tokens'] = $json['usage']['completion_tokens'];
-                }
-                if ($stats['model'] && $stats['input_tokens'] && $stats['output_tokens']) {
-                    // found all the things, exit early
-                    return $stats;
-                }
-            }
-        }
-
-        return $stats;
     }
 }

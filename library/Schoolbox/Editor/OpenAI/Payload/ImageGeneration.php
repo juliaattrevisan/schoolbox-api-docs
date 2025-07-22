@@ -17,6 +17,7 @@ class ImageGeneration
      */
     public const OPENAI_IMAGE_MODEL = 'gpt-image-1';
 
+    private const PARTIAL_IMAGE_QTY = 3;
     private const IMAGE_OUTPUT_FORMAT = 'png';
     private const IMAGE_OUTPUT_QUALITY = 'low';
 
@@ -104,7 +105,7 @@ class ImageGeneration
                     'model' => self::OPENAI_IMAGE_MODEL,
                     'output_format' => self::IMAGE_OUTPUT_FORMAT,
                     'background' => 'auto',
-                    'partial_images' => 0, /* if we use streaming this might be useful... */
+                    'partial_images' => self::PARTIAL_IMAGE_QTY,
                     'quality' => self::IMAGE_OUTPUT_QUALITY,
                     'size' => $attributes[self::ATTRIBUTE_KEY_SIZE] ?? 'auto',
                 ],
@@ -118,9 +119,7 @@ class ImageGeneration
              */
             "temperature" => self::TEMPERATURE,
             "top_p" => self::TOP_P,
-            /* For futureproofing: never really used atm
-             */
-            "stream" => false,
+            "stream" => true,
             'text' => [
                 'format' => [
                     'type' => 'text',

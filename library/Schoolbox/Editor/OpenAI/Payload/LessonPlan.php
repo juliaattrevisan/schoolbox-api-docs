@@ -305,7 +305,7 @@ class LessonPlan
              */
             "temperature" => self::TEMPERATURE,
             "top_p" => self::TOP_P,
-            /* For futureproofing: never really used atm
+            /* Lesson plans don't support streaming as they need the formatted json to be correct
              */
             "stream" => false,
             'text' => [

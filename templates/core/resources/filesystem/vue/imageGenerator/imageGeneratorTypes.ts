@@ -7,7 +7,7 @@ export type ImageRequest = {
     previousResponseId: string | null;
 };
 
-type ImageResponseSuccess = {
+export type ImageResponseSuccess = {
     type: "response";
     status: "success";
     entryKey: number;
@@ -16,7 +16,7 @@ type ImageResponseSuccess = {
     /* the image URL */
     src: string;
     /* a message from the AI, if any */
-    message: string | null;
+    message: string;
 };
 
 type ImageResponseError = {
@@ -27,7 +27,16 @@ type ImageResponseError = {
     message: string;
 };
 
-export type ImageResponse = ImageResponseSuccess | ImageResponseError;
+export type ImageResponseInProgress = {
+    type: "response";
+    status: "in_progress";
+    entryKey: `loading-${number}`;
+    responseId: string | null;
+    src: string | null;
+    message: string;
+};
+
+export type ImageResponse = ImageResponseSuccess | ImageResponseInProgress | ImageResponseError;
 
 export type AiFeedMessage = ImageRequest | ImageResponse;
 
