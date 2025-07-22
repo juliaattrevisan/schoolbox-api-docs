@@ -117,6 +117,7 @@ class Controller extends Base
         }
 
         $params = [
+            'evidence'                 => $this->mapper->createModel(),
             'users'                    => $users,
             'userIds'                  => $users->getPropertyValues('id'),
             'otherUsers'               => $otherUsers,
