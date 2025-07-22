@@ -341,25 +341,29 @@ function install_instance() {
   mariadb -h mariadb -u root -D schoolbox < "${SITE_ROOT}/sql/vagrant.sql"
   mariadb -h mariadb -u root -D schoolbox < "${cachedir}/vagrant-secrets.sql"
 
+  log "Loading all demo data complete";
 }
 
-#function site_down() {
-#  log "Putting system in maintenance mode";
-#  if INSTANCE_ID="${default_instance_id}" "$SITE_ROOT"/tools/maintenance/site_down.sh -eq 0 ; then
-#    log "Maintenance mode enabled on instance '${default_instance_id}'"
-#  else
-#    error "Could not enable maintenance mode on instance '${default_instance_id}': exiting"
-#    exit 1;
-#  fi
-#}
-
-function site_up() {
+function post_install() {
   log "Removing system maintenance mode";
   if INSTANCE_ID="${default_instance_id}" "$SITE_ROOT"/tools/maintenance/site_up.sh -eq 0 ; then
     log "Maintenance mode disabled on instance '${default_instance_id}'"
   else
     warn "Could not disable maintenance mode on instance 'docker': continuing"
   fi
+
+  # call custom provisioning
+  if [ -f "$SITE_ROOT"/post-provision.sh ];
+  then
+      log "Running custom post provisioning";
+      "$SITE_ROOT"/post-provision.sh;
+  fi
+
+  # update all dates to current time
+  "$SITE_ROOT"/tools/increment-instance-dates.php;
+
+  # Clean up vcal cache
+  "$SITE_ROOT"/tools/redis/removeVcalCache.php -p;
 }
 
 function init_npm_dependencies() {
@@ -493,28 +497,7 @@ function main() {
 
   init_database
   install_instance
-
-  log "Loading all demo data complete";
-
-#  # Vagrant uses a non-standard ffmpeg, installed via Schoolbox's package repo:
-#  # that does not seem to be needed here.
-#  ffmpegver=`dpkg -l ffmpeg | tail -n1 | awk {'print $3'}`;
-#  log "ffmpeg installed: $ffmpegver";
-
-  site_up
-
-  # call custom provisioning
-  if [ -f "$SITE_ROOT"/post-provision.sh ];
-  then
-      log "Running custom post provisioning";
-      "$SITE_ROOT"/post-provision.sh;
-  fi
-
-  # update all dates to current time
-  "$SITE_ROOT"/tools/increment-instance-dates.php;
-
-  # Clean up vcal cache
-  "$SITE_ROOT"/tools/redis/removeVcalCache.php -p;
+  post_install
 }
 
 main "$@"
