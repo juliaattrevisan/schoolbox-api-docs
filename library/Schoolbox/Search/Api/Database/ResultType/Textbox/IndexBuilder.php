@@ -95,6 +95,10 @@ class IndexBuilder extends BaseBuilder
      */
     public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
+        if ($subject !== null && !$this->accepts($subject, BuildType::UPDATE)) {
+            return;
+        }
+
         // Pass 1: textboxes within a component
         //  * A similar query exists in library/Schoolbox/Assessment/Course/Plan/Controller.php.
         //  * The displayed heading of a textbox component on a homepage will be:
@@ -154,9 +158,6 @@ class IndexBuilder extends BaseBuilder
             $params['toDate'] = $toDate->getDatabase();
         }
         if ($subject) {
-            if (!$this->accepts($subject, BuildType::UPDATE)) {
-                return;
-            }
             [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::UPDATE, $queryString, $params);
         }
         // Set max_statement_time at the query level to ensure no timeouts even if global max_statement_time is set.
@@ -267,6 +268,10 @@ class IndexBuilder extends BaseBuilder
      */
     public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
+        if ($subject !== null && !$this->accepts($subject, BuildType::DELETE)) {
+            return;
+        }
+
         // Examine and clean up every search index for textboxes
         $searchIndexQueryString = "
             SELECT identifier
