@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Provisions the Docker environment: port of `vagrant-provision.sh`
 
+REQUIRED_CONSTS=(SITE_ROOT cachedir)
+
 function verify_args() {
   local return=1
   for var in "$@"; do
@@ -14,15 +16,34 @@ function verify_args() {
   return $return
 }
 
+function verify_folders() {
+  local return=1
+  for var in "$@"; do
+    if [ -d "${!var}" ]; then
+      log "${var}: ${!var} is a folder";
+    else
+      warn "${var}: ${!var} is not a folder";
+      return=0
+    fi
+  done
+  return $return
+}
+
 function load_consts() {
   # Load global constants and functions
   source /usr/share/schoolbox/tools/docker-consts.sh
 
   log "Verifying constants:"
   local return=1
-  verify_args SITE_ROOT cachedir
+  verify_args "${REQUIRED_CONSTS[@]}"
   return=$?
   echo ""
+
+  log "Verifying constants are folders:"
+  verify_folders "${REQUIRED_CONSTS[@]}"
+  if [ $? -eq 0 ]; then return=0; fi;
+  echo ""
+
   return $return
 }
 
@@ -44,7 +65,6 @@ function load_config() {
   verify_args data_source data_filename
   if [ $? -eq 0 ]; then return=0; fi;
   echo ""
-
 
   log "Verifying external DB configuration:"
   verify_args external_db external_db_host external_db_db
@@ -68,6 +88,7 @@ function load_config() {
 function version_gte() {
   echo -e "$1\n$2" | sort -rCV
 }
+
 function setup_aws_sso() {
   if [ -f ~/.aws/credentials ]; then
     if grep -q 'default' ~/.aws/credentials; then
@@ -98,6 +119,8 @@ function setup_aws_sso() {
 }
 
 function main() {
+  log "Setting up Docker environment...";
+
   load_consts
   if [ $? -eq 0 ]; then
     error "Not all required consts defined: exiting"
@@ -111,25 +134,18 @@ function main() {
   fi
   setup_aws_sso
 
-
-  echo "[SB][`date +%Y-%m-%d\ %X`] Setting up Docker environment with options:";
-  echo "[SB][`date +%Y-%m-%d\ %X`] Data Source: $data_source";
-  echo "[SB][`date +%Y-%m-%d\ %X`] Data Filename: $data_filename";
-  echo "[SB][`date +%Y-%m-%d\ %X`] External DB: $external_db";
-  echo "[SB][`date +%Y-%m-%d\ %X`] External DB Host: $external_db_host";
-  echo "[SB][`date +%Y-%m-%d\ %X`] External DB Name: $external_db_db";
-  echo "[SB][`date +%Y-%m-%d\ %X`] Retrieving latest Data files";
-  echo "[SB][`date +%Y-%m-%d\ %X`] Cleaning up zero byte files";
+  log "Retrieving latest data files";
+  log "Cleaning up zero byte files";
   find "${cachedir}" -type f -empty -delete;
 
   # Download some files from S3
   # Note these still use the Vagrant names
   if ! $SITE_ROOT/tools/download-s3-file.sh --data-source "$data_source"  --file-name "vagrant-secrets.sql" --cache-dir "$cachedir"; then
-    echo "Error: Unable to download s3 file: 'vagrant-secrets.sql'";
+    error "Unable to download s3 file: 'vagrant-secrets.sql': exiting";
     exit 1;
   fi
   if ! $SITE_ROOT/tools/download-s3-file.sh --data-source "$data_source" --file-name "vagrant-cleanup-secrets.sql" --cache-dir "$cachedir"; then
-    echo "Error: Unable to download s3 file: 'vagrant-cleanup-secrets.sql'";
+    error "Unable to download s3 file: 'vagrant-cleanup-secrets.sql': exiting";
     exit 1;
   fi
 
@@ -137,13 +153,13 @@ function main() {
   #echo "[SB][`date +%Y-%m-%d\ %X`] Updating timezone data";
   #mysql_tzinfo_to_sql /usr/share/zoneinfo 2>/dev/null | mysql --defaults-extra-file=/root/.my.cnf mysql 2>/dev/null;
 
-  echo "[SB][`date +%Y-%m-%d\ %X`] Creating Schoolbox MariaDB schema and user";
+  log "Creating Schoolbox MariaDB schema and user";
   mariadb -h mariadb -u root < "${SITE_ROOT}/docker/schoolbox/sql/setup.sql"
 
-  echo "[SB][`date +%Y-%m-%d\ %X`] Setting Schoolbox dir ${SITE_ROOT} as safe for Git";
+  log "Adding Schoolbox dir ${SITE_ROOT} as safe for Git";
   git config --global --add safe.directory "${SITE_ROOT}"
 
-  echo "[SB][`date +%Y-%m-%d\ %X`] Installing vendor submodules with composer";
+  log "Installing vendor submodules with composer";
   cd $cachedir || exit;
   vendorfile='';
   composerlocksha=`sha1sum ../composer.lock 2>/dev/null | awk '{print $1}'`;
