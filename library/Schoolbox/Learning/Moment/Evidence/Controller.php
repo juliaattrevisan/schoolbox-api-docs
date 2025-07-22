@@ -261,7 +261,7 @@ class Controller extends Base
          * submit and publish immediately whilst some end up in a moderation queue.
          */
         $globalConfig = (bool)$this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED);
-        $moderationRequired = new ModerationRequired();
+        $moderationRequired = (new ModerationRequired())->isSatisfiedBy($globalConfig, $this->getUser()->getYear());
 
         $requestBody = $this->request->getParsedBody();
 
@@ -281,7 +281,7 @@ class Controller extends Base
 
             /* Accelerate into the next state based on configs and year level settings
              */
-            if ($moderationRequired->isSatisfiedBy($globalConfig, $user->getYear())) {
+            if ($moderationRequired) {
                 /* Requires moderation and; needs a human to progress to Published state
                  */
                 $evidenceModel->submit($this->getUser());
