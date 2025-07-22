@@ -196,9 +196,9 @@ class Hydrator extends BaseHydrator
         }
 
         return [
-            '' === $tokens[0] ? null : (int)$tokens[1], // tileId,
-            '' === $tokens[1] ? null : (int)$tokens[2], // componentInstanceId,
-            '' === $tokens[2] ? null : (int)$tokens[3]  // folderId.
+            '' === $tokens[0] ? null : (int)$tokens[0], // tileId,
+            '' === $tokens[1] ? null : (int)$tokens[1], // componentInstanceId,
+            '' === $tokens[2] ? null : (int)$tokens[2]  // folderId.
         ];
     }
 
