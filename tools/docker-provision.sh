@@ -8,7 +8,6 @@ declare REQUIRED_CONSTS=(SITE_ROOT cachedir)
 declare aws_account_id
 declare aws_role_name
 declare aws_start_url
-declare aws_bucket
 declare data_source
 declare data_filename
 declare external_db
@@ -18,7 +17,7 @@ declare instance_registry_url
 declare default_instance_id
 declare artifact_source
 declare REQUIRED_CONFIGS=(\
-  aws_account_id aws_role_name aws_start_url aws_bucket \
+  aws_account_id aws_role_name aws_start_url \
   data_source data_filename \
   external_db external_db_host external_db_db \
   instance_registry_url \
