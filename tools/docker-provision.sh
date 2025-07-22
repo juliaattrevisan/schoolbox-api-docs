@@ -144,6 +144,29 @@ function mark_safe_for_git() {
   git config --global --add safe.directory "${SITE_ROOT}"
 }
 
+function set_profile_env_vars() {
+  # Set env vars for root + standard user (if one is added)
+  local bashrcFiles=(/root/.bashrc)
+  declare -A env_vars=(
+    [INSTANCE_ID]="${default_instance_id}"
+  )
+  for config_name in "${!env_vars[@]}"; do
+    config_value=${env_vars[$config_name]}
+    for bashrcFile in "${bashrcFiles[@]}"; do
+      # Remove the config if it exists, then insert it
+      sed -i -E "/^export\s+$config_name\s*=.+/d" ${bashrcFile}
+      echo "export $config_name=\"$config_value\"" >> ${bashrcFile};
+    done
+
+  #  # Need to preserve these ENV vars for vagrant's sudo session
+  #  if ! grep -qE "^Defaults\s+env_keep\s*\+=\s*\".*$config_name" /etc/sudoers.d/vagrant; then
+  #    chmod a+w /etc/sudoers.d/vagrant;
+  #    echo "Defaults env_keep += \"$config_name\"" >> /etc/sudoers.d/vagrant;
+  #    chmod a-w /etc/sudoers.d/vagrant;
+  #  fi
+  done
+}
+
 function init_database() {
   # Timezone data: should be run in mariadb container on setup
   #log "Updating timezone data";
@@ -320,15 +343,15 @@ function install_instance() {
 
 }
 
-function site_down() {
-  log "Putting system in maintenance mode";
-  if INSTANCE_ID="${default_instance_id}" "$SITE_ROOT"/tools/maintenance/site_down.sh -eq 0 ; then
-    log "Maintenance mode enabled on instance '${default_instance_id}'"
-  else
-    error "Could not enable maintenance mode on instance '${default_instance_id}': exiting"
-    exit 1;
-  fi
-}
+#function site_down() {
+#  log "Putting system in maintenance mode";
+#  if INSTANCE_ID="${default_instance_id}" "$SITE_ROOT"/tools/maintenance/site_down.sh -eq 0 ; then
+#    log "Maintenance mode enabled on instance '${default_instance_id}'"
+#  else
+#    error "Could not enable maintenance mode on instance '${default_instance_id}': exiting"
+#    exit 1;
+#  fi
+#}
 
 function site_up() {
   log "Removing system maintenance mode";
@@ -463,35 +486,13 @@ function main() {
   cleanup_cache_dir
   download_secrets
   mark_safe_for_git
+  set_profile_env_vars
+
+  init_composer_dependencies
+  init_npm_dependencies
 
   init_database
-  init_composer_dependencies
-
   install_instance
-  site_down
-
-  # Set ENV VARs for root + vagrant users from vagrant.yaml params
-  declare -A env_vars=(
-    [INSTANCE_ID]="${default_instance_id}"
-  )
-  for config_name in "${!env_vars[@]}"; do
-    config_value=${env_vars[$config_name]}
-    for bashrcFile in /root/.bashrc; do
-  #  for bashrcFile in /home/vagrant/.bashrc /root/.bashrc; do
-      # Remove the config if it exists, then insert it
-      sed -i -E "/^export\s+$config_name\s*=.+/d" ${bashrcFile}
-      echo "export $config_name=\"$config_value\"" >> ${bashrcFile};
-    done
-
-  #  # Need to preserve these ENV vars for vagrant's sudo session
-  #  if ! grep -qE "^Defaults\s+env_keep\s*\+=\s*\".*$config_name" /etc/sudoers.d/vagrant; then
-  #    chmod a+w /etc/sudoers.d/vagrant;
-  #    echo "Defaults env_keep += \"$config_name\"" >> /etc/sudoers.d/vagrant;
-  #    chmod a-w /etc/sudoers.d/vagrant;
-  #  fi
-  done
-
-  init_npm_dependencies
 
   log "Loading all demo data complete";
 
