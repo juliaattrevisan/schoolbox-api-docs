@@ -103,20 +103,12 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Data Filename: $data_filename";
 echo "[SB][`date +%Y-%m-%d\ %X`] External DB: $external_db";
 echo "[SB][`date +%Y-%m-%d\ %X`] External DB Host: $external_db_host";
 echo "[SB][`date +%Y-%m-%d\ %X`] External DB Name: $external_db_db";
-
-#phpversion_current=`php -v | head -n1 | awk '{print $2}' | cut -c1-3`;
-#echo "[SB][`date +%Y-%m-%d\ %X`] Checking for correct PHP version - current: $phpversion_current, supported: $phpversion_supported";
-#if [ "$phpversion_current" != "$phpversion_supported" ]; then
-#  error " Current and supported PHP versions do not match. Check 'ubuntu-1804-php${phpversion_supported/./}.vagrant.yaml' in puppet repo";
-#  exit 1
-#fi
-
 echo "[SB][`date +%Y-%m-%d\ %X`] Retrieving latest Data files";
 echo "[SB][`date +%Y-%m-%d\ %X`] Cleaning up zero byte files";
 find "${cachedir}" -type f -empty -delete;
 
 # Download some files from S3
-# These still use the Vagrant names
+# Note these still use the Vagrant names
 if ! $SITE_ROOT/tools/download-s3-file.sh --data-source "$data_source"  --file-name "vagrant-secrets.sql" --cache-dir "$cachedir"; then
   echo "Error: Unable to download s3 file: 'vagrant-secrets.sql'";
   exit 1;
@@ -132,12 +124,6 @@ fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Creating Schoolbox MariaDB schema and user";
 mariadb -h mariadb -u root < "${SITE_ROOT}/docker/schoolbox/sql/setup.sql"
-#mysql --defaults-extra-file=/root/.my.cnf -e "CREATE DATABASE schoolbox CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';";
-#
-#echo "[SB][`date +%Y-%m-%d\ %X`] Creating Schoolbox MySQL user";
-#mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "CREATE USER 'schoolboxvagrant'@'localhost' IDENTIFIED BY 'abc123'";
-#mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "GRANT ALL ON schoolbox.* to 'schoolboxvagrant'@'localhost'";
-
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Setting Schoolbox dir ${SITE_ROOT} as safe for Git";
 git config --global --add safe.directory "${SITE_ROOT}"
@@ -235,10 +221,6 @@ composer install -o --no-interaction
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Installing instance via 'schoolbox-data-refresh.sh'";
 
-#if [[ $force_upgrade == 1 ]]; then
-#  export SB_FORCE_UPGRADE=1 # Allow unsafe upgrade from really old datasets
-#fi
-
 # Note schoolbox-data-refresh creates the database and then applies the schoolbox/updates SQL and PHP scripts.
 # It is the responsibility of schoolbox-data-refresh to enable and disable maintenance mode as appropriate during its
 # execution (by making calls to site_down.sh/site_up.sh).
@@ -305,9 +287,6 @@ else
   exit 1;
 fi
 
-## Finish here now
-#exit
-
 echo "[SB][`date +%Y-%m-%d\ %X`] Applying vagrant SQL fixes";
 mariadb -h mariadb -u root -D schoolbox < "${SITE_ROOT}/sql/vagrant.sql"
 mariadb -h mariadb -u root -D schoolbox < "${cachedir}/vagrant-secrets.sql"
@@ -315,9 +294,6 @@ mariadb -h mariadb -u root -D schoolbox < "${cachedir}/vagrant-secrets.sql"
 # Set ENV VARs for root + vagrant users from vagrant.yaml params
 declare -A env_vars=(
   [INSTANCE_ID]="$instance_id_env_var"
-#  [FACTER_primary_php_majver]="$phpversion_supported"
-#  [FACTER_vagrant_extra_hostname]="$extra_hostname"
-#  [FACTER_taskd_systemd_service_installed]="$taskd_systemd_service_installed"
 )
 for config_name in "${!env_vars[@]}"; do
   config_value=${env_vars[$config_name]}
@@ -336,19 +312,9 @@ for config_name in "${!env_vars[@]}"; do
 #  fi
 done
 
-## Set up the host for the newly-installed instance
-#echo "[SB][`date +%Y-%m-%d\ %X`] Invoking puppet to configure host for newly-installed instance";
-#FACTER_vagrant_extra_hostname="$extra_hostname" \
-#    FACTER_primary_php_majver="$phpversion_supported" \
-#    FACTER_taskd_systemd_service_installed="$taskd_systemd_service_installed" \
-#    "$SITE_ROOT"/puppet-apply.sh
-
-
 echo "[SB][`date +%Y-%m-%d\ %X`] Applying vagrant SQL fixes (post version upgrade)";
 mariadb -h mariadb -u root -D schoolbox < "${SITE_ROOT}/sql/vagrant.sql"
 mariadb -h mariadb -u root -D schoolbox < "${cachedir}/vagrant-secrets.sql"
-#cat "$SITE_ROOT"/sql/vagrant.sql | mysql --defaults-extra-file=/root/.my.cnf schoolbox
-#cat $cachedir/vagrant-secrets.sql | mysql --defaults-extra-file=/root/.my.cnf schoolbox
 
 # Ensure nvm.sh is run before building NPM stuff,
 # so the npm versions it installed are available
@@ -453,60 +419,6 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Loading all demo data complete";
 # that does not seem to be needed here.
 ffmpegver=`dpkg -l ffmpeg | tail -n1 | awk {'print $3'}`;
 echo "[SB][`date +%Y-%m-%d\ %X`] ffmpeg installed: $ffmpegver";
-
-#if [ "$enable_xdebug" == "true" ];
-#then
-#    echo "[SB][`date +%Y-%m-%d\ %X`] Enabling xdebug";
-#    if [ -f "$SITE_ROOT"/tools/xdebug.ini ]; then
-#        echo "[SB][`date +%Y-%m-%d\ %X`] Using custom xdebug: tools/xdebug.ini";
-#        cp -f "$SITE_ROOT"/tools/xdebug.ini /etc/php/"$phpversion_supported"/mods-available/xdebug.ini;
-#    else
-#        echo "[SB][`date +%Y-%m-%d\ %X`] Using default xdebug: tools/xdebug.default.ini";
-#        cp -f "$SITE_ROOT"/tools/xdebug.default.ini /etc/php/"$phpversion_supported"/mods-available/xdebug.ini;
-#    fi
-#
-#    ln -sf /etc/php/"$phpversion_supported"/mods-available/xdebug.ini   /etc/php/"$phpversion_supported"/fpm/conf.d/20-xdebug.ini
-#    ln -sf /etc/php/"$phpversion_supported"/mods-available/tideways.ini /etc/php/"$phpversion_supported"/fpm/conf.d/20-tideways.ini
-#    ln -sf /etc/php/"$phpversion_supported"/mods-available/xdebug.ini   /etc/php/"$phpversion_supported"/cli/conf.d/20-xdebug.ini
-#    ln -sf /etc/php/"$phpversion_supported"/mods-available/tideways.ini /etc/php/"$phpversion_supported"/cli/conf.d/20-tideways.ini
-#
-#
-#    # If not yet configured, add XDEBUG_CONFIG and PHP_IDE_CONFIG environment vars for 'vagrant' and 'root' users
-#    for bashrcFile in /home/vagrant/.bashrc /root/.bashrc; do
-#        if [[ -z `grep -E '^export\s+XDEBUG_CONFIG\s*=\s*"idekey=[^"]+"' ${bashrcFile}` ]];
-#        then
-#            echo "export XDEBUG_CONFIG=\"idekey=PHPSTORM\"" >> ${bashrcFile};
-#        fi
-#
-#        if [[ -z `grep -E '^export\s+PHP_IDE_CONFIG\s*=\s*"serverName=[^"]+"' ${bashrcFile}` ]];
-#        then
-#            # Requires PHPStorm to have a server configured with Name: "10.0.2.15" (this is the default)
-#            # See "Settings > Languages & Frameworks > PHP > Servers"
-#            # Technically this is redundant for 'vagrant' sessions, but it required for vagrant sudo and root session
-#            echo "export PHP_IDE_CONFIG=\"serverName=10.0.2.15\"" >> ${bashrcFile};
-#        fi
-#    done
-#
-#    # Need to preserve these ENV vars for vagrant's sudo session
-#    for envVar in XDEBUG_CONFIG PHP_IDE_CONFIG; do
-#        if [[ -z `grep -E "^Defaults\s+env_keep\s*\+=\s*\".*$envVar" /etc/sudoers.d/vagrant` ]];
-#        then
-#            chmod a+w /etc/sudoers.d/vagrant;
-#            echo "Defaults env_keep += \"$envVar\"" >> /etc/sudoers.d/vagrant;
-#            chmod a-w /etc/sudoers.d/vagrant;
-#        fi
-#    done
-#
-#else
-#    echo "[SB][`date +%Y-%m-%d\ %X`] Disabling xdebug";
-#    rm -f /etc/php/"$phpversion_supported"/cli/conf.d/20-xdebug.ini;
-#    rm -f /etc/php/"$phpversion_supported"/cli/conf.d/20-tideways.ini;
-#    rm -f /etc/php/"$phpversion_supported"/fpm/conf.d/20-xdebug.ini;
-#    rm -f /etc/php/"$phpversion_supported"/fpm/conf.d/20-tideways.ini;
-#fi
-#
-#echo "[SB][`date +%Y-%m-%d\ %X`] Ensure all services are running";
-#service caddy restart;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Removing system maintenance mode";
 if INSTANCE_ID=docker "$SITE_ROOT"/tools/maintenance/site_up.sh -eq 0 ; then
