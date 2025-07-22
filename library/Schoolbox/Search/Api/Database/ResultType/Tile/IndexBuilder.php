@@ -178,6 +178,8 @@ class IndexBuilder extends BaseBuilder
         } elseif ($subject instanceof Component_Config) {
             $searchIndexQueryString .= ' AND identifier LIKE :componentIdentifier';
             $searchIndexParams['componentIdentifier'] = '%-' . $subject->getInstanceId() . '-%';
+        } elseif ($subject !== null) { // Note $subject will be null when this is run from tools/search/buildIndex.php
+            return;
         }
         $searchIndexQuery = $this->connector->prepareQuery($searchIndexQueryString);
 
@@ -198,9 +200,10 @@ class IndexBuilder extends BaseBuilder
             AND   ccd.key   = :key"
         );
         $componentExistsCache = [];
+        $nIndicesRemoved = 0;
 
         $searchIndexQuery->execute($searchIndexParams);
-        $this->logger->info("Examining and cleaning up {$searchIndexQuery->rowCount()} tile search indices.");
+        $this->logger->info("Examining {$searchIndexQuery->rowCount()} tile search indices.");
         foreach ($searchIndexQuery->fetchColumnArray('identifier') as $identifier) {
             $removeIndex = false;
             [$tileId, $componentId] = explode('-', $identifier);
@@ -251,8 +254,11 @@ class IndexBuilder extends BaseBuilder
                     null,
                     null,
                 );
+                $nIndicesRemoved++;
             }
         }
+
+        $this->logger->info("Deleting search indices for $nIndicesRemoved tiles");
     }
 
     /**
