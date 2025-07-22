@@ -16,6 +16,8 @@ use Schoolbox\Learning\Moment\Evidence\Model;
 use Schoolbox\Learning\Moment\Evidence\Translator;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Resource\Exception;
+use Schoolbox\TokenReplacer;
 
 class Controller extends Base
 {
@@ -39,11 +41,27 @@ class Controller extends Base
      * @param Model $evidence
      * @return void
      * @throws MapperException
+     * @throws Exception
      */
     public function putPublish(Model $evidence): void
     {
+        $requestBody       = $this->request->getParsedBody();
         $requestTranslator = new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
         $requestTranslator->setCurriculumTaggingEnabled($this->curriculumTaggingEnabled());
+        $tokenReplacer     = new TokenReplacer\Student(new TokenReplacer\Simple());
+
+        /* This is a pretty convoluted way of doing things just to decide on a subset of nodes
+         * Anyway, this $baseModel contains any curriculum nodes and tags you might have altered
+         */
+        $baseModel = (new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory()))($requestBody)
+            ->setCreator($this->getUser());
+
+        /* Update anything that might have changed
+         */
+        $evidence = $requestTranslator($requestBody, $evidence)
+            ->setBody($tokenReplacer->replace($baseModel->getBody(), $evidence->getRecipient()))
+            ->setTags($baseModel->getTags())
+            ->setCurriculumNodes($baseModel->getCurriculumNodes());
 
         /* Secret-squirrel access to PUT payload...
          */

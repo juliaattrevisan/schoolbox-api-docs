@@ -148,31 +148,6 @@
 
         <a class="close-reveal-modal" aria-label="Close">&#215;</a>
     </div>
-
-    <script>
-        $(function() {
-            $('#evidence-submit').on('click', function() {
-                event.preventDefault();
-
-                {# Initial condition: preserve comments #}
-                $('#evidence-submit').attr('data-delete-comments', 0);
-
-                {# Show the modal with an option to delete comments #}
-                $('#deleteCommentsModal').foundation('reveal', 'open');
-
-                $('#deleteComments').on('click', function() {
-                    $('#evidence-submit').attr('data-delete-comments', 1);
-
-                    $('#evidence-form').submit();
-                });
-
-                {# ...or keep them intact #}
-                $('#preserveComments').on('click', function() {
-                    $('#evidence-form').submit();
-                });
-            });
-        });
-    </script>
 {% endif %}
 
 
@@ -204,6 +179,7 @@
                     tags: [],
                     type: '{{ momentType }}',
                 };
+
         let tags = form.querySelector('#evidence-tags').selectize.items;
         payload.tags = tags.map(
                 (v) => {
@@ -252,6 +228,7 @@
 
                 isSubmittingForm = true;
 
+                console.log(form);
                 // Build a request to post the form
                 let payload = buildPayload(form),
                     toast   = $('#toast'),
@@ -281,7 +258,7 @@
                         throw new Error("Save failed!");
                     }
                     toast.toastTimeout({text: 'Saved'});
-                    window.location.href = '{{ RETURN_URL.previous.decoded ?? '/' }}';
+                    {#window.location.href = '{{ RETURN_URL.previous.decoded ?? '/' }}';#}
                     isSubmittingForm = false;
                 })
                 .catch(() => {
@@ -308,7 +285,32 @@
                     document.addEventListener('evidence-media-recording__onUploadComplete', (event) => submitForm(form)); //once the media is uploaded, #evidence-media-recording.vue will dispatch
                     document.dispatchEvent(new CustomEvent('evidence-media-recording__onFormSubmit')); //dispatch to allow the media recording to start uploading
                 } else {
-                    submitForm(form);
+
+                    event.preventDefault();
+
+                    {# Moderation Workflow
+                     # Show a special modal about optionally deleting comments
+                     #}
+                    {% if USER.role.isStaff and USER.role.accessEvidence and evidence.isSubmitted and hasComments %}
+                        {# Initial condition: preserve comments #}
+                        $('#evidence-submit').attr('data-delete-comments', 0);
+
+                        {# Show the modal with an option to delete comments #}
+                        $('#deleteCommentsModal').foundation('reveal', 'open');
+
+                        $('#deleteComments').on('click', function() {
+                            $('#evidence-submit').attr('data-delete-comments', 1);
+
+                            submitForm(form);
+                        });
+
+                        {# ...or keep them intact #}
+                        $('#preserveComments').on('click', function() {
+                            submitForm(form);
+                        });
+                    {% else %}
+                        submitForm(form);
+                    {% endif %}
                 }
             }
         });
