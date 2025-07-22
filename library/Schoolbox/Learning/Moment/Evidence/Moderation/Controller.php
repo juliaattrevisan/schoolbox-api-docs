@@ -53,7 +53,17 @@ class Controller extends Base
          */
         $evidence->publish($this->getUser());
 
-        $this->mapper->save($evidence);
+        /* Secret-squirrel access to PUT payload...
+         */
+        $payload = $this->request->getParsedBody();
+
+        if ($payload['deleteComments'] ?? false) {
+            echo 'delete';
+        } else {
+            echo 'preserve';
+        }
+
+//        $this->mapper->save($evidence);
 
         /* TODO delete comments, if specified
          */
@@ -64,7 +74,7 @@ class Controller extends Base
             new ScrubAdapter(),
         );
 
-        $this->response = $this->responseAsJson($responseTranslator($evidence));
+//        $this->response = $this->responseAsJson($responseTranslator($evidence));
     }
 
     /**

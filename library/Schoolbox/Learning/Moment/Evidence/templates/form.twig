@@ -120,10 +120,11 @@
                 {% if evidence.isSubmitted %}
                     {# If the moment is in Submitted state, this acts as the transition to Published #}
                     {% set submitText = 'Approve' %}
+                    {% set deleteCommentsAttr = 'data-delete-comments="0"' %}
                 {% endif %}
             {% endif %}
 
-            <input type="submit" id="evidence-submit" data-test="learning-moment-evidence-form-submit" value="{{ submitText }}" />
+            <input type="submit" id="evidence-submit" {{ deleteComentsAttr ?? '' }} data-test="learning-moment-evidence-form-submit" value="{{ submitText }}" />
         </form>
     </div>
 </div>
@@ -138,8 +139,37 @@
         <h2 id="deleteCommentsModalTitle">Please confirm</h2>
         <p>There are comments on this learning moment that have already been made and will become visible to parents.</p>
         <p>Do you want to delete these comments?</p>
+
+        <button id="deleteComments">Delete and continue</button>
+        <button id="preserveComments">Continue</button>
+
         <a class="close-reveal-modal" aria-label="Close">&#215;</a>
     </div>
+
+    <script>
+        $(function() {
+            $('#evidence-submit').on('click', function() {
+                event.preventDefault();
+
+                {# Initial condition: preserve comments #}
+                $('#evidence-submit').attr('data-delete-comments', 0);
+
+                {# Show the modal with an option to delete comments #}
+                $('#deleteCommentsModal').foundation('reveal', 'open');
+
+                $('#deleteComments').on('click', function() {
+                    $('#evidence-submit').attr('data-delete-comments', 1);
+
+                    $('#evidence-form').submit();
+                });
+
+                {# ...or keep them intact #}
+                $('#preserveComments').on('click', function() {
+                    $('#evidence-form').submit();
+                });
+            });
+        });
+    </script>
 {% endif %}
 
 
@@ -227,6 +257,13 @@
                 // Toast then post
                 toast.toastActivate('Saving...')
                 submit.prop('disabled', true);
+
+                {# Moderation Workflow
+                 # Augment payload with the comment deletion flag, if set
+                 #}
+                if (0 != $('#evidence-submit').attr('data-delete-comments')) {
+                    payload.deleteComments = 1;
+                }
 
                 // Redirect to the return URL provided
                 fetch(form.action, {
