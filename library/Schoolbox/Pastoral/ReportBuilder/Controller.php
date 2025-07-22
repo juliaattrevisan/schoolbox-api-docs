@@ -26,6 +26,7 @@ use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
 use Schoolbox\Pastoral\DataSource as PastoralDataSource;
 use Schoolbox\Pastoral\Model as PastoralRecord;
+use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Report\Access\Mapper as ReportAccessMapper;
 use Schoolbox\Pastoral\Report\Access\Model as ReportAccess;
 use Schoolbox\Pastoral\Report\Dashboard\Mapper as PastoralReportDashboardMapper;
@@ -76,6 +77,7 @@ class Controller extends Base
      * @param RosettaStone                  $l10n
      * @param ModelToArray                  $pastoralTranslator
      * @param UserTranslator                $userTranslator
+     * @param PastoralMapper                $pastoralMapper
      */
     public function __construct(
         private ErrorMapper $errorMapper,
@@ -99,6 +101,7 @@ class Controller extends Base
         private RosettaStone $l10n,
         private ModelToArray $pastoralTranslator,
         private UserTranslator $userTranslator,
+        private PastoralMapper $pastoralMapper,
     ) {
     }
 
@@ -401,6 +404,7 @@ class Controller extends Base
                         'reportId' => $report->getId(),
                         'report' => $report,
                         'tabType' => $key,
+                        'resultType' => 'records',
                     ]
                 )
             ];
@@ -435,18 +439,23 @@ class Controller extends Base
      */
     public function getReportByTabType(string $tabType, PastoralReport $report): void
     {
+        $limit = $this->requestQuery->getInt('limit', Cursor::LIMIT_DEFAULT);
+
         try {
             $factory = (new Factory(
-                $this->userTranslator
-            ))->produce($report, $tabType);
+                $this->userTranslator,
+                $this->userMapper,
+                $this->termMapper,
+                $this->pastoralMapper,
+                $limit
+            ))->produce(
+                $this->prepareReportData($report),
+                $tabType
+            );
 
             if (null === $factory) {
                 throw new MapperException("Invalid type: $tabType has been given.");
             }
-
-//            $records1 = $this->getReportData($report);
-//            $payload = $factory->process2($records1);
-//            $this->response = $this->responseAsJson($payload);
 
             $records = $factory->retrieveResults(null);
             $records = $factory->process($records);
@@ -529,17 +538,8 @@ class Controller extends Base
         ];
     }
 
-    /**
-     * Get pastoral report records
-     *
-     * @param PastoralReport $report
-     *
-     * @return Collection
-     */
-    private function getReportData(PastoralReport $report): Collection
+    private function prepareReportData(PastoralReport $report): array
     {
-        // Get matching records
-
         // Special case for the current term relative date, which is not a strtotime-able thingy
         if (!$report->getUsesRelativeDate()) {
             $beforeDate = $report->getBeforeDate();
@@ -581,27 +581,63 @@ class Controller extends Base
             return $this->pastoralDataSource->createCollection();
         }
 
+        return [
+            'user' => $this->getUser(),
+            'beforeDate' => $beforeDate,
+            'afterDate' => $afterDate,
+            'severity' => $report->getSeverity(),
+            'types' => $report->getTypes(),
+            'subtypes' => $report->getSubTypes(),
+            'authors' => $report->getAuthors(),
+            'students' => $students,
+            'tags' => $report->getTags(),
+            'orders' => $report->getOrder(),
+            'involved' => $report->getInvolved(),
+            'years' => $report->getYears(),
+            'houses' => $report->getHouses(),
+            'campuses' => $report->getCampuses(),
+            'actions' => $report->getActions(),
+            'includeStudentsWithoutYear' => $report->getIncludeStudentsWithoutYear(),
+            'includeStudentWithoutHouse' => $report->getIncludeStudentsWithoutHouse(),
+            'includeRecordsWithoutAction' => $report->getIncludeRecordsWithoutAction(),
+            'includeArchivedRecords' => $report->getIncludeArchivedRecords(),
+            'actionStatus' => $report->getActionStatus(),
+        ];
+    }
+
+    /**
+     * Get pastoral report records
+     *
+     * @param PastoralReport $report
+     *
+     * @return Collection
+     */
+    private function getReportData(PastoralReport $report): Collection
+    {
+        // Get matching records
+        $data = $this->prepareReportData($report);
+
         return $this->pastoralDataSource->getReportData(
-            $this->getUser(),
-            $beforeDate,
-            $afterDate,
-            $report->getSeverity(),
-            $report->getTypes(),
-            $report->getSubTypes(),
-            $report->getAuthors(),
-            $students,
-            $report->getTags(),
-            $report->getOrder(),
-            $report->getInvolved(),
-            $report->getYears(),
-            $report->getHouses(),
-            $report->getCampuses(),
-            $report->getActions(),
-            $report->getIncludeStudentsWithoutYear(),
-            $report->getIncludeStudentsWithoutHouse(),
-            $report->getIncludeRecordsWithoutAction(),
-            $report->getIncludeArchivedRecords(),
-            $report->getActionStatus(),
+            $data['user'],
+            $data['beforeDate'],
+            $data['afterDate'],
+            $data['severity'],
+            $data['types'],
+            $data['subtypes'],
+            $data['authors'],
+            $data['students'],
+            $data['tags'],
+            $data['orders'],
+            $data['involved'],
+            $data['years'],
+            $data['houses'],
+            $data['campuses'],
+            $data['actions'],
+            $data['includeStudentsWithoutYear'],
+            $data['includeStudentWithoutHouse'],
+            $data['includeRecordsWithoutAction'],
+            $data['includeArchivedRecords'],
+            $data['actionStatus'],
         );
     }
 

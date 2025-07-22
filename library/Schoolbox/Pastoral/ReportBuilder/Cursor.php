@@ -3,9 +3,12 @@
 namespace Schoolbox\Pastoral\ReportBuilder;
 
 use Schoolbox\API\Cursor\ICursor;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Collection;
+use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Report\Model as PastoralReport;
 use Schoolbox\User\Translator\Author\ModelToArray;
+use Schoolbox\UserMapper;
 use ValueError;
 
 class Cursor implements ICursor
@@ -23,8 +26,11 @@ class Cursor implements ICursor
     public const LIMIT_DEFAULT = self::LIMIT_MAX;
 
     public function __construct(
-        protected PastoralReport $report,
+        protected array $report,
         protected ModelToArray $userTranslator,
+        protected UserMapper $userMapper,
+        protected TermMapper $termMapper,
+        protected PastoralMapper $pastoralMapper,
         protected ?int $limit = self::LIMIT_DEFAULT,
     ) {
         if ($this->limit > self::LIMIT_MAX) {

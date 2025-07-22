@@ -23,6 +23,7 @@ use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Report\Access\Model as ReportAccess;
 use Schoolbox\Pastoral\Report\Mapper as PastoralReportMapper;
 use Schoolbox\Pastoral\Report\Model as PastoralReport;
@@ -89,17 +90,19 @@ class Module extends BaseModule
                 )
             );
 
+        $resultsRoute = '/results/{reportId:\d+}';
+
         $this->registerRoutesArray(
             [
                 'GET'  => [
-                    ''                                          => ['getIndex' => $permissionStaff],
-                    '/insert'                                   => ['getReportInsert' => $permissionStaff],
-                    '/update/{reportId:\d+}'                    => ['getReportUpdate' => $permissionModifyReport],
-                    '/results/{reportId:\d+}'                   => ['getReportResults' => $permissionReadReport],
-                    '/results/tag/{tagId:\d+}'                  => ['getReportTags' => $permissionStaff],
-                    '/results/{reportId:\d+}/tab/{tabType}'     => ['getReportByTabType' => $permissionStaff],
-                    '/results/{reportId:\d+}/print'             => ['getReportResultsPrint' => $permissionReadReport],
-                    '/results/{reportId:\d+}/export'            => ['getReportResultsExport' => $permissionReadReport],
+                    ''                                                          => ['getIndex' => $permissionStaff],
+                    '/insert'                                                   => ['getReportInsert' => $permissionStaff],
+                    '/update/{reportId:\d+}'                                    => ['getReportUpdate' => $permissionModifyReport],
+                    "$resultsRoute"                                             => ['getReportResults' => $permissionReadReport],
+                    '/results/tag/{tagId:\d+}'                                  => ['getReportTags' => $permissionStaff],
+                    "$resultsRoute/tab/{tabType}/{resultType:(points|records)}" => ['getReportByTabType' => $permissionStaff],
+                    "$resultsRoute/print"                                       => ['getReportResultsPrint' => $permissionReadReport],
+                    "$resultsRoute/export"                                      => ['getReportResultsExport' => $permissionReadReport],
                 ],
                 'POST' => [
                     '/create'                => ['postReportCreate' => $permissionStaff],
@@ -153,6 +156,7 @@ class Module extends BaseModule
                 new ScrubAdapter(),
             ),
             new User\Translator\Author\ModelToArray(),
+            $this->getMapperFactory()->get(PastoralMapper::class),
         );
     }
 

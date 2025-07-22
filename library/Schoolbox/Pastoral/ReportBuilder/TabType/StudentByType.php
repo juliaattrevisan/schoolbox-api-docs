@@ -3,13 +3,11 @@
 namespace Schoolbox\Pastoral\ReportBuilder\TabType;
 
 use Schoolbox\Collection;
-use Schoolbox\Pastoral\Mapper;
 use Schoolbox\Pastoral\Report\Model as PastoralReport;
 use Schoolbox\Pastoral\ReportBuilder\Cursor;
 use Schoolbox\Pastoral\SubType\Model as SubType;
 use Schoolbox\Pastoral\Type\Model as Type;
 use Alaress_Date_Format;
-use Schoolbox\UserMapper;
 
 class StudentByType extends Cursor implements TabTypeInterface
 {
@@ -18,10 +16,21 @@ class StudentByType extends Cursor implements TabTypeInterface
         return  $this->getResults($this->report);
     }
 
-    private function getTableHeaders()
+    public function retrieveResultCount(): ?int
     {
-        $types = $this->report->getTypes()->diff(
-            $this->report->getSubTypes()?->map(
+        // TODO use a simpler query
+        return $this->getResults($this->report)->count();
+    }
+
+    /**
+     * Get the header row for the table
+     *
+     * @return array[]
+     */
+    private function getTableHeaders(): array
+    {
+        $types = $this->report['types']->diff(
+            $this->report['subtypes']?->map(
                 fn(SubType $subType) => $subType->getPastoralType()
             )
         );
@@ -50,7 +59,7 @@ class StudentByType extends Cursor implements TabTypeInterface
             ];
         }
 
-        foreach ($this->report->getSubTypes() as $subType) {
+        foreach ($this->report['subtypes'] as $subType) {
             if ($subType instanceof SubType) {
                 $tableHeaders[] = [
                     'key'   => "count_subtype_{$subType->getId()}",
@@ -65,14 +74,16 @@ class StudentByType extends Cursor implements TabTypeInterface
         return $tableHeaders;
     }
 
-
-    public function process(Collection $records)
+    /**
+     * Processing the payload to format it for presenting in a table
+     *
+     * @param Collection $records
+     * @return array[]
+     */
+    public function process(Collection $records): array
     {
         $tableHeader = $this->getTableHeaders();
-
-        $userMapper = UserMapper::getInstance();
-
-        $students = $userMapper->findByColumn('id', array_column($records->getAll(), 'student_id'));
+        $students = $this->userMapper->findByColumn('id', array_column($records->getAll(), 'student_id'));
 
         $keys = array_keys($records->first());
         array_shift($keys);
@@ -105,39 +116,18 @@ class StudentByType extends Cursor implements TabTypeInterface
         ];
     }
 
-    public function getResults(PastoralReport $report)
+    public function getResults(array $report)
     {
-        $pastoralMapper = Mapper::getInstance();
-        $termMapper = \Schoolbox\Assessment\Term\Mapper::getInstance();
+        $beforeDate = $report['beforeDate'];
+        $afterDate = $report['afterDate'];
 
-        // Special case for the current term relative date, which is not a strtotime-able thingy
-        if (!$report->getUsesRelativeDate()) {
-            $beforeDate = $report->getBeforeDate();
-            $afterDate  = $report->getAfterDate();
-        } elseif ($report->getRelativeDateString() === PastoralReport::THIS_TERM) {
-            $currentTerm = $termMapper->findForToday();
-            $beforeDate  = $currentTerm->getActualFinish();
-            $afterDate   = $currentTerm->getStart();
-        } elseif ($report->getRelativeDateString() === PastoralReport::THIS_YEAR) {
-            $now        = Alaress_Date_Format::now();
-            $beforeDate = (clone $now)->endOfYear();
-            $afterDate  = (clone $now)->startOfYear();
-        } elseif ($report->getRelativeDateString() === PastoralReport::THIS_SCHOOL_YEAR) {
-            $now        = Alaress_Date_Format::now();
-            $beforeDate = (clone $now)->endOfSchoolYear();
-            $afterDate  = (clone $now)->getStartOfSchoolYear();
-        } else {
-            $beforeDate = Alaress_Date_Format::now();
-            $afterDate  = Alaress_Date_Format::newFromTimestamp(strtotime($report->getRelativeDateString()));
-        }
-
-        $db = $pastoralMapper->getDatabase();
+        $db = $this->pastoralMapper->getDatabase();
 
         $whereInTypeSubTypeQuery = [];
         $selectCountTypeQuery = [];
 
-        $whereTypes = $report->getTypes()->diff(
-            $report->getSubTypes()?->map(
+        $whereTypes = $report['types']->diff(
+            $report['subtypes']?->map(
                 fn(SubType $subType) => $subType->getPastoralType()
             )
         );
@@ -159,12 +149,12 @@ class StudentByType extends Cursor implements TabTypeInterface
             );
         }
 
-        $whereSubTypes = $report->getSubTypes() ?? [];
+        $whereSubTypes = $report['subtypes'] ?? [];
         if (!empty($whereSubTypes)) {
-            $whereSubTypeIds   = implode(',', Collection::arrayColumn($report->getSubTypes(), 'id'));
+            $whereSubTypeIds   = implode(',', Collection::arrayColumn($report['subtypes'], 'id'));
             $countSubTypeQuery = implode(
                 ', ',
-                $report->getSubTypes()->map(
+                $report['subtypes']->map(
                     fn(SubType $subType) => "COUNT(CASE WHEN p.subtype_id = {$subType->getId()} THEN 1 END) AS count_subtype_{$subType->getId()}"
                 )->getAll()
             );
@@ -183,7 +173,7 @@ class StudentByType extends Cursor implements TabTypeInterface
 
         $countQuery =
             "SELECT p.student_id, {$countQuery}
-            FROM {$pastoralMapper->getTable()} p
+            FROM {$this->pastoralMapper->getTable()} p
             WHERE
                 ({$whereTypeSubTypeQuery}) AND
                 (COALESCE(`p`.`occurred_on`, `p`.`created_at`) <= :beforeDate) AND
@@ -201,7 +191,7 @@ class StudentByType extends Cursor implements TabTypeInterface
 
         $subTypeKeys = implode(
             ' + ',
-            $report->getSubTypes()->map(
+            $report['subtypes']->map(
                 fn(SubType $subType) => "count_subtype_{$subType->getId()}"
             )->getAll()
         );

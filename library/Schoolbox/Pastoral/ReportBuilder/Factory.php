@@ -2,9 +2,13 @@
 
 namespace Schoolbox\Pastoral\ReportBuilder;
 
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Collection;
+use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Report\Model as PastoralReport;
 use Schoolbox\Pastoral\ReportBuilder\TabType\StudentByType;
 use Schoolbox\User\Translator\Author\ModelToArray;
+use Schoolbox\UserMapper;
 
 class Factory
 {
@@ -16,15 +20,26 @@ class Factory
 
     public function __construct(
         private ModelToArray $userTranslator,
+        private UserMapper $userMapper,
+        private TermMapper $termMapper,
+        private PastoralMapper $pastoralMapper,
+        private ?int $limit = null,
     ) {
     }
 
     public function produce(
-        PastoralReport $report,
+        array $report,
         string $type,
     ) {
         return match ($type) {
-            self::STUDENT_BY_TYPE => new StudentByType($report, $this->userTranslator),
+            self::STUDENT_BY_TYPE => new StudentByType(
+                $report,
+                $this->userTranslator,
+                $this->userMapper,
+                $this->termMapper,
+                $this->pastoralMapper,
+                $this->limit,
+            ),
             default => null
         };
     }
