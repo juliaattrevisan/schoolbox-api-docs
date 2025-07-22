@@ -445,7 +445,7 @@ function getCustomisationLabel(plan: Plan | CustomisedPlan): string {
             <h3 class="selected-count">
                 <em>{{ selectedList.length }} selected</em>
             </h3>
-            <button class="button-clear" @click.prevent="selectedList.length = 0">Clear selection</button>
+            <button class="button-clear" @click.prevent="selectedList = []">Clear selection</button>
             <div class="l-flex-row l-flex--justify l-gap-xs">
                 <template v-if="hasCustomisedInSelection">
                     <button
