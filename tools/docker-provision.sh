@@ -93,11 +93,11 @@ function version_gte() {
 function setup_aws_sso() {
   if [ -f ~/.aws/credentials ]; then
     if grep -q 'default' ~/.aws/credentials; then
-      echo "[SB][`date +%Y-%m-%d\ %X`] AWS SSO already set up";
+      log "AWS SSO already set up";
       return
     fi
   fi
-  echo "[SB][`date +%Y-%m-%d\ %X`] Setting up AWS SSO";
+  log "Setting up AWS SSO";
   mkdir -p ~/.aws
   echo "[default]
   sso_session = docker
@@ -144,7 +144,7 @@ function mark_safe_for_git() {
 
 function init_database() {
   # Timezone data: should be run in mariadb container on setup
-  #echo "[SB][`date +%Y-%m-%d\ %X`] Updating timezone data";
+  #log "Updating timezone data";
   #mysql_tzinfo_to_sql /usr/share/zoneinfo 2>/dev/null | mysql --defaults-extra-file=/root/.my.cnf mysql 2>/dev/null;
 
   log "Creating Schoolbox MariaDB schema and user";
@@ -155,21 +155,23 @@ function init_composer_dependencies() {
   log "Installing vendor dependencies with composer";
   cd "$cachedir" || exit 1;
   local vendorfile='';
-  local composerlocksha=`sha1sum ../composer.lock 2>/dev/null | awk '{print $1}'`;
+  local composerlocksha;
+  composerlocksha=`sha1sum ../composer.lock 2>/dev/null | awk '{print $1}'`;
 
   if [ -f "$SITE_ROOT"/vendor/composer.lock.checksum ];
   then
       currentvendorsha=`awk '{print $1}' "$SITE_ROOT"/vendor/composer.lock.checksum`;
       if [ "$currentvendorsha" == "$composerlocksha" ];
       then
-          echo "[SB][`date +%Y-%m-%d\ %X`] Vendor build up to date, nothing to change";
+          log "Vendor build up to date, nothing to change";
           vendorfile='ignore';
       fi
   fi
 
   if [ "$vendorfile" != 'ignore' ];
   then
-      local check=`grep $composerlocksha vendor.cache 2>/dev/null | wc -l`;
+      local check;
+      check=`grep $composerlocksha vendor.cache 2>/dev/null | wc -l`;
       if [ $check -gt 0 ];
       then
           # Woo - we've located a matching cache file
@@ -190,7 +192,7 @@ function init_composer_dependencies() {
                       if [ $checketag -eq 0 ];
                       then
                           # New/updated version available - download it
-                          echo "[SB][`date +%Y-%m-%d\ %X`] Downloading latest vendor build: $branch-vendor-php-dev.tar.gz";
+                          log "Downloading latest vendor build: $branch-vendor-php-dev.tar.gz";
                           wget --no-verbose https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-vendor-php-dev.tar.gz -O $branch-vendor-php-dev.tar.gz 2>&1;
                           if [ $? -eq 0 ];
                           then
@@ -225,17 +227,17 @@ function init_composer_dependencies() {
           if [ -f "${cachedir}"/$vendorfile ];
           then
               # Extract content
-              echo "[SB][`date +%Y-%m-%d\ %X`] Found matching vendor cache file '$vendorfile', now extracting";
+              log "Found matching vendor cache file '$vendorfile', now extracting";
               rm -fR "$SITE_ROOT"/vendor 2>/dev/null;
               tar xzf "${cachedir}"/$vendorfile;
           else
               # Still no luck, build from scratch with composer
-              echo "[SB][`date +%Y-%m-%d\ %X`] No matching vendor cache found. Building with composer";
+              log "No matching vendor cache found. Building with composer";
               "$SITE_ROOT"/tools/composer.sh
           fi
       else
           # Still no luck, build from scratch with composer
-          echo "[SB][`date +%Y-%m-%d\ %X`] No matching vendor cache found. Building with composer";
+          log "No matching vendor cache found. Building with composer";
           "$SITE_ROOT"/tools/composer.sh
       fi
   fi
@@ -268,7 +270,7 @@ function main() {
   init_database
   init_composer_dependencies
 
-  echo "[SB][`date +%Y-%m-%d\ %X`] Installing instance via 'schoolbox-data-refresh.sh'";
+  log "Installing instance via 'schoolbox-data-refresh.sh'";
 
   # Note schoolbox-data-refresh creates the database and then applies the schoolbox/updates SQL and PHP scripts.
   # It is the responsibility of schoolbox-data-refresh to enable and disable maintenance mode as appropriate during its
@@ -328,15 +330,15 @@ function main() {
     exit 1
   fi
 
-  echo "[SB][`date +%Y-%m-%d\ %X`] Putting system in maintenance mode";
+  log "Putting system in maintenance mode";
   if INSTANCE_ID="${default_instance_id}" "$SITE_ROOT"/tools/maintenance/site_down.sh -eq 0 ; then
-    echo "[SB][`date +%Y-%m-%d\ %X`] Maintenance mode enabled on instance 'docker'."
+    log "Maintenance mode enabled on instance 'docker'."
   else
-    echo "[SB][`date +%Y-%m-%d\ %X`] Could not enable maintenance mode on instance 'docker'.  Exiting."
+    log "Could not enable maintenance mode on instance 'docker'.  Exiting."
     exit 1;
   fi
 
-  echo "[SB][`date +%Y-%m-%d\ %X`] Applying vagrant SQL fixes";
+  log "Applying vagrant SQL fixes";
   mariadb -h mariadb -u root -D schoolbox < "${SITE_ROOT}/sql/vagrant.sql"
   mariadb -h mariadb -u root -D schoolbox < "${cachedir}/vagrant-secrets.sql"
 
@@ -361,7 +363,7 @@ function main() {
   #  fi
   done
 
-  echo "[SB][`date +%Y-%m-%d\ %X`] Applying vagrant SQL fixes (post version upgrade)";
+  log "Applying vagrant SQL fixes (post version upgrade)";
   mariadb -h mariadb -u root -D schoolbox < "${SITE_ROOT}/sql/vagrant.sql"
   mariadb -h mariadb -u root -D schoolbox < "${cachedir}/vagrant-secrets.sql"
 
@@ -369,7 +371,7 @@ function main() {
   # so the npm versions it installed are available
   source ~/.nvm/nvm.sh
 
-  echo "[SB][`date +%Y-%m-%d\ %X`] Building NPM";
+  log "Building NPM";
   cd $cachedir;
   npmfile='';
   npmlocksha=`sha1sum "$SITE_ROOT"/npm-shrinkwrap.json 2>/dev/null | awk '{print $1}'`;
@@ -378,14 +380,14 @@ function main() {
       currentnpmsha=`awk '{print $1}' "$SITE_ROOT"/node_modules/npm.shrinkwrap.checksum`;
       if [ "$currentnpmsha" == "$npmlocksha" ];
       then
-          echo "[SB][`date +%Y-%m-%d\ %X`] NPM build up to date, nothing to change ($npmlocksha)";
+          log "NPM build up to date, nothing to change ($npmlocksha)";
           npmfile='ignore';
       fi
   fi
 
   if [ "$npmfile" != 'ignore' ];
   then
-      echo "[SB][`date +%Y-%m-%d\ %X`] NPM build not correct or missing ($npmlocksha)";
+      log "NPM build not correct or missing ($npmlocksha)";
       check=`grep $npmlocksha npm.cache 2>/dev/null | wc -l`;
       if [ $check -gt 0 ];
       then
@@ -405,7 +407,7 @@ function main() {
                       if [ $checketag -eq 0 ];
                       then
                           # New/updated version available - download it
-                          echo "[SB][`date +%Y-%m-%d\ %X`] Downloading latest NPM build: $branch-npm.tar.gz";
+                          log "Downloading latest NPM build: $branch-npm.tar.gz";
                           wget --no-verbose https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-npm.tar.gz -O $branch-npm.tar.gz 2>&1;
                           if [ $? -eq 0 ];
                           then
@@ -439,47 +441,47 @@ function main() {
           if [ -f "${cachedir}"/$npmfile ];
           then
               # Extract content
-              echo "[SB][`date +%Y-%m-%d\ %X`] Found matching NPM cache file ($npmlocksha) '$npmfile', now extracting";
+              log "Found matching NPM cache file ($npmlocksha) '$npmfile', now extracting";
               rm -fR "$SITE_ROOT"/node_modules 2>/dev/null;
               tar xzf "${cachedir}"/$npmfile;
           else
               # Still no luck, build from scratch with npm
-              echo "[SB][`date +%Y-%m-%d\ %X`] Cache content:";
+              log "Cache content:";
               cat "${cachedir}"/npm.cache;
-              echo "[SB][`date +%Y-%m-%d\ %X`] No matching NPM cache found. Building with npm";
+              log "No matching NPM cache found. Building with npm";
               "$SITE_ROOT"/tools/pkg-build-npm.sh 2>&1;
           fi
       else
           # Still no luck, build from scratch with npm
-          echo "[SB][`date +%Y-%m-%d\ %X`] Cache content:";
+          log "Cache content:";
           cat "${cachedir}"/npm.cache;
-          echo "[SB][`date +%Y-%m-%d\ %X`] No matching NPM cache found. Building with npm";
+          log "No matching NPM cache found. Building with npm";
           "$SITE_ROOT"/tools/pkg-build-npm.sh 2>&1;
       fi
   fi
   cd "$SITE_ROOT" || exit 1;
 
-  echo "[SB][`date +%Y-%m-%d\ %X`] Building JS/CSS files";
+  log "Building JS/CSS files";
   "$SITE_ROOT"/tools/pkg-build-css-js.sh
 
-  echo "[SB][`date +%Y-%m-%d\ %X`] Loading all demo data complete";
+  log "Loading all demo data complete";
 
   # Vagrant uses a non-standard ffmpeg, installed via Schoolbox's package repo:
   # that does not seem to be needed here.
   ffmpegver=`dpkg -l ffmpeg | tail -n1 | awk {'print $3'}`;
-  echo "[SB][`date +%Y-%m-%d\ %X`] ffmpeg installed: $ffmpegver";
+  log "ffmpeg installed: $ffmpegver";
 
-  echo "[SB][`date +%Y-%m-%d\ %X`] Removing system maintenance mode";
+  log "Removing system maintenance mode";
   if INSTANCE_ID=docker "$SITE_ROOT"/tools/maintenance/site_up.sh -eq 0 ; then
-    echo "[SB][`date +%Y-%m-%d\ %X`] Maintenance mode disabled on instance 'docker'."
+    log "Maintenance mode disabled on instance 'docker'."
   else
-    echo "[SB][`date +%Y-%m-%d\ %X`] Could not disable maintenance mode on instance 'docker'.  Continuing."
+    log "Could not disable maintenance mode on instance 'docker'.  Continuing."
   fi
 
   # call custom provisioning
   if [ -f "$SITE_ROOT"/post-provision.sh ];
   then
-      echo "[SB][`date +%Y-%m-%d\ %X`] Running custom post provisioning";
+      log "Running custom post provisioning";
       "$SITE_ROOT"/post-provision.sh;
   fi
 
