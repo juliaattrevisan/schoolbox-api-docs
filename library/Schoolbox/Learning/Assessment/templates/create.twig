@@ -24,7 +24,7 @@
          * @returns {Promise}
          */
         function formWillSubmit() {
-            {% if assessmentType is defined and assessmentType in ['dueWork', 'task'] and contextType is defined and contextType in ['units'] and customisedFor is not defined %}
+            {% if assessmentType is defined and assessmentType in ['dueWork', 'task'] and contextType is defined and contextType in ['units', 'projects'] and customisedFor is not defined %}
             const showParticipationPrompt = true;
             {% else %}
             const showParticipationPrompt = false;
