@@ -16,7 +16,19 @@
         ['Learning Moment', routeLookup('@learningMomentEvidence.getEvidenceDetail', {evidenceId: evidence.id})],
         ['Modify']
     ) }}
-    {% set formAction = routeLookup('learningMomentEvidence.putEvidence', {evidenceId: evidence.id}) %}
+
+    {# Moderation Workflow
+     # If this Moment is submitted and moderation is required,
+     # the form POSTs to the Moderation controller's postPublish
+     # which will also do other stuff like deleting comments.
+     #
+     # Otherwise, presume updating the Moment's contents as a student
+     #}
+    {% if evidence.isSubmitted and USER.role.isStaff %}
+        {% set formAction = routeLookup('learningMomentModeration.postPublish', {evidenceId: evidence.id}) %}
+    {% else %}
+        {% set formAction = routeLookup('learningMomentEvidence.putEvidence', {evidenceId: evidence.id}) %}
+    {% endif %}
 {% endif %}
 
 <div class="actions-small-1 row">
@@ -94,7 +106,9 @@
                     </fieldset>
                 </section>
 
-            {# Staff and students share this area, but their buttons are differently described #}
+            {# Moderation Workflow
+             # Staff and students share this area, but their buttons are differently described
+             #}
             {% set submitText = 'Submit' %}
 
             {% if USER.role.isStudent %}
@@ -242,7 +256,7 @@
                     submitForm(form);
                 }
 
-            }
+            #}
         });
         $('[data-tags]').selectizeSelector({
             ajax: {
