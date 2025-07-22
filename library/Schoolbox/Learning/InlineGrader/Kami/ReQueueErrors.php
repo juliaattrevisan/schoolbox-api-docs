@@ -143,7 +143,7 @@ class ReQueueErrors
      * Returns the IDs of all Kami documents that have a status of 'error'
      *
      * @param null|string $errorMessageFilter If supplied, only re-queue documents which match this error message
-     * @return string[]
+     * @return array
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \TypeError
      */
@@ -155,7 +155,7 @@ class ReQueueErrors
         }
         $ids = $this->mapper->findIdsByPredicates($pb);
 
-        $msg = sprintf("Re-queuing %d documents that with status = '%s'", \count($ids), Model::STATUS_ERROR);
+        $msg = 'Re-queuing ' . count($ids) . " documents that with status = '" . Model::STATUS_ERROR . "'";
         if (\is_string($errorMessageFilter)) {
             $msg .= " and 'error_message' = '{$errorMessageFilter}'";
         }
