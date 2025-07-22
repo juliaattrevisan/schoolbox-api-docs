@@ -321,6 +321,13 @@ class Controller extends Base
         $momentType = $evidence->getType();
         $template   = $this->getTemplateFromType($momentType);
 
+        /* Attachzone stuff for existing attachments
+         */
+        $zone = $this->buildAttachzone($momentType);
+        if ($evidence->getStorage()) {
+            $zone->attachFiles([$evidence->getStorage()->getHash()]);
+        }
+
         /* Students get their learning moment moderation requirement tested;
          * parents and teachers bypass this check
          */
@@ -330,7 +337,8 @@ class Controller extends Base
             $moderationRequired = (new ModerationRequired())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED), $this->getUser()->getYear());
         }
 
-        $params     = [
+        $params = [
+            'evidence'                 => $evidence,
             'users'                    => $evidence->getRecipient(),
             'userIds'                  => $evidence->getRecipient()->getId(),
             'otherUsers'               => [],
@@ -340,13 +348,8 @@ class Controller extends Base
             'isCreate'                 => false,
             'momentType'               => $momentType,
             'curriculumCodes'          => $evidence->getViewableCurriculumNodes()?->reindex(),
+            'zone'                     => $zone->getTwigContext()
         ];
-        $zone       = $this->buildAttachzone($momentType);
-        if ($evidence->getStorage()) {
-            $zone->attachFiles([$evidence->getStorage()->getHash()]);
-        }
-        $params['zone']     = $zone->getTwigContext();
-        $params['evidence'] = $evidence;
 
         $this->response = $this->responseFromTemplate(
             $template,
