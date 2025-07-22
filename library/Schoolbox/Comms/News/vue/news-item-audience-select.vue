@@ -756,7 +756,9 @@ export default {
                     :placeholder="audiencePlaceholder"
                     required
                 />
-                <button class="button icon-drag-drop" @click.prevent="openBrowseModal">Browse&hellip;</button>
+                <button type="button" class="button icon-drag-drop" @click.prevent="openBrowseModal">
+                    Browse&hellip;
+                </button>
             </div>
             <input type="hidden" name="audience" :value="audienceFormString" />
         </div>
