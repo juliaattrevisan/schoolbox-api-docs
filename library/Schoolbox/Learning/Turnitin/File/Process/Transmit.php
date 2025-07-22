@@ -173,12 +173,9 @@ class Transmit
 
             $this->changeState(
                 $model,
-                sprintf(
-                    'Report %s: Student Submission File %s not found; setting status [%s]',
-                    $model->getId(),
-                    $model->getStudentSubmissionFileId(),
-                    Turnitin\File\Model::STATUS_ERROR
-                ),
+                "Report {$model->getId()}: " .
+                "Student Submission File {$model->getStudentSubmissionFileId()} not found; " .
+                "setting status [" . Turnitin\File\Model::STATUS_ERROR . ']',
                 Turnitin\File\Model::STATUS_ERROR
             );
 
