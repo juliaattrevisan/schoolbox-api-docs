@@ -2,9 +2,10 @@
  # Share a Learning Moment
  #
  # @param bool $moderationRequired  Decide if the current user's post requires moderation
+ # @param bool $hasComments         Indicates whether there is at least one comment associated with this learning moment
  #}
-
 {% import 'sub/breadcrumbs.twig' as bread %}
+
 {% if isCreate %}
 {{ bread.crumbs(
     [ 'Share Learning' ]
@@ -132,7 +133,13 @@
  # Agreeing to that sets a hidden input field which is then interpreted by the
  # buildPayload method, injecting this for controllers to use.
  #}
-{% if USER.role.isStaff and USER.role.accessEvidence and evidence.isSubmitted %}
+{% if USER.role.isStaff and USER.role.accessEvidence and evidence.isSubmitted and hasComments %}
+    <div id="deleteCommentsModal" class="reveal-modal" data-reveal aria-labelledby="deleteCommentsModalTitle" aria-hidden="true" role="dialog">
+        <h2 id="deleteCommentsModalTitle">Please confirm</h2>
+        <p>There are comments on this learning moment that have already been made and will become visible to parents.</p>
+        <p>Do you want to delete these comments?</p>
+        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+    </div>
 {% endif %}
 
 
