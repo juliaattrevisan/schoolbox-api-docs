@@ -349,6 +349,10 @@ mariadb -h mariadb -u root -D schoolbox < "${cachedir}/vagrant-secrets.sql"
 #cat "$SITE_ROOT"/sql/vagrant.sql | mysql --defaults-extra-file=/root/.my.cnf schoolbox
 #cat $cachedir/vagrant-secrets.sql | mysql --defaults-extra-file=/root/.my.cnf schoolbox
 
+# Ensure nvm.sh is run before building NPM stuff,
+# so the npm versions it installed are available
+source ~/.nvm/nvm.sh
+
 echo "[SB][`date +%Y-%m-%d\ %X`] Building NPM";
 cd $cachedir;
 npmfile='';
