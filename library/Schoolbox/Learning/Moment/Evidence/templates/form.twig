@@ -258,7 +258,7 @@
                         throw new Error("Save failed!");
                     }
                     toast.toastTimeout({text: 'Saved'});
-                    {#window.location.href = '{{ RETURN_URL.previous.decoded ?? '/' }}';#}
+                    window.location.href = '{{ RETURN_URL.previous.decoded ?? '/' }}';
                     isSubmittingForm = false;
                 })
                 .catch(() => {
@@ -266,7 +266,6 @@
                     submit.prop('disabled', false);
                     isSubmittingForm = false;
                 });
-
             }
         }
 
