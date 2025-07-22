@@ -15,6 +15,12 @@ import type { injectScriptsIfNotLoaded } from "@js/util/domUtils";
 import type { Toast } from "@schoolboxVue/components/toast/sbxToastTypes";
 import type { SbxGlobalDocumentEventHandlerMap, SbxGlobalElementEventHandlerMap } from "./sbxEvents";
 
+type ResourceAttach = {
+    dropzone: {
+        addFile(file: File): void;
+    };
+};
+
 declare global {
     interface Window {
         cdnPrefix: string;
@@ -30,6 +36,7 @@ declare global {
         };
         jQuery: JQueryStatic;
         sbProps: {
+            activeResourceAttach?: ResourceAttach | null;
             ckeditor5LicenseKey: string;
             iframelyLicenseKey: string;
             siteTitle: string;
@@ -100,6 +107,10 @@ declare global {
          * From jquery.alaressValidate.js
          */
         alaressValidate(options?: Record<string, unknown>): JQuery;
+        /**
+         * From jquery.resourceAttach.js
+         */
+        data(key: "plugin_resourceAttach"): ResourceAttach;
     }
 
     // Fix types when importing .vue files and using with window.Vue.createApp

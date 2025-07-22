@@ -434,6 +434,7 @@
 
     ResourceAttach.prototype.open = function () {
         var self = this;
+        window.sbProps.activeResourceAttach = this;
 
         if (singletonModal == null) {
             // this will construct a modal VIA the cache, then recurse when done
@@ -549,6 +550,8 @@
         if (singletonModal && singletonModal.is(":visible")) {
             singletonModal.foundation("reveal", "close");
         }
+
+        window.sbProps.activeResourceAttach = null;
     };
 
     ResourceAttach.prototype.destroy = function () {
