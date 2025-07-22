@@ -210,7 +210,7 @@ if ! INSTANCE_ID=vagrantx schoolbox-data-refresh.sh \
 --sql-schema 'schoolbox' \
 --sql-user 'schoolboxvagrant' \
 --sql-pass 'abc123' \
---cache-dir "$SITE_ROOT/vagrantcache" \
+--cache-dir "${cachedir}" \
 --config amqp_host "'localhost'" \
 --config amqp_user "'guest'" \
 --config amqp_pass "'guest'" \

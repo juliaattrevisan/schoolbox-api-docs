@@ -251,7 +251,7 @@ if ! INSTANCE_ID=docker "${SITE_ROOT}/docker/base-images/php82-bookworm/usr/loca
 --sql-schema 'schoolbox' \
 --sql-user 'schoolboxdocker' \
 --sql-pass 'abc123' \
---cache-dir "$SITE_ROOT/vagrantcache" \
+--cache-dir "${cachedir}" \
 --config amqp_host "'rabbitmq'" \
 --config amqp_user "'guest'" \
 --config amqp_pass "'guest'" \
