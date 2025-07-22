@@ -457,7 +457,7 @@ function getCustomisationLabel(plan: Plan | CustomisedPlan): string {
                     </button>
                 </template>
                 <template v-else>
-                    <div class="l-flex__item--1">
+                    <div class="l-flex__item--1-auto">
                         <a
                             class="icon-modify submit"
                             :href="`${getLearningPlanNewUrl}?student=${selectedList.map((p) => p.user.id).join(',')}&${getReturnUrl()}`"
@@ -465,18 +465,18 @@ function getCustomisationLabel(plan: Plan | CustomisedPlan): string {
                             Modify
                         </a>
                     </div>
-                    <div class="l-flex__item--1">
+                    <div class="l-flex__item--1-auto">
                         <button class="icon-staff-students submit" @click.prevent="excludeSelected">Exclude</button>
                     </div>
-                    <div v-if="customisations.length > 0" class="l-flex__item--1">
+                    <div v-if="customisations.length > 0" class="l-flex__item--1-auto">
                         <button class="icon-list submit" @click.prevent="isIncludeOpen = true">
                             Include In Existing Customisation
                         </button>
                     </div>
-                    <div class="l-flex__item--1">
+                    <div class="l-flex__item--1-auto">
                         <a class="icon-copy submit" data-test="custom-participation-copy-activity">Copy Activity</a>
                     </div>
-                    <div class="l-flex__item--1">
+                    <div class="l-flex__item--1-auto">
                         <a
                             class="icon-submissions submit"
                             :href="`${getAssessmentParticipationNewActivity}?student=${selectedList.map((p) => p.user.id).join(',')}&original=${assessmentId}&${getReturnUrl()}`"
@@ -512,9 +512,9 @@ function getCustomisationLabel(plan: Plan | CustomisedPlan): string {
                 </select>
             </div>
             <div class="l-flex l-gap-xs f-no-margins">
-                <button class="button l-flex__item--1" @click.prevent="isIncludeOpen = false">Cancel</button>
+                <button class="button l-flex__item--1-auto" @click.prevent="isIncludeOpen = false">Cancel</button>
                 <button
-                    class="button submit l-flex__item--1"
+                    class="button submit l-flex__item--1-auto"
                     :disabled="!selectedActivity"
                     @click.prevent="includeParticipantInExistingPlan()"
                 >
@@ -544,7 +544,7 @@ function getCustomisationLabel(plan: Plan | CustomisedPlan): string {
         flex-direction: column;
     }
 
-    .l-flex__item--1 {
+    .l-flex__item--1-auto {
         flex: 1 1 100%;
     }
 }
