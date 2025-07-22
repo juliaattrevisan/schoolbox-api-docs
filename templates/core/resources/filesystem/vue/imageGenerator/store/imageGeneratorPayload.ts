@@ -1,11 +1,7 @@
+import type { ResponseStreamEvent } from "openai/resources/responses/responses";
 import { sseApiRequest } from "@js/util/sbx/apiUtils";
 import type { ApiBaseResponse } from "@js/util/sbx/apiUtils";
 
-type ImageGeneratorApiMessage = {
-    responseId: string;
-    src: string;
-    message: string | null;
-};
 
 /** The "complete" response we expect to receive at the very end from the API */
 type ImageGeneratorApiResponse = {
@@ -30,9 +26,9 @@ export type ImageGeneratorApiPayload = {
 export async function generateImage(
     url: string,
     body: ImageGeneratorApiPayload,
-    onMessage: (response: ApiBaseResponse<ImageGeneratorApiMessage>) => void,
+    onMessage: (response: ApiBaseResponse<ResponseStreamEvent>) => void,
 ): Promise<ApiBaseResponse<ImageGeneratorApiResponse>> {
-    return sseApiRequest<ImageGeneratorApiMessage, ImageGeneratorApiResponse, ImageGeneratorApiPayload>({
+    return sseApiRequest<ResponseStreamEvent, ImageGeneratorApiResponse, ImageGeneratorApiPayload>({
         url,
         method: "POST",
         body,

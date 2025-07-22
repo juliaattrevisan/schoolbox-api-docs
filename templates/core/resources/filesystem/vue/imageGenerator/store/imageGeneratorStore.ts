@@ -102,11 +102,7 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
                     feed.value.pop();
                     feed.value.push(newResponseEntry);
                 }
-
-                return;
-            }
-
-            if (message.data.type === "response.output_text.delta") {
+            } else if (message.data.type === "response.output_text.delta") {
                 if (responseEntry === null || responseEntry.message === null) {
                     // TODO
                     throw new Error("no response entry yet");
@@ -121,11 +117,7 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
                 responseEntry = newResponseEntry;
                 feed.value.pop();
                 feed.value.push(newResponseEntry);
-                return;
             }
-
-            // TODO
-            console.log(message.data.type, message, message.data?.delta);
         });
 
         // const response = await generateImage(generateRoute.value, payload);
