@@ -2,13 +2,13 @@
 # Provisions the Docker environment: port of `vagrant-provision.sh`
 
 function verify_args() {
-  ((return=0))
+  local return=1
   for var in "$@"; do
-    if [[ -v ${var} ]]; then
+    if [ -v ${var} ]; then
       log "${var}: ${!var}";
     else
-      warn "${var} is not defined"
-      return=1
+      warn "${var}: not defined"
+      return=0
     fi
   done
   return $return
@@ -19,8 +19,11 @@ function load_consts() {
   source /usr/share/schoolbox/tools/docker-consts.sh
 
   log "Verifying constants:"
+  local return=1
   verify_args SITE_ROOT cachedir
-  return $?
+  return=$?
+  echo ""
+  return $return
 }
 
 function load_config() {
@@ -30,26 +33,48 @@ function load_config() {
     source "${SITE_ROOT}/docker.ini"
   fi
 
+  local return=1
+
   log "Verifying configuration:"
   verify_args aws_account_id aws_role_name aws_start_url aws_bucket
+  if [ $? -eq 0 ]; then return=0; fi;
+  echo ""
 
   log "Verifying data source configuration:"
   verify_args data_source data_filename
+  if [ $? -eq 0 ]; then return=0; fi;
+  echo ""
+
 
   log "Verifying external DB configuration:"
   verify_args external_db external_db_host external_db_db
+  if [ $? -eq 0 ]; then return=0; fi;
+  echo ""
 
   log "Verifying instance registry configuration:"
   verify_args instance_registry_url
+  if [ $? -eq 0 ]; then return=0; fi;
+  echo ""
 
   log "Verifying default instance configuration:"
   verify_args default_instance_id
+  if [ $? -eq 0 ]; then return=0; fi;
+  echo ""
+
+  return $return
 }
 
 load_consts
-load_config
-exit
+if [ $? -eq 0 ]; then
+  error "Not all required consts defined: exiting"
+  exit 1
+fi
 
+load_config
+if [ $? -eq 0 ]; then
+  error "Not all required configs defined: exiting"
+  exit 1
+fi
 
 # Setup AWS CLI: copied from `vagrant-provision-pre-puppet.sh`
 function version_gte() {
