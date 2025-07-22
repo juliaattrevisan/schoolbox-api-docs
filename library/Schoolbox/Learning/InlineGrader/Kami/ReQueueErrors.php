@@ -24,7 +24,6 @@ use Throwable;
  */
 class ReQueueErrors
 {
-
     public const DEFAULT_MAX_ATTEMPTS = 3;           // How many times to try each document
     public const DEFAULT_MAX_SKIPS = 3;              // Number of consecutive failures that will trigger exit
     public const DEFAULT_BASE_JITTER_BACK_OFF = 500; // Number of milliseconds to wait if an attempt fails
