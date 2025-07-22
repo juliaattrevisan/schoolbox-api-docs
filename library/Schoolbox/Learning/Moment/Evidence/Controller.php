@@ -508,7 +508,7 @@ class Controller extends Base
         $translator = $this->buildTranslatorWithComments(1);
         $item = $translator($evidence);
 
-        return (bool)\count($item['discussionThread']['children']['data']);
+        return (bool)\count($item['discussionThread']['children']['data'] ?? []);
     }
 
 
