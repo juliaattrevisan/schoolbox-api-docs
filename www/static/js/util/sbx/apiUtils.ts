@@ -4,10 +4,7 @@
 
 import { parseSseEvent } from "./fetchUtils";
 
-/** The base response type returned by the api tools, not necessarily the API itself */
-type BaseResponseData = Record<string, unknown>;
-
-type ApiBaseResponseSuccess<TRespData extends BaseResponseData> = {
+type ApiBaseResponseSuccess<TRespData> = {
     success: true;
     data: TRespData;
 };
@@ -25,7 +22,7 @@ interface ApiBaseResponseUnknownFailure extends ApiBaseResponseFailure {
     detail: unknown;
 }
 
-export type ApiBaseResponse<TRespData extends BaseResponseData> =
+export type ApiBaseResponse<TRespData> =
     | ApiBaseResponseSuccess<TRespData>
     | ApiBaseResponseFailure
     | ApiBaseResponseUnknownFailure;
@@ -49,12 +46,10 @@ interface ApiRequestOptions<TBody extends ApiRequestBodyBase | undefined = undef
     body?: TBody;
 }
 
-export type SseMessageCallback<TMessageData extends BaseResponseData> = (data: ApiBaseResponse<TMessageData>) => void;
+export type SseMessageCallback<TMessageData> = (data: ApiBaseResponse<TMessageData>) => void;
 
-interface SseApiRequestOptions<
-    TMessageData extends BaseResponseData,
-    TBody extends ApiRequestBodyBase | undefined = undefined,
-> extends ApiRequestOptions<TBody> {
+interface SseApiRequestOptions<TMessageData, TBody extends ApiRequestBodyBase | undefined = undefined>
+    extends ApiRequestOptions<TBody> {
     /**
      * The callback to handle each message from the server
      */
@@ -128,7 +123,7 @@ async function buildRequest(
  * @param contentType - The content type of the response (e.g. "application/json")
  * @returns - The parsed response, always extending ApiBaseResponse
  */
-function parseResponse<TResponseData extends BaseResponseData>(
+function parseResponse<TResponseData>(
     text: string,
     status: number,
     contentType: string = "",
@@ -205,10 +200,9 @@ function parseResponse<TResponseData extends BaseResponseData>(
  * @param options - Options for the API request
  * @returns - A typed response from the server including a success state
  */
-export async function apiRequest<
-    TResponseData extends BaseResponseData,
-    TBody extends ApiRequestBodyBase | undefined = undefined,
->(options: ApiRequestOptions<TBody>): Promise<ApiBaseResponse<TResponseData>> {
+export async function apiRequest<TResponseData, TBody extends ApiRequestBodyBase | undefined = undefined>(
+    options: ApiRequestOptions<TBody>,
+): Promise<ApiBaseResponse<TResponseData>> {
     const request = buildRequest("application/json", options);
 
     let response: Response;
@@ -244,8 +238,8 @@ export async function apiRequest<
  * @returns - A typed response from the server including a success state
  */
 export async function sseApiRequest<
-    TMessageData extends BaseResponseData,
-    TResponseData extends BaseResponseData,
+    TMessageData,
+    TResponseData,
     TBody extends ApiRequestBodyBase | undefined = undefined,
 >(options: SseApiRequestOptions<TMessageData, TBody>): Promise<ApiBaseResponse<TResponseData>> {
     const request = buildRequest("text/event-stream", options);
