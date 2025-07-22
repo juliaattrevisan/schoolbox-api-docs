@@ -239,12 +239,12 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Installing instance via 'schoolbox-data-refresh
 #  export SB_FORCE_UPGRADE=1 # Allow unsafe upgrade from really old datasets
 #fi
 
-# Note schoolbox-data-refresh.sh creates the database and then applies the schoolbox/updates SQL and PHP scripts.  It
-# is the responsibility of schoolbox-data-refresh.sh to enable and disable maintenance mode as appropriate during its
-# execution (by making calls to site_down.sh/site_up.sh).  (The site_down.sh/site_up.sh scripts update the database, so
-# site_down.sh cannot be run until the database has been created.)
-# TODO revert to schoolbox-data-refresh once build is functional again
-if ! INSTANCE_ID=docker "${SITE_ROOT}/docker/base-images/php82-bookworm/usr/local/bin/schoolbox-data-refresh" \
+# Note schoolbox-data-refresh creates the database and then applies the schoolbox/updates SQL and PHP scripts.
+# It is the responsibility of schoolbox-data-refresh to enable and disable maintenance mode as appropriate during its
+# execution (by making calls to site_down.sh/site_up.sh).
+# (The site_down.sh/site_up.sh scripts update the database, so site_down.sh cannot be run until the database has been
+#  created.)
+if ! INSTANCE_ID=docker schoolbox-data-refresh \
 --data-source "$data_source" \
 --dataset "$data_filename" \
 --skip-bucket-copy \
