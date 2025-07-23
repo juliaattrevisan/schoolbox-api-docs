@@ -6,7 +6,7 @@ readonly L_INFO=200
 readonly L_ERROR=400
 readonly ARG_HELP_SHORT="h"
 readonly ARG_HELP_LONG="help"
-readonly VAGRANT_YAML_KEY_AWS_BUCKET="bucket_name:"
+readonly VAGRANT_YAML_KEY_AWS_BUCKET="aws_bucket:"
 readonly VAGRANT_YAML_KEY_AWS_BUCKET_PREFIX="aws_bucket_prefix"
 
 # Global vars
