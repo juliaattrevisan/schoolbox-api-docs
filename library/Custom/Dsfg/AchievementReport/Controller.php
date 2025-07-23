@@ -657,7 +657,14 @@ $allYears = [2022, 2023, 2024];
     public function getNcea(IConnector $db, User $user, array $externalUser, ?int $year): void
     {
 $externalUser = ['StudentID' => 507]; // 507 is jreed's user.synergy_id in the sales dataset.
-        $output = $this->getNceaOrYear11($db, $user, $externalUser, $year, NavigationSelector::NCEA_KEY);
+        $output = $this->getNceaOrYear11(
+            $db,
+            $user,
+            $externalUser,
+            $year,
+            NavigationSelector::NCEA_KEY,
+            'dbo.uvSchoolBoxNCEAResults'
+        );
         $this->response = $this->responseFromTemplate($output['template'], $output['data']);
     }
 
@@ -677,7 +684,14 @@ $externalUser = ['StudentID' => 507]; // 507 is jreed's user.synergy_id in the s
     public function getYear11(IConnector $db, User $user, array $externalUser, ?int $year): void
     {
 $externalUser = ['StudentID' => 507]; // 507 is jreed's user.synergy_id in the sales dataset.
-        $output = $this->getNceaOrYear11($db, $user, $externalUser, $year, NavigationSelector::YEAR11_KEY);
+        $output = $this->getNceaOrYear11(
+            $db,
+            $user,
+            $externalUser,
+            $year,
+            NavigationSelector::YEAR11_KEY,
+            'dbo.uvSchoolBoxNCEAResultsforDataRefreshV2_Year11'
+        );
         $this->response = $this->responseFromTemplate($output['template'], $output['data']);
     }
 
@@ -918,12 +932,13 @@ $allYears = [2022, 2023, 2024];
         User $user,
         array $externalUser,
         ?int $year,
-        string $navigationKey
+        string $navigationKey,
+        string $dbTableName
     ): array
     {
         $footer = new NCEA\Footer($user, $externalUser, $db, null);
 
-        $literacyNumeracyCheckbox = new NCEA\LiteracyNumeracyCheckbox($user, $externalUser, $db, $year);
+        $literacyNumeracyCheckbox = new NCEA\LiteracyNumeracyCheckbox($user, $externalUser, $db, $year, $dbTableName);
         $qualifications = new NCEA\Qualifications($user, $externalUser, $db, null);
         $creditSummary = new NCEA\CreditSummary($user, $externalUser, $db, null);
 
