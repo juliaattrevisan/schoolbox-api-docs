@@ -101,6 +101,21 @@ class Controller extends Base
          */
         $evidence->reject($this->getUser());
 
+        /* If a discussion thread never existed, spawn one
+         */
+        $discussionThread = $evidence->getDiscussionThread();
+
+        if (null === $discussionThread) {
+            $discussionThreadMapper = \Schoolbox\Discussion\Thread\Mapper::getInstance();
+
+            $discussionThread = $discussionThreadMapper->createModel()
+                ->setOpen(true);
+
+            $discussionThreadMapper->save($discussionThread);
+
+            $evidence->setDiscussionThread($discussionThread);
+        }
+
         $this->mapper->save($evidence);
 
         /* Spawn a comment
@@ -111,7 +126,7 @@ class Controller extends Base
         $comment = $this->commentMapper->createModel()
             ->setContent($postData['rejectionReason'])
             ->setAuthor($this->getUser())
-            ->setThread($evidence->getDiscussionThread());
+            ->setThread($discussionThread);
 
         $this->commentMapper->save($comment);
 
