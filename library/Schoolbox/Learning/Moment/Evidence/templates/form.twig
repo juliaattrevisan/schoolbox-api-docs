@@ -123,7 +123,7 @@
                 {% if evidence.isSubmitted %}
                     {# If the moment is in Submitted state, this acts as the transition to Published #}
                     {% set submitText = 'Approve' %}
-                    {% set deleteCommentsAttr = 'data-delete-comments="0"' %}
+                    {% set deleteCommentsAttr = 'data-delete-comments=0' %}
                 {% endif %}
             {% endif %}
 
