@@ -94,6 +94,8 @@ const imageSrc = window.Vue.computed(() => {
     }
 
     .loader {
+        min-width: 1.5rem;
+        min-height: 1.5rem;
         width: 1.5rem;
         height: 1.5rem;
         margin: 0 0.5rem 0 0;
