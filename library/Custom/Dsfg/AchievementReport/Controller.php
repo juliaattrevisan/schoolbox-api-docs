@@ -939,7 +939,7 @@ $allYears = [2022, 2023, 2024];
         $footer = new NCEA\Footer($user, $externalUser, $db, null);
 
         $literacyNumeracyCheckbox = new NCEA\LiteracyNumeracyCheckbox($user, $externalUser, $db, $year, $dbTableName);
-        $qualifications = new NCEA\Qualifications($user, $externalUser, $db, null);
+        $qualifications = new NCEA\Qualifications($user, $externalUser, $db, null, $dbTableName);
         $creditSummary = new NCEA\CreditSummary($user, $externalUser, $db, null);
 
         $output = [

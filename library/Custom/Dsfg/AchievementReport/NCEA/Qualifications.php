@@ -28,7 +28,7 @@ return [];
 
         $query = '
             SELECT *
-            FROM dbo.uvSchoolBoxNCEAResults
+            FROM ' . $this->getDbTableName() . '
             WHERE id = :externalId
             ORDER BY StudentYear DESC
         ';
