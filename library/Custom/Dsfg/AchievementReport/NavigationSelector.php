@@ -21,6 +21,7 @@ class NavigationSelector
      * Navigation keys
      */
     public const STANDARDISEDTEST_KEY = 'standardisedTest';
+    public const YEAR11_KEY = 'year11';
     public const SCHOOLGRADES_KEY = 'schoolGrades';
     public const NCEA_KEY = 'ncea';
     public const IB_KEY = 'ib';
@@ -195,6 +196,17 @@ $externalUser = ['StudentID' => 507]; // 507 is jreed's user.synergy_id in the s
             ];
         }
 
+        /* Conditionally add Year 11 option
+         */
+        if ($this->hasYear11()) {
+            $availableNavigation[self::YEAR11_KEY] = [
+                'url' => $this->routeGenerator->generate('achievementreport.getYear11', [
+                    'externalUserId' => $this->externalUser['StudentID'],
+                ]),
+                'label' => 'Year 11'
+            ];
+        }
+
         /* Conditionally add School Grades option
          */
         if ($this->hasSchoolGrades()) {
@@ -335,6 +347,32 @@ return true;
         ";
 
         return (bool)$this->db->getOne($query, $params);
+    }
+
+
+    /**
+     * Find out if they are in the NCEA table
+     *
+     * @return bool
+     */
+    private function hasYear11(): bool
+    {
+        if (!isset($this->externalUser['StudentID'])) {
+            return false;
+        }
+
+        $params = [
+            'externalId' => $this->externalUser['StudentID'],
+        ];
+return true;
+
+//        $query = "
+//            SELECT TOP 1 COUNT(*) AS 'computed'
+//            FROM dbo.uvSchoolBoxNCEAResults
+//            WHERE ID = :externalId
+//        ";
+//
+//        return (bool)$this->db->getOne($query, $params);
     }
 
 

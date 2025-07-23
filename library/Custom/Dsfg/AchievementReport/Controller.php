@@ -770,6 +770,11 @@ $allYears = [2022, 2023, 2024];
         $this->response = $this->responseFromTemplate($output['template'], $output['data']);
     }
 
+    public function getYear11(IConnector $db, User $user, array $externalUser, ?int $year): void
+    {
+        $this->response = $this->responseFromContent("Hello, I'm an empty report.");
+    }
+
 
     /**
      * Get all the comments for $externalUser
