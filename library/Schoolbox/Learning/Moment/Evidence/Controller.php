@@ -351,6 +351,7 @@ class Controller extends Base
             'curriculumCodes'          => $evidence->getViewableCurriculumNodes()?->reindex(),
             'zone'                     => $zone->getTwigContext(),
             'hasComments'              => $this->hasComments($evidence),
+            'returnUrl'                => $this->requestQuery->get('returnUrl')
         ];
 
         $this->response = $this->responseFromTemplate(

@@ -173,6 +173,7 @@
         <p>Provide feedback to the student. This will appear as a comment that can be deleted later.</p>
 
         <form id="rejectionForm" method="post" action="{{ rejectAction }}">
+            <input type="hidden" name="{{ RETURN_URL.name }}" value="{{ returnUrl }}"/>
             <textarea id="rejectionReason" name="rejectionReason"></textarea>
 
             <input type="submit" value="Request update" />
