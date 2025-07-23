@@ -124,6 +124,9 @@
                     {# If the moment is in Submitted state, this acts as the transition to Published #}
                     {% set submitText = 'Approve' %}
                     {% set deleteCommentsAttr = 'data-delete-comments=0' %}
+
+                    {# This triggers an async request to Reject+reason #}
+                    <button id="evidence-reject">Request update</button>
                 {% endif %}
             {% endif %}
 
@@ -152,6 +155,21 @@
         $(function() {
             $(document).on('closed.fndtn.reveal', '#deleteCommentsModal', function () {
                 $('#evidence-submit').prop('disabled', false);
+            });
+        });
+    </script>
+{% endif %}
+
+{# Moderation Workflow
+ # A secret form that submits a secret payload to the rejection endpoint when the Request Update
+ # button is clicked; this exists inside some other form.
+ #}
+{% if USER.role.isStaff and USER.role.accessEvidence and evidence.isSubmitted %}
+    {% set rejectAction = routeLookup('learningMomentModeration.postReject', {evidenceId: evidence.id}) %}
+    <script>
+        $(function() {
+            $('#evidence-reject').on('click', function() {
+                alert('construct a payload to {{ rejectAction }}');
             });
         });
     </script>
@@ -289,7 +307,7 @@
                     document.removeEventListener('evidence-media-recording__onUploadComplete', submitForm);
                     document.addEventListener('evidence-media-recording__onUploadComplete', (event) => submitForm(form)); //once the media is uploaded, #evidence-media-recording.vue will dispatch
                     document.dispatchEvent(new CustomEvent('evidence-media-recording__onFormSubmit')); //dispatch to allow the media recording to start uploading
-                } else {
+                }} else {
 
                     event.preventDefault();
 
