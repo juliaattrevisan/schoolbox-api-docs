@@ -295,11 +295,11 @@ function init_composer_dependencies() {
       log "Vendor artifact up to date: updating autoload and patches";
       composer install -o --no-interaction
   else
-      if [ -f "${artifact_file}" ]; then
+      if [ -f "${cachedir}/${artifact_file}" ]; then
           # Extract content
           log "Extracting vendor cache file '${artifact_file}'";
           rm -fR "${vendor_dir}" 2> /dev/null;
-          tar xzf "${artifact_file}";
+          tar xzf "${cachedir}/${artifact_file}";
           log "Updating autoload and patches";
           composer install -o --no-interaction
       else
@@ -515,12 +515,12 @@ function init_npm_dependencies() {
   if [ "$artifact_file" = "ignore" ]; then
       log "NPM artifact up to date";
   else
-      if [ -f "${artifact_file}" ]; then
+      if [ -f "${cachedir}/${artifact_file}" ]; then
           # Extract content
           log "Found matching NPM cache file: now extracting";
           rm -fR "$SITE_ROOT"/node_modules 2>/dev/null;
           rm -fR "${npm_dir}" 2> /dev/null;
-          tar xzf "${artifact_file}";
+          tar xzf "${cachedir}/${artifact_file}";
       else
           # Still no luck, build from scratch
           log "Cache content:";
@@ -645,7 +645,6 @@ function main() {
 
   init_composer_dependencies
   init_npm_dependencies
-#  exit;
 
   init_database
   install_instance
