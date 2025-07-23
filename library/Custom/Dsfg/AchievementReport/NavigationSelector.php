@@ -94,7 +94,6 @@ class NavigationSelector
      */
     public function __construct(Generator $routeGenerator, User $user, array $externalUser, IConnector $db, ?int $year)
     {
-$externalUser = ['StudentID' => 507]; // 507 is jreed's user.synergy_id in the sales dataset.
         $this->routeGenerator = $routeGenerator;
         $this->user           = $user;
         $this->externalUser = $externalUser;
@@ -286,7 +285,6 @@ $externalUser = ['StudentID' => 507]; // 507 is jreed's user.synergy_id in the s
         $params = [
             'externalId' => $this->externalUser['StudentID'],
         ];
-return true;
 
         $query = "
             SELECT TOP 1 COUNT(*) AS 'computed'
@@ -312,7 +310,6 @@ return true;
         $params = [
             'externalId' => $this->externalUser['StudentID'],
         ];
-return true;
 
         $query = "
             SELECT TOP 1 COUNT(*) AS 'computed'
@@ -338,7 +335,6 @@ return true;
         $params = [
             'externalId' => $this->externalUser['StudentID'],
         ];
-return true;
 
         $query = "
             SELECT TOP 1 COUNT(*) AS 'computed'
@@ -416,7 +412,6 @@ return true;
         $params = [
             'externalId' => $this->externalUser['StudentID'],
         ];
-return true;
 
         $query = "
             SELECT TOP 1 COUNT(*) AS 'computed'

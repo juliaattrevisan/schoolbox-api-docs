@@ -602,7 +602,6 @@ class Controller extends Base
          * could fiddle with the url to get illegal values
          */
         $allYears = (new IB\Navigation($user, $externalUser, $db, $year))->findData();
-$allYears = [2022, 2023, 2024];
 
         /* If $year wasn't provided, go with the most recent year we have
          */
@@ -656,7 +655,6 @@ $allYears = [2022, 2023, 2024];
      */
     public function getNcea(IConnector $db, User $user, array $externalUser, ?int $year): void
     {
-$externalUser = ['StudentID' => 507]; // 507 is jreed's user.synergy_id in the sales dataset.
         $output = $this->getNceaOrYear11(
             $db,
             $user,
@@ -683,7 +681,6 @@ $externalUser = ['StudentID' => 507]; // 507 is jreed's user.synergy_id in the s
      */
     public function getYear11(IConnector $db, User $user, array $externalUser, ?int $year): void
     {
-$externalUser = ['StudentID' => 507]; // 507 is jreed's user.synergy_id in the sales dataset.
         $output = $this->getNceaOrYear11(
             $db,
             $user,
@@ -993,7 +990,6 @@ $allYears = [2022, 2023, 2024];
          */
         $navigation = new NCEA\CourseCreditSummaryNavigation($user, $externalUser, $db, null, $dbTableName);
         $allYears = $navigation->findData();
-$allYears = [2022, 2023, 2024];
 
         if (\count($allYears)) {
             /* Course Credit Summary year selectors

@@ -3,14 +3,12 @@
         <div class="card small-12">
             <a href="/search/user/{{ user.getId() }}" title="View Profile">
                 {% include 'include/portrait.twig' with {user: user} only %}
-{#
                 <p>
                     {% if user.firstname != externalUser.StudentGiven1 %}({{ user.firstname }}){% endif %}
                     {{ externalUser.StudentGiven1 }} {{ externalUser.StudentSurname }}
                 </p>
-#}
                 <p class="meta">Year {{ user.year.name }}</p>
-                <p class="meta">NSN {# externalUser.StudentStudiesCode #}</p>
+                <p class="meta">NSN {{ externalUser.StudentStudiesCode }}</p>
             </a>
         </div>
     </div>
