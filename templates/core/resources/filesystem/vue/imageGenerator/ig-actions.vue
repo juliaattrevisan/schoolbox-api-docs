@@ -76,6 +76,7 @@ async function uploadImage(): Promise<void> {
             >
                 Upload
             </button>
+            <button class="button cancel" role="button" @click="closeModal">Cancel</button>
         </section>
     </div>
 </template>
