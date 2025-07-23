@@ -27,7 +27,11 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
-    <div class="ab-pane">
+    <div v-if="igStore.uploadLoading" class="ab-pane">
+        <h2>Uploading Image</h2>
+        <div class="loader"></div>
+    </div>
+    <div v-else class="ab-pane">
         <h2>Generate an Image</h2>
         <p>
             A good prompt will contain information on the format, style, subject, mood, light, colours, artistic style,
@@ -37,6 +41,10 @@ window.Vue.onMounted(() => {
         </p>
         <ig-feed />
         <ig-prompt :prompt-attributes="props.promptAttributes" />
+        <div v-if="igStore.uploadError !== null" class="alert-box alert l-mar--0">
+            <b>There was a problem uploading the image.</b>
+            {{ igStore.uploadError }}
+        </div>
     </div>
     <ig-actions />
 </template>

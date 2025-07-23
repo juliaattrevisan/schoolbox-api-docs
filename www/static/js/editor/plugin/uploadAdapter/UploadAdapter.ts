@@ -4,7 +4,7 @@
  * It calls asyncUpload.php and then returns the resource object
  */
 
-import type { AsyncUploadResponse, Resource } from "@js/editor/plugin/resource/resourceUtils";
+import type { AsyncUploadResponse, Resource } from "@js/resource/resourceUtils";
 import type { Editor, FileLoader, UploadResponse } from "ckeditor5";
 
 type UploadResolve = (value: UploadResponse | PromiseLike<UploadResponse>) => void;

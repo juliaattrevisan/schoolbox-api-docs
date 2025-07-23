@@ -15,17 +15,24 @@ const igStore = useImageGeneratorStore();
 const radioId = window.Vue.computed(() => {
     return `ig-feed-response-${props.message.entryKey}`;
 });
+
+const imageSrc = window.Vue.computed(() => {
+    if ("image" in props.message && props.message.image) {
+        return `data:${props.message.image.mime};base64,${props.message.image.b64}`;
+    }
+    return null;
+});
 </script>
 
 <template>
     <div v-if="props.message.status === 'in_progress'" class="ig-feed-response">
         <div class="loader"></div>
         <div>
-            <img v-if="props.message.src" :src="props.message.src" />
+            <img v-if="imageSrc" :src="imageSrc" />
 
             <p
                 class="l-mar--0-bottom ig-feed-message-content"
-                :class="{ 'ig-feed-message-loading': !props.message.src, 'l-mar-s--top': props.message.src }"
+                :class="{ 'ig-feed-message-loading': !imageSrc, 'l-mar-s--top': imageSrc }"
             >
                 {{ props.message.message.length === 0 ? "Generating... Please wait" : props.message.message }}
             </p>
@@ -49,11 +56,11 @@ const radioId = window.Vue.computed(() => {
         </div>
 
         <div v-else>
-            <div class="actions-small-1">
+            <div v-if="imageSrc" class="actions-small-1">
                 <nav>
-                    <a :href="props.message.src" class="icon-download" title="Download" download></a>
+                    <a :href="imageSrc" class="icon-download" title="Download" download></a>
                 </nav>
-                <img :src="props.message.src" />
+                <img :src="imageSrc" />
             </div>
             <p class="l-mar--0-bottom l-mar-s--top ig-feed-message-content">
                 {{ props.message.message }}
@@ -87,6 +94,8 @@ const radioId = window.Vue.computed(() => {
     }
 
     .loader {
+        min-width: 1.5rem;
+        min-height: 1.5rem;
         width: 1.5rem;
         height: 1.5rem;
         margin: 0 0.5rem 0 0;

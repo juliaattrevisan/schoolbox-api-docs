@@ -3,9 +3,9 @@
  */
 
 import { Command } from "ckeditor5";
+import type { Resource } from "@js/resource/resourceUtils";
+import { addResource } from "@js/editor/plugin/resource/editorResourceUtils";
 import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
-import { addResource } from "./resourceUtils";
-import type { Resource } from "./resourceUtils";
 
 export default class InsertResourceCommand extends Command {
     // @ts-expect-error -- as .bind() returns a new function object, we need to store it in a variable

@@ -100,6 +100,14 @@ declare global {
          * From jquery.alaressValidate.js
          */
         alaressValidate(options?: Record<string, unknown>): JQuery;
+        /**
+         * From jquery.resourceAttach.js
+         */
+        data(key: "plugin_resourceAttach"): {
+            dropzone: {
+                addFile(file: File): void;
+            };
+        };
     }
 
     // Fix types when importing .vue files and using with window.Vue.createApp
