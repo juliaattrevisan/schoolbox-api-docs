@@ -63,14 +63,14 @@
     </div>
 
     {% if evidence is defined and evidence.id %}
-        {% set deletRoute = routeLookupIfAuthorized('learningMomentEvidence.deleteEvidence', {evidenceId: evidence.id, creatorId: evidence.creator.id}) %}
+        {% set deleteRoute = routeLookupIfAuthorized('learningMomentEvidence.deleteEvidence', {evidenceId: evidence.id, creatorId: evidence.creator.id}) %}
 
-        {% if deletRoute %}
+        {% if deleteRoute %}
             <nav>
                 <sbx-pop-out content-id="overflow"></sbx-pop-out>
             </nav>
             <ul class="f-dropdown" data-dropdown-content id="overflow">
-                <li><a data-delete href="{{ deletRoute }}" class="icon-delete">Delete</a></li>
+                <li><a data-delete href="{{ deleteRoute }}" class="icon-delete">Delete</a></li>
             </ul>
         {% endif %}
     {% endif %}
