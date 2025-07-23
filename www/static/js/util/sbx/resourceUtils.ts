@@ -2,10 +2,6 @@
  * Various utility functions/helpers for the resource plugins
  */
 
-import type { Editor, Element } from "ckeditor5";
-import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
-import { getWithoutExtension } from "@js/util/fileUtils";
-
 export interface AsyncUploadResponseError {
     success: false;
     error: number;
@@ -48,7 +44,7 @@ export type AsyncUploadResponse = AsyncUploadResponseError | AsyncUploadResponse
  * @param baseHref - an option baseHref to add to the url
  * @returns - the url with the baseHref conditionally added
  */
-export function getURL(url: string, baseHref?: string): URL | string {
+function getURL(url: string, baseHref?: string): URL | string {
     // If we are requesting a baseHref to exist, we should be using it...
     if (baseHref) {
         return new URL(url, baseHref);
@@ -372,29 +368,4 @@ export function getSrc(resource: Resource, baseHref?: string): URL | string | un
     }
     // Default assumption (not sure where this manifests any more, sorry)
     return getFileSrc(resource, baseHref);
-}
-
-/**
- * Add a resource into the editor
- * @param editor - the ckeditor instance
- * @param resource - the resource
- */
-export function addResource(editor: Editor, resource: Resource): void {
-    const config = editor.config.get("sbConfig") as SbxEditorConfig;
-    const imageUtils = editor.plugins.get("ImageUtils");
-    editor.model.change((writer) => {
-        const image = imageUtils.insertImage(
-            getAttributes(resource, config.baseHref),
-            editor.model.document.selection.getFirstPosition(),
-            "imageInline",
-        ) as Element;
-        writer.setSelection(image, "after"); // deselect the selected image, otherwise further actions will overwrite it
-        if (resource.type === ResourceType.DOCUMENT || resource.type === ResourceType.OTHER) {
-            // we get without extension for now to avoid a copy/paste issue in ckeditor
-            // pasting with the extension will cause ckeditor to look to embed the file again
-            editor.model.insertContent(
-                writer.createText(`${getWithoutExtension(resource.name)} `, getAttributes(resource, config.baseHref)),
-            );
-        }
-    });
 }

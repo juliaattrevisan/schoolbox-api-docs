@@ -3,8 +3,8 @@
  */
 
 import { Command } from "ckeditor5";
-import { addResource } from "@js/util/sbx/resourceUtils";
 import type { Resource } from "@js/util/sbx/resourceUtils";
+import { addResource } from "@js/editor/plugin/resource/editorResourceUtils";
 import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
 
 export default class InsertResourceCommand extends Command {

@@ -111,7 +111,8 @@ export default class InsertResourceLinkCommand extends Command {
                 },
             });
             const resource = (await response.json()) as Resource;
-            const src = getSrc(resource, this.editor.config.get("sbConfig") as SbxEditorConfig) as string;
+            const config = this.editor.config.get("sbConfig") as SbxEditorConfig;
+            const src = getSrc(resource, config.baseHref) as string;
             this.updateLink(src);
         } catch (error) {
             console.error(error);
