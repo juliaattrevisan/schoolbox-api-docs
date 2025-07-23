@@ -11,6 +11,10 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
 
     const selectedFeedEntry = window.Vue.ref<AiFeedMessage["entryKey"] | null>(null);
 
+    // State to keep track of the final upload process
+    const uploadLoading = window.Vue.ref(false);
+    const uploadError = window.Vue.ref<string | null>(null);
+
     /**
      * Initialise the store
      * @param $generateRoute - The route to use for generating images
@@ -175,5 +179,7 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
         getPreviousResponseId,
         sendRequest,
         selectedFeedEntry,
+        uploadLoading,
+        uploadError,
     };
 });

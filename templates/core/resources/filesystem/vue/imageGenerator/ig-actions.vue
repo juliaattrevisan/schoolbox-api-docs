@@ -38,6 +38,9 @@ async function uploadImage(): Promise<void> {
         throw new Error("Selected feed item does not have a valid image");
     }
 
+    igStore.uploadLoading = true;
+    igStore.uploadError = null;
+
     const bstr = atob(selectedFeedItem.image.b64);
     const bytes = new Uint8Array(bstr.length);
     for (let i = 0; i < bstr.length; i += 1) {
@@ -47,9 +50,9 @@ async function uploadImage(): Promise<void> {
     const file = new File([bytes], selectedFeedItem.image.name, { type: selectedFeedItem.image.mime });
     const resource = await uploadFileToStorage(file);
 
+    igStore.uploadLoading = false;
     if (resource.success === false) {
-        // TODO handle error
-        console.error("Failed to upload image:", resource.message);
+        igStore.uploadError = resource.message;
         return;
     }
 
@@ -66,8 +69,13 @@ async function uploadImage(): Promise<void> {
 <template>
     <div class="component-action">
         <section>
-            <button class="button" :disabled="igStore.selectedFeedEntry === null" @click="uploadImage">Upload</button>
-            <button class="button" @click="closeModal">Cancel</button>
+            <button
+                class="button"
+                :disabled="igStore.selectedFeedEntry === null || igStore.uploadLoading"
+                @click="uploadImage"
+            >
+                Upload
+            </button>
         </section>
     </div>
 </template>
