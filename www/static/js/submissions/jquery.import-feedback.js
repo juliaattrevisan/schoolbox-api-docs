@@ -147,6 +147,20 @@
         }
 
         /**
+         * Update a comment field in a form
+         */
+        function updateCommentField(form, value) {
+            const textarea = $(form).find('textarea[name="comment"]');
+            const editor = window.sbProps.editors[textarea[0]?.id];
+            if (editor) {
+                editor.setData(value);
+            } else {
+                // No editor? It may be hidden or not initialised yet, set the value directly instead
+                textarea.val(value).change();
+            }
+        }
+
+        /**
          * Decide how to assign the csv data
          *
          * @return function
@@ -168,12 +182,12 @@
                 };
             } else if (dataFormat === "comment-only") {
                 assign = function (input, form) {
-                    $(form).find('textarea[name="comment"]').val(input[1]).change();
+                    updateCommentField(form, input[1]);
                 };
             } else {
                 assign = function (input, form) {
                     $(form).find('input[name="mark"], select[name="mark"]').val(input[1]).change();
-                    $(form).find('textarea[name="comment"]').val(input[2]).change();
+                    updateCommentField(form, input[2]);
                 };
             }
 
