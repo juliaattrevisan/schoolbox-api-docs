@@ -77,13 +77,6 @@ class Hydrator extends BaseHydrator
         // Get config info for each component instance for later lookup.
         $configByComponentInstanceId = $this->getConfigByComponentInstanceId($componentInstanceIds);
 
-        // Get tileLayouts, indexed by tileLayoutId.  This is necessary because tileLayout info is not hydrated in
-        // $tiles.  By getting this info here we avoid having to run many queries inside the loop.
-        $tileLayoutById = $this->tileLayoutMapper->findByColumn(
-            'id',
-            $tiles->map(fn ($tile) => $tile->getTileLayout()->getId())
-        );
-
         $fullResults = [];
 
         foreach ($acceptedMatches as $key => $match) {
@@ -99,12 +92,12 @@ class Hydrator extends BaseHydrator
                 continue;
             }
 
-            $tileLayout = $tileLayoutById[$tile->getTileLayout()->getId()];
-
-            // The folderId from the tileLayout should always match the folderId obtained via $match->id above (from
-            // the search_index table), because the search_index table should always be up to date.  But the folderId
-            // from the tileLayout is the authoritative value.
-            $folderId = $tileLayout->getFolder()->getId();
+            // Which folder should be used (from search index or from tile layout)?
+            // ------------------------------------------------------------------------
+            // The folderId from tile->getTileLayout()->getFolder() will normally match the folderId obtained via
+            // $match->id above (from the search_index table).  However, for tiles in alt-sourced components,
+            // $tile->getTileLayout()->getFolder() will be the folder of the tile in its original location.  We want
+            // the folder from the new location, so we continue to use the $folderId from $match->id.
 
             if ($folderId === null) {
                 // This tile is not linked to a folder, so it is of no interest.
