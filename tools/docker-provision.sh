@@ -152,6 +152,7 @@ function set_profile_env_vars() {
   local bashrcFiles=(/root/.bashrc)
   declare -A env_vars=(
     [INSTANCE_ID]="${default_instance_id}"
+    [HOST_TYPE]="docker"
   )
   for config_name in "${!env_vars[@]}"; do
     config_value=${env_vars[$config_name]}

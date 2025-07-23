@@ -267,6 +267,7 @@ mysql --defaults-extra-file=/root/.my.cnf schoolbox < $cachedir/vagrant-secrets.
 # Set ENV VARs for root + vagrant users from vagrant.yaml params
 declare -A env_vars=(
   [INSTANCE_ID]="$instance_id_env_var"
+  [HOST_TYPE]="vagrant"
   [FACTER_primary_php_majver]="$phpversion_supported"
   [FACTER_vagrant_extra_hostname]="$extra_hostname"
   [FACTER_taskd_systemd_service_installed]="$taskd_systemd_service_installed"
