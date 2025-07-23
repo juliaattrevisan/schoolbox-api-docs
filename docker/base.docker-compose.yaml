@@ -28,6 +28,7 @@ services:
       context: ./caddy
     volumes:
       - caddy-config:/etc/caddy
+      - caddy-ssl:/etc/nginx/certs/
     ports:
       - '80:80'
       - '443:443'
@@ -56,6 +57,7 @@ services:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
       - schoolbox-config:/etc/schoolbox
+      - caddy-ssl:/etc/nginx/certs/
     # After building: create data dirs
     post_start:
       - command : mkdir -p /var/lib/schoolbox/docker/cache/portrait
@@ -278,6 +280,14 @@ volumes:
       type: none
       o: bind
       device: ./caddy/config
+
+
+  caddy-ssl:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ../data/docker/ssl
 
   redis-storage-config:
     driver: local

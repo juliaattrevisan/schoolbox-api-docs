@@ -142,6 +142,22 @@ function download_secrets() {
   fi
 }
 
+function download_certs() {
+# Download wildcard cert
+    filename='tls-wildcard.dev.schoolbox.cloud.tar.gz'
+
+    if ! $SITE_ROOT/tools/download-s3-file.sh --data-source "https://s3-ap-southeast-2.amazonaws.com/schoolbox-cloud-tls" \
+      --file-name "certs/$filename" \
+      --cache-dir "$cache_dir"; then
+      echo "Unable to download wildcard certificate" >&2
+      exit 1
+    fi
+    tar xzfO $cache_dir/$filename dev.schoolbox.cloud/fullchain.pem >/etc/nginx/certs/schoolbox-docker-fullchain.crt
+    tar xzfO $cache_dir/$filename dev.schoolbox.cloud/privkey.pem >/etc/nginx/certs/schoolbox-docker-private.key
+    tar xzfO $cache_dir/$filename dev.schoolbox.cloud/chain.pem >/etc/nginx/certs/schoolbox-docker-intermediate.crt
+}
+
+
 function mark_safe_for_git() {
   log "Adding Schoolbox dir ${SITE_ROOT} as safe for Git";
   git config --global --add safe.directory "${SITE_ROOT}"
@@ -445,6 +461,7 @@ function main() {
 
   cleanup_cache_dir
   download_secrets
+  download_certs
   mark_safe_for_git
   set_profile_env_vars
 
