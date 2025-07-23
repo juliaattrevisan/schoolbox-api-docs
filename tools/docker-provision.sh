@@ -308,103 +308,43 @@ function init_composer_dependencies() {
           "$SITE_ROOT"/tools/composer.sh
       fi
   fi
+}
 
-#  cd "$cachedir" || exit 1;
-#  local vendorfile='';
-#  local composerlocksha;
-#  composerlocksha=`sha1sum ../composer.lock 2>/dev/null | awk '{print $1}'`;
-#
-#  if [ -f "$SITE_ROOT"/vendor/composer.lock.checksum ];
-#  then
-#      currentvendorsha=`awk '{print $1}' "$SITE_ROOT"/vendor/composer.lock.checksum`;
-#      if [ "$currentvendorsha" == "$composerlocksha" ];
-#      then
-#          log "Vendor build up to date, nothing to change";
-#          vendorfile='ignore';
-#      fi
-#  fi
-#
-#  if [ "$vendorfile" != 'ignore' ];
-#  then
-#      local check;
-#      check=`grep $composerlocksha vendor.cache 2>/dev/null | wc -l`;
-#      if [ $check -gt 0 ];
-#      then
-#          # Woo - we've located a matching cache file
-##          log "Found matching vendor cache file '$vendorfile'";
-#          vendorfile=`grep $composerlocksha vendor.cache 2>/dev/null | head -n1 | cut -d' ' -f2-100`;
-#      else
-#          # No cache files match - boo hoo - check to see if there are new versions
-#          log "No matching vendor cache file found: downloading";
-#          for branch in develop master;
-#          do
-#              # Check if we've already found a matching file
-#              if [ "$vendorfile" == '' ];
-#              then
-#                  local etag;
-#                  etag=$(curl -I "${artifact_source}/$branch-vendor-php-dev.tar.gz" 2>/dev/null | grep ETag | cut -d'"' -f2);
-#                  if [ $? -eq 0 ];
-#                  then
-#                      local checketag;
-#                      checketag=`grep $etag vendor.etag.cache 2>/dev/null | wc -l`;
-#                      if [ $checketag -eq 0 ];
-#                      then
-#                          # New/updated version available - download it
-#                          log "Downloading latest vendor build artifact: $branch-vendor-php-dev.tar.gz";
-#                          wget --no-verbose "${artifact_source}/$branch-vendor-php-dev.tar.gz" -O $branch-vendor-php-dev.tar.gz 2>&1;
-#                          if [ $? -eq 0 ];
-#                          then
-#                              # This is a new file, so remove old references
-#                              sed -i "/$branch-vendor-php-dev.tar.gz/d" vendor.etag.cache 2>/dev/null;
-#                              sed -i "/$branch-vendor-php-dev.tar.gz/d" vendor.cache 2>/dev/null;
-#                              # Add new file to etag cache
-#                              echo "$etag $branch-vendor-php-dev.tar.gz" >> vendor.etag.cache;
-#                              # Cleanup for purity
-#                              rm -fR "${cachedir}"/vendor 2>/dev/null;
-#                              # Extract checksum
-#                              tar xzf $branch-vendor-php-dev.tar.gz vendor/composer.lock.checksum;
-#                              local vendorchecksum
-#                              vendorchecksum=`awk '{print $1}' vendor/composer.lock.checksum`;
-#                              rm -fR "${cachedir}"/vendor 2>/dev/null;
-#                              # Add new file to vendor cache
-#                              echo "$vendorchecksum $branch-vendor-php-dev.tar.gz" >> vendor.cache;
-#                              # Check if this is file we need
-#                              if [ "$vendorchecksum" == "$composerlocksha" ];
-#                              then
-#                                  vendorfile="$branch-vendor-php-dev.tar.gz";
-#                              fi
-#                          fi
-#                      fi
-#                  fi
-#              fi
-#          done
-#      fi
-#      cd "$SITE_ROOT" || exit 1;
-#      if [ "$vendorfile" != '' ];
-#      then
-#          if [ -f "${cachedir}"/$vendorfile ];
-#          then
-#              # Extract content
-#              log "Extracting vendor cache file '$vendorfile'";
-#              rm -fR "$SITE_ROOT"/vendor 2>/dev/null;
-#              tar xzf "${cachedir}"/$vendorfile;
-#          else
-#              # Still no luck, build from scratch with composer
-#              log "No matching vendor cache found. Building with composer";
-#              "$SITE_ROOT"/tools/composer.sh
-#          fi
-#      else
-#          # Still no luck, build from scratch with composer
-#          log "No matching vendor cache found. Building with composer";
-#          "$SITE_ROOT"/tools/composer.sh
-#      fi
-#  fi
-#  cd "$SITE_ROOT" || exit;
-#
-#  # Composer autoload needs to apply patches as well:
-#  # just use composer install for that, rather than dump-autoload
-#  log "Updating composer autoload and patches";
-#  composer install -o --no-interaction
+function init_npm_dependencies() {
+  log "Installing NPM dependencies";
+
+  # Ensure nvm.sh is run before building NPM stuff,
+  # so the npm versions it installed are available
+  source ~/.nvm/nvm.sh
+
+  local npm_dir="$SITE_ROOT/node_modules"
+  local npm_file='npm.tar.gz'
+  local artifact_file;
+
+  # Only use last line of output from function:
+  # the rest may include logs
+  artifact_file=$(download_artifact "${npm_file}" 'npm' 'npm-shrinkwrap.json' 'node_modules/npm.shrinkwrap.checksum' "$npm_dir" | tail -n1)
+
+  if [ "$artifact_file" = "ignore" ]; then
+      log "NPM artifact up to date";
+  else
+      if [ -f "${cachedir}/${artifact_file}" ]; then
+          # Extract content
+          log "Found matching NPM cache file: now extracting";
+          rm -fR "$SITE_ROOT"/node_modules 2>/dev/null;
+          rm -fR "${npm_dir}" 2> /dev/null;
+          tar xzf "${cachedir}/${artifact_file}";
+      else
+          # Still no luck, build from scratch
+          log "Cache content:";
+          cat "${cachedir}"/npm.cache;
+          log "No matching NPM cache found. Building with npm";
+          "$SITE_ROOT"/tools/pkg-build-npm.sh 2>&1;
+      fi
+  fi
+
+  log "Building JS/CSS files";
+  "$SITE_ROOT"/tools/pkg-build-css-js.sh
 }
 
 function install_instance() {
@@ -495,142 +435,6 @@ function post_install() {
 
   # Clean up vcal cache
   "$SITE_ROOT"/tools/redis/removeVcalCache.php -p;
-}
-
-function init_npm_dependencies() {
-  log "Installing NPM dependencies";
-
-  # Ensure nvm.sh is run before building NPM stuff,
-  # so the npm versions it installed are available
-  source ~/.nvm/nvm.sh
-
-  local npm_dir="$SITE_ROOT/node_modules"
-  local npm_file='npm.tar.gz'
-  local artifact_file;
-
-  # Only use last line of output from function:
-  # the rest may include logs
-  artifact_file=$(download_artifact "${npm_file}" 'npm' 'npm-shrinkwrap.json' 'node_modules/npm.shrinkwrap.checksum' "$npm_dir" | tail -n1)
-
-  if [ "$artifact_file" = "ignore" ]; then
-      log "NPM artifact up to date";
-  else
-      if [ -f "${cachedir}/${artifact_file}" ]; then
-          # Extract content
-          log "Found matching NPM cache file: now extracting";
-          rm -fR "$SITE_ROOT"/node_modules 2>/dev/null;
-          rm -fR "${npm_dir}" 2> /dev/null;
-          tar xzf "${cachedir}/${artifact_file}";
-      else
-          # Still no luck, build from scratch
-          log "Cache content:";
-          cat "${cachedir}"/npm.cache;
-          log "No matching NPM cache found. Building with npm";
-          "$SITE_ROOT"/tools/pkg-build-npm.sh 2>&1;
-      fi
-  fi
-
-  log "Building JS/CSS files";
-  "$SITE_ROOT"/tools/pkg-build-css-js.sh
-
-#  log "Building NPM";
-#  cd "$cachedir" || exit 1;
-#  local npmfile='';
-#  local npmlocksha;
-#  npmlocksha=`sha1sum "$SITE_ROOT"/npm-shrinkwrap.json 2>/dev/null | awk '{print $1}'`;
-#  if [ -f "$SITE_ROOT"/node_modules/npm.shrinkwrap.checksum ];
-#  then
-#      local currentnpmsha;
-#      currentnpmsha=`awk '{print $1}' "$SITE_ROOT"/node_modules/npm.shrinkwrap.checksum`;
-#      if [ "$currentnpmsha" == "$npmlocksha" ];
-#      then
-#          log "NPM build up to date, nothing to change ($npmlocksha)";
-#          npmfile='ignore';
-#      fi
-#  fi
-#
-#  if [ "$npmfile" != 'ignore' ];
-#  then
-#      log "NPM build not correct or missing ($npmlocksha)";
-#      local check;
-#      check=`grep $npmlocksha npm.cache 2>/dev/null | wc -l`;
-#      if [ $check -gt 0 ];
-#      then
-#          # Woo - we've located a matching cache file
-##          local npmfile;
-#          npmfile=`grep $npmlocksha npm.cache 2>/dev/null | head -n1 | cut -d' ' -f2-100`;
-#      else
-#          # No cache files match - boo hoo - check to see if there are new versions
-#          for branch in develop master;
-#          do
-#              # Check if we've already found a matching file
-#              if [ "$npmfile" == '' ];
-#              then
-#                  etag=$(curl -I "${artifact_source}/$branch-npm.tar.gz" 2>/dev/null | grep ETag | cut -d'"' -f2);
-#                  if [ $? -eq 0 ];
-#                  then
-#                      local checketag;
-#                      checketag=`grep $etag npm.etag.cache 2>/dev/null | wc -l`;
-#                      if [ $checketag -eq 0 ];
-#                      then
-#                          # New/updated version available - download it
-#                          log "Downloading latest NPM build: $branch-npm.tar.gz";
-#                          wget --no-verbose "${artifact_source}/$branch-npm.tar.gz" -O $branch-npm.tar.gz 2>&1;
-#                          if [ $? -eq 0 ];
-#                          then
-#                              # This is a new file, so remove old references
-#                              sed -i "/$branch-npm.tar.gz/d" npm.etag.cache 2>/dev/null;
-#                              sed -i "/$branch-npm.tar.gz/d" npm.cache 2>/dev/null;
-#                              # Add new file to etag cache
-#                              echo "$etag $branch-npm.tar.gz" >> npm.etag.cache;
-#                              # Cleanup for purity
-#                              rm -fR "${cachedir}"/node_modules 2>/dev/null;
-#                              # Extract checksum
-#                              tar xzf $branch-npm.tar.gz node_modules/npm.shrinkwrap.checksum;
-#                              local npmchecksum;
-#                              npmchecksum=`awk '{print $1}' node_modules/npm.shrinkwrap.checksum`;
-#                              rm -fR "${cachedir}"/node_modules 2>/dev/null;
-#                              # Add new file to NPM cache
-#                              echo "$npmchecksum $branch-npm.tar.gz" >> npm.cache;
-#                              # Check if this is file we need
-#                              if [ "$npmchecksum" == "$npmlocksha" ];
-#                              then
-#                                  npmfile="$branch-npm.tar.gz";
-#                              fi
-#                          fi
-#                      fi
-#                  fi
-#              fi
-#          done
-#      fi
-#      cd "$SITE_ROOT" || exit 1;
-#      if [ "$npmfile" != '' ];
-#      then
-#          if [ -f "${cachedir}"/$npmfile ];
-#          then
-#              # Extract content
-#              log "Found matching NPM cache file ($npmlocksha) '$npmfile', now extracting";
-#              rm -fR "$SITE_ROOT"/node_modules 2>/dev/null;
-#              tar xzf "${cachedir}"/$npmfile;
-#          else
-#              # Still no luck, build from scratch with npm
-#              log "Cache content:";
-#              cat "${cachedir}"/npm.cache;
-#              log "No matching NPM cache found. Building with npm";
-#              "$SITE_ROOT"/tools/pkg-build-npm.sh 2>&1;
-#          fi
-#      else
-#          # Still no luck, build from scratch with npm
-#          log "Cache content:";
-#          cat "${cachedir}"/npm.cache;
-#          log "No matching NPM cache found. Building with npm";
-#          "$SITE_ROOT"/tools/pkg-build-npm.sh 2>&1;
-#      fi
-#  fi
-#  cd "$SITE_ROOT" || exit 1;
-#
-#  log "Building JS/CSS files";
-#  "$SITE_ROOT"/tools/pkg-build-css-js.sh
 }
 
 function main() {
