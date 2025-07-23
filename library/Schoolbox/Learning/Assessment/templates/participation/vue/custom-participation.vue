@@ -319,7 +319,7 @@ function getCustomisationLabel(plan: Plan | CustomisedPlan): string {
                     </td>
                     <td>
                         <div class="l-flex-col l-gap-s">
-                            <template v-if="participant.user.id">
+                            <div v-if="participant.user.id">
                                 <a :href="`/search/user/${participant.user.id}`">
                                     {{ participant.user.lastname + ", " + participant.user.firstname }}
                                     {{
@@ -330,7 +330,7 @@ function getCustomisationLabel(plan: Plan | CustomisedPlan): string {
                                     }}
                                     {{ participant.user.pronoun }}
                                 </a>
-                            </template>
+                            </div>
                             <template v-else>
                                 {{ participant.user.lastname + ", " + participant.user.firstname }}
                                 {{
@@ -445,7 +445,7 @@ function getCustomisationLabel(plan: Plan | CustomisedPlan): string {
             <h3 class="selected-count">
                 <em>{{ selectedList.length }} selected</em>
             </h3>
-            <button class="button-clear" @click.prevent="selectedList.length = 0">Clear selection</button>
+            <button class="button-clear" @click.prevent="selectedList = []">Clear selection</button>
             <div class="l-flex-row l-flex--justify l-gap-xs">
                 <template v-if="hasCustomisedInSelection">
                     <button
@@ -457,7 +457,7 @@ function getCustomisationLabel(plan: Plan | CustomisedPlan): string {
                     </button>
                 </template>
                 <template v-else>
-                    <div class="l-flex__item--1">
+                    <div class="l-flex__item--1-auto">
                         <a
                             class="icon-modify submit"
                             :href="`${getLearningPlanNewUrl}?student=${selectedList.map((p) => p.user.id).join(',')}&${getReturnUrl()}`"
@@ -465,18 +465,18 @@ function getCustomisationLabel(plan: Plan | CustomisedPlan): string {
                             Modify
                         </a>
                     </div>
-                    <div class="l-flex__item--1">
+                    <div class="l-flex__item--1-auto">
                         <button class="icon-staff-students submit" @click.prevent="excludeSelected">Exclude</button>
                     </div>
-                    <div v-if="customisations.length > 0" class="l-flex__item--1">
+                    <div v-if="customisations.length > 0" class="l-flex__item--1-auto">
                         <button class="icon-list submit" @click.prevent="isIncludeOpen = true">
                             Include In Existing Customisation
                         </button>
                     </div>
-                    <div class="l-flex__item--1">
+                    <div class="l-flex__item--1-auto">
                         <a class="icon-copy submit" data-test="custom-participation-copy-activity">Copy Activity</a>
                     </div>
-                    <div class="l-flex__item--1">
+                    <div class="l-flex__item--1-auto">
                         <a
                             class="icon-submissions submit"
                             :href="`${getAssessmentParticipationNewActivity}?student=${selectedList.map((p) => p.user.id).join(',')}&original=${assessmentId}&${getReturnUrl()}`"
@@ -489,21 +489,28 @@ function getCustomisationLabel(plan: Plan | CustomisedPlan): string {
         </bottom-drawer>
     </div>
     <basic-modal v-model:is-open="isIncludeOpen">
-        <div class="l-flex-col l-gap-s f-no-margins">
-            <h2>Include in existing customisation</h2>
-            <p class="meta">
-                Modifying participation for:
-                <template v-for="(participant, index) in selectedList" :key="participant.user.id">
-                    {{ participant.user.preferredName ? participant.user.preferredName : participant.user.firstname }}
-                    {{ participant.user.lastname }}<template v-if="index < selectedList.length - 2">, </template
-                    ><template v-if="index === selectedList.length - 2"> and </template>
-                </template>
-            </p>
-            <select id="activitySelect" v-model="selectedActivityId">
-                <option v-for="customisation in customisations" :key="customisation.id" :value="customisation.id">
-                    {{ getCustomisationLabel(customisation) }}
-                </option>
-            </select>
+        <div class="l-flex-col l-gap-m f-no-margins">
+            <div class="l-flex-col l-gap-s f-no-margins">
+                <h2>Include in existing customisation</h2>
+                <p class="meta">
+                    Modifying participation for:
+                    <template v-for="(participant, index) in selectedList" :key="participant.user.id">
+                        {{
+                            participant.user.preferredName ? participant.user.preferredName : participant.user.firstname
+                        }}
+                        {{ participant.user.lastname }}<template v-if="index < selectedList.length - 2">, </template
+                        ><template v-if="index === selectedList.length - 2"> and </template>
+                    </template>
+                </p>
+            </div>
+            <div class="l-flex-col l-gap-s f-no-margins">
+                <label for="activitySelect">Select customisation</label>
+                <select id="activitySelect" v-model="selectedActivityId" class="f-no-margins">
+                    <option v-for="customisation in customisations" :key="customisation.id" :value="customisation.id">
+                        {{ getCustomisationLabel(customisation) }}
+                    </option>
+                </select>
+            </div>
             <div class="l-flex l-gap-xs f-no-margins">
                 <button class="button l-flex__item--1" @click.prevent="isIncludeOpen = false">Cancel</button>
                 <button
@@ -537,7 +544,7 @@ function getCustomisationLabel(plan: Plan | CustomisedPlan): string {
         flex-direction: column;
     }
 
-    .l-flex__item--1 {
+    .l-flex__item--1-auto {
         flex: 1 1 100%;
     }
 }
