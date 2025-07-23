@@ -75,7 +75,9 @@ async function sendRequest(): Promise<void> {
 </script>
 
 <template>
+    <!-- file context is only available for the first message -->
     <file-drop
+        v-if="igStore.feed.length === 0"
         id="ig-prompt-file-drop"
         v-model:current-file="currentFile"
         placeholder="Click or drag here to add an image prompt"
