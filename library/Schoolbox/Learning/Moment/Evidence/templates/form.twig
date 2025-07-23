@@ -10,6 +10,7 @@
 {{ bread.crumbs(
     [ 'Share Learning' ]
 ) }}
+    {% set heading = 'Share a' %}
     {% set formAction = routeLookup('learningMomentEvidence.postMomentForUsers', {userIds: userIds|join(',')}) %}
 {% else %}
     {{ bread.crumbs(
@@ -26,8 +27,10 @@
      # Otherwise, presume updating the Moment's contents as a student
      #}
     {% if USER.role.isStaff and USER.role.accessEvidence and evidence.isSubmitted %}
+        {% set heading = 'Publish a' %}
         {% set formAction = routeLookup('learningMomentModeration.putPublish', {evidenceId: evidence.id}) %}
     {% else %}
+        {% set heading = 'Modify' %}
         {% set formAction = routeLookup('learningMomentEvidence.putEvidence', {evidenceId: evidence.id}) %}
     {% endif %}
 {% endif %}
@@ -35,7 +38,7 @@
 <div class="actions-small-1 row">
     <div class="list-item">
         <div class="small-12 column">
-            <h1>{{ isCreate ? 'Share a' : 'Modify' }} Learning Moment</h1>
+            <h1>{{ heading }} Learning Moment</h1>
     {##
      # How does the "sharing on behalf of" metadata show?
      # That depends on who the learning moment is being created for:
