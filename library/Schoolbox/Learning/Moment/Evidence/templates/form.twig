@@ -39,26 +39,26 @@
     <div class="list-item">
         <div class="small-12 column">
             <h1>{{ heading }} Learning Moment</h1>
-    {##
-     # How does the "sharing on behalf of" metadata show?
-     # That depends on who the learning moment is being created for:
-     # * Only for myself: don't show at all
-     # * Only for others: "sharing on behalf of ..."
-     # * For both myself and others: "Sharing for myself, and also on behalf of ..."
-     # * For neither myself nor others: how did you even get here?
-     #}
-    {% if otherUsers is not empty %}
-    <ul class="meta">
-        <li>
-            {% include 'sub/userListMetadata.twig'
-                with {
-                    users:   otherUsers,
-                    message: sharingForSelf ? 'Sharing for myself, and also on behalf of' : 'Sharing on behalf of'
-                } only
-            %}
-        </li>
-    </ul>
-    {% endif %}
+            {##
+             # How does the "sharing on behalf of" metadata show?
+             # That depends on who the learning moment is being created for:
+             # * Only for myself: don't show at all
+             # * Only for others: "sharing on behalf of ..."
+             # * For both myself and others: "Sharing for myself, and also on behalf of ..."
+             # * For neither myself nor others: how did you even get here?
+             #}
+            {% if otherUsers is not empty %}
+            <ul class="meta">
+                <li>
+                    {% include 'sub/userListMetadata.twig'
+                        with {
+                            users:   otherUsers,
+                            message: sharingForSelf ? 'Sharing for myself, and also on behalf of' : 'Sharing on behalf of'
+                        } only
+                    %}
+                </li>
+            </ul>
+            {% endif %}
         </div>
     </div>
 
