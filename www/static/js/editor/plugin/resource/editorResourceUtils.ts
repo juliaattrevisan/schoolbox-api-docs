@@ -4,8 +4,8 @@
 
 import type { Editor, Element } from "ckeditor5";
 import { getWithoutExtension } from "@js/util/fileUtils";
-import { getAttributes, ResourceType } from "@js/util/sbx/resourceUtils";
-import type { Resource } from "@js/util/sbx/resourceUtils";
+import { getAttributes, ResourceType } from "@js/resource/resourceUtils";
+import type { Resource } from "@js/resource/resourceUtils";
 import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
 
 /**

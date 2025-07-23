@@ -4,7 +4,7 @@
  */
 
 import { Plugin, type ResizeImageCommand, type Element } from "ckeditor5";
-import { ResourceType, getExtraAttributes } from "@js/util/sbx/resourceUtils";
+import { ResourceType, getExtraAttributes } from "@js/resource/resourceUtils";
 import InsertResourceCommand from "./InsertResourceCommand";
 
 export default class ResourceEditing extends Plugin {
