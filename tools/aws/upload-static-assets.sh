@@ -93,6 +93,10 @@ function load_config() {
       bucket_host="https://s3-ap-southeast-2.amazonaws.com"
       bucket_name=$(read_var_from_vagrant_yaml "$VAGRANT_YAML_KEY_AWS_BUCKET")
       bucket_prefix=$(read_var_from_vagrant_yaml "$VAGRANT_YAML_KEY_AWS_BUCKET_PREFIX")
+      if [[ -z $bucket_prefix ]]; then
+        error "Bucket prefix not found in vagrant.yaml please add value for $VAGRANT_YAML_KEY_AWS_BUCKET_PREFIX with your firstname.lastname"
+        exit 1
+      fi
       ;;
     *)
       error "HOST_TYPE=${HOST_TYPE}: must be either vagrant or docker"
@@ -128,10 +132,6 @@ function upload_assets() {
   log "Uploading assets..."
   site_version=$(find "$site_root"/updates/ -mindepth 1 -maxdepth 1 -type d -printf %f\\n | sort -V | tail -n 1)
   site_package=${site_version}-0
-  if [[ -z $bucket_prefix ]]; then
-    error "Bucket prefix not found in vagrant.yaml please add value for $VAGRANT_YAML_KEY_AWS_BUCKET_PREFIX with your firstname.lastname"
-    exit 1
-  fi
   aws s3 sync "$site_root"/www/static/ s3://"$bucket_name"/"$bucket_prefix"/"$site_package"
 
   log "Updating config..."
