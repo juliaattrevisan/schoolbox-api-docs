@@ -228,9 +228,13 @@ class Helper
                 $chunk = substr($chunkBuffer, 0, $pos);
                 $chunkBuffer = substr($chunkBuffer, $pos + 2);
 
-                echo "{$chunk}\n\n";
                 $event = $this->parseChunk($chunk);
                 $this->appendChunkToLog($event, $log, $type);
+
+                // Don't echo an 'error' chunk if this isn't going to ckeditor as it won't follow the format of an ApiProblem
+                if ($type === self::CHAT || $event['type'] !== 'error') {
+                    echo "{$chunk}\n\n";
+                }
 
                 // Is this the final event?
                 // There are 3 possible events that indicate the end of a response (see https://platform.openai.com/docs/api-reference/responses-streaming/response)

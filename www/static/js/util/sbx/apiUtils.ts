@@ -128,12 +128,14 @@ async function buildRequest(
  * @param text - The response from the server as a string
  * @param status - The HTTP status code of the response
  * @param contentType - The content type of the response (e.g. "application/json")
+ * @param eventName - When parsing a text/event-stream, the event name that is associated with the data
  * @returns - The parsed response, always extending ApiBaseResponse
  */
 function parseResponse<TResponseData>(
     text: string,
     status: number,
     contentType: string = "",
+    eventName?: string,
 ): ApiBaseResponse<TResponseData> {
     let responseJSON: TResponseData;
 
@@ -176,7 +178,7 @@ function parseResponse<TResponseData>(
     }
 
     /* Is this not a successful response? If so, it theoretically should be following RFC 9457 "API Problem" */
-    if (status !== 200) {
+    if (status !== 200 || eventName === "error") {
         const failureResponse: ApiBaseResponseFailure = {
             success: false,
             message: "An unexpected error occurred",
@@ -236,7 +238,7 @@ export async function apiRequest<TResponseData, TBody extends ApiRequestBodyBase
 /**
  * Generic function to make an API request to the server
  * Validates that the response matches our expected format
- * API errors should follow RFC 9457 "API Problem"
+ * API errors should follow RFC 9457 "API Problem", sending an event with the name "error" will be treated like this
  * Requires the final message to match options.finalEventName, which will terminate the stream
  * @template TMessageData - The type of the response from the server for each message
  * @template TResponseData - The type of the response from the server for the final message
@@ -311,7 +313,13 @@ export async function sseApiRequest<
                     break;
                 }
 
-                const parsedData = parseResponse<TMessageData>(data, response.status);
+                const parsedData = parseResponse<TMessageData>(data, response.status, contentType, eventName);
+
+                // If the parsed data indicates a failure, set it as the final response for now but let the stream keep going
+                if (parsedData.success === false) {
+                    finalResponseData = data;
+                }
+
                 options.onMessage(parsedData);
             }
         }
