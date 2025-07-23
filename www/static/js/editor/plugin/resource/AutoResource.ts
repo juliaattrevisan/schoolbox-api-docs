@@ -14,8 +14,8 @@ import {
     type DataTransfer,
 } from "ckeditor5";
 import { slideUp } from "@js/util/animateUtils";
-import type { Resource } from "@js/editor/plugin/resource/resourceUtils";
-import { addResource } from "@js/editor/plugin/resource/resourceUtils";
+import type { Resource } from "@js/util/sbx/resourceUtils";
+import { addResource } from "@js/util/sbx/resourceUtils";
 import ResourceUI from "@js/editor/plugin/resource/ResourceUI";
 import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
 import { EditorToolbar } from "@js/editor/types/editorTypes";
