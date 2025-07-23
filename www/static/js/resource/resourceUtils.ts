@@ -1,6 +1,8 @@
 /**
  * Various utility functions/helpers for the resource plugins
  */
+import { apiRequest } from "@js/util/sbx/apiUtils";
+import type { ApiBaseResponse } from "@js/util/sbx/apiUtils";
 
 export interface AsyncUploadResponseError {
     success: false;
@@ -37,6 +39,51 @@ export interface AsyncUploadResponseSuccess {
 
 // A response from /storage/asyncUpload.php
 export type AsyncUploadResponse = AsyncUploadResponseError | AsyncUploadResponseSuccess;
+
+/**
+ * Upload a file
+ * @param file - the file to upload
+ * @param expiryDate - Optional expiry date (Storage items always expire at the start of that date)
+ * @returns - the response from the server
+ */
+export async function uploadFileToStorage(
+    file: File,
+    expiryDate?: Date | null,
+): Promise<ApiBaseResponse<AsyncUploadResponseSuccess>> {
+    const formData = new FormData();
+    formData.append("upload", file);
+
+    let url = "/storage/asyncUpload.php";
+    if (expiryDate) {
+        const expiryDateRFC3339 = expiryDate.toISOString();
+        url += `?expiryDate=${encodeURIComponent(expiryDateRFC3339)}`;
+    }
+
+    const response = await apiRequest<AsyncUploadResponse, FormData>({
+        url,
+        method: "POST",
+        body: formData,
+    });
+
+    // Since asyncUpload doesn't use an ApiProblem to indicate an error, handle it here instead
+    // so that if response.success is true, we know it must be an AsyncUploadResponseSuccess
+    if (response.success === false) {
+        return response;
+    }
+
+    if (response.data.success === false) {
+        return {
+            success: false,
+            message: response.data.message,
+            data: response.data,
+        };
+    }
+
+    return {
+        success: true,
+        data: response.data,
+    };
+}
 
 /**
  * Get the url of the resource, and if we have specified a baseHref, to then use that

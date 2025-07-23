@@ -28,7 +28,7 @@ export type ApiBaseResponse<TRespData> =
     | ApiBaseResponseUnknownFailure;
 
 /** The base type for an API request body */
-type ApiRequestBodyBase = Record<string, unknown>;
+type ApiRequestBodyBase = Record<string, unknown> | FormData;
 
 interface ApiRequestOptions<TBody extends ApiRequestBodyBase | undefined = undefined> {
     /**
@@ -89,7 +89,13 @@ async function buildRequest(
         },
     };
 
-    if (options.body !== undefined) {
+    if (options.body instanceof FormData) {
+        // If the body is a FormData, we don't set Content-Type, as the browser will set it with the correct boundary
+        requestOptions.body = options.body;
+        if (requestOptions.headers && "Content-Type" in requestOptions.headers) {
+            delete requestOptions.headers["Content-Type"];
+        }
+    } else if (options.body !== undefined) {
         if (options.method === "GET") {
             // Remove any undefined values from the query string
             const filteredBody = Object.fromEntries(
