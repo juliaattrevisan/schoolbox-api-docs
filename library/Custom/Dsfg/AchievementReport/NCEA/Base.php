@@ -18,7 +18,7 @@ abstract class Base extends AchievementReportBase
      * The main source table for data used in the NCEA report.
      * @var string
      */
-    private string $dbTableName = '';
+    private string $dbTableName;
 
     /**
      * Constructor
