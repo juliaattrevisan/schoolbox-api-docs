@@ -84,6 +84,9 @@ class Controller extends Base
         $evidence->publish($this->getUser());
 
         $this->mapper->save($evidence);
+
+        /* TODO Post a notification
+         */
     }
 
 
@@ -139,6 +142,9 @@ class Controller extends Base
         } else {
             $returnUrl = $this->routeGenerator->generate('searchUser.getProfile', ['userId' => $evidence->getRecipient()->getId()]);
         }
+
+        /* TODO Post a notification
+         */
 
         $this->response = $this->redirectAfterPost($returnUrl);
     }
