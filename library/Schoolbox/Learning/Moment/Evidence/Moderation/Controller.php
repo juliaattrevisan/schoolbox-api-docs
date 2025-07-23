@@ -93,20 +93,23 @@ class Controller extends Base
      */
     public function postReject(Model $evidence): void
     {
-        echo 'rejected the thing';
-
         /* Update the status of $evidence to Rejected
-         * $evidence->reject($this->>getUser())
-         * $mapper->save($evidence);
          */
+        $evidence->reject($this->getUser());
+
+        $this->mapper->save($evidence);
 
         /* Spawn a comment
-         * (new Comment())->setDiscussionThread($evidence->getDiscussionThread())
+         * Save it to $evidence's discussion thread somehow
          */
+        $postData = $this->requestPost->getArrayCopy();
 
-        /* Save it to $evidence's discussion thread somehow
-         * $commentMapper->save($comment);
-         */
+        $comment = $this->commentMapper->createModel()
+            ->setContent($postData['rejectionReason'])
+            ->setAuthor($this->getUser())
+            ->setThread($evidence->getDiscussionThread());
+
+        $this->commentMapper->save($comment);
     }
 
 
