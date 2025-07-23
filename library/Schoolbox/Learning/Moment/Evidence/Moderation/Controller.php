@@ -84,6 +84,30 @@ class Controller extends Base
         $this->mapper->save($evidence);
     }
 
+
+    /**
+     * Reject a Moment, along with a reason which goes int the Moment's comment thread.
+     *
+     * @param Model $evidence
+     * @return void
+     */
+    public function postReject(Model $evidence): void
+    {
+        /* Update the status of $evidence to Rejected
+         * $evidence->reject($this->>getUser())
+         * $mapper->save($evidence);
+         */
+
+        /* Spawn a comment
+         * (new Comment())->setDiscussionThread($evidence->getDiscussionThread())
+         */
+
+        /* Save it to $evidence's discussion thread somehow
+         * $commentMapper->save($comment);
+         */
+    }
+
+
     /**
      * Checks whether curriculum tagging is enabled
      */
