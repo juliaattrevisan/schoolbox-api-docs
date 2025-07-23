@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { useTemplateRefsList } from "@vueuse/core";
 import FileDrop from "@js/resource/file-drop.vue";
+import { getImageSrc, uploadFileToStorage } from "@js/resource/resourceUtils";
+import type { FileDropFile } from "@js/resource/fileDropTypes";
 import { useImageGeneratorStore } from "./store/imageGeneratorStore";
 import type { ImagePromptAttribute } from "./imageGeneratorTypes";
 
@@ -14,6 +16,7 @@ interface Props {
 const props = defineProps<Props>();
 const igStore = useImageGeneratorStore();
 
+const currentFile = window.Vue.ref<FileDropFile | null>(null);
 const prompt = window.Vue.ref<string>("");
 const promptEl = window.Vue.useTemplateRef<HTMLTextAreaElement>("promptRef");
 const attributes = window.Vue.ref<Record<string, string>>({});
@@ -26,7 +29,24 @@ window.Vue.onMounted(() => {
 });
 
 /**
- * Temp function to test the prompt
+ * Upload the current file
+ * This is required before sending it off to the AI as we need to give it a URL
+ * @param file - The file to upload
+ * @returns the full URL to the file
+ */
+async function uploadFile(file: File): Promise<string> {
+    const expiry = new Date(Date.now() + 60 * 60 * 1000 * 6); // Expire in 6 hours
+    const response = await uploadFileToStorage(file, expiry);
+
+    if (!response.success) {
+        throw new Error(`Failed to upload file: ${response.message}`);
+    }
+
+    return getImageSrc(response.data.meta.file.hash, window.location.origin);
+}
+
+/**
+ * Send the current prompt to the AI
  */
 async function sendRequest(): Promise<void> {
     if (!promptEl.value?.reportValidity()) {
@@ -37,9 +57,15 @@ async function sendRequest(): Promise<void> {
         return; // some attributes are required and not set yet, can't send the request
     }
 
+    // Retrieve a storage hash for the file if it exists and is not already uploaded
+    if (currentFile.value && currentFile.value.storageHash === undefined) {
+        currentFile.value.storageHash = await uploadFile(currentFile.value.file);
+    }
+
     const isSuccess = await igStore.sendRequest({
         userPrompt: prompt.value,
         attributes: attributes.value,
+        imageUrl: currentFile.value?.storageHash ?? null,
         previousResponseId: igStore.getPreviousResponseId(),
     });
 
@@ -53,14 +79,9 @@ async function sendRequest(): Promise<void> {
 <template>
     <file-drop
         id="ig-prompt-file-drop"
+        v-model:current-file="currentFile"
         placeholder="Click or drag here to add an image prompt"
         accept="image/*"
-        :file-handler="
-            (file) => {
-                console.log('File dropped:', file);
-                return true;
-            }
-        "
     />
 
     <label>

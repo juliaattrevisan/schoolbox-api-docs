@@ -6,11 +6,7 @@
 
 import { useFileDialog } from "@vueuse/core";
 import FileDropPreview from "./file-drop-preview.vue";
-
-type FileDropFile = {
-    file: File;
-    error: false | string;
-};
+import type { FileDropFile } from "./fileDropTypes";
 
 interface Props {
     id: string;
@@ -30,12 +26,13 @@ const props = withDefaults(defineProps<Props>(), {
     fileHandler: () => true,
 });
 
+const currentFile = defineModel<FileDropFile | null>("currentFile", { required: true });
+
 const { reset, open, onChange, onCancel } = useFileDialog({
     accept: props.accept,
     multiple: false,
 });
 
-const currentFile = window.Vue.ref<FileDropFile | null>(null);
 const importFileName = window.Vue.ref<string | null>(null);
 
 /**
@@ -64,6 +61,8 @@ async function handleLoad(file: FileDropFile): Promise<void> {
     if (result !== true) {
         file.error = result || "Invalid file";
     }
+
+    currentFile.value = file;
 }
 
 /**
@@ -77,16 +76,18 @@ function handleFiles(files: FileList | null): void {
         return;
     }
 
-    const file = files[0];
-    currentFile.value = { file: files[0], error: false };
+    const file = { file: files[0], error: false } as const;
 
     // Is the file the right type?
-    if (!window.Dropzone.isValidFile(file, props.accept)) {
-        currentFile.value.error = "You can't upload files of this type.";
+    if (!window.Dropzone.isValidFile(file.file, props.accept)) {
+        currentFile.value = {
+            ...file,
+            error: "You can't upload files of this type.",
+        };
         return;
     }
 
-    void handleLoad(currentFile.value);
+    void handleLoad(file);
 }
 
 onChange(handleFiles);

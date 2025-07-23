@@ -11,7 +11,7 @@ const props = defineProps<Props>();
 
 <template>
     <div class="ig-feed-request snow">
-        <p class="l-mar-s ig-feed-message-content">{{ props.message.prompt }}</p>
+        <p class="l-mar-s ig-feed-message-content">{{ props.message.payload.userPrompt }}</p>
         <user-photo :user="props.message.user" render="xsmall" />
     </div>
 </template>

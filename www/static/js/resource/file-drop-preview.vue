@@ -1,8 +1,5 @@
 <script lang="ts" setup>
-type FileDropFile = {
-    file: File;
-    error: false | string;
-};
+import type { FileDropFile } from "./fileDropTypes";
 
 interface Props {
     file: FileDropFile;
