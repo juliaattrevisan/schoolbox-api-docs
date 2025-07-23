@@ -49,8 +49,11 @@ async function getImageUrl(file: File): Promise<string | null> {
  * Send the current prompt to the AI
  */
 async function sendRequest(): Promise<void> {
-    if (!promptEl.value?.reportValidity()) {
-        return; // prompt is required, can't send the request
+    if (promptEl.value) {
+        promptEl.value.value = promptEl.value.value.trim();
+        if (!promptEl.value.reportValidity()) {
+            return; // prompt is required, can't send the request
+        }
     }
 
     if (attributeEls.value.some((el) => !el.reportValidity())) {
@@ -59,7 +62,7 @@ async function sendRequest(): Promise<void> {
 
     const isSuccess = await igStore.sendRequest(
         {
-            userPrompt: prompt.value,
+            userPrompt: prompt.value.trim(),
             attributes: attributes.value,
             imageUrl: currentFile.value ? await getImageUrl(currentFile.value.file) : null,
             previousResponseId: igStore.getPreviousResponseId(),
@@ -87,7 +90,7 @@ async function sendRequest(): Promise<void> {
     <label>
         <textarea
             ref="promptRef"
-            v-model="prompt"
+            v-model.trim="prompt"
             name="prompt"
             rows="1"
             placeholder="Describe or refine the image you want to generate"
