@@ -12,6 +12,13 @@ interface Props {
     id: string;
     placeholder?: string;
     accept?: string;
+    class?: string;
+    /**
+     * The disabled state is intended to be used only when currentFile has a meaningful value
+     * It prevents removing of files to let us show a preview as if it were uploaded
+     * Currently this will not visually affect the file drop zone if currentFile is null
+     */
+    disabled?: boolean;
     /**
      * Handler for the File object when a file is selected
      * @param file - The file object
@@ -23,6 +30,8 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     placeholder: "Click or drag here to attach files",
     accept: "*/*",
+    class: "l-mar-s--bottom",
+    disabled: false,
     fileHandler: () => true,
 });
 
@@ -121,9 +130,9 @@ function handleDrop(event: DragEvent): void {
 </script>
 
 <template>
-    <div v-if="currentFile" class="ab-upload ab-upload-panel l-mar-m--bottom">
+    <div v-if="currentFile" class="ab-upload ab-upload-panel" :class="props.class">
         <div class="dzone dz-clickable dz-started" style="border: 0">
-            <file-drop-preview :file="currentFile" @remove="currentFile = null" />
+            <file-drop-preview :file="currentFile" :disabled="props.disabled" @remove="currentFile = null" />
         </div>
     </div>
 
@@ -131,7 +140,8 @@ function handleDrop(event: DragEvent): void {
         v-else
         :for="props.id"
         class="attachzone s64"
-        :class="{ 'dz-drag-hover': isOverDropZone }"
+        :class="{ 'dz-drag-hover': isOverDropZone && !props.disabled }"
+        :style="{ pointerEvents: props.disabled ? 'none' : undefined }"
         @click.prevent="handleClick"
         @drop.prevent="handleDrop"
         @dragover="handleDragOver"

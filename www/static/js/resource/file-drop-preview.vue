@@ -3,6 +3,7 @@ import type { FileDropFile } from "./fileDropTypes";
 
 interface Props {
     file: FileDropFile;
+    disabled?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -85,7 +86,9 @@ const fileSize = window.Vue.computed(() => {
             </div>
         </div>
 
-        <div class="dz-close"><a class="button dz-remove no-margin" @click="emit('remove')">×</a></div>
+        <div class="dz-close" v-if="!props.disabled">
+            <a class="button dz-remove no-margin" @click="emit('remove')">×</a>
+        </div>
     </div>
 </template>
 

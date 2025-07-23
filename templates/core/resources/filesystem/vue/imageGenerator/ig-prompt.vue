@@ -57,12 +57,15 @@ async function sendRequest(): Promise<void> {
         return; // some attributes are required and not set yet, can't send the request
     }
 
-    const isSuccess = await igStore.sendRequest({
-        userPrompt: prompt.value,
-        attributes: attributes.value,
-        imageUrl: currentFile.value ? await getImageUrl(currentFile.value.file) : null,
-        previousResponseId: igStore.getPreviousResponseId(),
-    });
+    const isSuccess = await igStore.sendRequest(
+        {
+            userPrompt: prompt.value,
+            attributes: attributes.value,
+            imageUrl: currentFile.value ? await getImageUrl(currentFile.value.file) : null,
+            previousResponseId: igStore.getPreviousResponseId(),
+        },
+        currentFile.value,
+    );
 
     if (isSuccess) {
         /* clear the prompt but not the other settings on success */

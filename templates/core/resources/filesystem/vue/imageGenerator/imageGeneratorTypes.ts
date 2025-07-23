@@ -1,3 +1,4 @@
+import type { FileDropFile } from "@js/resource/fileDropTypes";
 import type { ImageGeneratorApiPayload } from "./store/imageGeneratorPayload";
 
 type Image = {
@@ -11,6 +12,7 @@ export type ImageRequest = {
     entryKey: number;
     user: Pick<typeof window.schoolboxUser, "id" | "externalId" | "name">;
     payload: ImageGeneratorApiPayload;
+    file: FileDropFile | null;
 };
 
 export type ImageResponseSuccess = {
