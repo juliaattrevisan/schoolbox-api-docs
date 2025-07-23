@@ -166,10 +166,31 @@
  #}
 {% if USER.role.isStaff and USER.role.accessEvidence and evidence.isSubmitted %}
     {% set rejectAction = routeLookup('learningMomentModeration.postReject', {evidenceId: evidence.id}) %}
+
+    <div id="rejectModal" class="reveal-modal" data-reveal aria-labelledby="rejectModalTitle" aria-hidden="true" role="dialog">
+        <h2 id="rejectModalTitle">Request update</h2>
+        <p>You have requested the student updates their learning moment before it is published.</p>
+        <p>Provide feedback to the stduent. This will appear as a comment that can be deleted later.</p>
+
+        <form id="rejectionForm" method="post" action="{{ rejectAction }}">
+            <textarea id="rejectionReason" name="rejectionReason"></textarea>
+
+            <input type="submit" id="rejectionButton" value="Request update" />
+        </form>
+
+        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+    </div>
+
     <script>
         $(function() {
-            $('#evidence-reject').on('click', function() {
-                alert('construct a payload to {{ rejectAction }}');
+            $('#evidence-reject').on('click', function(event) {
+                event.preventDefault();
+
+                $('#rejectModal').foundation('reveal', 'open');
+
+                $('#rejectionButton').on('click', function(event) {
+
+                });
             });
         });
     </script>
@@ -307,7 +328,7 @@
                     document.removeEventListener('evidence-media-recording__onUploadComplete', submitForm);
                     document.addEventListener('evidence-media-recording__onUploadComplete', (event) => submitForm(form)); //once the media is uploaded, #evidence-media-recording.vue will dispatch
                     document.dispatchEvent(new CustomEvent('evidence-media-recording__onFormSubmit')); //dispatch to allow the media recording to start uploading
-                }} else {
+                } else {
 
                     event.preventDefault();
 
