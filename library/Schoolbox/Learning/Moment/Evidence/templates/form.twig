@@ -170,12 +170,12 @@
     <div id="rejectModal" class="reveal-modal" data-reveal aria-labelledby="rejectModalTitle" aria-hidden="true" role="dialog">
         <h2 id="rejectModalTitle">Request update</h2>
         <p>You have requested the student updates their learning moment before it is published.</p>
-        <p>Provide feedback to the stduent. This will appear as a comment that can be deleted later.</p>
+        <p>Provide feedback to the student. This will appear as a comment that can be deleted later.</p>
 
         <form id="rejectionForm" method="post" action="{{ rejectAction }}">
             <textarea id="rejectionReason" name="rejectionReason"></textarea>
 
-            <input type="submit" id="rejectionButton" value="Request update" />
+            <input type="submit" value="Request update" />
         </form>
 
         <a class="close-reveal-modal" aria-label="Close">&#215;</a>
@@ -187,10 +187,6 @@
                 event.preventDefault();
 
                 $('#rejectModal').foundation('reveal', 'open');
-
-                $('#rejectionButton').on('click', function(event) {
-
-                });
             });
         });
     </script>

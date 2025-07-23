@@ -55,7 +55,7 @@ class Module extends BaseModule
         /* Reject a Learning Moment
          */
         $this->register(
-            self::METHOD_PUT,
+            self::METHOD_POST,
             '/{evidenceId}/reject',
             'postReject',
             $staffOnlyRule,

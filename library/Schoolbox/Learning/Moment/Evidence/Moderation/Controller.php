@@ -93,6 +93,8 @@ class Controller extends Base
      */
     public function postReject(Model $evidence): void
     {
+        echo 'rejected the thing';
+
         /* Update the status of $evidence to Rejected
          * $evidence->reject($this->>getUser())
          * $mapper->save($evidence);
