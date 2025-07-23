@@ -2,6 +2,7 @@
 
 namespace Schoolbox\Pastoral\ReportBuilder;
 
+use Alaress\Codec\ICodec;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Collection;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;

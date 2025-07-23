@@ -13,13 +13,27 @@ class StudentByType extends Cursor implements TabTypeInterface
 {
     public function retrieveResults(?string $encodedCursor): Collection
     {
-        return  $this->getResults($this->report);
+        return  $this->getResults($this->report, $encodedCursor);
     }
 
     public function retrieveResultCount(): ?int
     {
         // TODO use a simpler query
         return $this->getResults($this->report)->count();
+    }
+
+    public function next(Collection $collection): ?string
+    {
+        // As usual: if the collection is empty, there is no next
+        if ($collection->count() === 0) {
+            return null;
+        }
+
+        $last = $collection->last();
+        return $this->codec->encode([
+            'id' => $last['student_id'],
+            'orderBy' => 'name' //TODO SA-20574 for sorting in different types
+        ]);
     }
 
     /**
@@ -80,51 +94,61 @@ class StudentByType extends Cursor implements TabTypeInterface
      * @param Collection $records
      * @return array[]
      */
-    public function process(Collection $records): array
+    public function process(Collection $records, ?string $encodedCursor = null): array
     {
         $tableHeader = $this->getTableHeaders();
+        $totalRow = $rows = [];
         $students = $this->userMapper->findByColumn('id', array_column($records->getAll(), 'student_id'));
 
-        $keys = array_keys($records->first());
-        array_shift($keys);
+        /* Only process if there are records in the paginated results
+         */
+        if ($records->count() > 0) {
+            $keys = array_keys($records->first());
+            array_shift($keys);
 
-        $totalRow['user'] = 'Total';
+            $totalRow['user'] = 'Total';
 
-        foreach ($keys as $key) {
-            $totalRow[$key] = ['records' => array_sum(array_column($records->getAll(), $key))];
+            foreach ($keys as $key) {
+                $totalRow[$key] = ['records' => array_sum(array_column($records->getAll(), $key))];
+            }
+
+            $rows = $records->map(
+                function (array $record) use ($students) {
+                    $row['user'] = call_user_func($this->userTranslator, $students->getBy('id', $record['student_id']));
+                    unset($record['student_id']);
+                    return array_merge($row, array_map(fn($value) => ['records' => (int)$value], ($record)));
+                }
+            );
         }
 
         return [
             'data' => [
                 'tableHeaders' => $tableHeader,
                 'totalRow' => $totalRow,
-                'rows' => $records->map(
-                    function (array $record) use ($students) {
-                        $row['user'] = call_user_func($this->userTranslator, $students->getBy('id', $record['student_id']));
-                        unset($record['student_id']);
-                        return array_merge($row, array_map(fn($value) => ['records' => (int)$value], ($record)));
-                    }
-                )
+                'rows' => $rows,
             ],
             'metadata' => [
                 'count' => $this->retrieveResultCount(),
                 'cursor' => [
-                    'current' => $this->current($records),
+                    'current' => $encodedCursor ?? $this->current($records),
                     'next' => $this->next($records) ?? null,
                 ]
             ]
         ];
     }
 
-    public function getResults(array $report)
+    public function getResults(array $report, ?string $encoodedCursor = null)
     {
+        if (null !== $encoodedCursor) {
+            $cursor = $this->codec->decode($encoodedCursor);
+        }
+
         $beforeDate = $report['beforeDate'];
         $afterDate = $report['afterDate'];
 
         $db = $this->pastoralMapper->getDatabase();
 
         $whereInTypeSubTypeQuery = [];
-        $selectCountTypeQuery = [];
 
         $whereTypes = $report['types']->diff(
             $report['subtypes']?->map(
@@ -141,12 +165,6 @@ class StudentByType extends Cursor implements TabTypeInterface
                 )->getAll()
             );
             $whereInTypeSubTypeQuery[] = "p.type_id IN ({$whereTypeIds})";
-            $selectCountTypeQuery[] = implode(
-                ', ',
-                $whereTypes->map(
-                    fn(Type $type) => "count_type_{$type->getId()}"
-                )->getAll()
-            );
         }
 
         $whereSubTypes = $report['subtypes'] ?? [];
@@ -159,27 +177,23 @@ class StudentByType extends Cursor implements TabTypeInterface
                 )->getAll()
             );
             $whereInTypeSubTypeQuery[] = "p.subtype_id IN ({$whereSubTypeIds})";
-            $selectCountTypeQuery[] = implode(
-                ', ',
-                $whereSubTypes->map(
-                    fn(SubType $subtype) => "count_subtype_{$subtype->getId()}"
-                )->getAll()
-            );
         }
 
         $countQuery = implode(', ', array_filter([$countTypeQuery ?? '', $countSubTypeQuery ?? '']));
 
         $whereTypeSubTypeQuery = implode(" OR ", $whereInTypeSubTypeQuery);
 
+        $orderBy = "u.lastname, COALESCE(u.preferred_name, u.firstname)";
+
         $countQuery =
             "SELECT p.student_id, {$countQuery}
             FROM {$this->pastoralMapper->getTable()} p
+            LEFT JOIN user u ON p.student_id = u.id
             WHERE
                 ({$whereTypeSubTypeQuery}) AND
                 (COALESCE(`p`.`occurred_on`, `p`.`created_at`) <= :beforeDate) AND
                 (COALESCE(`p`.`occurred_on`, `p`.`created_at`) >= :afterDate)
             GROUP BY p.student_id
-            LIMIT :limit
            ";
 
         $typeKeys = implode(
@@ -198,11 +212,29 @@ class StudentByType extends Cursor implements TabTypeInterface
 
         $totalCount = "SUM(" . implode(' + ', array_filter([$typeKeys, $subTypeKeys])) . ") as total";
 
-        $selectQuery = implode(', ', array_filter($selectCountTypeQuery));
+        /**
+         * Finding out where to locate the position where the cursor is pointing
+         */
+        $whereParts = "";
+        if (isset($cursor)) {
+            /* TODO default to ordering by name in ascending order, will update in SA-20574 when implementing sorting
+             */
+            $whereParts = "
+                CROSS JOIN (SELECT lastname, COALESCE(preferred_name, firstname) as preferred_name
+                FROM user
+                WHERE id = {$cursor['id']}) u2
+                WHERE u.lastname > u2.lastname OR (u.lastname > u2.lastname AND COALESCE(u.preferred_name, u.firstname) > u2.preferred_name)
+            ";
+        }
+
         $totalQuery = "
-            SELECT countData.student_id, {$totalCount}, {$selectQuery}
+            SELECT countData.*, {$totalCount}
             FROM ($countQuery) countData
-            GROUP BY countData.student_id
+            INNER JOIN user u ON countData.student_id = u.id
+            {$whereParts}
+            GROUP BY countData.student_id, {$orderBy}
+            ORDER BY {$orderBy} ASC
+            LIMIT :limit
         ";
 
         $result =  $db->executeQuery(

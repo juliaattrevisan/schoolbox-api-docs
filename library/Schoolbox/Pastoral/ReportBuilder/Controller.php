@@ -440,6 +440,7 @@ class Controller extends Base
     public function getReportByTabType(string $tabType, PastoralReport $report): void
     {
         $limit = $this->requestQuery->getInt('limit', Cursor::LIMIT_DEFAULT);
+        $encodedCursor = $this->requestQuery->get('cursor');
 
         try {
             $factory = (new Factory(
@@ -457,8 +458,8 @@ class Controller extends Base
                 throw new MapperException("Invalid type: $tabType has been given.");
             }
 
-            $records = $factory->retrieveResults(null);
-            $records = $factory->process($records);
+            $records = $factory->retrieveResults($encodedCursor);
+            $records = $factory->process($records, $encodedCursor);
             $this->response = $this->responseAsJson($records);
         } catch (\Exception $e) {
             $problem = new ApiProblem($e->getMessage());

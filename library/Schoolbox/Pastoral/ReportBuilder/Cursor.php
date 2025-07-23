@@ -2,6 +2,8 @@
 
 namespace Schoolbox\Pastoral\ReportBuilder;
 
+use Alaress\Codec\ICodec;
+use Alaress\Codec\Json\Base64;
 use Schoolbox\API\Cursor\ICursor;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Collection;
@@ -32,7 +34,9 @@ class Cursor implements ICursor
         protected TermMapper $termMapper,
         protected PastoralMapper $pastoralMapper,
         protected ?int $limit = self::LIMIT_DEFAULT,
+        protected ?ICodec $codec = null,
     ) {
+        $this->codec ??= new Base64();
         if ($this->limit > self::LIMIT_MAX) {
             throw new ValueError(sprintf('Limit must be at most %d: %d provided', self::LIMIT_MAX, $this->limit));
         }
