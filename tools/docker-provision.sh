@@ -193,12 +193,14 @@ function download_artifact() {
   local extract_dir=$4
 
   local lock_checksum;
-  lock_checksum=`sha1sum "${cachedir}/${lock_file}" 2>/dev/null | awk '{print $1}'`;
+#  echo "sha1sum \"${SITE_ROOT}/${lock_file}\" 2>/dev/null | awk '{print \$1}'"
+  lock_checksum=`sha1sum "${SITE_ROOT}/${lock_file}" 2>/dev/null | awk '{print $1}'`;
 
   local artifact_file='';
   local current_checksum;
   if [ -f "$SITE_ROOT/${checksum_file}" ]; then
-      current_checksum=`awk '{print $1}' "$SITE_ROOT/${checksum_file}"`;
+#      echo "awk '{print \$1}' \"${SITE_ROOT}/${checksum_file}\""
+      current_checksum=`awk '{print $1}' "${SITE_ROOT}/${checksum_file}"`;
       if [ "$lock_checksum" == "$current_checksum" ]; then
           log "Artifact $artifact_name up to date, nothing to change";
           artifact_file='ignore';
@@ -211,6 +213,7 @@ function download_artifact() {
   etag_file="${cachedir}/$artifact_name.etag.cache"
 
   if [ "$artifact_file" != 'ignore' ]; then
+      log "Artifact $artifact_name not up to date: checking for newer version";
       # download files
       local check;
       check=`grep "$lock_checksum" "$cache_file" 2>/dev/null | wc -l`;
@@ -250,7 +253,7 @@ function download_artifact() {
                               rm -fR "${cachedir}/${extract_dir:?}" 2> /dev/null;
 
                               # Extract checksum
-                              tar xzf "${cachedir}/${version_artifact_name}" "${extract_dir}/${checksum_file}";
+                              tar xzf "${cachedir}/${version_artifact_name}" "${checksum_file}";
                               local version_artifact_checksum
                               version_artifact_checksum=`awk '{print $1}' "${extract_dir}/${checksum_file}"`;
 
@@ -271,107 +274,134 @@ function download_artifact() {
       fi
   fi
 
-  return "$artifact_file"
+  echo "$artifact_file"
 }
 
 function init_composer_dependencies() {
   log "Installing vendor dependencies with composer";
-  cd "$cachedir" || exit 1;
-  local vendorfile='';
-  local composerlocksha;
-  composerlocksha=`sha1sum ../composer.lock 2>/dev/null | awk '{print $1}'`;
 
-  if [ -f "$SITE_ROOT"/vendor/composer.lock.checksum ];
-  then
-      currentvendorsha=`awk '{print $1}' "$SITE_ROOT"/vendor/composer.lock.checksum`;
-      if [ "$currentvendorsha" == "$composerlocksha" ];
-      then
-          log "Vendor build up to date, nothing to change";
-          vendorfile='ignore';
-      fi
-  fi
+  local vendor_dir="$SITE_ROOT/vendor"
+  local vendor_file='vendor-php-dev.tar.gz'
+  local artifact_file;
 
-  if [ "$vendorfile" != 'ignore' ];
-  then
-      local check;
-      check=`grep $composerlocksha vendor.cache 2>/dev/null | wc -l`;
-      if [ $check -gt 0 ];
-      then
-          # Woo - we've located a matching cache file
-#          log "Found matching vendor cache file '$vendorfile'";
-          vendorfile=`grep $composerlocksha vendor.cache 2>/dev/null | head -n1 | cut -d' ' -f2-100`;
-      else
-          # No cache files match - boo hoo - check to see if there are new versions
-          log "No matching vendor cache file found: downloading";
-          for branch in develop master;
-          do
-              # Check if we've already found a matching file
-              if [ "$vendorfile" == '' ];
-              then
-                  local etag;
-                  etag=$(curl -I "${artifact_source}/$branch-vendor-php-dev.tar.gz" 2>/dev/null | grep ETag | cut -d'"' -f2);
-                  if [ $? -eq 0 ];
-                  then
-                      local checketag;
-                      checketag=`grep $etag vendor.etag.cache 2>/dev/null | wc -l`;
-                      if [ $checketag -eq 0 ];
-                      then
-                          # New/updated version available - download it
-                          log "Downloading latest vendor build artifact: $branch-vendor-php-dev.tar.gz";
-                          wget --no-verbose "${artifact_source}/$branch-vendor-php-dev.tar.gz" -O $branch-vendor-php-dev.tar.gz 2>&1;
-                          if [ $? -eq 0 ];
-                          then
-                              # This is a new file, so remove old references
-                              sed -i "/$branch-vendor-php-dev.tar.gz/d" vendor.etag.cache 2>/dev/null;
-                              sed -i "/$branch-vendor-php-dev.tar.gz/d" vendor.cache 2>/dev/null;
-                              # Add new file to etag cache
-                              echo "$etag $branch-vendor-php-dev.tar.gz" >> vendor.etag.cache;
-                              # Cleanup for purity
-                              rm -fR "${cachedir}"/vendor 2>/dev/null;
-                              # Extract checksum
-                              tar xzf $branch-vendor-php-dev.tar.gz vendor/composer.lock.checksum;
-                              local vendorchecksum
-                              vendorchecksum=`awk '{print $1}' vendor/composer.lock.checksum`;
-                              rm -fR "${cachedir}"/vendor 2>/dev/null;
-                              # Add new file to vendor cache
-                              echo "$vendorchecksum $branch-vendor-php-dev.tar.gz" >> vendor.cache;
-                              # Check if this is file we need
-                              if [ "$vendorchecksum" == "$composerlocksha" ];
-                              then
-                                  vendorfile="$branch-vendor-php-dev.tar.gz";
-                              fi
-                          fi
-                      fi
-                  fi
-              fi
-          done
-      fi
-      cd "$SITE_ROOT" || exit 1;
-      if [ "$vendorfile" != '' ];
-      then
-          if [ -f "${cachedir}"/$vendorfile ];
-          then
-              # Extract content
-              log "Extracting vendor cache file '$vendorfile'";
-              rm -fR "$SITE_ROOT"/vendor 2>/dev/null;
-              tar xzf "${cachedir}"/$vendorfile;
-          else
-              # Still no luck, build from scratch with composer
-              log "No matching vendor cache found. Building with composer";
-              "$SITE_ROOT"/tools/composer.sh
-          fi
+  # Only use last line of output from function:
+  # the rest may include logs
+  artifact_file=$(download_artifact "${vendor_file}" 'composer.lock' 'vendor/composer.lock.checksum' "$vendor_dir" | tail -n1)
+
+  if [ "$artifact_file" = "ignore" ]; then
+      log "Vendor artifact up to date: updating autoload and patches";
+      composer install -o --no-interaction
+  else
+      if [ -f "${cachedir}/${vendor_file}" ]; then
+          # Extract content
+          log "Extracting vendor cache file '$vendor_file'";
+          rm -fR "${vendor_dir}" 2> /dev/null;
+          tar xzf "${cachedir}/${vendor_file}";
+          log "Updating autoload and patches";
+          composer install -o --no-interaction
       else
           # Still no luck, build from scratch with composer
           log "No matching vendor cache found. Building with composer";
           "$SITE_ROOT"/tools/composer.sh
       fi
   fi
-  cd "$SITE_ROOT" || exit;
 
-  # Composer autoload needs to apply patches as well:
-  # just use composer install for that, rather than dump-autoload
-  log "Updating composer autoload and patches";
-  composer install -o --no-interaction
+#  cd "$cachedir" || exit 1;
+#  local vendorfile='';
+#  local composerlocksha;
+#  composerlocksha=`sha1sum ../composer.lock 2>/dev/null | awk '{print $1}'`;
+#
+#  if [ -f "$SITE_ROOT"/vendor/composer.lock.checksum ];
+#  then
+#      currentvendorsha=`awk '{print $1}' "$SITE_ROOT"/vendor/composer.lock.checksum`;
+#      if [ "$currentvendorsha" == "$composerlocksha" ];
+#      then
+#          log "Vendor build up to date, nothing to change";
+#          vendorfile='ignore';
+#      fi
+#  fi
+#
+#  if [ "$vendorfile" != 'ignore' ];
+#  then
+#      local check;
+#      check=`grep $composerlocksha vendor.cache 2>/dev/null | wc -l`;
+#      if [ $check -gt 0 ];
+#      then
+#          # Woo - we've located a matching cache file
+##          log "Found matching vendor cache file '$vendorfile'";
+#          vendorfile=`grep $composerlocksha vendor.cache 2>/dev/null | head -n1 | cut -d' ' -f2-100`;
+#      else
+#          # No cache files match - boo hoo - check to see if there are new versions
+#          log "No matching vendor cache file found: downloading";
+#          for branch in develop master;
+#          do
+#              # Check if we've already found a matching file
+#              if [ "$vendorfile" == '' ];
+#              then
+#                  local etag;
+#                  etag=$(curl -I "${artifact_source}/$branch-vendor-php-dev.tar.gz" 2>/dev/null | grep ETag | cut -d'"' -f2);
+#                  if [ $? -eq 0 ];
+#                  then
+#                      local checketag;
+#                      checketag=`grep $etag vendor.etag.cache 2>/dev/null | wc -l`;
+#                      if [ $checketag -eq 0 ];
+#                      then
+#                          # New/updated version available - download it
+#                          log "Downloading latest vendor build artifact: $branch-vendor-php-dev.tar.gz";
+#                          wget --no-verbose "${artifact_source}/$branch-vendor-php-dev.tar.gz" -O $branch-vendor-php-dev.tar.gz 2>&1;
+#                          if [ $? -eq 0 ];
+#                          then
+#                              # This is a new file, so remove old references
+#                              sed -i "/$branch-vendor-php-dev.tar.gz/d" vendor.etag.cache 2>/dev/null;
+#                              sed -i "/$branch-vendor-php-dev.tar.gz/d" vendor.cache 2>/dev/null;
+#                              # Add new file to etag cache
+#                              echo "$etag $branch-vendor-php-dev.tar.gz" >> vendor.etag.cache;
+#                              # Cleanup for purity
+#                              rm -fR "${cachedir}"/vendor 2>/dev/null;
+#                              # Extract checksum
+#                              tar xzf $branch-vendor-php-dev.tar.gz vendor/composer.lock.checksum;
+#                              local vendorchecksum
+#                              vendorchecksum=`awk '{print $1}' vendor/composer.lock.checksum`;
+#                              rm -fR "${cachedir}"/vendor 2>/dev/null;
+#                              # Add new file to vendor cache
+#                              echo "$vendorchecksum $branch-vendor-php-dev.tar.gz" >> vendor.cache;
+#                              # Check if this is file we need
+#                              if [ "$vendorchecksum" == "$composerlocksha" ];
+#                              then
+#                                  vendorfile="$branch-vendor-php-dev.tar.gz";
+#                              fi
+#                          fi
+#                      fi
+#                  fi
+#              fi
+#          done
+#      fi
+#      cd "$SITE_ROOT" || exit 1;
+#      if [ "$vendorfile" != '' ];
+#      then
+#          if [ -f "${cachedir}"/$vendorfile ];
+#          then
+#              # Extract content
+#              log "Extracting vendor cache file '$vendorfile'";
+#              rm -fR "$SITE_ROOT"/vendor 2>/dev/null;
+#              tar xzf "${cachedir}"/$vendorfile;
+#          else
+#              # Still no luck, build from scratch with composer
+#              log "No matching vendor cache found. Building with composer";
+#              "$SITE_ROOT"/tools/composer.sh
+#          fi
+#      else
+#          # Still no luck, build from scratch with composer
+#          log "No matching vendor cache found. Building with composer";
+#          "$SITE_ROOT"/tools/composer.sh
+#      fi
+#  fi
+#  cd "$SITE_ROOT" || exit;
+#
+#  # Composer autoload needs to apply patches as well:
+#  # just use composer install for that, rather than dump-autoload
+#  log "Updating composer autoload and patches";
+#  composer install -o --no-interaction
 }
 
 function install_instance() {
