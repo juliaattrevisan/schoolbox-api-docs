@@ -13,8 +13,10 @@
     {% set formAction = routeLookup('learningMomentEvidence.putEvidence', {evidenceId: evidence.id}) %}
 {% endif %}
 
-<div class="small-12 column">
-    <h1>{{ isCreate ? 'Share a' : 'Modify' }} Learning Moment</h1>
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>{{ isCreate ? 'Share a' : 'Modify' }} Learning Moment</h1>
     {##
      # How does the "sharing on behalf of" metadata show?
      # That depends on who the learning moment is being created for:
@@ -34,6 +36,21 @@
             %}
         </li>
     </ul>
+    {% endif %}
+        </div>
+    </div>
+
+    {% if evidence is defined and evidence.id %}
+        {% set deletRoute = routeLookupIfAuthorized('learningMomentEvidence.deleteEvidence', {evidenceId: evidence.id, creatorId: evidence.creator.id}) %}
+
+        {% if deletRoute %}
+            <nav>
+                <sbx-pop-out content-id="overflow"></sbx-pop-out>
+            </nav>
+            <ul class="f-dropdown" data-dropdown-content id="overflow">
+                <li><a data-delete href="{{ deletRoute }}" class="icon-delete">Delete</a></li>
+            </ul>
+        {% endif %}
     {% endif %}
 </div>
 
@@ -239,6 +256,39 @@
                 {% endfor %}
             ],
             multiple: true
+        });
+
+        {# stolen from @see library/Schoolbox/Learning/Moment/Evidence/templates/detail.twig #}
+        $('#container').on('click', 'a[data-delete]', function(event) {
+            event.preventDefault();
+
+            let element = $(this);
+            let toast = $('[data-toast]');
+
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this Learning Moment?',
+                confirmLabel: 'Delete',
+                confirmEvent: function() {
+                    toast.toastActivate({
+                        'text': 'Deleting Learning Moment...'
+                    });
+
+                    $.ajax({
+                        url: element.attr('href'),
+                        type: 'DELETE',
+                        success: function(result) {
+                            toast.toastTimeout({text: 'Learning Moment deleted', css: 'success'});
+
+                            /* Redirect to dashboard, I guess
+                             */
+                            window.location.href = '{{ RETURN_URL.previous.decoded ?? '/' }}';
+                        },
+                        error: function() {
+                            toast.toastTimeout({text: 'Delete failed', css: 'alert'});
+                        }
+                    });
+                }
+            });
         });
     });
 </script>
