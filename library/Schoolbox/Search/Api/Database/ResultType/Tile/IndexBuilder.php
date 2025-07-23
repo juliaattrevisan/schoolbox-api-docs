@@ -24,9 +24,16 @@ use Schoolbox\Tile;
 class IndexBuilder extends BaseBuilder
 {
     /**
+     * This is a cache, so repeated calls to accepts() do not cause repeated database queries to look up the value.
+     * @var int|null
+     */
+    private ?int $tileComponentConfigDefinitionId = null;
+
+    /**
      * This builder works with:
      * * tile objects
-     * * tile layouts
+     * * tile components
+     * * component configs, if it is for a tile
      * * folders, when they are deleted
      *
      * @param object    $subject
@@ -35,12 +42,28 @@ class IndexBuilder extends BaseBuilder
      */
     protected function accepts(object $subject, BuildType $buildType): bool
     {
-        if ($subject instanceof Tile\Model || $subject instanceof Tile\Layout\Model) {
+        if ($subject instanceof Tile\Model) {
             return true;
         }
+
+        if (
+            $subject instanceof Component_Instance
+            /** @phpstan-ignore-next-line - $subject->getDefinition can return null */
+            && $subject->getDefinition()?->getClass() === self::getComponentClass()
+        ) {
+            return true;
+        }
+
+        if ($subject instanceof Component_Config) {
+            // Need to look up the component config definition to determine if $subject is relevant.
+            $this->tileComponentConfigDefinitionId ??= $this->getTileLayoutIdComponentConfigDefinitionId();
+            return $this->tileComponentConfigDefinitionId === $subject->getConfigDefinitionId();
+        }
+
         if ($buildType === BuildType::DELETE && $subject instanceof Folder\Model) {
             return true;
         }
+
         return false;
     }
 
@@ -55,13 +78,19 @@ class IndexBuilder extends BaseBuilder
                 $baseParams + ['id' => $subject->getId()],
             ];
         }
-        if ($subject instanceof Tile\Layout\Model) {
+        if ($subject instanceof Component_Instance) {
             return [
-                $baseQuery . ' AND tl.id = :id',
+                $baseQuery . ' AND ci.id = :id',
                 $baseParams + ['id' => $subject->getId()],
             ];
         }
-        if ($subject instanceof Folder\Model) {
+        if ($subject instanceof Component_Config) {
+            return [
+                $baseQuery . ' AND ci.id = :id',
+                $baseParams + ['id' => $subject->getInstanceId()],
+            ];
+        }
+        if ($buildType === BuildType::DELETE && $subject instanceof Folder\Model) {
             return [
                 $baseQuery . ' AND f.id = :id',
                 $baseParams + ['id' => $subject->getId()],
@@ -183,6 +212,9 @@ class IndexBuilder extends BaseBuilder
         } elseif ($subject instanceof Component_Config) {
             $searchIndexQueryString .= ' AND identifier LIKE :componentIdentifier';
             $searchIndexParams['componentIdentifier'] = '%-' . $subject->getInstanceId() . '-%';
+        } elseif ($subject instanceof Folder\Model) {
+            $searchIndexQueryString .= ' AND identifier LIKE :componentIdentifier';
+            $searchIndexParams['componentIdentifier'] = '%-' . $subject->getId();
         } elseif ($subject !== null) { // Note $subject will be null when this is run from tools/search/buildIndex.php
             return;
         }
@@ -234,7 +266,7 @@ class IndexBuilder extends BaseBuilder
                     // This index has no component.  Remove it if any components exist for this tile.
                     if (!empty($componentExistsCache[$tileId])) {
                         $this->logger->debug(
-                            "Tile '$identifier' is associated with a component.  Removing componentless index."
+                            "Tile $tileId is associated with a component.  Removing componentless index '$identifier'."
                         );
                         $removeIndex = true;
                     }
@@ -242,7 +274,8 @@ class IndexBuilder extends BaseBuilder
                     // This index does have a component.  Remove it if it is not associated with that component.
                     if (!in_array($componentId, $componentExistsCache[$tileId])) {
                         $this->logger->debug(
-                            "Tile '$identifier' is no longer associated with component $componentId.  Removing index."
+                            "Tile $tileId is no longer associated with component $componentId." .
+                            "  Removing index '$identifier'."
                         );
                         $removeIndex = true;
                     }
@@ -264,6 +297,29 @@ class IndexBuilder extends BaseBuilder
         }
 
         $this->logger->info("Deleting search indices for $nIndicesRemoved tiles");
+    }
+
+    /**
+     * Find the config definition ID for tiles.
+     *
+     * @return int|null
+     */
+    private function getTileLayoutIdComponentConfigDefinitionId(): ?int
+    {
+        // Look it up if not yet set
+        $componentConfigDefinitionId = $this->connector->executeQuery(
+            "SELECT ccd.id
+            FROM component_config_definition ccd
+            INNER JOIN component_definition cd ON ccd.component_definition_id = cd.id
+            WHERE ccd.key = :homepageComponentKey
+            AND   cd.class = :class",
+            [
+                'class' => self::getComponentClass(),
+                'homepageComponentKey' => Tile\Layout\Mapper::HOMEPAGE_COMPONENT_KEY
+            ]
+        )->fetchColumn();
+
+        return filter_var($componentConfigDefinitionId, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
     }
 
     /**
