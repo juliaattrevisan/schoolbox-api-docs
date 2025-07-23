@@ -44,10 +44,10 @@ export type AsyncUploadResponse = AsyncUploadResponseError | AsyncUploadResponse
  * @param baseHref - an option baseHref to add to the url
  * @returns - the url with the baseHref conditionally added
  */
-function getURL(url: string, baseHref?: string): URL | string {
+function getURL(url: string, baseHref?: string): string {
     // If we are requesting a baseHref to exist, we should be using it...
     if (baseHref) {
-        return new URL(url, baseHref);
+        return new URL(url, baseHref).toString();
     }
     return url;
 }
@@ -103,12 +103,12 @@ export type Resource = {
 
 /**
  * Get the image src
- * @param resource - the resource
+ * @param resourceHash - the resource hash
  * @param baseHref - an option baseHref to add to the url
  * @returns - the image src
  */
-function getImageSrc(resource: Resource, baseHref?: string): URL | string {
-    return getURL(`/storage/image.php?hash=${resource.hash}`, baseHref);
+export function getImageSrc(resourceHash: string, baseHref?: string): string {
+    return getURL(`/storage/image.php?hash=${resourceHash}`, baseHref);
 }
 
 /**
@@ -121,14 +121,14 @@ function getImageAttributes(
     resource: Resource,
     baseHref?: string,
 ): {
-    src: URL | string;
+    src: string;
     alt: string;
-    linkHref: URL | string;
+    linkHref: string;
 } {
     return {
-        src: getImageSrc(resource, baseHref),
+        src: getImageSrc(resource.hash, baseHref),
         alt: resource.name,
-        linkHref: getImageSrc(resource, baseHref),
+        linkHref: getImageSrc(resource.hash, baseHref),
     };
 }
 
@@ -138,7 +138,7 @@ function getImageAttributes(
  * @param baseHref - an option baseHref to add to the url
  * @returns - the video src
  */
-function getVideoSrc(resource: Resource, baseHref?: string): URL | string {
+function getVideoSrc(resource: Resource, baseHref?: string): string {
     const resourceId = resource.id ? resource.id : resource.hash;
     return getURL(`/cms/sendVideo.php?id=${resourceId}&type=${resource.filesystem}`, baseHref);
 }
@@ -149,7 +149,7 @@ function getVideoSrc(resource: Resource, baseHref?: string): URL | string {
  * @param baseHref - an option baseHref to add to the url
  * @returns - the video thumbnail src
  */
-function getVideoThumb(resource: Resource, baseHref?: string): URL | string {
+function getVideoThumb(resource: Resource, baseHref?: string): string {
     const resourceId = resource.id ? resource.id : resource.hash;
     const filesystemWithReplaces = resource.filesystem.replace("browse", "sbfs").replace("store", "storage");
     return getURL(
@@ -165,7 +165,7 @@ function getVideoThumb(resource: Resource, baseHref?: string): URL | string {
  * @param baseHref - an option baseHref to add to the url
  * @returns - the image attributes
  */
-function getVideoAttributes(resource: Resource, baseHref?: string): Record<string, string | URL | number> {
+function getVideoAttributes(resource: Resource, baseHref?: string): Record<string, string | number> {
     const thumbnail = getVideoThumb(resource, baseHref);
     return {
         src: thumbnail,
@@ -187,7 +187,7 @@ function getVideoAttributes(resource: Resource, baseHref?: string): Record<strin
  * @param baseHref - an option baseHref to add to the url
  * @returns - the audio src
  */
-function getAudioSrc(resource: Resource, baseHref?: string): URL | string {
+function getAudioSrc(resource: Resource, baseHref?: string): string {
     const resourceId = resource.id ? resource.id : resource.hash;
     return getURL(`/cms/sendVideo.php?id=${resourceId}&type=${resource.filesystem}`, baseHref);
 }
@@ -197,7 +197,7 @@ function getAudioSrc(resource: Resource, baseHref?: string): URL | string {
  * @param baseHref - an option baseHref to add to the url
  * @returns - the audio thumbnail src
  */
-function getAudioThumb(baseHref?: string): URL | string {
+function getAudioThumb(baseHref?: string): string {
     return getURL(
         `${window.cdnPrefix}/images/core/component/audio-thumbnail-processing.gif?v=${window.siteVersion}`,
         baseHref,
@@ -210,7 +210,7 @@ function getAudioThumb(baseHref?: string): URL | string {
  * @param baseHref - an option baseHref to add to the url
  * @returns - the audio attributes
  */
-function getAudioAttributes(resource: Resource, baseHref?: string): Record<string, string | URL | number> {
+function getAudioAttributes(resource: Resource, baseHref?: string): Record<string, string | number> {
     const thumbnail = getAudioThumb(baseHref);
     return {
         src: thumbnail,
@@ -231,7 +231,7 @@ function getAudioAttributes(resource: Resource, baseHref?: string): Record<strin
  * @param baseHref - an option baseHref to add to the url
  * @returns - the document attributes
  */
-function getDocumentAttributes(resource: Resource, baseHref?: string): Record<string, string | URL> {
+function getDocumentAttributes(resource: Resource, baseHref?: string): Record<string, string> {
     return {
         src: getURL(`/ajax/mime/${resource.mime}`, baseHref),
         alt: resource.name,
@@ -247,7 +247,7 @@ function getDocumentAttributes(resource: Resource, baseHref?: string): Record<st
  * @param baseHref - an option baseHref to add to the url
  * @returns - the document attributes
  */
-function getOtherAttributes(resource: Resource, baseHref?: string): Record<string, string | URL> {
+function getOtherAttributes(resource: Resource, baseHref?: string): Record<string, string> {
     return {
         src: getURL(`/ajax/mime/${resource.mime}`, baseHref),
         alt: resource.name,
@@ -263,7 +263,7 @@ function getOtherAttributes(resource: Resource, baseHref?: string): Record<strin
  * @param baseHref - an option baseHref to add to the url
  * @returns - the folder src
  */
-function getFolderSrc(resource: Resource, baseHref?: string): URL | string {
+function getFolderSrc(resource: Resource, baseHref?: string): string {
     return getURL(`/homepage/${resource.id as string}`, baseHref);
 }
 
@@ -273,7 +273,7 @@ function getFolderSrc(resource: Resource, baseHref?: string): URL | string {
  * @param baseHref - an option baseHref to add to the url
  * @returns - the storage src
  */
-function getStorageSrc(resource: Resource, baseHref?: string): URL | string {
+function getStorageSrc(resource: Resource, baseHref?: string): string {
     return getURL(`/storage/fetch.php?hash=${resource.hash}`, baseHref);
 }
 
@@ -283,7 +283,7 @@ function getStorageSrc(resource: Resource, baseHref?: string): URL | string {
  * @param baseHref - an option baseHref to add to the url
  * @returns - the web dav src
  */
-function getWebDavSrc(resource: Resource, baseHref?: string): URL | string {
+function getWebDavSrc(resource: Resource, baseHref?: string): string {
     return getURL(`/cms/sendNetworkFile.php?id=${resource.hash}`, baseHref);
 }
 
@@ -293,7 +293,7 @@ function getWebDavSrc(resource: Resource, baseHref?: string): URL | string {
  * @param baseHref - an option baseHref to add to the url
  * @returns - the file src
  */
-function getFileSrc(resource: Resource, baseHref?: string): URL | string {
+function getFileSrc(resource: Resource, baseHref?: string): string {
     return getURL(`/send.php?id=${resource.hash}`, baseHref);
 }
 
@@ -303,7 +303,7 @@ function getFileSrc(resource: Resource, baseHref?: string): URL | string {
  * @param baseHref - an option baseHref to add to the url
  * @returns - the resource attributes
  */
-export function getAttributes(resource: Resource, baseHref?: string): Record<string, string | URL | number> {
+export function getAttributes(resource: Resource, baseHref?: string): Record<string, string | number> {
     if (resource.type === ResourceType.IMAGE) {
         return getImageAttributes(resource, baseHref);
     }
@@ -328,9 +328,9 @@ export function getAttributes(resource: Resource, baseHref?: string): Record<str
  * @param baseHref - an option baseHref to add to the url
  * @returns - the resource attributes
  */
-export function getSrc(resource: Resource, baseHref?: string): URL | string | undefined {
+export function getSrc(resource: Resource, baseHref?: string): string | undefined {
     if (resource.type === ResourceType.IMAGE) {
-        return getImageSrc(resource, baseHref);
+        return getImageSrc(resource.hash, baseHref);
     }
     if (resource.type === ResourceType.VIDEO) {
         return getStorageSrc(resource, baseHref);
