@@ -11,7 +11,9 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Moment\Evidence\Moderation;
 
 use Alaress\Web\Controller\Base;
+use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Discussion\Comment;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Moment\Evidence\Model;
 use Schoolbox\Learning\Moment\Evidence\Translator;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -90,6 +92,8 @@ class Controller extends Base
      *
      * @param Model $evidence
      * @return void
+     * @throws MapperException
+     * @throws RouteNotFound
      */
     public function postReject(Model $evidence): void
     {
@@ -110,6 +114,18 @@ class Controller extends Base
             ->setThread($evidence->getDiscussionThread());
 
         $this->commentMapper->save($comment);
+
+        /* Redirect back to a place
+         */
+        $encodedReturnUrl = $this->requestPost->get(Redirect::RETURN_URL);
+
+        if (!empty($encodedReturnUrl)) {
+            $returnUrl = Redirect::decode($encodedReturnUrl);
+        } else {
+            $returnUrl = $this->routeGenerator->generate('searchUser.getProfile', ['userId' => $evidence->getRecipient()->getId()]);
+        }
+
+        $this->response = $this->redirectAfterPost($returnUrl);
     }
 
 
