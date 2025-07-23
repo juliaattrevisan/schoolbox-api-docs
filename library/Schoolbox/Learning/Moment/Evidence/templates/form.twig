@@ -1,3 +1,9 @@
+{##
+ # Share a Learning Moment
+ #
+ # @param bool $moderationRequired  Decide if the current user's post requires moderation
+ #}
+
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% if isCreate %}
 {{ bread.crumbs(
@@ -87,7 +93,14 @@
                         </div>
                     </fieldset>
                 </section>
-            <input type="submit" id="evidence-submit" data-test="learning-moment-evidence-form-submit" value="Submit" />
+
+            {% set submitText = 'Submit' %}
+
+            {% if moderationRequired %}
+                {% set submitText = 'Submit for approval' %}
+            {% endif %}
+
+            <input type="submit" id="evidence-submit" data-test="learning-moment-evidence-form-submit" value="{{ submitText }}" />
         </form>
     </div>
 </div>

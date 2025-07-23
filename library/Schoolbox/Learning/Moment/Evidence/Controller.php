@@ -14,8 +14,10 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\API\Translator\ModelToArray\Composite;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Discussion\Comment;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Moment\Evidence\Moderation\ModerationRequired;
 use Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Factory;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
@@ -104,12 +106,23 @@ class Controller extends Base
         // * upload
         $momentType = $this->requestQuery->get('momentType') ?: Model::MOMENT_TYPE_TEXT;
         $template   = $this->getTemplateFromType($momentType);
+
+        /* Students get their learning moment moderation requirement tested;
+         * parents and teachers bypass this check
+         */
+        $moderationRequired = false;
+
+        if ($this->getUser()->getRole()->isStudent()) {
+            $moderationRequired = (new ModerationRequired())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED), $this->getUser()->getYear());
+        }
+
         $params = [
             'users'                    => $users,
             'userIds'                  => $users->getPropertyValues('id'),
             'otherUsers'               => $otherUsers,
             'sharingForSelf'           => $sharingForSelf,
             'curriculumTaggingEnabled' => $this->curriculumTaggingEnabled(),
+            'moderationRequired'       => $moderationRequired,
             'isCreate'                 => true,
             'momentType'               => $momentType,
             'zone'                     => $this->buildAttachzone($momentType)->getTwigContext()
@@ -242,6 +255,14 @@ class Controller extends Base
      */
     public function postMomentForUsers(Collection $users): void
     {
+        /* Since this is a collection of users, each of whom might have a unique
+         * configuration (e.g. some year levels require moderation, some don't)
+         * you'll end up with an $evidenceCollection of mixed results; some will
+         * submit and publish immediately whilst some end up in a moderation queue.
+         */
+        $globalConfig = (bool)$this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED);
+        $moderationRequired = (new ModerationRequired())->isSatisfiedBy($globalConfig, $this->getUser()->getYear());
+
         $requestBody = $this->request->getParsedBody();
 
         //unless there are mapper errors (and those will change it to 500 as required
@@ -257,6 +278,19 @@ class Controller extends Base
             $evidenceModel = $evidenceModel
                 ->setRecipient($user)
                 ->setBody($tokenReplacer->replace($evidenceModel->getBody(), $user));
+
+            /* Accelerate into the next state based on configs and year level settings
+             */
+            if ($moderationRequired) {
+                /* Requires moderation and; needs a human to progress to Published state
+                 */
+                $evidenceModel->submit($this->getUser());
+            } else {
+                /* Does not require moderation; just send it into the world
+                 */
+                $evidenceModel->publish($this->getUser());
+            }
+
             $evidenceCollection->add($evidenceModel);
         }
         $this->mapper->save($evidenceCollection);
@@ -286,22 +320,36 @@ class Controller extends Base
         // * upload
         $momentType = $evidence->getType();
         $template   = $this->getTemplateFromType($momentType);
-        $params     = [
+
+        /* Attachzone stuff for existing attachments
+         */
+        $zone = $this->buildAttachzone($momentType);
+        if ($evidence->getStorage()) {
+            $zone->attachFiles([$evidence->getStorage()->getHash()]);
+        }
+
+        /* Students get their learning moment moderation requirement tested;
+         * parents and teachers bypass this check
+         */
+        $moderationRequired = false;
+
+        if ($this->getUser()->getRole()->isStudent()) {
+            $moderationRequired = (new ModerationRequired())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED), $this->getUser()->getYear());
+        }
+
+        $params = [
+            'evidence'                 => $evidence,
             'users'                    => $evidence->getRecipient(),
             'userIds'                  => $evidence->getRecipient()->getId(),
             'otherUsers'               => [],
             'sharingForSelf'           => $this->getUser() === $evidence->getRecipient(),
             'curriculumTaggingEnabled' => $this->curriculumTaggingEnabled(),
+            'moderationRequired'       => $moderationRequired,
             'isCreate'                 => false,
             'momentType'               => $momentType,
             'curriculumCodes'          => $evidence->getViewableCurriculumNodes()?->reindex(),
+            'zone'                     => $zone->getTwigContext()
         ];
-        $zone       = $this->buildAttachzone($momentType);
-        if ($evidence->getStorage()) {
-            $zone->attachFiles([$evidence->getStorage()->getHash()]);
-        }
-        $params['zone']     = $zone->getTwigContext();
-        $params['evidence'] = $evidence;
 
         $this->response = $this->responseFromTemplate(
             $template,

@@ -103,6 +103,43 @@ class Model implements ISoftDeletable, IThreadLocation
 
 
     /**
+     * @var \Alaress_Date_Format|null
+     */
+    private ?\Alaress_Date_Format $submittedAt = null;
+
+
+    /**
+     * @var User|null
+     */
+    private ?User $submittedBy = null;
+
+
+    /**
+     * @var \Alaress_Date_Format|null
+     */
+
+    private ?\Alaress_Date_Format $publishedAt = null;
+
+
+    /**
+     * @var User|null
+     */
+    private ?User $publishedBy = null;
+
+
+    /**
+     * @var \Alaress_Date_Format|null
+     */
+    private ?\Alaress_Date_Format $rejectedAt = null;
+
+
+    /**
+     * @var User|null
+     */
+    private ?User $rejectedBy = null;
+
+
+    /**
      * @return IStorage|null
      */
     public function getStorage(): ?IStorage
@@ -277,6 +314,158 @@ class Model implements ISoftDeletable, IThreadLocation
             }
         );
     }
+
+
+    /**
+     * Set a learning moment to Submitted status, along with its effector,
+     * ready for the next state transition to Published or Rejected
+     *
+     * @param User $effector
+     * @param \Alaress_Date_Format|null $now
+     * @return $this
+     */
+    public function submit(User $effector, \Alaress_Date_Format $now = null): self
+    {
+        $this->setSubmittedBy($effector);
+
+        /* Use the current datetime if one wasn't explicitly provided
+         */
+        if ($now) {
+            $this->setSubmittedAt($now);
+        } else {
+            $this->setSubmittedAt(\Alaress_Date_Format::now());
+        }
+
+        // Treat as never being published
+        $this->publishedAt = null;
+        $this->publishedBy = null;
+
+        // Treat as never being rejected
+        $this->rejectedAt = null;
+        $this->rejectedBy = null;
+
+        return $this;
+    }
+
+
+    /**
+     * Set a learning moment to Published status, along with its effector
+     *
+     * @param User $effector
+     * @param \Alaress_Date_Format|null $now
+     * @return $this
+     */
+    public function publish(User $effector, \Alaress_Date_Format $now = null): self
+    {
+        $this->setPublishedBy($effector);
+
+        /* Use the current datetime if one wasn't explicitly provided
+         */
+        if ($now) {
+            $this->setPublishedAt($now);
+        } else {
+            $this->setPublishedAt(\Alaress_Date_Format::now());
+        }
+
+        // Treat as never being rejected
+        $this->rejectedAt = null;
+        $this->rejectedBy = null;
+
+        return $this;
+    }
+
+
+    /**
+     * Set a learning moment to Rejected status, along with its effector
+     *
+     * @param User $effector
+     * @param \Alaress_Date_Format|null $now
+     * @return $this
+     */
+    public function reject(User $effector, \Alaress_Date_Format $now = null): self
+    {
+        $this->setRejectedBy($effector);
+
+        /* Use the current datetime if one wasn't explicitly provided
+         */
+        if ($now) {
+            $this->setRejectedAt($now);
+        } else {
+            $this->setRejectedAt(\Alaress_Date_Format::now());
+        }
+
+        // Treat as never being submitted (back to author to rework it)
+        $this->submittedAt = null;
+        $this->submittedBy = null;
+
+        // Treat as never being published
+        $this->publishedAt = null;
+        $this->publishedBy = null;
+
+        return $this;
+    }
+
+    /* Convenient bools
+     */
+
+    /**
+     * This moment is submitted;
+     * it isn't published, nor rejected
+     *
+     * @return bool
+     */
+    public function isSubmitted(): bool
+    {
+        return $this->getSubmittedAt() !== null &&
+            $this->getSubmittedBy() !== null &&
+            $this->getPublishedAt() === null &&
+            $this->getPublishedBy() === null &&
+            $this->getRejectedAt() === null &&
+            $this->getRejectedBy() === null;
+    }
+
+
+    /**
+     * This moment is published;
+     * it isn't rejected, but we know when it was submitted
+     *
+     * @return bool
+     */
+    public function isPublished(): bool
+    {
+        /* Arguably submittedAt and submittedBy could/should(?) be null, but then
+         * you'd lose info about when a student submitted a thing. Does it matter?
+         */
+        return $this->getSubmittedAt() !== null &&
+            $this->getSubmittedBy() !== null &&
+            $this->getPublishedAt() !== null &&
+            $this->getPublishedBy() !== null &&
+            $this->getRejectedAt() === null &&
+            $this->getRejectedBy() === null;
+    }
+
+
+    /**
+     * This moment is rejected;
+     * it's not published and we treat this like it was never submitted,
+     * forcing the user to go back and revise their content
+     *
+     * @return bool
+     */
+    public function isRejected(): bool
+    {
+        return $this->getSubmittedAt() === null &&
+            $this->getSubmittedBy() === null &&
+            $this->getPublishedAt() === null &&
+            $this->getPublishedBy() === null &&
+            $this->getRejectedAt() !== null &&
+            $this->getRejectedBy() !== null;
+    }
+
+
+    /* Getters/Setters
+     */
+
     /**
      * @return GenericCollection|null
      */
@@ -303,5 +492,125 @@ class Model implements ISoftDeletable, IThreadLocation
     public function getCommentNotifier(): ?string
     {
         return Discussion\Comment\Notifier::class;
+    }
+
+
+    /**
+     * @return \Alaress_Date_Format|null
+     */
+    public function getSubmittedAt(): ?\Alaress_Date_Format
+    {
+        return $this->submittedAt;
+    }
+
+
+    /**
+     * @param \Alaress_Date_Format|null $submittedAt
+     * @return $this
+     */
+    public function setSubmittedAt(?\Alaress_Date_Format $submittedAt): self
+    {
+        $this->submittedAt = $submittedAt;
+        return $this;
+    }
+
+
+    /**
+     * @return \Alaress_Date_Format|null
+     */
+    public function getPublishedAt(): ?\Alaress_Date_Format
+    {
+        return $this->publishedAt;
+    }
+
+
+    /**
+     * @param \Alaress_Date_Format|null $publishedAt
+     * @return $this
+     */
+    public function setPublishedAt(?\Alaress_Date_Format $publishedAt): self
+    {
+        $this->publishedAt = $publishedAt;
+        return $this;
+    }
+
+
+    /**
+     * @return \Alaress_Date_Format|null
+     */
+    public function getRejectedAt(): ?\Alaress_Date_Format
+    {
+        return $this->rejectedAt;
+    }
+
+
+    /**
+     * @param \Alaress_Date_Format|null $rejectedAt
+     * @return $this
+     */
+    public function setRejectedAt(?\Alaress_Date_Format $rejectedAt): self
+    {
+        $this->rejectedAt = $rejectedAt;
+        return $this;
+    }
+
+
+    /**
+     * @return User|null
+     */
+    public function getSubmittedBy(): ?User
+    {
+        return $this->submittedBy;
+    }
+
+
+    /**
+     * @param User|null $submittedBy
+     * @return $this
+     */
+    public function setSubmittedBy(?User $submittedBy): self
+    {
+        $this->submittedBy = $submittedBy;
+        return $this;
+    }
+
+
+    /**
+     * @return User|null
+     */
+    public function getPublishedBy(): ?User
+    {
+        return $this->publishedBy;
+    }
+
+
+    /**
+     * @param User|null $publishedBy
+     * @return $this
+     */
+    public function setPublishedBy(?User $publishedBy): self
+    {
+        $this->publishedBy = $publishedBy;
+        return $this;
+    }
+
+
+    /**
+     * @return User|null
+     */
+    public function getRejectedBy(): ?User
+    {
+        return $this->rejectedBy;
+    }
+
+
+    /**
+     * @param User|null $rejectedBy
+     * @return $this
+     */
+    public function setRejectedBy(?User $rejectedBy): self
+    {
+        $this->rejectedBy = $rejectedBy;
+        return $this;
     }
 }

@@ -42,6 +42,16 @@ class Mapper extends BaseMapper
         $this->joins('discussion_thread_id', ThreadMapper::class, 'id', null, null, 'discussionThread');
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'recipient', 'recipient');
         $this->uses('type', self::TYPE_STRING);
+        /* For moderation workflow
+         */
+        $this->joins('submitted_by', UserMapper::class, 'id', null, null, 'submittedBy', 'submittedBy');
+        $this->uses('submitted_at', self::TYPE_DATETIME);
+        $this->joins('published_by', UserMapper::class, 'id', null, null, 'publishedBy', 'publishedBy');
+        $this->uses('published_at', self::TYPE_DATETIME);
+        $this->joins('rejected_by', UserMapper::class, 'id', null, null, 'rejectedBy', 'rejectedBy');
+        $this->uses('rejected_at', self::TYPE_DATETIME);
+        /* Standard timestamps and authoring details
+         */
         $this->joins('created_by', UserMapper::class, 'id', null, null, 'creator', 'creator');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
@@ -90,7 +100,10 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('recipient.schoolHouse', 'recipientSchoolHouse')},
                 {$this->getJoinColumnString('recipient.pronoun', 'recipientPronoun')},
                 {$this->getJoinColumnString('creator', 'creator')},
-                {$this->getJoinColumnString('creator.pronoun', 'creatorPronoun')}
+                {$this->getJoinColumnString('creator.pronoun', 'creatorPronoun')},
+                {$this->getJoinColumnString('submittedBy', 'submittedBy')},
+                {$this->getJoinColumnString('publishedBy', 'publishedBy')},
+                {$this->getJoinColumnString('rejectedBy', 'rejectedBy')}
         ";
     }
 
@@ -112,6 +125,9 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('recipient.pronoun', 'recipient', 'recipientPronoun')}
             LEFT JOIN {$this->getJoinSql('creator', '', 'creator', true)}
             LEFT JOIN {$this->getJoinSql('creator.pronoun', 'creator', 'creatorPronoun')}
+            LEFT JOIN {$this->getJoinSql('submittedBy', '', 'submittedBy', true)}
+            LEFT JOIN {$this->getJoinSql('publishedBy', '', 'publishedBy', true)}
+            LEFT JOIN {$this->getJoinSql('rejectedBy', '', 'rejectedBy', true)}
         ";
     }
 
@@ -180,6 +196,29 @@ class Mapper extends BaseMapper
             // Set the list of curriculum codes as an empty collection:
             // these will be hydrated in `hydrateCurriculumNodesIntoCollection`
             $model->setCurriculumNodes($this->getJoinMapper('curriculum_evidence')->createCollection());
+
+            /* Set submitter/publisher/rejecter
+             */
+            /** @var \Schoolbox\User $submitter */
+            $submitter = $this->hydrateJoin($row, 'submittedBy', 'submittedBy');
+
+            if ($submitter) {
+                $model->setSubmittedBy($submitter);
+            }
+
+            /** @var \Schoolbox\User $publisher */
+            $publisher = $this->hydrateJoin($row, 'publishedBy', 'publishedBy');
+
+            if ($publisher) {
+                $model->setPublishedBy($publisher);
+            }
+
+            /** @var \Schoolbox\User $rejecter */
+            $rejecter = $this->hydrateJoin($row, 'rejectedBy', 'rejectedBy');
+
+            if ($rejecter) {
+                $model->setRejectedBy($rejecter);
+            }
 
             $collection[$model->getId()] = $model;
         }
