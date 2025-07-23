@@ -3,12 +3,12 @@
     .card {
         padding: 1rem;
         img {
-            margin: 0 1rem 0 1rem !important;
+            margin: 0 1rem 0 0;
             width: auto;
         }
         p > img,
         p > a > img {
-            float: none;
+            float: left;
         }
         > a:not([data-plugin]) > img {
             margin: 0 1rem 0 0;
