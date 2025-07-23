@@ -1010,7 +1010,7 @@ $allYears = [2022, 2023, 2024];
              */
             if ($year) {
                 $creditSummaryYear = new NCEA\CreditSummary($user, $externalUser, $db, $year, $dbTableName);
-                $courseCreditSummary = new NCEA\CourseCreditSummary($user, $externalUser, $db, $year);
+                $courseCreditSummary = new NCEA\CourseCreditSummary($user, $externalUser, $db, $year, $dbTableName);;
                 $entriesAndResults = new NCEA\EntriesAndResults($user, $externalUser, $db, $year);
 
                 /* Course Credit Summary graphs for a specific year
