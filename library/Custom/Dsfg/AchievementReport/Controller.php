@@ -991,7 +991,7 @@ $allYears = [2022, 2023, 2024];
          * year contains no data, probably 404 or something - you
          * could fiddle with the url to get illegal values
          */
-        $navigation = new NCEA\CourseCreditSummaryNavigation($user, $externalUser, $db, null);
+        $navigation = new NCEA\CourseCreditSummaryNavigation($user, $externalUser, $db, null, $dbTableName);
         $allYears = $navigation->findData();
 $allYears = [2022, 2023, 2024];
 

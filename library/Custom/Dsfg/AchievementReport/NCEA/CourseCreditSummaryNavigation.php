@@ -42,7 +42,7 @@ return [];
             SELECT
                 StudentYear
             FROM
-                dbo.uvSchoolBoxNCEAResults
+                " . $this->getDbTableName() . "
             WHERE
                 id = :externalId AND
                 WithdrawnFlag = 0 AND
