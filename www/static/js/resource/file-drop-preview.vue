@@ -86,7 +86,7 @@ const fileSize = window.Vue.computed(() => {
             </div>
         </div>
 
-        <div class="dz-close" v-if="!props.disabled">
+        <div v-if="!props.disabled" class="dz-close">
             <a class="button dz-remove no-margin" @click="emit('remove')">×</a>
         </div>
     </div>
