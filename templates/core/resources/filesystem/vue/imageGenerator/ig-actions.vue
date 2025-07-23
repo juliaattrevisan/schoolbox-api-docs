@@ -3,12 +3,13 @@
  * The component actions at the bottom of the image generator modal
  */
 
+import { uploadFileToStorage } from "@js/resource/resourceUtils";
 import { useImageGeneratorStore } from "./store/imageGeneratorStore";
 
 const igStore = useImageGeneratorStore();
 
 /**
- * When the cancel button is clicked or the image has been uploaded
+ * When the cancel button is clicked
  */
 function closeModal(): void {
     if (!window.top) {
@@ -20,16 +21,17 @@ function closeModal(): void {
 }
 
 /**
- * When the upload button is clicked
+ * Upload the image to storage and trigger whatever opened this modal to learn about it (ckeditor or normal attachzone)
  */
-function uploadImage(): void {
+async function uploadImage(): Promise<void> {
+    if (!window.top) {
+        // idk why you'd get here, but if you do, just throw an error
+        throw new Error("window.top is not available");
+    }
+
     const selectedFeedItem = igStore.feed.find((item) => item.entryKey === igStore.selectedFeedEntry);
     if (!selectedFeedItem) {
         throw new Error("Unable to find selected feed item");
-    }
-
-    if (!window.sbProps.activeResourceAttach) {
-        throw new Error("No active resource attach modal found");
     }
 
     if (!("image" in selectedFeedItem) || selectedFeedItem.image === null) {
@@ -43,8 +45,21 @@ function uploadImage(): void {
     }
 
     const file = new File([bytes], selectedFeedItem.image.name, { type: selectedFeedItem.image.mime });
-    window.sbProps.activeResourceAttach.dropzone.addFile(file);
-    closeModal();
+    const resource = await uploadFileToStorage(file);
+
+    if (resource.success === false) {
+        // TODO handle error
+        console.error("Failed to upload image:", resource.message);
+        return;
+    }
+
+    const data = {
+        title: file.name,
+        mimeType: file.type,
+        filesize: file.size,
+        hash: resource.data.hash,
+    };
+    window.top.postMessage(JSON.stringify({ data: [data] }), window.location.origin);
 }
 </script>
 
