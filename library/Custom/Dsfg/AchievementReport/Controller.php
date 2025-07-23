@@ -1009,7 +1009,7 @@ $allYears = [2022, 2023, 2024];
              * shenanigans altogether
              */
             if ($year) {
-                $creditSummaryYear = new NCEA\CreditSummary($user, $externalUser, $db, $year);
+                $creditSummaryYear = new NCEA\CreditSummary($user, $externalUser, $db, $year, $dbTableName);
                 $courseCreditSummary = new NCEA\CourseCreditSummary($user, $externalUser, $db, $year);
                 $entriesAndResults = new NCEA\EntriesAndResults($user, $externalUser, $db, $year);
 
