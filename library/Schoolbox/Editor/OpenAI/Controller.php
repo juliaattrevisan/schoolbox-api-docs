@@ -53,6 +53,9 @@ class Controller extends Base
      */
     public function postLessonPlan(): void
     {
+        // No BTTF in this space
+        $this->setAllowBackToTheFuture(false);
+
         try {
             $helper = new Helper(
                 trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_ENDPOINT)),
@@ -201,6 +204,9 @@ class Controller extends Base
      */
     public function postImage(): void
     {
+        // No BTTF in this space
+        $this->setAllowBackToTheFuture(false);
+
         try {
             $helper = new Helper(
                 trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_ENDPOINT)),
@@ -234,7 +240,7 @@ class Controller extends Base
                 // If we've indicated that this is a streaming request, send it in the right format
                 if (headers_sent()) {
                     echo sprintf("event: error\ndata: %s\n\n", json_encode($problem));
-                    return;
+                    die();
                 }
 
                 $this->response = $this->responseAsJson($problem)
@@ -252,6 +258,12 @@ class Controller extends Base
             $problem = (new ApiProblem($e->getMessage()))
                 ->setStatus($returnCode)
                 ->asArray();
+
+            // If we've indicated that this is a streaming request, send it in the right format
+            if (headers_sent()) {
+                echo sprintf("event: error\ndata: %s\n\n", json_encode($problem));
+                die();
+            }
 
             $this->response = $this->responseAsJson($problem)
                 ->withStatus($returnCode);
@@ -271,6 +283,9 @@ class Controller extends Base
      */
     public function postAiAssistant(): void
     {
+        // No BTTF in this space
+        $this->setAllowBackToTheFuture(false);
+
         try {
             (new Helper(
                 trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_ENDPOINT)),

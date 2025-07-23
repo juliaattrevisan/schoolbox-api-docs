@@ -228,13 +228,19 @@ class Helper
                 $chunk = substr($chunkBuffer, 0, $pos);
                 $chunkBuffer = substr($chunkBuffer, $pos + 2);
 
-                echo "{$chunk}\n\n";
                 $event = $this->parseChunk($chunk);
                 $this->appendChunkToLog($event, $log, $type);
 
+                // Don't echo an 'error' chunk if this isn't going to ckeditor as it won't follow the format of an ApiProblem
+                if ($type === self::CHAT || $event['type'] !== 'error') {
+                    echo "{$chunk}\n\n";
+                }
+
                 // Is this the final event?
-                if ($event['type'] === 'response.completed') {
+                // There are 3 possible events that indicate the end of a response (see https://platform.openai.com/docs/api-reference/responses-streaming/response)
+                if (in_array($event['type'], ['response.completed', 'response.failed', 'response.incomplete'])) {
                     $completedEvent = $event['data'][0]['response'];
+                    // Keep reading the stream as there *might* be more later that we can still log to debug issues
                 }
 
                 // Keep track of whether we're generating an image
