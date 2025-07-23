@@ -126,14 +126,16 @@ function read_var_from_vagrant_yaml() {
 
 function upload_assets() {
   log "Checking AWS credentials..."
-  if ! aws configure list >/dev/null; then
-    aws sso login --no-browser
+  # TODO this doesn't properly check if the current profile has keys
+  if ! aws configure list > /dev/null; then
+    aws sso login --no-browser --use-device-code
   fi
   log "Uploading assets..."
   site_version=$(find "$site_root"/updates/ -mindepth 1 -maxdepth 1 -type d -printf %f\\n | sort -V | tail -n 1)
   site_package=${site_version}-0
   aws s3 sync "$site_root"/www/static/ s3://"$bucket_name"/"$bucket_prefix"/"$site_package"
 
+  # TODO update config by connecting to correct database
   log "Updating config..."
   log "Setting 'site_package' to '$site_package'"
   mysql schoolbox -e "UPDATE config SET value = '$site_package' WHERE name = 'site_package'"
