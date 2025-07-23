@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { useTemplateRefsList } from "@vueuse/core";
 import FileDrop from "@js/resource/file-drop.vue";
-import { getImageSrc, uploadFileToStorage } from "@js/resource/resourceUtils";
 import type { FileDropFile } from "@js/resource/fileDropTypes";
 import { useImageGeneratorStore } from "./store/imageGeneratorStore";
 import type { ImagePromptAttribute } from "./imageGeneratorTypes";
@@ -29,20 +28,21 @@ window.Vue.onMounted(() => {
 });
 
 /**
- * Upload the current file
- * This is required before sending it off to the AI as we need to give it a URL
- * @param file - The file to upload
- * @returns the full URL to the file
+ * @param file - The relevant file
+ * @returns A URL (base64) for the current file to be included in the prompt
  */
-async function uploadFile(file: File): Promise<string> {
-    const expiry = new Date(Date.now() + 60 * 60 * 1000 * 6); // Expire in 6 hours
-    const response = await uploadFileToStorage(file, expiry);
-
-    if (!response.success) {
-        throw new Error(`Failed to upload file: ${response.message}`);
-    }
-
-    return getImageSrc(response.data.meta.file.hash, window.location.origin);
+async function getImageUrl(file: File): Promise<string | null> {
+    return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = (): void => {
+            if (typeof reader.result === "string" || reader.result === null) {
+                resolve(reader.result);
+            } else {
+                resolve(null);
+            }
+        };
+        reader.readAsDataURL(file);
+    });
 }
 
 /**
@@ -57,15 +57,10 @@ async function sendRequest(): Promise<void> {
         return; // some attributes are required and not set yet, can't send the request
     }
 
-    // Retrieve a storage hash for the file if it exists and is not already uploaded
-    if (currentFile.value && currentFile.value.storageHash === undefined) {
-        currentFile.value.storageHash = await uploadFile(currentFile.value.file);
-    }
-
     const isSuccess = await igStore.sendRequest({
         userPrompt: prompt.value,
         attributes: attributes.value,
-        imageUrl: currentFile.value?.storageHash ?? null,
+        imageUrl: currentFile.value ? await getImageUrl(currentFile.value.file) : null,
         previousResponseId: igStore.getPreviousResponseId(),
     });
 
