@@ -358,7 +358,7 @@ class IndexBuilder extends BaseBuilder
                     if (!in_array($componentId, $componentExistsCache[$textboxId])) {
                         $this->logger->debug(
                             "Textbox $textboxId is no longer associated with component $componentId." .
-                            "  Removing index '$identifier'.'"
+                            "  Removing index '$identifier'."
                         );
                         $removeIndex = true;
                     }
