@@ -7,3 +7,6 @@ cd "$(dirname "$0")/.." || exit 1
 
 # Run the provision script in the schoolbox-cli container
 docker exec -it schoolbox-cli tools/docker-provision.sh
+
+# restart the caddy container to pick up any changes
+docker restart caddy
