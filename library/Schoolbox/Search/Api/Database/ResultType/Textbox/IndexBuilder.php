@@ -331,9 +331,7 @@ class IndexBuilder extends BaseBuilder
                 $textboxExistsCache[$textboxId] = $textboxExistsQuery->rowCount() > 0;
             }
             if (!$textboxExistsCache[$textboxId]) {
-                $this->logger->debug(
-                    sprintf('Textbox %d no longer exists: removing index', $textboxId),
-                );
+                $this->logger->debug("Textbox $textboxId no longer exists.  Removing index '$identifier'.");
                 $removeIndex = true;
             } else {
                 // Does this index have an associated component?
@@ -349,10 +347,8 @@ class IndexBuilder extends BaseBuilder
                     // remove it if any components exist for this textbox
                     if (!empty($componentExistsCache[$textboxId])) {
                         $this->logger->debug(
-                            sprintf(
-                                'Textbox %d is associated with a component: removing componentless index',
-                                $textboxId,
-                            ),
+                            "Textbox $textboxId is associated with a component." .
+                            "  Removing componentless index '$identifier'."
                         );
                         $removeIndex = true;
                     }
@@ -361,11 +357,8 @@ class IndexBuilder extends BaseBuilder
                     // remove it if it is not associated with that component
                     if (!in_array($componentId, $componentExistsCache[$textboxId])) {
                         $this->logger->debug(
-                            sprintf(
-                                'Textbox %d is no longer associated with component %d: removing index',
-                                $textboxId,
-                                $componentId,
-                            ),
+                            "Textbox $textboxId is no longer associated with component $componentId." .
+                            "  Removing index '$identifier'.'"
                         );
                         $removeIndex = true;
                     }
