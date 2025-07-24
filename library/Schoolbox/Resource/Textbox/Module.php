@@ -151,7 +151,8 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(Component_ConfigMapper::class),
             new EditorTemplateHelper(
                 $this->getMapperFactory()->get(EditorTemplateMapper::class),
-                EditorTemplatesCategoryModel::HOMEPAGE
+                EditorTemplatesCategoryModel::HOMEPAGE,
+                $this->injector->get('user')
             )
         );
     }
