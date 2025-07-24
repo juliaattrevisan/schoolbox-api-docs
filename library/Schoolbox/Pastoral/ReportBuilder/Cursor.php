@@ -27,12 +27,17 @@ class Cursor implements ICursor
      */
     public const LIMIT_DEFAULT = self::LIMIT_MAX;
 
+    protected array $filters = [];
+    protected array $params = [];
+
+
     public function __construct(
         protected array $report,
         protected ModelToArray $userTranslator,
         protected UserMapper $userMapper,
         protected TermMapper $termMapper,
         protected PastoralMapper $pastoralMapper,
+        protected string $resultType,
         protected ?int $limit = self::LIMIT_DEFAULT,
         protected ?ICodec $codec = null,
     ) {

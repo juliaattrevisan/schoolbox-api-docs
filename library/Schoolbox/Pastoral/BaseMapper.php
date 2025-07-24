@@ -29,7 +29,7 @@ abstract class BaseMapper extends SchoolboxMapper
      *
      * @return bool
      */
-    protected function isUserInPastoralService(User $user): bool
+    public function isUserInPastoralService(User $user): bool
     {
         return null !== $user->getAccessList()->getBy('service', UserAccess::SERVICE_PASTORAL);
     }

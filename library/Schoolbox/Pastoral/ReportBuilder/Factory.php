@@ -24,6 +24,7 @@ class Factory
         private UserMapper $userMapper,
         private TermMapper $termMapper,
         private PastoralMapper $pastoralMapper,
+        private string $resultType,
         private ?int $limit = null,
     ) {
     }
@@ -39,6 +40,7 @@ class Factory
                 $this->userMapper,
                 $this->termMapper,
                 $this->pastoralMapper,
+                $this->resultType,
                 $this->limit,
             ),
             default => null

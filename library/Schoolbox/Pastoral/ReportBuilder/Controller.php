@@ -435,9 +435,10 @@ class Controller extends Base
      * to display in a table format
      *
      * @param string         $tabType
+     * @param string         $resultType
      * @param PastoralReport $report
      */
-    public function getReportByTabType(string $tabType, PastoralReport $report): void
+    public function getReportByTabType(string $tabType, PastoralReport $report, string $resultType): void
     {
         $limit = $this->requestQuery->getInt('limit', Cursor::LIMIT_DEFAULT);
         $encodedCursor = $this->requestQuery->get('cursor');
@@ -448,6 +449,7 @@ class Controller extends Base
                 $this->userMapper,
                 $this->termMapper,
                 $this->pastoralMapper,
+                $resultType,
                 $limit
             ))->produce(
                 $this->prepareReportData($report),
@@ -599,7 +601,7 @@ class Controller extends Base
             'campuses' => $report->getCampuses(),
             'actions' => $report->getActions(),
             'includeStudentsWithoutYear' => $report->getIncludeStudentsWithoutYear(),
-            'includeStudentWithoutHouse' => $report->getIncludeStudentsWithoutHouse(),
+            'includeStudentsWithoutHouse' => $report->getIncludeStudentsWithoutHouse(),
             'includeRecordsWithoutAction' => $report->getIncludeRecordsWithoutAction(),
             'includeArchivedRecords' => $report->getIncludeArchivedRecords(),
             'actionStatus' => $report->getActionStatus(),
@@ -635,7 +637,7 @@ class Controller extends Base
             $data['campuses'],
             $data['actions'],
             $data['includeStudentsWithoutYear'],
-            $data['includeStudentWithoutHouse'],
+            $data['includeStudentsWithoutHouse'],
             $data['includeRecordsWithoutAction'],
             $data['includeArchivedRecords'],
             $data['actionStatus'],
