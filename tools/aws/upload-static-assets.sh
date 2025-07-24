@@ -138,12 +138,12 @@ function upload_assets() {
   # TODO update config by connecting to correct database
   log "Updating config..."
   log "Setting 'site_package' to '$site_package'"
-  mysql schoolbox -e "UPDATE config SET value = '$site_package' WHERE name = 'site_package'"
+  "${site_root}/tools/instance-mariadb.sh" -e "UPDATE config SET value = '$site_package' WHERE name = 'site_package'"
   site_static_asset_prefix="$bucket_host/$bucket_name/$bucket_prefix/{site_package}"
   log "Setting 'site_static_asset_prefix' to '$site_static_asset_prefix'"
-  mysql schoolbox -e "UPDATE config SET value = '$site_static_asset_prefix' WHERE name = 'site_static_asset_prefix'"
+  "${site_root}/tools/instance-mariadb.sh" -e "UPDATE config SET value = '$site_static_asset_prefix' WHERE name = 'site_static_asset_prefix'"
   log "Setting 'site_static_asset_serve_from_cdn' to 1'"
-  mysql schoolbox -e "UPDATE config SET value = '1' WHERE name = 'site_static_asset_serve_from_cdn'"
+  "${site_root}/tools/instance-mariadb.sh" -e "UPDATE config SET value = '1' WHERE name = 'site_static_asset_serve_from_cdn'"
 }
 
 function main() {
