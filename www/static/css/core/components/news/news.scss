@@ -8,7 +8,7 @@
         }
         p > img,
         p > a > img {
-            float: left;
+            float: none;
         }
         > a:not([data-plugin]) > img {
             margin: 0 1rem 0 0;
@@ -78,6 +78,7 @@
         }
         article {
             padding-top: 0.5rem;
+            overflow-x: hidden;
         }
     }
     .v-card {
