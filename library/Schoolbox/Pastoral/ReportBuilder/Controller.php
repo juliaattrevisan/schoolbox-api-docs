@@ -452,7 +452,10 @@ class Controller extends Base
                 $resultType,
                 $limit
             ))->produce(
-                $this->prepareReportData($report),
+                new Helper(
+                    $this->prepareReportData($report),
+                    $this->pastoralMapper,
+                ),
                 $tabType
             );
 

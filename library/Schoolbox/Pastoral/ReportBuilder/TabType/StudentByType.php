@@ -18,267 +18,6 @@ use Schoolbox\UserMapper;
 
 class StudentByType extends Cursor implements TabTypeInterface
 {
-    public function __construct(
-        array $report,
-        ModelToArray $userTranslator,
-        UserMapper $userMapper,
-        TermMapper $termMapper,
-        PastoralMapper $pastoralMapper,
-        string $resultType,
-        ?int $limit = self::LIMIT_DEFAULT,
-        ?ICodec $codec = null
-    ) {
-        parent::__construct($report, $userTranslator, $userMapper, $termMapper, $pastoralMapper, $resultType, $limit, $codec);
-        $this->getFilters();
-    }
-
-    /**
-     * This will return the type that doesn't have subtypes
-     *
-     * @return Collection
-     */
-    private function getType(): Collection
-    {
-        /** @param Collection $types */
-        $types = $this->report['types'];
-        /** @param Collection|null $subtypes */
-        $subtypes = $this->report['subtypes'];
-        return $types->diff(
-            $subtypes?->map(
-                fn(SubType $subType) => $subType->getPastoralType()
-            )
-        );
-    }
-
-    private function getWhereDate(): void
-    {
-        if ($this->report['beforeDate'] instanceof Alaress_Date_Format) {
-            $this->filters[] = "(COALESCE(`p`.`occurred_on`, `p`.`created_at`) <= :beforeDate)";
-            $this->params['beforeDate'] = $this->report['beforeDate']->endOfDay()->toIso8601String();
-        }
-
-        if ($this->report['afterDate'] instanceof Alaress_Date_Format) {
-            $this->filters[] = "(COALESCE(`p`.`occurred_on`, `p`.`created_at`) >= :afterDate)";
-            $this->params['afterDate'] = $this->report['afterDate']->startOfDay()->toIso8601String();
-        }
-    }
-
-    private function getSeverity(): void
-    {
-        $configLoader = Loader::getInstance();
-        if ($this->report['severity'] && $configLoader->get(ConfigMapper::NAME_PASTORAL_SEVERITY_ENABLED)) {
-            $this->filters[] = "`sv`.`sequence` >= :severity";
-            $this->params['severity'] = $this->report['severity']->getSequence();
-        }
-    }
-
-    private function getStudents(): void
-    {
-        if ($this->report['students']->count() > 0) {
-            $this->filters[] = "p.student_id IN (" .
-                implode(
-                    ',',
-                    $this->report['students']->getPropertyValues('id')
-                ) . ")";
-        }
-    }
-
-    private function getYears(): void
-    {
-        if ($this->report['includeStudentsWithoutYear']) {
-            $filters[] = "`u`.`year_id` IS NULL";
-        }
-
-        if ($this->report['years']->count() > 0) {
-            $filters[] = '`u`.`year_id` IN (' .
-                    implode(',', $this->report['years']->getPropertyValues('id')) .
-                ')';
-        }
-
-        $query = implode(' OR ', array_filter($filters ?? []));
-
-        if ($query) {
-            $this->filters[] = $query;
-        }
-    }
-
-    private function getHouses(): void
-    {
-        if ($this->report['includeStudentsWithoutHouse']) {
-            $filters[] = "`u`.`house` IS NULL";
-        }
-
-        if ($this->report['houses']->count() > 0) {
-            $filters[] = '`u`.`house` IN (' .
-                implode(',', $this->report['houses']->getPropertyValues('id')) .
-                ')';
-        }
-
-        $query = implode(' OR ', array_filter($filters ?? []));
-
-        if ($query) {
-            $this->filters[] = "({$query})";
-        }
-    }
-
-    private function getCampuses(): void
-    {
-        if ($this->report['campuses']->count() > 0) {
-            $this->filters[] = '`c`.`campus` IN (' .
-                implode(',', $this->report['campuses']->getPropertyValues('id')) .
-                ')';
-        }
-    }
-
-    private function getAuthors(): void
-    {
-        if ($this->report['authors']->count() > 0) {
-            $this->filters[] = "p.author_id IN (" .
-                implode(',', $this->report['authors']->getPropertyValues('id')) .
-                ")";
-        }
-    }
-
-    private function getActions(): void
-    {
-        if (!$this->shouldFilterAction()) {
-            return;
-        }
-
-        $subFilter = [];
-        $value = null;
-        if ($this->report['actions']->count() > 0) {
-            $subFilter[] = '`a`.`action_id` IN (' .
-                implode(',', $this->report['actions']->getPropertyValues('id')) .
-                ')';
-        }
-
-        if ($this->report['actions']->count() > 0 || !$this->report['includeRecordsWithoutAction']) {
-            if ($this->report['actionStatus'] ?? false) {
-                $subFilter[] = '`a`.`completed` = :actionStatus';
-                $value = (int)(
-                    $this->report['actionStatus'] === \Schoolbox\Pastoral\Report\Model::ACTION_STATUS_COMPLETED
-                );
-            }
-        }
-
-        $subFilter = array_filter($subFilter);
-        if (!empty($subFilter)) {
-            $filters[] = '(' . implode(' AND ', $subFilter) . ')';
-        }
-
-        if ($this->report['includeRecordsWithoutAction']) {
-            $filters[] = "`a`.`action_id` IS NULL";
-        }
-
-        $query = implode(' OR ', array_filter($filters ?? []));
-
-        if ($query) {
-            $this->filters[] = "({$query})";
-            if (null !== $value) {
-                $this->params['actionStatus'] = $value;
-            }
-        }
-    }
-
-    private function getAccess(): void
-    {
-        $user = $this->report['user'];
-        if ($this->report['involved'] || !$this->pastoralMapper->isUserInPastoralService($user)) {
-            $this->filters[] = "
-                (
-                    (SELECT COUNT(*) FROM `pastoral_access` WHERE `role_id` = :user_role_id_0 AND `pastoral_id` = `pastoral`.`id`) > 0 OR
-                    (SELECT COUNT(*) FROM `pastoral_access` WHERE `user_id` = :user_id_0      AND `pastoral_id` = `pastoral`.`id`) > 0 OR
-                    (
-                        SELECT COUNT(*) FROM `pastoral_access` WHERE `group_id` IN (
-                            SELECT `group_id`
-                            FROM `pastoral_group_member`
-                            WHERE `user_id` = :user_id_1
-                        ) AND `pastoral_id` = `pastoral`.`id`
-                    ) > 0 OR
-                    `pastoral`.`owner_id` = :user_id_2
-                )
-            ";
-            $this->params['user_role_id_0'] = $user->getRole()->getId();
-            $this->params['user_id_0']      = $user->getId();
-            $this->params['user_id_1']      = $user->getId();
-            $this->params['user_id_2']      = $user->getId();
-        }
-    }
-
-    private function getExpired(): void
-    {
-        if (!$this->report['includeArchivedRecords']) {
-            $this->filters[] = "(`p`.`expires_at` >= CURDATE() OR `p`.`expires_at` IS NULL)";
-        }
-    }
-
-    private function getTags(): void
-    {
-        if ($this->report['tags']->count() > 0) {
-            $this->filters[] = '`t`.`tag_id` IN (' .
-                implode(',', $this->report['tags']->getPropertyValues('id')) .
-                ')';
-        }
-    }
-
-    /**
-     * Get all the filters from the report setting
-     *
-     * @return void
-     */
-    private function getFilters(): void
-    {
-        $this->getWhereDate();
-        $this->getSeverity();
-        $this->getStudents();
-        $this->getYears();
-        $this->getHouses();
-        $this->getCampuses();
-        $this->getAuthors();
-        $this->getActions();
-        $this->getAccess();
-        $this->getExpired();
-        $this->getTags();
-    }
-
-    private function shouldFilterAction(): bool
-    {
-        $configLoader = Loader::getInstance();
-        return $configLoader->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED) &&
-            (
-                ($this->report['actionStatus'] ?? false) ||
-                $this->report['includeRecordsWithoutAction'] ||
-                $this->report['actions']->count() > 0
-            );
-    }
-
-    private function getFromString(): string
-    {
-
-        $fromString = "
-            FROM {$this->pastoralMapper->getTable()} p
-            INNER JOIN user u ON p.student_id = u.id AND u.deleted_at IS NULL
-            LEFT JOIN lu_pastoral_severity sv ON p.severity_id = sv.id
-            LEFT JOIN userCampus c ON u.id = c.uid
-        ";
-
-        if ($this->shouldFilterAction()) {
-            $joinType = $this->report['includeRecordsWithoutAction'] ? 'LEFT' : 'INNER';
-            $fromString .= "
-                {$joinType} JOIN pastoral_record_action a ON p.id = a.pastoral_id AND a.deleted_at IS NULL
-            ";
-        }
-
-        if ($this->report['tags']->count() > 0) {
-            $fromString .= "
-                INNER JOIN pastoral_tags t on p.id = t.pastoral_id
-            ";
-        }
-
-        return $fromString;
-    }
-
     /**
      * @inheritdoc
      */
@@ -292,7 +31,7 @@ class StudentByType extends Cursor implements TabTypeInterface
 
         $whereInTypeSubTypeQuery = [];
 
-        $whereTypes = $this->getType();
+        $whereTypes = $this->helper->getType();
 
         if ($whereTypes->count() > 0) {
             $whereTypeIds = implode(',', Collection::arrayColumn($whereTypes, 'id'));
@@ -305,12 +44,12 @@ class StudentByType extends Cursor implements TabTypeInterface
             $whereInTypeSubTypeQuery[] = "p.type_id IN ({$whereTypeIds})";
         }
 
-        $whereSubTypes = $this->report['subtypes'] ?? [];
-        if (!empty($whereSubTypes)) {
-            $whereSubTypeIds   = implode(',', Collection::arrayColumn($this->report['subtypes'], 'id'));
+        $whereSubTypes = $this->helper->getSubTypes();
+        if (($whereSubTypes)->count() > 0) {
+            $whereSubTypeIds   = implode(',', Collection::arrayColumn($this->helper->getSubTypes(), 'id'));
             $countSubTypeQuery = implode(
                 ', ',
-                $this->report['subtypes']->map(
+                $this->helper->getSubTypes()->map(
                     fn(SubType $subType) => "COUNT(CASE WHEN p.subtype_id = {$subType->getId()} THEN 1 END) AS count_subtype_{$subType->getId()}"
                 )->getAll()
             );
@@ -323,11 +62,11 @@ class StudentByType extends Cursor implements TabTypeInterface
 
         $orderBy = "u.lastname, COALESCE(u.preferred_name, u.firstname)";
 
-        $whereQuery = implode(" AND ", $this->filters);
+        $whereQuery = implode(" AND ", $this->helper->getFilters());
 
         $countQuery =
             "SELECT p.student_id, {$countQuery}
-            {$this->getFromString()}
+            {$this->helper->getFromString()}
             WHERE
                 ({$whereTypeSubTypeQuery}) AND
                 {$whereQuery} AND
@@ -344,7 +83,7 @@ class StudentByType extends Cursor implements TabTypeInterface
 
         $subTypeKeys = implode(
             ' + ',
-            $this->report['subtypes']->map(
+            $this->helper->getSubTypes()->map(
                 fn(SubType $subType) => "count_subtype_{$subType->getId()}"
             )->getAll()
         );
@@ -382,7 +121,7 @@ class StudentByType extends Cursor implements TabTypeInterface
                 [
                     'limit' => $this->limit,
                 ],
-                $this->params
+                $this->helper->getParams()
             )
         );
 
@@ -396,21 +135,21 @@ class StudentByType extends Cursor implements TabTypeInterface
     public function retrieveResultCount(): ?int
     {
         $whereInTypeSubTypeQuery = [];
-        if ($this->getType()->count() > 0) {
-            $whereTypeIds = implode(',', Collection::arrayColumn($this->getType(), 'id'));
+        if ($this->helper->getType()->count() > 0) {
+            $whereTypeIds = implode(',', Collection::arrayColumn($this->helper->getType(), 'id'));
             $whereInTypeSubTypeQuery[] = "p.type_id IN ({$whereTypeIds})";
         }
-        if ($this->report['subtypes']->count() > 0) {
-            $whereSubTypeIds = implode(',', Collection::arrayColumn($this->report['subtypes'], 'id'));
+        if ($this->helper->getSubTypes()->count() > 0) {
+            $whereSubTypeIds = implode(',', Collection::arrayColumn($this->helper->getSubTypes(), 'id'));
             $whereInTypeSubTypeQuery[] = "p.subtype_id IN ({$whereSubTypeIds})";
         }
 
         $whereQuery = implode(" OR ", array_filter($whereInTypeSubTypeQuery));
-        $whereFilterQuery = implode(" AND ", $this->filters);
+        $whereFilterQuery = implode(" AND ", $this->helper->getFilters());
 
         $query = "
             SELECT p.student_id
-            {$this->getFromString()}
+            {$this->helper->getFromString()}
             WHERE
                 {$whereQuery}
                 AND {$whereFilterQuery}
@@ -420,7 +159,7 @@ class StudentByType extends Cursor implements TabTypeInterface
 
         $result = $this->pastoralMapper->getDatabase()->executeQuery(
             $query,
-            $this->params
+            $this->helper->getParams()
         );
 
         return $result->rowCount();
@@ -447,7 +186,7 @@ class StudentByType extends Cursor implements TabTypeInterface
      */
     private function getTableHeaders(): array
     {
-        $types = $this->getType();
+        $types = $this->helper->getType();
 
         $tableHeaders = [
             [
@@ -473,7 +212,7 @@ class StudentByType extends Cursor implements TabTypeInterface
             ];
         }
 
-        foreach ($this->report['subtypes'] as $subType) {
+        foreach ($this->helper->getSubTypes() as $subType) {
             if ($subType instanceof SubType) {
                 $tableHeaders[] = [
                     'key'   => "count_subtype_{$subType->getId()}",
@@ -491,7 +230,8 @@ class StudentByType extends Cursor implements TabTypeInterface
     /**
      * Processing the payload to format it for presenting in a table
      *
-     * @param Collection $records
+     * @param Collection  $records
+     * @param string|null $encodedCursor
      * @return array[]
      */
     public function process(Collection $records, ?string $encodedCursor = null): array

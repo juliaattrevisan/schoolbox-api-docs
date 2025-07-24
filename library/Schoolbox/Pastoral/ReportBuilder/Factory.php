@@ -30,12 +30,12 @@ class Factory
     }
 
     public function produce(
-        array $report,
+        Helper $helper,
         string $type,
     ) {
         return match ($type) {
             self::STUDENT_BY_TYPE => new StudentByType(
-                $report,
+                $helper,
                 $this->userTranslator,
                 $this->userMapper,
                 $this->termMapper,

@@ -27,12 +27,8 @@ class Cursor implements ICursor
      */
     public const LIMIT_DEFAULT = self::LIMIT_MAX;
 
-    protected array $filters = [];
-    protected array $params = [];
-
-
     public function __construct(
-        protected array $report,
+        protected Helper $helper,
         protected ModelToArray $userTranslator,
         protected UserMapper $userMapper,
         protected TermMapper $termMapper,
