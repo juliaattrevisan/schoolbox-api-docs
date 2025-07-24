@@ -25,11 +25,13 @@ class StudentByType extends Cursor implements TabTypeInterface
         $whereTypes = $this->helper->getType();
 
         if ($whereTypes->count() > 0) {
-            $whereTypeIds = implode(',', Collection::arrayColumn($whereTypes, 'id'));
+            $whereTypeIds = implode(',', $whereTypes->getPropertyValues('id'));
             $countTypeQuery = implode(
                 ', ',
                 $whereTypes->map(
-                    fn(Type $type) => "COUNT(CASE WHEN p.type_id = {$type->getId()} THEN 1 END) AS count_type_{$type->getId()}"
+                    fn(Type $type) => ($this->resultType == Cursor::RESULT_TYPE_RECORDS) ?
+                        "ROUND(COUNT(CASE WHEN p.type_id = {$type->getId()} THEN 1 END), 2) AS count_type_{$type->getId()}" :
+                        "ROUND(SUM(CASE WHEN p.type_id = {$type->getId()} THEN p.points END), 2) AS count_type_{$type->getId()}"
                 )->getAll()
             );
             $whereInTypeSubTypeQuery[] = "p.type_id IN ({$whereTypeIds})";
@@ -37,11 +39,13 @@ class StudentByType extends Cursor implements TabTypeInterface
 
         $whereSubTypes = $this->helper->getSubTypes();
         if (($whereSubTypes)->count() > 0) {
-            $whereSubTypeIds   = implode(',', Collection::arrayColumn($this->helper->getSubTypes(), 'id'));
+            $whereSubTypeIds   = implode(',', $this->helper->getSubTypes()->getPropertyValues('id'));
             $countSubTypeQuery = implode(
                 ', ',
                 $this->helper->getSubTypes()->map(
-                    fn(SubType $subType) => "COUNT(CASE WHEN p.subtype_id = {$subType->getId()} THEN 1 END) AS count_subtype_{$subType->getId()}"
+                    fn(SubType $subType) => ($this->resultType == Cursor::RESULT_TYPE_RECORDS) ?
+                        "ROUND(COUNT(CASE WHEN p.subtype_id = {$subType->getId()} THEN 1 END), 2) AS count_subtype_{$subType->getId()}" :
+                        "ROUND(SUM(CASE WHEN p.subtype_id = {$subType->getId()} THEN p.points END), 2) AS count_subtype_{$subType->getId()}"
                 )->getAll()
             );
             $whereInTypeSubTypeQuery[] = "p.subtype_id IN ({$whereSubTypeIds})";
@@ -127,11 +131,11 @@ class StudentByType extends Cursor implements TabTypeInterface
     {
         $whereInTypeSubTypeQuery = [];
         if ($this->helper->getType()->count() > 0) {
-            $whereTypeIds = implode(',', Collection::arrayColumn($this->helper->getType(), 'id'));
+            $whereTypeIds = implode(',', $this->helper->getType()->getPropertyValues('id'));
             $whereInTypeSubTypeQuery[] = "p.type_id IN ({$whereTypeIds})";
         }
         if ($this->helper->getSubTypes()->count() > 0) {
-            $whereSubTypeIds = implode(',', Collection::arrayColumn($this->helper->getSubTypes(), 'id'));
+            $whereSubTypeIds = implode(',', $this->helper->getSubTypes()->getPropertyValues('id'));
             $whereInTypeSubTypeQuery[] = "p.subtype_id IN ({$whereSubTypeIds})";
         }
 
@@ -240,14 +244,14 @@ class StudentByType extends Cursor implements TabTypeInterface
             $totalRow['user'] = 'Total';
 
             foreach ($keys as $key) {
-                $totalRow[$key] = ['records' => array_sum(array_column($records->getAll(), $key))];
+                $totalRow[$key] = [ $this->resultType => array_sum(array_column($records->getAll(), $key))];
             }
 
             $rows = $records->map(
                 function (array $record) use ($students) {
                     $row['user'] = call_user_func($this->userTranslator, $students->getBy('id', $record['student_id']));
                     unset($record['student_id']);
-                    return array_merge($row, array_map(fn($value) => ['records' => (int)$value], ($record)));
+                    return array_merge($row, array_map(fn($value) => ['records' => floatval($value)], ($record)));
                 }
             );
         }

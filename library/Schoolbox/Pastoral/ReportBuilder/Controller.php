@@ -404,7 +404,6 @@ class Controller extends Base
                         'reportId' => $report->getId(),
                         'report' => $report,
                         'tabType' => $key,
-                        'resultType' => 'records',
                     ]
                 )
             ];
@@ -438,11 +437,11 @@ class Controller extends Base
      * @param string         $resultType
      * @param PastoralReport $report
      */
-    public function getReportByTabType(string $tabType, PastoralReport $report, string $resultType): void
+    public function getReportByTabType(string $tabType, PastoralReport $report): void
     {
         $limit = $this->requestQuery->getInt('limit', Cursor::LIMIT_DEFAULT);
         $encodedCursor = $this->requestQuery->get('cursor');
-
+        $resultType = $this->requestQuery->get('selected');
         try {
             $factory = (new Factory(
                 $this->userTranslator,

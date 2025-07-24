@@ -26,6 +26,9 @@ class Cursor implements ICursor
      */
     public const LIMIT_DEFAULT = self::LIMIT_MAX;
 
+    public const RESULT_TYPE_POINTS = 'points';
+    public const RESULT_TYPE_RECORDS = 'records';
+
     public function __construct(
         protected Helper $helper,
         protected ModelToArray $userTranslator,
