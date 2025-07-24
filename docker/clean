@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+
+# Clean up folders which Docker may create, and Vagrant may still use:
+# Vagrant may need to write them
+rm -rf vendor/ node_modules/
+
+# Clean up build cache for Docker containers?
