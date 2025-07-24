@@ -360,15 +360,14 @@ class NavigationSelector
         $params = [
             'externalId' => $this->externalUser['StudentID'],
         ];
-return true;
 
-//        $query = "
-//            SELECT TOP 1 COUNT(*) AS 'computed'
-//            FROM dbo.uvSchoolBoxNCEAResults
-//            WHERE ID = :externalId
-//        ";
-//
-//        return (bool)$this->db->getOne($query, $params);
+        $query = "
+            SELECT TOP 1 COUNT(*) AS 'computed'
+            FROM dbo.uvSchoolBoxNCEAResultsforDataRefreshV2_Year11
+            WHERE ID = :externalId
+        ";
+
+        return (bool)$this->db->getOne($query, $params);
     }
 
 
