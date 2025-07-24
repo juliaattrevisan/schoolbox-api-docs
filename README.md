@@ -67,11 +67,11 @@ Ideally, only the Docker development environment will need to be set up.
     `cdn_bucket_prefix` will need to be set if testing S3 static file hosting
 * start the development environment's containers:
   ```shell
-  docker/up
+  sudo docker/up
   ```
 * install Schoolbox within the development environment:
   ```shell
-  docker/provision
+  sudo docker/provision
   ```
 * visit https://docker.dev.schoolbox.cloud/
 
@@ -110,6 +110,12 @@ the Vagrant environment is still supported.
   ```shell
   sudo mkdir -p /etc/vbox/
   echo "* 192.168.36.0/24" |sudo tee -a /etc/vbox/networks.conf
+  ```
+* If a Docker development environment has been set up, it should be cleaned up
+  before starting Vagrant as otherwise Vagrant cannot write files owned by
+  Docker:
+  ```shell
+  sudo docker/clean
   ```
 * In your schoolbox directory import your vagrant box and bring it up for the first time
   ```shell

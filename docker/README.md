@@ -41,3 +41,7 @@ up the Vagrant development environment.
   commands
 - `clean`: cleans up the temporary and cache files which the Docker development
   environment may create
+
+These scripts should all be run with `sudo`, unless your current user has been
+added to the Docker group: see
+https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user.
