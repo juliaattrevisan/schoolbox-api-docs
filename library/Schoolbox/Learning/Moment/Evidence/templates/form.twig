@@ -200,8 +200,13 @@
 
                 $('#evidence-form')
                     .attr('action', '{{ rejectAction }}')
-                    .append($('#rejectionReason'))
-                    .submit();
+                    .append($('#rejectionReason'));
+
+                {# If you just use $('#evidence-form').submit() the ckeditor contents won't update
+                 # prior to payload being constructed, sending you the original text rather than
+                 # the updated text. To dodge this ckeditor hankypanky we just simulate a user click
+                 #}
+                $('#evidence-submit').trigger('click');
             });
         });
     </script>
@@ -318,8 +323,7 @@
                 if (null !== payload.rejectionReason) {
                     formMethod = 'put';
                 }
-console.log(payload);
-                return;
+
                 // Redirect to the return URL provided
                 fetch(form.action, {
                     method: formMethod,
@@ -333,7 +337,7 @@ console.log(payload);
                         throw new Error("Save failed!");
                     }
                     toast.toastTimeout({text: 'Saved'});
-                    {#window.location.href = '{{ RETURN_URL.previous.decoded ?? '/' }}';#}
+                    window.location.href = '{{ RETURN_URL.previous.decoded ?? '/' }}';
                     isSubmittingForm = false;
                 })
                 .catch(() => {

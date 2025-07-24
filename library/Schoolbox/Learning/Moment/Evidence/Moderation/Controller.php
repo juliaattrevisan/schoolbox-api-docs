@@ -121,50 +121,48 @@ class Controller extends Base
         /* Update the status of $evidence to Rejected
          */
         $evidence->reject($this->getUser());
-new \Alaress_Probe($evidence);
-//        /* If a discussion thread never existed, spawn one
-//         */
-//        $discussionThread = $evidence->getDiscussionThread();
-//
-//        if (null === $discussionThread) {
-//            $discussionThreadMapper = \Schoolbox\Discussion\Thread\Mapper::getInstance();
-//
-//            $discussionThread = $discussionThreadMapper->createModel()
-//                ->setOpen(true);
-//
-//            $discussionThreadMapper->save($discussionThread);
-//
-//            $evidence->setDiscussionThread($discussionThread);
-//        }
-//
-//        $this->mapper->save($evidence);
-//
-//        /* Spawn a comment
-//         * Save it to $evidence's discussion thread somehow
-//         */
-//        $postData = $this->requestPost->getArrayCopy();
-//
-//        $comment = $this->commentMapper->createModel()
-//            ->setContent($postData['rejectionReason'])
-//            ->setAuthor($this->getUser())
-//            ->setThread($discussionThread);
-//
-//        $this->commentMapper->save($comment);
-//
-//        /* Redirect back to a place
-//         */
-//        $encodedReturnUrl = $this->requestPost->get(Redirect::RETURN_URL);
-//
-//        if (!empty($encodedReturnUrl)) {
-//            $returnUrl = Redirect::decode($encodedReturnUrl);
-//        } else {
-//            $returnUrl = $this->routeGenerator->generate('searchUser.getProfile', ['userId' => $evidence->getRecipient()->getId()]);
-//        }
-//
-//        /* TODO Post a notification
-//         */
-//
-//        $this->response = $this->redirectAfterPost($returnUrl);
+
+        /* If a discussion thread never existed, spawn one
+         */
+        $discussionThread = $evidence->getDiscussionThread();
+
+        if (null === $discussionThread) {
+            $discussionThreadMapper = \Schoolbox\Discussion\Thread\Mapper::getInstance();
+
+            $discussionThread = $discussionThreadMapper->createModel()
+                ->setOpen(true);
+
+            $discussionThreadMapper->save($discussionThread);
+
+            $evidence->setDiscussionThread($discussionThread);
+        }
+
+        $this->mapper->save($evidence);
+
+        /* Spawn a comment
+         * Save it to $evidence's discussion thread somehow
+         */
+        $comment = $this->commentMapper->createModel()
+            ->setContent($requestBody['rejectionReason'])
+            ->setAuthor($this->getUser())
+            ->setThread($discussionThread);
+
+        $this->commentMapper->save($comment);
+
+        /* Redirect back to a place
+         */
+        $encodedReturnUrl = $this->requestPost->get(Redirect::RETURN_URL);
+
+        if (!empty($encodedReturnUrl)) {
+            $returnUrl = Redirect::decode($encodedReturnUrl);
+        } else {
+            $returnUrl = $this->routeGenerator->generate('searchUser.getProfile', ['userId' => $evidence->getRecipient()->getId()]);
+        }
+
+        /* TODO Post a notification
+         */
+
+        $this->response = $this->redirectAfterPost($returnUrl);
     }
 
 
