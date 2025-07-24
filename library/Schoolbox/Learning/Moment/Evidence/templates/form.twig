@@ -243,6 +243,9 @@
                     .attr('action', '{{ rejectAction }}')
                     .append($('#rejectionReason'));
 
+                {# Hide it lol #}
+                $('#rejectionReason').css('opacity', 0);
+
                 {# If you just use $('#evidence-form').submit() the ckeditor contents won't update
                  # prior to payload being constructed, sending you the original text rather than
                  # the updated text. To dodge this ckeditor hankypanky we just simulate a user click
