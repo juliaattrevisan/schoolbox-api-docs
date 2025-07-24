@@ -25,7 +25,7 @@
                 post-changes-endpoint="{{ routeLookupIfAuthorized('textbox.postRename', {folderId: folder.id, folder: folder}) }}"
                 return-url="{{ RETURN_URL.previous.decoded ?? ('/homepage/' ~ folder.id) }}"
                 :folder-id="Number('{{ folder.id }}')"
-                {% if editorTemplates and USER.role.staff %}
+                {% if editorTemplates %}
                 :editor-templates="{{ editorTemplates|json_encode }}"
                 {% endif %}
             />
