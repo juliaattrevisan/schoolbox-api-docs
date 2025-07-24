@@ -349,7 +349,7 @@
                 // Build a request to post the form
                 let payload = buildPayload(form),
                     toast   = $('#toast'),
-                    submit  = $('#evidence-submit');
+                    submit  = $('#evidence-form').find('input[type="submit"], button');
 
                 // Toast then post
                 toast.toastActivate('Saving...')
