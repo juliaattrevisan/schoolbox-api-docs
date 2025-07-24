@@ -24,7 +24,6 @@ class Qualifications extends Base
         $params = [
             'externalId' => $this->getExternalUserId(),
         ];
-return [];
 
         $query = '
             SELECT *
