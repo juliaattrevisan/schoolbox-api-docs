@@ -36,7 +36,6 @@ class CourseCreditSummaryNavigation extends Base
             'externalId' => $this->getExternalUserId(),
             'year' => $this->getCurrentYear()
         ];
-return [];
 
         $query = "
             SELECT
