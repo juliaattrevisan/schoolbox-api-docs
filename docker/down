@@ -1,4 +1,7 @@
 #!/usr/bin/env sh
 
+# Always run within root folder
+cd "$(dirname "$0")/.." || exit 1
+
 # stop containers for the docker compose configuration
 docker compose --progress plain down

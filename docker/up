@@ -1,5 +1,8 @@
 #!/usr/bin/env sh
 
+# Always run within root folder
+cd "$(dirname "$0")/.." || exit 1
+
 # ensure that the storage folder exists
 mkdir -p ./data/docker/storage
 

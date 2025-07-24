@@ -1,5 +1,8 @@
 #!/usr/bin/env sh
 
+# Always run within root folder
+cd "$(dirname "$0")/.." || exit 1
+
 # Clean up folders which Docker may create, and Vagrant may still use:
 # Vagrant may need to write them
 rm -rf vendor/ node_modules/

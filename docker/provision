@@ -1,5 +1,8 @@
 #!/usr/bin/env sh
 
+# Always run within root folder
+cd "$(dirname "$0")/.." || exit 1
+
 # Add tests that containers are actually up, or just run docker-up
 
 # Run the provision script in the schoolbox-cli container
