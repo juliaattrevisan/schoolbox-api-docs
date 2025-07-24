@@ -109,7 +109,8 @@ class Controller extends Component_Homepage_ControllerAbstract
 
         $editorTemplateHelper = new EditorTemplateHelper(
             $this->getMapperFactory()->get(EditorTemplateMapper::class),
-            EditorTemplatesCategoryModel::HOMEPAGE
+            EditorTemplatesCategoryModel::HOMEPAGE,
+            $this->getUser()
         );
 
         return $this->renderTwigTemplate(
