@@ -116,24 +116,65 @@
             {# Moderation Workflow
              # Staff and students share this area, but their buttons are differently described
              #}
-            {% set submitText = 'Submit' %}
+            <input type="submit" id="evidence-save" data-test="learning-moment-evidence-form-submit" value="Save" />
 
             {% if USER.role.isStudent %}
                 {% if moderationRequired %}
                     {% set submitText = 'Submit for approval' %}
+                    <input type="submit" id="evidence-submit" data-test="learning-moment-evidence-form-submit" value="Submit" />
                 {% endif %}
             {% elseif USER.role.isStaff and USER.role.accessEvidence %}
                 {% if evidence.isSubmitted %}
                     {# If the moment is in Submitted state, this acts as the transition to Published #}
                     {% set submitText = 'Approve' %}
-                    {% set deleteCommentsAttr = 'data-delete-comments=0' %}
 
                     {# This triggers an async request to Reject+reason #}
-                    <button id="evidence-reject">Request update</button>
+                    <button id="request-update">Request update</button>
+
+                    {# To get around a ckeditor bug where it doesn't sent the current text #}
+                    <input type="submit" id="evidence-reject" data-test="learning-moment-evidence-form-submit" value="Reject" style="display:none" />
+
+                    {# Publish with optional comment deletion
+                     # This spawns a modal, which allows for the setting of a flag,
+                     # prior to the usual form submission. Sorry about all these cloak-and-dagger input fields
+                     # that I need to deconflict at least four workflows in via form + ckeditor bug
+                     #}
+                    <button id="publish">Approve</button>
+
+                    {% if hasComments %}
+                        <input type="hidden" name="delete-comments" id="delete-comments" value="0" />
+
+                        <script>
+                            $(function() {
+                                $('#publish').on('click', function(event) {
+                                    event.preventDefault();
+
+                                    {# Show the modal with an option to delete comments #}
+                                    $('#deleteCommentsModal').foundation('reveal', 'open');
+
+                                    {# Set a special flag for the payload to capture
+                                     # then proceed to submit the form
+                                     #}
+                                    $('#deleteComments').on('click', function (event) {
+                                        event.preventDefault();
+
+                                        $('#delete-comments').val(1);
+
+                                        $('#evidence-publish').trigger('click');
+                                    });
+
+                                    {# Continue with no further alterations #}
+                                    $('#preserveComments').on('click', function () {
+                                        $('#evidence-publish').trigger('click');
+                                    });
+                                })
+                            });
+                        </script>
+                    {% endif %}
+
+                    <input type="submit" id="evidence-publish" data-test="learning-moment-evidence-form-submit" value="Approve" style="display:none" />
                 {% endif %}
             {% endif %}
-
-            <input type="submit" id="evidence-submit" {{ deleteCommentsAttr ?? '' }} data-test="learning-moment-evidence-form-submit" value="{{ submitText }}" />
         </form>
     </div>
 </div>
@@ -186,7 +227,7 @@
 
     <script>
         $(function() {
-            $('#evidence-reject').on('click', function(event) {
+            $('#request-update').on('click', function(event) {
                 event.preventDefault();
 
                 $('#rejectModal').foundation('reveal', 'open');
@@ -206,7 +247,7 @@
                  # prior to payload being constructed, sending you the original text rather than
                  # the updated text. To dodge this ckeditor hankypanky we just simulate a user click
                  #}
-                $('#evidence-submit').trigger('click');
+                $('#evidence-reject').trigger('click');
             });
         });
     </script>
@@ -247,6 +288,10 @@
                      # same thing as putEvidence().
                     #}
                     rejectionReason: formData.get('rejectionReason'),
+                    {# Moderation Workflow
+                     # For when someone chose "Delete and continue"
+                     #}
+                    deleteComments: formData.get('delete-comments'),
                 };
 
         let tags = form.querySelector('#evidence-tags').selectize.items;
@@ -311,18 +356,15 @@
                 submit.prop('disabled', true);
 
                 {# Moderation Workflow
-                 # Augment payload with the comment deletion flag, if set
-                 #}
-                if (0 != $('#evidence-submit').attr('data-delete-comments')) {
-                    payload.deleteComments = 1;
-                }
-
-                {# Moderation Workflow
                  # Rejection is based on the presence of the rejectionReason node in the payload
                  #}
                 if (null !== payload.rejectionReason) {
                     formMethod = 'put';
                 }
+
+                // FIXME debug short-circuit
+                console.log(payload);
+                return;
 
                 // Redirect to the return URL provided
                 fetch(form.action, {
@@ -354,7 +396,7 @@
             submitHandler(form, event) {
                 event.preventDefault();
 
-                document.getElementById('evidence-submit').disabled = true; //disable on select to prevent multiple submits
+                // document.getElementById('evidence-submit').disabled = true; //disable on select to prevent multiple submits
 
                 if (isMediaUploadRequired()) {
                     document.getElementById('evidence-media-recording').scrollIntoView({behavior: 'smooth'}); //uploading can take a while, so scroll up to know that it's processing
@@ -364,29 +406,7 @@
                 } else {
                     event.preventDefault();
 
-                    {# Moderation Workflow
-                     # Show a special modal about optionally deleting comments
-                    #}
-                    {% if USER.role.isStaff and USER.role.accessEvidence and evidence.isSubmitted and hasComments %}
-                    {# Initial condition: preserve comments #}
-                    $('#evidence-submit').attr('data-delete-comments', 0);
-
-                    {# Show the modal with an option to delete comments #}
-                    $('#deleteCommentsModal').foundation('reveal', 'open');
-
-                    $('#deleteComments').on('click', function () {
-                        $('#evidence-submit').attr('data-delete-comments', 1);
-
-                        submitForm(form);
-                    });
-
-                    {# ...or keep them intact #}
-                    $('#preserveComments').on('click', function () {
-                        submitForm(form);
-                    });
-                    {% else %}
-                        submitForm(form);
-                    {% endif %}
+                    submitForm(form);
                 }
             }
         });
