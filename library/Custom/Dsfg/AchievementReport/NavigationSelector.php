@@ -364,11 +364,16 @@ class NavigationSelector
         $query = "
             SELECT TOP 1 COUNT(*) AS 'computed'
             FROM " . NCEA\Base::MAIN_DB_TABLE_YEAR11 . "
-            AND
             WHERE ID = :externalId
         ";
 
-        return (bool)$this->db->getOne($query, $params);
+        try {
+            $hasYear11 = (bool)$this->db->getOne($query, $params);
+        } catch (\Exception) {
+            $hasYear11 = false;
+        }
+
+        return $hasYear11;
     }
 
 
