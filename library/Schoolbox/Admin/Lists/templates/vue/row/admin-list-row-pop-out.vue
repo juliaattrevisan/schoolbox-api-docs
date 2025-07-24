@@ -53,11 +53,10 @@ export default {
          * @returns { Array of Objects }
          */
         activeFields() {
-            const fieldIdList = this.fields.map((field) => field.id); //a list of just field.id to get the relevant key/value in rowKeyValueList
-            const popOutKeyValueList = this.rowKeyValueList.filter((row) =>
-                fieldIdList.some((fieldId) => fieldId === row.key),
-            ); //pull out those rowKeyValue object pairs that are part of the pop out
-            return this.fields.filter((field, index) => popOutKeyValueList[index].value); //when the value is set to true, put in the list
+            return this.fields.filter((field) => {
+                const fieldValue = this.rowKeyValueList.find((row) => row.key === field.id);
+                return fieldValue !== undefined && fieldValue.value; // only show those fields that are set to true
+            });
         },
     },
 
