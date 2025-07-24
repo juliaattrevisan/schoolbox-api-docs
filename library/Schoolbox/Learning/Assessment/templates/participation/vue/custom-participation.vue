@@ -504,8 +504,9 @@ function getCustomisationLabel(plan: Plan | CustomisedPlan): string {
                 </p>
             </div>
             <div class="l-flex-col l-gap-s f-no-margins">
-                <label for="activitySelect">Select customisation</label>
+                <label for="activitySelect">Customisation</label>
                 <select id="activitySelect" v-model="selectedActivityId" class="f-no-margins">
+                    <option value="null" disabled>Select customisation</option>
                     <option v-for="customisation in customisations" :key="customisation.id" :value="customisation.id">
                         {{ getCustomisationLabel(customisation) }}
                     </option>
