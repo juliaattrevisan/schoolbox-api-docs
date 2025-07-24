@@ -39,10 +39,9 @@ abstract class Base extends AchievementReportBase
     }
 
     /**
-     * @param string $dbTableName
      * @return string
      */
-    protected function getDbTableName(string $dbTableName): string
+    protected function getDbTableName(): string
     {
         return $this->dbTableName;
     }
