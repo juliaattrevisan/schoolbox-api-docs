@@ -386,7 +386,6 @@ return true;
         $params = [
             'externalId' => $this->externalUser['StudentID'],
         ];
-return true;
 
         $query = "
             SELECT TOP 1 COUNT(*) AS 'computed'

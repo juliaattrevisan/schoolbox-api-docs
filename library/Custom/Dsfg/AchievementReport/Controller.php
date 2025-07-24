@@ -709,7 +709,6 @@ class Controller extends Base
          * could fiddle with the url to get illegal values
          */
         $allYears = (new Comments\CommentsNavigation($user, $externalUser, $db, $year))->findData();
-$allYears = [2022, 2023, 2024];
 
         /* If $year wasn't provided, go with the most recent year we have
          */

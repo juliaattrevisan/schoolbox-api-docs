@@ -191,7 +191,6 @@ class Base extends AchievementReportBase
             'externalId' => $this->getExternalUserId(),
             'year'       => $this->year,
         ];
-return [];
 
         $query = "
             SELECT
