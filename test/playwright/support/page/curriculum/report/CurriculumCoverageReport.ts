@@ -1,4 +1,4 @@
-/**JsonStream.php
+/**
  * Utility class for the Curriculum Coverage Report page
  */
 
