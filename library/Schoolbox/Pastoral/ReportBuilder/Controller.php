@@ -447,7 +447,6 @@ class Controller extends Base
             $factory = (new Factory(
                 $this->userTranslator,
                 $this->userMapper,
-                $this->termMapper,
                 $this->pastoralMapper,
                 $resultType,
                 $limit
@@ -455,6 +454,7 @@ class Controller extends Base
                 new Helper(
                     $this->prepareReportData($report),
                     $this->pastoralMapper,
+                    $this->getConfigLoader(),
                 ),
                 $tabType
             );

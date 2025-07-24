@@ -4,7 +4,7 @@ namespace Schoolbox\Pastoral\ReportBuilder;
 
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Config\Loader;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\SubType\Model as SubType;
 use Alaress_Date_Format;
@@ -17,6 +17,7 @@ class Helper
     public function __construct(
         private array $report,
         private PastoralMapper $pastoralMapper,
+        private IConfigLoader $configLoader,
     ) {
         $this->setFilters();
     }
@@ -59,8 +60,7 @@ class Helper
 
     private function getSeverity(): void
     {
-        $configLoader = Loader::getInstance();
-        if ($this->report['severity'] && $configLoader->get(ConfigMapper::NAME_PASTORAL_SEVERITY_ENABLED)) {
+        if ($this->report['severity'] && $this->configLoader->get(ConfigMapper::NAME_PASTORAL_SEVERITY_ENABLED)) {
             $this->filters[] = "`sv`.`sequence` >= :severity";
             $this->params['severity'] = $this->report['severity']->getSequence();
         }
@@ -218,8 +218,7 @@ class Helper
 
     private function shouldFilterAction(): bool
     {
-        $configLoader = Loader::getInstance();
-        return $configLoader->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED) &&
+        return $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED) &&
             (
                 ($this->report['actionStatus'] ?? false) ||
                 $this->report['includeRecordsWithoutAction'] ||

@@ -22,7 +22,6 @@ class Factory
     public function __construct(
         private ModelToArray $userTranslator,
         private UserMapper $userMapper,
-        private TermMapper $termMapper,
         private PastoralMapper $pastoralMapper,
         private string $resultType,
         private ?int $limit = null,
@@ -38,7 +37,6 @@ class Factory
                 $helper,
                 $this->userTranslator,
                 $this->userMapper,
-                $this->termMapper,
                 $this->pastoralMapper,
                 $this->resultType,
                 $this->limit,

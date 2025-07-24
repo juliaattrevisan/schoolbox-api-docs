@@ -8,7 +8,6 @@ use Schoolbox\API\Cursor\ICursor;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Collection;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
-use Schoolbox\Pastoral\Report\Model as PastoralReport;
 use Schoolbox\User\Translator\Author\ModelToArray;
 use Schoolbox\UserMapper;
 use ValueError;
@@ -31,7 +30,6 @@ class Cursor implements ICursor
         protected Helper $helper,
         protected ModelToArray $userTranslator,
         protected UserMapper $userMapper,
-        protected TermMapper $termMapper,
         protected PastoralMapper $pastoralMapper,
         protected string $resultType,
         protected ?int $limit = self::LIMIT_DEFAULT,

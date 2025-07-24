@@ -2,19 +2,10 @@
 
 namespace Schoolbox\Pastoral\ReportBuilder\TabType;
 
-use Alaress\Codec\ICodec;
-use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Collection;
-use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Config\Loader;
-use Schoolbox\Pastoral\Mapper as PastoralMapper;
-use Schoolbox\Pastoral\Report\Model as PastoralReport;
 use Schoolbox\Pastoral\ReportBuilder\Cursor;
 use Schoolbox\Pastoral\SubType\Model as SubType;
 use Schoolbox\Pastoral\Type\Model as Type;
-use Alaress_Date_Format;
-use Schoolbox\User\Translator\Author\ModelToArray;
-use Schoolbox\UserMapper;
 
 class StudentByType extends Cursor implements TabTypeInterface
 {
