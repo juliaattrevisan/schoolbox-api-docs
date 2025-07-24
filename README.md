@@ -43,17 +43,28 @@ This file is internal use and is not shipped to clients.
   git checkout origin/master
   git checkout -b master
   ```
-* Install the [Git Scripts](https://github.com/alaress/git-scripts) suite of tools. If the `jira-issue-tag` doesn't work after install, add the file from the downloaded zip file at `git-scripts-master/hooks/prepare-commit-msg.jira-issue-tag` into `.git/hooks/` and remove the `.jira-issue-tag` from the file name.
+* Install the [Git Scripts](https://github.com/alaress/git-scripts) suite of tools:
+  * If the `jira-issue-tag` doesn't work after install, add the file from the downloaded zip file at `git-scripts-master/hooks/prepare-commit-msg.jira-issue-tag` into `.git/hooks/` and remove the `.jira-issue-tag` from the file name.
 
 ### Set up Docker development environment
 
-* install the most recent Docker Engine for your operating system:
-  https://docs.docker.com/engine/install/
+The Docker development environment closely matches the proposed cloud-hosted
+environment, which will be deployed to scalable containers and orchestrated via
+AWS' [Elastic Container Service](https://docs.aws.amazon.com/ecs/).
+
+Ideally, only the Docker development environment will need to be set up.
+
+* install the most recent [Docker Engine](https://docs.docker.com/engine/install/)
+  for your operating system
 * add this line to `/etc/hosts` or its Windows equivalent
   (usually `C:\Windows\System32\drivers\etc\hosts`)
   ```
   127.0.0.1 docker.dev.schoolbox.cloud
   ```
+* create `docker.ini`, and override any configuration in `docker.default.ini`
+  if needed:
+  * the default settings should work for most development requirements, but
+    `cdn_bucket_prefix` will need to be set if testing S3 static file hosting
 * start the development environment's containers:
   ```shell
   docker/up
@@ -64,39 +75,50 @@ This file is internal use and is not shipped to clients.
   ```
 * visit https://docker.dev.schoolbox.cloud/
 
-### Set up Vagrant development environment (legacy)
+See [docker/README.md](docker/README.md) for more information about the Docker
+development environment, including a migration guide from Vagrant.
+
+### Set up Vagrant development environment (optional)
+
+The Vagrant development environment more closely matches the current
+cloud-hosted and on-premise environment, which is deployed as an APT package to
+servers which are running an Ubuntu LTS release.
+
+Ideally, developers will only need to consider the Docker environment: however,
+the Vagrant environment is still supported.
 
 * Install [Virtualbox](https://www.virtualbox.org/) (sudo apt install virtualbox)
 * Install [vagrant](https://vagrantup.com/downloads)
 * Fork the [Puppet repo](https://github.com/alaress/puppet-alaress) to your Github
-    ```shell
-    git clone git@github.com:%YourGitHubUsername%/puppet-alaress.git puppet-alaress (for example git clone git@github.com:low613/puppet-alaress.git puppet-alaress)
-    cd puppet-alaress
-    git remote add upstream git@github.com:alaress/puppet-alaress.git
-    git fetch upstream
-    git checkout origin/stable
-    git checkout -b stable
-    ```
+  ```shell
+  git clone git@github.com:%YourGitHubUsername%/puppet-alaress.git puppet-alaress (for example git clone git@github.com:low613/puppet-alaress.git puppet-alaress)
+  cd puppet-alaress
+  git remote add upstream git@github.com:alaress/puppet-alaress.git
+  git fetch upstream
+  git checkout origin/stable
+  git checkout -b stable
+  ```
 * create `vagrant.yaml` for overrides, see `vagrant.default.yaml` for defaults
-    ```yaml
-    processors: 3
-    memory: 4096
-    data_filename: "demo.tar.gz"
-    external_db: "schoolbox"
-    puppet_sync_type: "gitsync"
-    ```
+  ```yaml
+  processors: 3
+  memory: 4096
+  data_filename: "demo.tar.gz"
+  external_db: "schoolbox"
+  puppet_sync_type: "gitsync"
+  ```
 * Create a `/etc/vbox/networks.conf` on your local computer
-    ```shell
-    sudo mkdir -p /etc/vbox/
-    echo "* 192.168.36.0/24" |sudo tee -a /etc/vbox/networks.conf
-    ```
+  ```shell
+  sudo mkdir -p /etc/vbox/
+  echo "* 192.168.36.0/24" |sudo tee -a /etc/vbox/networks.conf
+  ```
 * In your schoolbox directory import your vagrant box and bring it up for the first time
-    ```shell
-    vagrant box add ubuntu-2204-php82 https://s3-ap-southeast-2.amazonaws.com/schoolbox-data/ubuntu-2204-php82.box;
-    vagrant up;
-    vagrant provision;
-    ```
+  ```shell
+  vagrant box add ubuntu-2204-php82 https://s3-ap-southeast-2.amazonaws.com/schoolbox-data/ubuntu-2204-php82.box;
+  vagrant up;
+  vagrant provision;
+  ```
 * visit https://vagrant.dev.schoolbox.cloud/
+
 ## Live environment
 
 When a release is tagged, APT packages are built by [ConcourseCI](https://ci.schoolbox.com.au/). These are then uploaded to the Schoolbox repo for distribution to servers.  The [Puppet repo](https://github.com/alaress/puppet-alaress) is then updated to trigger staging, and then live to update to the latest package.
