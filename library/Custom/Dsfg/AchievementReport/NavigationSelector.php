@@ -338,7 +338,7 @@ class NavigationSelector
 
         $query = "
             SELECT TOP 1 COUNT(*) AS 'computed'
-            FROM dbo.uvSchoolBoxNCEAResults
+            FROM " . NCEA\Base::MAIN_DB_TABLE_NCEA . "
             WHERE ID = :externalId
         ";
 
@@ -363,7 +363,8 @@ class NavigationSelector
 
         $query = "
             SELECT TOP 1 COUNT(*) AS 'computed'
-            FROM dbo.uvSchoolBoxNCEAResultsforDataRefreshV2_Year11
+            FROM " . NCEA\Base::MAIN_DB_TABLE_YEAR11 . "
+            AND
             WHERE ID = :externalId
         ";
 

@@ -14,6 +14,9 @@ use Schoolbox\User;
 
 abstract class Base extends AchievementReportBase
 {
+    const MAIN_DB_TABLE_NCEA = 'dbo.uvSchoolBoxNCEAResults';
+    const MAIN_DB_TABLE_YEAR11 = 'dbo.uvSchoolBoxNCEAResultsforDataRefreshV2_Year11';
+
     /**
      * The main source table for data used in the NCEA report.
      * @var string

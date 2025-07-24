@@ -661,7 +661,7 @@ class Controller extends Base
             $externalUser,
             $year,
             NavigationSelector::NCEA_KEY,
-            'dbo.uvSchoolBoxNCEAResults'
+            NCEA\Base::MAIN_DB_TABLE_NCEA
         );
         $this->response = $this->responseFromTemplate($output['template'], $output['data']);
     }
@@ -687,7 +687,7 @@ class Controller extends Base
             $externalUser,
             $year,
             NavigationSelector::YEAR11_KEY,
-            'dbo.uvSchoolBoxNCEAResultsforDataRefreshV2_Year11'
+            NCEA\Base::MAIN_DB_TABLE_YEAR11
         );
         $this->response = $this->responseFromTemplate($output['template'], $output['data']);
     }
