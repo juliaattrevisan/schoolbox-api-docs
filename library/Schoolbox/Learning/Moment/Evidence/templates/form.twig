@@ -12,6 +12,7 @@
 ) }}
     {% set heading = 'Share a' %}
     {% set formAction = routeLookup('learningMomentEvidence.postMomentForUsers', {userIds: userIds|join(',')}) %}
+    {% set formMethod = 'post' %}
 {% else %}
     {{ bread.crumbs(
         [evidence.recipient.fullName, '/search/user/' ~ evidence.recipient.id],
@@ -29,9 +30,11 @@
     {% if USER.role.isStaff and USER.role.accessEvidence and evidence.isSubmitted %}
         {% set heading = 'Publish a' %}
         {% set formAction = routeLookup('learningMomentModeration.putPublish', {evidenceId: evidence.id}) %}
+        {% set formMethod = 'post' %}
     {% else %}
         {% set heading = 'Modify' %}
         {% set formAction = routeLookup('learningMomentEvidence.putEvidence', {evidenceId: evidence.id}) %}
+        {% set formMethod = 'put' %}
     {% endif %}
 {% endif %}
 
@@ -165,7 +168,7 @@
  # button is clicked; this exists inside some other form.
  #}
 {% if USER.role.isStaff and USER.role.accessEvidence and evidence.isSubmitted %}
-    {% set rejectAction = routeLookup('learningMomentModeration.postReject', {evidenceId: evidence.id}) %}
+    {% set rejectAction = routeLookup('learningMomentModeration.putReject', {evidenceId: evidence.id}) %}
 
     <div id="rejectModal" class="reveal-modal" data-reveal aria-labelledby="rejectModalTitle" aria-hidden="true" role="dialog">
         <h2 id="rejectModalTitle">Request update</h2>
@@ -173,7 +176,6 @@
         <p>Provide feedback to the student. This will appear as a comment that can be deleted later.</p>
 
         <form id="rejectionForm" method="post" action="{{ rejectAction }}">
-            <input type="hidden" name="{{ RETURN_URL.name }}" value="{{ returnUrl }}"/>
             <textarea id="rejectionReason" name="rejectionReason"></textarea>
 
             <input type="submit" value="Request update" />
@@ -188,6 +190,18 @@
                 event.preventDefault();
 
                 $('#rejectModal').foundation('reveal', 'open');
+            });
+
+            {# Hijack the existing modify form to send it to the rejection endpoint,
+             # injecting the rejection data into the modify form.
+             #}
+            $('#rejectionForm').on('submit', function(event) {
+                event.preventDefault();
+
+                $('#evidence-form')
+                    .attr('action', '{{ rejectAction }}')
+                    .append($('#rejectionReason'))
+                    .submit();
             });
         });
     </script>
@@ -221,6 +235,13 @@
                     curriculumNodes: [],
                     tags: [],
                     type: '{{ momentType }}',
+                    {# Moderation Workflow
+                     # Append a rejection reason; this payload can go to putEvidence()
+                     # or putReject() depending on what the staff did. Rejection changes
+                     # the form url to go to putReject() where it essentially does the
+                     # same thing as putEvidence().
+                    #}
+                    rejectionReason: formData.get('rejectionReason'),
                 };
 
         let tags = form.querySelector('#evidence-tags').selectize.items;
@@ -266,10 +287,14 @@
          * @params { <form> element }
          */
         const submitForm = (form) => {
-
             if (!isSubmittingForm) {
-
                 isSubmittingForm = true;
+
+                {# This is either POST or PUT
+                 # ...it depends on whether you're creating a new thing, or modifying an existing thing
+                 # html forms don't support PUT, only the classical POST and GET methods.
+                 #}
+                let formMethod = '{{ formMethod }}';
 
                 // Build a request to post the form
                 let payload = buildPayload(form),
@@ -287,9 +312,17 @@
                     payload.deleteComments = 1;
                 }
 
+                {# Moderation Workflow
+                 # Rejection is based on the presence of the rejectionReason node in the payload
+                 #}
+                if (null !== payload.rejectionReason) {
+                    formMethod = 'put';
+                }
+console.log(payload);
+                return;
                 // Redirect to the return URL provided
                 fetch(form.action, {
-                    method: '{{ isCreate ? 'POST' : 'PUT' }}',
+                    method: formMethod,
                     headers: {
                         'Content-Type': 'application/json',
                     },
@@ -300,7 +333,7 @@
                         throw new Error("Save failed!");
                     }
                     toast.toastTimeout({text: 'Saved'});
-                    window.location.href = '{{ RETURN_URL.previous.decoded ?? '/' }}';
+                    {#window.location.href = '{{ RETURN_URL.previous.decoded ?? '/' }}';#}
                     isSubmittingForm = false;
                 })
                 .catch(() => {
@@ -315,7 +348,6 @@
             rules: buildValidationRules(),
             messages: buildValidationMessages(),
             submitHandler(form, event) {
-
                 event.preventDefault();
 
                 document.getElementById('evidence-submit').disabled = true; //disable on select to prevent multiple submits
@@ -326,35 +358,35 @@
                     document.addEventListener('evidence-media-recording__onUploadComplete', (event) => submitForm(form)); //once the media is uploaded, #evidence-media-recording.vue will dispatch
                     document.dispatchEvent(new CustomEvent('evidence-media-recording__onFormSubmit')); //dispatch to allow the media recording to start uploading
                 } else {
-
                     event.preventDefault();
 
                     {# Moderation Workflow
                      # Show a special modal about optionally deleting comments
-                     #}
+                    #}
                     {% if USER.role.isStaff and USER.role.accessEvidence and evidence.isSubmitted and hasComments %}
-                        {# Initial condition: preserve comments #}
-                        $('#evidence-submit').attr('data-delete-comments', 0);
+                    {# Initial condition: preserve comments #}
+                    $('#evidence-submit').attr('data-delete-comments', 0);
 
-                        {# Show the modal with an option to delete comments #}
-                        $('#deleteCommentsModal').foundation('reveal', 'open');
+                    {# Show the modal with an option to delete comments #}
+                    $('#deleteCommentsModal').foundation('reveal', 'open');
 
-                        $('#deleteComments').on('click', function() {
-                            $('#evidence-submit').attr('data-delete-comments', 1);
+                    $('#deleteComments').on('click', function () {
+                        $('#evidence-submit').attr('data-delete-comments', 1);
 
-                            submitForm(form);
-                        });
+                        submitForm(form);
+                    });
 
-                        {# ...or keep them intact #}
-                        $('#preserveComments').on('click', function() {
-                            submitForm(form);
-                        });
+                    {# ...or keep them intact #}
+                    $('#preserveComments').on('click', function () {
+                        submitForm(form);
+                    });
                     {% else %}
                         submitForm(form);
                     {% endif %}
                 }
             }
         });
+
         $('[data-tags]').selectizeSelector({
             ajax: {
                 url: '{{ routeLookup('learningMomentEvidence.getTags') }}',
