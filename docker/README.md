@@ -4,7 +4,15 @@ This set of configuration files, as well as
 [docker-compose.yaml](../docker-compose.yaml), define how Schoolbox may run
 within a self-contained development environment.
 
-## Migration from Vagrant
+## Configuration
+
+The Docker environment is configured with [docker.ini](../docker.ini) in the
+root of the Schoolbox folder.
+
+The settings in this file override the defaults in
+[docker.default.ini](../docker.default.ini).
+
+### Migration from Vagrant
 
 `vagrant.yaml` can be copied to `docker.ini` in Schoolbox's root folder,
 however its format will need to be changed from YAML:
@@ -19,3 +27,17 @@ Some fields have also changed name:
 
 Not all Vagrant configuration fields are relevant in Docker: if it's not in
 `docker.default.ini`, it won't be relevant to Docker.
+
+## Scripts
+
+The name of these scripts is intended to mirror the Vagrant commands for setting
+up the Vagrant development environment.
+
+- `up`: builds and starts containers for development environment
+- `down`: stops containers
+- `provision`: sets up the Schoolbox instance in the started containers
+  (`up` must be run first)
+- `ssh`: create a shell session in the `schoolbox-cli` container, for running
+  commands
+- `clean`: cleans up the temporary and cache files which the Docker development
+  environment may create
