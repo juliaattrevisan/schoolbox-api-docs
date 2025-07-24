@@ -21,6 +21,11 @@ class Cursor implements ICursor
     public const LIMIT_MAX = 20;
 
     /**
+     * Minimum number of results returnable and should really be more than 0
+     */
+    public const LIMIT_MIN = 1;
+
+    /**
      * A sensible default number of results to return from the cursor at once:
      * IMO the maximum is a sensible default.
      */
@@ -39,8 +44,17 @@ class Cursor implements ICursor
         protected ?ICodec $codec = null,
     ) {
         $this->codec ??= new Base64();
+
+        /* Set a maximum number of results should be returned otherwise reject
+         */
         if ($this->limit > self::LIMIT_MAX) {
             throw new ValueError(sprintf('Limit must be at most %d: %d provided', self::LIMIT_MAX, $this->limit));
+        }
+
+        /* Set a minimum number of results should be returned otherwise reject
+         */
+        if ($this->limit < self::LIMIT_MIN) {
+            throw new ValueError(sprintf('Limit must be at least %d: %d provided', self::LIMIT_MIN, $this->limit));
         }
     }
 

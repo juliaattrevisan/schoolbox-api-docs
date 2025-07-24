@@ -40,11 +40,21 @@ class Helper
         );
     }
 
+    /**
+     * This will return the subtypes that the report is filtering to
+     *
+     * @return Collection
+     */
     public function getSubTypes(): Collection
     {
         return $this->report['subtypes'] ?? new Collection();
     }
 
+    /**
+     * Date range filter
+     *
+     * @return void
+     */
     private function getWhereDate(): void
     {
         if ($this->report['beforeDate'] instanceof Alaress_Date_Format) {
@@ -58,6 +68,10 @@ class Helper
         }
     }
 
+    /**
+     * Severity filter
+     * @return void
+     */
     private function getSeverity(): void
     {
         if ($this->report['severity'] && $this->configLoader->get(ConfigMapper::NAME_PASTORAL_SEVERITY_ENABLED)) {
@@ -66,6 +80,11 @@ class Helper
         }
     }
 
+    /**
+     * Students filter
+     *
+     * @return void
+     */
     private function getStudents(): void
     {
         if ($this->report['students']->count() > 0) {
@@ -77,6 +96,11 @@ class Helper
         }
     }
 
+    /**
+     * Year level filters
+     *
+     * @return void
+     */
     private function getYears(): void
     {
         if ($this->report['includeStudentsWithoutYear']) {
@@ -96,6 +120,11 @@ class Helper
         }
     }
 
+    /**
+     * House filters
+     *
+     * @return void
+     */
     private function getHouses(): void
     {
         if ($this->report['includeStudentsWithoutHouse']) {
@@ -115,6 +144,11 @@ class Helper
         }
     }
 
+    /**
+     * Campus filters
+     *
+     * @return void
+     */
     private function getCampuses(): void
     {
         if ($this->report['campuses']->count() > 0) {
@@ -124,6 +158,11 @@ class Helper
         }
     }
 
+    /**
+     * Author filters
+     *
+     * @return void
+     */
     private function getAuthors(): void
     {
         if ($this->report['authors']->count() > 0) {
@@ -133,6 +172,24 @@ class Helper
         }
     }
 
+    /**
+     * @return bool
+     */
+    private function shouldFilterAction(): bool
+    {
+        return $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED) &&
+            (
+                ($this->report['actionStatus'] ?? false) ||
+                $this->report['includeRecordsWithoutAction'] ||
+                $this->report['actions']->count() > 0
+            );
+    }
+
+    /**
+     * Action filters
+     *
+     * @return void
+     */
     private function getActions(): void
     {
         if (!$this->shouldFilterAction()) {
@@ -175,6 +232,11 @@ class Helper
         }
     }
 
+    /**
+     * Access filters
+     *
+     * @return void
+     */
     private function getAccess(): void
     {
         $user = $this->report['user'];
@@ -200,6 +262,11 @@ class Helper
         }
     }
 
+    /**
+     * Record expiry filters
+     *
+     * @return void
+     */
     private function getExpired(): void
     {
         if (!$this->report['includeArchivedRecords']) {
@@ -207,6 +274,11 @@ class Helper
         }
     }
 
+    /**
+     * Tag filters
+     *
+     * @return void
+     */
     private function getTags(): void
     {
         if ($this->report['tags']->count() > 0) {
@@ -216,16 +288,11 @@ class Helper
         }
     }
 
-    private function shouldFilterAction(): bool
-    {
-        return $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED) &&
-            (
-                ($this->report['actionStatus'] ?? false) ||
-                $this->report['includeRecordsWithoutAction'] ||
-                $this->report['actions']->count() > 0
-            );
-    }
-
+    /**
+     * Initiates all the filters
+     *
+     * @return void
+     */
     private function setFilters(): void
     {
         $this->getWhereDate();
@@ -241,6 +308,11 @@ class Helper
         $this->getTags();
     }
 
+    /**
+     * Get the FROM string of the query
+     *
+     * @return string
+     */
     public function getFromString(): string
     {
 
@@ -277,6 +349,11 @@ class Helper
         return $this->filters;
     }
 
+    /**
+     * Get all the parameters for filtering
+     *
+     * @return array
+     */
     public function getParams(): array
     {
         return $this->params;

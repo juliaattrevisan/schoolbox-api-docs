@@ -12,6 +12,7 @@ namespace Schoolbox\Pastoral\ReportBuilder;
 
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
+use Aura\Router\Exception\RouteNotFound;
 use Crell\ApiProblem\ApiProblem;
 use HouseMapper;
 use Schoolbox\Assessment\Term;
@@ -50,6 +51,7 @@ use Schoolbox\User;
 use Schoolbox\User\Translator\Author\ModelToArray as UserTranslator;
 use Schoolbox\UserMapper;
 use Schoolbox\YearLevel;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 class Controller extends Base
 {
@@ -360,6 +362,7 @@ class Controller extends Base
      *
      * @param PastoralReport $report
      * @throws MapperException
+     * @throws RouteNotFound
      */
     public function getReportResults(PastoralReport $report): void
     {
@@ -542,6 +545,12 @@ class Controller extends Base
         ];
     }
 
+    /**
+     * Preparing the data readying for report filtering
+     *
+     * @param PastoralReport $report
+     * @return array
+     */
     private function prepareReportData(PastoralReport $report): array
     {
         // Special case for the current term relative date, which is not a strtotime-able thingy
