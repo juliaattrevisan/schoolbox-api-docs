@@ -30,7 +30,7 @@
     {% if USER.role.isStaff and USER.role.accessEvidence and evidence.isSubmitted %}
         {% set heading = 'Publish a' %}
         {% set formAction = routeLookup('learningMomentModeration.putPublish', {evidenceId: evidence.id}) %}
-        {% set formMethod = 'post' %}
+        {% set formMethod = 'put' %}
     {% else %}
         {% set heading = 'Modify' %}
         {% set formAction = routeLookup('learningMomentEvidence.putEvidence', {evidenceId: evidence.id}) %}
@@ -361,10 +361,6 @@
                 if (null !== payload.rejectionReason) {
                     formMethod = 'put';
                 }
-
-                // FIXME debug short-circuit
-                console.log(payload);
-                return;
 
                 // Redirect to the return URL provided
                 fetch(form.action, {
