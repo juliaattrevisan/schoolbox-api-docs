@@ -2,13 +2,15 @@
  # Share a Learning Moment
  #
  # @param bool $moderationRequired  Decide if the current user's post requires moderation
+ # @param bool $hasComments         Indicates whether there is at least one comment associated with this learning moment
  #}
-
 {% import 'sub/breadcrumbs.twig' as bread %}
+
 {% if isCreate %}
 {{ bread.crumbs(
     [ 'Share Learning' ]
 ) }}
+    {% set heading = 'Share a' %}
     {% set formAction = routeLookup('learningMomentEvidence.postMomentForUsers', {userIds: userIds|join(',')}) %}
 {% else %}
     {{ bread.crumbs(
@@ -16,45 +18,59 @@
         ['Learning Moment', routeLookup('@learningMomentEvidence.getEvidenceDetail', {evidenceId: evidence.id})],
         ['Modify']
     ) }}
-    {% set formAction = routeLookup('learningMomentEvidence.putEvidence', {evidenceId: evidence.id}) %}
+
+    {# Moderation Workflow
+     # If this Moment is submitted and moderation is required,
+     # the form POSTs to the Moderation controller's postPublish
+     # which will also do other stuff like deleting comments.
+     #
+     # Otherwise, presume updating the Moment's contents as a student
+     #}
+    {% if USER.role.isStaff and USER.role.accessEvidence and evidence.isSubmitted %}
+        {% set heading = 'Publish a' %}
+        {% set formAction = routeLookup('learningMomentModeration.putPublish', {evidenceId: evidence.id}) %}
+    {% else %}
+        {% set heading = 'Modify' %}
+        {% set formAction = routeLookup('learningMomentEvidence.putEvidence', {evidenceId: evidence.id}) %}
+    {% endif %}
 {% endif %}
 
 <div class="actions-small-1 row">
     <div class="list-item">
         <div class="small-12 column">
-            <h1>{{ isCreate ? 'Share a' : 'Modify' }} Learning Moment</h1>
-    {##
-     # How does the "sharing on behalf of" metadata show?
-     # That depends on who the learning moment is being created for:
-     # * Only for myself: don't show at all
-     # * Only for others: "sharing on behalf of ..."
-     # * For both myself and others: "Sharing for myself, and also on behalf of ..."
-     # * For neither myself nor others: how did you even get here?
-     #}
-    {% if otherUsers is not empty %}
-    <ul class="meta">
-        <li>
-            {% include 'sub/userListMetadata.twig'
-                with {
-                    users:   otherUsers,
-                    message: sharingForSelf ? 'Sharing for myself, and also on behalf of' : 'Sharing on behalf of'
-                } only
-            %}
-        </li>
-    </ul>
-    {% endif %}
+            <h1>{{ heading }} Learning Moment</h1>
+            {##
+             # How does the "sharing on behalf of" metadata show?
+             # That depends on who the learning moment is being created for:
+             # * Only for myself: don't show at all
+             # * Only for others: "sharing on behalf of ..."
+             # * For both myself and others: "Sharing for myself, and also on behalf of ..."
+             # * For neither myself nor others: how did you even get here?
+             #}
+            {% if otherUsers is not empty %}
+            <ul class="meta">
+                <li>
+                    {% include 'sub/userListMetadata.twig'
+                        with {
+                            users:   otherUsers,
+                            message: sharingForSelf ? 'Sharing for myself, and also on behalf of' : 'Sharing on behalf of'
+                        } only
+                    %}
+                </li>
+            </ul>
+            {% endif %}
         </div>
     </div>
 
     {% if evidence is defined and evidence.id %}
-        {% set deletRoute = routeLookupIfAuthorized('learningMomentEvidence.deleteEvidence', {evidenceId: evidence.id, creatorId: evidence.creator.id}) %}
+        {% set deleteRoute = routeLookupIfAuthorized('learningMomentEvidence.deleteEvidence', {evidenceId: evidence.id, creatorId: evidence.creator.id}) %}
 
-        {% if deletRoute %}
+        {% if deleteRoute %}
             <nav>
                 <sbx-pop-out content-id="overflow"></sbx-pop-out>
             </nav>
             <ul class="f-dropdown" data-dropdown-content id="overflow">
-                <li><a data-delete href="{{ deletRoute }}" class="icon-delete">Delete</a></li>
+                <li><a data-delete href="{{ deleteRoute }}" class="icon-delete">Delete</a></li>
             </ul>
         {% endif %}
     {% endif %}
@@ -94,16 +110,52 @@
                     </fieldset>
                 </section>
 
+            {# Moderation Workflow
+             # Staff and students share this area, but their buttons are differently described
+             #}
             {% set submitText = 'Submit' %}
 
-            {% if moderationRequired %}
-                {% set submitText = 'Submit for approval' %}
+            {% if USER.role.isStudent %}
+                {% if moderationRequired %}
+                    {% set submitText = 'Submit for approval' %}
+                {% endif %}
+            {% elseif USER.role.isStaff and USER.role.accessEvidence %}
+                {% if evidence.isSubmitted %}
+                    {# If the moment is in Submitted state, this acts as the transition to Published #}
+                    {% set submitText = 'Approve' %}
+                    {% set deleteCommentsAttr = 'data-delete-comments=0' %}
+                {% endif %}
             {% endif %}
 
-            <input type="submit" id="evidence-submit" data-test="learning-moment-evidence-form-submit" value="{{ submitText }}" />
+            <input type="submit" id="evidence-submit" {{ deleteCommentsAttr ?? '' }} data-test="learning-moment-evidence-form-submit" value="{{ submitText }}" />
         </form>
     </div>
 </div>
+
+{# Moderation Workflow
+ # This modal offers the moderator an opportunity to delete all associated comments.
+ # Agreeing to that sets a hidden input field which is then interpreted by the
+ # buildPayload method, injecting this for controllers to use.
+ #}
+{% if USER.role.isStaff and USER.role.accessEvidence and evidence.isSubmitted and hasComments %}
+    <div id="deleteCommentsModal" class="reveal-modal" data-reveal aria-labelledby="deleteCommentsModalTitle" aria-hidden="true" role="dialog">
+        <h2 id="deleteCommentsModalTitle">Please confirm</h2>
+        <p>There are comments on this learning moment that have already been made and will become visible to parents.</p>
+        <p>Do you want to delete these comments?</p>
+
+        <button id="deleteComments">Delete and continue</button>
+        <button id="preserveComments">Continue</button>
+
+        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+    </div>
+    <script>
+        $(function() {
+            $(document).on('closed.fndtn.reveal', '#deleteCommentsModal', function () {
+                $('#evidence-submit').prop('disabled', false);
+            });
+        });
+    </script>
+{% endif %}
 
 
 {# Set up CKEditor #}
@@ -134,6 +186,7 @@
                     tags: [],
                     type: '{{ momentType }}',
                 };
+
         let tags = form.querySelector('#evidence-tags').selectize.items;
         payload.tags = tags.map(
                 (v) => {
@@ -191,6 +244,13 @@
                 toast.toastActivate('Saving...')
                 submit.prop('disabled', true);
 
+                {# Moderation Workflow
+                 # Augment payload with the comment deletion flag, if set
+                 #}
+                if (0 != $('#evidence-submit').attr('data-delete-comments')) {
+                    payload.deleteComments = 1;
+                }
+
                 // Redirect to the return URL provided
                 fetch(form.action, {
                     method: '{{ isCreate ? 'POST' : 'PUT' }}',
@@ -212,7 +272,6 @@
                     submit.prop('disabled', false);
                     isSubmittingForm = false;
                 });
-
             }
         }
 
@@ -226,14 +285,38 @@
                 document.getElementById('evidence-submit').disabled = true; //disable on select to prevent multiple submits
 
                 if (isMediaUploadRequired()) {
-                    document.getElementById('evidence-media-recording').scrollIntoView( { behavior: 'smooth' } ); //uploading can take a while, so scroll up to know that it's processing
+                    document.getElementById('evidence-media-recording').scrollIntoView({behavior: 'smooth'}); //uploading can take a while, so scroll up to know that it's processing
                     document.removeEventListener('evidence-media-recording__onUploadComplete', submitForm);
-                    document.addEventListener('evidence-media-recording__onUploadComplete', (event) => submitForm(form) ); //once the media is uploaded, #evidence-media-recording.vue will dispatch
+                    document.addEventListener('evidence-media-recording__onUploadComplete', (event) => submitForm(form)); //once the media is uploaded, #evidence-media-recording.vue will dispatch
                     document.dispatchEvent(new CustomEvent('evidence-media-recording__onFormSubmit')); //dispatch to allow the media recording to start uploading
                 } else {
-                    submitForm(form);
-                }
 
+                    event.preventDefault();
+
+                    {# Moderation Workflow
+                     # Show a special modal about optionally deleting comments
+                     #}
+                    {% if USER.role.isStaff and USER.role.accessEvidence and evidence.isSubmitted and hasComments %}
+                        {# Initial condition: preserve comments #}
+                        $('#evidence-submit').attr('data-delete-comments', 0);
+
+                        {# Show the modal with an option to delete comments #}
+                        $('#deleteCommentsModal').foundation('reveal', 'open');
+
+                        $('#deleteComments').on('click', function() {
+                            $('#evidence-submit').attr('data-delete-comments', 1);
+
+                            submitForm(form);
+                        });
+
+                        {# ...or keep them intact #}
+                        $('#preserveComments').on('click', function() {
+                            submitForm(form);
+                        });
+                    {% else %}
+                        submitForm(form);
+                    {% endif %}
+                }
             }
         });
         $('[data-tags]').selectizeSelector({

@@ -117,6 +117,7 @@ class Controller extends Base
         }
 
         $params = [
+            'evidence'                 => $this->mapper->createModel(),
             'users'                    => $users,
             'userIds'                  => $users->getPropertyValues('id'),
             'otherUsers'               => $otherUsers,
@@ -348,7 +349,8 @@ class Controller extends Base
             'isCreate'                 => false,
             'momentType'               => $momentType,
             'curriculumCodes'          => $evidence->getViewableCurriculumNodes()?->reindex(),
-            'zone'                     => $zone->getTwigContext()
+            'zone'                     => $zone->getTwigContext(),
+            'hasComments'              => $this->hasComments($evidence),
         ];
 
         $this->response = $this->responseFromTemplate(
@@ -491,6 +493,22 @@ class Controller extends Base
             default:
                 return '@learningMomentEvidence/form/text.twig';
         }
+    }
+
+
+    /**
+     * Find out if there any comments related to this learning moment
+     * Finding at least one comment means there's stuff to delete here
+     *
+     * @param $evidence
+     * @return bool
+     */
+    private function hasComments($evidence): bool
+    {
+        $translator = $this->buildTranslatorWithComments(1);
+        $item = $translator($evidence);
+
+        return (bool)\count($item['discussionThread']['children']['data'] ?? []);
     }
 
 
