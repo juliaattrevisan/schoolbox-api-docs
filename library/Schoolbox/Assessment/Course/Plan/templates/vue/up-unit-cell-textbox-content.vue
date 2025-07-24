@@ -96,7 +96,7 @@ async function initEditor(): Promise<void> {
 
     // Avoid initialising the editor multiple times
     editorInitialised.value = true;
-
+    console.warn(store.editorTemplates);
     await new Promise((resolve) => {
         useEditor(
             editorContent,
@@ -104,6 +104,7 @@ async function initEditor(): Promise<void> {
             {
                 targetElements: [`#${editorId}`],
                 type: EditorType.INLINE,
+                templates: store.editorTemplates,
             },
             true,
             (e) => {
