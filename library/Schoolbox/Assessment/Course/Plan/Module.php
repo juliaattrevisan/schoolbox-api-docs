@@ -29,6 +29,9 @@ use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
+use Schoolbox\Editor\Templates\Mapper as EditorTemplateMapper;
+use Schoolbox\Admin\Editor\Templates\Category\Model as EditorTemplatesCategoryModel;
 
 class Module extends BaseModule
 {
@@ -115,6 +118,11 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(CourseConfigMapper::class),
             $this->getMapperFactory()->get(UnitSpecificationMapper::class),
             $this->getMapperFactory()->get(Access::class),
+            new EditorTemplateHelper(
+                $this->getMapperFactory()->get(EditorTemplateMapper::class),
+                EditorTemplatesCategoryModel::HOMEPAGE,
+                $this->injector->get('user')
+            )
         );
     }
 
