@@ -131,9 +131,6 @@
                     {# This triggers an async request to Reject+reason #}
                     <button id="request-update">Request update</button>
 
-                    {# To get around a ckeditor bug where it doesn't sent the current text #}
-                    <input type="submit" id="evidence-reject" data-test="learning-moment-evidence-form-submit" value="Reject" style="display:none" />
-
                     {# Publish with optional comment deletion
                      # This spawns a modal, which allows for the setting of a flag,
                      # prior to the usual form submission. Sorry about all these cloak-and-dagger input fields
@@ -160,19 +157,19 @@
 
                                         $('#delete-comments').val(1);
 
-                                        $('#evidence-publish').trigger('click');
+                                        $('#evidence-moderate').trigger('click');
                                     });
 
                                     {# Continue with no further alterations #}
                                     $('#preserveComments').on('click', function () {
-                                        $('#evidence-publish').trigger('click');
+                                        $('#evidence-moderate').trigger('click');
                                     });
                                 })
                             });
                         </script>
                     {% endif %}
 
-                    <input type="submit" id="evidence-publish" data-test="learning-moment-evidence-form-submit" value="Approve" style="display:none" />
+                    <input type="submit" id="evidence-moderate" data-test="learning-moment-evidence-form-submit" value="Approve" style="display:none" />
                 {% endif %}
             {% endif %}
         </form>
@@ -250,7 +247,7 @@
                  # prior to payload being constructed, sending you the original text rather than
                  # the updated text. To dodge this ckeditor hankypanky we just simulate a user click
                  #}
-                $('#evidence-reject').trigger('click');
+                $('#evidence-moderate').trigger('click');
             });
         });
     </script>
