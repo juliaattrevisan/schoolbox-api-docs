@@ -434,7 +434,6 @@ class Controller extends Base
      * to display in a table format
      *
      * @param string         $tabType
-     * @param string         $resultType
      * @param PastoralReport $report
      */
     public function getReportByTabType(string $tabType, PastoralReport $report): void
@@ -583,7 +582,7 @@ class Controller extends Base
 
         // if folder is set, but no users returned, we should not return any records
         if (($report->getFolders()->count() > 0) && ($students->count() === 0)) {
-            return $this->pastoralDataSource->createCollection();
+            return [];
         }
 
         return [
@@ -621,6 +620,10 @@ class Controller extends Base
     {
         // Get matching records
         $data = $this->prepareReportData($report);
+
+        if (empty($data)) {
+            return $this->pastoralDataSource->createCollection();
+        }
 
         return $this->pastoralDataSource->getReportData(
             $data['user'],

@@ -21,7 +21,6 @@ use Schoolbox\User;
  */
 abstract class BaseMapper extends SchoolboxMapper
 {
-
     /**
      * Does the given user have access to the pastoral service?
      *
