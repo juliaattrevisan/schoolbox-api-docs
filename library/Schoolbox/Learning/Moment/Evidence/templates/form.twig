@@ -392,7 +392,11 @@
             submitHandler(form, event) {
                 event.preventDefault();
 
-                // document.getElementById('evidence-submit').disabled = true; //disable on select to prevent multiple submits
+                //disable on select to prevent multiple submits
+                /* it already does this during the submitForm() method, not sure why we do it twice
+                 * but whatever
+                 */
+                $('#evidence-form').find('input[type="submit"], button').prop('disabled', true);
 
                 if (isMediaUploadRequired()) {
                     document.getElementById('evidence-media-recording').scrollIntoView({behavior: 'smooth'}); //uploading can take a while, so scroll up to know that it's processing
