@@ -11,6 +11,8 @@ This file is internal use and is not shipped to clients.
 * dav - WebDav site for exporting the Schoolbox resources
 * data - client data and caches (client side only)
 * debian - APT package building definitions (not deployed to clients)
+* docker - definition of Docker images used in Schoolbox development and
+  production environments
 * docs - documentation for developers
 * library - Schoolbox code base
 * node_modules - directory for external libraries loaded via NPM
@@ -29,51 +31,72 @@ This file is internal use and is not shipped to clients.
 
 ## Installation
 
-### Development Environment with Vagrant
+### Download Schoolbox code
 
-* Install [Virtualbox](https://www.virtualbox.org/) (sudo apt install virtualbox)
-* Install [vagrant](https://vagrantup.com/downloads)
 * Create an SSH key and add to Github
-* Fork the [Schoolbox repo](https://github.com/alaress/schoolbox) to your Github
-```
+* Fork the [Schoolbox repo](https://github.com/alaress/schoolbox) to your Github:
+  ```shell
   git clone git@github.com:%YourGitHubUsername%/schoolbox.git schoolbox (for example git clone git@github.com:low613/schoolbox.git schoolbox)
   cd schoolbox
   git remote add upstream git@github.com:alaress/schoolbox.git
   git fetch upstream
   git checkout origin/master
   git checkout -b master
-```
-* Fork the [Puppet repo](https://github.com/alaress/puppet-alaress) to your Github
-```
-  git clone git@github.com:%YourGitHubUsername%/puppet-alaress.git puppet-alaress (for example git clone git@github.com:low613/puppet-alaress.git puppet-alaress)
-  cd puppet-alaress
-  git remote add upstream git@github.com:alaress/puppet-alaress.git
-  git fetch upstream
-  git checkout origin/stable
-  git checkout -b stable
-```
-* create `vagrant.yaml` for overrides, see `vagrant.default.yaml` for defaults
-```
-  processors: 3
-  memory: 4096
-  data_filename: "demo.tar.gz"
-  external_db: "schoolbox"
-  puppet_sync_type: "gitsync"
-```
-
-* Create a `/etc/vbox/networks.conf` on your local computer
-```
-sudo mkdir -p /etc/vbox/
-echo "* 192.168.36.0/24" |sudo tee -a /etc/vbox/networks.conf
-```
-* In your schoolbox directory import your vagrant box and bring it up for the first time
-```
-  vagrant box add ubuntu-2204-php82 https://s3-ap-southeast-2.amazonaws.com/schoolbox-data/ubuntu-2204-php82.box;
-  vagrant up;
-  vagrant provision;
-```
+  ```
 * Install the [Git Scripts](https://github.com/alaress/git-scripts) suite of tools. If the `jira-issue-tag` doesn't work after install, add the file from the downloaded zip file at `git-scripts-master/hooks/prepare-commit-msg.jira-issue-tag` into `.git/hooks/` and remove the `.jira-issue-tag` from the file name.
 
+### Set up Docker development environment
+
+* install the most recent Docker Engine for your operating system:
+  https://docs.docker.com/engine/install/
+* add this line to `/etc/hosts` or its Windows equivalent
+  (usually `C:\Windows\System32\drivers\etc\hosts`)
+  ```
+  127.0.0.1 docker.dev.schoolbox.cloud
+  ```
+* start the development environment's containers:
+  ```shell
+  docker/up
+  ```
+* install Schoolbox within the development environment:
+  ```shell
+  docker/provision
+  ```
+* visit https://docker.dev.schoolbox.cloud/
+
+### Set up Vagrant development environment (legacy)
+
+* Install [Virtualbox](https://www.virtualbox.org/) (sudo apt install virtualbox)
+* Install [vagrant](https://vagrantup.com/downloads)
+* Fork the [Puppet repo](https://github.com/alaress/puppet-alaress) to your Github
+    ```shell
+    git clone git@github.com:%YourGitHubUsername%/puppet-alaress.git puppet-alaress (for example git clone git@github.com:low613/puppet-alaress.git puppet-alaress)
+    cd puppet-alaress
+    git remote add upstream git@github.com:alaress/puppet-alaress.git
+    git fetch upstream
+    git checkout origin/stable
+    git checkout -b stable
+    ```
+* create `vagrant.yaml` for overrides, see `vagrant.default.yaml` for defaults
+    ```yaml
+    processors: 3
+    memory: 4096
+    data_filename: "demo.tar.gz"
+    external_db: "schoolbox"
+    puppet_sync_type: "gitsync"
+    ```
+* Create a `/etc/vbox/networks.conf` on your local computer
+    ```shell
+    sudo mkdir -p /etc/vbox/
+    echo "* 192.168.36.0/24" |sudo tee -a /etc/vbox/networks.conf
+    ```
+* In your schoolbox directory import your vagrant box and bring it up for the first time
+    ```shell
+    vagrant box add ubuntu-2204-php82 https://s3-ap-southeast-2.amazonaws.com/schoolbox-data/ubuntu-2204-php82.box;
+    vagrant up;
+    vagrant provision;
+    ```
+* visit https://vagrant.dev.schoolbox.cloud/
 ## Live environment
 
 When a release is tagged, APT packages are built by [ConcourseCI](https://ci.schoolbox.com.au/). These are then uploaded to the Schoolbox repo for distribution to servers.  The [Puppet repo](https://github.com/alaress/puppet-alaress) is then updated to trigger staging, and then live to update to the latest package.
