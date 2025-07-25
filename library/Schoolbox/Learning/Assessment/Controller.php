@@ -957,7 +957,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         /**
          * First priority is the toParticipation flag,
          * which is set when the user is creating a new implementation assessment
-         * Second priority is a the post return URL
+         * Second priority is the post return URL
          * Then if this is in a project, and if so then go to project status
          * Otherwise go to default return url
          */
