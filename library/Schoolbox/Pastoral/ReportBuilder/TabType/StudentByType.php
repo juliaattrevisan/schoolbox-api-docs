@@ -95,18 +95,29 @@ class StudentByType extends Cursor implements TabTypeInterface
         $typeKeys = implode(
             ' + ',
             $whereTypes->map(
-                fn(Type $type) => "count_type_{$type->getId()}"
+                fn(Type $type) => "COALESCE(count_type_{$type->getId()}, 0)"
             )->getAll()
         );
 
         $subTypeKeys = implode(
             ' + ',
             $this->helper->getSubTypes()->map(
-                fn(SubType $subType) => "count_subtype_{$subType->getId()}"
+                fn(SubType $subType) => "COALESCE(count_subtype_{$subType->getId()}, 0)"
             )->getAll()
         );
 
-        $totalCount = "SUM(" . implode(' + ', array_filter([$typeKeys, $subTypeKeys])) . ") as total";
+        $typeNullValueCheck = $this->helper->getType()->map(
+            fn(Type $type) => "count_type_{$type->getId()} IS NULL"
+        )->getAll();
+
+        $subTypeNullValueCheck = $this->helper->getSubTypes()->map(
+            fn(SubType $subType) => "count_subtype_{$subType->getId()} IS NULL"
+        )->getAll();
+
+        $totalCount = "CASE WHEN ";
+        $totalCount .= implode(" AND ", array_filter($typeNullValueCheck + $subTypeNullValueCheck));
+        $totalCount .= " THEN NULL ELSE ";
+        $totalCount .= "(" . implode(' + ', array_filter([$typeKeys, $subTypeKeys])) . ") END as total";
 
         /**
          * Finding out where to locate the position where the cursor is pointing
@@ -266,15 +277,26 @@ class StudentByType extends Cursor implements TabTypeInterface
 
             $totalRow['user'] = 'Total';
 
+            /* Return null if all the values are null otherwise return the total count
+             */
             foreach ($keys as $key) {
-                $totalRow[$key] = [ $this->resultType => array_sum(array_column($records->getAll(), $key))];
+                $totalRow[$key] = [
+                    $this->resultType => array_reduce(
+                        array_column($records->getAll(), $key),
+                        function (?float $carry, ?float $value) {
+                            if (!is_null($value)) {
+                                return $carry += $value;
+                            }
+                            return $carry;
+                        }
+                    )];
             }
 
             $rows = $records->map(
                 function (array $record) use ($students) {
                     $row['user'] = call_user_func($this->userTranslator, $students->getBy('id', $record['student_id']));
                     unset($record['student_id']);
-                    return array_merge($row, array_map(fn($value) => [ $this->resultType => floatval($value)], ($record)));
+                    return array_merge($row, array_map(fn($value) => [ $this->resultType => $value], ($record)));
                 }
             );
         }
