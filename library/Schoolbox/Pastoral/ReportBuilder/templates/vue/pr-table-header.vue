@@ -4,6 +4,7 @@
  * Renders headers with optional sorting functionality.
  */
 
+import { capitalizeFirstLetter } from "@js/util/stringUtils";
 import type { TableHeader, Config } from "../js/types/pastoralReportTypes";
 
 const props = defineProps<{
@@ -91,7 +92,7 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
                     <ul class="option-list l-flex l-gap-m f-no-margins">
                         <li v-for="(option, index) in props.recordsAndPoints" :key="`option-${index}`">
                             <input :id="option" v-model="recordsOrPoints" type="radio" :value="option" />
-                            <label :for="option" class="f-no-margins">{{ option }}</label>
+                            <label :for="option" class="f-no-margins">{{ capitalizeFirstLetter(option) }}</label>
                         </li>
                     </ul>
                 </div>
