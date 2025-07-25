@@ -98,6 +98,11 @@ function onSortSelected(headerKey: string): void {
  */
 function onPrevious(): void {
     currentEndpoint.value = `${props.selectedTab.endpoint}?selected=${recordsOrPoints.value}`;
+    // need an array to store the cursor
+    // when the first item (the start of the payload) the cursor should be empty
+    // items after the previous will be the stored .next cursor
+
+    // this cursor array needs to reset on a new table load, points/records change, or sort change
 }
 
 /**
@@ -105,6 +110,8 @@ function onPrevious(): void {
  */
 function onNext(): void {
     currentEndpoint.value = `${props.selectedTab.endpoint}?selected=${recordsOrPoints.value}&cursor=${payload.value?.metadata.cursor.next}`;
+    // need an array to store the cursor
+    // if there's no cursor in the array, can use metadata.cursor.next to load, otherwise use the stored cursor
 }
 
 // #endregion
