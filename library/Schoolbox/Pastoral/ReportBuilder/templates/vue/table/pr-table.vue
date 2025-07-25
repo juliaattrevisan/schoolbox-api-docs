@@ -97,8 +97,7 @@ function onSortSelected(headerKey: string): void {
  * Handle previous page button click
  */
 function onPrevious(): void {
-    // TODO: Implement previous page logic
-    // This should update the currentEndpoint with previous page parameters
+    currentEndpoint.value = `${props.selectedTab.endpoint}?selected=${recordsOrPoints.value}`;
 }
 
 /**
@@ -171,8 +170,8 @@ function onNext(): void {
                 </tbody>
             </table>
             <pr-table-footer
-                v-if="hasMoreRows"
                 :metadata="(payload as TablePayload).metadata"
+                :has-more-rows="hasMoreRows"
                 @previous="onPrevious"
                 @next="onNext"
             />

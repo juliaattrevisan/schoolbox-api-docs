@@ -7,6 +7,7 @@ import type { Metadata } from "@js/util/sbx/apiUtils";
 
 const props = defineProps<{
     metadata: Metadata;
+    hasMoreRows: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -34,7 +35,7 @@ function onNextSelected(): void {
         <p class="f-no-margins">
             <b>1-25 of {{ props.metadata.count }}</b>
         </p>
-        <nav class="l-flex-row l-gap-s">
+        <nav v-if="props.hasMoreRows" class="l-flex-row l-gap-s">
             <button type="button" @click="onPreviousSelected">&lt;</button>
             <button type="button" @click="onNextSelected">&gt;</button>
         </nav>
