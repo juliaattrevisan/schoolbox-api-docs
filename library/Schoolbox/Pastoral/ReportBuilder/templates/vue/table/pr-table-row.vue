@@ -6,8 +6,8 @@
 
 import type { User } from "@schoolboxLibrary/types/User";
 import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
-import { TableHeaderType } from "../js/types/pastoralReportTypes";
-import type { TableHeader, RowOptions, RecordsAndPoints } from "../js/types/pastoralReportTypes";
+import { TableHeaderType } from "../../js/types/pastoralReportTypes";
+import type { TableHeader, RowOptions, RecordsAndPoints } from "../../js/types/pastoralReportTypes";
 
 type Props = {
     headers: TableHeader[];

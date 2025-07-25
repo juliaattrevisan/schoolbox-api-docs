@@ -4,12 +4,13 @@
  */
 
 import { useTemplateRef } from "vue";
-import type { Tab, TablePayload, Config, Routes } from "../js/types/pastoralReportTypes";
-import { TabType } from "../js/types/pastoralReportTypes";
-import { useLoadPrTable } from "./composable/useLoadPrTable";
+import type { Tab, TablePayload, Config, Routes } from "../../js/types/pastoralReportTypes";
+import { TabType } from "../../js/types/pastoralReportTypes";
+import { useLoadPrTable } from "../composable/useLoadPrTable";
 import PrTableHeader from "./pr-table-header.vue";
 import PrTableTotalRow from "./pr-table-total-row.vue";
 import PrTableRow from "./pr-table-row.vue";
+import PrTableFooter from "./pr-table-footer.vue";
 
 const props = defineProps<{
     selectedTab: Tab;
@@ -154,6 +155,7 @@ function onSortSelected(headerKey: string): void {
                     />
                 </tbody>
             </table>
+            <pr-table-footer />
         </div>
         <!-- Table metadata -->
         <!-- <div class="pr-table-metadata">

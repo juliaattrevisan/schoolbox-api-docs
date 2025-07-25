@@ -5,8 +5,8 @@
  */
 
 import { capitalizeFirstLetter } from "@js/util/stringUtils";
-import { TableHeaderType } from "../js/types/pastoralReportTypes";
-import type { TableHeader, RowOptions, RecordsAndPoints } from "../js/types/pastoralReportTypes";
+import { TableHeaderType } from "../../js/types/pastoralReportTypes";
+import type { TableHeader, RowOptions, RecordsAndPoints } from "../../js/types/pastoralReportTypes";
 
 type Props = {
     headers: TableHeader[];
