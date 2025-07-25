@@ -6,34 +6,10 @@
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/jquery-validation/dist/additional-methods.min.js?v={{ config.site_version }}"></script>
 <script src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
 <script src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
-<script src="{{ CDN_PREFIX }}/js/assessment/participation.js?v={{ config.site_version }}"></script>
 
 {% autoescape 'js' %}
 <script>
     $(function () {
-
-        // Participation
-        $('#participation-container').participationSettings({
-            getAvailableDateFields: function () {
-
-                var dateArray = [];
-
-                if($('#publishDate').length != 0 && $('#publishDate').is(":visible")) {
-                    dateArray.push('publish');
-                }
-                if($('#openDate').length != 0 && $('#openDate').is(":visible")) {
-                    dateArray.push('open');
-                }
-                if($('#dueDate').length != 0 && $('#dueDate').is(":visible")) {
-                    dateArray.push('due');
-                }
-                if($('#closeDate').length != 0 && $('#closeDate').is(":visible")) {
-                    dateArray.push('close');
-                }
-
-                return dateArray;
-            }
-        });
 
         // the mage plugin is applied to the submit buttons: setup a basic mage on all the buttons
         $('input[data-mage-next]').mage({
@@ -239,6 +215,3 @@
 </div>
 
 <div id="toast" class="toast"></div>
-
-{# Participation modal w/ form. Must live outside of main form #}
-{% include '@learningAssessment/fragments/participationModal.twig' %}

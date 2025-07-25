@@ -948,16 +948,25 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @param string      $defaultReturnUrl
      * @param bool        $relocated
      * @param bool        $isCreate
+     * @param bool        $toParticipation
      * @return string
      * @throws RouteNotFound
      */
-    public function determineRedirect(IAssessable $assessment, $postReturnUrl = null, $defaultReturnUrl = '', bool $relocated = false, bool $isCreate = false): string
+    public function determineRedirect(IAssessable $assessment, $postReturnUrl = null, $defaultReturnUrl = '', bool $relocated = false, bool $isCreate = false, bool $toParticipation = false): string
     {
         /**
-         * First priority is a the post return URL
+         * First priority is the toParticipation flag,
+         * which is set when the user is creating a new implementation assessment
+         * Second priority is the post return URL
          * Then if this is in a project, and if so then go to project status
          * Otherwise go to default return url
          */
+        if ($toParticipation) {
+            return $this->routeGenerator->generate('learningAssessment.getAssessmentParticipationForm', [
+                'assessmentId' => $assessment->getId(),
+                'assessment' => $assessment,
+            ]);
+        }
         if ($postReturnUrl) {
             $returnUrl = Redirect::decode($postReturnUrl);
             if ($relocated && strpos($returnUrl, '/homepage/') === 0) {

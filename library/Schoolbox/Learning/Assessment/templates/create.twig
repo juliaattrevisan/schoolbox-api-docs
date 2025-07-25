@@ -8,13 +8,73 @@
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/jquery-validation/dist/additional-methods.min.js?v={{ config.site_version }}"></script>
 <script src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
 <script src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
-<script src="{{ CDN_PREFIX }}/js/assessment/participation.js?v={{ config.site_version }}"></script>
 <script>
     $(function () {
         // the mage plugin is applied to the submit buttons: setup a basic mage on all the buttons
         $('input[data-mage-next]').mage({
             validateOptions: validateOptions
         });
+
+        /**
+         * Check if the participation prompt should be shown based on hidden input field values
+         * @returns {boolean}
+         */
+        function showParticipationPrompt() {
+            // Check if assessmentType is either 'dueWork' or 'task'
+            const assessmentTypeInput = document.querySelector('input[name="assessmentType"]');
+            const assessmentType = assessmentTypeInput ? assessmentTypeInput.value : null;
+            const validAssessmentType = assessmentType && (assessmentType === 'dueWork' || assessmentType === 'task');
+
+            // Check if contextType is either 'units' or 'projects'
+            const contextTypeInput = document.querySelector('input[name="contextType"]');
+            const contextType = contextTypeInput ? contextTypeInput.value : null;
+            const validContextType = contextType && (contextType === 'units' || contextType === 'projects');
+
+            // Check that customisedFor hidden input field doesn't exist
+            const customisedForInput = document.querySelector('input[name="customisedFor"]');
+            const isNotCustomised = !customisedForInput;
+
+            return validAssessmentType && validContextType && isNotCustomised;
+        }
+
+        /**
+         * Before submitting the form, intercept the submission
+         * and show a confirmation dialog to check if the user wants to edit participation.
+         * If not just continue with the submission
+         * If so add a hidden field to the formData to that will be used in the backend
+         * to redirect to the student participation page.
+         * @returns {Promise}
+         */
+        function formWillSubmit() {
+            return new Promise(function(resolve, reject) {
+                if (showParticipationPrompt()) {
+                    $("body").confirmDialog({
+                        header: "Activity created",
+                        text: "Would you like to edit the student participation for this activity now?",
+                        flipButtons: true,
+                        cancelLabel: "Later",
+                        cancelEvent: () => {
+                            resolve();
+                        },
+                        confirmLabel: "Yes",
+                        confirmEvent: () => {
+                            // add a new hidden field to the formData to indicate that the user wants to edit participation
+                            const targetFieldSet = document.querySelector('[data-mage="part-2"]');
+                            if (targetFieldSet) {
+                                const hiddenInput = document.createElement("input");
+                                hiddenInput.type = "hidden";
+                                hiddenInput.name = "toParticipation";
+                                hiddenInput.value = "true";
+                                targetFieldSet.appendChild(hiddenInput);
+                            }
+                            resolve();
+                        },
+                    });
+                } else {
+                    resolve();
+                }
+            });
+        }
 
         /**
          * When you finish configuring a non-project assessment
@@ -24,6 +84,7 @@
             $('input[data-mage-next="end"]').mage({
                 validateOptions: validateOptions,
                 beforeAttemptingSubmit: beforeAttemptingSubmit,
+                formWillSubmit: formWillSubmit,
                 onXhrDone: function (data) {
                     if('string' == typeof data.returnUrl){
                         window.location.href = data.returnUrl;
@@ -37,29 +98,6 @@
             /* Save everything when Part 1 was already chosen in route
              */
             setupAssessmentEnd('{{ assessmentType }}');
-
-            // Participation
-            $('#participation-container').participationSettings({
-                getAvailableDateFields: function () {
-
-                    var dateArray = [];
-
-                    if($('#publishDate').length != 0 && $('#publishDate').is(":visible")) {
-                        dateArray.push('publish');
-                    }
-                    if($('#openDate').length != 0 && $('#openDate').is(":visible")) {
-                        dateArray.push('open');
-                    }
-                    if($('#dueDate').length != 0 && $('#dueDate').is(":visible")) {
-                        dateArray.push('due');
-                    }
-                    if($('#closeDate').length != 0 && $('#closeDate').is(":visible")) {
-                        dateArray.push('close');
-                    }
-
-                    return dateArray;
-                }
-            });
 
         {% else %}
 
@@ -88,29 +126,6 @@
 
                     // Re-init foundation plugins
                     $(document).foundation();
-
-                    // Participation
-                    $('#participation-container').participationSettings({
-                        getAvailableDateFields: function () {
-
-                            var dateArray = [];
-
-                            if($('#publishDate').length != 0 && $('#publishDate').is(":visible")) {
-                                dateArray.push('publish');
-                            }
-                            if($('#openDate').length != 0 && $('#openDate').is(":visible")) {
-                                dateArray.push('open');
-                            }
-                            if($('#dueDate').length != 0 && $('#dueDate').is(":visible")) {
-                                dateArray.push('due');
-                            }
-                            if($('#closeDate').length != 0 && $('#closeDate').is(":visible")) {
-                                dateArray.push('close');
-                            }
-
-                            return dateArray;
-                        }
-                    });
                 }
             });
 
@@ -300,6 +315,3 @@
         </form>
     </div>
 </div>
-
-{# Participation modal w/ form. Must live outside of main form as per above #}
-{#{% include '@learningAssessment/fragments/participationModal.twig' %}#}

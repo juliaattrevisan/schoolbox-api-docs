@@ -14,6 +14,7 @@
  *                  following whatever link is on this element.
  * * cancelEvent:   Callback that is run when 'No' is clicked. Defaults to no op.
  * * destroyDialog: True if dialog is to be destroyed when it's closed.
+ * * flipButtons:   When true, displays cancel button before confirm button. Defaults to false.
  */
 (function ($) {
     $.confirmDialog = {};
@@ -66,6 +67,7 @@
              */
             hasConfirmButton: true,
             hasCancelButton: true,
+            flipButtons: false,
         };
 
         // Allow passing of defaults in data-vars
@@ -94,15 +96,16 @@
          * then shank it into the flexlist
          */
         var buttons = $();
+        var confirmButton, cancelButton;
 
         if (settings.hasConfirmButton) {
-            var okayButton = $(
+            confirmButton = $(
                 '<a href="#" class="button submit" id="confirm-dialog-confirm-button" data-test="confirm-dialog-confirm-button" />',
             ).text(settings.confirmLabel);
 
-            buttons.add(okayButton);
+            buttons = buttons.add(confirmButton);
 
-            okayButton.on("click.confirmDialog", function (e) {
+            confirmButton.on("click.confirmDialog", function (e) {
                 // Immediately prevent further click events
                 buttons.off("click.confirmDialog");
                 e.preventDefault();
@@ -111,8 +114,6 @@
                 modal.off("close.fndtn.reveal.cancel");
                 modal.foundation("reveal", "close");
             });
-
-            ul.append(li.clone().append(okayButton));
         }
 
         /* If you want the Cancel button available,
@@ -120,11 +121,11 @@
          * then shank it into the flexlist
          */
         if (settings.hasCancelButton) {
-            var cancelButton = $('<a href="#" class="button" id="confirm-dialog-cancel-button" />').text(
+            cancelButton = $('<a href="#" class="button" id="confirm-dialog-cancel-button" />').text(
                 settings.cancelLabel,
             );
 
-            buttons.add(cancelButton);
+            buttons = buttons.add(cancelButton);
 
             cancelButton.on("click.confirmDialog", function (e) {
                 // Immediately prevent further click events
@@ -135,8 +136,25 @@
                 // This is so clicking the X, or pressing ESC, triggers the cancel.
                 modal.foundation("reveal", "close");
             });
+        }
 
-            ul.append(li.clone().append(cancelButton));
+        // Add buttons to the flex list in the correct order based on flipButtons setting
+        if (settings.flipButtons) {
+            // Cancel button first, then confirm button
+            if (settings.hasCancelButton) {
+                ul.append(li.clone().append(cancelButton));
+            }
+            if (settings.hasConfirmButton) {
+                ul.append(li.clone().append(confirmButton));
+            }
+        } else {
+            // Default order: confirm button first, then cancel button
+            if (settings.hasConfirmButton) {
+                ul.append(li.clone().append(confirmButton));
+            }
+            if (settings.hasCancelButton) {
+                ul.append(li.clone().append(cancelButton));
+            }
         }
 
         var pBody = $("<p />");
