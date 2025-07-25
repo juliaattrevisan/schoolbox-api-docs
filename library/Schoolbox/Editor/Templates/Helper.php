@@ -12,12 +12,14 @@ namespace Schoolbox\Editor\Templates;
 
 use Schoolbox\GenericCollection;
 use Schoolbox\Collection;
+use Schoolbox\User;
 
 class Helper
 {
     public function __construct(
         private Mapper $templateMapper,
-        private int $categoryId
+        private int $categoryId,
+        private User $user
     ) {
     }
 
@@ -30,6 +32,10 @@ class Helper
      */
     public function getTemplatesForCategory(): Collection
     {
+        // If the user is not a staff member, return an empty collection
+        if (!$this->user->getRole()->isStaff()) {
+            return new GenericCollection(Model::class);
+        }
         try {
             $templates = $this->templateMapper->findByColumn('category_id', $this->categoryId);
             return $templates->map(function (Model $template) {

@@ -252,7 +252,8 @@ class Module extends BaseModule
             $this->injector->get('l10n'),
             new EditorTemplateHelper(
                 $this->getMapperFactory()->get(EditorTemplateMapper::class),
-                EditorTemplatesCategoryModel::NEWS
+                EditorTemplatesCategoryModel::NEWS,
+                $this->injector->get('user')
             )
         );
     }

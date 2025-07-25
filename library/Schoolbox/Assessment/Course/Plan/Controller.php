@@ -42,6 +42,7 @@ use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly;
 use Schoolbox\Resource\Textbox;
 use Scrub;
 use Twig\Error\Error;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 
 class Controller extends Base
 {
@@ -64,6 +65,7 @@ class Controller extends Base
      * @param CourseConfigMapper        $courseConfigMapper
      * @param UnitSpecificationMapper   $unitSpecificationMapper
      * @param Access                    $access
+     * @param EditorTemplateHelper      $editorTemplateHelper
      */
     public function __construct(
         private AssessmentMapperProxy $assessmentMapper,
@@ -74,6 +76,7 @@ class Controller extends Base
         private CourseConfigMapper $courseConfigMapper,
         private UnitSpecificationMapper $unitSpecificationMapper,
         private Access $access,
+        private EditorTemplateHelper $editorTemplateHelper
     ) {
         /* Only prepare the textbox statement once
          */
@@ -247,8 +250,9 @@ class Controller extends Base
                 'activityDefId' => $activityDefId,
                 'textboxes' => $textboxTemplate,
                 'curriculum' => $curriculumTemplate,
-                'activities' => $courseBuilderTemplate
-            ]
+                'activities' => $courseBuilderTemplate,
+            ],
+            'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
         ], "Unit Planner - {$course->getTitle()}");
     }
 

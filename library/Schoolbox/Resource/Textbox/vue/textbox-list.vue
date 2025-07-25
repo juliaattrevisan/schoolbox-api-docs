@@ -63,6 +63,15 @@ export default {
             type: String,
             required: true,
         },
+
+        /**
+         * Editor templates to use in the CKEditor instances.
+         * Can refer to www/static/js/editor/types/editorTypes.ts:Template
+         */
+        editorTemplates: {
+            type: Array,
+            default: () => [],
+        },
     },
     data() {
         return {
@@ -266,6 +275,7 @@ export default {
                                 maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
                                 targetElements: [`#${this.id}`],
                                 fileBrowserCategoryId: self.folderId,
+                                templates: self.editorTemplates,
                             },
                         }),
                     );

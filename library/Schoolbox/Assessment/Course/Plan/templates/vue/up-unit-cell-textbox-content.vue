@@ -104,6 +104,7 @@ async function initEditor(): Promise<void> {
             {
                 targetElements: [`#${editorId}`],
                 type: EditorType.INLINE,
+                templates: store.editorTemplates,
             },
             true,
             (e) => {

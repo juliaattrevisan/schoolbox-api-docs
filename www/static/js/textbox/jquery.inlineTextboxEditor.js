@@ -17,6 +17,7 @@
         saveButton,
         deleteButton,
         fileBrowserCategoryId,
+        editorTemplates,
     ) {
         var self = this;
         self.states = {
@@ -34,6 +35,7 @@
         self.saveButton = saveButton;
         self.deleteButton = deleteButton;
         self.fileBrowserCategoryId = fileBrowserCategoryId;
+        self.editorTemplates = editorTemplates;
         self.editor = null;
 
         // Set up events
@@ -221,6 +223,7 @@
                     maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
                     targetElements: ["#" + editorInstanceId],
                     fileBrowserCategoryId: self.fileBrowserCategoryId,
+                    ...(self.editorTemplates && { templates: self.editorTemplates }),
                 },
             }),
         );
@@ -334,14 +337,16 @@
                 $saveButton = $this.find(derivedOptions.saveButton),
                 $editorInstance = $this.find(derivedOptions.editorInstance),
                 fileBrowserCategoryId = derivedOptions.fileBrowserCategoryId,
-                inlineTextboxEditor = new InlineTextboxEditor(
-                    $this,
-                    $editorInstance,
-                    $modifyButton,
-                    $saveButton,
-                    $deleteButton,
-                    fileBrowserCategoryId,
-                );
+                editorTemplates = derivedOptions.editorTemplates;
+            inlineTextboxEditor = new InlineTextboxEditor(
+                $this,
+                $editorInstance,
+                $modifyButton,
+                $saveButton,
+                $deleteButton,
+                fileBrowserCategoryId,
+                editorTemplates,
+            );
             $this.data("inlineTextboxEditor", inlineTextboxEditor);
         });
         return this;
