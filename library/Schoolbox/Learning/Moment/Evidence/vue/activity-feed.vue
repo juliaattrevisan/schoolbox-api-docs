@@ -750,6 +750,9 @@ export default {
                                             :site-version="siteVersion"
                                         />
                                     </div>
+
+                                    <p>TODO Action buttons go here</p>
+
                                 </template>
                                 <template v-if="evidence.discriminator === 'badgeAward'">
                                     <div class="card badge-card small-12">
