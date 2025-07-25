@@ -444,8 +444,8 @@ class Controller extends Base
         $limit = $this->requestQuery->getInt('limit', Cursor::LIMIT_DEFAULT);
         $encodedCursor = $this->requestQuery->get('cursor');
         $resultType = $this->requestQuery->get('selected');
-        $sortBy = $this->requestQuery->get('sortBy', 'name');
-        $order = $this->requestQuery->get('order', 'ASC');
+        $sortBy = $this->requestQuery->get('sortBy', Cursor::SORT_BY_DEFAULT);
+        $order = $this->requestQuery->get('order', Cursor::ORDER_DEFAULT);
 
         try {
             $factory = (new Factory(
@@ -453,6 +453,8 @@ class Controller extends Base
                 $this->userMapper,
                 $this->pastoralMapper,
                 $resultType,
+                $sortBy,
+                $order,
                 $limit
             ))->produce(
                 new Helper(

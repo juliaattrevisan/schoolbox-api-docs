@@ -33,6 +33,8 @@ class Cursor implements ICursor
 
     public const RESULT_TYPE_POINTS = 'points';
     public const RESULT_TYPE_RECORDS = 'records';
+    public const SORT_BY_DEFAULT = 'name';
+    public const ORDER_DEFAULT = 'ASC';
 
     public function __construct(
         protected Helper $helper,
@@ -40,6 +42,8 @@ class Cursor implements ICursor
         protected UserMapper $userMapper,
         protected PastoralMapper $pastoralMapper,
         protected string $resultType,
+        protected ?string $sortBy = self::SORT_BY_DEFAULT,
+        protected ?string $order = self::ORDER_DEFAULT,
         protected ?int $limit = self::LIMIT_DEFAULT,
         protected ?ICodec $codec = null,
     ) {
@@ -55,6 +59,16 @@ class Cursor implements ICursor
          */
         if ($this->limit < self::LIMIT_MIN) {
             throw new ValueError(sprintf('Limit must be at least %d: %d provided', self::LIMIT_MIN, $this->limit));
+        }
+
+        /* Set default if sorting is set as null
+         */
+        if (null === $this->sortBy) {
+            $this->sortBy = self::SORT_BY_DEFAULT;
+        }
+
+        if (null === $this->order) {
+            $this->order = self::ORDER_DEFAULT;
         }
     }
 
