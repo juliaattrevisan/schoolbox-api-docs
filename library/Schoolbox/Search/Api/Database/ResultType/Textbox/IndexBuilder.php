@@ -283,7 +283,8 @@ class IndexBuilder extends BaseBuilder
         ";
         $searchIndexParams = ['type' => Hydrator::BASE_TYPE];
 
-        // Also add subject filters here, in a convoluted way
+        // Since search_index.identifier has the format "$textboxId-$componentId-$folderId", a different
+        // LIKE condition can be used to filter rows of search_index depending on the type of $subject.
         if ($subject instanceof Textbox\Model) {
             $searchIndexQueryString .= ' AND identifier LIKE :textboxIdentifier';
             $searchIndexParams['textboxIdentifier'] = $subject->getId() . '-%';
