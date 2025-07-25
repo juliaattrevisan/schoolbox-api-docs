@@ -2,8 +2,14 @@
 
 namespace Schoolbox\Pastoral\ReportBuilder;
 
+use Alaress\Codec\ICodec;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Collection;
+use Schoolbox\Pastoral\Mapper as PastoralMapper;
+use Schoolbox\Pastoral\Report\Model as PastoralReport;
 use Schoolbox\Pastoral\ReportBuilder\TabType\StudentByType;
 use Schoolbox\User\Translator\Author\ModelToArray;
+use Schoolbox\UserMapper;
 
 class Factory
 {
@@ -15,14 +21,26 @@ class Factory
 
     public function __construct(
         private ModelToArray $userTranslator,
+        private UserMapper $userMapper,
+        private PastoralMapper $pastoralMapper,
+        private string $resultType,
+        private ?int $limit = null,
     ) {
     }
 
     public function produce(
+        Helper $helper,
         string $type,
     ) {
         return match ($type) {
-            self::STUDENT_BY_TYPE => new StudentByType($this->userTranslator),
+            self::STUDENT_BY_TYPE => new StudentByType(
+                $helper,
+                $this->userTranslator,
+                $this->userMapper,
+                $this->pastoralMapper,
+                $this->resultType,
+                $this->limit,
+            ),
             default => null
         };
     }

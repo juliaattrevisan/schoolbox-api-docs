@@ -12,6 +12,7 @@ namespace Schoolbox\Pastoral\ReportBuilder;
 
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
+use Aura\Router\Exception\RouteNotFound;
 use Crell\ApiProblem\ApiProblem;
 use HouseMapper;
 use Schoolbox\Assessment\Term;
@@ -26,12 +27,14 @@ use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
 use Schoolbox\Pastoral\DataSource as PastoralDataSource;
 use Schoolbox\Pastoral\Model as PastoralRecord;
+use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Report\Access\Mapper as ReportAccessMapper;
 use Schoolbox\Pastoral\Report\Access\Model as ReportAccess;
 use Schoolbox\Pastoral\Report\Dashboard\Mapper as PastoralReportDashboardMapper;
 use Schoolbox\Pastoral\Report\Dashboard\Model as PastoralReportDashboard;
 use Schoolbox\Pastoral\Report\Mapper as PastoralReportMapper;
 use Schoolbox\Pastoral\Report\Model as PastoralReport;
+use Schoolbox\Pastoral\ReportBuilder\TabType\TabTypeInterface;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Tag\Model as PastoralTag;
@@ -48,6 +51,7 @@ use Schoolbox\User;
 use Schoolbox\User\Translator\Author\ModelToArray as UserTranslator;
 use Schoolbox\UserMapper;
 use Schoolbox\YearLevel;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 class Controller extends Base
 {
@@ -75,6 +79,7 @@ class Controller extends Base
      * @param RosettaStone                  $l10n
      * @param ModelToArray                  $pastoralTranslator
      * @param UserTranslator                $userTranslator
+     * @param PastoralMapper                $pastoralMapper
      */
     public function __construct(
         private ErrorMapper $errorMapper,
@@ -98,6 +103,7 @@ class Controller extends Base
         private RosettaStone $l10n,
         private ModelToArray $pastoralTranslator,
         private UserTranslator $userTranslator,
+        private PastoralMapper $pastoralMapper,
     ) {
     }
 
@@ -356,6 +362,7 @@ class Controller extends Base
      *
      * @param PastoralReport $report
      * @throws MapperException
+     * @throws RouteNotFound
      */
     public function getReportResults(PastoralReport $report): void
     {
@@ -429,25 +436,37 @@ class Controller extends Base
      * Retrieve report of all pastoral records with the selected type
      * to display in a table format
      *
+     * @param string         $tabType
      * @param PastoralReport $report
-     * @throws MapperException
      */
     public function getReportByTabType(string $tabType, PastoralReport $report): void
     {
+        $limit = $this->requestQuery->getInt('limit', Cursor::LIMIT_DEFAULT);
+        $encodedCursor = $this->requestQuery->get('cursor');
+        $resultType = $this->requestQuery->get('selected');
         try {
             $factory = (new Factory(
-                $this->userTranslator
-            ))->produce($tabType);
+                $this->userTranslator,
+                $this->userMapper,
+                $this->pastoralMapper,
+                $resultType,
+                $limit
+            ))->produce(
+                new Helper(
+                    $this->prepareReportData($report),
+                    $this->pastoralMapper,
+                    $this->getConfigLoader(),
+                ),
+                $tabType
+            );
 
             if (null === $factory) {
                 throw new MapperException("Invalid type: $tabType has been given.");
             }
 
-            $records = $this->getReportData($report);
-
-            $payload = $factory->process($records);
-
-            $this->response = $this->responseAsJson($payload);
+            $records = $factory->retrieveResults($encodedCursor);
+            $records = $factory->process($records, $encodedCursor);
+            $this->response = $this->responseAsJson($records);
         } catch (\Exception $e) {
             $problem = new ApiProblem($e->getMessage());
             $problem->setStatus($e->getCode());
@@ -527,16 +546,13 @@ class Controller extends Base
     }
 
     /**
-     * Get pastoral report records
+     * Preparing the data readying for report filtering
      *
      * @param PastoralReport $report
-     *
-     * @return Collection
+     * @return array
      */
-    private function getReportData(PastoralReport $report): Collection
+    private function prepareReportData(PastoralReport $report): array
     {
-        // Get matching records
-
         // Special case for the current term relative date, which is not a strtotime-able thingy
         if (!$report->getUsesRelativeDate()) {
             $beforeDate = $report->getBeforeDate();
@@ -575,30 +591,70 @@ class Controller extends Base
 
         // if folder is set, but no users returned, we should not return any records
         if (($report->getFolders()->count() > 0) && ($students->count() === 0)) {
+            return [];
+        }
+
+        return [
+            'user' => $this->getUser(),
+            'beforeDate' => $beforeDate,
+            'afterDate' => $afterDate,
+            'severity' => $report->getSeverity(),
+            'types' => $report->getTypes(),
+            'subtypes' => $report->getSubTypes(),
+            'authors' => $report->getAuthors(),
+            'students' => $students,
+            'tags' => $report->getTags(),
+            'orders' => $report->getOrder(),
+            'involved' => $report->getInvolved(),
+            'years' => $report->getYears(),
+            'houses' => $report->getHouses(),
+            'campuses' => $report->getCampuses(),
+            'actions' => $report->getActions(),
+            'includeStudentsWithoutYear' => $report->getIncludeStudentsWithoutYear(),
+            'includeStudentsWithoutHouse' => $report->getIncludeStudentsWithoutHouse(),
+            'includeRecordsWithoutAction' => $report->getIncludeRecordsWithoutAction(),
+            'includeArchivedRecords' => $report->getIncludeArchivedRecords(),
+            'actionStatus' => $report->getActionStatus(),
+        ];
+    }
+
+    /**
+     * Get pastoral report records
+     *
+     * @param PastoralReport $report
+     *
+     * @return Collection
+     */
+    private function getReportData(PastoralReport $report): Collection
+    {
+        // Get matching records
+        $data = $this->prepareReportData($report);
+
+        if (empty($data)) {
             return $this->pastoralDataSource->createCollection();
         }
 
         return $this->pastoralDataSource->getReportData(
-            $this->getUser(),
-            $beforeDate,
-            $afterDate,
-            $report->getSeverity(),
-            $report->getTypes(),
-            $report->getSubTypes(),
-            $report->getAuthors(),
-            $students,
-            $report->getTags(),
-            $report->getOrder(),
-            $report->getInvolved(),
-            $report->getYears(),
-            $report->getHouses(),
-            $report->getCampuses(),
-            $report->getActions(),
-            $report->getIncludeStudentsWithoutYear(),
-            $report->getIncludeStudentsWithoutHouse(),
-            $report->getIncludeRecordsWithoutAction(),
-            $report->getIncludeArchivedRecords(),
-            $report->getActionStatus(),
+            $data['user'],
+            $data['beforeDate'],
+            $data['afterDate'],
+            $data['severity'],
+            $data['types'],
+            $data['subtypes'],
+            $data['authors'],
+            $data['students'],
+            $data['tags'],
+            $data['orders'],
+            $data['involved'],
+            $data['years'],
+            $data['houses'],
+            $data['campuses'],
+            $data['actions'],
+            $data['includeStudentsWithoutYear'],
+            $data['includeStudentsWithoutHouse'],
+            $data['includeRecordsWithoutAction'],
+            $data['includeArchivedRecords'],
+            $data['actionStatus'],
         );
     }
 

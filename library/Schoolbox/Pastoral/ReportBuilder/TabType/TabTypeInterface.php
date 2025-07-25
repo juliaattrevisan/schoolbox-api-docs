@@ -6,5 +6,5 @@ use Schoolbox\Collection;
 
 interface TabTypeInterface
 {
-    public function process(Collection $records);
+    public function process(Collection $records, ?string $encodedCursor = null);
 }

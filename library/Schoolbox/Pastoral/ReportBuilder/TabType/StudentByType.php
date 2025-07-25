@@ -2,179 +2,210 @@
 
 namespace Schoolbox\Pastoral\ReportBuilder\TabType;
 
-use Schoolbox\Pastoral\Model as PastoralRecord;
-use Schoolbox\User\Translator\Author\ModelToArray;
+use Schoolbox\Collection;
+use Schoolbox\Pastoral\ReportBuilder\Cursor;
+use Schoolbox\Pastoral\SubType\Model as SubType;
+use Schoolbox\Pastoral\Type\Model as Type;
 
-class StudentByType implements TabTypeInterface
+class StudentByType extends Cursor implements TabTypeInterface
 {
-    public function __construct(
-        private ModelToArray $userTranslator,
-    ) {
+    private array $params = [];
+
+    /**
+     * Get the select string for the counts
+     *
+     * @param string $resultType
+     * @param int    $value
+     * @param bool   $isSubtype
+     * @return string
+     * @throws \Exception
+     */
+    private function getSelectCountString(string $resultType, int $value, bool $isSubtype = false): string
+    {
+        $type = $isSubtype ? 'subtype' : 'type';
+
+        $label = "count_{$type}_{$value}";
+        $this->params[$label] = $label;
+
+        return match (strtolower($resultType)) {
+            Cursor::RESULT_TYPE_RECORDS =>
+            "ROUND(COUNT(CASE WHEN p.{$type}_id = {$value} THEN 1 END), 2) AS :{$label}",
+            Cursor::RESULT_TYPE_POINTS =>
+            "ROUND(SUM(CASE WHEN p.{$type}_id = {$value} THEN p.points END), 2) AS :{$label}",
+            default => throw new \Exception("Unknown result type: '{$resultType}'"),
+        };
     }
 
-    public function process($records)
+    /**
+     * @inheritdoc
+     */
+    public function retrieveResults(?string $encodedCursor): Collection
     {
-        // Extract unique types and subtypes from the records in a single pass
-        $types = [];
-        $subtypes = [];
-        $typesWithSubtypes = [];
-
-        /** @var PastoralRecord $record */
-        foreach ($records as $record) {
-            $type = $record->getType();
-            if ($type) {
-                $typeId = $type->getId();
-                // add type to the list if it doesn't already exist
-                if (!isset($types[$typeId])) {
-                    $types[$typeId] = $type;
-                }
-            }
-
-            $subtype = $record->getSubType();
-            if ($subtype) {
-                $subtypeId = $subtype->getId();
-                // add subtype to the list if it doesn't already exist
-                if (!isset($subtypes[$subtypeId])) {
-                    $subtypes[$subtypeId] = $subtype;
-                    // Track which types have subtypes for later processing
-                    $typesWithSubtypes[$subtype->getPastoralType()->getId()] = true;
-                }
-            }
+        if (null !== $encodedCursor) {
+            $cursor = $this->codec->decode($encodedCursor);
         }
 
-        // Calculate counts and points for all types/subtypes and group by student in a single pass
-        $subtypeCounts = [];
-        $subtypePoints = [];
-        $subtypeHasPoints = []; // Track if any records for this subtype have points set
-        $typeCounts = [];
-        $typePoints = [];
-        $typeHasPoints = []; // Track if any records for this type have points set
-        $studentRecords = [];
+        $db = $this->pastoralMapper->getDatabase();
 
-        foreach ($records as $record) {
-            $student = $record->getStudent();
-            $studentId = $student->getId();
-            $points = $record->getPoints();
-            $pointsValue = ($points !== null && $points !== '') ? (int)$points : 0;
+        $whereInTypeSubTypeQuery = [];
 
-            // Initialize student record if not exists
-            if (!isset($studentRecords[$studentId])) {
-                $studentRecords[$studentId] = [
-                    'student' => $student,
-                    'subtypeCounts' => [],
-                    'subtypePoints' => [],
-                    'subtypeHasPoints' => [], // Track if any records for this student/subtype have points set
-                    'typeCounts' => [],
-                    'typePoints' => [],
-                    'typeHasPoints' => [], // Track if any records for this student/type have points set
-                ];
-            }
+        $whereTypes = $this->helper->getType();
 
-            // Process subtypes
-            $subtype = $record->getSubType();
-            if ($subtype) {
-                $subtypeId = $subtype->getId();
-                $hasPoints = ($points !== null && $points !== '');
-
-                // Increment global counts
-                $subtypeCounts[$subtypeId] = ($subtypeCounts[$subtypeId] ?? 0) + 1;
-                $subtypePoints[$subtypeId] = ($subtypePoints[$subtypeId] ?? 0) + $pointsValue;
-                if ($hasPoints) {
-                    $subtypeHasPoints[$subtypeId] = true;
-                }
-
-                // Increment student counts
-                $studentRecords[$studentId]['subtypeCounts'][$subtypeId] =
-                    ($studentRecords[$studentId]['subtypeCounts'][$subtypeId] ?? 0) + 1;
-                $studentRecords[$studentId]['subtypePoints'][$subtypeId] =
-                    ($studentRecords[$studentId]['subtypePoints'][$subtypeId] ?? 0) + $pointsValue;
-                if ($hasPoints) {
-                    $studentRecords[$studentId]['subtypeHasPoints'][$subtypeId] = true;
-                }
-            }
-
-            // Process types (only those without subtypes)
-            $type = $record->getType();
-            if ($type && !isset($typesWithSubtypes[$type->getId()])) {
-                $typeId = $type->getId();
-                $hasPoints = ($points !== null && $points !== '');
-
-                // Increment global counts
-                $typeCounts[$typeId] = ($typeCounts[$typeId] ?? 0) + 1;
-                $typePoints[$typeId] = ($typePoints[$typeId] ?? 0) + $pointsValue;
-                if ($hasPoints) {
-                    $typeHasPoints[$typeId] = true;
-                }
-
-                // Increment student counts
-                $studentRecords[$studentId]['typeCounts'][$typeId] =
-                    ($studentRecords[$studentId]['typeCounts'][$typeId] ?? 0) + 1;
-                $studentRecords[$studentId]['typePoints'][$typeId] =
-                    ($studentRecords[$studentId]['typePoints'][$typeId] ?? 0) + $pointsValue;
-                if ($hasPoints) {
-                    $studentRecords[$studentId]['typeHasPoints'][$typeId] = true;
-                }
-            }
+        if ($whereTypes->count() > 0) {
+            $whereTypeIds = implode(',', $whereTypes->getPropertyValues('id'));
+            $countTypeQuery = implode(
+                ', ',
+                $whereTypes->map(
+                    fn(Type $type) => $this->getSelectCountString($this->resultType, $type->getId())
+                )->getAll()
+            );
+            $whereInTypeSubTypeQuery[] = "p.type_id IN ({$whereTypeIds})";
         }
 
-        // Sort types by sequence and build table columns in the correct order
-        $typesSorted = [];
-        foreach ($types as $type) {
-            $typesSorted[$type->getSequence()] = $type;
-        }
-        ksort($typesSorted);
-
-        // Build table columns and total row data arrays
-        $tableColumns = [];
-        $totalRowData = [];
-
-        foreach ($typesSorted as $type) {
-            $typeId = $type->getId();
-
-            if (isset($typesWithSubtypes[$typeId])) {
-                // This type has subtypes - sort and add all subtypes for this type
-                $typeSubtypes = [];
-                foreach ($subtypes as $subtype) {
-                    if ($subtype->getPastoralType()->getId() === $typeId) {
-                        $typeSubtypes[$subtype->getSequence()] = $subtype;
-                    }
-                }
-                ksort($typeSubtypes);
-
-                foreach ($typeSubtypes as $subtype) {
-                    $subtypeId = $subtype->getId();
-                    $tableColumns[] = [
-                        'key' => 'subtype-' . $subtypeId,
-                        'title' => $subtype->getPastoralType()->getName(),
-                        'subTitle' => $subtype->getName(),
-                        'type' => 'RecordsAndPoints',
-                        'isSortable' => true,
-                    ];
-
-                    $totalRowItem = ['records' => $subtypeCounts[$subtypeId] ?? 0];
-                    if (isset($subtypeHasPoints[$subtypeId])) {
-                        $totalRowItem['points'] = $subtypePoints[$subtypeId] ?? 0;
-                    }
-                    $totalRowData[] = $totalRowItem;
-                }
-            } else {
-                // This type has no subtypes - add the type itself
-                $tableColumns[] = [
-                    'key' => 'type-' . $typeId,
-                    'title' => $type->getName(),
-                    'type' => 'RecordsAndPoints',
-                    'isSortable' => true,
-                ];
-
-                $totalRowItem = ['records' => $typeCounts[$typeId] ?? 0];
-                if (isset($typeHasPoints[$typeId])) {
-                    $totalRowItem['points'] = $typePoints[$typeId] ?? 0;
-                }
-                $totalRowData[] = $totalRowItem;
-            }
+        $whereSubTypes = $this->helper->getSubTypes();
+        if (($whereSubTypes)->count() > 0) {
+            $whereSubTypeIds   = implode(',', $this->helper->getSubTypes()->getPropertyValues('id'));
+            $countSubTypeQuery = implode(
+                ', ',
+                $this->helper->getSubTypes()->map(
+                    fn(SubType $subType) => $this->getSelectCountString($this->resultType, $subType->getId(), true)
+                )->getAll()
+            );
+            $whereInTypeSubTypeQuery[] = "p.subtype_id IN ({$whereSubTypeIds})";
         }
 
-        // Build table headers structure
+        $countQuery = implode(', ', array_filter([$countTypeQuery ?? '', $countSubTypeQuery ?? '']));
+
+        $whereTypeSubTypeQuery = implode(" OR ", $whereInTypeSubTypeQuery);
+
+        $orderBy = "u.lastname, COALESCE(u.preferred_name, u.firstname)";
+
+        $whereQuery = implode(" AND ", $this->helper->getFilters());
+
+        $countQuery =
+            "SELECT p.student_id, {$countQuery}
+            {$this->helper->getFromString()}
+            WHERE
+                ({$whereTypeSubTypeQuery}) AND
+                {$whereQuery} AND
+                p.deleted_at IS NULL
+            GROUP BY p.student_id
+           ";
+
+        $typeKeys = implode(
+            ' + ',
+            $whereTypes->map(
+                fn(Type $type) => "count_type_{$type->getId()}"
+            )->getAll()
+        );
+
+        $subTypeKeys = implode(
+            ' + ',
+            $this->helper->getSubTypes()->map(
+                fn(SubType $subType) => "count_subtype_{$subType->getId()}"
+            )->getAll()
+        );
+
+        $totalCount = "SUM(" . implode(' + ', array_filter([$typeKeys, $subTypeKeys])) . ") as total";
+
+        /**
+         * Finding out where to locate the position where the cursor is pointing
+         */
+        $whereParts = "";
+        $this->params['limit'] = $this->limit;
+        if (isset($cursor)) {
+            /* TODO default to ordering by name in ascending order, will update in SA-20574 when implementing sorting
+             */
+            $whereParts = "
+                CROSS JOIN (SELECT lastname, COALESCE(preferred_name, firstname) as preferred_name
+                FROM user
+                WHERE id = :cursor) u2
+                WHERE u.lastname > u2.lastname OR (u.lastname > u2.lastname AND COALESCE(u.preferred_name, u.firstname) > u2.preferred_name)
+            ";
+            $this->params['cursor'] = $cursor['id'];
+        }
+
+        $totalQuery = "
+            SELECT countData.*, {$totalCount}
+            FROM ($countQuery) countData
+            INNER JOIN user u ON countData.student_id = u.id
+            {$whereParts}
+            GROUP BY countData.student_id, {$orderBy}
+            ORDER BY {$orderBy} ASC
+            LIMIT :limit
+        ";
+
+        $result =  $db->executeQuery(
+            $totalQuery,
+            array_merge(
+                $this->params,
+                $this->helper->getParams()
+            )
+        );
+
+        $data = $result->fetchAll(\PDO::FETCH_ASSOC);
+        return new Collection($data);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function retrieveResultCount(): ?int
+    {
+        $whereInTypeSubTypeQuery = [];
+        if ($this->helper->getType()->count() > 0) {
+            $whereTypeIds = implode(',', $this->helper->getType()->getPropertyValues('id'));
+            $whereInTypeSubTypeQuery[] = "p.type_id IN ({$whereTypeIds})";
+        }
+        if ($this->helper->getSubTypes()->count() > 0) {
+            $whereSubTypeIds = implode(',', $this->helper->getSubTypes()->getPropertyValues('id'));
+            $whereInTypeSubTypeQuery[] = "p.subtype_id IN ({$whereSubTypeIds})";
+        }
+
+        $whereQuery = implode(" OR ", array_filter($whereInTypeSubTypeQuery));
+        $whereFilterQuery = implode(" AND ", $this->helper->getFilters());
+
+        $query = "
+            SELECT p.student_id
+            {$this->helper->getFromString()}
+            WHERE
+                {$whereQuery}
+                AND {$whereFilterQuery}
+                AND p.deleted_at IS NULL
+            GROUP BY p.student_id
+        ;";
+
+        $result = $this->pastoralMapper->getDatabase()->executeQuery(
+            $query,
+            $this->helper->getParams()
+        );
+
+        return $result->rowCount();
+    }
+
+    public function next(Collection $collection): ?string
+    {
+        // As usual: if the collection is empty, there is no next
+        if ($collection->count() === 0) {
+            return null;
+        }
+
+        $last = $collection->last();
+        return $this->codec->encode([
+            'id' => $last['student_id'],
+            'orderBy' => 'name' //TODO SA-20574 for sorting in different types
+        ]);
+    }
+
+    /**
+     * Get the header row for the table
+     *
+     * @return array[]
+     */
+    private function getTableHeaders(): array
+    {
+        $types = $this->helper->getType();
+
         $tableHeaders = [
             [
                 'key' => 'user',
@@ -187,106 +218,80 @@ class StudentByType implements TabTypeInterface
                 'title' => 'Total',
                 'type' => 'RecordsAndPoints',
                 'isSortable' => true,
-            ],
-        ];
-        $tableHeaders = array_merge($tableHeaders, $tableColumns);
-
-        // Calculate grand totals for the summary row
-        $grandTotalRecords = array_sum($subtypeCounts) + array_sum($typeCounts);
-        $grandTotalPoints = array_sum($subtypePoints) + array_sum($typePoints);
-
-        // Build total row structure
-        $totalRow = [
-            'Total', // Sits in first column along with User
+            ]
         ];
 
-        $grandTotalItem = ['records' => $grandTotalRecords];
-        if (!empty($subtypeHasPoints) || !empty($typeHasPoints)) {
-            $grandTotalItem['points'] = $grandTotalPoints;
-        }
-        $totalRow[] = $grandTotalItem;
-
-        $totalRow = array_merge($totalRow, $totalRowData);
-
-        // Build student rows with data matching the column order
-        $studentRows = [];
-        foreach ($studentRecords as $studentData) {
-            $student = $studentData['student'];
-
-            // Use the user translator to get standardized user data
-            $userData = call_user_func($this->userTranslator, $student);
-
-            // First column user data from translator
-            $row = [$userData];
-
-            // Next, add total column
-            $totalRecords = array_sum($studentData['subtypeCounts']) + array_sum($studentData['typeCounts']);
-            $totalPoints = array_sum($studentData['subtypePoints']) + array_sum($studentData['typePoints']);
-
-            $totalItem = ['records' => $totalRecords];
-            if (!empty($studentData['subtypeHasPoints']) || !empty($studentData['typeHasPoints'])) {
-                $totalItem['points'] = $totalPoints;
-            }
-            $row[] = $totalItem;
-
-            // Add data for each column in the same order as tableColumns
-            foreach ($typesSorted as $type) {
-                $typeId = $type->getId();
-
-                if (isset($typesWithSubtypes[$typeId])) {
-                    // Add subtypes for this type in sequence order
-                    $typeSubtypes = [];
-                    foreach ($subtypes as $subtype) {
-                        if ($subtype->getPastoralType()->getId() === $typeId) {
-                            $typeSubtypes[$subtype->getSequence()] = $subtype;
-                        }
-                    }
-                    ksort($typeSubtypes);
-
-                    foreach ($typeSubtypes as $subtype) {
-                        $subtypeId = $subtype->getId();
-                        $studentSubtypeItem = ['records' => $studentData['subtypeCounts'][$subtypeId] ?? 0];
-                        if (isset($studentData['subtypeHasPoints'][$subtypeId])) {
-                            $studentSubtypeItem['points'] = $studentData['subtypePoints'][$subtypeId] ?? 0;
-                        }
-                        $row[] = $studentSubtypeItem;
-                    }
-                } else {
-                    // Add data for standalone type
-                    $studentTypeItem = ['records' => $studentData['typeCounts'][$typeId] ?? 0];
-                    if (isset($studentData['typeHasPoints'][$typeId])) {
-                        $studentTypeItem['points'] = $studentData['typePoints'][$typeId] ?? 0;
-                    }
-                    $row[] = $studentTypeItem;
-                }
-            }
-
-            $studentRows[] = $row;
+        foreach ($types as $type) {
+            $tableHeaders[] = [
+                'key' => "count_type_{$type->getId()}",
+                'title' => $type->getName(),
+                'type' => 'RecordsAndPoints',
+                'isSortable' => true,
+            ];
         }
 
-        // Sort student rows alphabetically by last name
-        usort($studentRows, function ($a, $b) {
-            return strcmp($a[0]['lastName'], $b[0]['lastName']);
-        });
+        foreach ($this->helper->getSubTypes() as $subType) {
+            if ($subType instanceof SubType) {
+                $tableHeaders[] = [
+                    'key'   => "count_subtype_{$subType->getId()}",
+                    'title' => $subType->getPastoralType()->getName(),
+                    'subTitle' => $subType->getName(),
+                    'type' => 'RecordsAndPoints',
+                    'isSortable' => true,
+                ];
+            }
+        }
 
-        /**
-         * TODO this is temporary and should create a cursor to return the data properly with pagination
-         * it will be done later in the epic
+        return $tableHeaders;
+    }
+
+    /**
+     * Processing the payload to format it for presenting in a table
+     *
+     * @param Collection  $records
+     * @param string|null $encodedCursor
+     * @return array[]
+     */
+    public function process(Collection $records, ?string $encodedCursor = null): array
+    {
+        $tableHeader = $this->getTableHeaders();
+        $totalRow = $rows = [];
+        $students = $this->userMapper->findByColumn('id', array_column($records->getAll(), 'student_id'));
+
+        /* Only process if there are records in the paginated results
          */
-        // Data payload with calculated values
+        if ($records->count() > 0) {
+            $keys = array_keys($records->first());
+            array_shift($keys);
+
+            $totalRow['user'] = 'Total';
+
+            foreach ($keys as $key) {
+                $totalRow[$key] = [ $this->resultType => array_sum(array_column($records->getAll(), $key))];
+            }
+
+            $rows = $records->map(
+                function (array $record) use ($students) {
+                    $row['user'] = call_user_func($this->userTranslator, $students->getBy('id', $record['student_id']));
+                    unset($record['student_id']);
+                    return array_merge($row, array_map(fn($value) => [ $this->resultType => floatval($value)], ($record)));
+                }
+            );
+        }
+
         return [
             'data' => [
-                'tableHeaders' => $tableHeaders,
+                'tableHeaders' => $tableHeader,
                 'totalRow' => $totalRow,
-                'rows' => $studentRows,
+                'rows' => $rows,
             ],
             'metadata' => [
-                'count' => 20,
+                'count' => $this->retrieveResultCount(),
                 'cursor' => [
-                    'current' => null,
-                    'next' => null,
-                ],
-            ],
+                    'current' => $encodedCursor ?? $this->current($records),
+                    'next' => $this->next($records) ?? null,
+                ]
+            ]
         ];
     }
 }
