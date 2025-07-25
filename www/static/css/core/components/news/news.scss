@@ -3,7 +3,7 @@
     .card {
         padding: 1rem;
         img {
-            margin: 0 1rem 0 0;
+            margin: 0px;
             width: auto;
         }
         p > img,
@@ -78,7 +78,6 @@
         }
         article {
             padding-top: 0.5rem;
-            overflow-x: hidden;
         }
     }
     .v-card {
