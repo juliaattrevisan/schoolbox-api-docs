@@ -322,7 +322,7 @@ class IndexBuilder extends BaseBuilder
         $this->logger->info(sprintf('Examining %d text box search indices', $searchIndexQuery->rowCount()));
         foreach ($searchIndexQuery->fetchColumnArray('identifier') as $identifier) {
             $removeIndex = false;
-            [$textboxId, $componentId] = explode('-', $identifier);
+            [$textboxId, $componentId, $folderIgnored] = Hydrator::explodeTextboxInstanceId($identifier);
 
             // Check if this textbox exists:
             // if not, delete its index

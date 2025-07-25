@@ -243,7 +243,7 @@ class IndexBuilder extends BaseBuilder
         $this->logger->info("Examining {$searchIndexQuery->rowCount()} tile search indices.");
         foreach ($searchIndexQuery->fetchColumnArray('identifier') as $identifier) {
             $removeIndex = false;
-            [$tileId, $componentId] = explode('-', $identifier);
+            [$tileId, $componentId, $folderIdIgnored] = Hydrator::explodeTileInstanceId($identifier);
 
             // Check if this tile/tile_layout exists.  If not, delete its index.
             if (!isset($tileLayoutIdByTileId[$tileId])) {

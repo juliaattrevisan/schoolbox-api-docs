@@ -233,7 +233,7 @@ class Hydrator extends BaseHydrator
      * @param string $textboxInstanceId - Expected to be a string like "$textboxId-$componentInstanceId-$folderId".
      * @return array
      */
-    private static function explodeTextboxInstanceId(string $textboxInstanceId): array
+    public static function explodeTextboxInstanceId(string $textboxInstanceId): array
     {
         $tokens = explode('-', $textboxInstanceId);
 

@@ -177,7 +177,7 @@ class Hydrator extends BaseHydrator
      * @param string $tileInstanceId - Expected to be a string like "$tileId-$componentInstanceId-$folderId".
      * @return array
      */
-    private static function explodeTileInstanceId(string $tileInstanceId): array
+    public static function explodeTileInstanceId(string $tileInstanceId): array
     {
         $tokens = explode('-', $tileInstanceId);
 
