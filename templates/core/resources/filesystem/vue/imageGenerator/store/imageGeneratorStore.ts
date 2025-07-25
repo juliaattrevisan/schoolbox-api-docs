@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import type { FileDropFile } from "@js/resource/fileDropTypes";
 import type { AiFeedMessage, ImageResponseInProgress } from "../imageGeneratorTypes";
 import { generateImage } from "./imageGeneratorPayload";
 import type { ImageGeneratorApiPayload } from "./imageGeneratorPayload";
@@ -49,9 +50,10 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
     /**
      * Request a new image from the AI
      * @param payload - The payload to send to the AI
+     * @param file - The file that was sent with the request (if any)
      * @returns whether the request was sent successfully or not
      */
-    async function sendRequest(payload: ImageGeneratorApiPayload): Promise<boolean> {
+    async function sendRequest(payload: ImageGeneratorApiPayload, file: FileDropFile | null): Promise<boolean> {
         if (activeGeneration.value !== null) {
             return false;
         }
@@ -64,9 +66,8 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
             type: "request",
             entryKey: getNextEntryKey(),
             user: window.schoolboxUser,
-            prompt: payload.userPrompt,
-            attributes: payload.attributes,
-            previousResponseId: payload.previousResponseId,
+            payload,
+            file,
         });
 
         activeGeneration.value = {

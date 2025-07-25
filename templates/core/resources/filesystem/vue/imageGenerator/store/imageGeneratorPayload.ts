@@ -8,6 +8,7 @@ const finalEventName: ResponseCompletedEvent["type"] = "response.completed";
 export type ImageGeneratorApiPayload = {
     userPrompt: string;
     attributes: Record<string, string | null>;
+    imageUrl: string | null;
     previousResponseId: string | null;
 };
 

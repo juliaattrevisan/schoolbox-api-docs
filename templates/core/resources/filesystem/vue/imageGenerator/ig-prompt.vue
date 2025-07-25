@@ -1,5 +1,7 @@
 <script lang="ts" setup>
 import { useTemplateRefsList } from "@vueuse/core";
+import FileDrop from "@js/resource/file-drop.vue";
+import type { FileDropFile } from "@js/resource/fileDropTypes";
 import { useImageGeneratorStore } from "./store/imageGeneratorStore";
 import type { ImagePromptAttribute } from "./imageGeneratorTypes";
 
@@ -13,6 +15,7 @@ interface Props {
 const props = defineProps<Props>();
 const igStore = useImageGeneratorStore();
 
+const currentFile = window.Vue.ref<FileDropFile | null>(null);
 const prompt = window.Vue.ref<string>("");
 const promptEl = window.Vue.useTemplateRef<HTMLTextAreaElement>("promptRef");
 const attributes = window.Vue.ref<Record<string, string>>({});
@@ -25,22 +28,47 @@ window.Vue.onMounted(() => {
 });
 
 /**
- * Temp function to test the prompt
+ * @param file - The relevant file
+ * @returns A URL (base64) for the current file to be included in the prompt
+ */
+async function getImageUrl(file: File): Promise<string | null> {
+    return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = (): void => {
+            if (typeof reader.result === "string" || reader.result === null) {
+                resolve(reader.result);
+            } else {
+                resolve(null);
+            }
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+/**
+ * Send the current prompt to the AI
  */
 async function sendRequest(): Promise<void> {
-    if (!promptEl.value?.reportValidity()) {
-        return; // prompt is required, can't send the request
+    if (promptEl.value) {
+        promptEl.value.value = promptEl.value.value.trim();
+        if (!promptEl.value.reportValidity()) {
+            return; // prompt is required, can't send the request
+        }
     }
 
     if (attributeEls.value.some((el) => !el.reportValidity())) {
         return; // some attributes are required and not set yet, can't send the request
     }
 
-    const isSuccess = await igStore.sendRequest({
-        userPrompt: prompt.value,
-        attributes: attributes.value,
-        previousResponseId: igStore.getPreviousResponseId(),
-    });
+    const isSuccess = await igStore.sendRequest(
+        {
+            userPrompt: prompt.value.trim(),
+            attributes: attributes.value,
+            imageUrl: currentFile.value ? await getImageUrl(currentFile.value.file) : null,
+            previousResponseId: igStore.getPreviousResponseId(),
+        },
+        currentFile.value,
+    );
 
     if (isSuccess) {
         /* clear the prompt but not the other settings on success */
@@ -50,10 +78,19 @@ async function sendRequest(): Promise<void> {
 </script>
 
 <template>
+    <!-- file context is only available for the first message -->
+    <file-drop
+        v-if="igStore.feed.length === 0"
+        id="ig-prompt-file-drop"
+        v-model:current-file="currentFile"
+        placeholder="Click or drag here to add an image prompt"
+        accept="image/*"
+    />
+
     <label>
         <textarea
             ref="promptRef"
-            v-model="prompt"
+            v-model.trim="prompt"
             name="prompt"
             rows="1"
             placeholder="Describe or refine the image you want to generate"

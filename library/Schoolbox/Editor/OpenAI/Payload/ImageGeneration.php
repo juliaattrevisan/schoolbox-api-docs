@@ -20,6 +20,7 @@ class ImageGeneration
     private const PARTIAL_IMAGE_QTY = 3;
     private const IMAGE_OUTPUT_FORMAT = 'png';
     private const IMAGE_OUTPUT_QUALITY = 'low';
+    private const IMAGE_INPUT_DETAIL = 'auto';
 
 
     /**
@@ -74,6 +75,7 @@ class ImageGeneration
      *
      * @param string $userPrompt
      * @param array<string,?string> $userAttributes
+     * @param ?string $imageUrl
      * @param ?string $previousResponseId
      * @return string
      * @throws \JsonException
@@ -81,6 +83,7 @@ class ImageGeneration
     public function generate(
         string $userPrompt,
         array $userAttributes,
+        ?string $imageUrl = null,
         ?string $previousResponseId = null,
     ): string {
         $attributes = self::parseAttributes($userAttributes);
@@ -143,16 +146,24 @@ class ImageGeneration
             ];
         }
 
+        $userPrompt = [
+            ['type' => 'input_text', 'text' => trim($userPrompt), ],
+        ];
+
+        /* Did the user include an image as additional context? Add it to the prompt
+         * See https://platform.openai.com/docs/guides/images-vision#image-input-requirements
+         */
+        if (trim((string)$imageUrl) !== '') {
+            $userPrompt[] = [
+                'type' => 'input_image',
+                'image_url' => $imageUrl,
+                'detail' => self::IMAGE_INPUT_DETAIL,
+            ];
+        }
+
         $payload['input'][] = [
             'role' => 'user',
-            'content' => trim($userPrompt),
-            /* TODO: will need this in the future when we (optionally) pass thru images
-             * See https://platform.openai.com/docs/guides/images-vision#image-input-requirements
-             * 'content' => [
-             *     [ 'type' => 'input_text', 'text' => $userPrompt ],
-             *     [ 'type' => 'input_image', 'image_url' => '...', 'detail' => '???' ],
-             * ],
-             */
+            'content' => $userPrompt,
         ];
 
         /* If there is a previous response ID, add it to the payload

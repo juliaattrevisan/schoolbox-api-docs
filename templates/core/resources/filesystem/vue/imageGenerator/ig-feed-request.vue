@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import FileDrop from "@js/resource/file-drop.vue";
 import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
 import type { ImageRequest } from "./imageGeneratorTypes";
 
@@ -11,7 +12,15 @@ const props = defineProps<Props>();
 
 <template>
     <div class="ig-feed-request snow">
-        <p class="l-mar-s ig-feed-message-content">{{ props.message.prompt }}</p>
+        <div class="ig-feed-message-container l-mar-s">
+            <file-drop
+                v-if="props.message.file"
+                :id="`ig-message-file-drop-${props.message.entryKey}`"
+                :current-file="props.message.file"
+                disabled
+            />
+            <p class="ig-feed-message-content l-mar--0">{{ props.message.payload.userPrompt }}</p>
+        </div>
         <user-photo :user="props.message.user" render="xsmall" />
     </div>
 </template>
@@ -24,7 +33,7 @@ const props = defineProps<Props>();
     margin-left: 20%;
     width: 80%;
 
-    p {
+    .ig-feed-message-container {
         flex-grow: 1;
     }
 

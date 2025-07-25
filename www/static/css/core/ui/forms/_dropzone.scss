@@ -18,7 +18,8 @@ $attachzone-overlay-timing: cubic-bezier(0.2, 1, 0, 1);
 
 /* Special layout for our file uploader in Mr Matt's Modal
  */
-#filesystem-upload-panel #ab-upload {
+#filesystem-upload-panel #ab-upload,
+.ab-upload.ab-upload-panel {
     height: 100%;
 
     .dzone {
@@ -518,7 +519,8 @@ ul.az-error-list {
 }
 
 // Attach-browser upload
-#ab-upload {
+#ab-upload,
+.ab-upload {
     .dzone {
         display: flex;
         flex-wrap: wrap;
