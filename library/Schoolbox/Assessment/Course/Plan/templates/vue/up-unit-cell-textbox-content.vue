@@ -96,6 +96,7 @@ async function initEditor(): Promise<void> {
 
     // Avoid initialising the editor multiple times
     editorInitialised.value = true;
+
     await new Promise((resolve) => {
         useEditor(
             editorContent,
