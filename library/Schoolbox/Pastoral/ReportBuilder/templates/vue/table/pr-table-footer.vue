@@ -8,6 +8,25 @@ import type { Metadata } from "@js/util/sbx/apiUtils";
 const props = defineProps<{
     metadata: Metadata;
 }>();
+
+const emit = defineEmits<{
+    previous: [];
+    next: [];
+}>();
+
+/**
+ * Handles the previous button click
+ */
+function onPreviousSelected(): void {
+    emit("previous");
+}
+
+/**
+ * Handles the next button click
+ */
+function onNextSelected(): void {
+    emit("next");
+}
 </script>
 
 <template>
@@ -16,8 +35,8 @@ const props = defineProps<{
             <b>1-25 of {{ props.metadata.count }}</b>
         </p>
         <nav class="l-flex-row l-gap-s">
-            <button type="button">&lt;</button>
-            <button type="button">&gt;</button>
+            <button type="button" @click="onPreviousSelected">&lt;</button>
+            <button type="button" @click="onNextSelected">&gt;</button>
         </nav>
     </div>
 </template>
