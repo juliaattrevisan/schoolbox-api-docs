@@ -98,6 +98,7 @@ class Base
             'storage'          => $model->getStorage()
                 ? call_user_func($this->storageTranslator, $model->getStorage())
                 : null,
+            'currentState' => $model->getCurrentState(),
             'curriculumNodes' => $model->getViewableCurriculumNodes()
                 ? $model->getViewableCurriculumNodes()
                         ->map(

@@ -629,6 +629,7 @@ export default {
                                                     :alt="!evidence.object.creator.isDeleted ? 'View Profile' : null"
                                                 />
                                                 <p>{{ evidence.object.creator.fullName }}</p>
+
                                                 <time
                                                     class="pipe meta"
                                                     :datetime="formatDate(evidence.object.createdAt)"
@@ -645,6 +646,9 @@ export default {
                                                         )
                                                     }}</time
                                                 >
+                                                <template v-if="'published' != evidence.object.currentState">
+                                                    <p class="pipe meta">{{ evidence.object.currentState }}</p>
+                                                </template>
                                             </component>
                                         </div>
                                         <nav v-if="hasMenu(evidence.object)">
