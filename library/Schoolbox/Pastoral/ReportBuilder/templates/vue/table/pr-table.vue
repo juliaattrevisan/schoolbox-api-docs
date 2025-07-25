@@ -155,15 +155,8 @@ function onSortSelected(headerKey: string): void {
                     />
                 </tbody>
             </table>
-            <pr-table-footer />
+            <pr-table-footer :metadata="(payload as TablePayload).metadata" />
         </div>
-        <!-- Table metadata -->
-        <!-- <div class="pr-table-metadata">
-            <div class="pr-table-metadata__count">
-                Showing {{ (payload as TablePayload).data.rows.length }} of
-                {{ (payload as TablePayload).metadata.count }} records
-            </div>
-        </div> -->
     </template>
 </template>
 

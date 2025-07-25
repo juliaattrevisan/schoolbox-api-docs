@@ -1,4 +1,5 @@
 import type { User } from "@schoolboxLibrary/types/User";
+import type { Metadata } from "@js/util/sbx/apiUtils";
 
 /**
  * Pastoral report tab types
@@ -85,11 +86,5 @@ export type TablePayload = {
         totalRow: { [key: string]: RowOptions };
         rows: { [key: string]: RowOptions }[];
     };
-    metadata: {
-        count: number;
-        cursor: {
-            current: string | null;
-            next: string | null;
-        };
-    };
+    metadata: Metadata;
 };
