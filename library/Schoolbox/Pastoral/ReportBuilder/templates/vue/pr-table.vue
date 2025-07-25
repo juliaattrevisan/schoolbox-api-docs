@@ -25,7 +25,7 @@ const recordsOrPoints = defineModel<string>("records-or-points", { default: "rec
 const sortBy = window.Vue.ref<string>("user"); // the current sort by field - this should update when payload is loaded
 const sortOrder = window.Vue.ref<"asc" | "desc">("asc"); // the current sort order
 const currentEndpoint = window.Vue.ref("");
-const { isLoading, payload, isEmpty, loadError } = useLoadPrTable(currentEndpoint);
+const { isNewLoading, isSameLoading, payload, isEmpty, loadError } = useLoadPrTable(currentEndpoint);
 
 // #region scrollable height
 
@@ -97,7 +97,7 @@ function onSortSelected(headerKey: string): void {
 </script>
 
 <template>
-    <div v-if="isLoading" class="c-island l-pad-m" data-test="pr-table-loading">
+    <div v-if="isNewLoading" class="c-island l-pad-m" data-test="pr-table-loading">
         <div class="loader"></div>
     </div>
     <div v-else-if="loadError" class="c-island l-pad-m">
