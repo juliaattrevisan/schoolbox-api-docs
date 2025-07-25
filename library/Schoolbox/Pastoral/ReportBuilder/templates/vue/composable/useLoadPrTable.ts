@@ -62,7 +62,7 @@ export function useLoadPrTable(endpoint: Ref<string>): {
                 throw new Error(errorMessage);
             }
             const newPayload = (await response.json()) as TablePayload;
-            hasMoreRows.value = newPayload.data.rows.length >= MAX_ROWS;
+            hasMoreRows.value = newPayload.metadata.count >= MAX_ROWS;
             // check if the response does not have the expected structure
             if (newPayload === null || newPayload.data === undefined || !Array.isArray(newPayload.data.tableHeaders)) {
                 throw new Error("Unexpected response format");

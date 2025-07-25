@@ -93,6 +93,21 @@ function onSortSelected(headerKey: string): void {
     // or sort the existing data in payloadData
 }
 
+/**
+ * Handle previous page button click
+ */
+function onPrevious(): void {
+    // TODO: Implement previous page logic
+    // This should update the currentEndpoint with previous page parameters
+}
+
+/**
+ * Handle next page button click
+ */
+function onNext(): void {
+    currentEndpoint.value = `${props.selectedTab.endpoint}?selected=${recordsOrPoints.value}&cursor=${payload.value?.metadata.cursor.next}`;
+}
+
 // #endregion
 </script>
 
@@ -155,7 +170,12 @@ function onSortSelected(headerKey: string): void {
                     />
                 </tbody>
             </table>
-            <pr-table-footer v-if="hasMoreRows" :metadata="(payload as TablePayload).metadata" />
+            <pr-table-footer
+                v-if="hasMoreRows"
+                :metadata="(payload as TablePayload).metadata"
+                @previous="onPrevious"
+                @next="onNext"
+            />
         </div>
     </template>
 </template>
