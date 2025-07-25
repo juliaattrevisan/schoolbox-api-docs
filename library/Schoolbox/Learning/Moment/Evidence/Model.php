@@ -27,6 +27,7 @@ class Model implements ISoftDeletable, IThreadLocation
     use ModelTraits\UpdatedAtDate;
     use ModelTraits\DeletedAtDate;
 
+
     /**
      * The types of evidence
      */
@@ -35,6 +36,17 @@ class Model implements ISoftDeletable, IThreadLocation
     public const MOMENT_TYPE_PHOTO  = 'photo';
     public const MOMENT_TYPE_AUDIO  = 'audio';
     public const MOMENT_TYPE_VIDEO  = 'video';
+
+
+    /**
+     * Find the current state of a learning moment
+     * "draft" is inferred if none of the others are applicable.
+     */
+    public const STATUS_DRAFT = 'draft';
+    public const STATUS_SUBMITTED = 'submitted';
+    public const STATUS_PUBLISHED = 'published';
+    public const STATUS_REJECTED = 'rejected';
+
 
     /**
      * The file content (if any) that was uploaded to the learning moment.
@@ -367,6 +379,11 @@ class Model implements ISoftDeletable, IThreadLocation
             $this->setPublishedAt(\Alaress_Date_Format::now());
         }
 
+        /* Clear submission date once published
+         */
+        $this->submittedAt = null;
+        $this->submittedBy = null;
+
         // Treat as never being rejected
         $this->rejectedAt = null;
         $this->rejectedBy = null;
@@ -433,15 +450,36 @@ class Model implements ISoftDeletable, IThreadLocation
      */
     public function isPublished(): bool
     {
-        /* Arguably submittedAt and submittedBy could/should(?) be null, but then
-         * you'd lose info about when a student submitted a thing. Does it matter?
-         */
-        return $this->getSubmittedAt() !== null &&
-            $this->getSubmittedBy() !== null &&
+        return $this->getSubmittedAt() === null &&
+            $this->getSubmittedBy() === null &&
             $this->getPublishedAt() !== null &&
             $this->getPublishedBy() !== null &&
             $this->getRejectedAt() === null &&
             $this->getRejectedBy() === null;
+    }
+
+
+    /**
+     * Return the current state of a learning moment, defaulting to Draft
+     * if it isn't submitted/published/rejected
+     *
+     * @return string
+     */
+    public function getCurrentState(): string
+    {
+        if ($this->isPublished()) {
+            return self::STATUS_PUBLISHED;
+        }
+
+        if ($this->isSubmitted()) {
+            return self::STATUS_SUBMITTED;
+        }
+
+        if ($this->isRejected()) {
+            return self::STATUS_REJECTED;
+        }
+
+        return self::STATUS_DRAFT;
     }
 
 

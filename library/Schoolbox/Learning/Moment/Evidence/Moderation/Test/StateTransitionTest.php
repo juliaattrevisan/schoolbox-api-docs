@@ -17,12 +17,55 @@ namespace Schoolbox\Learning\Moment\Evidence\Moderation\Test;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Schoolbox\Learning\Moment\Evidence\Model;
+use Schoolbox\User;
 
 /**
- * Validation test
+ * State Transition tests
  */
 class StateTransitionTest extends TestCase
 {
+    /**
+     * @param mixed $moment
+     * @param mixed $expected
+     */
+    #[DataProvider('providerCurrentState')]
+    public function testCurrentState($moment, $expected)
+    {
+        $this->assertEquals($moment->getCurrentState(), $expected);
+    }
+
+
+    /**
+     * Data provider for testCurrentState
+     *
+     * @return array
+     */
+    public static function providerCurrentState(): array
+    {
+        $effector = (new User())->setId(1);
+
+        return [
+            'Submitted' => [
+                (new Model())->submit($effector),
+                Model::STATUS_SUBMITTED
+            ],
+            'Published' => [
+                (new Model())->publish($effector),
+                Model::STATUS_PUBLISHED
+            ],
+            'Rejected' => [
+                (new Model())->reject($effector),
+                Model::STATUS_REJECTED
+            ],
+            'Draft' => [
+                (new Model()),
+                Model::STATUS_DRAFT
+            ],
+        ];
+    }
+
+
     /**
      * @param mixed $moment
      */
@@ -57,8 +100,8 @@ class StateTransitionTest extends TestCase
         $this->assertEquals(true, $moment->isPublished());
         $this->assertEquals(false, $moment->isRejected());
 
-        $this->assertEquals('2025-07-20 11:22:33', $moment->getSubmittedAt()?->getDatabase());
-        $this->assertEquals($jana->getId(), $moment->getSubmittedBy()?->getId());
+        $this->assertEquals(null, $moment->getSubmittedAt()?->getDatabase());
+        $this->assertEquals(null, $moment->getSubmittedBy()?->getId());
         $this->assertEquals('2025-07-21 22:33:44', $moment->getPublishedAt()?->getDatabase());
         $this->assertEquals($coles->getId(), $moment->getPublishedBy()?->getId());
         $this->assertEquals(null, $moment->getRejectedAt());
@@ -102,8 +145,8 @@ class StateTransitionTest extends TestCase
         $this->assertEquals(true, $moment->isPublished());
         $this->assertEquals(false, $moment->isRejected());
 
-        $this->assertEquals('2025-07-24 01:02:09', $moment->getSubmittedAt()?->getDatabase());
-        $this->assertEquals($jana->getId(), $moment->getSubmittedBy()?->getId());
+        $this->assertEquals(null, $moment->getSubmittedAt()?->getDatabase());
+        $this->assertEquals(null, $moment->getSubmittedBy()?->getId());
         $this->assertEquals('2025-07-24 13:13:13', $moment->getPublishedAt()?->getDatabase());
         $this->assertEquals($jenni->getId(), $moment->getPublishedBy()?->getId());
         $this->assertEquals(null, $moment->getRejectedAt());
