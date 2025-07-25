@@ -92,7 +92,7 @@ if ($_SESSION['communityLogin'] ?? false) {
     preg_match('/id="__EVENTVALIDATION" value="(.*?)"/', $login, $eventValidation);
     preg_match('/id="__VIEWSTATEGENERATOR" value="(.*?)"/', $login, $viewStateGenerator);
     preg_match('/id="__VIEWSTATEENCRYPTED" value="(.*?)"/', $login, $viewStateEncrypted);
-    preg_match('/name="__RequestVerificationToken" value="(.*?)"/', $login, $requestVerificationToken); // the AntiForgeryToken check was added in CommPortal version 71.62
+    preg_match('/name="__RequestVerificationToken" type="hidden" value="(.*?)"/', $login, $requestVerificationToken); // the AntiForgeryToken check was added in CommPortal version 71.62
     preg_match('/name="(.*?)" value="Login"/', $login, $loginButton);
     preg_match('/name="(.*?)" type="text"/', $login, $loginUsername);
     preg_match('/name="(.*?)" type="password"/', $login, $loginPassword);
@@ -108,6 +108,12 @@ if ($_SESSION['communityLogin'] ?? false) {
          */
         $page->localRedir($url);
     }
+
+    // if request verify token found, set that as a cookie... for the $url
+    if (!empty($requestVerificationToken[1])) {
+        setcookie('__RequestVerificationToken', $requestVerificationToken[1], domain: $url->getHost(), secure: true, httponly: true);
+    }
+
 
     $password = $_SESSION['password'];
     $formArray['__VIEWSTATE'] = $viewState[1] ?? '';
