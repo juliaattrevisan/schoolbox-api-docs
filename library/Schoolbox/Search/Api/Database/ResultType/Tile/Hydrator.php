@@ -137,8 +137,8 @@ class Hydrator extends BaseHydrator
             // Note Component_Config_ShowComponentTitle is poorly named.  The UI makes clear that this option applies
             // only to read-only users.  To confirm, go to a homepage, and edit the configuration of a tile component.
             // The checkbox label is 'Show Title to Read-Only Users'.
-            $componentIsCollapsed = boolval($componentConfig[Component_Config_Collapse::KEY] ?? 0); // Default is not collapsed.
-            $showTitleToReadOnlyUsers = boolval($componentConfig[Component_Config_ShowComponentTitle::KEY] ?? 1); // Default is to show title.
+            $componentIsCollapsed = (bool)($componentConfig[Component_Config_Collapse::KEY] ?? 0); // Default is not collapsed.
+            $showTitleToReadOnlyUsers = (bool)($componentConfig[Component_Config_ShowComponentTitle::KEY] ?? 1); // Default is to show title.
 
             // Tiles that have been hidden to read-only users (by having title hidden and body collapsed)
             // should appear in search results only for users with write access.
