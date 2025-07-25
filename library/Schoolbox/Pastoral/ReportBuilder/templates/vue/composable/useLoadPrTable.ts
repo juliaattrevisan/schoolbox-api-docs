@@ -8,6 +8,8 @@ import { isNewUrl } from "@js/util/queryUtils";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import type { TablePayload } from "../../js/types/pastoralReportTypes";
 
+const MAX_ROWS = 20; // Maximum number of rows to display in the table
+
 /**
  * load the pastoral report table data from the given endpoint.
  * @param endpoint - the endpoint to load the table data
@@ -17,6 +19,7 @@ export function useLoadPrTable(endpoint: Ref<string>): {
     isNewLoading: Ref<boolean>;
     isSameLoading: Ref<boolean>;
     payload: Ref<TablePayload | null>;
+    hasMoreRows: Ref<boolean>;
     isEmpty: Ref<boolean>;
     loadError: Ref<string | null>;
 } {
@@ -24,6 +27,7 @@ export function useLoadPrTable(endpoint: Ref<string>): {
     const isNewLoading = window.Vue.ref(false); // to notify when a new table is being loaded
     const isSameLoading = window.Vue.ref(false); // to notify when the data linked to the same table is being loaded
     const payload = window.Vue.ref<TablePayload | null>(null); // to store the payload that matches the current query
+    const hasMoreRows = window.Vue.ref(false); // to indicate if there are more rows to load
     const isEmpty = window.Vue.computed(() => payload.value === null && !isNewLoading.value); // To show that no payload match the current report table
     const loadError = window.Vue.ref<string | null>(null); // to store any error that occurs during the load
     let controller: AbortController; // to allow aborting the previous search if a new one is started
@@ -57,16 +61,13 @@ export function useLoadPrTable(endpoint: Ref<string>): {
                 const errorMessage = await extractErrorMessage(response);
                 throw new Error(errorMessage);
             }
-            const responseJson = (await response.json()) as TablePayload;
+            const newPayload = (await response.json()) as TablePayload;
+            hasMoreRows.value = newPayload.data.rows.length >= MAX_ROWS;
             // check if the response does not have the expected structure
-            if (
-                responseJson === null ||
-                responseJson.data === undefined ||
-                !Array.isArray(responseJson.data.tableHeaders)
-            ) {
+            if (newPayload === null || newPayload.data === undefined || !Array.isArray(newPayload.data.tableHeaders)) {
                 throw new Error("Unexpected response format");
             }
-            payload.value = responseJson;
+            payload.value = newPayload;
         } catch (error) {
             // ignore abort errors, as the previous request was cancelled
             if (isAbortError(error)) {
@@ -100,6 +101,7 @@ export function useLoadPrTable(endpoint: Ref<string>): {
         isNewLoading,
         isSameLoading,
         payload,
+        hasMoreRows,
         isEmpty,
         loadError,
     };
