@@ -4,10 +4,11 @@
  */
 
 import type { Metadata } from "@js/util/sbx/apiUtils";
+import type { LoadStatus } from "../composable/useLoadPrTable";
 
 const props = defineProps<{
     metadata: Metadata;
-    hasMoreRows: boolean;
+    loadStatus: LoadStatus;
 }>();
 
 const emit = defineEmits<{
@@ -33,11 +34,25 @@ function onNextSelected(): void {
 <template>
     <div class="pr-table-footer l-flex-row l-flex--align-center l-flex--justify-end l-gap-m l-pad-m">
         <p class="f-no-margins">
-            <b>1-25 of {{ props.metadata.count }}</b>
+            <b
+                >{{ (props.loadStatus.loadIndex - 1) * props.loadStatus.maxRows + 1 }}-{{
+                    Math.min(props.loadStatus.loadIndex * props.loadStatus.maxRows, props.metadata.count)
+                }}
+                of {{ props.metadata.count }}</b
+            >
         </p>
-        <nav v-if="props.hasMoreRows" class="l-flex-row l-gap-s">
-            <button type="button" @click="onPreviousSelected">&lt;</button>
-            <button type="button" @click="onNextSelected">&gt;</button>
+        <nav v-if="props.loadStatus.hasMoreRows" class="l-flex-row l-gap-s">
+            <button v-if="props.loadStatus.loadIndex > 1" type="button" title="Previous" @click="onPreviousSelected">
+                &lt;
+            </button>
+            <button
+                v-if="props.loadStatus.loadIndex < props.loadStatus.maxLoads"
+                type="button"
+                title="Next"
+                @click="onNextSelected"
+            >
+                &gt;
+            </button>
         </nav>
     </div>
 </template>

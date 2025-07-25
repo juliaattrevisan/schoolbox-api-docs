@@ -25,7 +25,7 @@ const recordsOrPoints = defineModel<"records" | "points">("records-or-points", {
 const sortBy = window.Vue.ref<string>("user"); // the current sort by field - this should update when payload is loaded
 const sortOrder = window.Vue.ref<"asc" | "desc">("asc"); // the current sort order
 const currentEndpoint = window.Vue.ref("");
-const { isNewLoading, isSameLoading, payload, hasMoreRows, isEmpty, loadError } = useLoadPrTable(currentEndpoint);
+const { isNewLoading, isSameLoading, payload, loadStatus, isEmpty, loadError } = useLoadPrTable(currentEndpoint);
 
 // #region scrollable height
 
@@ -171,7 +171,7 @@ function onNext(): void {
             </table>
             <pr-table-footer
                 :metadata="(payload as TablePayload).metadata"
-                :has-more-rows="hasMoreRows"
+                :load-status="loadStatus"
                 @previous="onPrevious"
                 @next="onNext"
             />
