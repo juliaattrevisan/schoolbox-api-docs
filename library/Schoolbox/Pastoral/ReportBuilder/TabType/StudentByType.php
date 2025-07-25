@@ -27,7 +27,7 @@ class StudentByType extends Cursor implements TabTypeInterface
         $label = "count_{$type}_{$value}";
         $this->params[$label] = $label;
 
-        return match(strtolower($resultType)) {
+        return match (strtolower($resultType)) {
             Cursor::RESULT_TYPE_RECORDS =>
             "ROUND(COUNT(CASE WHEN p.{$type}_id = {$value} THEN 1 END), 2) AS :{$label}",
             Cursor::RESULT_TYPE_POINTS =>
