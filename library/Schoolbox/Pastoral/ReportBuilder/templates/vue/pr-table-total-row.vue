@@ -31,7 +31,10 @@ const props = defineProps<Props>();
                 <Transition name="fade" mode="out-in">
                     <span :key="`${props.recordsOrPoints}-${header.key}`">
                         <template v-if="props.recordsOrPoints === 'records'">
-                            {{ (props.rowData[header.key] as RecordsAndPoints).records }}
+                            <!-- Only show records if they're above 0 -->
+                            <template v-if="(props.rowData[header.key] as RecordsAndPoints)?.records! > 0">
+                                {{ (props.rowData[header.key] as RecordsAndPoints).records }}
+                            </template>
                         </template>
                         <template v-else>
                             {{ (props.rowData[header.key] as RecordsAndPoints).points }}

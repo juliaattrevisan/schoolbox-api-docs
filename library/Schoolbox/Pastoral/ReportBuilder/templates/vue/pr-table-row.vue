@@ -67,10 +67,14 @@ function isUser(data: RowOptions): data is User {
                 <Transition name="fade" mode="out-in">
                     <span :key="`${props.recordsOrPoints}-${header.key}`">
                         <template v-if="props.recordsOrPoints === 'records'">
-                            {{ (props.rowData[header.key] as RecordsAndPoints).records }}
+                            <template v-if="(props.rowData[header.key] as RecordsAndPoints)?.records! > 0">
+                                {{ (props.rowData[header.key] as RecordsAndPoints).records }}
+                            </template>
                         </template>
                         <template v-else>
-                            {{ (props.rowData[header.key] as RecordsAndPoints).points }}
+                            <template v-if="props.rowData[header.key]">
+                                {{ (props.rowData[header.key] as RecordsAndPoints).points }}
+                            </template>
                         </template>
                     </span>
                 </Transition>
