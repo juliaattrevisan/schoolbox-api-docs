@@ -132,7 +132,14 @@ function onSortSelected(headerKey: string): void {
                     :sort-order="sortOrder"
                     @sort="onSortSelected"
                 />
-                <tbody>
+                <tbody v-if="isSameLoading">
+                    <tr>
+                        <td colspan="100%">
+                            <div class="loader"></div>
+                        </td>
+                    </tr>
+                </tbody>
+                <tbody v-else>
                     <!-- Total row -->
                     <pr-table-total-row
                         :headers="(payload as TablePayload).data.tableHeaders"

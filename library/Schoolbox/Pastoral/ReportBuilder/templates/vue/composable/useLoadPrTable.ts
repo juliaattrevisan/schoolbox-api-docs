@@ -4,6 +4,7 @@
 
 import type { Ref } from "vue";
 import { isAbortError, hasErrorMessage } from "@js/util/errorUtils";
+import { isNewUrl } from "@js/util/queryUtils";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import type { TablePayload } from "../../js/types/pastoralReportTypes";
 
@@ -19,6 +20,7 @@ export function useLoadPrTable(endpoint: Ref<string>): {
     isEmpty: Ref<boolean>;
     loadError: Ref<string | null>;
 } {
+    const isNewLoad = window.Vue.ref(false); // to distinguish between loading a new table and loading data for the same table
     const isNewLoading = window.Vue.ref(false); // to notify when a new table is being loaded
     const isSameLoading = window.Vue.ref(false); // to notify when the data linked to the same table is being loaded
     const payload = window.Vue.ref<TablePayload | null>(null); // to store the payload that matches the current query
@@ -31,11 +33,17 @@ export function useLoadPrTable(endpoint: Ref<string>): {
      */
     async function load(): Promise<void> {
         // abort the previous search if it's still running
-        if (isNewLoading.value) {
+        if (isNewLoading.value || isSameLoading.value) {
             controller.abort();
         }
         try {
-            isNewLoading.value = true;
+            // to distinguish between loading a new table and loading data for the same table
+            // so the entire table doesn't need to be re-rendered to just load new rows
+            if (isNewLoad.value) {
+                isNewLoading.value = true;
+            } else {
+                isSameLoading.value = true;
+            }
             loadError.value = null;
             controller = new AbortController();
             const response = await fetch(endpoint.value, {
@@ -69,15 +77,21 @@ export function useLoadPrTable(endpoint: Ref<string>): {
             }
             console.error(error);
         } finally {
-            isNewLoading.value = false;
+            if (isNewLoad.value) {
+                isNewLoading.value = false;
+            } else {
+                isSameLoading.value = false;
+            }
         }
     }
 
     /**
-     * when the endpoint changes trigger a new load
+     * when the endpoint to trigger load changes provided the endpoint is not empty
+     * and the new endpoint is different from the old one, load the data
      */
-    window.Vue.watch(endpoint, () => {
-        if (endpoint.value !== "") {
+    window.Vue.watch(endpoint, (newEndpoint, oldEndpoint) => {
+        if (endpoint.value !== "" && newEndpoint !== oldEndpoint) {
+            isNewLoad.value = isNewUrl(oldEndpoint, newEndpoint);
             void load();
         }
     });
