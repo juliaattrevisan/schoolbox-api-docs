@@ -444,6 +444,9 @@ class Controller extends Base
         $limit = $this->requestQuery->getInt('limit', Cursor::LIMIT_DEFAULT);
         $encodedCursor = $this->requestQuery->get('cursor');
         $resultType = $this->requestQuery->get('selected');
+        $sortBy = $this->requestQuery->get('sortBy', 'name');
+        $order = $this->requestQuery->get('order', 'ASC');
+
         try {
             $factory = (new Factory(
                 $this->userTranslator,
