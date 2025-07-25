@@ -112,7 +112,7 @@ class IndexBuilder extends BaseBuilder
         // * Tiles without a title should not appear in search results (AC for SA-8841)
         // * Only tiles in homepages should be included in the index (not dashboards, not templates)
         // * Tiles only in deleted folders should not be indexed
-        // * Check the related query in buildDeletes() after making changes to this query.
+        // * Check the related code in buildDeletes() after making changes to this query.
         $queryString = "
             SELECT
             CONCAT(t.id, '-', ci.id, '-', f.id) AS id,
