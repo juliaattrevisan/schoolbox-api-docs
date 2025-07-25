@@ -20,7 +20,7 @@ const props = defineProps<{
     localePastoral: string;
 }>();
 
-const recordsOrPoints = defineModel<string>("records-or-points", { default: "Records" });
+const recordsOrPoints = defineModel<string>("records-or-points", { default: "records" });
 
 const sortBy = window.Vue.ref<string>("user"); // the current sort by field - this should update when payload is loaded
 const sortOrder = window.Vue.ref<"asc" | "desc">("asc"); // the current sort order
@@ -49,7 +49,7 @@ window.Vue.onMounted(() => {
         setScrollableHeight();
     });
     // Set initial endpoint based on selected tab, which will trigger the load in useLoadPrTable
-    currentEndpoint.value = props.selectedTab.endpoint;
+    currentEndpoint.value = `${props.selectedTab.endpoint}?selected=${recordsOrPoints.value}`;
 });
 
 // #endregion

@@ -66,7 +66,7 @@ function isUser(data: RowOptions): data is User {
                 <!-- Change data based on current radio button selection -->
                 <Transition name="fade" mode="out-in">
                     <span :key="`${props.recordsOrPoints}-${header.key}`">
-                        <template v-if="props.recordsOrPoints === 'Records'">
+                        <template v-if="props.recordsOrPoints === 'records'">
                             {{ (props.rowData[header.key] as RecordsAndPoints).records }}
                         </template>
                         <template v-else>
