@@ -18,21 +18,3 @@ export function getReturnUrl(url?: string | undefined): string {
 
     return returnUrl;
 }
-
-/**
- * Checks if a URL is new by comparing the pathname and hash, ignoring query parameters
- * @param oldUrl - The original URL to compare
- * @param newUrl - The new URL to compare
- * @returns - True if the URLs are different, false if they are the same
- */
-export function isNewUrl(oldUrl: string, newUrl: string): boolean {
-    try {
-        const oldUrlObj = new URL(oldUrl, window.location.origin);
-        const newUrlObj = new URL(newUrl, window.location.origin);
-        // Compare pathname and hash, ignoring search parameters
-        return oldUrlObj.pathname !== newUrlObj.pathname || oldUrlObj.hash !== newUrlObj.hash;
-    } catch {
-        // If URL parsing fails, consider them different
-        return true;
-    }
-}
