@@ -417,7 +417,7 @@ function getCustomisationLabel(plan: Plan | CustomisedPlan): string {
                                             class="icon-list"
                                             @click.prevent="openIncludeModal(participant)"
                                         >
-                                            Include In Existing Customisation
+                                            Include in Existing Customisation
                                         </button>
                                     </li>
                                     <li class="separator">Create</li>
@@ -470,7 +470,7 @@ function getCustomisationLabel(plan: Plan | CustomisedPlan): string {
                     </div>
                     <div v-if="customisations.length > 0" class="l-flex__item--1-auto">
                         <button class="icon-list submit" @click.prevent="isIncludeOpen = true">
-                            Include In Existing Customisation
+                            Include in Existing Customisation
                         </button>
                     </div>
                     <div class="l-flex__item--1-auto">
