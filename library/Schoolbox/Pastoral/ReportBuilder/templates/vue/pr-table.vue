@@ -66,6 +66,15 @@ window.Vue.watch(
     },
 );
 
+// #region reload data
+
+/**
+ * Load the row data again when the recordsOrPoints changes
+ */
+window.Vue.watch(recordsOrPoints, () => {
+    currentEndpoint.value = `${props.selectedTab.endpoint}?selected=${recordsOrPoints.value}`;
+});
+
 /**
  * Handle sort button click
  * @param headerKey - the key of the header that was clicked for sorting
@@ -83,6 +92,8 @@ function onSortSelected(headerKey: string): void {
     // This could trigger a new data load with sorting parameters
     // or sort the existing data in payloadData
 }
+
+// #endregion
 </script>
 
 <template>
