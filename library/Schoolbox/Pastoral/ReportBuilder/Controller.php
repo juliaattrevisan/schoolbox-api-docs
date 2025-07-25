@@ -445,7 +445,7 @@ class Controller extends Base
         $encodedCursor = $this->requestQuery->get('cursor');
         $resultType = $this->requestQuery->get('selected');
         $sortBy = $this->requestQuery->get('sortBy', Cursor::SORT_BY_DEFAULT);
-        $order = $this->requestQuery->get('order', Cursor::ORDER_DEFAULT);
+        $order = $this->requestQuery->get('order', Cursor::ORDER_DIRECTION_DEFAULT);
 
         try {
             $factory = (new Factory(

@@ -78,8 +78,6 @@ class StudentByType extends Cursor implements TabTypeInterface
 
         $whereTypeSubTypeQuery = implode(" OR ", $whereInTypeSubTypeQuery);
 
-        $orderBy = "u.lastname, COALESCE(u.preferred_name, u.firstname)";
-
         $whereQuery = implode(" AND ", $this->helper->getFilters());
 
         $countQuery =
@@ -124,14 +122,21 @@ class StudentByType extends Cursor implements TabTypeInterface
          */
         $whereParts = "";
         $this->params['limit'] = $this->limit;
+        $groupBy = "u.lastname, COALESCE(u.preferred_name, u.firstname)";
+        $orderBy = "u.lastname {$this->order}, COALESCE(u.preferred_name, u.firstname) {$this->order}";
+
         if (isset($cursor)) {
             /* TODO default to ordering by name in ascending order, will update in SA-20574 when implementing sorting
              */
+            $sortingOperator = $this->order == Cursor::ORDER_DIRECTION_DEFAULT ? ' >= ' : ' <= ';
             $whereParts = "
-                CROSS JOIN (SELECT lastname, COALESCE(preferred_name, firstname) as preferred_name
+                CROSS JOIN (SELECT id, lastname, COALESCE(preferred_name, firstname) as preferred_name
                 FROM user
                 WHERE id = :cursor) u2
-                WHERE u.lastname > u2.lastname OR (u.lastname > u2.lastname AND COALESCE(u.preferred_name, u.firstname) > u2.preferred_name)
+                WHERE (
+                    u.lastname {$sortingOperator} u2.lastname OR
+                    (u.lastname {$sortingOperator} u2.lastname AND COALESCE(u.preferred_name, u.firstname) {$sortingOperator} u2.preferred_name) AND
+                    u.id <> u2.id)
             ";
             $this->params['cursor'] = $cursor['id'];
         }
@@ -141,8 +146,8 @@ class StudentByType extends Cursor implements TabTypeInterface
             FROM ($countQuery) countData
             INNER JOIN user u ON countData.student_id = u.id
             {$whereParts}
-            GROUP BY countData.student_id, {$orderBy}
-            ORDER BY {$orderBy} ASC
+            GROUP BY countData.student_id, {$groupBy}
+            ORDER BY {$orderBy}
             LIMIT :limit
         ";
 
