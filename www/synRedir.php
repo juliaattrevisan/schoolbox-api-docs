@@ -109,9 +109,13 @@ if ($_SESSION['communityLogin'] ?? false) {
         $page->localRedir($url);
     }
 
-    // if request verify token found, set that as a cookie... for the $url
+    // CommPortal (71.62) changed the login form, which breaks this CSRF hack. check for this
     if (!empty($requestVerificationToken[1])) {
-        setcookie('__RequestVerificationToken', $requestVerificationToken[1], domain: $url->getHost(), secure: true, httponly: true);
+    /* if request verify token found, redirect to the login page, we can't handle this
+     * as it requires a cookie to be set on the $url which then matches to the form entry
+     * and browsers won't allow us to set a cookie on a different domain.
+     */
+        $page->localRedir($url);
     }
 
 
@@ -123,7 +127,6 @@ if ($_SESSION['communityLogin'] ?? false) {
     $formArray['__LASTFOCUS'] = '';
     $formArray['__VIEWSTATEGENERATOR'] = $viewStateGenerator[1] ?? '';
     $formArray['__VIEWSTATEENCRYPTED'] = $viewStateEncrypted[1] ?? '';
-    $formArray['__RequestVerificationToken'] = $requestVerificationToken[1] ?? ''; // the AntiForgeryToken check was added in CommPortal version 71.62
     $formArray[$loginButton[1]] = 'Login';
     $formArray[$loginUsername[1]] = $user->getUsername();
     $formArray[$loginPassword[1]] = $password;
