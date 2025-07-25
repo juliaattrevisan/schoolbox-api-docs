@@ -9,6 +9,33 @@ use Schoolbox\Pastoral\Type\Model as Type;
 
 class StudentByType extends Cursor implements TabTypeInterface
 {
+    private array $params = [];
+
+    /**
+     * Get the select string for the counts
+     *
+     * @param string $resultType
+     * @param int    $value
+     * @param bool   $isSubtype
+     * @return string
+     * @throws \Exception
+     */
+    private function getSelectCountString(string $resultType, int $value, bool $isSubtype = false): string
+    {
+        $type = $isSubtype ? 'subtype' : 'type';
+
+        $label = "count_{$type}_{$value}";
+        $this->params[$label] = $label;
+
+        return match(strtolower($resultType)) {
+            Cursor::RESULT_TYPE_RECORDS =>
+            "ROUND(COUNT(CASE WHEN p.{$type}_id = {$value} THEN 1 END), 2) AS :{$label}",
+            Cursor::RESULT_TYPE_POINTS =>
+            "ROUND(SUM(CASE WHEN p.{$type}_id = {$value} THEN p.points END), 2) AS :{$label}",
+            default => throw new \Exception("Unknown result type: '{$resultType}'"),
+        };
+    }
+
     /**
      * @inheritdoc
      */
@@ -29,9 +56,7 @@ class StudentByType extends Cursor implements TabTypeInterface
             $countTypeQuery = implode(
                 ', ',
                 $whereTypes->map(
-                    fn(Type $type) => ($this->resultType == Cursor::RESULT_TYPE_RECORDS) ?
-                        "ROUND(COUNT(CASE WHEN p.type_id = {$type->getId()} THEN 1 END), 2) AS count_type_{$type->getId()}" :
-                        "ROUND(SUM(CASE WHEN p.type_id = {$type->getId()} THEN p.points END), 2) AS count_type_{$type->getId()}"
+                    fn(Type $type) => $this->getSelectCountString($this->resultType, $type->getId())
                 )->getAll()
             );
             $whereInTypeSubTypeQuery[] = "p.type_id IN ({$whereTypeIds})";
@@ -43,9 +68,7 @@ class StudentByType extends Cursor implements TabTypeInterface
             $countSubTypeQuery = implode(
                 ', ',
                 $this->helper->getSubTypes()->map(
-                    fn(SubType $subType) => ($this->resultType == Cursor::RESULT_TYPE_RECORDS) ?
-                        "ROUND(COUNT(CASE WHEN p.subtype_id = {$subType->getId()} THEN 1 END), 2) AS count_subtype_{$subType->getId()}" :
-                        "ROUND(SUM(CASE WHEN p.subtype_id = {$subType->getId()} THEN p.points END), 2) AS count_subtype_{$subType->getId()}"
+                    fn(SubType $subType) => $this->getSelectCountString($this->resultType, $subType->getId(), true)
                 )->getAll()
             );
             $whereInTypeSubTypeQuery[] = "p.subtype_id IN ({$whereSubTypeIds})";
@@ -89,15 +112,17 @@ class StudentByType extends Cursor implements TabTypeInterface
          * Finding out where to locate the position where the cursor is pointing
          */
         $whereParts = "";
+        $this->params['limit'] = $this->limit;
         if (isset($cursor)) {
             /* TODO default to ordering by name in ascending order, will update in SA-20574 when implementing sorting
              */
             $whereParts = "
                 CROSS JOIN (SELECT lastname, COALESCE(preferred_name, firstname) as preferred_name
                 FROM user
-                WHERE id = {$cursor['id']}) u2
+                WHERE id = :cursor) u2
                 WHERE u.lastname > u2.lastname OR (u.lastname > u2.lastname AND COALESCE(u.preferred_name, u.firstname) > u2.preferred_name)
             ";
+            $this->params['cursor'] = $cursor['id'];
         }
 
         $totalQuery = "
@@ -113,9 +138,7 @@ class StudentByType extends Cursor implements TabTypeInterface
         $result =  $db->executeQuery(
             $totalQuery,
             array_merge(
-                [
-                    'limit' => $this->limit,
-                ],
+                $this->params,
                 $this->helper->getParams()
             )
         );
@@ -251,7 +274,7 @@ class StudentByType extends Cursor implements TabTypeInterface
                 function (array $record) use ($students) {
                     $row['user'] = call_user_func($this->userTranslator, $students->getBy('id', $record['student_id']));
                     unset($record['student_id']);
-                    return array_merge($row, array_map(fn($value) => ['records' => floatval($value)], ($record)));
+                    return array_merge($row, array_map(fn($value) => [ $this->resultType => floatval($value)], ($record)));
                 }
             );
         }
