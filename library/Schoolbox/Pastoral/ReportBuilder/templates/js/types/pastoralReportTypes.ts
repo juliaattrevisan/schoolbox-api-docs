@@ -69,7 +69,7 @@ export type TableHeader = {
  * Displays either records or points in the table cell
  * depending on the current selection - never both at the same time
  */
-export type RecordsAndPoints = { records: number; points?: never } | { records?: never; points: number };
+export type RecordsAndPoints = { records: number; points?: never } | { records?: never; points: number | null };
 
 /**
  * The options for a row in the Pastoral Report Table.
