@@ -1,0 +1,18 @@
+# docker-compose.yaml override, for when using a local taskd build.
+
+include:
+  - dev.docker-compose.yaml
+
+services:
+  # Local taskd definition:
+  # must assume that taskd is in a sibling folder named `taskd`
+  schoolbox-taskd:
+    container_name: schoolbox-taskd
+    depends_on:
+      redis-storage:
+        condition: service_healthy
+    build:
+      context: ../../taskd
+    env_file:
+      - path: ./schoolbox-taskd/default.env
+        required: true
