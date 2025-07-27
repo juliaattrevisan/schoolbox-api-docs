@@ -93,11 +93,15 @@ function onSortSelected(headerKey: string): void {
     // or sort the existing data in payloadData
 }
 
+const cursorList = window.Vue.ref<string[]>([""]); // Array to store cursors for pagination
+const cursorIndex = window.Vue.ref<number>(0); // Current index in the cursor list
+
 /**
  * Handle previous page button click
  */
 function onPrevious(): void {
-    currentEndpoint.value = `${props.selectedTab.endpoint}?selected=${recordsOrPoints.value}`;
+    cursorIndex.value -= 1;
+    currentEndpoint.value = `${props.selectedTab.endpoint}?selected=${recordsOrPoints.value}&cursor=${cursorList.value[cursorIndex.value]}`;
     // need an array to store the cursor
     // when the first item (the start of the payload) the cursor should be empty
     // items after the previous will be the stored .next cursor
@@ -109,7 +113,9 @@ function onPrevious(): void {
  * Handle next page button click
  */
 function onNext(): void {
-    currentEndpoint.value = `${props.selectedTab.endpoint}?selected=${recordsOrPoints.value}&cursor=${payload.value?.metadata.cursor.next}`;
+    cursorIndex.value += 1;
+    cursorList.value.push(payload.value?.metadata.cursor.next || "");
+    currentEndpoint.value = `${props.selectedTab.endpoint}?selected=${recordsOrPoints.value}&cursor=${cursorList.value[cursorIndex.value]}`;
     // need an array to store the cursor
     // if there's no cursor in the array, can use metadata.cursor.next to load, otherwise use the stored cursor
 }
