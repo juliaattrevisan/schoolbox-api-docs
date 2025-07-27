@@ -199,8 +199,9 @@ services:
         condition: service_healthy
     build:
       context: ./schoolbox-taskd
-    environment:
-      REDIS_HOST: redis-storage
+    env_file:
+      - path: ./schoolbox-taskd/default.env
+        required: true
 
   schoolbox-gotenberg:
     container_name: schoolbox-gotenberg
