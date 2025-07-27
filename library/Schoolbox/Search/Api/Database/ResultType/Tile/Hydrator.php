@@ -193,8 +193,17 @@ class Hydrator extends BaseHydrator
     }
 
     /**
+     * Return an array containing config key:value pairs, for each component instance, indexed by componentInstanceId.
+     * E.g.
+     * [
+     *     3823 => [
+     *         'collapse' => '0',
+     *         'showComponentTitle' => '1'
+     *     ],
+     *     ...
+     * ]
      * @param array $componentInstanceIds
-     * @return array
+     * @return array<int, array<string, string>>
      */
     private function getConfigByComponentInstanceId(array $componentInstanceIds): array
     {
